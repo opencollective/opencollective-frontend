@@ -220,10 +220,8 @@ const messages = defineMessages({
   },
 });
 
-const ButtonsContainer = styled.div.attrs({ 'data-cy': 'order-actions' })`
-  display: flex;
+const ButtonsContainer = styled(Flex).attrs({ 'data-cy': 'order-actions' })`
   flex-wrap: wrap;
-  margin-top: 8px;
   transition: opacity 0.05s;
   justify-content: flex-end;
 
@@ -351,6 +349,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
           py={[0, 5]}
           px={[2, 3, 4]}
           mt={2}
+          mb={5}
           flexDirection={['column', null, 'row']}
           justifyContent={'space-between'}
         >
@@ -479,11 +478,20 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                   <OrderDetails>
                     <FormattedMessage id="Contact" defaultMessage="Contact" />
                     <span>
-                      {order.pendingContributionData.fromAccountInfo.name} (
-                      <StyledLink href={`mailto:${order.pendingContributionData.fromAccountInfo.email}`} openInNewTab>
-                        {order.pendingContributionData.fromAccountInfo.email}
-                      </StyledLink>
-                      )
+                      {order.pendingContributionData.fromAccountInfo.name}
+
+                      {order.pendingContributionData.fromAccountInfo.email && (
+                        <React.Fragment>
+                          &nbsp;(
+                          <StyledLink
+                            href={`mailto:${order.pendingContributionData.fromAccountInfo.email}`}
+                            openInNewTab
+                          >
+                            {order.pendingContributionData.fromAccountInfo.email}
+                          </StyledLink>
+                          )
+                        </React.Fragment>
+                      )}
                     </span>
                   </OrderDetails>
                 )}
@@ -584,17 +592,22 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
               {hasProcessButtons(order?.permissions) && (
                 <Box mt="40px">
                   <StyledHr />
-                  <Flex justifyContent="space-between">
-                    <ButtonsContainer>
+                  <Flex
+                    justifyContent={['stretch', 'space-between']}
+                    flexDirection={['column-reverse', 'row']}
+                    mt="8px"
+                  >
+                    <ButtonsContainer flexDirection={['column', 'row']}>
                       {order?.permissions?.canEdit && (
                         <React.Fragment>
                           <StyledButton
                             data-cy="edit-order-button"
                             buttonSize="tiny"
-                            minWidth="130"
+                            minWidth="130px"
                             mx={2}
                             mt={2}
                             py="9px"
+                            height="34px"
                             onClick={() => setShowCreatePendingOrderModal(true)}
                           >
                             <FormattedMessage id="order.edit" defaultMessage="Edit Order" />
@@ -610,7 +623,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                         </React.Fragment>
                       )}
                     </ButtonsContainer>
-                    <ButtonsContainer>
+                    <ButtonsContainer flexDirection={['column', 'row']}>
                       <ProcessOrderButtons
                         order={order}
                         permissions={order.permissions}
