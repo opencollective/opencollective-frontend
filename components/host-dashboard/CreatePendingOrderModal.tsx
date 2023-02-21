@@ -716,7 +716,10 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
               const order = {
                 ...values,
                 fromAccount: buildAccountReference(values.fromAccount),
-                toAccount: buildAccountReference(values.toAccount),
+                toAccount: values.childAccount
+                  ? buildAccountReference(values.childAccount)
+                  : buildAccountReference(values.toAccount),
+                childAccount: undefined,
                 tier: !values.tier ? null : { id: values.tier.id },
                 expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
               };
