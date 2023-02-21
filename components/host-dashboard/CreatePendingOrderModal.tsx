@@ -543,7 +543,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           )}
         </Field>
         <Field
-          name=".paymentMethod"
+          name="paymentMethod"
           htmlFor="CreatePendingContribution-.paymentMethod"
           mt={3}
           label={<FormattedMessage id="Fields.paymentMethod" defaultMessage="Payment method" />}
