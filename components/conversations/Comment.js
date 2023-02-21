@@ -44,15 +44,17 @@ const Comment = ({
   canReply,
 }) => {
   const [isEditing, setEditing] = React.useState(false);
-  const hasActions = !isEditing && (canEdit || canDelete);
+  const hasActions = !isEditing;
+  const anchorHash = `comment-${new Date(comment.createdAt).getTime()}`;
 
   return (
-    <Container width="100%" data-cy="comment">
+    <Container width="100%" data-cy="comment" id={anchorHash}>
       <Flex mb={3} justifyContent="space-between">
         <CommentMetadata comment={comment} />
         {hasActions && (
           <CommentActions
             comment={comment}
+            anchorHash={anchorHash}
             isConversationRoot={isConversationRoot}
             canEdit={canEdit}
             canDelete={canDelete}
