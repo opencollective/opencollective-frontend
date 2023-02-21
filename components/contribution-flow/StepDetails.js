@@ -144,9 +144,9 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
                     const valueChange = 49;
 
                     if (isTopArrowClicked) {
-                      value = Math.round((value + valueChange)/50)*50;
+                      value = Math.round((value + valueChange) / 50) * 50;
                     } else if (isBottomArrowClicked) {
-                      value = Math.round((value - valueChange)/50) * 50;
+                      value = Math.round((value - valueChange) / 50) * 50;
                     }
                   }
                   dispatchChange('amount', value);
