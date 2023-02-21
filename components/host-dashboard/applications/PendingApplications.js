@@ -5,18 +5,18 @@ import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
-import { Box, Flex } from '../Grid';
-import LoadingPlaceholder from '../LoadingPlaceholder';
-import MessageBox from '../MessageBox';
-import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
-import Pagination from '../Pagination';
-import SearchBar from '../SearchBar';
-import StyledHr from '../StyledHr';
-import { H1 } from '../Text';
+import { Box, Flex } from '../../Grid';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
+import MessageBox from '../../MessageBox';
+import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
+import Pagination from '../../Pagination';
+import SearchBar from '../../SearchBar';
+import StyledHr from '../../StyledHr';
+import { H1 } from '../../Text';
+import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from '../HostAdminCollectiveFilters';
 
-import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from './HostAdminCollectiveFilters';
 import PendingApplication, { processApplicationAccountFields } from './PendingApplication';
 
 const COLLECTIVES_PER_PAGE = 20;

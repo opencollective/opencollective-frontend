@@ -2,7 +2,6 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import dynamic from 'next/dynamic';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
@@ -17,13 +16,11 @@ import Header from '../components/Header';
 import I18nFormatters, { getI18nLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
 import MessageBox from '../components/MessageBox';
+import { PasswordStrengthBar } from '../components/PasswordStrengthBar';
 import StyledButton from '../components/StyledButton';
 import StyledInput from '../components/StyledInput';
 import StyledInputField from '../components/StyledInputField';
-import { P } from '../components/Text';
-
-// Dynamic imports
-const PasswordStrengthBar = dynamic(() => import('react-password-strength-bar'));
+import { H1, P } from '../components/Text';
 
 class ResetPasswordPage extends React.Component {
   static getInitialProps({ query: { token } }) {
@@ -99,17 +96,9 @@ class ResetPasswordPage extends React.Component {
                   <Image src="/static/images/oc-logo-watercolor-256.png" height={128} width={128} />
                 </Flex>
 
-                <Flex
-                  as="label"
-                  fontWeight={700}
-                  htmlFor="password"
-                  fontSize={'32px'}
-                  mb={12}
-                  mt={3}
-                  justifyContent="center"
-                >
+                <H1 fontWeight={700} fontSize="32px" mb={12} mt={3} textAlign="center">
                   <FormattedMessage defaultMessage="Reset Password" />
-                </Flex>
+                </H1>
 
                 {!this.props.data?.loggedInAccount && (
                   <MessageBox type="error" withIcon my={5}>
@@ -216,7 +205,6 @@ class ResetPasswordPage extends React.Component {
                     </StyledInputField>
 
                     <PasswordStrengthBar
-                      style={{ visibility: password ? 'visible' : 'hidden' }}
                       password={password}
                       onChangeScore={passwordScore => {
                         this.setState({ passwordScore });

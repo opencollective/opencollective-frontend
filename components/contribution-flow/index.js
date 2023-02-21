@@ -254,7 +254,8 @@ class ContributionFlow extends React.Component {
     }
 
     try {
-      const skipTaxes = isEmpty(this.getApplicableTaxes(collective, host, tier?.type));
+      const totalAmount = getTotalAmount(stepDetails, stepSummary);
+      const skipTaxes = !totalAmount || isEmpty(this.getApplicableTaxes(collective, host, tier?.type));
       const response = await this.props.createOrder({
         variables: {
           order: {
@@ -276,7 +277,7 @@ class ContributionFlow extends React.Component {
               this.props.paymentFlow === PAYMENT_FLOW.CRYPTO
                 ? {
                     thegivingblock: {
-                      pledgeAmount: stepDetails.amount,
+                      pledgeAmount: stepDetails.cryptoAmount,
                       pledgeCurrency: stepDetails.currency.value,
                     },
                   }
@@ -1046,9 +1047,11 @@ class ContributionFlow extends React.Component {
                       nextStep={nextStep}
                       isValidating={isValidating || isLoading}
                       paypalButtonProps={!nextStep ? this.getPaypalButtonProps({ currency }) : null}
-                      totalAmount={getTotalAmount(stepDetails, stepSummary)}
                       currency={currency}
                       isCrypto={isCrypto}
+                      tier={tier}
+                      stepDetails={stepDetails}
+                      stepSummary={stepSummary}
                     />
                   </Box>
                   {!isEmbed && (

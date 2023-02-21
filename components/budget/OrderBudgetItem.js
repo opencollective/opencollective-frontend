@@ -163,7 +163,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
             <LoadingPlaceholder height={20} width={140} mt={2} />
           ) : (
             <Flex>
-              <StyledTag variant="rounded-left" fontSize="10px" fontWeight="500" mr={1}>
+              <StyledTag variant="rounded-left" fontSize="10px" fontWeight="500" mr={1} textTransform="uppercase">
                 <FormattedMessage id="Order" defaultMessage="Order" /> #{order.legacyId}
               </StyledTag>
               <OrderStatusTag status={order.status} />

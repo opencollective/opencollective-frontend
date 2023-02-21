@@ -8,6 +8,7 @@ import PayWithPaypalButton from '../PayWithPaypalButton';
 import StyledButton from '../StyledButton';
 
 import { STEPS } from './constants';
+import { getTotalAmount } from './utils';
 
 class ContributionFlowButtons extends React.Component {
   static propTypes = {
@@ -18,9 +19,11 @@ class ContributionFlowButtons extends React.Component {
     isValidating: PropTypes.bool,
     /** If provided, the PayPal button will be displayed in place of the regular submit */
     paypalButtonProps: PropTypes.object,
-    totalAmount: PropTypes.number,
     currency: PropTypes.string,
     isCrypto: PropTypes.bool,
+    tier: PropTypes.shape({ type: PropTypes.string }),
+    stepDetails: PropTypes.object,
+    stepSummary: PropTypes.object,
   };
 
   state = { isLoadingNext: false };
@@ -47,7 +50,8 @@ class ContributionFlowButtons extends React.Component {
   }
 
   render() {
-    const { goBack, isValidating, prevStep, nextStep, paypalButtonProps, totalAmount, currency, isCrypto } = this.props;
+    const { goBack, isValidating, nextStep, paypalButtonProps, currency, tier, isCrypto, stepDetails } = this.props;
+    const totalAmount = getTotalAmount(stepDetails, this.props.stepSummary, isCrypto);
     return (
       <Flex flexWrap="wrap" justifyContent="center">
         <Fragment>
@@ -63,7 +67,9 @@ class ContributionFlowButtons extends React.Component {
               mt={2}
             >
               &larr;{' '}
-              {this.getStepLabel(prevStep) || <FormattedMessage id="Pagination.Prev" defaultMessage="Previous" />}
+              {this.getStepLabel(this.props.prevStep) || (
+                <FormattedMessage id="Pagination.Prev" defaultMessage="Previous" />
+              )}
             </StyledButton>
           )}
           {!paypalButtonProps || nextStep ? (
@@ -89,6 +95,12 @@ class ContributionFlowButtons extends React.Component {
                 <FormattedMessage
                   defaultMessage="I've sent {CryptoAmount} {CryptoCurrency} to this wallet address"
                   values={{ CryptoAmount: totalAmount, CryptoCurrency: currency }}
+                />
+              ) : tier?.type === 'TICKET' ? (
+                <FormattedMessage
+                  id="contribute.ticket"
+                  defaultMessage="Get {quantity, select, 1 {ticket} other {tickets}}"
+                  values={{ quantity: stepDetails.quantity || 1 }}
                 />
               ) : totalAmount ? (
                 <FormattedMessage

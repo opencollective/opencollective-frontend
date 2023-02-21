@@ -13,7 +13,7 @@ import { Flex } from '../Grid';
 import StyledLink from '../StyledLink';
 import { P, Span } from '../Text';
 
-import { InfoSectionHeader } from './PendingApplication';
+import { InfoSectionHeader } from './applications/InfoSectionHeader';
 
 dayjs.extend(relativeTime);
 

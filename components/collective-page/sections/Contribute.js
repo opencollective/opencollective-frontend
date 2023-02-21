@@ -16,7 +16,7 @@ import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
-import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
+import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';
 import ContributeCardContainer, { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
 import ContributeCrypto from '../../contribute-cards/ContributeCrypto';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';

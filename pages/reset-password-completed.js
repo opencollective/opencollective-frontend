@@ -10,7 +10,7 @@ import { P } from '../components/Text';
 const ResetPasswordCompleted = () => {
   return (
     <Page noRobots showFooter={false}>
-      <Container pt={[4, 5]} pb={6} px={3} textAlign="center">
+      <Container pt={[4, 5]} pb={6} px={3} textAlign="center" data-cy="reset-password-success-page">
         <Image src="/static/images/sign-in-illustration.png" width="624px" height="372px" />
         <P fontSize="32px" lineHeight="40px" color="black.900" fontWeight={700}>
           <FormattedMessage defaultMessage="Your password was updated." />

@@ -120,7 +120,6 @@ function FormFields({ collective, values, hideTypeSelect }) {
     // No interval for products and tickets
     if ([PRODUCT, TICKET].includes(values.type)) {
       formik.setFieldValue('interval', null);
-      formik.setFieldValue('amountType', FIXED);
     }
   }, [values.interval, values.type]);
 
@@ -171,6 +170,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
         label={intl.formatMessage({ id: 'Fields.name', defaultMessage: 'Name' })}
         labelFontWeight="bold"
         mt="3"
+        required
       >
         {({ field }) => <StyledInput data-cy={field.name} placeholder="E.g. Donation" {...field} />}
       </StyledInputFormikField>
@@ -301,7 +301,9 @@ function FormFields({ collective, values, hideTypeSelect }) {
               onChange={value =>
                 form.setFieldValue(
                   field.name,
-                  value ? { currency: field.value?.currency ?? collective.currency, valueInCents: value } : null,
+                  !isNil(value) && !isNaN(value)
+                    ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                    : null,
                 )
               }
               onBlur={() => form.setFieldTouched(field.name, true)}
