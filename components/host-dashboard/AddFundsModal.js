@@ -49,7 +49,8 @@ const Illustration = styled.img.attrs({ src: illustration })`
 
 const AddFundsModalContainer = styled(StyledModal)`
   width: 100%;
-  max-width: 435px;
+  max-width: 576px;
+  padding: 24px 30px;
   ${props =>
     props.showPlatformTipModal &&
     css`
@@ -291,6 +292,11 @@ const getTiersOptions = (intl, tiers) => {
   ];
 };
 
+const Field = styled(StyledInputFormikField).attrs({
+  labelFontSize: '16px',
+  labelFontWeight: '700',
+})``;
+
 const AddFundsModal = ({ collective, ...props }) => {
   const { LoggedInUser } = useLoggedInUser();
   const [fundDetails, setFundDetails] = useState({});
@@ -475,7 +481,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                     <FormattedMessage id="AddFundsModal.SubHeading" defaultMessage="Add Funds to the Collective" />
                   </h3>
                   <ModalBody>
-                    <StyledInputFormikField
+                    <Field
                       name="fromAccount"
                       htmlFor="addFunds-fromAccount"
                       label={<FormattedMessage id="AddFundsModal.source" defaultMessage="Source" />}
@@ -494,8 +500,8 @@ const AddFundsModal = ({ collective, ...props }) => {
                           onChange={({ value }) => form.setFieldValue(field.name, value)}
                         />
                       )}
-                    </StyledInputFormikField>
-                    <StyledInputFormikField
+                    </Field>
+                    <Field
                       name="tier"
                       htmlFor="addFunds-tier"
                       label={<FormattedMessage defaultMessage="Tier" />}
@@ -516,16 +522,16 @@ const AddFundsModal = ({ collective, ...props }) => {
                           )}
                         />
                       )}
-                    </StyledInputFormikField>
-                    <StyledInputFormikField
+                    </Field>
+                    <Field
                       name="description"
                       htmlFor="addFunds-description"
                       label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
                       mt={3}
                     >
                       {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
-                    </StyledInputFormikField>
-                    <StyledInputFormikField
+                    </Field>
+                    <Field
                       name="processedAt"
                       htmlFor="addFunds-processedAt"
                       inputType="date"
@@ -543,8 +549,8 @@ const AddFundsModal = ({ collective, ...props }) => {
                       mt={3}
                     >
                       {({ field }) => <StyledInput data-cy="add-funds-processedAt" {...field} />}
-                    </StyledInputFormikField>
-                    <StyledInputFormikField
+                    </Field>
+                    <Field
                       name="memo"
                       htmlFor="addFunds-memo"
                       label={
@@ -564,9 +570,9 @@ const AddFundsModal = ({ collective, ...props }) => {
                       mt={3}
                     >
                       {({ field }) => <StyledInput data-cy="add-funds-memo" {...field} />}
-                    </StyledInputFormikField>
+                    </Field>
                     <Flex mt={3} flexWrap="wrap">
-                      <StyledInputFormikField
+                      <Field
                         name="amount"
                         htmlFor="addFunds-amount"
                         label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}
@@ -586,9 +592,9 @@ const AddFundsModal = ({ collective, ...props }) => {
                             onBlur={() => form.setFieldTouched(field.name, true)}
                           />
                         )}
-                      </StyledInputFormikField>
+                      </Field>
                       {canAddHostFee && (
-                        <StyledInputFormikField
+                        <Field
                           name="hostFeePercent"
                           htmlFor="addFunds-hostFeePercent"
                           label={
@@ -619,12 +625,12 @@ const AddFundsModal = ({ collective, ...props }) => {
                               onBlur={() => form.setFieldTouched(field.name, true)}
                             />
                           )}
-                        </StyledInputFormikField>
+                        </Field>
                       )}
                     </Flex>
                     {receiptTemplateTitles.length > 1 && (
                       <Container width="100%">
-                        <StyledInputFormikField
+                        <Field
                           name="invoiceTemplate"
                           htmlFor="addFunds-invoiceTemplate"
                           label={<FormattedMessage defaultMessage="Choose receipt" />}
@@ -638,7 +644,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                               onChange={value => form.setFieldValue(field.name, value)}
                             />
                           )}
-                        </StyledInputFormikField>
+                        </Field>
                       </Container>
                     )}
                     <P fontSize="14px" lineHeight="17px" fontWeight="500" mt={4}>

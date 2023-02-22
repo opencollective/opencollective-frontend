@@ -20,7 +20,6 @@ import DateTime from '../DateTime';
 import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
 import ExpenseFilesPreviewModal from '../expenses/ExpenseFilesPreviewModal';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
-import ExpenseTags from '../expenses/ExpenseTags';
 import ExpenseTypeTag from '../expenses/ExpenseTypeTag';
 import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
 import ProcessExpenseButtons, {
@@ -35,6 +34,7 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
+import Tags from '../Tags';
 import { H3, P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 
@@ -316,7 +316,7 @@ const ExpenseBudgetItem = ({
               )}
             </Flex>
           ) : (
-            <ExpenseTags
+            <Tags
               expense={expense}
               canEdit={get(expense, 'permissions.canEditTags', false)}
               suggestedTags={suggestedTags}
