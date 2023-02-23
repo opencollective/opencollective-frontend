@@ -115,7 +115,7 @@ function createLink({ twoFactorAuthContext }) {
     let token;
 
     // From OAuth session
-    const session = await getSession();
+    const session = (await getSession()) as any;
     if (session?.accessToken) {
       token = session.accessToken;
     }
