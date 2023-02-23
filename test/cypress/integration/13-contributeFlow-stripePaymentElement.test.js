@@ -70,7 +70,7 @@ function contributeNewSEPADebit({ name } = {}) {
   cy.wait(3000);
 }
 
-describe.skip('Contribute Flow: Stripe Payment Element', () => {
+describe('Contribute Flow: Stripe Payment Element', () => {
   describe('Card', () => {
     beforeEach(() => {
       cy.intercept('GET', 'https://js.stripe.com/v3/', req => {
