@@ -6,6 +6,8 @@ import PropTypes from 'prop-types';
 import { ApolloClient } from '@apollo/client';
 import { getDataFromTree } from '@apollo/client/react/ssr';
 
+// import { getSession } from 'next-auth/react';
+// import { authOptions } from '../pages/api/auth/[...nextauth]';
 import { withTwoFactorAuthentication } from './two-factor-authentication/TwoFactorAuthenticationContext';
 import { initClient } from './apollo-client';
 import { compose } from './utils';
@@ -24,6 +26,8 @@ const withData = ComposedComponent => {
   return class WithData extends React.Component<WithDataProps> {
     static async getInitialProps(context) {
       const { Component } = context;
+
+      // const session = await getSession(context.req, context.res, authOptions);
 
       const client = initClient();
 
@@ -67,6 +71,7 @@ const withData = ComposedComponent => {
     static propTypes = {
       serverState: PropTypes.object.isRequired,
       options: PropTypes.object,
+      // session: PropTypes.object,
       twoFactorAuthContext: PropTypes.object,
     };
 

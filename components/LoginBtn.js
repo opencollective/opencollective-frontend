@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { signIn } from 'next-auth/react';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
@@ -58,7 +59,13 @@ class LoginBtn extends React.Component {
           py: 2,
         };
     return (
-      <Link href={{ pathname: '/signin', query: { next: this.redirectAfterSignin } }}>
+      <Link
+        onClick={e => {
+          e.preventDefault();
+          signIn();
+        }}
+        href={{ pathname: '/signin', query: { next: this.redirectAfterSignin } }}
+      >
         <StyledLink as={Container} {...buttonProps}>
           {this.renderContent()}
         </StyledLink>

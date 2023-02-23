@@ -10,7 +10,7 @@ const intl = require('./intl');
 const logger = require('./logger');
 const prependHttp = require('prepend-http');
 
-const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
+// const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
 const maxAge = (maxAge = 60) => {
   return (req, res, next) => {

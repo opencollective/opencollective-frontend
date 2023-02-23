@@ -1,8 +1,10 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { ApolloProvider } from '@apollo/client';
+// import { omit } from 'lodash';
 import App from 'next/app';
 import Router from 'next/router';
+import { SessionProvider } from 'next-auth/react';
 import NProgress from 'nprogress';
 import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
@@ -123,28 +125,32 @@ class OpenCollectiveFrontendApp extends App {
   render() {
     const { client, Component, pageProps, scripts, locale, messages } = this.props;
 
+    const { session, ...restPageProps } = pageProps;
+
     const intl = createIntl({ locale: locale || 'en', defaultLocale: 'en', messages }, cache);
 
     return (
       <Fragment>
-        <ApolloProvider client={client}>
-          <ThemeProvider theme={theme}>
-            <StripeProviderSSR>
-              <RawIntlProvider value={intl}>
-                <UserProvider>
-                  <NewsAndUpdatesProvider>
-                    <ToastProvider>
-                      <Component {...pageProps} />
-                      <GlobalToasts />
-                      <GlobalNewsAndUpdates />
-                      <TwoFactorAuthenticationModal />
-                    </ToastProvider>
-                  </NewsAndUpdatesProvider>
-                </UserProvider>
-              </RawIntlProvider>
-            </StripeProviderSSR>
-          </ThemeProvider>
-        </ApolloProvider>
+        <SessionProvider session={session}>
+          <ApolloProvider client={client}>
+            <ThemeProvider theme={theme}>
+              <StripeProviderSSR>
+                <RawIntlProvider value={intl}>
+                  <UserProvider>
+                    <NewsAndUpdatesProvider>
+                      <ToastProvider>
+                        <Component {...restPageProps} />
+                        <GlobalToasts />
+                        <GlobalNewsAndUpdates />
+                        <TwoFactorAuthenticationModal />
+                      </ToastProvider>
+                    </NewsAndUpdatesProvider>
+                  </UserProvider>
+                </RawIntlProvider>
+              </StripeProviderSSR>
+            </ThemeProvider>
+          </ApolloProvider>
+        </SessionProvider>
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />
         ))}

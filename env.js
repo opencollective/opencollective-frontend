@@ -40,6 +40,7 @@ const defaults = {
   OC_SECRET: crypto.randomBytes(16).toString('hex'),
   WISE_ENVIRONMENT: process.env.OC_ENV === 'production' ? 'production' : 'sandbox',
   API_PROXY: 'true',
+  OPENCOLLECTIVE_OAUTH_URL: 'https://opencollective.com',
 };
 
 if (['production', 'staging'].includes(process.env.OC_ENV)) {
