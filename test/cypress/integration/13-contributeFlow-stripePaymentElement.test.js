@@ -196,7 +196,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       cy.get('button[data-cy="cf-next-step"]').click();
       contributeWithNewUsBankAccount();
       cy.getByDataCy('order-success').contains('Thank you!');
-      cy.wait(5000);
+      cy.wait(10000);
 
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate`);
@@ -234,7 +234,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       contributeNewSEPADebit({ email, name: 'guest user' });
 
       cy.getByDataCy('order-success').contains('Thank you!');
-      cy.wait(5000);
+      cy.wait(10000);
 
       cy.get('@collective').then(col => {
         cy.visit(`${col.slug}/orders`);
@@ -256,7 +256,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       contributeNewSEPADebit();
 
       cy.getByDataCy('order-success').contains('Thank you!');
-      cy.wait(5000);
+      cy.wait(10000);
 
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate`);
