@@ -8,6 +8,7 @@ import { GQLV2_PAYMENT_METHOD_LEGACY_TYPES } from '../../lib/constants/payment-m
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 import { i18nPaymentMethodType } from '../../lib/i18n/payment-method-type';
 import { toPx } from '../../lib/theme/helpers';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
@@ -15,11 +16,14 @@ import Container from '../Container';
 import DateTime from '../DateTime';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import OrderStatusTag from '../orders/OrderStatusTag';
 import ProcessOrderButtons from '../orders/ProcessOrderButtons';
+import StyledLink from '../StyledLink';
 import StyledTag from '../StyledTag';
+import StyledTooltip from '../StyledTooltip';
 import { H3, P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 
@@ -38,6 +42,7 @@ const ButtonsContainer = styled.div.attrs({ 'data-cy': 'order-actions' })`
   display: flex;
   flex-wrap: wrap;
   margin-top: 8px;
+  flex-grow: 1;
   transition: opacity 0.05s;
   justify-content: flex-end;
 
@@ -79,29 +84,30 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
             <LoadingPlaceholder height={60} />
           ) : (
             <Box>
-              <AutosizeText
-                value={order.description}
-                maxLength={255}
-                minFontSizeInPx={12}
-                maxFontSizeInPx={16}
-                lengthThreshold={72}
-                mobileRatio={0.875}
-                valueFormatter={toPx}
-              >
-                {({ value, fontSize }) => (
-                  <H3
-                    fontWeight="500"
-                    lineHeight="1.5em"
-                    textDecoration="none"
-                    color="black.900"
-                    fontSize={fontSize}
-                    data-cy="expense-title"
-                  >
-                    {value}
-                  </H3>
-                )}
-              </AutosizeText>
-
+              <StyledLink as={Link} href={`${getCollectivePageRoute(order.toAccount)}/orders/${order.legacyId}`}>
+                <AutosizeText
+                  value={order.description}
+                  maxLength={255}
+                  minFontSizeInPx={12}
+                  maxFontSizeInPx={16}
+                  lengthThreshold={72}
+                  mobileRatio={0.875}
+                  valueFormatter={toPx}
+                >
+                  {({ value, fontSize }) => (
+                    <H3
+                      fontWeight="500"
+                      lineHeight="1.5em"
+                      textDecoration="none"
+                      color="black.900"
+                      fontSize={fontSize}
+                      data-cy="expense-title"
+                    >
+                      {value}
+                    </H3>
+                  )}
+                </AutosizeText>
+              </StyledLink>
               <P mt="5px" fontSize="12px" color="black.600">
                 <FormattedMessage
                   id="Order.fromTo"
@@ -172,29 +178,72 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
         </Flex>
       </Flex>
       <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}>
-        <Box>
-          <Flex>
-            <Flex flexDirection="column" justifyContent="flex-end" mr={[3, 4]} minHeight={50}>
-              <DetailColumnHeader>
-                <FormattedMessage id="paymentmethod.label" defaultMessage="Payment Method" />
-              </DetailColumnHeader>
-              {isLoading ? (
-                <LoadingPlaceholder height={16} />
-              ) : (
-                <Span fontSize="11px" lineHeight="16px" color="black.700">
-                  {order.paymentMethod?.type
-                    ? i18nPaymentMethodType(intl, order.paymentMethod.type)
-                    : i18nPaymentMethodProviderType(
-                        intl,
-                        // TODO(paymentMethodType): migrate to service+type
-                        order.paymentMethod?.providerType || GQLV2_PAYMENT_METHOD_LEGACY_TYPES.BANK_TRANSFER,
-                      )}
-                </Span>
-              )}
-            </Flex>
+        <Flex flexWrap="wrap" alignItems="center" justifyContent={['space-between', null, 'flex-start']} flexGrow={1}>
+          <Flex flexDirection="column" justifyContent="flex-end" mr={[3, 4]} minHeight={50}>
+            <DetailColumnHeader>
+              <FormattedMessage id="paymentmethod.label" defaultMessage="Payment Method" />
+            </DetailColumnHeader>
+            {isLoading ? (
+              <LoadingPlaceholder height={16} />
+            ) : (
+              <Span fontSize="11px" lineHeight="16px" color="black.700">
+                {order.paymentMethod?.type
+                  ? i18nPaymentMethodType(intl, order.paymentMethod.type)
+                  : i18nPaymentMethodProviderType(
+                      intl,
+                      // TODO(paymentMethodType): migrate to service+type
+                      order.paymentMethod?.providerType ||
+                        order.pendingContributionData?.paymentMethod ||
+                        GQLV2_PAYMENT_METHOD_LEGACY_TYPES.BANK_TRANSFER,
+                    )}
+              </Span>
+            )}
           </Flex>
-        </Box>
+          {order?.status === 'PENDING' && order?.pendingContributionData && (
+            <React.Fragment>
+              {order.pendingContributionData.ponumber && (
+                <Flex flexDirection="column" justifyContent="flex-end" mr={[3, 4]} minHeight={50}>
+                  <DetailColumnHeader>
+                    <StyledTooltip
+                      content={
+                        <FormattedMessage defaultMessage="External reference code for this order. This is usually a reference number from the contributor accounting system." />
+                      }
+                      containerCursor="default"
+                    >
+                      <FormattedMessage id="Fields.PONumber" defaultMessage="PO Number" />
+                    </StyledTooltip>
+                  </DetailColumnHeader>
+                  {isLoading ? (
+                    <LoadingPlaceholder height={16} />
+                  ) : (
+                    <Span fontSize="11px" lineHeight="16px" color="black.700">
+                      {`#${order.pendingContributionData.ponumber}`}
+                    </Span>
+                  )}
+                </Flex>
+              )}
 
+              {order.pendingContributionData.expectedAt && (
+                <Flex flexDirection="column" justifyContent="flex-end" mr={[3, 4]} minHeight={50}>
+                  <DetailColumnHeader>
+                    <FormattedMessage defaultMessage="Expected" />
+                  </DetailColumnHeader>
+                  {isLoading ? (
+                    <LoadingPlaceholder height={16} />
+                  ) : (
+                    <Span fontSize="11px" lineHeight="16px" color="black.700">
+                      <DateTime
+                        value={order.pendingContributionData.expectedAt}
+                        dateStyle={'medium'}
+                        timeStyle={undefined}
+                      />
+                    </Span>
+                  )}
+                </Flex>
+              )}
+            </React.Fragment>
+          )}
+        </Flex>
         {order?.permissions && (
           <ButtonsContainer>
             <ProcessOrderButtons order={order} permissions={order.permissions} />
@@ -236,6 +285,11 @@ OrderBudgetItem.propTypes = {
     permissions: PropTypes.shape({
       canReject: PropTypes.bool,
       canMarkAsPaid: PropTypes.bool,
+    }),
+    pendingContributionData: PropTypes.shape({
+      ponumber: PropTypes.number,
+      expectedAt: PropTypes.string,
+      paymentMethod: PropTypes.string,
     }),
     paymentMethod: PropTypes.shape({
       providerType: PropTypes.string,

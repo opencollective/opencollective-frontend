@@ -850,6 +850,11 @@ type Order {
   paymentMethod: PaymentMethod
 
   """
+  Host fee percent attached to the Order.
+  """
+  hostFeePercent: Int
+
+  """
   Platform Tip attached to the Order.
   """
   platformTipAmount: Amount
@@ -883,9 +888,19 @@ type Order {
   memo: String
 
   """
+  The account who created this order
+  """
+  createdByAccount: Account
+
+  """
   Date the funds were received.
   """
   processedAt: DateTime
+
+  """
+  Data about the pending contribution
+  """
+  pendingContributionData: PendingOrderData
 
   """
   Whether the order needs confirmation (3DSecure/SCA)
@@ -5128,6 +5143,24 @@ type OrderPermissions {
   Whether the current user can mark this order as unpaid
   """
   canMarkAsPaid: Boolean!
+
+  """
+  Whether the current user edit this pending order
+  """
+  canEdit: Boolean!
+}
+
+type PendingOrderData {
+  expectedAt: DateTime
+  paymentMethod: String
+  ponumber: String
+  memo: String
+  fromAccountInfo: PendingOrderFromAccountInfo
+}
+
+type PendingOrderFromAccountInfo {
+  name: String
+  email: String
 }
 
 enum TierType {
@@ -13596,6 +13629,11 @@ type Mutation {
   createPendingOrder(order: PendingOrderCreateInput!): Order!
 
   """
+  To edit a pending order. Scope: "orders".
+  """
+  editPendingOrder(order: PendingOrderEditInput!): Order!
+
+  """
   Add a new payment method to be used with an Order. Scope: "orders".
   """
   addCreditCard(
@@ -14008,6 +14046,14 @@ type Mutation {
     """
     socialLinks: [SocialLinkInput!]!
   ): [SocialLink!]!
+  setTags(
+    """
+    Tags associated with the object being updated
+    """
+    tags: [String]
+    order: OrderReferenceInput
+    expense: ExpenseReferenceInput
+  ): TagResponse!
 }
 
 input CollectiveCreateInput {
@@ -15227,9 +15273,14 @@ input PendingOrderCreateInput {
   fromAccountInfo: OrderFromAccountInfo
 
   """
-  The collective/event/project you want to contribute to
+  The collective you want to contribute to
   """
   toAccount: AccountReferenceInput!
+
+  """
+  The event/project you want to contribute to
+  """
+  childAccount: AccountReferenceInput
 
   """
   Platform tip attached to this order
@@ -15252,9 +15303,90 @@ input PendingOrderCreateInput {
   description: String
 
   """
-  Custom data related to the Pending Order
+  Private memo for the host
   """
-  customData: JSON
+  memo: String
+
+  """
+  External identifier for the order
+  """
+  ponumber: String
+
+  """
+  Payment method expected for this order
+  """
+  paymentMethod: String
+
+  """
+  When is the money expected?
+  """
+  expectedAt: DateString
+  hostFeePercent: Int
+}
+
+"""
+Input to edit an existing pending order
+"""
+input PendingOrderEditInput {
+  """
+  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the order (ie: 4242)
+  """
+  legacyId: Int
+
+  """
+  The contribution amount, without platform contribution and taxes
+  """
+  amount: AmountInput!
+
+  """
+  The profile making the contribution.
+  """
+  fromAccount: AccountReferenceInput
+
+  """
+  Additional information about the contributing profile
+  """
+  fromAccountInfo: OrderFromAccountInfo
+
+  """
+  Platform tip attached to this order
+  """
+  platformTipAmount: AmountInput
+
+  """
+  Use this field to set the taxes associated to this order
+  """
+  taxes: [OrderTaxInput]
+
+  """
+  The tier you are contributing to
+  """
+  tier: TierReferenceInput
+
+  """
+  Public order description
+  """
+  description: String
+
+  """
+  Private memo for the host
+  """
+  memo: String
+
+  """
+  External identifier for the order
+  """
+  ponumber: String
+
+  """
+  Payment method expected for this order
+  """
+  paymentMethod: String
 
   """
   When is the money expected?
@@ -15414,14 +15546,14 @@ input TierUpdateInput {
   The public id identifying the tier (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
   """
   id: String!
-  amount: AmountInput!
+  amount: AmountInput
   name: NonEmptyString
   description: String
   button: String
   goal: AmountInput
-  type: TierType!
-  amountType: TierAmountType!
-  frequency: TierFrequency!
+  type: TierType
+  amountType: TierAmountType
+  frequency: TierFrequency
   presets: [Int!]
   maxQuantity: Int
   minimumAmount: AmountInput
@@ -15431,8 +15563,8 @@ input TierUpdateInput {
 }
 
 input TierCreateInput {
-  amount: AmountInput!
-  name: NonEmptyString
+  amount: AmountInput
+  name: NonEmptyString!
   description: String
   button: String
   goal: AmountInput
@@ -15494,4 +15626,9 @@ input PersonalTokenReferenceInput {
 input SocialLinkInput {
   type: SocialLinkType!
   url: URL!
+}
+
+type TagResponse {
+  order: Order
+  expense: Expense
 }

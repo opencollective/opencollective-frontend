@@ -183,6 +183,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
                     <SearchBar
                       defaultValue={query.searchTerm}
                       onSubmit={searchTerm => this.handleSearch(searchTerm, data.account)}
+                      placeholder={undefined}
                     />
                   </SearchFormContainer>
                 </Flex>

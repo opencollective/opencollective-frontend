@@ -20,6 +20,7 @@ import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
+import Tags from '../Tags';
 import { H1, H4, P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
@@ -27,7 +28,6 @@ import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseMoreActionsButton from './ExpenseMoreActionsButton';
 import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseStatusTag from './ExpenseStatusTag';
-import ExpenseTags from './ExpenseTags';
 import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
 
 export const SummaryHeader = styled(H1)`
@@ -120,7 +120,7 @@ const ExpenseSummary = ({
           )}
         </Flex>
       </Flex>
-      <ExpenseTags expense={expense} isLoading={isLoading} canEdit={canEditTags} suggestedTags={suggestedTags} />
+      <Tags expense={expense} isLoading={isLoading} canEdit={canEditTags} suggestedTags={suggestedTags} />
       <Flex alignItems="center" mt={3}>
         {isLoading ? (
           <LoadingPlaceholder height={24} width={200} />
