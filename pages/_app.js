@@ -125,13 +125,11 @@ class OpenCollectiveFrontendApp extends App {
   render() {
     const { client, Component, pageProps, scripts, locale, messages } = this.props;
 
-    const { session, ...restPageProps } = pageProps;
-
     const intl = createIntl({ locale: locale || 'en', defaultLocale: 'en', messages }, cache);
 
     return (
       <Fragment>
-        <SessionProvider session={session}>
+        <SessionProvider>
           <ApolloProvider client={client}>
             <ThemeProvider theme={theme}>
               <StripeProviderSSR>
@@ -139,7 +137,7 @@ class OpenCollectiveFrontendApp extends App {
                   <UserProvider>
                     <NewsAndUpdatesProvider>
                       <ToastProvider>
-                        <Component {...restPageProps} />
+                        <Component {...pageProps} />
                         <GlobalToasts />
                         <GlobalNewsAndUpdates />
                         <TwoFactorAuthenticationModal />
