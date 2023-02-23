@@ -1,6 +1,6 @@
 import speakeasy from 'speakeasy';
 
-import { randomEmail } from '../support/faker';
+import { randomEmail, randomSlug } from '../support/faker';
 
 describe('edit collective', () => {
   let collectiveSlug = null;
@@ -142,7 +142,6 @@ describe('edit collective', () => {
   });
 
   it('enables VAT', () => {
-    cy.visit(`${collectiveSlug}/admin`);
     cy.contains('[data-cy="country-select"]', 'Please select your country').click();
     cy.contains('[data-cy="select-option"]', 'Belgium').click();
     cy.getByDataCy('VAT').click();
@@ -159,41 +158,37 @@ describe('edit collective', () => {
 });
 
 describe('edit user collective', () => {
-  let user = null;
-  let secret;
-  let TOTPCode;
-
-  before(() => {
-    cy.signup({ user: { settings: { features: { twoFactorAuth: true } } }, redirect: `/` }).then(u => (user = u));
-  });
-
   it('adds two-factor authentication', () => {
-    cy.visit(`/${user.collective.slug}/admin`).then(() => {
-      cy.getByDataCy('menu-item-user-security').click();
-      cy.getByDataCy('qr-code').should('exist');
-      cy.getByDataCy('manual-entry-2fa-token')
-        .invoke('text')
-        .then(text => {
-          expect(text.trim()).to.have.lengthOf(117);
-          secret = text.split(':')[1].trim();
-          // typing the wrong code fails
-          cy.getByDataCy('add-two-factor-auth-totp-code-field').type('123456');
-          cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
-          cy.getByDataCy('add-two-factor-auth-error').should('exist');
-          // typing the right code passes
-          TOTPCode = speakeasy.totp({
-            algorithm: 'SHA1',
-            encoding: 'base32',
-            secret,
-          });
-          cy.getByDataCy('add-two-factor-auth-totp-code-field').clear().type(TOTPCode);
-          cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
-          cy.getByDataCy('recovery-codes-container').should('exist');
-          cy.getByDataCy('recovery-codes-container').children().should('have.length', 6);
-          cy.getByDataCy('add-two-factor-auth-confirm-recovery-codes-button').click();
-          cy.getByDataCy('confirmation-modal-continue').click();
-          cy.getByDataCy('add-two-factor-auth-success').should('exist');
-        });
+    const userSlug = randomSlug();
+    cy.signup({
+      user: { name: userSlug, settings: { features: { twoFactorAuth: true } } },
+      redirect: `/${userSlug}/admin`,
     });
+
+    cy.getByDataCy('menu-item-user-security').click();
+    cy.getByDataCy('qr-code').should('exist');
+    cy.getByDataCy('manual-entry-2fa-token')
+      .invoke('text')
+      .then(text => {
+        expect(text.trim()).to.have.lengthOf(117);
+        const secret = text.split(':')[1].trim();
+        // typing the wrong code fails
+        cy.getByDataCy('add-two-factor-auth-totp-code-field').type('123456');
+        cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
+        cy.getByDataCy('add-two-factor-auth-error').should('exist');
+        // typing the right code passes
+        const TOTPCode = speakeasy.totp({
+          algorithm: 'SHA1',
+          encoding: 'base32',
+          secret,
+        });
+        cy.getByDataCy('add-two-factor-auth-totp-code-field').clear().type(TOTPCode);
+        cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
+        cy.getByDataCy('recovery-codes-container').should('exist');
+        cy.getByDataCy('recovery-codes-container').children().should('have.length', 6);
+        cy.getByDataCy('add-two-factor-auth-confirm-recovery-codes-button').click();
+        cy.getByDataCy('confirmation-modal-continue').click();
+        cy.getByDataCy('add-two-factor-auth-success').should('exist');
+      });
   });
 });
