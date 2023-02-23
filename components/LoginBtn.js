@@ -62,7 +62,7 @@ class LoginBtn extends React.Component {
       <Link
         onClick={e => {
           e.preventDefault();
-          signIn();
+          signIn(['opencollective']);
         }}
         href={{ pathname: '/signin', query: { next: this.redirectAfterSignin } }}
       >
