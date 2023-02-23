@@ -57,29 +57,31 @@ module.exports = (expressApp, nextApp) => {
 
   // NOTE: in production and staging environment, this is currently not used
   // we use Cloudflare workers to route the request directly to the API
-  app.use(
-    '/api',
-    proxy(baseApiUrl, {
-      parseReqBody: false,
-      proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
-        for (const key of ['oc-env', 'oc-secret', 'oc-application']) {
-          if (srcReq.headers[key]) {
-            proxyReqOpts.headers[key] = srcReq.headers[key];
+  if (process.env.API_PROXY === 'true') {
+    app.use(
+      '/api',
+      proxy(baseApiUrl, {
+        parseReqBody: false,
+        proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+          for (const key of ['oc-env', 'oc-secret', 'oc-application']) {
+            if (srcReq.headers[key]) {
+              proxyReqOpts.headers[key] = srcReq.headers[key];
+            }
           }
-        }
-        proxyReqOpts.headers['oc-frontend-api-proxy'] = '1';
-        proxyReqOpts.headers['oc-frontend-ip'] = srcReq.ip;
-        proxyReqOpts.headers['X-Forwarded-For'] = srcReq.ip;
-        return proxyReqOpts;
-      },
-      proxyReqPathResolver: req => {
-        const [pathname, search] = req.url.split('?');
-        const searchParams = new URLSearchParams(search);
-        searchParams.set('api_key', process.env.API_KEY);
-        return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
-      },
-    }),
-  );
+          proxyReqOpts.headers['oc-frontend-api-proxy'] = '1';
+          proxyReqOpts.headers['oc-frontend-ip'] = srcReq.ip;
+          proxyReqOpts.headers['X-Forwarded-For'] = srcReq.ip;
+          return proxyReqOpts;
+        },
+        proxyReqPathResolver: req => {
+          const [pathname, search] = req.url.split('?');
+          const searchParams = new URLSearchParams(search);
+          searchParams.set('api_key', process.env.API_KEY);
+          return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
+        },
+      }),
+    );
+  }
 
   /**
    * Contact Form
