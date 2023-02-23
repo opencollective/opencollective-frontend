@@ -41,6 +41,7 @@ const defaults = {
   WISE_ENVIRONMENT: process.env.OC_ENV === 'production' ? 'production' : 'sandbox',
   API_PROXY: 'true',
   OPENCOLLECTIVE_OAUTH_URL: 'https://opencollective.com',
+  OPENCOLLECTIVE_OAUTH_SCOPES: 'email',
 };
 
 if (['production', 'staging'].includes(process.env.OC_ENV)) {

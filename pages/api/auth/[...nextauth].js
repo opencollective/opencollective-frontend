@@ -17,8 +17,8 @@ const loggedInUserQuery = gql`
   }
 `;
 
-const oAuthUrl = process.env.OPENCOLLECTIVE_OAUTH_URL || 'https://opencollective.com';
-const oAuthScopes = process.env.OPENCOLLECTIVE_OAUTH_SCOPES || 'email';
+const oAuthUrl = process.env.OPENCOLLECTIVE_OAUTH_URL;
+const oAuthScopes = process.env.OPENCOLLECTIVE_OAUTH_SCOPES;
 
 // console.log({
 //   id: 'opencollective',
