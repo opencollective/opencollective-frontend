@@ -238,7 +238,9 @@ class ResetPasswordPage extends React.Component {
 const resetPasswordMutation = gql`
   mutation ResetPassword($password: String!) {
     setPassword(password: $password) {
-      id
+      individual {
+        id
+      }
     }
   }
 `;

@@ -94,6 +94,7 @@ class UserSecurity extends React.Component {
       hasRole: PropTypes.func.isRequired,
       email: PropTypes.string.isRequired,
     }),
+    login: PropTypes.func.isRequired,
     refetchLoggedInUser: PropTypes.func.isRequired,
     data: PropTypes.shape({
       individual: PropTypes.object,
@@ -234,9 +235,10 @@ class UserSecurity extends React.Component {
 
     try {
       this.setState({ passwordLoading: true });
-      await this.props.setPassword({
+      const result = await this.props.setPassword({
         variables: { password, currentPassword },
       });
+      await this.props.login(result.data.setPassword.token);
       await this.props.refetchLoggedInUser();
       this.setState({
         currentPassword: '',
@@ -813,8 +815,11 @@ const accountHasTwoFactorAuthQuery = gql`
 const setPasswordMutation = gql`
   mutation SetPassword($password: String!, $currentPassword: String) {
     setPassword(password: $password, currentPassword: $currentPassword) {
-      id
-      hasPassword
+      individual {
+        id
+        hasPassword
+      }
+      token
     }
   }
 `;
