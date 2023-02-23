@@ -130,6 +130,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
   const { formatMessage } = useIntl();
   const [selected, setSelected] = React.useState([]);
   const { addToast } = useToasts();
+  const inheritsPolicies = Boolean(collective.parentCollective);
 
   // GraphQL
   const { loading, data } = useQuery(getSettingsQuery, {
@@ -456,7 +457,8 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             disabled={
               isSettingPolicies ||
               (numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled)) ||
-              authorCannotApproveExpenseEnforcedByHost
+              authorCannotApproveExpenseEnforcedByHost ||
+              inheritsPolicies
             }
           />
           <Flex
@@ -473,7 +475,8 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               disabled={
                 isSettingPolicies ||
                 authorCannotApproveExpenseEnforcedByHost ||
-                !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled
+                !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled ||
+                inheritsPolicies
               }
               currency={data?.account?.currency}
               currencyDisplay="CODE"
@@ -661,6 +664,7 @@ Policies.propTypes = {
     id: PropTypes.number,
     slug: PropTypes.string,
     isHost: PropTypes.bool,
+    parentCollective: PropTypes.any,
     members: PropTypes.arrayOf(
       PropTypes.shape({
         role: PropTypes.string,
