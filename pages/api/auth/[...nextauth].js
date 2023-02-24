@@ -20,23 +20,9 @@ const loggedInUserQuery = gql`
 const oAuthUrl = process.env.OPENCOLLECTIVE_OAUTH_URL;
 const oAuthScopes = process.env.OPENCOLLECTIVE_OAUTH_SCOPES;
 
-// console.log({
-//   id: 'opencollective',
-//   name: 'Open Collective',
-//   type: 'oauth',
-//   authorization: `${oAuthUrl}/oauth/authorize?scope=${oAuthScopes}`,
-//   token: `${process.env.API_URL}/oauth/token`,
-//   userinfo: {
-//     url: `${process.env.API_URL}/graphql`,
-//     params: { query: queryToString(loggedInUserQuery) },
-//   },
-//   options: {
-//     clientId: process.env.OPENCOLLECTIVE_OAUTH_APP_ID,
-//     clientSecret: process.env.OPENCOLLECTIVE_OAUTH_APP_SECRET,
-//   },
-// });
-
 export default NextAuth({
+  debug: false,
+
   providers: [
     {
       id: 'opencollective',
@@ -62,9 +48,7 @@ export default NextAuth({
       },
     },
   ],
-  theme: {
-    colorScheme: 'light',
-  },
+
   callbacks: {
     async jwt({ token, account }) {
       // Persist the OAuth access_token to the token right after signin

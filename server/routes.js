@@ -59,7 +59,7 @@ module.exports = (expressApp, nextApp) => {
   // we use Cloudflare workers to route the request directly to the API
   if (process.env.API_PROXY === 'true') {
     app.use(
-      '/api',
+      '/api/',
       proxy(baseApiUrl, {
         parseReqBody: false,
         proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
@@ -82,6 +82,12 @@ module.exports = (expressApp, nextApp) => {
       }),
     );
   }
+
+  // No cache on API please
+  app.use('/api/', (req, res, next) => {
+    res.removeHeader('Cache-Control');
+    next();
+  });
 
   /**
    * Contact Form
