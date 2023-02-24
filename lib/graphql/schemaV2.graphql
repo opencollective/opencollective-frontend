@@ -13365,7 +13365,7 @@ type Mutation {
     The current password (if any) to confirm password change.
     """
     currentPassword: String
-  ): Individual!
+  ): SetPasswordResponse!
 
   """
   Invite a new member to the Collective. Scope: "account".
@@ -14899,6 +14899,11 @@ enum ProcessHostApplicationAction {
   SEND_PUBLIC_MESSAGE
 }
 
+type SetPasswordResponse {
+  individual: Individual!
+  token: String
+}
+
 input MemberInvitationReferenceInput {
   """
   The public id identifying the member invitation (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -15276,11 +15281,6 @@ input PendingOrderCreateInput {
   The collective you want to contribute to
   """
   toAccount: AccountReferenceInput!
-
-  """
-  The event/project you want to contribute to
-  """
-  childAccount: AccountReferenceInput
 
   """
   Platform tip attached to this order
