@@ -234,6 +234,7 @@ class UserSecurity extends React.Component {
 
     try {
       this.setState({ passwordLoading: true });
+      const hadPassword = this.props.LoggedInUser.hasPassword;
       await this.props.setPassword({
         variables: { password, currentPassword },
       });
@@ -248,7 +249,7 @@ class UserSecurity extends React.Component {
       });
       this.props.addToast({
         type: TOAST_TYPE.SUCCESS,
-        message: this.props.LoggedInUser.hasPassword ? (
+        message: hadPassword ? (
           <FormattedMessage defaultMessage="Password successfully updated" />
         ) : (
           <FormattedMessage defaultMessage="Password successfully set" />
