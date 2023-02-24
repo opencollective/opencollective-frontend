@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { Lock } from '@styled-icons/fa-solid';
+import { Lock } from '@styled-icons/fa-solid/Lock';
 import { get, isEmpty } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
