@@ -134,7 +134,7 @@ describe('signin', () => {
 
     const expectedEmailSubject = 'Open Collective: Sign In';
     cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
-    cy.contains('a', 'One-click login').click();
+    cy.contains('a', 'One-click Sign In').click();
     cy.wait(200);
     cy.contains('Welcome to Open Collective!');
   });
@@ -156,7 +156,7 @@ describe('signin', () => {
 
     const expectedEmailSubject = 'Open Collective: Sign In';
     cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
-    cy.contains('a', 'One-click login').click();
+    cy.contains('a', 'One-click Sign In').click();
     cy.wait(200);
     cy.contains('How Open Collective works');
   });
