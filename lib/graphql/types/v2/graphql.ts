@@ -5430,7 +5430,7 @@ export type Mutation = {
   /** Update newsletter opt-in preference. Scope: "account". */
   setNewsletterOptIn: Individual;
   /** Set password to Individual. Scope: "account". 2FA. */
-  setPassword: Individual;
+  setPassword: SetPasswordResponse;
   /** Adds or removes a policy on a given account. Scope: "account". */
   setPolicies: Account;
   setTags: TagResponse;
@@ -7022,8 +7022,6 @@ export type PaypalPlan = {
 export type PendingOrderCreateInput = {
   /** The contribution amount, without platform contribution and taxes */
   amount: AmountInput;
-  /** The event/project you want to contribute to */
-  childAccount?: InputMaybe<AccountReferenceInput>;
   /** Public order description */
   description?: InputMaybe<Scalars['String']>;
   /** When is the money expected? */
@@ -7950,6 +7948,12 @@ export enum SecurityCheckScope {
 export type SendMessageResult = {
   __typename?: 'SendMessageResult';
   success?: Maybe<Scalars['Boolean']>;
+};
+
+export type SetPasswordResponse = {
+  __typename?: 'SetPasswordResponse';
+  individual: Individual;
+  token?: Maybe<Scalars['String']>;
 };
 
 /** A social link */

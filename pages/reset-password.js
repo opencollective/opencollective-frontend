@@ -7,6 +7,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { compose } from '../lib/utils';
 
 import Avatar from '../components/Avatar';
 import Body from '../components/Body';
@@ -21,6 +22,7 @@ import StyledButton from '../components/StyledButton';
 import StyledInput from '../components/StyledInput';
 import StyledInputField from '../components/StyledInputField';
 import { H1, P } from '../components/Text';
+import { withUser } from '../components/UserProvider';
 
 class ResetPasswordPage extends React.Component {
   static getInitialProps({ query: { token } }) {
@@ -39,6 +41,10 @@ class ResetPasswordPage extends React.Component {
 
     /* From addResetPasswordAccountQuery */
     data: PropTypes.object,
+
+    // from WithUser
+    login: PropTypes.func.isRequired,
+    refetchLoggedInUser: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -69,7 +75,11 @@ class ResetPasswordPage extends React.Component {
     this.setState({ passwordLoading: true });
 
     try {
-      await this.props.resetPassword({ variables: { password } });
+      const result = await this.props.resetPassword({ variables: { password } });
+      if (result.data.setPassword.token) {
+        await this.props.login(result.data.setPassword.token);
+      }
+      await this.props.refetchLoggedInUser();
       await this.props.router.push({ pathname: '/reset-password/completed' });
     } catch (error) {
       const errorMessage = i18nGraphqlException(this.props.intl, error);
@@ -238,7 +248,10 @@ class ResetPasswordPage extends React.Component {
 const resetPasswordMutation = gql`
   mutation ResetPassword($password: String!) {
     setPassword(password: $password) {
-      id
+      individual {
+        id
+      }
+      token
     }
   }
 `;
@@ -256,27 +269,28 @@ const resetPasswordAccountQuery = gql`
   }
 `;
 
-const addResetPasswordMutation = graphql(resetPasswordMutation, {
-  name: 'resetPassword',
-  options: props => {
-    return {
-      context: {
-        ...API_V2_CONTEXT,
-        headers: { authorization: `Bearer ${props.token}` },
-      },
-    };
-  },
-});
+const addGraphql = compose(
+  graphql(resetPasswordMutation, {
+    name: 'resetPassword',
+    options: props => {
+      return {
+        context: {
+          ...API_V2_CONTEXT,
+          headers: { authorization: `Bearer ${props.token}` },
+        },
+      };
+    },
+  }),
+  graphql(resetPasswordAccountQuery, {
+    options: props => {
+      return {
+        context: {
+          ...API_V2_CONTEXT,
+          headers: { authorization: `Bearer ${props.token}` },
+        },
+      };
+    },
+  }),
+);
 
-const addResetPasswordAccountQuery = graphql(resetPasswordAccountQuery, {
-  options: props => {
-    return {
-      context: {
-        ...API_V2_CONTEXT,
-        headers: { authorization: `Bearer ${props.token}` },
-      },
-    };
-  },
-});
-
-export default withRouter(injectIntl(addResetPasswordAccountQuery(addResetPasswordMutation(ResetPasswordPage))));
+export default withRouter(injectIntl(withUser(addGraphql(ResetPasswordPage))));
