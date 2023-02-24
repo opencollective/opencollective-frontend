@@ -46,7 +46,7 @@ describe('passwords', () => {
 
     // Submit new password
     cy.contains('button', 'Set Password').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Password successfully updated' });
+    cy.checkToast({ type: 'SUCCESS', message: 'Password successfully set' });
   });
 
   it('can then be edited', () => {

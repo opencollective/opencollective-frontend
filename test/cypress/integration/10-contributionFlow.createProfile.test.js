@@ -4,7 +4,9 @@ describe('Contribution Flow: Create profile', () => {
   it('Personal profile', () => {
     // Create account is the default view when unauthenticated
     cy.visit('/apex/donate');
-
+    // Wait for query params to be loaded
+    cy.url().should('contain', 'interval=oneTime&amount=20');
+    cy.wait(250);
     // Skip the step details
     cy.get('button[data-cy="cf-next-step"]').click();
 

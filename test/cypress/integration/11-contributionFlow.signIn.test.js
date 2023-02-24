@@ -7,8 +7,14 @@ describe('Contribution Flow: Sign In', () => {
     cy.createCollective({ type: 'USER', email: validUserEmail });
   });
 
-  it("Doesn't allow to submit if email is invalid", () => {
+  beforeEach(() => {
     cy.visit('/apex/donate');
+    cy.url().should('contain', 'interval=oneTime&amount=20');
+    // Still need to wait a bit for the query params to be loaded
+    cy.wait(250);
+  });
+
+  it("Doesn't allow to submit if email is invalid", () => {
     cy.get('button[data-cy="cf-next-step"]').click();
 
     cy.getByDataCy('cf-profile-signin-btn').click();
@@ -20,7 +26,6 @@ describe('Contribution Flow: Sign In', () => {
   });
 
   it("Shows a warning when email doesn't exist", () => {
-    cy.visit('/apex/donate');
     cy.get('button[data-cy="cf-next-step"]').click();
 
     cy.getByDataCy('cf-profile-signin-btn').click();
@@ -33,7 +38,6 @@ describe('Contribution Flow: Sign In', () => {
   });
 
   it('Works if given a valid email', () => {
-    cy.visit('/apex/donate');
     cy.get('button[data-cy="cf-next-step"]').click();
 
     cy.getByDataCy('cf-profile-signin-btn').click();

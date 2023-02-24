@@ -62,7 +62,7 @@ class Updates extends React.Component {
 
     return (
       <div className="Updates">
-        <Container position="relative" border="1px solid #e6e8eb" borderRadius={5}>
+        <Container position="relative" border="1px solid #e6e8eb" borderRadius={5} data-cy="updatesList">
           {this.state.loading && (
             <LoadingContainer>
               <FormattedMessage id="loading" defaultMessage="loading" />

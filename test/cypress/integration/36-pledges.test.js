@@ -14,6 +14,7 @@ describe('Pledges', () => {
     });
 
     it('join an existing pledge individual pledge', () => {
+      cy.wait(250);
       cy.visit('/opencollective-frontend');
       let value1 = '';
       cy.get('[data-cy="currencyAmount"]').then($val => {
@@ -106,8 +107,7 @@ describe('Pledges Logged out', () => {
     cy.get('[data-cy="amountPledgedTotal"]').then($val => {
       amountOutside = $val.text();
     });
-    cy.login();
-    cy.visit('/opencollective-frontend');
+    cy.login({ redirect: '/opencollective-frontend' });
     cy.get('[data-cy="currencyAmount"]').should('contain', amountOutside);
   });
 });
