@@ -25,25 +25,25 @@ import Custom404 from './404';
 /** A page rendered when collective is pledged and not active yet */
 const PledgedCollectivePage = dynamic(
   () => import(/* webpackChunkName: 'PledgedCollectivePage' */ '../components/PledgedCollectivePage'),
-  { loading: Loading, ssr: false },
+  { loading: Loading },
 );
 
 /** A page rendered when collective is incognito */
 const IncognitoUserCollective = dynamic(
   () => import(/* webpackChunkName: 'IncognitoUserCollective' */ '../components/IncognitoUserCollective'),
-  { loading: Loading, ssr: false },
+  { loading: Loading },
 );
 
 /** A page rendered when collective is guest */
 const GuestUserProfile = dynamic(
   () => import(/* webpackChunkName: 'GuestUserProfile' */ '../components/GuestUserProfile'),
-  { loading: Loading, ssr: false },
+  { loading: Loading },
 );
 
 /** Load the onboarding modal dynamically since it's not used often */
 const OnboardingModal = dynamic(
   () => import(/* webpackChunkName: 'OnboardingModal' */ '../components/onboarding-modal/OnboardingModal'),
-  { loading: Loading, ssr: false },
+  { loading: Loading },
 );
 
 const GlobalStyles = createGlobalStyle`
