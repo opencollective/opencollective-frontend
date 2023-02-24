@@ -150,7 +150,7 @@ class SectionUpdates extends React.PureComponent {
           </div>
         ) : (
           <Box mt={[3, 5]} mb={[3, 4]}>
-            <StyledCard data-cy="updatesList">
+            <StyledCard>
               {updates.map((update, idx) => (
                 <Container
                   key={update.id}
