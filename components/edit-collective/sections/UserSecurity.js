@@ -235,10 +235,10 @@ class UserSecurity extends React.Component {
 
     try {
       this.setState({ passwordLoading: true });
-      const result = await this.props.setPassword({
-        variables: { password, currentPassword },
-      });
-      await this.props.login(result.data.setPassword.token);
+      const result = await this.props.setPassword({ variables: { password, currentPassword } });
+      if (result.data.setPassword.token) {
+        await this.props.login(result.data.setPassword.token);
+      }
       await this.props.refetchLoggedInUser();
       this.setState({
         currentPassword: '',
@@ -824,15 +824,6 @@ const setPasswordMutation = gql`
   }
 `;
 
-const addAccountHasTwoFactorAuthData = graphql(accountHasTwoFactorAuthQuery, {
-  options: props => ({
-    context: API_V2_CONTEXT,
-    variables: {
-      slug: props.slug,
-    },
-  }),
-});
-
 const addGraphql = compose(
   graphql(setPasswordMutation, {
     name: 'setPassword',
@@ -846,7 +837,14 @@ const addGraphql = compose(
     name: 'removeTwoFactorAuthTokenFromIndividual',
     options: { context: API_V2_CONTEXT },
   }),
-  addAccountHasTwoFactorAuthData,
+  graphql(accountHasTwoFactorAuthQuery, {
+    options: props => ({
+      context: API_V2_CONTEXT,
+      variables: {
+        slug: props.slug,
+      },
+    }),
+  }),
 );
 
 export default injectIntl(withToasts(withUser(addGraphql(UserSecurity))));
