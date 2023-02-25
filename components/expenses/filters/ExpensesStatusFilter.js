@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 
 import expenseStatus from '../../../lib/constants/expense-status';
 import { i18nExpenseStatus } from '../../../lib/i18n/expense';
+import { sortSelectOptions } from '../../../lib/utils';
 
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 
@@ -27,7 +28,7 @@ const ExpenseStatusFilter = ({ value, onChange, ignoredExpenseStatus = IGNORED_E
     <StyledSelectFilter
       inputId="expenses-status-filter"
       data-cy="expenses-filter-status"
-      options={options}
+      options={options.sort(sortSelectOptions)}
       onChange={({ value }) => onChange(value)}
       value={getOption(intl, value || 'ALL')}
       {...props}
