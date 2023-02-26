@@ -2213,7 +2213,7 @@
   "paymentMethod.confirm": "Potwierdź",
   "paymentMethod.editSubscriptions": "Edytuj cykliczne wsparcie finansowe",
   "paymentmethod.label": "Metoda płatności",
-  "paymentMethod.manual.edit.description": "Contributors can choose \"Bank Transfer\" as a payment method at checkout and instructions will be automatically emailed to them. Once received, you can mark the transaction as confirmed to credit the budget on Open Collective.",
+  "paymentMethod.manual.edit.description": "Uczestnicy mogą wybrać \"przelew bankowy\" jako metodę płatności przy kasie, a instrukcje zostaną im automatycznie przesłane pocztą elektroniczną. Po otrzymaniu instrukcji możesz oznaczyć transakcję jako potwierdzoną, aby zasilić budżet Open Collective.",
   "paymentMethod.save": "Zapamiętaj tę metodę płatności",
   "paymentMethod.typeSelect": "{type, select, giftcard {Karta podarunkowa} creditcard {Karta kredytowa} prepaid {Zapłacono} other {}}",
   "PaymentMethodExpiredOn": "Wygasło {expiryDate}",
