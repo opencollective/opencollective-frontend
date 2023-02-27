@@ -231,7 +231,8 @@ const ExpenseSummary = ({
                             item: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
                           }}
                         />{' '}
-                        <FormattedDate value={attachment.incurredAt} />
+                        {/* Using timeZone=UTC as we only store the date as a UTC string, without time */}
+                        <FormattedDate value={attachment.incurredAt} dateStyle="long" timeZone="UTC" />{' '}
                       </Span>
                     )}
                   </Flex>
