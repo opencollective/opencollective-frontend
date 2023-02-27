@@ -487,15 +487,11 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
   const currencyFieldName = getFieldName('data.currency');
   const selectedCurrency = get(formik.values, currencyFieldName);
 
-  const validateCurrency = () => {
+  const validateCurrencyMinimumAmount = () => {
     // Skip if currency is fixed (2) (3)
     // or if `availableCurrencies` is not set (but we're not supposed to be there anyway)
     if (fixedCurrency || !availableCurrencies) {
       return;
-    }
-
-    if (!formik?.values?.currency) {
-      return formatMessage({ defaultMessage: 'Please select a currency' });
     }
 
     // Only validate minimum amount if the form has items
@@ -523,7 +519,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
 
   return (
     <React.Fragment>
-      <Field name={currencyFieldName} validate={validateCurrency}>
+      <Field name={currencyFieldName} validate={validateCurrencyMinimumAmount}>
         {({ field }) => (
           <StyledInputField name={field.name} label={formatMessage(msg.currency)} labelFontSize="13px" mt={3} mb={2}>
             {({ id }) => (

@@ -193,35 +193,13 @@ Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserE
  * provided, the email used will default to `defaultTestUserEmail`.
  */
 Cypress.Commands.add('createHostedCollectiveV2', ({ email = defaultTestUserEmail, testPayload } = {}) => {
-  const user = { email, newsletterOptIn: false };
-  return signinRequest(user, null).then(response => {
-    const token = getTokenFromRedirectUrl(response.body.redirect);
-    return graphqlQueryV2(token, {
-      operationName: 'createCollective',
-      query: `
-          mutation createCollective($collective: CollectiveCreateInput!, $host: AccountReferenceInput!, $testPayload: JSON) {
-            createCollective(collective: $collective, host: $host, testPayload: $testPayload) {
-              id
-              slug
-              name
-              description
-              settings
-            }
-          }
-        `,
-      variables: {
-        host: { slug: 'opensourceorg' },
-        testPayload: testPayload || null,
-        collective: {
-          name: 'TestCollective',
-          slug: randomSlug(),
-          description: 'A test collective',
-          repositoryUrl: 'https://github.com/opencollective',
-        },
-      },
-    }).then(({ body }) => {
-      return body.data.createCollective;
-    });
+  return cy.createCollectiveV2({
+    email,
+    testPayload,
+    host: { slug: 'opensourceorg' },
+    collective: {
+      repositoryUrl: 'https://github.com/opencollective',
+    },
   });
 });
 
@@ -581,6 +559,41 @@ Cypress.Commands.add('restoreLocalStorage', () => {
   });
 });
 
+Cypress.Commands.add('getStripePaymentElement', getStripePaymentElement);
+
+Cypress.Commands.add('createCollectiveV2', ({ email = defaultTestUserEmail, testPayload, host, collective } = {}) => {
+  const user = { email, newsletterOptIn: false };
+  return signinRequest(user, null).then(response => {
+    const token = getTokenFromRedirectUrl(response.body.redirect);
+    return graphqlQueryV2(token, {
+      operationName: 'createCollective',
+      query: `
+          mutation createCollective($collective: CollectiveCreateInput!, $host: AccountReferenceInput!, $testPayload: JSON) {
+            createCollective(collective: $collective, host: $host, testPayload: $testPayload) {
+              id
+              slug
+              name
+              description
+              settings
+            }
+          }
+        `,
+      variables: {
+        host,
+        testPayload: testPayload || null,
+        collective: {
+          name: 'TestCollective',
+          slug: randomSlug(),
+          description: 'A test collective',
+          ...collective,
+        },
+      },
+    }).then(({ body }) => {
+      return body.data.createCollective;
+    });
+  });
+});
+
 // ---- Private ----
 
 /**
@@ -692,5 +705,14 @@ function getEmail(emailMatcher, timeout = 8000) {
     }
     cy.wait(100);
     return getEmail(emailMatcher, timeout - 100);
+  });
+}
+
+function getStripePaymentElement() {
+  const stripeIframeSelector = '.__PrivateStripeElement iframe';
+  const iframePromise = cy.get(stripeIframeSelector).first();
+
+  return iframePromise.then(iframe => {
+    return iframe.contents().find('body');
   });
 }

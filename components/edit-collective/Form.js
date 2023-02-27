@@ -20,7 +20,6 @@ import { ALL_SECTIONS } from '../admin-panel/constants';
 import ActivityLog from '../admin-panel/sections/ActivityLog';
 import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
 import ForDevelopers from '../admin-panel/sections/ForDevelopers';
-import CodeRepositoryIcon from '../CodeRepositoryIcon';
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
 import { Box, Flex } from '../Grid';
@@ -667,31 +666,6 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'slug',
           pre: 'https://opencollective.com/',
-          placeholder: '',
-          when: () => collective.type !== EVENT,
-        },
-        {
-          name: 'twitterHandle',
-          type: 'text',
-          pre: 'https://twitter.com/',
-          maxLength: 255,
-          placeholder: '',
-          label: 'Twitter',
-          when: () => collective.type !== EVENT,
-        },
-        {
-          name: 'repositoryUrl',
-          type: 'text',
-          pre: <CodeRepositoryIcon repositoryUrl={this.state.collective.repositoryUrl} size={16} color="#757677" />,
-          maxLength: 2048,
-          label: intl.formatMessage({ defaultMessage: 'Code repository' }),
-          placeholder: 'https://github.com/my-organization/my-repo',
-          when: () => collective.type !== EVENT,
-        },
-        {
-          name: 'website',
-          type: 'text',
-          maxLength: 255,
           placeholder: '',
           when: () => collective.type !== EVENT,
         },

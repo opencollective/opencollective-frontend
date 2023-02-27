@@ -187,11 +187,12 @@ type ModalFooterProps = {
   children: React.ReactNode;
   dividerMargin?: string;
   isFullWidth?: boolean;
+  showDivider?: boolean;
 };
 
-export const ModalFooter = ({ children, isFullWidth, dividerMargin, ...props }: ModalFooterProps) => (
+export const ModalFooter = ({ children, isFullWidth, showDivider, dividerMargin, ...props }: ModalFooterProps) => (
   <Container {...props}>
-    <Divider margin={dividerMargin} isFullWidth={isFullWidth} />
+    {showDivider && <Divider margin={dividerMargin} isFullWidth={isFullWidth} />}
     {children}
   </Container>
 );
@@ -199,11 +200,13 @@ export const ModalFooter = ({ children, isFullWidth, dividerMargin, ...props }: 
 ModalFooter.propTypes = {
   children: PropTypes.node,
   isFullWidth: PropTypes.bool,
+  showDivider: PropTypes.bool,
   dividerMargin: PropTypes.string,
 };
 
 ModalFooter.defaultProps = {
   dividerMargin: '2rem 0',
+  showDivider: true,
 };
 
 const DefaultTrapContainer = props => {

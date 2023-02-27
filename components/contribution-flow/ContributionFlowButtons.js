@@ -51,7 +51,7 @@ class ContributionFlowButtons extends React.Component {
 
   render() {
     const { goBack, isValidating, nextStep, paypalButtonProps, currency, tier, isCrypto, stepDetails } = this.props;
-    const totalAmount = getTotalAmount(stepDetails, this.props.stepSummary);
+    const totalAmount = getTotalAmount(stepDetails, this.props.stepSummary, isCrypto);
     return (
       <Flex flexWrap="wrap" justifyContent="center">
         <Fragment>

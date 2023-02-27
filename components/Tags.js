@@ -4,21 +4,26 @@ import { gql, useMutation } from '@apollo/client';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { i18nGraphqlException } from '../lib/errors';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
-import { Flex } from '../Grid';
-import StyledInputTags from '../StyledInputTags';
-import StyledTag from '../StyledTag';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import ExpenseTypeTag from './expenses/ExpenseTypeTag';
+import { Flex } from './Grid';
+import StyledInputTags from './StyledInputTags';
+import StyledTag from './StyledTag';
+import { TOAST_TYPE, useToasts } from './ToastProvider';
 
-import ExpenseTypeTag from './ExpenseTypeTag';
-
-const editExpenseTagsMutation = gql`
-  mutation EditExpenseTags($id: String!, $tags: [String!]!) {
-    editExpense(expense: { id: $id, tags: $tags }) {
-      id
-      tags
+const setTagsMutation = gql`
+  mutation SetTags($order: OrderReferenceInput, $expense: ExpenseReferenceInput, $tags: [String!]!) {
+    setTags(expense: $expense, order: $order, tags: $tags) {
+      order {
+        id
+        tags
+      }
+      expense {
+        id
+        tags
+      }
     }
   }
 `;
@@ -26,18 +31,20 @@ const editExpenseTagsMutation = gql`
 /**
  * Display expense tags, with the ability to edit them. Triggers a migration whenever a tag changes.
  */
-const ExpenseTagsForAdmins = ({ expense, suggestedTags }) => {
-  const [submitTags, { loading }] = useMutation(editExpenseTagsMutation, { context: API_V2_CONTEXT });
+const TagsForAdmins = ({ expense, order, suggestedTags }) => {
+  const [setTags, { loading }] = useMutation(setTagsMutation, { context: API_V2_CONTEXT });
+  const tagList = expense?.tags || order?.tags;
   const { addToast } = useToasts();
   const intl = useIntl();
   return (
     <StyledInputTags
       disabled={loading}
-      value={expense.tags}
+      value={tagList}
       suggestedTags={suggestedTags}
       onChange={async tags => {
         try {
-          await submitTags({ variables: { id: expense.id, tags: tags.map(tag => tag.value) } });
+          const referencedObject = expense ? { expense: { id: expense.id } } : { order: { id: order.id } };
+          await setTags({ variables: { ...referencedObject, tags: tags.map(tag => tag.value) } });
         } catch (e) {
           addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
         }
@@ -46,30 +53,41 @@ const ExpenseTagsForAdmins = ({ expense, suggestedTags }) => {
   );
 };
 
-ExpenseTagsForAdmins.propTypes = {
+TagsForAdmins.propTypes = {
   suggestedTags: PropTypes.arrayOf(PropTypes.string),
   expense: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    id: PropTypes.string,
+    status: PropTypes.string,
     tags: PropTypes.arrayOf(PropTypes.string),
-  }).isRequired,
+    legacyId: PropTypes.number,
+    type: PropTypes.string,
+  }),
+  order: PropTypes.shape({
+    id: PropTypes.string,
+    status: PropTypes.string,
+    tags: PropTypes.arrayOf(PropTypes.string),
+    legacyId: PropTypes.number,
+    type: PropTypes.string,
+  }),
 };
 
-const ExpenseTag = styled(StyledTag).attrs({
+const Tag = styled(StyledTag).attrs({
   mb: '4px',
   mr: '4px',
   variant: 'rounded-right',
 })``;
 
-const ExpenseTags = ({ expense, isLoading, limit, getTagProps, children, canEdit, suggestedTags, showUntagged }) => {
+const Tags = ({ expense, order, isLoading, limit, getTagProps, children, canEdit, suggestedTags, showUntagged }) => {
   const intl = useIntl();
+  const tagList = expense?.tags || order?.tags;
 
   const renderTag = ({ tag, label }) => {
     const extraTagProps = getTagProps?.(tag) || {};
 
     const renderedTag = (
-      <ExpenseTag key={tag} data-cy="expense-tag" {...extraTagProps}>
+      <Tag key={tag} data-cy="expense-tag" {...extraTagProps}>
         {label ?? tag}
-      </ExpenseTag>
+      </Tag>
     );
 
     return children ? children({ key: tag, tag, renderedTag, props: extraTagProps }) : renderedTag;
@@ -79,25 +97,25 @@ const ExpenseTags = ({ expense, isLoading, limit, getTagProps, children, canEdit
       {expense?.type && <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} isLoading={isLoading} />}
 
       {canEdit ? (
-        <ExpenseTagsForAdmins expense={expense} suggestedTags={suggestedTags} />
+        <TagsForAdmins expense={expense} order={order} suggestedTags={suggestedTags} />
       ) : (
-        expense?.tags && (
+        tagList && (
           <React.Fragment>
-            {expense.tags.slice(0, limit).map(tag => renderTag({ tag }))}
+            {tagList.slice(0, limit).map(tag => renderTag({ tag }))}
             {showUntagged &&
               renderTag({
                 tag: 'untagged',
                 label: intl.formatMessage(defineMessage({ defaultMessage: 'Untagged' })),
               })}
 
-            {expense.tags.length > limit && (
-              <ExpenseTag color="black.600" title={expense.tags.slice(limit).join(', ')}>
+            {tagList.length > limit && (
+              <Tag color="black.600" title={tagList.slice(limit).join(', ')}>
                 <FormattedMessage
                   id="expenses.countMore"
                   defaultMessage="+ {count} more"
-                  values={{ count: expense.tags.length - limit }}
+                  values={{ count: tagList.length - limit }}
                 />
-              </ExpenseTag>
+              </Tag>
             )}
           </React.Fragment>
         )
@@ -106,7 +124,7 @@ const ExpenseTags = ({ expense, isLoading, limit, getTagProps, children, canEdit
   );
 };
 
-ExpenseTags.propTypes = {
+Tags.propTypes = {
   isLoading: PropTypes.bool,
   /** Max number of tags to display */
   limit: PropTypes.number,
@@ -119,6 +137,14 @@ ExpenseTags.propTypes = {
   /** If canEdit is true, this array is used to display suggested tags */
   suggestedTags: PropTypes.arrayOf(PropTypes.string),
   expense: PropTypes.shape({
+    id: PropTypes.string,
+    status: PropTypes.string,
+    tags: PropTypes.arrayOf(PropTypes.string),
+    legacyId: PropTypes.number,
+    type: PropTypes.string,
+  }),
+  order: PropTypes.shape({
+    id: PropTypes.string,
     status: PropTypes.string,
     tags: PropTypes.arrayOf(PropTypes.string),
     legacyId: PropTypes.number,
@@ -128,8 +154,8 @@ ExpenseTags.propTypes = {
   showUntagged: PropTypes.bool,
 };
 
-ExpenseTags.defaultProps = {
+Tags.defaultProps = {
   limit: 4,
 };
 
-export default ExpenseTags;
+export default Tags;

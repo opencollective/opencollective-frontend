@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { parseDateInterval } from '../../lib/date-utils';
@@ -84,6 +84,16 @@ const accountOrdersQuery = gql`
           name
           imageUrl
         }
+        pendingContributionData {
+          expectedAt
+          paymentMethod
+          ponumber
+          memo
+          fromAccountInfo {
+            name
+            email
+          }
+        }
         toAccount {
           id
           slug
@@ -113,17 +123,25 @@ const isValidStatus = status => {
 const getVariablesFromQuery = (query, forcedStatus) => {
   const amountRange = parseAmountRange(query.amount);
   const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
+  const searchTerm = query.searchTerm || null;
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || ORDERS_PER_PAGE,
-    status: forcedStatus ? forcedStatus : isValidStatus(query.status) ? query.status : null,
+    status: searchTerm ? null : forcedStatus ? forcedStatus : isValidStatus(query.status) ? query.status : null,
     minAmount: amountRange[0] && amountRange[0] * 100,
     maxAmount: amountRange[1] && amountRange[1] * 100,
     dateFrom,
     dateTo,
-    searchTerm: query.searchTerm,
+    searchTerm,
   };
 };
+
+const messages = defineMessages({
+  searchPlaceholder: {
+    id: 'Orders.Search.Placeholder',
+    defaultMessage: 'Search all contributions...',
+  },
+});
 
 const hasParams = query => {
   return Object.entries(query).some(([key, value]) => {
@@ -152,6 +170,7 @@ const updateQuery = (router, newParams) => {
 
 const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreatePendingOrder }) => {
   const router = useRouter() || { query: {} };
+  const intl = useIntl();
   const hasFilters = React.useMemo(() => hasParams(router.query), [router.query]);
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
   const queryVariables = { accountSlug, ...getVariablesFromQuery(router.query, status) };
@@ -179,6 +198,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
           <SearchBar
             defaultValue={router.query.searchTerm}
             onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
+            placeholder={intl.formatMessage(messages.searchPlaceholder)}
           />
         </Box>
       </Flex>
@@ -205,6 +225,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
               height="38px"
               lineHeight="12px"
               mt="17px"
+              data-cy="create-pending-contribution"
             >
               Create +
             </StyledButton>

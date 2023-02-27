@@ -28,7 +28,6 @@ import ErrorPage from '../components/ErrorPage';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
 import ExpensesList from '../components/expenses/ExpensesList';
-import ExpenseTags from '../components/expenses/ExpenseTags';
 import { ExpensesDirection } from '../components/expenses/filters/ExpensesDirection';
 import ExpensesOrder, { parseChronologicalOrderInput } from '../components/expenses/filters/ExpensesOrder';
 import { expenseHostFields, expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
@@ -41,6 +40,7 @@ import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import Pagination from '../components/Pagination';
 import SearchBar from '../components/SearchBar';
+import Tags from '../components/Tags';
 import { H1, H5 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
@@ -334,7 +334,7 @@ class ExpensePage extends React.Component {
                       <H5 mb={3}>
                         <FormattedMessage id="Tags" defaultMessage="Tags" />
                       </H5>
-                      <ExpenseTags
+                      <Tags
                         isLoading={data.loading}
                         expense={{
                           tags: data.account?.expensesTags.map(({ tag }) => tag),
@@ -356,7 +356,7 @@ class ExpensePage extends React.Component {
                             {renderedTag}
                           </Link>
                         )}
-                      </ExpenseTags>
+                      </Tags>
                     </React.Fragment>
                   )}
                 </ExpenseInfoSidebar>

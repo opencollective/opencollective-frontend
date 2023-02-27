@@ -245,7 +245,7 @@ const StepSummary = ({
   const tierType = tier?.type;
   const hostCountry = get(collective.host, 'location.country');
   const collectiveCountry = collective.location.country || get(collective.parent, 'location.country');
-  const currency = tier?.amount.currency || collective.currency;
+  const currency = isCrypto ? stepDetails.currency.value : tier?.amount.currency || collective.currency;
 
   const [formState, setFormState] = useState({ isEnabled: false, error: false });
   const taxPercentage = getTaxPercentageForProfile(taxes, tierType, hostCountry, collectiveCountry, data);
@@ -314,6 +314,10 @@ StepSummary.propTypes = {
     amount: PropTypes.number.isRequired,
     /** Number of items to order */
     quantity: PropTypes.number,
+    /** Currency of the order (for crypto flow) */
+    currency: {
+      value: PropTypes.string,
+    },
   }),
   stepProfile: PropTypes.shape({
     location: PropTypes.shape({

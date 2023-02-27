@@ -472,6 +472,7 @@ export default class RichTextEditor extends React.Component {
     const onFailure = () => {
       this.props.setUploading?.(false);
       this.setState({ error: 'File upload failed' });
+      attachment.remove();
     };
     uploadImageWithXHR(attachment.file, this.props.kind, { onProgress, onSuccess, onFailure });
     return e;
@@ -630,7 +631,7 @@ export default class RichTextEditor extends React.Component {
         ref={this.mainContainerRef}
       >
         {this.state.error && (
-          <MessageBox type="error" withIcon>
+          <MessageBox type="error" mb="36px" withIcon>
             {this.state.error.toString()}
           </MessageBox>
         )}

@@ -29,6 +29,8 @@ env:
   IMAGES_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-images
   TERM: xterm
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  STRIPE_WEBHOOK_KEY: ${{ secrets.STRIPE_WEBHOOK_KEY }}
+  STRIPE_WEBHOOK_SIGNING_SECRET: ${{ secrets.STRIPE_WEBHOOK_SIGNING_SECRET }}
 
 jobs:
   e2e:
@@ -72,6 +74,12 @@ jobs:
 
       - name: Install graphicsmagick
         run: sudo apt-get install -y graphicsmagick
+
+      - name: Install stripe-cli
+        run: |
+          sudo apt-get install -y wget
+          wget https://github.com/stripe/stripe-cli/releases/download/v1.13.9/stripe_1.13.9_linux_x86_64.tar.gz -O /tmp/stripe_1.13.9_linux_x86_64.tar.gz
+          sudo tar xzvf /tmp/stripe_1.13.9_linux_x86_64.tar.gz -C /bin/
 
       - name: Checkout (frontend)
         uses: actions/checkout@v3
