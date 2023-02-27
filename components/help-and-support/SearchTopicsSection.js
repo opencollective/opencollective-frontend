@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search } from '@styled-icons/boxicons-regular';
+import { Search } from '@styled-icons/boxicons-regular/Search';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 

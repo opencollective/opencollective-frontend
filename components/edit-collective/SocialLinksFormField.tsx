@@ -1,6 +1,7 @@
 import React from 'react';
-import { Plus, Times } from '@styled-icons/fa-solid';
-import { DragIndicator } from '@styled-icons/material';
+import { Plus } from '@styled-icons/fa-solid/Plus';
+import { Times } from '@styled-icons/fa-solid/Times';
+import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { sortBy } from 'lodash';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
