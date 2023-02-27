@@ -57,42 +57,25 @@ class CreateOrganization extends React.Component {
 
     delete organization.authorization;
 
+    const inviteMembers = this.state.admins
+      .filter(admin => {
+        if (admin.member.id !== this.props.LoggedInUser.collective.id) {
+          return admin;
+        }
+      })
+      .map(admin => ({
+        memberAccount: { slug: admin.member.slug },
+        role: admin.role,
+      }));
+
     try {
       const response = await this.props.createOrganization({
         variables: {
           organization,
+          inviteMembers,
         },
       });
 
-      if (response) {
-        await this.props.refetchLoggedInUser();
-        const member = await this.props.LoggedInUser.memberOf.filter(
-          member => member.collective.id === response.data.createOrganization.legacyId,
-        );
-        const adminList = this.state.admins.filter(admin => {
-          if (admin.member.id !== this.props.LoggedInUser.collective.id) {
-            return admin;
-          }
-        });
-
-        this.setState({
-          admins: [...adminList, { role: 'ADMIN', member: this.props.LoggedInUser.collective, id: member[0].id }],
-        });
-
-        await this.props.editCollectiveMembers({
-          variables: {
-            collectiveId: response.data.createOrganization.legacyId,
-            members: this.state.admins.map(member => ({
-              id: member.id,
-              role: member.role,
-              member: {
-                id: member.member.id,
-                name: member.member.name,
-              },
-            })),
-          },
-        });
-      }
       await this.props.refetchLoggedInUser();
 
       this.props.router
@@ -147,8 +130,8 @@ class CreateOrganization extends React.Component {
 }
 
 const createOrganizationMutation = gql`
-  mutation CreateOrganization($organization: OrganizationCreateInput!) {
-    createOrganization(organization: $organization) {
+  mutation CreateOrganization($organization: OrganizationCreateInput!, $inviteMembers: [InviteMemberInput]) {
+    createOrganization(organization: $organization, inviteMembers: $inviteMembers) {
       id
       name
       slug
