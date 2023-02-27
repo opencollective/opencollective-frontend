@@ -610,7 +610,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                             height="34px"
                             onClick={() => setShowCreatePendingOrderModal(true)}
                           >
-                            <FormattedMessage id="order.edit" defaultMessage="Edit Order" />
+                            <FormattedMessage id="contribution.edit" defaultMessage="Edit Contribution" />
                           </StyledButton>
                           {showCreatePendingOrderModal && (
                             <CreatePendingOrderModal
