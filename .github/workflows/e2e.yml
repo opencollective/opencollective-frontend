@@ -63,11 +63,6 @@ jobs:
       - name: Hack sources.list
         run: sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu/|http://mirror.arizona.edu/ubuntu/|g' /etc/apt/sources.list
 
-      - name: Add stripe apt sources
-        run: |
-          curl -s https://packages.stripe.dev/api/security/keypair/stripe-cli-gpg/public | gpg --dearmor | sudo tee /usr/share/keyrings/stripe.gpg
-          echo "deb [signed-by=/usr/share/keyrings/stripe.gpg] https://packages.stripe.dev/stripe-cli-debian-local stable main" | sudo tee -a /etc/apt/sources.list.d/stripe.list
-
       - name: Update apt
         run: sudo apt-get update || exit 0
 
@@ -81,7 +76,10 @@ jobs:
         run: sudo apt-get install -y graphicsmagick
 
       - name: Install stripe-cli
-        run: sudo apt-get install -y stripe
+        run: |
+          sudo apt-get install -y wget
+          wget https://github.com/stripe/stripe-cli/releases/download/v1.13.9/stripe_1.13.9_linux_x86_64.tar.gz -O /tmp/stripe_1.13.9_linux_x86_64.tar.gz
+          sudo tar xzvf /tmp/stripe_1.13.9_linux_x86_64.tar.gz -C /bin/
 
       - name: Checkout (frontend)
         uses: actions/checkout@v3

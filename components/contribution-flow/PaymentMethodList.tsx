@@ -275,7 +275,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
               <PayWithStripeForm
                 bilingDetails={{
                   name: props.fromAccount?.name,
-                  email: LoggedInUser?.email,
+                  email: LoggedInUser?.email ?? props?.fromAccount?.email,
                 }}
                 paymentIntentId={paymentIntent.id}
                 paymentIntentClientSecret={paymentIntent.client_secret}

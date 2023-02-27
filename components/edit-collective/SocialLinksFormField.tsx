@@ -2,8 +2,9 @@ import React from 'react';
 import { closestCenter, DndContext } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Plus, Times } from '@styled-icons/fa-solid';
-import { DragIndicator } from '@styled-icons/material';
+import { Plus } from '@styled-icons/fa-solid/Plus';
+import { Times } from '@styled-icons/fa-solid/Times';
+import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { sortBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 

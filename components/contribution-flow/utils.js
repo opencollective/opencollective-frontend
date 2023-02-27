@@ -1,5 +1,5 @@
 import React from 'react';
-import { CreditCard } from '@styled-icons/fa-solid';
+import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import { find, get, isEmpty, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 

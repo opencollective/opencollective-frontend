@@ -81,7 +81,7 @@ describe('Accept financial contributions flow', () => {
     it('Successfully applies to a host', () => {
       cy.visit(`/${collectiveSlug}/accept-financial-contributions`);
       cy.getByDataCy('afc-picker-host-button').click();
-      cy.getByDataCy('afc-host-collective-card').should('have.length', 4);
+      cy.getByDataCy('afc-host-collective-card').should('have.length', 5);
       cy.get(':nth-child(2) > [data-cy="afc-host-collective-card"]').within(() => {
         cy.getByDataCy('afc-host-apply-button').click();
       });

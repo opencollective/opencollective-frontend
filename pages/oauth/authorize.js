@@ -58,7 +58,7 @@ const OAuthAuthorizePage = () => {
   const queryParams = { skip: skipQuery, variables: queryVariables, context: API_V2_CONTEXT };
   const { data, error, loading: isLoadingAuthorization } = useQuery(applicationQuery, queryParams);
   const isLoading = loadingLoggedInUser || isLoadingAuthorization;
-  const requestedScopes = query.scope ? query.scope.split(',').map(s => s.trim().toLowerCase()) : [];
+  const requestedScopes = query.scope ? query.scope.split(',').map(s => s.trim()) : [];
   const hasExistingAuthorization = isValidAuthorization(data?.application?.oAuthAuthorization, requestedScopes);
 
   return (
