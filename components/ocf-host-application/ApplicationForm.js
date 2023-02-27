@@ -20,6 +20,7 @@ import { i18nOCFApplicationFormLabel } from '../../lib/i18n/ocf-form';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';
+import CollectiveTagsInput from '../CollectiveTagsInput';
 import Container from '../Container';
 import OCFHostApplicationFAQ from '../faqs/OCFHostApplicationFAQ';
 import { Box, Flex } from '../Grid';
@@ -123,6 +124,7 @@ const ApplicationForm = ({
   router,
   collective: collectiveWithSlug,
   host,
+  popularTags,
 }) => {
   const intl = useIntl();
   const [submitApplication, { loading: submitting, error }] = useApplicationMutation(canApplyWithCollective);
@@ -566,6 +568,31 @@ const ApplicationForm = ({
                         </P>
                       </Box>
                       <Box width={['256px', '484px', '663px']} my={2}>
+                        <StyledInputFormikField
+                          name="collective.tags"
+                          htmlFor="tags"
+                          labelFontSize="13px"
+                          labelColor="#4E5052"
+                          labelProps={{ fontWeight: '600', lineHeight: '16px' }}
+                          label={intl.formatMessage({ id: 'Tags', defaultMessage: 'Tags' })}
+                          data-cy="ccf-form-tags"
+                        >
+                          {({ field }) => (
+                            <CollectiveTagsInput
+                              {...field}
+                              defaultValue={field.value}
+                              onChange={tags => {
+                                setFieldValue(
+                                  'collective.tags',
+                                  tags.map(t => t.value),
+                                );
+                              }}
+                              suggestedTags={popularTags}
+                            />
+                          )}
+                        </StyledInputFormikField>
+                      </Box>
+                      <Box width={['256px', '484px', '663px']} my={2}>
                         <P fontSize="13px" lineHeight="16px" color="#4E5052">
                           <FormattedMessage id="onboarding.admins.header" defaultMessage="Add administrators" />
                         </P>
@@ -767,6 +794,7 @@ ApplicationForm.propTypes = {
     slug: PropTypes.string,
     policies: PropTypes.object,
   }),
+  popularTags: PropTypes.arrayOf(PropTypes.string),
   loadingCollective: PropTypes.bool,
   canApplyWithCollective: PropTypes.bool,
   router: PropTypes.object,

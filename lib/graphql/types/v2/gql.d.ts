@@ -6,6 +6,14 @@ declare module "@apollo/client" {
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query SearchTags($term: String) {\n    tagStats(tagSearchTerm: $term) {\n      nodes {\n        id\n        tag\n      }\n    }\n  }\n"): typeof import('./graphql').SearchTagsDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query tagStats($host: AccountReferenceInput) {\n    tagStats(host: $host, limit: 5) {\n      nodes {\n        id\n        tag\n      }\n    }\n  }\n"): typeof import('./graphql').TagStatsDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query AdminPanel($slug: String!) {\n    account(slug: $slug) {\n      id\n      legacyId\n      slug\n      name\n      isHost\n      type\n      settings\n      isArchived\n      isIncognito\n      imageUrl(height: 256)\n      features {\n        id\n        ...NavbarFields\n        VIRTUAL_CARDS\n        USE_PAYMENT_METHODS\n        EMIT_GIFT_CARDS\n      }\n      policies {\n        REQUIRE_2FA_FOR_ADMINS\n      }\n      ... on AccountWithParent {\n        parent {\n          id\n          slug\n          policies {\n            REQUIRE_2FA_FOR_ADMINS\n          }\n        }\n      }\n      ... on AccountWithHost {\n        hostFeePercent\n        host {\n          id\n          slug\n          name\n          settings\n          policies {\n            EXPENSE_AUTHOR_CANNOT_APPROVE {\n              enabled\n              amountInCents\n              appliesToHostedCollectives\n              appliesToSingleAdminCollectives\n            }\n            COLLECTIVE_MINIMUM_ADMINS {\n              numberOfAdmins\n              applies\n              freeze\n            }\n          }\n        }\n      }\n      ... on AccountWithHost {\n        isApproved\n      }\n    }\n  }\n  \n"): typeof import('./graphql').AdminPanelDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.

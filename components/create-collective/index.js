@@ -166,8 +166,8 @@ const createCollectiveMutation = gql`
 `;
 
 const tagStatsQuery = gql`
-  query CreateCollectivePageQuery {
-    tagStats {
+  query TagStatsQuery($host: AccountReferenceInput) {
+    tagStats(limit: 6, host: $host) {
       nodes {
         id
         tag
@@ -182,8 +182,13 @@ const addCreateCollectiveMutation = graphql(createCollectiveMutation, {
 });
 
 const addTagStatsQuery = graphql(tagStatsQuery, {
-  options: {
-    context: API_V2_CONTEXT,
+  options: props => {
+    return {
+      context: API_V2_CONTEXT,
+      variables: {
+        host: props.host ? { slug: props.host.slug } : undefined,
+      },
+    };
   },
 });
 

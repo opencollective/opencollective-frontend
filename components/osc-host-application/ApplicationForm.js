@@ -22,6 +22,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';
+import CollectiveTagsInput from '../CollectiveTagsInput';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -216,6 +217,7 @@ const ApplicationForm = ({
   collective: collectiveWithSlug,
   host,
   refetchLoggedInUser,
+  popularTags,
 }) => {
   const intl = useIntl();
   const [submitApplication, { loading: submitting, error }] = useApplicationMutation(canApplyWithCollective);
@@ -484,7 +486,7 @@ const ApplicationForm = ({
                               </P>
                             </Box>
                           </Grid>
-                          <Box>
+                          <Box mb={3}>
                             <StyledInputFormikField
                               name="collective.description"
                               htmlFor="description"
@@ -508,6 +510,30 @@ const ApplicationForm = ({
                             <P fontSize="13px" lineHeight="20px" color="black.600" mt="6px">
                               {intl.formatMessage(messages.descriptionHint)}
                             </P>
+                          </Box>
+                          <Box>
+                            <StyledInputFormikField
+                              name="collective.tags"
+                              htmlFor="tags"
+                              labelFontSize="16px"
+                              labelProps={{ fontWeight: '600' }}
+                              label={intl.formatMessage(messages.tagsLabel)}
+                              data-cy="ccf-form-tags"
+                            >
+                              {({ field }) => (
+                                <CollectiveTagsInput
+                                  {...field}
+                                  defaultValue={field.value}
+                                  onChange={tags => {
+                                    setFieldValue(
+                                      'collective.tags',
+                                      tags.map(t => t.value),
+                                    );
+                                  }}
+                                  suggestedTags={popularTags}
+                                />
+                              )}
+                            </StyledInputFormikField>
                           </Box>
                         </React.Fragment>
                       )}
@@ -892,6 +918,7 @@ ApplicationForm.propTypes = {
     slug: PropTypes.string,
     policies: PropTypes.object,
   }),
+  popularTags: PropTypes.arrayOf(PropTypes.string),
   loadingCollective: PropTypes.bool,
   canApplyWithCollective: PropTypes.bool,
   router: PropTypes.object,

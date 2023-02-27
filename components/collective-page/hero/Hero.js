@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { Tags } from '@styled-icons/bootstrap/Tags';
 import { Palette } from '@styled-icons/boxicons-regular/Palette';
 import { Camera } from '@styled-icons/feather/Camera';
 import { Globe } from '@styled-icons/feather/Globe';
@@ -18,6 +19,7 @@ import CodeRepositoryIcon from '../../CodeRepositoryIcon';
 import ContactCollectiveBtn from '../../ContactCollectiveBtn';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
+import EditTagsModal from '../../EditTagsModal';
 import { Box, Flex } from '../../Grid';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
 import Link from '../../Link';
@@ -25,6 +27,7 @@ import LinkCollective from '../../LinkCollective';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import { Dropdown, DropdownContent } from '../../StyledDropdown';
+import { EditTag } from '../../StyledInputTags';
 import StyledLink from '../../StyledLink';
 import StyledModal from '../../StyledModal';
 import StyledRoundButton from '../../StyledRoundButton';
@@ -104,6 +107,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   const { LoggedInUser } = useLoggedInUser();
   const [hasColorPicker, showColorPicker] = React.useState(false);
   const [isEditingCover, editCover] = React.useState(false);
+  const [isEditingTags, editTags] = React.useState(false);
   const isEditing = hasColorPicker || isEditingCover;
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isEvent = collective.type === CollectiveType.EVENT;
@@ -131,6 +135,8 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   return (
     <Fragment>
       {isEditingCover && <HeroBackgroundCropperModal collective={collective} onClose={() => editCover(false)} />}
+      {isEditingTags && <EditTagsModal collective={collective} onClose={() => editTags(false)} />}
+
       <Container position="relative" minHeight={325} zIndex={1000} data-cy="collective-hero">
         <HeroBackground collective={collective} />
         {isAdmin && !isEditing && (
@@ -247,6 +253,14 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                         </Dropdown>
                       )}
                     </Fragment>
+                  )}
+                  {isAdmin && (
+                    <EditTag ml="10px" mt={['5px', 0]} active={isEditingTags} onClick={() => editTags(true)}>
+                      <Tags size="14px" />{' '}
+                      <Span ml="4px" letterSpacing={0}>
+                        <FormattedMessage id="StyledInputTags.EditLabel" defaultMessage="Edit Tags" />
+                      </Span>
+                    </EditTag>
                   )}
                 </Flex>
               )}
