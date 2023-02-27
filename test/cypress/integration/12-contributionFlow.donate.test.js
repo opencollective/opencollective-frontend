@@ -124,6 +124,7 @@ describe('Contribution Flow: Donate', () => {
 
     cy.clock(Date.parse('2042/05/25'));
     cy.contains('the next charge will be on May 1, 2043');
+    cy.wait(250);
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.checkStepsProgress({ enabled: ['details', 'profile'] });
     cy.get('button[data-cy="cf-next-step"]').click();
@@ -143,7 +144,9 @@ describe('Contribution Flow: Donate', () => {
 
   it('works with 3D secure', retriesConfig3DSecure, () => {
     cy.signup({ redirect: `${donateRoute}/42/year`, visitParams, user: { name: 'John Doe' } });
+    cy.wait(250);
     cy.get('button[data-cy="cf-next-step"]').click();
+    cy.wait(250);
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.checkStepsProgress({ enabled: ['details', 'profile', 'payment'] });
     cy.wait(3000); // Wait for stripe to be loaded
@@ -207,7 +210,9 @@ describe('Contribution Flow: Donate', () => {
 
   it('Shows Stripe errors in the frontend', () => {
     cy.signup({ redirect: donateRoute, visitParams, user: { name: 'John Doe' } });
+    cy.wait(250);
     cy.get('button[data-cy="cf-next-step"]').click();
+    cy.wait(250);
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.wait(3000); // Wait for stripe to be loaded
     cy.fillStripeInput({ card: CreditCards.CARD_DECLINED });

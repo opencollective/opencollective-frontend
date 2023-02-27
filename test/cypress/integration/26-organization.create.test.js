@@ -14,7 +14,9 @@ describe('create an organization', () => {
     cy.get('[data-cy="cof-org-description"]').type('short description for new org');
     cy.get('[data-cy="cof-org-website"]').type('ww.com');
     cy.get('[data-cy="custom-checkbox"]').click();
+    cy.wait(250);
     cy.get('[data-cy="cof-form-submit"]').click();
+    cy.wait(300);
     cy.contains('Your Organization has been created.');
     cy.wait(300);
   });

@@ -41,6 +41,8 @@ describe('New expense flow', () => {
     });
 
     it('submits new expense then edit it', () => {
+      cy.getByDataCy('radio-expense-type-RECEIPT');
+      cy.wait(250);
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
       // Select Payout Method
       cy.getByDataCy('payout-method-select').click();
@@ -137,6 +139,8 @@ describe('New expense flow', () => {
     });
 
     it('can create a new organization', () => {
+      cy.getByDataCy('radio-expense-type-RECEIPT');
+      cy.wait(250);
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
 
       cy.getByDataCy('select-expense-payee').click();
@@ -191,6 +195,8 @@ describe('New expense flow', () => {
         url: 'https://country-service.shopifycloud.com/graphql',
         query: { fixture: 'countries.json' },
       });
+      cy.getByDataCy('radio-expense-type-INVOICE');
+      cy.wait(250);
       cy.getByDataCy('radio-expense-type-INVOICE').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
@@ -219,6 +225,8 @@ describe('New expense flow', () => {
       let inviteeEmail = randomEmail();
 
       it('can invite an existing user to submit an expense', () => {
+        cy.getByDataCy('radio-expense-type-INVOICE');
+        cy.wait(250);
         cy.getByDataCy('radio-expense-type-INVOICE').click();
 
         cy.getByDataCy('select-expense-payee').click();
@@ -242,6 +250,8 @@ describe('New expense flow', () => {
       });
 
       it('can invite a third-party user to submit an expense', () => {
+        cy.getByDataCy('radio-expense-type-INVOICE');
+        cy.wait(250);
         cy.getByDataCy('radio-expense-type-INVOICE').click();
 
         cy.getByDataCy('select-expense-payee').click();
@@ -271,10 +281,14 @@ describe('New expense flow', () => {
       });
 
       it('can create a new expense and account as the invitee', () => {
+        cy.wait(250);
         cy.visit(`/${collective}/expenses/${expenseId}?key=draft-key`);
         cy.logout();
         cy.reload();
+        cy.wait(500);
 
+        cy.getByDataCy('country-select');
+        cy.wait(250);
         cy.getByDataCy('country-select').click();
         cy.contains('[data-cy="select-option"]', 'Angola').click();
         cy.get('[data-cy="address-address1"]').type('Street Name, 123');
@@ -306,6 +320,8 @@ describe('New expense flow', () => {
 
       it('can invite a third-party organization to submit an expense', () => {
         inviteeEmail = randomEmail();
+        cy.getByDataCy('radio-expense-type-INVOICE');
+        cy.wait(250);
         cy.getByDataCy('radio-expense-type-INVOICE').click();
 
         cy.getByDataCy('select-expense-payee').click();
