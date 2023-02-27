@@ -159,6 +159,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
             </Span>
             <StyledInputAmount
               name="paymentProcessorFee"
+              data-cy="payment-processor-fee"
               width="142px"
               currency={currency}
               onChange={value => setPaymentProcessorFee(value)}
