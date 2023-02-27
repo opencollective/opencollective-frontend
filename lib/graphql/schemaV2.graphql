@@ -12859,6 +12859,11 @@ type Mutation {
     Information about the organization to create (name, slug, description, website, ...)
     """
     organization: OrganizationCreateInput!
+
+    """
+    List of members to invite on Organization creation.
+    """
+    inviteMembers: [InviteMemberInput]
   ): Organization
 
   """
