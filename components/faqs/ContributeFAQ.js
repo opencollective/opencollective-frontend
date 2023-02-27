@@ -63,7 +63,7 @@ const ContributeFAQ = ({ collective, isCrypto, ...props }) => (
         </Content>
       </Entry>
     )}
-    {collective.host.contributionPolicy && (
+    {collective.host.contributionPolicy && collective.name !== collective.host.name && (
       <Entry>
         <Title>
           <FormattedMessage
