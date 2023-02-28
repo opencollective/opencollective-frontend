@@ -10,9 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Install Dependencies
-        shell: bash
-        run: npm install -g npm@8.19.2
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      # Publish to Chromatic
       - name: Publish to Chromatic
         uses: chromaui/action@v1
         with:
