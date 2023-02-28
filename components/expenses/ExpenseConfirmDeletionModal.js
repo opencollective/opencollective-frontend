@@ -51,7 +51,15 @@ const ExpenseConfirmDeletion = ({ onDelete, showDeleteConfirmMoreActions, expens
           continueHandler={async () => {
             try {
               await deleteExpense({ variables: { id: expense.id } });
-              addToast({ type: TOAST_TYPE.SUCCESS, message: 'Expense has been deleted successfully' });
+              addToast({
+                type: TOAST_TYPE.SUCCESS,
+                message: (
+                  <FormattedMessage
+                    id="delete.successMessage"
+                    defaultMessage="'Expense has been deleted successfully'"
+                  />
+                ),
+              });
             } catch (e) {
               addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
             }

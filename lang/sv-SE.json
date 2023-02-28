@@ -886,6 +886,7 @@
   "DDNNLJ": "Funktioner för insamling och crowdfunding",
   "Decline": "Neka",
   "DefaultValue": "Förvalt värde",
+  "delete.successMessage": "'Expense has been deleted successfully'",
   "Details": "Detaljer",
   "deViVP": "{type, select, TICKET {Ticket} other {Tier}} created.",
   "dG3sDf": "För mer information om OAuth applikationer, se <link>vår dokumentation</link>.",

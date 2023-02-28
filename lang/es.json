@@ -886,6 +886,7 @@
   "DDNNLJ": "Funciones para recaudar fondos y financiar en masa",
   "Decline": "Denegar",
   "DefaultValue": "Valor predeterminado",
+  "delete.successMessage": "'Expense has been deleted successfully'",
   "Details": "Detalles",
   "deViVP": "{type, select, TICKET {Ticket} other {Tier}} created.",
   "dG3sDf": "Para más información sobre las aplicaciones OAuth, consulta <link>nuestra documentación</link>.",

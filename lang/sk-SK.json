@@ -886,6 +886,7 @@
   "DDNNLJ": "Možnosti získavania finančných prostriedkov a crowdfundingu",
   "Decline": "Odmietnuť",
   "DefaultValue": "Predvolená hodnota",
+  "delete.successMessage": "'Expense has been deleted successfully'",
   "Details": "Podrobnosti",
   "deViVP": "{type, select, TICKET {Ticket} other {Tier}} created.",
   "dG3sDf": "Ďalšie informácie o aplikáciách OAuth nájdete v <link>našej dokumentácii</link>.",

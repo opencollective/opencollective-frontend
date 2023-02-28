@@ -886,6 +886,7 @@
   "DDNNLJ": "Recursos de capitação e financiamento coletivo",
   "Decline": "Recusar",
   "DefaultValue": "Valor padrão",
+  "delete.successMessage": "'Expense has been deleted successfully'",
   "Details": "Detalhes",
   "deViVP": "{type, select, TICKET {Ticket} other {Tier}} created.",
   "dG3sDf": "Para obter mais informações sobre aplicações OAuth, consulte <link>nossa documentação</link>.",

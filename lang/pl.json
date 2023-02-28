@@ -886,6 +886,7 @@
   "DDNNLJ": "Cechy fundraisingu i crowdfundingu",
   "Decline": "Odrzuć",
   "DefaultValue": "Wartość domyślna",
+  "delete.successMessage": "'Expense has been deleted successfully'",
   "Details": "Szczegóły",
   "deViVP": "{type, select, TICKET {Bilet} other {Poziom}} utworzono.",
   "dG3sDf": "Aby uzyskać więcej informacji o aplikacjach OAuth, sprawdź <link>naszą dokumentację</link>.",
