@@ -217,11 +217,12 @@ class SectionContribute extends React.PureComponent {
     const orderKeys = getCollectiveContributionCardsOrder(collective);
     const contributeCards = this.getContributeCards(tiers);
     const sortedContributeCards = this.sortContributeCards(contributeCards, orderKeys);
-    const hasContribute = isAdmin || (collective.isActive && contributeCards.length);
+    const hasContribute = Boolean(isAdmin || (collective.isActive && contributeCards.length));
     const hasNoContributor = !this.hasContributors(contributors);
     const sortedTicketTiers = this.sortTicketTiers(this.filterTickets(tiers));
+    const hasTickets = isEvent && Boolean(isAdmin || (collective.isActive && sortedTicketTiers.length));
     const hideTicketsFromNonAdmins = (sortedTicketTiers.length === 0 || !collective.isActive) && !isAdmin;
-    const cannotOrderTickets = (!hasContribute && !isAdmin) || isPastEvent(collective);
+    const cannotOrderTickets = (!hasTickets && !isAdmin) || isPastEvent(collective);
 
     /*
     cases
@@ -232,7 +233,7 @@ class SectionContribute extends React.PureComponent {
     3. not admin + Collective not active + no connectedcollectives/events = display nothing ✅
     */
 
-    if (!hasContribute && !hasOtherWaysToContribute) {
+    if (!hasContribute && !hasTickets && !hasOtherWaysToContribute) {
       return null;
     }
 
