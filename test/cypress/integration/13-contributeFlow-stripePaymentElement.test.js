@@ -186,6 +186,8 @@ describe('Contribute Flow: Stripe Payment Element', () => {
     });
 
     it('Guest', () => {
+      cy.logout();
+
       const email = `${randomSlug()}@guest.com`;
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate`);
