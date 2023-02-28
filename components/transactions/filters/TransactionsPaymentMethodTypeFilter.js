@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { maxWidth } from 'styled-system';
 
 import { i18nPaymentMethodType } from '../../../lib/i18n/payment-method-type';
+import { sortSelectOptions } from '../../../lib/utils';
 
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 import { Span } from '../../Text';
@@ -64,27 +65,10 @@ const REACT_SELECT_COMPONENT_OVERRIDE = {
   MultiValue: () => null, // Items will be displayed as a truncated string in `TruncatedValueContainer `
 };
 
-/**
- * Sort options as: All, then by alphabetical order, then "No payment method" at the end
- */
-const sortTypes = (option1, option2) => {
-  if (option1.value === 'ALL') {
-    return -1;
-  } else if (option2.value === 'ALL') {
-    return 1;
-  } else if (option1.value === null) {
-    return 1;
-  } else if (option2.value === null) {
-    return -1;
-  } else {
-    return option1.label.localeCompare(option2.label);
-  }
-};
-
 const TransactionsPaymentMethodTypeFilter = ({ onChange, value, types, ...props }) => {
   const intl = useIntl();
   const getOption = (value, idx) => ({ label: i18nPaymentMethodType(intl, value), value: value, idx });
-  const options = ['ALL', ...types].map(getOption).sort(sortTypes);
+  const options = ['ALL', ...types].map(getOption).sort(sortSelectOptions);
   const selectedTypes = value?.split(',') || [];
   const selectedOptions = !value
     ? [options[0]]
