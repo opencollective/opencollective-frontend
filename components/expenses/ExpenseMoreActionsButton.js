@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Mutation } from '@apollo/client/react/components';
+// import { Mutation } from '@apollo/client/react/components';
 import { Check } from '@styled-icons/feather/Check';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
@@ -9,24 +9,19 @@ import { Flag as FlagIcon } from '@styled-icons/feather/Flag';
 import { Link as IconLink } from '@styled-icons/feather/Link';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { useRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { margin } from 'styled-system';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useClipboard from '../../lib/hooks/useClipboard';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
-import { deleteExpenseMutation, removeExpenseFromCache } from '../../components/expenses/DeleteExpenseButton';
-
-import ConfirmationModal from '../ConfirmationModal';
 import { Flex } from '../Grid';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
+import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
 import MarkExpenseAsIncompleteModal from './MarkExpenseAsIncompleteModal';
 
@@ -81,8 +76,8 @@ const ExpenseMoreActionsButton = ({
   const [showMarkAsIncompleteModal, setMarkAsIncompleteModal] = React.useState(false);
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
-  const { addToast } = useToasts();
-  const intl = useIntl();
+  // const { addToast } = useToasts();
+  // const intl = useIntl();
 
   const router = useRouter();
   const permissions = expense?.permissions;
@@ -176,34 +171,11 @@ const ExpenseMoreActionsButton = ({
         <MarkExpenseAsIncompleteModal expense={expense} onClose={() => setMarkAsIncompleteModal(false)} />
       )}
       {hasDeleteConfirm && (
-        <Mutation mutation={deleteExpenseMutation} context={API_V2_CONTEXT} update={removeExpenseFromCache}>
-          {deleteExpense => (
-            <ConfirmationModal
-              isDanger
-              type="delete"
-              onClose={() => showDeleteConfirmMoreActions(false)}
-              header={<FormattedMessage id="actions.delete" defaultMessage="Delete" />}
-              continueHandler={async () => {
-                try {
-                  await deleteExpense({ variables: { id: expense.id } });
-                  addToast({ type: TOAST_TYPE.SUCCESS, message: 'Expense has been deleted successfully' });
-                } catch (e) {
-                  addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
-                }
-
-                if (onDelete) {
-                  await onDelete(expense);
-                }
-                showDeleteConfirmMoreActions(false);
-              }}
-            >
-              <FormattedMessage
-                id="Expense.DeleteDetails"
-                defaultMessage="This will permanently delete the expense and all attachments and comments."
-              />
-            </ConfirmationModal>
-          )}
-        </Mutation>
+        <ExpenseConfirmDeletion
+          onDelete={onDelete}
+          expense={expense}
+          showDeleteConfirmMoreActions={showDeleteConfirmMoreActions}
+        />
       )}
     </React.Fragment>
   );
