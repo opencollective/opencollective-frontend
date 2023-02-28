@@ -852,7 +852,7 @@ type Order {
   """
   Host fee percent attached to the Order.
   """
-  hostFeePercent: Int
+  hostFeePercent: Float
 
   """
   Platform Tip attached to the Order.
@@ -3769,6 +3769,7 @@ enum PaymentMethodLegacyType {
   US_BANK_ACCOUNT
   SEPA_DEBIT
   BACS_DEBIT
+  BANCONTACT
 }
 
 """
