@@ -67,7 +67,7 @@ class NewContributionFlowPage extends React.Component {
     const queryParameters = {
       ...omit(router.query, ['verb', 'step', 'collectiveSlug']),
     };
-    addParentToURLIfMissing(router, account, `/${router.query.verb}/${router.query.step}`, queryParameters);
+    addParentToURLIfMissing(router, account, `/${router.query.verb}/${router.query.step ?? ''}`, queryParameters);
   }
 
   componentDidUpdate(prevProps) {
