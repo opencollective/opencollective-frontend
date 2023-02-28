@@ -22,8 +22,10 @@ const getOptions = (intl, ignoredExpenseStatus) => {
 
 const ExpenseStatusFilter = ({ value, onChange, ignoredExpenseStatus = IGNORED_EXPENSE_STATUS, ...props }) => {
   const intl = useIntl();
-  const options = React.useMemo(() => getOptions(intl, ignoredExpenseStatus), [ignoredExpenseStatus]);
-  const sortedOptions = React.useMemo(() => options.sort(sortSelectOptions), [options]);
+  const sortedOptions = React.useMemo(
+    () => getOptions(intl, ignoredExpenseStatus).sort(sortSelectOptions),
+    [ignoredExpenseStatus],
+  );
 
   return (
     <StyledSelectFilter
