@@ -85,8 +85,6 @@ class Webhooks extends React.Component {
         'collective.monthly',
         'collective.transaction.created',
         'collective.transaction.paid',
-        'collective.update.created',
-        'collective.update.published',
       );
     }
     if (collectiveType !== CollectiveType.ORGANIZATION) {
@@ -97,6 +95,10 @@ class Webhooks extends React.Component {
     }
     if (!isHost) {
       removeList.push('collective.apply', 'collective.approved', 'collective.created');
+    }
+
+    if (!isHost && collectiveType === CollectiveType.USER) {
+      removeList.push('collective.update.created', 'collective.update.published');
     }
 
     return difference(WebhookEventsList, removeList);
