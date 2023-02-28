@@ -17,4 +17,5 @@ jobs:
         uses: chromaui/action@v1
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          buildScriptName: "styleguide:build"
           exitZeroOnChanges: true # 👈 Option to prevent the workflow from failing
