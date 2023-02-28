@@ -6266,7 +6266,7 @@ export type Order = {
   frequency?: Maybe<ContributionFrequency>;
   fromAccount?: Maybe<Account>;
   /** Host fee percent attached to the Order. */
-  hostFeePercent?: Maybe<Scalars['Int']>;
+  hostFeePercent?: Maybe<Scalars['Float']>;
   id: Scalars['String'];
   legacyId: Scalars['Int'];
   /** This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order. */
@@ -6902,6 +6902,7 @@ export enum PaymentMethodLegacyType {
   ADDED_FUNDS = 'ADDED_FUNDS',
   ALIPAY = 'ALIPAY',
   BACS_DEBIT = 'BACS_DEBIT',
+  BANCONTACT = 'BANCONTACT',
   BANK_TRANSFER = 'BANK_TRANSFER',
   CREDIT_CARD = 'CREDIT_CARD',
   CRYPTO = 'CRYPTO',
