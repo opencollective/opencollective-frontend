@@ -132,7 +132,7 @@ const orderPageQuery = gql`
           name
           imageUrl
         }
-        toAccount {
+        account {
           id
           slug
           name
@@ -334,6 +334,8 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
       fetchData();
     }
   }, [LoggedInUser]);
+
+  const accountTransactions = order?.transactions?.filter(t => t.account.id === account.id);
 
   return (
     <Page
@@ -538,7 +540,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                     </TransactionDetails>
                   </React.Fragment>
                 ) : (
-                  orderBy(order?.transactions, ['legacyId'], ['desc']).map(transaction => {
+                  orderBy(accountTransactions, ['legacyId'], ['desc']).map(transaction => {
                     const displayedAmount = getDisplayedAmount(transaction, account);
                     const displayPaymentFees =
                       transaction.type === 'CREDIT' &&
@@ -574,13 +576,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                             values={{
                               type: transaction.type,
                               date: <DateTime value={transaction.createdAt} dateStyle={'short'} timeStyle="short" />,
-                              account: (
-                                <LinkCollective
-                                  collective={
-                                    transaction.type === 'CREDIT' ? transaction.toAccount : transaction.fromAccount
-                                  }
-                                />
-                              ),
+                              account: <LinkCollective collective={transaction.account} />,
                             }}
                           />
                         </span>
