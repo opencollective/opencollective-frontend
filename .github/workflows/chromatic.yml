@@ -1,6 +1,9 @@
 name: 'Chromatic'
 
-on: push
+on:
+  push:
+    branches-ignore:
+      - 'renovate/**'
 
 jobs:
   chromatic-deployment:
@@ -8,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Install dependencies
-        run: npm
+        run: npm install
       - name: Publish to Chromatic
         uses: chromaui/action@v1
         with:
