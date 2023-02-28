@@ -352,15 +352,10 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
           px={[2, 3, 4]}
           mt={2}
           mb={5}
-          flexDirection={['column', null, 'row']}
+          flexDirection={['column', null, null, 'row']}
           justifyContent={'space-between'}
         >
-          <Box
-            flex="1 1"
-            flexBasis={['initial', null, null, '832px']}
-            width={[1, null, null, 832]}
-            mr={[null, 2, 3, 4]}
-          >
+          <Box flex="1 0" flexBasis={['initial', null, null, '832px']} width="100%" mr={[null, 2, 3, 4]}>
             {error && (
               <MessageBox type="error" withIcon m={4}>
                 {formatErrorMessage(intl, error)}
@@ -572,7 +567,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                         )}
                         <span>
                           <FormattedMessage
-                            defaultMessage="{type, select, CREDIT {Recevied by} DEBIT {Paid by} other {}} {account} on {date}"
+                            defaultMessage="{type, select, CREDIT {Received by} DEBIT {Paid by} other {}} {account} on {date}"
                             values={{
                               type: transaction.type,
                               date: <DateTime value={transaction.createdAt} dateStyle={'short'} timeStyle="short" />,
@@ -654,7 +649,6 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
             )}
           </Box>
           <Flex
-            flex="1 1"
             minWidth="270px"
             display={['none', 'block']}
             justifyContent={['center', null, 'flex-start', 'flex-end']}
