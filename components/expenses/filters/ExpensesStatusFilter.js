@@ -23,12 +23,13 @@ const getOptions = (intl, ignoredExpenseStatus) => {
 const ExpenseStatusFilter = ({ value, onChange, ignoredExpenseStatus = IGNORED_EXPENSE_STATUS, ...props }) => {
   const intl = useIntl();
   const options = React.useMemo(() => getOptions(intl, ignoredExpenseStatus), [ignoredExpenseStatus]);
+  const sortedOptions = React.useMemo(() => options.sort(sortSelectOptions), [options]);
 
   return (
     <StyledSelectFilter
       inputId="expenses-status-filter"
       data-cy="expenses-filter-status"
-      options={options.sort(sortSelectOptions)}
+      options={sortedOptions}
       onChange={({ value }) => onChange(value)}
       value={getOption(intl, value || 'ALL')}
       {...props}
