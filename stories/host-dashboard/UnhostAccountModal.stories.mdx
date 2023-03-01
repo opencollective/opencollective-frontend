@@ -24,9 +24,7 @@ export const DefaultStory = props => <UnhostAccountModal {...props} />;
     }}
   >
     <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-      <ToastProvider>
-        <UnhostAccountModal collective={webpackCollective} host={webpackCollective.host} />
-      </ToastProvider>
+      <UnhostAccountModal collective={webpackCollective} host={webpackCollective.host} />
     </UserContext.Provider>
   </Story>
 </Canvas>
@@ -44,12 +42,10 @@ export const DefaultStory = props => <UnhostAccountModal {...props} />;
     }}
   >
     <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-      <ToastProvider>
-        <UnhostAccountModal
-          collective={{ ...webpackCollective, stats: { balance: { valueInCents: 1000, currency: 'USD' } } }}
-          host={webpackCollective.host}
-        />
-      </ToastProvider>
+      <UnhostAccountModal
+        collective={{ ...webpackCollective, stats: { balance: { valueInCents: 1000, currency: 'USD' } } }}
+        host={webpackCollective.host}
+      />
     </UserContext.Provider>
   </Story>
 </Canvas>

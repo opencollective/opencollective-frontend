@@ -15,9 +15,7 @@ import { webpackCollective } from '../mocks/collectives';
         <Formik initialValues={{ type: 'RECEIPT', currency: 'USD' }}>
           {() => (
             <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-              <ToastProvider>
-                <FieldArray name="items" component={ExpenseFormItems} />
-              </ToastProvider>
+              <FieldArray name="items" component={ExpenseFormItems} />
             </UserContext.Provider>
           )}
         </Formik>
@@ -33,11 +31,9 @@ import { webpackCollective } from '../mocks/collectives';
         <Formik initialValues={{ type: 'INVOICE', currency: 'EUR' }}>
           {() => (
             <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-              <ToastProvider>
-                <FieldArray name="items">
-                  {fieldsArrayProps => <ExpenseFormItems {...fieldsArrayProps} collective={webpackCollective} />}
-                </FieldArray>
-              </ToastProvider>
+              <FieldArray name="items">
+                {fieldsArrayProps => <ExpenseFormItems {...fieldsArrayProps} collective={webpackCollective} />}
+              </FieldArray>
             </UserContext.Provider>
           )}
         </Formik>
@@ -63,9 +59,7 @@ import { webpackCollective } from '../mocks/collectives';
         >
           {() => (
             <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-              <ToastProvider>
-                <FieldArray name="items" component={ExpenseFormItems} />
-              </ToastProvider>
+              <FieldArray name="items" component={ExpenseFormItems} />
             </UserContext.Provider>
           )}
         </Formik>
@@ -92,9 +86,7 @@ import { webpackCollective } from '../mocks/collectives';
           >
             {() => (
               <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-                <ToastProvider>
-                  <FieldArray name="items" component={ExpenseFormItems} />
-                </ToastProvider>
+                <FieldArray name="items" component={ExpenseFormItems} />
               </UserContext.Provider>
             )}
           </Formik>

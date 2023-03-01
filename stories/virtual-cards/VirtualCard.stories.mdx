@@ -24,43 +24,6 @@ export const DefaultStory = props => <VirtualCard {...props} />;
     }}
   >
     <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-      <ToastProvider>
-        <VirtualCard
-          host={openSourceHost}
-          virtualCard={{
-            account: openSourceHost,
-            assignee: webpackCollective,
-            data: { status: 'active' },
-            last4: '9012',
-            privateData: { cvv: '321', expiryDate: '12/30', cardNumber: '5432123456789012' },
-            currency: 'USD',
-            provider: 'STRIPE',
-            spendingLimitAmount: 50000,
-            spendingLimitInterval: 'MONTHLY',
-            createdAt: '2022-09-29T05:00:00Z',
-          }}
-          canEditVirtualCard
-          canPauseOrResumeVirtualCard
-          canDeleteVirtualCard
-        />
-      </ToastProvider>
-    </UserContext.Provider>
-  </Story>
-</Canvas>
-
-## With Collective Admin
-
-<Canvas>
-  <Story
-    name="With Collective Admin"
-    parameters={{
-      design: {
-        type: 'figma',
-        url: 'https://www.figma.com/file/ZQBMWhnGGtRWeIZknFW1eP/%5BOC-Design%5D-Production-Ready-%E2%9C%85?node-id=18797%3A200561',
-      },
-    }}
-  >
-    <ToastProvider>
       <VirtualCard
         host={openSourceHost}
         virtualCard={{
@@ -79,6 +42,39 @@ export const DefaultStory = props => <VirtualCard {...props} />;
         canPauseOrResumeVirtualCard
         canDeleteVirtualCard
       />
-    </ToastProvider>
+    </UserContext.Provider>
+  </Story>
+</Canvas>
+
+## With Collective Admin
+
+<Canvas>
+  <Story
+    name="With Collective Admin"
+    parameters={{
+      design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/ZQBMWhnGGtRWeIZknFW1eP/%5BOC-Design%5D-Production-Ready-%E2%9C%85?node-id=18797%3A200561',
+      },
+    }}
+  >
+    <VirtualCard
+      host={openSourceHost}
+      virtualCard={{
+        account: openSourceHost,
+        assignee: webpackCollective,
+        data: { status: 'active' },
+        last4: '9012',
+        privateData: { cvv: '321', expiryDate: '12/30', cardNumber: '5432123456789012' },
+        currency: 'USD',
+        provider: 'STRIPE',
+        spendingLimitAmount: 50000,
+        spendingLimitInterval: 'MONTHLY',
+        createdAt: '2022-09-29T05:00:00Z',
+      }}
+      canEditVirtualCard
+      canPauseOrResumeVirtualCard
+      canDeleteVirtualCard
+    />
   </Story>
 </Canvas>

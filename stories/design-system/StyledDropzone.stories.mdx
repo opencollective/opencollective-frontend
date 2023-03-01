@@ -12,9 +12,7 @@ import { loggedInUser } from '../mocks/loggedInUser';
   <Story name="Default">
     {() => (
       <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-        <ToastProvider>
-          <StyledDropzone onSuccess={console.log} />;
-        </ToastProvider>
+        <StyledDropzone onSuccess={console.log} />
       </UserContext.Provider>
     )}
   </Story>
@@ -28,9 +26,7 @@ import { loggedInUser } from '../mocks/loggedInUser';
   <Story name="Additional Message">
     {() => (
       <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-        <ToastProvider>
-          <StyledDropzone onSuccess={console.log}>Hello World</StyledDropzone>;
-        </ToastProvider>
+        <StyledDropzone onSuccess={console.log}>Hello World</StyledDropzone>
       </UserContext.Provider>
     )}
   </Story>
@@ -42,9 +38,7 @@ import { loggedInUser } from '../mocks/loggedInUser';
   <Story name="Custom Size">
     {() => (
       <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-        <ToastProvider>
-          <StyledDropzone onSuccess={console.log} size={150} />;
-        </ToastProvider>
+        <StyledDropzone onSuccess={console.log} size={150} />
       </UserContext.Provider>
     )}
   </Story>
@@ -56,9 +50,7 @@ import { loggedInUser } from '../mocks/loggedInUser';
   <Story name="Loading State">
     {() => (
       <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-        <ToastProvider>
-          <StyledDropzone onSuccess={console.log} size={150} isLoading />;
-        </ToastProvider>
+        <StyledDropzone onSuccess={console.log} size={150} isLoading />
       </UserContext.Provider>
     )}
   </Story>
@@ -70,9 +62,7 @@ import { loggedInUser } from '../mocks/loggedInUser';
   <Story name="Show Progress">
     {() => (
       <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-        <ToastProvider>
-          <StyledDropzone onSuccess={console.log} isLoading loadingProgress={100} />;
-        </ToastProvider>
+        <StyledDropzone onSuccess={console.log} isLoading loadingProgress={100} />
       </UserContext.Provider>
     )}
   </Story>

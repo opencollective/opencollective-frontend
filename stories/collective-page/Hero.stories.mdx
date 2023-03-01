@@ -23,9 +23,7 @@ export const DefaultStory = props => <Hero {...props} />;
   }}
 >
   <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-    <ToastProvider>
-      <Hero collective={webpackCollective} host={openSourceHost} />
-    </ToastProvider>
+    <Hero collective={webpackCollective} host={openSourceHost} />
   </UserContext.Provider>
 </Story>
 

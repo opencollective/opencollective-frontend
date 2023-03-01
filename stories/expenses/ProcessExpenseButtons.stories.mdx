@@ -12,20 +12,18 @@ import { loggedInUser } from '../mocks/loggedInUser';
     {() => {
       return (
         <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-          <ToastProvider>
-            <ProcessExpenseButtons
-              expense={{ legacyId: 42, amount: 4200 }}
-              collective={webpackCollective}
-              permissions={{
-                approve: true,
-                canApprove: true,
-                canUnapprove: true,
-                canReject: true,
-                canPay: true,
-                canMarkAsUnpaid: true,
-              }}
-            />
-          </ToastProvider>
+          <ProcessExpenseButtons
+            expense={{ legacyId: 42, amount: 4200 }}
+            collective={webpackCollective}
+            permissions={{
+              approve: true,
+              canApprove: true,
+              canUnapprove: true,
+              canReject: true,
+              canPay: true,
+              canMarkAsUnpaid: true,
+            }}
+          />
         </UserContext.Provider>
       );
     }}
@@ -37,17 +35,15 @@ import { loggedInUser } from '../mocks/loggedInUser';
     {() => {
       return (
         <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-          <ToastProvider>
-            <ProcessExpenseButtons
-              expense={{ legacyId: 42, amount: 4200 }}
-              collective={webpackCollective}
-              permissions={{
-                approve: true,
-                canApprove: true,
-                canReject: true,
-              }}
-            />
-          </ToastProvider>
+          <ProcessExpenseButtons
+            expense={{ legacyId: 42, amount: 4200 }}
+            collective={webpackCollective}
+            permissions={{
+              approve: true,
+              canApprove: true,
+              canReject: true,
+            }}
+          />
         </UserContext.Provider>
       );
     }}

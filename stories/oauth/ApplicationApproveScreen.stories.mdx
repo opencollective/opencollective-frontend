@@ -23,9 +23,7 @@ export const testApp = {
     {() => {
       return (
         <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-          <ToastProvider>
-            <ApplicationApproveScreen application={testApp} />
-          </ToastProvider>
+          <ApplicationApproveScreen application={testApp} />
         </UserContext.Provider>
       );
     }}
@@ -37,9 +35,7 @@ export const testApp = {
     {() => {
       return (
         <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-          <ToastProvider>
-            <ApplicationApproveScreen autoApprove application={testApp} />
-          </ToastProvider>
+          <ApplicationApproveScreen autoApprove application={testApp} />
         </UserContext.Provider>
       );
     }}

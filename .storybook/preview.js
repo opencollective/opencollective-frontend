@@ -13,6 +13,7 @@ import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
 import { WithNextRouter } from 'storybook-addon-next-router/dist/decorators';
+import ToastProvider from '../components/ToastProvider';
 
 Object.defineProperty(nextImage, 'default', {
   configurable: true,
@@ -32,7 +33,9 @@ export const decorators = [
       <ThemeProvider theme={theme}>
         <IntlProvider locale="en">
           <UserProvider>
-            <Story />
+            <ToastProvider>
+              <Story />
+            </ToastProvider>
           </UserProvider>
         </IntlProvider>
       </ThemeProvider>

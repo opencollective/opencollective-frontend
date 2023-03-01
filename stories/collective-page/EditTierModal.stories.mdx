@@ -23,9 +23,7 @@ export const DefaultStory = props => <EditTierModal {...props} />;
     }}
   >
     <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-      <ToastProvider>
-        <EditTierModal collective={{ type: 'ORGANIZATION', currency: 'USD', isActive: true }} />
-      </ToastProvider>
+      <EditTierModal collective={{ type: 'ORGANIZATION', currency: 'USD', isActive: true }} />
     </UserContext.Provider>
   </Story>
 </Canvas>
@@ -41,9 +39,7 @@ export const DefaultStory = props => <EditTierModal {...props} />;
     }}
   >
     <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-      <ToastProvider>
-        <EditTierModal collective={{ type: 'ORGANIZATION', currency: 'USD', isActive: true }} tier={{ id: 'xpto' }} />
-      </ToastProvider>
+      <EditTierModal collective={{ type: 'ORGANIZATION', currency: 'USD', isActive: true }} tier={{ id: 'xpto' }} />
     </UserContext.Provider>
   </Story>
 </Canvas>
