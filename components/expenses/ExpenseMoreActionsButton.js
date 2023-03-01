@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import { Mutation } from '@apollo/client/react/components';
 import { Check } from '@styled-icons/feather/Check';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
@@ -76,8 +75,6 @@ const ExpenseMoreActionsButton = ({
   const [showMarkAsIncompleteModal, setMarkAsIncompleteModal] = React.useState(false);
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
-  // const { addToast } = useToasts();
-  // const intl = useIntl();
 
   const router = useRouter();
   const permissions = expense?.permissions;
