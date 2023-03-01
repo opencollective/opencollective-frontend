@@ -700,7 +700,7 @@
   "contribution.minimumAmount": "Minimum amount: {minAmount} {currency}",
   "contribution.paymentFee": "Payment processor fee",
   "contribution.quantity": "Quantitat",
-  "ContributionFlow.backToCollectivePage": "Back to Collective Page",
+  "ContributionFlow.backToCollectivePage": "Back to {accountName}'s Page",
   "ContributionFlow.Contribution": "Contribució",
   "ContributionFlow.CreateOrganizationLabel": "Contribute as an organization",
   "ContributionFlow.CreateUserLabel": "Contribute as an individual",

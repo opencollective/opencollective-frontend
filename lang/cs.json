@@ -700,7 +700,7 @@
   "contribution.minimumAmount": "Minimum amount: {minAmount} {currency}",
   "contribution.paymentFee": "Payment processor fee",
   "contribution.quantity": "Množství",
-  "ContributionFlow.backToCollectivePage": "Back to Collective Page",
+  "ContributionFlow.backToCollectivePage": "Back to {accountName}'s Page",
   "ContributionFlow.Contribution": "Příspěvek",
   "ContributionFlow.CreateOrganizationLabel": "Přispět jako organizace",
   "ContributionFlow.CreateUserLabel": "Contribute as an individual",
