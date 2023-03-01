@@ -166,7 +166,7 @@ describe('Collective page', () => {
 });
 
 describe('Collective page with euro currency', () => {
-  before(() => {
+  beforeEach(() => {
     cy.visit('/brusselstogether');
   });
 
