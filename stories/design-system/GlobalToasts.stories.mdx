@@ -1,6 +1,6 @@
 import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
 import GlobalToasts, { DEFAULT_TOAST_DURATION } from '../../components/GlobalToasts';
-import ToastProvider, { ToastContext, TOAST_TYPE } from '../../components/ToastProvider';
+import ToastProvider from '../../components/ToastProvider';
 import theme from '../../lib/theme';
 
 <Meta
@@ -32,17 +32,15 @@ import theme from '../../lib/theme';
 <Canvas>
   <Story name="Global toasts" parameters={{ controls: false }}>
     {({ toast: defaultToast, variant, type, duration }) => (
-      <ToastProvider>
-        <ToastContext.Consumer>
-          {({ toasts, removeToasts, addToast }) => (
-            <div>
-              <GlobalToasts toasts={toasts} removeToasts={removeToasts} />
-              <hr />
-              <button onClick={() => addToast({ ...defaultToast, variant, type, duration })}>Add toast</button>
-            </div>
-          )}
-        </ToastContext.Consumer>
-      </ToastProvider>
+      <ToastContext.Consumer>
+        {({ toasts, removeToasts, addToast }) => (
+          <div>
+            <GlobalToasts toasts={toasts} removeToasts={removeToasts} />
+            <hr />
+            <button onClick={() => addToast({ ...defaultToast, variant, type, duration })}>Add toast</button>
+          </div>
+        )}
+      </ToastContext.Consumer>
     )}
   </Story>
 </Canvas>

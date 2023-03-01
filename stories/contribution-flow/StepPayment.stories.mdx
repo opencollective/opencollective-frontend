@@ -1,6 +1,7 @@
 import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
 import StepPayment from '../../components/contribution-flow/StepPayment';
 import StepProfile from '../../components/contribution-flow/StepProfile';
+import StepDetails from '../../components/contribution-flow/StepDetails';
 import { webpackCollective } from '../mocks/collectives';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -10,7 +11,13 @@ const stripePromise = loadStripe('storybookStripeId');
 
 export const DefaultStory = props => (
   <Elements stripe={stripePromise}>
-    <StepPayment stepProfile={StepProfile} collective={webpackCollective} onChange={console.log} {...props} />
+    <StepPayment
+      stepProfile={StepProfile}
+      stepDetails={StepDetails}
+      collective={webpackCollective}
+      onChange={console.log}
+      {...props}
+    />
   </Elements>
 );
 

@@ -2,7 +2,7 @@ import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
 import EditVirtualCardModal from '../../components/edit-collective/EditVirtualCardModal';
 import { webpackCollective, openSourceHost } from '../mocks/collectives';
 
-import ToastProvider, { ToastContext, TOAST_TYPE } from '../../components/ToastProvider';
+import ToastProvider from '../../components/ToastProvider';
 import { UserContext } from '../../components/UserProvider';
 import { loggedInUser } from '../mocks/loggedInUser';
 
@@ -17,9 +17,7 @@ export const DefaultStory = props => <EditVirtualCardModal {...props} />;
 <Canvas>
   <Story name="Create">
     <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-      <ToastProvider>
-        <EditVirtualCardModal host={openSourceHost} />
-      </ToastProvider>
+      <EditVirtualCardModal host={openSourceHost} />
     </UserContext.Provider>
   </Story>
 </Canvas>
@@ -29,25 +27,23 @@ export const DefaultStory = props => <EditVirtualCardModal {...props} />;
 <Canvas>
   <Story name="Edit">
     <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-      <ToastProvider>
-        <EditVirtualCardModal
-          host={openSourceHost}
-          virtualCard={{
-            id: '1233',
-            name: 'Test card',
-            assignee: loggedInUser.collective,
-            account: webpackCollective,
-            data: { status: 'active' },
-            last4: '9012',
-            privateData: { cvv: '321', expiryDate: '12/30', cardNumber: '5432123456789012' },
-            currency: 'USD',
-            provider: 'STRIPE',
-            spendingLimitAmount: 50000,
-            spendingLimitInterval: 'MONTHLY',
-            createdAt: '2022-09-29T05:00:00Z',
-          }}
-        />
-      </ToastProvider>
+      <EditVirtualCardModal
+        host={openSourceHost}
+        virtualCard={{
+          id: '1233',
+          name: 'Test card',
+          assignee: loggedInUser.collective,
+          account: webpackCollective,
+          data: { status: 'active' },
+          last4: '9012',
+          privateData: { cvv: '321', expiryDate: '12/30', cardNumber: '5432123456789012' },
+          currency: 'USD',
+          provider: 'STRIPE',
+          spendingLimitAmount: 50000,
+          spendingLimitInterval: 'MONTHLY',
+          createdAt: '2022-09-29T05:00:00Z',
+        }}
+      />
     </UserContext.Provider>
   </Story>
 </Canvas>
