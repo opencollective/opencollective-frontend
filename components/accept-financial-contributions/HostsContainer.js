@@ -131,12 +131,6 @@ const hostsQuery = gql`
         currency
         totalHostedCollectives
         hostFeePercent
-        stats {
-          id
-          yearlyBudgetManaged {
-            value
-          }
-        }
       }
     }
   }
