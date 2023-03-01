@@ -2,6 +2,7 @@ import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
 import { ApplicationApproveScreen } from '../../components/oauth/ApplicationApproveScreen';
 import { UserContext } from '../../components/UserProvider';
 import { loggedInUser } from '../mocks/loggedInUser';
+import ToastProvider from '../../components/ToastProvider';
 
 export const testApp = {
   name: 'Test Application',
@@ -22,7 +23,9 @@ export const testApp = {
     {() => {
       return (
         <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-          <ApplicationApproveScreen application={testApp} />
+          <ToastProvider>
+            <ApplicationApproveScreen application={testApp} />
+          </ToastProvider>
         </UserContext.Provider>
       );
     }}
@@ -34,7 +37,9 @@ export const testApp = {
     {() => {
       return (
         <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-          <ApplicationApproveScreen autoApprove application={testApp} />
+          <ToastProvider>
+            <ApplicationApproveScreen autoApprove application={testApp} />
+          </ToastProvider>
         </UserContext.Provider>
       );
     }}
