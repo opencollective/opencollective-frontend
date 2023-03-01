@@ -5,6 +5,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import { getI18nLink } from './I18nFormatters';
 import Image from './Image';
 import Link from './Link';
 import MessageBox from './MessageBox';
@@ -26,9 +27,6 @@ const messages = defineMessages({
   },
   email: {
     defaultMessage: 'Your email',
-  },
-  disclaimer: {
-    defaultMessage: 'I agree with the terms of service of Open Collective',
   },
 });
 
@@ -95,13 +93,23 @@ NewsletterCheckBox.propTypes = {
 };
 
 const TOSCheckBox = ({ onChange, checked }) => {
-  const intl = useIntl();
   return (
     <StyledCheckbox
       onChange={({ checked, name }) => onChange({ target: { name, value: checked } })}
       checked={checked}
       name="tosOptIn"
-      label={intl.formatMessage(messages.disclaimer)}
+      label={
+        <FormattedMessage
+          defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of Open Collective"
+          values={{
+            TOSLink: getI18nLink({
+              href: '/tos',
+              openInNewTabNoFollow: true,
+              onClick: e => e.stopPropagation(), // don't check the checkbox when clicking on the link
+            }),
+          }}
+        />
+      }
     />
   );
 };
