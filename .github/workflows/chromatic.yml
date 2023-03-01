@@ -22,4 +22,5 @@ jobs:
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           buildScriptName: "styleguide:build"
+          onlyChanged: true
           exitZeroOnChanges: true # 👈 Option to prevent the workflow from failing
