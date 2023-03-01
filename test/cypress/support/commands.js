@@ -1,4 +1,3 @@
-import 'cypress-file-upload';
 import './third-party-commands';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';

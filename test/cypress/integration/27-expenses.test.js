@@ -1,5 +1,3 @@
-import 'cypress-file-upload';
-
 import { randomEmail } from '../support/faker';
 
 describe('New expense flow', () => {
@@ -52,11 +50,23 @@ describe('New expense flow', () => {
 
       cy.getByDataCy('expense-summary-btn').should('be.disabled');
       // Upload 2 files to the multi-files dropzone
-      cy.fixture('images/receipt.jpg').then(fileContent => {
-        const getFile = idx => ({ fileContent, fileName: `receipt${idx}.jpg`, mimeType: 'image/jpeg' });
-        const files = [getFile(1), getFile(2)];
-        cy.getByDataCy('expense-multi-attachments-dropzone').upload(files, { subjectType: 'drag-n-drop' });
-      });
+
+      cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
+        {
+          contents: 'test/cypress/fixtures/images/receipt.jpg',
+          fileName: 'receipt0.jpg',
+          mimeType: 'image/jpeg',
+        },
+        { action: 'drag-drop' },
+      );
+      cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
+        {
+          contents: 'test/cypress/fixtures/images/receipt.jpg',
+          fileName: 'receipt1.jpg',
+          mimeType: 'image/jpeg',
+        },
+        { action: 'drag-drop' },
+      );
       cy.getByDataCy('expense-attachment-form').should('have.length', 2);
 
       // Fill info for first attachment
@@ -105,12 +115,14 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-add-item-btn').click();
       cy.get('input[name="items[2].description"]').type('Some more delicious stuff');
       cy.get('input[name="items[2].amount"]').type('{selectall}34');
-      cy.fixture('images/receipt.jpg').then(fileContent => {
-        cy.getByDataCy('items[2].url-dropzone').upload(
-          [{ fileContent, fileName: `receipt2.jpg`, mimeType: 'image/jpeg' }],
-          { subjectType: 'drag-n-drop' },
-        );
-      });
+      cy.getByDataCy('items[2].url-dropzone').selectFile(
+        {
+          contents: 'test/cypress/fixtures/images/receipt.jpg',
+          fileName: 'receipt2.jpg',
+          mimeType: 'image/jpeg',
+        },
+        { action: 'drag-drop' },
+      );
 
       // Change payee - use a new organization
       cy.getByDataCy('expense-back').click();
@@ -154,11 +166,24 @@ describe('New expense flow', () => {
 
       cy.get('input[name="description"]').type('Brussels January team retreat');
 
-      cy.fixture('images/receipt.jpg').then(fileContent => {
-        const getFile = idx => ({ fileContent, fileName: `receipt${idx}.jpg`, mimeType: 'image/jpeg' });
-        const files = [getFile(1), getFile(2)];
-        cy.getByDataCy('expense-multi-attachments-dropzone').upload(files, { subjectType: 'drag-n-drop' });
-      });
+      cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
+        {
+          contents: 'test/cypress/fixtures/images/receipt.jpg',
+          fileName: 'receipt0.jpg',
+          mimeType: 'image/jpeg',
+        },
+        { action: 'drag-drop' },
+      );
+
+      cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
+        {
+          contents: 'test/cypress/fixtures/images/receipt.jpg',
+          fileName: 'receipt1.jpg',
+          mimeType: 'image/jpeg',
+        },
+        { action: 'drag-drop' },
+      );
+
       cy.getByDataCy('expense-attachment-form').should('have.length', 2);
       // Fill info for first attachment
       cy.get('input[name="items[0].description"]').type('Fancy restaurant');
