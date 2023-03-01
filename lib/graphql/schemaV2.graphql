@@ -3067,7 +3067,7 @@ type Host implements Account & AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -3280,7 +3280,7 @@ interface AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -6307,7 +6307,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -6385,7 +6385,7 @@ interface AccountWithHost {
   """
   Fees percentage that the platform takes for this collective
   """
-  platformFeePercent: Int
+  platformFeePercent: Float
 
   """
   Date of approval by the Fiscal Host.
@@ -7154,7 +7154,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -8590,7 +8590,7 @@ type Organization implements Account & AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -9203,7 +9203,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -12017,7 +12017,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -12630,7 +12630,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -15324,7 +15324,7 @@ input PendingOrderCreateInput {
   When is the money expected?
   """
   expectedAt: DateString
-  hostFeePercent: Int
+  hostFeePercent: Float
 }
 
 """
@@ -15395,7 +15395,7 @@ input PendingOrderEditInput {
   When is the money expected?
   """
   expectedAt: DateString
-  hostFeePercent: Int
+  hostFeePercent: Float
 }
 
 type CreditCardWithStripeError {
