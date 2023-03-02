@@ -97,7 +97,7 @@ class Webhooks extends React.Component {
       removeList.push('collective.apply', 'collective.approved', 'collective.created');
     }
 
-    if (!isHost && collectiveType === CollectiveType.USER) {
+    if ([CollectiveType.USER, CollectiveType.ORGANIZATION].includes(collectiveType) && !isHost) {
       removeList.push('collective.update.created', 'collective.update.published');
     }
 
