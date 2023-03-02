@@ -2400,7 +2400,7 @@
   "qxlyPu": "Zaloguj się lub utwórz konto osobiste, aby kontynuować",
   "QxN1ZU": "Zobacz stronę profilu",
   "qYxNsK": "Błąd przy usuwaniu wirtualnej karty: {error}",
-  "QZRYxh": "Personal tokens are used to authenticate with the API. They are not tied to a specific application. Pass it as {headerName} HTTP header or {queryParam} query parameter in the URL.",
+  "QZRYxh": "Tokeny osobiste służą do uwierzytelniania za pomocą API. Nie są one związane z konkretną aplikacją. Przekaż je jako nagłówek HTTP {headerName} lub parametr zapytania {queryParam} w adresie URL.",
   "qzsw+D": "Twoja Aktualizacja nie zostanie do nikogo wysłana.",
   "r+ksJu": "Utwórz aplikację",
   "R1RQBD": "Twoja wpłata pozostanie w stanie przetwarzania, dopóki nie zostanie zakończona po stronie operatora płatności. Otrzymasz e-mail, gdy proces ten zakończy się sukcesem. Nie są wymagane żadne dalsze działania z Twojej strony.",
