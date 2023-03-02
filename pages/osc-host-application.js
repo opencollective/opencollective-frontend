@@ -171,6 +171,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
                 typeOfProject: handle ? 'CODE' : null,
                 repositoryUrl: handle ? `https://github.com/${handle}` : '',
                 licenseSpdxId,
+                useGithubValidation: true,
               },
             });
           }}
