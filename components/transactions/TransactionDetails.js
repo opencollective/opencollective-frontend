@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Info } from '@styled-icons/feather/Info';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { renderDetailsString, saveInvoice } from '../../lib/transactions';
@@ -121,54 +123,83 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
   const paymentProcessorCover = transaction.relatedTransactions?.find(
     t => t.kind === TransactionKind.PAYMENT_PROCESSOR_COVER && t.type === TransactionTypes.CREDIT,
   );
+  const isProcessing = [ORDER_STATUS.PROCESSING, ORDER_STATUS.PENDING].includes(order?.status);
 
   return (
     <DetailsContainer flexWrap="wrap" alignItems="flex-start">
-      <Flex flexDirection="column" width={[1, 0.35]}>
-        <DetailTitle>
-          <FormattedMessage id="transaction.details" defaultMessage="transaction details" />
-        </DetailTitle>
-        <DetailDescription>
-          {renderDetailsString({
-            amount,
-            platformFee,
-            hostFee,
-            paymentProcessorFee,
-            netAmount,
-            isCredit,
-            isRefunded,
-            hasOrder,
-            toAccount,
-            fromAccount,
-            taxAmount: transaction.taxAmount,
-            taxInfo: transaction.taxInfo,
-            intl,
-            kind,
-            expense,
-            isRefund,
-            paymentProcessorCover,
-          })}
-          {['CONTRIBUTION', 'ADDED_FUNDS', 'EXPENSE'].includes(transaction.kind) && hostFeeTransaction && (
+      {!isProcessing && (
+        <Flex flexDirection="column" width={[1, 0.35]}>
+          <DetailTitle>
+            <FormattedMessage id="transaction.details" defaultMessage="transaction details" />
+          </DetailTitle>
+          <DetailDescription>
+            {renderDetailsString({
+              amount,
+              platformFee,
+              hostFee,
+              paymentProcessorFee,
+              netAmount,
+              isCredit,
+              isRefunded,
+              hasOrder,
+              toAccount,
+              fromAccount,
+              taxAmount: transaction.taxAmount,
+              taxInfo: transaction.taxInfo,
+              intl,
+              kind,
+              expense,
+              isRefund,
+              paymentProcessorCover,
+            })}
+            {['CONTRIBUTION', 'ADDED_FUNDS', 'EXPENSE'].includes(transaction.kind) && hostFeeTransaction && (
+              <React.Fragment>
+                <br />
+                <FormattedMessage
+                  id="TransactionDetails.HostFee"
+                  defaultMessage="This transaction includes {amount} host fees"
+                  values={{
+                    amount: (
+                      <FormattedMoneyAmount
+                        amount={hostFeeTransaction.netAmount.valueInCents}
+                        currency={hostFeeTransaction.netAmount.currency}
+                        showCurrencyCode={false}
+                        amountStyles={null}
+                      />
+                    ),
+                  }}
+                />
+              </React.Fragment>
+            )}
+          </DetailDescription>
+          {order?.memo && (
             <React.Fragment>
-              <br />
-              <FormattedMessage
-                id="TransactionDetails.HostFee"
-                defaultMessage="This transaction includes {amount} host fees"
-                values={{
-                  amount: (
-                    <FormattedMoneyAmount
-                      amount={hostFeeTransaction.netAmount.valueInCents}
-                      currency={hostFeeTransaction.netAmount.currency}
-                      showCurrencyCode={false}
-                      amountStyles={null}
-                    />
-                  ),
-                }}
-              />
+              <DetailTitle>
+                <FormattedMessage defaultMessage="Memo" />
+              </DetailTitle>
+              <DetailDescription>{order.memo}</DetailDescription>
             </React.Fragment>
           )}
-        </DetailDescription>
-      </Flex>
+          {order?.processedAt &&
+            (transaction.kind === TransactionKind.ADDED_FUNDS ||
+              (!paymentMethod && transaction.kind === TransactionKind.CONTRIBUTION)) && (
+              <React.Fragment>
+                <DetailTitle>
+                  <span>
+                    <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
+                    {` `}
+                    <StyledTooltip content={() => <FormattedMessage defaultMessage="Date the funds were received." />}>
+                      <InfoCircle size={13} />
+                    </StyledTooltip>
+                  </span>
+                </DetailTitle>
+                <DetailDescription>
+                  {intl.formatDate(order.processedAt, { dateStyle: 'long', timeZone: 'UTC' })}
+                </DetailDescription>
+              </React.Fragment>
+            )}
+        </Flex>
+      )}
       <Flex flexDirection="column" width={[1, 0.35]}>
         <Box>
           {(host || paymentMethod) && (
@@ -288,6 +319,8 @@ TransactionDetails.propTypes = {
     order: PropTypes.shape({
       id: PropTypes.string,
       status: PropTypes.string,
+      memo: PropTypes.string,
+      processedAt: PropTypes.string,
     }),
     expense: PropTypes.object,
     id: PropTypes.string,

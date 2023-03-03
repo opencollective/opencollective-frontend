@@ -143,6 +143,7 @@ const CommentForm = ({
           <LoadingPlaceholder height={232} />
         ) : (
           <RichTextEditor
+            kind="COMMENT"
             withBorders
             inputName="html"
             editorMinHeight={150}

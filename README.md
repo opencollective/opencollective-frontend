@@ -17,7 +17,7 @@ If you see a step below that could be improved (or is outdated), please update t
 
 ### Prerequisite
 
-1. Make sure you have Node.js version 16.x and NPM version 8.x.
+1. Make sure you have Node.js version 18.x and NPM version 8.x.
 
 - We recommend using [nvm](https://github.com/creationix/nvm): `nvm install && nvm use`.
 
@@ -68,7 +68,7 @@ To update:
 
 ## Styleguide
 
-We use [Storybook](https://storybook.js.org/docs/react/get-started/introduction) to develop and document our React components in isolation with [styled-components](https://www.styled-components.com/) and [styled-system](https://jxnblk.com/styled-system/).
+We use [Storybook](https://storybook.js.org/docs/react/get-started/introduction) to develop and document our React components in isolation with [styled-components](https://www.styled-components.com/) and [styled-system](https://styled-system.com/).
 
 More info: [docs/styleguide.md](docs/styleguide.md)
 
@@ -102,8 +102,24 @@ This project is currently deployed to staging and production with [Heroku](https
 
 More info: [docs/deployment.md](docs/deployment.md)
 
+## Publishing components
+
+To publish a frontend components update to [NPM](https://www.npmjs.com/package/@opencollective/frontend-components), you need to be a core member of the Open Collective team. Steps:
+
+1. Check the currently published version with `npm view @opencollective/frontend-components version`
+2. Trigger the publishing script by running `npm run publish-components {NEW_VERSION}`, where `{NEW_VERSION}` is the new version number (please follow [semver](https://semver.org/)).
+3. Review the changes, and confirm if everything makes sense.
+
+To add new files or dependencies to this exported package, have a look at [scripts/publish-components/config.ts](scripts/publish-components/config.ts).
+
 ## Discussion
 
 If you have any questions, ping us on Slack
 (https://slack.opencollective.com) or on Twitter
 ([@opencollect](https://twitter.com/opencollect)).
+
+## Thanks
+
+<a href="https://www.chromatic.com/"><img src="https://user-images.githubusercontent.com/321738/84662277-e3db4f80-af1b-11ea-88f5-91d67a5e59f6.png" width="153" height="30" alt="Chromatic" /></a>
+
+Thanks to [Chromatic](https://www.chromatic.com/) for providing the visual testing platform that helps us review UI changes and catch visual regressions.

@@ -1,6 +1,6 @@
 import { gqlV1 } from '../../../lib/graphql/helpers';
 
-import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/Contribute';
+import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/constants';
 
 import * as fragments from './fragments';
 
@@ -20,6 +20,10 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       twitterHandle
       repositoryUrl
       website
+      socialLinks {
+        type
+        url
+      }
       tags
       company
       type
@@ -109,6 +113,12 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
           id
           VIRTUAL_CARDS
         }
+        policies {
+          COLLECTIVE_MINIMUM_ADMINS {
+            freeze
+            numberOfAdmins
+          }
+        }
       }
       coreContributors: contributors(roles: [ADMIN, MEMBER]) {
         id
@@ -129,6 +139,9 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       projects {
         id
         ...ContributeCardProjectFields
+      }
+      admins: members(role: "ADMIN") {
+        id
       }
       connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
         id
@@ -187,6 +200,7 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
             name
             company
             image
+            isIncognito
             imageUrl
             slug
             twitterHandle

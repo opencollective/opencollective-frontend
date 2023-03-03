@@ -287,7 +287,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
                     // Upload image if changed or remove it
                     let imgURL = collective.image;
                     if (uploadedImage) {
-                      imgURL = await upload(uploadedImage);
+                      imgURL = await upload(uploadedImage, 'ACCOUNT_AVATAR');
                     }
 
                     // Update settings

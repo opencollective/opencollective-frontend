@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
-import { filter, get, isEmpty, omit, size } from 'lodash';
+import { filter, get, isEmpty, size } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
@@ -19,6 +19,7 @@ import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
+import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
@@ -57,7 +58,13 @@ const setPoliciesMutation = gql`
     setPolicies(account: $account, policies: $policies) {
       id
       policies {
-        EXPENSE_AUTHOR_CANNOT_APPROVE
+        EXPENSE_AUTHOR_CANNOT_APPROVE {
+          enabled
+          amountInCents
+          appliesToHostedCollectives
+          appliesToSingleAdminCollectives
+        }
+        REQUIRE_2FA_FOR_ADMINS
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
           applies
@@ -170,17 +177,18 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
     },
     async onSubmit(values) {
       const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission, expenseTypes, policies } = values;
+      const newSettings = { ...collective.settings, disablePublicExpenseSubmission };
+      if (collective.isHost) {
+        newSettings.expenseTypes = expenseTypes;
+      }
+
       await updateCollective({
         variables: {
           collective: {
             id: collective.id,
             contributionPolicy,
             expensePolicy,
-            settings: {
-              ...collective.settings,
-              disablePublicExpenseSubmission,
-              expenseTypes,
-            },
+            settings: newSettings,
           },
         },
       });
@@ -250,6 +258,10 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
     { value: 'NEW_COLLECTIVES', label: <FormattedMessage defaultMessage="New Collectives Only" /> },
     { value: 'ALL_COLLECTIVES', label: <FormattedMessage defaultMessage="All Collectives" /> },
   ];
+
+  const hostAuthorCannotApproveExpensePolicy = data?.account?.host?.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'];
+  const authorCannotApproveExpenseEnforcedByHost =
+    hostAuthorCannotApproveExpensePolicy?.enabled && hostAuthorCannotApproveExpensePolicy?.appliesToHostedCollectives;
 
   return (
     <Flex flexDirection="column">
@@ -356,7 +368,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                   options={numberOfAdminsOptions}
                   onChange={option => {
                     if (option.value === 0) {
-                      formik.setFieldValue('policies', omit(formik.values.policies, ['COLLECTIVE_MINIMUM_ADMINS']));
+                      formik.setFieldValue('policies', { ...formik.values.policies, COLLECTIVE_MINIMUM_ADMINS: null });
                     } else {
                       formik.setFieldValue('policies.COLLECTIVE_MINIMUM_ADMINS', {
                         ...formik.values.policies.COLLECTIVE_MINIMUM_ADMINS,
@@ -426,28 +438,129 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               />
             }
             onChange={() =>
-              formik.setFieldValue(
-                'policies',
-                formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']
-                  ? omit(formik.values.policies, ['EXPENSE_AUTHOR_CANNOT_APPROVE'])
-                  : { ...formik.values.policies, EXPENSE_AUTHOR_CANNOT_APPROVE: true },
-              )
+              formik.setFieldValue('policies', {
+                ...formik.values.policies,
+                ['EXPENSE_AUTHOR_CANNOT_APPROVE']: {
+                  ...formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'],
+                  enabled: !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled,
+                  appliesToHostedCollectives: false,
+                  appliesToSingleAdminCollectives: false,
+                  amountInCents: 0,
+                },
+              })
             }
-            checked={Boolean(formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'])}
+            checked={
+              authorCannotApproveExpenseEnforcedByHost ||
+              Boolean(formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled)
+            }
             disabled={
               isSettingPolicies ||
-              (numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']))
+              (numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled)) ||
+              authorCannotApproveExpenseEnforcedByHost
             }
           />
-          {collective?.isHost && (
-            <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
-              <FormattedMessage
-                id="editCollective.expenseApprovalsPolicy.authorCannotApprove.hostDescription"
-                defaultMessage="This policy is only enforced on your fiscal host and does not affect collectives hosted by you."
-              />
+          <Flex
+            ml="2.2rem"
+            mt="1rem"
+            alignItems="center"
+            color={!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled ? 'black.600' : undefined}
+          >
+            <P mr="2rem">
+              <FormattedMessage defaultMessage="Enforce for expenses above:" />
             </P>
+            <StyledInputAmount
+              maxWidth="11em"
+              disabled={
+                isSettingPolicies ||
+                authorCannotApproveExpenseEnforcedByHost ||
+                !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled
+              }
+              currency={data?.account?.currency}
+              currencyDisplay="CODE"
+              placeholder="0"
+              value={
+                authorCannotApproveExpenseEnforcedByHost
+                  ? hostAuthorCannotApproveExpensePolicy.amountInCents
+                  : formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.amountInCents
+              }
+              onChange={value =>
+                formik.setFieldValue('policies', {
+                  ...formik.values.policies,
+                  ['EXPENSE_AUTHOR_CANNOT_APPROVE']: {
+                    ...formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'],
+                    amountInCents: value,
+                  },
+                })
+              }
+            />
+          </Flex>
+          {collective?.isHost && (
+            <React.Fragment>
+              <P
+                ml="2.2rem"
+                mt="1rem"
+                color={!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled ? 'black.600' : undefined}
+              >
+                <StyledCheckbox
+                  name="authorCannotApproveExpense.appliesToHostedCollectives"
+                  label={
+                    <FormattedMessage
+                      id="editCollective.expenseApprovalsPolicy.authorCannotApprove.appliesToHostedCollectives"
+                      defaultMessage="Enforce this policy on collectives hosted by you."
+                    />
+                  }
+                  checked={formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.appliesToHostedCollectives}
+                  disabled={isSettingPolicies || !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled}
+                  onChange={() =>
+                    formik.setFieldValue('policies', {
+                      ...formik.values.policies,
+                      ['EXPENSE_AUTHOR_CANNOT_APPROVE']: {
+                        ...formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'],
+                        appliesToHostedCollectives:
+                          !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.appliesToHostedCollectives,
+                        appliesToSingleAdminCollectives: false,
+                      },
+                    })
+                  }
+                />
+              </P>
+              <P
+                ml="2.2rem"
+                mt="1rem"
+                color={
+                  !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.appliesToHostedCollectives
+                    ? 'black.600'
+                    : undefined
+                }
+              >
+                <StyledCheckbox
+                  name="authorCannotApproveExpense.appliesToSingleAdminCollectives"
+                  label={
+                    <FormattedMessage
+                      id="editCollective.expenseApprovalsPolicy.authorCannotApprove.appliesToSingleAdminCollectives"
+                      defaultMessage="Enforce this policy on collectives with a single admin."
+                    />
+                  }
+                  checked={formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.appliesToSingleAdminCollectives}
+                  disabled={
+                    isSettingPolicies ||
+                    !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.appliesToHostedCollectives
+                  }
+                  onChange={() =>
+                    formik.setFieldValue('policies', {
+                      ...formik.values.policies,
+                      ['EXPENSE_AUTHOR_CANNOT_APPROVE']: {
+                        ...formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE'],
+                        appliesToSingleAdminCollectives:
+                          !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.appliesToSingleAdminCollectives,
+                      },
+                    })
+                  }
+                />
+              </P>
+            </React.Fragment>
           )}
-          {numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']) && (
+          {numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled) && (
             <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
               <FormattedMessage
                 id="editCollective.expenseApprovalsPolicy.authorCannotApprove.minAdminRequired"
@@ -466,35 +579,40 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             defaultChecked={Boolean(formik.values.disablePublicExpenseSubmission)}
           />
         </Container>
-        <Container>
-          <SettingsSectionTitle mt={4}>
-            <FormattedMessage id="editCollective.expenseTypesPolicy.header" defaultMessage="Expense types" />
-          </SettingsSectionTitle>
-          <P mb={2}>
-            <FormattedMessage
-              id="editCollective.expenseTypes.description"
-              defaultMessage="Specify the types of expenses allowed for all the collectives you're hosting. If you wish to customize these options for specific collectives, head to the <HostedCollectivesLink>Hosted Collectives</HostedCollectivesLink> section."
-              values={{
-                HostedCollectivesLink: getI18nLink({ as: Link, href: `/${collective.slug}/admin/hosted-collectives` }),
-              }}
-            />
-          </P>
+        {collective.isHost && (
+          <Container>
+            <SettingsSectionTitle mt={4}>
+              <FormattedMessage defaultMessage="Expense types" />
+            </SettingsSectionTitle>
+            <P mb={2}>
+              <FormattedMessage
+                id="editCollective.expenseTypes.description"
+                defaultMessage="Specify the types of expenses allowed for all the collectives you're hosting. If you wish to customize these options for specific collectives, head to the <HostedCollectivesLink>Hosted Collectives</HostedCollectivesLink> section."
+                values={{
+                  HostedCollectivesLink: getI18nLink({
+                    as: Link,
+                    href: `/${collective.slug}/admin/hosted-collectives`,
+                  }),
+                }}
+              />
+            </P>
 
-          {['RECEIPT', 'INVOICE', 'GRANT'].map(type => (
-            <StyledCheckbox
-              key={type}
-              name={`allow-${type}-submission`}
-              label={formatMessage(messages[`expensePolicy.${type}`])}
-              checked={Boolean(formik.values.expenseTypes[type])}
-              onChange={() =>
-                formik.setFieldValue('expenseTypes', {
-                  ...formik.values.expenseTypes,
-                  [type]: !formik.values.expenseTypes[type],
-                })
-              }
-            />
-          ))}
-        </Container>
+            {['RECEIPT', 'INVOICE', 'GRANT'].map(type => (
+              <StyledCheckbox
+                key={type}
+                name={`allow-${type}-submission`}
+                label={formatMessage(messages[`expensePolicy.${type}`])}
+                checked={Boolean(formik.values.expenseTypes[type])}
+                onChange={() =>
+                  formik.setFieldValue('expenseTypes', {
+                    ...formik.values.expenseTypes,
+                    [type]: !formik.values.expenseTypes[type],
+                  })
+                }
+              />
+            ))}
+          </Container>
+        )}
         <Container>
           <SettingsSectionTitle mt={4}>
             <FormattedMessage id="editCollective.rejectCategories.header" defaultMessage="Rejected categories" />

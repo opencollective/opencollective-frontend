@@ -5,7 +5,7 @@ import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
+import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';
 import ContributeProject from '../../contribute-cards/ContributeProject';
 import CreateNew from '../../contribute-cards/CreateNew';
 import { Box } from '../../Grid';
@@ -68,7 +68,7 @@ class SectionProjects extends React.PureComponent {
       <Box pt={[4, 5]} data-cy="Projects">
         <ContainerSectionContent>
           <SectionTitle>
-            <FormattedMessage id="CollectivePage.SectionProjects.Title" defaultMessage="Projects" />
+            <FormattedMessage id="Projects" defaultMessage="Projects" />
           </SectionTitle>
           <P color="black.700" mb={4}>
             {isAdmin ? (

@@ -1,20 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
-import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
-import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
 import InlineEditField from '../InlineEditField';
-import LinkCollective from '../LinkCollective';
 import RichTextEditor from '../RichTextEditor';
-import { P } from '../Text';
 
 import CommentActions from './CommentActions';
+import { CommentMetadata } from './CommentMetadata';
 import EmojiReactionPicker from './EmojiReactionPicker';
 import CommentReactions from './EmojiReactions';
 import { commentFieldsFragment } from './graphql';
@@ -40,7 +37,6 @@ const Comment = ({
   comment,
   canEdit,
   canDelete,
-  withoutActions,
   maxCommentHeight,
   isConversationRoot,
   onDelete,
@@ -48,36 +44,17 @@ const Comment = ({
   canReply,
 }) => {
   const [isEditing, setEditing] = React.useState(false);
-  const hasActions = !withoutActions && !isEditing && (canEdit || canDelete);
-  const hasReactionsPicker = canReply && !withoutActions;
+  const hasActions = !isEditing;
+  const anchorHash = `comment-${new Date(comment.createdAt).getTime()}`;
 
   return (
-    <Container width="100%" data-cy="comment">
+    <Container width="100%" data-cy="comment" id={anchorHash}>
       <Flex mb={3} justifyContent="space-between">
-        <Flex>
-          <Box mr={3}>
-            <LinkCollective collective={comment.fromCollective}>
-              <Avatar collective={comment.fromCollective} radius={40} />
-            </LinkCollective>
-          </Box>
-          <Flex flexDirection="column">
-            <LinkCollective collective={comment.fromCollective}>
-              <P color="black.800" fontWeight="500" truncateOverflow>
-                {comment.fromCollective.name}
-              </P>
-            </LinkCollective>
-            <P fontSize="12px" color="black.600" truncateOverflow title={comment.createdAt}>
-              <FormattedMessage
-                id="Comment.PostedOn"
-                defaultMessage="Posted on {createdAt, date, long}"
-                values={{ createdAt: new Date(comment.createdAt) }}
-              />
-            </P>
-          </Flex>
-        </Flex>
+        <CommentMetadata comment={comment} />
         {hasActions && (
           <CommentActions
             comment={comment}
+            anchorHash={anchorHash}
             isConversationRoot={isConversationRoot}
             canEdit={canEdit}
             canDelete={canDelete}
@@ -107,6 +84,7 @@ const Comment = ({
               <HTMLContent content={comment.html} fontSize="13px" data-cy="comment-body" />
             ) : (
               <RichTextEditor
+                kind="COMMENT"
                 defaultValue={comment.html}
                 onChange={e => setValue(e.target.value)}
                 fontSize="13px"
@@ -116,10 +94,10 @@ const Comment = ({
             )
           }
         </InlineEditField>
-        {(reactions || hasReactionsPicker) && (
+        {(reactions || canReply) && (
           <Flex mt={3} flexWrap="wrap" data-cy="comment-reactions">
             {reactions && <CommentReactions reactions={reactions} />}
-            {hasReactionsPicker && <EmojiReactionPicker comment={comment} reactions={reactions} />}
+            {canReply && <EmojiReactionPicker comment={comment} reactions={reactions} />}
           </Flex>
         )}
       </Box>
@@ -132,7 +110,7 @@ Comment.propTypes = {
     id: PropTypes.string.isRequired,
     html: PropTypes.string,
     createdAt: PropTypes.string,
-    fromCollective: PropTypes.shape({
+    fromAccount: PropTypes.shape({
       id: PropTypes.string,
       name: PropTypes.string,
     }),

@@ -30,6 +30,16 @@ const CategoryContainer = styled(Container).attrs({ px: [1, 3, 0] })`
     letter-spacing: 0.06em;
     text-transform: uppercase;
     font-weight: 500;
+    /** To compensate the space taken by the font-weight difference */
+    &::after {
+      display: block;
+      content: attr(aria-label);
+      font-weight: 700;
+      height: 1px;
+      color: transparent;
+      overflow: hidden;
+      visibility: hidden;
+    }
   }
 
   &:focus,
@@ -39,7 +49,6 @@ const CategoryContainer = styled(Container).attrs({ px: [1, 3, 0] })`
     text-decoration: none;
     font-weight: 700;
     outline: 0;
-    letter-spacing: 0.0525em; /** To compensate the space taken by the font-weight difference */
     color: ${themeGet('colors.black.800')};
   }
 
@@ -141,7 +150,14 @@ export const NavBarCategory = ({ category, collective }) => {
         <Image width={32} height={32} alt="" src={categoryDetails.img || SECTIONS_CATEGORY_ICON.CONTRIBUTE} />
       </Flex>
       <Flex alignItems="center">
-        <Span textTransform="uppercase" fontSize="14px" fontWeight="500" color="black.800" letterSpacing="0.02em">
+        <Span
+          textTransform="uppercase"
+          fontSize="14px"
+          fontWeight="500"
+          color="black.800"
+          letterSpacing="0.02em"
+          aria-label={categoryDetails.title}
+        >
           {categoryDetails.title}
         </Span>
       </Flex>

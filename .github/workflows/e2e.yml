@@ -29,6 +29,8 @@ env:
   IMAGES_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-images
   TERM: xterm
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  STRIPE_WEBHOOK_KEY: ${{ secrets.STRIPE_WEBHOOK_KEY }}
+  STRIPE_WEBHOOK_SIGNING_SECRET: ${{ secrets.STRIPE_WEBHOOK_SIGNING_SECRET }}
 
 jobs:
   e2e:
@@ -47,7 +49,7 @@ jobs:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: postgres:13.8
+        image: postgres:13.9
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
@@ -58,6 +60,9 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
+      - name: Hack sources.list
+        run: sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu/|http://mirror.arizona.edu/ubuntu/|g' /etc/apt/sources.list
+
       - name: Update apt
         run: sudo apt-get update || exit 0
 
@@ -70,10 +75,23 @@ jobs:
       - name: Install graphicsmagick
         run: sudo apt-get install -y graphicsmagick
 
+      - name: Install stripe-cli
+        run: |
+          sudo apt-get install -y wget
+          wget https://github.com/stripe/stripe-cli/releases/download/v1.13.9/stripe_1.13.9_linux_x86_64.tar.gz -O /tmp/stripe_1.13.9_linux_x86_64.tar.gz
+          sudo tar xzvf /tmp/stripe_1.13.9_linux_x86_64.tar.gz -C /bin/
+
+      - name: Checkout (frontend)
+        uses: actions/checkout@v3
+
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
+          node-version-file: 'package.json'
+
+      - name: Force NPM version (this step can be moved once Vercel defaults to node 18.14)
+        shell: bash
+        run: npm install -g npm@8.19.2
 
       # Npm cache
 
@@ -87,9 +105,6 @@ jobs:
             - ${{ runner.os }}-npm-cache-
 
       # Checkouts
-
-      - name: Checkout (frontend)
-        uses: actions/checkout@v3
 
       - name: Set REF in env, removing the `refs/` part
         run: echo "MATCHING_BRANCH_REF=$(echo $GITHUB_REF | sed 's|refs/||')" >> $GITHUB_ENV

@@ -24,7 +24,7 @@ const GroupView = ({ accounts, title, advancedSettings, roleLabel }) => {
     <Box>
       <P color="blue.800" fontSize="13px" fontWeight="500" lineHeight="16px" mb={4}>
         <StyledLink textDecoration="underline" color="inherit" onClick={handleBack}>
-          <FormattedMessage id="NotificationsSettings.Title" defaultMessage="Notifications Settings" />
+          <FormattedMessage id="NotificationsSettings.Title" defaultMessage="Notification Settings" />
         </StyledLink>{' '}
         &gt; {title}
       </P>

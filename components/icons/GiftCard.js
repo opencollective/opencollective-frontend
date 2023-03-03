@@ -4,6 +4,7 @@ import { lighten } from 'polished';
 
 import CustomStyledIcon from './CustomStyledIcon';
 
+/* eslint-disable react/no-unknown-property */
 const GiftCard = props => {
   const gradientID = `gradient-${props.color.replace('#', '')}`;
   return (

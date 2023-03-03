@@ -1,8 +1,12 @@
 #!/bin/bash
 
 echo "> Starting maildev server"
-npx maildev@2.0.4 &
+npx maildev@2.0.5 &
 MAILDEV_PID=$!
+
+echo "> Starting stripe webhook listener"
+stripe --api-key $STRIPE_WEBHOOK_KEY listen --forward-connect-to localhost:3060/webhooks/stripe > /dev/null &
+STRIPE_WEBHOOK_PID=$!
 
 echo "> Starting api server"
 if [ -z "$API_FOLDER" ]; then
@@ -81,6 +85,7 @@ echo ""
 
 echo "Killing all node processes"
 kill $MAILDEV_PID;
+kill $STRIPE_WEBHOOK_PID
 kill $API_PID;
 kill $FRONTEND_PID;
 kill $IMAGES_PID;

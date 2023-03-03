@@ -86,7 +86,9 @@ const CurrencyPicker = ({ availableCurrencies, value, onChange }) => {
   return (
     <StyledSelect
       inputId="currency-picker"
-      placeholder={intl.formatMessage({ id: 'Currency', defaultMessage: 'Currency' })}
+      data-cy="currency-picker"
+      placeholder="----"
+      error={!value}
       isSearchable={availableCurrencies?.length > 10}
       options={currencyOptions}
       value={!value ? null : { value, label: <Box minWidth={200}>{selectedCurrency}</Box> }}
@@ -95,7 +97,7 @@ const CurrencyPicker = ({ availableCurrencies, value, onChange }) => {
       onInputChange={inputValue => (inputValue.length <= 3 ? inputValue : inputValue.substr(0, 3))} // Limit search length to 3 characters
       styles={{
         control: {
-          border: 'none',
+          border: !value ? '' : 'none',
           background: '#F7F8FA',
         },
         menu: {
@@ -146,7 +148,7 @@ const StyledInputAmount = ({
       if (parsedValue === null || isNaN(parsedValue)) {
         onChange(parsedValue, e);
       } else if (!e.target.checkValidity() || parsedValue !== valueWithIgnoredComma) {
-        onChange(e.target.value ? NaN : null, e);
+        onChange(isNaN(e.target.value) ? NaN : null, e);
       } else {
         onChange(floatAmountToCents(parsedValue), e);
       }
@@ -165,7 +167,7 @@ const StyledInputAmount = ({
       error={props.error || getError(curValue, minAmount, props.required)}
       defaultValue={isUndefined(defaultValue) ? undefined : defaultValue / 100}
       value={curValue}
-      prependProps={!hasCurrencyPicker ? undefined : { p: 0 }}
+      prependProps={!hasCurrencyPicker ? { color: props.disabled ? 'black.400' : 'black.800' } : { p: 0 }}
       prepend={
         !hasCurrencyPicker ? (
           formatCurrencyName(currency, currencyDisplay)
@@ -207,7 +209,7 @@ const StyledInputAmount = ({
 
 StyledInputAmount.propTypes = {
   /** The currency (eg. `USD`, `EUR`...) */
-  currency: PropTypes.string.isRequired,
+  currency: PropTypes.string,
   /** Gets passed the new currency. Only when hasCurrencyPicker is true */
   onCurrencyChange: PropTypes.func,
   /** Gets passed the amount in cents as first param, and the event as second param. */

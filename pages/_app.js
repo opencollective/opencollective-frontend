@@ -19,7 +19,11 @@ import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
 
-Router.onRouteChangeStart = () => NProgress.start();
+Router.onRouteChangeStart = (url, { shallow }) => {
+  if (!shallow) {
+    NProgress.start();
+  }
+};
 
 Router.onRouteChangeComplete = () => NProgress.done();
 
@@ -119,7 +123,7 @@ class OpenCollectiveFrontendApp extends App {
   render() {
     const { client, Component, pageProps, scripts, locale, messages } = this.props;
 
-    const intl = createIntl({ locale: locale || 'en', messages }, cache);
+    const intl = createIntl({ locale: locale || 'en', defaultLocale: 'en', messages }, cache);
 
     return (
       <Fragment>

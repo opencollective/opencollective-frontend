@@ -13,4 +13,5 @@ export const CreditCards = {
   CARD_3D_SECURE: generateValidCard('4000000000003063'),
   CARD_3D_SECURE_2: generateValidCard('4000000000003220'),
   CARD_3D_SECURE_DECLINED: generateValidCard('4000008400001629'),
+  CARD_3D_SECURE_ALWAYS_AUTHENTICATE: generateValidCard('4000002760003184'),
 };

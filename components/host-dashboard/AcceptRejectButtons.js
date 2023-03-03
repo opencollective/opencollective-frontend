@@ -12,7 +12,15 @@ import { Span } from '../Text';
 
 import ApplicationRejectionReasonModal from './ApplicationRejectionReasonModal';
 
-const AcceptRejectButtons = ({ collective, isLoading, onApprove, onReject, disabled, disabledMessage }) => {
+const AcceptRejectButtons = ({
+  collective,
+  isLoading,
+  onApprove,
+  onReject,
+  disabled,
+  disabledMessage,
+  customButton,
+}) => {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [action, setAction] = useState(null);
   return (
@@ -24,35 +32,57 @@ const AcceptRejectButtons = ({ collective, isLoading, onApprove, onReject, disab
           </Span>
         </StyledTooltip>
       )}
-      <StyledButton
-        minWidth={100}
-        buttonSize="tiny"
-        buttonStyle="successSecondary"
-        height={32}
-        disabled={disabled || isLoading}
-        loading={isLoading && action === 'APPROVE'}
-        data-cy={`${collective.slug}-approve`}
-        onClick={() => {
-          setAction('APPROVE');
-          onApprove();
-        }}
-      >
-        <Check size={12} />
-        &nbsp; <FormattedMessage id="actions.approve" defaultMessage="Approve" />
-      </StyledButton>
-      <StyledButton
-        minWidth={100}
-        buttonSize="tiny"
-        buttonStyle="dangerSecondary"
-        height={32}
-        onClick={() => setShowRejectModal(true)}
-        disabled={isLoading}
-        loading={isLoading && action === 'REJECT'}
-        data-cy={`${collective.slug}-reject`}
-      >
-        <Ban size={12} />
-        &nbsp; <FormattedMessage id="actions.reject" defaultMessage="Reject" />
-      </StyledButton>
+      {customButton ? (
+        customButton({
+          onClick: () => {
+            setAction('APPROVE');
+            onApprove();
+          },
+          disabled: disabled || isLoading,
+          loading: isLoading && action === 'APPROVE',
+          children: <FormattedMessage id="actions.approve" defaultMessage="Approve" />,
+        })
+      ) : (
+        <StyledButton
+          minWidth={100}
+          buttonSize="tiny"
+          buttonStyle="successSecondary"
+          height={32}
+          disabled={disabled || isLoading}
+          loading={isLoading && action === 'APPROVE'}
+          data-cy={`${collective.slug}-approve`}
+          onClick={() => {
+            setAction('APPROVE');
+            onApprove();
+          }}
+        >
+          <Check size={12} />
+          &nbsp; <FormattedMessage id="actions.approve" defaultMessage="Approve" />
+        </StyledButton>
+      )}
+
+      {customButton ? (
+        customButton({
+          onClick: () => setShowRejectModal(true),
+          disabled: isLoading,
+          loading: isLoading && action === 'REJECT',
+          children: <FormattedMessage id="actions.reject" defaultMessage="Reject" />,
+        })
+      ) : (
+        <StyledButton
+          minWidth={100}
+          buttonSize="tiny"
+          buttonStyle="dangerSecondary"
+          height={32}
+          onClick={() => setShowRejectModal(true)}
+          disabled={isLoading}
+          loading={isLoading && action === 'REJECT'}
+          data-cy={`${collective.slug}-reject`}
+        >
+          <Ban size={12} />
+          &nbsp; <FormattedMessage id="actions.reject" defaultMessage="Reject" />
+        </StyledButton>
+      )}
       {showRejectModal && (
         <ApplicationRejectionReasonModal
           collective={collective}
@@ -78,6 +108,7 @@ AcceptRejectButtons.propTypes = {
   disabledMessage: PropTypes.string,
   onApprove: PropTypes.func,
   onReject: PropTypes.func,
+  customButton: PropTypes.func,
 };
 
 export default AcceptRejectButtons;

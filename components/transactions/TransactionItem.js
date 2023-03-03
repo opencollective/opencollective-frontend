@@ -8,6 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import expenseStatus from '../../lib/constants/expense-status';
+import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -20,7 +21,6 @@ import Container from '../Container';
 import DateTime from '../DateTime';
 import DefinedTerm, { Terms } from '../DefinedTerm';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
-import ExpenseTags from '../expenses/ExpenseTags';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Link from '../Link';
@@ -29,6 +29,7 @@ import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import StyledTag from '../StyledTag';
 import StyledTooltip from '../StyledTooltip';
+import Tags from '../Tags';
 import { P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 import TransactionStatusTag from '../TransactionStatusTag';
@@ -40,14 +41,18 @@ const { CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP } = TransactionKind;
 /** To separate individual information below description */
 const INFO_SEPARATOR = ' • ';
 
-const getDisplayedAmount = (transaction, collective) => {
+export const getDisplayedAmount = (transaction, collective) => {
   const isCredit = transaction.type === TransactionTypes.CREDIT;
   const hasOrder = transaction.order !== null;
   const isExpense = transaction.kind === TransactionKind.EXPENSE;
   const isSelf = transaction.fromAccount.slug === collective.slug;
+  const isProcessingOrPending =
+    hasOrder && [ORDER_STATUS.PROCESSING, ORDER_STATUS.PENDING].includes(transaction.order?.status);
 
   if (isExpense) {
     return transaction.netAmount;
+  } else if (isProcessingOrPending) {
+    return transaction.amount;
   } else if (isCredit && hasOrder) {
     // Credit from donations should display the full amount donated by the user
     return transaction.amount;
@@ -62,7 +67,7 @@ const getDisplayedAmount = (transaction, collective) => {
   }
 };
 
-const ItemTitleWrapper = ({ expense, children }) => {
+const ItemTitleWrapper = ({ expense, order, children }) => {
   if (expense) {
     return (
       <StyledTooltip
@@ -78,6 +83,21 @@ const ItemTitleWrapper = ({ expense, children }) => {
         </StyledLink>
       </StyledTooltip>
     );
+  } else if (order) {
+    return (
+      <StyledTooltip
+        content={<FormattedMessage id="Contribution.GoToPage" defaultMessage="Go to contribution page" />}
+        delayHide={0}
+      >
+        <StyledLink
+          as={Link}
+          underlineOnHover
+          href={`${getCollectivePageRoute(order.toAccount)}/orders/${order.legacyId}`}
+        >
+          {children}
+        </StyledLink>
+      </StyledTooltip>
+    );
   } else {
     return <React.Fragment>{children}</React.Fragment>;
   }
@@ -88,6 +108,12 @@ ItemTitleWrapper.propTypes = {
   expense: PropTypes.shape({
     legacyId: PropTypes.number,
     account: PropTypes.shape({
+      slug: PropTypes.string,
+    }),
+  }),
+  order: PropTypes.shape({
+    legacyId: PropTypes.number,
+    toAccount: PropTypes.shape({
       slug: PropTypes.string,
     }),
   }),
@@ -138,7 +164,6 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
     createdAt,
     isRefunded,
     isRefund,
-    isOrderRejected,
   } = transaction;
 
   const { LoggedInUser } = useLoggedInUser();
@@ -152,6 +177,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
   const legacyCollectiveId = collective.legacyId || collective.id;
   const isOwnUserProfile = LoggedInUser && LoggedInUser.CollectiveId === legacyCollectiveId;
   const avatarCollective = isCredit ? fromAccount : toAccount;
+  const isProcessingOrPending = hasOrder && [ORDER_STATUS.PROCESSING, ORDER_STATUS.PENDING].includes(order?.status);
 
   const displayedAmount = getDisplayedAmount(transaction, collective);
 
@@ -202,7 +228,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 fontSize={['14px', null, null, '16px']}
                 lineHeight={['20px', null, null, '24px']}
               >
-                <ItemTitleWrapper expense={expense}>
+                <ItemTitleWrapper expense={expense} order={order}>
                   <Span title={description} color={description ? 'black.900' : 'black.600'}>
                     {description ? (
                       truncate(description, { length: 60 })
@@ -293,9 +319,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
             </Container>
             {hasOrder && (
               <TransactionStatusTag
-                isRefund={isRefund}
-                isRefunded={isRefunded}
-                isOrderRejected={isOrderRejected}
+                transaction={transaction}
                 fontSize="12px"
                 fontWeight="bold"
                 lineHeight="16px"
@@ -313,12 +337,12 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
               {i18nTransactionKind(intl, transaction.kind)}
               {Boolean(order?.legacyId) && ` #${order.legacyId}`}
             </KindTag>
-            {transactionDetailsLink()}
+            {(!isProcessingOrPending || transaction.paymentMethod) && transactionDetailsLink()}
           </Container>
         )}
         {isExpense && (
           <Container display="flex" mt={3} pt={[2, 0]}>
-            <ExpenseTags expense={expense} />
+            <Tags expense={expense} />
             {transactionDetailsLink()}
           </Container>
         )}
@@ -405,6 +429,7 @@ TransactionItem.propTypes = {
     }),
     netAmountInCollectiveCurrency: PropTypes.number,
     usingGiftCardFromCollective: PropTypes.object,
+    paymentMethod: PropTypes.object,
   }),
   collective: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

@@ -59,6 +59,7 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
             if (isEditing) {
               return (
                 <RichTextEditor
+                  kind="ACCOUNT_LONG_DESCRIPTION"
                   defaultValue={collective.longDescription}
                   onChange={e => setValue(e.target.value)}
                   placeholder={intl.formatMessage(messages.placeholder)}

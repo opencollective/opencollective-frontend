@@ -87,7 +87,7 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefet
               type="submit"
               textTransform="capitalize"
             >
-              <FormattedMessage defaultMessage="Delete" />
+              <FormattedMessage id="actions.delete" defaultMessage="Delete" />
             </StyledButton>
           </Container>
         </ModalFooter>

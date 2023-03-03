@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
-import { Plus, Trash } from '@styled-icons/boxicons-regular';
+import { Plus } from '@styled-icons/boxicons-regular/Plus';
+import { Trash } from '@styled-icons/boxicons-regular/Trash';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -149,7 +150,7 @@ const InvoicesReceipts = ({ collective }) => {
         </StyledInputField>
       </Box>
       <SettingsSectionTitle>
-        <FormattedMessage defaultMessage="Financial contributions" />
+        <FormattedMessage id="financialContributions" defaultMessage="Financial contributions" />
       </SettingsSectionTitle>
       <P pb="26px">
         <FormattedMessage

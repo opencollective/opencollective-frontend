@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -7,70 +7,20 @@ import { isHostAccount } from '../lib/collective.lib';
 import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { require2FAForAdmins } from '../lib/policies';
 
 import { AdminPanelContext } from '../components/admin-panel/AdminPanelContext';
 import AdminPanelSection from '../components/admin-panel/AdminPanelSection';
 import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/admin-panel/constants';
+import { adminPanelQuery } from '../components/admin-panel/queries';
 import AdminPanelSideBar from '../components/admin-panel/SideBar';
 import AdminPanelTopBar from '../components/admin-panel/TopBar';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import { Flex, Grid } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
-
-export const adminPanelQuery = gql`
-  query AdminPanel($slug: String!) {
-    account(slug: $slug) {
-      id
-      legacyId
-      slug
-      name
-      isHost
-      type
-      settings
-      isArchived
-      isIncognito
-      imageUrl(height: 256)
-      features {
-        id
-        ...NavbarFields
-        VIRTUAL_CARDS
-        USE_PAYMENT_METHODS
-        EMIT_GIFT_CARDS
-        EMAIL_NOTIFICATIONS_PANEL
-      }
-      ... on AccountWithParent {
-        parent {
-          id
-          slug
-        }
-      }
-      ... on AccountWithHost {
-        hostFeePercent
-        host {
-          id
-          slug
-          name
-          settings
-          policies {
-            EXPENSE_AUTHOR_CANNOT_APPROVE
-            COLLECTIVE_MINIMUM_ADMINS {
-              numberOfAdmins
-              applies
-              freeze
-            }
-          }
-        }
-      }
-      ... on AccountWithHost {
-        isApproved
-      }
-    }
-  }
-  ${collectiveNavbarFieldsFragment}
-`;
+import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -87,7 +37,7 @@ const messages = defineMessages({
   },
   userIsArchivedDescription: {
     id: 'user.isArchived.edit.description',
-    defaultMessage: 'This account has been archived is no longer active.',
+    defaultMessage: 'This account has been archived and is no longer active.',
   },
 });
 
@@ -96,7 +46,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return ALL_SECTIONS.INFO;
   }
 
-  const isAdmin = loggedInUser?.isAdminOfCollectiveOrHost(account);
+  const isAdmin = loggedInUser?.isAdminOfCollective(account);
   const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
   const isAccountantOnly = !isAdmin && isAccountant;
   if (isHostAccount(account)) {
@@ -108,16 +58,15 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
 
 const getNotification = (intl, account) => {
   if (account?.isArchived) {
-    const notification = { status: 'collectiveArchived' };
     if (account.type === 'USER') {
       return {
-        ...notification,
+        type: 'warning',
         title: intl.formatMessage(messages.userIsArchived),
         description: intl.formatMessage(messages.userIsArchivedDescription),
       };
     } else {
       return {
-        ...notification,
+        type: 'warning',
         title: intl.formatMessage(messages.collectiveIsArchived, { name: account.name }),
         description: intl.formatMessage(messages.collectiveIsArchivedDescription, {
           type: account.type.toLowerCase(),
@@ -137,7 +86,7 @@ function getBlocker(LoggedInUser, account, section) {
   }
 
   // Check permissions
-  const isAdmin = LoggedInUser.isAdminOfCollectiveOrHost(account);
+  const isAdmin = LoggedInUser.isAdminOfCollective(account);
   if (SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS.includes(section)) {
     if (!isAdmin && !LoggedInUser.hasRole(roles.ACCOUNTANT, account)) {
       return <FormattedMessage defaultMessage="You need to be logged in as an admin or accountant to view this page" />;
@@ -148,9 +97,7 @@ function getBlocker(LoggedInUser, account, section) {
 }
 
 const getIsAccountantOnly = (LoggedInUser, account) => {
-  return (
-    LoggedInUser && !LoggedInUser.isAdminOfCollectiveOrHost(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account)
-  );
+  return LoggedInUser && !LoggedInUser.isAdminOfCollective(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account);
 };
 
 const AdminPanelPage = () => {
@@ -181,13 +128,7 @@ const AdminPanelPage = () => {
             display={['flex', null, 'none']}
           />
         )}
-        {Boolean(notification) && (
-          <NotificationBar
-            status={notification.status}
-            title={notification.title}
-            description={notification.description}
-          />
-        )}
+        {Boolean(notification) && <NotificationBar {...notification} />}
         {blocker ? (
           <Flex flexDirection="column" alignItems="center" my={6}>
             <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
@@ -204,6 +145,7 @@ const AdminPanelPage = () => {
             m="0 auto"
             px={3}
             py={4}
+            data-cy="admin-panel-container"
           >
             <AdminPanelSideBar
               isLoading={isLoading}
@@ -212,7 +154,16 @@ const AdminPanelPage = () => {
               display={['none', null, 'block']}
               isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
             />
-            <AdminPanelSection section={selectedSection} isLoading={isLoading} collective={account} subpath={subpath} />
+            {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
+              <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
+            ) : (
+              <AdminPanelSection
+                section={selectedSection}
+                isLoading={isLoading}
+                collective={account}
+                subpath={subpath}
+              />
+            )}
           </Grid>
         )}
       </Page>

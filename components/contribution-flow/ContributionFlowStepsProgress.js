@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import INTERVALS from '../../lib/constants/intervals';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 
 import Container from '../Container';
@@ -13,7 +13,7 @@ import StepsProgress from '../StepsProgress';
 import { P, Span } from '../Text';
 
 import { STEPS } from './constants';
-import { getTotalAmount } from './utils';
+import { getTotalAmount, NEW_CREDIT_CARD_KEY } from './utils';
 
 // Styles for the steps label rendered in StepsProgress
 const StepLabel = styled(Span)`
@@ -28,11 +28,13 @@ const StepLabel = styled(Span)`
 `;
 
 const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, isCrypto }) => {
-  if (stepDetails.amount) {
-    const totalAmount = stepDetails.amount + (stepDetails.platformContribution || 0);
+  if (stepDetails.amount || stepDetails.cryptoAmount) {
+    const totalAmount = isCrypto
+      ? get(stepDetails, 'cryptoAmount', 0)
+      : get(stepDetails, 'amount', 0) + get(stepDetails, 'platformTip', 0);
     return (
       <FormattedMoneyAmount
-        interval={stepDetails.interval !== INTERVALS.flexible ? stepDetails.interval : null}
+        interval={stepDetails.interval}
         currency={currency}
         amount={totalAmount}
         abbreviateInterval
@@ -52,7 +54,8 @@ PrettyAmountFromStepDetails.propTypes = {
   stepDetails: PropTypes.shape({
     interval: PropTypes.string,
     amount: PropTypes.number,
-    platformContribution: PropTypes.number,
+    cryptoAmount: PropTypes.number,
+    platformTip: PropTypes.number,
   }),
   isFreeTier: PropTypes.bool,
   isCrypto: PropTypes.bool,
@@ -86,6 +89,8 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
   } else if (step.name === STEPS.PAYMENT) {
     if (isFreeTier && getTotalAmount(stepDetails, stepSummary) === 0) {
       return <FormattedMessage id="noPaymentRequired" defaultMessage="No payment required" />;
+    } else if (stepPayment?.key === NEW_CREDIT_CARD_KEY) {
+      return <FormattedMessage id="contribute.newcreditcard" defaultMessage="New credit/debit card" />;
     } else {
       return (!isCrypto && stepPayment?.paymentMethod && getPaymentMethodName(stepPayment.paymentMethod)) || null;
     }

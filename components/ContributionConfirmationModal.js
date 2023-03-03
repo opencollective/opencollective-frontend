@@ -1,19 +1,23 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { getCurrentDateInUTC } from '../lib/utils';
 
 import Container from './Container';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import { Box, Flex } from './Grid';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
+import StyledInput from './StyledInput';
 import StyledInputAmount from './StyledInputAmount';
 import StyledInputPercentage from './StyledInputPercentage';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
+import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from './StyledModal';
+import StyledTooltip from './StyledTooltip';
 import { P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
 
@@ -39,8 +43,8 @@ const confirmContributionMutation = gql`
   }
 `;
 
-const ContributionConfirmationModal = ({ order, onClose }) => {
-  const defaultHostFeePercent = order.toAccount.bankTransfersHostFeePercent;
+const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
+  const defaultHostFeePercent = order.hostFeePercent || order.toAccount.bankTransfersHostFeePercent;
   const platformTipAmount = order.platformTipAmount?.valueInCents || 0;
   const amountInitiated = order.amount.valueInCents + platformTipAmount;
   const currency = order.amount.currency;
@@ -48,6 +52,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
   const [platformTip, setPlatformTip] = useState(platformTipAmount);
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
   const [hostFeePercent, setHostFeePercent] = useState(defaultHostFeePercent);
+  const [processedAt, setProcessedAt] = useState(getCurrentDateInUTC());
   const intl = useIntl();
   const { addToast } = useToasts();
   const [confirmOrder, { loading }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
@@ -82,12 +87,17 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
       orderUpdate.hostFeePercent = hostFeePercent;
     }
 
+    if (processedAt) {
+      orderUpdate.processedAt = new Date(processedAt);
+    }
+
     try {
       await confirmOrder({ variables: { order: orderUpdate, action: 'MARK_AS_PAID' } });
       addToast({
         type: TOAST_TYPE.SUCCESS,
         message: intl.formatMessage({ defaultMessage: 'Order confirmed successfully' }),
       });
+      onSuccess?.();
       onClose();
     } catch (e) {
       addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
@@ -96,14 +106,17 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
 
   return (
     <StyledModal width="578px" onClose={onClose} trapFocus>
-      <ModalHeader>
-        <FormattedMessage defaultMessage="Confirm Contribution" />
-      </ModalHeader>
+      <CollectiveModalHeader
+        collective={order.toAccount}
+        customText={
+          <FormattedMessage defaultMessage="Confirm contribution to {payee}" values={{ payee: order.toAccount.name }} />
+        }
+      />
       <ModalBody>
-        <P mb={4} fontSize="13px">
+        <P mt={3} fontSize="13px">
           <FormattedMessage defaultMessage="Confirm the amount of funds you have received in your host account." />
         </P>
-        <Container mt="58px">
+        <Container mt={4}>
           <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
             <Span fontSize="14px" lineHeight="20px" fontWeight="700">
               <FormattedMessage
@@ -146,6 +159,7 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
             </Span>
             <StyledInputAmount
               name="paymentProcessorFee"
+              data-cy="payment-processor-fee"
               width="142px"
               currency={currency}
               onChange={value => setPaymentProcessorFee(value)}
@@ -187,6 +201,27 @@ const ContributionConfirmationModal = ({ order, onClose }) => {
             </Container>
           </Fragment>
         )}
+        <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
+        <Container>
+          <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
+            <Span fontSize="14px" lineHeight="20px" fontWeight="400">
+              <span>
+                <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
+                {` `}
+                <StyledTooltip content={() => <FormattedMessage defaultMessage="Date the funds were received." />}>
+                  <InfoCircle size={16} />
+                </StyledTooltip>
+              </span>
+            </Span>
+            <StyledInput
+              name="processedAt"
+              type="date"
+              data-cy="processedAt"
+              defaultValue={processedAt}
+              onChange={e => setProcessedAt(e.target.value)}
+            />
+          </Flex>
+        </Container>
         <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
         <Container>
           <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
@@ -270,6 +305,8 @@ ContributionConfirmationModal.propTypes = {
   order: PropTypes.object,
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
+  /** Called if the action request is successfull */
+  onSuccess: PropTypes.func,
 };
 
 export default ContributionConfirmationModal;

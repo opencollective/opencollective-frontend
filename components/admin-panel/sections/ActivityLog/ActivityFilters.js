@@ -5,8 +5,8 @@ import styled from 'styled-components';
 
 import { encodeDateInterval } from '../../../../lib/date-utils';
 
-import PeriodFilter from '../../../budget/filters/PeriodFilter';
 import Container from '../../../Container';
+import PeriodFilter from '../../../filters/PeriodFilter';
 import { Box, Flex } from '../../../Grid';
 
 import ActivityAccountFilter from './ActivityAccountFilter';
@@ -48,7 +48,7 @@ const ActivityFilters = ({ filters, onChange, account }) => {
         </FilterContainer>
         <FilterContainer width={[1, 1 / 3, 1 / 3]} pl={[0, '19px']}>
           <FilterLabel htmlFor="activity-filter-type">
-            <FormattedMessage id="webhooks.types.label" defaultMessage="Activity" />
+            <FormattedMessage defaultMessage="Activity" />
           </FilterLabel>
           <ActivityTypeFilter account={account} {...getFilterProps('type')} />
         </FilterContainer>

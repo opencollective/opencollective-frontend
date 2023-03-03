@@ -211,7 +211,7 @@ describe('Edit public message after contribution', () => {
         cy.get('button[data-cy="cf-next-step"]').click();
         cy.wait(50);
         cy.get('button[data-cy="cf-next-step"]').click();
-        cy.wait(1000); // Wait for stripe to be loaded
+        cy.wait(2000); // Wait for stripe to be loaded
         cy.fillStripeInput();
         cy.contains('button', 'Contribute').click();
         cy.wait(1000); // It takes a little bit of time to create the order.

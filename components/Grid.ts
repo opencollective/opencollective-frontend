@@ -12,6 +12,7 @@ import {
   flexbox,
   FlexboxProps,
   grid,
+  GridProps,
   layout,
   LayoutProps,
   space,
@@ -20,7 +21,7 @@ import {
   TypographyProps,
 } from 'styled-system';
 
-const boxProps = compose(space, color, layout, typography, flexbox, grid);
+export const boxProps = compose(space, color, layout, typography, flexbox, grid);
 
 type BoxProps = SpaceProps &
   ColorProps &
@@ -28,6 +29,7 @@ type BoxProps = SpaceProps &
   TypographyProps &
   FlexboxProps & {
     gap?: string | number;
+    css?: string | object;
   };
 
 export const Box = styled.div<BoxProps>(
@@ -47,7 +49,9 @@ Box.propTypes = {
   ...propTypes.flexbox,
 };
 
-export const Flex = styled(Box)(
+export type FlexProps = BoxProps;
+
+export const Flex = styled(Box)<FlexProps>(
   props => ({
     display: 'flex',
     gap: props.gap,
@@ -57,7 +61,7 @@ export const Flex = styled(Box)(
 
 Flex.displayName = 'Flex';
 
-export const Grid = styled.div(
+export const Grid = styled.div<BoxProps & GridProps>(
   {
     boxSizing: 'border-box',
     display: 'grid',

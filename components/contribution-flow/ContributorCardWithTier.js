@@ -18,17 +18,25 @@ import { withUser } from '../UserProvider';
 
 const ContributorCardWithTier = ({ contribution, ...props }) => {
   const collective = contribution.toAccount;
-  const contributors =
-    collective.isHost && collective.host.contributors ? collective.host.contributors : collective.contributors;
   const pendingOrder = contribution.status === ORDER_STATUS.PENDING;
+
+  const tagMessages = {
+    [ORDER_STATUS.PENDING]: (
+      <FormattedMessage id="NewContributionFlow.PendingContribution" defaultMessage="Pending contribution" />
+    ),
+    [ORDER_STATUS.PROCESSING]: (
+      <FormattedMessage id="NewContributionFlow.ProcessingContribution" defaultMessage="Processing Payment" />
+    ),
+  };
+
   return (
     <StyledCollectiveCard
       {...props}
       collective={collective}
       tag={
-        pendingOrder ? (
+        tagMessages[contribution.status] ? (
           <StyledTag display="inline-block" textTransform="uppercase" my={2} type="warning">
-            <FormattedMessage id="NewContributionFlow.PendingContribution" defaultMessage="Pending contribution" />
+            {tagMessages[contribution.status]}
           </StyledTag>
         ) : null
       }
@@ -43,7 +51,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
               values={{
                 contributors: (
                   <span style={{ color: 'black.900' }}>
-                    <b>{contributors.totalCount || 1}</b>
+                    <b>{collective.contributors?.totalCount || 1}</b>
                   </span>
                 ),
               }}

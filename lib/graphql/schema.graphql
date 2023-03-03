@@ -57,7 +57,7 @@ interface CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -175,10 +175,11 @@ interface CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -254,6 +255,11 @@ interface CollectiveInterface {
   Categories set by Open Collective to help moderation.
   """
   categories: [String]!
+
+  """
+  Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
+  """
+  policies: Policies!
 }
 
 """
@@ -282,6 +288,13 @@ type UserDetails {
   """
   isLimited: Boolean
   hasSeenLatestChangelogEntry: Boolean!
+  hasTwoFactorAuth: Boolean
+
+  """
+  Has the account a password set?
+  """
+  hasPassword: Boolean
+  isRoot: Boolean!
 }
 
 """
@@ -537,7 +550,7 @@ type Contributor {
   """
   True if the contributor is a fundraiser
   """
-  isFundraiser: Boolean!
+  isFundraiser: Boolean @deprecated(reason: "2022-09-12: This role does not exist anymore")
 
   """
   A list of tier ids that this contributors is a member of. A null value indicates that a membership without tier.
@@ -604,7 +617,6 @@ enum ContributorRole {
   MEMBER
   CONTRIBUTOR
   BACKER
-  FUNDRAISER
   ATTENDEE
   FOLLOWER
   CONNECTED_COLLECTIVE
@@ -753,12 +765,16 @@ enum OrderStatus {
   REQUIRE_CLIENT_CONFIRMATION
   PAID
   ERROR
+  PROCESSING
   ACTIVE
   CANCELLED
   PENDING
   EXPIRED
   PLEDGED
   REJECTED
+  DISPUTED
+  REFUNDED
+  IN_REVIEW
 }
 
 """
@@ -972,6 +988,52 @@ type ExpenseAttachedFile {
 }
 
 """
+A social link
+"""
+type SocialLink {
+  type: SocialLinkType!
+  url: URL!
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+"""
+The type of social link
+"""
+enum SocialLinkType {
+  TWITTER
+  TUMBLR
+  MASTODON
+  MATTERMOST
+  SLACK
+  LINKEDIN
+  MEETUP
+  FACEBOOK
+  INSTAGRAM
+  DISCORD
+  YOUTUBE
+  GITHUB
+  GITLAB
+  GIT
+  WEBSITE
+  DISCOURSE
+  PIXELFED
+  GHOST
+  PEERTUBE
+  TIKTOK
+}
+
+"""
+A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
+"""
+scalar URL
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
+
+"""
 This represents an Update
 """
 type UpdateType {
@@ -1108,6 +1170,7 @@ type CollectiveFeatures {
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
   ALIPAY: CollectiveFeatureStatus
+  STRIPE_PAYMENT_INTENT: CollectiveFeatureStatus
   USE_PAYMENT_METHODS: CollectiveFeatureStatus
   EMIT_GIFT_CARDS: CollectiveFeatureStatus
   EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
@@ -1156,6 +1219,779 @@ type PlanType {
   hostFees: Boolean
   hostFeeSharePercent: Float
   platformTips: Boolean
+}
+
+type Policies {
+  EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
+  REQUIRE_2FA_FOR_ADMINS: Boolean
+  COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
+  MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
+}
+
+type EXPENSE_AUTHOR_CANNOT_APPROVE {
+  amountInCents: Int
+  enabled: Boolean
+  appliesToHostedCollectives: Boolean
+  appliesToSingleAdminCollectives: Boolean
+}
+
+type COLLECTIVE_MINIMUM_ADMINS {
+  numberOfAdmins: Int
+  applies: PolicyApplication
+  freeze: Boolean
+}
+
+"""
+Defines how the policy is applied
+"""
+enum PolicyApplication {
+  ALL_COLLECTIVES
+  NEW_COLLECTIVES
+}
+
+type MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
+  ALL_TIME: Amount
+  DAILY: Amount
+  MONTHLY: Amount
+  PER_AUTHORIZATION: Amount
+  WEEKLY: Amount
+  YEARLY: Amount
+}
+
+"""
+A financial amount.
+"""
+type Amount {
+  value: Float
+  currency: Currency
+  valueInCents: Float
+
+  """
+  If the amount was generated from a currency conversion, this field contains details about the conversion
+  """
+  exchangeRate: CurrencyExchangeRate
+}
+
+"""
+All supported currencies
+"""
+enum Currency {
+  """
+  US Dollar
+  """
+  USD
+
+  """
+  UAE Dirham
+  """
+  AED
+
+  """
+  Afghani
+  """
+  AFN
+
+  """
+  Lek
+  """
+  ALL
+
+  """
+  Armenian Dram
+  """
+  AMD
+
+  """
+  Netherlands Antillean Guilder
+  """
+  ANG
+
+  """
+  Kwanza
+  """
+  AOA
+
+  """
+  Argentine Peso
+  """
+  ARS
+
+  """
+  Australian Dollar
+  """
+  AUD
+
+  """
+  Aruban Florin
+  """
+  AWG
+
+  """
+  Azerbaijanian Manat
+  """
+  AZN
+
+  """
+  Convertible Mark
+  """
+  BAM
+
+  """
+  Barbados Dollar
+  """
+  BBD
+
+  """
+  Taka
+  """
+  BDT
+
+  """
+  Bulgarian Lev
+  """
+  BGN
+
+  """
+  Burundi Franc
+  """
+  BIF
+
+  """
+  Bermudian Dollar
+  """
+  BMD
+
+  """
+  Brunei Dollar
+  """
+  BND
+
+  """
+  Boliviano
+  """
+  BOB
+
+  """
+  Brazilian Real
+  """
+  BRL
+
+  """
+  Bahamian Dollar
+  """
+  BSD
+
+  """
+  Pula
+  """
+  BWP
+
+  """
+  Belarussian Ruble
+  """
+  BYN
+
+  """
+  Belize Dollar
+  """
+  BZD
+
+  """
+  Canadian Dollar
+  """
+  CAD
+
+  """
+  Congolese Franc
+  """
+  CDF
+
+  """
+  Swiss Franc
+  """
+  CHF
+
+  """
+  Chilean Peso
+  """
+  CLP
+
+  """
+  Yuan Renminbi
+  """
+  CNY
+
+  """
+  Colombian Peso
+  """
+  COP
+
+  """
+  Costa Rican Colon
+  """
+  CRC
+
+  """
+  Cabo Verde Escudo
+  """
+  CVE
+
+  """
+  Czech Koruna
+  """
+  CZK
+
+  """
+  Djibouti Franc
+  """
+  DJF
+
+  """
+  Danish Krone
+  """
+  DKK
+
+  """
+  Dominican Peso
+  """
+  DOP
+
+  """
+  Algerian Dinar
+  """
+  DZD
+
+  """
+  Egyptian Pound
+  """
+  EGP
+
+  """
+  Ethiopian Birr
+  """
+  ETB
+
+  """
+  Euro
+  """
+  EUR
+
+  """
+  Fiji Dollar
+  """
+  FJD
+
+  """
+  Falkland Islands Pound
+  """
+  FKP
+
+  """
+  Pound Sterling
+  """
+  GBP
+
+  """
+  Lari
+  """
+  GEL
+
+  """
+  Gibraltar Pound
+  """
+  GIP
+
+  """
+  Dalasi
+  """
+  GMD
+
+  """
+  Guinea Franc
+  """
+  GNF
+
+  """
+  Quetzal
+  """
+  GTQ
+
+  """
+  Guyana Dollar
+  """
+  GYD
+
+  """
+  Hong Kong Dollar
+  """
+  HKD
+
+  """
+  Lempira
+  """
+  HNL
+
+  """
+  Kuna
+  """
+  HRK
+
+  """
+  Gourde
+  """
+  HTG
+
+  """
+  Forint
+  """
+  HUF
+
+  """
+  Rupiah
+  """
+  IDR
+
+  """
+  New Israeli Sheqel
+  """
+  ILS
+
+  """
+  Indian Rupee
+  """
+  INR
+
+  """
+  Iceland Krona
+  """
+  ISK
+
+  """
+  Jamaican Dollar
+  """
+  JMD
+
+  """
+  Yen
+  """
+  JPY
+
+  """
+  Kenyan Shilling
+  """
+  KES
+
+  """
+  Som
+  """
+  KGS
+
+  """
+  Riel
+  """
+  KHR
+
+  """
+  Comoro Franc
+  """
+  KMF
+
+  """
+  Won
+  """
+  KRW
+
+  """
+  Cayman Islands Dollar
+  """
+  KYD
+
+  """
+  Tenge
+  """
+  KZT
+
+  """
+  Kip
+  """
+  LAK
+
+  """
+  Lebanese Pound
+  """
+  LBP
+
+  """
+  Sri Lanka Rupee
+  """
+  LKR
+
+  """
+  Liberian Dollar
+  """
+  LRD
+
+  """
+  Loti
+  """
+  LSL
+
+  """
+  Moroccan Dirham
+  """
+  MAD
+
+  """
+  Moldovan Leu
+  """
+  MDL
+
+  """
+  Malagasy Ariary
+  """
+  MGA
+
+  """
+  Denar
+  """
+  MKD
+
+  """
+  Kyat
+  """
+  MMK
+
+  """
+  Tugrik
+  """
+  MNT
+
+  """
+  Pataca
+  """
+  MOP
+
+  """
+  Mauritius Rupee
+  """
+  MUR
+
+  """
+  Rufiyaa
+  """
+  MVR
+
+  """
+  Kwacha
+  """
+  MWK
+
+  """
+  Mexican Peso
+  """
+  MXN
+
+  """
+  Malaysian Ringgit
+  """
+  MYR
+
+  """
+  Mozambique Metical
+  """
+  MZN
+
+  """
+  Namibia Dollar
+  """
+  NAD
+
+  """
+  Naira
+  """
+  NGN
+
+  """
+  Cordoba Oro
+  """
+  NIO
+
+  """
+  Norwegian Krone
+  """
+  NOK
+
+  """
+  Nepalese Rupee
+  """
+  NPR
+
+  """
+  New Zealand Dollar
+  """
+  NZD
+
+  """
+  Balboa
+  """
+  PAB
+
+  """
+  Nuevo Sol
+  """
+  PEN
+
+  """
+  Kina
+  """
+  PGK
+
+  """
+  Philippine Peso
+  """
+  PHP
+
+  """
+  Pakistan Rupee
+  """
+  PKR
+
+  """
+  Zloty
+  """
+  PLN
+
+  """
+  Guarani
+  """
+  PYG
+
+  """
+  Qatari Rial
+  """
+  QAR
+
+  """
+  Romanian Leu
+  """
+  RON
+
+  """
+  Serbian Dinar
+  """
+  RSD
+
+  """
+  Russian Ruble
+  """
+  RUB
+
+  """
+  Rwanda Franc
+  """
+  RWF
+
+  """
+  Saudi Riyal
+  """
+  SAR
+
+  """
+  Solomon Islands Dollar
+  """
+  SBD
+
+  """
+  Seychelles Rupee
+  """
+  SCR
+
+  """
+  Swedish Krona
+  """
+  SEK
+
+  """
+  Singapore Dollar
+  """
+  SGD
+
+  """
+  Saint Helena Pound
+  """
+  SHP
+
+  """
+  Leone
+  """
+  SLL
+
+  """
+  Somali Shilling
+  """
+  SOS
+
+  """
+  Surinam Dollar
+  """
+  SRD
+
+  """
+  Lilangeni
+  """
+  SZL
+
+  """
+  Baht
+  """
+  THB
+
+  """
+  Somoni
+  """
+  TJS
+
+  """
+  Pa’anga
+  """
+  TOP
+
+  """
+  Turkish Lira
+  """
+  TRY
+
+  """
+  Trinidad and Tobago Dollar
+  """
+  TTD
+
+  """
+  New Taiwan Dollar
+  """
+  TWD
+
+  """
+  Tanzanian Shilling
+  """
+  TZS
+
+  """
+  Hryvnia
+  """
+  UAH
+
+  """
+  Uganda Shilling
+  """
+  UGX
+
+  """
+  Peso Uruguayo
+  """
+  UYU
+
+  """
+  Uzbekistan Sum
+  """
+  UZS
+
+  """
+  Dong
+  """
+  VND
+
+  """
+  Vatu
+  """
+  VUV
+
+  """
+  Tala
+  """
+  WST
+
+  """
+  CFA Franc BEAC
+  """
+  XAF
+
+  """
+  East Caribbean Dollar
+  """
+  XCD
+
+  """
+  CFA Franc BCEAO
+  """
+  XOF
+
+  """
+  CFP Franc
+  """
+  XPF
+
+  """
+  Yemeni Rial
+  """
+  YER
+
+  """
+  Rand
+  """
+  ZAR
+
+  """
+  Zambian Kwacha
+  """
+  ZMW
+}
+
+"""
+Fields for a currency fx rate
+"""
+type CurrencyExchangeRate {
+  """
+  Exchange rate value as a scalar (e.g 1.15 or 0.86)
+  """
+  value: Float!
+
+  """
+  Where does the FX rate comes from
+  """
+  source: CurrencyExchangeRateSourceType!
+  fromCurrency: Currency!
+  toCurrency: Currency!
+
+  """
+  Date of the FX rate
+  """
+  date: DateTime!
+
+  """
+  Is the FX rate approximate or a fixed value?
+  """
+  isApproximate: Boolean!
+}
+
+"""
+Where does the FX rate come from
+"""
+enum CurrencyExchangeRateSourceType {
+  """
+  Open Collective internal system, relying on caching and 3rd party APIs
+  """
+  OPENCOLLECTIVE
+
+  """
+  PayPal API
+  """
+  PAYPAL
+
+  """
+  Wise API
+  """
+  WISE
 }
 
 """
@@ -1373,7 +2209,7 @@ type Collective implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -1404,6 +2240,11 @@ type Collective implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -1523,14 +2364,15 @@ type Collective implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -1595,6 +2437,7 @@ type Collective implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  policies: Policies!
 }
 
 """
@@ -1624,7 +2467,7 @@ type Event implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -1655,6 +2498,11 @@ type Event implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -1774,14 +2622,15 @@ type Event implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -1846,6 +2695,7 @@ type Event implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  policies: Policies!
 }
 
 """
@@ -1875,7 +2725,7 @@ type Fund implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -1906,6 +2756,11 @@ type Fund implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -2025,14 +2880,15 @@ type Fund implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -2097,6 +2953,7 @@ type Fund implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  policies: Policies!
 }
 
 """
@@ -2126,7 +2983,7 @@ type Organization implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2157,6 +3014,11 @@ type Organization implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -2276,14 +3138,15 @@ type Organization implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -2348,6 +3211,7 @@ type Organization implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  policies: Policies!
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 }
 
@@ -2378,7 +3242,7 @@ type Project implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2409,6 +3273,11 @@ type Project implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -2528,14 +3397,15 @@ type Project implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -2600,6 +3470,7 @@ type Project implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  policies: Policies!
 }
 
 """
@@ -2871,7 +3742,7 @@ type User implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2902,6 +3773,11 @@ type User implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -3021,14 +3897,15 @@ type User implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -3093,6 +3970,7 @@ type User implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  policies: Policies!
   email: String
   applications: [Application]
 }
@@ -3124,7 +4002,7 @@ type Vendor implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -3155,6 +4033,11 @@ type Vendor implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -3274,14 +4157,15 @@ type Vendor implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
@@ -3346,6 +4230,7 @@ type Vendor implements CollectiveInterface {
   stats: CollectiveStatsType
   contributionPolicy: String
   categories: [String]!
+  policies: Policies!
 }
 
 """
@@ -3387,9 +4272,12 @@ type Query {
     """
     includeExpenseTransactions: Boolean
     fetchDataFromLedger: Boolean
+      @deprecated(
+        reason: "2023-01-11: Removed support for this in 2019 (https://github.com/opencollective/opencollective-api/pull/2384)"
+      )
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction]
-  Application(id: Int): Application
+  Application(id: Int): Application @deprecated(reason: "2023-01-03: Please use PersonalToken from GQLV2")
   Transaction(id: Int, uuid: String): Transaction
   allCollectives(
     """
@@ -3663,8 +4551,6 @@ type Mutation {
   deleteUserCollective(id: Int!): CollectiveInterface
   archiveCollective(id: Int!): CollectiveInterface
   unarchiveCollective(id: Int!): CollectiveInterface
-  sendMessageToCollective(collectiveId: Int!, message: String!, subject: String): SendMessageToCollectiveResult
-    @deprecated(reason: "2022-08-01: Please use the sendMessage mutation from GraphQL v2 instead.")
 
   """
   Create a user with an optional organization.
@@ -3745,11 +4631,10 @@ type Mutation {
   editPublicMessage(FromCollectiveId: Int!, CollectiveId: Int!, message: String): [Member]
     @deprecated(reason: "2021-01-27: Please use editPublicMessage from GQLV2")
   createOrder(order: OrderInputType!): OrderType
-    @deprecated(reason: "2020-10-13: This endpoint has been moved to GQLV2")
-  confirmOrder(order: ConfirmOrderInputType!): OrderType
-  refundTransaction(id: Int!): Transaction @deprecated(reason: "2022-01-27: Please use refundTransaction from GQLV2")
+    @deprecated(reason: "2020-10-13: This mutation has been moved to GQLV2")
   createApplication(application: ApplicationInput!): Application
-  deleteApplication(id: Int!): Application
+    @deprecated(reason: "2023-01-03: Please use createPersonalToken from GQLV2")
+  deleteApplication(id: Int!): Application @deprecated(reason: "2023-01-03: Please use deletePersonalToken from GQLV2")
 
   """
   Update a payment method
@@ -3926,10 +4811,11 @@ input CollectiveInputType {
   name: String
   legalName: String
   company: String
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  socialLinks: [SocialLinkInput!]
   description: String
   longDescription: String
   expensePolicy: String
@@ -3958,6 +4844,11 @@ input CollectiveInputType {
   isIncognito: Boolean
   isActive: Boolean
   contributionPolicy: String
+}
+
+input SocialLinkInput {
+  type: SocialLinkType!
+  url: URL!
 }
 
 """
@@ -4099,10 +4990,10 @@ input CollectiveAttributesInputType {
   description: String
   longDescription: String
   expensePolicy: String
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   location: LocationInputType
   startsAt: String
   endsAt: String
@@ -4123,10 +5014,6 @@ input NotificationInputType {
   webhookUrl: String
 }
 
-type SendMessageToCollectiveResult {
-  success: Boolean
-}
-
 type CreateUserResult {
   user: UserDetails
   organization: CollectiveInterface
@@ -4144,10 +5031,10 @@ input UserInputType {
   image: String
   username: String @deprecated(reason: "2022-01-13: Not used anymore. Will be ignored")
   description: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   newsletterOptIn: Boolean
   location: LocationInputType
 }
@@ -4170,7 +5057,7 @@ input OrderInputType {
   quantity: Int = 1
   totalAmount: Int
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   platformFee: Int
   isFeesOnTop: Boolean
   currency: String
@@ -4280,13 +5167,6 @@ Implemented Captcha Providers
 enum CaptchaProvider {
   HCAPTCHA
   RECAPTCHA
-}
-
-"""
-Input type for ConfirmOrderType
-"""
-input ConfirmOrderInputType {
-  id: Int
 }
 
 """

@@ -19,7 +19,6 @@ import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/u
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { Sections } from '../components/collective-page/_constants';
 import Container from '../components/Container';
 import CommentForm from '../components/conversations/CommentForm';
 import { commentFieldsFragment } from '../components/conversations/graphql';
@@ -49,6 +48,7 @@ import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
+import StyledCard from '../components/StyledCard';
 import StyledCheckbox from '../components/StyledCheckbox';
 import StyledLink from '../components/StyledLink';
 import { H5, Span } from '../components/Text';
@@ -196,7 +196,7 @@ class ExpensePage extends React.Component {
     super(props);
     this.expenseTopRef = React.createRef();
     this.state = {
-      isRefetchingDataForUser: false,
+      hasRefetchedDataForUser: Boolean(props.LoggedInUser), // If the page is loaded directly with a logged in user, we can consider the query was already authenticated
       error: null,
       status:
         this.props.draftKey && this.props.data.expense?.status === expenseStatus.DRAFT
@@ -307,10 +307,10 @@ class ExpensePage extends React.Component {
 
   async refetchDataForUser() {
     try {
-      this.setState({ isRefetchingDataForUser: true });
+      this.setState({ hasRefetchedDataForUser: false });
       await this.props.data.refetch();
     } finally {
-      this.setState({ isRefetchingDataForUser: false });
+      this.setState({ hasRefetchedDataForUser: true });
     }
   }
 
@@ -462,8 +462,9 @@ class ExpensePage extends React.Component {
   };
 
   render() {
-    const { collectiveSlug, data, loadingLoggedInUser, intl } = this.props;
-    const { isRefetchingDataForUser, error, status, editedExpense } = this.state;
+    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, intl } = this.props;
+    const { hasRefetchedDataForUser, error, status, editedExpense } = this.state;
+    const isRefetchingDataForUser = LoggedInUser && !hasRefetchedDataForUser;
 
     if (!data.loading && !isRefetchingDataForUser) {
       if (!data || data.error) {
@@ -512,11 +513,10 @@ class ExpensePage extends React.Component {
         <CollectiveNavbar
           collective={collective}
           isLoading={!collective}
-          selected={Sections.BUDGET}
           selectedCategory={NAVBAR_CATEGORIES.BUDGET}
           callsToAction={{ hasSubmitExpense: status === PAGE_STATUS.VIEW }}
         />
-        <Flex flexDirection={['column', 'row']} my={[4, 5]} data-cy="expense-page-content">
+        <Flex flexDirection={['column', 'row']} px={[2, 3, 4]} py={[0, 5]} mt={3} data-cy="expense-page-content">
           <Box width={SIDE_MARGIN_WIDTH}></Box>
           <Box
             flex="1 1 650px"
@@ -531,7 +531,7 @@ class ExpensePage extends React.Component {
                 id="ExpenseSummaryTitle"
                 defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} Summary to <LinkCollective>{collectiveName}</LinkCollective>"
                 values={{
-                  type: expense?.type,
+                  type: (editedExpense || expense)?.type,
                   collectiveName: collective?.name,
                   LinkCollective: text => <LinkCollective collective={collective}>{text}</LinkCollective>,
                 }}
@@ -583,8 +583,8 @@ class ExpensePage extends React.Component {
                 {status !== PAGE_STATUS.EDIT_SUMMARY && (
                   <React.Fragment>
                     {hasAttachedFiles && (
-                      <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
-                        <H5 fontSize="16px" mb={3}>
+                      <StyledCard mt="32px" p="32px">
+                        <H5 fontSize="16px" fontWeight="700" mb={3}>
                           <FormattedMessage id="Downloads" defaultMessage="Downloads" />
                         </H5>
                         <ExpenseAttachedFiles
@@ -593,7 +593,7 @@ class ExpensePage extends React.Component {
                           expense={expense}
                           showInvoice={canSeeInvoiceInfo}
                         />
-                      </Container>
+                      </StyledCard>
                     )}
                     {expense?.privateMessage && (
                       <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">

@@ -5,7 +5,6 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isValidRelativeUrl } from '../lib/utils';
 
@@ -19,7 +18,7 @@ import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-class SigninV2Page extends React.Component {
+class SigninPage extends React.Component {
   static getInitialProps({ query: { token, next, form, email }, req }) {
     // Decode next URL if URI encoded
     if (next && next.startsWith('%2F')) {
@@ -46,7 +45,6 @@ class SigninV2Page extends React.Component {
     errorLoggedInUser: PropTypes.string,
     LoggedInUser: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
-    enforceTwoFactorAuthForLoggedInUser: PropTypes.bool,
     isSuspiciousUserAgent: PropTypes.bool,
     router: PropTypes.object,
   };
@@ -75,7 +73,7 @@ class SigninV2Page extends React.Component {
       this.setState({ success: true, redirecting: true });
       // Avoid redirect loop: replace '/signin' redirects by '/'
       const { next } = this.props;
-      const redirect = next && next.match(/^\/?signin[?/]?/) ? null : next;
+      const redirect = next && (next.match(/^\/?signin[?/]?/) || next.match(/^\/?reset-password[?/]?/)) ? null : next;
       await this.props.router.replace(redirect || '/');
       window.scroll(0, 0);
     } else if (this.props.token && oldProps.token !== this.props.token) {
@@ -126,15 +124,7 @@ class SigninV2Page extends React.Component {
   }
 
   renderContent() {
-    const {
-      loadingLoggedInUser,
-      errorLoggedInUser,
-      token,
-      next,
-      form,
-      LoggedInUser,
-      enforceTwoFactorAuthForLoggedInUser,
-    } = this.props;
+    const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser } = this.props;
 
     if (this.state.isRobot && token) {
       return (
@@ -193,23 +183,7 @@ class SigninV2Page extends React.Component {
             )}
           </MessageBox>
         )}
-        <SignInOrJoinFree
-          email={this.props.email}
-          redirect={next || '/'}
-          form={form}
-          routes={this.getRoutes()}
-          enforceTwoFactorAuthForLoggedInUser={enforceTwoFactorAuthForLoggedInUser}
-          submitTwoFactorAuthenticatorCode={twoFactorAuthenticatorCode => {
-            const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-            return this.props.login(localStorage2FAToken, {
-              twoFactorAuthenticatorCode,
-            });
-          }}
-          submitRecoveryCode={recoveryCode => {
-            const localStorage2FAToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-            return this.props.login(localStorage2FAToken, { recoveryCode });
-          }}
-        />
+        <SignInOrJoinFree email={this.props.email} redirect={next || '/'} form={form} routes={this.getRoutes()} />
       </React.Fragment>
     );
   }
@@ -234,4 +208,4 @@ class SigninV2Page extends React.Component {
   }
 }
 
-export default withUser(withRouter(SigninV2Page));
+export default withUser(withRouter(SigninPage));

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ForwardRefExoticComponent } from 'react';
 import PropTypes from 'prop-types';
 import StyledSystemPropTypes from '@styled-system/prop-types';
 import styled, { css } from 'styled-components';
@@ -19,22 +19,23 @@ import {
   TypographyProps,
 } from 'styled-system';
 
-import { textTransform, whiteSpace } from '../lib/styled-system-custom-properties';
+import { textTransform, TextTransformProps, whiteSpace } from '../lib/styled-system-custom-properties';
 import theme from '../lib/theme';
-import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
+import { ButtonSize, buttonSize, ButtonStyle, buttonStyle } from '../lib/theme/variants/button';
 
 import StyledSpinner from './StyledSpinner';
 
 type StyledButtonProps = BackgroundProps &
   BorderProps &
-  ColorProps &
   FlexboxProps &
   LayoutProps &
   SpaceProps &
   TypographyProps &
+  ColorProps &
+  TextTransformProps &
   React.HTMLProps<HTMLButtonElement> & {
-    buttonStyle?: string;
-    buttonSize?: string;
+    buttonStyle?: ButtonStyle;
+    buttonSize?: ButtonSize;
     loading?: boolean;
     asLink?: boolean;
     isBorderless?: boolean;
@@ -109,7 +110,10 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
   }}
 `;
 
-const StyledButton = React.forwardRef<HTMLButtonElement, StyledButtonProps>(({ loading, as, ...props }, ref) =>
+const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forwardRef<
+  HTMLButtonElement,
+  StyledButtonProps
+>(({ loading, as, ...props }, ref) =>
   // TODO(Typescript): We have to hack the `as` prop because styled-components somehow types it as "never"
   !loading ? (
     <StyledButtonContent {...props} as={as as never} ref={ref} />
@@ -133,11 +137,17 @@ StyledButton.propTypes = {
   /**
    * Based on the design system theme
    */
-  buttonSize: PropTypes.oneOf(Object.keys(theme.buttonSizes)),
+  buttonSize: PropTypes.oneOfType([
+    PropTypes.oneOf(Object.keys(theme.buttonSizes)),
+    PropTypes.arrayOf(PropTypes.oneOf(Object.keys(theme.buttonSizes))),
+  ]),
   /**
    * Based on the design system theme
    */
-  buttonStyle: PropTypes.oneOf(Object.keys(theme.buttons)),
+  buttonStyle: PropTypes.oneOfType([
+    PropTypes.oneOf(Object.keys(theme.buttons)),
+    PropTypes.arrayOf(PropTypes.oneOf(Object.keys(theme.buttons))),
+  ]),
   /**
    * Show a loading spinner on button
    */

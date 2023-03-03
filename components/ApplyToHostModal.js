@@ -172,7 +172,7 @@ const GQL_CONTEXT = { context: API_V2_CONTEXT };
 const INITIAL_FORM_VALUES = { message: '', areTosChecked: false, collective: null, inviteMembers: [] };
 const STEPS = {
   INFORMATION: { name: 'Information', label: <FormattedMessage defaultMessage="Information" /> },
-  APPLY: { name: 'Apply', label: <FormattedMessage defaultMessage="Apply" /> },
+  APPLY: { name: 'Apply', label: <FormattedMessage id="Apply" defaultMessage="Apply" /> },
 };
 
 const getAccountInput = collective => {
@@ -192,7 +192,7 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, is
         px={3}
       >
         {onBack ? (
-          <FormattedMessage defaultMessage="Back" />
+          <FormattedMessage id="Back" defaultMessage="Back" />
         ) : (
           <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
         )}
@@ -313,6 +313,12 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
             if (!values.collective && contentRef.current) {
               contentRef.current.scrollIntoView({ behavior: 'smooth' });
             }
+
+            // Since the OSC flow is using a standalone form, without any TOS checkbox in this modal, skip validation here
+            if (isOSCHost) {
+              return {};
+            }
+
             return requireFields(values, host.termsUrl ? ['areTosChecked', 'collective'] : ['collective']);
           }}
           onSubmit={async values => {
@@ -485,102 +491,110 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                         {!isOSCHost && (
                           <React.Fragment>
                             <StyledHr my="18px" width="100%" borderColor="black.300" />
-                            <Box>
-                              <P fontSize="13px" lineHeight="16px" fontWeight="600" color="black.700">
-                                <FormattedMessage defaultMessage="Minimum Administrators Required" />
-                              </P>
-                              <Flex mt={1} width="100%">
-                                <P
-                                  my={2}
-                                  fontSize="9px"
-                                  textTransform="uppercase"
-                                  color="black.700"
-                                  letterSpacing="0.06em"
-                                >
-                                  <FormattedMessage id="administrators" defaultMessage="Administrators" />
-                                  {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
-                                    values.collective &&
-                                    ` (${
-                                      values.collective?.admins?.nodes.length +
-                                      values.collective?.memberInvitations?.length +
-                                      values.inviteMembers.length
-                                    }/${host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins})`}
-                                </P>
-                                <Flex flexGrow={1} alignItems="center">
-                                  <StyledHr width="100%" ml={2} borderColor="black.300" />
-                                </Flex>
-                              </Flex>
-                              <Flex width="100%" flexWrap="wrap" data-cy="profile-card">
-                                {values.collective?.admins?.nodes.map(admin => (
-                                  <OnboardingProfileCard key={admin.account.id} collective={admin.account} />
-                                ))}
-                                {values.collective?.memberInvitations?.map(invitations => (
-                                  <OnboardingProfileCard
-                                    key={invitations.memberAccount.id}
-                                    collective={invitations.memberAccount}
-                                    isPending
-                                  />
-                                ))}
-                                {values.inviteMembers?.map(invite => (
-                                  <OnboardingProfileCard
-                                    key={invite.memberAccount.id}
-                                    collective={invite.memberAccount}
-                                    removeAdmin={() =>
-                                      setFieldValue(
-                                        'inviteMembers',
-                                        values.inviteMembers.filter(
-                                          i => i.memberAccount.id !== invite.memberAccount.id,
-                                        ),
-                                      )
-                                    }
-                                  />
-                                ))}
-                              </Flex>
-                              <Flex mt={1} width="100%">
-                                <P
-                                  my={2}
-                                  fontSize="9px"
-                                  textTransform="uppercase"
-                                  color="black.700"
-                                  letterSpacing="0.06em"
-                                >
-                                  <FormattedMessage id="InviteAdministrators" defaultMessage="Invite Administrators" />
-                                </P>
-                                <Flex flexGrow={1} alignItems="center">
-                                  <StyledHr width="100%" ml={2} borderColor="black.300" />
-                                </Flex>
-                              </Flex>
-                              <Box>
-                                <CollectivePickerAsync
-                                  inputId="onboarding-admin-picker"
-                                  creatable
-                                  collective={null}
-                                  types={['USER']}
-                                  data-cy="admin-picker"
-                                  filterResults={collectives =>
-                                    collectives.filter(
-                                      collective =>
-                                        !values.inviteMembers.some(invite => invite.memberAccount.id === collective.id),
-                                    )
-                                  }
-                                  onChange={option => {
-                                    setFieldValue('inviteMembers', [
-                                      ...values.inviteMembers,
-                                      { role: 'ADMIN', memberAccount: option.value },
-                                    ]);
-                                  }}
-                                />
-                              </Box>
-                              {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
-                                <MessageBox type="info" mt={3} fontSize="13px">
-                                  <FormattedMessage
-                                    defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
-                                    values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
-                                  />
-                                </MessageBox>
-                              )}
-                            </Box>
-                            <StyledHr my="18px" width="100%" borderColor="black.300" />
+                            {host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1 && (
+                              <React.Fragment>
+                                <Box>
+                                  <P fontSize="13px" lineHeight="16px" fontWeight="600" color="black.700">
+                                    <FormattedMessage defaultMessage="Minimum Administrators Required" />
+                                  </P>
+                                  <Flex mt={1} width="100%">
+                                    <P
+                                      my={2}
+                                      fontSize="9px"
+                                      textTransform="uppercase"
+                                      color="black.700"
+                                      letterSpacing="0.06em"
+                                    >
+                                      <FormattedMessage id="administrators" defaultMessage="Administrators" />
+                                      {values.collective &&
+                                        ` (${
+                                          values.collective?.admins?.nodes.length +
+                                          values.collective?.memberInvitations?.length +
+                                          values.inviteMembers.length
+                                        }/${host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins})`}
+                                    </P>
+                                    <Flex flexGrow={1} alignItems="center">
+                                      <StyledHr width="100%" ml={2} borderColor="black.300" />
+                                    </Flex>
+                                  </Flex>
+                                  <Flex width="100%" flexWrap="wrap" data-cy="profile-card">
+                                    {values.collective?.admins?.nodes.map(admin => (
+                                      <OnboardingProfileCard key={admin.account.id} collective={admin.account} />
+                                    ))}
+                                    {values.collective?.memberInvitations?.map(invitations => (
+                                      <OnboardingProfileCard
+                                        key={invitations.memberAccount.id}
+                                        collective={invitations.memberAccount}
+                                        isPending
+                                      />
+                                    ))}
+                                    {values.inviteMembers?.map(invite => (
+                                      <OnboardingProfileCard
+                                        key={invite.memberAccount.id}
+                                        collective={invite.memberAccount}
+                                        removeAdmin={() =>
+                                          setFieldValue(
+                                            'inviteMembers',
+                                            values.inviteMembers.filter(
+                                              i => i.memberAccount.id !== invite.memberAccount.id,
+                                            ),
+                                          )
+                                        }
+                                      />
+                                    ))}
+                                  </Flex>
+                                  <Flex mt={1} width="100%">
+                                    <P
+                                      my={2}
+                                      fontSize="9px"
+                                      textTransform="uppercase"
+                                      color="black.700"
+                                      letterSpacing="0.06em"
+                                    >
+                                      <FormattedMessage
+                                        id="InviteAdministrators"
+                                        defaultMessage="Invite Administrators"
+                                      />
+                                    </P>
+                                    <Flex flexGrow={1} alignItems="center">
+                                      <StyledHr width="100%" ml={2} borderColor="black.300" />
+                                    </Flex>
+                                  </Flex>
+                                  <Box>
+                                    <CollectivePickerAsync
+                                      inputId="onboarding-admin-picker"
+                                      creatable
+                                      collective={null}
+                                      types={['USER']}
+                                      data-cy="admin-picker"
+                                      filterResults={collectives =>
+                                        collectives.filter(
+                                          collective =>
+                                            !values.inviteMembers.some(
+                                              invite => invite.memberAccount.id === collective.id,
+                                            ),
+                                        )
+                                      }
+                                      onChange={option => {
+                                        setFieldValue('inviteMembers', [
+                                          ...values.inviteMembers,
+                                          { role: 'ADMIN', memberAccount: option.value },
+                                        ]);
+                                      }}
+                                    />
+                                  </Box>
+                                  {host?.policies?.COLLECTIVE_MINIMUM_ADMINS && (
+                                    <MessageBox type="info" mt={3} fontSize="13px">
+                                      <FormattedMessage
+                                        defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
+                                        values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                                      />
+                                    </MessageBox>
+                                  )}
+                                </Box>
+                                <StyledHr my="18px" width="100%" borderColor="black.300" />
+                              </React.Fragment>
+                            )}
                             {isOCFHost ? (
                               <ApplicationDescription />
                             ) : (
@@ -656,7 +670,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                       buttonStyle="primary"
                       onClick={() => setStep(STEPS.APPLY)}
                     >
-                      <FormattedMessage defaultMessage="Next" />
+                      <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
                     </StyledButton>
                   </Flex>
                 )}

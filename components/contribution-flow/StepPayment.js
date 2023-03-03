@@ -1,86 +1,13 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
-import { themeGet } from '@styled-system/theme-get';
-import { get, isEmpty } from 'lodash';
-import { FormattedMessage } from 'react-intl';
-import styled, { css } from 'styled-components';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { require2FAForAdmins } from '../../lib/policies';
 
 import Container from '../Container';
-import { Box, Flex } from '../Grid';
-import Loading from '../Loading';
-import MessageBox from '../MessageBox';
-import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
-import NewCreditCardForm from '../NewCreditCardForm';
-import StyledRadioList from '../StyledRadioList';
-import { P } from '../Text';
+import { TwoFactorAuthRequiredMessage } from '../TwoFactorAuthRequiredMessage';
 
-import BlockedContributorMessage from './BlockedContributorMessage';
-import { generatePaymentMethodOptions, NEW_CREDIT_CARD_KEY } from './utils';
-
-const PaymentMethodBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: #ffffff;
-  padding: 16px;
-
-  ${props =>
-    props.index &&
-    css`
-      border-top: 1px solid ${themeGet('colors.black.200')};
-    `}
-`;
-
-const paymentMethodsQuery = gql`
-  query ContributionFlowPaymentMethods($slug: String) {
-    account(slug: $slug) {
-      id
-      paymentMethods(enumType: [CREDITCARD, GIFTCARD, PREPAID, COLLECTIVE], includeExpired: true) {
-        id
-        name
-        data
-        service
-        type
-        expiryDate
-        providerType
-        sourcePaymentMethod {
-          id
-          name
-          data
-          service
-          type
-          expiryDate
-          providerType
-          balance {
-            currency
-          }
-          limitedToHosts {
-            id
-            legacyId
-            slug
-          }
-        }
-        balance {
-          valueInCents
-          currency
-        }
-        account {
-          id
-          slug
-          type
-          name
-        }
-        limitedToHosts {
-          id
-          legacyId
-          slug
-        }
-      }
-    }
-  }
-`;
+import PaymentMethodList from './PaymentMethodList';
 
 const StepPayment = ({
   stepDetails,
@@ -95,111 +22,28 @@ const StepPayment = ({
   onNewCardFormReady,
   disabledPaymentMethodTypes,
 }) => {
-  // GraphQL mutations and queries
-  const { loading, data, error } = useQuery(paymentMethodsQuery, {
-    variables: { slug: stepProfile.slug },
-    context: API_V2_CONTEXT,
-    skip: !stepProfile.id || stepProfile.contributorRejectedCategories,
-    fetchPolicy: 'cache-and-network',
-  });
+  const { LoggedInUser } = useLoggedInUser();
 
-  // data handling
-  const paymentMethods = get(data, 'account.paymentMethods', null) || [];
-  const paymentOptions = React.useMemo(() =>
-    generatePaymentMethodOptions(
-      paymentMethods,
-      stepProfile,
-      stepDetails,
-      stepSummary,
-      collective,
-      isEmbed,
-      disabledPaymentMethodTypes,
-    ),
-  );
-
-  const setNewPaymentMethod = (key, paymentMethod) => {
-    onChange({ stepPayment: { key, paymentMethod } });
-  };
-
-  // Set default payment method
-  useEffect(() => {
-    if (!loading && !stepPayment && !isEmpty(paymentOptions)) {
-      const firstOption = paymentOptions.find(pm => !pm.disabled);
-      if (firstOption) {
-        setNewPaymentMethod(firstOption.key, firstOption.paymentMethod);
-      }
-    }
-  }, [paymentOptions, stepPayment, loading]);
+  if (require2FAForAdmins(stepProfile) && !LoggedInUser?.hasTwoFactorAuth) {
+    return <TwoFactorAuthRequiredMessage borderWidth={0} noTitle />;
+  }
 
   return (
     <Container width={1} border={['1px solid #DCDEE0', 'none']} borderRadius={15}>
-      {stepProfile.contributorRejectedCategories ? (
-        <BlockedContributorMessage categories={stepProfile.contributorRejectedCategories} collective={collective} />
-      ) : loading && !paymentMethods.length ? (
-        <Loading />
-      ) : error ? (
-        <MessageBoxGraphqlError error={error} />
-      ) : !paymentOptions.length ? (
-        <MessageBox type="warning" withIcon>
-          <FormattedMessage
-            id="NewContribute.noPaymentMethodsAvailable"
-            defaultMessage="No payment methods available."
-          />
-        </MessageBox>
-      ) : (
-        <StyledRadioList
-          id="PaymentMethod"
-          name="PaymentMethod"
-          keyGetter="key"
-          options={paymentOptions}
-          onChange={option => setNewPaymentMethod(option.key, option.value.paymentMethod)}
-          value={stepPayment?.key || null}
-          disabled={isSubmitting}
-        >
-          {({ radio, checked, index, value }) => (
-            <PaymentMethodBox index={index} disabled={value.disabled}>
-              <Flex alignItems="center" css={value.disabled ? 'filter: grayscale(1) opacity(50%);' : undefined}>
-                <Box as="span" mr={3} flexWrap="wrap">
-                  {radio}
-                </Box>
-                <Flex mr={3} css={{ flexBasis: '26px' }}>
-                  {value.icon}
-                </Flex>
-                <Flex flexDirection="column">
-                  <P fontSize="15px" lineHeight="20px" fontWeight={400} color="black.900">
-                    {value.title}
-                  </P>
-                  {value.subtitle && (
-                    <P fontSize="12px" fontWeight={400} lineHeight="18px" color="black.500">
-                      {value.subtitle}
-                    </P>
-                  )}
-                </Flex>
-              </Flex>
-              {value.key === NEW_CREDIT_CARD_KEY && checked && (
-                <Box my={3}>
-                  <NewCreditCardForm
-                    name={NEW_CREDIT_CARD_KEY}
-                    profileType={get(stepProfile, 'type')}
-                    hidePostalCode={hideCreditCardPostalCode}
-                    onReady={onNewCardFormReady}
-                    useLegacyCallback={false}
-                    onChange={paymentMethod => setNewPaymentMethod(NEW_CREDIT_CARD_KEY, paymentMethod)}
-                    error={get(stepPayment, 'paymentMethod.stripeData.error.message')}
-                    defaultIsSaved={!stepProfile.isGuest}
-                    hasSaveCheckBox={!stepProfile.isGuest}
-                  />
-                </Box>
-              )}
-              {value.key === 'manual' && checked && value.instructions && (
-                <Box my={3} color="black.600" fontSize="14px">
-                  {value.instructions}
-                </Box>
-              )}
-            </PaymentMethodBox>
-          )}
-        </StyledRadioList>
-      )}
+      <PaymentMethodList
+        host={collective.host}
+        toAccount={collective}
+        fromAccount={stepProfile}
+        disabledPaymentMethodTypes={disabledPaymentMethodTypes}
+        stepSummary={stepSummary}
+        stepDetails={stepDetails}
+        stepPayment={stepPayment}
+        isEmbed={isEmbed}
+        isSubmitting={isSubmitting}
+        hideCreditCardPostalCode={hideCreditCardPostalCode}
+        onNewCardFormReady={onNewCardFormReady}
+        onChange={onChange}
+      />
     </Container>
   );
 };

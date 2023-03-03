@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { parseDateInterval } from '../../lib/date-utils';
@@ -13,12 +13,14 @@ import { usePrevious } from '../../lib/hooks/usePrevious';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import { Box, Flex } from '../Grid';
+import CreatePendingOrderModal from '../host-dashboard/CreatePendingOrderModal';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
+import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
 
@@ -41,6 +43,8 @@ const accountOrdersQuery = gql`
       id
       slug
       currency
+      legacyId
+      name
     }
     orders(
       account: { slug: $accountSlug }
@@ -80,6 +84,16 @@ const accountOrdersQuery = gql`
           name
           imageUrl
         }
+        pendingContributionData {
+          expectedAt
+          paymentMethod
+          ponumber
+          memo
+          fromAccountInfo {
+            name
+            email
+          }
+        }
         toAccount {
           id
           slug
@@ -109,17 +123,25 @@ const isValidStatus = status => {
 const getVariablesFromQuery = (query, forcedStatus) => {
   const amountRange = parseAmountRange(query.amount);
   const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
+  const searchTerm = query.searchTerm || null;
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || ORDERS_PER_PAGE,
-    status: forcedStatus ? forcedStatus : isValidStatus(query.status) ? query.status : null,
+    status: searchTerm ? null : forcedStatus ? forcedStatus : isValidStatus(query.status) ? query.status : null,
     minAmount: amountRange[0] && amountRange[0] * 100,
     maxAmount: amountRange[1] && amountRange[1] * 100,
     dateFrom,
     dateTo,
-    searchTerm: query.searchTerm,
+    searchTerm,
   };
 };
+
+const messages = defineMessages({
+  searchPlaceholder: {
+    id: 'Orders.Search.Placeholder',
+    defaultMessage: 'Search all contributions...',
+  },
+});
 
 const hasParams = query => {
   return Object.entries(query).some(([key, value]) => {
@@ -146,14 +168,17 @@ const updateQuery = (router, newParams) => {
   return router.push({ pathname, query });
 };
 
-const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
+const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreatePendingOrder }) => {
   const router = useRouter() || { query: {} };
+  const intl = useIntl();
   const hasFilters = React.useMemo(() => hasParams(router.query), [router.query]);
+  const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
   const queryVariables = { accountSlug, ...getVariablesFromQuery(router.query, status) };
   const queryParams = { variables: queryVariables, context: API_V2_CONTEXT };
   const { data, error, loading, variables, refetch } = useQuery(accountOrdersQuery, queryParams);
   const { LoggedInUser } = useLoggedInUser();
   const prevLoggedInUser = usePrevious(LoggedInUser);
+  const isHostAdmin = LoggedInUser?.isAdminOfCollective(data?.account);
 
   // Refetch data when user logs in
   React.useEffect(() => {
@@ -173,22 +198,47 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip }) => {
           <SearchBar
             defaultValue={router.query.searchTerm}
             onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
+            placeholder={intl.formatMessage(messages.searchPlaceholder)}
           />
         </Box>
       </Flex>
       <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
-      <Box mb={34} maxWidth={500}>
-        {data?.account ? (
-          <OrdersFilters
-            currency={data.account.currency}
-            filters={router.query}
-            onChange={queryParams => updateQuery(router, { ...queryParams, offset: null })}
-            hasStatus={!status}
-          />
-        ) : loading ? (
-          <LoadingPlaceholder height={70} />
-        ) : null}
-      </Box>
+      <Flex mb={34}>
+        <Box flexGrow="1" mr="18px">
+          {data?.account ? (
+            <OrdersFilters
+              currency={data.account.currency}
+              filters={router.query}
+              onChange={queryParams => updateQuery(router, { ...queryParams, offset: null })}
+              hasStatus={!status}
+            />
+          ) : loading ? (
+            <LoadingPlaceholder height={70} />
+          ) : null}
+        </Box>
+        {isHostAdmin && canCreatePendingOrder && (
+          <React.Fragment>
+            <StyledButton
+              onClick={() => setShowCreatePendingOrderModal(true)}
+              buttonSize="small"
+              buttonStyle="primary"
+              height="38px"
+              lineHeight="12px"
+              mt="17px"
+              data-cy="create-pending-contribution"
+            >
+              Create +
+            </StyledButton>
+            {showCreatePendingOrderModal && (
+              <CreatePendingOrderModal
+                host={data.account}
+                onClose={() => setShowCreatePendingOrderModal(false)}
+                onSuccess={() => refetch()}
+              />
+            )}
+          </React.Fragment>
+        )}
+      </Flex>
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : !loading && !data.orders?.nodes.length ? (
@@ -240,6 +290,7 @@ OrdersWithData.propTypes = {
   /** An optional title to be used instead of "Financial contributions" */
   title: PropTypes.node,
   showPlatformTip: PropTypes.bool,
+  canCreatePendingOrder: PropTypes.bool,
 };
 
 export default OrdersWithData;

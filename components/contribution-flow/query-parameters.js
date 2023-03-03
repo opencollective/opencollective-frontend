@@ -1,3 +1,5 @@
+import { assign, pick } from 'lodash';
+
 import UrlQueryHelper from '../../lib/UrlQueryHelper';
 
 /**
@@ -14,11 +16,6 @@ const ContributionFlowUrlParametersConfig = {
    */
   amount: { type: 'amount' },
   /**
-   * Default platform tip
-   * @private
-   */
-  platformTip: { type: 'amount' },
-  /**
    * Default number of units (for products and tickets only)
    * @default 1
    * @example 5
@@ -30,9 +27,9 @@ const ContributionFlowUrlParametersConfig = {
    */
   interval: { type: 'interval' },
   /**
-   * A custom description
+   * ID of the payment method to use. Will fallback to another payment method if not available.
    */
-  description: { type: 'string' },
+  paymentMethod: { type: 'string' },
   // -- Profile
   /**
    * Slug of the default profile to use to contribute
@@ -49,30 +46,35 @@ const ContributionFlowUrlParametersConfig = {
    * @example John Doe
    */
   name: { type: 'string' },
+  /**
+   * Guest contributions only: The legal name to use to contribute
+   * @example John Doe
+   */
+  legalName: { type: 'string' },
   // -- Payment
   /** @private */
-  hideCreditCardPostalCode: { type: 'boolean' },
+  hideCreditCardPostalCode: { type: 'boolean', static: true },
   /**
    * To disable specific payment method types
-   * @example MANUAL,BANK_TRANSFER
+   * @example "MANUAL", "BANK_TRANSFER", "PAYMENT" (for PayPal)
    */
-  disabledPaymentMethodTypes: { type: 'stringArray' },
+  disabledPaymentMethodTypes: { type: 'stringArray', static: true },
   // -- Success
   /**
    * The URL to redirect to after a successful contribution
    * @example https://www.example.com/thank-you
    */
-  redirect: { type: 'string' },
+  redirect: { type: 'string', static: true },
   // -- Misc metadata
   /** @private */
-  data: { type: 'json' },
+  customData: { type: 'json' },
   /**
    * Some tags to attach to the contribution
    * @example tag1,tag2
    */
-  tags: { type: 'stringArray' },
+  tags: { type: 'stringArray', static: true },
   /** To hide the steps on top. Will also hide the "previous" button on step payment */
-  hideSteps: { type: 'boolean' },
+  hideSteps: { type: 'boolean', static: true },
   // ---- Aliases for legacy compatibility ----
   /**
    * The default amount in cents
@@ -80,12 +82,14 @@ const ContributionFlowUrlParametersConfig = {
    * @example 4200
    */
   totalAmount: { type: 'alias', on: 'amount', modifier: value => Math.round(value / 100) },
-  /** @deprecated Use `platformTip` instead */
-  platformContribution: { type: 'alias', on: 'platformTip' },
   /** @deprecated Use `email` instead */
   defaultEmail: { type: 'alias', on: 'email' },
   /** @deprecated Use `name` instead */
   defaultName: { type: 'alias', on: 'name' },
+  /** Cryptocurrency type; BTC, ETH etc **/
+  cryptoCurrency: { type: 'string' },
+  /** Cryptocurrency amount **/
+  cryptoAmount: { type: 'float' },
 };
 
 const EmbedContributionFlowUrlParametersConfig = {
@@ -95,24 +99,81 @@ const EmbedContributionFlowUrlParametersConfig = {
    * @default false
    * @example true
    */
-  hideFAQ: { type: 'boolean' },
+  hideFAQ: { type: 'boolean', static: true },
   /**
    * Whether we need to hide the contribution flow header
    * @default false
    * @example true
    */
-  hideHeader: { type: 'boolean' },
+  hideHeader: { type: 'boolean', static: true },
   /**
    * A custom color to use as the background color of the contribution flow
    * @example #ff0000
    */
-  backgroundColor: { type: 'color' },
+  backgroundColor: { type: 'color', static: true },
   /**
    * Whether to use the collective theme (custom colors)
    * @default false
    * @example true
    */
-  useTheme: { type: 'boolean' },
+  useTheme: { type: 'boolean', static: true },
+  /**
+   * Whether to redirect the parent of the iframe rather than the iframe itself. The `iframe` needs to have
+   * its `sandbox` property set to `allow-top-navigation` for this to work.
+   */
+  shouldRedirectParent: { type: 'boolean', static: true },
+};
+
+// Params that are not meant to be changed during the flow and should be kept in the URL
+const STATIC_PARAMS = Object.keys(ContributionFlowUrlParametersConfig).filter(
+  key => ContributionFlowUrlParametersConfig[key].static,
+);
+const STATIC_PARAMS_EMBED = Object.keys(EmbedContributionFlowUrlParametersConfig).filter(
+  key => EmbedContributionFlowUrlParametersConfig[key].static,
+);
+
+/**
+ * Returns an un-sanitized version of the URL query parameters
+ */
+export const stepsDataToUrlParamsData = (
+  previousUrlParams,
+  stepDetails,
+  stepProfile,
+  stepPayment,
+  isCrypto,
+  isEmbed,
+) => {
+  // Static params that are not meant to be changed during the flow
+  const data = pick(previousUrlParams, isEmbed ? STATIC_PARAMS_EMBED : STATIC_PARAMS);
+
+  // Step details
+  assign(data, pick(stepDetails, ['interval', 'quantity', 'customData']));
+
+  if (isCrypto) {
+    data.cryptoAmount = parseFloat(stepDetails.cryptoAmount) || previousUrlParams.cryptoAmount || 0;
+    data.cryptoCurrency = stepDetails.currency?.value ? stepDetails.currency.value : previousUrlParams.cryptoCurrency;
+  } else {
+    data.amount = stepDetails.amount;
+  }
+
+  // Step profile
+  if (stepProfile?.slug) {
+    data.contributeAs = stepProfile.slug;
+  } else {
+    assign(data, pick(stepProfile, ['name', 'legalName', 'email']));
+  }
+
+  // Step payment
+  if (stepPayment?.key) {
+    data.paymentMethod = stepPayment.key;
+  }
+
+  // Remove entries that are set to their default values
+  if (data.quantity === 1) {
+    delete data.quantity;
+  }
+
+  return data;
 };
 
 export const ContributionFlowUrlQueryHelper = new UrlQueryHelper(ContributionFlowUrlParametersConfig);

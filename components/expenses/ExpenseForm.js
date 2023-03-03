@@ -12,8 +12,9 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { getSupportedExpenseTypes } from '../../lib/expenses';
 import { requireFields } from '../../lib/form-utils';
 import { usePrevious } from '../../lib/hooks/usePrevious';
+import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep } from '../../lib/utils';
-import { checkRequiresAddress, validateExpenseTaxes } from './lib/utils';
+import { checkRequiresAddress, getSupportedCurrencies, validateExpenseTaxes } from './lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
@@ -77,15 +78,19 @@ const msg = defineMessages({
     defaultMessage: 'Payee information',
   },
   cancelEditExpense: {
+    id: 'ExpenseForm.CancelEditExpense',
     defaultMessage: 'Cancel Edit',
   },
   confirmCancelEditExpense: {
+    id: 'ExpenseForm.ConfirmCancelEditExpense',
     defaultMessage: 'Are you sure you want to cancel the edits?',
   },
   clearExpenseForm: {
+    id: 'ExpenseForm.ClearExpenseForm',
     defaultMessage: 'Clear Form',
   },
   confirmClearExpenseForm: {
+    id: 'ExpenseForm.ConfirmClearExpenseForm',
     defaultMessage: 'Are you sure you want to clear the expense form?',
   },
 });
@@ -100,7 +105,7 @@ const getDefaultExpense = collective => ({
   privateMessage: '',
   invoiceInfo: '',
   currency: collective.currency,
-  taxes: [],
+  taxes: null,
   payeeLocation: {
     address: '',
     country: null,
@@ -125,6 +130,11 @@ export const prepareExpenseForSubmit = expenseData => {
     ? pick(expenseData.payeeLocation, ['address', 'country', 'structured'])
     : null;
 
+  const payoutMethod = pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']);
+  if (payoutMethod.id === 'new') {
+    payoutMethod.id = null;
+  }
+
   return {
     ...pick(expenseData, [
       'id',
@@ -138,8 +148,8 @@ export const prepareExpenseForSubmit = expenseData => {
     ]),
     payee,
     payeeLocation,
-    payoutMethod: pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']),
-    attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url'])) : [],
+    payoutMethod,
+    attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => {
       return pick(item, [
@@ -266,7 +276,7 @@ const ExpenseFormBody = ({
   const stepTwoCompleted = isInvite
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
-
+  const availableCurrencies = getSupportedCurrencies(collective, values.payoutMethod);
   const [step, setStep] = React.useState(() => getDefaultStep(defaultStep, stepOneCompleted, isCreditCardCharge));
 
   // Only true when logged in and drafting the expense
@@ -298,9 +308,14 @@ const ExpenseFormBody = ({
         (values.payee && payoutProfiles.find(p => p.slug === values.payee.slug)) || first(payoutProfiles);
       formik.setFieldValue('payee', defaultProfile);
     }
-    // If recurring expense with selected Payout Method
-    if (isDraft && loggedInAccount && !values.payoutMethod && expense.payoutMethod) {
-      formik.setFieldValue('payoutMethod', expense.payoutMethod);
+    // Update the form state with private fields that were refeched after the user was authenticated
+    if (isDraft && loggedInAccount) {
+      const privateFields = ['payoutMethod', 'invoiceInfo'];
+      for (const field of privateFields) {
+        if (!values[field] && expense[field]) {
+          formik.setFieldValue(field, expense[field]);
+        }
+      }
     }
   }, [payoutProfiles, loggedInAccount]);
 
@@ -334,6 +349,20 @@ const ExpenseFormBody = ({
       formik.setFieldValue('payeeLocation.address', serializeAddress(values.payeeLocation.structured));
     }
   }, [values.payeeLocation]);
+
+  React.useEffect(() => {
+    // If the currency is not supported anymore, we need to do something
+    if (!loading && (!values.currency || !availableCurrencies.includes(values.currency))) {
+      const hasItemsWithAmounts = values.items.some(item => Boolean(item.amount));
+      if (!hasItemsWithAmounts) {
+        // If no items have amounts yet, we can safely set the default currency
+        formik.setFieldValue('currency', availableCurrencies[0]);
+      } else if (values.currency) {
+        // If there are items with amounts, we need to reset the currency
+        formik.setFieldValue('currency', null);
+      }
+    }
+  }, [loading, values.payoutMethod]);
 
   // Load values from localstorage
   React.useEffect(() => {
@@ -405,6 +434,7 @@ const ExpenseFormBody = ({
         formik={formik}
         isOnBehalf={isOnBehalf}
         onCancel={onCancel}
+        handleClearPayeeStep={() => setShowResetModal(true)}
         payoutProfiles={payoutProfiles}
         loggedInAccount={loggedInAccount}
         onChange={payee => {
@@ -419,6 +449,10 @@ const ExpenseFormBody = ({
             setErrors({ payoutMethod: validation });
           }
         }}
+        editingExpense={editingExpense}
+        resetDefaultStep={() => setStep(EXPENSE_FORM_STEPS.PAYEE)}
+        formPersister={formPersister}
+        getDefaultExpense={getDefaultExpense}
         onInvite={isInvite => {
           setOnBehalf(isInvite);
           formik.setFieldValue('payeeLocation', {});
@@ -573,7 +607,13 @@ const ExpenseFormBody = ({
                 </Flex>
                 <Box>
                   <FieldArray name="items">
-                    {fieldsArrayProps => <ExpenseFormItems {...fieldsArrayProps} collective={collective} />}
+                    {fieldsArrayProps => (
+                      <ExpenseFormItems
+                        {...fieldsArrayProps}
+                        collective={collective}
+                        availableCurrencies={availableCurrencies}
+                      />
+                    )}
                   </FieldArray>
                 </Box>
 
@@ -717,6 +757,7 @@ ExpenseFormBody.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
+    currency: PropTypes.string.isRequired,
     host: PropTypes.shape({
       transferwise: PropTypes.shape({
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
@@ -734,6 +775,7 @@ ExpenseFormBody.propTypes = {
   }).isRequired,
   expense: PropTypes.shape({
     type: PropTypes.oneOf(Object.values(expenseTypes)),
+    currency: PropTypes.string,
     description: PropTypes.string,
     status: PropTypes.string,
     payee: PropTypes.object,
@@ -743,6 +785,7 @@ ExpenseFormBody.propTypes = {
       interval: PropTypes.string,
       endsAt: PropTypes.string,
     }),
+    amountInAccountCurrency: AmountPropTypeShape,
     items: PropTypes.arrayOf(
       PropTypes.shape({
         url: PropTypes.string,

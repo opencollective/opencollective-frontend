@@ -14,6 +14,7 @@ import StyledTooltip from '../StyledTooltip';
 import { Span } from '../Text';
 
 import PayExpenseModal from './PayExpenseModal';
+import SecurityChecksModal, { expenseRequiresSecurityConfirmation } from './SecurityChecksModal';
 
 const getDisabledMessage = (expense, collective, host, payoutMethod) => {
   // Collective / Balance can be v1 or v2 there ...
@@ -80,8 +81,12 @@ PayoutMethodTypeIcon.propTypes = {
 
 const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error, ...props }) => {
   const [hasModal, showModal] = React.useState(false);
+  const [hasSecurityModal, showSecurityModal] = React.useState(false);
   const disabledMessage = getDisabledMessage(expense, collective, host, expense.payoutMethod);
   const isDisabled = Boolean(disabled || disabledMessage);
+  const requiresSecurityCheck = expenseRequiresSecurityConfirmation(expense);
+
+  const handleClick = () => (requiresSecurityCheck ? showSecurityModal(true) : showModal(true));
 
   const button = (
     <StyledButton
@@ -89,7 +94,7 @@ const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error
       data-cy="pay-button"
       {...props}
       disabled={isDisabled}
-      onClick={() => showModal(true)}
+      onClick={handleClick}
     >
       <PayoutMethodTypeIcon type={expense.payoutMethod?.type} host={host} size={12} />
       <Span ml="6px">
@@ -117,6 +122,20 @@ const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error
               showModal(false);
             }
           }}
+        />
+      </React.Fragment>
+    );
+  } else if (hasSecurityModal) {
+    return (
+      <React.Fragment>
+        {button}
+        <SecurityChecksModal
+          expense={expense}
+          onConfirm={() => {
+            showModal(true);
+            showSecurityModal(false);
+          }}
+          onClose={() => showSecurityModal(false)}
         />
       </React.Fragment>
     );

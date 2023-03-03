@@ -8,6 +8,7 @@ import INTERVALS from '../../lib/constants/intervals';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency, getPrecisionFromAmount, graphqlAmountValueInCents } from '../../lib/currency-utils';
 import { isPastEvent } from '../../lib/events';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { isTierExpired } from '../../lib/tier-utils';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { capitalize } from '../../lib/utils';
@@ -64,7 +65,7 @@ const TierTitle = ({ collective, tier }) => {
       >
         <StyledLink
           as={Link}
-          href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}`}
+          href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.legacyId || tier.id}`}
           color="black.900"
           hoverColor="black.900"
           underlineOnHover
@@ -81,14 +82,26 @@ TierTitle.propTypes = {
     slug: PropTypes.string,
   }),
   tier: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    legacyId: PropTypes.number,
     slug: PropTypes.string,
     name: PropTypes.string,
     useStandalonePage: PropTypes.bool,
   }),
 };
 
-const ContributeTier = ({ intl, collective, tier, enableEditing, ...props }) => {
+const canContribute = (collective, LoggedInUser) => {
+  if (!collective.isActive) {
+    return false;
+  } else if (collective.type === 'EVENT') {
+    return !isPastEvent(collective) || Boolean(LoggedInUser.isAdminOfCollectiveOrHost(collective));
+  } else {
+    return true;
+  }
+};
+
+const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
+  const { LoggedInUser } = useLoggedInUser();
   const { stats } = tier;
   const currency = tier.currency || collective.currency;
   const isFlexibleAmount = tier.amountType === 'FLEXIBLE';
@@ -98,8 +111,9 @@ const ContributeTier = ({ intl, collective, tier, enableEditing, ...props }) => 
   const tierIsExpired = isTierExpired(tier);
   const tierType = getContributionTypeFromTier(tier, tierIsExpired);
   const hasNoneLeft = stats?.availableQuantity === 0;
-  const canContributeToCollective = collective.isActive && !isPastEvent(collective);
+  const canContributeToCollective = canContribute(collective, LoggedInUser);
   const isDisabled = !canContributeToCollective || tierIsExpired || hasNoneLeft;
+  const tierLegacyId = tier.legacyId || tier.id;
 
   let description = tier.description;
   if (!tier.description) {
@@ -113,15 +127,15 @@ const ContributeTier = ({ intl, collective, tier, enableEditing, ...props }) => 
 
   return (
     <Contribute
-      route={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}/checkout`}
+      route={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tierLegacyId}/checkout`}
       title={<TierTitle collective={collective} tier={tier} />}
       type={tierType}
       buttonText={tier.button}
       contributors={tier.contributors}
       stats={stats?.contributors}
       data-cy="contribute-card-tier"
-      disableCTA={isDisabled}
-      enableEditing={enableEditing}
+      isPreview={isPreview}
+      disableCTA={!isPreview && isDisabled}
       tier={tier}
       collective={collective}
       {...props}
@@ -134,7 +148,7 @@ const ContributeTier = ({ intl, collective, tier, enableEditing, ...props }) => 
                 id="tier.limited"
                 values={{
                   maxQuantity: tier.maxQuantity,
-                  availableQuantity: stats?.availableQuantity,
+                  availableQuantity: (stats?.availableQuantity ?? tier.availableQuantity) || 0,
                 }}
                 defaultMessage="LIMITED: {availableQuantity} LEFT OUT OF {maxQuantity}"
               />
@@ -147,7 +161,9 @@ const ContributeTier = ({ intl, collective, tier, enableEditing, ...props }) => 
                 <StyledLink
                   as={Link}
                   whiteSpace="nowrap"
-                  href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.id}`}
+                  href={
+                    isPreview ? '#' : `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tierLegacyId}`
+                  }
                 >
                   <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
                 </StyledLink>
@@ -223,7 +239,8 @@ ContributeTier.propTypes = {
     }),
   }),
   tier: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    legacyId: PropTypes.number,
     slug: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     description: PropTypes.string,
@@ -237,6 +254,7 @@ ContributeTier.propTypes = {
     minimumAmount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
     amount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
     maxQuantity: PropTypes.number,
+    availableQuantity: PropTypes.number,
     stats: PropTypes.shape({
       totalRecurringDonations: PropTypes.number,
       totalDonated: PropTypes.number,
@@ -247,11 +265,7 @@ ContributeTier.propTypes = {
   }),
   /** @ignore */
   intl: PropTypes.object.isRequired,
-  enableEditing: PropTypes.bool,
-};
-
-ContributeTier.defaultProps = {
-  enableEditing: false,
+  isPreview: PropTypes.bool,
 };
 
 export default injectIntl(ContributeTier);

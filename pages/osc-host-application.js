@@ -4,7 +4,7 @@ import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
-import { CollectiveType } from '../lib/constants/collectives';
+import { CollectiveType, IGNORED_TAGS } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
@@ -46,6 +46,12 @@ const oscHostApplicationPageQuery = gql`
         }
       }
     }
+    tagStats(host: { slug: "opensource" }, limit: 6) {
+      nodes {
+        id
+        tag
+      }
+    }
   }
 `;
 
@@ -72,11 +78,14 @@ const formValues = {
   collective: {
     name: '',
     slug: '',
+    description: '',
+    tags: [],
   },
   applicationData: {
+    typeOfProject: null,
     repositoryUrl: '',
     licenseSpdxId: null,
-    linksToLicenses: '',
+    extraLicenseInfo: '',
     amountOfMembers: '',
     linksToPreviousEvents: '',
   },
@@ -89,7 +98,7 @@ const formatNameFromSlug = repoName => {
   return repoName.replace(/[-_]/g, ' ').replace(/(?:^|\s)\S/g, words => words.toUpperCase());
 };
 
-const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
+const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedInUser }) => {
   const [checkedTermsOfFiscalSponsorship, setCheckedTermsOfFiscalSponsorship] = useState(false);
   const [initialValues, setInitialValues] = useState(formValues);
 
@@ -119,6 +128,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
   const collective = data?.account;
   const canApplyWithCollective = collective && collective.isAdmin && collective.type === CollectiveType.COLLECTIVE;
   const hasHost = collective && collective?.host?.id;
+  const popularTags = hostData?.tagStats.nodes.map(({ tag }) => tag).filter(tag => !IGNORED_TAGS.includes(tag));
 
   React.useEffect(() => {
     if (collectiveSlug && collective && (!canApplyWithCollective || hasHost)) {
@@ -158,8 +168,10 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
               },
               applicationData: {
                 ...initialValues.applicationData,
+                typeOfProject: handle ? 'CODE' : null,
                 repositoryUrl: handle ? `https://github.com/${handle}` : '',
                 licenseSpdxId,
+                useGithubValidation: true,
               },
             });
           }}
@@ -177,6 +189,8 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
           host={hostData?.account}
           loadingCollective={loadingCollective}
           canApplyWithCollective={canApplyWithCollective && !hasHost}
+          refetchLoggedInUser={refetchLoggedInUser}
+          popularTags={popularTags}
         />
       )}
       {step === 'success' && <YourInitiativeIsNearlyThere />}
@@ -187,6 +201,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
 OSCHostApplication.propTypes = {
   loadingLoggedInUser: PropTypes.bool,
   LoggedInUser: PropTypes.object,
+  refetchLoggedInUser: PropTypes.func,
 };
 
 export default withUser(OSCHostApplication);

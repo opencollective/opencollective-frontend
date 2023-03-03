@@ -41,7 +41,8 @@ const ExpenseAmountBreakdown = ({ items, currency, taxes, expenseTotalAmount }) 
         <Flex flexDirection="column" alignItems="flex-end">
           <AmountLine data-cy="expense-invoiced-amount">
             <Span textTransform="capitalize" mr={3}>
-              <FormattedMessage defaultMessage="Subtotal" /> ({currency})
+              <FormattedMessage defaultMessage="Subtotal" />
+              {currency && ` (${currency})`}
             </Span>
             &nbsp;
             <FormattedMoneyAmount
@@ -55,8 +56,8 @@ const ExpenseAmountBreakdown = ({ items, currency, taxes, expenseTotalAmount }) 
           {taxes.map(tax => (
             <AmountLine key={tax.type} data-cy={`tax-${tax.type}-expense-amount-line`}>
               <Span textTransform="capitalize" mr={3}>
-                {i18nTaxType(intl, tax.type, 'short')} (
-                {!isTaxRateValid(tax.rate) ? '??' : round(tax.rate * 100, 2) || 0}%)
+                {i18nTaxType(intl, tax.type, 'short')}
+                {isTaxRateValid(tax.rate) && ` (${round(tax.rate * 100, 2)}%)`}
               </Span>
               &nbsp;
               <FormattedMoneyAmount

@@ -116,7 +116,7 @@ class HostsContainer extends React.Component {
 
 const hostsQuery = gql`
   query AcceptFinancialContributionsHosts($tags: [String], $limit: Int) {
-    hosts(tags: $tags, limit: $limit) {
+    hosts(tag: $tags, limit: $limit) {
       totalCount
       nodes {
         id
@@ -131,12 +131,6 @@ const hostsQuery = gql`
         currency
         totalHostedCollectives
         hostFeePercent
-        stats {
-          id
-          yearlyBudgetManaged {
-            value
-          }
-        }
       }
     }
   }

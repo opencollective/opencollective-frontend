@@ -31,6 +31,14 @@ exports.REWRITES = [
     destination: '/signinLinkSent',
   },
   {
+    source: '/reset-password/sent',
+    destination: '/reset-password-sent',
+  },
+  {
+    source: '/reset-password/completed',
+    destination: '/reset-password-completed',
+  },
+  {
     source: '/oauth/authorize',
     destination: '/oauth/authorize',
   },
@@ -87,6 +95,10 @@ exports.REWRITES = [
     destination: '/signin',
   },
   {
+    source: '/reset-password/:token?',
+    destination: '/reset-password',
+  },
+  {
     source: '/confirm/email/:token',
     destination: '/confirmEmail',
   },
@@ -131,24 +143,28 @@ exports.REWRITES = [
     destination: '/create-expense',
   },
   {
-    source:
-      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)/:version(v2)?',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
     destination: '/expense',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:version(v2)?',
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses',
     destination: '/expenses',
+  },
+  {
+    source: '/:collectiveSlug/submitted-expenses',
+    destination: '/submitted-expenses',
   },
   {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders',
     destination: '/orders',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders/:OrderId([0-9]+)',
+    source:
+      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/(orders|contributions)/:OrderId([0-9]+)',
     destination: '/order',
   },
   {
-    source: '/orders/:id([0-9]+)/confirm',
+    source: '/:collectiveSlug?/orders/:id([0-9]+)/confirm',
     destination: '/confirmOrder',
   },
   {
@@ -262,16 +278,24 @@ exports.REWRITES = [
   },
   // New recurring contributions page
   {
-    source: '/:slug/recurring-contributions',
-    destination: '/recurring-contributions',
+    source: '/:slug/manage-contributions/:tab(recurring|processing)?',
+    destination: '/manage-contributions',
   },
   {
-    source: '/recurring-contributions',
-    destination: '/recurring-contributions',
+    source: '/manage-contributions/:tab(recurring|processing)?',
+    destination: '/manage-contributions',
+  },
+  {
+    source: '/:slug/recurring-contributions/:tab(recurring|processing)?',
+    destination: '/manage-contributions',
+  },
+  {
+    source: '/recurring-contributions/:tab(recurring|processing)?',
+    destination: '/manage-contributions',
   },
   {
     source: '/:slug/subscriptions',
-    destination: '/recurring-contributions',
+    destination: '/manage-contributions',
   },
   // Path routing: all the rewrites below are ready to be removed as soon as we
   // set `useFileSystemPublicRoutes` to true (default) in `next.config.js`

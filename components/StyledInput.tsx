@@ -70,6 +70,7 @@ const StyledInput = styled.input`
   &:disabled {
     background-color: ${themeGet('colors.black.50')};
     cursor: not-allowed;
+    color: ${themeGet('colors.black.400')};
   }
 
   &:hover:not(:disabled) {

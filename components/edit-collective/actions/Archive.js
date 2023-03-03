@@ -7,7 +7,7 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 
-import { adminPanelQuery } from '../../../pages/admin-panel';
+import { adminPanelQuery } from '../../admin-panel/queries';
 import Container from '../../Container';
 import { getI18nLink } from '../../I18nFormatters';
 import MessageBox from '../../MessageBox';
@@ -205,13 +205,18 @@ const ArchiveCollective = ({ collective }) => {
           <ModalBody>
             <P>
               {modal.type !== 'Unarchive' && (
-                <FormattedMessage
-                  id="archive.account.confirmation"
-                  defaultMessage={
-                    'Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
-                  }
-                  values={{ type: collective.type }}
-                />
+                <React.Fragment>
+                  <FormattedMessage
+                    id="archive.account.confirmation"
+                    defaultMessage={
+                      'Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
+                    }
+                    values={{ type: collective.type }}
+                  />
+                  <MessageBox fontSize={13} type="warning" withIcon mt={3} mb={3}>
+                    <FormattedMessage defaultMessage="Note that archiving will cancel all active recurring contributions." />
+                  </MessageBox>
+                </React.Fragment>
               )}
               {modal.type === 'Unarchive' && (
                 <FormattedMessage

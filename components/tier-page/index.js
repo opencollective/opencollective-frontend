@@ -14,7 +14,6 @@ import { getWebsiteUrl } from '../../lib/utils';
 
 import CollectiveNavbar from '../collective-navbar';
 import { NAVBAR_CATEGORIES } from '../collective-navbar/constants';
-import { Sections } from '../collective-page/_constants';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -118,7 +117,7 @@ class TierPage extends Component {
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
-      interval: PropTypes.string.isRequired,
+      interval: PropTypes.string,
       currency: PropTypes.string,
       endsAt: PropTypes.string,
       button: PropTypes.string,
@@ -166,7 +165,7 @@ class TierPage extends Component {
 
   render() {
     const { collective, tier, contributors, contributorsStats, redirect, LoggedInUser } = this.props;
-    const canEdit = LoggedInUser && LoggedInUser.isAdminOfCollectiveOrHost(collective);
+    const canEdit = LoggedInUser && LoggedInUser.isAdminOfCollective(collective);
     const isFlexibleInterval = tier.interval === INTERVALS.flexible;
     const amountRaisedKey = tier.interval && !isFlexibleInterval ? 'totalRecurringDonations' : 'totalDonated';
     const amountRaised = tier.stats?.[amountRaisedKey] || 0;
@@ -177,14 +176,7 @@ class TierPage extends Component {
     return (
       <Container>
         {/** ---- Hero / Banner ---- */}
-        <Container position="sticky" top={0} zIndex={999}>
-          <CollectiveNavbar
-            collective={collective}
-            selected={Sections.CONTRIBUTE}
-            selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE}
-            isAdmin={canEdit}
-          />
-        </Container>
+        <CollectiveNavbar collective={collective} selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE} isAdmin={canEdit} />
         <Container position="relative">
           <Container position="absolute" width={1} zIndex={-1} overflow="hidden">
             <TierCover backgroundImage={collective.backgroundImage} />

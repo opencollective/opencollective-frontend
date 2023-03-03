@@ -78,7 +78,7 @@ const StyledInputLocation = ({
       ) : (
         <StyledInputField
           name={`${prefix}${name}`}
-          label="Address"
+          label={intl.formatMessage({ id: 'collective.address.label', defaultMessage: 'Address' })}
           required
           mt={3}
           labelFontSize={labelFontSize}
@@ -92,6 +92,7 @@ const StyledInputLocation = ({
               minHeight={100}
               placeholder="P. Sherman 42&#10;Wallaby Way&#10;Sydney"
               defaultValue={location?.address || ''}
+              onChange={e => onChange({ ...(location || DEFAULT_LOCATION), address: e.target.value })}
             />
           )}
         </StyledInputField>

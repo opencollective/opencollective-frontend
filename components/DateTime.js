@@ -44,7 +44,7 @@ DateTime.propTypes = {
   /** Date style, set this to null to hide the date */
   dateStyle: PropTypes.oneOf(['full', 'long', 'medium', 'short']),
   /** Time style, set this to display the time along with the date */
-  timeStyle: PropTypes.oneOf(['full', 'long', 'medium', 'short']),
+  timeStyle: PropTypes.oneOf(['full', 'long', 'medium', 'short', undefined, null]),
 };
 
 DateTime.defaultProps = {

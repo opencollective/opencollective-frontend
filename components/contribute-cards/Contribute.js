@@ -14,12 +14,11 @@ import StyledHr from '../StyledHr';
 import StyledTag from '../StyledTag';
 import { P } from '../Text';
 
-import EditTierModal from './EditTierModal';
-
-/** Max number of contributors on each tier card */
-export const MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD = 4;
-export const CONTRIBUTE_CARD_WIDTH = 280;
-export const CONTRIBUTE_CARD_BORDER_RADIUS = 16;
+import {
+  CONTRIBUTE_CARD_BORDER_RADIUS,
+  CONTRIBUTE_CARD_WIDTH,
+  MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+} from './constants';
 
 /** The main container */
 const StyledContributeCard = styled.div`
@@ -198,14 +197,16 @@ const ContributeCard = ({
   image,
   disableCTA,
   hideCTA,
-  enableEditing,
+  onClickEdit,
   tier,
-  collective,
+  isPreview,
   ...props
 }) => {
-  const [isEditTierModalOpen, setIsEditTierModalOpen] = React.useState(false);
-
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
+
+  if (isPreview) {
+    route = '#';
+  }
 
   return (
     <StyledContributeCard {...props}>
@@ -280,22 +281,15 @@ const ContributeCard = ({
               )}
             </Box>
           )}
-          {enableEditing && (
+          {onClickEdit && (
             <Box>
-              <StyledButton
-                buttonStyle="secondary"
-                width={1}
-                mb={2}
-                mt={3}
-                data-cy="edit-btn"
-                onClick={() => setIsEditTierModalOpen(true)}
-              >
-                Edit tier
+              <StyledButton buttonStyle="secondary" width={1} mb={2} mt={3} data-cy="edit-btn" onClick={onClickEdit}>
+                <FormattedMessage
+                  defaultMessage="Edit {type, select, TICKET {Ticket} other {Tier}}"
+                  values={{ type: tier.type }}
+                />
               </StyledButton>
             </Box>
-          )}
-          {isEditTierModalOpen && (
-            <EditTierModal tier={tier} collective={collective} onClose={() => setIsEditTierModalOpen(false)} />
           )}
         </Box>
       </Flex>
@@ -339,13 +333,10 @@ ContributeCard.propTypes = {
   /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
   router: PropTypes.object,
-  enableEditing: PropTypes.bool,
   tier: PropTypes.object,
   collective: PropTypes.object,
-};
-
-ContributeCard.defaultProps = {
-  enableEditing: false,
+  isPreview: PropTypes.bool,
+  onClickEdit: PropTypes.func,
 };
 
 export default injectIntl(ContributeCard);

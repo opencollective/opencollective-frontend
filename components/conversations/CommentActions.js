@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { DotsHorizontalRounded } from '@styled-icons/boxicons-regular/DotsHorizontalRounded';
+import { Share2 as ShareIcon } from '@styled-icons/feather/Share2';
 import { X } from '@styled-icons/feather/X';
 import { Edit } from '@styled-icons/material/Edit';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -10,17 +11,19 @@ import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import useClipboard from '../../lib/hooks/useClipboard';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import { Flex } from '../Grid';
+import HTMLContent from '../HTMLContent';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { P } from '../Text';
 
-import Comment from './Comment';
+import { CommentMetadata } from './CommentMetadata';
 
 const AdminActionsPopupContainer = styled(Flex)`
   flex-direction: column;
@@ -53,10 +56,27 @@ const CommentBtn = styled(StyledButton).attrs({ buttonSize: 'small' })`
 /**
  * Action buttons for the comment owner. Styles change between mobile and desktop.
  */
-const AdminActionButtons = ({ canEdit, canDelete, openDeleteConfirmation, onEdit, closePopup }) => {
+const AdminActionButtons = ({
+  canEdit,
+  canDelete,
+  openDeleteConfirmation,
+  onEdit,
+  copyLinkToClipboard,
+  closePopup,
+}) => {
   return (
     <React.Fragment>
       {/** Buttons */}
+      <CommentBtn
+        data-cy="share-comment-btn"
+        onClick={() => {
+          closePopup();
+          copyLinkToClipboard();
+        }}
+      >
+        <ShareIcon size="1em" mr={2} />
+        <FormattedMessage tagName="span" id="Share" defaultMessage="Share" />
+      </CommentBtn>
       {canEdit && (
         <CommentBtn
           data-cy="edit-comment-btn"
@@ -94,6 +114,7 @@ AdminActionButtons.propTypes = {
   isConversationRoot: PropTypes.bool,
   canEdit: PropTypes.bool,
   canDelete: PropTypes.bool,
+  copyLinkToClipboard: PropTypes.func,
 };
 
 const deleteCommentMutation = gql`
@@ -115,8 +136,9 @@ const REACT_POPPER_MODIFIERS = [
 
 const mutationOptions = { context: API_V2_CONTEXT };
 
-const CommentActions = ({ comment, isConversationRoot, canEdit, canDelete, onDelete, onEditClick }) => {
+const CommentActions = ({ comment, anchorHash, isConversationRoot, canEdit, canDelete, onDelete, onEditClick }) => {
   const intl = useIntl();
+  const { copy } = useClipboard();
   const [isDeleting, setDeleting] = React.useState(null);
   const [showAdminActions, setShowAdminActions] = React.useState(false);
   const [refElement, setRefElement] = React.useState(null);
@@ -126,6 +148,12 @@ const CommentActions = ({ comment, isConversationRoot, canEdit, canDelete, onDel
     placement: 'bottom-end',
     modifiers: REACT_POPPER_MODIFIERS,
   });
+
+  const copyLinkToClipboard = () => {
+    const [baseLink] = window.location.href.split('#');
+    const linkWithAnchorHash = `${baseLink}#${anchorHash}`;
+    copy(linkWithAnchorHash);
+  };
 
   useGlobalBlur(state?.elements.popper, outside => {
     if (outside && showAdminActions) {
@@ -170,6 +198,7 @@ const CommentActions = ({ comment, isConversationRoot, canEdit, canDelete, onDel
               onEdit={onEditClick}
               canEdit={canEdit}
               canDelete={canDelete}
+              copyLinkToClipboard={copyLinkToClipboard}
               closePopup={() => setShowAdminActions(false)}
             />
           </Flex>
@@ -205,7 +234,10 @@ const CommentActions = ({ comment, isConversationRoot, canEdit, canDelete, onDel
             </MessageBox>
           )}
           <Container padding={2} borderRadius={8} border="1px solid #e1e4e6">
-            <Comment comment={comment} maxCommentHeight={150} withoutActions />
+            <CommentMetadata comment={comment} />
+            <Container mt={3} maxHeight={150} overflowY="auto">
+              <HTMLContent content={comment.html} fontSize="12px" data-cy="comment-body" />
+            </Container>
           </Container>
           {deleteError && (
             <MessageBox type="error" withIcon mt={3}>
@@ -223,11 +255,9 @@ CommentActions.propTypes = {
     id: PropTypes.string.isRequired,
     html: PropTypes.string,
     createdAt: PropTypes.string,
-    fromCollective: PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-    }),
   }).isRequired,
+  /** needed to copy the comment link */
+  anchorHash: PropTypes.string.isRequired,
   /** Can current user edit this comment? */
   canEdit: PropTypes.bool,
   /** Can current user delete this comment? */

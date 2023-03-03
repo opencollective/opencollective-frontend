@@ -3,32 +3,35 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, pick } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { gqlV1 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
-import InputField from '../InputField';
+import InputSwitch from '../InputSwitch';
 import StyledButton from '../StyledButton';
+import StyledTextarea from '../StyledTextarea';
+import { Label, P, Span } from '../Text';
+import { TOAST_TYPE, withToasts } from '../ToastProvider';
 
-const NotificationSettingsContainer = styled.div`
-  label {
-    margin-top: 0.7rem;
-  }
-  .form-group {
-    margin-bottom: 0rem;
-  }
-  .inputField textarea {
-    height: 14rem;
-  }
-`;
+const DEFAULT_TWEETS = {
+  newBacker: '{backerTwitterHandle} thank you for your contribution of {amount} 🙏 - it makes a difference!',
+  tenBackers: `🎉 {collective} just reached 10 financial contributors! Thank you {topBackersTwitterHandles} 🙌
+  Support them too!`,
+  fiftyBackers: `🎉 {collective} just reached 50 financial contributors!! 🙌
+  Support them too!`,
+  oneHundred: `🎉 {collective} just reached 100 financial contributors!! 🙌
+  Support them too!`,
+  oneThousandBackers: `🎉 {collective} just reached 1,000 financial contributors!!! 🙌
+  Support them too!`,
+};
 
 class EditTwitterAccount extends React.Component {
   static propTypes = {
     connectedAccount: PropTypes.object.isRequired,
     collective: PropTypes.object,
     intl: PropTypes.object.isRequired,
-    editConnectedAccount: PropTypes.func,
+    editConnectedAccount: PropTypes.func.isRequired,
+    addToast: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -45,10 +48,6 @@ class EditTwitterAccount extends React.Component {
         id: 'connectedAccounts.twitter.newBacker.toggle.description',
         defaultMessage:
           'Whenever you have a new contributor that has provided a twitter username, a tweet will be sent from your connected account',
-      },
-      'newBacker.tweet': {
-        id: 'connectedAccounts.twitter.newBacker.tweet',
-        defaultMessage: '{backerTwitterHandle} thank you for your contribution of {amount} 🙏 - it makes a difference!',
       },
       'monthlyStats.toggle.label': {
         id: 'connectedAccounts.twitter.monthlyStats.toggle.label',
@@ -75,10 +74,6 @@ class EditTwitterAccount extends React.Component {
         id: 'connectedAccounts.twitter.tenBackers.toggle.description',
         defaultMessage: 'Whenever one of the Collectives that you are Hosting reaches 10 contributors',
       },
-      'tenBackers.tweet': {
-        id: 'connectedAccounts.twitter.tenBackers.tweet',
-        defaultMessage: '🎉 {collective} just reached 10 contributors! Thank you {topBackersTwitterHandles}! 🙌',
-      },
       'oneHundredBackers.toggle.label': {
         id: 'connectedAccounts.twitter.oneHundredBackers.toggle.label',
         defaultMessage: '100 contributors',
@@ -86,10 +81,6 @@ class EditTwitterAccount extends React.Component {
       'oneHundredBackers.toggle.description': {
         id: 'connectedAccounts.twitter.oneHundredBackers.toggle.description',
         defaultMessage: 'Whenever one of the Collectives that you are Hosting reaches 100 contributors',
-      },
-      'oneHundredBackers.tweet': {
-        id: 'connectedAccounts.twitter.oneHundredBackers.tweet',
-        defaultMessage: '🎉 {collective} just reached 100 contributors!! 🙌.',
       },
       'oneThousandBackers.toggle.label': {
         id: 'connectedAccounts.twitter.oneThousandBackers.toggle.label',
@@ -99,43 +90,43 @@ class EditTwitterAccount extends React.Component {
         id: 'connectedAccounts.twitter.oneThousandBackers.toggle.description',
         defaultMessage: 'Whenever one of the Collectives that you are Hosting reaches 1,000 contributors',
       },
-      'oneThousandBackers.tweet': {
-        id: 'connectedAccounts.twitter.oneThousandBackers.tweet',
-        defaultMessage: 'Wow! 🎉 {collective} just reached 1,000 contributors!! 🙌',
-      },
     });
 
-    this.notificationTypes = [];
-    if (props.collective.type === 'COLLECTIVE') {
-      this.notificationTypes = ['newBacker', 'monthlyStats', 'updatePublished'];
-    }
-
-    if (props.collective.isHost) {
-      this.notificationTypes = ['tenBackers', 'oneHundredBackers', 'oneThousandBackers'];
-    }
-
-    this.state = { connectedAccount: cloneDeep(props.connectedAccount) };
-    this.state.connectedAccount.settings = this.state.connectedAccount.settings || {};
-    this.notificationTypes.forEach(notificationType => {
-      this.state.connectedAccount.settings[notificationType] = this.state.connectedAccount.settings[
-        notificationType
-      ] || { active: false };
-      if (this.messages[`${notificationType}.tweet`]) {
-        this.state.connectedAccount.settings[notificationType].tweet =
-          this.state.connectedAccount.settings[notificationType].tweet ||
-          props.intl.formatMessage(this.messages[`${notificationType}.tweet`]);
-      }
+    const connectedAccount = cloneDeep(props.connectedAccount);
+    connectedAccount.settings = connectedAccount.settings || {};
+    this.getNotificationTypes().forEach(notificationType => {
+      connectedAccount.settings[notificationType] = connectedAccount.settings[notificationType] || { active: false };
     });
+
+    this.state = { isSaving: false, isModified: false, connectedAccount };
   }
 
+  getNotificationTypes = () => {
+    const notificationTypes = [];
+    if (this.props.collective.type === 'COLLECTIVE') {
+      notificationTypes.push('newBacker', 'monthlyStats', 'updatePublished');
+    }
+    if (this.props.collective.isHost) {
+      notificationTypes.push('tenBackers', 'oneHundredBackers', 'oneThousandBackers');
+    }
+
+    return notificationTypes;
+  };
+
   async onClick() {
-    const connectedAccount = pick(this.state.connectedAccount, ['id', 'settings']);
-    await this.props.editConnectedAccount({ variables: { connectedAccount } });
-    this.setState({ isModified: false });
+    this.setState({ isSaving: true });
+    try {
+      const connectedAccount = pick(this.state.connectedAccount, ['id', 'settings']);
+      await this.props.editConnectedAccount({ variables: { connectedAccount } });
+      this.setState({ isModified: false });
+      this.props.addToast({ type: TOAST_TYPE.SUCCESS, message: 'Twitter settings updated' });
+    } finally {
+      this.setState({ isSaving: false });
+    }
   }
 
   handleChange(notification, attr, val) {
-    const { connectedAccount } = this.state;
+    const connectedAccount = cloneDeep(this.state.connectedAccount);
     connectedAccount.settings[notification][attr] = val;
     this.setState({ connectedAccount, isModified: true });
   }
@@ -143,65 +134,82 @@ class EditTwitterAccount extends React.Component {
   renderNotification(notificationType) {
     const { intl } = this.props;
     const { connectedAccount } = this.state;
-
+    const defaultTweet = DEFAULT_TWEETS[notificationType];
     return (
-      <NotificationSettingsContainer key={notificationType}>
-        <Flex flexWrap="wrap">
-          <Box width={1}>
-            <InputField
-              type="switch"
-              name={`${notificationType}.active`}
-              className="horizontal"
-              defaultValue={connectedAccount.settings[notificationType].active}
-              label={intl.formatMessage(this.messages[`${notificationType}.toggle.label`])}
-              description={
-                this.messages[`${notificationType}.toggle.description`] &&
-                intl.formatMessage(this.messages[`${notificationType}.toggle.description`])
-              }
-              onChange={activateNewBacker => this.handleChange(notificationType, 'active', activateNewBacker)}
-            />
-            {this.messages[`${notificationType}.tweet`] && (
-              <InputField
-                type="textarea"
-                className="horizontal"
-                maxLength={280}
-                charCount={true}
-                name={`${notificationType}.tweet`}
-                defaultValue={
-                  connectedAccount.settings[notificationType].tweet ||
-                  intl.formatMessage(this.messages[`${notificationType}.tweet`])
-                }
-                onChange={tweet => this.handleChange(notificationType, 'tweet', tweet)}
-              />
-            )}
+      <Box margin="16px 0" key={notificationType}>
+        <Flex alignItems="center">
+          <Box flex="0 1" flexBasis={['100%', '25%']}>
+            <Label htmlFor={`${notificationType}.active`} fontWeight="700" fontSize="14px" cursor="pointer">
+              {intl.formatMessage(this.messages[`${notificationType}.toggle.label`])}
+            </Label>
           </Box>
+          <div>
+            <InputSwitch
+              id={`${notificationType}.active`}
+              name={`${notificationType}.active`}
+              checked={connectedAccount.settings[notificationType].active}
+              onChange={event => this.handleChange(notificationType, 'active', event.target.checked)}
+            />
+          </div>
         </Flex>
-      </NotificationSettingsContainer>
+        {this.messages[`${notificationType}.toggle.description`] && (
+          <Flex>
+            <Box flex="0 1" flexBasis={[0, '25%']} />
+            <Box flex="1 1" flexBasis={['100%', '75%']} pl="12px">
+              <P fontSize="13px" color="black.600">
+                {intl.formatMessage(this.messages[`${notificationType}.toggle.description`])}
+              </P>
+            </Box>
+          </Flex>
+        )}
+        {defaultTweet && (
+          <Flex mt={2} flexWrap="wrap">
+            <Box flex="0 1" flexBasis={[0, '25%']} />
+            <Box flex="1 1" flexBasis={['100%', '75%']} pl="12px">
+              <StyledTextarea
+                maxLength={280}
+                minHeight="100px"
+                width="100%"
+                showCount={true}
+                name={`${notificationType}.tweet`}
+                defaultValue={connectedAccount.settings[notificationType].tweet || ''}
+                placeholder={defaultTweet}
+                onChange={event => this.handleChange(notificationType, 'tweet', event.target.value)}
+              />
+            </Box>
+          </Flex>
+        )}
+      </Box>
     );
   }
 
   render() {
     return (
-      <div className="EditTwitterAccount">
-        <form>
-          <details>
-            <summary>
-              <FormattedMessage id="Settings" defaultMessage="Settings" />
-            </summary>
-            {this.notificationTypes.map(this.renderNotification)}
-            <Flex flexWrap="wrap">
-              <Box width={[1, 3 / 12]} />
-              <Box width={[1, 9 / 12]}>
-                {this.state.isModified && (
-                  <StyledButton buttonSize="small" onClick={this.onClick}>
-                    <FormattedMessage id="save" defaultMessage="Save" />
-                  </StyledButton>
-                )}
-              </Box>
-            </Flex>
-          </details>
-        </form>
-      </div>
+      <details>
+        <summary>
+          <Span fontSize="15px" color="blue.500">
+            <FormattedMessage id="Settings" defaultMessage="Settings" />
+          </Span>
+        </summary>
+        <div>
+          {this.getNotificationTypes().map(this.renderNotification)}
+          <Flex flexWrap="wrap">
+            <Box width={[1, '25%']} />
+            <Box width={[1, '75%']}>
+              <StyledButton
+                disabled={!this.state.isModified}
+                buttonStyle="primary"
+                buttonSize="small"
+                onClick={this.onClick}
+                loading={this.state.isSaving}
+                minWidth={100}
+              >
+                <FormattedMessage id="save" defaultMessage="Save" />
+              </StyledButton>
+            </Box>
+          </Flex>
+        </div>
+      </details>
     );
   }
 }
@@ -219,4 +227,4 @@ const addEditConnectedAccountMutation = graphql(editConnectedAccountMutation, {
   name: 'editConnectedAccount',
 });
 
-export default injectIntl(addEditConnectedAccountMutation(EditTwitterAccount));
+export default injectIntl(addEditConnectedAccountMutation(withToasts(EditTwitterAccount)));

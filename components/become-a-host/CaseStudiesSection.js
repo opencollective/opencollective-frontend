@@ -172,6 +172,7 @@ const CaseStudies = () => {
       <Box mb={[4, 3]} width={['288px', '648px']}>
         <SectionDescription textAlign="center">
           <FormattedMessage
+            id="home.OCUsersSection.subtitle"
             defaultMessage={'Communities around the world are using Open Collective. Find out more about them!'}
           />
         </SectionDescription>

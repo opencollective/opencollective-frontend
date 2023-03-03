@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Facebook } from '@styled-icons/fa-brands/Facebook';
+import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { themeGet } from '@styled-system/theme-get';
 import { get } from 'lodash';
@@ -14,7 +15,8 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
-import { facebookShareURL, getCollectivePageRoute, tweetURL } from '../../lib/url-helpers';
+import { facebookShareURL, getCollectivePageRoute, mastodonShareURL, tweetURL } from '../../lib/url-helpers';
+import { getWebsiteUrl } from '../../lib/utils';
 
 import Container from '../../components/Container';
 import I18nFormatters, { getI18nLink, I18nBold } from '../../components/I18nFormatters';
@@ -92,6 +94,15 @@ const successMsgs = defineMessages({
     defaultMessage: "I'm attending {event}. Join me!",
   },
 });
+
+const isAccountFediverse = account => {
+  return (
+    account &&
+    (account.tags?.includes('mastodon') ||
+      account.tags?.includes('fediverse') ||
+      (account.socialLinks || []).map(el => el.type).includes('MASTODON'))
+  );
+};
 
 const getMainTag = collective => {
   if (collective.host?.slug === 'opensource' || collective.tags?.includes('open source')) {
@@ -223,7 +234,9 @@ class ContributionFlowSuccess extends React.Component {
   render() {
     const { LoggedInUser, collective, data, intl, isEmbed } = this.props;
     const { order } = data;
-    const shareURL = `${process.env.WEBSITE_URL}/${collective.slug}`;
+    const shareURL = `${getWebsiteUrl()}/${collective.slug}`;
+    const isProcessing = order?.status === ORDER_STATUS.PROCESSING;
+    const isFediverse = order && (isAccountFediverse(order.toAccount) || isAccountFediverse(order.toAccount.parent));
 
     if (!data.loading && !order) {
       return (
@@ -236,98 +249,150 @@ class ContributionFlowSuccess extends React.Component {
     }
 
     return (
-      <Flex
-        width={1}
-        minHeight="calc(100vh - 69px)"
-        flexDirection={['column', null, null, 'row']}
-        justifyContent={[null, null, 'center']}
-        css={{ height: '100%' }}
-        data-cy="order-success"
-      >
-        {data.loading ? (
-          <Container display="flex" alignItems="center" justifyContent="center">
-            <Loading />
-          </Container>
-        ) : (
-          <Fragment>
-            <ContainerWithImage
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              width={['100%', null, null, '50%', '762px']}
-              mb={[4, null, 0]}
-              flexShrink={0}
+      <React.Fragment>
+        {!isEmbed && isProcessing && (
+          <Flex
+            height="120px"
+            justifyContent="center"
+            alignItems="center"
+            backgroundColor="#FFFFC2"
+            color="#0C2D66"
+            flexDirection="column"
+          >
+            <P fontWeight="700" fontSize="14px" lineHeight="20px">
+              <FormattedMessage defaultMessage="Your Contribution is processing!" />
+            </P>
+            <Box mt={1} maxWidth="672px">
+              <P fontWeight="400" fontSize="14px" lineHeight="20px" textAlign="center">
+                <FormattedMessage defaultMessage="Your contribution will remain in processing state until it is completed from the payment processor's end. You will receive an email when it goes through successfully. No further action is required from your end." />
+              </P>
+            </Box>
+            <StyledLink
+              href={`${getCollectivePageRoute(order.fromAccount)}/transactions`}
+              fontWeight="700"
+              fontSize="14px"
+              lineHeight="20px"
+              textDecoration="underline"
+              color="#0C2D66"
+              mt={1}
             >
-              <Flex flexDirection="column" alignItems="center" justifyContent="center" my={4} width={1}>
-                <H3 mb={3}>
-                  <FormattedMessage id="NewContributionFlow.Success.Header" defaultMessage="Thank you! 🎉" />
-                </H3>
-                <Box mb={3}>
-                  <P fontSize="20px" color="black.700" fontWeight={500} textAlign="center">
-                    <FormattedMessage
-                      id="NewContributionFlow.Success.NowSupporting"
-                      defaultMessage="You are now supporting <link>{collective}</link>."
-                      values={{
-                        collective: order.toAccount.name,
-                        link: isEmbed
-                          ? I18nBold
-                          : getI18nLink({ href: getCollectivePageRoute(order.toAccount), as: Link }),
-                      }}
-                    />
-                  </P>
-                </Box>
-                {isEmbed ? (
-                  <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
-                ) : (
-                  <StyledLink as={Link} color="black.800" href={getCollectivePageRoute(order.toAccount)}>
-                    <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
-                  </StyledLink>
-                )}
-                {!isEmbed && (
-                  <Box my={4}>
-                    <Link href={{ pathname: '/search', query: { show: getMainTag(order.toAccount) } }}>
-                      <P color="black.800" fontWeight={500} textAlign="center">
-                        <FormattedMessage
-                          id="NewContributionFlow.Success.DiscoverMore"
-                          defaultMessage="Discover more Collectives like {collective}"
-                          values={{ collective: order.toAccount.name }}
-                        />
-                        &nbsp;&rarr;
-                      </P>
-                    </Link>
-                  </Box>
-                )}
-                <Flex justifyContent="center" mt={3}>
-                  <ShareLink
-                    href={tweetURL({
-                      url: shareURL,
-                      text: intl.formatMessage(
-                        order.toAccount.type === 'EVENT' ? successMsgs.event : successMsgs.default,
-                        { collective: order.toAccount.name, event: order.toAccount.name },
-                      ),
-                    })}
-                  >
-                    <Twitter size="1.2em" color="#4E5052" />
-                    <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
-                  </ShareLink>
-                  <ShareLink href={facebookShareURL({ u: shareURL })}>
-                    <Facebook size="1.2em" color="#4E5052" />
-                    <FormattedMessage id="shareIt" defaultMessage="Share it" />
-                  </ShareLink>
-                </Flex>
-                {LoggedInUser && (
-                  <Box px={1}>
-                    <PublicMessageForm order={order} publicMessage={get(order, 'membership.publicMessage')} />
-                  </Box>
-                )}
-              </Flex>
-            </ContainerWithImage>
-            <Flex flexDirection="column" alignItems="center" justifyContent="center" width={1}>
-              {this.renderInfoByPaymentMethod()}
-            </Flex>
-          </Fragment>
+              <FormattedMessage defaultMessage="View Contribution!" />
+            </StyledLink>
+          </Flex>
         )}
-      </Flex>
+        <Flex
+          width={1}
+          minHeight="calc(100vh - 69px)"
+          flexDirection={['column', null, null, 'row']}
+          justifyContent={[null, null, 'center']}
+          css={{ height: '100%' }}
+          data-cy="order-success"
+        >
+          {data.loading ? (
+            <Container display="flex" alignItems="center" justifyContent="center">
+              <Loading />
+            </Container>
+          ) : (
+            <Fragment>
+              <ContainerWithImage
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                width={['100%', null, null, '50%', '762px']}
+                mb={[4, null, 0]}
+                flexShrink={0}
+              >
+                <Flex flexDirection="column" alignItems="center" justifyContent="center" my={4} width={1}>
+                  <H3 mb={3}>
+                    <FormattedMessage id="NewContributionFlow.Success.Header" defaultMessage="Thank you! 🎉" />
+                  </H3>
+                  <Box mb={3}>
+                    <P fontSize="20px" color="black.700" fontWeight={500} textAlign="center">
+                      <FormattedMessage
+                        id="NewContributionFlow.Success.NowSupporting"
+                        defaultMessage="You are now supporting <link>{collective}</link>."
+                        values={{
+                          collective: order.toAccount.name,
+                          link: isEmbed
+                            ? I18nBold
+                            : getI18nLink({ href: getCollectivePageRoute(order.toAccount), as: Link }),
+                        }}
+                      />
+                    </P>
+                  </Box>
+                  {isEmbed ? (
+                    <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
+                  ) : (
+                    <StyledLink as={Link} color="black.800" href={getCollectivePageRoute(order.toAccount)}>
+                      <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
+                    </StyledLink>
+                  )}
+                  {!isEmbed && (
+                    <Box my={4}>
+                      <Link href={{ pathname: '/search', query: { show: getMainTag(order.toAccount) } }}>
+                        <P color="black.800" fontWeight={500} textAlign="center">
+                          <FormattedMessage
+                            id="NewContributionFlow.Success.DiscoverMore"
+                            defaultMessage="Discover more Collectives like {collective}"
+                            values={{ collective: order.toAccount.name }}
+                          />
+                          &nbsp;&rarr;
+                        </P>
+                      </Link>
+                    </Box>
+                  )}
+                  <Flex justifyContent="center" mt={3}>
+                    <ShareLink
+                      href={tweetURL({
+                        url: shareURL,
+                        text: intl.formatMessage(
+                          order.toAccount.type === 'EVENT' ? successMsgs.event : successMsgs.default,
+                          { collective: order.toAccount.name, event: order.toAccount.name },
+                        ),
+                      })}
+                    >
+                      <Twitter size="1.2em" color="#4E5052" />
+                      <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
+                    </ShareLink>
+                    {!isFediverse && (
+                      <ShareLink href={facebookShareURL({ u: shareURL })}>
+                        <Facebook size="1.2em" color="#4E5052" />
+                        <FormattedMessage id="shareIt" defaultMessage="Share it" />
+                      </ShareLink>
+                    )}
+                    {isFediverse && (
+                      <ShareLink
+                        href={mastodonShareURL({
+                          text:
+                            // eslint-disable-next-line prefer-template
+                            intl.formatMessage(
+                              order.toAccount.type === 'EVENT' ? successMsgs.event : successMsgs.default,
+                              {
+                                collective: order.toAccount.name,
+                                event: order.toAccount.name,
+                              },
+                            ) + ` ${shareURL}`,
+                        })}
+                      >
+                        <Mastodon size="1.2em" color="#4E5052" />
+                        <FormattedMessage id="shareOnMastodon" defaultMessage="Share on Mastodon" />
+                      </ShareLink>
+                    )}
+                  </Flex>
+                  {LoggedInUser && (
+                    <Box px={1}>
+                      <PublicMessageForm order={order} publicMessage={get(order, 'membership.publicMessage')} />
+                    </Box>
+                  )}
+                </Flex>
+              </ContainerWithImage>
+              <Flex flexDirection="column" alignItems="center" justifyContent="center" width={1}>
+                {this.renderInfoByPaymentMethod()}
+              </Flex>
+            </Fragment>
+          )}
+        </Flex>
+      </React.Fragment>
     );
   }
 }

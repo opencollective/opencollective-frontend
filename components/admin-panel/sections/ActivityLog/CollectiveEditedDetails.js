@@ -28,8 +28,8 @@ const deepCompare = (prev, next) => {
   const addedKeys = Object.keys(next).filter(key => !has(prev, key));
   const changedValues = pickBy(next, (value, key) => !addedKeys.includes(key) && prev[key] !== value);
   return [
-    ...removedKeys.map(key => ({ action: 'remove', key, prevValue: prev[key] })),
-    ...addedKeys.map(key => ({ action: 'add', key, newValue: next[key] })),
+    ...removedKeys.map(key => ({ action: 'remove', key, prevValue: JSON.stringify(prev[key]) })),
+    ...addedKeys.map(key => ({ action: 'add', key, newValue: JSON.stringify(next[key]) })),
     ...Object.keys(changedValues).map(key => ({
       action: 'update',
       key,

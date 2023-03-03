@@ -19,7 +19,6 @@ export default class TierContributors extends React.Component {
         roles: PropTypes.arrayOf(PropTypes.string.isRequired),
         isCore: PropTypes.bool.isRequired,
         isBacker: PropTypes.bool.isRequired,
-        isFundraiser: PropTypes.bool.isRequired,
       }),
     ),
     /** Some statistics about this tier */

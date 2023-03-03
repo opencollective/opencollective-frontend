@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { ChevronDown, ChevronUp } from '@styled-icons/boxicons-regular';
+import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
+import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { debounce } from 'lodash';
 import { FormattedMessage } from 'react-intl';
