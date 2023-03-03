@@ -131,7 +131,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
   const popularTags = hostData?.tagStats.nodes.map(({ tag }) => tag).filter(tag => !IGNORED_TAGS.includes(tag));
 
   React.useEffect(() => {
-    if (collectiveSlug && collective && (!canApplyWithCollective || hasHost)) {
+    if (step === 'form' && collectiveSlug && collective && (!canApplyWithCollective || hasHost)) {
       addToast({
         type: TOAST_TYPE.ERROR,
         title: intl.formatMessage(messages['error.title']),
