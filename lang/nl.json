@@ -701,7 +701,7 @@
   "contribution.minimumAmount": "Minimum amount: {minAmount} {currency}",
   "contribution.paymentFee": "Payment processor fee",
   "contribution.quantity": "Aantal",
-  "ContributionFlow.backToCollectivePage": "Back to Collective Page",
+  "ContributionFlow.backToCollectivePage": "Back to {accountName}'s Page",
   "ContributionFlow.Contribution": "Contribution",
   "ContributionFlow.CreateOrganizationLabel": "Bijdragen als een organisatie",
   "ContributionFlow.CreateUserLabel": "Contribute as an individual",
