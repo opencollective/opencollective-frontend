@@ -44,7 +44,7 @@ const Location = ({ collective: event, refetch }) => {
           showTitle={false}
         />
         {event.privateInstructions && (
-          <Container mt={4} textAlign="center">
+          <Container maxWidth={700} mx="auto" mt={4}>
             <P fontWeight="bold" fontSize="18px">
               <FormattedMessage id="event.privateInstructions.label" defaultMessage="Private instructions" />
             </P>
