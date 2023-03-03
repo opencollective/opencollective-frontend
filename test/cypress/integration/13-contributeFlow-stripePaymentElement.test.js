@@ -346,4 +346,48 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       cy.contains('Paid');
     });
   });
+
+  describe('Redirects', () => {
+    beforeEach(() => {
+      cy.intercept('GET', 'https://js.stripe.com/v3/', req => {
+        req.continue(res => {
+          res.body = res.body.replaceAll('window.top.location.href', 'window.location.href');
+        });
+      });
+
+      cy.createCollectiveV2({ host: { slug: 'e2e-eur-host' } }).as('collective');
+      cy.clearCookies();
+      cy.clearLocalStorage();
+    });
+
+    it('Redirects to trusted url', () => {
+      cy.get('@collective').then(col => {
+        cy.visit(`/${col.slug}/donate?redirect=https://opencollective.com`);
+      });
+
+      cy.contains('Your info').click();
+      cy.get('input[type="email"]').type(`${randomSlug()}@guest.com`);
+      cy.get('button[data-cy="cf-next-step"]').click();
+
+      contributeWithNewCard();
+
+      cy.location('origin').should('eql', 'https://opencollective.com');
+    });
+
+    it('Redirects to untrusted url', () => {
+      cy.get('@collective').then(col => {
+        cy.visit(`/${col.slug}/donate?redirect=https://google.com`);
+      });
+
+      cy.contains('Your info').click();
+      cy.get('input[type="email"]').type(`${randomSlug()}@guest.com`);
+      cy.get('button[data-cy="cf-next-step"]').click();
+
+      contributeWithNewCard();
+
+      cy.location('origin').should('eql', 'http://localhost:3000');
+      cy.location('pathname').should('eql', '/external-redirect');
+      cy.contains('Your request is currently being redirected to https://google.com').should('exist');
+    });
+  });
 });
