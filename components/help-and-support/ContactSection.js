@@ -10,8 +10,10 @@ import { sendContactMessage } from '../../lib/api';
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { getCollectivePageCanonicalURL } from '../../lib/url-helpers';
 import { isValidEmail } from '../../lib/utils';
 
+import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 // import Link from '../Link';
@@ -66,10 +68,21 @@ const ContactForm = () => {
       topic: '',
       message: '',
       link: '',
+      relatedCollectives: [],
     },
     validate,
     onSubmit: values => {
       setIsSubmitting(true);
+      if (values.relatedCollectives.length === 0 && LoggedInUser) {
+        setFieldValue(
+          'relatedCollectives',
+          LoggedInUser.memberOf.map(member => {
+            if (member.role === 'ADMIN') {
+              return getCollectivePageCanonicalURL(member.collective);
+            }
+          }),
+        );
+      }
       sendContactMessage(values)
         .then(() => {
           setIsSubmitting(false);
@@ -86,6 +99,12 @@ const ContactForm = () => {
     if (LoggedInUser) {
       setFieldValue('name', LoggedInUser.collective.name);
       setFieldValue('email', LoggedInUser.email);
+      setFieldValue(
+        'relatedCollectives',
+        LoggedInUser.memberOf
+          .filter(member => member.role === 'ADMIN')
+          .map(member => getCollectivePageCanonicalURL(member.collective)),
+      );
     }
   }, [LoggedInUser]);
 
@@ -180,6 +199,36 @@ const ContactForm = () => {
                 }
               >
                 {inputProps => <StyledInput {...inputProps} placeholder="e.g. Transactions, profile" width="100%" />}
+              </StyledInputField>
+            </Box>
+            <Box mb="28px">
+              <StyledInputField
+                required={false}
+                label={<FormattedMessage defaultMessage="Enter related Collectives" />}
+                {...getFieldProps('relatedCollectives')}
+                labelFontWeight="700"
+                labelProps={{
+                  lineHeight: '24px',
+                  fontSize: '16px',
+                }}
+                error={touched.relatedCollectives && formatFormErrorMessage(intl, errors.relatedCollectives)}
+                hint={<FormattedMessage defaultMessage="Enter collectives related to your request." />}
+              >
+                {inputProps => (
+                  <CollectivePickerAsync
+                    {...inputProps}
+                    isMulti
+                    useCompactMode
+                    types={['COLLECTIVE', 'ORGANIZATION', 'EVENT', 'PROJECT', 'USER', 'FUND']}
+                    createCollectiveOptionalFields={['location.address', 'location.country']}
+                    onChange={value =>
+                      setFieldValue(
+                        'relatedCollectives',
+                        value.map(element => getCollectivePageCanonicalURL(element.value)),
+                      )
+                    }
+                  />
+                )}
               </StyledInputField>
             </Box>
             <Box mb="28px">
