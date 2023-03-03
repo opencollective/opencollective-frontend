@@ -101,9 +101,10 @@ module.exports = (expressApp, nextApp) => {
 
     let relatedCollectives = 'Related Collectives: ';
     if (body.relatedCollectives?.length > 0) {
-      for (let i = 0; i < Math.min(body.relatedCollectives.length, 50); i++) {
-        relatedCollectives = `${relatedCollectives}<a href='${body.relatedCollectives[i]}'>${body.relatedCollectives[i]}</a>, `;
-      }
+      relatedCollectives = body.relatedCollectives
+        .slice(0, 50)
+        .map(url => `<a href='${url}'>${url}</a>`)
+        .join(', ');
     }
 
     logger.info(`Contact From: ${body.name} <${body.email}>`);

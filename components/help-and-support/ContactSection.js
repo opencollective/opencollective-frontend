@@ -211,7 +211,7 @@ const ContactForm = () => {
                   lineHeight: '24px',
                   fontSize: '16px',
                 }}
-                error={touched.topic && formatFormErrorMessage(intl, errors.topic)}
+                error={touched.relatedCollectives && formatFormErrorMessage(intl, errors.relatedCollectives)}
                 hint={<FormattedMessage defaultMessage="Enter collectives related to your request." />}
               >
                 {inputProps => (
