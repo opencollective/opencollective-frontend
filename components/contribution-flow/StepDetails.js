@@ -42,7 +42,6 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
   const getDefaultOtherAmountSelected = () => isNil(amount) || !presets?.includes(amount);
   const [isOtherAmountSelected, setOtherAmountSelected] = React.useState(getDefaultOtherAmountSelected);
   const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
-  const [pressedKey, setPressedKey] = React.useState();
   const { LoggedInUser } = useLoggedInUser();
 
   const minAmount = getTierMinAmount(tier, currency);
@@ -127,15 +126,9 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
                 currencyDisplay="full"
                 prependProps={{ color: 'black.500' }}
                 required
-                onKeyDown={event => {
-                  setPressedKey(event.key);
-                }}
-                onChange={value => {
+                onChange={(value, event) => {
                   // Increase/Decrease the amount by $0.5 instead of $0.01 when using the arrows
-                  if (
-                    !pressedKey ||
-                    !(/[0-9]/g.test(pressedKey) || pressedKey === 'Backspace' || pressedKey === 'Delete')
-                  ) {
+                  if (event.nativeEvent.inputType === 'insertReplacementText') {
                     const previousValue = data?.amount;
                     const isTopArrowClicked = value - previousValue === 1;
                     const isBottomArrowClicked = value - previousValue === -1;
@@ -150,8 +143,6 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
                     }
                   }
                   dispatchChange('amount', value);
-                  // Reset the pressed key
-                  setPressedKey(null);
                 }}
               />
               {Boolean(minAmount) && (
