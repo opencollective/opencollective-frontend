@@ -128,6 +128,7 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
                 required
                 onChange={(value, event) => {
                   // Increase/Decrease the amount by $0.5 instead of $0.01 when using the arrows
+                  // inputEvent.inputType is `insertReplacementText` when the value is changed using the arrows
                   if (event.nativeEvent.inputType === 'insertReplacementText') {
                     const previousValue = data?.amount;
                     const isTopArrowClicked = value - previousValue === 1;
