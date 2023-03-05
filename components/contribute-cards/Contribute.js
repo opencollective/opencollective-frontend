@@ -171,6 +171,18 @@ const getFooterHeading = type => {
   }
 };
 
+const getFooterMessage = type => {
+  switch (type) {
+    case ContributionTypes.TICKET:
+    case ContributionTypes.EVENT_PARTICIPATE:
+      return <FormattedMessage defaultMessage="Be the first one to attend!" />;
+    case ContributionTypes.EVENT_PASSED:
+      return <FormattedMessage defaultMessage="No attendees" />;
+    default:
+      return <FormattedMessage defaultMessage="Be the first one to contriubte!" />;
+  }
+};
+
 const getCTAButtonStyle = type => {
   if (type === ContributionTypes.TICKET) {
     return 'secondary';
@@ -203,12 +215,6 @@ const ContributeCard = ({
   ...props
 }) => {
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
-  const isFinancialContribution = [
-    ContributionTypes.FINANCIAL_CUSTOM,
-    ContributionTypes.FINANCIAL_ONE_TIME,
-    ContributionTypes.FINANCIAL_GOAL,
-    ContributionTypes.FINANCIAL_RECURRING,
-  ].includes(type);
 
   if (isPreview) {
     route = '#';
@@ -248,25 +254,34 @@ const ContributeCard = ({
           )}
           {!hideContributors && (
             <Box mt={3} height={60}>
-              {contributors && contributors.length > 0 && (
+              <React.Fragment>
+                <Flex alignItems="center" mt={3} mb={2}>
+                  <P
+                    color="black.700"
+                    fontSize="12px"
+                    lineHeight="16px"
+                    fontWeight="500"
+                    letterSpacing="0.06em"
+                    pr={2}
+                    textTransform="uppercase"
+                    whiteSpace="nowrap"
+                  >
+                    {getFooterHeading(type)}
+                  </P>
+                  <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+                </Flex>
+              </React.Fragment>
+              {totalContributors === 0 ? (
                 <React.Fragment>
-                  <Flex alignItems="center" mt={3} mb={2}>
-                    <P
-                      color="black.700"
-                      fontSize="12px"
-                      lineHeight="16px"
-                      fontWeight="500"
-                      letterSpacing="0.06em"
-                      pr={2}
-                      textTransform="uppercase"
-                      whiteSpace="nowrap"
-                    >
-                      {getFooterHeading(type)}
-                    </P>
-                    <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-                  </Flex>
-                  <Flex>
-                    {contributors.slice(0, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD).map(contributor => (
+                  <Container pt="0.7em" color="black.600">
+                    {getFooterMessage(type)}
+                  </Container>
+                </React.Fragment>
+              ) : (
+                <Flex>
+                  {contributors &&
+                    contributors.length > 0 &&
+                    contributors.slice(0, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD).map(contributor => (
                       <Box key={contributor.id} mx={1}>
                         {contributor.collectiveSlug ? (
                           <Link href={`/${contributor.collectiveSlug}`} title={contributor.name}>
@@ -277,35 +292,12 @@ const ContributeCard = ({
                         )}
                       </Box>
                     ))}
-                    {totalContributors > MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD && (
-                      <Container ml={2} pt="0.7em" fontSize="11px" fontWeight="bold" color="black.600">
-                        + {totalContributors - MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD}
-                      </Container>
-                    )}
-                  </Flex>
-                </React.Fragment>
-              )}
-              {isFinancialContribution && totalContributors === 0 && (
-                <React.Fragment>
-                  <Flex alignItems="center" mt={3} mb={2}>
-                    <P
-                      color="black.700"
-                      fontSize="12px"
-                      lineHeight="16px"
-                      fontWeight="500"
-                      letterSpacing="0.06em"
-                      pr={2}
-                      textTransform="uppercase"
-                      whiteSpace="nowrap"
-                    >
-                      {getFooterHeading(type)}
-                    </P>
-                    <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-                  </Flex>
-                  <Container pt="0.7em" color="black.600">
-                    <FormattedMessage defaultMessage="Be the first one to contribute!" />
-                  </Container>
-                </React.Fragment>
+                  {totalContributors > MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD && (
+                    <Container ml={2} pt="0.7em" fontSize="11px" fontWeight="bold" color="black.600">
+                      + {totalContributors - MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD}
+                    </Container>
+                  )}
+                </Flex>
               )}
             </Box>
           )}
