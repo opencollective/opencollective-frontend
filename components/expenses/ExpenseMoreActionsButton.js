@@ -6,6 +6,7 @@ import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { Edit as IconEdit } from '@styled-icons/feather/Edit';
 import { Flag as FlagIcon } from '@styled-icons/feather/Flag';
 import { Link as IconLink } from '@styled-icons/feather/Link';
+import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -19,6 +20,7 @@ import { Flex } from '../Grid';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
 
+import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
 import MarkExpenseAsIncompleteModal from './MarkExpenseAsIncompleteModal';
 
@@ -59,12 +61,28 @@ const Action = styled.button`
  * Admin buttons for the expense, displayed in a React fragment to let parent
  * in control of the layout.
  */
-const ExpenseMoreActionsButton = ({ expense, collective, onError, onEdit, isDisabled, linkAction, ...props }) => {
+const ExpenseMoreActionsButton = ({
+  expense,
+  collective,
+  onError,
+  onEdit,
+  isDisabled,
+  linkAction,
+  onModalToggle,
+  onDelete,
+  ...props
+}) => {
   const [showMarkAsIncompleteModal, setMarkAsIncompleteModal] = React.useState(false);
+  const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
 
   const router = useRouter();
   const permissions = expense?.permissions;
+
+  const showDeleteConfirmMoreActions = isOpen => {
+    setDeleteConfirm(isOpen);
+    onModalToggle?.(isOpen);
+  };
 
   return (
     <React.Fragment>
@@ -96,6 +114,16 @@ const ExpenseMoreActionsButton = ({ expense, collective, onError, onEdit, isDisa
               >
                 <FlagIcon size={14} />
                 <FormattedMessage id="actions.markAsIncomplete" defaultMessage="Mark as Incomplete" />
+              </Action>
+            )}
+            {permissions?.canDelete && (
+              <Action
+                data-cy="more-actions-delete-expense-btn"
+                onClick={() => showDeleteConfirmMoreActions(true)}
+                disabled={isDisabled}
+              >
+                <IconTrash size="16px" />
+                <FormattedMessage id="actions.delete" defaultMessage="Delete" />
               </Action>
             )}
             {permissions?.canEdit && (
@@ -139,6 +167,13 @@ const ExpenseMoreActionsButton = ({ expense, collective, onError, onEdit, isDisa
       {showMarkAsIncompleteModal && (
         <MarkExpenseAsIncompleteModal expense={expense} onClose={() => setMarkAsIncompleteModal(false)} />
       )}
+      {hasDeleteConfirm && (
+        <ExpenseConfirmDeletion
+          onDelete={onDelete}
+          expense={expense}
+          showDeleteConfirmMoreActions={showDeleteConfirmMoreActions}
+        />
+      )}
     </React.Fragment>
   );
 };
@@ -164,6 +199,8 @@ ExpenseMoreActionsButton.propTypes = {
   }),
   /** Called with an error if anything wrong happens */
   onError: PropTypes.func,
+  onDelete: PropTypes.func,
+  onModalToggle: PropTypes.func,
   onEdit: PropTypes.func,
   linkAction: PropTypes.oneOf(['link', 'copy']),
 };

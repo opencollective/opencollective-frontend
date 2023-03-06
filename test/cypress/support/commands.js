@@ -1,4 +1,3 @@
-import 'cypress-file-upload';
 import './third-party-commands';
 
 // import gql from 'fake-tag'; // eslint-disable-line

@@ -1045,7 +1045,8 @@ class ContributionFlow extends React.Component {
                       <CollectiveTitleContainer collective={collective} useLink>
                         <FormattedMessage
                           id="ContributionFlow.backToCollectivePage"
-                          defaultMessage="Back to Collective Page"
+                          defaultMessage="Back to {accountName}'s Page"
+                          values={{ accountName: collective.name }}
                         />
                       </CollectiveTitleContainer>
                     </Box>
