@@ -1,0 +1,56 @@
+import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
+import ExpenseForm from '../../components/expenses/ExpenseForm';
+import { loggedInUser } from '../mocks/loggedInUser';
+
+<Meta title="Expenses/ExpenseForm" component={ExpenseForm} />
+
+## Default
+
+<Canvas>
+  <Story name="Default">
+    {() => (
+      <ExpenseForm
+        collective={{ currency: 'USD' }}
+        loggedInAccount={loggedInUser}
+        payoutProfiles={[
+          {
+            id: '1',
+            name: 'Frank Zappa',
+            type: 'INDIVIDUAL',
+            slug: 'zappa',
+            imageUrl: 'https://images-staging.opencollective.com/betree/34c2aa0/avatar.png',
+          },
+          {
+            id: '2',
+            name: 'Open Collective Inc',
+            slug: 'opencollective',
+            type: 'ORGANIZATION',
+            imageUrl: 'https://images-staging.opencollective.com/opencollective/8c4448e/logo/256.png',
+          },
+        ]}
+        expense={{
+          id: '1',
+          type: 'RECEIPT',
+          description: 'Food for the team retreat',
+          items: [
+            {
+              id: '1',
+              url: 'https://loremflickr.com/120/120/invoice?lock=1',
+              description: 'Fancy restaurant',
+              amount: 17500,
+              incurredAt: '2020-01-01',
+            },
+            {
+              id: '2',
+              url: 'https://loremflickr.com/120/120/invoice?lock=2',
+              description: 'Potatoes & cheese for the non-vegan raclette',
+              amount: 3000,
+              incurredAt: '2020-01-01',
+            },
+          ],
+        }}
+        onSubmit={console.log}
+      />
+    )}
+  </Story>
+</Canvas>
