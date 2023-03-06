@@ -211,13 +211,15 @@ const nextConfig = {
   },
 };
 
-module.exports = withSentryConfig(
-  {
-    ...nextConfig,
-    sentry: {
-      disableServerWebpackPlugin: true,
-      disableClientWebpackPlugin: true,
-    },
-  },
-  { silent: true },
-);
+// Bypasses conflict bug between @sentry/nextjs and depcheck
+const isDepcheck = process.argv[1]?.includes('.bin/depcheck');
+
+module.exports = isDepcheck
+  ? nextConfig
+  : withSentryConfig({
+      ...nextConfig,
+      sentry: {
+        disableServerWebpackPlugin: true,
+        disableClientWebpackPlugin: true,
+      },
+    });
