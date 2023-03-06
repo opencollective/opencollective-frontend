@@ -211,6 +211,13 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
-
-module.exports = withSentryConfig(module.exports, { silent: true }, { hideSourcemaps: true });
+module.exports = withSentryConfig(
+  {
+    ...nextConfig,
+    sentry: {
+      disableServerWebpackPlugin: true,
+      disableClientWebpackPlugin: true,
+    },
+  },
+  { silent: true },
+);
