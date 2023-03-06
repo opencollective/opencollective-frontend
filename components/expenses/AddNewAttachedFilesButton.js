@@ -14,6 +14,7 @@ const AddNewAttachedFilesButton = ({ disabled, mockImageGenerator, onSuccess }) 
     mockImageGenerator,
     onSuccess,
     kind: 'EXPENSE_ATTACHED_FILE',
+    accept: attachmentDropzoneParams.accept,
   });
 
   return (
