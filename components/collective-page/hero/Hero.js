@@ -265,11 +265,11 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                 </Flex>
               )}
               <Flex alignItems="center" flexWrap="wrap">
-                <Flex my={2}>
+                <Flex mb={2} mt={-2} flexWrap="wrap">
                   {collective.canContact && (
                     <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
                       {btnProps => (
-                        <StyledRoundButton {...btnProps} size={32} mr={3} title="Contact" aria-label="Contact">
+                        <StyledRoundButton mt={2} {...btnProps} size={32} mr={3} title="Contact" aria-label="Contact">
                           <Mail size={12} />
                         </StyledRoundButton>
                       )}
