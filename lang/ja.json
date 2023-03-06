@@ -887,6 +887,7 @@
   "DDNNLJ": "ファンドレイジングおよびクラウドファンディング機能",
   "Decline": "許可しない",
   "DefaultValue": "既定値",
+  "delete.successMessage": "'Expense has been deleted successfully'",
   "Details": "詳細",
   "deViVP": "{type, select, TICKET {Ticket} other {Tier}} created.",
   "dG3sDf": "OAuth アプリケーションの詳細については、<link>こちらのドキュメント</link>を参照してください。",

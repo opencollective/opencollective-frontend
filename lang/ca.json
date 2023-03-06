@@ -887,6 +887,7 @@
   "DDNNLJ": "Funcions de recaptació de fons i finançament col·lectiu",
   "Decline": "Rebutja",
   "DefaultValue": "Default value",
+  "delete.successMessage": "'Expense has been deleted successfully'",
   "Details": "Details",
   "deViVP": "{type, select, TICKET {Ticket} other {Tier}} created.",
   "dG3sDf": "For more information about OAuth applications, check <link>our documentation</link>.",

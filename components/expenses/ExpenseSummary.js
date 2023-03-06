@@ -296,11 +296,20 @@ const ExpenseSummary = ({
           mt={4}
           pt={12}
         >
-          <ExpenseMoreActionsButton onEdit={onEdit} expense={expense} mt={['16px', null, '8px']} />
+          <ExpenseMoreActionsButton
+            onEdit={onEdit}
+            expense={expense}
+            mt={['16px', null, '8px']}
+            onDelete={() => {
+              onDelete?.(expense);
+              onClose?.();
+            }}
+          />
           {Boolean(showProcessButtons && existsInAPI && collective && hasProcessButtons(expense?.permissions)) && (
             <Flex flexWrap="wrap">
               <ProcessExpenseButtons
                 expense={expense}
+                isMoreActions
                 permissions={expense?.permissions}
                 collective={collective}
                 host={host}

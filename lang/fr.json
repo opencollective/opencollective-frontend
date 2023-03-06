@@ -887,6 +887,7 @@
   "DDNNLJ": "Fonctionnalités de collecte de fonds et de financement participatif",
   "Decline": "Refuser",
   "DefaultValue": "Valeur par défaut",
+  "delete.successMessage": "'Expense has been deleted successfully'",
   "Details": "Détails",
   "deViVP": "{type, select, TICKET {Ticket} other {Palier}} créé.",
   "dG3sDf": "Pour plus d'informations sur les applications OAuth, consultez <link>notre documentation</link>.",

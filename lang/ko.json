@@ -887,6 +887,7 @@
   "DDNNLJ": "Fundraising and crowdfunding features",
   "Decline": "거부",
   "DefaultValue": "기본값",
+  "delete.successMessage": "'Expense has been deleted successfully'",
   "Details": "상세",
   "deViVP": "{type, select, TICKET {Ticket} other {Tier}} created.",
   "dG3sDf": "For more information about OAuth applications, check <link>our documentation</link>.",
