@@ -327,6 +327,7 @@ ExpensePayeeDetails.propTypes = {
       }),
     }),
     payeeLocation: PropTypes.shape({
+      // TODO: fix
       address: PropTypes.string,
       country: PropTypes.string,
     }),

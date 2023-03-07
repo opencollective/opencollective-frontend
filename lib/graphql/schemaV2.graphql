@@ -2116,6 +2116,31 @@ type Location {
   address: String
 
   """
+  Street name and house number
+  """
+  address1: String
+
+  """
+  Apt, suite, etc
+  """
+  address2: String
+
+  """
+  Postal code
+  """
+  postalCode: String
+
+  """
+  City name
+  """
+  city: String
+
+  """
+  State/province/region
+  """
+  zone: String
+
+  """
   Two letters country code (eg. FR, BE...etc)
   """
   country: String
@@ -2129,11 +2154,6 @@ type Location {
   Longitude
   """
   long: Float
-
-  """
-  Structured JSON address
-  """
-  structured: JSON
 }
 
 """
@@ -14064,9 +14084,65 @@ input CollectiveCreateInput {
   slug: String!
   description: String!
   tags: [String]
+  location: LocationInput
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   settings: JSON
+}
+
+"""
+Input type for Geographic location
+"""
+input LocationInput {
+  """
+  A short name for the location (eg. Open Collective Headquarters)
+  """
+  name: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Street name and house number
+  """
+  address1: String
+
+  """
+  Apt, suite, etc
+  """
+  address2: String
+
+  """
+  Postal code
+  """
+  postalCode: String
+
+  """
+  City name
+  """
+  city: String
+
+  """
+  State/province/region
+  """
+  zone: String
+
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
+  country: CountryISO
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
 }
 
 input IndividualCreateInput {
@@ -14477,41 +14553,6 @@ input ExpenseAttachedFileInput {
   URL of the file
   """
   url: URL!
-}
-
-"""
-Input type for Geographic location
-"""
-input LocationInput {
-  """
-  A short name for the location (eg. Open Collective Headquarters)
-  """
-  name: String
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
-
-  """
-  Two letters country code (eg. FR, BE...etc)
-  """
-  country: CountryISO
-
-  """
-  Latitude
-  """
-  lat: Float
-
-  """
-  Longitude
-  """
-  long: Float
-
-  """
-  Structured JSON address
-  """
-  structured: JSON
 }
 
 """

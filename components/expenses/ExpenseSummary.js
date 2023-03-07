@@ -381,6 +381,7 @@ ExpenseSummary.propTypes = {
       isAdmin: PropTypes.bool,
     }).isRequired,
     payeeLocation: PropTypes.shape({
+      // TODO: fix
       address: PropTypes.string,
       country: PropTypes.string,
     }),

@@ -87,7 +87,11 @@ const msg = defineMessages({
 const setLocationFromPayee = (formik, payee) => {
   formik.setFieldValue('payeeLocation.country', payee?.location?.country || null);
   formik.setFieldValue('payeeLocation.address', payee?.location?.address || '');
-  formik.setFieldValue('payeeLocation.structured', payee?.location?.structured);
+  formik.setFieldValue('payeeLocation.address1', payee?.location?.address1 || '');
+  formik.setFieldValue('payeeLocation.address2', payee?.location?.address2 || '');
+  formik.setFieldValue('payeeLocation.city', payee?.location?.city || '');
+  formik.setFieldValue('payeeLocation.zone', payee?.location?.zone || '');
+  formik.setFieldValue('payeeLocation.postalCode', payee?.location?.postalCode || '');
 };
 
 const getPayoutMethodsFromPayee = payee => {

@@ -173,7 +173,7 @@ const AdminPanelPage = () => {
 
 AdminPanelPage.getInitialProps = () => {
   return {
-    scripts: { googleMaps: true }, // TODO: This should be enabled only for events
+    scripts: { googleMaps: true }, // To enable location autocomplete
   };
 };
 

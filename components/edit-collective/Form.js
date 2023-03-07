@@ -308,6 +308,8 @@ class EditCollectiveForm extends React.Component {
     this.setState(state => {
       const collective = cloneDeep(state.collective);
 
+      // TODO: update location fields
+
       // GraphQL schema has address embedded within location
       // mutation expects { location: { address: '' } }
       if (['address', 'country'].includes(fieldname)) {
@@ -381,6 +383,7 @@ class EditCollectiveForm extends React.Component {
     if (field.defaultValue !== undefined) {
       return field.defaultValue;
     } else if (['address', 'country'].includes(field.name)) {
+      // TODO: update to new structure
       return get(this.state.collective.location, field.name);
     }
 
@@ -669,20 +672,13 @@ class EditCollectiveForm extends React.Component {
           placeholder: '',
           when: () => collective.type !== EVENT,
         },
-        {
-          name: 'address',
-          placeholder: '',
-          maxLength: 255,
-          type: 'textarea',
-          when: () => collective.type !== EVENT,
-          // TODO: Use structured here to be consistent with other places
-        },
-        {
-          name: 'country',
-          type: 'country',
-          placeholder: 'Select country',
-          when: () => collective.type !== EVENT,
-        },
+
+        // {
+        //   name: 'country',
+        //   type: 'country',
+        //   placeholder: 'Select country',
+        //   when: () => collective.type !== EVENT,
+        // },
         {
           name: 'startsAt',
           type: 'datetime-local',
@@ -708,7 +704,7 @@ class EditCollectiveForm extends React.Component {
           name: 'location',
           placeholder: '',
           type: 'location',
-          when: () => collective.type === EVENT,
+          when: () => collective.type !== USER,
         },
         {
           name: 'privateInstructions',
@@ -744,6 +740,16 @@ class EditCollectiveForm extends React.Component {
           type: 'collective-tags',
           placeholder: intl.formatMessage(this.messages['tags.input.placeholder']),
           when: () => ![EVENT, PROJECT, FUND].includes(collective.type),
+        },
+        {
+          name: 'socialLinks',
+          type: 'socialLinks',
+          defaultValue: get(this.state.collective, 'socialLinks'),
+        },
+        {
+          name: 'location',
+          type: 'address',
+          when: () => collective.type === USER,
         },
       ],
       'fiscal-hosting': [
@@ -846,18 +852,6 @@ class EditCollectiveForm extends React.Component {
                       required={field.required}
                     />
                   ))}
-                  {section === 'info' && (
-                    <Box p={1}>
-                      <Box my="5px" fontWeight={700}>
-                        <FormattedMessage defaultMessage="Social Links" />
-                      </Box>
-                      <SocialLinksFormField
-                        value={this.state.collective?.socialLinks}
-                        touched={this.state.modified}
-                        onChange={value => this.handleChange('socialLinks', value)}
-                      />
-                    </Box>
-                  )}
                 </div>
               </div>
             )}

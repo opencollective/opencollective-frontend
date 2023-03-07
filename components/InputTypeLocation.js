@@ -1,5 +1,6 @@
 import React, { createRef, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import AddressFormatter from '@shopify/address';
 import { Clear } from '@styled-icons/material/Clear';
 import { themeGet } from '@styled-system/theme-get';
 import { get } from 'lodash';
@@ -137,28 +138,33 @@ class InputTypeLocation extends React.Component {
     }
   }
 
-  removeCountryFromAddress(address) {
-    return address.split(', ').slice(0, -1).join(', ');
-  }
-
   handleChange(value) {
     if (!value) {
       this.setState({ value: null });
       return this.props.onChange(null);
     } else if (value.isOnline) {
-      const location = { name: 'Online', address: value.address };
+      const location = { name: 'Online', address1: value.address1 };
       this.setState({ value: location });
       return this.props.onChange(location);
     }
 
-    const countryComponent = value.gmaps['address_components'].find(c => c.types.includes('country'));
+    const country = value.gmaps['address_components'].find(c => c.types.includes('country'))?.['short_name'];
+
+    // use adr microformat field because of more consistent formatting
+    // that includes a single field for street address (with house number in the correct place depending on locality)
+    const adrAddress = value.gmaps['adr_address'];
+    const streetAddress = adrAddress.match(/<span class="street-address">([^<]+)<\/span>/i)?.[1];
+    const postalCode = adrAddress.match(/<span class="postal-code">([^<]+)<\/span>/i)?.[1];
+    const city = adrAddress.match(/<span class="locality">([^<]+)<\/span>/i)?.[1];
+    const zone = adrAddress.match(/<span class="region">([^<]+)<\/span>/i)?.[1];
     const location = {
-      // Remove country from address
-      address: this.removeCountryFromAddress(value.gmaps.formatted_address),
       // Keep only the first part for location name
       name: value.label && value.label.replace(/,.+/, ''),
-      // Normally returned addresses always have a country, this is just defensive
-      country: countryComponent ? countryComponent['short_name'] : null,
+      address1: streetAddress ?? null,
+      postalCode: postalCode ?? null,
+      city: city ?? null,
+      zone: zone ?? null,
+      country: country ?? null,
       lat: value.location.lat,
       long: value.location.lng,
     };
@@ -174,7 +180,6 @@ class InputTypeLocation extends React.Component {
   render() {
     const options = this.props.options || {};
     const autoCompleteNotAvailable = !this.isAutocompleteServiceAvailable();
-
     return (
       <div>
         {autoCompleteNotAvailable ? (
@@ -228,7 +233,7 @@ class InputTypeLocation extends React.Component {
                       {...field}
                       width="100%"
                       placeholder="https://meet.jit.si/opencollective"
-                      defaultValue={this.state.value.address}
+                      defaultValue={this.state.value.address1}
                       onBlur={e => {
                         if (e.target.value && !isURL(e.target.value)) {
                           this.setState({ eventUrlError: true });
@@ -236,7 +241,7 @@ class InputTypeLocation extends React.Component {
                       }}
                       onChange={({ target: { value } }) => {
                         this.setState({ eventUrlError: !isURL(value) });
-                        this.handleChange({ isOnline: true, address: value });
+                        this.handleChange({ isOnline: true, address1: value });
                       }}
                     />
                     {this.state.eventUrlError && (

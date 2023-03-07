@@ -18,6 +18,7 @@ import CollectiveTagsInput from '../CollectiveTagsInput';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
+import InputTypeLocation from '../InputTypeLocation';
 import MessageBox from '../MessageBox';
 import OnboardingProfileCard from '../onboarding-modal/OnboardingProfileCard';
 import StyledButton from '../StyledButton';
@@ -59,6 +60,8 @@ const messages = defineMessages({
     defaultMessage: 'What does your Collective do?',
   },
   tagsLabel: { id: 'Tags', defaultMessage: 'Tags' },
+  locationLabel: { id: 'SectionLocation.Title', defaultMessage: 'Location' },
+  locationPlaceholder: { id: 'createCollective.form.locationPlaceholder', defaultMessage: 'Where are you based?' },
   descriptionHint: {
     id: 'createCollective.form.descriptionHint',
     defaultMessage: 'Write a short description (150 characters max)',
@@ -104,6 +107,8 @@ class CreateCollectiveForm extends React.Component {
       name: '',
       description: '',
       slug: '',
+      tags: [],
+      location: null,
       message: '',
       tos: false,
       hostTos: false,
@@ -131,8 +136,8 @@ class CreateCollectiveForm extends React.Component {
     };
 
     const submit = values => {
-      const { description, name, slug, message, tags, inviteMembers } = values;
-      this.props.onSubmit({ collective: { name, description, slug, tags }, message, inviteMembers });
+      const { description, name, slug, message, tags, location, inviteMembers } = values;
+      this.props.onSubmit({ collective: { name, description, slug, tags, location }, message, inviteMembers });
     };
 
     return (
@@ -353,6 +358,26 @@ class CreateCollectiveForm extends React.Component {
                         </Box>
                       )}
                       <StyledInputFormikField
+                        name="location"
+                        htmlFor="location"
+                        labelProps={LABEL_STYLES}
+                        label={intl.formatMessage(messages.locationLabel)}
+                        value={values.location}
+                        required
+                        mt={3}
+                        mb={2}
+                      >
+                        {({ field }) => (
+                          <InputTypeLocation
+                            {...field}
+                            onChange={value => {
+                              setFieldValue('location', value);
+                            }}
+                            placeholder={intl.formatMessage(messages.locationPlaceholder)}
+                          />
+                        )}
+                      </StyledInputFormikField>
+                      <StyledInputFormikField
                         name="tags"
                         htmlFor="tags"
                         labelProps={LABEL_STYLES}
@@ -382,6 +407,7 @@ class CreateCollectiveForm extends React.Component {
                           defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world."
                         />
                       </MessageBox>
+
                       {host && (
                         <StyledInputFormikField
                           name="message"

@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get, isNil } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { capitalize } from '../lib/utils';
 
+import SocialLinksFormField from './edit-collective/SocialLinksFormField';
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import CollectiveTagsInput from './CollectiveTagsInput';
 import { Box, Flex } from './Grid';
@@ -14,6 +16,7 @@ import InputTypeLocation from './InputTypeLocation';
 import StyledButton from './StyledButton';
 import StyledCheckbox from './StyledCheckbox';
 import StyledInputGroup from './StyledInputGroup';
+import StyledInputLocation from './StyledInputLocation';
 import StyledInputTags from './StyledInputTags';
 import StyledSelect from './StyledSelect';
 import StyledTextarea from './StyledTextarea';
@@ -396,7 +399,40 @@ class InputField extends React.Component {
         );
         break;
 
-      case 'country':
+      case 'address':
+        this.input = (
+          <Flex flexWrap="wrap" p={1}>
+            {field.label && (
+              <Box width={1}>
+                <label>{`${capitalize(field.label)}`}</label>
+              </Box>
+            )}
+            <Box width={1}>
+              <StyledInputLocation
+                location={this.state.value || field.defaultValue}
+                onChange={event => this.handleChange(event)}
+                // placeholder={field.placeholder}
+              />
+              {field.description && <HelpBlock>{field.description}</HelpBlock>}
+            </Box>
+          </Flex>
+        );
+        break;
+      case 'socialLinks':
+        this.input = (
+          <Box p={1}>
+            <Box my="5px" fontWeight={700}>
+              <FormattedMessage defaultMessage="Social Links" />
+            </Box>
+            <SocialLinksFormField
+              value={this.state.value || field.defaultValue}
+              touched={this.state.modified}
+              onChange={event => this.handleChange(event)}
+            />
+          </Box>
+        );
+        break;
+      case 'country': // TODO: remove?
         this.input = (
           <div>
             {horizontal && (
