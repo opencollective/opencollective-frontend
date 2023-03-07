@@ -2589,6 +2589,7 @@
   "Stripe.PaymentMethod.Label.wechat_pay": "WeChat Pay",
   "Stripe.SEPA.Mandate": "By providing your payment information and confirming this payment, you authorise (A) OPENCOLLECTIVE INC and Stripe, our payment service provider and/or PPRO, its local service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions. As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights are explained in a statement that you can obtain from your bank. You agree to receive notifications for future debits up to 2 days before they occur.",
   "StyledDropzone.DropMsg": "Перетягніть {count,plural, one {файл} few {файли} many {файли} other {файли}} сюди",
+  "StyledDropzone.FileInvalidType": "Filetype error: only {availableExtensions} is supported",
   "StyledDropzone.InvalidFiles": "{count, plural, one {Цей файл недійсний} few {Ці файли недійсні} many {Ці файли недійсні} other {Ці файли недійсні}}: {files}",
   "StyledInputTags.AddLabel": "Додати мітки",
   "StyledInputTags.EditLabel": "Змінити мітки",

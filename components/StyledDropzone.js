@@ -103,7 +103,7 @@ const StyledDropzone = ({
   kind,
   ...props
 }) => {
-  const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess, onReject, kind };
+  const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess, onReject, kind, accept };
   const { uploadFiles, isUploading, uploadProgress } = useImageUploader(imgUploaderParams);
   const dropzoneParams = { accept, minSize, maxSize, multiple: isMulti, onDrop: uploadFiles };
   const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneParams);
