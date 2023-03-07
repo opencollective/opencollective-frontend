@@ -179,7 +179,7 @@ const getFooterMessage = type => {
     case ContributionTypes.EVENT_PASSED:
       return <FormattedMessage defaultMessage="No attendees" />;
     default:
-      return <FormattedMessage defaultMessage="Be the first one to contriubte!" />;
+      return <FormattedMessage defaultMessage="Be the first one to contribute!" />;
   }
 };
 
