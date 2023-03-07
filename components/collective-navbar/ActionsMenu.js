@@ -386,9 +386,7 @@ CollectiveNavbarActionsMenu.propTypes = {
     settings: PropTypes.object,
     tiers: PropTypes.array,
     isApproved: PropTypes.bool,
-    host: PropTypes.shape({
-      hostFees: PropTypes.bool,
-    }),
+    host: PropTypes.object.isRequired,
   }),
   callsToAction: PropTypes.shape({
     /** Button to contact the collective */

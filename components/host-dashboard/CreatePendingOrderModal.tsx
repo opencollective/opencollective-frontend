@@ -87,11 +87,6 @@ const createPendingContributionModalQuery = gql`
       slug
       currency
       settings
-
-      plan {
-        id
-        hostFees
-      }
       policies {
         REQUIRE_2FA_FOR_ADMINS
       }
@@ -243,7 +238,6 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const currency = collective?.currency || host.currency;
   const childrenOptions = collective?.childrenAccounts?.nodes || [];
   const childAccount = values.childAccount?.id && childrenOptions.find(option => option.id === values.childAccount?.id);
-  const canAddHostFee = host?.plan?.hostFees;
   const hostFeePercent = host.hostFeePercent;
   const tiersOptions = childAccount
     ? getTiersOptions(intl, childAccount?.tiers?.nodes || [])
@@ -486,42 +480,40 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               />
             )}
           </Field>
-          {(true || canAddHostFee) && (
-            <Field
-              name="hostFeePercent"
-              htmlFor="CreatePendingContribution-hostFeePercent"
-              label={
-                <span>
-                  <FormattedMessage defaultMessage="Host Fee" />
-                  {` `}
-                  <StyledTooltip
-                    content={() => (
-                      <FormattedMessage
-                        id="AddFundsModal.hostFee.tooltip"
-                        defaultMessage="The default host fee percentage is set up in your host settings. The host fee is charged by the fiscal host to the collectives for the financial services provided."
-                      />
-                    )}
-                  >
-                    <InfoCircle size={16} />
-                  </StyledTooltip>
-                </span>
-              }
-              ml={3}
-              required={false}
-            >
-              {({ form, field }) => (
-                <StyledInputPercentage
-                  id={field.id}
-                  placeholder={hostFeePercent}
-                  value={field.value}
-                  error={field.error}
-                  onChange={value => form.setFieldValue(field.name, value)}
-                  onBlur={() => form.setFieldTouched(field.name, true)}
-                  maxWidth="100%"
-                />
-              )}
-            </Field>
-          )}
+          <Field
+            name="hostFeePercent"
+            htmlFor="CreatePendingContribution-hostFeePercent"
+            label={
+              <span>
+                <FormattedMessage defaultMessage="Host Fee" />
+                {` `}
+                <StyledTooltip
+                  content={() => (
+                    <FormattedMessage
+                      id="AddFundsModal.hostFee.tooltip"
+                      defaultMessage="The default host fee percentage is set up in your host settings. The host fee is charged by the fiscal host to the collectives for the financial services provided."
+                    />
+                  )}
+                >
+                  <InfoCircle size={16} />
+                </StyledTooltip>
+              </span>
+            }
+            ml={3}
+            required={false}
+          >
+            {({ form, field }) => (
+              <StyledInputPercentage
+                id={field.id}
+                placeholder={hostFeePercent}
+                value={field.value}
+                error={field.error}
+                onChange={value => form.setFieldValue(field.name, value)}
+                onBlur={() => form.setFieldTouched(field.name, true)}
+                maxWidth="100%"
+              />
+            )}
+          </Field>
         </Flex>
         <Field
           name="expectedAt"
