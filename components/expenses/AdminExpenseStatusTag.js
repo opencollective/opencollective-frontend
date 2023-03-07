@@ -85,6 +85,9 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
   const buttonProps = { px: 2, py: 2, isBorderless: true, width: '100%', textAlign: 'left' };
 
   const onClick = () => {
+    if (hideProcessExpenseButtons && !expense?.permissions?.canMarkAsIncomplete) {
+      return;
+    }
     setShowPopup(true);
   };
 
@@ -118,7 +121,7 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
               >
                 <Flex>
                   {i18nExpenseStatus(intl, expense.status)}
-                  <ChevronDownIcon />
+                  {(!hideProcessExpenseButtons || expense?.permissions?.canMarkAsIncomplete) && <ChevronDownIcon />}
                 </Flex>
               </ExpenseStatusTag>
             </Box>
