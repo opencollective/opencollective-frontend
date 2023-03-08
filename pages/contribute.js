@@ -183,7 +183,7 @@ class TiersPage extends React.Component {
           props: {
             collective: collective,
             event: event,
-            hideContributors: showAll ? !hasContributors : hasEventContributors,
+            hideContributors: showAll ? !hasContributors : !hasEventContributors,
           },
         });
       });
