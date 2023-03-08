@@ -99,6 +99,8 @@ class TiersPage extends React.Component {
     const waysToContribute = [];
     const canContribute = collective.isActive && collective.host;
     const hasContributors = this.hasContributors(collective.contributors, collective.events);
+    const hasEventContributors = this.hasContributors([], collective.events);
+    const hasProjectContributors = this.hasContributors([], collective.projects);
     const showAll = verb === 'contribute';
 
     // Financial contributions
@@ -166,7 +168,7 @@ class TiersPage extends React.Component {
             collective: collective,
             project: project,
             disableCTA: !project.isActive,
-            hideContributors: !hasContributors,
+            hideContributors: showAll ? !hasContributors : !hasProjectContributors,
           },
         });
       });
@@ -181,7 +183,7 @@ class TiersPage extends React.Component {
           props: {
             collective: collective,
             event: event,
-            hideContributors: !hasContributors,
+            hideContributors: showAll ? !hasContributors : hasEventContributors,
           },
         });
       });
