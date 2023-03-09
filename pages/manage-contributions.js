@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { css } from '@styled-system/css';
-import { groupBy, isEmpty, mapValues, orderBy, uniqBy } from 'lodash';
+import { concat, groupBy, isEmpty, mapValues, orderBy, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { CollectiveType } from '../lib/constants/collectives';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import formatCollectiveType from '../lib/i18n/collective-type';
@@ -62,6 +63,8 @@ const MenuEntry = styled(Link)`
   }
 `;
 
+const memberCollective = member => (member.type === CollectiveType.PROJECT ? member : member.collective);
+
 class ManageContributionsPage extends React.Component {
   static getInitialProps({ query: { slug } }) {
     return { slug };
@@ -100,6 +103,12 @@ class ManageContributionsPage extends React.Component {
     const adminMemberships = loggedInUser?.memberOf?.filter(m => m.role === 'ADMIN' && !m.collective.isIncognito);
     const uniqMemberships = uniqBy(adminMemberships, 'collective.id');
     const groupedMemberships = groupBy(uniqMemberships, 'collective.type');
+    const projectMemberships = concat(...uniqMemberships.map(m => m.collective.children)).filter(
+      m => m.type === CollectiveType.PROJECT,
+    );
+    if (projectMemberships.length > 0) {
+      groupedMemberships[CollectiveType.PROJECT] = projectMemberships;
+    }
     return mapValues(groupedMemberships, memberships => orderBy(memberships, 'collective.name'));
   });
 
@@ -167,13 +176,13 @@ class ManageContributionsPage extends React.Component {
                         {members.map(m => (
                           <MenuEntry
                             key={m.id}
-                            href={`/${m.collective.slug}/manage-contributions`}
-                            title={m.collective.name}
-                            $isActive={slug === m.collective.slug}
+                            href={`/${memberCollective(m).slug}/manage-contributions`}
+                            title={memberCollective(m).name}
+                            $isActive={slug === memberCollective(m).slug}
                           >
-                            <Avatar collective={m.collective} size={32} />
+                            <Avatar collective={memberCollective(m)} size={32} />
                             <Span ml={3} truncateOverflow>
-                              {m.collective.name}
+                              {memberCollective(m).name}
                             </Span>
                           </MenuEntry>
                         ))}
