@@ -419,7 +419,7 @@ class CreateCollectiveForm extends React.Component {
                                   defaultMessage="I agree with the {toslink} of Open Collective."
                                   values={{
                                     toslink: (
-                                      <StyledLink href="/tos" openInNewTab>
+                                      <StyledLink href="/tos" openInNewTab onClick={e => e.stopPropagation()}>
                                         <FormattedMessage id="tos" defaultMessage="terms of service" />
                                       </StyledLink>
                                     ),
