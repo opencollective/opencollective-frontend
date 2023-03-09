@@ -24,13 +24,13 @@ OCF is a tech-first nonprofit. We are one node in a growing international networ
 
 ### Learn more
 
-Website
-2022 year in review
-2-minute explainer video
-Values & Mission
-Blog
-Team
-Documentation
+- [Website](https://opencollective.foundation/)
+- [2022 year in review](https://blog.opencollective.com/ocf-2022/)
+- [2-minute explainer video](https://youtu.be/269SyUQmL_U)
+- [Values & Mission](https://docs.opencollective.foundation/about/mission-and-values)
+- [Blog](https://blog.opencollective.com/tag/ocf/)
+- [Team](https://docs.opencollective.foundation/about/team)
+- [Documentation](https://docs.opencollective.foundation/)
 
 ### Tasks & required skills/experience
 
