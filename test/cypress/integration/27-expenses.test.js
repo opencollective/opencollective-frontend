@@ -46,7 +46,7 @@ describe('New expense flow', () => {
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('expense-next').click();
 
-      cy.get('input[name="description"]').type('Brussels January team retreat');
+      cy.get('textarea[name="description"]').type('Brussels January team retreat');
 
       cy.getByDataCy('expense-summary-btn').should('be.disabled');
       // Upload 2 files to the multi-files dropzone
@@ -108,7 +108,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('more-actions').click();
       cy.getByDataCy('edit-expense-btn').click();
       cy.getByDataCy('expense-next').click();
-      cy.get('input[name="description"]').type(' edited');
+      cy.get('textarea[name="description"]').type(' edited');
       cy.get('input[name="items[0].description"]').type(' but not too expensive');
       cy.get('input[name="items[0].amount"]').type('{selectall}111');
       // Add new item
@@ -164,7 +164,7 @@ describe('New expense flow', () => {
       cy.get('textarea[name="payoutMethod.data.content"]').type('make it rain');
       cy.getByDataCy('expense-next').click();
 
-      cy.get('input[name="description"]').type('Brussels January team retreat');
+      cy.get('textarea[name="description"]').type('Brussels January team retreat');
 
       cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
         {
@@ -226,7 +226,7 @@ describe('New expense flow', () => {
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('expense-next').click();
       // Fill the form with valid data
-      cy.get('input[name="description"]').type('March invoice');
+      cy.get('textarea[name="description"]').type('March invoice');
       cy.get('input[name="items[0].description"]').type('Peeling potatoes');
       cy.getByDataCy('currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
@@ -249,7 +249,7 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-next').click();
         // TODO: Make sure there's no payout method input visible
 
-        cy.get('input[name="description"]').type('Service Invoice');
+        cy.get('textarea[name="description"]').type('Service Invoice');
         cy.get('input[name="items[0].amount"]').type('{selectall}4200');
 
         cy.getByDataCy('expense-summary-btn').click();
@@ -273,7 +273,7 @@ describe('New expense flow', () => {
         cy.get('input[name="payee.email"]').type(inviteeEmail);
         cy.get('[data-cy="expense-next"]').click();
 
-        cy.get('input[name="description"]').type('Service Invoice');
+        cy.get('textarea[name="description"]').type('Service Invoice');
         cy.get('input[name="items[0].amount"]').type('{selectall}4200');
 
         cy.getByDataCy('expense-summary-btn').click();
@@ -351,7 +351,7 @@ describe('New expense flow', () => {
         cy.get('input[name="payee.email"]').type(inviteeEmail);
         cy.get('[data-cy="expense-next"]').click();
 
-        cy.get('input[name="description"]').type('Service Invoice');
+        cy.get('textarea[name="description"]').type('Service Invoice');
         cy.get('input[name="items[0].amount"]').type('{selectall}4200');
 
         cy.getByDataCy('expense-summary-btn').click();
@@ -447,7 +447,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-next').click();
 
       // Fill details
-      cy.get('input[name="description"]').type('Brussels January team retreat');
+      cy.get('textarea[name="description"]').type('Brussels January team retreat');
       cy.get('input[name="items[0].description"]').type('TShirts');
       cy.get('input[name="items[0].amount"]').type('{selectall}112');
       cy.getByDataCy('currency-picker').click();
