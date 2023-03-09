@@ -13,7 +13,7 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
 const isEmptyOnlineLocation = event => {
-  return event.location?.name === 'Online' && !event.location.address && !event.privateInstructions;
+  return event.location?.name === 'Online' && !event.location.url && !event.privateInstructions;
 };
 
 const Location = ({ collective: event, refetch }) => {
