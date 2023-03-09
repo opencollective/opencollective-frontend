@@ -10,7 +10,7 @@ Open Collective is a financial and legal toolbox for grassroots groups. We suppo
 
 <!--<strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>-->
 
-## [Open Collective Foundation](https://opencollective.foundation/): 
+## [Open Collective Foundation](https://opencollective.foundation/):
 
 <img width="663" alt="Screenshot 2023-03-09 at 3 24 43 PM" src="https://user-images.githubusercontent.com/79115149/223950611-3c6bd34a-45b2-49bd-a032-d28a7598b672.png">
 
@@ -39,17 +39,19 @@ A key part of our service is receiving money and paying out expenses for our Col
 
 # Responding to user support inquiries
 
-Answering questions, pointing people to documentation, customer service skills. Our financial admin processes are 'front of house' services that often directly involve our Collective members. 
+Answering questions, pointing people to documentation, customer service skills. Our financial admin processes are 'front of house' services that often directly involve our Collective members.
 
 # Who we're looking for
 
 An operations and community-oriented person who is:
+
 - Excited to be a driving force behind our operational functions and to support our Collectives to make the best use of our services
 - Self-motivated and autonomous, to thrive in our fully remote, high-trust, low-hierarchy environment
 - Comfortable with and excited about technology, able to learn new digital tools quickly, and eager to understand the ins and outs of the Open Collective software platform
 - Based in the United States
 
 # Additional desired experience
+
 (We don’t expect you to have all of these! Any of them would be a bonus).
 
 - Fiscal sponsorship
@@ -61,13 +63,13 @@ An operations and community-oriented person who is:
 
 - This is a fully remote position (we don't have any physical offices and our team is distributed across time zones)
 - Highly flexible schedule (we have a few weekly meetings and the rest us up to you)
-- - Open to applicants anywhere in the United States (sorry, we can't consider international candidates) 
+- - Open to applicants anywhere in the United States (sorry, we can't consider international candidates)
 - The pay will be $60k plus benefits (including health insurance)
 - We are seeking someone to commit 30-40 hours per week (pro rata pay for less than 40 hours)
 
 # To apply
 
-[Fill out this form!] (https://docs.google.com/forms/d/e/1FAIpQLSfbI-cg19Wv9eN9WiZ37de-mKCNDFoasRQEDXlhVtE8CI_Mcg/viewform) 
+[Fill out this form!] (https://docs.google.com/forms/d/e/1FAIpQLSfbI-cg19Wv9eN9WiZ37de-mKCNDFoasRQEDXlhVtE8CI_Mcg/viewform)
 
 If you have questions, reach out to [contact@opencollective.foundation](mailto:contact@opencollective.foundation)
 
