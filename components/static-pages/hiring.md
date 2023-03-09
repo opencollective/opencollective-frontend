@@ -10,19 +10,19 @@ Open Collective is a financial and legal toolbox for grassroots groups. We suppo
 
 <!--<strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>-->
 
-## [Open Collective Foundation](https://opencollective.foundation/):
+## [Open Collective Foundation](https://opencollective.foundation/): Finance Admin
 
-<img width="663" alt="Screenshot 2023-03-09 at 3 24 43 PM" src="https://user-images.githubusercontent.com/79115149/223950611-3c6bd34a-45b2-49bd-a032-d28a7598b672.png">
+<img width="663" alt="" src="https://user-images.githubusercontent.com/79115149/223950611-3c6bd34a-45b2-49bd-a032-d28a7598b672.png">
 
 $60k/year for 40 hrs/wk (or 30 hrs/wk pro rata). Must live in the US. Applications open until March 24th.
 
-[Open Collective Foundation (OCF)] (http://opencollective.foundation/) is a nonprofit fiscal sponsor with an open source tech platform, that is enabling 500+ groups to access 501(c)(3) status and fundraise in full transparency. [Our Collectives] (https://opencollective.com/foundation#category-CONTRIBUTIONS) include mutual aid groups, public interest open source tech, social justice movements, humanitarian aid, climate action, and many kinds of communities with missions focused on education, civic engagement, and positive social impact. [Solidarity is our guiding principle](https://blog.opencollective.com/solidarity-as-our-guiding-principle/). Our Collectives raised over $30m in 2022, representing 100x growth since 2019. We are scaling our team to meet increasing demand.
+[Open Collective Foundation (OCF)](http://opencollective.foundation/) is a nonprofit fiscal sponsor with an open source tech platform, that is enabling 500+ groups to access 501(c)(3) status and fundraise in full transparency. [Our Collectives](https://opencollective.com/foundation#category-CONTRIBUTIONS) include mutual aid groups, public interest open source tech, social justice movements, humanitarian aid, climate action, and many kinds of communities with missions focused on education, civic engagement, and positive social impact. [Solidarity is our guiding principle](https://blog.opencollective.com/solidarity-as-our-guiding-principle/). Our Collectives raised over $30m in 2022, representing 100x growth since 2019. We are scaling our team to meet increasing demand.
 
-# What Makes Us Different
+### What Makes Us Different
 
 OCF is a tech-first nonprofit. We are one node in a growing international network of 30+ fiscal sponsor organizations who use [Open Collective](https://opencollective.com/), an open source software platform for transparent fundraising and money management, to create efficiencies with money and amplify impact in communities. Globally, the network supports 15,000+ Collectives. Our tech platform and mission are all about transparency, collective collaboration, and practicality—we apply the same principles to how we run OCF as an organization.
 
-# Learn more
+### Learn more
 
 Website
 2022 year in review
@@ -32,16 +32,16 @@ Blog
 Team
 Documentation
 
-# Tasks & required skills/experience
+### Tasks & required skills/experience
 
 Accounts payable & receivable processing in a 501(c)(3) nonprofit  
 A key part of our service is receiving money and paying out expenses for our Collectives. We need someone with nonprofit financial admin/bookkeeping skills.
 
-# Responding to user support inquiries
+### Responding to user support inquiries
 
 Answering questions, pointing people to documentation, customer service skills. Our financial admin processes are 'front of house' services that often directly involve our Collective members.
 
-# Who we're looking for
+### Who we're looking for
 
 An operations and community-oriented person who is:
 
@@ -50,7 +50,7 @@ An operations and community-oriented person who is:
 - Comfortable with and excited about technology, able to learn new digital tools quickly, and eager to understand the ins and outs of the Open Collective software platform
 - Based in the United States
 
-# Additional desired experience
+#### Additional desired experience
 
 (We don’t expect you to have all of these! Any of them would be a bonus).
 
@@ -59,7 +59,7 @@ An operations and community-oriented person who is:
 - Tech tools like Slack, Loom, Google Workspace, Trello, Loomio, GitHub (extra points if you’ve used Open Collective, of course!)
 - Experience in collectives, cooperatives, activism, radical movements, solidarity economy
 
-# Compensation & role details
+### Compensation & role details
 
 - This is a fully remote position (we don't have any physical offices and our team is distributed across time zones)
 - Highly flexible schedule (we have a few weekly meetings and the rest us up to you)
@@ -67,9 +67,9 @@ An operations and community-oriented person who is:
 - The pay will be $60k plus benefits (including health insurance)
 - We are seeking someone to commit 30-40 hours per week (pro rata pay for less than 40 hours)
 
-# To apply
+### To apply
 
-[Fill out this form!] (https://docs.google.com/forms/d/e/1FAIpQLSfbI-cg19Wv9eN9WiZ37de-mKCNDFoasRQEDXlhVtE8CI_Mcg/viewform)
+[Fill out this form!](https://docs.google.com/forms/d/e/1FAIpQLSfbI-cg19Wv9eN9WiZ37de-mKCNDFoasRQEDXlhVtE8CI_Mcg/viewform)
 
 If you have questions, reach out to [contact@opencollective.foundation](mailto:contact@opencollective.foundation)
 
