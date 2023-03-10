@@ -2781,6 +2781,7 @@
   "TwoFactorAuth.Setup.Form.ErrorLength": "Nieprawidłowa długość kodu. Wprowadź ponownie swój 6-cyfrowy kod.",
   "TwoFactorAuth.Setup.Form.FinishSetup": "Konfiguracja końcowa",
   "TwoFactorAuth.Setup.Form.InputLabel": "Wprowadź swój 6-cyfrowy kod bez kresek.",
+  "TwoFactorAuth.Setup.Form.InputLabel.YubiKey": "Please enter your 6-digit code without any dashes or select the input below, plug your YubiKey and press it to generate a code.",
   "TwoFactorAuth.Setup.Form.VerifyButton": "Zweryfikuj i zobacz kody odzyskiwania",
   "TwoFactorAuth.Setup.Info": "Dwuskładnikowe uwierzytelnianie dodaje dodatkową warstwę bezpieczeństwa dla Twojego konta podczas logowania lub wykonywania czynności administracyjnych.",
   "TwoFactorAuth.Setup.ManualEntry": "Wpisz ręcznie: {token}",
