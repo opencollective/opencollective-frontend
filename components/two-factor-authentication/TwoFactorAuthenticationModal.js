@@ -20,6 +20,7 @@ export default function TwoFactorAuthenticationModal() {
   const [twoFactorCode, setTwoFactorCode] = React.useState('');
   const [confirming, setConfirming] = React.useState(false);
   const prompt = useTwoFactorAuthenticationPrompt();
+  const hasYubikeyOTP = prompt.supportedMethods.includes('yubikey_otp');
 
   const cancel = React.useCallback(() => {
     setTwoFactorCode('');
@@ -31,12 +32,17 @@ export default function TwoFactorAuthenticationModal() {
     const code = twoFactorCode;
     setConfirming(true);
     setTwoFactorCode('');
+
+    let type = 'totp';
+    if (hasYubikeyOTP && code.length === 44) {
+      type = 'yubikey_otp';
+    }
     prompt.resolveAuth({
-      type: 'totp',
+      type,
       code,
     });
     setConfirming(false);
-  }, [twoFactorCode]);
+  }, [twoFactorCode, hasYubikeyOTP]);
 
   const router = useRouter();
 
@@ -49,6 +55,12 @@ export default function TwoFactorAuthenticationModal() {
 
     return () => router.events.off('routeChangeStart', handleRouteChange);
   }, [cancel]);
+
+  React.useEffect(() => {
+    if (hasYubikeyOTP && twoFactorCode.length === 44) {
+      confirm();
+    }
+  }, [confirm, twoFactorCode, hasYubikeyOTP]);
 
   if (prompt?.isOpen) {
     const has2FAConfigured = prompt.supportedMethods.length > 0;
@@ -65,10 +77,17 @@ export default function TwoFactorAuthenticationModal() {
         {has2FAConfigured ? (
           <Flex mt={2} flexDirection="column">
             <Label htmlFor="2fa-code-input" fontWeight="normal" as="label" mb={2}>
-              <FormattedMessage
-                id="TwoFactorAuth.Setup.Form.InputLabel"
-                defaultMessage="Please enter your 6-digit code without any dashes."
-              />
+              {hasYubikeyOTP ? (
+                <FormattedMessage
+                  id="TwoFactorAuth.Setup.Form.InputLabel.YubiKey"
+                  defaultMessage="Please enter your 6-digit code without any dashes or select the input below, plug your YubiKey and press it to generate a code."
+                />
+              ) : (
+                <FormattedMessage
+                  id="TwoFactorAuth.Setup.Form.InputLabel"
+                  defaultMessage="Please enter your 6-digit code without any dashes."
+                />
+              )}
             </Label>
             <StyledInput
               id="2fa-code-input"
@@ -76,8 +95,8 @@ export default function TwoFactorAuthenticationModal() {
               type="text"
               minHeight={50}
               fontSize="20px"
-              placeholder="123456"
-              pattern="[0-9]{6}"
+              placeholder={hasYubikeyOTP ? '123456 or YubiKey: cccc...' : '123456'}
+              pattern={hasYubikeyOTP ? undefined : '[0-9]{6}'}
               inputMode="numeric"
               value={twoFactorCode}
               onChange={e => setTwoFactorCode(e.target.value)}
@@ -116,7 +135,9 @@ export default function TwoFactorAuthenticationModal() {
               minWidth={120}
               buttonStyle="primary"
               loading={confirming}
-              disabled={!has2FAConfigured || twoFactorCode?.length !== 6}
+              disabled={
+                !has2FAConfigured || (twoFactorCode?.length !== 6 && hasYubikeyOTP && twoFactorCode?.length !== 44)
+              }
               onClick={confirm}
             >
               <FormattedMessage id="actions.verify" defaultMessage="Verify" />
