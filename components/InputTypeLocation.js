@@ -1,6 +1,5 @@
 import React, { createRef, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import AddressFormatter from '@shopify/address';
 import { Clear } from '@styled-icons/material/Clear';
 import { themeGet } from '@styled-system/theme-get';
 import { get } from 'lodash';
