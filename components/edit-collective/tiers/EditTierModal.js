@@ -143,6 +143,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
                 onBlur={() => form.setFieldTouched(field.name, true)}
                 onChange={({ value }) => form.setFieldValue(field.name, value)}
                 isLoading={loading}
+                menuPosition="fixed"
                 options={tierTypeOptions}
                 value={tierTypeOptions.find(option => option.value === field.value)}
               />
@@ -203,6 +204,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               isLoading={loading}
               options={intervalOptions}
+              menuPosition="fixed"
               value={intervalOptions.find(option => option.value === field.value)}
             />
           )}
@@ -227,6 +229,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               isLoading={loading}
               options={amountTypeOptions}
+              menuPosition="fixed"
               value={amountTypeOptions.find(option => option.value === field.value)}
             />
           )}
@@ -515,6 +518,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
                 onBlur={() => form.setFieldTouched(field.name, true)}
                 onChange={({ value }) => form.setFieldValue(field.name, value)}
                 isLoading={loading}
+                menuPosition="fixed"
                 options={receiptTemplateOptions}
                 value={receiptTemplateOptions.find(option => option.value === field.value)}
               />
