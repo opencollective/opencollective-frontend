@@ -108,11 +108,6 @@ const getDefaultExpense = collective => ({
   taxes: null,
   payeeLocation: {
     address: '',
-    address1: '',
-    address2: '',
-    city: '',
-    postalCode: '',
-    zone: '',
     country: null,
   },
 });
@@ -132,7 +127,7 @@ export const prepareExpenseForSubmit = expenseData => {
       : { [payeeIdField]: expenseData.payee.id };
 
   const payeeLocation = checkRequiresAddress(expenseData)
-    ? pick(expenseData.payeeLocation, ['address', 'address1', 'address2', 'city', 'postalCode', 'zone', 'country'])
+    ? pick(expenseData.payeeLocation, ['address', 'country', 'structured'])
     : null;
 
   const payoutMethod = pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']);
@@ -215,14 +210,9 @@ const validateExpense = (intl, expense) => {
 };
 
 const setLocationFromPayee = (formik, payee) => {
-  // TODO: this is a duplicate of the one in ExpenseFormPayeeStep?
-  formik.setFieldValue('payeeLocation.country', payee?.location?.country || null);
-  formik.setFieldValue('payeeLocation.address', payee?.location?.address || '');
-  formik.setFieldValue('payeeLocation.address1', payee?.location?.address1 || '');
-  formik.setFieldValue('payeeLocation.address2', payee?.location?.address2 || '');
-  formik.setFieldValue('payeeLocation.city', payee?.location?.city || '');
-  formik.setFieldValue('payeeLocation.zone', payee?.location?.zone || ''); // TODO: set null?
-  formik.setFieldValue('payeeLocation.postalCode', payee?.location?.postalCode || '');
+  formik.setFieldValue('payeeLocation.country', payee.location.country || null);
+  formik.setFieldValue('payeeLocation.address', payee.location.address || '');
+  formik.setFieldValue('payeeLocation.structured', payee.location.structured);
 };
 
 const HiddenFragment = styled.div`
@@ -936,6 +926,7 @@ ExpenseForm.propTypes = {
       location: PropTypes.shape({
         address: PropTypes.string,
         country: PropTypes.string,
+        structured: PropTypes.object,
       }),
       payoutMethods: PropTypes.arrayOf(
         PropTypes.shape({

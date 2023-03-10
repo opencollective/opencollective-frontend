@@ -312,7 +312,7 @@ class EditCollectiveForm extends React.Component {
 
       // GraphQL schema has address embedded within location
       // mutation expects { location: { address: '' } }
-      if (['address', 'country'].includes(fieldname)) {
+      if (['address', 'country', 'structured'].includes(fieldname)) {
         collective.location[fieldname] = value;
       } else if (fieldname === 'VAT') {
         set(collective, 'settings.VAT.type', value);

@@ -2111,36 +2111,6 @@ type Location {
   name: String
 
   """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
-
-  """
-  Street name and house number
-  """
-  address1: String
-
-  """
-  Apt, suite, etc
-  """
-  address2: String
-
-  """
-  Postal code
-  """
-  postalCode: String
-
-  """
-  City name
-  """
-  city: String
-
-  """
-  State/province/region
-  """
-  zone: String
-
-  """
   Two letters country code (eg. FR, BE...etc)
   """
   country: String
@@ -2154,6 +2124,21 @@ type Location {
   Longitude
   """
   long: Float
+
+  """
+  URL for the location
+  """
+  url: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
 }
 
 """
@@ -4052,6 +4037,7 @@ type AccountStats {
   ): Amount!
   yearlyBudget: Amount!
   yearlyBudgetManaged: Amount!
+    @deprecated(reason: "2023-03-01: This field will be removed soon, please use totalMoneyManaged")
 
   """
   Total net amount received
@@ -4315,7 +4301,7 @@ type TimeSeriesAmountNode {
 }
 
 """
-Statistics aith amounts
+Statistics with amounts
 """
 type AmountStats {
   """
@@ -7790,7 +7776,9 @@ type Individual implements Account {
     offset: Int! = 0
   ): OAuthApplicationCollection
 
-  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see their own address\n            - Hosts can see the address of users submitting expenses to their collectives\n        "
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
   location: Location
   categories: [String]!
   stats: AccountStats
@@ -8620,7 +8608,7 @@ type Organization implements Account & AccountWithContributions {
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
   """
-  If the organization if a host account, this will return the matching Host object
+  If the organization is a host account, this will return the matching Host object
   """
   host: Host
 }
@@ -9362,6 +9350,26 @@ type Query {
     tagSearchOperator: TagSearchOperator! = AND
 
     """
+    Included collectives which are archived
+    """
+    includeArchived: Boolean
+
+    """
+    Only return "active" accounts with Financial Contributions enabled if true.
+    """
+    isActive: Boolean
+
+    """
+    Whether to skip recent suspicious accounts (48h)
+    """
+    skipRecentAccounts: Boolean = false
+
+    """
+    Limit the search to collectives belonging to these countries
+    """
+    country: [CountryISO]
+
+    """
     Host hosting the account
     """
     host: [AccountReferenceInput]
@@ -9377,16 +9385,6 @@ type Query {
     isHost: Boolean
 
     """
-    Included collectives which are archived
-    """
-    includeArchived: Boolean
-
-    """
-    Only return "active" accounts with Financial Contributions enabled if true.
-    """
-    isActive: Boolean
-
-    """
     Only accounts with custom contribution (/donate) enabled
     """
     hasCustomContributionsEnabled: Boolean
@@ -9398,16 +9396,6 @@ type Query {
       @deprecated(
         reason: "2022-04-22: Introduced for Hacktoberfest. Reference: https://github.com/opencollective/opencollective-api/pull/7440#issuecomment-1121504508"
       )
-
-    """
-    Whether to skip recent suspicious accounts (48h)
-    """
-    skipRecentAccounts: Boolean = false
-
-    """
-    Limit the search to collectives belonging to these countries
-    """
-    country: [CountryISO]
 
     """
     The order of results. Defaults to [RANK, DESC] (or [CREATED_AT, DESC] if `supportedPaymentMethodService` is provided)
@@ -9685,14 +9673,44 @@ type Query {
     offset: Int! = 0
 
     """
-    Filter hosts by tags (multiple = OR)
+    Search accounts related to this term based on name, description, tags, slug, and location
     """
-    tags: [String] @deprecated(reason: "2020-06-30: Please use tag (singular)")
+    searchTerm: String
+
+    """
+    Only accounts that match these tags
+    """
+    tag: [String]
+
+    """
+    Operator to use when searching with tags. Defaults to 'AND'
+    """
+    tagSearchOperator: TagSearchOperator! = AND
+
+    """
+    Included collectives which are archived
+    """
+    includeArchived: Boolean
+
+    """
+    Only return "active" accounts with Financial Contributions enabled if true.
+    """
+    isActive: Boolean
+
+    """
+    Whether to skip recent suspicious accounts (48h)
+    """
+    skipRecentAccounts: Boolean = false
+
+    """
+    Limit the search to collectives belonging to these countries
+    """
+    country: [CountryISO]
 
     """
     Filter hosts by tags (multiple = OR)
     """
-    tag: [String]
+    tags: [String] @deprecated(reason: "2020-06-30: Please use tag (singular)")
   ): HostCollection
   individual(
     """
@@ -14100,36 +14118,6 @@ input LocationInput {
   name: String
 
   """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
-
-  """
-  Street name and house number
-  """
-  address1: String
-
-  """
-  Apt, suite, etc
-  """
-  address2: String
-
-  """
-  Postal code
-  """
-  postalCode: String
-
-  """
-  City name
-  """
-  city: String
-
-  """
-  State/province/region
-  """
-  zone: String
-
-  """
   Two letters country code (eg. FR, BE...etc)
   """
   country: CountryISO
@@ -14143,6 +14131,21 @@ input LocationInput {
   Longitude
   """
   long: Float
+
+  """
+  URL for the location
+  """
+  url: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
 }
 
 input IndividualCreateInput {

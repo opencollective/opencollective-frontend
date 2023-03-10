@@ -15,19 +15,19 @@ const LocationSection = styled.section`
 `;
 
 function Location({ location, showTitle }) {
-  const { name, formattedAddress, url, lat, long, country } = location || {};
+  const { name, address, lat, long, country } = location || {};
 
   if (!location) {
     return null;
   }
 
   if (name === 'Online') {
-    if (url && isURL(url)) {
+    if (address && isURL(address)) {
       return (
         <Flex flexDirection="Column" alignItems="center">
           <P textAlign="center">
-            <StyledLink openInNewTabNoFollow href={url}>
-              {url}
+            <StyledLink openInNewTabNoFollow href={address}>
+              {address}
             </StyledLink>
           </P>
         </Flex>
@@ -39,14 +39,14 @@ function Location({ location, showTitle }) {
         </P>
       );
     }
-  } else if (!name && !formattedAddress && !lat && !long && !country) {
+  } else if (!name && !address && !lat && !long && !country) {
     return null;
   }
 
   const openStreetMapLink =
     lat && long
       ? `https://www.openstreetmap.org/?mlat=${lat}&amp;mlon=${long}#map=16/${lat}/${long}`
-      : `https://www.openstreetmap.org/search?query=${encodeURIComponent(formattedAddress)}`;
+      : `https://www.openstreetmap.org/search?query=${encodeURIComponent(address)}`;
 
   return (
     <LocationSection id="location">
@@ -57,7 +57,7 @@ function Location({ location, showTitle }) {
         </Container>
         <Container className="address" color="black.600">
           <StyledLink href={openStreetMapLink} openInNewTab>
-            {[formattedAddress, country].filter(Boolean).join(', ')}
+            {[address, country].filter(Boolean).join(', ')}
           </StyledLink>
         </Container>
       </Container>

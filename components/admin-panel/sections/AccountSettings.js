@@ -117,14 +117,10 @@ const AccountSettings = ({ account, section }) => {
       CollectiveInputType.location = pick(collective.location, [
         'name',
         'address',
-        'address1',
-        'address2',
-        'postalCode',
-        'city',
-        'zone',
         'lat',
         'long',
         'country',
+        'structured',
       ]);
     }
     setState({ ...state, status: 'loading' });

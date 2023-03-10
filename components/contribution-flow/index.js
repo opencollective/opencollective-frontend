@@ -268,16 +268,7 @@ class ContributionFlow extends React.Component {
             guestInfo,
             fromAccount,
             fromAccountInfo: {
-              location: pick(stepProfile.location, [
-                'name',
-                'address',
-                'address1',
-                'address2',
-                'postalCode',
-                'city',
-                'zone',
-                'country',
-              ]),
+              location: pick(stepProfile.location, ['name', 'address', 'country', 'structured']),
               legalName: stepProfile.legalName,
               name: stepProfile.name,
             },

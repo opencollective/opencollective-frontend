@@ -14,13 +14,8 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
     location {
       id
       address
-      address1
-      address2
-      city
-      postalCode
-      zone
       country
-      # structured
+      structured
     }
     payoutMethods {
       id
@@ -79,13 +74,8 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
           location {
             id
             address
-            address1
-            address2
-            city
-            zone
-            postalCode
             country
-            # structured
+            structured
           }
           payoutMethods {
             id
@@ -213,11 +203,6 @@ export const expensePageExpenseFieldsFragment = gql`
       location {
         id
         address
-        address1
-        address2
-        city
-        zone
-        postalCode
         country
       }
       payoutMethods {
@@ -255,11 +240,7 @@ export const expensePageExpenseFieldsFragment = gql`
       id
       address
       country
-      address1
-      address2
-      city
-      zone
-      postalCode
+      structured
     }
     createdByAccount {
       id

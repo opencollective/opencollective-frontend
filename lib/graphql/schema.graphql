@@ -804,39 +804,9 @@ type LocationType {
   id: String
 
   """
-  A short name for the location (eg. Google Headquarters)
+  A short name for the location (eg. Open Collective Headquarters)
   """
   name: String
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
-
-  """
-  Street name and house number
-  """
-  address1: String
-
-  """
-  Apt, suite, etc
-  """
-  address2: String
-
-  """
-  Postal code
-  """
-  postalCode: String
-
-  """
-  City name
-  """
-  city: String
-
-  """
-  State/province/region
-  """
-  zone: String
 
   """
   Two letters country code (eg. FR, BE...etc)
@@ -852,6 +822,21 @@ type LocationType {
   Longitude
   """
   long: Float
+
+  """
+  URL for the location
+  """
+  url: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
 }
 
 """
@@ -2103,6 +2088,7 @@ type CollectiveStatsType {
   totalNetAmountReceived: Int
   yearlyBudget: Int
   yearlyBudgetManaged: Int
+    @deprecated(reason: "2023-03-01: This field will be removed soon, please use totalMoneyManaged from GraphQL V2")
   activeRecurringContributions: JSON
 }
 
@@ -4876,39 +4862,9 @@ Input type for Location
 """
 input LocationInputType {
   """
-  A short name for the location (eg. Google Headquarters)
+  A short name for the location (eg. Open Collective Headquarters)
   """
   name: String
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
-
-  """
-  Street name and house number
-  """
-  address1: String
-
-  """
-  Apt, suite, etc
-  """
-  address2: String
-
-  """
-  Postal code
-  """
-  postalCode: String
-
-  """
-  City name
-  """
-  city: String
-
-  """
-  State/province/region
-  """
-  zone: String
 
   """
   Two letters country code (eg. FR, BE...etc)
@@ -4924,6 +4880,16 @@ input LocationInputType {
   Longitude
   """
   long: Float
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
 }
 
 """

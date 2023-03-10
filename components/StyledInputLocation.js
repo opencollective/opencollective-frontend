@@ -13,12 +13,7 @@ import StyledTextarea from './StyledTextarea';
 const DEFAULT_LOCATION = {
   country: null,
   address: null,
-  address1: null,
-  address2: null,
-  city: null,
-  postalCode: null,
-  zone: null,
-  //structured: null,
+  structured: null,
 };
 
 /**
@@ -38,9 +33,9 @@ const StyledInputLocation = ({
 }) => {
   const [useFallback, setUseFallback] = React.useState(false);
   const intl = useIntl();
-  const forceLegacyFormat = Boolean(!location?.address1 && location?.address?.length);
+  const forceLegacyFormat = Boolean(!location?.structured && location?.address);
   const hasCountry = Boolean(location?.country);
-  console.log({ location, forceLegacyFormat });
+
   return (
     <div>
       <StyledInputField
@@ -70,25 +65,16 @@ const StyledInputLocation = ({
       {hasCountry && !useFallback && !forceLegacyFormat ? (
         <I18nAddressFields
           selectedCountry={location.country}
-          value={location || {}}
+          value={location.structured || {}}
           onLoadError={() => setUseFallback(true)} // TODO convert from structured to raw
           Component={SimpleLocationFieldRenderer}
           fieldProps={{ labelFontSize, labelFontWeight }}
           required={required}
-          onCountryChange={values => {
+          onCountryChange={structured =>
             onChange(
-              pick({ ...(location || DEFAULT_LOCATION), ...values }, [
-                'name',
-                'address',
-                'address1',
-                'address2',
-                'postalCode',
-                'city',
-                'zone',
-                'country',
-              ]),
-            );
-          }}
+              pick({ ...(location || DEFAULT_LOCATION), structured }, ['name', 'address', 'country', 'structured']),
+            )
+          }
         />
       ) : (
         <StyledInputField
@@ -125,13 +111,8 @@ StyledInputLocation.propTypes = {
   labelFontWeight: PropTypes.any,
   labelFontSize: PropTypes.any,
   location: PropTypes.shape({
-    //structured: PropTypes.object,
+    structured: PropTypes.object,
     address: PropTypes.string,
-    address1: PropTypes.string,
-    address2: PropTypes.string,
-    city: PropTypes.string,
-    zone: PropTypes.string,
-    postalCode: PropTypes.string,
     country: PropTypes.string,
   }),
   errors: PropTypes.object,
