@@ -5113,8 +5113,6 @@ export type Location = {
   name?: Maybe<Scalars['String']>;
   /** Structured JSON address */
   structured?: Maybe<Scalars['JSON']>;
-  /** URL for the location */
-  url?: Maybe<Scalars['String']>;
 };
 
 /** Input type for Geographic location */
@@ -5131,8 +5129,6 @@ export type LocationInput = {
   name?: InputMaybe<Scalars['String']>;
   /** Structured JSON address */
   structured?: InputMaybe<Scalars['JSON']>;
-  /** URL for the location */
-  url?: InputMaybe<Scalars['String']>;
 };
 
 export type Maximum_Virtual_Card_Limit_Amount_For_Interval = {

@@ -49,7 +49,7 @@ interface CollectiveInterface {
   tags: [String]
 
   """
-  Name, address, street, city, postal code, zone, country, lat, long of the location.
+  Name, address, country, lat, long of the location.
   """
   location: LocationType
   createdAt: DateString
@@ -822,11 +822,6 @@ type LocationType {
   Longitude
   """
   long: Float
-
-  """
-  URL for the location
-  """
-  url: String
 
   """
   Postal address without country (eg. 12 opensource avenue, 7500 Paris)
@@ -4867,6 +4862,11 @@ input LocationInputType {
   name: String
 
   """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
   Two letters country code (eg. FR, BE...etc)
   """
   country: String
@@ -4880,11 +4880,6 @@ input LocationInputType {
   Longitude
   """
   long: Float
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
 
   """
   Structured JSON address

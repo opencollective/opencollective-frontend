@@ -2111,6 +2111,11 @@ type Location {
   name: String
 
   """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
   Two letters country code (eg. FR, BE...etc)
   """
   country: String
@@ -2124,16 +2129,6 @@ type Location {
   Longitude
   """
   long: Float
-
-  """
-  URL for the location
-  """
-  url: String
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
 
   """
   Structured JSON address
@@ -14118,6 +14113,11 @@ input LocationInput {
   name: String
 
   """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
   Two letters country code (eg. FR, BE...etc)
   """
   country: CountryISO
@@ -14131,16 +14131,6 @@ input LocationInput {
   Longitude
   """
   long: Float
-
-  """
-  URL for the location
-  """
-  url: String
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
 
   """
   Structured JSON address
