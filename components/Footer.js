@@ -155,6 +155,10 @@ const messages = defineMessages({
     id: 'company.securityPolicy',
     defaultMessage: 'Security Policy',
   },
+  'company.contactUs': {
+    id: 'contactUs',
+    defaultMessage: 'Contact Us',
+  },
 });
 
 const navigation = {
@@ -186,6 +190,7 @@ const navigation = {
     termsOfService: '/tos',
     privacyPolicy: '/privacypolicy',
     securityPolicy: 'https://docs.opencollective.com/help/product/security',
+    contactUs: '/contact',
   },
 };
 
