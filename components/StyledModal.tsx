@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Times } from '@styled-icons/fa-solid/Times';
 import propTypes from '@styled-system/prop-types';
 import { themeGet } from '@styled-system/theme-get';
-import FocusTrap from 'focus-trap-react';
 import { createPortal } from 'react-dom';
 import { useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
@@ -13,6 +12,7 @@ import useKeyBoardShortcut, { ESCAPE_KEY } from '../lib/hooks/useKeyboardKey';
 
 import Avatar from './Avatar';
 import Container from './Container';
+import { FocusTrapWithContext } from './FocusTrapContext';
 import { Flex } from './Grid';
 import { fadeIn } from './StyledKeyframes';
 import StyledLinkButton from './StyledLinkButton';
@@ -210,10 +210,9 @@ ModalFooter.defaultProps = {
 };
 
 const DefaultTrapContainer = props => {
-  return <FocusTrap focusTrapOptions={{ clickOutsideDeactivates: true }} {...props} />;
+  return <FocusTrapWithContext focusTrapOptions={{ clickOutsideDeactivates: true }} {...props} />;
 };
 
-export const ModalReferenceContext = React.createContext(null);
 /**
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
  * a styled `Container`.
@@ -258,14 +257,12 @@ const StyledModal = ({
         <Wrapper>
           <TrapContainer>
             <Modal ref={modalRef} {...props}>
-              <ModalReferenceContext.Provider value={modalRef}>
-                {React.Children.map(children, child => {
-                  if (child?.type?.displayName === 'Header') {
-                    return React.cloneElement(child, { onClose: closeHandler });
-                  }
-                  return child;
-                })}
-              </ModalReferenceContext.Provider>
+              {React.Children.map(children, child => {
+                if (child?.type?.displayName === 'Header') {
+                  return React.cloneElement(child, { onClose: closeHandler });
+                }
+                return child;
+              })}
             </Modal>
           </TrapContainer>
         </Wrapper>
@@ -280,14 +277,12 @@ const StyledModal = ({
         <Wrapper zindex={props.zindex}>
           <TrapContainer>
             <Modal ref={modalRef} {...props}>
-              <ModalReferenceContext.Provider value={modalRef}>
-                {React.Children.map(children, child => {
-                  if (child?.type?.displayName === 'Header') {
-                    return React.cloneElement(child, { onClose: closeHandler });
-                  }
-                  return child;
-                })}
-              </ModalReferenceContext.Provider>
+              {React.Children.map(children, child => {
+                if (child?.type?.displayName === 'Header') {
+                  return React.cloneElement(child, { onClose: closeHandler });
+                }
+                return child;
+              })}
             </Modal>
           </TrapContainer>
           <ModalOverlay

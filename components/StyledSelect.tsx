@@ -7,6 +7,7 @@ import Select, {
   components as ReactSelectComponents,
   ContainerProps,
   GroupHeadingProps,
+  MenuProps,
   OptionProps,
   ValueContainerProps,
 } from 'react-select';
@@ -14,10 +15,10 @@ import styled from 'styled-components';
 import { layout, LayoutProps, space, SpaceProps, typography, TypographyProps } from 'styled-system';
 
 import Container from './Container';
+import { FocusTrapContext } from './FocusTrapContext';
 import { Flex } from './Grid';
 import SearchIcon from './SearchIcon';
 import StyledHr from './StyledHr';
-import { ModalReferenceContext } from './StyledModal';
 import StyledTag from './StyledTag';
 import { P } from './Text';
 
@@ -37,6 +38,25 @@ const Messages = defineMessages({
 });
 
 /* eslint-disable react/prop-types */
+const Menu = ({ innerProps, ...props }: MenuProps) => {
+  // If we're inside a focus trap context, we must register the select to make sure its focus events
+  // will be propagated correctly.
+  const ref = React.useRef();
+  const focusTrapContext = React.useContext(FocusTrapContext);
+  React.useEffect(() => {
+    if (focusTrapContext) {
+      focusTrapContext.registerRef(ref);
+      return () => {
+        focusTrapContext.unregisterRef(ref);
+      };
+    }
+  }, []);
+
+  return (
+    <ReactSelectComponents.Menu {...props} innerProps={{ ...innerProps, ref } as React.HTMLProps<HTMLDivElement>} />
+  );
+};
+
 const Option = ({ innerProps, ...props }: OptionProps & { 'data-cy': string }) => (
   <ReactSelectComponents.Option
     {...props}
@@ -46,14 +66,19 @@ const Option = ({ innerProps, ...props }: OptionProps & { 'data-cy': string }) =
   />
 );
 
-const SelectContainer = ({ innerProps, ...props }: ContainerProps) => (
-  <ReactSelectComponents.SelectContainer
-    {...props}
-    innerProps={
-      { ...innerProps, 'data-cy': props.selectProps['data-cy'] || 'select' } as React.HTMLProps<HTMLDivElement>
-    }
-  />
-);
+const SelectContainer = ({ innerProps, ...props }: ContainerProps) => {
+  return (
+    <ReactSelectComponents.SelectContainer
+      {...props}
+      innerProps={
+        {
+          ...innerProps,
+          'data-cy': props.selectProps['data-cy'] || 'select',
+        } as React.HTMLProps<HTMLDivElement>
+      }
+    />
+  );
+};
 
 const MultiValue = ({ children, removeProps, ...props }) => {
   let title;
@@ -152,7 +177,7 @@ const GroupHeading = ({ children, ...props }: GroupHeadingProps) => (
 /**
  * A map to override the default components of react-select
  */
-export const customComponents = { SelectContainer, Option, MultiValue, GroupHeading, ValueContainer };
+export const customComponents = { SelectContainer, Menu, Option, MultiValue, GroupHeading, ValueContainer };
 export const searchableCustomComponents = { ...customComponents, DropdownIndicator: DropdownSearchIndicator };
 
 const getComponents = (components, useSearchIcon) => {
@@ -190,13 +215,10 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     options,
   }) => {
     isSearchable = isSearchable ?? options?.length > 8;
-    // If a StyledSelect is rendered within a modal, make sure we use the modal as the portal target
-    const modalRef = React.useContext(ModalReferenceContext);
-
     return {
       isSearchable,
       menuPortalTarget:
-        menuPortalTarget === null || typeof document === 'undefined' ? undefined : modalRef?.current || document.body,
+        menuPortalTarget || (menuPortalTarget === null || typeof document === 'undefined' ? undefined : document.body),
       isDisabled: disabled || isDisabled,
       placeholder: placeholder || intl.formatMessage(Messages.placeholder),
       loadingMessage: () => intl.formatMessage(Messages.loading),
