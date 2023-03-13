@@ -210,10 +210,9 @@ ModalFooter.defaultProps = {
 };
 
 const DefaultTrapContainer = props => {
-  return <FocusTrap focusTrapOptions={{ clickOutsideDeactivates: true }} {...props} />;
+  return <FocusTrap focusTrapOptions={{ allowOutsideClick: true }} {...props} />;
 };
 
-export const ModalReferenceContext = React.createContext(null);
 /**
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
  * a styled `Container`.
@@ -258,14 +257,12 @@ const StyledModal = ({
         <Wrapper>
           <TrapContainer>
             <Modal ref={modalRef} {...props}>
-              <ModalReferenceContext.Provider value={modalRef}>
-                {React.Children.map(children, child => {
-                  if (child?.type?.displayName === 'Header') {
-                    return React.cloneElement(child, { onClose: closeHandler });
-                  }
-                  return child;
-                })}
-              </ModalReferenceContext.Provider>
+              {React.Children.map(children, child => {
+                if (child?.type?.displayName === 'Header') {
+                  return React.cloneElement(child, { onClose: closeHandler });
+                }
+                return child;
+              })}
             </Modal>
           </TrapContainer>
         </Wrapper>
@@ -280,14 +277,12 @@ const StyledModal = ({
         <Wrapper zindex={props.zindex}>
           <TrapContainer>
             <Modal ref={modalRef} {...props}>
-              <ModalReferenceContext.Provider value={modalRef}>
-                {React.Children.map(children, child => {
-                  if (child?.type?.displayName === 'Header') {
-                    return React.cloneElement(child, { onClose: closeHandler });
-                  }
-                  return child;
-                })}
-              </ModalReferenceContext.Provider>
+              {React.Children.map(children, child => {
+                if (child?.type?.displayName === 'Header') {
+                  return React.cloneElement(child, { onClose: closeHandler });
+                }
+                return child;
+              })}
             </Modal>
           </TrapContainer>
           <ModalOverlay
