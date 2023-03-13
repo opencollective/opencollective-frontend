@@ -249,7 +249,11 @@ export const generatePaymentMethodOptions = (
     }
 
     // Manual (bank transfer)
-    if (hostHasManual && INTERVALS.oneTime && !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)) {
+    if (
+      hostHasManual &&
+      stepDetails.interval === INTERVALS.oneTime &&
+      !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)
+    ) {
       uniquePMs.push({
         key: 'manual',
         title: get(collective, 'host.settings.paymentMethods.manual.title', null) || (
