@@ -4,6 +4,7 @@ import { useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
 import { assign, cloneDeep, get, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import roles from '../lib/constants/roles';
@@ -176,6 +177,10 @@ const createUserMutation = gqlV1`
   }
 `;
 
+const FormContainer = styled(Form)`
+  position: relative;
+`;
+
 /**
  * A mini-form to create collectives/orgs/users. Meant to be embed in popups or
  * small component where we want to provide just the essential fields.
@@ -189,6 +194,7 @@ const CreateCollectiveMiniForm = ({
   refetchLoggedInUser,
   excludeAdminFields,
   optionalFields,
+  menuPortalTarget = undefined,
   email = '',
   name = '',
 }) => {
@@ -198,6 +204,7 @@ const CreateCollectiveMiniForm = ({
   const noAdminFields = isOrganization && excludeAdminFields;
   const mutation = isUser ? createUserMutation : createCollectiveMutation;
   const [createCollective, { error: submitError }] = useMutation(mutation);
+  const containerRef = React.useRef();
   const intl = useIntl();
   const { formatMessage } = intl;
 
@@ -259,7 +266,7 @@ const CreateCollectiveMiniForm = ({
         const { values, errors, touched, isSubmitting } = formik;
 
         return (
-          <Form data-cy="create-collective-mini-form">
+          <FormContainer data-cy="create-collective-mini-form" ref={containerRef}>
             <H5 fontWeight={600}>{CreateNewMessages[type] ? formatMessage(CreateNewMessages[type]) : null}</H5>
             <Box mt={3}>
               {(isUser || isOrganization) && !noAdminFields && (
@@ -396,6 +403,8 @@ const CreateCollectiveMiniForm = ({
                             inputId="location.country"
                             onChange={country => form.setFieldValue(name, country)}
                             maxMenuHeight={95}
+                            menuPortalTarget={menuPortalTarget}
+                            menuPosition="absolute" // Menu is inside an absolute block, fixed won't work here
                           />
                         );
                       default:
@@ -431,7 +440,7 @@ const CreateCollectiveMiniForm = ({
                 {isUser ? formatMessage(msg.saveUser) : formatMessage(msg.save)}
               </StyledButton>
             </Container>
-          </Form>
+          </FormContainer>
         );
       }}
     </Formik>
@@ -459,6 +468,8 @@ CreateCollectiveMiniForm.propTypes = {
   name: PropTypes.string,
   /** A list of optional fields to include in the form */
   optionalFields: PropTypes.arrayOf(PropTypes.oneOf(['location.address', 'location.country'])),
+  /** Must be provided when the form is rendered in a popper (i.e. in CollectivePicker) to make sure the select won't overflow the parent */
+  menuPortalTarget: PropTypes.any,
 };
 
 export default withUser(CreateCollectiveMiniForm);

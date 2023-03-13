@@ -107,6 +107,7 @@ class CollectivePicker extends React.PureComponent {
   constructor(props) {
     super(props);
     this.containerRef = React.createRef();
+    this.newCollectiveFormContainerRef = React.createRef();
     this.state = {
       createFormCollectiveType: null,
       displayInviteMenu: null,
@@ -359,11 +360,13 @@ class CollectivePicker extends React.PureComponent {
                   }}
                 >
                   <StyledCard
+                    position="relative"
                     p={3}
                     my={1}
                     boxShadow="-2px 4px 7px 0 rgba(78, 78, 78, 14%)"
                     maxHeight={315}
                     overflowY="auto"
+                    ref={this.newCollectiveFormContainerRef}
                     data-cy="collective-mini-form-scroll"
                     {...this.props.styles?.menu}
                   >
@@ -374,6 +377,7 @@ class CollectivePicker extends React.PureComponent {
                         addLoggedInUserAsAdmin={addLoggedInUserAsAdmin}
                         excludeAdminFields={this.props.excludeAdminFields}
                         optionalFields={this.props.createCollectiveOptionalFields}
+                        menuPortalTarget={this.newCollectiveFormContainerRef?.current}
                         onSuccess={collective => {
                           if (onChange) {
                             onChange({ label: collective.name, value: collective, isNew: true });

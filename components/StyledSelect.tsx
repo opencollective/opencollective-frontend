@@ -184,6 +184,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     styles,
     components,
     isSearchable,
+    menuPosition,
     menuPortalTarget,
     selectTheme,
     noOptionsMessage = () => intl.formatMessage(Messages.noOptions),
@@ -195,8 +196,10 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
 
     return {
       isSearchable,
+      menuPosition: menuPosition || (modalRef?.current ? 'fixed' : 'absolute'),
       menuPortalTarget:
-        menuPortalTarget === null || typeof document === 'undefined' ? undefined : modalRef?.current || document.body,
+        menuPortalTarget ||
+        (menuPortalTarget === null || typeof document === 'undefined' ? undefined : modalRef?.current || document.body),
       isDisabled: disabled || isDisabled,
       placeholder: placeholder || intl.formatMessage(Messages.placeholder),
       loadingMessage: () => intl.formatMessage(Messages.loading),
