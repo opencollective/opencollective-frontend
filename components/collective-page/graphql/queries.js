@@ -175,7 +175,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
         id
         hostedCollectives
       }
-
       ... on Event {
         timezone
         startsAt
@@ -225,6 +224,36 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
   ${fragments.contributeCardTierFieldsFragment}
   ${fragments.contributeCardEventFieldsFragment}
   ${fragments.contributeCardProjectFieldsFragment}
+`;
+/* eslint-enable graphql/template-strings */
+
+// We have to disable the linter because it's not able to detect that `nbContributorsPerContributeCard` is used in fragments
+/* eslint-disable graphql/template-strings */
+export const collectivePageLoggedInUserQuery = gqlV1/* GraphQL */ `
+  query CollectivePageClient($slug: String!) {
+    Collective(slug: $slug, throwIfMissing: false) {
+      id
+      features {
+        id
+        ...NavbarFields
+      }
+      host {
+        id
+        features {
+          id
+          VIRTUAL_CARDS
+        }
+        policies {
+          COLLECTIVE_MINIMUM_ADMINS {
+            freeze
+            numberOfAdmins
+          }
+        }
+      }
+    }
+  }
+
+  ${fragments.collectiveNavbarFieldsFragment}
 `;
 /* eslint-enable graphql/template-strings */
 

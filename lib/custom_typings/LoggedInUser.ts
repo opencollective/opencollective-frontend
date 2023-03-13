@@ -7,6 +7,7 @@ export type LoggedInUser = {
     type: string;
   };
   hasTwoFactorAuth: boolean;
+  isRoot: boolean;
   hasRole: (roles: string[] | string, collective) => boolean;
   hostsUserisAdminOf: () => any[];
   isAdminOfCollective: (collective: any) => boolean;

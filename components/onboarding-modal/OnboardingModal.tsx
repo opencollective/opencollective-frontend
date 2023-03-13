@@ -4,30 +4,24 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
 import { map, omit } from 'lodash';
-import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { Router, withRouter } from 'next/router';
+import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
+import type { LoggedInUser as LoggedInUserType } from '../../lib/custom_typings/LoggedInUser';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
 import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
 import { compose, isValidUrl } from '../../lib/utils';
 
-import Container from '../../components/Container';
-import MessageBox from '../../components/MessageBox';
-import StyledButton from '../../components/StyledButton';
-import StyledModal, {
-  CloseIcon,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-} from '../../components/StyledModal';
-import { H1, P } from '../../components/Text';
-
+import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Image from '../Image';
+import MessageBox from '../MessageBox';
+import StyledButton from '../StyledButton';
+import StyledModal, { CloseIcon, ModalBody, ModalFooter, ModalHeader, ModalOverlay } from '../StyledModal';
+import { H1, P } from '../Text';
 
 import OnboardingContentBox from './OnboardingContentBox';
 import OnboardingNavButtons from './OnboardingNavButtons';
@@ -86,8 +80,8 @@ const ResponsiveModalFooter = styled(ModalFooter)`
 `;
 
 const ResponsiveModalOverlay = styled(ModalOverlay)`
-  ${overlay =>
-    overlay.noOverlay &&
+  ${(props: { noOverlay: boolean }) =>
+    props.noOverlay &&
     css`
       display: none;
     `}
@@ -125,7 +119,39 @@ const params = {
   },
 };
 
-class OnboardingModal extends React.Component {
+type OnboardingModalProps = {
+  step: number;
+  mode: string;
+  showOnboardingModal?: boolean;
+  setShowOnboardingModal?: Function;
+  editCollectiveContact?: Function;
+  editCollectiveMembers?: Function;
+  collective: {
+    id: number;
+    slug: string;
+    socialLinks: Array<SocialLinkType & { __typename: string }>;
+  };
+  data?: any;
+  router?: Router;
+  LoggedInUser: LoggedInUserType | null;
+  intl: IntlShape;
+};
+
+const INITIAL_STATE = {
+  step: 0,
+  members: [],
+  error: null,
+  noOverlay: false,
+  isSubmitting: false,
+};
+
+type OnboardingModalState = typeof INITIAL_STATE;
+
+const messages = defineMessages({
+  websiteError: { id: 'onboarding.error.website', defaultMessage: 'Please enter a valid URL.' },
+});
+
+class OnboardingModal extends React.Component<OnboardingModalProps, OnboardingModalState> {
   static propTypes = {
     step: PropTypes.string,
     mode: PropTypes.string,
@@ -142,17 +168,7 @@ class OnboardingModal extends React.Component {
 
   constructor(props) {
     super(props);
-
-    this.state = {
-      step: 0,
-      members: [],
-      error: null,
-      noOverlay: false,
-    };
-
-    this.messages = defineMessages({
-      websiteError: { id: 'onboarding.error.website', defaultMessage: 'Please enter a valid URL.' },
-    });
+    this.state = INITIAL_STATE;
   }
 
   componentDidMount() {
@@ -245,7 +261,7 @@ class OnboardingModal extends React.Component {
     const isValidSocialLinks = values.socialLinks?.filter(l => !isValidUrl(l.url))?.length === 0;
 
     if (!isValidSocialLinks) {
-      errors.socialLinks = this.props.intl.formatMessage(this.messages.websiteError);
+      errors['sociallinks'] = this.props.intl.formatMessage(messages.websiteError);
     }
 
     return errors;
@@ -445,7 +461,7 @@ const addMemberInvitationQuery = graphql(
     }
   `,
   {
-    options: props => ({
+    options: (props: OnboardingModalProps) => ({
       variables: { slug: props.collective.slug },
       context: API_V2_CONTEXT,
     }),
@@ -458,4 +474,4 @@ const addGraphql = compose(
   addMemberInvitationQuery,
 );
 
-export default injectIntl(addGraphql(withRouter(OnboardingModal)));
+export default injectIntl<'intl', OnboardingModalProps>(addGraphql(withRouter(OnboardingModal)));
