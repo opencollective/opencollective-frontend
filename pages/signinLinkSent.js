@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
-import Container from '../../components/Container';
-import { Box } from '../../components/Grid';
-import { getI18nLink } from '../../components/I18nFormatters';
-import Image from '../../components/Image';
-import OpenEmailProviderButton from '../../components/OpenEmailProviderButton';
-import Page from '../../components/Page';
-import { P } from '../../components/Text';
+import Container from '../components/Container';
+import { Box } from '../components/Grid';
+import { getI18nLink } from '../components/I18nFormatters';
+import Image from '../components/Image';
+import OpenEmailProviderButton from '../components/OpenEmailProviderButton';
+import Page from '../components/Page';
+import { P } from '../components/Text';
 
 class SignInLinkSent extends Component {
   static async getInitialProps({ res, query = {}, router }) {

@@ -350,10 +350,10 @@ exports.REWRITES = [
   //   source: '/:slug',
   //   destination: '/collective-page',
   // },
-  {
-    source: '/:slug/:action(apply)?/:mode(onboarding)?/:step(administrators|contact-info|success)?',
-    destination: '/collective-page',
-  },
+  // {
+  //   source: '/:slug/:action(apply)?/:mode(onboarding)?/:step(administrators|contact-info|success)?',
+  //   destination: '/collective-page',
+  // },
   // Root actions
   {
     source: '/opencollective/root-actions/:section?',
