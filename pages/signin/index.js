@@ -5,18 +5,18 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
-import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
-import { isValidRelativeUrl } from '../lib/utils';
+import { isSuspiciousUserAgent, RobotsDetector } from '../../lib/robots-detector';
+import { isValidRelativeUrl } from '../../lib/utils';
 
-import Body from '../components/Body';
-import { Flex } from '../components/Grid';
-import Header from '../components/Header';
-import Loading from '../components/Loading';
-import LoadingGrid from '../components/LoadingGrid';
-import MessageBox from '../components/MessageBox';
-import SignInOrJoinFree from '../components/SignInOrJoinFree';
-import { P } from '../components/Text';
-import { withUser } from '../components/UserProvider';
+import Body from '../../components/Body';
+import { Flex } from '../../components/Grid';
+import Header from '../../components/Header';
+import Loading from '../../components/Loading';
+import LoadingGrid from '../../components/LoadingGrid';
+import MessageBox from '../../components/MessageBox';
+import SignInOrJoinFree from '../../components/SignInOrJoinFree';
+import { P } from '../../components/Text';
+import { withUser } from '../../components/UserProvider';
 
 class SigninPage extends React.Component {
   static getInitialProps({ query: { token, next, form, email }, req }) {
