@@ -38,6 +38,7 @@ const nextConfig = {
         HCAPTCHA_SITEKEY: false,
         CAPTCHA_ENABLED: false,
         CAPTCHA_PROVIDER: 'HCAPTCHA',
+        SENTRY_TRACES_SAMPLE_RATE: null,
       }),
     );
 
