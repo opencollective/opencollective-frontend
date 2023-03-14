@@ -28,5 +28,5 @@ export default {
     /^chrome-extension:\/\//i,
   ],
 
-  tracesSampleRate: 0.1,
+  tracesSampleRate: process.env.SENTRY_TRACES_SAMPLE_RATE ? parseInt(process.env.SENTRY_TRACES_SAMPLE_RATE, 10) : 0.01,
 };
