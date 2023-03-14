@@ -2,13 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { css } from '@styled-system/css';
-import { concat, groupBy, isEmpty, mapValues, orderBy, uniqBy } from 'lodash';
+import { flatten, groupBy, isEmpty, mapValues, orderBy, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../lib/constants/collectives';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import formatCollectiveType from '../lib/i18n/collective-type';
@@ -63,8 +62,6 @@ const MenuEntry = styled(Link)`
   }
 `;
 
-const memberCollective = member => (member.type === CollectiveType.PROJECT ? member : member.collective);
-
 class ManageContributionsPage extends React.Component {
   static getInitialProps({ query: { slug } }) {
     return { slug };
@@ -101,15 +98,11 @@ class ManageContributionsPage extends React.Component {
   getAdministratedAccounts = memoizeOne(loggedInUser => {
     // Personal profile already includes incognito contributions
     const adminMemberships = loggedInUser?.memberOf?.filter(m => m.role === 'ADMIN' && !m.collective.isIncognito);
-    const uniqMemberships = uniqBy(adminMemberships, 'collective.id');
-    const groupedMemberships = groupBy(uniqMemberships, 'collective.type');
-    const projectMemberships = concat(...uniqMemberships.map(m => m.collective.children)).filter(
-      m => m.type === CollectiveType.PROJECT,
-    );
-    if (projectMemberships.length > 0) {
-      groupedMemberships[CollectiveType.PROJECT] = projectMemberships;
-    }
-    return mapValues(groupedMemberships, memberships => orderBy(memberships, 'collective.name'));
+    const adminAccounts = adminMemberships?.map(m => m.collective) || [];
+    const childrenAdminAccounts = flatten(adminAccounts.map(c => c.children));
+    const uniqAccounts = uniqBy([...adminAccounts, ...childrenAdminAccounts], 'id');
+    const groupedAccounts = groupBy(uniqAccounts, 'type');
+    return mapValues(groupedAccounts, accounts => orderBy(accounts, 'name'));
   });
 
   render() {
@@ -176,13 +169,13 @@ class ManageContributionsPage extends React.Component {
                         {members.map(m => (
                           <MenuEntry
                             key={m.id}
-                            href={`/${memberCollective(m).slug}/manage-contributions`}
-                            title={memberCollective(m).name}
-                            $isActive={slug === memberCollective(m).slug}
+                            href={`/${m.slug}/manage-contributions`}
+                            title={m.name}
+                            $isActive={slug === m.slug}
                           >
-                            <Avatar collective={memberCollective(m)} size={32} />
+                            <Avatar collective={m} size={32} />
                             <Span ml={3} truncateOverflow>
-                              {memberCollective(m).name}
+                              {m.name}
                             </Span>
                           </MenuEntry>
                         ))}
