@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-//import { useLazyQuery } from '@apollo/client';
+// import { useLazyQuery } from '@apollo/client';
 import { isUndefined, omitBy } from 'lodash';
-//import { GetServerSideProps } from 'next';
+// import { GetServerSideProps } from 'next';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { createGlobalStyle } from 'styled-components';
@@ -43,11 +43,11 @@ const GuestUserProfile = dynamic(
   { loading: Loading },
 );
 
-/** Load the onboarding modal dynamically since it's not used often */
-const OnboardingModal = dynamic(
-  () => import(/* webpackChunkName: 'OnboardingModal' */ '../../components/onboarding-modal/OnboardingModal'),
-  { loading: Loading },
-);
+// /** Load the onboarding modal dynamically since it's not used often */
+// const OnboardingModal = dynamic(
+//   () => import(/* webpackChunkName: 'OnboardingModal' */ '../../components/onboarding-modal/OnboardingModal'),
+//   { loading: Loading },
+// );
 
 const GlobalStyles = createGlobalStyle`
   section {
@@ -147,7 +147,7 @@ const CollectivePage = props => {
     addParentToURLIfMissing(router, collective);
   }, [collective]);
 
-  //if (!query.loading) {
+  // if (!query.loading) {
   if (!data || data.error) {
     return <ErrorPage data={data} />;
   } else if (!data.Collective) {
@@ -159,7 +159,7 @@ const CollectivePage = props => {
   } else if (data.Collective.isGuest) {
     return <GuestUserProfile account={data.Collective} />;
   }
-  //}
+  // }
 
   // Don't allow /collective/apply
   if (props.action === 'apply' && !collective?.isHost) {
