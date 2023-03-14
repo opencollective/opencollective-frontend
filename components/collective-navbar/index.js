@@ -449,12 +449,12 @@ const CollectiveNavbar = ({
   const { data, dataLoading } = useQuery(accountPermissionsQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: collective?.slug },
-    skip: !collective?.slug,
+    skip: !collective?.slug || !LoggedInUser,
   });
 
   const loading = isLoading || dataLoading;
 
-  const isAllowedAddFunds = data?.account?.permissions?.addFunds?.allowed;
+  const isAllowedAddFunds = Boolean(data?.account?.permissions?.addFunds?.allowed);
   const sections = React.useMemo(() => {
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);

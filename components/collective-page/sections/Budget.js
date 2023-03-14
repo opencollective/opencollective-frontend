@@ -143,6 +143,7 @@ export const budgetSectionForIndividualQuery = gql`
   ${expenseHostFields}
 `;
 
+// /!\ Any change here should be reflected in API's `server/graphql/cache.js`
 export const budgetSectionWithHostQuery = gql`
   query BudgetSectionWithHost($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
     transactions(
