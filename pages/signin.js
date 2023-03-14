@@ -91,7 +91,7 @@ class SigninPage extends React.Component {
 
   async initialize() {
     const token = this.props.token || this.props.router.query.token;
-
+    console.log({ token, props: this.props });
     if (token) {
       let user;
       try {
