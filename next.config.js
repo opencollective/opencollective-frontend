@@ -6,11 +6,11 @@ const { withSentryConfig } = require('@sentry/nextjs');
 
 const path = require('path');
 require('./env');
-const { REWRITES } = require('./rewrites');
+// const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
-  useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true' || process.env.API_PROXY !== 'true',
+  useFileSystemPublicRoutes: true, // || process.env.IS_VERCEL === 'true' || process.env.API_PROXY !== 'true',
   productionBrowserSourceMaps: true,
   images: {
     disableStaticImages: true,
@@ -124,9 +124,9 @@ const nextConfig = {
 
     return config;
   },
-  async rewrites() {
-    return REWRITES;
-  },
+  // async rewrites() {
+  //   return REWRITES;
+  // },
   async headers() {
     return process.env.IS_VERCEL === 'true'
       ? [
