@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 //import { useLazyQuery } from '@apollo/client';
 import { isUndefined, omitBy } from 'lodash';
 //import { GetServerSideProps } from 'next';
@@ -134,7 +135,7 @@ const CollectivePage = props => {
   //   });
   const data = props.data; // query.data || props.data;
   const collective = data?.Collective;
-  const [showOnboardingModal, setShowOnboardingModal] = React.useState(false);
+  //  const [showOnboardingModal, setShowOnboardingModal] = React.useState(false);
 
   //   React.useEffect(() => {
   //     if (LoggedInUser) {
@@ -212,7 +213,7 @@ const CollectivePage = props => {
               />
             )}
           </CollectiveThemeProvider>
-          {props.mode === 'onboarding' && LoggedInUser?.isAdminOfCollective(collective) && (
+          {/* {props.mode === 'onboarding' && LoggedInUser?.isAdminOfCollective(collective) && (
             <OnboardingModal
               showOnboardingModal={showOnboardingModal}
               setShowOnboardingModal={setShowOnboardingModal}
@@ -221,11 +222,53 @@ const CollectivePage = props => {
               collective={collective}
               LoggedInUser={LoggedInUser}
             />
-          )}
+          )} */}
         </React.Fragment>
       )}
     </Page>
   );
+};
+
+CollectivePage.propTypes = {
+  slug: PropTypes.string.isRequired, // from getInitialProps
+  /** A special status to show the notification bar (collective created, archived...etc) */
+  status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived', 'fundCreated', 'projectCreated', 'eventCreated']),
+  step: PropTypes.string,
+  mode: PropTypes.string,
+  action: PropTypes.string,
+  LoggedInUser: PropTypes.object, // from withUser
+  router: PropTypes.object,
+  data: PropTypes.shape({
+    loading: PropTypes.bool,
+    error: PropTypes.any,
+    account: PropTypes.object,
+    Collective: PropTypes.shape({
+      name: PropTypes.string,
+      type: PropTypes.string.isRequired,
+      description: PropTypes.string,
+      twitterHandle: PropTypes.string,
+      image: PropTypes.string,
+      isApproved: PropTypes.bool,
+      isArchived: PropTypes.bool,
+      isHost: PropTypes.bool,
+      isActive: PropTypes.bool,
+      isPledged: PropTypes.bool,
+      isIncognito: PropTypes.bool,
+      isGuest: PropTypes.bool,
+      parentCollective: PropTypes.shape({ slug: PropTypes.string, image: PropTypes.string }),
+      host: PropTypes.object,
+      stats: PropTypes.object,
+      coreContributors: PropTypes.arrayOf(PropTypes.object),
+      financialContributors: PropTypes.arrayOf(PropTypes.object),
+      tiers: PropTypes.arrayOf(PropTypes.object),
+      events: PropTypes.arrayOf(PropTypes.object),
+      connectedCollectives: PropTypes.arrayOf(PropTypes.object),
+      transactions: PropTypes.arrayOf(PropTypes.object),
+      expenses: PropTypes.arrayOf(PropTypes.object),
+      updates: PropTypes.arrayOf(PropTypes.object),
+    }),
+    refetch: PropTypes.func,
+  }).isRequired, // from withData
 };
 
 export default CollectivePage;

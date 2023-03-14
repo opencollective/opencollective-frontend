@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/client';
 import { isUndefined, omitBy } from 'lodash';
 import { GetServerSideProps } from 'next';
@@ -61,6 +62,43 @@ type CollectivePageQuery = {
   mode: string;
   action: string;
 };
+
+// export async function getStaticPaths() {
+//   return {
+//     paths: [{ params: { slug: 'opensourced' } }],
+//     fallback: true,
+//   };
+// }
+
+// export async function getStaticProps(context) {
+//   //  const { slug, status, step, mode, action } = context.query as CollectivePageQuery;
+//   const { slug } = context.params;
+//   const client = initClient();
+//   console.log('params:');
+//   console.log(context.params);
+
+//   const { data, error } = await client.query({
+//     query: collectivePageQuery,
+//     variables: { slug: context.query.slug, nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD },
+//     // fetchPolicy: 'network-only',
+//   });
+
+//   return {
+//     props: omitBy(
+//       {
+//         status,
+//         step,
+//         mode,
+//         skipDataFromTree: false,
+//         action,
+//         slug,
+//         data,
+//         error: error || null,
+//       },
+//       isUndefined,
+//     ),
+//   };
+// }
 
 export const getServerSideProps: GetServerSideProps = async context => {
   const { slug, status, step, mode, action } = context.query as CollectivePageQuery;
@@ -175,7 +213,7 @@ const CollectivePage = props => {
               />
             )}
           </CollectiveThemeProvider>
-          {props.mode === 'onboarding' && LoggedInUser?.isAdminOfCollective(collective) && (
+          {/* {props.mode === 'onboarding' && LoggedInUser?.isAdminOfCollective(collective) && (
             <OnboardingModal
               showOnboardingModal={showOnboardingModal}
               setShowOnboardingModal={setShowOnboardingModal}
@@ -184,11 +222,53 @@ const CollectivePage = props => {
               collective={collective}
               LoggedInUser={LoggedInUser}
             />
-          )}
+          )} */}
         </React.Fragment>
       )}
     </Page>
   );
+};
+
+CollectivePage.propTypes = {
+  slug: PropTypes.string.isRequired, // from getInitialProps
+  /** A special status to show the notification bar (collective created, archived...etc) */
+  status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived', 'fundCreated', 'projectCreated', 'eventCreated']),
+  step: PropTypes.string,
+  mode: PropTypes.string,
+  action: PropTypes.string,
+  LoggedInUser: PropTypes.object, // from withUser
+  router: PropTypes.object,
+  data: PropTypes.shape({
+    loading: PropTypes.bool,
+    error: PropTypes.any,
+    account: PropTypes.object,
+    Collective: PropTypes.shape({
+      name: PropTypes.string,
+      type: PropTypes.string.isRequired,
+      description: PropTypes.string,
+      twitterHandle: PropTypes.string,
+      image: PropTypes.string,
+      isApproved: PropTypes.bool,
+      isArchived: PropTypes.bool,
+      isHost: PropTypes.bool,
+      isActive: PropTypes.bool,
+      isPledged: PropTypes.bool,
+      isIncognito: PropTypes.bool,
+      isGuest: PropTypes.bool,
+      parentCollective: PropTypes.shape({ slug: PropTypes.string, image: PropTypes.string }),
+      host: PropTypes.object,
+      stats: PropTypes.object,
+      coreContributors: PropTypes.arrayOf(PropTypes.object),
+      financialContributors: PropTypes.arrayOf(PropTypes.object),
+      tiers: PropTypes.arrayOf(PropTypes.object),
+      events: PropTypes.arrayOf(PropTypes.object),
+      connectedCollectives: PropTypes.arrayOf(PropTypes.object),
+      transactions: PropTypes.arrayOf(PropTypes.object),
+      expenses: PropTypes.arrayOf(PropTypes.object),
+      updates: PropTypes.arrayOf(PropTypes.object),
+    }),
+    refetch: PropTypes.func,
+  }).isRequired, // from withData
 };
 
 export default CollectivePage;
