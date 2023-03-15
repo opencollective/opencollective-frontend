@@ -12,8 +12,6 @@ Open Collective is a financial and legal toolbox for grassroots groups. We suppo
 
 ## [Open Collective Foundation](https://opencollective.foundation/): Finance Admin
 
-<img width="663" alt="" src="https://user-images.githubusercontent.com/79115149/223950611-3c6bd34a-45b2-49bd-a032-d28a7598b672.png">
-
 $60k/year for 40 hrs/wk (or 30 hrs/wk pro rata). Must live in the US. Applications open until March 24th.
 
 [Open Collective Foundation (OCF)](http://opencollective.foundation/) is a nonprofit fiscal sponsor with an open source tech platform, that is enabling 500+ groups to access 501(c)(3) status and fundraise in full transparency. [Our Collectives](https://opencollective.com/foundation#category-CONTRIBUTIONS) include mutual aid groups, public interest open source tech, social justice movements, humanitarian aid, climate action, and many kinds of communities with missions focused on education, civic engagement, and positive social impact. [Solidarity is our guiding principle](https://blog.opencollective.com/solidarity-as-our-guiding-principle/). Our Collectives raised over $30m in 2022, representing 100x growth since 2019. We are scaling our team to meet increasing demand.
