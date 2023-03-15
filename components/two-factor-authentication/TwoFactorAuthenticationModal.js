@@ -28,6 +28,10 @@ export default function TwoFactorAuthenticationModal() {
   const has2FAConfigured = prompt.supportedMethods.length > 0;
   const cancellable = !prompt.supportedMethods.includes('recovery_code');
 
+  React.useEffect(() => {
+    setIsUsingRecoveryCode(false);
+  }, [hasRecoveryCodeOption]);
+
   const cancel = React.useCallback(() => {
     if (!cancellable) {
       return;
