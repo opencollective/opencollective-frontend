@@ -26,12 +26,16 @@ export default function TwoFactorAuthenticationModal() {
   const hasYubikeyOTP = prompt.supportedMethods.includes('yubikey_otp');
   const hasRecoveryCodeOption = prompt.supportedMethods.includes('recovery_code');
   const has2FAConfigured = prompt.supportedMethods.length > 0;
+  const cancellable = !prompt.supportedMethods.includes('recovery_code');
 
   const cancel = React.useCallback(() => {
+    if (!cancellable) {
+      return;
+    }
     setTwoFactorCode('');
     setConfirming(false);
     prompt.rejectAuth(createError(ERROR.TWO_FACTOR_AUTH_CANCELED));
-  }, []);
+  }, [cancellable]);
 
   const confirm = React.useCallback(() => {
     const code = twoFactorCode;
@@ -195,9 +199,11 @@ export default function TwoFactorAuthenticationModal() {
         )}
         <ModalFooter isFullWidth dividerMargin="1rem 0">
           <Flex justifyContent="right" flexWrap="wrap">
-            <StyledButton disabled={confirming} mr={2} minWidth={120} onClick={cancel}>
-              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-            </StyledButton>
+            {cancellable && (
+              <StyledButton disabled={confirming} mr={2} minWidth={120} onClick={cancel}>
+                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+              </StyledButton>
+            )}
             <StyledButton
               ml={2}
               minWidth={120}
