@@ -8,7 +8,7 @@ import { injectIntl } from 'react-intl';
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
-import { withTwoFactorAuthentication } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+import { withTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 
 import { TOAST_TYPE, withToasts } from './ToastProvider';
 
@@ -25,7 +25,7 @@ class UserProvider extends React.Component {
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired,
     addToast: PropTypes.func,
-    twoFactorAuthContext: PropTypes.object,
+    twoFactorAuthPrompt: PropTypes.object,
     router: PropTypes.object,
     token: PropTypes.string,
     client: PropTypes.object,
@@ -83,7 +83,7 @@ class UserProvider extends React.Component {
   };
 
   login = async (token, options = {}) => {
-    const { getLoggedInUser, twoFactorAuthContext } = this.props;
+    const { getLoggedInUser, twoFactorAuthPrompt } = this.props;
     const { twoFactorAuthenticatorCode, recoveryCode } = options;
     try {
       const LoggedInUser = token
@@ -107,7 +107,7 @@ class UserProvider extends React.Component {
         // eslint-disable-next-line no-constant-condition
         while (true) {
           try {
-            const result = await twoFactorAuthContext.prompt.open({
+            const result = await twoFactorAuthPrompt.open({
               supportedMethods: ['totp', 'recovery_code'],
             });
             const LoggedInUser = await getLoggedInUser({
@@ -194,7 +194,7 @@ const withUser = WrappedComponent => {
 };
 
 export default withToasts(
-  injectIntl(withApollo(withLoggedInUser(withTwoFactorAuthentication(withRouter(UserProvider))))),
+  injectIntl(withApollo(withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(UserProvider))))),
 );
 
 export { UserConsumer, withUser };
