@@ -22,15 +22,18 @@ export default function TwoFactorAuthenticationModal() {
   const [isUsingRecoveryCode, setIsUsingRecoveryCode] = React.useState(false);
 
   const prompt = useTwoFactorAuthenticationPrompt();
-  const isOpen = prompt.isOpen;
-  const hasYubikeyOTP = prompt.supportedMethods.includes('yubikey_otp');
-  const hasRecoveryCodeOption = prompt.supportedMethods.includes('recovery_code');
-  const has2FAConfigured = prompt.supportedMethods.length > 0;
-  const cancellable = !prompt.supportedMethods.includes('recovery_code');
+  const isOpen = prompt?.isOpen ?? false;
+  const supportedMethods = prompt?.supportedMethods ?? [];
+  const hasYubikeyOTP = supportedMethods.includes('yubikey_otp');
+  const hasRecoveryCodeOption = supportedMethods.includes('recovery_code');
+  const has2FAConfigured = supportedMethods.length > 0;
+  const cancellable = !supportedMethods.includes('recovery_code');
 
   React.useEffect(() => {
-    setIsUsingRecoveryCode(false);
-  }, [hasRecoveryCodeOption]);
+    if (isUsingRecoveryCode) {
+      setIsUsingRecoveryCode(false);
+    }
+  }, [isUsingRecoveryCode, hasRecoveryCodeOption]);
 
   const cancel = React.useCallback(() => {
     if (!cancellable) {
