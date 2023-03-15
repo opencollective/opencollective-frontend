@@ -2,11 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import { isEqual } from 'lodash';
-import Router from 'next/router';
+import Router, { withRouter } from 'next/router';
+import { injectIntl } from 'react-intl';
 
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
-import { LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
+import { withTwoFactorAuthentication } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+
+import { TOAST_TYPE, withToasts } from './ToastProvider';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,
@@ -20,6 +24,9 @@ export const UserContext = React.createContext({
 class UserProvider extends React.Component {
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired,
+    addToast: PropTypes.func,
+    twoFactorAuthContext: PropTypes.object,
+    router: PropTypes.object,
     token: PropTypes.string,
     client: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
@@ -35,7 +42,6 @@ class UserProvider extends React.Component {
     loadingLoggedInUser: true,
     LoggedInUser: null,
     errorLoggedInUser: null,
-    enforceTwoFactorAuthForLoggedInUser: null,
   };
 
   async componentDidMount() {
@@ -77,7 +83,7 @@ class UserProvider extends React.Component {
   };
 
   login = async (token, options = {}) => {
-    const { getLoggedInUser } = this.props;
+    const { getLoggedInUser, twoFactorAuthContext } = this.props;
     const { twoFactorAuthenticatorCode, recoveryCode } = options;
     try {
       const LoggedInUser = token
@@ -87,7 +93,6 @@ class UserProvider extends React.Component {
         loadingLoggedInUser: false,
         errorLoggedInUser: null,
         LoggedInUser,
-        enforceTwoFactorAuthForLoggedInUser: false,
       });
       return LoggedInUser;
     } catch (error) {
@@ -99,17 +104,47 @@ class UserProvider extends React.Component {
       // Store the error
       this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
       if (error.message.includes('Two-factor authentication is enabled')) {
-        this.setState({ enforceTwoFactorAuthForLoggedInUser: true });
-        throw new Error(error.message);
-      }
-      if (error.type === 'too_many_requests') {
-        this.setState({ enforceTwoFactorAuthForLoggedInUser: false });
-        throw new Error(error.message);
-      }
-      // We don't want to catch "Two-factor authentication code failed. Please try again" here
-      if (error.type === 'unauthorized' && error.message.includes('Cannot use this token')) {
-        this.setState({ enforceTwoFactorAuthForLoggedInUser: false });
-        throw new Error(error.message);
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          try {
+            const result = await twoFactorAuthContext.prompt.open({
+              supportedMethods: ['totp', 'recovery_code'],
+            });
+            const LoggedInUser = await getLoggedInUser({
+              token: getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN),
+              twoFactorAuthenticatorCode: result.type !== 'recovery_code' ? result.code : undefined,
+              recoveryCode: result.type === 'recovery_code' ? result.code : undefined,
+            });
+            if (result.type === 'recovery_code') {
+              this.props.router.replace({
+                pathname: '/[slug]/admin/user-security',
+                query: { slug: LoggedInUser.collective.slug },
+              });
+            } else {
+              this.setState({
+                loadingLoggedInUser: false,
+                errorLoggedInUser: null,
+                LoggedInUser,
+              });
+            }
+
+            return LoggedInUser;
+          } catch (e) {
+            this.setState({ loadingLoggedInUser: false, errorLoggedInUser: e.message });
+            this.props.addToast({
+              type: TOAST_TYPE.ERROR,
+              message: e.message,
+            });
+
+            // stop trying to get the code.
+            if (
+              e.type === 'too_many_requests' ||
+              (e.type === 'unauthorized' && e.message.includes('Cannot use this token'))
+            ) {
+              throw new Error(e.message);
+            }
+          }
+        }
       }
     }
   };
@@ -158,6 +193,8 @@ const withUser = WrappedComponent => {
   return WithUser;
 };
 
-export default withApollo(withLoggedInUser(UserProvider));
+export default withToasts(
+  injectIntl(withApollo(withLoggedInUser(withTwoFactorAuthentication(withRouter(UserProvider))))),
+);
 
 export { UserConsumer, withUser };
