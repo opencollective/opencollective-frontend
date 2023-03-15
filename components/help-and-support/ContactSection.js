@@ -71,7 +71,7 @@ const ContactForm = () => {
       }
 
       if (shouldDisplayCatcha && !captcha) {
-        errors.message = createError(ERROR.FORM_FIELD_REQUIRED);
+        errors.captcha = createError(ERROR.FORM_FIELD_REQUIRED);
       }
 
       return errors;
