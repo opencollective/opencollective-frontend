@@ -291,7 +291,7 @@ const ContactForm = () => {
             </Box>
             {shouldDisplayCatcha && (
               <Box mb="28px">
-                <Captcha ref={captchaRef} onVerify={result => setFieldValue('captcha', result)} />
+                <Captcha onVerify={result => setFieldValue('captcha', result)} />
               </Box>
             )}
 
