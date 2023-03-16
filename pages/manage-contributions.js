@@ -158,7 +158,7 @@ class ManageContributionsPage extends React.Component {
                         <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" />
                       </Span>
                     </MenuEntry>
-                    {Object.entries(groupedAdminOf).map(([collectiveType, members]) => (
+                    {Object.entries(groupedAdminOf).map(([collectiveType, accounts]) => (
                       <div key={collectiveType}>
                         <Flex alignItems="center" px={2} mt={3} mb={2}>
                           <Span fontWeight="bold" color="black.700" fontSize="14px">
@@ -166,16 +166,16 @@ class ManageContributionsPage extends React.Component {
                           </Span>
                           <StyledHr ml={2} width="100%" borderColor="black.300" />
                         </Flex>
-                        {members.map(m => (
+                        {accounts.map(account => (
                           <MenuEntry
-                            key={m.id}
-                            href={`/${m.slug}/manage-contributions`}
-                            title={m.name}
-                            $isActive={slug === m.slug}
+                            key={account.id}
+                            href={`/${account.slug}/manage-contributions`}
+                            title={account.name}
+                            $isActive={slug === account.slug}
                           >
-                            <Avatar collective={m} size={32} />
+                            <Avatar collective={account} size={32} />
                             <Span ml={3} truncateOverflow>
-                              {m.name}
+                              {account.name}
                             </Span>
                           </MenuEntry>
                         ))}
