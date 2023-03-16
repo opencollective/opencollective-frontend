@@ -9,10 +9,12 @@ import styled from 'styled-components';
 
 import { suggestSlug } from '../../lib/collective.lib';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
+import withData from '../../lib/withData';
 
 import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';
+import CollectiveTagsInput from '../CollectiveTagsInput';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -24,7 +26,6 @@ import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
-import StyledInputTags from '../StyledInputTags';
 import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { H1, P } from '../Text';
@@ -83,8 +84,8 @@ class CreateCollectiveForm extends React.Component {
     intl: PropTypes.object.isRequired,
     onChange: PropTypes.func,
     router: PropTypes.object.isRequired,
-    popularTags: PropTypes.arrayOf(PropTypes.string),
     loggedInUser: PropTypes.object,
+    popularTags: PropTypes.arrayOf(PropTypes.string),
   };
 
   hasHostTerms() {
@@ -363,20 +364,24 @@ class CreateCollectiveForm extends React.Component {
                         data-cy="ccf-form-tags"
                       >
                         {({ field }) => (
-                          <StyledInputTags
+                          <CollectiveTagsInput
                             {...field}
-                            suggestedTags={popularTags}
                             onChange={tags => {
                               formik.setFieldValue(
                                 'tags',
                                 tags.map(t => t.value.toLowerCase()),
                               );
                             }}
-                            value={values.tags}
+                            suggestedTags={popularTags}
                           />
                         )}
                       </StyledInputFormikField>
-
+                      <MessageBox type="info" mt={3}>
+                        <FormattedMessage
+                          id="collective.tags.info"
+                          defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world."
+                        />
+                      </MessageBox>
                       {host && (
                         <StyledInputFormikField
                           name="message"
@@ -414,7 +419,7 @@ class CreateCollectiveForm extends React.Component {
                                   defaultMessage="I agree with the {toslink} of Open Collective."
                                   values={{
                                     toslink: (
-                                      <StyledLink href="/tos" openInNewTab>
+                                      <StyledLink href="/tos" openInNewTab onClick={e => e.stopPropagation()}>
                                         <FormattedMessage id="tos" defaultMessage="terms of service" />
                                       </StyledLink>
                                     ),
@@ -483,4 +488,4 @@ class CreateCollectiveForm extends React.Component {
   }
 }
 
-export default injectIntl(withRouter(CreateCollectiveForm));
+export default injectIntl(withData(withRouter(CreateCollectiveForm)));

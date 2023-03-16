@@ -9,7 +9,7 @@ const notFoundURL = `/${notFoundSlug}`;
 // });
 
 describe('the NotFound page when logged out', () => {
-  before(() => {
+  beforeEach(() => {
     cy.visit(notFoundURL, { failOnStatusCode: false });
   });
 

@@ -136,14 +136,7 @@ describe('passwords', () => {
     cy.get('input#new-password:visible').type('{selectall}{backspace}strongNewP@ssword<>?');
     cy.contains('[data-cy="resetPassword-form"] button', 'Continue').click();
     cy.contains('[data-cy="reset-password-success-page"]', 'Your password was updated.');
-    cy.contains('[data-cy="reset-password-success-page"]', 'You can now Sign In with it.');
 
-    // Sign-in with new password
-    cy.contains('[data-cy="reset-password-success-page"] a', 'Sign In').click();
-    cy.get('input[name="email"]').type(user.email);
-    cy.getByDataCy('signin-btn').click();
-    cy.get('input[name="password"]:visible').type('strongNewP@ssword<>?');
-    cy.getByDataCy('signin-btn').click();
     cy.assertLoggedIn(user);
   });
 

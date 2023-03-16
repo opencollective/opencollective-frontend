@@ -82,6 +82,10 @@ export const budgetSectionQuery = gql`
       nodes {
         id
         ...ExpensesListFieldsFragment
+        host {
+          id
+          ...ExpenseHostFields
+        }
       }
     }
     account(slug: $slug) {
@@ -91,6 +95,7 @@ export const budgetSectionQuery = gql`
   }
   ${transactionsQueryCollectionFragment}
   ${expensesListFieldsFragment}
+  ${expenseHostFields}
   ${budgetSectionAccountFieldsFragment}
 `;
 
@@ -110,6 +115,10 @@ export const budgetSectionForIndividualQuery = gql`
       nodes {
         id
         ...ExpensesListFieldsFragment
+        host {
+          id
+          ...ExpenseHostFields
+        }
       }
     }
     account(slug: $slug) {
@@ -131,14 +140,12 @@ export const budgetSectionForIndividualQuery = gql`
   }
   ${transactionsQueryCollectionFragment}
   ${expensesListFieldsFragment}
+  ${expenseHostFields}
 `;
 
+// /!\ Any change here should be reflected in API's `server/graphql/cache.js`
 export const budgetSectionWithHostQuery = gql`
-  query BudgetSectionWithHost($slug: String!, $hostSlug: String!, $limit: Int!, $kind: [TransactionKind]) {
-    host(slug: $hostSlug) {
-      id
-      ...ExpenseHostFields
-    }
+  query BudgetSectionWithHost($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
     transactions(
       account: { slug: $slug }
       limit: $limit
@@ -159,6 +166,12 @@ export const budgetSectionWithHostQuery = gql`
     account(slug: $slug) {
       id
       ...BudgetSectionAccountFields
+      ... on AccountWithHost {
+        host {
+          id
+          ...ExpenseHostFields
+        }
+      }
     }
   }
   ${transactionsQueryCollectionFragment}
@@ -359,7 +372,12 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
                   >
                     {item.__typename === 'Expense' ? (
                       <DebitItem>
-                        <ExpenseBudgetItem expense={item} host={data?.host} showAmountSign showProcessActions />
+                        <ExpenseBudgetItem
+                          expense={item}
+                          host={item.host || data.account.host}
+                          showAmountSign
+                          showProcessActions
+                        />
                       </DebitItem>
                     ) : (
                       <TransactionItem

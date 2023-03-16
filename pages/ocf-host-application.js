@@ -4,7 +4,7 @@ import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
-import { CollectiveType } from '../lib/constants/collectives';
+import { CollectiveType, IGNORED_TAGS } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
@@ -46,6 +46,12 @@ const ocfHostApplicationPageQuery = gql`
         }
       }
     }
+    tagStats(host: { slug: "foundation" }, limit: 6) {
+      nodes {
+        id
+        tag
+      }
+    }
   }
 `;
 
@@ -73,6 +79,7 @@ const formValues = {
     name: '',
     slug: '',
     description: '',
+    tags: [],
   },
   applicationData: {
     location: '',
@@ -116,9 +123,10 @@ const OCFHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
   const collective = data?.account;
   const canApplyWithCollective = collective && collective.isAdmin && collective.type === CollectiveType.COLLECTIVE;
   const hasHost = collective && collective?.host?.id;
+  const popularTags = hostData?.tagStats.nodes.map(({ tag }) => tag).filter(tag => !IGNORED_TAGS.includes(tag));
 
   React.useEffect(() => {
-    if (collectiveSlug && collective && (!canApplyWithCollective || hasHost)) {
+    if (step === 'form' && collectiveSlug && collective && (!canApplyWithCollective || hasHost)) {
       addToast({
         type: TOAST_TYPE.ERROR,
         title: intl.formatMessage(messages['error.title']),
@@ -152,6 +160,7 @@ const OCFHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
           host={hostData?.account}
           loadingCollective={loadingCollective}
           canApplyWithCollective={canApplyWithCollective && !hasHost}
+          popularTags={popularTags}
         />
       )}
       {step === 'success' && <YourInitiativeIsNearlyThere />}

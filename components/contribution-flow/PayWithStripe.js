@@ -2,17 +2,30 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { Question } from '@styled-icons/octicons/Question';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 import { PAYMENT_METHOD_SERVICE, PAYMENT_METHOD_TYPE } from '../../lib/constants/payment-methods';
 
-import { Flex } from '../Grid';
+import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledTooltip from '../StyledTooltip';
-import { Span } from '../Text';
+import { P, Span } from '../Text';
 
 import { STRIPE_PAYMENT_ELEMENT_KEY } from './utils';
+
+const StripePaymentMethodTypesWithMandate = ['bancontact'];
+
+const StripeSEPAMandateMessage = defineMessage({
+  id: 'Stripe.SEPA.Mandate',
+  defaultMessage:
+    'By providing your payment information and confirming this payment, you authorise (A) OPENCOLLECTIVE INC and Stripe, our payment service provider and/or PPRO, its local service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions. As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights are explained in a statement that you can obtain from your bank. You agree to receive notifications for future debits up to 2 days before they occur.',
+});
+
+function StripeMandate() {
+  const intl = useIntl();
+  return <P>{intl.formatMessage(StripeSEPAMandateMessage)}</P>;
+}
 
 export function PayWithStripeForm({
   defaultIsSaved,
@@ -21,7 +34,11 @@ export function PayWithStripeForm({
   paymentIntentId,
   paymentIntentClientSecret,
   onChange,
+  stepDetails,
 }) {
+  const [isSavedForLater, setIsSavedForLater] = React.useState(defaultIsSaved);
+  const [stripePaymentMethodType, setStripePaymentMethodType] = React.useState();
+
   const elements = useElements();
   const stripe = useStripe();
 
@@ -44,6 +61,7 @@ export function PayWithStripeForm({
           },
         },
       });
+      setStripePaymentMethodType(event?.value?.type);
     },
     [onChange],
   );
@@ -58,6 +76,8 @@ export function PayWithStripeForm({
         },
       },
     }));
+
+    setIsSavedForLater(checked);
   });
 
   return (
@@ -74,6 +94,13 @@ export function PayWithStripeForm({
         }}
         onChange={onElementChange}
       />
+
+      {(stepDetails.interval || isSavedForLater) &&
+        StripePaymentMethodTypesWithMandate.includes(stripePaymentMethodType) && (
+          <Box mt={3} color="black.600" fontWeight="normal">
+            <StripeMandate />
+          </Box>
+        )}
       {hasSaveCheckBox && (
         <Flex mt={3} alignItems="center" color="black.700">
           <StyledCheckbox
@@ -117,4 +144,7 @@ PayWithStripeForm.propTypes = {
   }),
   defaultIsSaved: PropTypes.bool,
   hasSaveCheckBox: PropTypes.bool,
+  stepDetails: PropTypes.shape({
+    interval: PropTypes.string,
+  }),
 };
