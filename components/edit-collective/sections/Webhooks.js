@@ -96,7 +96,12 @@ class Webhooks extends React.Component {
     }
 
     if ([CollectiveType.USER, CollectiveType.ORGANIZATION].includes(collectiveType) && !isHost) {
-      removeList.push('collective.update.created', 'collective.update.published', 'collective.expense.created', 'collective.transaction.created');
+      removeList.push(
+        'collective.update.created',
+        'collective.update.published',
+        'collective.expense.created',
+        'collective.transaction.created',
+      );
     }
 
     return difference(WebhookEventsList, removeList);
