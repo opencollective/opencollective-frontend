@@ -27,6 +27,7 @@ const ExpenseStatusTag = styled(StyledTag)`
   line-height: 16px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  cursor: ${props => (props?.hideProcessExpenseButtons ? 'auto' : 'pointer')};
 `;
 
 const PopupContainer = styled(`div`)`
@@ -81,11 +82,12 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
   const [showPopup, setShowPopup] = React.useState(false);
   const [isClosable, setClosable] = React.useState(true);
   const [showMarkAsIncompleteModal, setMarkAsIncompleteModal] = React.useState(false);
-  const hideProcessExpenseButtons = expense?.status === expenseStatus.APPROVED;
+  const hideProcessExpenseButtons =
+    expense?.status === expenseStatus.APPROVED && !expense?.permissions?.canMarkAsIncomplete;
   const buttonProps = { px: 2, py: 2, isBorderless: true, width: '100%', textAlign: 'left' };
 
   const onClick = () => {
-    if (hideProcessExpenseButtons && !expense?.permissions?.canMarkAsIncomplete) {
+    if (hideProcessExpenseButtons) {
       return;
     }
     setShowPopup(true);
@@ -118,10 +120,11 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
                 type={getExpenseStatusMsgType(expense.status)}
                 data-cy="admin-expense-status-msg"
                 {...props}
+                hideProcessExpenseButtons={hideProcessExpenseButtons}
               >
                 <Flex>
                   {i18nExpenseStatus(intl, expense.status)}
-                  {(!hideProcessExpenseButtons || expense?.permissions?.canMarkAsIncomplete) && <ChevronDownIcon />}
+                  {!hideProcessExpenseButtons && <ChevronDownIcon />}
                 </Flex>
               </ExpenseStatusTag>
             </Box>
