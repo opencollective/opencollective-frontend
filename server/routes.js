@@ -55,33 +55,40 @@ module.exports = (expressApp, nextApp) => {
     return res.sendFile(path.join(__dirname, '../public/static/images/favicon.ico.png'));
   });
 
-  // NOTE: in production and staging environment, this is currently not used
-  // we use Cloudflare workers to route the request directly to the API
-  if (process.env.API_PROXY === 'true') {
-    app.use(
-      '/api',
-      proxy(baseApiUrl, {
-        parseReqBody: false,
-        proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
-          for (const key of ['oc-env', 'oc-secret', 'oc-application']) {
-            if (srcReq.headers[key]) {
-              proxyReqOpts.headers[key] = srcReq.headers[key];
-            }
-          }
-          proxyReqOpts.headers['oc-frontend-api-proxy'] = '1';
-          proxyReqOpts.headers['oc-frontend-ip'] = srcReq.ip;
-          proxyReqOpts.headers['X-Forwarded-For'] = srcReq.ip;
-          return proxyReqOpts;
-        },
-        proxyReqPathResolver: req => {
-          const [pathname, search] = req.url.split('?');
-          const searchParams = new URLSearchParams(search);
-          searchParams.set('api_key', process.env.API_KEY);
-          return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
-        },
-      }),
-    );
-  }
+  // app.post(`/api/revalidate`, async (req, res) => {
+  //   // const { path } = req.params
+  //   const parsedUrl = parse(req.url, true);
+  //   const { pathname, query } = parsedUrl;
+  //   return app.render(req, res, '/api/revalidate', query);
+  // });
+
+  // // NOTE: in production and staging environment, this is currently not used
+  // // we use Cloudflare workers to route the request directly to the API
+  // if (process.env.API_PROXY === 'true') {
+  //   app.use(
+  //     '/api',
+  //     proxy(baseApiUrl, {
+  //       parseReqBody: false,
+  //       proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+  //         for (const key of ['oc-env', 'oc-secret', 'oc-application']) {
+  //           if (srcReq.headers[key]) {
+  //             proxyReqOpts.headers[key] = srcReq.headers[key];
+  //           }
+  //         }
+  //         proxyReqOpts.headers['oc-frontend-api-proxy'] = '1';
+  //         proxyReqOpts.headers['oc-frontend-ip'] = srcReq.ip;
+  //         proxyReqOpts.headers['X-Forwarded-For'] = srcReq.ip;
+  //         return proxyReqOpts;
+  //       },
+  //       proxyReqPathResolver: req => {
+  //         const [pathname, search] = req.url.split('?');
+  //         const searchParams = new URLSearchParams(search);
+  //         searchParams.set('api_key', process.env.API_KEY);
+  //         return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
+  //       },
+  //     }),
+  //   );
+  // }
 
   /**
    * Contact Form
