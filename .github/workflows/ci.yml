@@ -85,7 +85,6 @@ jobs:
       - run: npm run langs:check
 
   build:
-    needs: test
     runs-on: ubuntu-latest
 
     timeout-minutes: 15
@@ -118,7 +117,6 @@ jobs:
         run: npm run build
 
   test:
-    needs: [lint, prettier, depcheck, check-langs, typescript]
     runs-on: ubuntu-latest
 
     timeout-minutes: 15
