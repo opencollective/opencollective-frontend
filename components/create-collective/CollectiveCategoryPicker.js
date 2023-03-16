@@ -78,7 +78,7 @@ const CollectiveCategoryPicker = () => {
                 {formatMessage(messages.opensource)}
               </StyledButton>
             </Link>
-            <ExamplesLink href="/search?tag=opensource" openInNewTab>
+            <ExamplesLink href="/search?tag=open+source" openInNewTab>
               <FormattedMessage id="createCollective.examples" defaultMessage="See examples" />
             </ExamplesLink>
           </Flex>
