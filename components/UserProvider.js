@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
+import jwt from 'jsonwebtoken';
 import { isEqual } from 'lodash';
 import Router, { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
@@ -82,13 +83,10 @@ class UserProvider extends React.Component {
     await this.props.client.resetStore();
   };
 
-  login = async (token, options = {}) => {
+  login = async token => {
     const { getLoggedInUser, twoFactorAuthPrompt } = this.props;
-    const { twoFactorAuthenticatorCode, recoveryCode } = options;
     try {
-      const LoggedInUser = token
-        ? await getLoggedInUser({ token, twoFactorAuthenticatorCode, recoveryCode })
-        : await getLoggedInUser();
+      const LoggedInUser = token ? await getLoggedInUser({ token }) : await getLoggedInUser();
       this.setState({
         loadingLoggedInUser: false,
         errorLoggedInUser: null,
@@ -107,13 +105,16 @@ class UserProvider extends React.Component {
         // eslint-disable-next-line no-constant-condition
         while (true) {
           try {
+            const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+            const decodedToken = jwt.decode(token);
+
             const result = await twoFactorAuthPrompt.open({
-              supportedMethods: ['totp', 'recovery_code'],
+              supportedMethods: decodedToken.supported2FAMethods ?? ['totp', 'recovery_code'],
             });
             const LoggedInUser = await getLoggedInUser({
               token: getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN),
-              twoFactorAuthenticatorCode: result.type !== 'recovery_code' ? result.code : undefined,
-              recoveryCode: result.type === 'recovery_code' ? result.code : undefined,
+              twoFactorAuthenticatorCode: result.code,
+              twoFactorAuthenticationType: result.type,
             });
             if (result.type === 'recovery_code') {
               this.props.router.replace({

@@ -30,10 +30,8 @@ export default function TwoFactorAuthenticationModal() {
   const cancellable = !supportedMethods.includes('recovery_code');
 
   React.useEffect(() => {
-    if (isUsingRecoveryCode) {
-      setIsUsingRecoveryCode(false);
-    }
-  }, [isUsingRecoveryCode, hasRecoveryCodeOption]);
+    setIsUsingRecoveryCode(false);
+  }, [supportedMethods]);
 
   const cancel = React.useCallback(() => {
     if (!cancellable) {
