@@ -30,7 +30,7 @@ describe('event.create.test.js', () => {
     // Go to "Edit Tickets"
     cy.get('[data-cy=edit-collective-btn]:first').click();
     cy.getByDataCy('menu-item-tickets').click();
-    cy.getByDataCy('create-contribute-tier').click();
+    cy.getByDataCy('create-ticket').click();
     cy.get('[data-cy=name]').type('Free ticket');
     cy.get('[data-cy=description]').type('Free ticket for students');
     cy.get('input[data-cy=amount]').type('0');
@@ -39,7 +39,7 @@ describe('event.create.test.js', () => {
     cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
 
     cy.getByDataCy('menu-item-tickets').click();
-    cy.getByDataCy('create-contribute-tier').click();
+    cy.getByDataCy('create-ticket').click();
     cy.get('[data-cy=name]').type('Paid ticket');
     cy.get('input[data-cy=amount]').type('15');
     cy.getByDataCy('confirm-btn').click();
