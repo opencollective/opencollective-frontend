@@ -44,15 +44,12 @@ const messages = defineMessages({
 const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return ALL_SECTIONS.INFO;
-  }
-
-  const isAdmin = loggedInUser?.isAdminOfCollective(account);
-  const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
-  const isAccountantOnly = !isAdmin && isAccountant;
-  if (isHostAccount(account)) {
-    return isAccountantOnly ? ALL_SECTIONS.REPORTS : ALL_SECTIONS.EXPENSES;
+  } else if (isHostAccount(account)) {
+    return ALL_SECTIONS.EXPENSES;
   } else {
-    return isAccountantOnly ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.INFO;
+    const isAdmin = loggedInUser?.isAdminOfCollective(account);
+    const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
+    return !isAdmin && isAccountant ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.INFO;
   }
 };
 
