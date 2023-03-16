@@ -1,15 +1,16 @@
+import { pick } from 'lodash';
+
 export default async function handle(req, res) {
-  const graphqlUrl = `${process.env.API_URL}/users/update-token?api_key=${process.env.API_KEY}`;
+  const apiUrl = `${process.env.API_URL}/users/update-token?api_key=${process.env.API_KEY}`;
 
-  const Authorization = req.headers['authorization'];
-  const Accept = req.headers['accept'];
-
-  const json = await fetch(graphqlUrl, {
-    method: 'POST',
-    headers: { Authorization, Accept },
+  const result = await fetch(apiUrl, {
+    method: req.method,
+    headers: pick(req.headers, ['accept', 'content-type', 'authorization', 'user-agent', 'accept-language']),
     body: JSON.stringify(req.body),
-  }).then(result => result.json());
+  });
+
+  const json = await result.json();
 
   res.setHeader('Content-Type', 'application/json');
-  res.json(json);
+  res.status(result.status).json(json);
 }

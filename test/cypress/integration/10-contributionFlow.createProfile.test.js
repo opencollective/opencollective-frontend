@@ -23,7 +23,7 @@ describe('Contribution Flow: Create profile', () => {
     // Test frontend validations
     cy.get('[data-cy="cf-content"] input[name=name]').type('Test User');
     cy.get('[data-cy="cf-content"] input[name=email]').type('IncorrectValue');
-    cy.get('[data-cy=checkbox-tosOptIn]').click();
+    cy.get('[data-cy=checkbox-tosOptIn] [data-cy=custom-checkbox]').click();
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
     cy.contains("Please include an '@' in the email address. 'IncorrectValue' is missing an '@'.");
 

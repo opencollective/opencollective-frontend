@@ -99,7 +99,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             if={isType(collective, ORGANIZATION) && isHost}
           >
             <OrganizationSettingsMenuLinks collective={collective} isAccountantOnly={isAccountantOnly} />
-            <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} />
+            <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} if={!isAccountantOnly} />
           </SubMenu>
           <SubMenu
             label={<FormattedMessage id="AdminPanel.FiscalHostSettings" defaultMessage="Fiscal Host Settings" />}

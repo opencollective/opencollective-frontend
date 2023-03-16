@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 
 import expenseTypes from '../../../lib/constants/expenseTypes';
 import { i18nExpenseType } from '../../../lib/i18n/expense';
+import { sortSelectOptions } from '../../../lib/utils';
 
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 
@@ -13,13 +14,14 @@ const ExpenseTypeFilter = ({ onChange, value, ...props }) => {
 
   const expenseTypeKeys = Object.keys(expenseTypes);
   expenseTypeKeys.unshift('ALL');
+  const options = expenseTypeKeys.map(getOption);
 
   return (
     <StyledSelectFilter
       inputId="expenses-type-filter"
       onChange={({ value }) => onChange(value)}
       value={getOption(value || 'ALL')}
-      options={expenseTypeKeys.map(getOption)}
+      options={options.sort(sortSelectOptions)}
       {...props}
     />
   );

@@ -57,7 +57,7 @@ interface CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2209,7 +2209,7 @@ type Collective implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2467,7 +2467,7 @@ type Event implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2725,7 +2725,7 @@ type Fund implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2983,7 +2983,7 @@ type Organization implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -3242,7 +3242,7 @@ type Project implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -3742,7 +3742,7 @@ type User implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -4002,7 +4002,7 @@ type Vendor implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -5057,7 +5057,7 @@ input OrderInputType {
   quantity: Int = 1
   totalAmount: Int
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   platformFee: Int
   isFeesOnTop: Boolean
   currency: String

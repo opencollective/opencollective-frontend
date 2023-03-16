@@ -39,7 +39,7 @@ const YourInitiativeIsNearlyThere = () => (
         <H1 fontSize="32px" lineHeight="40px" letterSpacing="-0.008em" color="black.900" textAlign="center" mb="14px">
           <FormattedMessage
             id="OCFHostApplication.yourInitiativeIsNearlyThere"
-            defaultMessage="Your initiative is nearly there!"
+            defaultMessage="Your Collective is nearly there!"
           />
         </H1>
         <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.800">

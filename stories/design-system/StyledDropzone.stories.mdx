@@ -1,5 +1,8 @@
 import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
 import StyledDropzone from '../../components/StyledDropzone';
+import ToastProvider from '../../components/ToastProvider';
+import { UserContext } from '../../components/UserProvider';
+import { loggedInUser } from '../mocks/loggedInUser';
 
 <Meta title="Design system/StyledDropzone" component={StyledDropzone} />
 
@@ -7,9 +10,11 @@ import StyledDropzone from '../../components/StyledDropzone';
 
 <Canvas>
   <Story name="Default">
-    {() => {
-      return <StyledDropzone onSuccess={console.log} />;
-    }}
+    {() => (
+      <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+        <StyledDropzone onSuccess={console.log} />
+      </UserContext.Provider>
+    )}
   </Story>
 </Canvas>
 
@@ -19,9 +24,11 @@ import StyledDropzone from '../../components/StyledDropzone';
 
 <Canvas>
   <Story name="Additional Message">
-    {() => {
-      return <StyledDropzone onSuccess={console.log}>Hello World</StyledDropzone>;
-    }}
+    {() => (
+      <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+        <StyledDropzone onSuccess={console.log}>Hello World</StyledDropzone>
+      </UserContext.Provider>
+    )}
   </Story>
 </Canvas>
 
@@ -29,9 +36,11 @@ import StyledDropzone from '../../components/StyledDropzone';
 
 <Canvas>
   <Story name="Custom Size">
-    {() => {
-      return <StyledDropzone onSuccess={console.log} size={150} />;
-    }}
+    {() => (
+      <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+        <StyledDropzone onSuccess={console.log} size={150} />
+      </UserContext.Provider>
+    )}
   </Story>
 </Canvas>
 
@@ -39,9 +48,11 @@ import StyledDropzone from '../../components/StyledDropzone';
 
 <Canvas>
   <Story name="Loading State">
-    {() => {
-      return <StyledDropzone onSuccess={console.log} size={150} isLoading />;
-    }}
+    {() => (
+      <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+        <StyledDropzone onSuccess={console.log} size={150} isLoading />
+      </UserContext.Provider>
+    )}
   </Story>
 </Canvas>
 
@@ -49,8 +60,10 @@ import StyledDropzone from '../../components/StyledDropzone';
 
 <Canvas>
   <Story name="Show Progress">
-    {() => {
-      return <StyledDropzone onSuccess={console.log} isLoading loadingProgress={100} />;
-    }}
+    {() => (
+      <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+        <StyledDropzone onSuccess={console.log} isLoading loadingProgress={100} />
+      </UserContext.Provider>
+    )}
   </Story>
 </Canvas>

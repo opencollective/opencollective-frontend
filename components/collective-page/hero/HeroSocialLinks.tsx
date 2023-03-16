@@ -1,7 +1,20 @@
 import React from 'react';
-import { Discord, Discourse, Mastodon, Meetup, Tiktok, Tumblr } from '@styled-icons/fa-brands';
-import { Facebook, Github, Gitlab, Globe, Instagram, Linkedin, Slack, Twitter, Youtube } from '@styled-icons/feather';
-import { Pixelfed } from '@styled-icons/remix-line';
+import { Discord } from '@styled-icons/fa-brands/Discord';
+import { Discourse } from '@styled-icons/fa-brands/Discourse';
+import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
+import { Meetup } from '@styled-icons/fa-brands/Meetup';
+import { Tiktok } from '@styled-icons/fa-brands/Tiktok';
+import { Tumblr } from '@styled-icons/fa-brands/Tumblr';
+import { Facebook } from '@styled-icons/feather/Facebook';
+import { Github } from '@styled-icons/feather/Github';
+import { Gitlab } from '@styled-icons/feather/Gitlab';
+import { Globe } from '@styled-icons/feather/Globe';
+import { Instagram } from '@styled-icons/feather/Instagram';
+import { Linkedin } from '@styled-icons/feather/Linkedin';
+import { Slack } from '@styled-icons/feather/Slack';
+import { Twitter } from '@styled-icons/feather/Twitter';
+import { Youtube } from '@styled-icons/feather/Youtube';
+import { Pixelfed } from '@styled-icons/remix-line/Pixelfed';
 
 import { SocialLink, SocialLinkType } from '../../../lib/graphql/types/v2/graphql';
 
@@ -51,7 +64,7 @@ export default function HeroSocialLinks({ socialLinks, relMe }: HeroSocialLinksP
         openInNewTabNoFollow={!relMe}
         openInNewTabNoFollowRelMe={!!relMe}
       >
-        <StyledRoundButton size={32} mr={3}>
+        <StyledRoundButton size={32} mt={2} mr={3}>
           <Icon size={12} />
         </StyledRoundButton>
       </StyledLink>

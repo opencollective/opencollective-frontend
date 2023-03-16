@@ -852,7 +852,7 @@ type Order {
   """
   Host fee percent attached to the Order.
   """
-  hostFeePercent: Int
+  hostFeePercent: Float
 
   """
   Platform Tip attached to the Order.
@@ -3067,7 +3067,7 @@ type Host implements Account & AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -3280,7 +3280,7 @@ interface AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -3515,6 +3515,7 @@ enum PaymentMethodType {
   us_bank_account @deprecated(reason: "Please use uppercase values")
   sepa_debit @deprecated(reason: "Please use uppercase values")
   bacs_debit @deprecated(reason: "Please use uppercase values")
+  bancontact @deprecated(reason: "Please use uppercase values")
   ALIPAY
   CREDITCARD
   PREPAID
@@ -3530,6 +3531,7 @@ enum PaymentMethodType {
   US_BANK_ACCOUNT
   SEPA_DEBIT
   BACS_DEBIT
+  BANCONTACT
 }
 
 input PaymentMethodReferenceInput {
@@ -3767,6 +3769,7 @@ enum PaymentMethodLegacyType {
   US_BANK_ACCOUNT
   SEPA_DEBIT
   BACS_DEBIT
+  BANCONTACT
 }
 
 """
@@ -6304,7 +6307,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -6382,7 +6385,7 @@ interface AccountWithHost {
   """
   Fees percentage that the platform takes for this collective
   """
-  platformFeePercent: Int
+  platformFeePercent: Float
 
   """
   Date of approval by the Fiscal Host.
@@ -7151,7 +7154,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -8587,7 +8590,7 @@ type Organization implements Account & AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -9200,7 +9203,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -12014,7 +12017,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -12627,7 +12630,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -13365,7 +13368,7 @@ type Mutation {
     The current password (if any) to confirm password change.
     """
     currentPassword: String
-  ): Individual!
+  ): SetPasswordResponse!
 
   """
   Invite a new member to the Collective. Scope: "account".
@@ -14899,6 +14902,11 @@ enum ProcessHostApplicationAction {
   SEND_PUBLIC_MESSAGE
 }
 
+type SetPasswordResponse {
+  individual: Individual!
+  token: String
+}
+
 input MemberInvitationReferenceInput {
   """
   The public id identifying the member invitation (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -15278,11 +15286,6 @@ input PendingOrderCreateInput {
   toAccount: AccountReferenceInput!
 
   """
-  The event/project you want to contribute to
-  """
-  childAccount: AccountReferenceInput
-
-  """
   Platform tip attached to this order
   """
   platformTipAmount: AmountInput
@@ -15321,7 +15324,7 @@ input PendingOrderCreateInput {
   When is the money expected?
   """
   expectedAt: DateString
-  hostFeePercent: Int
+  hostFeePercent: Float
 }
 
 """
@@ -15392,7 +15395,7 @@ input PendingOrderEditInput {
   When is the money expected?
   """
   expectedAt: DateString
-  hostFeePercent: Int
+  hostFeePercent: Float
 }
 
 type CreditCardWithStripeError {

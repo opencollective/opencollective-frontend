@@ -4,7 +4,6 @@ import { withRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { confettiFireworks } from '../../lib/confettis';
-import { formatCurrency } from '../../lib/currency-utils';
 
 import ApplyToHostModal from '../ApplyToHostModal';
 import Container from '../Container';
@@ -18,10 +17,6 @@ const messages = defineMessages({
     id: 'Collectives',
     defaultMessage: 'Collectives',
   },
-  managed: {
-    id: 'ManagedFunds',
-    defaultMessage: 'Managed funds',
-  },
   apply: {
     id: 'Apply',
     defaultMessage: 'Apply',
@@ -30,7 +25,7 @@ const messages = defineMessages({
 
 const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
   const [showModal, setShowModal] = useState(false);
-  const { formatMessage, locale } = useIntl();
+  const { formatMessage } = useIntl();
 
   return (
     <Fragment>
@@ -42,14 +37,6 @@ const HostCollectiveCard = ({ host, collective, onChange, ...props }) => {
             </P>
             <P ml={2} fontSize="12px">
               {formatMessage(messages.collectives)}
-            </P>
-          </Flex>
-          <Flex data-cy="caption" mb={2} alignItems="flex-end">
-            <P fontSize="16px" fontWeight="bold">
-              {formatCurrency(host.stats.yearlyBudgetManaged.value * 100, host.currency, { precision: 0, locale })}
-            </P>
-            <P ml={2} fontSize="12px">
-              {host.currency} {formatMessage(messages.managed)}
             </P>
           </Flex>
           <StyledButton

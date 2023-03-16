@@ -1,18 +1,17 @@
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation, useQuery } from '@apollo/client';
+import { closestCenter, DndContext, DragOverlay } from '@dnd-kit/core';
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { cloneDeep, flatten, get, isEqual, set } from 'lodash';
-import memoizeOne from 'memoize-one';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getCollectiveSections, getSectionPath } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
-import DRAG_AND_DROP_TYPES from '../../../lib/constants/drag-and-drop';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import i18nNavbarCategory from '../../../lib/i18n/navbar-categories';
@@ -82,14 +81,7 @@ export const collectiveSettingsV1Query = gqlV1/* GraphQL */ `
   }
 `;
 
-const DRAG_TYPE = DRAG_AND_DROP_TYPES.COLLECTIVE_PAGE_EDIT_SECTION;
-
-const SectionEntryContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px 16px;
-
+const ItemContainer = styled.div`
   ${props =>
     props.isDragging &&
     css`
@@ -99,55 +91,37 @@ const SectionEntryContainer = styled.div`
         opacity: 0;
       }
     `}
-`;
 
-const TopLevelMenuEntryContainer = styled.div`
+  background: ${props =>
+    props.isDragging
+      ? '#f0f8ff'
+      : !props.isDragOverlay
+      ? 'transparent'
+      : props.isSubSection
+      ? props.theme.colors.black[100]
+      : 'white'};
+
   ${props =>
-    props.isDragging &&
+    props.isDragOverlay &&
     css`
-      border-color: #99c9ff;
-      background: #f0f8ff;
-      & > * {
-        opacity: 0;
-      }
+      box-shadow: 0px 4px 6px rgba(26, 27, 31, 0.16);
     `}
 `;
-
-const getItemType = parent => {
-  return parent ? `${parent.name}-${DRAG_TYPE}` : DRAG_TYPE;
-};
 
 const CollectiveSectionEntry = ({
-  parentItem,
   isEnabled,
   version,
   restrictedTo,
   section,
-  index,
-  onMove,
-  onDrop,
   onSectionToggle,
   collectiveType,
-  fontWeight,
+  isSubSection,
   hasData,
   showMissingDataWarning,
   showDragIcon,
+  dragHandleProps,
 }) => {
   const intl = useIntl();
-  const ref = React.useRef(null);
-  const [, drop] = useDrop({
-    accept: getItemType(parentItem),
-    hover: item => onMove(item, index),
-  });
-
-  const [{ isDragging }, drag, preview] = useDrag({
-    type: getItemType(parentItem),
-    item: { index, parentItem },
-    collect: monitor => ({ isDragging: monitor.isDragging() }),
-    end: onDrop,
-  });
-
-  drag(drop(ref));
 
   let options = [
     {
@@ -197,13 +171,18 @@ const CollectiveSectionEntry = ({
   }
 
   return (
-    <SectionEntryContainer ref={preview} isDragging={isDragging}>
+    <Flex justifyContent="space-between" alignItems="center" padding="4px 16px">
       {showDragIcon && (
-        <Container mr={3} cursor="move" ref={ref}>
+        <Container mr={3} cursor="move" {...dragHandleProps}>
           <DragIndicator size={14} />
         </Container>
       )}
-      <P fontSize="14px" fontWeight={fontWeight || '500'} css={{ flex: '1' }}>
+      <P
+        letterSpacing={isSubSection ? undefined : 0}
+        fontSize="14px"
+        fontWeight={isSubSection ? '500' : '700'}
+        css={{ flex: '1' }}
+      >
         {i18nCollectivePageSection(intl, section)}
       </P>
 
@@ -244,7 +223,7 @@ const CollectiveSectionEntry = ({
           )}
         </Box>
       )}
-    </SectionEntryContainer>
+    </Flex>
   );
 };
 
@@ -263,43 +242,35 @@ CollectiveSectionEntry.propTypes = {
   showMissingDataWarning: PropTypes.bool,
   showDragIcon: PropTypes.bool,
   parentItem: PropTypes.object,
+  dragHandleProps: PropTypes.object,
+  isSubSection: PropTypes.bool,
 };
 
-const getNewSections = memoizeOne((sections, item, toIndex) => {
-  const newSections = cloneDeep(sections);
-  if (item.parentItem) {
-    const subSectionsIdx = newSections.findIndex(e => e.type === 'CATEGORY' && e.name === item.parentItem.name);
-    const newSubsections = [...newSections[subSectionsIdx].sections];
-    newSubsections.splice(toIndex, 0, newSubsections.splice(item.index, 1)[0]);
-    newSections[subSectionsIdx] = { ...newSections[subSectionsIdx], sections: newSubsections };
-  } else {
-    newSections.splice(toIndex, 0, newSections.splice(item.index, 1)[0]);
+const MenuCategory = ({ item, collective, onSectionToggle, setSubSections, dragHandleProps }) => {
+  const intl = useIntl();
+
+  const [draggingId, setDraggingId] = React.useState(null);
+  function handleDragStart(event) {
+    setDraggingId(event.active.id);
+  }
+  function handleDragEnd(event) {
+    const { active, over } = event;
+    setDraggingId(null);
+    if (active.id !== over.id) {
+      const oldSubsections = item.sections;
+      const oldIndex = oldSubsections.findIndex(item => item.name === active.id);
+      const newIndex = oldSubsections.findIndex(item => item.name === over.id);
+
+      const newSections = arrayMove(oldSubsections, oldIndex, newIndex);
+      setSubSections(newSections);
+    }
   }
 
-  return newSections;
-});
-
-const MenuCategory = ({ item, index, collective, onMove, onDrop, onSectionToggle }) => {
-  const intl = useIntl();
-  const ref = React.useRef(null);
-  const [, drop] = useDrop({
-    accept: getItemType(),
-    hover: item => onMove(item, index),
-  });
-
-  const [{ isDragging }, drag, preview] = useDrag({
-    type: getItemType(),
-    item: { index },
-    collect: monitor => ({ isDragging: monitor.isDragging() }),
-    end: onDrop,
-  });
-
-  drag(drop(ref));
+  const draggingItem = item.sections.find(item => item.name === draggingId);
 
   return (
-    <TopLevelMenuEntryContainer isDragging={isDragging} ref={preview}>
+    <React.Fragment>
       <Container
-        position="relative"
         display="flex"
         px={3}
         py="10px"
@@ -308,31 +279,35 @@ const MenuCategory = ({ item, index, collective, onMove, onDrop, onSectionToggle
         boxShadow="0 3px 4px 0px #6b6b6b38"
         alignItems="center"
       >
-        <Container display="inline-block" mr={3} cursor="move" ref={ref}>
+        <Container display="inline-block" mr={3} cursor="move" {...dragHandleProps}>
           <DragIndicator size={14} />
         </Container>
         <Container>{i18nNavbarCategory(intl, item.name)}</Container>
       </Container>
       <Container>
-        {item.sections?.map((section, index) => (
-          <Container key={section.name} pl={1} borderLeft="8px solid" borderColor="black.200" bg="black.100">
-            <CollectiveSectionEntry
-              parentItem={item}
-              section={section.name}
-              index={index}
-              isEnabled={section.isEnabled}
-              version={section.version}
-              collectiveType={collective.type}
-              restrictedTo={section.restrictedTo}
-              onMove={onMove}
-              onDrop={onDrop}
-              onSectionToggle={onSectionToggle}
-              showDragIcon={item.sections.length > 1}
-            />
-          </Container>
-        ))}
+        <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <SortableContext items={item.sections?.map(item => item.name)} strategy={verticalListSortingStrategy}>
+            {item.sections?.map(section => (
+              <Container key={section.name} pl={1} borderLeft="8px solid" borderColor="black.200" bg="black.100">
+                <DraggableItem
+                  id={section.name}
+                  item={section}
+                  collective={collective}
+                  onSectionToggle={onSectionToggle}
+                  showDragIcon={item.sections.length > 1}
+                  isSubSection
+                />
+              </Container>
+            ))}
+          </SortableContext>
+          <DragOverlay>
+            {draggingItem ? (
+              <Item item={draggingItem} collective={collective} showDragIcon isDragOverlay isSubSection />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       </Container>
-    </TopLevelMenuEntryContainer>
+    </React.Fragment>
   );
 };
 
@@ -343,13 +318,112 @@ MenuCategory.propTypes = {
   onMove: PropTypes.func,
   onDrop: PropTypes.func,
   onSectionToggle: PropTypes.func,
+  setSubSections: PropTypes.func,
+  isDragOverlay: PropTypes.bool,
+  dragHandleProps: PropTypes.object,
+};
+
+const Item = React.forwardRef(
+  (
+    {
+      dragHandleProps,
+      isDragging,
+      isDragOverlay,
+      style,
+      setSubSections,
+      onSectionToggle,
+      collective,
+      item,
+      isSubSection,
+      showDragIcon,
+    },
+    ref,
+  ) => {
+    return (
+      <ItemContainer
+        ref={ref}
+        style={style}
+        isDragging={isDragging}
+        isDragOverlay={isDragOverlay}
+        isSubSection={isSubSection}
+      >
+        {item.type === 'CATEGORY' ? (
+          <MenuCategory
+            item={item}
+            collective={collective}
+            onSectionToggle={onSectionToggle}
+            setSubSections={setSubSections}
+            dragHandleProps={dragHandleProps}
+          />
+        ) : item.type === 'SECTION' ? (
+          <CollectiveSectionEntry
+            section={item.name}
+            isEnabled={item.isEnabled}
+            version={item.version}
+            collectiveType={collective.type}
+            restrictedTo={item.restrictedTo}
+            onSectionToggle={onSectionToggle}
+            isSubSection={isSubSection}
+            showDragIcon={showDragIcon}
+            dragHandleProps={dragHandleProps}
+          />
+        ) : null}
+      </ItemContainer>
+    );
+  },
+);
+
+Item.propTypes = {
+  dragHandleProps: PropTypes.object,
+  isDragging: PropTypes.bool,
+  isDragOverlay: PropTypes.bool,
+  style: PropTypes.object,
+  item: PropTypes.object,
+  collective: PropTypes.object,
+  onSectionToggle: PropTypes.func,
+  setSubSections: PropTypes.func,
+  isSubSection: PropTypes.bool,
+  showDragIcon: PropTypes.bool,
+};
+
+Item.displayName = 'Item';
+
+const MemoizedItem = memo(Item);
+
+const DraggableItem = props => {
+  const { attributes, listeners, isDragging, setNodeRef, transform, transition } = useSortable({ id: props.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <MemoizedItem
+      ref={setNodeRef}
+      style={style}
+      dragHandleProps={{ ...attributes, ...listeners }}
+      isDragging={isDragging}
+      {...props}
+    />
+  );
+};
+
+DraggableItem.propTypes = {
+  item: PropTypes.object,
+  collective: PropTypes.object,
+  onSectionToggle: PropTypes.func,
+  setSubSections: PropTypes.func,
+  isSubSection: PropTypes.bool,
+  showDragIcon: PropTypes.bool,
+  id: PropTypes.string,
 };
 
 const EditCollectivePage = ({ collective }) => {
   const intl = useIntl();
   const [isDirty, setDirty] = React.useState(false);
-  const [sections, setSections] = React.useState(null);
-  const [tmpSections, setTmpSections] = React.useState(null);
+  const [sections, setSections] = React.useState([]);
+  const [draggingId, setDraggingId] = React.useState(null);
 
   const { loading, data } = useQuery(getSettingsQuery, {
     variables: { slug: collective.slug },
@@ -370,22 +444,6 @@ const EditCollectivePage = ({ collective }) => {
     }
   }, [data?.account]);
 
-  const onMove = (item, hoverIndex) => {
-    const newSections = getNewSections(sections, item, hoverIndex);
-    if (!isEqual(tmpSections, newSections)) {
-      setTmpSections(newSections);
-    }
-  };
-
-  const onDrop = () => {
-    // Ignore if the drop happened outside of a valid dropzone (tmpSections=null)
-    if (tmpSections) {
-      setSections(tmpSections);
-      setTmpSections(null);
-      setDirty(true);
-    }
-  };
-
   const onSectionToggle = (selectedSection, { isEnabled, restrictedTo, version }) => {
     const newSections = cloneDeep(sections);
     const sectionPath = getSectionPath(sections, selectedSection);
@@ -394,9 +452,26 @@ const EditCollectivePage = ({ collective }) => {
     setDirty(true);
   };
 
-  const displayedSections = tmpSections || sections;
+  function handleDragStart(event) {
+    setDraggingId(event.active.id);
+  }
+
+  function handleDragEnd(event) {
+    const { active, over } = event;
+    setDraggingId(null);
+    if (active.id !== over.id) {
+      const oldIndex = sections.findIndex(item => item.name === active.id);
+      const newIndex = sections.findIndex(item => item.name === over.id);
+      const newSections = arrayMove(sections, oldIndex, newIndex);
+      setSections(newSections);
+      setDirty(true);
+    }
+  }
+
+  const draggingSection = sections.find(section => section.name === draggingId);
+
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <SettingsSubtitle>
         <FormattedMessage
           id="EditCollectivePage.SectionsDescription"
@@ -405,41 +480,43 @@ const EditCollectivePage = ({ collective }) => {
       </SettingsSubtitle>
       <Flex flexWrap="wrap" mt={4}>
         <Box width="100%" maxWidth={436}>
-          {loading || !displayedSections ? (
+          {loading || !sections ? (
             <LoadingPlaceholder height={400} />
           ) : (
             <div>
-              <StyledCard mb={4}>
-                {displayedSections.map((item, index) => (
-                  <React.Fragment key={`${item.type}-${item.name}`}>
-                    {index !== 0 && <StyledHr borderColor="black.200" />}
-                    {item.type === 'CATEGORY' ? (
-                      <MenuCategory
-                        item={item}
-                        index={index}
-                        collective={collective}
-                        onMove={onMove}
-                        onDrop={onDrop}
-                        onSectionToggle={onSectionToggle}
-                      />
-                    ) : item.type === 'SECTION' ? (
-                      <CollectiveSectionEntry
-                        key={`${item.type}-${item.name}`}
-                        section={item.name}
-                        index={index}
-                        isEnabled={item.isEnabled}
-                        version={item.version}
-                        collectiveType={collective.type}
-                        restrictedTo={item.restrictedTo}
-                        onMove={onMove}
-                        onDrop={onDrop}
-                        onSectionToggle={onSectionToggle}
-                        fontWeight="bold"
-                        showDragIcon
-                      />
-                    ) : null}
-                  </React.Fragment>
-                ))}
+              <StyledCard mb={4} overflowX={'visible'} overflowY="visible" position="relative">
+                <SortableContext items={sections?.map(item => item.name)} strategy={verticalListSortingStrategy}>
+                  {sections.map((item, index) => {
+                    return (
+                      <React.Fragment key={item.name}>
+                        {index !== 0 && <StyledHr borderColor="black.200" />}
+
+                        <DraggableItem
+                          id={item.name}
+                          item={item}
+                          collective={collective}
+                          onSectionToggle={onSectionToggle}
+                          fontWeight="bold"
+                          showDragIcon
+                          setSubSections={subSections => {
+                            const newSections = cloneDeep(sections);
+                            const subSectionsIdx = newSections.findIndex(
+                              e => e.type === 'CATEGORY' && e.name === item.name,
+                            );
+                            newSections[subSectionsIdx] = { ...newSections[subSectionsIdx], sections: subSections };
+                            setSections(newSections);
+                            setDirty(true);
+                          }}
+                        />
+                      </React.Fragment>
+                    );
+                  })}
+                </SortableContext>
+                <DragOverlay>
+                  {draggingSection ? (
+                    <Item item={draggingSection} collective={collective} isDragOverlay showDragIcon />
+                  ) : null}
+                </DragOverlay>
               </StyledCard>
               {error && (
                 <MessageBox type="error" fontSize="14px" withIcon my={2}>
@@ -488,7 +565,7 @@ const EditCollectivePage = ({ collective }) => {
           <EditCollectivePageFAQ withNewButtons withBorderLeft />
         </Box>
       </Flex>
-    </DndProvider>
+    </DndContext>
   );
 };
 

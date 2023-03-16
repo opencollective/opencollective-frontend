@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight } from '@styled-icons/fa-solid';
+import { ArrowRight } from '@styled-icons/fa-solid/ArrowRight';
 import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';

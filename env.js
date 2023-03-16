@@ -39,6 +39,8 @@ const defaults = {
   OC_ENV: process.env.NODE_ENV || 'development',
   OC_SECRET: crypto.randomBytes(16).toString('hex'),
   WISE_ENVIRONMENT: process.env.OC_ENV === 'production' ? 'production' : 'sandbox',
+  API_PROXY: 'true',
+  SENTRY_TRACES_SAMPLE_RATE: null,
 };
 
 if (['production', 'staging'].includes(process.env.OC_ENV)) {
