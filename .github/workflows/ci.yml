@@ -146,3 +146,8 @@ jobs:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
       - run: npm run type:check
+
+  e2e:
+    needs: build
+    uses: ./.github/workflows/e2e.yml
+    secrets: inherit
