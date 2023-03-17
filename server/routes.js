@@ -99,9 +99,20 @@ module.exports = (expressApp, nextApp) => {
       additionalLink = `Additional Link: <a href="${bodyLink}">${bodyLink}</a></br>`;
     }
 
+    let relatedCollectives = 'Related Collectives: ';
+    if (body.relatedCollectives?.length > 0) {
+      relatedCollectives = body.relatedCollectives
+        .slice(0, 50)
+        .map(url => `<a href='${url}'>${url}</a>`)
+        .join(', ');
+    }
+
     logger.info(`Contact From: ${body.name} <${body.email}>`);
     logger.info(`Contact Subject: ${body.topic}`);
     logger.info(`Contact Message: ${body.message}`);
+    if (body.relatedCollectives?.length > 0) {
+      logger.info(`${relatedCollectives}`);
+    }
     if (additionalLink) {
       logger.info(`Contact Link: ${additionalLink}`);
     }
@@ -112,6 +123,9 @@ module.exports = (expressApp, nextApp) => {
       subject: `${body.topic}`,
       html: `
             ${body.message}
+            <br/>
+            ${body.relatedCollectives?.length > 0 ? relatedCollectives : ''}
+            <br/>
             <br/>
             ${additionalLink}
         `,

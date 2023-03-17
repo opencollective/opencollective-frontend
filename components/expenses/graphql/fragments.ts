@@ -434,6 +434,9 @@ export const expensesListFieldsFragment = gql`
     createdAt
     tags
     amount
+    comments {
+      totalCount
+    }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
       currency

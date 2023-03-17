@@ -335,6 +335,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
             labelFontSize="16px"
             labelFontWeight="700"
             mt={3}
+            required={false}
           >
             {({ form, field }) => (
               <CollectivePicker
@@ -358,6 +359,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           htmlFor="CreatePendingContribution-tier"
           label={<FormattedMessage defaultMessage="Tier" />}
           mt={3}
+          required={false}
         >
           {({ form, field }) => (
             <StyledSelect
@@ -382,6 +384,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           htmlFor="CreatePendingContribution-fromAccount"
           label={<FormattedMessage defaultMessage="Who is this contribution from?" />}
           mt={3}
+          required
         >
           {({ form, field }) => (
             <CollectivePickerAsync
@@ -403,6 +406,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           htmlFor="CreatePendingContribution-fromAccountInfo-name"
           label={<FormattedMessage id="ContactName" defaultMessage="Contact name" />}
           mt={3}
+          required
         >
           {({ field }) => <StyledInput data-cy="create-pending-contribution-contact-name" {...field} />}
         </Field>
@@ -417,6 +421,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
             />
           }
           mt={3}
+          required
         >
           {({ field }) => (
             <StyledInput
@@ -437,6 +442,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           hint={
             <FormattedMessage defaultMessage="External reference code for this order. This is usually a reference number from the contributor accounting system." />
           }
+          required={false}
         >
           {({ field }) => <StyledInput type="text" data-cy="create-pending-contribution-ponumber" {...field} />}
         </Field>
@@ -444,8 +450,8 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           name="memo"
           htmlFor="CreatePendingContribution-memo"
           label={<FormattedMessage id="Expense.PrivateNote" defaultMessage="Private note" />}
-          required={false}
           mt={3}
+          required={false}
         >
           {({ field }) => <StyledTextarea data-cy="create-pending-contribution-memo" {...field} />}
         </Field>
@@ -501,6 +507,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
                 </span>
               }
               ml={3}
+              required={false}
             >
               {({ form, field }) => (
                 <StyledInputPercentage
@@ -510,6 +517,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
                   error={field.error}
                   onChange={value => form.setFieldValue(field.name, value)}
                   onBlur={() => form.setFieldTouched(field.name, true)}
+                  maxWidth="100%"
                 />
               )}
             </Field>
@@ -529,6 +537,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               />
             )
           }
+          required
         >
           {({ form, field }) => (
             <StyledSelect
@@ -547,6 +556,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           htmlFor="CreatePendingContribution-.paymentMethod"
           mt={3}
           label={<FormattedMessage id="Fields.paymentMethod" defaultMessage="Payment method" />}
+          required={false}
         >
           {({ form, field }) => (
             <StyledSelect

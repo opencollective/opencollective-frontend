@@ -1,6 +1,6 @@
-import 'cypress-file-upload';
 import './third-party-commands';
 
+// import gql from 'fake-tag'; // eslint-disable-line
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { loggedInUserQuery } from '../../../lib/graphql/queries';
 
@@ -8,6 +8,8 @@ import { CreditCards } from '../../stripe-helpers';
 
 import { defaultTestUserEmail } from './data';
 import { randomEmail, randomSlug } from './faker';
+
+// const gqlV1 = gql;
 
 /**
  * Login with an existing account. If not provided in `params`, the email used for
@@ -139,20 +141,20 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQuery(token, {
       operationName: 'createCollective',
-      query: `
-          mutation createCollective($collective: CollectiveInputType!) {
-            createCollective(collective: $collective) {
-              id
-              slug
-              name
-              description
-              longDescription
-              website
-              imageUrl
-              settings
-            }
+      query: /* GraphQL */ `
+        mutation createCollective($collective: CollectiveInputType!) {
+          createCollective(collective: $collective) {
+            id
+            slug
+            name
+            description
+            longDescription
+            website
+            imageUrl
+            settings
           }
-        `,
+        }
+      `,
       variables: { collective: { location: {}, name: 'TestOrg', slug: '', tiers: [], type, ...params } },
     }).then(({ body }) => {
       return body.data.createCollective;
@@ -167,7 +169,7 @@ Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserE
   return signinRequestAndReturnToken({ email: userEmail }).then(token => {
     return graphqlQuery(token, {
       operationName: 'EditCollective',
-      query: `
+      query: /* GraphQL */ `
         mutation EditCollective($collective: CollectiveInputType!) {
           editCollective(collective: $collective) {
             id
@@ -196,9 +198,12 @@ Cypress.Commands.add('createHostedCollectiveV2', ({ email = defaultTestUserEmail
   return cy.createCollectiveV2({
     email,
     testPayload,
-    host: { slug: 'opensourceorg' },
+    host: { slug: 'opensource' },
     collective: {
       repositoryUrl: 'https://github.com/opencollective',
+    },
+    applicationData: {
+      useGithubValidation: true,
     },
   });
 });
@@ -219,18 +224,18 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
   return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
     return graphqlQueryV2(token, {
       operationName: 'createExpense',
-      query: `
-          mutation createExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
-            createExpense(expense: $expense, account: $account) {
+      query: /* GraphQL */ `
+        mutation createExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
+          createExpense(expense: $expense, account: $account) {
+            id
+            legacyId
+            account {
               id
-              legacyId
-              account {
-                id
-                slug
-              }
+              slug
             }
           }
-        `,
+        }
+      `,
       variables: { expense, account },
       failOnStatusCode: false,
     }).then(({ body }) => {
@@ -255,7 +260,7 @@ Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEma
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQuery(token, {
       operationName: 'CreateCollectiveWithHost',
-      query: `
+      query: /* GraphQL */ `
         mutation CreateCollectiveWithHost($collective: CollectiveInputType!) {
           createCollectiveFromGithub(collective: $collective) {
             id
@@ -266,7 +271,7 @@ Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEma
             }
           }
         }
-        `,
+      `,
       variables: { collective },
     }).then(({ body }) => {
       return body.data.createCollectiveFromGithub;
@@ -285,7 +290,7 @@ Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, colle
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQueryV2(token, {
       operationName: 'CreateProject',
-      query: `
+      query: /* GraphQL */ `
         mutation CreateProject($project: ProjectCreateInput!, $parent: AccountReferenceInput) {
           createProject(project: $project, parent: $parent) {
             id
@@ -483,7 +488,7 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
     authToken = token;
     return graphqlQueryV2(authToken, {
       operationName: 'AccountHasTwoFactorAuth',
-      query: `
+      query: /* GraphQL */ `
         query AccountHasTwoFactorAuth($slug: String) {
           individual(slug: $slug) {
             id
@@ -499,7 +504,7 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
             }
           }
         }
-          `,
+      `,
       variables: { slug: userSlug },
       options: { context: API_V2_CONTEXT },
     })
@@ -511,19 +516,19 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
 
         return graphqlQueryV2(authToken, {
           operationName: 'AddTwoFactorAuthToIndividual',
-          query: `
-          mutation AddTwoFactorAuthToIndividual($account: AccountReferenceInput!, $token: String!) {
-            addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
-              account {
-                id
-                ... on Individual {
-                  hasTwoFactorAuth
+          query: /* GraphQL */ `
+            mutation AddTwoFactorAuthToIndividual($account: AccountReferenceInput!, $token: String!) {
+              addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
+                account {
+                  id
+                  ... on Individual {
+                    hasTwoFactorAuth
+                  }
                 }
+                recoveryCodes
               }
-              recoveryCodes
             }
-          }
-        `,
+          `,
           variables: { account, token },
           options: { context: API_V2_CONTEXT },
         });
@@ -561,15 +566,27 @@ Cypress.Commands.add('restoreLocalStorage', () => {
 
 Cypress.Commands.add('getStripePaymentElement', getStripePaymentElement);
 
-Cypress.Commands.add('createCollectiveV2', ({ email = defaultTestUserEmail, testPayload, host, collective } = {}) => {
-  const user = { email, newsletterOptIn: false };
-  return signinRequest(user, null).then(response => {
-    const token = getTokenFromRedirectUrl(response.body.redirect);
-    return graphqlQueryV2(token, {
-      operationName: 'createCollective',
-      query: `
-          mutation createCollective($collective: CollectiveCreateInput!, $host: AccountReferenceInput!, $testPayload: JSON) {
-            createCollective(collective: $collective, host: $host, testPayload: $testPayload) {
+Cypress.Commands.add(
+  'createCollectiveV2',
+  ({ email = defaultTestUserEmail, testPayload, host, collective, applicationData } = {}) => {
+    const user = { email, newsletterOptIn: false };
+    return signinRequest(user, null).then(response => {
+      const token = getTokenFromRedirectUrl(response.body.redirect);
+      return graphqlQueryV2(token, {
+        operationName: 'createCollective',
+        query: /* GraphQL */ `
+          mutation createCollective(
+            $collective: CollectiveCreateInput!
+            $host: AccountReferenceInput!
+            $testPayload: JSON
+            $applicationData: JSON
+          ) {
+            createCollective(
+              collective: $collective
+              host: $host
+              testPayload: $testPayload
+              applicationData: $applicationData
+            ) {
               id
               slug
               name
@@ -578,21 +595,23 @@ Cypress.Commands.add('createCollectiveV2', ({ email = defaultTestUserEmail, test
             }
           }
         `,
-      variables: {
-        host,
-        testPayload: testPayload || null,
-        collective: {
-          name: 'TestCollective',
-          slug: randomSlug(),
-          description: 'A test collective',
-          ...collective,
+        variables: {
+          host,
+          testPayload: testPayload || null,
+          collective: {
+            name: 'TestCollective',
+            slug: randomSlug(),
+            description: 'A test collective',
+            ...collective,
+          },
+          applicationData,
         },
-      },
-    }).then(({ body }) => {
-      return body.data.createCollective;
+      }).then(({ body }) => {
+        return body.data.createCollective;
+      });
     });
-  });
-});
+  },
+);
 
 // ---- Private ----
 

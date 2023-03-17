@@ -100,7 +100,7 @@ describe('signin', () => {
     // Test frontend validations
     cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=email]').type('IncorrectValue');
-    cy.get('[data-cy=checkbox-tosOptIn]').click();
+    cy.get('[data-cy=checkbox-tosOptIn] [data-cy=custom-checkbox]').click();
     cy.get('button[type=submit]').click();
     cy.contains("Please include an '@' in the email address. 'IncorrectValue' is missing an '@'.");
 
@@ -129,7 +129,7 @@ describe('signin', () => {
     // Submit the form with correct values
     const email = randomEmail();
     cy.get('input[name=email]').type(email);
-    cy.get('[data-cy=checkbox-tosOptIn]').click();
+    cy.get('[data-cy=checkbox-tosOptIn] [data-cy=custom-checkbox]').click();
     cy.get('button[type=submit]').click();
 
     const expectedEmailSubject = 'Open Collective: Sign In';
@@ -151,7 +151,7 @@ describe('signin', () => {
     // Submit the form with correct values
     const email = randomEmail();
     cy.get('input[name=email]').type(email);
-    cy.get('[data-cy=checkbox-tosOptIn]').click();
+    cy.get('[data-cy=checkbox-tosOptIn] [data-cy=custom-checkbox]').click();
     cy.get('button[type=submit]').click();
 
     const expectedEmailSubject = 'Open Collective: Sign In';
@@ -168,7 +168,7 @@ describe('signin', () => {
     cy.contains('a', 'Create an account').click();
     cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=email]').type(`{selectall}${gmailEmail}`);
-    cy.get('[data-cy=checkbox-tosOptIn]').click();
+    cy.get('[data-cy=checkbox-tosOptIn] [data-cy=custom-checkbox]').click();
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
     cy.contains(`We've sent it to ${gmailEmail}`);
@@ -186,7 +186,7 @@ describe('signin', () => {
     cy.contains('a', 'Create an account').click();
     cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=email]').type(`{selectall}${hotmail}`);
-    cy.get('[data-cy=checkbox-tosOptIn]').click();
+    cy.get('[data-cy=checkbox-tosOptIn] [data-cy=custom-checkbox]').click();
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
     cy.contains(`We've sent it to ${hotmail}`);

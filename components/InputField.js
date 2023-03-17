@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { capitalize } from '../lib/utils';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
+import CollectiveTagsInput from './CollectiveTagsInput';
 import { Box, Flex } from './Grid';
 import InputSwitch from './InputSwitch';
 import InputTypeCountry from './InputTypeCountry';
@@ -307,6 +308,36 @@ class InputField extends React.Component {
                 {field.description && <HelpBlock p={1}>{field.description}</HelpBlock>}
                 <Box width={1}>
                   <StyledInputTags {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
+                </Box>
+              </Flex>
+            )}
+          </div>
+        );
+        break;
+
+      case 'collective-tags':
+        this.input = (
+          <div>
+            {horizontal && (
+              <Flex flexWrap="wrap" p={1}>
+                <Box width={[1, 2 / 12]}>
+                  <label>{capitalize(field.label)}</label>
+                </Box>
+                <Box width={[1, 2 / 12]}>
+                  <CollectiveTagsInput {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
+                </Box>
+              </Flex>
+            )}
+            {!horizontal && (
+              <Flex flexWrap="wrap" p={1}>
+                {field.label && (
+                  <Box width={1}>
+                    <label>{`${capitalize(field.label)}`}</label>
+                  </Box>
+                )}
+                {field.description && <HelpBlock p={1}>{field.description}</HelpBlock>}
+                <Box width={1}>
+                  <CollectiveTagsInput {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
                 </Box>
               </Flex>
             )}

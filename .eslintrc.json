@@ -33,6 +33,12 @@
             "name": "next/link",
             "message": "Next Link is not supposed to be used direclty. Please use components/Link instead."
           }
+        ],
+        "patterns": [
+          {
+            "group": ["@styled-icons/*", "!@styled-icons/*/"],
+            "message": "Add icon name to import path. Example: '@styled-icons/fa-solid' to '@styled-icons/fa-solid/Lock'."
+          }
         ]
       }
     ],

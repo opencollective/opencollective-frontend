@@ -225,6 +225,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
               height="38px"
               lineHeight="12px"
               mt="17px"
+              data-cy="create-pending-contribution"
             >
               Create +
             </StyledButton>

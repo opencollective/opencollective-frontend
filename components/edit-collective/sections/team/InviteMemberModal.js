@@ -168,6 +168,7 @@ const InviteMemberModal = props => {
               data-cy="confirmation-modal-continue"
               loading={isInviting}
               onClick={handleSubmitForm}
+              disabled={!member}
             >
               <FormattedMessage id="save" defaultMessage="Save" />
             </StyledButton>
