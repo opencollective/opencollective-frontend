@@ -1973,7 +1973,7 @@
   "NewContributionFlow.ContributionDetailsTitle": "Detalles de la contribución",
   "NewContributionFlow.FAQ.Secure.Title": "¿Es segura mi contribución?",
   "NewContributionFlow.InTheMeantime": "Mientras tanto puedes ver qué está haciendo {collective} en <CollectiveLink>su página de Colectivo</CollectiveLink>.",
-  "NewContributionFlow.Join": "Únete a {numberOfContributors} colaborador(es) más",
+  "NewContributionFlow.Join": "Join {numberOfContributors} other fellow contributors",
   "NewContributionFlow.NumberOfFinancialContributors": "Colaboradores financieros {contributors}",
   "NewContributionFlow.PaymentInstructions": "Instrucciones de pago",
   "NewContributionFlow.PendingContribution": "Contribución pendiente",
