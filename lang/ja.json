@@ -1973,7 +1973,7 @@
   "NewContributionFlow.ContributionDetailsTitle": "貢献内容",
   "NewContributionFlow.FAQ.Secure.Title": "貢献に関するデータの安全は確保されていますか？",
   "NewContributionFlow.InTheMeantime": "In the meantime, you can see what {collective} is up to <CollectiveLink>on their Collective page</CollectiveLink>.",
-  "NewContributionFlow.Join": "{numberOfContributors} 人のコントリビューターがいます。あなたも彼らの仲間入りをしましょう。",
+  "NewContributionFlow.Join": "Join {numberOfContributors} other fellow contributors",
   "NewContributionFlow.NumberOfFinancialContributors": "{contributors} financial contributors",
   "NewContributionFlow.PaymentInstructions": "Payment instructions",
   "NewContributionFlow.PendingContribution": "Pending contribution",
