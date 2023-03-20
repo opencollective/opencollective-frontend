@@ -116,7 +116,7 @@ const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, any> = {
   transaction: <FormattedMessage defaultMessage="Transaction" />,
   accounts: <FormattedMessage defaultMessage="Accounts" />,
   order: <FormattedMessage defaultMessage="Order" />,
-  expense: <FormattedMessage defaultMessage="Expense" />,
+  expense: <FormattedMessage id="Expense" defaultMessage="Expense" />,
 };
 
 const DEFAULT_FIELDS = [
@@ -153,28 +153,28 @@ const DEFAULT_FIELDS = [
 ];
 
 const FieldLabels = {
-  date: <FormattedMessage defaultMessage="Date" />,
+  date: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
   datetime: <FormattedMessage defaultMessage="Date & Time" />,
   id: <FormattedMessage defaultMessage="Transaction ID" />,
   legacyId: <FormattedMessage defaultMessage="Legacy Transaction ID" />,
   shortId: <FormattedMessage defaultMessage="Short Transaction ID" />,
   shortGroup: <FormattedMessage defaultMessage="Short Group ID" />,
   group: <FormattedMessage defaultMessage="Group ID" />,
-  description: <FormattedMessage defaultMessage="Description" />,
+  description: <FormattedMessage id="Fields.description" defaultMessage="Description" />,
   type: <FormattedMessage defaultMessage="Type" />,
-  kind: <FormattedMessage defaultMessage="Kind" />,
+  kind: <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />,
   isRefund: <FormattedMessage defaultMessage="Is Refund" />,
   isRefunded: <FormattedMessage defaultMessage="Is Refunded" />,
   refundId: <FormattedMessage defaultMessage="Refund ID" />,
   shortRefundId: <FormattedMessage defaultMessage="Short Refund ID" />,
   displayAmount: <FormattedMessage defaultMessage="Display Amount" />,
-  amount: <FormattedMessage defaultMessage="Amount" />,
+  amount: <FormattedMessage id="Fields.amount" defaultMessage="Amount" />,
   paymentProcessorFee: <FormattedMessage defaultMessage="Payment Processor Fee" />,
   platformFee: <FormattedMessage defaultMessage="Platform Fee" />,
   hostFee: <FormattedMessage defaultMessage="Host Fee" />,
   netAmount: <FormattedMessage defaultMessage="Net Amount" />,
-  balance: <FormattedMessage defaultMessage="Balance" />,
-  currency: <FormattedMessage defaultMessage="Currency" />,
+  balance: <FormattedMessage id="Balance" defaultMessage="Balance" />,
+  currency: <FormattedMessage id="Currency" defaultMessage="Currency" />,
   accountSlug: <FormattedMessage defaultMessage="Account Slug" />,
   accountName: <FormattedMessage defaultMessage="Account Name" />,
   accountType: <FormattedMessage defaultMessage="Account Type" />,

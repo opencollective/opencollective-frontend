@@ -58,7 +58,7 @@ class CollectiveGoals extends React.Component {
       add: { id: 'goal.add', defaultMessage: 'Add goal' },
       remove: { id: 'Remove', defaultMessage: 'Remove' },
       type: { id: 'goal.type.label', defaultMessage: 'Type' },
-      balance: { id: 'goal.balance.label', defaultMessage: 'Balance' },
+      balance: { id: 'Balance', defaultMessage: 'Balance' },
       monthlyBudget: { id: 'MonthlyBudget', defaultMessage: 'Monthly budget' },
       yearlyBudget: { id: 'YearlyBudget', defaultMessage: 'Yearly budget' },
       title: { id: 'goal.title.label', defaultMessage: 'Title' },
