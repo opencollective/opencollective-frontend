@@ -60,6 +60,7 @@ type CSVField =
   | 'orderId'
   | 'orderLegacyId'
   | 'orderFrequency'
+  | 'orderProcessedDate'
   | 'paymentMethodService'
   | 'paymentMethodType'
   | 'expenseId'
@@ -89,8 +90,6 @@ const FIELD_GROUPS: Record<string, CSVField[]> = {
     'displayAmount',
     'amount',
     'paymentProcessorFee',
-    'platformFee',
-    'hostFee',
     'netAmount',
     'balance',
     'currency',
@@ -108,8 +107,17 @@ const FIELD_GROUPS: Record<string, CSVField[]> = {
     'hostName',
     'hostType',
   ],
-  order: ['orderId', 'orderLegacyId', 'orderMemo', 'orderFrequency', 'paymentMethodService', 'paymentMethodType'],
+  order: [
+    'orderId',
+    'orderLegacyId',
+    'orderMemo',
+    'orderFrequency',
+    'orderProcessedDate',
+    'paymentMethodService',
+    'paymentMethodType',
+  ],
   expense: ['expenseId', 'expenseLegacyId', 'expenseType', 'expenseTags', 'payoutMethodType', 'merchantId'],
+  legacy: ['platformFee', 'hostFee'],
 };
 
 const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, any> = {
@@ -117,6 +125,7 @@ const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, any> = {
   accounts: <FormattedMessage defaultMessage="Accounts" />,
   order: <FormattedMessage defaultMessage="Order" />,
   expense: <FormattedMessage id="Expense" defaultMessage="Expense" />,
+  legacy: <FormattedMessage id="Legacy/Deprecated" defaultMessage="Legacy/Deprecated" />,
 };
 
 const DEFAULT_FIELDS = [
@@ -132,7 +141,6 @@ const DEFAULT_FIELDS = [
   'displayAmount',
   'amount',
   'paymentProcessorFee',
-  'hostFee',
   'netAmount',
   'balance',
   'currency',
@@ -190,6 +198,7 @@ const FieldLabels = {
   orderLegacyId: <FormattedMessage defaultMessage="Legacy Order ID" />,
   orderFrequency: <FormattedMessage defaultMessage="Order Frequency" />,
   orderMemo: <FormattedMessage defaultMessage="Order Memo" />,
+  orderProcessedDate: <FormattedMessage defaultMessage="Order Processed Date" />,
   paymentMethodService: <FormattedMessage defaultMessage="Payment Method Service" />,
   paymentMethodType: <FormattedMessage defaultMessage="Payment Method Type" />,
   expenseId: <FormattedMessage defaultMessage="Expense ID" />,
@@ -467,16 +476,18 @@ const ExportTransactionsCSVModal = ({
                 </Flex>
 
                 <Grid mt={1} gridGap={1} gridTemplateColumns={['1fr', '1fr 1fr']}>
-                  {FIELD_GROUPS[group].map(field => (
-                    <StyledCheckbox
-                      key={field}
-                      name={field}
-                      disabled={loading}
-                      onChange={handleFieldSwitch}
-                      checked={fields[field] === true}
-                      label={FieldLabels[field] || field}
-                    />
-                  ))}
+                  {FIELD_GROUPS[group]
+                    .filter(field => field !== 'balance' || !isHostReport)
+                    .map(field => (
+                      <StyledCheckbox
+                        key={field}
+                        name={field}
+                        disabled={loading}
+                        onChange={handleFieldSwitch}
+                        checked={fields[field] === true}
+                        label={FieldLabels[field] || field}
+                      />
+                    ))}
                 </Grid>
               </Box>
             );

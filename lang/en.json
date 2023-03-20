@@ -1263,7 +1263,6 @@
   "ExportTransactionsCSVModal.RowsWarning": "Sorry, the requested file is would take too long to be exported. Row count ({rows}) above limit.",
   "ExportTransactionsCSVModal.SelectAll": "Select all",
   "ExportTransactionsCSVModal.Title": "Export Transactions",
-  "ExportTransactionsCSVModal.TruncationWarning": "Exported CSV will be truncated in 1000 rows from a total selected of {rows} rows.",
   "ExportTransactionsCSVModal.UnselectAll": "Unselect all",
   "externalRedirect.message": "Your request is currently being redirected to {redirect}. For the safety and privacy of your Open Collective account, remember to never enter your credentials unless you're on the real Open Collective website.",
   "F21ZZ6": "Receipt Preview",
@@ -1873,6 +1872,7 @@
   "lc+Sfp": "Core member invitation declined",
   "LdgLV7": "You can provide perks or rewards for your tiers, have a set membership fee, or create categories for your contributors. Tiers can be limited to an amount or frequency (one time, monthly, yearly), or allowed to be flexibly set by contributors.",
   "LearnMoreAboutServiceFees": "Learn more about {service} fees",
+  "Legacy/Deprecated": "Legacy/Deprecated",
   "LegalName": "Legal Name",
   "lehIHr": "Organization created",
   "LeOcpF": "Something went wrong while trying to reset your password. Please try again or <SupportLink>contact support</SupportLink> if the problem persists.",
@@ -3089,6 +3089,7 @@
   "zoC8Gb": "The payee is covering the fees",
   "ZonfjV": "You cannot edit this collective",
   "ZqbBGv": "wk",
+  "ZtblWT": "Order Processed Date",
   "zu5ckP": "Refund and reject recorded transactions.",
   "ZvWD3X": "Support the event or buy tickets to attend.",
   "zWgbGg": "Today"

@@ -1263,7 +1263,6 @@
   "ExportTransactionsCSVModal.RowsWarning": "Sorry, the requested file is would take too long to be exported. Row count ({rows}) above limit.",
   "ExportTransactionsCSVModal.SelectAll": "Select all",
   "ExportTransactionsCSVModal.Title": "Export Transactions",
-  "ExportTransactionsCSVModal.TruncationWarning": "Exported CSV will be truncated in 1000 rows from a total selected of {rows} rows.",
   "ExportTransactionsCSVModal.UnselectAll": "Unselect all",
   "externalRedirect.message": "Din begäran omdirigeras till {redirect}. Tänk på säkerheten för ditt konto och ange aldrig dessa uppgifter om du inte är på Open Collective's hemsida.",
   "F21ZZ6": "Förhandsgranska kvitto",
@@ -1873,6 +1872,7 @@
   "lc+Sfp": "Inbjudan till teammedlem avböjdes",
   "LdgLV7": "Du kan ge förmåner eller belöningar för dina nivåer, ha en fast medlemsavgift eller skapa kategorier för dina bidragsgivare. Nivåer kan begränsas till ett belopp eller frekvens (en gång, månadsvis, årligen) eller bestämmas fritt av dina bidragsgivare.",
   "LearnMoreAboutServiceFees": "Läs mer om {service} avgifter",
+  "Legacy/Deprecated": "Legacy/Deprecated",
   "LegalName": "Juridiskt namn",
   "lehIHr": "Organisation skapad",
   "LeOcpF": "Something went wrong while trying to reset your password. Please try again or <SupportLink>contact support</SupportLink> if the problem persists.",
@@ -3089,6 +3089,7 @@
   "zoC8Gb": "Betalningsmottagaren täcker avgifterna",
   "ZonfjV": "Du kan inte redigera detta kollektiv",
   "ZqbBGv": "v",
+  "ZtblWT": "Order Processed Date",
   "zu5ckP": "Återbetala transaktioner.",
   "ZvWD3X": "Stöd evenemanget eller köp biljetter för att delta.",
   "zWgbGg": "Idag"

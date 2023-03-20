@@ -1263,7 +1263,6 @@
   "ExportTransactionsCSVModal.RowsWarning": "Sorry, the requested file is would take too long to be exported. Row count ({rows}) above limit.",
   "ExportTransactionsCSVModal.SelectAll": "Select all",
   "ExportTransactionsCSVModal.Title": "Export Transactions",
-  "ExportTransactionsCSVModal.TruncationWarning": "Exported CSV will be truncated in 1000 rows from a total selected of {rows} rows.",
   "ExportTransactionsCSVModal.UnselectAll": "Unselect all",
   "externalRedirect.message": "Vaša požiadavka je momentálne presmerovaná na {redirect}. Pre bezpečnosť a súkromie vášho účtu Open Collective pamätajte, že nikdy nezadávajte svoje prihlasovacie údaje, pokiaľ nie ste na skutočnej webovej stránke Open Collective.",
   "F21ZZ6": "Náhľad príjmového dokladu",
@@ -1873,6 +1872,7 @@
   "lc+Sfp": "Core member invitation declined",
   "LdgLV7": "You can provide perks or rewards for your tiers, have a set membership fee, or create categories for your contributors. Tiers can be limited to an amount or frequency (one time, monthly, yearly), or allowed to be flexibly set by contributors.",
   "LearnMoreAboutServiceFees": "Ďalšie informácie o poplatkoch za {service}",
+  "Legacy/Deprecated": "Legacy/Deprecated",
   "LegalName": "Oficiálny názov",
   "lehIHr": "Organization created",
   "LeOcpF": "Something went wrong while trying to reset your password. Please try again or <SupportLink>contact support</SupportLink> if the problem persists.",
@@ -3089,6 +3089,7 @@
   "zoC8Gb": "Poplatky hradí príjemca",
   "ZonfjV": "Tento kolektív nemôžete upravovať",
   "ZqbBGv": "wk",
+  "ZtblWT": "Order Processed Date",
   "zu5ckP": "Vrátiť a odmietnuť zaznamenané transakcie.",
   "ZvWD3X": "Podporte podujatie alebo si zakúpte vstupenky, ak si želáte zúčastniť sa.",
   "zWgbGg": "Dnes"

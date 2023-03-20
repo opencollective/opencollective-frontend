@@ -1263,7 +1263,6 @@
   "ExportTransactionsCSVModal.RowsWarning": "Sorry, the requested file is would take too long to be exported. Row count ({rows}) above limit.",
   "ExportTransactionsCSVModal.SelectAll": "Select all",
   "ExportTransactionsCSVModal.Title": "Export Transactions",
-  "ExportTransactionsCSVModal.TruncationWarning": "Exported CSV will be truncated in 1000 rows from a total selected of {rows} rows.",
   "ExportTransactionsCSVModal.UnselectAll": "Unselect all",
   "externalRedirect.message": "Twoje żądanie jest obecnie przekierowywane na adres {redirect}. Ze względu na bezpieczeństwo i prywatność twojego konta w Open Collective pamiętaj, aby nigdy nie wprowadzać swoich danych uwierzytelniających, chyba że znajdujesz się na prawdziwej stronie Open Collective.",
   "F21ZZ6": "Podgląd Paragonu",
@@ -1873,6 +1872,7 @@
   "lc+Sfp": "Odrzucono zaproszenie dla członka głównego",
   "LdgLV7": "Możesz zapewnić korzyści lub nagrody na swoich poziomach, ustalić opłatę członkowską lub stworzyć kategorie dla swoich współpracowników. Poziomy mogą być ograniczone do określonej kwoty lub częstotliwości (jednorazowo, miesięcznie, rocznie) lub mogą być dowolnie ustalane przez wpłacających.",
   "LearnMoreAboutServiceFees": "Dowiedz się więcej o opłatach {service}",
+  "Legacy/Deprecated": "Legacy/Deprecated",
   "LegalName": "Nazwa prawna",
   "lehIHr": "Organizacja utworzona",
   "LeOcpF": "Something went wrong while trying to reset your password. Please try again or <SupportLink>contact support</SupportLink> if the problem persists.",
@@ -3089,6 +3089,7 @@
   "zoC8Gb": "Odbiorca pokrywa koszty opłat",
   "ZonfjV": "Nie możesz edytować tej zbiórki",
   "ZqbBGv": "tyg.",
+  "ZtblWT": "Order Processed Date",
   "zu5ckP": "Zwroty i odrzucanie zarejestrowanych transakcji.",
   "ZvWD3X": "Wesprzyj wydarzenie lub kup bilety, aby uczestniczyć.",
   "zWgbGg": "Dzisiaj"
