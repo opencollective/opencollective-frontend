@@ -779,6 +779,7 @@
   "createCollective.form.error.slug": "Använd färre än 30 tecken",
   "createCollective.form.error.slug.hyphen": "Kollektivets slug-URL kan inte starta eller avsluta med ett bindestreck",
   "createCollective.form.error.slug.taken": "URL redan upptagen",
+  "createCollective.form.locationPlaceholder": "Where are you based?",
   "createCollective.form.nameLabel": "Kollektivets namn",
   "createCollective.form.slugLabel": "Ange en webbadress",
   "createCollective.form.suggestedLabel": "Förslag",

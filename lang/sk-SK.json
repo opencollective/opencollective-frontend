@@ -779,6 +779,7 @@
   "createCollective.form.error.slug": "Prosím použite menej ako 30 znakov",
   "createCollective.form.error.slug.hyphen": "URL skratka Kolektívu nemôže začínať ani končiť spojovníkom",
   "createCollective.form.error.slug.taken": "URL už je obsadené",
+  "createCollective.form.locationPlaceholder": "Where are you based?",
   "createCollective.form.nameLabel": "Názov Kolektívu",
   "createCollective.form.slugLabel": "Nastaviť vašu URL",
   "createCollective.form.suggestedLabel": "Navrhované",

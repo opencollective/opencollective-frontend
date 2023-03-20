@@ -779,6 +779,7 @@
   "createCollective.form.error.slug": "Please use fewer than 30 characters",
   "createCollective.form.error.slug.hyphen": "Collective slug URL cannot start or end with a hyphen",
   "createCollective.form.error.slug.taken": "URL already taken",
+  "createCollective.form.locationPlaceholder": "Where are you based?",
   "createCollective.form.nameLabel": "コレクティブ名",
   "createCollective.form.slugLabel": "URLの設定",
   "createCollective.form.suggestedLabel": "提案",

@@ -779,6 +779,7 @@
   "createCollective.form.error.slug": "Si prega di utilizzare meno di 30 caratteri",
   "createCollective.form.error.slug.hyphen": "Collective slug URL cannot start or end with a hyphen",
   "createCollective.form.error.slug.taken": "URL già in uso",
+  "createCollective.form.locationPlaceholder": "Where are you based?",
   "createCollective.form.nameLabel": "Nome Collettivo",
   "createCollective.form.slugLabel": "Imposta il tuo URL",
   "createCollective.form.suggestedLabel": "Suggerimenti",
