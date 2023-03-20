@@ -283,8 +283,9 @@ const ExportTransactionsCSVModal = ({
       ? new URL(`${process.env.REST_URL}/v2/${host.slug}/hostTransactions.${format}`)
       : new URL(`${process.env.REST_URL}/v2/${collective.slug}/transactions.${format}`);
 
+    url.searchParams.set('fetchAll', '1');
+
     if (isHostReport) {
-      url.searchParams.set('fetchAll', '1');
       if (accounts?.length) {
         url.searchParams.set('account', accounts.map(a => a.slug).join(','));
       }
@@ -292,12 +293,6 @@ const ExportTransactionsCSVModal = ({
       url.searchParams.set('includeChildrenTransactions', '1');
       url.searchParams.set('includeIncognitoTransactions', '1');
       url.searchParams.set('includeGiftCardTransactions', '1');
-      if (dateFrom) {
-        // Is the diff between dateFrom and dateTo (or today) less than 62 days?
-        if (dayjs(to || undefined).unix() - dayjs(from).unix() < 62 * 24 * 60 * 60) {
-          url.searchParams.set('fetchAll', '1');
-        }
-      }
     }
 
     if (from) {
@@ -494,7 +489,7 @@ const ExportTransactionsCSVModal = ({
               values={{ rows: exportedRows }}
             />
           </MessageBox>
-        ) : host && exportedRows > 10e3 ? (
+        ) : exportedRows > 10e3 ? (
           <MessageBox type="info" withIcon mt={3}>
             <FormattedMessage
               id="ExportTransactionsCSVModal.ExportTimeWarning"
@@ -502,16 +497,6 @@ const ExportTransactionsCSVModal = ({
               values={{
                 rows: exportedRows,
                 expectedTimeInMinutes,
-              }}
-            />
-          </MessageBox>
-        ) : !host && exportedRows > 1e3 ? (
-          <MessageBox type="info" withIcon mt={3}>
-            <FormattedMessage
-              id="ExportTransactionsCSVModal.TruncationWarning"
-              defaultMessage="Exported CSV will be truncated in 1000 rows from a total selected of {rows} rows."
-              values={{
-                rows: exportedRows,
               }}
             />
           </MessageBox>
