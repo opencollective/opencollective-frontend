@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import { useLazyQuery } from '@apollo/client';
-import { isUndefined, omitBy } from 'lodash';
+import { useQuery } from '@apollo/client';
+// import { isUndefined, omitBy } from 'lodash';
 // import { GetServerSideProps } from 'next';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { createGlobalStyle } from 'styled-components';
 
-import { initClient } from '../../lib/apollo-client';
+import { addApolloState, initClient } from '../../lib/apollo-client';
 import { getCollectivePageMetadata } from '../../lib/collective.lib';
 import { generateNotFoundError } from '../../lib/errors';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -71,31 +71,22 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps(context) {
-  //  const { slug, status, step, mode, action } = context.query as CollectivePageQuery;
-  const { slug } = context.params;
   const client = initClient();
-
-  const { data, error } = await client.query({
+  const variables = {
+    slug: context.params.slug,
+    nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+  };
+  const res = await client.query({
     query: collectivePageQuery,
-    variables: { slug: context.params.slug, nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD },
-    // fetchPolicy: 'network-only',
+    variables,
   });
 
-  return {
-    props: omitBy(
-      {
-        //    status,
-        // step,
-        // mode,
-        skipDataFromTree: false,
-        // action,
-        slug,
-        data,
-        error: error || null,
-      },
-      isUndefined,
-    ),
-  };
+  console.log({ res, variables });
+
+  return addApolloState(client, {
+    props: {},
+    // revalidate: 1,
+  });
 }
 
 // export const getServerSideProps: GetServerSideProps = async context => {
@@ -128,13 +119,19 @@ export async function getStaticProps(context) {
 const CollectivePage = props => {
   const { LoggedInUser } = useLoggedInUser();
   const router = useRouter();
-  // const { slug, status, step, mode, action } = router.query;
+  const { slug, status, step, mode, action } = router.query;
+  const variables = { slug: router.query.slug, nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD };
+  const { data, loading, error } = useQuery(collectivePageQuery, {
+    variables,
+    // Setting this value to true will make the component rerender when
+    // the "networkStatus" changes, so we are able to know if it is fetching
+    // more data
+    notifyOnNetworkStatusChange: true,
+  });
 
-  //   const [fetchData, query] = useLazyQuery(collectivePageQuery, {
-  //     variables: { slug: router.query.slug, nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD },
-  //   });
-  const data = props.data; // query.data || props.data;
   const collective = data?.Collective;
+
+  console.log({ data, loading, error, variables });
   //  const [showOnboardingModal, setShowOnboardingModal] = React.useState(false);
 
   //   React.useEffect(() => {

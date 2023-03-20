@@ -4,11 +4,13 @@
 import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
-import { pick } from 'lodash';
+import merge from 'deepmerge';
+import { isEqual, pick } from 'lodash';
 
 import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFactorAuthenticationApolloLink';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from './local-storage';
 import { parseToBoolean } from './utils';
+import { useMemo } from 'react';
 
 let apolloClient, customAgent;
 
@@ -16,6 +18,7 @@ const INTERNAL_API_V1_URL = process.env.INTERNAL_API_V1_URL;
 const INTERNAL_API_V2_URL = process.env.INTERNAL_API_V2_URL;
 const INTERNAL_API_V1_OPERATION_NAMES = process.env.INTERNAL_API_V1_OPERATION_NAMES;
 const INTERNAL_API_V2_OPERATION_NAMES = process.env.INTERNAL_API_V2_OPERATION_NAMES;
+const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__';
 
 const getBaseApiUrl = (apiVersion, internal = false) => {
   if (process.browser) {
@@ -230,17 +233,82 @@ function createClient({ initialState, twoFactorAuthContext }: any = {}) {
   });
 }
 
-export function initClient({ initialState, twoFactorAuthContext }: any = {}): ReturnType<typeof createClient> {
-  // Make sure to create a new client for every server-side request so that data
-  // isn't shared between connections (which would be bad)
-  if (!process.browser) {
-    return createClient({ initialState });
-  }
+// export function initClient({ initialState, twoFactorAuthContext }: any = {}): ReturnType<typeof createClient> {
+//   // Make sure to create a new client for every server-side request so that data
+//   // isn't shared between connections (which would be bad)
+//   if (!process.browser) {
+//     return createClient({ initialState });
+//   }
 
-  // Reuse client on the client-side
+//   // Reuse client on the client-side
+//   if (!apolloClient) {
+//     apolloClient = createClient({ initialState, twoFactorAuthContext });
+//   }
+
+//   if (initialState) {
+//     // Get existing cache, loaded during client side data fetching
+//     const existingCache = apolloClient.extract();
+
+//     // Merge the initialState from getStaticProps/getServerSideProps in the existing cache
+//     const data = merge(existingCache, initialState, {
+//       // combine arrays using object equality (like in sets)
+//       arrayMerge: (destinationArray, sourceArray) => [
+//         ...sourceArray,
+//         ...destinationArray.filter(d => sourceArray.every(s => !isEqual(d, s))),
+//       ],
+//     });
+
+//     // Restore the cache with the merged data
+//     apolloClient.cache.restore(data);
+//   }
+
+//   return apolloClient;
+// }
+
+// from Next.js function
+export function initClient({ initialState = null } = {}) {
+  const _apolloClient = apolloClient ?? createClient();
+
+  // If your page has Next.js data fetching methods that use Apollo Client, the initial state
+  // gets hydrated here
+  if (initialState) {
+    // Get existing cache, loaded during client side data fetching
+    const existingCache = _apolloClient.extract();
+
+    // Merge the initialState from getStaticProps/getServerSideProps in the existing cache
+    const data = merge(existingCache, initialState, {
+      // combine arrays using object equality (like in sets)
+      arrayMerge: (destinationArray, sourceArray) => [
+        ...sourceArray,
+        ...destinationArray.filter(d => sourceArray.every(s => !isEqual(d, s))),
+      ],
+    });
+
+    // Restore the cache with the merged data
+    _apolloClient.cache.restore(data);
+  }
+  // For SSG and SSR always create a new Apollo Client
+  if (typeof window === 'undefined') {
+    return _apolloClient;
+  }
+  // Create the Apollo Client once in the client
   if (!apolloClient) {
-    apolloClient = createClient({ initialState, twoFactorAuthContext });
+    apolloClient = _apolloClient;
   }
 
-  return apolloClient;
+  return _apolloClient;
+}
+
+export function addApolloState(client, pageProps) {
+  if (pageProps?.props) {
+    pageProps.props[APOLLO_STATE_PROP_NAME] = client.cache.extract();
+  }
+
+  return pageProps;
+}
+
+export function useApollo(pageProps) {
+  const state = pageProps[APOLLO_STATE_PROP_NAME];
+  const store = useMemo(() => initClient({ initialState: state }), [state]);
+  return store;
 }
