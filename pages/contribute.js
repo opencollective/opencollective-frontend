@@ -71,9 +71,26 @@ class TiersPage extends React.Component {
     return contributors.filter(c => c.isBacker && (c.tiersIds.length === 0 || c.tiersIds[0] === null));
   });
 
-  hasContributors = memoizeOne((contributors, events) => {
-    const hasFinancial = contributors.find(c => c.isBacker);
-    return hasFinancial || events.find(event => event.contributors.length > 0);
+  hasContributors = memoizeOne((collective, verb) => {
+    const hasFinancial = collective.contributors.some(c => c.isBacker);
+    const hasEventContributors = collective.events?.some(event => event.contributors.length > 0);
+    const hasProjectContributors = collective.projects?.some(project => project.contributors.length > 0);
+    const hasConnectedCollectiveContributors = collective.connectedCollectives?.some(
+      connectedCollective => connectedCollective.collective.contributors.length > 0,
+    );
+
+    switch (verb) {
+      case 'events':
+        return hasEventContributors;
+      case 'projects':
+        return hasProjectContributors;
+      case 'connected-collectives':
+        return hasConnectedCollectiveContributors;
+      case 'tiers':
+        return hasFinancial;
+      default:
+        return hasFinancial || hasEventContributors || hasProjectContributors;
+    }
   });
 
   getPageMetadata(collective) {
@@ -98,7 +115,7 @@ class TiersPage extends React.Component {
 
     const waysToContribute = [];
     const canContribute = collective.isActive && collective.host;
-    const hasContributors = this.hasContributors(collective.contributors, collective.events);
+    const hasContributors = this.hasContributors(collective, verb);
     const showAll = verb === 'contribute';
 
     // Financial contributions

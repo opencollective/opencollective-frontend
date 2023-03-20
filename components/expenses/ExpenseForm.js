@@ -24,8 +24,8 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
-import StyledInput from '../StyledInput';
 import StyledInputTags from '../StyledInputTags';
+import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
@@ -539,7 +539,7 @@ const ExpenseFormBody = ({
                 />
               </P>
               <Field
-                as={StyledInput}
+                as={StyledTextarea}
                 autoFocus={autoFocusTitle}
                 border="0"
                 error={errors.description}
@@ -552,6 +552,7 @@ const ExpenseFormBody = ({
                 py={1}
                 width="100%"
                 withOutline
+                autoSize
                 placeholder={
                   values.type === expenseTypes.GRANT
                     ? formatMessage(msg.grantSubjectPlaceholder)

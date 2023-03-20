@@ -1,13 +1,7 @@
 name: 'Chromatic'
 
 on:
-  push:
-    paths:
-      - 'components/**'
-      - '.storybook/**'
-      - 'stories/**'
-    branches-ignore:
-      - 'renovate/**'
+  workflow_dispatch:
 
 jobs:
   chromatic-deployment:

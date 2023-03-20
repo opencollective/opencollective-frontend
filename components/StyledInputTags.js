@@ -76,6 +76,7 @@ const Input = styled.input`
 const InputWrapper = styled(Box)`
   position: sticky;
   top: 0;
+  z-index: 9; // To make sure tags are not appearing over the input
   padding: 12px 16px;
   background-color: inherit;
   :not(:only-child) {

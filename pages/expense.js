@@ -626,12 +626,12 @@ class ExpensePage extends React.Component {
                                 defaultMessage="I agree with the {toslink} and {privacylink} of Open Collective."
                                 values={{
                                   toslink: (
-                                    <StyledLink href="/tos" openInNewTab>
+                                    <StyledLink href="/tos" openInNewTab onClick={e => e.stopPropagation()}>
                                       <FormattedMessage id="tos" defaultMessage="terms of service" />
                                     </StyledLink>
                                   ),
                                   privacylink: (
-                                    <StyledLink href="/privacypolicy" openInNewTab>
+                                    <StyledLink href="/privacypolicy" openInNewTab onClick={e => e.stopPropagation()}>
                                       <FormattedMessage id="privacypolicy" defaultMessage="privacy policy" />
                                     </StyledLink>
                                   ),

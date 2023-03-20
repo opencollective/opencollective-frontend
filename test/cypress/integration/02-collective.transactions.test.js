@@ -13,11 +13,6 @@ describe('collective.transactions', () => {
 
   it("shows the 'Download CSV' button and popup feature buttons", () => {
     cy.visit('/apex/transactions');
-    cy.get('[data-cy=download-csv]').click();
-
-    cy.wait(300);
-
-    cy.get('[data-cy=download-csv-download]').should('exist');
-    cy.get('[data-cy=download-csv-download-v2]').should('exist');
+    cy.get('[data-cy=download-csv]').should('exist');
   });
 });

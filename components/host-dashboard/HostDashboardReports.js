@@ -157,7 +157,7 @@ const FilterLabel = styled.label`
 `;
 
 const prepareCollectivesForFilter = collectives => {
-  return !collectives?.length ? null : collectives.map(collective => ({ legacyId: collective.value.id }));
+  return !collectives?.length ? null : collectives.map(({ value }) => ({ legacyId: value.id, slug: value.slug }));
 };
 
 const getDefaultDateInterval = () => {

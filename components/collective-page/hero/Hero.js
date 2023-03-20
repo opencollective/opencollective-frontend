@@ -265,11 +265,11 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                 </Flex>
               )}
               <Flex alignItems="center" flexWrap="wrap">
-                <Flex my={2}>
+                <Flex mb={2} mt={-2} flexWrap="wrap">
                   {collective.canContact && (
                     <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
                       {btnProps => (
-                        <StyledRoundButton {...btnProps} size={32} mr={3} title="Contact" aria-label="Contact">
+                        <StyledRoundButton mt={2} {...btnProps} size={32} mr={3} title="Contact" aria-label="Contact">
                           <Mail size={12} />
                         </StyledRoundButton>
                       )}
@@ -282,7 +282,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       href={twitterProfileUrl(collective.twitterHandle)}
                       openInNewTabNoFollowRelMe
                     >
-                      <StyledRoundButton size={32} mr={3} title="Twitter" aria-label="Twitter link">
+                      <StyledRoundButton size={32} mt={2} mr={3} title="Twitter" aria-label="Twitter link">
                         <Twitter size={12} />
                       </StyledRoundButton>
                     </StyledLink>
@@ -292,6 +292,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       <StyledRoundButton
                         size={32}
                         mr={3}
+                        mt={2}
                         title={intl.formatMessage(Translations.website)}
                         aria-label="Website link"
                       >
@@ -301,7 +302,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                   )}
                   {!hasSocialLinks && collective.repositoryUrl && (
                     <StyledLink data-cy="repositoryUrl" href={collective.repositoryUrl} openInNewTabNoFollowRelMe>
-                      <StyledButton buttonSize="tiny" color="black.700" height={32} mr={3}>
+                      <StyledButton mt={2} buttonSize="tiny" color="black.700" height={32} mr={3}>
                         <CodeRepositoryIcon size={12} repositoryUrl={collective.repositoryUrl} />
                         <Span ml={2}>
                           <FormattedMessage defaultMessage="Code repository" />
