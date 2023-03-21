@@ -8,9 +8,10 @@ import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
+import { useApollo } from '../lib/apollo-client';
 import theme from '../lib/theme';
-import withData from '../lib/withData';
 
+// import withData from '../lib/withData';
 import StripeProviderSSR from '../components/StripeProvider';
 import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
 import UserProvider from '../components/UserProvider';
@@ -47,110 +48,115 @@ if (!process.browser) {
 // since it prevents memory leak
 const cache = createIntlCache();
 
-class OpenCollectiveFrontendApp extends App {
-  static propTypes = {
-    pageProps: PropTypes.object.isRequired,
-    scripts: PropTypes.object.isRequired,
-    locale: PropTypes.string,
-    messages: PropTypes.object,
-  };
+const OpenCollectiveFrontendApp = ({ Component, pageProps, locale, messages, scripts }) => {
+  // const {  Component, pageProps, scripts, locale, messages } = this.props;
+  const apolloClient = useApollo(pageProps);
 
-  constructor() {
-    super(...arguments);
-    this.state = { hasError: false, errorEventId: undefined };
-  }
+  const intl = createIntl({ locale: locale || 'en', defaultLocale: 'en', messages }, cache);
 
-  static async getInitialProps({ Component, ctx, client }) {
-    // Get the `locale` and `messages` from the request object on the server.
-    // In the browser, use the same values that the server serialized.
-    const { locale, messages } = ctx?.req || window.__NEXT_DATA__.props;
-    const props = { pageProps: {}, scripts: {}, locale, messages };
+  return (
+    <Fragment>
+      <ApolloProvider client={apolloClient}>
+        <ThemeProvider theme={theme}>
+          <StripeProviderSSR>
+            <RawIntlProvider value={intl}>
+              <UserProvider>
+                <NewsAndUpdatesProvider>
+                  <ToastProvider>
+                    <Component {...pageProps} />
+                    <GlobalToasts />
+                    <GlobalNewsAndUpdates />
+                    <TwoFactorAuthenticationModal />
+                  </ToastProvider>
+                </NewsAndUpdatesProvider>
+              </UserProvider>
+            </RawIntlProvider>
+          </StripeProviderSSR>
+        </ThemeProvider>
+      </ApolloProvider>
+      {Object.keys(scripts || {}).map(key => (
+        <script key={key} type="text/javascript" src={scripts[key]} />
+      ))}
+    </Fragment>
+  );
+};
 
-    try {
-      if (Component.getInitialProps) {
-        props.pageProps = await Component.getInitialProps({ ...ctx, client });
-      }
+// class OpenCollectiveFrontendApp extends App {
+//   static propTypes = {
+//     pageProps: PropTypes.object.isRequired,
+//     scripts: PropTypes.object.isRequired,
+//     locale: PropTypes.string,
+//     messages: PropTypes.object,
+//   };
 
-      if (props.pageProps.scripts) {
-        if (props.pageProps.scripts.googleMaps) {
-          if (ctx.req) {
-            props.scripts['google-maps'] = getGoogleMapsScriptUrl();
-          } else {
-            try {
-              await loadGoogleMaps();
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.error(e);
-            }
-          }
-        }
-      }
-    } catch (error) {
-      return { ...props, hasError: true, errorEventId: sentryLib.captureException(error, ctx) };
-    }
+//   constructor() {
+//     super(...arguments);
+//     this.state = { hasError: false, errorEventId: undefined };
+//   }
 
-    return props;
-  }
+//   // static async getInitialProps({ Component, ctx, client }) {
+//   //   // Get the `locale` and `messages` from the request object on the server.
+//   //   // In the browser, use the same values that the server serialized.
+//   //   const { locale, messages } = ctx?.req || window.__NEXT_DATA__.props;
+//   //   const props = { pageProps: {}, scripts: {}, locale, messages };
 
-  static getDerivedStateFromProps(props, state) {
-    // If there was an error generated within getInitialProps, and we haven't
-    // yet seen an error, we add it to this.state here
-    return {
-      hasError: props.hasError || state.hasError || false,
-      errorEventId: props.errorEventId || state.errorEventId || undefined,
-    };
-  }
+//   //   try {
+//   //     if (Component.getInitialProps) {
+//   //       props.pageProps = await Component.getInitialProps({ ...ctx, client });
+//   //     }
 
-  componentDidCatch(error, errorInfo) {
-    const errorEventId = sentryLib.captureException(error, { errorInfo });
-    this.setState({ hasError: true, errorEventId });
-    super.componentDidCatch(error, errorInfo);
-  }
+//   //     if (props.pageProps.scripts) {
+//   //       if (props.pageProps.scripts.googleMaps) {
+//   //         if (ctx.req) {
+//   //           props.scripts['google-maps'] = getGoogleMapsScriptUrl();
+//   //         } else {
+//   //           try {
+//   //             await loadGoogleMaps();
+//   //           } catch (e) {
+//   //             // eslint-disable-next-line no-console
+//   //             console.error(e);
+//   //           }
+//   //         }
+//   //       }
+//   //     }
+//   //   } catch (error) {
+//   //     return { ...props, hasError: true, errorEventId: sentryLib.captureException(error, ctx) };
+//   //   }
 
-  componentDidMount() {
-    Router.events.on('routeChangeComplete', url => {
-      if (window && window._paq) {
-        if (url.match(/\/signin\/sent/)) {
-          window._paq.push(['setCustomUrl', '/signin/sent']);
-        } else {
-          window._paq.push(['setCustomUrl', url]);
-        }
-        window._paq.push(['trackPageView']);
-      }
-    });
-  }
+//   //   return props;
+//   // }
 
-  render() {
-    const { client, Component, pageProps, scripts, locale, messages } = this.props;
+//   // static getDerivedStateFromProps(props, state) {
+//   //   // If there was an error generated within getInitialProps, and we haven't
+//   //   // yet seen an error, we add it to this.state here
+//   //   return {
+//   //     hasError: props.hasError || state.hasError || false,
+//   //     errorEventId: props.errorEventId || state.errorEventId || undefined,
+//   //   };
+//   // }
 
-    const intl = createIntl({ locale: locale || 'en', defaultLocale: 'en', messages }, cache);
+//   // componentDidCatch(error, errorInfo) {
+//   //   const errorEventId = sentryLib.captureException(error, { errorInfo });
+//   //   this.setState({ hasError: true, errorEventId });
+//   //   super.componentDidCatch(error, errorInfo);
+//   // }
 
-    return (
-      <Fragment>
-        <ApolloProvider client={client}>
-          <ThemeProvider theme={theme}>
-            <StripeProviderSSR>
-              <RawIntlProvider value={intl}>
-                <UserProvider>
-                  <NewsAndUpdatesProvider>
-                    <ToastProvider>
-                      <Component {...pageProps} />
-                      <GlobalToasts />
-                      <GlobalNewsAndUpdates />
-                      <TwoFactorAuthenticationModal />
-                    </ToastProvider>
-                  </NewsAndUpdatesProvider>
-                </UserProvider>
-              </RawIntlProvider>
-            </StripeProviderSSR>
-          </ThemeProvider>
-        </ApolloProvider>
-        {Object.keys(scripts).map(key => (
-          <script key={key} type="text/javascript" src={scripts[key]} />
-        ))}
-      </Fragment>
-    );
-  }
-}
+//   // componentDidMount() {
+//   //   Router.events.on('routeChangeComplete', url => {
+//   //     if (window && window._paq) {
+//   //       if (url.match(/\/signin\/sent/)) {
+//   //         window._paq.push(['setCustomUrl', '/signin/sent']);
+//   //       } else {
+//   //         window._paq.push(['setCustomUrl', url]);
+//   //       }
+//   //       window._paq.push(['trackPageView']);
+//   //     }
+//   //   });
+//   // }
 
-export default withData(OpenCollectiveFrontendApp);
+//   render() {
+
+//   }
+// }
+
+export default OpenCollectiveFrontendApp;

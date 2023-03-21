@@ -55,6 +55,7 @@
     "currency-symbol-map": "5.1.0",
     "dayjs": "1.11.7",
     "debug": "4.3.4",
+    "deepmerge": "^4.3.1",
     "diff": "5.1.0",
     "dotenv": "16.0.3",
     "draft-js": "0.11.7",
