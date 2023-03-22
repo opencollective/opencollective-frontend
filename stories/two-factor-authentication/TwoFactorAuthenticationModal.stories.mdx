@@ -37,6 +37,18 @@ export const DefaultStory = props => <TwoFactorAuthenticationModal {...props} />
   </Story>
 </Canvas>
 
+## Methods
+
+<Canvas>
+  <Story name="Methods">
+    <TwoFactorAuthContext.Provider
+      value={{ prompt: { isOpen: true, supportedMethods: ['totp', 'yubikey_otp', 'recovery_code'] } }}
+    >
+      <TwoFactorAuthenticationModal />
+    </TwoFactorAuthContext.Provider>
+  </Story>
+</Canvas>
+
 ## No 2FA configured
 
 <Canvas>

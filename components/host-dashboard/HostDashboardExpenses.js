@@ -145,12 +145,12 @@ const hasParams = query => {
   });
 };
 
-const HostDashboardExpenses = ({ hostSlug, isNewAdmin }) => {
+const HostDashboardExpenses = ({ hostSlug }) => {
   const router = useRouter() || {};
   const query = router.query;
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const hasFilters = React.useMemo(() => hasParams(query), [query]);
-  const pageRoute = isNewAdmin ? `/${hostSlug}/admin/expenses` : `/${hostSlug}/dashboard/expenses`;
+  const pageRoute = `/${hostSlug}/admin/expenses`;
   const expenses = useQuery(hostDashboardExpensesQuery, {
     variables: { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) },
     context: API_V2_CONTEXT,
