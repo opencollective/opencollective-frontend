@@ -5,6 +5,7 @@ import { withRouter } from 'next/router';
 import AcceptContributionsOurselvesOrOrg from './AcceptContributionsOurselvesOrOrg';
 import ApplyToHost from './ApplyToHost';
 import ContributionCategoryPicker from './ContributionCategoryPicker';
+import StartAcceptingFinancialContributionsPage from './StartAcceptingFinancialContributionsPage';
 import SuccessPage from './SuccessPage';
 
 class AcceptFinancialContributions extends Component {
@@ -31,6 +32,10 @@ class AcceptFinancialContributions extends Component {
     const { router } = this.props;
     const { chosenHost } = this.state;
     const { path, state, message } = router.query;
+
+    if (!path && ['development', 'staging'].includes(process.env.OC_ENV) && router.query.newFlow) {
+      return <StartAcceptingFinancialContributionsPage collective={this.props.collective} />;
+    }
 
     if (!path) {
       return <ContributionCategoryPicker collective={this.props.collective} />;
