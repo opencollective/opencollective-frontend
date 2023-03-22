@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { Question } from '@styled-icons/remix-line/Question';
+import dayjs from 'dayjs';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -80,19 +81,11 @@ const hostReportPageQuery = gql`
           valueInCents
           currency
         }
-        pendingPlatformFees {
-          valueInCents
-          currency
-        }
         platformTips {
           valueInCents
           currency
         }
         pendingPlatformTips {
-          valueInCents
-          currency
-        }
-        pendingHostFeeShare {
           valueInCents
           currency
         }
@@ -173,7 +166,11 @@ const HostDashboardReports = ({ hostSlug }) => {
   const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
   const [collectives, setCollectives] = React.useState(null);
   const dateFrom = simpleDateToISOString(dateInterval?.from, false, dateInterval?.timezoneType);
-  const dateTo = simpleDateToISOString(dateInterval?.to, true, dateInterval?.timezoneType);
+  const dateTo =
+    // Not useful to pass today or a future date, can end up deoptimizing the API call
+    dateInterval?.to && dayjs(dateInterval?.to).isBefore(dayjs().startOf('day'))
+      ? simpleDateToISOString(dateInterval?.to, true, dateInterval?.timezoneType)
+      : null;
   const variables = { hostSlug, account: collectives, dateFrom, dateTo };
   const { data, error, loading } = useQuery(hostReportPageQuery, { variables, context: API_V2_CONTEXT });
   const host = data?.host;
