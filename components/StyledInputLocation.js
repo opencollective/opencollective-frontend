@@ -64,8 +64,8 @@ const StyledInputLocation = ({
       </StyledInputField>
       {hasCountry && !useFallback && !forceLegacyFormat ? (
         <I18nAddressFields
-          selectedCountry={location.country}
-          value={location.structured || {}}
+          selectedCountry={location?.country}
+          value={location?.structured || {}}
           onLoadError={() => setUseFallback(true)} // TODO convert from structured to raw
           Component={SimpleLocationFieldRenderer}
           fieldProps={{ labelFontSize, labelFontWeight }}
