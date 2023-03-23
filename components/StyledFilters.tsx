@@ -12,8 +12,8 @@ const FilterButton = styled(StyledButton).attrs({
 })`
   font-size: 14px;
   font-weight: 400;
-  height: ${props => props.heignt};
-  padding: ${props => props.padding};
+  height: ${props => props.height};
+  padding: ${(props: { padding: string | number }) => props.padding};
   background: #f9fafb;
   border-color: white;
   color: ${props => props.theme.colors.black[800]};
@@ -40,7 +40,7 @@ const FilterButton = styled(StyledButton).attrs({
   }
 `;
 
-const ButtonContainer = styled.span`
+const ButtonContainer = styled.span<{ flexGrow: string }>`
   ${props =>
     props.flexGrow &&
     css`
