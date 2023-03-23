@@ -1,11 +1,12 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { Collective, Host } from '../../lib/graphql/types/v2/graphql';
+import { getCountryDisplayName, isoCountryList } from '../../lib/i18n/countries';
 
 import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -198,8 +199,8 @@ function IndependentCollectiveCard(props: { collective: Collective }) {
 }
 
 const FindAFiscalHostQuery = gql`
-  query FindAFiscalHostQuery($tags: [String], $limit: Int) {
-    hosts(tag: $tags, limit: $limit, tagSearchOperator: OR) {
+  query FindAFiscalHostQuery($tags: [String], $limit: Int, $country: [CountryISO]) {
+    hosts(tag: $tags, limit: $limit, tagSearchOperator: OR, country: $country) {
       totalCount
       nodes {
         id
@@ -286,12 +287,13 @@ function OtherFiscalHostResults({
   );
 }
 
-function FindAHostSearch(props: { selectedCommunityType: string[] }) {
+function FindAHostSearch(props: { selectedCommunityType: string[]; selectedCountry: string }) {
   const { data, loading } = useQuery<{
     hosts: { nodes: Pick<Host, 'slug' | 'currency' | 'totalHostedCollectives' | 'hostFeePercent' | 'isTrustedHost'>[] };
   }>(FindAFiscalHostQuery, {
     variables: {
       tags: props.selectedCommunityType.length !== 0 ? props.selectedCommunityType : undefined,
+      country: props.selectedCountry !== 'ALL' ? [props.selectedCountry] : null,
       limit: 50,
     },
     context: API_V2_CONTEXT,
@@ -332,9 +334,29 @@ function FindAHostSearch(props: { selectedCommunityType: string[] }) {
   );
 }
 
+const I18nMessages = defineMessages({
+  ALL_COUNTRIES: {
+    defaultMessage: 'All countries',
+  },
+});
+
 export default function StartAcceptingFinancialContributionsPage(props: StartAcceptingFinancialContributionsPageProps) {
+  const intl = useIntl();
+  const allCountriesSelectOption = { value: 'ALL', label: intl.formatMessage(I18nMessages.ALL_COUNTRIES) };
   const [selectedCommunityType, setSelectedCommunityType] = React.useState<string[]>([]);
+  const [selectedCountry, setSelectedCountry] = React.useState(allCountriesSelectOption);
   const [searchingForFiscalHost, setSearchingForFiscalHost] = React.useState(false);
+
+  const countrySelectOptions = React.useMemo(() => {
+    const countryList = isoCountryList
+      .map(countryCode => ({
+        value: countryCode,
+        label: getCountryDisplayName(intl, countryCode),
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+
+    return [allCountriesSelectOption, ...countryList];
+  }, [intl]);
 
   return (
     <Flex my={5} alignItems="center" flexDirection="column">
@@ -371,9 +393,10 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
           <FormattedMessage defaultMessage="Where would your collective be most active?" />
         </P>
         <StyledSelect
-          value={{ value: 'All countries', label: 'All countries' }}
+          value={selectedCountry}
           inputId="country-input"
-          options={[{ value: 'All countries', label: 'All countries' }]}
+          options={countrySelectOptions}
+          onChange={setSelectedCountry}
         />
         <P color="black.600" fontWeight="400" fontSize="11px" lineHeight="16px">
           <FormattedMessage defaultMessage="If multiple areas, please select most prominent of them all." />
@@ -430,7 +453,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
 
       {searchingForFiscalHost && (
         <Box mt={3} width="1000px">
-          <FindAHostSearch selectedCommunityType={selectedCommunityType} />
+          <FindAHostSearch selectedCommunityType={selectedCommunityType} selectedCountry={selectedCountry.value} />
         </Box>
       )}
     </Flex>
