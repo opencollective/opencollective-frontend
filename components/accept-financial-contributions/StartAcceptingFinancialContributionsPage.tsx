@@ -72,7 +72,7 @@ const StyledCollectiveCardWrapper = styled(StyledCollectiveCard)`
   }
 `;
 
-const CommunityTypes = ['Open Source', 'Mutual Aid', 'Climate Change', 'BLM', 'Indigenous', 'Education', 'Festival'];
+const CommunityTypes = ['Open Source', 'Mutual Aid', 'Climate', 'BLM', 'Indigenous', 'Education', 'Festival'];
 
 function ApplyToHostCard(props: {
   host: Pick<Host, 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>;
@@ -199,7 +199,7 @@ function IndependentCollectiveCard(props: { collective: Collective }) {
 
 const FindAFiscalHostQuery = gql`
   query FindAFiscalHostQuery($tags: [String], $limit: Int) {
-    hosts(tag: $tags, limit: $limit, isActive: true, tagSearchOperator: "OR") {
+    hosts(tag: $tags, limit: $limit, tagSearchOperator: OR) {
       totalCount
       nodes {
         id
@@ -215,6 +215,11 @@ const FindAFiscalHostQuery = gql`
         totalHostedCollectives
         hostFeePercent
         isTrustedHost
+        location {
+          id
+          country
+        }
+        tags
       }
     }
   }
@@ -286,7 +291,7 @@ function FindAHostSearch(props: { selectedCommunityType: string[] }) {
     hosts: { nodes: Pick<Host, 'slug' | 'currency' | 'totalHostedCollectives' | 'hostFeePercent' | 'isTrustedHost'>[] };
   }>(FindAFiscalHostQuery, {
     variables: {
-      tags: props.selectedCommunityType ? [props.selectedCommunityType] : [],
+      tags: props.selectedCommunityType.length !== 0 ? props.selectedCommunityType : undefined,
       limit: 50,
     },
     context: API_V2_CONTEXT,

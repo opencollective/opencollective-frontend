@@ -5,15 +5,17 @@ import { injectIntl, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../lib/collective.lib';
+import { getCountryDisplayName, getFlagEmoji } from '../lib/i18n/countries';
 
 import Avatar from './Avatar';
 import Container from './Container';
+import { Box, Flex } from './Grid';
 import I18nCollectiveTags from './I18nCollectiveTags';
 import LinkCollective from './LinkCollective';
 import StyledCard from './StyledCard';
 import StyledLink from './StyledLink';
 import StyledTag from './StyledTag';
-import { P } from './Text';
+import { P, Span } from './Text';
 
 const MaskSVG = props => (
   <svg
@@ -192,19 +194,29 @@ const StyledCollectiveCard = ({
                 </StyledLink>
               </P>
             )}
-            {collective.isFrozen ? (
-              <StyledTag display="inline-block" variant="rounded-right" my={2}>
-                <I18nCollectiveTags tags={intl.formatMessage({ defaultMessage: 'This Collective is frozen' })} />
-              </StyledTag>
-            ) : tag === undefined ? (
-              <StyledTag display="inline-block" variant="rounded-right" my={2}>
-                <I18nCollectiveTags
-                  tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
-                />
-              </StyledTag>
-            ) : (
-              tag
-            )}
+
+            <Flex my={2} alignItems="center">
+              {collective.location?.country && (
+                <Box mr={1}>
+                  {getFlagEmoji(collective.location?.country)}
+                  <Span ml={1}></Span>
+                  {getCountryDisplayName(intl, collective.location?.country)}
+                </Box>
+              )}
+              {collective.isFrozen ? (
+                <StyledTag display="inline-block" variant="rounded-right">
+                  <I18nCollectiveTags tags={intl.formatMessage({ defaultMessage: 'This Collective is frozen' })} />
+                </StyledTag>
+              ) : tag === undefined ? (
+                <StyledTag display="inline-block" variant="rounded-right">
+                  <I18nCollectiveTags
+                    tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
+                  />
+                </StyledTag>
+              ) : (
+                tag
+              )}
+            </Flex>
           </Container>
           {children}
         </Container>
@@ -238,6 +250,9 @@ StyledCollectiveCard.propTypes = {
     }),
     parent: PropTypes.shape({
       backgroundImageUrl: PropTypes.string,
+    }),
+    location: PropTypes.shape({
+      country: PropTypes.string,
     }),
     isFrozen: PropTypes.bool,
   }).isRequired,
