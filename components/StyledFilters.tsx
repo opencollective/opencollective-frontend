@@ -1,6 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
+import { FlexGrowProps } from 'styled-system';
 
 import { Flex } from './Grid';
 import StyledButton from './StyledButton';
@@ -40,7 +40,7 @@ const FilterButton = styled(StyledButton).attrs({
   }
 `;
 
-const ButtonContainer = styled.span<{ flexGrow: string }>`
+const ButtonContainer = styled.span<{ flexGrow: FlexGrowProps['flexGrow'] }>`
   ${props =>
     props.flexGrow &&
     css`
@@ -49,6 +49,18 @@ const ButtonContainer = styled.span<{ flexGrow: string }>`
 `;
 
 const defaultGetLabel = filter => filter;
+
+type StyledFiltersProps = {
+  filters: string[];
+  getLabel: (string) => string;
+  onChange: (value) => void;
+  selected: string;
+  disabled?: boolean;
+  buttonGrow?: FlexGrowProps['flexGrow'];
+  minButtonWidth?: number | string;
+  buttonHeight?: number | string;
+  buttonPadding?: number | string;
+};
 
 /**
  * A controlled component to display a list of filters.
@@ -64,7 +76,7 @@ const StyledFilters = ({
   buttonPadding = '4px 14px',
   buttonGrow = undefined,
   ...flexProps
-}) => {
+}: StyledFiltersProps) => {
   return (
     <Flex data-cy="filters" px={1} py={1} css={{ overflowX: 'auto' }} gap="8px" {...flexProps}>
       {filters.map(filter => {
@@ -87,18 +99,6 @@ const StyledFilters = ({
       })}
     </Flex>
   );
-};
-
-StyledFilters.propTypes = {
-  filters: PropTypes.arrayOf(PropTypes.string).isRequired,
-  getLabel: PropTypes.func.isRequired,
-  onChange: PropTypes.func.isRequired,
-  selected: PropTypes.string,
-  disabled: PropTypes.bool,
-  buttonGrow: PropTypes.any,
-  minButtonWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  buttonHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  buttonPadding: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default StyledFilters;
