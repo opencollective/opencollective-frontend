@@ -5,6 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { simpleDateToISOString } from '../lib/date-utils';
 import type { Account } from '../lib/graphql/types/v2/graphql';
+import { useAsyncCall } from '../lib/hooks/useAsyncCall';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 
 import { PeriodFilterForm } from './filters/PeriodFilter';
@@ -220,6 +221,7 @@ const FieldOptionsLabels = {
 };
 
 const FieldOptions = Object.keys(FIELD_OPTIONS).map(value => ({ value, label: FieldOptionsLabels[value] }));
+const env = process.env.OC_ENV;
 
 type ExportTransactionsCSVModalProps = {
   onClose: () => void;
@@ -239,18 +241,15 @@ const ExportTransactionsCSVModal = ({
   accounts,
   ...props
 }: ExportTransactionsCSVModalProps) => {
-  const now = new Date().toISOString();
   const isHostReport = Boolean(host);
-  const interval = { from: dateFrom, to: dateTo || now };
 
   const intl = useIntl();
   const [tmpDateInterval, setTmpDateInterval] = React.useState(dateInterval);
-  const [exportedRows, setExportedRows] = React.useState(0);
-  const [tmpDateInterval, setTmpDateInterval] = React.useState(interval);
+  const [filename, setFilename] = React.useState<string | null>(null);
+  const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [fieldOption, setFieldOption] = React.useState(FieldOptions[0].value);
   const [fields, setFields] = React.useState(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
   const [isValidDateInterval, setIsValidDateInterval] = React.useState(true);
-  const [loading, setLoading] = React.useState(false);
   const datePresetSelectedOption = React.useMemo(
     () => getSelectedPeriodOptionFromInterval(tmpDateInterval as any),
     [tmpDateInterval],
@@ -261,6 +260,27 @@ const ExportTransactionsCSVModal = ({
       label: PERIOD_FILTER_PRESETS[presetKey].label,
     }));
   }, [intl]);
+  const {
+    loading: isFetchingRows,
+    call: fetchRows,
+    data: exportedRows,
+  } = useAsyncCall(
+    async () => {
+      const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+      if (accessToken) {
+        const url = getUrl();
+        const response = await fetch(url, {
+          method: 'HEAD',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const rows = parseInt(response.headers.get('x-exported-rows'), 10);
+        return rows;
+      }
+    },
+    { defaultData: 0 },
+  );
 
   const handleFieldOptionsChange = ({ value }) => {
     setFieldOption(value);
@@ -289,8 +309,8 @@ const ExportTransactionsCSVModal = ({
     const { from, to, timezoneType } = tmpDateInterval;
 
     const url = isHostReport
-      ? new URL(`${process.env.REST_URL}/v2/${host.slug}/hostTransactions.${format}`)
-      : new URL(`${process.env.REST_URL}/v2/${collective.slug}/transactions.${format}`);
+      ? new URL(`${process.env.REST_URL}/v2/${host.slug}/hostTransactions.csv`)
+      : new URL(`${process.env.REST_URL}/v2/${collective.slug}/transactions.csv`);
 
     url.searchParams.set('fetchAll', '1');
 
@@ -315,62 +335,28 @@ const ExportTransactionsCSVModal = ({
     return url.toString();
   };
 
-  const fetchRows = async () => {
-    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    if (accessToken) {
-      const url = getUrl();
-      const response = await fetch(url, {
-        method: 'HEAD',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      const rows = parseInt(response.headers.get('x-exported-rows'), 10);
-      setExportedRows(rows);
-      return rows;
-    }
-  };
-
-  const handleExport = async () => {
-    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    if (accessToken) {
-      try {
-        setLoading(true);
-        const url = getUrl();
-        const { from, to } = tmpDateInterval;
-        let filename = isHostReport ? `${host.slug}-host-transactions` : `${collective.slug}-transactions`;
-        if (from) {
-          const until = to || dayjs().format('YYYY-MM-DD');
-          filename += `-${from}-${until}`;
-        }
-        const rows = await fetchRows();
-        if (rows > 100e3) {
-          addToast({
-            type: TOAST_TYPE.ERROR,
-            message: (
-              <FormattedMessage
-                id="ExportTransactionsCSVModal.RowsWarning"
-                defaultMessage="Sorry, the requested file is would take too long to be exported. Row count ({rows}) above limit."
-                values={{ rows: exportedRows }}
-              />
-            ),
-          });
-          return;
-        }
-        await fetchCSVFileFromRESTService(url, filename);
-        addToast({ type: TOAST_TYPE.SUCCESS, message: <FormattedMessage defaultMessage="File downloaded!" /> });
-        onClose();
-      } catch (error) {
-        addToast({ type: TOAST_TYPE.ERROR, message: formatErrorMessage(intl, error) });
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
   React.useEffect(() => {
     fetchRows();
   }, [tmpDateInterval, collective, host, accounts]);
+
+  React.useEffect(() => {
+    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+    if (typeof document !== 'undefined' && accessToken) {
+      document.cookie =
+        env === 'development' || env === 'e2e'
+          ? `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120`
+          : // It is not possible to use HttpOnly when setting from JavaScript.
+            // I'm enforcing SameSitre and Domain in production to prevent CSRF.
+            `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
+    }
+    let filename = isHostReport ? `${host.slug}-host-transactions` : `${collective.slug}-transactions`;
+    if (tmpDateInterval.from) {
+      const until = tmpDateInterval.to || dayjs().format('YYYY-MM-DD');
+      filename += `-${tmpDateInterval.from}-${until}.csv`;
+    }
+    setFilename(filename);
+    setDownloadUrl(getUrl());
+  }, [fields, tmpDateInterval]);
 
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
 
@@ -407,7 +393,6 @@ const ExportTransactionsCSVModal = ({
                   onChange={({ value }) => setTmpDateInterval(PERIOD_FILTER_PRESETS[value].getInterval())}
                   value={datePresetSelectedOption}
                   width="100%"
-                  disabled={loading}
                 />
               )}
             </StyledInputField>
@@ -419,7 +404,6 @@ const ExportTransactionsCSVModal = ({
             onValidate={setIsValidDateInterval}
             value={tmpDateInterval}
             inputId="daterange"
-            disabled={loading}
             omitPresets
           />
           <StyledInputField
@@ -437,7 +421,6 @@ const ExportTransactionsCSVModal = ({
                 onChange={handleFieldOptionsChange}
                 defaultValue={FieldOptions.find(option => option.value === fieldOption)}
                 width="100%"
-                disabled={loading}
               />
             )}
           </StyledInputField>
@@ -516,10 +499,10 @@ const ExportTransactionsCSVModal = ({
           <StyledButton
             buttonSize="small"
             buttonStyle="primary"
-            onClick={handleExport}
-            loading={loading}
-            disabled={!isValidDateInterval || exportedRows > 100e3}
-            minWidth={140}
+            as="a"
+            download={filename}
+            href={downloadUrl}
+            disabled={!isValidDateInterval || isFetchingRows || exportedRows > 100e3}
           >
             <FormattedMessage defaultMessage="Export CSV" />
           </StyledButton>
