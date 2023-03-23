@@ -164,6 +164,7 @@ const addFundsAccountQuery = gql`
       }
       ... on Host {
         id
+        legacyId
         slug
         name
         settings
@@ -180,6 +181,7 @@ const addFundsAccountQuery = gql`
         addedFundsHostFeePercent: hostFeePercent(paymentMethodType: HOST)
         host {
           id
+          legacyId
           slug
           name
           settings
@@ -357,9 +359,10 @@ const AddFundsModal = ({ collective, ...props }) => {
     return null;
   }
 
-  // From the Collective page we pass host and collective as API v1 objects
-  // From the Host dashboard we pass host and collective as API v2 objects
-  const canAddHostFee = host?.plan?.hostFees && collective.id !== host?.id;
+  // From the Collective page we pass collective as API v1 object
+  // From the Host dashboard we pass collective as API v2 object
+  const canAddHostFee =
+    host?.plan?.hostFees && collective.id !== host?.id && collective?.parentCollective?.id !== host?.legacyId;
   const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const canAddPlatformTip = host?.isTrustedHost;
@@ -862,6 +865,9 @@ AddFundsModal.propTypes = {
     hostFeePercent: PropTypes.number,
     slug: PropTypes.string,
     policies: PropTypes.object,
+    parentCollective: PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    }),
   }).isRequired,
   onClose: PropTypes.func,
 };
