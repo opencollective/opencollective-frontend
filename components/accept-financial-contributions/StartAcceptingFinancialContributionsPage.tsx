@@ -4,10 +4,12 @@ import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { confettiFireworks } from '../../lib/confettis';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Collective, Host } from '../../lib/graphql/types/v2/graphql';
+import { Account, Collective, Host } from '../../lib/graphql/types/v2/graphql';
 import { getCountryDisplayName, isoCountryList } from '../../lib/i18n/countries';
 
+import ApplyToHostModal from '../ApplyToHostModal';
 import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
@@ -22,6 +24,7 @@ import { H1, P, Span } from '../Text';
 
 export type StartAcceptingFinancialContributionsPageProps = {
   collective: Collective;
+  onChange: (field: string, value: unknown) => void;
 };
 
 const HostCardContainer = styled(Grid).attrs({
@@ -76,79 +79,108 @@ const StyledCollectiveCardWrapper = styled(StyledCollectiveCard)`
 const CommunityTypes = ['Open Source', 'Mutual Aid', 'Climate', 'BLM', 'Indigenous', 'Education', 'Festival'];
 
 function ApplyToHostCard(props: {
-  host: Pick<Host, 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>;
+  host: Pick<Host, 'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>;
+  collective: Pick<Account, 'slug'>;
+  onHostApplyClick: (host: Partial<Host>) => void;
 }) {
+  const [showApplyToHostModal, setShowApplyToHostModal] = React.useState(false);
+  const router = useRouter();
+
   return (
-    /* @ts-ignore StyledCollectiveCard is not typed */
-    <StyledCollectiveCardWrapper
-      /* @ts-ignore StyledCollectiveCard is not typed */
-      collective={props.host}
-      minWidth={250}
-      position="relative"
-      width="100%"
-      paddingBottom="20px !important"
-      childrenContainerProps={{ height: '100%', flexGrow: 1, justifyContent: 'flex-start' }}
-      bodyProps={{ display: 'flex', flexDirection: 'column', height: '100%' }}
-    >
-      <Box flexGrow={1}>
-        <Box mx={3}>
-          <P>
-            <FormattedMessage
-              defaultMessage="{ hostedCollectives, plural, one {<b>#</b> Collective} other {<b>#</b> Collectives} } hosted"
-              values={{
-                hostedCollectives: props.host.totalHostedCollectives,
-                b: chunks => <strong>{chunks}</strong>,
-              }}
-            />
-          </P>
-          <P mt={2}>
-            <FormattedMessage
-              defaultMessage="<b>{ currencyCode  }</b> Currency"
-              values={{
-                currencyCode: props.host.currency.toUpperCase(),
-                b: chunks => <strong>{chunks}</strong>,
-              }}
-            />
-          </P>
-          {props.host.hostFeePercent !== null && (
-            <P mt={2}>
+    <React.Fragment>
+      {/* @ts-ignore StyledCollectiveCard is not typed */}
+      <StyledCollectiveCardWrapper
+        /* @ts-ignore StyledCollectiveCard is not typed */
+        collective={props.host}
+        minWidth={250}
+        position="relative"
+        width="100%"
+        paddingBottom="20px !important"
+        childrenContainerProps={{ height: '100%', flexGrow: 1, justifyContent: 'flex-start' }}
+        bodyProps={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+      >
+        <Box flexGrow={1}>
+          <Box mx={3}>
+            <P>
               <FormattedMessage
-                defaultMessage="<b>{ hostFeePercent }%</b> Host fee"
+                defaultMessage="{ hostedCollectives, plural, one {<b>#</b> Collective} other {<b>#</b> Collectives} } hosted"
                 values={{
-                  hostFeePercent: props.host.hostFeePercent,
+                  hostedCollectives: props.host.totalHostedCollectives,
                   b: chunks => <strong>{chunks}</strong>,
                 }}
               />
             </P>
+            <P mt={2}>
+              <FormattedMessage
+                defaultMessage="<b>{ currencyCode  }</b> Currency"
+                values={{
+                  currencyCode: props.host.currency.toUpperCase(),
+                  b: chunks => <strong>{chunks}</strong>,
+                }}
+              />
+            </P>
+            {props.host.hostFeePercent !== null && (
+              <P mt={2}>
+                <FormattedMessage
+                  defaultMessage="<b>{ hostFeePercent }%</b> Host fee"
+                  values={{
+                    hostFeePercent: props.host.hostFeePercent,
+                    b: chunks => <strong>{chunks}</strong>,
+                  }}
+                />
+              </P>
+            )}
+          </Box>
+          {props.host.description !== null && props.host.description.length !== 0 && (
+            <React.Fragment>
+              <Flex mx={3} pt={3} alignItems="center">
+                <Span
+                  color="black.700"
+                  fontSize="12px"
+                  lineHeight="16px"
+                  textTransform="uppercase"
+                  fontWeight="500"
+                  letterSpacing="0.06em"
+                >
+                  <FormattedMessage id="OurPurpose" defaultMessage="Our purpose" />
+                </Span>
+                <StyledHr borderColor="black.300" flex="1 1" ml={2} />
+              </Flex>
+              <P mx={3} mt={1} fontSize="12px" lineHeight="18px" color="black.800">
+                {props.host.description}
+              </P>
+            </React.Fragment>
           )}
         </Box>
-        {props.host.description !== null && props.host.description.length !== 0 && (
-          <React.Fragment>
-            <Flex mx={3} pt={3} alignItems="center">
-              <Span
-                color="black.700"
-                fontSize="12px"
-                lineHeight="16px"
-                textTransform="uppercase"
-                fontWeight="500"
-                letterSpacing="0.06em"
-              >
-                <FormattedMessage id="OurPurpose" defaultMessage="Our purpose" />
-              </Span>
-              <StyledHr borderColor="black.300" flex="1 1" ml={2} />
-            </Flex>
-            <P mx={3} mt={1} fontSize="12px" lineHeight="18px" color="black.800">
-              {props.host.description}
-            </P>
-          </React.Fragment>
-        )}
-      </Box>
-      <Box mx={3} mt={3}>
-        <ApplyButton buttonStyle="primary" width="100%">
-          <FormattedMessage id="Apply" defaultMessage="Apply" />
-        </ApplyButton>
-      </Box>
-    </StyledCollectiveCardWrapper>
+        <Box mx={3} mt={3}>
+          <ApplyButton
+            onClick={() => {
+              props.onHostApplyClick(props.host);
+              setShowApplyToHostModal(true);
+            }}
+            buttonStyle="primary"
+            width="100%"
+          >
+            <FormattedMessage id="Apply" defaultMessage="Apply" />
+          </ApplyButton>
+        </Box>
+      </StyledCollectiveCardWrapper>
+      {showApplyToHostModal && (
+        <ApplyToHostModal
+          hostSlug={props.host.slug}
+          collective={props.collective}
+          onClose={() => setShowApplyToHostModal(false)}
+          onSuccess={() => {
+            return router
+              .push(`${props.collective.slug}/accept-financial-contributions/host/success`)
+              .then(() => window.scrollTo(0, 0))
+              .then(() => {
+                confettiFireworks(5000, { zIndex: 3000 });
+              });
+          }}
+        />
+      )}
+    </React.Fragment>
   );
 }
 
@@ -228,8 +260,12 @@ const FindAFiscalHostQuery = gql`
 
 function FeaturedFiscalHostResults({
   hosts,
+  collective,
+  onHostApplyClick,
 }: {
   hosts: Pick<Host, 'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>[];
+  collective: Pick<Account, 'slug'>;
+  onHostApplyClick: (host: Partial<Host>) => void;
 }) {
   return (
     <StyledCard padding={4} bg="#F1F6FF" borderRadius="24px" borderStyle="none">
@@ -251,7 +287,9 @@ function FeaturedFiscalHostResults({
       </P>
       <HostCardContainer mt={3}>
         {hosts.map(host => {
-          return <ApplyToHostCard key={host.slug} host={host} />;
+          return (
+            <ApplyToHostCard key={host.slug} host={host} collective={collective} onHostApplyClick={onHostApplyClick} />
+          );
         })}
       </HostCardContainer>
     </StyledCard>
@@ -260,8 +298,12 @@ function FeaturedFiscalHostResults({
 
 function OtherFiscalHostResults({
   hosts,
+  collective,
+  onHostApplyClick,
 }: {
   hosts: Pick<Host, 'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>[];
+  collective: Pick<Account, 'slug'>;
+  onHostApplyClick: (host: Partial<Host>) => void;
 }) {
   return (
     <Box>
@@ -280,14 +322,21 @@ function OtherFiscalHostResults({
       </Flex>
       <HostCardContainer mt={3}>
         {hosts.map(host => {
-          return <ApplyToHostCard key={host.slug} host={host} />;
+          return (
+            <ApplyToHostCard key={host.slug} host={host} collective={collective} onHostApplyClick={onHostApplyClick} />
+          );
         })}
       </HostCardContainer>
     </Box>
   );
 }
 
-function FindAHostSearch(props: { selectedCommunityType: string[]; selectedCountry: string }) {
+function FindAHostSearch(props: {
+  selectedCommunityType: string[];
+  selectedCountry: string;
+  collective: Account;
+  onHostApplyClick: (host: Partial<Host>) => void;
+}) {
   const { data, loading } = useQuery<{
     hosts: { nodes: Pick<Host, 'slug' | 'currency' | 'totalHostedCollectives' | 'hostFeePercent' | 'isTrustedHost'>[] };
   }>(FindAFiscalHostQuery, {
@@ -322,12 +371,20 @@ function FindAHostSearch(props: { selectedCommunityType: string[]; selectedCount
     <React.Fragment>
       {featuredHosts.length !== 0 && (
         <Box mb={3}>
-          <FeaturedFiscalHostResults hosts={featuredHosts} />
+          <FeaturedFiscalHostResults
+            collective={props.collective}
+            hosts={featuredHosts}
+            onHostApplyClick={props.onHostApplyClick}
+          />
         </Box>
       )}
       {otherHosts.length !== 0 && (
         <Box padding={4}>
-          <OtherFiscalHostResults hosts={otherHosts} />
+          <OtherFiscalHostResults
+            collective={props.collective}
+            hosts={otherHosts}
+            onHostApplyClick={props.onHostApplyClick}
+          />
         </Box>
       )}
     </React.Fragment>
@@ -453,7 +510,14 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
 
       {searchingForFiscalHost && (
         <Box mt={3} width="1000px">
-          <FindAHostSearch selectedCommunityType={selectedCommunityType} selectedCountry={selectedCountry.value} />
+          <FindAHostSearch
+            collective={props.collective}
+            selectedCommunityType={selectedCommunityType}
+            selectedCountry={selectedCountry.value}
+            onHostApplyClick={host => {
+              props.onChange('chosenHost', host);
+            }}
+          />
         </Box>
       )}
     </Flex>

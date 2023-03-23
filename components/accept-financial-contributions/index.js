@@ -34,7 +34,9 @@ class AcceptFinancialContributions extends Component {
     const { path, state, message } = router.query;
 
     if (!path && ['development', 'staging'].includes(process.env.OC_ENV) && router.query.newFlow) {
-      return <StartAcceptingFinancialContributionsPage collective={this.props.collective} />;
+      return (
+        <StartAcceptingFinancialContributionsPage collective={this.props.collective} onChange={this.handleChange} />
+      );
     }
 
     if (!path) {
