@@ -199,7 +199,7 @@ function IndependentCollectiveCard(props: { collective: Collective }) {
 
 const FindAFiscalHostQuery = gql`
   query FindAFiscalHostQuery($tags: [String], $limit: Int) {
-    hosts(tag: $tags, limit: $limit) {
+    hosts(tag: $tags, limit: $limit, isActive: true) {
       totalCount
       nodes {
         id
