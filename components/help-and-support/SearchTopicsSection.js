@@ -10,7 +10,9 @@ import { searchDocs } from '../../lib/api';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
 import { Box, Flex } from '../Grid';
+import { I18nBold } from '../I18nFormatters';
 import Link from '../Link';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
@@ -60,18 +62,30 @@ const REACT_POPPER_MODIFIERS = [
   },
 ];
 
+const LoadingSearchResults = () => {
+  const placeholderNum = 4;
+  return Array.from({ length: placeholderNum }, (_, i) => (
+    <React.Fragment key={i}>
+      <LoadingPlaceholder height="62px" borderRadius="4px" />
+      {i !== placeholderNum - 1 && <StyledHr my="3px" width="100%" borderColor="rgba(50, 51, 52, 0.1)" />}
+    </React.Fragment>
+  ));
+};
+
 const SearchTopics = () => {
+  const innerRef = React.useRef();
   const [refElement, setRefElement] = React.useState(null);
   const [popperElement, setPopperElement] = React.useState(null);
   const [showSearchResults, setShowSearchResults] = React.useState(null);
   const [searchResults, setSearchResults] = React.useState([]);
   const [searchQuery, setSearchQuery] = React.useState('');
-  const { styles, attributes, state } = usePopper(refElement, popperElement, {
+  const [isLoading, setIsLoading] = React.useState(false);
+  const { styles, attributes } = usePopper(refElement, popperElement, {
     placement: 'bottom',
     modifiers: REACT_POPPER_MODIFIERS,
   });
 
-  useGlobalBlur(state?.elements.popper, outside => {
+  useGlobalBlur(innerRef, outside => {
     if (outside && showSearchResults) {
       setShowSearchResults(false);
     }
@@ -80,22 +94,26 @@ const SearchTopics = () => {
 
   const search = async query => {
     if (!query) {
+      setSearchResults([]);
       return;
     }
 
     try {
+      setIsLoading(true);
       const results = await searchDocs(query);
       setSearchResults(results.items);
     } catch (error) {
       console.error('error', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const debouncedSearch = React.useCallback(debounce(search, 100), []);
+  const debouncedSearch = React.useCallback(debounce(search, 200), []);
 
   return (
     <Flex justifyContent="center" alignItems="center" px="16px">
-      <Flex mt={['9px', '32px']} flexDirection="column">
+      <Flex mt={['9px', '32px']} flexDirection="column" ref={innerRef}>
         <StyledCard
           bg="black.50"
           display="flex"
@@ -137,10 +155,22 @@ const SearchTopics = () => {
         {showSearchResults && (
           <SearchResultPopup width={['725px']} ref={setPopperElement} style={styles.popper} {...attributes.popper}>
             <Box maxHeight="416px" overflowY={'auto'}>
-              {isEmpty(sections) ? (
+              {isLoading ? (
+                <LoadingSearchResults />
+              ) : isEmpty(sections) ? (
                 <Flex justifyContent={'center'} align="center" py={'20px'}>
                   <P fontSize="14px" lineHeight="20px" color="black.500" fontWeight="400">
-                    <FormattedMessage defaultMessage={'No results found'} />
+                    {searchQuery ? (
+                      <FormattedMessage
+                        defaultMessage={'No results found for <b>{query}</b>'}
+                        values={{
+                          query: searchQuery,
+                          b: I18nBold,
+                        }}
+                      />
+                    ) : (
+                      <FormattedMessage defaultMessage={'Type something to search'} />
+                    )}
                   </P>
                 </Flex>
               ) : (
