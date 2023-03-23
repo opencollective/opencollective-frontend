@@ -5,25 +5,34 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { Collective, Host } from '../../lib/graphql/types/v2/graphql';
 
-import { Box, Flex } from '../Grid';
+import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import Loading from '../Loading';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
+import StyledCollectiveCard from '../StyledCollectiveCard';
 import StyledFilters from '../StyledFilters';
 import StyledHr from '../StyledHr';
 import StyledSelect from '../StyledSelect';
-import { H1, P } from '../Text';
-
-import HostCollectiveCard from './HostCollectiveCard';
+import { H1, P, Span } from '../Text';
 
 export type StartAcceptingFinancialContributionsPageProps = {
-  collective: {
-    slug: string;
-  };
+  collective: Collective;
 };
+
+const HostCardContainer = styled(Grid).attrs({
+  justifyItems: 'center',
+  gridGap: '30px',
+  gridTemplateColumns: ['repeat(auto-fill, minmax(250px, 1fr))'],
+  gridAutoRows: ['1fr'],
+})`
+  & > * {
+    padding: 0;
+  }
+`;
 
 const RoundOr = styled.div`
   width: 64px;
@@ -49,9 +58,100 @@ const Illustration = styled.img`
   object-fit: cover;
 `;
 
+const ApplyButton = styled(StyledButton)`
+  visibility: hidden;
+`;
+
+const StyledCollectiveCardWrapper = styled(StyledCollectiveCard)`
+  &:hover ${ApplyButton} {
+    visibility: visible;
+  }
+
+  &:hover {
+    border-color: #1869f5;
+  }
+`;
+
 const CommunityTypes = ['Open Source', 'Mutual Aid', 'Climate Change', 'BLM', 'Indigenous', 'Education', 'Festival'];
 
-function IndependentCollectiveCard(props: { collective: { slug: string } }) {
+function ApplyToHostCard(props: {
+  host: Pick<Host, 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>;
+}) {
+  return (
+    /* @ts-ignore StyledCollectiveCard is not typed */
+    <StyledCollectiveCardWrapper
+      /* @ts-ignore StyledCollectiveCard is not typed */
+      collective={props.host}
+      minWidth={250}
+      position="relative"
+      width="100%"
+      paddingBottom="20px !important"
+      childrenContainerProps={{ height: '100%', flexGrow: 1, justifyContent: 'flex-start' }}
+      bodyProps={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+    >
+      <Box flexGrow={1}>
+        <Box mx={3}>
+          <P>
+            <FormattedMessage
+              defaultMessage="{ hostedCollectives, plural, one {<b>#</b> Collective} other {<b>#</b> Collectives} } hosted"
+              values={{
+                hostedCollectives: props.host.totalHostedCollectives,
+                b: chunks => <strong>{chunks}</strong>,
+              }}
+            />
+          </P>
+          <P mt={2}>
+            <FormattedMessage
+              defaultMessage="<b>{ currencyCode  }</b> Currency"
+              values={{
+                currencyCode: props.host.currency.toUpperCase(),
+                b: chunks => <strong>{chunks}</strong>,
+              }}
+            />
+          </P>
+          {props.host.hostFeePercent !== null && (
+            <P mt={2}>
+              <FormattedMessage
+                defaultMessage="<b>{ hostFeePercent }%</b> Host fee"
+                values={{
+                  hostFeePercent: props.host.hostFeePercent,
+                  b: chunks => <strong>{chunks}</strong>,
+                }}
+              />
+            </P>
+          )}
+        </Box>
+        {props.host.description !== null && props.host.description.length !== 0 && (
+          <React.Fragment>
+            <Flex mx={3} pt={3} alignItems="center">
+              <Span
+                color="black.700"
+                fontSize="12px"
+                lineHeight="16px"
+                textTransform="uppercase"
+                fontWeight="500"
+                letterSpacing="0.06em"
+              >
+                <FormattedMessage id="OurPurpose" defaultMessage="Our purpose" />
+              </Span>
+              <StyledHr borderColor="black.300" flex="1 1" ml={2} />
+            </Flex>
+            <P mx={3} mt={1} fontSize="12px" lineHeight="18px" color="black.800">
+              {props.host.description}
+            </P>
+          </React.Fragment>
+        )}
+      </Box>
+      <Box mx={3} mt={3}>
+        <ApplyButton buttonStyle="primary" width="100%">
+          <FormattedMessage id="Apply" defaultMessage="Apply" />
+        </ApplyButton>
+      </Box>
+    </StyledCollectiveCardWrapper>
+  );
+}
+
+function IndependentCollectiveCard(props: { collective: Collective }) {
   const router = useRouter();
   return (
     <StyledCard width="800px" padding="32px 24px">
@@ -120,8 +220,71 @@ const FindAFiscalHostQuery = gql`
   }
 `;
 
-function FiscalAHostSearch(props: { selectedCommunityType: string }) {
-  const { data, loading } = useQuery(FindAFiscalHostQuery, {
+function FeaturedFiscalHostResults({
+  hosts,
+}: {
+  hosts: Pick<Host, 'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>[];
+}) {
+  return (
+    <StyledCard padding={4} bg="#F1F6FF" borderRadius="24px" borderStyle="none">
+      <Flex>
+        <P fontSize="24px" lineHeight="32px" fontWeight="700" color="black.900">
+          <FormattedMessage defaultMessage="Featured Hosts" />
+        </P>
+        <P ml={1} fontSize="14px" lineHeight="32px" fontWeight="400" color="black.900">
+          <FormattedMessage
+            defaultMessage="{ hostCount, plural, one {# host} other {# hosts} } found"
+            values={{
+              hostCount: hosts.length,
+            }}
+          />
+        </P>
+      </Flex>
+      <P fontSize="14px" lineHeight="24px" fontWeight="700" color="black.700" opacity={0.5}>
+        <FormattedMessage defaultMessage="Our most trusted hosts" />
+      </P>
+      <HostCardContainer mt={3}>
+        {hosts.map(host => {
+          return <ApplyToHostCard key={host.slug} host={host} />;
+        })}
+      </HostCardContainer>
+    </StyledCard>
+  );
+}
+
+function OtherFiscalHostResults({
+  hosts,
+}: {
+  hosts: Pick<Host, 'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>[];
+}) {
+  return (
+    <Box>
+      <Flex>
+        <P fontSize="24px" lineHeight="32px" fontWeight="700" color="black.900">
+          <FormattedMessage defaultMessage="Other Hosts" />
+        </P>
+        <P ml={1} fontSize="14px" lineHeight="32px" fontWeight="400" color="black.900">
+          <FormattedMessage
+            defaultMessage="{ hostCount, plural, one {# host} other {# hosts} } found"
+            values={{
+              hostCount: hosts.length,
+            }}
+          />
+        </P>
+      </Flex>
+      <HostCardContainer mt={3}>
+        {hosts.map(host => {
+          return <ApplyToHostCard key={host.slug} host={host} />;
+        })}
+      </HostCardContainer>
+    </Box>
+  );
+}
+
+function FindAHostSearch(props: { selectedCommunityType: string }) {
+  const { data, loading } = useQuery<{
+    hosts: { nodes: Pick<Host, 'slug' | 'currency' | 'totalHostedCollectives' | 'hostFeePercent' | 'isTrustedHost'>[] };
+  }>(FindAFiscalHostQuery, {
     variables: {
       tags: props.selectedCommunityType ? [props.selectedCommunityType] : [],
       limit: 50,
@@ -145,10 +308,23 @@ function FiscalAHostSearch(props: { selectedCommunityType: string }) {
     return <div>Empty state</div>;
   }
 
-  return hosts.map(host => {
-    /* @ts-ignore HostCollectiveCard is not typed */
-    return <HostCollectiveCard key={host.slug} host={host} />;
-  });
+  const featuredHosts = hosts.filter(host => host.isTrustedHost);
+  const otherHosts = hosts.filter(host => !host.isTrustedHost);
+
+  return (
+    <React.Fragment>
+      {featuredHosts.length !== 0 && (
+        <Box mb={3}>
+          <FeaturedFiscalHostResults hosts={featuredHosts} />
+        </Box>
+      )}
+      {otherHosts.length !== 0 && (
+        <Box padding={4}>
+          <OtherFiscalHostResults hosts={otherHosts} />
+        </Box>
+      )}
+    </React.Fragment>
+  );
 }
 
 export default function StartAcceptingFinancialContributionsPage(props: StartAcceptingFinancialContributionsPageProps) {
@@ -243,8 +419,8 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
       )}
 
       {searchingForFiscalHost && (
-        <Box mt={3} width="800px">
-          <FiscalAHostSearch selectedCommunityType={selectedCommunityType} />
+        <Box mt={3} width="1000px">
+          <FindAHostSearch selectedCommunityType={selectedCommunityType} />
         </Box>
       )}
     </Flex>
