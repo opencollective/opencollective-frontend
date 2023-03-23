@@ -11,7 +11,7 @@ import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
-import { getSettingsRoute } from '../lib/url-helpers';
+import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
@@ -88,20 +88,27 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
           ) : null
         }
       </Query>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={getSettingsRoute(LoggedInUser.collective)}>
-        <FormattedMessage id="Settings" defaultMessage="Settings" />
-      </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/manage-contributions`}>
+
+      <UserMenuLinkEntry
+        isMobileMenuLink={isMobileView}
+        href={getDashboardRoute(LoggedInUser.collective, 'manage-contributions')}
+      >
         <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/submitted-expenses`}>
+      <UserMenuLinkEntry
+        isMobileMenuLink={isMobileView}
+        href={getDashboardRoute(LoggedInUser.collective, 'manage-expenses')}
+      >
         <FormattedMessage id="home.feature.manageExpenses" defaultMessage="Manage Expenses" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/transactions`}>
+      <UserMenuLinkEntry
+        isMobileMenuLink={isMobileView}
+        href={getDashboardRoute(LoggedInUser.collective, 'transactions')}
+      >
         <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href="/applications">
-        <FormattedMessage id="menu.applications" defaultMessage="Applications" />
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={getDashboardRoute(LoggedInUser.collective, 'info')}>
+        <FormattedMessage id="Settings" defaultMessage="Settings" />
       </UserMenuLinkEntry>
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} as="a" href="/help">
         <FormattedMessage id="menu.help" defaultMessage="Help" />
