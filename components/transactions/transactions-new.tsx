@@ -1,33 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
-import { graphql } from '@apollo/client/react/hoc';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
-import { get, isNil, omit, omitBy, pick } from 'lodash';
-import { useRouter, withRouter } from 'next/router';
+import { isNil, omit, omitBy, pick } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { loggedInUserCanAccessFinancialData } from '../../lib/collective.lib';
-import { CollectiveType } from '../../lib/constants/collectives';
 import roles from '../../lib/constants/roles';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { parseDateInterval } from '../../lib/date-utils';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../../lib/url-helpers';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { getCollectivePageCanonicalURL } from '../../lib/url-helpers';
 
-import Body from '../Body';
 import { parseAmountRange } from '../budget/filters/AmountFilter';
-import CollectiveNavbar from '../collective-navbar';
-import { NAVBAR_CATEGORIES } from '../collective-navbar/constants';
-import { Sections } from '../collective-page/_constants';
 import { collectiveNavbarFieldsFragment, processingOrderFragment } from '../collective-page/graphql/fragments';
 import SectionTitle from '../collective-page/SectionTitle';
 import ErrorPage from '../ErrorPage';
-import Footer from '../Footer';
 import { Box, Flex } from '../Grid';
-import Header from '../Header';
 import Link from '../Link';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
@@ -37,14 +30,13 @@ import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
+
 import { getDefaultKinds, parseTransactionKinds } from './filters/TransactionsKindFilter';
 import { parseTransactionPaymentMethodTypes } from './filters/TransactionsPaymentMethodTypeFilter';
 import { transactionsQueryCollectionFragment } from './graphql/fragments';
 import TransactionsDownloadCSV from './TransactionsDownloadCSV';
 import TransactionsFilters from './TransactionsFilters';
 import TransactionsList from './TransactionsList';
-import { withUser } from '../UserProvider';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 const transactionsPageQuery = gql`
   query TransactionsPage(
