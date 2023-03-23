@@ -3,8 +3,7 @@ import dayjs from 'dayjs';
 import { flatten, isEmpty, omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { fetchCSVFileFromRESTService } from '../lib/api';
-import { formatErrorMessage } from '../lib/errors';
+import { simpleDateToISOString } from '../lib/date-utils';
 import type { Account } from '../lib/graphql/types/v2/graphql';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 
@@ -225,6 +224,7 @@ type ExportTransactionsCSVModalProps = {
   onClose: () => void;
   dateFrom?: string;
   dateTo?: string;
+  dateInterval?: { from?: string; to?: string; timezoneType?: string };
   collective: Account;
   host?: Account;
   accounts?: Account[];
@@ -233,8 +233,7 @@ type ExportTransactionsCSVModalProps = {
 const ExportTransactionsCSVModal = ({
   onClose,
   collective,
-  dateFrom,
-  dateTo,
+  dateInterval,
   host,
   accounts,
   ...props
@@ -244,7 +243,7 @@ const ExportTransactionsCSVModal = ({
   const interval = { from: dateFrom, to: dateTo || now };
 
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const [tmpDateInterval, setTmpDateInterval] = React.useState(dateInterval);
   const [exportedRows, setExportedRows] = React.useState(0);
   const [tmpDateInterval, setTmpDateInterval] = React.useState(interval);
   const [fieldOption, setFieldOption] = React.useState(FieldOptions[0].value);
@@ -252,7 +251,7 @@ const ExportTransactionsCSVModal = ({
   const [isValidDateInterval, setIsValidDateInterval] = React.useState(true);
   const [loading, setLoading] = React.useState(false);
   const datePresetSelectedOption = React.useMemo(
-    () => getSelectedPeriodOptionFromInterval(tmpDateInterval),
+    () => getSelectedPeriodOptionFromInterval(tmpDateInterval as any),
     [tmpDateInterval],
   );
   const datePresetPptions = React.useMemo(() => {
@@ -286,8 +285,8 @@ const ExportTransactionsCSVModal = ({
   };
 
   const getUrl = () => {
-    const format = 'txt';
-    const { from, to } = tmpDateInterval;
+    const { from, to, timezoneType } = tmpDateInterval;
+
     const url = isHostReport
       ? new URL(`${process.env.REST_URL}/v2/${host.slug}/hostTransactions.${format}`)
       : new URL(`${process.env.REST_URL}/v2/${collective.slug}/transactions.${format}`);
@@ -303,12 +302,11 @@ const ExportTransactionsCSVModal = ({
       url.searchParams.set('includeIncognitoTransactions', '1');
       url.searchParams.set('includeGiftCardTransactions', '1');
     }
-
     if (from) {
-      url.searchParams.set('dateFrom', from);
+      url.searchParams.set('dateFrom', simpleDateToISOString(from, false, timezoneType));
     }
     if (to) {
-      url.searchParams.set('dateTo', to);
+      url.searchParams.set('dateTo', simpleDateToISOString(from, true, timezoneType));
     }
     if (!isEmpty(fields)) {
       url.searchParams.set('fields', Object.keys(fields).join(','));
