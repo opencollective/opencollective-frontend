@@ -5,6 +5,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ApolloClient } from '@apollo/client';
 import { getDataFromTree } from '@apollo/client/react/ssr';
+import { v4 as uuid } from 'uuid';
 
 import { withTwoFactorAuthentication } from './two-factor-authentication/TwoFactorAuthenticationContext';
 import { initClient } from './apollo-client';
@@ -17,6 +18,7 @@ function getComponentDisplayName(Component) {
 
 type WithDataProps = {
   serverState: any;
+  requestId: any;
   twoFactorAuthContext: any;
 };
 
@@ -25,7 +27,9 @@ const withData = ComposedComponent => {
     static async getInitialProps(context) {
       const { Component } = context;
 
-      const client = initClient();
+      const requestId = context.ctx.req?.id || uuid();
+
+      const client = initClient({ requestId });
 
       // Evaluate the composed component's getInitialProps()
       let composedInitialProps = {};
@@ -58,6 +62,7 @@ const withData = ComposedComponent => {
 
       return {
         serverState,
+        requestId,
         ...composedInitialProps,
       };
     }
@@ -80,8 +85,8 @@ const withData = ComposedComponent => {
 
     constructor(props) {
       super(props);
-      const { serverState, twoFactorAuthContext } = this.props;
-      this.client = initClient({ initialState: serverState.apollo.data, twoFactorAuthContext });
+      const { requestId, serverState, twoFactorAuthContext } = this.props;
+      this.client = initClient({ requestId, initialState: serverState.apollo.data, twoFactorAuthContext });
     }
 
     client: ApolloClient<{}> | null;

@@ -109,7 +109,18 @@ const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?
   return result;
 };
 
-function createLink({ twoFactorAuthContext }) {
+function createLink({ requestId, twoFactorAuthContext }) {
+  const requestIdLink = setContext((_, { headers }) => {
+    if (requestId) {
+      return {
+        headers: {
+          'X-Request-Id': requestId,
+          ...headers,
+        },
+      };
+    }
+  });
+
   const authLink = setContext((_, { headers }) => {
     const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
     if (token) {
@@ -180,7 +191,7 @@ function createLink({ twoFactorAuthContext }) {
 
   const twoFactorAuthLink = new TwoFactorAuthenticationApolloLink(twoFactorAuthContext);
 
-  return ApolloLink.from([errorLink, authLink, twoFactorAuthLink, httpLink]);
+  return ApolloLink.from([errorLink, requestIdLink, authLink, twoFactorAuthLink, httpLink]);
 }
 
 function createInMemoryCache() {
@@ -213,13 +224,13 @@ function createInMemoryCache() {
   return inMemoryCache;
 }
 
-function createClient({ initialState, twoFactorAuthContext }: any = {}) {
+function createClient({ requestId, initialState, twoFactorAuthContext }: any = {}) {
   const cache = createInMemoryCache();
   if (initialState) {
     cache.restore(initialState);
   }
 
-  const link = createLink({ twoFactorAuthContext });
+  const link = createLink({ requestId, twoFactorAuthContext });
 
   return new ApolloClient({
     cache,
@@ -230,11 +241,13 @@ function createClient({ initialState, twoFactorAuthContext }: any = {}) {
   });
 }
 
-export function initClient({ initialState, twoFactorAuthContext }: any = {}): ReturnType<typeof createClient> {
+export function initClient({ requestId, initialState, twoFactorAuthContext }: any = {}): ReturnType<
+  typeof createClient
+> {
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections (which would be bad)
   if (!process.browser) {
-    return createClient({ initialState });
+    return createClient({ requestId, initialState });
   }
 
   // Reuse client on the client-side
