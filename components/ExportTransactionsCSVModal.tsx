@@ -18,9 +18,10 @@ import StyledInputField from './StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import StyledSelect from './StyledSelect';
 import { Span } from './Text';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const AVERAGE_TRANSACTIONS_PER_MINUTE = 8240;
+// Fields that are not available when exporting transactions from the host dashboard
+const HOST_OMITTED_FIELDS = ['balance', 'hostSlug', 'hostName', 'hostType'];
 
 type CSVField =
   | 'date'
@@ -475,12 +476,11 @@ const ExportTransactionsCSVModal = ({
 
                 <Grid mt={1} gridGap={1} gridTemplateColumns={['1fr', '1fr 1fr']}>
                   {FIELD_GROUPS[group]
-                    .filter(field => field !== 'balance' || !isHostReport)
+                    .filter(field => !(isHostReport && HOST_OMITTED_FIELDS.includes(field)))
                     .map(field => (
                       <StyledCheckbox
                         key={field}
                         name={field}
-                        disabled={loading}
                         onChange={handleFieldSwitch}
                         checked={fields[field] === true}
                         label={FieldLabels[field] || field}
