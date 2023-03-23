@@ -164,7 +164,7 @@ const StyledCollectiveCard = ({
       >
         <StyledBackgroundMask />
       </Container>
-      <Container position="relative">
+      <Container position="relative" {...props.bodyProps}>
         <Container height={74} px={3} pt={26} style={{ filter: collective.isFrozen ? 'grayscale(1)' : undefined }}>
           <Container borderRadius={borderRadius} background="white" width={48} border="3px solid white">
             <CollectiveContainer useLink={useLink} collective={collective}>
@@ -172,7 +172,13 @@ const StyledCollectiveCard = ({
             </CollectiveContainer>
           </Container>
         </Container>
-        <Container display="flex" flexDirection="column" justifyContent="space-between" height={bodyHeight}>
+        <Container
+          display="flex"
+          flexDirection="column"
+          justifyContent="space-between"
+          height={bodyHeight}
+          {...props.childrenContainerProps}
+        >
           <Container p={3}>
             <CollectiveContainer useLink={useLink} collective={collective}>
               <P mt={3} fontSize="16px" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
@@ -238,6 +244,8 @@ StyledCollectiveCard.propTypes = {
   borderRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   showWebsite: PropTypes.bool,
   useLink: PropTypes.bool,
+  childrenContainerProps: PropTypes.object,
+  bodyProps: PropTypes.object,
 };
 
 StyledCollectiveCard.defaultProps = {
