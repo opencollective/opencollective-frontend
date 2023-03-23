@@ -127,6 +127,10 @@ exports.REWRITES = [
     destination: '/create-project',
   },
   {
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/dashboard/:section?/:subpath*',
+    destination: '/dashboard',
+  },
+  {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',
     destination: '/admin-panel',
   },

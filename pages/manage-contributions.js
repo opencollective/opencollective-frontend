@@ -116,6 +116,8 @@ class ManageContributionsPage extends React.Component {
       }
     }
 
+    console.log({ data });
+
     const collective = data && data.account;
     const canEditCollective = Boolean(LoggedInUser?.isAdminOfCollective(collective));
     const recurringContributions = collective && collective.orders;
