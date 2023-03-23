@@ -1017,7 +1017,7 @@
   "editTeam.member.invite.error": "メンバーの招待に失敗しました。",
   "editTeam.member.invite.success": "メンバーの招待に成功しました。",
   "editTeam.member.remove.error": "メンバーの削除に失敗しました。",
-  "editTeam.member.remove.success": "メンバーの削除が完了しました。",
+  "editTeam.member.remove.success": "Member removed successfully.",
   "editTeam.memberInvitation.edit.error": "メンバー招待の更新に失敗しました。",
   "editTeam.memberInvitation.edit.success": "メンバー招待の更新に成功しました。",
   "editTeam.memberInvitation.remove.error": "メンバー招待の削除に失敗しました。",
