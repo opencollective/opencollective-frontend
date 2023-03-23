@@ -199,7 +199,7 @@ function IndependentCollectiveCard(props: { collective: Collective }) {
 
 const FindAFiscalHostQuery = gql`
   query FindAFiscalHostQuery($tags: [String], $limit: Int) {
-    hosts(tag: $tags, limit: $limit, isActive: true) {
+    hosts(tag: $tags, limit: $limit, isActive: true, tagSearchOperator: "OR") {
       totalCount
       nodes {
         id
@@ -281,7 +281,7 @@ function OtherFiscalHostResults({
   );
 }
 
-function FindAHostSearch(props: { selectedCommunityType: string }) {
+function FindAHostSearch(props: { selectedCommunityType: string[] }) {
   const { data, loading } = useQuery<{
     hosts: { nodes: Pick<Host, 'slug' | 'currency' | 'totalHostedCollectives' | 'hostFeePercent' | 'isTrustedHost'>[] };
   }>(FindAFiscalHostQuery, {
@@ -328,7 +328,7 @@ function FindAHostSearch(props: { selectedCommunityType: string }) {
 }
 
 export default function StartAcceptingFinancialContributionsPage(props: StartAcceptingFinancialContributionsPageProps) {
-  const [selectedCommunityType, setSelectedCommunityType] = React.useState();
+  const [selectedCommunityType, setSelectedCommunityType] = React.useState<string[]>([]);
   const [searchingForFiscalHost, setSearchingForFiscalHost] = React.useState(false);
 
   return (
@@ -355,7 +355,12 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         <P mb={1} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
           <FormattedMessage defaultMessage="What type of community are you?" />
         </P>
-        <StyledFilters filters={CommunityTypes} onChange={setSelectedCommunityType} selected={selectedCommunityType} />
+        <StyledFilters
+          multiSelect
+          filters={CommunityTypes}
+          onChange={setSelectedCommunityType}
+          selected={selectedCommunityType}
+        />
 
         <P mt={4} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
           <FormattedMessage defaultMessage="Where would your collective be most active?" />
