@@ -48,49 +48,89 @@ const ButtonContainer = styled.span<{ flexGrow: FlexGrowProps['flexGrow'] }>`
     `}
 `;
 
-const defaultGetLabel = filter => filter;
-
 type StyledFiltersProps = {
   filters: string[];
-  getLabel: (string) => string;
-  onChange: (value) => void;
-  selected: string;
+  getLabel?: (filter: string) => string;
   disabled?: boolean;
   buttonGrow?: FlexGrowProps['flexGrow'];
   minButtonWidth?: number | string;
   buttonHeight?: number | string;
   buttonPadding?: number | string;
-};
+} & (
+  | {
+      multiSelect?: false;
+      onChange: (value: string) => void;
+      selected: string;
+    }
+  | {
+      multiSelect: true;
+      onChange: (value: string[]) => void;
+      selected: string[];
+    }
+);
 
 /**
  * A controlled component to display a list of filters.
  */
-const StyledFilters = ({
-  filters,
-  onChange,
-  disabled = false,
-  getLabel = defaultGetLabel,
-  selected = undefined,
-  minButtonWidth = undefined,
-  buttonHeight = '34px',
-  buttonPadding = '4px 14px',
-  buttonGrow = undefined,
-  ...flexProps
-}: StyledFiltersProps) => {
+export default function StyledFilters(props: StyledFiltersProps) {
+  const {
+    minButtonWidth,
+    buttonPadding,
+    buttonHeight,
+    disabled,
+    buttonGrow,
+    onChange,
+    selected,
+    filters,
+    multiSelect,
+    ...flexProps
+  } = props;
+
+  const onFilterClick = React.useCallback(
+    (clickedFilter: string) => {
+      if (multiSelect === true) {
+        const idx = selected.indexOf(clickedFilter);
+
+        if (idx >= 0) {
+          onChange([...selected.slice(0, idx), ...selected.slice(idx + 1)]);
+        } else {
+          onChange([...selected, clickedFilter]);
+        }
+      } else {
+        if (selected !== clickedFilter) {
+          onChange(clickedFilter);
+        }
+      }
+    },
+    [selected, multiSelect],
+  );
+
+  const isSelected = React.useCallback(
+    (filter: string) => {
+      if (multiSelect === true) {
+        return selected.includes(filter);
+      } else {
+        return selected === filter;
+      }
+    },
+    [selected],
+  );
+
+  const getLabel = props.getLabel ?? ((filter: string) => filter);
+
   return (
     <Flex data-cy="filters" px={1} py={1} css={{ overflowX: 'auto' }} gap="8px" {...flexProps}>
       {filters.map(filter => {
-        const isSelected = filter === selected;
         return (
           <ButtonContainer key={filter} flexGrow={buttonGrow}>
             <FilterButton
               data-cy={`filter-button ${filter.toLowerCase()}`}
-              onClick={isSelected ? undefined : () => onChange(filter)}
-              data-selected={isSelected}
+              onClick={() => onFilterClick(filter)}
+              data-selected={isSelected(filter)}
               minWidth={minButtonWidth}
               disabled={disabled}
-              height={buttonHeight}
-              padding={buttonPadding}
+              height={buttonHeight || '34px'}
+              padding={buttonPadding || '4px 14px'}
             >
               <Span whiteSpace="nowrap">{getLabel(filter)}</Span>
             </FilterButton>
@@ -99,6 +139,4 @@ const StyledFilters = ({
       })}
     </Flex>
   );
-};
-
-export default StyledFilters;
+}
