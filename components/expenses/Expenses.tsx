@@ -243,7 +243,6 @@ const Expenses = props => {
                 isLoading={loading}
                 collective={data.account}
                 host={data.account?.host}
-                isDashboard={isDashboard}
                 // showExpenseTypeFilters
               >
                 {data.account?.expensesTags.length > 0 && (

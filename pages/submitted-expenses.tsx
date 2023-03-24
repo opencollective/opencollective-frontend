@@ -181,7 +181,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
                   <Box mx="auto" />
                   <SearchFormContainer p={2}>
                     <SearchBar
-                      defaultValue={query.searchTerm}
+                      defaultValue={query.searchTerm.toString()}
                       onSubmit={searchTerm => this.handleSearch(searchTerm, data.account)}
                       placeholder={undefined}
                     />

@@ -21,7 +21,7 @@ const SearchBar = ({
   defaultValue,
   placeholder,
   ...props
-}: HeightProps & React.HTMLAttributes<HTMLInputElement>) => {
+}: HeightProps & React.HTMLAttributes<HTMLFormElement>) => {
   const [value, setValue] = React.useState(defaultValue || '');
   const intl = useIntl();
 
