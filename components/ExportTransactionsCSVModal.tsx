@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import { flatten, isEmpty, omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -245,7 +244,6 @@ const ExportTransactionsCSVModal = ({
 
   const intl = useIntl();
   const [tmpDateInterval, setTmpDateInterval] = React.useState(dateInterval);
-  const [filename, setFilename] = React.useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [fieldOption, setFieldOption] = React.useState(FieldOptions[0].value);
   const [fields, setFields] = React.useState(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
@@ -349,12 +347,6 @@ const ExportTransactionsCSVModal = ({
             // I'm enforcing SameSitre and Domain in production to prevent CSRF.
             `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
     }
-    let filename = isHostReport ? `${host.slug}-host-transactions` : `${collective.slug}-transactions`;
-    if (tmpDateInterval.from) {
-      const until = tmpDateInterval.to || dayjs().format('YYYY-MM-DD');
-      filename += `-${tmpDateInterval.from}-${until}.csv`;
-    }
-    setFilename(filename);
     setDownloadUrl(getUrl());
   }, [fields, tmpDateInterval]);
 
@@ -500,7 +492,6 @@ const ExportTransactionsCSVModal = ({
             buttonSize="small"
             buttonStyle="primary"
             as="a"
-            download={filename}
             href={downloadUrl}
             disabled={!isValidDateInterval || isFetchingRows || exportedRows > 100e3}
           >
