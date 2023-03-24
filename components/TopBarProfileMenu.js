@@ -11,7 +11,7 @@ import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
-import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
+import { getDashboardRoute } from '../lib/url-helpers';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';

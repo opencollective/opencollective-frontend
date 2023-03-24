@@ -148,7 +148,13 @@ class TransactionsPage extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, router, query, data, slug } = this.props;
+    const {
+      LoggedInUser,
+      router,
+      data,
+      // slug,
+      // query,
+    } = this.props;
     const { account, transactions, refetch, variables, error, loading } = data || {};
 
     if (!account && data.loading) {

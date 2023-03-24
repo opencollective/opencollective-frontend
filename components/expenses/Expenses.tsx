@@ -3,13 +3,9 @@ import PropTypes from 'prop-types';
 import { omit, omitBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
-import {
-  getCollectivePageMetadata,
-  getSuggestedTags,
-  loggedInUserCanAccessFinancialData,
-} from '../../lib/collective.lib';
+import { getSuggestedTags, loggedInUserCanAccessFinancialData } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { generateNotFoundError } from '../../lib/errors';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../../lib/url-helpers';
@@ -36,17 +32,17 @@ import ExpenseInfoSidebar from './ExpenseInfoSidebar';
 import ExpensesFilters from './ExpensesFilters';
 import ExpensesList from './ExpensesList';
 
-const messages = defineMessages({
-  title: {
-    id: 'ExpensesPage.title',
-    defaultMessage: '{collectiveName} · Expenses',
-  },
-});
+// const messages = defineMessages({
+//   title: {
+//     id: 'ExpensesPage.title',
+//     defaultMessage: '{collectiveName} · Expenses',
+//   },
+// });
 
 const ORDER_SELECT_STYLE = { control: { background: 'white' } };
 
 const Expenses = props => {
-  const intl = useIntl();
+  //   const intl = useIntl();
   const router = useRouter();
   const { query, LoggedInUser, data, collectiveSlug, loading, error, variables, refetch, isDashboard = true } = props;
 
@@ -68,18 +64,6 @@ const Expenses = props => {
     }
     setOldLoggedInUser(LoggedInUser);
   }, [oldLoggedInUser, LoggedInUser, data]);
-
-  function getPageMetaData(collective) {
-    const baseMetadata = getCollectivePageMetadata(collective);
-    if (collective) {
-      return {
-        ...baseMetadata,
-        title: intl.formatMessage(messages.title, { collectiveName: collective.name }),
-      };
-    } else {
-      return { ...baseMetadata, title: `Expenses` };
-    }
-  }
 
   const hasFilter = memoizeOne(query => {
     return Object.entries(query).some(([key, value]) => key !== 'offset' && key !== 'limit' && value);
@@ -109,12 +93,6 @@ const Expenses = props => {
   function getTagProps(tag) {
     if (tag === query.tag) {
       return { type: 'info', closeButtonProps: true };
-    }
-  }
-
-  function getShouldDisplayFeatureNotSupported(account) {
-    if (!account) {
-      return true;
     }
   }
 

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { getDashboardRoute, getSettingsRoute } from '../../lib/url-helpers';
+import { getDashboardRoute } from '../../lib/url-helpers';
 
 import { Box } from '../Grid';
 import Link from '../Link';

@@ -18,8 +18,8 @@ import { AdminSectionProps } from '../types';
 
 const parseQuery = routerQuery => {
   const {
-    parentCollectiveSlug,
-    collectiveSlug,
+    // parentCollectiveSlug,
+    // collectiveSlug,
     offset,
     limit,
     type,
@@ -48,13 +48,13 @@ const parseQuery = routerQuery => {
 };
 const EXPENSES_PER_PAGE = 10;
 
-const getVariablesFromQuery = (query, slug, props) => {
+const getVariablesFromQuery = (query, slug) => {
   const amountRange = parseAmountRange(query.amount);
   const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
   const orderBy = query.orderBy && parseChronologicalOrderInput(query.orderBy);
-  // const showSubmitted = query.direction === 'SUBMITTED' || props.account.type === 'USER';
 
-  // Fix for only showing Submitted expenses (for now)
+  // TODO: This is hard-coded to only work for Submitted Expenses for Users currently
+  // const showSubmitted = query.direction === 'SUBMITTED' || props.account.type === 'USER';
   // const fromAccount = showSubmitted ? { slug } : null;
   // const account = !showSubmitted ? { slug } : null;
 

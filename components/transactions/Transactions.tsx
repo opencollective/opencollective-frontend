@@ -5,7 +5,6 @@ import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { isNil, omit, omitBy, pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { loggedInUserCanAccessFinancialData } from '../../lib/collective.lib';
 import roles from '../../lib/constants/roles';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { parseDateInterval } from '../../lib/date-utils';
@@ -20,8 +19,6 @@ import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
-import Page from '../Page';
-import PageFeatureNotSupported from '../PageFeatureNotSupported';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
