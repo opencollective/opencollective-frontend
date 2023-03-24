@@ -351,6 +351,7 @@ const ExportTransactionsCSVModal = ({
   }, [fields, tmpDateInterval]);
 
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
+  const disabled = !isValidDateInterval || isFetchingRows || exportedRows > 100e3;
 
   return (
     <StyledModal onClose={onClose} width="100%" maxWidth="576px" {...props}>
@@ -491,9 +492,9 @@ const ExportTransactionsCSVModal = ({
           <StyledButton
             buttonSize="small"
             buttonStyle="primary"
-            as="a"
-            href={downloadUrl}
-            disabled={!isValidDateInterval || isFetchingRows || exportedRows > 100e3}
+            as={disabled ? undefined : 'a'}
+            href={disabled ? undefined : downloadUrl}
+            disabled={disabled}
           >
             <FormattedMessage defaultMessage="Export CSV" />
           </StyledButton>
