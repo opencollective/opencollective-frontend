@@ -138,7 +138,17 @@ const convertProcessingOrderIntoTransactionItem = order => ({
   ...pick(order, ['id', 'amount', 'toAccount', 'fromAccount', 'description', 'createdAt', 'paymentMethod']),
 });
 
-const Transactions = ({ LoggedInUser, transactions, error, account, loading, refetch, variables, router }) => {
+const Transactions = ({
+  LoggedInUser,
+  transactions,
+  error,
+  account,
+  loading,
+  refetch,
+  variables,
+  router,
+  isDashboard,
+}) => {
   const [state, setState] = useState({
     hasChildren: null,
     hasGiftCards: null,
@@ -208,7 +218,9 @@ const Transactions = ({ LoggedInUser, transactions, error, account, loading, ref
 
   function updateFilters(queryParams, collective) {
     return router.push({
-      pathname: `${getCollectivePageCanonicalURL(collective)}/transactions`,
+      pathname: isDashboard
+        ? `${getCollectivePageCanonicalURL(collective)}/dashboard/transactions`
+        : `${getCollectivePageCanonicalURL(collective)}/transactions`,
       query: buildFilterLinkParams({ ...queryParams, offset: null }),
     });
   }
@@ -233,7 +245,7 @@ const Transactions = ({ LoggedInUser, transactions, error, account, loading, ref
       : transactions?.nodes || [];
 
   return (
-    <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} py={[0, 4]} mt={[3, 0]} data-cy="transactions-page-content">
+    <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} pb={3} data-cy="transactions-page-content">
       <Flex justifyContent="space-between" alignItems="baseline">
         <SectionTitle textAlign="left" mb={1} display={['none', 'block']}>
           <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
@@ -400,6 +412,7 @@ Transactions.propTypes = {
     displayPendingContributions: PropTypes.string,
   }),
   router: PropTypes.object,
+  isDashboard: PropTypes.bool,
 };
 
 export default Transactions;

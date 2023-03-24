@@ -25,7 +25,7 @@ import { isSupportedExpenseType } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { getCollectivePageRoute, getSettingsRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute, getSettingsRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -309,12 +309,17 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.SETTINGS,
       component: (
-        <Link href={getSettingsRoute(collective)} data-cy="edit-collective-btn">
+        <Link
+          href={collective.type === CollectiveType.USER ? getDashboardRoute(collective) : getSettingsRoute(collective)}
+          data-cy="edit-collective-btn"
+        >
           <ActionButton tabIndex="-1">
             <Settings size="1em" />
             <Span ml={2}>
               {collective.isHost ? (
                 <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
+              ) : collective.type === CollectiveType.USER ? (
+                <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
               ) : (
                 <FormattedMessage id="Settings" defaultMessage="Settings" />
               )}

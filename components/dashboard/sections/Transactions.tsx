@@ -31,6 +31,7 @@ const Transactions = (props: AdminSectionProps) => {
         loading={loading}
         refetch={refetch}
         router={router}
+        isDashboard
       />
     </React.Fragment>
   );

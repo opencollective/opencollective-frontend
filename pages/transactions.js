@@ -21,6 +21,7 @@ import {
 } from '../components/collective-page/graphql/fragments';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
+import { Box } from '../components/Grid';
 import Header from '../components/Header';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
@@ -149,7 +150,6 @@ class TransactionsPage extends React.Component {
   render() {
     const { LoggedInUser, router, query, data, slug } = this.props;
     const { account, transactions, refetch, variables, error, loading } = data || {};
-    console.log({ account, router, query, slug });
 
     if (!account && data.loading) {
       return (
@@ -179,16 +179,18 @@ class TransactionsPage extends React.Component {
             selectedCategory={NAVBAR_CATEGORIES.BUDGET}
             selectedSection={account.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
           />
-          <Transactions
-            transactions={transactions}
-            account={account}
-            LoggedInUser={LoggedInUser}
-            variables={variables}
-            error={error}
-            loading={loading}
-            refetch={refetch}
-            router={router}
-          />
+          <Box pt={3}>
+            <Transactions
+              transactions={transactions}
+              account={account}
+              LoggedInUser={LoggedInUser}
+              variables={variables}
+              error={error}
+              loading={loading}
+              refetch={refetch}
+              router={router}
+            />
+          </Box>
         </Body>
         <Footer />
       </TransactionPageWrapper>

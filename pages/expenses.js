@@ -369,7 +369,7 @@ class ExpensePage extends React.Component {
   }
 }
 
-const expensesPageQuery = gql`
+export const expensesPageQuery = gql`
   query ExpensesPage(
     $collectiveSlug: String!
     $account: AccountReferenceInput

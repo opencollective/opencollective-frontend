@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
+import { HeightProps } from 'styled-system';
 
 import SearchForm from './SearchForm';
 
@@ -15,7 +16,12 @@ const messages = defineMessages({
  * A wrapper around `SearchForm` that holds state and interacts with parent
  * through `onSubmit`, rather than `onChange`.
  */
-const SearchBar = ({ onSubmit, defaultValue, placeholder, ...props }) => {
+const SearchBar = ({
+  onSubmit,
+  defaultValue,
+  placeholder,
+  ...props
+}: HeightProps & React.HTMLAttributes<HTMLInputElement>) => {
   const [value, setValue] = React.useState(defaultValue || '');
   const intl = useIntl();
 
