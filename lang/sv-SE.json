@@ -3048,6 +3048,7 @@
   "XPruqs": "Order",
   "xQXSru": "Token name",
   "xrcsxW": "Nytt väntande <Order>bidrag</Order> från <FromAccount></FromAccount> till <Account></Account>",
+  "XruSTn": "This event will only be triggered when the activity occurs on {host}'s account, not on its hosted initiatives.",
   "XvKF/A": "Förhandsgranska notis",
   "XVzYBE": "Manage members",
   "XW00me": "Din värd kräver att kollektiv har {numberOfAdmins, plural, one {# aktiv administratör} other {# aktiva administratörer} }.",
