@@ -82,7 +82,7 @@ const getVariablesFromQuery = (query, slug) => {
 const Expenses = (props: AdminSectionProps) => {
   const router = useRouter();
   const query = parseQuery(router.query);
-  const variables = getVariablesFromQuery(query, props.account.slug, props);
+  const variables = getVariablesFromQuery(query, props.account.slug);
   const { LoggedInUser } = useLoggedInUser();
 
   const { data, error, loading, refetch } = useQuery(expensesPageQuery, {
