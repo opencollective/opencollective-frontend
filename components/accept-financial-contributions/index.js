@@ -33,7 +33,7 @@ class AcceptFinancialContributions extends Component {
     const { chosenHost } = this.state;
     const { path, state, message } = router.query;
 
-    if (!path && router.query.newFlow) {
+    if (!path && router.query.newFlow === 'true') {
       return (
         <StartAcceptingFinancialContributionsPage collective={this.props.collective} onChange={this.handleChange} />
       );

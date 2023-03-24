@@ -10,6 +10,7 @@ import { Account, Collective, Host } from '../../lib/graphql/types/v2/graphql';
 import { getCountryDisplayName, isoCountryList } from '../../lib/i18n/countries';
 
 import ApplyToHostModal from '../ApplyToHostModal';
+import HowToUseOpenCollective from '../fiscal-hosting/HowCanAFiscalHostHelpSection';
 import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
@@ -271,7 +272,7 @@ function FeaturedFiscalHostResults({
     <StyledCard padding={4} bg="#F1F6FF" borderRadius="24px" borderStyle="none">
       <Flex>
         <P fontSize="24px" lineHeight="32px" fontWeight="700" color="black.900">
-          <FormattedMessage defaultMessage="Featured Hosts" />
+          <FormattedMessage defaultMessage="Recommended Hosts" />
         </P>
         <P ml={1} fontSize="14px" lineHeight="32px" fontWeight="400" color="black.900">
           <FormattedMessage
@@ -403,6 +404,8 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
   const [selectedCommunityType, setSelectedCommunityType] = React.useState<string[]>([]);
   const [selectedCountry, setSelectedCountry] = React.useState(allCountriesSelectOption);
   const [searchingForFiscalHost, setSearchingForFiscalHost] = React.useState(false);
+  const router = useRouter();
+  const independentCollectiveOption = router.query.independentCollectiveOption === 'true';
 
   const countrySelectOptions = React.useMemo(() => {
     const countryList = isoCountryList
@@ -499,7 +502,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
           </React.Fragment>
         )}
       </StyledCard>
-      {!searchingForFiscalHost && (
+      {!searchingForFiscalHost && independentCollectiveOption && (
         <React.Fragment>
           <RoundOr>
             <FormattedMessage defaultMessage="Or" />
@@ -507,6 +510,8 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
           <IndependentCollectiveCard collective={props.collective} />
         </React.Fragment>
       )}
+
+      {!searchingForFiscalHost && <HowToUseOpenCollective />}
 
       {searchingForFiscalHost && (
         <Box mt={3} width="1000px">
