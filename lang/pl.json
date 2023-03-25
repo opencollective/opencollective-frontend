@@ -3048,7 +3048,7 @@
   "XPruqs": "Zamówienie",
   "xQXSru": "Nazwa tokena",
   "xrcsxW": "Nowa oczekująca <Order>wpłata</Order> z <FromAccount></FromAccount> do <Account></Account>",
-  "XruSTn": "This event will only be triggered when the activity occurs on {host}'s account, not on its hosted initiatives.",
+  "XruSTn": "To zdarzenie zostanie wywołane tylko wtedy, gdy aktywność wystąpi na koncie {host}, a nie na jego inicjatywach obsługiwanych przez gospodarza.",
   "XvKF/A": "Podgląd Powiadomienia",
   "XVzYBE": "Zarządzanie członkami",
   "XW00me": "Twój gospodarz wymaga, aby Zbiorki miały {numberOfAdmins, plural, one {# aktywnego administratora} few {# aktywnych administratorów} many {# aktywnych administratorów} other {# aktywnych administratorów} }.",
