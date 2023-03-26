@@ -3048,6 +3048,7 @@
   "XPruqs": "Order",
   "xQXSru": "Nombre del token",
   "xrcsxW": "Nueva <Order>contribución</Order> pendiente de <FromAccount></FromAccount> a <Account></Account>",
+  "XruSTn": "This event will only be triggered when the activity occurs on {host}'s account, not on its hosted initiatives.",
   "XvKF/A": "Notificaciones de Vista Previa",
   "XVzYBE": "Gestionar miembros",
   "XW00me": "Tu Host requiere que los Colectivos tengan {numberOfAdmins, plural, one {# administrador activo} other {# administradores activos} }.",

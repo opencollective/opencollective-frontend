@@ -34,7 +34,7 @@ import {
   TagMarker,
 } from './common';
 
-const budgetSectionExpenseQuery = gql`
+export const budgetSectionExpenseQuery = gql`
   query BudgetSectionExpenseQuery($slug: String!, $from: DateTime, $to: DateTime) {
     account(slug: $slug) {
       id

@@ -3048,6 +3048,7 @@
   "XPruqs": "Order",
   "xQXSru": "Token name",
   "xrcsxW": "New pending <Order>contribution</Order> from <FromAccount></FromAccount> to <Account></Account>",
+  "XruSTn": "This event will only be triggered when the activity occurs on {host}'s account, not on its hosted initiatives.",
   "XvKF/A": "预览通知",
   "XVzYBE": "Manage members",
   "XW00me": "Your host requires that Collectives have {numberOfAdmins, plural, one {# active administrator} other {# active administrators} }.",

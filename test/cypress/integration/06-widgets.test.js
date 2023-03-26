@@ -6,6 +6,6 @@ describe('widgets', () => {
 
   it('shows the collectives backed by a user', () => {
     cy.visit('/xdamman/widget.html');
-    cy.get('.CollectiveCard').should('have.length', 9);
+    cy.get('.CollectiveCard').should('have.length', 12);
   });
 });
