@@ -15,6 +15,7 @@ import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import Loading from '../Loading';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledCollectiveCard from '../StyledCollectiveCard';
@@ -63,15 +64,7 @@ const Illustration = styled.img`
   object-fit: cover;
 `;
 
-const ApplyButton = styled(StyledButton)`
-  visibility: hidden;
-`;
-
 const StyledCollectiveCardWrapper = styled(StyledCollectiveCard)`
-  &:hover ${ApplyButton} {
-    visibility: visible;
-  }
-
   &:hover {
     border-color: #1869f5;
   }
@@ -154,7 +147,7 @@ function ApplyToHostCard(props: {
           )}
         </Box>
         <Box mx={3} mt={3}>
-          <ApplyButton
+          <StyledButton
             onClick={() => {
               props.onHostApplyClick(props.host);
               setShowApplyToHostModal(true);
@@ -163,7 +156,7 @@ function ApplyToHostCard(props: {
             width="100%"
           >
             <FormattedMessage id="Apply" defaultMessage="Apply" />
-          </ApplyButton>
+          </StyledButton>
         </Box>
       </StyledCollectiveCardWrapper>
       {showApplyToHostModal && (
@@ -299,10 +292,12 @@ function FeaturedFiscalHostResults({
 
 function OtherFiscalHostResults({
   hosts,
+  totalCount,
   collective,
   onHostApplyClick,
 }: {
   hosts: Pick<Host, 'slug' | 'totalHostedCollectives' | 'description' | 'currency' | 'hostFeePercent'>[];
+  totalCount: number;
   collective: Pick<Account, 'slug'>;
   onHostApplyClick: (host: Partial<Host>) => void;
 }) {
@@ -316,7 +311,7 @@ function OtherFiscalHostResults({
           <FormattedMessage
             defaultMessage="{ hostCount, plural, one {# host} other {# hosts} } found"
             values={{
-              hostCount: hosts.length,
+              hostCount: totalCount,
             }}
           />
         </P>
@@ -332,14 +327,29 @@ function OtherFiscalHostResults({
   );
 }
 
+function useNonEmptyResultCache(data) {
+  const nonEmptyResult = React.useRef(data);
+  React.useEffect(() => {
+    if (data && data?.hosts?.nodes?.length !== 0) {
+      nonEmptyResult.current = data;
+    }
+  }, [data]);
+
+  return nonEmptyResult.current;
+}
+
 function FindAHostSearch(props: {
+  searchingForFiscalHost: boolean;
   selectedCommunityType: string[];
   selectedCountry: string;
   collective: Account;
   onHostApplyClick: (host: Partial<Host>) => void;
 }) {
   const { data, loading } = useQuery<{
-    hosts: { nodes: Pick<Host, 'slug' | 'currency' | 'totalHostedCollectives' | 'hostFeePercent' | 'isTrustedHost'>[] };
+    hosts: {
+      totalCount: number;
+      nodes: Pick<Host, 'slug' | 'currency' | 'totalHostedCollectives' | 'hostFeePercent' | 'isTrustedHost'>[];
+    };
   }>(FindAFiscalHostQuery, {
     variables: {
       tags: props.selectedCommunityType.length !== 0 ? props.selectedCommunityType : undefined,
@@ -348,6 +358,12 @@ function FindAHostSearch(props: {
     },
     context: API_V2_CONTEXT,
   });
+
+  const cachedNonEmptyResult = useNonEmptyResultCache(data);
+
+  if (!props.searchingForFiscalHost) {
+    return null;
+  }
 
   if (loading) {
     return (
@@ -360,16 +376,22 @@ function FindAHostSearch(props: {
     );
   }
 
-  const hosts = data?.hosts?.nodes || [];
-  if (hosts.length === 0) {
-    return <div>Empty state</div>;
-  }
+  const isEmpty = data?.hosts?.nodes?.length === 0;
+  const displayData = isEmpty ? cachedNonEmptyResult : data;
+
+  const hosts = displayData?.hosts?.nodes || [];
 
   const featuredHosts = hosts.filter(host => host.isTrustedHost);
   const otherHosts = hosts.filter(host => !host.isTrustedHost);
 
   return (
     <React.Fragment>
+      {isEmpty && (
+        <MessageBox mb={3} type="warning">
+          <FormattedMessage defaultMessage="We could not find a host that matches all your criteria." />
+        </MessageBox>
+      )}
+
       {featuredHosts.length !== 0 && (
         <Box mb={3}>
           <FeaturedFiscalHostResults
@@ -384,6 +406,7 @@ function FindAHostSearch(props: {
           <OtherFiscalHostResults
             collective={props.collective}
             hosts={otherHosts}
+            totalCount={displayData.hosts.totalCount - featuredHosts.length}
             onHostApplyClick={props.onHostApplyClick}
           />
         </Box>
@@ -438,7 +461,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
           <FormattedMessage defaultMessage="Choose who will hold the money on your behalf" />
         </P>
       </Box>
-      <StyledCard width="800px" padding="32px 24px">
+      <StyledCard width={['300px', '400px', '600px', '800px']} padding="32px 24px">
         <P mb={1} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
           <FormattedMessage defaultMessage="What type of community are you?" />
         </P>
@@ -447,6 +470,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
           filters={CommunityTypes}
           onChange={setSelectedCommunityType}
           selected={selectedCommunityType}
+          flexWrap="wrap"
         />
 
         <P mt={4} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
@@ -469,8 +493,8 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
             <P mt={4} fontSize="20px" lineHeight="28px" fontWeight="700" color="black.800">
               <FormattedMessage defaultMessage="Continue with a Fiscal Host" />
             </P>
-            <Flex mt={3}>
-              <Box>
+            <Flex mt={3} flexDirection={['column', 'row']}>
+              <Box display={['none', 'block']}>
                 <Illustration
                   alt="A place to grow and thrive illustration"
                   src="/static/images/watering-plants-bird-illustration.png"
@@ -496,7 +520,11 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
                 />
               </Flex>
             </Flex>
-            <StyledButton onClick={() => setSearchingForFiscalHost(true)} mt={3} buttonStyle="primary" width="100%">
+            <StyledHr my={4} />
+            <MessageBox my={4} type="info">
+              <FormattedMessage defaultMessage="You can always change your selection of filters and criteria in the future." />
+            </MessageBox>
+            <StyledButton onClick={() => setSearchingForFiscalHost(true)} buttonStyle="primary" width="100%">
               <FormattedMessage defaultMessage="Search for Fiscal Hosts" />
             </StyledButton>
           </React.Fragment>
@@ -511,20 +539,23 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         </React.Fragment>
       )}
 
-      {!searchingForFiscalHost && <HowToUseOpenCollective />}
-
-      {searchingForFiscalHost && (
-        <Box mt={3} width="1000px">
-          <FindAHostSearch
-            collective={props.collective}
-            selectedCommunityType={selectedCommunityType}
-            selectedCountry={selectedCountry.value}
-            onHostApplyClick={host => {
-              props.onChange('chosenHost', host);
-            }}
-          />
+      {!searchingForFiscalHost && (
+        <Box mt={3} width={['360px', '500px', '700px', '900px']}>
+          <HowToUseOpenCollective />
         </Box>
       )}
+
+      <Box mt={3} width={['360px', '500px', '700px', '900px']}>
+        <FindAHostSearch
+          searchingForFiscalHost={searchingForFiscalHost}
+          collective={props.collective}
+          selectedCommunityType={selectedCommunityType}
+          selectedCountry={selectedCountry.value}
+          onHostApplyClick={host => {
+            props.onChange('chosenHost', host);
+          }}
+        />
+      </Box>
     </Flex>
   );
 }
