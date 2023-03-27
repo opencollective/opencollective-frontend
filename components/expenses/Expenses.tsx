@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { getSuggestedTags, loggedInUserCanAccessFinancialData } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { generateNotFoundError } from '../../lib/errors';
-import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../../lib/url-helpers';
+import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
 
 import { Dimensions } from '../collective-page/_constants';
 import SectionTitle from '../collective-page/SectionTitle';
@@ -45,6 +45,9 @@ const Expenses = props => {
   //   const intl = useIntl();
   const router = useRouter();
   const { query, LoggedInUser, data, collectiveSlug, loading, error, variables, refetch, isDashboard = true } = props;
+  const expensesRoute = isDashboard
+    ? `${getCollectivePageRoute(data.account)}/dashboard/expenses`
+    : `${getCollectivePageRoute(data.account)}/expenses`;
 
   useEffect(() => {
     const account = data?.account;
@@ -78,16 +81,16 @@ const Expenses = props => {
     return omitBy(queryParameters, value => !value);
   }
 
-  function updateFilters(queryParams, collective) {
+  function updateFilters(queryParams) {
     return router.push({
-      pathname: `${getCollectivePageCanonicalURL(collective)}/dashboard/manage-expenses`,
+      pathname: expensesRoute,
       query: buildFilterLinkParams({ ...queryParams, offset: null }),
     });
   }
 
-  function handleSearch(searchTerm, collective) {
+  function handleSearch(searchTerm) {
     const params = buildFilterLinkParams({ searchTerm, offset: null });
-    router.push({ pathname: `${getCollectivePageCanonicalURL(collective)}/expenses`, query: params });
+    router.push({ pathname: expensesRoute, query: params });
   }
 
   function getTagProps(tag) {
@@ -130,21 +133,21 @@ const Expenses = props => {
               value={query.direction || 'RECEIVED'}
               onChange={direction => {
                 const newFilters = { ...query, direction };
-                updateFilters(newFilters, data.account);
+                updateFilters(newFilters);
               }}
             />
           </Box>
           <Box flex="12 1 150px">
             <SearchBar
               defaultValue={query.searchTerm}
-              onSubmit={searchTerm => handleSearch(searchTerm, data.account)}
+              onSubmit={searchTerm => handleSearch(searchTerm)}
               height="40px"
             />
           </Box>
           <Box flex="1 1 150px">
             <ExpensesOrder
               value={query.orderBy}
-              onChange={orderBy => updateFilters({ ...query, orderBy }, data.account)}
+              onChange={orderBy => updateFilters({ ...query, orderBy })}
               styles={ORDER_SELECT_STYLE}
             />
           </Box>
@@ -154,7 +157,7 @@ const Expenses = props => {
             <ExpensesFilters
               collective={data.account}
               filters={query}
-              onChange={queryParams => updateFilters(queryParams, data.account)}
+              onChange={queryParams => updateFilters(queryParams)}
               wrap={false}
               showOrderFilter={false} // On this page, the order filter is displayed at the top
             />
@@ -175,10 +178,7 @@ const Expenses = props => {
                     defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
                     values={{
                       ResetLink: text => (
-                        <Link
-                          data-cy="reset-expenses-filters"
-                          href={`${getCollectivePageRoute(data.account)}/expenses`}
-                        >
+                        <Link data-cy="reset-expenses-filters" href={expensesRoute}>
                           <span>{text}</span>
                         </Link>
                       ),
@@ -202,7 +202,7 @@ const Expenses = props => {
                 />
                 <Flex mt={5} justifyContent="center">
                   <Pagination
-                    route={`${getCollectivePageRoute(data.account)}/expenses`}
+                    route={expensesRoute}
                     total={data.expenses?.totalCount}
                     limit={variables.limit}
                     offset={variables.offset}
@@ -239,7 +239,7 @@ const Expenses = props => {
                         <Link
                           key={key}
                           href={{
-                            pathname: `${getCollectivePageRoute(data.account)}/expenses`,
+                            pathname: expensesRoute,
                             query: buildFilterLinkParams({ tag: closeButtonProps ? null : tag }),
                           }}
                           data-cy="expense-tags-link"
