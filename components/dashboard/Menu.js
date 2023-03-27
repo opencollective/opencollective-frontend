@@ -135,14 +135,15 @@ const Menu = ({ collective, isAccountantOnly }) => {
             <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
           </MenuSectionHeader>
           {/* <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.HOME} /> */}
+
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.EXPENSES} />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.TRANSACTIONS} />
           <MenuLink
             collective={collective}
             section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
             if={isSelfHostedAccount(collective) && !isAccountantOnly && isType(collective, COLLECTIVE)}
           />
-          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} />
-          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.EXPENSES} />
-          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.TRANSACTIONS} />
           {/* <MenuLink
             collective={collective}
             section={COLLECTIVE_SECTIONS.VIRTUAL_CARDS}

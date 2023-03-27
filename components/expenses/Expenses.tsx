@@ -46,9 +46,8 @@ const Expenses = props => {
   const router = useRouter();
   const { query, LoggedInUser, data, collectiveSlug, loading, error, variables, refetch, isDashboard = true } = props;
   const expensesRoute = isDashboard
-    ? `${getCollectivePageRoute(data.account)}/dashboard/expenses`
-    : `${getCollectivePageRoute(data.account)}/expenses`;
-
+    ? `${getCollectivePageRoute(data?.account)}/dashboard/expenses`
+    : `${getCollectivePageRoute(data?.account)}/expenses`;
   useEffect(() => {
     const account = data?.account;
     const queryParameters = {
