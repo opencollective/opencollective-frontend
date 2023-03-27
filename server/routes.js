@@ -9,7 +9,6 @@ const { sendMessage } = require('./email');
 const intl = require('./intl');
 const logger = require('./logger');
 const prependHttp = require('prepend-http');
-const fetch = require('node-fetch');
 
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
@@ -133,37 +132,6 @@ module.exports = (expressApp, nextApp) => {
     });
 
     res.status(200).send({ sent: true });
-  });
-
-  /**
-   * Gitbook search proxy
-   *
-   * This is used to proxy the search request to Gitbook's search API
-   * */
-  app.get('/docs/search', async (req, res) => {
-    const { query } = req.query;
-
-    if (!query) {
-      return res.status(400).send({
-        error: {
-          message: 'Missing query parameter',
-          code: 400,
-        },
-      });
-    }
-
-    try {
-      const response = await fetch(`https://api.gitbook.com/v1/spaces/-LWSZizTt4ZC1UNDV89f/search?query=${query}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${process.env.GITBOOK_API_KEY}`,
-        },
-      });
-      const json = await response.json();
-      return res.status(200).send(json);
-    } catch (error) {
-      return res.status(500).send(error);
-    }
   });
 
   /**
