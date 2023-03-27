@@ -15,12 +15,12 @@ import NotFound from '../NotFound';
 import { H2 } from '../Text';
 
 import AccountSettings from './sections/AccountSettings';
+import Expenses from './sections/Expenses';
 import FinancialContributions from './sections/FinancialContributions';
 import Home from './sections/Home';
 import HostVirtualCards from './sections/HostVirtualCards';
 import InvoicesReceipts from './sections/InvoicesReceipts';
 import ManageContributions from './sections/ManageContributions';
-import ManageExpenses from './sections/ManageExpenses';
 import NotificationsSettings from './sections/NotificationsSettings';
 import PendingContributions from './sections/PendingContributions';
 import TeamSettings from './sections/Team';
@@ -37,7 +37,7 @@ const ADMIN_PANEL_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
   [HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS]: FinancialContributions,
   [HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS]: PendingContributions,
-  [HOST_DASHBOARD_SECTIONS.EXPENSES]: HostDashboardExpenses,
+  [HOST_DASHBOARD_SECTIONS.HOST_EXPENSES]: HostDashboardExpenses,
   [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: PendingApplications,
   [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
   [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
@@ -45,7 +45,7 @@ const ADMIN_PANEL_SECTIONS = {
   [COLLECTIVE_SECTIONS.TEAM]: TeamSettings,
   [COLLECTIVE_SECTIONS.HOME]: Home,
   [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
-  [COLLECTIVE_SECTIONS.MANAGE_EXPENSES]: ManageExpenses,
+  [COLLECTIVE_SECTIONS.EXPENSES]: Expenses,
   [COLLECTIVE_SECTIONS.TRANSACTIONS]: Transactions,
   // [COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: VirtualCards,
 };

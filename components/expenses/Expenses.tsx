@@ -122,21 +122,18 @@ const Expenses = props => {
     <Container position="relative" minHeight={[null, 800]}>
       <Box maxWidth={Dimensions.MAX_SECTION_WIDTH} m="0 auto" px={[2, 3, 4]} pb={3}>
         <SectionTitle textAlign="left" mb={4} display={['none', 'block']}>
-          {isDashboard ? (
-            <FormattedMessage defaultMessage="Submitted Expenses" />
-          ) : (
-            <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-          )}
+          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         </SectionTitle>
         <Flex alignItems={[null, null, 'center']} mb="26px" flexWrap="wrap" gap="16px" mr={2}>
-          {!isDashboard && (
-            <Box flex="0 1" flexBasis={['100%', null, '380px']}>
-              <ExpensesDirection
-                value={query.direction || 'SUBMITTED'}
-                onChange={direction => updateFilters({ ...query, direction }, data.account)}
-              />
-            </Box>
-          )}
+          <Box flex="0 1" flexBasis={['100%', null, '380px']}>
+            <ExpensesDirection
+              value={query.direction || 'RECEIVED'}
+              onChange={direction => {
+                const newFilters = { ...query, direction };
+                updateFilters(newFilters, data.account);
+              }}
+            />
+          </Box>
           <Box flex="12 1 150px">
             <SearchBar
               defaultValue={query.searchTerm}
@@ -200,8 +197,8 @@ const Expenses = props => {
                   expenses={data.expenses?.nodes}
                   nbPlaceholders={variables.limit}
                   suggestedTags={suggestedTags(data.account)}
-                  isInverted={isDashboard || query.direction === 'SUBMITTED'}
-                  view={isDashboard ? 'submitter' : undefined}
+                  isInverted={query.direction === 'SUBMITTED'}
+                  view={query.direction === 'SUBMITTED' ? 'submitter' : undefined}
                 />
                 <Flex mt={5} justifyContent="center">
                   <Pagination

@@ -11,7 +11,7 @@ export const HOST_DASHBOARD_SECTIONS = {
   OVERVIEW: 'info',
   REPORTS: 'reports',
   // Existing Host Dashboard Sections
-  EXPENSES: 'expenses',
+  HOST_EXPENSES: 'host-expenses',
   FINANCIAL_CONTRIBUTIONS: 'orders',
   PENDING_CONTRIBUTIONS: 'pending-contributions',
   HOSTED_COLLECTIVES: 'hosted-collectives',
@@ -58,7 +58,7 @@ export const COLLECTIVE_SECTIONS = {
   HOST: 'host',
   INFO: 'info',
   HOME: 'home',
-  MANAGE_EXPENSES: 'manage-expenses',
+  EXPENSES: 'expenses',
   MANAGE_CONTRIBUTIONS: 'manage-contributions',
   TRANSACTIONS: 'transactions',
   PAYMENT_METHODS: 'payment-methods',
@@ -93,7 +93,7 @@ export const ALL_SECTIONS = {
 export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.REPORTS,
   ALL_SECTIONS.PAYMENT_RECEIPTS,
-  ALL_SECTIONS.EXPENSES,
+  ALL_SECTIONS.HOST_EXPENSES,
   ALL_SECTIONS.FINANCIAL_CONTRIBUTIONS,
 ];
 
@@ -111,9 +111,9 @@ export const SECTION_LABELS = defineMessages({
     id: 'home',
     defaultMessage: 'Home',
   },
-  [ALL_SECTIONS.MANAGE_EXPENSES]: {
-    id: 'home.feature.manageExpenses',
-    defaultMessage: 'Manage Expenses',
+  [ALL_SECTIONS.EXPENSES]: {
+    id: 'Expenses',
+    defaultMessage: 'Expenses',
   },
   [ALL_SECTIONS.MANAGE_CONTRIBUTIONS]: {
     id: 'menu.subscriptions',
@@ -126,7 +126,7 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.ACTIVITY_LOG]: {
     defaultMessage: 'Activity log',
   },
-  [ALL_SECTIONS.EXPENSES]: {
+  [ALL_SECTIONS.HOST_EXPENSES]: {
     id: 'Expenses',
     defaultMessage: 'Expenses',
   },

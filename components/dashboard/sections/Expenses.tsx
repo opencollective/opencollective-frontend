@@ -3,6 +3,7 @@ import { useQuery } from '@apollo/client';
 import { has } from 'lodash';
 import { useRouter } from 'next/router';
 
+import { isIndividualAccount } from '../../../lib/collective.lib';
 import expenseStatus from '../../../lib/constants/expense-status';
 import expenseTypes from '../../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../../lib/constants/payout-method';
@@ -16,7 +17,7 @@ import ExpensesComponent from '../../expenses/Expenses';
 import { parseChronologicalOrderInput } from '../../expenses/filters/ExpensesOrder';
 import { AdminSectionProps } from '../types';
 
-const parseQuery = routerQuery => {
+const parseQuery = (routerQuery, account) => {
   const {
     // parentCollectiveSlug,
     // collectiveSlug,
@@ -32,13 +33,15 @@ const parseQuery = routerQuery => {
     orderBy,
     direction,
   } = routerQuery;
+  const newDirection = direction ? direction : isIndividualAccount(account) ? 'SUBMITTED' : 'RECEIVED';
+
   return {
     offset: parseInt(offset) || undefined,
     limit: parseInt(limit) || undefined,
     type: has(expenseTypes, type) ? type : undefined,
     status: has(expenseStatus, status) || status === 'READY_TO_PAY' ? status : undefined,
     payout: has(PayoutMethodType, payout) ? payout : undefined,
-    direction,
+    direction: newDirection,
     period,
     amount,
     tag,
@@ -48,18 +51,14 @@ const parseQuery = routerQuery => {
 };
 const EXPENSES_PER_PAGE = 10;
 
-const getVariablesFromQuery = (query, slug) => {
+const getVariables = (query, slug) => {
   const amountRange = parseAmountRange(query.amount);
   const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
   const orderBy = query.orderBy && parseChronologicalOrderInput(query.orderBy);
 
-  // TODO: This is hard-coded to only work for Submitted Expenses for Users currently
-  // const showSubmitted = query.direction === 'SUBMITTED' || props.account.type === 'USER';
-  // const fromAccount = showSubmitted ? { slug } : null;
-  // const account = !showSubmitted ? { slug } : null;
-
-  const fromAccount = { slug };
-  const account = null;
+  const showSubmitted = query.direction === 'SUBMITTED';
+  const fromAccount = showSubmitted ? { slug } : null;
+  const account = !showSubmitted ? { slug } : null;
   return {
     collectiveSlug: slug,
     fromAccount,
@@ -81,8 +80,8 @@ const getVariablesFromQuery = (query, slug) => {
 
 const Expenses = (props: AdminSectionProps) => {
   const router = useRouter();
-  const query = parseQuery(router.query);
-  const variables = getVariablesFromQuery(query, props.account.slug);
+  const query = parseQuery(router.query, props.account);
+  const variables = getVariables(query, props.account.slug);
   const { LoggedInUser } = useLoggedInUser();
 
   const { data, error, loading, refetch } = useQuery(expensesPageQuery, {
