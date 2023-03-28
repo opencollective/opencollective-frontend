@@ -5,6 +5,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
+import { Currency } from '../../lib/constants/currency';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { Account, Collective, Host } from '../../lib/graphql/types/v2/graphql';
 import { getCountryDisplayName, isoCountryList } from '../../lib/i18n/countries';
@@ -225,8 +226,8 @@ function IndependentCollectiveCard(props: { collective: Collective }) {
 }
 
 const FindAFiscalHostQuery = gql`
-  query FindAFiscalHostQuery($tags: [String], $limit: Int, $country: [CountryISO]) {
-    hosts(tag: $tags, limit: $limit, tagSearchOperator: OR, country: $country) {
+  query FindAFiscalHostQuery($tags: [String], $limit: Int, $country: [CountryISO], $currency: String) {
+    hosts(tag: $tags, limit: $limit, tagSearchOperator: OR, country: $country, currency: $currency) {
       totalCount
       nodes {
         id
@@ -342,6 +343,7 @@ function FindAHostSearch(props: {
   searchingForFiscalHost: boolean;
   selectedCommunityType: string[];
   selectedCountry: string;
+  selectedCurrency: string;
   collective: Account;
   onHostApplyClick: (host: Partial<Host>) => void;
 }) {
@@ -354,6 +356,7 @@ function FindAHostSearch(props: {
     variables: {
       tags: props.selectedCommunityType.length !== 0 ? props.selectedCommunityType : undefined,
       country: props.selectedCountry !== 'ALL' ? [props.selectedCountry] : null,
+      currency: props.selectedCurrency,
       limit: 50,
     },
     context: API_V2_CONTEXT,
@@ -426,6 +429,8 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
   const allCountriesSelectOption = { value: 'ALL', label: intl.formatMessage(I18nMessages.ALL_COUNTRIES) };
   const [selectedCommunityType, setSelectedCommunityType] = React.useState<string[]>([]);
   const [selectedCountry, setSelectedCountry] = React.useState(allCountriesSelectOption);
+  const currencyOptions = Currency.map(c => ({ value: c, label: c }));
+  const [selectedCurrency, setSelectedCurrency] = React.useState(currencyOptions[0]);
   const [searchingForFiscalHost, setSearchingForFiscalHost] = React.useState(false);
   const router = useRouter();
   const independentCollectiveOption = router.query.independentCollectiveOption === 'true';
@@ -473,18 +478,33 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
           flexWrap="wrap"
         />
 
-        <P mt={4} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
-          <FormattedMessage defaultMessage="Where would your collective be most active?" />
-        </P>
-        <StyledSelect
-          value={selectedCountry}
-          inputId="country-input"
-          options={countrySelectOptions}
-          onChange={setSelectedCountry}
-        />
-        <P color="black.600" fontWeight="400" fontSize="11px" lineHeight="16px">
-          <FormattedMessage defaultMessage="If multiple areas, please select most prominent of them all." />
-        </P>
+        <Flex gap="40px">
+          <Box>
+            <P mt={4} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
+              <FormattedMessage defaultMessage="Where would your collective be most active?" />
+            </P>
+            <StyledSelect
+              value={selectedCountry}
+              inputId="country-input"
+              options={countrySelectOptions}
+              onChange={setSelectedCountry}
+            />
+            <P color="black.600" fontWeight="400" fontSize="11px" lineHeight="16px">
+              <FormattedMessage defaultMessage="If multiple areas, please select most prominent of them all." />
+            </P>
+          </Box>
+          <Box flexGrow={1}>
+            <P mt={4} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
+              <FormattedMessage defaultMessage="What currency will your collective use?" />
+            </P>
+            <StyledSelect
+              value={selectedCurrency}
+              inputId="currency-input"
+              options={currencyOptions}
+              onChange={setSelectedCurrency}
+            />
+          </Box>
+        </Flex>
 
         {!searchingForFiscalHost && (
           <React.Fragment>
@@ -551,6 +571,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
           collective={props.collective}
           selectedCommunityType={selectedCommunityType}
           selectedCountry={selectedCountry.value}
+          selectedCurrency={selectedCurrency.value}
           onHostApplyClick={host => {
             props.onChange('chosenHost', host);
           }}
