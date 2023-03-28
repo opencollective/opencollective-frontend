@@ -46,14 +46,16 @@ const Expenses = props => {
   const router = useRouter();
   const { query, LoggedInUser, data, collectiveSlug, loading, error, variables, refetch, isDashboard = true } = props;
   const expensesRoute = isDashboard
-    ? `${getCollectivePageRoute(data?.account)}/dashboard/expenses`
+    ? `/dashboard/expenses/${collectiveSlug}`
     : `${getCollectivePageRoute(data?.account)}/expenses`;
   useEffect(() => {
     const account = data?.account;
     const queryParameters = {
       ...omit(query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
     };
-    addParentToURLIfMissing(router, account, `/expenses`, queryParameters);
+    if (!isDashboard) {
+      addParentToURLIfMissing(router, account, `/expenses`, queryParameters);
+    }
   }, []);
 
   const [oldLoggedInUser, setOldLoggedInUser] = useState(null);
