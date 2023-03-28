@@ -147,6 +147,7 @@ const DashboardPage = () => {
             <AdminPanelSideBar
               isLoading={isLoading}
               collective={account}
+              //  LoggedInUser={LoggedInUser}
               selectedSection={selectedSection}
               display={['none', null, 'block']}
               isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}

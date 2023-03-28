@@ -1,38 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { getCollectivePageRoute } from '../../lib/url-helpers';
-
-import Avatar from '../Avatar';
 import { Box } from '../Grid';
-import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
-import { H1 } from '../Text';
 
 import Menu from './Menu';
 import { MenuContainer } from './MenuComponents';
+import Switcher from './Switcher';
 
-const AdminPanelSideBar = ({ collective, isAccountantOnly, isLoading, selectedSection, onRoute, ...props }) => {
-  const pageUrl = getCollectivePageRoute(collective);
+const AdminPanelSideBar = ({
+  collective,
+  isAccountantOnly,
+  // LoggedInUser,
+  isLoading,
+  selectedSection,
+  onRoute,
+  ...props
+}) => {
   return (
     <Box {...props}>
       <MenuContainer>
-        <Box mb={32}>
-          {isLoading ? (
-            <LoadingPlaceholder height={56} width={56} borderRadius="50%" />
-          ) : (
-            <Link href={pageUrl} data-cy="menu-account-avatar-link">
-              <Avatar collective={collective} radius={56} />
-            </Link>
-          )}
-          <H1 fontSize="16px" lineHeight="24px" fontWeight="700" letterSpacing="0.04px" mb={16} mt={12}>
-            {isLoading ? (
-              <LoadingPlaceholder height={24} maxWidth="75%" />
-            ) : (
-              <Link href={pageUrl}>{collective.name}</Link>
-            )}
-          </H1>
-        </Box>
+        <Switcher collective={collective} isLoading={isLoading} />
 
         {isLoading ? (
           [...Array(5).keys()].map(i => (
@@ -57,6 +45,7 @@ AdminPanelSideBar.propTypes = {
     type: PropTypes.string,
     isHost: PropTypes.bool,
   }),
+  // LoggedInUser: PropTypes.object,
   isAccountantOnly: PropTypes.bool,
   onRoute: PropTypes.func,
 };
