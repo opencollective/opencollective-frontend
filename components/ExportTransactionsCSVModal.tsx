@@ -325,7 +325,7 @@ const ExportTransactionsCSVModal = ({
       url.searchParams.set('dateFrom', simpleDateToISOString(from, false, timezoneType));
     }
     if (to) {
-      url.searchParams.set('dateTo', simpleDateToISOString(from, true, timezoneType));
+      url.searchParams.set('dateTo', simpleDateToISOString(to, true, timezoneType));
     }
     if (!isEmpty(fields)) {
       url.searchParams.set('fields', Object.keys(fields).join(','));
