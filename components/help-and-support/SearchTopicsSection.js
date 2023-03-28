@@ -153,7 +153,12 @@ const SearchTopics = () => {
           <Search size="20px" color="#75777A" />
         </StyledCard>
         {showSearchResults && (
-          <SearchResultPopup width={['725px']} ref={setPopperElement} style={styles.popper} {...attributes.popper}>
+          <SearchResultPopup
+            width={['228px', '725px']}
+            ref={setPopperElement}
+            style={styles.popper}
+            {...attributes.popper}
+          >
             <Box maxHeight="416px" overflowY={'auto'}>
               {isLoading ? (
                 <LoadingSearchResults />
