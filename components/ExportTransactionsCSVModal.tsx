@@ -243,7 +243,7 @@ const ExportTransactionsCSVModal = ({
   const isHostReport = Boolean(host);
 
   const intl = useIntl();
-  const [tmpDateInterval, setTmpDateInterval] = React.useState(dateInterval);
+  const [tmpDateInterval, setTmpDateInterval] = React.useState(dateInterval || { to: null, from: null });
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [fieldOption, setFieldOption] = React.useState(FieldOptions[0].value);
   const [fields, setFields] = React.useState(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
