@@ -12985,6 +12985,10 @@ type Mutation {
     Individual that will have 2FA added to it
     """
     account: AccountReferenceInput!
+
+    """
+    The two factor method to add, defaults to TOTP
+    """
     type: TwoFactorMethod
 
     """
@@ -13001,12 +13005,16 @@ type Mutation {
     Account that will have 2FA removed from it
     """
     account: AccountReferenceInput!
+
+    """
+    The two factor method to remove. Removes all if empty
+    """
     type: TwoFactorMethod
 
     """
     The 6-digit 2FA code
     """
-    code: String
+    code: String @deprecated(reason: "2FA code to validate this action must be set via 2FA header")
   ): Individual!
 
   """
