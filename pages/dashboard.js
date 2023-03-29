@@ -45,7 +45,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return ALL_SECTIONS.INFO;
   } else if (isHostAccount(account)) {
-    return ALL_SECTIONS.EXPENSES;
+    return ALL_SECTIONS.HOST_EXPENSES;
   } else {
     const isAdmin = loggedInUser?.isAdminOfCollective(account);
     const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
