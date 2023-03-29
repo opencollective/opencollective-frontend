@@ -98,9 +98,9 @@ const messages = defineMessages({
 });
 
 const getNotification = (intl, status, collective, host, LoggedInUser, refetch) => {
-  const numberOfAdmins = [CollectiveType.EVENT, CollectiveType.PROJECT].includes(collective.type)
-    ? collective?.parentCollective?.coreContributors?.filter(c => c.isAdmin)?.length
-    : collective?.admins?.length;
+  const numberOfAdmins = collective.parentCollective
+    ? collective.parentCollective.coreContributors?.filter(c => c.isAdmin)?.length + collective.admins.length
+    : collective.admins.length;
   if (status === 'collectiveCreated') {
     switch (collective.type) {
       case CollectiveType.ORGANIZATION:
