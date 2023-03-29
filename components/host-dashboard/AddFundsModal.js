@@ -299,6 +299,21 @@ const Field = styled(StyledInputFormikField).attrs({
   labelFontWeight: '700',
 })``;
 
+const checkCanAddHostFee = account => {
+  // No host, no host fees
+  if (!account.host) {
+    return false;
+  }
+
+  if (account.parentCollective) {
+    // No host fees for child of independent collective
+    return account.host.id !== account.parentCollective.id;
+  }
+
+  // No host fees for Host Organizations or Independent Collectives
+  return account.host.id !== account.id;
+};
+
 const AddFundsModal = ({ collective, ...props }) => {
   const { LoggedInUser } = useLoggedInUser();
   const [fundDetails, setFundDetails] = useState({});
@@ -361,7 +376,7 @@ const AddFundsModal = ({ collective, ...props }) => {
 
   // From the Collective page we pass collective as API v1 object
   // From the Host dashboard we pass collective as API v2 object
-  const canAddHostFee = host?.plan?.hostFees && collective?.parentCollective?.id !== host?.legacyId;
+  const canAddHostFee = checkCanAddHostFee(collective);
   const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const canAddPlatformTip = host?.isTrustedHost;
