@@ -15,7 +15,7 @@ import AdminPanelSection from '../components/dashboard/DashboardSection';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
 import AdminPanelTopBar from '../components/dashboard/TopBar';
-import { Flex, Grid } from '../components/Grid';
+import { Box, Flex, Grid } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
@@ -135,13 +135,13 @@ const DashboardPage = () => {
           </Flex>
         ) : (
           <Grid
-            gridTemplateColumns={['1fr', null, '208px 1fr']}
+            gridTemplateColumns={['1fr', null, 'repeat(4, minmax(0, 1fr))']}
             maxWidth={1280}
             minHeight={600}
             gridGap={56}
             m="0 auto"
             px={3}
-            py={4}
+            // p={4}
             data-cy="admin-panel-container"
           >
             <AdminPanelSideBar
@@ -149,18 +149,20 @@ const DashboardPage = () => {
               collective={account}
               //  LoggedInUser={LoggedInUser}
               selectedSection={selectedSection}
-              display={['none', null, 'block']}
+              // display={['none', null, 'block']}
               isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
             />
             {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
             ) : (
-              <AdminPanelSection
-                section={selectedSection}
-                isLoading={isLoading}
-                collective={account}
-                subpath={subpath}
-              />
+              <Box gridColumn={'span 3 / span 3'} py={'24px'}>
+                <AdminPanelSection
+                  section={selectedSection}
+                  isLoading={isLoading}
+                  collective={account}
+                  subpath={subpath}
+                />
+              </Box>
             )}
           </Grid>
         )}

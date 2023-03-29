@@ -33,6 +33,7 @@ const StyledMenuEntry = styled(Link)`
   justify-content: space-between;
   background: white;
   padding: 8px;
+  margin-bottom: 4px;
   cursor: pointer;
   background: none;
   color: inherit;

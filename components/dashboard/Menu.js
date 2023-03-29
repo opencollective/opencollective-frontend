@@ -1,5 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { BarChartAlt2 as Chart } from '@styled-icons/boxicons-regular/BarChartAlt2';
+import { Cog } from '@styled-icons/boxicons-regular/Cog';
+import { Coin } from '@styled-icons/boxicons-regular/Coin';
+import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
+import { NetworkChart } from '@styled-icons/boxicons-regular/NetworkChart';
+import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
+import { Transfer } from '@styled-icons/boxicons-regular/Transfer';
+// import { Inbox } from '@styled-icons/bootstrap/Inbox';
+import { Inbox } from '@styled-icons/octicons/Inbox';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
@@ -67,42 +76,42 @@ const Menu = ({ collective, isAccountantOnly }) => {
   } else {
     return (
       <React.Fragment>
-        {/** Host settings */}
+        {/** Host dashboard */}
         <MenuGroup if={isHost} mb={24}>
           <MenuSectionHeader>
             <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
           </MenuSectionHeader>
-          <MenuLink collective={collective} section={HOST_SECTIONS.HOST_EXPENSES} />
-          <MenuLink collective={collective} section={HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS} />
+          <MenuLink collective={collective} section={HOST_SECTIONS.HOST_EXPENSES} icon={<Receipt size={16} />} />
+          <MenuLink collective={collective} section={HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS} icon={<Coin size={16} />} />
           <MenuLink
             collective={collective}
             section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS}
             if={!isAccountantOnly}
+            icon={<Coin size={16} />}
           />
-          <MenuLink collective={collective} section={HOST_SECTIONS.PENDING_APPLICATIONS} if={!isAccountantOnly} />
-          <MenuLink collective={collective} section={HOST_SECTIONS.HOSTED_COLLECTIVES} if={!isAccountantOnly} />
+          <MenuLink
+            collective={collective}
+            section={HOST_SECTIONS.PENDING_APPLICATIONS}
+            if={!isAccountantOnly}
+            icon={<Inbox size={16} />}
+          />
+          <MenuLink
+            collective={collective}
+            section={HOST_SECTIONS.HOSTED_COLLECTIVES}
+            if={!isAccountantOnly}
+            icon={<NetworkChart size={16} />}
+          />
           <MenuLink
             collective={collective}
             section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS}
+            icon={<CreditCard size={16} />}
             if={!isAccountantOnly && hasFeature(collective, FEATURES.VIRTUAL_CARDS)}
           />
-          <MenuLink collective={collective} section={HOST_SECTIONS.REPORTS} isBeta />
-        </MenuGroup>
+          <MenuLink collective={collective} section={HOST_SECTIONS.REPORTS} isBeta icon={<Chart size={16} />} />
 
-        {/** Organization settings */}
-        <MenuGroup if={isHost || isType(collective, ORGANIZATION)}>
-          <MenuSectionHeader>
-            <FormattedMessage id="Settings" defaultMessage="Settings" />
-          </MenuSectionHeader>
-          <SubMenu
-            label={formatMessage(PAGE_TITLES[getCollectiveTypeKey(collective.type)])}
-            if={isType(collective, ORGANIZATION) && isHost}
-          >
-            <OrganizationSettingsMenuLinks collective={collective} isAccountantOnly={isAccountantOnly} />
-            <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} if={!isAccountantOnly} />
-          </SubMenu>
           <SubMenu
             label={<FormattedMessage id="AdminPanel.FiscalHostSettings" defaultMessage="Fiscal Host Settings" />}
+            icon={<Cog size={16} />}
             if={isHost && !isAccountantOnly}
           >
             <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.FISCAL_HOSTING} />
@@ -124,39 +133,40 @@ const Menu = ({ collective, isAccountantOnly }) => {
           </SubMenu>
         </MenuGroup>
 
-        {/** General non-host organization settings (hosts organizations have a dedicated sub-menu) */}
-        <MenuGroup if={isSimpleOrg}>
-          <OrganizationSettingsMenuLinks collective={collective} isAccountantOnly={isAccountantOnly} />
-        </MenuGroup>
-
-        {/** General settings for everyone except organizations */}
-        <MenuGroup if={!isType(collective, ORGANIZATION) && !isAccountantOnly}>
+        {/** User/org/collective/event/project dashbord */}
+        <MenuGroup>
           <MenuSectionHeader>
-            <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+            {isType(collective, ORGANIZATION) ? (
+              <FormattedMessage defaultMessage="Organization Dashboard" />
+            ) : isType(collective, USER) ? (
+              <FormattedMessage defaultMessage="User Dashboard" />
+            ) : isType(collective, COLLECTIVE) ? (
+              <FormattedMessage defaultMessage="Collective Dashboard" />
+            ) : (
+              <FormattedMessage defaultMessage="Dashboard" />
+            )}
           </MenuSectionHeader>
           {/* <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.HOME} /> */}
 
-          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} />
-          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.EXPENSES} />
-          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.TRANSACTIONS} />
+          <MenuLink
+            collective={collective}
+            section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS}
+            icon={<Coin size={16} />}
+          />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.EXPENSES} icon={<Receipt size={16} />} />
+          <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.TRANSACTIONS} icon={<Transfer size={16} />} />
           <MenuLink
             collective={collective}
             section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
             if={isSelfHostedAccount(collective) && !isAccountantOnly && isType(collective, COLLECTIVE)}
           />
-          {/* <MenuLink
-            collective={collective}
-            section={COLLECTIVE_SECTIONS.VIRTUAL_CARDS}
-            if={
-              isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT]) &&
-              hasFeature(collective.host, FEATURES.VIRTUAL_CARDS) &&
-              collective.isApproved
-            }
-          /> */}
-          <MenuSectionHeader>
-            <FormattedMessage id="Settings" defaultMessage="Settings" />
-          </MenuSectionHeader>
-          <SubMenu label={<FormattedMessage id="Settings" defaultMessage="Settings" />}>
+
+          {/* general settings */}
+          <SubMenu
+            if={!isHost}
+            icon={<Cog size={16} />}
+            label={<FormattedMessage id="Settings" defaultMessage="Settings" />}
+          >
             <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.INFO} />
             <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.COLLECTIVE_PAGE} />
             <MenuLink
@@ -255,6 +265,26 @@ const Menu = ({ collective, isAccountantOnly }) => {
               <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />
             </MenuGroup>
           </SubMenu>
+
+          {/* org settings for hosts */}
+          <SubMenu
+            label={formatMessage(PAGE_TITLES[getCollectiveTypeKey(collective.type)])}
+            icon={<Cog size={16} />}
+            if={isType(collective, ORGANIZATION) && isHost}
+          >
+            <OrganizationSettingsMenuLinks collective={collective} isAccountantOnly={isAccountantOnly} />
+            <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} if={!isAccountantOnly} />
+          </SubMenu>
+          {/* <MenuLink
+            collective={collective}
+            section={COLLECTIVE_SECTIONS.VIRTUAL_CARDS}
+            if={
+              isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT]) &&
+              hasFeature(collective.host, FEATURES.VIRTUAL_CARDS) &&
+              collective.isApproved
+            }
+          /> */}
+
           {/* Below hould go to settings submenu */}
         </MenuGroup>
       </React.Fragment>

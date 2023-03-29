@@ -95,10 +95,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
       >
         <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry
-        isMobileMenuLink={isMobileView}
-        href={getDashboardRoute(LoggedInUser.collective, 'manage-expenses')}
-      >
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={getDashboardRoute(LoggedInUser.collective, 'expenses')}>
         <FormattedMessage id="home.feature.manageExpenses" defaultMessage="Manage Expenses" />
       </UserMenuLinkEntry>
       <UserMenuLinkEntry

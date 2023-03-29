@@ -12,42 +12,70 @@ import StyledLink from '../StyledLink';
 import { SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
 
+// display: flex;
+// padding: 0.5rem;
+// font-size: 0.875rem;
+// line-height: 1.25rem;
+// font-weight: 600;
+// line-height: 1.5rem;
+// border-radius: 0.375rem;
+// column-gap: 0.75rem;
+
+// active:
+// background-color: #F9FAFB;
+// color: #4F46E5;
+
+// inctive:
+// color: #374151;
+// :hover {
+//   color: #4F46E5;
+//   }
+
 const MenuLinkContainer = styled.li`
-  margin: 4px -8px 0px;
   a,
   ${StyledLink} {
     display: flex;
-    justify-content: space-between;
-    font-weight: 500;
-    font-size: 13px;
-    line-height: 16px;
-    line-height: 22px;
-    padding: 4px 12px;
-    border-radius: 100px;
+    //justify-content: space-between;
+    align-items: center;
+    grid-gap: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 20px;
+    padding: 8px;
+    border-radius: 6px;
+    -webkit-font-smoothing: antialiased;
+    width: 100%;
     cursor: pointer;
-    color: ${props => props.theme.colors.black[700]};
-    &:hover {
-      color: ${props => props.theme.colors.primary[700]};
-    }
+
     ${props =>
-      props.isSelected &&
-      css`
-        background: ${props => props.theme.colors.primary[50]};
-        color: ${props => props.theme.colors.primary[700]};
-        font-weight: 700;
-        font-size: 14px;
-      `}
-    ${props =>
-      props.isStrong &&
-      css`
-        font-weight: 700;
-        font-size: 15px;
-        line-height: 22px;
-      `}
+      props.isSelected
+        ? css`
+            background: ${props => props.theme.colors.black[50]};
+            color: ${props => props.theme.colors.primary[700]};
+            &:hover {
+              color: ${props => props.theme.colors.primary[700]};
+            }
+          `
+        : css`
+            color: ${props => props.theme.colors.black[900]};
+            &:hover {
+              color: ${props => props.theme.colors.primary[700]};
+              background: ${props => props.theme.colors.black[50]};
+            }
+          `}
   }
 `;
 
-export const MenuLink = ({ collective, section, children, onClick, isSelected, isStrong, if: conditional, isBeta }) => {
+export const MenuLink = ({
+  collective,
+  section,
+  children,
+  onClick,
+  isSelected,
+  if: conditional,
+  isBeta,
+  icon = null,
+}) => {
   const { selectedSection } = React.useContext(DashboardContext);
   const { formatMessage } = useIntl();
   if (conditional === false) {
@@ -57,17 +85,17 @@ export const MenuLink = ({ collective, section, children, onClick, isSelected, i
   if (!children && SECTION_LABELS[section]) {
     children = formatMessage(SECTION_LABELS[section]);
   }
-
+  console.log({ isSelected, lastPart: section && selectedSection === section, children });
   return (
-    <MenuLinkContainer isSelected={isSelected || (section && selectedSection === section)} isStrong={isStrong}>
+    <MenuLinkContainer isSelected={isSelected || (section && selectedSection === section)}>
       {onClick ? (
         <StyledLink as="button" onClick={onClick} data-cy={`menu-item-${section}`}>
-          {children}
+          {icon} {children}
           {isBeta ? ' (Beta)' : ''}
         </StyledLink>
       ) : (
         <Link href={getDashboardRoute(collective, section)} data-cy={`menu-item-${section}`}>
-          {children}
+          {icon} {children}
           {isBeta ? ' (Beta)' : ''}
         </Link>
       )}
@@ -91,20 +119,18 @@ MenuLink.propTypes = {
 };
 
 export const MenuSectionHeader = styled.div`
-  font-weight: 700;
+  font-weight: 500;
   font-size: 12px;
-  line-height: 16px;
-  text-transform: uppercase;
-  padding: 12px 0;
-  margin-bottom: 12px;
-  border-bottom: 1px solid ${props => props.theme.colors.black[700]};
-  color: ${props => props.theme.colors.black[800]};
+  line-height: 24px;
+  margin-top: 12px;
+  margin-bottom: 6px;
+
+  color: ${props => props.theme.colors.black[600]};
 `;
 
 export const MenuContainer = styled.ul`
   margin: 0;
   margin-bottom: 100px;
-  width: 256px;
   max-width: 100%;
 
   a {
@@ -118,6 +144,9 @@ export const MenuContainer = styled.ul`
   & ul {
     list-style-type: none;
     padding: 0;
+    & li {
+      padding: 2px 0;
+    }
   }
 `;
 
@@ -149,10 +178,11 @@ export const useSubmenu = () => {
       {submenuContent}
     </React.Fragment>
   );
-  const SubMenu = ({ label, children, if: conditional }) => {
+  const SubMenu = ({ icon, label, children, if: conditional }) => {
     return (
       <MenuLink
         if={conditional}
+        icon={icon}
         onClick={() =>
           setSubmenu(
             <React.Fragment>
