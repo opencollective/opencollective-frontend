@@ -336,7 +336,7 @@ const AddFundsModal = ({ collective, ...props }) => {
       {
         context: API_V2_CONTEXT,
         query: getBudgetSectionQuery(true, false, false),
-        variables: getBudgetSectionQueryVariables(collective.slug, host?.slug, false),
+        variables: getBudgetSectionQueryVariables(collective.slug, false),
       },
       { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
     ],
