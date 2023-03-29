@@ -8,13 +8,11 @@ import { confettiFireworks } from '../../lib/confettis';
 import { Currency } from '../../lib/constants/currency';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { Account, Collective, Host } from '../../lib/graphql/types/v2/graphql';
-import { getCountryDisplayName, isoCountryList } from '../../lib/i18n/countries';
 
 import ApplyToHostModal from '../ApplyToHostModal';
 import HowToUseOpenCollective from '../fiscal-hosting/HowCanAFiscalHostHelpSection';
 import { Box, Flex, Grid } from '../Grid';
-import { getI18nLink } from '../I18nFormatters';
-import Link from '../Link';
+import InputTypeCountry from '../InputTypeCountry';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
@@ -39,24 +37,6 @@ const HostCardContainer = styled(Grid).attrs({
   & > * {
     padding: 0;
   }
-`;
-
-const RoundOr = styled.div`
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f1f6ff;
-  color: #1869f5;
-  text-transform: uppercase;
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 18px;
-  margin: 20px 0;
 `;
 
 const Illustration = styled.img`
@@ -179,52 +159,6 @@ function ApplyToHostCard(props: {
   );
 }
 
-function IndependentCollectiveCard(props: { collective: Collective }) {
-  const router = useRouter();
-  return (
-    <StyledCard width="800px" padding="32px 24px">
-      <Flex>
-        <Box>
-          <Illustration
-            alt="A place to grow and thrive illustration"
-            src="/static/images/fiscal-hosting/what-is-a-fiscalhost-illustration.png"
-          />
-        </Box>
-        <Flex
-          pl="20px"
-          fontWeight={400}
-          fontSize="15px"
-          lineHeight="22px"
-          flexDirection="column"
-          justifyContent="center"
-        >
-          <P fontSize="20px" mb={3} lineHeight="28px" fontWeight="700" color="black.800">
-            <FormattedMessage defaultMessage="I want to be an Independent Collective" />
-          </P>
-          <FormattedMessage
-            defaultMessage="You will need your own bank account, you will have to be your own legal entity and take care of accounting, invoices, taxes, admins, payments and liability. <link>Read more</link>"
-            values={{
-              link: getI18nLink({
-                as: Link,
-                openInNewTab: true,
-                href: 'https://docs.opencollective.com/help/independent-collectives',
-              }),
-            }}
-          />
-        </Flex>
-      </Flex>
-      <StyledButton
-        onClick={() => router.push(`/${props.collective.slug}/accept-financial-contributions/ourselves`)}
-        mt={3}
-        buttonStyle="primary"
-        width="100%"
-      >
-        <FormattedMessage id="acceptContributions.picker.ourselves" defaultMessage="Independent Collective" />
-      </StyledButton>
-    </StyledCard>
-  );
-}
-
 const FindAFiscalHostQuery = gql`
   query FindAFiscalHostQuery($tags: [String], $limit: Int, $country: [CountryISO], $currency: String) {
     hosts(tag: $tags, limit: $limit, tagSearchOperator: OR, country: $country, currency: $currency) {
@@ -340,7 +274,6 @@ function useNonEmptyResultCache(data) {
 }
 
 function FindAHostSearch(props: {
-  searchingForFiscalHost: boolean;
   selectedCommunityType: string[];
   selectedCountry: string;
   selectedCurrency: string;
@@ -356,17 +289,13 @@ function FindAHostSearch(props: {
     variables: {
       tags: props.selectedCommunityType.length !== 0 ? props.selectedCommunityType : undefined,
       country: props.selectedCountry !== 'ALL' ? [props.selectedCountry] : null,
-      currency: props.selectedCurrency,
+      currency: props.selectedCurrency !== 'ANY' ? props.selectedCurrency : null,
       limit: 50,
     },
     context: API_V2_CONTEXT,
   });
 
   const cachedNonEmptyResult = useNonEmptyResultCache(data);
-
-  if (!props.searchingForFiscalHost) {
-    return null;
-  }
 
   if (loading) {
     return (
@@ -422,29 +351,19 @@ const I18nMessages = defineMessages({
   ALL_COUNTRIES: {
     defaultMessage: 'All countries',
   },
+  ANY_CURRENCY: {
+    defaultMessage: 'Any currency',
+  },
 });
 
 export default function StartAcceptingFinancialContributionsPage(props: StartAcceptingFinancialContributionsPageProps) {
   const intl = useIntl();
   const allCountriesSelectOption = { value: 'ALL', label: intl.formatMessage(I18nMessages.ALL_COUNTRIES) };
+  const allCurrenciesSelectOption = { value: 'ANY', label: intl.formatMessage(I18nMessages.ANY_CURRENCY) };
   const [selectedCommunityType, setSelectedCommunityType] = React.useState<string[]>([]);
-  const [selectedCountry, setSelectedCountry] = React.useState(allCountriesSelectOption);
-  const currencyOptions = Currency.map(c => ({ value: c, label: c }));
+  const [selectedCountry, setSelectedCountry] = React.useState('ALL');
+  const currencyOptions = [allCurrenciesSelectOption, ...Currency.map(c => ({ value: c, label: c }))];
   const [selectedCurrency, setSelectedCurrency] = React.useState(currencyOptions[0]);
-  const [searchingForFiscalHost, setSearchingForFiscalHost] = React.useState(false);
-  const router = useRouter();
-  const independentCollectiveOption = router.query.independentCollectiveOption === 'true';
-
-  const countrySelectOptions = React.useMemo(() => {
-    const countryList = isoCountryList
-      .map(countryCode => ({
-        value: countryCode,
-        label: getCountryDisplayName(intl, countryCode),
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label));
-
-    return [allCountriesSelectOption, ...countryList];
-  }, [intl]);
 
   return (
     <Flex my={5} alignItems="center" flexDirection="column">
@@ -467,7 +386,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         </P>
       </Box>
       <StyledCard width={['300px', '400px', '600px', '800px']} padding="32px 24px">
-        <P mb={1} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
+        <P mb={2} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
           <FormattedMessage defaultMessage="What type of community are you?" />
         </P>
         <StyledFilters
@@ -478,23 +397,22 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
           flexWrap="wrap"
         />
 
-        <Flex gap="40px">
-          <Box>
-            <P mt={4} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
+        <Flex gap={'40px'} flexWrap="wrap" mt={4}>
+          <Box flexGrow={1}>
+            <P fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb={2}>
               <FormattedMessage defaultMessage="Where would your collective be most active?" />
             </P>
-            <StyledSelect
+            <InputTypeCountry
               value={selectedCountry}
-              inputId="country-input"
-              options={countrySelectOptions}
               onChange={setSelectedCountry}
+              customOptions={[allCountriesSelectOption]}
             />
             <P color="black.600" fontWeight="400" fontSize="11px" lineHeight="16px">
               <FormattedMessage defaultMessage="If multiple areas, please select most prominent of them all." />
             </P>
           </Box>
           <Box flexGrow={1}>
-            <P mt={4} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
+            <P fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb={2}>
               <FormattedMessage defaultMessage="What currency will your collective use?" />
             </P>
             <StyledSelect
@@ -505,77 +423,22 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
             />
           </Box>
         </Flex>
-
-        {!searchingForFiscalHost && (
-          <React.Fragment>
-            <StyledHr borderTopColor="black.200" mt={4} />
-
-            <P mt={4} fontSize="20px" lineHeight="28px" fontWeight="700" color="black.800">
-              <FormattedMessage defaultMessage="Continue with a Fiscal Host" />
-            </P>
-            <Flex mt={3} flexDirection={['column', 'row']}>
-              <Box display={['none', 'block']}>
-                <Illustration
-                  alt="A place to grow and thrive illustration"
-                  src="/static/images/watering-plants-bird-illustration.png"
-                />
-              </Box>
-              <Flex
-                pl="20px"
-                fontWeight={400}
-                fontSize="15px"
-                lineHeight="22px"
-                flexDirection="column"
-                justifyContent="center"
-              >
-                <FormattedMessage
-                  defaultMessage="A fiscal host allows you to start accepting contributions without the need to set up a legal entity and bank account for your project. The host will hold funds on your behalf, and will take care of accounting, invoices, taxes, admin, payments, and liability. You can use their NGO Status to raise runds. <link>Read more</link>"
-                  values={{
-                    link: getI18nLink({
-                      as: Link,
-                      openInNewTab: true,
-                      href: 'https://opencollective.com/fiscal-hosting',
-                    }),
-                  }}
-                />
-              </Flex>
-            </Flex>
-            <StyledHr my={4} />
-            <MessageBox my={4} type="info">
-              <FormattedMessage defaultMessage="You can always change your selection of filters and criteria in the future." />
-            </MessageBox>
-            <StyledButton onClick={() => setSearchingForFiscalHost(true)} buttonStyle="primary" width="100%">
-              <FormattedMessage defaultMessage="Search for Fiscal Hosts" />
-            </StyledButton>
-          </React.Fragment>
-        )}
       </StyledCard>
-      {!searchingForFiscalHost && independentCollectiveOption && (
-        <React.Fragment>
-          <RoundOr>
-            <FormattedMessage defaultMessage="Or" />
-          </RoundOr>
-          <IndependentCollectiveCard collective={props.collective} />
-        </React.Fragment>
-      )}
-
-      {!searchingForFiscalHost && (
-        <Box mt={3} width={['360px', '500px', '700px', '900px']}>
-          <HowToUseOpenCollective />
-        </Box>
-      )}
 
       <Box mt={3} width={['360px', '500px', '700px', '900px']}>
         <FindAHostSearch
-          searchingForFiscalHost={searchingForFiscalHost}
           collective={props.collective}
           selectedCommunityType={selectedCommunityType}
-          selectedCountry={selectedCountry.value}
+          selectedCountry={selectedCountry}
           selectedCurrency={selectedCurrency.value}
           onHostApplyClick={host => {
             props.onChange('chosenHost', host);
           }}
         />
+      </Box>
+
+      <Box mt={3} width={['360px', '500px', '700px', '900px']}>
+        <HowToUseOpenCollective />
       </Box>
     </Flex>
   );
