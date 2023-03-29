@@ -5,6 +5,7 @@ npx maildev@2.0.5 &
 MAILDEV_PID=$!
 
 echo "> Starting stripe webhook listener"
+export STRIPE_WEBHOOK_SIGNING_SECRET=$(stripe --api-key $STRIPE_WEBHOOK_KEY listen --forward-connect-to localhost:3060/webhooks/stripe --print-secret)
 stripe --api-key $STRIPE_WEBHOOK_KEY listen --forward-connect-to localhost:3060/webhooks/stripe > /dev/null &
 STRIPE_WEBHOOK_PID=$!
 
