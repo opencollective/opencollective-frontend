@@ -179,6 +179,11 @@ const addFundsAccountQuery = gql`
           }
         }
       }
+      ... on AccountWithParent {
+        parent {
+          id
+        }
+      }
       ... on Host {
         id
         slug
@@ -330,14 +335,14 @@ const Field = styled(StyledInputFormikField).attrs({
 })``;
 
 const checkCanAddHostFee = account => {
-  // No host, no host fees
-  if (!account.host) {
+  // No host, or no account, no host fees
+  if (!account?.host) {
     return false;
   }
 
-  if (account.parentCollective) {
+  if (account.parent) {
     // No host fees for child of independent collective
-    return account.host.id !== account.parentCollective.id;
+    return account.host.id !== account.parent.id;
   }
 
   // No host fees for Host Organizations or Independent Collectives
@@ -407,7 +412,7 @@ const AddFundsModal = ({ collective, ...props }) => {
 
   // From the Collective page we pass collective as API v1 objects
   // From the Host dashboard we pass collective as API v2 objects
-  const canAddHostFee = checkCanAddHostFee(collective);
+  const canAddHostFee = checkCanAddHostFee(account);
   const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const canAddPlatformTip = host?.isTrustedHost;
