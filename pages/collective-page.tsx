@@ -99,9 +99,9 @@ export const getServerSideProps: GetServerSideProps<
 };
 
 const CollectivePage = (props: CollectivePageProps) => {
-  const { slug, status, step, mode, action } = props.query;
   useData(props);
   const router = useRouter();
+  const { slug, status, step, mode, action } = router.query as CollectivePageQuery;
   const { LoggedInUser } = useLoggedInUser();
   const { data } = useQuery(collectivePageQuery, {
     variables: { slug, nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD },
@@ -117,7 +117,7 @@ const CollectivePage = (props: CollectivePageProps) => {
       fetchData();
     }
   }, [LoggedInUser]);
-  const [showOnboardingModal, setShowOnboardingModal] = React.useState(false);
+  const [showOnboardingModal, setShowOnboardingModal] = React.useState(true);
   React.useEffect(() => {
     addParentToURLIfMissing(router, data.Collective);
   }, [data.Collective]);
