@@ -107,11 +107,18 @@ const AdminContributeCardsContainer = ({
           })}
           <ContributeCardContainer>
             {useTierModals ? (
-              <CreateNew as="div" data-cy="create-contribute-tier" onClick={() => setShowTierModal('new')}>
+              <CreateNew
+                as="div"
+                data-cy={createNewType === 'TICKET' ? 'create-ticket' : 'create-contribute-tier'}
+                onClick={() => setShowTierModal('new')}
+              >
                 {addNewMessage}
               </CreateNew>
             ) : (
-              <CreateNew data-cy="create-contribute-tier" route={createContributionTierRoute}>
+              <CreateNew
+                data-cy={createNewType === 'TICKET' ? 'create-ticket' : 'create-contribute-tier'}
+                route={createContributionTierRoute}
+              >
                 {addNewMessage}
               </CreateNew>
             )}

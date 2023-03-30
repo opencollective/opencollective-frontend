@@ -46,7 +46,7 @@ describe('passwords', () => {
 
     // Submit new password
     cy.contains('button', 'Set Password').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Password successfully updated' });
+    cy.checkToast({ type: 'SUCCESS', message: 'Password successfully set' });
   });
 
   it('can then be edited', () => {
@@ -153,14 +153,10 @@ describe('passwords', () => {
 
     // 2FA required
     cy.getByDataCy('signin-btn').click();
-    cy.getByDataCy('signin-two-factor-auth-input').type('123456');
-    cy.getByDataCy('signin-two-factor-auth-button').click();
-    cy.getByDataCy('signin-message-box').contains(
-      'Sign In failed: Two-factor authentication code failed. Please try again',
-    );
+    cy.complete2FAPrompt('123456');
+    cy.contains('Two-factor authentication code failed. Please try again').should.exist;
     const code = speakeasy.totp({ algorithm: 'SHA1', encoding: 'base32', secret: secret.base32 });
-    cy.getByDataCy('signin-two-factor-auth-input').clear().type(code);
-    cy.getByDataCy('signin-two-factor-auth-button').click();
+    cy.complete2FAPrompt(code);
     cy.assertLoggedIn(user);
   });
 });

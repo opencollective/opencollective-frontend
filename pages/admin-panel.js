@@ -1,6 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
-import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { isHostAccount } from '../lib/collective.lib';
@@ -15,10 +15,10 @@ import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/
 import { adminPanelQuery } from '../components/admin-panel/queries';
 import AdminPanelSideBar from '../components/admin-panel/SideBar';
 import AdminPanelTopBar from '../components/admin-panel/TopBar';
+import AuthenticatedPage from '../components/AuthenticatedPage';
 import { Flex, Grid } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
-import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 
@@ -44,15 +44,12 @@ const messages = defineMessages({
 const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return ALL_SECTIONS.INFO;
-  }
-
-  const isAdmin = loggedInUser?.isAdminOfCollective(account);
-  const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
-  const isAccountantOnly = !isAdmin && isAccountant;
-  if (isHostAccount(account)) {
-    return isAccountantOnly ? ALL_SECTIONS.REPORTS : ALL_SECTIONS.EXPENSES;
+  } else if (isHostAccount(account)) {
+    return ALL_SECTIONS.EXPENSES;
   } else {
-    return isAccountantOnly ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.INFO;
+    const isAdmin = loggedInUser?.isAdminOfCollective(account);
+    const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
+    return !isAdmin && isAccountant ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.INFO;
   }
 };
 
@@ -100,9 +97,7 @@ const getIsAccountantOnly = (LoggedInUser, account) => {
   return LoggedInUser && !LoggedInUser.isAdminOfCollective(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account);
 };
 
-const AdminPanelPage = () => {
-  const router = useRouter();
-  const { slug, section, subpath } = router.query;
+const AdminPanelPage = ({ slug, section, subpath }) => {
   const intl = useIntl();
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
@@ -118,7 +113,7 @@ const AdminPanelPage = () => {
 
   return (
     <AdminPanelContext.Provider value={{ selectedSection }}>
-      <Page noRobots collective={account} title={account ? `${account.name} - ${titleBase}` : titleBase}>
+      <AuthenticatedPage noRobots collective={account} title={account ? `${account.name} - ${titleBase}` : titleBase}>
         {!blocker && (
           <AdminPanelTopBar
             isLoading={isLoading}
@@ -166,13 +161,22 @@ const AdminPanelPage = () => {
             )}
           </Grid>
         )}
-      </Page>
+      </AuthenticatedPage>
     </AdminPanelContext.Provider>
   );
 };
 
-AdminPanelPage.getInitialProps = () => {
+AdminPanelPage.propTypes = {
+  slug: PropTypes.string,
+  section: PropTypes.string,
+  subpath: PropTypes.string,
+};
+
+AdminPanelPage.getInitialProps = async ({ query: { slug, section = null, subpath = null } }) => {
   return {
+    slug,
+    section,
+    subpath,
     scripts: { googleMaps: true }, // TODO: This should be enabled only for events
   };
 };

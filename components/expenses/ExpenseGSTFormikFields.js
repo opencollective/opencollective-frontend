@@ -42,6 +42,7 @@ const ExpenseGSTFormikFields = ({ formik, isOptional }) => {
         name="taxes.0.rate"
         htmlFor="GST-rate"
         label={intl.formatMessage({ defaultMessage: 'GST rate' })}
+        labelProps={{ whiteSpace: 'nowrap' }}
         inputType="number"
         required
       >
@@ -61,6 +62,7 @@ const ExpenseGSTFormikFields = ({ formik, isOptional }) => {
         name="taxes.0.idNumber"
         htmlFor="GST-number"
         label={intl.formatMessage({ id: 'EditCollective.GSTNumber', defaultMessage: 'GST number' })}
+        labelProps={{ whiteSpace: 'nowrap' }}
         required={!isOptional}
         mr={2}
       >
