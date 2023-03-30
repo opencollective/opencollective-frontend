@@ -404,14 +404,13 @@ class InputField extends React.Component {
           <Flex flexWrap="wrap" p={1}>
             {field.label && (
               <Box width={1}>
-                <label>{`${capitalize(field.label)}`}</label>
+                <Label label={capitalize(field.label)} isPrivate={field.isPrivate} />
               </Box>
             )}
             <Box width={1}>
               <StyledInputLocation
                 location={this.state.value || field.defaultValue}
                 onChange={event => this.handleChange(event)}
-                // placeholder={field.placeholder}
               />
               {field.description && <HelpBlock>{field.description}</HelpBlock>}
             </Box>

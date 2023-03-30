@@ -307,8 +307,6 @@ class EditCollectiveForm extends React.Component {
     this.setState(state => {
       const collective = cloneDeep(state.collective);
 
-      // TODO: update location fields
-
       // GraphQL schema has address embedded within location
       // mutation expects { location: { address: '' } }
       if (['address', 'country', 'structured'].includes(fieldname)) {
@@ -671,13 +669,6 @@ class EditCollectiveForm extends React.Component {
           placeholder: '',
           when: () => collective.type !== EVENT,
         },
-
-        // {
-        //   name: 'country',
-        //   type: 'country',
-        //   placeholder: 'Select country',
-        //   when: () => collective.type !== EVENT,
-        // },
         {
           name: 'startsAt',
           type: 'datetime-local',
@@ -749,6 +740,7 @@ class EditCollectiveForm extends React.Component {
           name: 'location',
           type: 'address',
           when: () => collective.type === USER,
+          isPrivate: true,
         },
       ],
       'fiscal-hosting': [
