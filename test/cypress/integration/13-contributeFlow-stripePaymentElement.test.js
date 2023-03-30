@@ -11,6 +11,7 @@ function contributeWithNewCard() {
     cy.get('#Field-postalCodeInput').type('90210');
   });
   cy.get('button[data-cy="cf-next-step"]').click();
+  cy.wait(2000);
 }
 
 function contributeWithNewUsBankAccount({ name } = {}) {
