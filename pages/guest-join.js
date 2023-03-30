@@ -100,7 +100,7 @@ const JoinAsGuest = () => {
             <P mt={2} fontSize="14px" lineHeight="20px">
               <FormattedMessage
                 id="guestJoin.contactSupport"
-                defaultMessage="Please contact <SupportLink>support</SupportLink> to get more info on the procedure to claim your account. Please attach this order id to your request: {orderId}"
+                defaultMessage="Please contact <SupportLink>support</SupportLink> to get more info on the procedure to claim your account. Please attach this contribution id to your request: {orderId}"
                 values={{ SupportLink: I18nSupportLink, orderId: <code>{query.OrderId}</code> }}
               />
             </P>

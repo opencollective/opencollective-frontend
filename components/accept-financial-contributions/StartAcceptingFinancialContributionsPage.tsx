@@ -169,7 +169,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
           </Box>
           <Box flexGrow={1}>
             <P fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb={2}>
-              <FormattedMessage defaultMessage="What currency will your collective use?" />
+              <FormattedMessage defaultMessage="What currency will your Collective use?" />
             </P>
             <StyledSelect
               value={selectedCurrency}

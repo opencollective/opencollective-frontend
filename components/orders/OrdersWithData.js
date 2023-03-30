@@ -258,7 +258,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
               }}
             />
           ) : (
-            <FormattedMessage id="orders.empty" defaultMessage="No orders" />
+            <FormattedMessage id="orders.empty" defaultMessage="No contribution" />
           )}
         </MessageBox>
       ) : (
