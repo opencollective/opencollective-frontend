@@ -8,9 +8,9 @@ Do you want to get paid to work on your passion for open source, mutual aid, and
 
 Open Collective is a financial and legal toolbox for grassroots groups. We support 15,000 groups and 30+ nonprofits around the world with one shared backend solution for fundraising and money management. This year our Collectives are on track to raise and spend $35 million dollars in full transparency.
 
-<!--<strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>-->
+<strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>
 
-## [Open Collective Foundation](https://opencollective.foundation/): Finance Admin
+<!--## [Open Collective Foundation](https://opencollective.foundation/): Finance Admin
 
 $60k/year for 40 hrs/wk (or 30 hrs/wk pro rata). Must live in the US. Applications open until March 24th.
 
@@ -69,7 +69,7 @@ An operations and community-oriented person who is:
 
 [Fill out this form!](https://docs.google.com/forms/d/e/1FAIpQLSfbI-cg19Wv9eN9WiZ37de-mKCNDFoasRQEDXlhVtE8CI_Mcg/viewform)
 
-If you have questions, reach out to [contact@opencollective.foundation](mailto:contact@opencollective.foundation)
+If you have questions, reach out to [contact@opencollective.foundation](mailto:contact@opencollective.foundation)-->
 
 <!-- ## [Open Source Collective](https://www.oscollective.org/): Operations Coordinator
 
