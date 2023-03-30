@@ -32,7 +32,7 @@ OCF is a tech-first nonprofit. We are one node in a growing international networ
 
 ### Tasks & required skills/experience
 
-Accounts payable & receivable processing in a 501(c)(3) nonprofit  
+Accounts payable & receivable processing in a 501(c)(3) nonprofit
 A key part of our service is receiving money and paying out expenses for our Collectives. We need someone with nonprofit financial admin/bookkeeping skills.
 
 ### Responding to user support inquiries
