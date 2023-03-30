@@ -60,7 +60,7 @@ const ActivityDescription = ({ activity }) => {
             title={activity.expense.description}
             openInNewTab
           >
-            <FormattedMessage id="Transaction.kind.EXPENSE" defaultMessage="Expense" /> #{activity.expense.legacyId}
+            <FormattedMessage id="Expense" defaultMessage="Expense" /> #{activity.expense.legacyId}
           </LinkExpense>
         );
       } else {

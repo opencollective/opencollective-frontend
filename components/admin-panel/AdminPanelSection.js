@@ -6,10 +6,10 @@ import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box } from '../Grid';
+import PendingApplications from '../host-dashboard/applications/PendingApplications';
 import HostDashboardExpenses from '../host-dashboard/HostDashboardExpenses';
 import HostDashboardHostedCollectives from '../host-dashboard/HostDashboardHostedCollectives';
 import HostDashboardReports from '../host-dashboard/HostDashboardReports';
-import PendingApplications from '../host-dashboard/PendingApplications';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 import { H2 } from '../Text';
@@ -19,6 +19,8 @@ import FinancialContributions from './sections/FinancialContributions';
 import HostVirtualCards from './sections/HostVirtualCards';
 import InvoicesReceipts from './sections/InvoicesReceipts';
 import NotificationsSettings from './sections/NotificationsSettings';
+import PendingContributions from './sections/PendingContributions';
+import TeamSettings from './sections/Team';
 import {
   COLLECTIVE_SECTIONS,
   FISCAL_HOST_SECTIONS,
@@ -30,11 +32,13 @@ import {
 const ADMIN_PANEL_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
   [HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS]: FinancialContributions,
+  [HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS]: PendingContributions,
   [HOST_DASHBOARD_SECTIONS.EXPENSES]: HostDashboardExpenses,
   [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: PendingApplications,
   [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
   [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
   [COLLECTIVE_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
+  [COLLECTIVE_SECTIONS.TEAM]: TeamSettings,
 };
 
 const FISCAL_HOST_SETTINGS_SECTIONS = {
@@ -59,12 +63,11 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
     );
   }
 
-  // Host Dashboard
   const AdminSectionComponent = ADMIN_PANEL_SECTIONS[section];
   if (AdminSectionComponent) {
     return (
       <Container width="100%">
-        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} isNewAdmin />
+        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} />
       </Container>
     );
   }

@@ -1,6 +1,6 @@
 import { gqlV1 } from '../../../lib/graphql/helpers';
 
-import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/Contribute';
+import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/constants';
 
 import * as fragments from './fragments';
 

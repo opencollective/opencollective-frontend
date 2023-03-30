@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
-import { BarChart, FormatListBulleted, PieChart, Timeline } from '@styled-icons/material';
+import { BarChart } from '@styled-icons/material/BarChart';
+import { FormatListBulleted } from '@styled-icons/material/FormatListBulleted';
+import { PieChart } from '@styled-icons/material/PieChart';
+import { Timeline } from '@styled-icons/material/Timeline';
 import { capitalize, sumBy } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -31,7 +34,7 @@ import {
   TagMarker,
 } from './common';
 
-const budgetSectionExpenseQuery = gql`
+export const budgetSectionExpenseQuery = gql`
   query BudgetSectionExpenseQuery($slug: String!, $from: DateTime, $to: DateTime) {
     account(slug: $slug) {
       id

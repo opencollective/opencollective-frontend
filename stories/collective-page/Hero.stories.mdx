@@ -1,15 +1,11 @@
 import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
 import Hero from '../../components/collective-page/hero/Hero';
 import { webpackCollective, openSourceHost } from '../mocks/collectives';
+import ToastProvider from '../../components/ToastProvider';
+import { UserContext } from '../../components/UserProvider';
+import { loggedInUser } from '../mocks/loggedInUser';
 
-<Meta
-  title="Collective Page/Hero"
-  component={Hero}
-  argTypes={{
-    collective: { defaultValue: webpackCollective },
-    host: { defaultValue: openSourceHost },
-  }}
-/>
+<Meta title="Collective Page/Hero" component={Hero} />
 
 # Hero
 
@@ -26,7 +22,9 @@ export const DefaultStory = props => <Hero {...props} />;
     },
   }}
 >
-  {DefaultStory.bind({})}
+  <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+    <Hero collective={webpackCollective} host={openSourceHost} />
+  </UserContext.Provider>
 </Story>
 
 <ArgsTable story="Default" />

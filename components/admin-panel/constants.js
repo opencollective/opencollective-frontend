@@ -13,6 +13,7 @@ export const HOST_DASHBOARD_SECTIONS = {
   // Existing Host Dashboard Sections
   EXPENSES: 'expenses',
   FINANCIAL_CONTRIBUTIONS: 'orders',
+  PENDING_CONTRIBUTIONS: 'pending-contributions',
   HOSTED_COLLECTIVES: 'hosted-collectives',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   PENDING_APPLICATIONS: 'pending-applications',
@@ -22,7 +23,7 @@ export const ABOUT_ORG_SECTIONS = {
   COLLECTIVE_PAGE: 'collective-page',
   CONNECTED_ACCOUNTS: 'connected-accounts',
   INFO: 'info',
-  TEAM: 'members',
+  TEAM: 'team',
 };
 
 export const ORG_BUDGET_SECTIONS = {
@@ -61,11 +62,10 @@ export const COLLECTIVE_SECTIONS = {
   NOTIFICATIONS: 'notifications',
   POLICIES: 'policies',
   CUSTOM_EMAIL: 'custom-email',
-  TEAM: 'members',
+  TEAM: 'team',
   TICKETS: 'tickets',
   TIERS: 'tiers',
-  TIERS_REVAMP: 'tiers-revamp',
-  TWO_FACTOR_AUTH: 'two-factor-auth',
+  USER_SECURITY: 'user-security',
   VIRTUAL_CARDS: 'virtual-cards',
   WEBHOOKS: 'webhooks',
   ACTIVITY_LOG: 'activity-log',
@@ -86,7 +86,12 @@ export const ALL_SECTIONS = {
   ...HOST_DASHBOARD_SECTIONS,
 };
 
-export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [ALL_SECTIONS.REPORTS, ALL_SECTIONS.PAYMENT_RECEIPTS];
+export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
+  ALL_SECTIONS.REPORTS,
+  ALL_SECTIONS.PAYMENT_RECEIPTS,
+  ALL_SECTIONS.EXPENSES,
+  ALL_SECTIONS.FINANCIAL_CONTRIBUTIONS,
+];
 
 export const PAGE_TITLES = defineMessages({
   [USER]: { id: 'AdminPanel.UserSettings', defaultMessage: 'User Settings' },
@@ -108,6 +113,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.FINANCIAL_CONTRIBUTIONS]: {
     id: 'FinancialContributions',
     defaultMessage: 'Financial Contributions',
+  },
+  [ALL_SECTIONS.PENDING_CONTRIBUTIONS]: {
+    id: 'PendingContributions',
+    defaultMessage: 'Pending Contributions',
   },
   [ALL_SECTIONS.PENDING_APPLICATIONS]: {
     id: 'AdminPanel.Menu.PendingApplications',
@@ -200,9 +209,6 @@ export const SECTION_LABELS = defineMessages({
     id: 'Tiers',
     defaultMessage: 'Tiers',
   },
-  [ALL_SECTIONS.TIERS_REVAMP]: {
-    defaultMessage: 'Tiers (New!)',
-  },
   [ALL_SECTIONS.GIFT_CARDS]: {
     id: 'editCollective.menu.giftCards',
     defaultMessage: 'Gift Cards',
@@ -221,9 +227,9 @@ export const SECTION_LABELS = defineMessages({
     id: 'section.tickets.title',
     defaultMessage: 'Tickets',
   },
-  [ALL_SECTIONS.TWO_FACTOR_AUTH]: {
-    id: 'TwoFactorAuth',
-    defaultMessage: 'Two-factor authentication',
+  [ALL_SECTIONS.USER_SECURITY]: {
+    id: 'Security',
+    defaultMessage: 'Security',
   },
   [ALL_SECTIONS.PAYMENT_RECEIPTS]: {
     id: 'editCollective.menu.paymentReceipts',

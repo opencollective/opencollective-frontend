@@ -7,7 +7,6 @@ import { ContributionTypes } from '../../lib/constants/contribution-types';
 
 import { ContributorAvatar } from '../Avatar';
 import Container from '../Container';
-import EditTierModal from '../edit-collective/tiers/EditTierModal';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
@@ -15,10 +14,11 @@ import StyledHr from '../StyledHr';
 import StyledTag from '../StyledTag';
 import { P } from '../Text';
 
-/** Max number of contributors on each tier card */
-export const MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD = 4;
-export const CONTRIBUTE_CARD_WIDTH = 280;
-export const CONTRIBUTE_CARD_BORDER_RADIUS = 16;
+import {
+  CONTRIBUTE_CARD_BORDER_RADIUS,
+  CONTRIBUTE_CARD_WIDTH,
+  MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+} from './constants';
 
 /** The main container */
 const StyledContributeCard = styled.div`
@@ -171,6 +171,18 @@ const getFooterHeading = type => {
   }
 };
 
+const getFooterMessage = type => {
+  switch (type) {
+    case ContributionTypes.TICKET:
+    case ContributionTypes.EVENT_PARTICIPATE:
+      return <FormattedMessage defaultMessage="Be the first one to attend!" />;
+    case ContributionTypes.EVENT_PASSED:
+      return <FormattedMessage defaultMessage="No attendees" />;
+    default:
+      return <FormattedMessage defaultMessage="Be the first one to contribute!" />;
+  }
+};
+
 const getCTAButtonStyle = type => {
   if (type === ContributionTypes.TICKET) {
     return 'secondary';
@@ -197,14 +209,11 @@ const ContributeCard = ({
   image,
   disableCTA,
   hideCTA,
-  enableEditing,
+  onClickEdit,
   tier,
-  collective,
   isPreview,
   ...props
 }) => {
-  const [isEditTierModalOpen, setIsEditTierModalOpen] = React.useState(false);
-
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
 
   if (isPreview) {
@@ -245,25 +254,34 @@ const ContributeCard = ({
           )}
           {!hideContributors && (
             <Box mt={3} height={60}>
-              {contributors && contributors.length > 0 && (
+              <React.Fragment>
+                <Flex alignItems="center" mt={3} mb={2}>
+                  <P
+                    color="black.700"
+                    fontSize="12px"
+                    lineHeight="16px"
+                    fontWeight="500"
+                    letterSpacing="0.06em"
+                    pr={2}
+                    textTransform="uppercase"
+                    whiteSpace="nowrap"
+                  >
+                    {getFooterHeading(type)}
+                  </P>
+                  <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+                </Flex>
+              </React.Fragment>
+              {totalContributors === 0 ? (
                 <React.Fragment>
-                  <Flex alignItems="center" mt={3} mb={2}>
-                    <P
-                      color="black.700"
-                      fontSize="12px"
-                      lineHeight="16px"
-                      fontWeight="500"
-                      letterSpacing="0.06em"
-                      pr={2}
-                      textTransform="uppercase"
-                      whiteSpace="nowrap"
-                    >
-                      {getFooterHeading(type)}
-                    </P>
-                    <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-                  </Flex>
-                  <Flex>
-                    {contributors.slice(0, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD).map(contributor => (
+                  <Container pt="0.7em" color="black.600">
+                    {getFooterMessage(type)}
+                  </Container>
+                </React.Fragment>
+              ) : (
+                <Flex>
+                  {contributors &&
+                    contributors.length > 0 &&
+                    contributors.slice(0, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD).map(contributor => (
                       <Box key={contributor.id} mx={1}>
                         {contributor.collectiveSlug ? (
                           <Link href={`/${contributor.collectiveSlug}`} title={contributor.name}>
@@ -274,32 +292,24 @@ const ContributeCard = ({
                         )}
                       </Box>
                     ))}
-                    {totalContributors > MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD && (
-                      <Container ml={2} pt="0.7em" fontSize="11px" fontWeight="bold" color="black.600">
-                        + {totalContributors - MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD}
-                      </Container>
-                    )}
-                  </Flex>
-                </React.Fragment>
+                  {totalContributors > MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD && (
+                    <Container ml={2} pt="0.7em" fontSize="11px" fontWeight="bold" color="black.600">
+                      + {totalContributors - MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD}
+                    </Container>
+                  )}
+                </Flex>
               )}
             </Box>
           )}
-          {enableEditing && (
+          {onClickEdit && (
             <Box>
-              <StyledButton
-                buttonStyle="secondary"
-                width={1}
-                mb={2}
-                mt={3}
-                data-cy="edit-btn"
-                onClick={() => setIsEditTierModalOpen(true)}
-              >
-                Edit tier
+              <StyledButton buttonStyle="secondary" width={1} mb={2} mt={3} data-cy="edit-btn" onClick={onClickEdit}>
+                <FormattedMessage
+                  defaultMessage="Edit {type, select, TICKET {Ticket} other {Tier}}"
+                  values={{ type: tier.type }}
+                />
               </StyledButton>
             </Box>
-          )}
-          {isEditTierModalOpen && (
-            <EditTierModal tier={tier} collective={collective} onClose={() => setIsEditTierModalOpen(false)} />
           )}
         </Box>
       </Flex>
@@ -343,14 +353,10 @@ ContributeCard.propTypes = {
   /** @ignore from injectIntl */
   intl: PropTypes.object.isRequired,
   router: PropTypes.object,
-  enableEditing: PropTypes.bool,
   tier: PropTypes.object,
   collective: PropTypes.object,
   isPreview: PropTypes.bool,
-};
-
-ContributeCard.defaultProps = {
-  enableEditing: false,
+  onClickEdit: PropTypes.func,
 };
 
 export default injectIntl(ContributeCard);

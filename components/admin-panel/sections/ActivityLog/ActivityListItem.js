@@ -62,7 +62,7 @@ const ActivityListItem = ({ activity }) => {
               values={{
                 userName: !activity.individual ? (
                   <Span>
-                    <FormattedMessage id="user.unknown" defaultMessage="Unknown" />
+                    <FormattedMessage id="user.Unknown" defaultMessage="Unknown" />
                   </Span>
                 ) : (
                   <StyledLink as={LinkCollective} color="black.700" collective={activity.individual}>

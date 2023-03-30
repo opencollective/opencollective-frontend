@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 import { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
 
@@ -36,7 +36,6 @@ class NewContributionFlowPage extends React.Component {
       // Route parameters
       collectiveSlug: query.eventSlug || query.collectiveSlug,
       tierId: parseInt(query.tierId) || null,
-      verb: query.verb,
       paymentFlow: query.paymentFlow,
       // Query parameters
       error: query.error,
@@ -45,7 +44,6 @@ class NewContributionFlowPage extends React.Component {
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
-    verb: PropTypes.string,
     paymentFlow: PropTypes.string,
     tierId: PropTypes.number,
     error: PropTypes.string,
@@ -66,8 +64,10 @@ class NewContributionFlowPage extends React.Component {
     this.loadExternalScripts();
     const { router, data } = this.props;
     const account = data?.account;
-    const path = router.asPath;
-    addParentToURLIfMissing(router, account, path.replace(new RegExp(`^/${account?.slug}/`), '/'));
+    const queryParameters = {
+      ...omit(router.query, ['verb', 'step', 'collectiveSlug']),
+    };
+    addParentToURLIfMissing(router, account, `/${router.query.verb}/${router.query.step ?? ''}`, queryParameters);
   }
 
   componentDidUpdate(prevProps) {
@@ -121,7 +121,6 @@ class NewContributionFlowPage extends React.Component {
           collective={account}
           host={account.host}
           tier={tier}
-          verb={this.props.verb}
           paymentFlow={paymentFlow}
           error={error}
         />

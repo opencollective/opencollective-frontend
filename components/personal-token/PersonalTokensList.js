@@ -8,7 +8,6 @@ import { getPersonalTokenSettingsRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
 import { Box, Flex, Grid } from '../Grid';
-import I18nFormatters from '../I18nFormatters';
 import Image from '../Image';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -75,8 +74,11 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
       </Flex>
       <P my={2} color="black.700">
         <FormattedMessage
-          defaultMessage="Personal tokens are used to authenticate with the API. They are not tied to a specific application. Pass it as <code>Personal-Token</code> HTTP header or <code>personalToken</code> query paramater in the URL."
-          values={I18nFormatters}
+          defaultMessage="Personal tokens are used to authenticate with the API. They are not tied to a specific application. Pass it as {headerName} HTTP header or {queryParam} query parameter in the URL."
+          values={{
+            headerName: <code>Personal-Token</code>,
+            queryParam: <code>personalToken</code>,
+          }}
         />
       </P>
       <Box my={4}>

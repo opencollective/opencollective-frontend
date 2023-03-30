@@ -9,7 +9,14 @@ import { attachmentDropzoneParams } from './lib/attachments';
 import StyledButton from '../StyledButton';
 
 const AddNewAttachedFilesButton = ({ disabled, mockImageGenerator, onSuccess }) => {
-  const { isUploading, uploadFiles } = useImageUploader({ isMulti: true, mockImageGenerator, onSuccess });
+  const { isUploading, uploadFiles } = useImageUploader({
+    isMulti: true,
+    mockImageGenerator,
+    onSuccess,
+    kind: 'EXPENSE_ATTACHED_FILE',
+    accept: attachmentDropzoneParams.accept,
+  });
+
   return (
     <Dropzone
       {...attachmentDropzoneParams}

@@ -212,7 +212,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                           if (uploadedImage === KEY_IMG_REMOVE) {
                             imgURL = null;
                           } else if (uploadedImage) {
-                            imgURL = await upload(uploadedImage);
+                            imgURL = await upload(uploadedImage, 'ACCOUNT_BANNER');
                           }
                         } catch (e) {
                           const error = getErrorFromXhrUpload(e);

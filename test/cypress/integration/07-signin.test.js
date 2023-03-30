@@ -100,7 +100,7 @@ describe('signin', () => {
     // Test frontend validations
     cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=email]').type('IncorrectValue');
-    cy.get('[data-cy=checkbox-tosOptIn]').click();
+    cy.get('[data-cy=checkbox-tosOptIn] [data-cy=custom-checkbox]').click();
     cy.get('button[type=submit]').click();
     cy.contains("Please include an '@' in the email address. 'IncorrectValue' is missing an '@'.");
 
@@ -129,12 +129,12 @@ describe('signin', () => {
     // Submit the form with correct values
     const email = randomEmail();
     cy.get('input[name=email]').type(email);
-    cy.get('[data-cy=checkbox-tosOptIn]').click();
+    cy.get('[data-cy=checkbox-tosOptIn] [data-cy=custom-checkbox]').click();
     cy.get('button[type=submit]').click();
 
-    const expectedEmailSubject = 'Open Collective: Login';
+    const expectedEmailSubject = 'Open Collective: Sign In';
     cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
-    cy.contains('a', 'One-click login').click();
+    cy.contains('a', 'One-click Sign In').click();
     cy.wait(200);
     cy.contains('Welcome to Open Collective!');
   });
@@ -151,12 +151,12 @@ describe('signin', () => {
     // Submit the form with correct values
     const email = randomEmail();
     cy.get('input[name=email]').type(email);
-    cy.get('[data-cy=checkbox-tosOptIn]').click();
+    cy.get('[data-cy=checkbox-tosOptIn] [data-cy=custom-checkbox]').click();
     cy.get('button[type=submit]').click();
 
-    const expectedEmailSubject = 'Open Collective: Login';
+    const expectedEmailSubject = 'Open Collective: Sign In';
     cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
-    cy.contains('a', 'One-click login').click();
+    cy.contains('a', 'One-click Sign In').click();
     cy.wait(200);
     cy.contains('How Open Collective works');
   });
@@ -168,14 +168,14 @@ describe('signin', () => {
     cy.contains('a', 'Create an account').click();
     cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=email]').type(`{selectall}${gmailEmail}`);
-    cy.get('[data-cy=checkbox-tosOptIn]').click();
+    cy.get('[data-cy=checkbox-tosOptIn] [data-cy=custom-checkbox]').click();
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
     cy.contains(`We've sent it to ${gmailEmail}`);
     cy.getByDataCy('open-inbox-link').should(
       'have.prop',
       'href',
-      'https://mail.google.com/mail/u/2/#advanced-search/subject=Open+Collective%3A+Login&amp;subset=all&amp;within=2d',
+      'https://mail.google.com/mail/u/2/#advanced-search/subject=Open+Collective%3A+Sign+In&amp;subset=all&amp;within=2d',
     );
   });
 
@@ -186,7 +186,7 @@ describe('signin', () => {
     cy.contains('a', 'Create an account').click();
     cy.get('input[name=name]').type('Dummy Name');
     cy.get('input[name=email]').type(`{selectall}${hotmail}`);
-    cy.get('[data-cy=checkbox-tosOptIn]').click();
+    cy.get('[data-cy=checkbox-tosOptIn] [data-cy=custom-checkbox]').click();
     cy.get('button[type=submit]').click();
     cy.contains('Your magic link is on its way!');
     cy.contains(`We've sent it to ${hotmail}`);
@@ -216,18 +216,14 @@ describe('signin with 2FA', () => {
   it('can signin with 2fa enabled', () => {
     // now login with 2FA enabled
     cy.login({ email: user.email, redirect: '/apex' });
-    cy.getByDataCy('signin-two-factor-auth-input').type('123456');
-    cy.getByDataCy('signin-two-factor-auth-button').click();
-    cy.getByDataCy('signin-message-box').contains(
-      'Sign In failed: Two-factor authentication code failed. Please try again',
-    );
+    cy.complete2FAPrompt('123456');
+    cy.contains('Two-factor authentication code failed. Please try again').should.exist;
     TOTPCode = speakeasy.totp({
       algorithm: 'SHA1',
       encoding: 'base32',
       secret: secret.base32,
     });
-    cy.getByDataCy('signin-two-factor-auth-input').clear().type(TOTPCode);
-    cy.getByDataCy('signin-two-factor-auth-button').click();
+    cy.complete2FAPrompt(TOTPCode);
     cy.assertLoggedIn();
     cy.url().should('eq', `${Cypress.config().baseUrl}/apex`);
   });

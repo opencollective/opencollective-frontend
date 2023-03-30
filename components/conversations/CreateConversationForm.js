@@ -146,6 +146,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
               <RichTextEditor
                 inputName="html"
                 {...getFieldProps('html')}
+                kind="COMMENT"
                 withStickyToolbar
                 toolbarOffsetY={0}
                 placeholder={formatMessage(messages.bodyPlaceholder)}

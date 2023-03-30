@@ -17,7 +17,7 @@ If you see a step below that could be improved (or is outdated), please update t
 
 ### Prerequisite
 
-1. Make sure you have Node.js version 16.x and NPM version 8.x.
+1. Make sure you have Node.js version 18.x and NPM version 8.x.
 
 - We recommend using [nvm](https://github.com/creationix/nvm): `nvm install && nvm use`.
 
@@ -117,3 +117,9 @@ To add new files or dependencies to this exported package, have a look at [scrip
 If you have any questions, ping us on Slack
 (https://slack.opencollective.com) or on Twitter
 ([@opencollect](https://twitter.com/opencollect)).
+
+## Thanks
+
+<a href="https://www.chromatic.com/"><img src="https://user-images.githubusercontent.com/321738/84662277-e3db4f80-af1b-11ea-88f5-91d67a5e59f6.png" width="153" height="30" alt="Chromatic" /></a>
+
+Thanks to [Chromatic](https://www.chromatic.com/) for providing the visual testing platform that helps us review UI changes and catch visual regressions.

@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty, throttle } from 'lodash';
+import { compact, concat, isEmpty, throttle } from 'lodash';
 import memoizeOne from 'memoize-one';
 
 import { getFilteredSectionsForCollective } from '../../lib/collective-sections';
@@ -225,7 +225,9 @@ class CollectivePage extends Component {
         return (
           <SectionOurTeam
             collective={this.props.collective}
-            coreContributors={this.props.collective.parentCollective?.coreContributors || this.props.coreContributors}
+            coreContributors={compact(
+              concat(this.props.collective.parentCollective?.coreContributors, this.props.coreContributors),
+            )}
             LoggedInUser={this.props.LoggedInUser}
           />
         );

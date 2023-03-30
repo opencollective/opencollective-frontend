@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Move as MoveIcon } from '@styled-icons/feather/Move';
-import { useDrag, useDrop } from 'react-dnd';
 import styled, { css } from 'styled-components';
-
-import DRAG_AND_DROP_TYPES from '../../lib/constants/drag-and-drop';
 
 import StyledRoundButton from '../StyledRoundButton';
 
@@ -16,12 +15,19 @@ const MainContainer = styled.div`
   ${props =>
     props.isDragging &&
     css`
-      border: 1px solid #99c9ff;
+      outline: 1px solid #99c9ff;
       background: #f0f8ff;
       border-radius: 16px;
       & > * {
         opacity: 0;
       }
+    `}
+
+  ${props =>
+    props.isDragOverlay &&
+    css`
+      box-shadow: 0px 4px 6px rgba(26, 27, 31, 0.16);
+      border-radius: 16px;
     `}
 `;
 
@@ -49,40 +55,45 @@ const StyledDragHandle = styled(DragHandle)`
   }
 `;
 
-/**
- * A wrapper arround contribute cards that makes them draggable
- */
-const DraggableContributeCardWrapper = ({ Component, componentProps, index, onMove, onDrop }) => {
-  const ref = React.useRef(null);
-
-  const [, drop] = useDrop({
-    accept: DRAG_AND_DROP_TYPES.CONTRIBUTE_CARD,
-    hover: item => onMove(item.index, index),
-  });
-
-  const [{ isDragging }, drag, preview] = useDrag({
-    type: DRAG_AND_DROP_TYPES.CONTRIBUTE_CARD,
-    item: { index },
-    end: item => onDrop(item.index, index),
-    collect: monitor => ({ isDragging: monitor.isDragging() }),
-  });
-
-  drag(drop(ref));
-
+export const ContributeCardWithDragHandle = ({ Component, componentProps, dragHandleProps, isDragOverlay }) => {
   return (
-    <MainContainer ref={preview} isDragging={isDragging}>
+    <MainContainer isDragOverlay={isDragOverlay}>
       <Component {...componentProps} />
-      <StyledDragHandle ref={ref} />
+      <StyledDragHandle {...dragHandleProps} />
     </MainContainer>
   );
 };
 
+ContributeCardWithDragHandle.propTypes = {
+  Component: PropTypes.any.isRequired,
+  componentProps: PropTypes.object,
+  dragHandleProps: PropTypes.object,
+  isDragOverlay: PropTypes.bool,
+};
+
+// Memoized for improved performance when dragging
+const MemoizedContributeCardWithDragHandle = memo(ContributeCardWithDragHandle);
+
+/**
+ * A wrapper arround contribute cards that makes them draggable
+ */
+export default function DraggableContributeCardWrapper(props) {
+  const { attributes, listeners, isDragging, setNodeRef, transform, transition } = useSortable({ id: props.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <MainContainer ref={setNodeRef} style={style} isDragging={isDragging}>
+      <MemoizedContributeCardWithDragHandle dragHandleProps={{ ...attributes, ...listeners }} {...props} />
+    </MainContainer>
+  );
+}
+
 DraggableContributeCardWrapper.propTypes = {
-  index: PropTypes.number.isRequired,
-  onMove: PropTypes.func.isRequired,
-  onDrop: PropTypes.func.isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   Component: PropTypes.any.isRequired,
   componentProps: PropTypes.object,
 };
-
-export default DraggableContributeCardWrapper;

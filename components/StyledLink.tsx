@@ -29,6 +29,7 @@ type StyledLinkProps = BorderProps &
     buttonSize?: ButtonSize;
     openInNewTab?: boolean;
     openInNewTabNoFollow?: boolean;
+    openInNewTabNoFollowRelMe?: boolean;
     truncateOverflow?: boolean;
     underlineOnHover?: boolean;
     hoverColor?: string;
@@ -50,6 +51,12 @@ const StyledLink = styled.a.attrs<StyledLinkProps>(props => {
     return {
       target: '_blank',
       rel: 'noopener noreferrer nofollow',
+    };
+  }
+  if (props.openInNewTabNoFollowRelMe) {
+    return {
+      target: '_blank',
+      rel: 'noopener noreferrer nofollow me',
     };
   }
 })<StyledLinkProps>`

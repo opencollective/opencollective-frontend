@@ -139,6 +139,10 @@ export const transactionsQueryCollectionFragment = gql`
         status
         memo
         processedAt
+        toAccount {
+          id
+          slug
+        }
       }
       expense {
         id

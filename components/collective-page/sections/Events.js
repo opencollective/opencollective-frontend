@@ -5,7 +5,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { sortEvents } from '../../../lib/events';
 
-import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/Contribute';
+import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';
 import { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
 import ContributeEvent from '../../contribute-cards/ContributeEvent';
 import CreateNew from '../../contribute-cards/CreateNew';

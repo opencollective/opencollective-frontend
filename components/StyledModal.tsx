@@ -163,12 +163,12 @@ ModalHeader.displayName = 'Header';
 /**
  * A special header that displays collective name + avatar in the header.
  */
-export const CollectiveModalHeader = ({ collective, ...props }) => (
+export const CollectiveModalHeader = ({ collective, customText, ...props }) => (
   <ModalHeader {...props}>
     <Flex alignItems="center">
       <Avatar collective={collective} radius={40} />
       <P fontSize="16px" lineHeight="24px" fontWeight="bold" ml={3}>
-        {collective.name}
+        {customText || collective.name}
       </P>
     </Flex>
   </ModalHeader>
@@ -178,6 +178,7 @@ CollectiveModalHeader.propTypes = {
   collective: PropTypes.shape({
     name: PropTypes.string,
   }),
+  customText: PropTypes.string,
 };
 
 CollectiveModalHeader.displayName = 'Header';
@@ -186,11 +187,12 @@ type ModalFooterProps = {
   children: React.ReactNode;
   dividerMargin?: string;
   isFullWidth?: boolean;
+  showDivider?: boolean;
 };
 
-export const ModalFooter = ({ children, isFullWidth, dividerMargin, ...props }: ModalFooterProps) => (
+export const ModalFooter = ({ children, isFullWidth, showDivider, dividerMargin, ...props }: ModalFooterProps) => (
   <Container {...props}>
-    <Divider margin={dividerMargin} isFullWidth={isFullWidth} />
+    {showDivider && <Divider margin={dividerMargin} isFullWidth={isFullWidth} />}
     {children}
   </Container>
 );
@@ -198,15 +200,17 @@ export const ModalFooter = ({ children, isFullWidth, dividerMargin, ...props }: 
 ModalFooter.propTypes = {
   children: PropTypes.node,
   isFullWidth: PropTypes.bool,
+  showDivider: PropTypes.bool,
   dividerMargin: PropTypes.string,
 };
 
 ModalFooter.defaultProps = {
   dividerMargin: '2rem 0',
+  showDivider: true,
 };
 
 const DefaultTrapContainer = props => {
-  return <FocusTrap focusTrapOptions={{ clickOutsideDeactivates: true }} {...props} />;
+  return <FocusTrap focusTrapOptions={{ allowOutsideClick: true }} {...props} />;
 };
 
 /**
@@ -223,6 +227,7 @@ const StyledModal = ({
   ...props
 }) => {
   const intl = useIntl();
+  const modalRef = React.useRef(null);
   const TrapContainer = trapFocus ? DefaultTrapContainer : React.Fragment;
   const closeHandler = React.useCallback(() => {
     if (
@@ -251,7 +256,7 @@ const StyledModal = ({
         {hasUnsavedChanges && <WarnIfUnsavedChanges hasUnsavedChanges />}
         <Wrapper>
           <TrapContainer>
-            <Modal {...props}>
+            <Modal ref={modalRef} {...props}>
               {React.Children.map(children, child => {
                 if (child?.type?.displayName === 'Header') {
                   return React.cloneElement(child, { onClose: closeHandler });
@@ -271,7 +276,7 @@ const StyledModal = ({
         {hasUnsavedChanges && <WarnIfUnsavedChanges hasUnsavedChanges />}
         <Wrapper zindex={props.zindex}>
           <TrapContainer>
-            <Modal {...props}>
+            <Modal ref={modalRef} {...props}>
               {React.Children.map(children, child => {
                 if (child?.type?.displayName === 'Header') {
                   return React.cloneElement(child, { onClose: closeHandler });

@@ -7,13 +7,13 @@ describe('Recurring contributions', () => {
       .then(collective => {
         collectiveSlug = collective.slug;
         cy.login({ redirect: `/${collectiveSlug}/admin/tiers` });
-        cy.getByDataCy('add-tier-button').click();
-        cy.get('[data-cy="tier-input-field-name"] input').last().type('Recurring Fixed Donation Tier');
-        cy.get('[data-cy="tier-input-field-interval"] [data-cy="interval"]').last().click();
+        cy.getByDataCy('create-contribute-tier').click();
+        cy.get('input[data-cy="name"]').type('Recurring Fixed Donation Tier');
+        cy.get('[data-cy="select-interval"]').click();
         cy.contains('[data-cy="select-option"]', 'Monthly').click();
-        cy.get('[data-cy="tier-input-field-amount"] input').last().type('10');
-        cy.getByDataCy('collective-save').click();
-        cy.wait(2000);
+        cy.get('input[data-cy="amount"]').type('10');
+        cy.getByDataCy('confirm-btn').click();
+        cy.checkToast({ type: 'SUCCESS', message: 'Tier created.' });
         cy.logout();
       })
       .then(() => {

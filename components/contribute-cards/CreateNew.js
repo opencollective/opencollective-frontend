@@ -7,7 +7,7 @@ import Link from '../Link';
 import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
 
-import { CONTRIBUTE_CARD_BORDER_RADIUS, CONTRIBUTE_CARD_WIDTH } from './Contribute';
+import { CONTRIBUTE_CARD_BORDER_RADIUS, CONTRIBUTE_CARD_WIDTH } from './constants';
 
 const CreateNewCard = styled(Link)`
   display: block;

@@ -223,13 +223,25 @@ export const ActivityDescriptionI18n = defineMessages({
   },
   // Sign in
   USER_NEW_TOKEN: {
-    defaultMessage: 'Requested a new sign in token',
+    defaultMessage: 'Requested a new sign in token', // Deprecated and replaced by USER_SIGNIN
+  },
+  USER_SIGNIN: {
+    defaultMessage: 'Signed In',
   },
   OAUTH_APPLICATION_AUTHORIZED: {
     defaultMessage: 'Authorized a new OAuth application',
   },
   USER_CHANGE_EMAIL: {
     defaultMessage: 'Changed email address',
+  },
+  USER_PASSWORD_SET: {
+    defaultMessage: 'Changed password',
+  },
+  TWO_FACTOR_CODE_ADDED: {
+    defaultMessage: 'Two factor authentication added',
+  },
+  TWO_FACTOR_CODE_DELETED: {
+    defaultMessage: 'Two factor authentication removed',
   },
   // Gift cards
   USER_CARD_CLAIMED: {

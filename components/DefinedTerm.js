@@ -126,8 +126,8 @@ const UnderlinedTerm = styled.span`
   ${textTransform}
 
   &:hover {
-    color: ${themeGet('colors.primary.400')};
-    border-color: ${themeGet('colors.primary.400')};
+    color: ${themeGet('colors.primary.500')};
+    border-color: ${themeGet('colors.primary.500')};
   }
 `;
 
@@ -172,7 +172,7 @@ DefinedTerm.propTypes = {
 };
 
 DefinedTerm.defaultProps = {
-  color: 'black.500',
+  color: 'black.700',
 };
 
 export default injectIntl(DefinedTerm);

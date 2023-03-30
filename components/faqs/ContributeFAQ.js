@@ -34,7 +34,7 @@ const ContributeFAQ = ({ collective, isCrypto, ...props }) => (
         ) : (
           <FormattedMessage
             id="ContributeFAQ.Safe"
-            defaultMessage="Open Collective doesn't store credit card numbers, instead relying on our payment processor, Stripe, a secure solution that is widely adopted. If our systems are compromised, your credit card information is not at risk, because we simply don't store it. <LearnMoreLink>Learn more</LearnMoreLink>."
+            defaultMessage="Open Collective doesn't store sensitive payment data (e.g. Credit Card numbers), instead relying on our payment processor, Stripe, a secure solution that is widely adopted. If our systems are compromised, your payment information is not at risk, because we simply don't store it. <LearnMoreLink>Learn more</LearnMoreLink>."
             values={{
               LearnMoreLink: getI18nLink({
                 openInNewTab: true,
@@ -63,7 +63,7 @@ const ContributeFAQ = ({ collective, isCrypto, ...props }) => (
         </Content>
       </Entry>
     )}
-    {collective.host.contributionPolicy && (
+    {collective.host.contributionPolicy && collective.name !== collective.host.name && (
       <Entry>
         <Title>
           <FormattedMessage

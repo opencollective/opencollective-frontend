@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 DIST=./dist
 
 echo "> Cleaning dist (before build)"

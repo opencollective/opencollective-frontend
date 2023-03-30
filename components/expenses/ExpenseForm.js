@@ -12,8 +12,9 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { getSupportedExpenseTypes } from '../../lib/expenses';
 import { requireFields } from '../../lib/form-utils';
 import { usePrevious } from '../../lib/hooks/usePrevious';
+import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep } from '../../lib/utils';
-import { checkRequiresAddress, validateExpenseTaxes } from './lib/utils';
+import { checkRequiresAddress, getSupportedCurrencies, validateExpenseTaxes } from './lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
@@ -23,8 +24,8 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
-import StyledInput from '../StyledInput';
 import StyledInputTags from '../StyledInputTags';
+import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
@@ -122,7 +123,7 @@ export const prepareExpenseForSubmit = expenseData => {
   const isGrant = expenseData.type === expenseTypes.GRANT;
   const payee =
     expenseData.payee?.isNewUser || expenseData.payee?.isInvite
-      ? pick(expenseData.payee, ['name', 'email', 'legalName', 'organization', 'newsletterOptIn'])
+      ? pick(expenseData.payee, ['name', 'slug', 'email', 'legalName', 'organization', 'newsletterOptIn'])
       : { [payeeIdField]: expenseData.payee.id };
 
   const payeeLocation = checkRequiresAddress(expenseData)
@@ -275,7 +276,7 @@ const ExpenseFormBody = ({
   const stepTwoCompleted = isInvite
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
-
+  const availableCurrencies = getSupportedCurrencies(collective, values.payoutMethod);
   const [step, setStep] = React.useState(() => getDefaultStep(defaultStep, stepOneCompleted, isCreditCardCharge));
 
   // Only true when logged in and drafting the expense
@@ -348,6 +349,20 @@ const ExpenseFormBody = ({
       formik.setFieldValue('payeeLocation.address', serializeAddress(values.payeeLocation.structured));
     }
   }, [values.payeeLocation]);
+
+  React.useEffect(() => {
+    // If the currency is not supported anymore, we need to do something
+    if (!loading && (!values.currency || !availableCurrencies.includes(values.currency))) {
+      const hasItemsWithAmounts = values.items.some(item => Boolean(item.amount));
+      if (!hasItemsWithAmounts) {
+        // If no items have amounts yet, we can safely set the default currency
+        formik.setFieldValue('currency', availableCurrencies[0]);
+      } else if (values.currency) {
+        // If there are items with amounts, we need to reset the currency
+        formik.setFieldValue('currency', null);
+      }
+    }
+  }, [loading, values.payoutMethod]);
 
   // Load values from localstorage
   React.useEffect(() => {
@@ -524,7 +539,7 @@ const ExpenseFormBody = ({
                 />
               </P>
               <Field
-                as={StyledInput}
+                as={StyledTextarea}
                 autoFocus={autoFocusTitle}
                 border="0"
                 error={errors.description}
@@ -537,6 +552,7 @@ const ExpenseFormBody = ({
                 py={1}
                 width="100%"
                 withOutline
+                autoSize
                 placeholder={
                   values.type === expenseTypes.GRANT
                     ? formatMessage(msg.grantSubjectPlaceholder)
@@ -592,7 +608,13 @@ const ExpenseFormBody = ({
                 </Flex>
                 <Box>
                   <FieldArray name="items">
-                    {fieldsArrayProps => <ExpenseFormItems {...fieldsArrayProps} collective={collective} />}
+                    {fieldsArrayProps => (
+                      <ExpenseFormItems
+                        {...fieldsArrayProps}
+                        collective={collective}
+                        availableCurrencies={availableCurrencies}
+                      />
+                    )}
                   </FieldArray>
                 </Box>
 
@@ -736,6 +758,7 @@ ExpenseFormBody.propTypes = {
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
+    currency: PropTypes.string.isRequired,
     host: PropTypes.shape({
       transferwise: PropTypes.shape({
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
@@ -753,6 +776,7 @@ ExpenseFormBody.propTypes = {
   }).isRequired,
   expense: PropTypes.shape({
     type: PropTypes.oneOf(Object.values(expenseTypes)),
+    currency: PropTypes.string,
     description: PropTypes.string,
     status: PropTypes.string,
     payee: PropTypes.object,
@@ -762,6 +786,7 @@ ExpenseFormBody.propTypes = {
       interval: PropTypes.string,
       endsAt: PropTypes.string,
     }),
+    amountInAccountCurrency: AmountPropTypeShape,
     items: PropTypes.arrayOf(
       PropTypes.shape({
         url: PropTypes.string,

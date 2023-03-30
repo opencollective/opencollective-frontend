@@ -12,6 +12,9 @@ export const ChartWrapper = styled.div`
       vertical-align: middle;
     }
   }
+  .apexcharts-toolbar {
+    z-index: 0;
+  }
 
   .apexcharts-legend-marker {
     margin-right: 8px;

@@ -52,6 +52,7 @@ const ExpenseVATFormikFields = ({ formik, isOptional }) => {
         name="taxes.0.rate"
         htmlFor="vat-rate"
         label={intl.formatMessage({ defaultMessage: 'VAT rate' })}
+        labelProps={{ whiteSpace: 'nowrap' }}
         inputType="number"
         required={!isOptional}
       >
@@ -71,6 +72,7 @@ const ExpenseVATFormikFields = ({ formik, isOptional }) => {
         name="taxes.0.idNumber"
         htmlFor="vat-number"
         label={intl.formatMessage({ defaultMessage: 'VAT identifier' })}
+        labelProps={{ whiteSpace: 'nowrap' }}
         required={!isOptional && Boolean(formik.values.taxes?.[0]?.rate)}
         mr={2}
       >

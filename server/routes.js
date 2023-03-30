@@ -8,6 +8,7 @@ const { template, trim } = require('lodash');
 const { sendMessage } = require('./email');
 const intl = require('./intl');
 const logger = require('./logger');
+const prependHttp = require('prepend-http');
 
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
@@ -56,29 +57,31 @@ module.exports = (expressApp, nextApp) => {
 
   // NOTE: in production and staging environment, this is currently not used
   // we use Cloudflare workers to route the request directly to the API
-  app.use(
-    '/api',
-    proxy(baseApiUrl, {
-      parseReqBody: false,
-      proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
-        for (const key of ['oc-env', 'oc-secret', 'oc-application']) {
-          if (srcReq.headers[key]) {
-            proxyReqOpts.headers[key] = srcReq.headers[key];
+  if (process.env.API_PROXY === 'true') {
+    app.use(
+      '/api',
+      proxy(baseApiUrl, {
+        parseReqBody: false,
+        proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+          for (const key of ['oc-env', 'oc-secret', 'oc-application']) {
+            if (srcReq.headers[key]) {
+              proxyReqOpts.headers[key] = srcReq.headers[key];
+            }
           }
-        }
-        proxyReqOpts.headers['oc-frontend-api-proxy'] = '1';
-        proxyReqOpts.headers['oc-frontend-ip'] = srcReq.ip;
-        proxyReqOpts.headers['X-Forwarded-For'] = srcReq.ip;
-        return proxyReqOpts;
-      },
-      proxyReqPathResolver: req => {
-        const [pathname, search] = req.url.split('?');
-        const searchParams = new URLSearchParams(search);
-        searchParams.set('api_key', process.env.API_KEY);
-        return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
-      },
-    }),
-  );
+          proxyReqOpts.headers['oc-frontend-api-proxy'] = '1';
+          proxyReqOpts.headers['oc-frontend-ip'] = srcReq.ip;
+          proxyReqOpts.headers['X-Forwarded-For'] = srcReq.ip;
+          return proxyReqOpts;
+        },
+        proxyReqPathResolver: req => {
+          const [pathname, search] = req.url.split('?');
+          const searchParams = new URLSearchParams(search);
+          searchParams.set('api_key', process.env.API_KEY);
+          return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
+        },
+      }),
+    );
+  }
 
   /**
    * Contact Form
@@ -90,21 +93,39 @@ module.exports = (expressApp, nextApp) => {
       res.status(400).send('All inputs required');
     }
 
-    const additionalLink = body.link ? `Additional Link: <a href="https://${body.link}">${body.link}</a></br>` : '';
+    let additionalLink = '';
+    if (body.link) {
+      const bodyLink = prependHttp(body.link);
+      additionalLink = `Additional Link: <a href="${bodyLink}">${bodyLink}</a></br>`;
+    }
+
+    let relatedCollectives = 'Related Collectives: ';
+    if (body.relatedCollectives?.length > 0) {
+      relatedCollectives = body.relatedCollectives
+        .slice(0, 50)
+        .map(url => `<a href='${url}'>${url}</a>`)
+        .join(', ');
+    }
 
     logger.info(`Contact From: ${body.name} <${body.email}>`);
     logger.info(`Contact Subject: ${body.topic}`);
     logger.info(`Contact Message: ${body.message}`);
+    if (body.relatedCollectives?.length > 0) {
+      logger.info(`${relatedCollectives}`);
+    }
     if (additionalLink) {
       logger.info(`Contact Link: ${additionalLink}`);
     }
 
     await sendMessage({
-      to: 'support@opencollective.freshdesk.com',
+      to: 'support@opencollective.com',
       from: `${body.name} <${body.email}>`,
       subject: `${body.topic}`,
       html: `
             ${body.message}
+            <br/>
+            ${body.relatedCollectives?.length > 0 ? relatedCollectives : ''}
+            <br/>
             <br/>
             ${additionalLink}
         `,

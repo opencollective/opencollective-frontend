@@ -184,10 +184,10 @@ interface Account {
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -248,6 +248,7 @@ interface Account {
     Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
     """
     accountType: [AccountType]
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -690,6 +691,11 @@ enum SocialLinkType {
   GITLAB
   GIT
   WEBSITE
+  DISCOURSE
+  PIXELFED
+  GHOST
+  PEERTUBE
+  TIKTOK
 }
 
 enum ImageFormat {
@@ -792,6 +798,7 @@ type Tier {
   endsAt: DateTime
   invoiceTemplate: String
   useStandalonePage: Boolean
+  singleTicket: Boolean
 }
 
 """
@@ -843,6 +850,11 @@ type Order {
   paymentMethod: PaymentMethod
 
   """
+  Host fee percent attached to the Order.
+  """
+  hostFeePercent: Float
+
+  """
   Platform Tip attached to the Order.
   """
   platformTipAmount: Amount
@@ -876,9 +888,19 @@ type Order {
   memo: String
 
   """
+  The account who created this order
+  """
+  createdByAccount: Account
+
+  """
   Date the funds were received.
   """
   processedAt: DateTime
+
+  """
+  Data about the pending contribution
+  """
+  pendingContributionData: PendingOrderData
 
   """
   Whether the order needs confirmation (3DSecure/SCA)
@@ -1115,7 +1137,7 @@ type Expense {
     """
     Source of the currency to express the amount. Defaults to the expense currency
     """
-    currencySource: ExpenseCurrencySource
+    currencySource: ExpenseCurrencySource = EXPENSE
   ): Amount
 
   """
@@ -2034,8 +2056,6 @@ type Comment {
   Returns the list of reactions added to this comment by logged in user
   """
   userReactions: [String]
-  fromCollective: Account @deprecated(reason: "2020-02-25: Please use fromAccount")
-  collective: Account @deprecated(reason: "2020-02-25: Please use account")
 }
 
 """
@@ -2165,9 +2185,14 @@ type ExpenseAttachedFile {
   url: URL
 
   """
+  The file info associated with this item (if any)
+  """
+  info: FileInfo
+
+  """
   The original filename
   """
-  name: String
+  name: String @deprecated(reason: "2023-01-23: We're moving this field to \"file.name\"")
 }
 
 """
@@ -2204,6 +2229,11 @@ type ExpenseItem {
   """
   description: String
   url: URL
+
+  """
+  The file associated with this item (if any)
+  """
+  file: FileInfo
 }
 
 """
@@ -2361,6 +2391,11 @@ type Activity {
   order: Order
 
   """
+  The transaction related to this activity, if any
+  """
+  transaction: Transaction
+
+  """
   Data attached to this activity (if any)
   """
   data: JSON!
@@ -2440,6 +2475,9 @@ enum ActivityType {
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
+  ORDER_PENDING_CREATED
+  ORDER_PENDING_FOLLOWUP
+  ORDER_PENDING_RECEIVED
   ORDERS_SUSPICIOUS
   BACKYOURSTACK_DISPATCH_CONFIRMED
   PAYMENT_FAILED
@@ -2447,11 +2485,14 @@ enum ActivityType {
   PAYMENT_CREDITCARD_EXPIRING
   USER_CREATED
   USER_NEW_TOKEN
+  USER_SIGNIN
+  USER_RESET_PASSWORD
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_CODE_ADDED
   TWO_FACTOR_CODE_DELETED
   USER_CHANGE_EMAIL
   USER_PAYMENT_METHOD_CREATED
+  USER_PASSWORD_SET
   USER_CARD_CLAIMED
   USER_CARD_INVITED
   WEBHOOK_STRIPE_RECEIVED
@@ -2494,10 +2535,10 @@ type Host implements Account & AccountWithContributions {
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -2559,6 +2600,7 @@ type Host implements Account & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -3025,7 +3067,7 @@ type Host implements Account & AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -3238,7 +3280,7 @@ interface AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -3472,6 +3514,8 @@ enum PaymentMethodType {
   paymentintent @deprecated(reason: "Please use uppercase values")
   us_bank_account @deprecated(reason: "Please use uppercase values")
   sepa_debit @deprecated(reason: "Please use uppercase values")
+  bacs_debit @deprecated(reason: "Please use uppercase values")
+  bancontact @deprecated(reason: "Please use uppercase values")
   ALIPAY
   CREDITCARD
   PREPAID
@@ -3486,6 +3530,8 @@ enum PaymentMethodType {
   PAYMENT_INTENT
   US_BANK_ACCOUNT
   SEPA_DEBIT
+  BACS_DEBIT
+  BANCONTACT
 }
 
 input PaymentMethodReferenceInput {
@@ -3524,9 +3570,7 @@ type Conversation {
   updatedAt: DateTime!
   tags: [String]
   summary: String!
-  collective: Account @deprecated(reason: "2022-09-14: Please use account")
   account: Account
-  fromCollective: Account @deprecated(reason: "2022-09-14: Please use fromAccount")
   fromAccount: Account
 
   """
@@ -3724,6 +3768,8 @@ enum PaymentMethodLegacyType {
   PAYMENT_INTENT
   US_BANK_ACCOUNT
   SEPA_DEBIT
+  BACS_DEBIT
+  BANCONTACT
 }
 
 """
@@ -4923,11 +4969,6 @@ type ExpenseStats {
   expensesCount: Int!
 
   """
-  The total number of expenses over time
-  """
-  expenseAmountOverTime: TimeSeriesAmount @deprecated(reason: "2022-04-21: Please use hostMetricsTimeSeries.totalSpent")
-
-  """
   The daily average paid in expenses
   """
   dailyAverageAmount: Amount!
@@ -5105,6 +5146,24 @@ type OrderPermissions {
   Whether the current user can mark this order as unpaid
   """
   canMarkAsPaid: Boolean!
+
+  """
+  Whether the current user edit this pending order
+  """
+  canEdit: Boolean!
+}
+
+type PendingOrderData {
+  expectedAt: DateTime
+  paymentMethod: String
+  ponumber: String
+  memo: String
+  fromAccountInfo: PendingOrderFromAccountInfo
+}
+
+type PendingOrderFromAccountInfo {
+  name: String
+  email: String
 }
 
 enum TierType {
@@ -5220,10 +5279,10 @@ type Bot implements Account {
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -5285,6 +5344,7 @@ type Bot implements Account {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -5737,10 +5797,10 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -5802,6 +5862,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -6246,7 +6307,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -6324,7 +6385,7 @@ interface AccountWithHost {
   """
   Fees percentage that the platform takes for this collective
   """
-  platformFeePercent: Int
+  platformFeePercent: Float
 
   """
   Date of approval by the Fiscal Host.
@@ -6583,10 +6644,10 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -6648,6 +6709,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -7092,7 +7154,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -7179,6 +7241,108 @@ interface AccountWithParent {
 }
 
 """
+Exposes information about an uploaded file (image, pdf, etc.)
+"""
+interface FileInfo {
+  """
+  Unique identifier for the file
+  """
+  id: String!
+
+  """
+  URL to access the file
+  """
+  url: URL!
+
+  """
+  Name of the file
+  """
+  name: String
+
+  """
+  Mime type of the file
+  """
+  type: String!
+
+  """
+  Size of the file in bytes
+  """
+  size: Int
+}
+
+"""
+Exposes information about an uploaded image file
+"""
+type ImageFileInfo implements FileInfo {
+  """
+  Unique identifier for the file
+  """
+  id: String!
+
+  """
+  URL to access the file
+  """
+  url: URL!
+
+  """
+  Name of the file
+  """
+  name: String
+
+  """
+  Mime type of the file
+  """
+  type: String!
+
+  """
+  Size of the file in bytes
+  """
+  size: Int
+
+  """
+  If the file is an image, this will be the width of the image in pixels
+  """
+  width: Int
+
+  """
+  If the file is an image, this will be the height of the image in pixels
+  """
+  height: Int
+
+  """
+  Blurhash of the image
+  """
+  blurHash: String
+}
+
+type GenericFileInfo implements FileInfo {
+  """
+  Unique identifier for the file
+  """
+  id: String!
+
+  """
+  URL to access the file
+  """
+  url: URL!
+
+  """
+  Name of the file
+  """
+  name: String
+
+  """
+  Mime type of the file
+  """
+  type: String!
+
+  """
+  Size of the file in bytes
+  """
+  size: Int
+}
+
+"""
 This represents an Individual account
 """
 type Individual implements Account {
@@ -7203,10 +7367,10 @@ type Individual implements Account {
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -7268,6 +7432,7 @@ type Individual implements Account {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -7732,6 +7897,11 @@ type Individual implements Account {
     """
     offset: Int! = 0
   ): PersonalTokenCollection
+
+  """
+  Has the account a password set? For authenticated user: scope: "account".
+  """
+  hasPassword: Boolean
 }
 
 """
@@ -7824,6 +7994,11 @@ type Member {
   Custom user description
   """
   description: String
+
+  """
+  If membership is inherited from parent collective
+  """
+  inherited: Boolean
   account: Account
 }
 
@@ -7852,6 +8027,11 @@ type MemberOf {
   Custom user description
   """
   description: String
+
+  """
+  If membership is inherited from parent collective
+  """
+  inherited: Boolean
   account: Account
 }
 
@@ -7880,10 +8060,10 @@ type Organization implements Account & AccountWithContributions {
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -7945,6 +8125,7 @@ type Organization implements Account & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -8409,7 +8590,7 @@ type Organization implements Account & AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -8512,10 +8693,10 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -8577,6 +8758,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -9021,7 +9203,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -9670,9 +9852,19 @@ type Query {
   ): Project
   tagStats(
     """
-    Return tags from collectives which includes this search term
+    Return tags from collectives which includes this search term. Using this argument will ignore tagSearchTerm. Skipping this argument will use a more efficient query.
     """
     searchTerm: String
+
+    """
+    Return tags which includes this search term. Using this argument will ignore searchTerm.
+    """
+    tagSearchTerm: String
+
+    """
+    Return tags from collectives hosted by this host.
+    """
+    host: AccountReferenceInput
     limit: Int! = 10
     offset: Int! = 0
   ): TagStatsCollection!
@@ -11203,6 +11395,9 @@ enum ActivityAndClassesType {
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
+  ORDER_PENDING_CREATED
+  ORDER_PENDING_FOLLOWUP
+  ORDER_PENDING_RECEIVED
   ORDERS_SUSPICIOUS
   BACKYOURSTACK_DISPATCH_CONFIRMED
   PAYMENT_FAILED
@@ -11210,11 +11405,14 @@ enum ActivityAndClassesType {
   PAYMENT_CREDITCARD_EXPIRING
   USER_CREATED
   USER_NEW_TOKEN
+  USER_SIGNIN
+  USER_RESET_PASSWORD
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_CODE_ADDED
   TWO_FACTOR_CODE_DELETED
   USER_CHANGE_EMAIL
   USER_PAYMENT_METHOD_CREATED
+  USER_PASSWORD_SET
   USER_CARD_CLAIMED
   USER_CARD_INVITED
   WEBHOOK_STRIPE_RECEIVED
@@ -11309,10 +11507,10 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -11374,6 +11572,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -11818,7 +12017,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -11921,10 +12120,10 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   description: String
   longDescription: String
   tags: [String]
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   currency: String
   expensePolicy: String
@@ -11986,6 +12185,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Order of the results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
   ): MemberCollection!
 
   """
@@ -12430,7 +12630,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   How much platform fees are charged for this account
   """
-  platformFeePercent: Int!
+  platformFeePercent: Float!
 
   """
   Date of approval by the Fiscal Host.
@@ -12662,6 +12862,11 @@ type Mutation {
     Information about the organization to create (name, slug, description, website, ...)
     """
     organization: OrganizationCreateInput!
+
+    """
+    List of members to invite on Organization creation.
+    """
+    inviteMembers: [InviteMemberInput]
   ): Organization
 
   """
@@ -13156,6 +13361,21 @@ type Mutation {
   setNewsletterOptIn(newsletterOptIn: Boolean!): Individual!
 
   """
+  Set password to Individual. Scope: "account". 2FA.
+  """
+  setPassword(
+    """
+    The password to set.
+    """
+    password: String!
+
+    """
+    The current password (if any) to confirm password change.
+    """
+    currentPassword: String
+  ): SetPasswordResponse!
+
+  """
   Invite a new member to the Collective. Scope: "account".
   """
   inviteMember(
@@ -13412,6 +13632,16 @@ type Mutation {
   createPaymentIntent(paymentIntent: PaymentIntentInput!): PaymentIntent!
 
   """
+  To submit a new order. Scope: "orders".
+  """
+  createPendingOrder(order: PendingOrderCreateInput!): Order!
+
+  """
+  To edit a pending order. Scope: "orders".
+  """
+  editPendingOrder(order: PendingOrderEditInput!): Order!
+
+  """
   Add a new payment method to be used with an Order. Scope: "orders".
   """
   addCreditCard(
@@ -13479,6 +13709,11 @@ type Mutation {
     Specify whether the account is a trusted host
     """
     isTrustedHost: Boolean
+
+    """
+    Set this to false to disable 2FA. Other values have no effect.
+    """
+    isTwoFactorAuthEnabled: Boolean
   ): Account!
 
   """
@@ -13819,6 +14054,14 @@ type Mutation {
     """
     socialLinks: [SocialLinkInput!]!
   ): [SocialLink!]!
+  setTags(
+    """
+    Tags associated with the object being updated
+    """
+    tags: [String]
+    order: OrderReferenceInput
+    expense: ExpenseReferenceInput
+  ): TagResponse!
 }
 
 input CollectiveCreateInput {
@@ -13827,7 +14070,7 @@ input CollectiveCreateInput {
   description: String!
   tags: [String]
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   settings: JSON
 }
 
@@ -14231,6 +14474,9 @@ input ExpenseAttachedFileInput {
   Original filename
   """
   name: String
+    @deprecated(
+      reason: "2023-02-02: This must now be provided when uploading the file. This parameter will be ignored."
+    )
 
   """
   URL of the file
@@ -14661,6 +14907,11 @@ enum ProcessHostApplicationAction {
   SEND_PUBLIC_MESSAGE
 }
 
+type SetPasswordResponse {
+  individual: Individual!
+  token: String
+}
+
 input MemberInvitationReferenceInput {
   """
   The public id identifying the member invitation (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -14790,6 +15041,7 @@ input OrderFromAccountInfo {
   """
   location: LocationInput
   name: String
+  email: String
   legalName: String
 }
 
@@ -15014,6 +15266,143 @@ input PaymentIntentInput {
   toAccount: AccountReferenceInput!
 }
 
+"""
+Input to create a new pending order
+"""
+input PendingOrderCreateInput {
+  """
+  The contribution amount, without platform contribution and taxes
+  """
+  amount: AmountInput!
+
+  """
+  The profile making the contribution.
+  """
+  fromAccount: AccountReferenceInput!
+
+  """
+  Additional information about the contributing profile
+  """
+  fromAccountInfo: OrderFromAccountInfo
+
+  """
+  The collective you want to contribute to
+  """
+  toAccount: AccountReferenceInput!
+
+  """
+  Platform tip attached to this order
+  """
+  platformTipAmount: AmountInput
+
+  """
+  Use this field to set the taxes associated to this order
+  """
+  taxes: [OrderTaxInput]
+
+  """
+  The tier you are contributing to
+  """
+  tier: TierReferenceInput
+
+  """
+  Public order description
+  """
+  description: String
+
+  """
+  Private memo for the host
+  """
+  memo: String
+
+  """
+  External identifier for the order
+  """
+  ponumber: String
+
+  """
+  Payment method expected for this order
+  """
+  paymentMethod: String
+
+  """
+  When is the money expected?
+  """
+  expectedAt: DateString
+  hostFeePercent: Float
+}
+
+"""
+Input to edit an existing pending order
+"""
+input PendingOrderEditInput {
+  """
+  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the order (ie: 4242)
+  """
+  legacyId: Int
+
+  """
+  The contribution amount, without platform contribution and taxes
+  """
+  amount: AmountInput!
+
+  """
+  The profile making the contribution.
+  """
+  fromAccount: AccountReferenceInput
+
+  """
+  Additional information about the contributing profile
+  """
+  fromAccountInfo: OrderFromAccountInfo
+
+  """
+  Platform tip attached to this order
+  """
+  platformTipAmount: AmountInput
+
+  """
+  Use this field to set the taxes associated to this order
+  """
+  taxes: [OrderTaxInput]
+
+  """
+  The tier you are contributing to
+  """
+  tier: TierReferenceInput
+
+  """
+  Public order description
+  """
+  description: String
+
+  """
+  Private memo for the host
+  """
+  memo: String
+
+  """
+  External identifier for the order
+  """
+  ponumber: String
+
+  """
+  Payment method expected for this order
+  """
+  paymentMethod: String
+
+  """
+  When is the money expected?
+  """
+  expectedAt: DateString
+  hostFeePercent: Float
+}
+
 type CreditCardWithStripeError {
   """
   The payment method created
@@ -15165,23 +15554,25 @@ input TierUpdateInput {
   The public id identifying the tier (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
   """
   id: String!
-  amount: AmountInput!
+  amount: AmountInput
   name: NonEmptyString
   description: String
   button: String
   goal: AmountInput
-  type: TierType!
-  amountType: TierAmountType!
-  frequency: TierFrequency!
+  type: TierType
+  amountType: TierAmountType
+  frequency: TierFrequency
   presets: [Int!]
   maxQuantity: Int
   minimumAmount: AmountInput
   useStandalonePage: Boolean
+  invoiceTemplate: String
+  singleTicket: Boolean
 }
 
 input TierCreateInput {
-  amount: AmountInput!
-  name: NonEmptyString
+  amount: AmountInput
+  name: NonEmptyString!
   description: String
   button: String
   goal: AmountInput
@@ -15192,6 +15583,8 @@ input TierCreateInput {
   maxQuantity: Int
   minimumAmount: AmountInput
   useStandalonePage: Boolean
+  invoiceTemplate: String
+  singleTicket: Boolean
 }
 
 """
@@ -15241,4 +15634,9 @@ input PersonalTokenReferenceInput {
 input SocialLinkInput {
   type: SocialLinkType!
   url: URL!
+}
+
+type TagResponse {
+  order: Order
+  expense: Expense
 }

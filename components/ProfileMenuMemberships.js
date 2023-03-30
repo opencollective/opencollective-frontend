@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Plus } from '@styled-icons/boxicons-regular';
+import { Plus } from '@styled-icons/boxicons-regular/Plus';
 import { Settings } from '@styled-icons/feather/Settings';
 import { groupBy, isEmpty, uniqBy } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';

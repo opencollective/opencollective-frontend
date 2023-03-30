@@ -59,7 +59,7 @@ export const contributionFlowAccountFieldsFragment = gql`
       contributionPolicy
       platformFeePercent
       platformContributionAvailable
-      contributors(limit: 6) {
+      contributors(limit: 6, roles: [BACKER, ATTENDEE]) {
         totalCount
         nodes {
           id
@@ -162,9 +162,12 @@ export const orderSuccessFragment = gql`
       type
       isHost
       settings
+      socialLinks {
+        type
+      }
       ... on AccountWithContributions {
         # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
-        contributors(limit: 1) {
+        contributors(limit: 1, roles: [BACKER, ATTENDEE]) {
           totalCount
         }
       }
@@ -172,6 +175,10 @@ export const orderSuccessFragment = gql`
         parent {
           id
           slug
+          tags
+          socialLinks {
+            type
+          }
         }
       }
       ... on AccountWithHost {
@@ -184,12 +191,6 @@ export const orderSuccessFragment = gql`
         host {
           id
           ...OrderSuccessHostFragment
-          ... on AccountWithContributions {
-            # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
-            contributors(limit: 1) {
-              totalCount
-            }
-          }
         }
       }
     }

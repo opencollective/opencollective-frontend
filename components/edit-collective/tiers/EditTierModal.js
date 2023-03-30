@@ -3,13 +3,15 @@ import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
-import { omit } from 'lodash';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { isNil, omit } from 'lodash';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { getLegacyIdForCollective } from '../../../lib/collective.lib';
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
+import INTERVALS, { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
+import { getIntervalFromContributionFrequency } from '../../../lib/date-utils';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { requireFields } from '../../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
@@ -81,15 +83,15 @@ function getReceiptTemplates(host) {
   return receiptTemplateTitles;
 }
 
-function FormFields({ collective, types, values }) {
+function FormFields({ collective, values, hideTypeSelect }) {
   const intl = useIntl();
 
   const tierTypeOptions = getTierTypeOptions(intl, collective.type);
   const intervalOptions = [
-    { value: 'onetime', label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) },
+    { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
+    { value: null, label: intl.formatMessage({ id: 'Frequency.OneTime', defaultMessage: 'One time' }) },
     { value: 'month', label: intl.formatMessage({ id: 'Frequency.Monthly', defaultMessage: 'Monthly' }) },
     { value: 'year', label: intl.formatMessage({ id: 'Frequency.Yearly', defaultMessage: 'Yearly' }) },
-    { value: 'flexible', label: intl.formatMessage({ id: 'tier.interval.flexible', defaultMessage: 'Flexible' }) },
   ];
 
   const amountTypeOptions = [
@@ -105,22 +107,27 @@ function FormFields({ collective, types, values }) {
   const taxes = getApplicableTaxes(collective, collective.host, values.type);
 
   const formik = useFormikContext();
-  React.useEffect(() => {
-    if (values.interval === 'flexible') {
-      formik.setFieldValue('amountType', FLEXIBLE);
-    }
-  }, [values.interval]);
 
+  // Enforce certain rules when updating
   React.useEffect(() => {
-    if (values.type === PRODUCT) {
-      formik.setFieldValue('interval', null);
-      formik.setFieldValue('amountType', FIXED);
+    // Flexible amount implies flexible interval, and vice versa
+    if (values.interval === 'flexible' && values.amountType !== FLEXIBLE) {
+      formik.setFieldValue('amountType', FLEXIBLE);
+    } else if (values.amountType === FIXED && values.interval === 'flexible') {
+      formik.setFieldValue('interval', 'onetime');
     }
-  }, [values.type]);
+
+    // No interval for products and tickets
+    if ([PRODUCT, TICKET].includes(values.type)) {
+      formik.setFieldValue('interval', null);
+    }
+  }, [values.interval, values.type]);
+
+  React.useEffect(() => {}, [values.type]);
 
   return (
     <React.Fragment>
-      {(![FUND].includes(collective.type) || types?.length === 1) && (
+      {collective.type !== FUND && !hideTypeSelect && (
         <React.Fragment>
           <StyledInputFormikField
             name="type"
@@ -131,7 +138,7 @@ function FormFields({ collective, types, values }) {
             {({ field, form, loading }) => (
               <StyledSelect
                 inputId={field.name}
-                data-cy={field.name}
+                data-cy={`select-${field.name}`}
                 error={field.error}
                 onBlur={() => form.setFieldTouched(field.name, true)}
                 onChange={({ value }) => form.setFieldValue(field.name, value)}
@@ -163,6 +170,7 @@ function FormFields({ collective, types, values }) {
         label={intl.formatMessage({ id: 'Fields.name', defaultMessage: 'Name' })}
         labelFontWeight="bold"
         mt="3"
+        required
       >
         {({ field }) => <StyledInput data-cy={field.name} placeholder="E.g. Donation" {...field} />}
       </StyledInputFormikField>
@@ -181,18 +189,15 @@ function FormFields({ collective, types, values }) {
       {[DONATION, MEMBERSHIP, TIER, SERVICE].includes(values.type) && (
         <StyledInputFormikField
           name="interval"
-          label={intl.formatMessage({
-            id: 'tier.interval.label',
-            defaultMessage: 'Interval',
-          })}
+          label={intl.formatMessage({ id: 'tier.interval.label', defaultMessage: 'Interval' })}
           labelFontWeight="bold"
           mt="3"
-          required={false}
+          required
         >
           {({ field, form, loading }) => (
             <StyledSelect
               inputId={field.name}
-              data-cy={field.name}
+              data-cy={`select-${field.name}`}
               error={field.error}
               onBlur={() => form.setFieldTouched(field.name, true)}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
@@ -247,7 +252,9 @@ function FormFields({ collective, types, values }) {
               onChange={value =>
                 form.setFieldValue(
                   field.name,
-                  value ? { currency: field.value?.currency ?? collective.currency, valueInCents: value } : null,
+                  !isNil(value) && !isNaN(value)
+                    ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                    : null,
                 )
               }
               onBlur={() => form.setFieldTouched(field.name, true)}
@@ -277,10 +284,7 @@ function FormFields({ collective, types, values }) {
       {values.amountType === FLEXIBLE && (
         <StyledInputFormikField
           name="amount"
-          label={intl.formatMessage({
-            id: 'tier.defaultAmount.label',
-            defaultMessage: 'Default amount',
-          })}
+          label={intl.formatMessage({ id: 'tier.defaultAmount.label', defaultMessage: 'Default amount' })}
           labelFontWeight="bold"
           mt="3"
         >
@@ -297,7 +301,9 @@ function FormFields({ collective, types, values }) {
               onChange={value =>
                 form.setFieldValue(
                   field.name,
-                  value ? { currency: field.value?.currency ?? collective.currency, valueInCents: value } : null,
+                  !isNil(value) && !isNaN(value)
+                    ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                    : null,
                 )
               }
               onBlur={() => form.setFieldTouched(field.name, true)}
@@ -311,7 +317,7 @@ function FormFields({ collective, types, values }) {
           label={intl.formatMessage({ id: 'tier.minimumAmount.label', defaultMessage: 'Minimum amount' })}
           labelFontWeight="bold"
           mt="3"
-          required={false}
+          required
         >
           {({ field, form }) => (
             <StyledInputAmount
@@ -326,7 +332,9 @@ function FormFields({ collective, types, values }) {
               onChange={value =>
                 form.setFieldValue(
                   field.name,
-                  value ? { currency: field.value?.currency ?? collective.currency, valueInCents: value } : null,
+                  !isNil(value) && !isNaN(value)
+                    ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                    : null,
                 )
               }
               onBlur={() => form.setFieldTouched(field.name, true)}
@@ -394,7 +402,9 @@ function FormFields({ collective, types, values }) {
             onChange={value =>
               form.setFieldValue(
                 field.name,
-                value ? { currency: field.value?.currency ?? collective.currency, valueInCents: value } : null,
+                !isNil(value) && !isNaN(value)
+                  ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                  : null,
               )
             }
             onBlur={() => form.setFieldTouched(field.name, true)}
@@ -407,6 +417,33 @@ function FormFields({ collective, types, values }) {
           defaultMessage: 'Amount you aim to raise',
         })}
       </FieldDescription>
+      {values.type === TICKET && (
+        <React.Fragment>
+          <StyledInputFormikField
+            name="singleTicket"
+            label={<FormattedMessage defaultMessage="Single Ticket" />}
+            labelFontWeight="bold"
+            mt="3"
+            flexDirection={'row'}
+            justifyContent={'space-between'}
+            alignItems={'center'}
+          >
+            {({ field, form }) => (
+              <InputSwitch
+                name={field.name}
+                checked={field.value}
+                onChange={event => form.setFieldValue(field.name, event.target.checked)}
+              />
+            )}
+          </StyledInputFormikField>
+          <FieldDescription>
+            <FormattedMessage
+              id="tier.singleTicketDescription"
+              defaultMessage="Only allow people to buy a single ticket per order"
+            />
+          </FieldDescription>
+        </React.Fragment>
+      )}
       {![FUND, PROJECT].includes(collective.type) && (
         <React.Fragment>
           <StyledInputFormikField
@@ -507,7 +544,11 @@ FormFields.propTypes = {
     amountType: PropTypes.string,
     interval: PropTypes.string,
   }),
-  types: PropTypes.array,
+  hideTypeSelect: PropTypes.bool,
+  tier: PropTypes.shape({
+    type: PropTypes.string,
+    singleTicket: PropTypes.bool,
+  }),
 };
 
 const EditSectionContainer = styled(Flex)`
@@ -590,10 +631,10 @@ const ContributeCardPreviewContainer = styled.div`
   }
 `;
 
-export default function EditTierModal({ tier, collective, onClose }) {
+export default function EditTierModal({ tier, collective, onClose, onUpdate, forcedType }) {
   return (
     <ModalContainer onClose={onClose} ignoreEscapeKey>
-      <EditTierForm tier={tier} collective={collective} onClose={onClose} />
+      <EditTierForm tier={tier} collective={collective} onClose={onClose} forcedType={forcedType} onUpdate={onUpdate} />
     </ModalContainer>
   );
 }
@@ -602,6 +643,8 @@ EditTierModal.propTypes = {
   tier: PropTypes.object,
   collective: PropTypes.object,
   onClose: PropTypes.func,
+  onUpdate: PropTypes.func,
+  forcedType: PropTypes.string,
 };
 
 export function ContributeCardPreview({ tier, collective }) {
@@ -632,7 +675,46 @@ ContributeCardPreview.propTypes = {
   collective: PropTypes.object,
 };
 
-const listTierQuery = gql`
+export const editTiersFieldsFragment = gql`
+  fragment EditTiersFields on Tier {
+    id
+    legacyId
+    amount {
+      value
+      valueInCents
+      currency
+    }
+    amountType
+    availableQuantity
+    button
+    customFields
+    description
+    endsAt
+    frequency
+    goal {
+      value
+      valueInCents
+      currency
+    }
+    interval
+    invoiceTemplate
+    maxQuantity
+    minimumAmount {
+      value
+      valueInCents
+      currency
+    }
+    name
+    presets
+    slug
+    type
+    useStandalonePage
+    singleTicket
+    invoiceTemplate
+  }
+`;
+
+export const listTierQuery = gql`
   query AccountTiers($accountSlug: String!) {
     account(slug: $accountSlug) {
       id
@@ -640,113 +722,41 @@ const listTierQuery = gql`
         tiers {
           nodes {
             id
-            legacyId
-            name
-            slug
-            description
-            interval
-            frequency
-            amount {
-              valueInCents
-              currency
-            }
-            minimumAmount {
-              valueInCents
-              currency
-            }
-            goal {
-              valueInCents
-              currency
-            }
-            amountType
-            endsAt
-            type
-            maxQuantity
-            presets
-            button
-            useStandalonePage
+            ...EditTiersFields
+          }
+        }
+      }
+      ... on Organization {
+        tiers {
+          nodes {
+            id
+            ...EditTiersFields
           }
         }
       }
     }
   }
+  ${editTiersFieldsFragment}
 `;
 
 const editTierMutation = gql`
   mutation EditTier($tier: TierUpdateInput!) {
     editTier(tier: $tier) {
       id
-      legacyId
-      slug
-      name
-      description
-      amount {
-        value
-        currency
-        valueInCents
-      }
-      button
-      goal {
-        value
-        currency
-        valueInCents
-      }
-      type
-      interval
-      frequency
-      presets
-      maxQuantity
-      availableQuantity
-      customFields
-      amountType
-      minimumAmount {
-        value
-        currency
-        valueInCents
-      }
-      endsAt
-      invoiceTemplate
-      useStandalonePage
+      ...EditTiersFields
     }
   }
+  ${editTiersFieldsFragment}
 `;
 
 const createTierMutation = gql`
   mutation CreateTier($tier: TierCreateInput!, $account: AccountReferenceInput!) {
     createTier(tier: $tier, account: $account) {
       id
-      legacyId
-      slug
-      name
-      description
-      amount {
-        value
-        currency
-        valueInCents
-      }
-      button
-      goal {
-        value
-        currency
-        valueInCents
-      }
-      type
-      interval
-      presets
-      maxQuantity
-      availableQuantity
-      customFields
-      amountType
-      minimumAmount {
-        value
-        currency
-        valueInCents
-      }
-      endsAt
-      invoiceTemplate
-      useStandalonePage
+      ...EditTiersFields
     }
   }
+  ${editTiersFieldsFragment}
 `;
 
 const deleteTierMutation = gql`
@@ -757,32 +767,42 @@ const deleteTierMutation = gql`
   }
 `;
 
-const i18nMessages = defineMessages({
-  EDIT_SUCCESS: { id: 'EditTier.Edit.Success', defaultMessage: 'Tier updated.' },
-  CREATE_SUCCESS: { id: 'EditTier.Create.Success', defaultMessage: 'Tier created.' },
-  DELETE_SUCCESS: { id: 'EditTier.Delete.Success', defaultMessage: 'Tier deleted.' },
-});
+const getRequiredFields = values => {
+  const fields = ['name', 'type', 'amountType'];
 
-export function EditTierForm({ tier, collective, onClose }) {
+  // Depending on amount type
+  if (values.amountType === 'FIXED') {
+    fields.push('amount');
+  } else if (values.amountType === 'FLEXIBLE') {
+    fields.push('minimumAmount');
+  }
+
+  return fields;
+};
+
+export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
   const intl = useIntl();
   const isEditing = React.useMemo(() => !!tier?.id);
   const initialValues = React.useMemo(() => {
     if (isEditing) {
       return {
-        ...omit(tier, ['__typename', 'endsAt', 'slug', 'legacyId']),
+        ...omit(tier, ['__typename', 'endsAt', 'slug', 'legacyId', 'customFields', 'availableQuantity']),
         amount: omit(tier.amount, '__typename'),
+        interval: getIntervalFromContributionFrequency(tier.frequency),
         goal: omit(tier.goal, '__typename'),
         minimumAmount: omit(tier.minimumAmount, '__typename'),
         description: tier.description || '',
         presets: tier.presets || [1000],
+        invoiceTemplate: tier.invoiceTemplate,
       };
     } else {
       return {
         name: '',
-        type: null,
-        amountType: null,
+        type: forcedType || TierTypes.TIER,
+        amountType: AmountTypes.FIXED,
         amount: null,
-        interval: null,
+        minimumAmount: null,
+        interval: INTERVALS.month,
         description: '',
         presets: [1000],
       };
@@ -793,41 +813,22 @@ export function EditTierForm({ tier, collective, onClose }) {
 
   const [submitFormMutation] = useMutation(formMutation, {
     context: API_V2_CONTEXT,
-    variables: {
-      account: {
-        legacyId: collective.id,
-      },
+    update: cache => {
+      // Invalidate the cache for the collective page query to make sure we'll fetch the latest data next time we visit
+      const __typename = collective.type === CollectiveType.EVENT ? 'Event' : 'Collective';
+      const cachedCollective = cache.identify({ __typename, id: getLegacyIdForCollective(collective) });
+      if (cachedCollective) {
+        cache.modify({
+          id: cachedCollective,
+          fields: {
+            tiers: (_, { DELETE }) => DELETE,
+          },
+        });
+      }
     },
-    refetchQueries: [
-      {
-        query: listTierQuery,
-        context: API_V2_CONTEXT,
-        variables: {
-          accountSlug: collective.slug,
-        },
-      },
-    ],
-    awaitRefetchQueries: true,
   });
 
-  const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation, {
-    context: API_V2_CONTEXT,
-    variables: {
-      tier: {
-        id: tier?.id,
-      },
-    },
-    refetchQueries: [
-      {
-        query: listTierQuery,
-        context: API_V2_CONTEXT,
-        variables: {
-          accountSlug: collective.slug,
-        },
-      },
-    ],
-    awaitRefetchQueries: true,
-  });
+  const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation, { context: API_V2_CONTEXT });
 
   const [isConfirmingDelete, setIsConfirmingDelete] = React.useState(false);
   const { addToast } = useToasts();
@@ -841,13 +842,22 @@ export function EditTierForm({ tier, collective, onClose }) {
       try {
         await deleteTier({
           variables: {
+            tier: { id: tier.id },
             stopRecurringContributions: !keepRecurringContributions,
+          },
+          update: cache => {
+            cache.evict({ id: cache.identify(tier) }); // Evict from GraphQL V1
+            cache.evict({ id: cache.identify({ __typename: 'Tier', id: tier.legacyId }) }); // Evict from GraphQL V2
+            cache.gc();
           },
         });
         onClose();
         addToast({
           type: TOAST_TYPE.SUCCESS,
-          message: intl.formatMessage(i18nMessages['DELETE_SUCCESS']),
+          message: intl.formatMessage(
+            { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} deleted.' },
+            { type: tier.type },
+          ),
         });
       } catch (e) {
         addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e.message) });
@@ -862,26 +872,32 @@ export function EditTierForm({ tier, collective, onClose }) {
     <React.Fragment>
       <Formik
         initialValues={initialValues}
-        validate={values => requireFields(values, ['name', 'type', 'amountType', 'amount'])}
+        validate={values => requireFields(values, getRequiredFields(values))}
         onSubmit={async values => {
           const tier = {
-            ...omit(values, 'interval'),
+            ...omit(values, ['interval']),
             frequency: getGQLV2FrequencyFromInterval(values.interval),
             maxQuantity: parseInt(values.maxQuantity),
-            goal: values?.goal?.valueInCents ? values.goal : null,
-            amount: values?.amount?.valueInCents ? values.amount : null,
-            minimumAmount: values?.minimumAmount?.valueInCents ? values.minimumAmount : null,
+            goal: !isNil(values?.goal?.valueInCents) ? values.goal : null,
+            amount: !isNil(values?.amount?.valueInCents) ? values.amount : null,
+            minimumAmount: !isNil(values?.minimumAmount?.valueInCents) ? values.minimumAmount : null,
+            singleTicket: values?.singleTicket,
           };
 
           try {
-            await submitFormMutation({
-              variables: {
-                tier,
-              },
-            });
+            const result = await submitFormMutation({ variables: { tier, account: { legacyId: collective.id } } });
+            onUpdate?.(result);
             addToast({
               type: TOAST_TYPE.SUCCESS,
-              message: intl.formatMessage(i18nMessages[isEditing ? 'EDIT_SUCCESS' : 'CREATE_SUCCESS']),
+              message: isEditing
+                ? intl.formatMessage(
+                    { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} updated.' },
+                    { type: values.type },
+                  )
+                : intl.formatMessage(
+                    { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} created.' },
+                    { type: values.type },
+                  ),
             });
             onClose();
           } catch (e) {
@@ -891,18 +907,29 @@ export function EditTierForm({ tier, collective, onClose }) {
       >
         {({ values, isSubmitting }) => {
           return (
-            <Form>
+            <Form data-cy="edit-tier-modal-form">
               <ModalHeader onClose={onClose} hideCloseIcon>
                 {isEditing ? (
-                  <FormattedMessage id="modal.edit-tier.title" defaultMessage="Edit Tier" />
+                  <FormattedMessage
+                    defaultMessage="Edit {type, select, TICKET {Ticket} other {Tier}}"
+                    values={{ type: tier.type }}
+                  />
                 ) : (
-                  <FormattedMessage id="modal.create-tier.title" defaultMessage="Create Tier" />
+                  <FormattedMessage
+                    defaultMessage="Create {type, select, TICKET {Ticket} other {Tier}}"
+                    values={{ type: forcedType }}
+                  />
                 )}
               </ModalHeader>
               <ModalBody>
                 <ModalSectionContainer>
                   <EditSectionContainer>
-                    <FormFields collective={collective} values={values} />
+                    <FormFields
+                      collective={collective}
+                      values={values}
+                      tier={tier}
+                      hideTypeSelect={Boolean(forcedType)}
+                    />
                   </EditSectionContainer>
                   <PreviewSectionContainer>
                     <ContributeCardPreview collective={collective} tier={values} />
@@ -956,6 +983,7 @@ export function EditTierForm({ tier, collective, onClose }) {
       </Formik>
       {isConfirmingDelete && (
         <ConfirmTierDeleteModal
+          tier={tier}
           isDeleting={isDeleting}
           onClose={() => setIsConfirmingDelete(false)}
           onConfirmDelete={onConfirmDelete}
@@ -969,4 +997,6 @@ EditTierForm.propTypes = {
   collective: PropTypes.object,
   tier: PropTypes.object,
   onClose: PropTypes.func,
+  onUpdate: PropTypes.func,
+  forcedType: PropTypes.string,
 };

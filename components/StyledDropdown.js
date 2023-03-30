@@ -101,6 +101,7 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
     <div
       role="button"
       tabIndex={0}
+      // eslint-disable-next-line react/no-unknown-property
       trigger={trigger}
       {...props}
       onFocus={() => setTimeout(() => setDisplayed(true), 50)}

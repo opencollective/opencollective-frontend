@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
+import { truncate } from 'lodash';
 import { injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -119,7 +120,7 @@ class PayWithPaypalButton extends Component {
     // Initialize button
     const { host, currency } = this.props;
     const clientId = host.paypalClientId;
-    const intent = isRecurring ? 'subscription' : 'capture';
+    const intent = isRecurring ? 'subscription' : 'authorize';
     const paypal = await getPaypal({ clientId, currency, intent });
     const options = this.getOptions();
     paypal.Buttons(options).render(this.paypalTarget.current);
@@ -146,7 +147,7 @@ class PayWithPaypalButton extends Component {
           plan_id: this.props.data.paypalPlan.id,
           start_time: this.props.subscriptionStartDate,
           application_context: {
-            brand_name: `${this.props.collective.name} - Open Collective`,
+            brand_name: `${truncate(this.props.collective.name, { length: 108 })} - Open Collective`,
             locale: this.props.intl.locale,
             shipping_preference: 'NO_SHIPPING',
             user_action: 'CONTINUE',
@@ -157,12 +158,12 @@ class PayWithPaypalButton extends Component {
         this.props.onSuccess({ subscriptionId: data.subscriptionID });
       };
     } else {
-      options.intent = 'capture';
+      options.intent = 'authorize';
       options.createOrder = (data, actions) => {
         return actions.order.create({
-          intent: 'CAPTURE',
+          intent: 'AUTHORIZE',
           application_context: {
-            brand_name: `${this.props.collective.name} - Open Collective`,
+            brand_name: `${truncate(this.props.collective.name, { length: 108 })} - Open Collective`,
             locale: this.props.intl.locale,
             shipping_preference: 'NO_SHIPPING',
             user_action: 'CONTINUE',

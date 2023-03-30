@@ -1,15 +1,21 @@
-require('./env');
+// This file sets a custom webpack configuration to use your Next.js app
+// with Sentry.
+// https://nextjs.org/docs/api-reference/next.config.js/introduction
+// https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+const { withSentryConfig } = require('@sentry/nextjs');
 
+const path = require('path');
+require('./env');
 const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
-  useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true',
+  useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true' || process.env.API_PROXY !== 'true',
   productionBrowserSourceMaps: true,
   images: {
     disableStaticImages: true,
   },
-  webpack: (config, { webpack, isServer, buildId }) => {
+  webpack: (config, { webpack, buildId }) => {
     config.plugins.push(
       // Ignore __tests__
       new webpack.IgnorePlugin({ resourceRegExp: /[\\/]__tests__[\\/]/ }),
@@ -32,6 +38,7 @@ const nextConfig = {
         HCAPTCHA_SITEKEY: false,
         CAPTCHA_ENABLED: false,
         CAPTCHA_PROVIDER: 'HCAPTCHA',
+        SENTRY_TRACES_SAMPLE_RATE: null,
       }),
     );
 
@@ -41,23 +48,16 @@ const nextConfig = {
       }),
     );
 
-    // XXX See https://github.com/zeit/next.js/blob/canary/examples/with-sentry-simple/next.config.js
-    // In `pages/_app.js`, Sentry is imported from @sentry/node. While
-    // @sentry/browser will run in a Node.js environment, @sentry/node will use
-    // Node.js-only APIs to catch even more unhandled exceptions.
-    //
-    // This works well when Next.js is SSRing your page on a server with
-    // Node.js, but it is not what we want when your client-side bundle is being
-    // executed by a browser.
-    //
-    // Luckily, Next.js will call this webpack function twice, once for the
-    // server and once for the client. Read more:
-    // https://nextjs.org/docs#customizing-webpack-config
-    //
-    // So ask Webpack to replace @sentry/node imports with @sentry/browser when
-    // building the browser's bundle
-    if (!isServer) {
-      config.resolve.alias['@sentry/node'] = '@sentry/browser';
+    if (['ci', 'test', 'development'].includes(process.env.OC_ENV)) {
+      // eslint-disable-next-line node/no-unpublished-require
+      const CircularDependencyPlugin = require('circular-dependency-plugin');
+      config.plugins.push(
+        new CircularDependencyPlugin({
+          include: /components|pages|server/,
+          failOnError: true,
+          cwd: process.cwd(),
+        }),
+      );
     }
 
     if (process.env.WEBPACK_BUNDLE_ANALYZER) {
@@ -78,7 +78,7 @@ const nextConfig = {
 
     // Configuration for images
     config.module.rules.unshift({
-      test: /public\/.*\/images[\\/].*\.(jpg|gif|png|svg)$/,
+      test: /\.(jpg|gif|png|svg)$/,
       use: {
         loader: 'file-loader',
         options: {
@@ -88,6 +88,7 @@ const nextConfig = {
           esModule: false,
         },
       },
+      include: [path.resolve(__dirname, 'public')],
     });
 
     // Configuration for static/marketing pages
@@ -101,13 +102,14 @@ const nextConfig = {
 
     // Load images in base64
     config.module.rules.push({
-      test: /components\/.*\.(svg|png|jpg|gif)$/,
+      test: /\.(svg|png|jpg|gif)$/,
       use: {
         loader: 'url-loader',
         options: {
           limit: 1000000,
         },
       },
+      include: [path.resolve(__dirname, 'components')],
     });
 
     if (['ci', 'e2e'].includes(process.env.OC_ENV)) {
@@ -210,4 +212,15 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+// Bypasses conflict bug between @sentry/nextjs and depcheck
+const isDepcheck = process.argv[1]?.includes('.bin/depcheck');
+
+module.exports = isDepcheck
+  ? nextConfig
+  : withSentryConfig({
+      ...nextConfig,
+      sentry: {
+        disableServerWebpackPlugin: true,
+        disableClientWebpackPlugin: true,
+      },
+    });

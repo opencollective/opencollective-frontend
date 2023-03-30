@@ -126,11 +126,12 @@ class CreateFundForm extends React.Component {
                 id="createFund.subtitle.introduce"
                 defaultMessage="Apply for Fiscal Sponsorship below. We will review your application shortly. {faqLink}"
                 values={{
-                  faqLink: host.faqUrl ? (
-                    <StyledLink href={host.faqUrl} openInNewTab>
-                      <FormattedMessage id="createFund.subtitle.faq" defaultMessage="FAQ here." />
-                    </StyledLink>
-                  ) : null,
+                  faqLink:
+                    host && host.faqUrl ? (
+                      <StyledLink href={host.faqUrl} openInNewTab>
+                        <FormattedMessage id="createFund.subtitle.faq" defaultMessage="FAQ here." />
+                      </StyledLink>
+                    ) : null,
                 }}
               />
             </P>

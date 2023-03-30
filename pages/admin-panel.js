@@ -1,6 +1,6 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
-import { useRouter } from 'next/router';
+import PropTypes from 'prop-types';
+import { useQuery } from '@apollo/client';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { isHostAccount } from '../lib/collective.lib';
@@ -12,77 +12,15 @@ import { require2FAForAdmins } from '../lib/policies';
 import { AdminPanelContext } from '../components/admin-panel/AdminPanelContext';
 import AdminPanelSection from '../components/admin-panel/AdminPanelSection';
 import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/admin-panel/constants';
+import { adminPanelQuery } from '../components/admin-panel/queries';
 import AdminPanelSideBar from '../components/admin-panel/SideBar';
 import AdminPanelTopBar from '../components/admin-panel/TopBar';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
+import AuthenticatedPage from '../components/AuthenticatedPage';
 import { Flex, Grid } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
-import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
-
-export const adminPanelQuery = gql`
-  query AdminPanel($slug: String!) {
-    account(slug: $slug) {
-      id
-      legacyId
-      slug
-      name
-      isHost
-      type
-      settings
-      isArchived
-      isIncognito
-      imageUrl(height: 256)
-      features {
-        id
-        ...NavbarFields
-        VIRTUAL_CARDS
-        USE_PAYMENT_METHODS
-        EMIT_GIFT_CARDS
-      }
-      policies {
-        REQUIRE_2FA_FOR_ADMINS
-      }
-      ... on AccountWithParent {
-        parent {
-          id
-          slug
-          policies {
-            REQUIRE_2FA_FOR_ADMINS
-          }
-        }
-      }
-      ... on AccountWithHost {
-        hostFeePercent
-        host {
-          id
-          slug
-          name
-          settings
-          policies {
-            EXPENSE_AUTHOR_CANNOT_APPROVE {
-              enabled
-              amountInCents
-              appliesToHostedCollectives
-              appliesToSingleAdminCollectives
-            }
-            COLLECTIVE_MINIMUM_ADMINS {
-              numberOfAdmins
-              applies
-              freeze
-            }
-          }
-        }
-      }
-      ... on AccountWithHost {
-        isApproved
-      }
-    }
-  }
-  ${collectiveNavbarFieldsFragment}
-`;
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -106,15 +44,12 @@ const messages = defineMessages({
 const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return ALL_SECTIONS.INFO;
-  }
-
-  const isAdmin = loggedInUser?.isAdminOfCollective(account);
-  const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
-  const isAccountantOnly = !isAdmin && isAccountant;
-  if (isHostAccount(account)) {
-    return isAccountantOnly ? ALL_SECTIONS.REPORTS : ALL_SECTIONS.EXPENSES;
+  } else if (isHostAccount(account)) {
+    return ALL_SECTIONS.EXPENSES;
   } else {
-    return isAccountantOnly ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.INFO;
+    const isAdmin = loggedInUser?.isAdminOfCollective(account);
+    const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
+    return !isAdmin && isAccountant ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.INFO;
   }
 };
 
@@ -162,9 +97,7 @@ const getIsAccountantOnly = (LoggedInUser, account) => {
   return LoggedInUser && !LoggedInUser.isAdminOfCollective(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account);
 };
 
-const AdminPanelPage = () => {
-  const router = useRouter();
-  const { slug, section, subpath } = router.query;
+const AdminPanelPage = ({ slug, section, subpath }) => {
   const intl = useIntl();
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
@@ -180,7 +113,7 @@ const AdminPanelPage = () => {
 
   return (
     <AdminPanelContext.Provider value={{ selectedSection }}>
-      <Page noRobots collective={account} title={account ? `${account.name} - ${titleBase}` : titleBase}>
+      <AuthenticatedPage noRobots collective={account} title={account ? `${account.name} - ${titleBase}` : titleBase}>
         {!blocker && (
           <AdminPanelTopBar
             isLoading={isLoading}
@@ -207,6 +140,7 @@ const AdminPanelPage = () => {
             m="0 auto"
             px={3}
             py={4}
+            data-cy="admin-panel-container"
           >
             <AdminPanelSideBar
               isLoading={isLoading}
@@ -227,13 +161,22 @@ const AdminPanelPage = () => {
             )}
           </Grid>
         )}
-      </Page>
+      </AuthenticatedPage>
     </AdminPanelContext.Provider>
   );
 };
 
-AdminPanelPage.getInitialProps = () => {
+AdminPanelPage.propTypes = {
+  slug: PropTypes.string,
+  section: PropTypes.string,
+  subpath: PropTypes.string,
+};
+
+AdminPanelPage.getInitialProps = async ({ query: { slug, section = null, subpath = null } }) => {
   return {
+    slug,
+    section,
+    subpath,
     scripts: { googleMaps: true }, // TODO: This should be enabled only for events
   };
 };

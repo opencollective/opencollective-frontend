@@ -18,8 +18,6 @@ import { withUser } from '../UserProvider';
 
 const ContributorCardWithTier = ({ contribution, ...props }) => {
   const collective = contribution.toAccount;
-  const contributors =
-    collective.isHost && collective.host.contributors ? collective.host.contributors : collective.contributors;
   const pendingOrder = contribution.status === ORDER_STATUS.PENDING;
 
   const tagMessages = {
@@ -53,7 +51,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
               values={{
                 contributors: (
                   <span style={{ color: 'black.900' }}>
-                    <b>{contributors.totalCount || 1}</b>
+                    <b>{collective.contributors?.totalCount || 1}</b>
                   </span>
                 ),
               }}

@@ -40,16 +40,10 @@ const getSignInLinkQueryParams = email => {
   return email ? { ...params, email } : params;
 };
 
-const StepProfileGuestForm = ({ stepDetails, onChange, data, defaultEmail, defaultName, isEmbed, onSignInClick }) => {
+const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInClick }) => {
   const totalAmount = getTotalAmount(stepDetails);
   const dispatchChange = (field, value) => onChange({ stepProfile: set({ ...data, isGuest: true }, field, value) });
   const dispatchGenericEvent = e => dispatchChange(e.target.name, e.target.value);
-
-  React.useEffect(() => {
-    if (!data && (defaultName || defaultEmail)) {
-      onChange({ stepProfile: { ...data, isGuest: true, name: defaultName || '', email: defaultEmail || '' } });
-    }
-  }, [defaultEmail, defaultName]);
 
   return (
     <Container border="none" width={1} pb={3}>

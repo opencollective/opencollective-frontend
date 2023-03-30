@@ -30,18 +30,22 @@ const processPendingOrderMutation = gql`
 
 const ButtonLabel = styled.span({ marginLeft: 6 });
 
+const usablePermissions = ['canMarkAsPaid', 'canMarkAsExpired'];
+
 /**
  * A small helper to know if expense process buttons should be displayed
  */
 export const hasProcessButtons = permissions => {
-  return Object.values(permissions).some(Boolean);
+  return Object.keys(permissions).some(
+    permission => usablePermissions.includes(permission) && Boolean(permissions[permission]),
+  );
 };
 
 /**
  * All the buttons to process an expense, displayed in a React.Fragment to let the parent
  * in charge of the layout.
  */
-const ProcessOrderButtons = ({ order, permissions }) => {
+const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
   const [selectedAction, setSelectedAction] = React.useState(null);
@@ -60,6 +64,7 @@ const ProcessOrderButtons = ({ order, permissions }) => {
     setConfirm(false);
     try {
       await processOrder({ variables: { id: order.id, action } });
+      onSuccess?.();
     } catch (e) {
       addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
     }
@@ -111,6 +116,11 @@ const ProcessOrderButtons = ({ order, permissions }) => {
           continueHandler={() => triggerAction(selectedAction)}
           isDanger={selectedAction === 'MARK_AS_EXPIRED'}
           isSuccess={selectedAction === 'MARK_AS_PAID'}
+          continueLabel={
+            selectedAction === 'MARK_AS_EXPIRED' ? (
+              <FormattedMessage id="order.markAsExpired" defaultMessage="Mark as expired" />
+            ) : undefined
+          }
           header={
             selectedAction === 'MARK_AS_PAID' ? (
               <FormattedMessage id="Order.MarkPaidConfirm" defaultMessage="Mark this order as paid?" />
@@ -119,16 +129,26 @@ const ProcessOrderButtons = ({ order, permissions }) => {
             )
           }
         >
-          {selectedAction === 'MARK_AS_PAID' ? (
+          {selectedAction === 'MARK_AS_PAID' && (
             <FormattedMessage
               id="Order.MarkPaidConfirmDetails"
               defaultMessage="Confirm you have received the funds for this contribution."
             />
-          ) : null}
+          )}
+          {selectedAction === 'MARK_AS_EXPIRED' && (
+            <FormattedMessage
+              id="Order.MarkPaidExpiredDetails"
+              defaultMessage="This contribution will be marked as expired removed from Pending Contributions. You can find this page by searching for its ID in the search bar or through the status filter in the Financial Contributions page."
+            />
+          )}
         </ConfirmationModal>
       )}
       {showContributionConfirmationModal && (
-        <ContributionConfirmationModal order={order} onClose={() => setShowContributionConfirmationModal(false)} />
+        <ContributionConfirmationModal
+          order={order}
+          onClose={() => setShowContributionConfirmationModal(false)}
+          onSuccess={onSuccess}
+        />
       )}
     </React.Fragment>
   );

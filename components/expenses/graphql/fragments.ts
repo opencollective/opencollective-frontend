@@ -187,6 +187,11 @@ export const expensePageExpenseFieldsFragment = gql`
       id
       url
       name
+      info {
+        id
+        name
+        size
+      }
     }
     payee {
       id
@@ -429,6 +434,9 @@ export const expensesListFieldsFragment = gql`
     createdAt
     tags
     amount
+    comments {
+      totalCount
+    }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
       currency

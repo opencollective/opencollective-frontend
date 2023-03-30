@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
-import { Exit } from '@styled-icons/boxicons-regular';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronRight } from '@styled-icons/boxicons-regular/ChevronRight';
+import { Exit } from '@styled-icons/boxicons-regular/Exit';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -157,6 +157,12 @@ class TopBarProfileMenu extends React.Component {
     main.addEventListener('click', this.onClickOutside);
     if (!getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN)) {
       this.setState({ loading: false });
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!prevProps.LoggedInUser && this.props.LoggedInUser) {
+      this.setState({ status: 'loggedin' });
     }
   }
 

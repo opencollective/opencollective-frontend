@@ -20,6 +20,7 @@ import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
+import Tags from '../Tags';
 import { H1, H4, P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
@@ -27,7 +28,6 @@ import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseMoreActionsButton from './ExpenseMoreActionsButton';
 import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseStatusTag from './ExpenseStatusTag';
-import ExpenseTags from './ExpenseTags';
 import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
 
 export const SummaryHeader = styled(H1)`
@@ -120,7 +120,7 @@ const ExpenseSummary = ({
           )}
         </Flex>
       </Flex>
-      <ExpenseTags expense={expense} isLoading={isLoading} canEdit={canEditTags} suggestedTags={suggestedTags} />
+      <Tags expense={expense} isLoading={isLoading} canEdit={canEditTags} suggestedTags={suggestedTags} />
       <Flex alignItems="center" mt={3}>
         {isLoading ? (
           <LoadingPlaceholder height={24} width={200} />
@@ -231,7 +231,8 @@ const ExpenseSummary = ({
                             item: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
                           }}
                         />{' '}
-                        <FormattedDate value={attachment.incurredAt} />
+                        {/* Using timeZone=UTC as we only store the date as a UTC string, without time */}
+                        <FormattedDate value={attachment.incurredAt} dateStyle="long" timeZone="UTC" />{' '}
                       </Span>
                     )}
                   </Flex>
@@ -295,11 +296,20 @@ const ExpenseSummary = ({
           mt={4}
           pt={12}
         >
-          <ExpenseMoreActionsButton onEdit={onEdit} expense={expense} mt={['16px', null, '8px']} />
+          <ExpenseMoreActionsButton
+            onEdit={onEdit}
+            expense={expense}
+            mt={['16px', null, '8px']}
+            onDelete={() => {
+              onDelete?.(expense);
+              onClose?.();
+            }}
+          />
           {Boolean(showProcessButtons && existsInAPI && collective && hasProcessButtons(expense?.permissions)) && (
             <Flex flexWrap="wrap">
               <ProcessExpenseButtons
                 expense={expense}
+                isMoreActions
                 permissions={expense?.permissions}
                 collective={collective}
                 host={host}

@@ -42,7 +42,7 @@ Currency.propTypes = {
   /** The amount to display, in cents */
   value: PropTypes.number.isRequired,
   /** The currency (eg. `USD`, `EUR`...etc) */
-  currency: PropTypes.string.isRequired,
+  currency: PropTypes.string,
   /** Format the currency value to display with separators such as 100,000 instead of 100000 */
   formatWithSeparators: PropTypes.bool,
   /** How many numbers should we display after the comma. When `auto` is given, decimals are only displayed if necessary. */

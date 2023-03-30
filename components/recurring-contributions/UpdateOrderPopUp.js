@@ -117,6 +117,7 @@ const useUpdateOrder = ({ contribution, onSuccess }) => {
             },
             tier: {
               id: selectedTier?.id || null,
+              isCustom: !selectedTier,
             },
           },
         });

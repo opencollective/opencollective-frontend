@@ -3,15 +3,16 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
+import { map, omit } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
-import { isURL, matches } from 'validator';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
-import { compose } from '../../lib/utils';
+import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
+import { compose, isValidUrl } from '../../lib/utils';
 
 import Container from '../../components/Container';
 import MessageBox from '../../components/MessageBox';
@@ -150,7 +151,6 @@ class OnboardingModal extends React.Component {
     };
 
     this.messages = defineMessages({
-      twitterError: { id: 'onboarding.error.twitter', defaultMessage: 'Please enter a valid Twitter handle.' },
       websiteError: { id: 'onboarding.error.website', defaultMessage: 'Please enter a valid URL.' },
     });
   }
@@ -242,17 +242,10 @@ class OnboardingModal extends React.Component {
   validateFormik = values => {
     const errors = {};
 
-    if (values.website !== '' && isURL(values.website) === false) {
-      errors.website = this.props.intl.formatMessage(this.messages['websiteError']);
-    }
+    const isValidSocialLinks = values.socialLinks?.filter(l => !isValidUrl(l.url))?.length === 0;
 
-    if (values.repositoryUrl && !isURL(values.repositoryUrl)) {
-      errors.repositoryUrl = this.props.intl.formatMessage(this.messages.websiteError);
-    }
-
-    // https://stackoverflow.com/questions/11361044/twitter-name-validation
-    if (values.twitterHandle !== '' && matches(values.twitterHandle, /^[a-zA-Z0-9_]{1,15}$/) === false) {
-      errors.twitterHandle = this.props.intl.formatMessage(this.messages['twitterError']);
+    if (!isValidSocialLinks) {
+      errors.socialLinks = this.props.intl.formatMessage(this.messages.websiteError);
     }
 
     return errors;
@@ -330,15 +323,21 @@ class OnboardingModal extends React.Component {
                   validate={this.validateFormik}
                   validateOnBlur={true}
                   initialValues={{
-                    website: collective.website?.replace(/^https?:\/\//, '') || '',
-                    twitterHandle: collective.twitterHandle || '',
-                    repositoryUrl: collective.repositoryUrl?.replace(/^https?:\/\//, '') || '',
+                    socialLinks:
+                      collective.socialLinks?.length !== 0
+                        ? map(collective.socialLinks, sl => omit(sl, '__typename'))
+                        : [
+                            {
+                              type: SocialLinkType.WEBSITE,
+                              url: '',
+                            },
+                          ],
                   }}
                   onSubmit={values => {
                     this.submitCollectiveInfo(values);
                   }}
                 >
-                  {({ values, handleSubmit, errors, touched }) => (
+                  {({ values, handleSubmit, errors, touched, setFieldValue, setFieldTouched }) => (
                     <FormWithStyles>
                       <ResponsiveModalBody>
                         <Flex flexDirection="column" alignItems="center">
@@ -357,6 +356,8 @@ class OnboardingModal extends React.Component {
                             values={values}
                             errors={errors}
                             touched={touched}
+                            setFieldValue={setFieldValue}
+                            setFieldTouched={setFieldTouched}
                             memberInvitations={data?.memberInvitations || []}
                           />
                           {error && (
@@ -416,9 +417,10 @@ const editCollectiveContactMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveContact($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
       id
-      website
-      twitterHandle
-      repositoryUrl
+      socialLinks {
+        type
+        url
+      }
     }
   }
 `;

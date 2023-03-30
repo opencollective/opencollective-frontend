@@ -191,7 +191,8 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     isSearchable = isSearchable ?? options?.length > 8;
     return {
       isSearchable,
-      menuPortalTarget: menuPortalTarget === null || typeof document === 'undefined' ? undefined : document.body,
+      menuPortalTarget:
+        menuPortalTarget || (menuPortalTarget === null || typeof document === 'undefined' ? undefined : document.body),
       isDisabled: disabled || isDisabled,
       placeholder: placeholder || intl.formatMessage(Messages.placeholder),
       loadingMessage: () => intl.formatMessage(Messages.loading),
@@ -300,12 +301,19 @@ type StyledSelectCustomComponent = Select &
       SpaceProps & {
         intl: IntlShape;
         /** Alias for isDisabled */
+        inputId: string;
         disabled?: boolean;
         useSearchIcon?: boolean;
         hideDropdownIndicator?: boolean;
         hideMenu?: boolean;
         error?: boolean;
-        style: Record<string, unknown>;
+        style?: Record<string, unknown>;
+        onBlur?: Function;
+        onChange?: Function;
+        isLoading?: boolean;
+        isSearchable?: boolean;
+        options?: any;
+        value?: any;
       }
   >;
 

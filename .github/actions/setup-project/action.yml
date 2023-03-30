@@ -7,17 +7,14 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Get Node version from package.json
-      shell: bash
-      id: parse_package_json
-      run: |
-        result=`jq -r '.engines.node' package.json`
-        echo "::set-output name=node_version::$result"
-
     - name: Setup node
       uses: actions/setup-node@v3
       with:
-        node-version: ${{steps.parse_package_json.outputs.node_version}}
+        node-version-file: 'package.json'
+
+    - name: Force NPM version (this step can be moved once Vercel defaults to node 18.14)
+      shell: bash
+      run: npm install -g npm@8.19.2
 
     - name: Restore node_modules
       uses: actions/cache@v3

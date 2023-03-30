@@ -82,6 +82,10 @@ export const budgetSectionQuery = gql`
       nodes {
         id
         ...ExpensesListFieldsFragment
+        host {
+          id
+          ...ExpenseHostFields
+        }
       }
     }
     account(slug: $slug) {
@@ -91,6 +95,7 @@ export const budgetSectionQuery = gql`
   }
   ${transactionsQueryCollectionFragment}
   ${expensesListFieldsFragment}
+  ${expenseHostFields}
   ${budgetSectionAccountFieldsFragment}
 `;
 
@@ -110,6 +115,10 @@ export const budgetSectionForIndividualQuery = gql`
       nodes {
         id
         ...ExpensesListFieldsFragment
+        host {
+          id
+          ...ExpenseHostFields
+        }
       }
     }
     account(slug: $slug) {
@@ -131,14 +140,11 @@ export const budgetSectionForIndividualQuery = gql`
   }
   ${transactionsQueryCollectionFragment}
   ${expensesListFieldsFragment}
+  ${expenseHostFields}
 `;
 
 export const budgetSectionWithHostQuery = gql`
-  query BudgetSectionWithHost($slug: String!, $hostSlug: String!, $limit: Int!, $kind: [TransactionKind]) {
-    host(slug: $hostSlug) {
-      id
-      ...ExpenseHostFields
-    }
+  query BudgetSectionWithHost($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
     transactions(
       account: { slug: $slug }
       limit: $limit
@@ -159,6 +165,12 @@ export const budgetSectionWithHostQuery = gql`
     account(slug: $slug) {
       id
       ...BudgetSectionAccountFields
+      ... on AccountWithHost {
+        host {
+          id
+          ...ExpenseHostFields
+        }
+      }
     }
   }
   ${transactionsQueryCollectionFragment}
@@ -177,7 +189,6 @@ export const getBudgetSectionQuery = (hasHost, isIndividual) => {
   }
 };
 
-// Any change here should be reflected in API's `server/graphql/cache.js`
 export const getBudgetSectionQueryVariables = (collectiveSlug, hostSlug, isIndividual) => {
   if (isIndividual) {
     return { slug: collectiveSlug, limit: 3, kind: getDefaultKinds().filter(kind => kind !== TransactionKind.EXPENSE) };
@@ -236,9 +247,16 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions, isIndiv
         data-cy="view-all-expenses-link"
       >
         <span>
-          <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
-          &rarr;
+          <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />
+          &nbsp; &rarr;
         </span>
+      </Link>
+    );
+  } else if (isFilterAll && isIndividual) {
+    return (
+      <Link href={`${getCollectivePageRoute(collective)}/transactions`} data-cy="view-all-transactions-link">
+        <FormattedMessage id="transactions.viewAll" defaultMessage="View All Transactions" />
+        &nbsp; &rarr;
       </Link>
     );
   } else if (filter === 'transactions' || (isFilterAll && hasTransactions && !hasExpenses)) {
@@ -250,8 +268,8 @@ const ViewAllLink = ({ collective, filter, hasExpenses, hasTransactions, isIndiv
         <FormattedMessage
           id="CollectivePage.SectionBudget.ViewAllContributions"
           defaultMessage="View all contributions"
-        />{' '}
-        &rarr;
+        />
+        &nbsp; &rarr;
       </Link>
     ) : (
       <Link href={`${getCollectivePageRoute(collective)}/transactions`} data-cy="view-all-transactions-link">
@@ -352,7 +370,12 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
                   >
                     {item.__typename === 'Expense' ? (
                       <DebitItem>
-                        <ExpenseBudgetItem expense={item} host={data?.host} showAmountSign showProcessActions />
+                        <ExpenseBudgetItem
+                          expense={item}
+                          host={item.host || data.account.host}
+                          showAmountSign
+                          showProcessActions
+                        />
                       </DebitItem>
                     ) : (
                       <TransactionItem

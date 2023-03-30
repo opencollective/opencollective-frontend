@@ -35,17 +35,23 @@ describe('Onboarding modal', () => {
     cy.get('[data-cy="profile-card"]').children().should('have.length', 1);
     cy.get('[data-cy="step-forward-button"]').click();
     // Add Github, Twitter, and website links
-    cy.get(`input[name="website"]`).type('opencollective.com/testCollective');
-    cy.get(`input[name="twitterHandle"]`).type('testCollective');
-    cy.get(`input[name="repositoryUrl"]`).type('https://github.com/testCollective');
+    cy.focused().type('https://opencollective.com/testCollective');
+    cy.contains('Add social link').click();
+    cy.focused().type('https://twitter.com/testCollective');
+    cy.contains('Add social link').click();
+    cy.focused().type('https://github.com/testCollective');
     // Finish creating collective
     cy.get('[data-cy="finish-button"]').click();
     cy.get('[data-cy="welcome-collective"]').contains('Welcome to your new Collective!');
     // close the modal
     cy.get('[data-cy="close-button"]').click();
     // Check if the link have been added
-    cy.get('[data-cy=twitterProfileUrl]').should('have.attr', 'href', 'https://twitter.com/testCollective');
-    cy.get('[data-cy=repositoryUrl]').should('have.attr', 'href', 'https://github.com/testCollective');
-    cy.get('[data-cy=collectiveWebsite]').should('have.attr', 'href', 'https://opencollective.com/testCollective');
+    cy.get('a[rel~=me]')
+      .first()
+      .should('have.attr', 'href', 'https://opencollective.com/testCollective')
+      .next()
+      .should('have.attr', 'href', 'https://twitter.com/testCollective')
+      .next()
+      .should('have.attr', 'href', 'https://github.com/testCollective');
   });
 });

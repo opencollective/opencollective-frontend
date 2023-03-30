@@ -4,10 +4,11 @@ import { useIntl } from 'react-intl';
 
 import expenseStatus from '../../../lib/constants/expense-status';
 import { i18nExpenseStatus } from '../../../lib/i18n/expense';
+import { sortSelectOptions } from '../../../lib/utils';
 
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 
-const IGNORED_EXPENSE_STATUS = [expenseStatus.DRAFT, expenseStatus.UNVERIFIED];
+const IGNORED_EXPENSE_STATUS = [expenseStatus.UNVERIFIED];
 
 const getOption = (intl, value) => ({ label: i18nExpenseStatus(intl, value), value });
 
@@ -21,13 +22,16 @@ const getOptions = (intl, ignoredExpenseStatus) => {
 
 const ExpenseStatusFilter = ({ value, onChange, ignoredExpenseStatus = IGNORED_EXPENSE_STATUS, ...props }) => {
   const intl = useIntl();
-  const options = React.useMemo(() => getOptions(intl, ignoredExpenseStatus), [ignoredExpenseStatus]);
+  const sortedOptions = React.useMemo(
+    () => getOptions(intl, ignoredExpenseStatus).sort(sortSelectOptions),
+    [ignoredExpenseStatus],
+  );
 
   return (
     <StyledSelectFilter
       inputId="expenses-status-filter"
       data-cy="expenses-filter-status"
-      options={options}
+      options={sortedOptions}
       onChange={({ value }) => onChange(value)}
       value={getOption(intl, value || 'ALL')}
       {...props}

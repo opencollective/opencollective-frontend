@@ -64,15 +64,26 @@ export function PayWithStripeForm({
     <React.Fragment>
       <PaymentElement
         options={{
+          paymentMethodOrder: ['card', 'apple_pay', 'google_pay'],
           defaultValues: {
             billingDetails: {
               name: bilingDetails?.name,
               email: bilingDetails?.email,
             },
           },
+          terms: {
+            bancontact: 'always',
+            card: 'always',
+            ideal: 'always',
+            sepaDebit: 'always',
+            sofort: 'always',
+            auBecsDebit: 'always',
+            usBankAccount: 'always',
+          },
         }}
         onChange={onElementChange}
       />
+
       {hasSaveCheckBox && (
         <Flex mt={3} alignItems="center" color="black.700">
           <StyledCheckbox
@@ -87,7 +98,7 @@ export function PayWithStripeForm({
               <Span fontWeight="normal">
                 <FormattedMessage
                   id="ContributeFAQ.Safe"
-                  defaultMessage="Open Collective doesn't store credit card numbers, instead relying on our payment processor, Stripe, a secure solution that is widely adopted. If our systems are compromised, your credit card information is not at risk, because we simply don't store it. <LearnMoreLink>Learn more</LearnMoreLink>."
+                  defaultMessage="Open Collective doesn't store sensitive payment data (e.g. Credit Card numbers), instead relying on our payment processor, Stripe, a secure solution that is widely adopted. If our systems are compromised, your payment information is not at risk, because we simply don't store it. <LearnMoreLink>Learn more</LearnMoreLink>."
                   values={{
                     LearnMoreLink: getI18nLink({
                       openInNewTab: true,

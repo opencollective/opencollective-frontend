@@ -31,14 +31,18 @@ const DeleteModalActionsContainer = styled(Flex)`
   }
 `;
 
-export default function ConfirmTierDeleteModal({ isDeleting, onClose, onConfirmDelete }) {
+export default function ConfirmTierDeleteModal({ isDeleting, onClose, onConfirmDelete, tier }) {
   const [keepRecurringContributions, setKeepRecurringContributions] = React.useState(true);
+  const action = (
+    <FormattedMessage
+      defaultMessage="Delete {type, select, TICKET {Ticket} other {Tier}}"
+      values={{ type: tier.type }}
+    />
+  );
 
   return (
     <StyledModal>
-      <ModalHeader hideCloseIcon>
-        <FormattedMessage defaultMessage="Delete Tier" />
-      </ModalHeader>
+      <ModalHeader hideCloseIcon>{action}</ModalHeader>
       <P mt="1.2em">
         <FormattedMessage defaultMessage="The tier will be deleted forever and can't be retrieved." />
       </P>
@@ -85,7 +89,7 @@ export default function ConfirmTierDeleteModal({ isDeleting, onClose, onConfirmD
               <Flex alignItems="center" mr={1}>
                 <Trash size="1em" />
               </Flex>
-              <FormattedMessage defaultMessage="Delete Tier" />
+              {action}
             </Flex>
           </ConfirmDeleteModalButton>
         </DeleteModalActionsContainer>
@@ -98,4 +102,7 @@ ConfirmTierDeleteModal.propTypes = {
   isDeleting: PropTypes.bool,
   onClose: PropTypes.func,
   onConfirmDelete: PropTypes.func,
+  tier: PropTypes.shape({
+    type: PropTypes.string,
+  }),
 };
