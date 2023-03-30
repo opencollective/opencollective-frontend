@@ -97,7 +97,7 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
   }
 
   return (
-    <Container display="flex" justifyContent="center" alignItems="center">
+    <Container py={5}>
       <NotFound />
     </Container>
   );
