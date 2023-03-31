@@ -123,7 +123,7 @@ export const prepareExpenseForSubmit = expenseData => {
   const isGrant = expenseData.type === expenseTypes.GRANT;
   const payee =
     expenseData.payee?.isNewUser || expenseData.payee?.isInvite
-      ? pick(expenseData.payee, ['name', 'email', 'legalName', 'organization', 'newsletterOptIn'])
+      ? pick(expenseData.payee, ['name', 'slug', 'email', 'legalName', 'organization', 'newsletterOptIn'])
       : { [payeeIdField]: expenseData.payee.id };
 
   const payeeLocation = checkRequiresAddress(expenseData)

@@ -1,4 +1,4 @@
-import { randomEmail } from '../support/faker';
+import { randomEmail, randomSlug } from '../support/faker';
 
 describe('New expense flow', () => {
   describe('new expense when logged out', () => {
@@ -327,7 +327,6 @@ describe('New expense flow', () => {
             email: inviteeEmail,
             redirect: `/${createdExpense.collective}/expenses/${createdExpense.expenseId}`,
           });
-          cy.visit(`/${createdExpense.collective}/expenses/${createdExpense.expenseId}`);
         });
 
         cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
@@ -339,15 +338,16 @@ describe('New expense flow', () => {
 
       it('can invite a third-party organization to submit an expense', () => {
         const inviteeEmail = randomEmail();
+        const slug = randomSlug();
         cy.getByDataCy('radio-expense-type-INVOICE').click();
 
         cy.getByDataCy('select-expense-payee').click();
         cy.getByDataCy('collective-picker-invite-button').click();
         cy.getByDataCy('payee-type-org').click();
-        cy.get('input[name="payee.organization.name"]').type('Hollywood');
+        cy.get('input[name="payee.organization.name"]').type(slug);
         cy.get('input[name="payee.organization.description"]').type('We make movies.');
         cy.get('input[name="payee.organization.website"]').type('http://hollywood.com');
-        cy.get('input[name="payee.name"]').type('Nicolas Cage');
+        cy.get('input[name="payee.name"]').type('Willem Dafoe');
         cy.get('input[name="payee.email"]').type(inviteeEmail);
         cy.get('[data-cy="expense-next"]').click();
 
@@ -363,7 +363,7 @@ describe('New expense flow', () => {
           'contain',
           `An invitation to submit this expense has been sent to ${inviteeEmail}`,
         );
-        cy.getByDataCy('expense-summary-payee').should('contain', 'Hollywood');
+        cy.getByDataCy('expense-summary-payee').should('contain', slug);
 
         // Log out and submit as invitee...
         cy.url({ log: true })
@@ -405,11 +405,10 @@ describe('New expense flow', () => {
             email: inviteeEmail,
             redirect: `/${createdExpense.collective}/expenses/${createdExpense.expenseId}`,
           });
-          cy.visit(`/${createdExpense.collective}/expenses/${createdExpense.expenseId}`);
         });
         cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
         cy.getByDataCy('expense-author').should('contain', 'Invited by');
-        cy.getByDataCy('expense-summary-payee').should('contain', 'Hollywood');
+        cy.getByDataCy('expense-summary-payee').should('contain', slug);
         cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
         cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
       });

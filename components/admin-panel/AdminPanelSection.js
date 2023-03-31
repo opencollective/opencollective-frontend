@@ -67,7 +67,7 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
   if (AdminSectionComponent) {
     return (
       <Container width="100%">
-        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} isNewAdmin />
+        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} />
       </Container>
     );
   }

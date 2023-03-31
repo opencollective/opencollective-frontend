@@ -118,7 +118,7 @@ module.exports = (expressApp, nextApp) => {
     }
 
     await sendMessage({
-      to: 'support@opencollective.freshdesk.com',
+      to: 'support@opencollective.com',
       from: `${body.name} <${body.email}>`,
       subject: `${body.topic}`,
       html: `

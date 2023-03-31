@@ -8,7 +8,7 @@ import { sortSelectOptions } from '../../../lib/utils';
 
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 
-const IGNORED_EXPENSE_STATUS = [expenseStatus.DRAFT, expenseStatus.UNVERIFIED];
+const IGNORED_EXPENSE_STATUS = [expenseStatus.UNVERIFIED];
 
 const getOption = (intl, value) => ({ label: i18nExpenseStatus(intl, value), value });
 
