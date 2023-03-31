@@ -431,48 +431,6 @@ class InputField extends React.Component {
           </Box>
         );
         break;
-      case 'country': // TODO: remove?
-        this.input = (
-          <div>
-            {horizontal && (
-              <Flex flexWrap="wrap" p={1}>
-                <Box width={[1, 2 / 12]}>
-                  <label>{capitalize(field.label)}</label>
-                </Box>
-                <Box width={[1, 10 / 12]}>
-                  <InputTypeCountry
-                    name={field.name}
-                    inputId={field.name}
-                    value={field.value}
-                    defaultValue={field.defaultValue}
-                    onChange={this.handleChange}
-                  />
-                </Box>
-              </Flex>
-            )}
-            {!horizontal && (
-              <Flex flexWrap="wrap" p={1}>
-                {field.label && (
-                  <Box width={1}>
-                    <label>{`${capitalize(field.label)}`}</label>
-                  </Box>
-                )}
-                <Box width={1}>
-                  <InputTypeCountry
-                    name={field.name}
-                    inputId={field.name}
-                    value={field.value}
-                    defaultValue={field.defaultValue}
-                    onChange={this.handleChange}
-                  />
-                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
-                </Box>
-              </Flex>
-            )}
-          </div>
-        );
-        break;
-
       case 'currency':
         value = value || field.defaultValue;
         value = typeof value === 'number' ? value / 100 : '';
