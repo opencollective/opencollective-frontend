@@ -156,10 +156,13 @@ class InputTypeLocation extends React.Component {
     /* Use ADR microformat field `adr_address` because of more consistent formatting and since
        it also includes a single field for street address (with house number in the correct place depending on locality) */
     const adrAddress = value.gmaps['adr_address'];
-    const streetAddress = adrAddress.match(/<span class="street-address">([^<]+)<\/span>/i)?.[1];
-    const postalCode = adrAddress.match(/<span class="postal-code">([^<]+)<\/span>/i)?.[1];
-    const city = adrAddress.match(/<span class="locality">([^<]+)<\/span>/i)?.[1];
-    const zone = adrAddress.match(/<span class="region">([^<]+)<\/span>/i)?.[1];
+    const parser = new DOMParser();
+    const adrAddressDoc = parser.parseFromString(adrAddress, 'text/html');
+    const streetAddress = adrAddressDoc.querySelector('.street-address')?.textContent;
+    const postalCode = adrAddressDoc.querySelector('.postal-code')?.textContent;
+    const city = adrAddressDoc.querySelector('.locality')?.textContent;
+    const zone = adrAddressDoc.querySelector('.region')?.textContent;
+
     const location = {
       // Remove country from address
       address: this.removeCountryFromAddress(value.gmaps.formatted_address),
