@@ -2,12 +2,11 @@ import React, { createRef, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Clear } from '@styled-icons/material/Clear';
 import { themeGet } from '@styled-system/theme-get';
-import { get } from 'lodash';
+import { get, isNil, omitBy } from 'lodash';
 import Geosuggest from 'react-geosuggest';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { isURL } from 'validator';
-import { omitBy, isNil } from 'lodash';
 
 import Container from './Container';
 import Location from './Location';
