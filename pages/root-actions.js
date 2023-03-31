@@ -45,7 +45,7 @@ const MENU = [
   {
     id: 'Account Type',
     Component: AccountType,
-    description: `This tool is meant to convert a User account to an Organization type. The organization account will have the fields copied from the initial user account. Please notify the user to go through and update the organization account details after this is done.`,
+    description: `This tool is meant to convert a User account to an Organization type. The organization account will have the fields copied from the initial user account. Please notify the user to go through and update the organization account details after this is done. The location data for the user (if exists) will become public for the organization.`,
   },
   { id: 'Activity Log', Component: RootActivityLog, useCard: false },
   {
