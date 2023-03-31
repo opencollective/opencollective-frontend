@@ -7,6 +7,7 @@ import Geosuggest from 'react-geosuggest';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { isURL } from 'validator';
+import { omitBy, isNil } from 'lodash';
 
 import Container from './Container';
 import Location from './Location';
@@ -158,10 +159,13 @@ class InputTypeLocation extends React.Component {
     const adrAddress = value.gmaps['adr_address'];
     const parser = new DOMParser();
     const adrAddressDoc = parser.parseFromString(adrAddress, 'text/html');
-    const streetAddress = adrAddressDoc.querySelector('.street-address')?.textContent;
-    const postalCode = adrAddressDoc.querySelector('.postal-code')?.textContent;
-    const city = adrAddressDoc.querySelector('.locality')?.textContent;
-    const zone = adrAddressDoc.querySelector('.region')?.textContent;
+    const structured = {
+      address1: adrAddressDoc.querySelector('.street-address')?.textContent,
+      address2: adrAddressDoc.querySelector('.extended-address')?.textContent,
+      postalCode: adrAddressDoc.querySelector('.postal-code')?.textContent,
+      city: adrAddressDoc.querySelector('.locality')?.textContent,
+      zone: adrAddressDoc.querySelector('.region')?.textContent,
+    };
 
     const location = {
       // Remove country from address
@@ -171,12 +175,7 @@ class InputTypeLocation extends React.Component {
       country,
       lat: value.location.lat,
       long: value.location.lng,
-      structured: {
-        address1: streetAddress,
-        postalCode,
-        city,
-        zone,
-      },
+      structured: omitBy(structured, isNil),
     };
 
     this.setState({ value: location });
