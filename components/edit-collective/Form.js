@@ -232,10 +232,6 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.currency.placeholder',
         defaultMessage: 'Select currency',
       },
-      'address.label': {
-        id: 'collective.address.label',
-        defaultMessage: 'Address',
-      },
       'VAT.label': {
         id: 'EditCollective.VAT',
         defaultMessage: 'VAT settings',
@@ -307,11 +303,7 @@ class EditCollectiveForm extends React.Component {
     this.setState(state => {
       const collective = cloneDeep(state.collective);
 
-      // GraphQL schema has address embedded within location
-      // mutation expects { location: { address: '' } }
-      if (['address', 'country', 'structured'].includes(fieldname)) {
-        collective.location[fieldname] = value;
-      } else if (fieldname === 'VAT') {
+      if (fieldname === 'VAT') {
         set(collective, 'settings.VAT.type', value);
       } else if (fieldname === 'VAT-number') {
         set(collective, 'settings.VAT.number', value);
@@ -379,9 +371,6 @@ class EditCollectiveForm extends React.Component {
   getFieldDefaultValue(field) {
     if (field.defaultValue !== undefined) {
       return field.defaultValue;
-    } else if (['address'].includes(field.name)) {
-      // TODO: update to new structure
-      return get(this.state.collective.location, field.name);
     }
 
     return this.state.collective[field.name];
