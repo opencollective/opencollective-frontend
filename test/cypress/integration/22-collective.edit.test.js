@@ -142,7 +142,8 @@ describe('edit collective', () => {
   });
 
   it('enables VAT', () => {
-    cy.get('input[id=geosuggest__input]').type('Belgium').wait(750).type('{downArrow}{enter}');
+    cy.get('input[id=geosuggest__input]').type('Belgium');
+    cy.contains('.geosuggest__suggests > :nth-child(1)', 'Belgium').click();
     cy.getByDataCy('VAT').click();
 
     cy.contains('[data-cy="select-option"]', 'Use my own VAT number').click();
