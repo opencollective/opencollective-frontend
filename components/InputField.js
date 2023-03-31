@@ -11,7 +11,6 @@ import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import CollectiveTagsInput from './CollectiveTagsInput';
 import { Box, Flex } from './Grid';
 import InputSwitch from './InputSwitch';
-import InputTypeCountry from './InputTypeCountry';
 import InputTypeLocation from './InputTypeLocation';
 import StyledButton from './StyledButton';
 import StyledCheckbox from './StyledCheckbox';
