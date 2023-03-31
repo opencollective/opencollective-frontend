@@ -44,9 +44,9 @@ function Location({ location, showTitle }) {
   }
 
   const openStreetMapLink =
-    lat && long
-      ? `https://www.openstreetmap.org/?mlat=${lat}&amp;mlon=${long}#map=16/${lat}/${long}`
-      : `https://www.openstreetmap.org/search?query=${encodeURIComponent(address)}`;
+    isNaN(lat) || isNaN(long)
+      ? `https://www.openstreetmap.org/search?query=${encodeURIComponent(address)}`
+      : `https://www.openstreetmap.org/?mlat=${lat}&amp;mlon=${long}#map=16/${lat}/${long}`;
 
   return (
     <LocationSection id="location">
