@@ -17,6 +17,7 @@ export const editAccountTypeMutation = gql`
     editAccountType(account: $account) {
       id
       slug
+      type
     }
   }
 `;
