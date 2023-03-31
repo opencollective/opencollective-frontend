@@ -379,7 +379,7 @@ class EditCollectiveForm extends React.Component {
   getFieldDefaultValue(field) {
     if (field.defaultValue !== undefined) {
       return field.defaultValue;
-    } else if (['address', 'country'].includes(field.name)) {
+    } else if (['address'].includes(field.name)) {
       // TODO: update to new structure
       return get(this.state.collective.location, field.name);
     }
