@@ -56,7 +56,7 @@ class CreateConversationPage extends React.Component {
         type: PropTypes.string.isRequired,
         twitterHandle: PropTypes.string,
         imageUrl: PropTypes.string,
-        conversationsTags: PropTypes.arrayOf(PropTypes.string),
+        conversationsTags: PropTypes.arrayOf(PropTypes.shape({ tag: PropTypes.string })),
       }),
     }).isRequired, // from withData
   };

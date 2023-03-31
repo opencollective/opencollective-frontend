@@ -12,7 +12,7 @@ import { space, typography } from 'styled-system';
  * editor. This function tries to detect this and returns true if there's no real
  * text, image or iframe contents.
  */
-export const isEmptyValue = value => {
+export const isEmptyHTMLValue = value => {
   if (!value) {
     return true;
   } else if (value.length > 50) {
