@@ -42,6 +42,8 @@ import Tags from '../components/Tags';
 import { H1, H4, H5, P, Span } from '../components/Text';
 import { getDisplayedAmount } from '../components/transactions/TransactionItem';
 
+import Custom404 from './404';
+
 const orderPageQuery = gql`
   query OrderPage($legacyId: Int!, $collectiveSlug: String!) {
     order(order: { legacyId: $legacyId }) {
@@ -207,6 +209,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
     variables: { legacyId: toNumber(OrderId), collectiveSlug },
     context: API_V2_CONTEXT,
     fetchPolicy: 'network-only',
+    errorPolicy: 'ignore',
   });
   return {
     props: { query: context.query, ...data, error: error || null }, // will be passed to the page component as props
@@ -310,7 +313,7 @@ const OverdueTag = styled.span`
 export default function OrderPage(props: OrderPageQuery & { error: any }) {
   const { LoggedInUser } = useLoggedInUser();
   const [fetchData, query] = useLazyQuery<OrderPageQuery, OrderPageQueryVariables>(orderPageQuery, {
-    variables: { legacyId: toNumber(props.order.legacyId), collectiveSlug: props.account.slug },
+    variables: { legacyId: toNumber(props.order?.legacyId), collectiveSlug: props.account.slug },
     context: API_V2_CONTEXT,
   });
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
@@ -325,8 +328,8 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
   const isPending = order?.status === 'PENDING';
   const isOverdue =
     isPending &&
-    order.pendingContributionData?.expectedAt &&
-    dayjs().isAfter(dayjs(order.pendingContributionData.expectedAt));
+    order?.pendingContributionData?.expectedAt &&
+    dayjs().isAfter(dayjs(order?.pendingContributionData.expectedAt));
   const intl = useIntl();
 
   React.useEffect(() => {
@@ -334,6 +337,10 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
       fetchData();
     }
   }, [LoggedInUser]);
+
+  if (!order || order.toAccount.slug !== props.account.slug) {
+    return <Custom404 />;
+  }
 
   const accountTransactions = order?.transactions?.filter(t => t.account.id === account.id);
 

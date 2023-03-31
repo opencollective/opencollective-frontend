@@ -51,7 +51,7 @@ const PERIOD_FILTER_SELECT_STYLES = {
   option: { fontSize: '12px' },
 };
 
-const getSelectedPeriodOptionFromInterval = ({ from, to }) => {
+export const getSelectedPeriodOptionFromInterval = ({ from, to }) => {
   const isSameDay = (dayjsDate, otherDate) => (!dayjsDate && !otherDate) || dayjsDate?.isSame(otherDate, 'day');
   const preset = Object.keys(PERIOD_FILTER_PRESETS).find(preset => {
     const presetDetails = PERIOD_FILTER_PRESETS[preset];

@@ -970,7 +970,7 @@
   "GithubRepositories.faq.repoStar.content": "In order to provide fiscal sponsorship to a project, we need to ensure that there is a community around it. If you don’t fit 100 GitHub stars requirement, we will consider your application on a case by case basis, <criteria-link>using this criteria.</criteria-link> If you already have a legal entity (or know a legal entity that could host your collective), then you could directly host your collective independently. Please use the <for-any-community>For any Community</for-any-community> option when creating a collective. Note that in that case you will be responsible for doing the accounting as well as facilitating payments from sponsors. If you have a project with an existing community but don't use GitHub, apply via the <open-source>Open Source</open-source> option and select 'Request manual verification'.",
   "GithubRepositories.faq.repoStar.title": "Why only repos with at least 100 stars?",
   "goal.add": "Add goal",
-  "goal.balance.label": "Balance",
+  "Balance": "Balance",
   "goal.show": "Show the goals on my collective page",
   "goal.title.label": "Title",
   "goal.type.label": "Type",

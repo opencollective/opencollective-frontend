@@ -37,7 +37,7 @@ describe('event.create.test.js', () => {
     cy.getByDataCy('confirm-btn').click();
     cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
 
-    cy.getByDataCy('menu-item-tickets').click();
+    // Create another ticket
     cy.getByDataCy('create-ticket').click();
     cy.get('[data-cy=name]').type('Paid ticket');
     cy.get('input[data-cy=amount]').type('15');

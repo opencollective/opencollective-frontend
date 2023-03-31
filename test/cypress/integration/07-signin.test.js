@@ -216,18 +216,14 @@ describe('signin with 2FA', () => {
   it('can signin with 2fa enabled', () => {
     // now login with 2FA enabled
     cy.login({ email: user.email, redirect: '/apex' });
-    cy.getByDataCy('signin-two-factor-auth-input').type('123456');
-    cy.getByDataCy('signin-two-factor-auth-button').click();
-    cy.getByDataCy('signin-message-box').contains(
-      'Sign In failed: Two-factor authentication code failed. Please try again',
-    );
+    cy.complete2FAPrompt('123456');
+    cy.contains('Two-factor authentication code failed. Please try again').should.exist;
     TOTPCode = speakeasy.totp({
       algorithm: 'SHA1',
       encoding: 'base32',
       secret: secret.base32,
     });
-    cy.getByDataCy('signin-two-factor-auth-input').clear().type(TOTPCode);
-    cy.getByDataCy('signin-two-factor-auth-button').click();
+    cy.complete2FAPrompt(TOTPCode);
     cy.assertLoggedIn();
     cy.url().should('eq', `${Cypress.config().baseUrl}/apex`);
   });

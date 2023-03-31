@@ -47,6 +47,19 @@ ExtendedTag.propTypes = {
   children: PropTypes.any,
 };
 
+const BaseTag = ({ status, ...props }) => {
+  const intl = useIntl();
+  return (
+    <StyledTag type={getExpenseStatusMsgType(status)} data-cy="expense-status-msg" {...props}>
+      {i18nExpenseStatus(intl, status)}
+    </StyledTag>
+  );
+};
+
+BaseTag.propTypes = {
+  status: PropTypes.oneOf(Object.values(expenseStatus)),
+};
+
 /**
  * Displays an i18n version of the expense status in a `StyledTag`.
  * The color change in function of the status.
@@ -54,7 +67,6 @@ ExtendedTag.propTypes = {
  * Accepts all the props exposed by `StyledTag`.
  */
 const ExpenseStatusTag = ({ status, showTaxFormTag, showTaxFormMsg, ...props }) => {
-  const intl = useIntl();
   const tagProps = {
     fontWeight: '600',
     fontSize: '10px',
@@ -63,27 +75,21 @@ const ExpenseStatusTag = ({ status, showTaxFormTag, showTaxFormMsg, ...props }) 
     ...props,
   };
 
-  const tag = (
-    <StyledTag type={getExpenseStatusMsgType(status)} data-cy="expense-status-msg" {...tagProps} {...props}>
-      {i18nExpenseStatus(intl, status)}
-    </StyledTag>
-  );
-
   if (status === expenseStatus.UNVERIFIED) {
     return (
       <Flex alignItems="center">
-        {tag}
+        <BaseTag status={expenseStatus.PENDING} {...tagProps} />
         <ExtendedTag {...tagProps}>
           <FormattedMessage id="Unverified" defaultMessage="Unverified" />
         </ExtendedTag>
       </Flex>
     );
   } else if (!showTaxFormTag) {
-    return tag;
+    return <BaseTag status={status} {...tagProps} />;
   } else if (!showTaxFormMsg) {
     return (
       <Flex alignItems="center">
-        {tag}
+        <BaseTag status={status} {...tagProps} />
         <ExtendedTag>
           <FormattedMessage id="TaxForm" defaultMessage="Tax form" />
         </ExtendedTag>
@@ -92,7 +98,7 @@ const ExpenseStatusTag = ({ status, showTaxFormTag, showTaxFormMsg, ...props }) 
   } else {
     return (
       <Flex alignItems="center">
-        {tag}
+        <BaseTag status={status} {...tagProps} />
         <StyledTooltip
           content={() => (
             <FormattedMessage

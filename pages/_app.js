@@ -131,16 +131,16 @@ class OpenCollectiveFrontendApp extends App {
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
               <RawIntlProvider value={intl}>
-                <UserProvider>
-                  <NewsAndUpdatesProvider>
-                    <ToastProvider>
+                <ToastProvider>
+                  <UserProvider>
+                    <NewsAndUpdatesProvider>
                       <Component {...pageProps} />
                       <GlobalToasts />
                       <GlobalNewsAndUpdates />
                       <TwoFactorAuthenticationModal />
-                    </ToastProvider>
-                  </NewsAndUpdatesProvider>
-                </UserProvider>
+                    </NewsAndUpdatesProvider>
+                  </UserProvider>
+                </ToastProvider>
               </RawIntlProvider>
             </StripeProviderSSR>
           </ThemeProvider>

@@ -60,17 +60,6 @@ const nextConfig = {
       );
     }
 
-    if (process.env.WEBPACK_BUNDLE_ANALYZER) {
-      // eslint-disable-next-line node/no-unpublished-require
-      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-      config.plugins.push(
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'static',
-          generateStatsFile: true,
-          openAnalyzer: false,
-        }),
-      );
-    }
     config.module.rules.push({
       test: /\.md$/,
       use: ['babel-loader', 'raw-loader', 'markdown-loader'],
@@ -215,12 +204,22 @@ const nextConfig = {
 // Bypasses conflict bug between @sentry/nextjs and depcheck
 const isDepcheck = process.argv[1]?.includes('.bin/depcheck');
 
-module.exports = isDepcheck
-  ? nextConfig
-  : withSentryConfig({
-      ...nextConfig,
-      sentry: {
-        disableServerWebpackPlugin: true,
-        disableClientWebpackPlugin: true,
-      },
-    });
+let exportedConfig = nextConfig;
+if (!isDepcheck) {
+  exportedConfig = withSentryConfig({
+    ...nextConfig,
+    sentry: {
+      disableServerWebpackPlugin: true,
+      disableClientWebpackPlugin: true,
+    },
+  });
+}
+if (process.env.ANALYZE) {
+  // eslint-disable-next-line node/no-unpublished-require
+  const withBundleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: true,
+  });
+  exportedConfig = withBundleAnalyzer(exportedConfig);
+}
+
+module.exports = exportedConfig;
