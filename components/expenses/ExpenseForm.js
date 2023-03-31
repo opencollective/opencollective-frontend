@@ -346,7 +346,7 @@ const ExpenseFormBody = ({
 
   React.useEffect(() => {
     if (values.payeeLocation?.structured) {
-      formik.setFieldValue('payeeLocation.address', serializeAddress(values.payeeLocation.structured)); // TODO: when and why?
+      formik.setFieldValue('payeeLocation.address', serializeAddress(values.payeeLocation.structured));
     }
   }, [values.payeeLocation]);
 
