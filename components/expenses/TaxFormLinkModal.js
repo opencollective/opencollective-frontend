@@ -14,21 +14,36 @@ import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledLink from '../StyledLink';
+import StyledSelect from '../StyledSelect';
 import { H2, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import StyledModal, { ModalBody, ModalHeader } from './../StyledModal';
 
 const setTaxFormMutation = gql`
-  mutation SetTaxForm($account: AccountReferenceInput!, $taxFormLink: NonEmptyString!, $year: Int!) {
+  mutation SetTaxForm($account: AccountReferenceInput!, $taxFormLink: URL!, $year: Int!) {
     setTaxForm(account: $account, taxFormLink: $taxFormLink, year: $year) {
       success
     }
   }
 `;
 
+const arrayOfYears = () => {
+  const max = new Date().getFullYear();
+  const min = 2018;
+  const years = [];
+
+  for (let i = max; i >= min; i--) {
+    years.push(i);
+  }
+  return years;
+};
+
 const TaxFormLinkModal = ({ account, year, onClose, expenseData }) => {
   const [taxFormLink, setTaxFormLink] = React.useState(null);
+  const taxYearOptions = arrayOfYears().map(year => ({ key: year, value: year, label: year }));
+  const defaultTaxYearOption = taxYearOptions.filter(option => option.value === year)[0];
+  const [taxFormYear, setTaxFormYear] = React.useState(defaultTaxYearOption.value);
   const { addToast } = useToasts();
   const [error, setError] = React.useState(null);
   const [submit, { loading }] = useMutation(setTaxFormMutation, { context: API_V2_CONTEXT });
@@ -59,13 +74,33 @@ const TaxFormLinkModal = ({ account, year, onClose, expenseData }) => {
           <StyledInputField
             label={
               <Span fontWeight={700}>
+                <FormattedMessage defaultMessage="Year" />
+              </Span>
+            }
+            width="100%"
+            htmlFor="year"
+          >
+            {inputProps => (
+              <StyledSelect
+                {...inputProps}
+                options={taxYearOptions}
+                defaultValue={defaultTaxYearOption}
+                onChange={e => setTaxFormYear(e.value)}
+              />
+            )}
+          </StyledInputField>
+        </Container>
+        <Container pt={4}>
+          <StyledInputField
+            label={
+              <Span fontWeight={700}>
                 <FormattedMessage defaultMessage="Tax Form Link" />
               </Span>
             }
             width="100%"
             htmlFor="taxFormLink"
           >
-            {inputProps => <StyledInput {...inputProps} onChange={e => setTaxFormLink(e.target.value)} />}
+            {inputProps => <StyledInput {...inputProps} type="url" onChange={e => setTaxFormLink(e.target.value)} />}
           </StyledInputField>
         </Container>
         {error && <MessageBoxGraphqlError error={error} mt={3} />}
@@ -83,15 +118,20 @@ const TaxFormLinkModal = ({ account, year, onClose, expenseData }) => {
                   variables: {
                     account: { slug: account.slug },
                     taxFormLink,
-                    year,
+                    year: taxFormYear,
                   },
                 });
                 if (get(result, 'data.setTaxForm.success')) {
                   addToast({
                     type: TOAST_TYPE.SUCCESS,
-                    message: <FormattedMessage defaultMessage="Tax From Submitted" />,
+                    message: <FormattedMessage defaultMessage="Tax form submitted" />,
                   });
                   await expenseData.refetch();
+                } else {
+                  addToast({
+                    type: TOAST_TYPE.ERROR,
+                    message: <FormattedMessage defaultMessage="Failed to submit the tax form" />,
+                  });
                 }
                 onClose();
               } catch (e) {
