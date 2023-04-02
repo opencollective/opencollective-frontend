@@ -1,27 +1,23 @@
 import React from 'react';
-import { Search } from '@styled-icons/boxicons-regular/Search';
 import { themeGet } from '@styled-system/theme-get';
 import { debounce, isEmpty, truncate } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { usePopper } from 'react-popper';
 import styled from 'styled-components';
 
 import { searchDocs } from '../../lib/api';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 
+import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import { I18nBold } from '../I18nFormatters';
+import { getI18nLink, I18nBold, I18nUnderline } from '../I18nFormatters';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import SearchForm from '../SearchForm';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
-import StyledInput from '../StyledInput';
 import { P } from '../Text';
-
-const SearchInput = styled(StyledInput)`
-  background-color: #f9fafb;
-  border: none;
-`;
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 const SearchResultPopup = styled(StyledCard)`
   border: 1px solid rgba(50, 51, 52, 0.05);
@@ -73,13 +69,15 @@ const LoadingSearchResults = () => {
 };
 
 const SearchTopics = () => {
+  const intl = useIntl();
   const innerRef = React.useRef();
   const [refElement, setRefElement] = React.useState(null);
   const [popperElement, setPopperElement] = React.useState(null);
-  const [showSearchResults, setShowSearchResults] = React.useState(null);
+  const [showSearchResults, setShowSearchResults] = React.useState(false);
   const [searchResults, setSearchResults] = React.useState([]);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
+  const { addToast } = useToasts();
   const { styles, attributes } = usePopper(refElement, popperElement, {
     placement: 'bottom',
     modifiers: REACT_POPPER_MODIFIERS,
@@ -95,15 +93,36 @@ const SearchTopics = () => {
   const search = async query => {
     if (!query) {
       setSearchResults([]);
+      setIsLoading(false);
       return;
     }
 
     try {
-      setIsLoading(true);
       const results = await searchDocs(query);
       setSearchResults(results.items);
     } catch (error) {
-      console.error('error', error);
+      addToast({
+        type: TOAST_TYPE.ERROR,
+        title: intl.formatMessage({ defaultMessage: 'Error in fetching results' }),
+        message: (
+          <p>
+            <FormattedMessage
+              defaultMessage={
+                'Oops! There was an unexpected error.{lineBreak} <openDocsLink><u>Visit our docs page</u></openDocsLink>'
+              }
+              values={{
+                openDocsLink: getI18nLink({
+                  href: `${DOCS_BASE_URL}`,
+                  openInNewTab: true,
+                }),
+                u: I18nUnderline,
+                lineBreak: <br />,
+              }}
+            />
+          </p>
+        ),
+      });
+      setSearchResults([]);
     } finally {
       setIsLoading(false);
     }
@@ -114,47 +133,36 @@ const SearchTopics = () => {
   return (
     <Flex justifyContent="center" alignItems="center" px="16px">
       <Flex mt={['9px', '32px']} flexDirection="column" ref={innerRef}>
-        <StyledCard
-          bg="black.50"
-          display="flex"
-          width={['288px', '720px']}
-          px="16px"
-          py="24px"
-          alignItems="center"
-          justifyContent="space-between"
-          borderRadius="12px"
-          boxShadow="0px 1px 4px 1px rgba(49, 50, 51, 0.1)"
-          borderWidth="0"
-          ref={setRefElement}
-        >
-          <SearchInput
-            fontSize="18px"
-            color="black.900"
-            lineHeight="26px"
-            width="80%"
-            placeholder="Search for topics"
-            borderWidth="0"
-            borderColor="transparent"
-            px="0"
-            py="0"
+        <Box ref={setRefElement}>
+          <SearchForm
+            autoFocus
+            width={['1', '248px', '608px']}
+            borderRadius="100px"
+            placeholder={intl.formatMessage({ defaultMessage: 'Type keywords to search for topics' })}
+            showSearchButton
+            searchButtonStyles={{ width: '32px', height: '32px' }}
             value={searchQuery}
-            backgroundColor="#F9FAFB"
-            onChange={async e => {
+            onChange={query => {
               if (!showSearchResults) {
                 setShowSearchResults(true);
               }
 
-              const query = e.target.value;
               setSearchQuery(query);
+              setIsLoading(true);
               debouncedSearch(query);
             }}
             onFocus={() => setShowSearchResults(true)}
+            autoComplete="off"
+            fontStyle="normal"
+            fontSize="16px"
+            lineHeight="20px"
+            letterSpacing="normal"
+            fontWeight="400"
           />
-          <Search size="20px" color="#75777A" />
-        </StyledCard>
+        </Box>
         {showSearchResults && (
           <SearchResultPopup
-            width={['228px', '725px']}
+            width={['180px', '248px', '700px']}
             ref={setPopperElement}
             style={styles.popper}
             {...attributes.popper}
@@ -163,11 +171,17 @@ const SearchTopics = () => {
               {isLoading ? (
                 <LoadingSearchResults />
               ) : isEmpty(sections) ? (
-                <Flex justifyContent={'center'} align="center" py={'20px'}>
-                  <P fontSize="14px" lineHeight="20px" color="black.500" fontWeight="400">
+                <Container
+                  display="flex"
+                  justifyContent={'center'}
+                  align="center"
+                  py={'16px'}
+                  backgroundColor={searchQuery && 'red.100'}
+                >
+                  <P fontSize="18px" lineHeight="26px" color="#4D4F51" fontWeight="400">
                     {searchQuery ? (
                       <FormattedMessage
-                        defaultMessage={'No results found for <b>{query}</b>'}
+                        defaultMessage={'No results found for <b>{query}</b>. Please type another keyword.'}
                         values={{
                           query: searchQuery,
                           b: I18nBold,
@@ -177,7 +191,7 @@ const SearchTopics = () => {
                       <FormattedMessage defaultMessage={'Type something to search'} />
                     )}
                   </P>
-                </Flex>
+                </Container>
               ) : (
                 <React.Fragment>
                   {sections.map((section, index) => {

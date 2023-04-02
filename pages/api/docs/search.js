@@ -9,5 +9,5 @@ export default async function handle(req, res) {
     },
   });
   const json = await result.json();
-  return res.status(200).send(json);
+  return res.status(result.status).send(json);
 }
