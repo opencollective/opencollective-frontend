@@ -128,14 +128,13 @@ const SearchTopics = () => {
     }
   };
 
-  const debouncedSearch = React.useCallback(debounce(search, 200), []);
+  const debouncedSearch = React.useCallback(debounce(search, 500), []);
 
   return (
     <Flex justifyContent="center" alignItems="center" px="16px">
       <Flex mt={['9px', '32px']} flexDirection="column" ref={innerRef}>
-        <Box ref={setRefElement}>
+        <Box ref={setRefElement} data-cy="search-input">
           <SearchForm
-            autoFocus
             width={['1', '248px', '608px']}
             borderRadius="100px"
             placeholder={intl.formatMessage({ defaultMessage: 'Type keywords to search for topics' })}
@@ -167,9 +166,9 @@ const SearchTopics = () => {
             style={styles.popper}
             {...attributes.popper}
           >
-            <Box maxHeight="416px" overflowY={'auto'}>
+            <Box maxHeight="416px" overflowY={'auto'} data-cy="search-result-popup">
               {isLoading ? (
-                <LoadingSearchResults />
+                <LoadingSearchResults data-cy="search-loading-placeholder" />
               ) : isEmpty(sections) ? (
                 <Container
                   display="flex"
@@ -197,7 +196,7 @@ const SearchTopics = () => {
                   {sections.map((section, index) => {
                     return (
                       <React.Fragment key={section.id}>
-                        <Link href={`${DOCS_BASE_URL}/${section.path}`} openInNewTab>
+                        <Link data-cy="search-result-link" href={`${DOCS_BASE_URL}/${section.path}`} openInNewTab>
                           <SectionCard px="12px" py="16px" border="none">
                             <P fontSize={'18px'} lineHeight="26px" fontWeight={'400'} color="#4D4F51">
                               {section.title}
