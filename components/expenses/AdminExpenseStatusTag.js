@@ -18,7 +18,7 @@ import StyledTag from '../StyledTag';
 
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import { getExpenseStatusMsgType } from './ExpenseStatusTag';
-import ProcessExpenseButtons, { ButtonLabel } from './ProcessExpenseButtons';
+import ProcessExpenseButtons, { ButtonLabel, hasProcessButtons } from './ProcessExpenseButtons';
 
 const ExpenseStatusTag = styled(StyledTag)`
   cursor: pointer;
@@ -27,7 +27,6 @@ const ExpenseStatusTag = styled(StyledTag)`
   line-height: 16px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  cursor: ${props => (props?.hideProcessExpenseButtons ? 'auto' : 'pointer')};
 `;
 
 const PopupContainer = styled(`div`)`
@@ -83,13 +82,10 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
   const [isClosable, setClosable] = React.useState(true);
   const [showMarkAsIncompleteModal, setMarkAsIncompleteModal] = React.useState(false);
   const hideProcessExpenseButtons =
-    expense?.status === expenseStatus.APPROVED && !expense?.permissions?.canMarkAsIncomplete;
+    expense?.status === expenseStatus.APPROVED && !hasProcessButtons(expense?.permissions);
   const buttonProps = { px: 2, py: 2, isBorderless: true, width: '100%', textAlign: 'left' };
 
   const onClick = () => {
-    if (hideProcessExpenseButtons) {
-      return;
-    }
     setShowPopup(true);
   };
 
@@ -120,11 +116,10 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
                 type={getExpenseStatusMsgType(expense.status)}
                 data-cy="admin-expense-status-msg"
                 {...props}
-                hideProcessExpenseButtons={hideProcessExpenseButtons}
               >
                 <Flex>
                   {i18nExpenseStatus(intl, expense.status)}
-                  {!hideProcessExpenseButtons && <ChevronDownIcon />}
+                  <ChevronDownIcon />
                 </Flex>
               </ExpenseStatusTag>
             </Box>
