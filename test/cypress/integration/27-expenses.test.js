@@ -578,7 +578,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('confirmation-modal-continue').click();
       cy.url().should('eq', `${Cypress.config().baseUrl}/${collective.slug}/expenses`);
       cy.visit(expenseUrl);
-      cy.getByDataCy('error-page').contains('Not found');
+      cy.getByDataCy('error-page').contains('Page not found');
     });
 
     it('Displays expense policy', () => {
