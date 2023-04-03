@@ -675,6 +675,12 @@ const AddFundsModal = ({ collective, ...props }) => {
                           formikValuePath="tax"
                           isOptional
                           labelProps={{ fontSize: '16px', fontWeight: '700' }}
+                          idNumberLabelRenderer={shortTaxTypeLabel =>
+                            intl.formatMessage(
+                              { defaultMessage: "Source's {taxName} identifier" },
+                              { taxName: shortTaxTypeLabel },
+                            )
+                          }
                         />
                       </Box>
                     )}

@@ -9,7 +9,7 @@ import { verifyValueInRange } from '../../lib/form-utils';
 import { ExpenseTaxInput, TaxInput } from '../../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 
-import { Flex, Grid } from '../Grid';
+import { Flex } from '../Grid';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
@@ -20,6 +20,7 @@ type TaxesFormikFieldsProps = {
   formikValuePath: string;
   isOptional?: boolean;
   labelProps?: Record<string, any>;
+  idNumberLabelRenderer?: (shortLabel: string) => string;
 };
 
 type TaxSpecificValues = {
@@ -103,6 +104,7 @@ export const TaxesFormikFields = ({
   formikValuePath,
   labelProps,
   isOptional,
+  idNumberLabelRenderer,
 }: TaxesFormikFieldsProps) => {
   const intl = useIntl();
   const currentTaxValue = get(formik.values, formikValuePath);
@@ -150,7 +152,11 @@ export const TaxesFormikFields = ({
       <StyledInputFormikField
         name={`${formikValuePath}.idNumber`}
         htmlFor={`input-${taxType}-id-number`}
-        label={intl.formatMessage({ defaultMessage: '{taxName} identifier' }, { taxName: shortTaxTypeLabel })}
+        label={
+          idNumberLabelRenderer
+            ? idNumberLabelRenderer(shortTaxTypeLabel)
+            : intl.formatMessage({ defaultMessage: '{taxName} identifier' }, { taxName: shortTaxTypeLabel })
+        }
         labelProps={{ whiteSpace: 'nowrap', ...labelProps }}
         required={!isOptional && taxSpecificValues.requireIdNumber}
         flexGrow={1}
