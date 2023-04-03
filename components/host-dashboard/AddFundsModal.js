@@ -501,7 +501,7 @@ const AddFundsModal = ({ collective, ...props }) => {
           {formik => {
             const { values, isSubmitting } = formik;
             const hostFeePercent = isNaN(values.hostFeePercent) ? defaultHostFeePercent : values.hostFeePercent;
-            const taxAmount = (values.tax?.rate || 0) * values.amount;
+            const taxAmount = !values.tax?.rate ? 0 : Math.round(values.amount - values.amount / (1 + values.tax.rate));
             const hostFee = Math.round((values.amount - taxAmount) * (hostFeePercent / 100));
 
             const defaultSources = [];
@@ -713,15 +713,31 @@ const AddFundsModal = ({ collective, ...props }) => {
                       label={<FormattedMessage id="AddFundsModal.fundingAmount" defaultMessage="Funding amount" />}
                     />
                     {Boolean(values.tax?.rate) && (
-                      <AmountDetailsLine
-                        value={taxAmount}
-                        currency={currency}
-                        label={`${i18nTaxType(intl, values.tax.type, 'long')} (${Math.round(values.tax.rate * 100)}%)`}
-                      />
+                      <React.Fragment>
+                        <AmountDetailsLine
+                          value={-taxAmount}
+                          currency={currency}
+                          label={`${i18nTaxType(intl, values.tax.type, 'long')} (${Math.round(
+                            values.tax.rate * 100,
+                          )}%)`}
+                        />
+                        <StyledHr my={1} borderColor="black.200" />
+                        <AmountDetailsLine
+                          value={(values.amount || 0) - taxAmount}
+                          currency={currency}
+                          label={
+                            <FormattedMessage
+                              defaultMessage="Gross amount without {taxName}"
+                              values={{ taxName: i18nTaxType(intl, values.tax.type, 'short') }}
+                            />
+                          }
+                        />
+                        <StyledHr my={1} borderColor="black.200" />
+                      </React.Fragment>
                     )}
                     {canAddHostFee && (
                       <AmountDetailsLine
-                        value={hostFee}
+                        value={!hostFee ? 0 : -hostFee}
                         currency={currency}
                         label={
                           <FormattedMessage
