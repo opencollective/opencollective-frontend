@@ -61,6 +61,8 @@ const validateGSTTaxInput = (intl, tax: TaxInput, options) => {
   // ID number is required if there's a tax rate
   if (tax.rate && !tax.idNumber && options.requireTaxIdNumber) {
     errors.idNumber = createError(ERROR.FORM_FIELD_REQUIRED);
+  } else if (![0, 0.15].includes(tax.rate)) {
+    errors.rate = createError(ERROR.FORM_FIELD_INVALID_VALUE);
   }
 
   return errors;
@@ -145,7 +147,7 @@ export const TaxesFormikFields = ({
             min={0}
             max={100}
             step="0.01"
-            disabled={!isNil(taxSpecificValues.forcedRate)}
+            disabled={!isOptional && !isNil(taxSpecificValues.forcedRate)}
           />
         )}
       </StyledInputFormikField>
