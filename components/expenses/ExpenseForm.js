@@ -29,7 +29,7 @@ import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
-import ExpenseFormItems, { addNewExpenseItem } from './ExpenseFormItems';
+import ExpenseFormItems, { addNewExpenseItem, newExpenseItem } from './ExpenseFormItems';
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
 import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';
@@ -820,7 +820,7 @@ const ExpenseForm = ({
   const initialValues = { ...getDefaultExpense(collective), ...expense };
   const validate = expenseData => validateExpense(intl, expenseData);
   if (isDraft) {
-    initialValues.items = expense.draft.items;
+    initialValues.items = expense.draft.items?.map(newExpenseItem) || [];
     initialValues.taxes = expense.draft.taxes;
     initialValues.attachedFiles = expense.draft.attachedFiles;
     initialValues.payoutMethod = expense.draft.payoutMethod;
