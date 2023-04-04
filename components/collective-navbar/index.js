@@ -309,17 +309,12 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.SETTINGS,
       component: (
-        <Link
-          href={collective.type === CollectiveType.USER ? getDashboardRoute(collective) : getSettingsRoute(collective)}
-          data-cy="edit-collective-btn"
-        >
+        <Link href={getSettingsRoute(collective)} data-cy="edit-collective-btn">
           <ActionButton tabIndex="-1">
             <Settings size="1em" />
             <Span ml={2}>
               {collective.isHost ? (
                 <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
-              ) : collective.type === CollectiveType.USER ? (
-                <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
               ) : (
                 <FormattedMessage id="Settings" defaultMessage="Settings" />
               )}
