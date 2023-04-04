@@ -13,12 +13,14 @@ import { Flex } from '../Grid';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
+import StyledSelect from '../StyledSelect';
 
 type TaxesFormikFieldsProps = {
   taxType: TaxType;
   formik: FormikProps<any>;
   formikValuePath: string;
   isOptional?: boolean;
+  dispatchDefaultValueOnMount?: boolean;
   labelProps?: Record<string, any>;
   idNumberLabelRenderer?: (shortLabel: string) => string;
 };
@@ -27,6 +29,7 @@ type TaxSpecificValues = {
   idNumberPlaceholder: string;
   requireIdNumber: boolean;
   forcedRate?: number;
+  possibleRates?: number[];
 };
 
 const validateVATTaxInput = (intl, tax: TaxInput, options) => {
@@ -61,6 +64,8 @@ const validateGSTTaxInput = (intl, tax: TaxInput, options) => {
   // ID number is required if there's a tax rate
   if (tax.rate && !tax.idNumber && options.requireTaxIdNumber) {
     errors.idNumber = createError(ERROR.FORM_FIELD_REQUIRED);
+  } else if (![0, 0.15].includes(tax.rate)) {
+    errors.rate = createError(ERROR.FORM_FIELD_INVALID_VALUE);
   }
 
   return errors;
@@ -89,9 +94,18 @@ const getTaxSpecificValues = (intl: IntlShape, taxType: TaxType, currentTaxValue
         idNumberPlaceholder: '123456789',
         requireIdNumber: false,
         forcedRate: GST_RATE_PERCENT / 100,
+        possibleRates: [0, GST_RATE_PERCENT / 100],
       };
     default:
       return null;
+  }
+};
+
+const i18nTaxRate = (intl: IntlShape, taxType: TaxType, rate: number) => {
+  if (rate) {
+    return `${rate * 100}%`;
+  } else {
+    return intl.formatMessage({ defaultMessage: 'No {taxName}' }, { taxName: i18nTaxType(intl, taxType, 'short') });
   }
 };
 
@@ -105,19 +119,19 @@ export const TaxesFormikFields = ({
   labelProps,
   isOptional,
   idNumberLabelRenderer,
+  dispatchDefaultValueOnMount = true,
 }: TaxesFormikFieldsProps) => {
   const intl = useIntl();
   const currentTaxValue = get(formik.values, formikValuePath);
   const taxSpecificValues = getTaxSpecificValues(intl, taxType, currentTaxValue);
 
+  const dispatchChange = (rate: number) =>
+    formik.setFieldValue(formikValuePath, { ...currentTaxValue, type: taxType, rate: rate });
+
   // If mounted, it means that the form is subject to taxType. Let's make sure we initialize taxes field accordingly
   React.useEffect(() => {
-    if (taxType && currentTaxValue?.type !== taxType) {
-      formik.setFieldValue(formikValuePath, {
-        ...currentTaxValue,
-        type: taxType,
-        rate: taxSpecificValues.forcedRate,
-      });
+    if (dispatchDefaultValueOnMount && taxType && currentTaxValue?.type !== taxType) {
+      dispatchChange(taxSpecificValues.forcedRate);
     }
   }, []);
 
@@ -126,6 +140,7 @@ export const TaxesFormikFields = ({
   }
 
   const shortTaxTypeLabel = i18nTaxType(intl, taxType, 'short');
+  const isForcedRate = !isOptional && !isNil(taxSpecificValues.forcedRate);
   return (
     <Flex gap="8px">
       <StyledInputFormikField
@@ -136,18 +151,31 @@ export const TaxesFormikFields = ({
         inputType="number"
         required={!isOptional}
       >
-        {({ field }) => (
-          <StyledInputGroup
-            {...field}
-            value={round(field.value * 100, 2)}
-            onChange={e => formik.setFieldValue(e.target.name, round(e.target.value / 100, 4))}
-            append="%"
-            min={0}
-            max={100}
-            step="0.01"
-            disabled={!isNil(taxSpecificValues.forcedRate)}
-          />
-        )}
+        {({ field }) =>
+          isForcedRate || !taxSpecificValues.possibleRates ? (
+            <StyledInputGroup
+              {...field}
+              value={round(field.value * 100, 2)}
+              onChange={e => dispatchChange(round(e.target.value / 100, 4))}
+              minWidth={65}
+              append="%"
+              min={0}
+              max={100}
+              step="0.01"
+              disabled={isForcedRate}
+            />
+          ) : (
+            <StyledSelect
+              inputId={`input-${taxType}-rate`}
+              value={{ value: round(field.value * 100, 2), label: i18nTaxRate(intl, taxType, field.value) }}
+              onChange={({ value }) => dispatchChange(value)}
+              options={taxSpecificValues.possibleRates.map(rate => ({
+                value: rate,
+                label: i18nTaxRate(intl, taxType, rate),
+              }))}
+            />
+          )
+        }
       </StyledInputFormikField>
       <StyledInputFormikField
         name={`${formikValuePath}.idNumber`}
