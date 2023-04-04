@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -98,12 +98,19 @@ const getIsAccountantOnly = (LoggedInUser, account) => {
 };
 
 const DashboardPage = () => {
+  const intl = useIntl();
   const router = useRouter();
   const { slug, section, subpath } = router.query;
-  const intl = useIntl();
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
-  const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
 
+  // Redirect to the dashboard of the logged in user if no slug is provided
+  useEffect(() => {
+    if (!slug && LoggedInUser) {
+      router.push(`/dashboard/${LoggedInUser.collective.slug}`);
+    }
+  }, [slug, LoggedInUser]);
+
+  const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
   const account = data?.account;
   const notification = getNotification(intl, account);
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);

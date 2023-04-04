@@ -127,6 +127,10 @@ exports.REWRITES = [
     destination: '/create-project',
   },
   {
+    source: '/dashboard',
+    destination: '/dashboard',
+  },
+  {
     source: '/dashboard/:section?/:slug/:subpath*',
     destination: '/dashboard',
   },
