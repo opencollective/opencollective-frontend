@@ -33,12 +33,6 @@ class AcceptFinancialContributions extends Component {
     const { chosenHost } = this.state;
     const { path, state, message } = router.query;
 
-    if (!path && router.query.newFlow === 'true') {
-      return (
-        <StartAcceptingFinancialContributionsPage collective={this.props.collective} onChange={this.handleChange} />
-      );
-    }
-
     if (!path) {
       return <ContributionCategoryPicker collective={this.props.collective} />;
     }
@@ -48,6 +42,12 @@ class AcceptFinancialContributions extends Component {
     }
 
     if (path === 'host') {
+      if (router.query.newFlow === 'true') {
+        return (
+          <StartAcceptingFinancialContributionsPage collective={this.props.collective} onChange={this.handleChange} />
+        );
+      }
+
       return <ApplyToHost collective={this.props.collective} onChange={this.handleChange} />;
     } else {
       return <AcceptContributionsOurselvesOrOrg collective={this.props.collective} />;
