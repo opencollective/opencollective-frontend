@@ -157,7 +157,7 @@ const messages = defineMessages({
   },
   'company.contactUs': {
     id: 'contactUs',
-    defaultMessage: 'Contact Us',
+    defaultMessage: 'Contact us',
   },
 });
 
