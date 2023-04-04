@@ -242,7 +242,7 @@ const Transactions = ({
       : transactions?.nodes || [];
 
   return (
-    <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} pb={3} data-cy="transactions-page-content">
+    <Box maxWidth={1260} m="0 auto" pb={3} data-cy="transactions-page-content">
       <Flex justifyContent="space-between" alignItems="baseline">
         <SectionTitle textAlign="left" mb={1} display={['none', 'block']}>
           <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
