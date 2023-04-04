@@ -674,6 +674,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           formik={formik}
                           formikValuePath="tax"
                           isOptional
+                          dispatchDefaultValueOnMount={false}
                           labelProps={{ fontSize: '16px', fontWeight: '700' }}
                           idNumberLabelRenderer={shortTaxTypeLabel =>
                             intl.formatMessage(
@@ -732,7 +733,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                             />
                           }
                         />
-                        <StyledHr my={1} borderColor="black.200" />
+                        {canAddHostFee && <StyledHr my={1} borderColor="black.200" />}
                       </React.Fragment>
                     )}
                     {canAddHostFee && (
@@ -831,7 +832,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                                       currency={currency}
                                       showCurrencyCode={false}
                                       amount={
-                                        (fundDetails.fundAmount - (fundDetails.taxAmount.valueInCents || 0)) *
+                                        (fundDetails.fundAmount - (fundDetails.taxAmount?.valueInCents || 0)) *
                                         (fundDetails.hostFeePercent / 100)
                                       }
                                     />
