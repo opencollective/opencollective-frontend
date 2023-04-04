@@ -4799,7 +4799,7 @@ export type Individual = Account & {
   githubHandle?: Maybe<Scalars['String']>;
   /** Has the account a password set? For authenticated user: scope: "account". */
   hasPassword?: Maybe<Scalars['Boolean']>;
-  hasSeenLatestChangelogEntry: Scalars['Boolean'];
+  hasSeenLatestChangelogEntry?: Maybe<Scalars['Boolean']>;
   hasTwoFactorAuth?: Maybe<Scalars['Boolean']>;
   /** If the individual is a host account, this will return the matching Host object */
   host?: Maybe<Host>;
@@ -5487,10 +5487,11 @@ export type MutationAddFundsArgs = {
   amount: AmountInput;
   description: Scalars['String'];
   fromAccount: AccountReferenceInput;
-  hostFeePercent?: InputMaybe<Scalars['Float']>;
+  hostFeePercent: Scalars['Float'];
   invoiceTemplate?: InputMaybe<Scalars['String']>;
   memo?: InputMaybe<Scalars['String']>;
   processedAt?: InputMaybe<Scalars['DateTime']>;
+  tax?: InputMaybe<TaxInput>;
   tier?: InputMaybe<TierReferenceInput>;
 };
 
@@ -6307,6 +6308,8 @@ export type Order = {
   quantity?: Maybe<Scalars['Int']>;
   status?: Maybe<OrderStatus>;
   tags: Array<Maybe<Scalars['String']>>;
+  /** Tax amount */
+  taxAmount?: Maybe<Amount>;
   taxes: Array<Maybe<OrderTax>>;
   tier?: Maybe<Tier>;
   toAccount?: Maybe<Account>;
@@ -8079,6 +8082,16 @@ export type TaxInfo = {
   rate: Scalars['Float'];
   /** Identifier for this tax (GST, VAT, etc) */
   type: OrderTaxType;
+};
+
+/** Input to set taxes for an expense */
+export type TaxInput = {
+  /** Tax identification number, if any */
+  idNumber?: InputMaybe<Scalars['String']>;
+  /** Tax rate as a float number between 0 and 1 */
+  rate: Scalars['Float'];
+  /** Tax type */
+  type: TaxType;
 };
 
 /** The type of a tax like GST, VAT, etc */

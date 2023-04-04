@@ -72,6 +72,7 @@ const COMMON_DIRECTIVES = {
     'www.youtube-nocookie.com',
     'opencollective.com',
     'anchor.fm',
+    'podcasters.spotify.com',
     'js.stripe.com',
     '*.paypal.com',
     '*.openstreetmap.org',

@@ -1,0 +1,278 @@
+{
+  "items": [
+    {
+      "id": "ZYGdBl8Hs9Z9cRG0Vofe",
+      "title": "Custom Email",
+      "path": "collectives/custom-email",
+      "sections": [
+        {
+          "id": "11dfa40405304fd08f3feb14442c375e",
+          "title": "Collective Custom Email",
+          "body": "Click through to your Collective Settings\n\n \n\n2. The 'Custom Email' section will enable you to customise the message that is included in the thank you email sent to financial contributors of your Collective.  ",
+          "path": "collectives/custom-email#collective-custom-email",
+          "urls": {
+            "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/collectives/custom-email#collective-custom-email"
+          }
+        }
+      ],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/collectives/custom-email"
+      }
+    },
+    {
+      "id": "-Ls3oHjuyLLlSSiNQqqH",
+      "title": "Currencies",
+      "path": "product/currencies",
+      "sections": [
+        {
+          "id": "9b2fd090feac4642a53f52a6bf4685e5",
+          "title": "Collectives can receive contributions from all over the world via credit card, in any currency.",
+          "body": "Donation amounts will be denominated in the currency of the Collective's Fiscal Host, which can be set up in the following currencies (so far):\n\nArgentine Peso - ARS\nAustralian Dollar - AUD\nBangladeshi Taka - BDT\nBulgarian Lev - BGN\nBrazilian Real - BRL\nCanadian Dollar - CAD\nSwiss Franc - CHF\nCzech Koruna - CZK\nDanish Krone - DKK\nEuro - EUR\nPound sterling - GBP\nHong Kong Dollar - HKD\nCroatian Kuna - HRK\nHungarian Forint - HUF\nIndian Rupee - INR\nIcelandic Króna - ISK\nJapanese Yen - JPY\nMexican Peso - MXN\nMalaysian Ringgit - MYR\nNigerian Naira - NGN\nNorwegian Krone - NOK\nNepalese Rupee - NPR\nNew Zealand Dollar- NZD\nPoland złoty - PLN\nRomanian Leu - RON\nSwedish Krona - SEK\nSingapore Dollar - SGD\nUkrainian hryvnia - UAH\nUnited States Dollar - USD\nUruguayan Peso - UYU\nSouth African Rand - ZAR\n\nThe currency a Fiscal Host supports is determined by the currency used by their Stripe account. If you'd like to chance the currency on your OC Fiscal Host, please check the primary currency of the Stripe account and change it there. If this doesn't work or you're having issues, please contact us.",
+          "path": "product/currencies#collectives-can-receive-contributions-from-all-over-the-world-via-credit-card-in-any-currency.",
+          "urls": {
+            "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/product/currencies#collectives-can-receive-contributions-from-all-over-the-world-via-credit-card-in-any-currency."
+          }
+        }
+      ],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/product/currencies"
+      }
+    },
+    {
+      "id": "-Ls3oHjNgoNbISNrnptm",
+      "title": "Terminology",
+      "path": "about/terminology",
+      "sections": [
+        {
+          "id": "9e125888207e419aad9cc87792f8ceca",
+          "title": "Collectives ",
+          "body": "The primary entity most representative of the basis of our platform. A Collective represents a project or group that has a mission or purpose in the world, which they raise and spend funds transparently to achieve.",
+          "path": "about/terminology#collectives",
+          "urls": {
+            "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/about/terminology#collectives"
+          }
+        }
+      ],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/about/terminology"
+      }
+    },
+    {
+      "id": "-Ls3oHkMwlanNJY_wHQE",
+      "title": "Organization FAQ",
+      "path": "financial-contributors/organizations/organization-faq",
+      "sections": [
+        {
+          "id": "9497128c0fc348e78891b44fbafebaf4",
+          "title": "Which Collectives should we Sponsor?",
+          "body": "We offer tools to help you find Collectives that are providing value for your company.\n\nBackYourStack: discover your open source dependencies\nGift Cards: let your developers, ambassadors, employees, or recruits determine which Collective to support \nDiscover: search for Collectives on the platform",
+          "path": "financial-contributors/organizations/organization-faq#which-collectives-should-we-sponsor",
+          "urls": {
+            "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/financial-contributors/organizations/organization-faq#which-collectives-should-we-sponsor"
+          }
+        }
+      ],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/financial-contributors/organizations/organization-faq"
+      }
+    },
+    {
+      "id": "-Ls3oHkYLWa-AfWZDAhN",
+      "title": "Tax Information",
+      "path": "expenses-and-getting-paid/tax-information",
+      "sections": [
+        {
+          "id": "6ac4c24402bd4ce193871f08e46d4a4f",
+          "title": "Info For Collectives",
+          "body": "Collectives that live under the umbrella of a Fiscal Host, don't need to worry about accounting and tax obligations, because the host manages that (this is the awesome value of fiscal hosting). If you need tax or accounting information for some reason, get in touch with your fiscal host.\n\nSome Collectives run their own Fiscal Host, and they have all the normal tax and reporting obligations of any legal entity. In that case, consult with your accountant to understand the requirements for taxes.",
+          "path": "expenses-and-getting-paid/tax-information#info-for-collectives",
+          "urls": {
+            "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/expenses-and-getting-paid/tax-information#info-for-collectives"
+          }
+        }
+      ],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/expenses-and-getting-paid/tax-information"
+      }
+    },
+    {
+      "id": "-Ls3oHkcBQGNKFA6lka_",
+      "title": "Creating a Fiscal Host",
+      "path": "fiscal-hosts/create-a-fiscal-host",
+      "sections": [
+        {
+          "id": "2e9c4f7331254d6296e7201e183ea53c",
+          "title": "Create a Collective",
+          "body": "If you already created a Collective and want to add a Fiscal Host of your own, go to Add a Fiscal Host.\n\nThis will be the page for the first project, group or budget you will be hosting. Open your user menu and click the + next to My Collectives. \n\nWhen choosing what type of Collective you want to create, choose the For any community option.\n\nIf you need detailed instructions on how to create a Collective, please read our Creating a Collective page.",
+          "path": "fiscal-hosts/create-a-fiscal-host#create-a-collective",
+          "urls": {
+            "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/fiscal-hosts/create-a-fiscal-host#create-a-collective"
+          }
+        }
+      ],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/fiscal-hosts/create-a-fiscal-host"
+      }
+    },
+    {
+      "id": "-Ls3oHkFIsbAO46JgiiI",
+      "title": "Closing a Collective",
+      "path": "collectives/collective-settings/closing-a-collective",
+      "sections": [
+        {
+          "id": "ae4a65a7b98042578b3f9f96fed43dc5",
+          "title": "Delete a Collective",
+          "body": "If your Collective does not have any transactions or financial activity, you can delete it. Deleting a Collective will remove its data, including memberships, payment methods, etc.\n\nIf your Collective has transactions associated with it, you will have to archive it. The reason we cannot delete transactions is the financial ledger must retain its accuracy and integrity. Your income is someone else's expense, and your expenses are someone else's income.",
+          "path": "collectives/collective-settings/closing-a-collective#delete-a-collective",
+          "urls": {
+            "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/collectives/collective-settings/closing-a-collective#delete-a-collective"
+          }
+        }
+      ],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/collectives/collective-settings/closing-a-collective"
+      }
+    },
+    {
+      "id": "-Ls3oHjydgiG96-r1hFo",
+      "title": "Collectives FAQ",
+      "path": "collectives/collectives",
+      "sections": [
+        {
+          "id": "0d460eaf84794a109e2090cf308f4f79",
+          "title": "What do Collectives spend money on?",
+          "body": "There are as many answers to this question as there are Collectives! It's up to each community to decide how to spend their funds.\n\nSome communities delegate financial decision-making to a specific person or role, some develop policies about what should be funded, and others have processes to make spending decisions together as a group.\n\nFor ideas and examples, check out this article: Has Your Open Source Community Raised Money? Here’s How to Spend It.\n\nSome common expenses are hosting costs, documentation, community moderation, printing t-shirts and stickers, conference travel expenses, food at meetups, time spent working on specific features, or even paying someone to work on a project full time!\n\nFor more details about how to spend money, see our documentation about expenses.",
+          "path": "collectives/collectives#what-do-collectives-spend-money-on",
+          "urls": {
+            "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/collectives/collectives#what-do-collectives-spend-money-on"
+          }
+        }
+      ],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/collectives/collectives"
+      }
+    },
+    {
+      "id": "-Ls3oHjtXI8lF4UsHXee",
+      "title": "User Profile",
+      "path": "product/user-profile",
+      "sections": [
+        {
+          "id": "116814e1f6ae47eaa5bf418d85ef74d7",
+          "title": "Using Open Collective Anonymously",
+          "body": "We understand that not everyone can or wants to show their real name on public Collective budgets.\n\nIf you are getting paid through the platform, we will need some personally identifiable information. Including your legal name. We will also need some documents, invoices and tax forms, these documents are not availably to the public, only admins of Collectives you work withwill be able to see them.",
+          "path": "product/user-profile#using-open-collective-anonymously",
+          "urls": {
+            "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/product/user-profile#using-open-collective-anonymously"
+          }
+        }
+      ],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/product/user-profile"
+      }
+    },
+    {
+      "id": "s2GgpOsenKn0mKjUZPsm",
+      "title": "Notifications",
+      "path": "product/notifications",
+      "sections": [
+        {
+          "id": "746a8ed142b347d5b5c534df6bd1f3e4",
+          "title": "Updates about Open Collective and the Collectives you support",
+          "body": "These are the notifications triggered by updates and newsletters sent by our platform and by the collectives you support.\n\nIn this section, you can subscribe and unsubscribe from our monthly newsletter and also tweak which collectives that you contribute to that can reach out to you through email:",
+          "path": "product/notifications#updates-about-open-collective-and-the-collectives-you-support",
+          "urls": {
+            "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/product/notifications#updates-about-open-collective-and-the-collectives-you-support"
+          }
+        }
+      ],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/product/notifications"
+      }
+    },
+    {
+      "id": "-Mdu8Baj54H5lnbb2cHy",
+      "title": "Collective Settings",
+      "path": "collectives/collective-settings",
+      "sections": [],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/collectives/collective-settings"
+      }
+    },
+    {
+      "id": "-Ls3oHlA1H9kitIibH-9",
+      "title": "Collective's locations",
+      "path": "contributing/development/collectives-locations",
+      "sections": [],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/contributing/development/collectives-locations"
+      }
+    },
+    {
+      "id": "-Ls3oHkzAmVDNYn50TyC",
+      "title": "Collectives",
+      "path": "contributing/development/api/collectives",
+      "sections": [],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/contributing/development/api/collectives"
+      }
+    },
+    {
+      "id": "-Ls3oHkRk4j6MWuakaKL",
+      "title": "Collective to Collective",
+      "path": "financial-contributors/collective-to-collective",
+      "sections": [],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/financial-contributors/collective-to-collective"
+      }
+    },
+    {
+      "id": "-Ls3oHk2qr8ryLxmx6GB",
+      "title": "Collective Goals & Tiers",
+      "path": "collectives/collective-settings/tiers-goals",
+      "sections": [],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/collectives/collective-settings/tiers-goals"
+      }
+    },
+    {
+      "id": "58fS1Z7YK1pV2amy26yL",
+      "title": "Hosted Collectives",
+      "path": "fiscal-hosts/fiscal-host-dashboard/hosted-collectives",
+      "sections": [],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/fiscal-hosts/fiscal-host-dashboard/hosted-collectives"
+      }
+    },
+    {
+      "id": "-MkoiVj8XCUdyhZdWD36",
+      "title": "Independent Collective Management",
+      "path": "independent-collectives/manage-independent-collective",
+      "sections": [],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/independent-collectives/manage-independent-collective"
+      }
+    },
+    {
+      "id": "-MkoiJD2Lt2Mfnri8x9j",
+      "title": "Independent Collective Setup",
+      "path": "independent-collectives/set-up-independent-collective",
+      "sections": [],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/independent-collectives/set-up-independent-collective"
+      }
+    },
+    {
+      "id": "-M65X9gvXsblnJzHNGyH",
+      "title": "Connected Collectives",
+      "path": "collectives/connectedcollectives",
+      "sections": [],
+      "urls": {
+        "app": "https://app.gitbook.com/o/-LWSZizNMEjL8_DrMNdF/s/-LWSZizTt4ZC1UNDV89f/collectives/connectedcollectives"
+      }
+    }
+  ],
+  "next": {
+    "page": "1"
+  }
+}

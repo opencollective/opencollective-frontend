@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import styled from 'styled-components';
-import { borderRadius, fontSize, height } from 'styled-system';
+import { borderRadius, height, typography } from 'styled-system';
 
 import { Box, Flex } from './Grid';
 import SearchIcon from './SearchIcon';
@@ -23,10 +23,7 @@ const SearchInput = styled(Box)`
     appearance: none;
     background-color: transparent;
     border: none;
-    font-size: 1.2rem;
-    letter-spacing: 0.1rem;
-    font-style: italic;
-    ${fontSize};
+    ${typography}
     ::placeholder {
       color: #9d9fa3;
     }
@@ -56,7 +53,6 @@ class SearchForm extends React.Component {
 
   render() {
     const {
-      fontSize,
       onSubmit = this.handleSubmit,
       placeholder = 'Search...',
       width = 1,
@@ -67,6 +63,13 @@ class SearchForm extends React.Component {
       borderRadius = '20px',
       height = '46px',
       disabled,
+      onFocus,
+      autoComplete = 'on',
+      fontStyle = 'italic',
+      letterSpacing = '0.1rem',
+      fontSize = '1.2rem',
+      lineHeight,
+      fontWeight,
     } = this.props;
     return (
       <form action="/search" method="GET" onSubmit={onSubmit}>
@@ -90,11 +93,17 @@ class SearchForm extends React.Component {
             pl={3}
             width={width}
             fontSize={fontSize}
+            fontStyle={fontStyle}
+            letterSpacing={letterSpacing}
+            lineHeight={lineHeight}
+            fontWeight={fontWeight}
             aria-label="Open Collective search input"
             defaultValue={defaultValue}
             value={value}
             onChange={onChange && (e => onChange(e.target.value))}
             disabled={disabled}
+            onFocus={onFocus}
+            autoComplete={autoComplete}
           />
           {this.props.showSearchButton && (
             <StyledRoundButton
@@ -128,6 +137,12 @@ SearchForm.propTypes = {
   autoFocus: PropTypes.bool,
   showSearchButton: PropTypes.bool,
   searchButtonStyles: PropTypes.object,
+  onFocus: PropTypes.func,
+  autoComplete: PropTypes.string,
+  fontStyle: PropTypes.string,
+  letterSpacing: PropTypes.string,
+  lineHeight: PropTypes.string,
+  fontWeight: PropTypes.string,
 };
 
 export default withRouter(SearchForm);

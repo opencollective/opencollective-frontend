@@ -825,6 +825,11 @@ type Order {
   amount: Amount!
 
   """
+  Tax amount
+  """
+  taxAmount: Amount
+
+  """
   Total order amount, including all taxes and platform tip
   """
   totalAmount: Amount!
@@ -7877,7 +7882,7 @@ type Individual implements Account {
   If the individual is a host account, this will return the matching Host object
   """
   host: Host
-  hasSeenLatestChangelogEntry: Boolean!
+  hasSeenLatestChangelogEntry: Boolean
   oAuthAuthorizations(
     """
     The number of results to fetch (default 10, max 1000)
@@ -12800,15 +12805,55 @@ type Mutation {
   Add funds to the given account. Scope: "host".
   """
   addFunds(
+    """
+    The account that will be used as the source of the funds
+    """
     fromAccount: AccountReferenceInput!
+
+    """
+    The account that will receive the funds
+    """
     account: AccountReferenceInput!
+
+    """
+    The tier to which the funds will be added
+    """
     tier: TierReferenceInput
+
+    """
+    The total amount of the order, including taxes
+    """
     amount: AmountInput!
+
+    """
+    A short description of the contribution
+    """
     description: String!
+
+    """
+    The host fee percent to apply to the order, as a float between 0 and 100
+    """
+    hostFeePercent: Float!
+
+    """
+    A private note for the host
+    """
     memo: String
+
+    """
+    The date at which the order was processed
+    """
     processedAt: DateTime
-    hostFeePercent: Float
+
+    """
+    The invoice template to use for this order
+    """
     invoiceTemplate: String
+
+    """
+    The tax to apply to the order
+    """
+    tax: TaxInput
   ): Order!
 
   """
@@ -14111,6 +14156,41 @@ type Mutation {
   ): TagResponse!
 }
 
+"""
+Input to set taxes for an expense
+"""
+input TaxInput {
+  """
+  Tax type
+  """
+  type: TaxType!
+
+  """
+  Tax rate as a float number between 0 and 1
+  """
+  rate: Float!
+
+  """
+  Tax identification number, if any
+  """
+  idNumber: String
+}
+
+"""
+The type of a tax like GST, VAT, etc
+"""
+enum TaxType {
+  """
+  European Value Added Tax
+  """
+  VAT
+
+  """
+  New Zealand Good and Services Tax
+  """
+  GST
+}
+
 input CollectiveCreateInput {
   name: String!
   slug: String!
@@ -14594,21 +14674,6 @@ input ExpenseTaxInput {
   Tax identification number, if any
   """
   idNumber: String
-}
-
-"""
-The type of a tax like GST, VAT, etc
-"""
-enum TaxType {
-  """
-  European Value Added Tax
-  """
-  VAT
-
-  """
-  New Zealand Good and Services Tax
-  """
-  GST
 }
 
 input RecurringExpenseInput {
