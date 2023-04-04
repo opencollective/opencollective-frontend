@@ -831,7 +831,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                                       currency={currency}
                                       showCurrencyCode={false}
                                       amount={
-                                        (fundDetails.fundAmount - (fundDetails.taxAmount.valueInCents || 0)) *
+                                        (fundDetails.fundAmount - (fundDetails.taxAmount?.valueInCents || 0)) *
                                         (fundDetails.hostFeePercent / 100)
                                       }
                                     />
