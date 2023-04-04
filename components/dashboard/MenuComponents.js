@@ -1,43 +1,27 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { ChevronDown } from '@styled-icons/feather/ChevronDown';
+import { ChevronUp } from '@styled-icons/feather/ChevronUp';
+import { useRouter } from 'next/router';
+import ReactAnimateHeight from 'react-animate-height';
+import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getDashboardRoute } from '../../lib/url-helpers';
 
-import { Box } from '../Grid';
+import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import StyledLink from '../StyledLink';
+import { Span } from '../Text';
 
 import { SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
-
-// display: flex;
-// padding: 0.5rem;
-// font-size: 0.875rem;
-// line-height: 1.25rem;
-// font-weight: 600;
-// line-height: 1.5rem;
-// border-radius: 0.375rem;
-// column-gap: 0.75rem;
-
-// active:
-// background-color: #F9FAFB;
-// color: #4F46E5;
-
-// inctive:
-// color: #374151;
-// :hover {
-//   color: #4F46E5;
-//   }
 
 const MenuLinkContainer = styled.li`
   a,
   ${StyledLink} {
     display: flex;
-    //justify-content: space-between;
     align-items: center;
-    grid-gap: 8px;
     font-weight: 600;
     font-size: 14px;
     line-height: 20px;
@@ -47,22 +31,51 @@ const MenuLinkContainer = styled.li`
     width: 100%;
     cursor: pointer;
 
+    svg {
+      flex-shrink: 0;
+    }
+
     ${props =>
       props.isSelected
         ? css`
             background: ${props => props.theme.colors.black[50]};
-            color: ${props => props.theme.colors.primary[700]};
+            color: ${props => props.theme.colors.primary[700]} !important;
             &:hover {
-              color: ${props => props.theme.colors.primary[700]};
+              color: ${props => props.theme.colors.primary[700]} !important;
             }
           `
         : css`
-            color: ${props => props.theme.colors.black[900]};
+            color: ${props => props.theme.colors.black[900]} !important;
             &:hover {
-              color: ${props => props.theme.colors.primary[700]};
+              color: ${props => props.theme.colors.primary[700]} !important;
               background: ${props => props.theme.colors.black[50]};
             }
           `}
+
+    ${props =>
+      props.isSub
+        ? css`
+            padding-left: 32px;
+          `
+        : css``}
+  }
+`;
+
+const ExpandButton = styled.button`
+  border: 0;
+  outline: 0;
+  border-radius: 6px;
+  flex-shrink: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  transition: background 50ms ease-in-out;
+  color: ${props => props.theme.colors.black[800]};
+  &:hover {
+    background: ${props => props.theme.colors.black[200]};
   }
 `;
 
@@ -75,7 +88,13 @@ export const MenuLink = ({
   if: conditional,
   isBeta,
   icon = null,
+  subMenu = null,
+  isSub = false,
+  expanded = false,
+  setExpanded,
+  goToSection,
 }) => {
+  const router = useRouter();
   const { selectedSection } = React.useContext(DashboardContext);
   const { formatMessage } = useIntl();
   if (conditional === false) {
@@ -85,21 +104,59 @@ export const MenuLink = ({
   if (!children && SECTION_LABELS[section]) {
     children = formatMessage(SECTION_LABELS[section]);
   }
-  console.log({ isSelected, lastPart: section && selectedSection === section, children });
-  return (
-    <MenuLinkContainer isSelected={isSelected || (section && selectedSection === section)}>
-      {onClick ? (
-        <StyledLink as="button" onClick={onClick} data-cy={`menu-item-${section}`}>
-          {icon} {children}
+  const handleClick = e => {
+    setExpanded?.(section);
+    onClick?.(e);
+    if (goToSection) {
+      router.push({ pathname: getDashboardRoute(collective, goToSection) });
+    }
+  };
+  const renderButtonContent = () => (
+    <Flex alignItems="center" justifyContent="space-between" flex={1}>
+      <Flex alignItems="center" gridGap="8px">
+        {icon}
+        <Span truncateOverflow>
+          {children}
           {isBeta ? ' (Beta)' : ''}
-        </StyledLink>
-      ) : (
-        <Link href={getDashboardRoute(collective, section)} data-cy={`menu-item-${section}`}>
-          {icon} {children}
-          {isBeta ? ' (Beta)' : ''}
-        </Link>
+        </Span>
+      </Flex>
+      {subMenu && (
+        <ExpandButton
+          onClick={e => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            setExpanded(expanded ? null : section);
+          }}
+        >
+          {expanded ? <ChevronUp size="16px" /> : <ChevronDown size="16px" />}
+        </ExpandButton>
       )}
-    </MenuLinkContainer>
+    </Flex>
+  );
+  return (
+    <React.Fragment>
+      <MenuLinkContainer isSelected={isSelected || (section && selectedSection === section)} isSub={isSub}>
+        {onClick ? (
+          <StyledLink as="button" onClick={handleClick} data-cy={`menu-item-${section}`}>
+            {renderButtonContent()}
+          </StyledLink>
+        ) : (
+          <Link
+            onClick={handleClick}
+            href={getDashboardRoute(collective, goToSection ? goToSection : section)}
+            data-cy={`menu-item-${section}`}
+          >
+            {renderButtonContent()}
+          </Link>
+        )}
+      </MenuLinkContainer>
+      {subMenu && (
+        <ReactAnimateHeight duration={150} height={expanded ? 'auto' : 0}>
+          {subMenu}
+        </ReactAnimateHeight>
+      )}
+    </React.Fragment>
   );
 };
 
@@ -113,9 +170,15 @@ MenuLink.propTypes = {
   isStrong: PropTypes.bool,
   onClick: PropTypes.func,
   afterClick: PropTypes.func,
+  icon: PropTypes.node,
   collective: PropTypes.shape({
     slug: PropTypes.string,
   }),
+  subMenu: PropTypes.node,
+  isSub: PropTypes.bool,
+  expanded: PropTypes.bool,
+  setExpanded: PropTypes.func,
+  goToSection: PropTypes.string,
 };
 
 export const MenuSectionHeader = styled.div`
@@ -132,7 +195,7 @@ export const MenuContainer = styled.ul`
   margin: 0;
   margin-bottom: 100px;
   max-width: 100%;
-
+  position: relative;
   a {
     color: ${props => props.theme.colors.black[900]};
     &:hover {
@@ -161,47 +224,4 @@ export const MenuGroup = ({ if: conditional, children, ...props }) => {
 MenuGroup.propTypes = {
   if: PropTypes.bool,
   children: PropTypes.node,
-};
-
-export const useSubmenu = () => {
-  const [submenuContent, setSubmenu] = React.useState();
-  const menuContent = submenuContent && (
-    <React.Fragment>
-      <ul>
-        <MenuLink onClick={() => setSubmenu(undefined)}>
-          <span>
-            &larr;&nbsp;
-            <FormattedMessage id="Back" defaultMessage="Back" />
-          </span>
-        </MenuLink>
-      </ul>
-      {submenuContent}
-    </React.Fragment>
-  );
-  const SubMenu = ({ icon, label, children, if: conditional }) => {
-    return (
-      <MenuLink
-        if={conditional}
-        icon={icon}
-        onClick={() =>
-          setSubmenu(
-            <React.Fragment>
-              <MenuSectionHeader>{label}</MenuSectionHeader>
-
-              {children}
-            </React.Fragment>,
-          )
-        }
-      >
-        <span>{label}</span>&nbsp;
-        <span>&rarr;</span>
-      </MenuLink>
-    );
-  };
-  SubMenu.propTypes = {
-    if: PropTypes.bool,
-    label: PropTypes.node,
-    children: PropTypes.node,
-  };
-  return { menuContent, SubMenu };
 };

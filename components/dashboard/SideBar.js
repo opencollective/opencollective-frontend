@@ -9,16 +9,12 @@ import Menu from './Menu';
 import { MenuContainer } from './MenuComponents';
 import Switcher from './Switcher';
 
-const SidebarContainer = styled.div`
+const SidebarContainer = styled(Box)`
   border-right: 1px solid #e6e8eb;
-  // padding: 16px;
-  // position: sticky;
-  // top: 0;
 `;
 
 const Sticky = styled.div`
-  // border-right: 1px solid #e6e8eb;
-  padding: 16px;
+  padding: 24px 16px;
   position: sticky;
   top: 0;
 `;
@@ -30,10 +26,11 @@ const AdminPanelSideBar = ({
   isLoading,
   selectedSection,
   onRoute,
-  // ...props
+  // display,
+  ...props
 }) => {
   return (
-    <SidebarContainer>
+    <SidebarContainer {...props}>
       <Sticky>
         <MenuContainer>
           <Switcher collective={collective} isLoading={isLoading} />

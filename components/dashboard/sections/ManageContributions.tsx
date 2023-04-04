@@ -22,9 +22,9 @@ const ManageContributions = ({ account }: AdminSectionProps) => {
   return (
     <React.Fragment>
       <Container position="relative" minHeight={[null, 800]}>
-        <Box maxWidth={Dimensions.MAX_SECTION_WIDTH} m="0 auto" px={[2, 3, 4]} pb={3}>
+        <Box maxWidth={Dimensions.MAX_SECTION_WIDTH} m="0 auto" pb={3}>
           <SectionTitle textAlign="left" mb={4} display={['none', 'block']}>
-            <FormattedMessage id="Contributions" defaultMessage="Contributions" />
+            <FormattedMessage defaultMessage="Manage Contributions" />
           </SectionTitle>
           <RecurringContributionsContainer
             recurringContributions={recurringContributions}

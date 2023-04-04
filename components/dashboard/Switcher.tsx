@@ -40,17 +40,16 @@ const StyledMenuEntry = styled(Link)`
   border: none;
   font: inherit;
   outline: inherit;
-  width: 100%;
+  max-width: 100%;
   text-align: left;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
-  grid-gap: 12px;
+  grid-gap: 4px;
 
   ${props =>
     props.$isActive
       ? css({
-          //   fontWeight: 800,
           backgroundColor: 'primary.100',
         })
       : css({
@@ -103,6 +102,8 @@ const ChevronUpDown = ({ style }) => (
 
 const StyledDropdownContent = styled(DropdownContent)`
   border-radius: 8px;
+  right: 0;
+  left: 0;
 `;
 
 const getAllAdminMemberships = memoizeOne(loggedInUser => {
@@ -142,7 +143,7 @@ const MenuEntry = ({ account, isActive, activeSlug }) => {
   return (
     <React.Fragment>
       <StyledMenuEntry key={account.id} href={`/dashboard/${account.slug}`} title={account.name} $isActive={isActive}>
-        <Flex alignItems="center" gridGap="12px">
+        <Flex overflow="hidden" alignItems="center" gridGap="12px">
           <Avatar collective={account} size={32} />
           <Span truncateOverflow>{account.name}</Span>
         </Flex>
@@ -156,6 +157,7 @@ const MenuEntry = ({ account, isActive, activeSlug }) => {
               e.stopPropagation();
               setExpanded(!expanded);
             }}
+            flexShrink={0}
           >
             {expanded ? <ChevronUp size="16px" /> : <ChevronDown size="16px" />}
           </StyledRoundButton>
@@ -169,7 +171,7 @@ const MenuEntry = ({ account, isActive, activeSlug }) => {
             title={account.name}
             $isActive={activeSlug === account.slug}
           >
-            <Flex alignItems="center" gridGap="12px">
+            <Flex overflow="hidden" alignItems="center" gridGap="12px">
               <Avatar ml={4} collective={account} size={32} />
               <Span truncateOverflow>{account.name}</Span>
             </Flex>
