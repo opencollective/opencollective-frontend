@@ -5,22 +5,18 @@ import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { getSuggestedTags, loggedInUserCanAccessFinancialData } from '../../lib/collective.lib';
+import { getSuggestedTags } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
-import { generateNotFoundError } from '../../lib/errors';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
 
 import { Dimensions } from '../collective-page/_constants';
 import SectionTitle from '../collective-page/SectionTitle';
 import Container from '../Container';
-import ErrorPage from '../ErrorPage';
 import { Box, Flex } from '../Grid';
 import ScheduledExpensesBanner from '../host-dashboard/ScheduledExpensesBanner';
 import Link from '../Link';
-import Loading from '../Loading';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
-import PageFeatureNotSupported from '../PageFeatureNotSupported';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import Tags from '../Tags';
@@ -32,29 +28,22 @@ import ExpenseInfoSidebar from './ExpenseInfoSidebar';
 import ExpensesFilters from './ExpensesFilters';
 import ExpensesList from './ExpensesList';
 
-// const messages = defineMessages({
-//   title: {
-//     id: 'ExpensesPage.title',
-//     defaultMessage: '{collectiveName} · Expenses',
-//   },
-// });
-
 const ORDER_SELECT_STYLE = { control: { background: 'white' } };
 
 const Expenses = props => {
-  //   const intl = useIntl();
   const router = useRouter();
-  const { query, LoggedInUser, data, collectiveSlug, loading, error, variables, refetch, isDashboard = true } = props;
+  const { query, LoggedInUser, data, loading, variables, refetch, isDashboard = true } = props;
+
   const expensesRoute = isDashboard
-    ? `/dashboard/expenses/${collectiveSlug}`
-    : `${getCollectivePageRoute(data?.account)}/expenses`;
+    ? `/dashboard/expenses/${data?.account?.slug}`
+    : `${getCollectivePageRoute(data.account)}/expenses`;
+
   useEffect(() => {
-    const account = data?.account;
     const queryParameters = {
       ...omit(query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
     };
     if (!isDashboard) {
-      addParentToURLIfMissing(router, account, `/expenses`, queryParameters);
+      addParentToURLIfMissing(router, data.account, `/expenses`, queryParameters);
     }
   }, []);
 
@@ -104,23 +93,6 @@ const Expenses = props => {
 
   const hasFilters = hasFilter(query);
   const isSelfHosted = data?.account?.id === data?.account?.host?.id;
-
-  if (!loading) {
-    if (error) {
-      return <ErrorPage data={data} />;
-    } else if (!data?.account || !data?.expenses?.nodes) {
-      return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
-    } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, data?.account)) {
-      // Hack for funds that want to keep their budget "private"
-      return <PageFeatureNotSupported showContactSupportLink={false} />;
-    }
-  }
-
-  if (!data?.account && loading) {
-    return <Loading />;
-  } else if (!data?.account) {
-    return <ErrorPage error={error} loading={loading} />;
-  }
 
   return (
     <Container position="relative" minHeight={[null, 800]}>
@@ -193,18 +165,18 @@ const Expenses = props => {
               <React.Fragment>
                 <ExpensesList
                   isLoading={loading}
-                  collective={data.account}
-                  host={data.account?.isHost ? data.account : data.account?.host}
-                  expenses={data.expenses?.nodes}
+                  collective={data?.account}
+                  host={data?.account?.isHost ? data?.account : data?.account?.host}
+                  expenses={data?.expenses?.nodes}
                   nbPlaceholders={variables.limit}
-                  suggestedTags={suggestedTags(data.account)}
+                  suggestedTags={suggestedTags(data?.account)}
                   isInverted={query.direction === 'SUBMITTED'}
                   view={query.direction === 'SUBMITTED' ? 'submitter' : undefined}
                 />
                 <Flex mt={5} justifyContent="center">
                   <Pagination
                     route={expensesRoute}
-                    total={data.expenses?.totalCount}
+                    total={data?.expenses?.totalCount}
                     limit={variables.limit}
                     offset={variables.offset}
                     ignoredQueryParams={['collectiveSlug', 'parentCollectiveSlug']}
@@ -217,11 +189,11 @@ const Expenses = props => {
             <Box minWidth={270} width={['100%', null, null, 275]} mt={[0, 48]}>
               <ExpenseInfoSidebar
                 isLoading={loading}
-                collective={data.account}
-                host={data.account?.host}
+                collective={data?.account}
+                host={data?.account?.host}
                 // showExpenseTypeFilters
               >
-                {data.account?.expensesTags.length > 0 && (
+                {data?.account?.expensesTags.length > 0 && (
                   <React.Fragment>
                     <H5 mb={3}>
                       <FormattedMessage id="Tags" defaultMessage="Tags" />
@@ -229,7 +201,7 @@ const Expenses = props => {
                     <Tags
                       isLoading={loading}
                       expense={{
-                        tags: data.account?.expensesTags.map(({ tag }) => tag),
+                        tags: data?.account?.expensesTags.map(({ tag }) => tag),
                       }}
                       limit={30}
                       getTagProps={getTagProps}
@@ -283,6 +255,7 @@ Expenses.propTypes = {
     account: PropTypes.shape({
       id: PropTypes.string.isRequired,
       currency: PropTypes.string.isRequired,
+      slug: PropTypes.string.isRequired,
       name: PropTypes.string,
       isArchived: PropTypes.bool,
       isHost: PropTypes.bool,

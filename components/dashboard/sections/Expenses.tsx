@@ -13,7 +13,7 @@ import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import { expensesPageQuery } from '../../../pages/expenses';
 import { parseAmountRange } from '../../budget/filters/AmountFilter';
-import ExpensesComponent from '../../expenses/Expenses';
+import ExpensesPage from '../../expenses/ExpensesPage';
 import { parseChronologicalOrderInput } from '../../expenses/filters/ExpensesOrder';
 import { AdminSectionProps } from '../types';
 
@@ -91,7 +91,7 @@ const Expenses = (props: AdminSectionProps) => {
 
   return (
     <React.Fragment>
-      <ExpensesComponent
+      <ExpensesPage
         data={data}
         refetch={refetch}
         query={query}
