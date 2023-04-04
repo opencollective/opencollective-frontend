@@ -26,7 +26,16 @@ const Illustration = styled.img`
   object-fit: cover;
 `;
 
-const CommunityTypes = ['Open Source', 'Mutual Aid', 'Climate', 'BLM', 'Indigenous', 'Education', 'Festival'];
+const CommunityTypesToTags = {
+  'Open Source': ['open source', 'opensource', 'open-source'],
+  'Mutual Aid': ['mutual aid', 'covid', 'covid-19'],
+  Education: ['education', 'meetup', 'tech meetup'],
+  'Civic Tech': [''],
+  'Arts & Culture': ['arts and culture', 'art', 'arts', 'visual art', 'visual arts', 'music'],
+  Climate: ['climate', 'climate change', 'climate crisis', 'climate action', 'climate emergency'],
+};
+
+const CommunityTypes = Object.keys(CommunityTypesToTags);
 
 const I18nMessages = defineMessages({
   ALL_COUNTRIES: {
@@ -45,6 +54,10 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
   const [selectedCountry, setSelectedCountry] = React.useState('ALL');
   const currencyOptions = [allCurrenciesSelectOption, ...Currency.map(c => ({ value: c, label: c }))];
   const [selectedCurrency, setSelectedCurrency] = React.useState(currencyOptions[0]);
+
+  const communityTags = selectedCommunityType.reduce((tags, community) => {
+    return [...tags, ...CommunityTypesToTags[community]];
+  }, []);
 
   return (
     <Flex my={5} alignItems="center" flexDirection="column">
@@ -68,7 +81,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
       </Box>
       <StyledCard width={['300px', '400px', '600px', '800px']} padding="32px 24px">
         <P mb={2} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
-          <FormattedMessage defaultMessage="What type of community are you?" />
+          <FormattedMessage defaultMessage="What categories describe your work?" />
         </P>
         <StyledFilters
           multiSelect
@@ -81,7 +94,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         <Flex gap={'40px'} flexWrap="wrap" mt={4}>
           <Box flexGrow={1}>
             <P fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb={2}>
-              <FormattedMessage defaultMessage="Where would your collective be most active?" />
+              <FormattedMessage defaultMessage="Where are your financial contributors based?" />
             </P>
             <InputTypeCountry
               value={selectedCountry}
@@ -109,7 +122,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
       <Box mt={3} width={['360px', '500px', '700px', '900px']}>
         <FindAHostSearch
           collective={props.collective}
-          selectedCommunityType={selectedCommunityType}
+          communityTags={communityTags}
           selectedCountry={selectedCountry}
           selectedCurrency={selectedCurrency.value}
           onHostApplyClick={host => {
