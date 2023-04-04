@@ -27,7 +27,7 @@ import Loading from '../components/Loading';
 import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import { transactionsQueryCollectionFragment } from '../components/transactions/graphql/fragments';
-import Transactions, { getVariablesFromQuery } from '../components/transactions/Transactions';
+import Transactions, { getVariablesFromQuery } from '../components/transactions/TransactionsPage';
 import { withUser } from '../components/UserProvider';
 
 export const transactionsPageQuery = gql`

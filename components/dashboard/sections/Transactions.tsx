@@ -6,7 +6,7 @@ import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import { transactionsPageQuery } from '../../../pages/transactions';
-import TransactionsComponent, { getVariablesFromQuery } from '../../transactions/Transactions';
+import TransactionsPage, { getVariablesFromQuery } from '../../transactions/TransactionsPage';
 import { AdminSectionProps } from '../types';
 
 const Transactions = (props: AdminSectionProps) => {
@@ -22,7 +22,7 @@ const Transactions = (props: AdminSectionProps) => {
 
   return (
     <React.Fragment>
-      <TransactionsComponent
+      <TransactionsPage
         transactions={transactions}
         account={account}
         variables={variables}

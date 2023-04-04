@@ -153,7 +153,9 @@ const Transactions = ({
     hasProcessingOrders: null,
   });
 
-  const currentCollective = account;
+  const pathname = isDashboard
+    ? `/dashboard/transactions/${account?.slug}`
+    : `${getCollectivePageCanonicalURL(account)}/transactions`;
 
   useEffect(() => {
     const queryParameters = {
@@ -163,7 +165,7 @@ const Transactions = ({
     let newState = { ...state };
     const hasChildren =
       (transactions?.nodes || []).some(
-        el => el.fromAccount?.parent?.id === currentCollective.id || el.toAccount?.parent?.id === account?.id,
+        el => el.fromAccount?.parent?.id === account.id || el.toAccount?.parent?.id === account?.id,
       ) || router.query.ignoreChildrenTransactions;
     if (isNil(state.hasChildren) && hasChildren) {
       newState = { ...newState, hasChildren };
@@ -213,11 +215,9 @@ const Transactions = ({
     return { ...omitBy(queryParameters, value => !value), ...pick(queryParameters, ['displayPendingContributions']) };
   }
 
-  function updateFilters(queryParams, collective) {
+  function updateFilters(queryParams) {
     return router.push({
-      pathname: isDashboard
-        ? `${getCollectivePageCanonicalURL(collective)}/dashboard/transactions`
-        : `${getCollectivePageCanonicalURL(collective)}/transactions`,
+      pathname,
       query: buildFilterLinkParams({ ...queryParams, offset: null }),
     });
   }
@@ -252,7 +252,7 @@ const Transactions = ({
             placeholder="Search transactions..." // TODO: fix intl
             defaultValue={router.query.searchTerm}
             height="40px"
-            onSubmit={searchTerm => updateFilters({ searchTerm, offset: null }, account)}
+            onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
           />
         </Box>
       </Flex>
@@ -269,7 +269,7 @@ const Transactions = ({
           kinds={transactions?.kinds}
           paymentMethodTypes={transactions?.paymentMethodTypes}
           collective={account}
-          onChange={queryParams => updateFilters({ ...queryParams, offset: null }, account)}
+          onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
         />
         <Flex>
           {canDownloadInvoices && (
@@ -295,7 +295,7 @@ const Transactions = ({
         {state.hasProcessingOrders && (
           <StyledCheckbox
             checked={router.query.displayPendingContributions !== 'false' ? true : false}
-            onChange={({ checked }) => updateFilters({ displayPendingContributions: checked }, account)}
+            onChange={({ checked }) => updateFilters({ displayPendingContributions: checked })}
             label={
               <FormattedMessage
                 id="transactions.displayPendingContributions"
@@ -307,7 +307,7 @@ const Transactions = ({
         {state.hasChildren && (
           <StyledCheckbox
             checked={router.query.ignoreChildrenTransactions ? true : false}
-            onChange={({ checked }) => updateFilters({ ignoreChildrenTransactions: checked }, account)}
+            onChange={({ checked }) => updateFilters({ ignoreChildrenTransactions: checked })}
             label={
               <FormattedMessage
                 id="transactions.excludeChildren"
@@ -328,7 +328,7 @@ const Transactions = ({
         {state.hasIncognito && (
           <StyledCheckbox
             checked={router.query.ignoreIncognitoTransactions ? true : false}
-            onChange={({ checked }) => updateFilters({ ignoreIncognitoTransactions: checked }, account)}
+            onChange={({ checked }) => updateFilters({ ignoreIncognitoTransactions: checked })}
             label={
               <FormattedMessage id="transactions.excludeIncognito" defaultMessage="Exclude Incognito transactions" />
             }
@@ -350,7 +350,7 @@ const Transactions = ({
                 values={{
                   ResetLink(text) {
                     return (
-                      <Link data-cy="reset-transactions-filters" href={`/${account.slug}/transactions`}>
+                      <Link data-cy="reset-transactions-filters" href={pathname}>
                         <span>{text}</span>
                       </Link>
                     );
