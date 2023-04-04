@@ -1,11 +1,10 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import { flatten, isEmpty, omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { fetchCSVFileFromRESTService } from '../lib/api';
-import { formatErrorMessage } from '../lib/errors';
+import { simpleDateToISOString } from '../lib/date-utils';
 import type { Account } from '../lib/graphql/types/v2/graphql';
+import { useAsyncCall } from '../lib/hooks/useAsyncCall';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 
 import { PeriodFilterForm } from './filters/PeriodFilter';
@@ -19,9 +18,10 @@ import StyledInputField from './StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import StyledSelect from './StyledSelect';
 import { Span } from './Text';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const AVERAGE_TRANSACTIONS_PER_MINUTE = 8240;
+// Fields that are not available when exporting transactions from the host dashboard
+const HOST_OMITTED_FIELDS = ['balance', 'hostSlug', 'hostName', 'hostType'];
 
 type CSVField =
   | 'date'
@@ -220,11 +220,13 @@ const FieldOptionsLabels = {
 };
 
 const FieldOptions = Object.keys(FIELD_OPTIONS).map(value => ({ value, label: FieldOptionsLabels[value] }));
+const env = process.env.OC_ENV;
 
 type ExportTransactionsCSVModalProps = {
   onClose: () => void;
   dateFrom?: string;
   dateTo?: string;
+  dateInterval?: { from?: string; to?: string; timezoneType?: string };
   collective: Account;
   host?: Account;
   accounts?: Account[];
@@ -233,26 +235,21 @@ type ExportTransactionsCSVModalProps = {
 const ExportTransactionsCSVModal = ({
   onClose,
   collective,
-  dateFrom,
-  dateTo,
+  dateInterval,
   host,
   accounts,
   ...props
 }: ExportTransactionsCSVModalProps) => {
-  const now = new Date().toISOString();
   const isHostReport = Boolean(host);
-  const interval = { from: dateFrom, to: dateTo || now };
 
   const intl = useIntl();
-  const { addToast } = useToasts();
-  const [exportedRows, setExportedRows] = React.useState(0);
-  const [tmpDateInterval, setTmpDateInterval] = React.useState(interval);
+  const [tmpDateInterval, setTmpDateInterval] = React.useState(dateInterval || { to: null, from: null });
+  const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [fieldOption, setFieldOption] = React.useState(FieldOptions[0].value);
   const [fields, setFields] = React.useState(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
   const [isValidDateInterval, setIsValidDateInterval] = React.useState(true);
-  const [loading, setLoading] = React.useState(false);
   const datePresetSelectedOption = React.useMemo(
-    () => getSelectedPeriodOptionFromInterval(tmpDateInterval),
+    () => getSelectedPeriodOptionFromInterval(tmpDateInterval as any),
     [tmpDateInterval],
   );
   const datePresetPptions = React.useMemo(() => {
@@ -261,6 +258,27 @@ const ExportTransactionsCSVModal = ({
       label: PERIOD_FILTER_PRESETS[presetKey].label,
     }));
   }, [intl]);
+  const {
+    loading: isFetchingRows,
+    call: fetchRows,
+    data: exportedRows,
+  } = useAsyncCall(
+    async () => {
+      const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+      if (accessToken) {
+        const url = getUrl();
+        const response = await fetch(url, {
+          method: 'HEAD',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const rows = parseInt(response.headers.get('x-exported-rows'), 10);
+        return rows;
+      }
+    },
+    { defaultData: 0 },
+  );
 
   const handleFieldOptionsChange = ({ value }) => {
     setFieldOption(value);
@@ -286,11 +304,11 @@ const ExportTransactionsCSVModal = ({
   };
 
   const getUrl = () => {
-    const format = 'txt';
-    const { from, to } = tmpDateInterval;
+    const { from, to, timezoneType } = tmpDateInterval;
+
     const url = isHostReport
-      ? new URL(`${process.env.REST_URL}/v2/${host.slug}/hostTransactions.${format}`)
-      : new URL(`${process.env.REST_URL}/v2/${collective.slug}/transactions.${format}`);
+      ? new URL(`${process.env.REST_URL}/v2/${host.slug}/hostTransactions.csv`)
+      : new URL(`${process.env.REST_URL}/v2/${collective.slug}/transactions.csv`);
 
     url.searchParams.set('fetchAll', '1');
 
@@ -303,12 +321,11 @@ const ExportTransactionsCSVModal = ({
       url.searchParams.set('includeIncognitoTransactions', '1');
       url.searchParams.set('includeGiftCardTransactions', '1');
     }
-
     if (from) {
-      url.searchParams.set('dateFrom', from);
+      url.searchParams.set('dateFrom', simpleDateToISOString(from, false, timezoneType));
     }
     if (to) {
-      url.searchParams.set('dateTo', to);
+      url.searchParams.set('dateTo', simpleDateToISOString(to, true, timezoneType));
     }
     if (!isEmpty(fields)) {
       url.searchParams.set('fields', Object.keys(fields).join(','));
@@ -316,64 +333,25 @@ const ExportTransactionsCSVModal = ({
     return url.toString();
   };
 
-  const fetchRows = async () => {
-    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    if (accessToken) {
-      const url = getUrl();
-      const response = await fetch(url, {
-        method: 'HEAD',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      const rows = parseInt(response.headers.get('x-exported-rows'), 10);
-      setExportedRows(rows);
-      return rows;
-    }
-  };
-
-  const handleExport = async () => {
-    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    if (accessToken) {
-      try {
-        setLoading(true);
-        const url = getUrl();
-        const { from, to } = tmpDateInterval;
-        let filename = isHostReport ? `${host.slug}-host-transactions` : `${collective.slug}-transactions`;
-        if (from) {
-          const until = to || dayjs().format('YYYY-MM-DD');
-          filename += `-${from}-${until}`;
-        }
-        const rows = await fetchRows();
-        if (rows > 100e3) {
-          addToast({
-            type: TOAST_TYPE.ERROR,
-            message: (
-              <FormattedMessage
-                id="ExportTransactionsCSVModal.RowsWarning"
-                defaultMessage="Sorry, the requested file is would take too long to be exported. Row count ({rows}) above limit."
-                values={{ rows: exportedRows }}
-              />
-            ),
-          });
-          return;
-        }
-        await fetchCSVFileFromRESTService(url, filename);
-        addToast({ type: TOAST_TYPE.SUCCESS, message: <FormattedMessage defaultMessage="File downloaded!" /> });
-        onClose();
-      } catch (error) {
-        addToast({ type: TOAST_TYPE.ERROR, message: formatErrorMessage(intl, error) });
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
   React.useEffect(() => {
     fetchRows();
   }, [tmpDateInterval, collective, host, accounts]);
 
+  React.useEffect(() => {
+    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+    if (typeof document !== 'undefined' && accessToken) {
+      document.cookie =
+        env === 'development' || env === 'e2e'
+          ? `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120`
+          : // It is not possible to use HttpOnly when setting from JavaScript.
+            // I'm enforcing SameSitre and Domain in production to prevent CSRF.
+            `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
+    }
+    setDownloadUrl(getUrl());
+  }, [fields, tmpDateInterval]);
+
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
+  const disabled = !isValidDateInterval || isFetchingRows || exportedRows > 100e3;
 
   return (
     <StyledModal onClose={onClose} width="100%" maxWidth="576px" {...props}>
@@ -408,7 +386,6 @@ const ExportTransactionsCSVModal = ({
                   onChange={({ value }) => setTmpDateInterval(PERIOD_FILTER_PRESETS[value].getInterval())}
                   value={datePresetSelectedOption}
                   width="100%"
-                  disabled={loading}
                 />
               )}
             </StyledInputField>
@@ -420,7 +397,6 @@ const ExportTransactionsCSVModal = ({
             onValidate={setIsValidDateInterval}
             value={tmpDateInterval}
             inputId="daterange"
-            disabled={loading}
             omitPresets
           />
           <StyledInputField
@@ -438,7 +414,6 @@ const ExportTransactionsCSVModal = ({
                 onChange={handleFieldOptionsChange}
                 defaultValue={FieldOptions.find(option => option.value === fieldOption)}
                 width="100%"
-                disabled={loading}
               />
             )}
           </StyledInputField>
@@ -477,12 +452,11 @@ const ExportTransactionsCSVModal = ({
 
                 <Grid mt={1} gridGap={1} gridTemplateColumns={['1fr', '1fr 1fr']}>
                   {FIELD_GROUPS[group]
-                    .filter(field => field !== 'balance' || !isHostReport)
+                    .filter(field => !(isHostReport && HOST_OMITTED_FIELDS.includes(field)))
                     .map(field => (
                       <StyledCheckbox
                         key={field}
                         name={field}
-                        disabled={loading}
                         onChange={handleFieldSwitch}
                         checked={fields[field] === true}
                         label={FieldLabels[field] || field}
@@ -518,10 +492,9 @@ const ExportTransactionsCSVModal = ({
           <StyledButton
             buttonSize="small"
             buttonStyle="primary"
-            onClick={handleExport}
-            loading={loading}
-            disabled={!isValidDateInterval || exportedRows > 100e3}
-            minWidth={140}
+            as={disabled ? undefined : 'a'}
+            href={disabled ? undefined : downloadUrl}
+            disabled={disabled}
           >
             <FormattedMessage defaultMessage="Export CSV" />
           </StyledButton>

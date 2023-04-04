@@ -2,25 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { simpleDateToISOString } from '../../../lib/date-utils';
-
 import ExportTransactionsCSVModal from '../../ExportTransactionsCSVModal';
 import StyledButton from '../../StyledButton';
 
-const prepareDateArgs = dateInterval => {
-  if (!dateInterval) {
-    return {};
-  } else {
-    return {
-      dateFrom: simpleDateToISOString(dateInterval.from, false, dateInterval.timezoneType),
-      dateTo: simpleDateToISOString(dateInterval.to, true, dateInterval.timezoneType),
-    };
-  }
-};
-
 const HostCSVDownloadButton = ({ host, collectives, dateInterval }) => {
   const [displayModal, setDisplayModal] = React.useState(false);
-  const { dateFrom, dateTo } = prepareDateArgs(dateInterval);
 
   return (
     <React.Fragment>
@@ -37,8 +23,7 @@ const HostCSVDownloadButton = ({ host, collectives, dateInterval }) => {
       </StyledButton>
       {displayModal && (
         <ExportTransactionsCSVModal
-          dateFrom={dateFrom}
-          dateTo={dateTo}
+          dateInterval={dateInterval}
           host={host}
           accounts={collectives}
           onClose={() => setDisplayModal(false)}

@@ -143,7 +143,6 @@ export const budgetSectionForIndividualQuery = gql`
   ${expenseHostFields}
 `;
 
-// /!\ Any change here should be reflected in API's `server/graphql/cache.js`
 export const budgetSectionWithHostQuery = gql`
   query BudgetSectionWithHost($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
     transactions(
@@ -190,7 +189,6 @@ export const getBudgetSectionQuery = (hasHost, isIndividual) => {
   }
 };
 
-// Any change here should be reflected in API's `server/graphql/cache.js`
 export const getBudgetSectionQueryVariables = (collectiveSlug, hostSlug, isIndividual) => {
   if (isIndividual) {
     return { slug: collectiveSlug, limit: 3, kind: getDefaultKinds().filter(kind => kind !== TransactionKind.EXPENSE) };

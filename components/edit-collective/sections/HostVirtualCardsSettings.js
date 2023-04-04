@@ -193,7 +193,7 @@ const HostVirtualCards = props => {
               id={inputProps.id}
               inputName={inputProps.name}
               onChange={e => setVirtualCardPolicy(e.target.value)}
-              value={virtualCardPolicy}
+              defaultValue={virtualCardPolicy}
               placeholder={formatMessage(messages['policy.placeholder'])}
               fontSize="14px"
             />

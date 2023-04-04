@@ -9,6 +9,7 @@ import { maxWidth } from 'styled-system';
 import { TransactionKind } from '../../../lib/constants/transactions';
 import { i18nTransactionKind } from '../../../lib/i18n/transaction';
 
+import { Flex } from '../../Grid';
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 import { Span } from '../../Text';
 
@@ -60,9 +61,11 @@ const TruncatedValueContainer = props => {
   const itemsListStr = itemsList.join(', ');
 
   return (
-    <ReactSelectComponents.SelectContainer {...props}>
-      <TruncatedItemsList title={itemsListStr}>{itemsListStr}</TruncatedItemsList>
-      {children}
+    <ReactSelectComponents.SelectContainer height="1em" {...props}>
+      <Flex>
+        <TruncatedItemsList title={itemsListStr}>{itemsListStr}</TruncatedItemsList>
+        {children}
+      </Flex>
     </ReactSelectComponents.SelectContainer>
   );
 };
@@ -99,6 +102,9 @@ const TransactionsKindFilter = ({ onChange, value, kinds, ...props }) => {
       isMulti
       maxWidth={['100%', 200, 300]}
       minWidth={150}
+      styles={{
+        control: { flexWrap: 'nowrap' },
+      }}
       {...props}
     />
   );

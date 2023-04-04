@@ -134,7 +134,11 @@ export const PeriodFilterForm = ({
   const [isValidDateInterval, setIsValidDateInterval] = React.useState(true);
   const [tmpDateInterval, setTmpDateInterval] = React.useState(intervalFromValue);
   React.useEffect(() => {
-    if (tmpDateInterval.from !== intervalFromValue.from || tmpDateInterval.to !== intervalFromValue.to) {
+    if (
+      tmpDateInterval.from !== intervalFromValue.from ||
+      tmpDateInterval.to !== intervalFromValue.to ||
+      tmpDateInterval.timezoneType !== intervalFromValue.timezoneType
+    ) {
       onChange(tmpDateInterval);
     }
   }, [tmpDateInterval]);
@@ -201,7 +205,7 @@ export const PeriodFilterForm = ({
             selected={tmpDateInterval.timezoneType}
             buttonPropsBuilder={({ item }) => ({ title: getTimeZoneTypeName(intl, item) })}
             onChange={timezoneType => {
-              setTmpDateInterval({ ...tmpDateInterval, timezoneType });
+              setTmpDateInterval(getIntervalFromValue({ ...tmpDateInterval, timezoneType }));
             }}
             disabled={disabled}
           >

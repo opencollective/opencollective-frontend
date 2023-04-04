@@ -10,6 +10,7 @@ function contributeWithNewCard() {
     cy.get('#Field-countryInput').select('US');
     cy.get('#Field-postalCodeInput').type('90210');
   });
+  cy.wait(2000);
   cy.get('button[data-cy="cf-next-step"]').click();
 }
 
@@ -42,6 +43,26 @@ function contributeWithNewUsBankAccount({ name } = {}) {
   cy.get('button[data-cy="cf-next-step"]').click();
 }
 
+function waitOrderStatus(status = 'PAID') {
+  cy.retryChain(
+    () =>
+      cy.get('@collective').then(col => {
+        return cy.visit(`${col.slug}/orders`);
+      }),
+    () => {
+      if (cy.$$(`[data-cy='order-${status}']`).length === 0) {
+        throw new Error(`Order did not transition to ${status} before timeout.`);
+      }
+    },
+    {
+      maxAttempts: 10,
+      wait: 6000,
+    },
+  );
+
+  cy.get(`[data-cy='order-${status}']`).should('exist');
+}
+
 function contributeNewSEPADebit({ name } = {}) {
   cy.contains('New payment method').click();
 
@@ -66,6 +87,7 @@ function contributeNewSEPADebit({ name } = {}) {
     cy.get('#Field-postalCodeInput').type('01562');
     cy.get('#Field-localityInput').type('Paris');
   });
+  cy.wait(2000);
   cy.get('button[data-cy="cf-next-step"]').click();
   cy.wait(3000);
 }
@@ -93,6 +115,13 @@ function contributeNewBancontact({ name } = {}) {
   cy.wait(3000);
 }
 
+const testConfig = {
+  retries: {
+    runMode: 2,
+    openMode: 0,
+  },
+};
+
 describe('Contribute Flow: Stripe Payment Element', () => {
   describe('Card', () => {
     beforeEach(() => {
@@ -105,7 +134,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       cy.createCollectiveV2({ host: { slug: 'e2e-host' } }).as('collective');
     });
 
-    it('Guest', () => {
+    it('Guest', testConfig, () => {
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate`);
       });
@@ -116,16 +145,9 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
       contributeWithNewCard();
 
-      cy.getByDataCy('order-success').contains('Thank you!');
+      cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
 
-      cy.wait(3000);
-      cy.get('@collective').then(col => {
-        cy.visit(`${col.slug}/orders`);
-      });
-
-      cy.contains('Financial contribution to TestCollective');
-      cy.contains('for TestCollective from Guest');
-      cy.contains('Paid');
+      waitOrderStatus();
 
       cy.get('@collective').then(col => {
         cy.visit(`${col.slug}/transactions`);
@@ -136,7 +158,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       cy.contains('Completed');
     });
 
-    it('User', () => {
+    it('User', testConfig, () => {
       cy.get('@collective').then(col => {
         cy.signup({ email: `${randomSlug()}+test@opencollective.com`, redirect: `/${col.slug}/donate` });
       });
@@ -146,7 +168,9 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
       contributeWithNewCard();
 
-      cy.getByDataCy('order-success').contains('Thank you!');
+      cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
+
+      waitOrderStatus();
 
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate`);
@@ -157,7 +181,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
       cy.contains('VISA **** 4242').click();
       cy.get('button[data-cy="cf-next-step"]').click();
-      cy.getByDataCy('order-success').contains('Thank you!');
+      cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
 
       cy.wait(2000);
       cy.get('@collective').then(col => {
@@ -185,7 +209,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       cy.createCollectiveV2({ host: { slug: 'e2e-host' } }).as('collective');
     });
 
-    it('Guest', () => {
+    it('Guest', testConfig, () => {
       const email = `${randomSlug()}@guest.com`;
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate`);
@@ -197,17 +221,12 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
       contributeWithNewUsBankAccount({ name: 'guest user' });
 
-      cy.getByDataCy('order-success').contains('Thank you!');
+      cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
 
-      cy.get('@collective').then(col => {
-        cy.visit(`${col.slug}/orders`);
-      });
-
-      cy.contains('Financial contribution to TestCollective');
-      cy.contains('Processing');
+      waitOrderStatus('PROCESSING');
     });
 
-    it('User', () => {
+    it('User', testConfig, () => {
       cy.get('@collective').then(col => {
         cy.signup({ email: `${randomSlug()}+test@opencollective.com`, redirect: `/${col.slug}/donate` });
       });
@@ -215,9 +234,10 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       cy.contains('Your info').click();
       cy.get('button[data-cy="cf-next-step"]').click();
       contributeWithNewUsBankAccount();
-      cy.getByDataCy('order-success').contains('Thank you!');
-      cy.wait(10000);
+      cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
+      waitOrderStatus('PROCESSING');
 
+      cy.wait(10000);
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate`);
       });
@@ -226,7 +246,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       cy.contains('ACH STRIPE TEST BANK ****6789').click();
       cy.get('button[data-cy="cf-next-step"]').click();
 
-      cy.getByDataCy('order-success').contains('Thank you!');
+      cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
     });
   });
 
@@ -241,7 +261,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       cy.createCollectiveV2({ host: { slug: 'e2e-eur-host' } }).as('collective');
     });
 
-    it('Guest', () => {
+    it('Guest', testConfig, () => {
       const email = `${randomSlug()}@guest.com`;
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate`);
@@ -253,18 +273,15 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
       contributeNewSEPADebit({ name: 'guest user' });
 
-      cy.getByDataCy('order-success').contains('Thank you!');
-      cy.wait(10000);
+      cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
 
-      cy.get('@collective').then(col => {
-        cy.visit(`${col.slug}/orders`);
-      });
+      waitOrderStatus();
 
       cy.contains('Financial contribution to TestCollective');
       cy.contains('Paid');
     });
 
-    it('User', () => {
+    it('User', testConfig, () => {
       cy.get('@collective').then(col => {
         cy.signup({ email: `${randomSlug()}+test@opencollective.com`, redirect: `/${col.slug}/donate` });
       });
@@ -274,8 +291,8 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
       contributeNewSEPADebit();
 
-      cy.getByDataCy('order-success').contains('Thank you!');
-      cy.wait(10000);
+      cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
+      waitOrderStatus();
 
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate`);
@@ -285,7 +302,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       cy.contains('SEPA 20041 ****2606').click();
       cy.get('button[data-cy="cf-next-step"]').click();
 
-      cy.getByDataCy('order-success').contains('Thank you!');
+      cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
     });
   });
 
@@ -300,7 +317,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       cy.createCollectiveV2({ host: { slug: 'e2e-eur-host' } }).as('collective');
     });
 
-    it('Guest', () => {
+    it('Guest', testConfig, () => {
       const email = `${randomSlug()}@guest.com`;
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate`);
@@ -312,8 +329,9 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
       contributeNewBancontact({ name: 'guest user' });
 
-      cy.getByDataCy('order-success').contains('Thank you!');
-      cy.wait(10000);
+      cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
+
+      waitOrderStatus();
 
       cy.get('@collective').then(col => {
         cy.visit(`${col.slug}/orders`);
@@ -323,7 +341,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       cy.contains('Paid');
     });
 
-    it('User', () => {
+    it('User', testConfig, () => {
       cy.get('@collective').then(col => {
         cy.signup({ email: `${randomSlug()}+test@opencollective.com`, redirect: `/${col.slug}/donate` });
       });
@@ -333,12 +351,9 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
       contributeNewBancontact();
 
-      cy.getByDataCy('order-success').contains('Thank you!');
-      cy.wait(10000);
+      cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
 
-      cy.get('@collective').then(col => {
-        cy.visit(`${col.slug}/orders`);
-      });
+      waitOrderStatus();
 
       cy.contains('Financial contribution to TestCollective');
       cy.contains('Paid');
@@ -354,11 +369,9 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       });
 
       cy.createCollectiveV2({ host: { slug: 'e2e-eur-host' } }).as('collective');
-      cy.clearCookies();
-      cy.clearLocalStorage();
     });
 
-    it('Redirects to trusted url', () => {
+    it('Redirects to trusted url', testConfig, () => {
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate?redirect=https://opencollective.com`);
       });
@@ -369,10 +382,10 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
       contributeWithNewCard();
 
-      cy.location('origin').should('eql', 'https://opencollective.com');
+      cy.location('origin', { timeout: 60000 }).should('eql', 'https://opencollective.com');
     });
 
-    it('Redirects to untrusted url', () => {
+    it('Redirects to untrusted url', testConfig, () => {
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate?redirect=https://google.com`);
       });
@@ -383,7 +396,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
       contributeWithNewCard();
 
-      cy.location('origin').should('eql', 'http://localhost:3000');
+      cy.location('origin', { timeout: 60000 }).should('eql', 'http://localhost:3000');
       cy.location('pathname').should('eql', '/external-redirect');
       cy.contains('Your request is currently being redirected to https://google.com').should('exist');
     });

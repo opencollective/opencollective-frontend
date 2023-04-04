@@ -193,7 +193,6 @@ const Transactions = ({
   }, [transactions, account, router.query]);
 
   function checkCanDownloadInvoices() {
-    // const collective = account // || this.state.Collective;
     if (!account || !LoggedInUser) {
       return false;
     } else if (account.type !== 'ORGANIZATION' && account.type !== 'USER') {
@@ -275,7 +274,16 @@ const Transactions = ({
           {canDownloadInvoices && (
             <Box mr="8px">
               <Link href={`/${account.slug}/admin/payment-receipts`}>
-                <StyledButton buttonSize="small" minWidth={140} isBorderless flexGrow={1}>
+                <StyledButton
+                  buttonSize="small"
+                  minWidth={140}
+                  height={38}
+                  mb="8px"
+                  p="6px 10px"
+                  isBorderless
+                  flexGrow={1}
+                  whiteSpace="nowrap"
+                >
                   <FormattedMessage id="transactions.downloadinvoicesbutton" defaultMessage="Download Receipts" />
                   <IconDownload size="13px" style={{ marginLeft: '8px' }} />
                 </StyledButton>

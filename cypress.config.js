@@ -2,6 +2,7 @@
 const { defineConfig } = require('cypress');
 
 module.exports = defineConfig({
+  experimentalMemoryManagement: true,
   viewportWidth: 1200,
   viewportHeight: 1660,
   projectId: 'yt5kwm',

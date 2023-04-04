@@ -12,10 +12,6 @@ import StyledTooltip from '../StyledTooltip';
 
 const TransactionsDownloadCSV = ({ collective, query }) => {
   const [displayModal, setDisplayModal] = React.useState(false);
-  let dateFrom, dateTo;
-  if (query.period) {
-    ({ from: dateFrom, to: dateTo } = parseDateInterval(query.period));
-  }
 
   return (
     <React.Fragment>
@@ -44,8 +40,7 @@ const TransactionsDownloadCSV = ({ collective, query }) => {
       </StyledTooltip>
       {displayModal && (
         <ExportTransactionsCSVModal
-          dateFrom={dateFrom}
-          dateTo={dateTo}
+          dateInterval={query.period && parseDateInterval(query.period)}
           collective={collective}
           onClose={() => setDisplayModal(false)}
         />
