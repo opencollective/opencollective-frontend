@@ -18,21 +18,7 @@ import { parseChronologicalOrderInput } from '../../expenses/filters/ExpensesOrd
 import { AdminSectionProps } from '../types';
 
 const parseQuery = (routerQuery, account) => {
-  const {
-    // parentCollectiveSlug,
-    // collectiveSlug,
-    offset,
-    limit,
-    type,
-    status,
-    tag,
-    amount,
-    payout,
-    period,
-    searchTerm,
-    orderBy,
-    direction,
-  } = routerQuery;
+  const { offset, limit, type, status, tag, amount, payout, period, searchTerm, orderBy, direction } = routerQuery;
   const newDirection = direction ? direction : isIndividualAccount(account) ? 'SUBMITTED' : 'RECEIVED';
 
   return {
@@ -100,6 +86,7 @@ const Expenses = (props: AdminSectionProps) => {
         variables={variables}
         LoggedInUser={LoggedInUser}
         collectiveSlug={variables.collectiveSlug}
+        isDashboard
       />
     </React.Fragment>
   );

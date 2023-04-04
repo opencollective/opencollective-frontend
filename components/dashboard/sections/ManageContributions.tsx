@@ -4,12 +4,11 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
-import { Dimensions } from '../../collective-page/_constants';
-import SectionTitle from '../../collective-page/SectionTitle';
 import Container from '../../Container';
 import { Box } from '../../Grid';
 import { manageContributionsQuery } from '../../recurring-contributions/graphql/queries';
 import RecurringContributionsContainer from '../../recurring-contributions/RecurringContributionsContainer';
+import { H1 } from '../../Text';
 import { AdminSectionProps } from '../types';
 
 const ManageContributions = ({ account }: AdminSectionProps) => {
@@ -20,21 +19,19 @@ const ManageContributions = ({ account }: AdminSectionProps) => {
   const recurringContributions = data?.account?.orders || {};
 
   return (
-    <React.Fragment>
-      <Container position="relative" minHeight={[null, 800]}>
-        <Box maxWidth={Dimensions.MAX_SECTION_WIDTH} m="0 auto" pb={3}>
-          <SectionTitle textAlign="left" mb={4} display={['none', 'block']}>
-            <FormattedMessage defaultMessage="Manage Contributions" />
-          </SectionTitle>
-          <RecurringContributionsContainer
-            recurringContributions={recurringContributions}
-            account={account}
-            isLoading={loading}
-            displayFilters
-          />
-        </Box>
-      </Container>
-    </React.Fragment>
+    <Container minHeight={[null, 800]}>
+      <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+        <FormattedMessage defaultMessage="Manage Contributions" />
+      </H1>
+      <Box py={'32px'}>
+        <RecurringContributionsContainer
+          recurringContributions={recurringContributions}
+          account={account}
+          isLoading={loading}
+          displayFilters
+        />
+      </Box>
+    </Container>
   );
 };
 

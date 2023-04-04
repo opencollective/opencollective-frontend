@@ -141,14 +141,11 @@ const DashboardPage = () => {
             gridGap={16}
             m="0 auto"
             pr={3}
-            // px={3}
-            // p={4}
             data-cy="admin-panel-container"
           >
             <AdminPanelSideBar
               isLoading={isLoading}
               collective={account}
-              //  LoggedInUser={LoggedInUser}
               selectedSection={selectedSection}
               display={['none', 'none', 'block']}
               isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
@@ -156,7 +153,7 @@ const DashboardPage = () => {
             {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
             ) : (
-              <Box gridColumn={'span 3 / span 3'} py={'16px'} px={'24px'}>
+              <Box gridColumn={'span 3 / span 3'} py={'32px'} px={'24px'}>
                 <AdminPanelSection
                   section={selectedSection}
                   isLoading={isLoading}

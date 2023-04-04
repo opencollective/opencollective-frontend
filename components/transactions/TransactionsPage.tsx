@@ -13,7 +13,7 @@ import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../../li
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import { collectiveNavbarFieldsFragment, processingOrderFragment } from '../collective-page/graphql/fragments';
-import SectionTitle from '../collective-page/SectionTitle';
+import Container from '../Container';
 import ErrorPage from '../ErrorPage';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
@@ -23,6 +23,7 @@ import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
+import { H1 } from '../Text';
 
 import { getDefaultKinds, parseTransactionKinds } from './filters/TransactionsKindFilter';
 import { parseTransactionPaymentMethodTypes } from './filters/TransactionsPaymentMethodTypeFilter';
@@ -241,11 +242,11 @@ const Transactions = ({
       : transactions?.nodes || [];
 
   return (
-    <Box maxWidth={1260} m="0 auto" pb={3} data-cy="transactions-page-content">
+    <Container>
       <Flex justifyContent="space-between" alignItems="baseline">
-        <SectionTitle textAlign="left" mb={1} display={['none', 'block']}>
+        <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
           <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
-        </SectionTitle>
+        </H1>
         <Box flexGrow={[1, 0]}>
           <SearchBar
             placeholder="Search transactions..." // TODO: fix intl
@@ -390,7 +391,7 @@ const Transactions = ({
           </React.Fragment>
         )}
       </Box>
-    </Box>
+    </Container>
   );
 };
 
