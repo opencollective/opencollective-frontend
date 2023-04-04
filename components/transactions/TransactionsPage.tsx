@@ -328,7 +328,7 @@ const Transactions = ({
         {state.hasGiftCards && (
           <StyledCheckbox
             checked={router.query.ignoreGiftCardsTransactions ? true : false}
-            onChange={({ checked }) => updateFilters({ ignoreGiftCardsTransactions: checked }, account)}
+            onChange={({ checked }) => updateFilters({ ignoreGiftCardsTransactions: checked })}
             label={
               <FormattedMessage id="transactions.excludeGiftCards" defaultMessage="Exclude Gift Card transactions" />
             }
