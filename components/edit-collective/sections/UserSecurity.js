@@ -110,7 +110,7 @@ class UserSecurity extends React.Component {
     super(props);
     this.state = {
       error: null,
-      disablingTwoFactorAuth: false,
+      isDisablingTwoFactorAuth: false,
       disableError: null,
       recoveryCodes: null,
       enablingTwoFactorAuth: false,
@@ -199,7 +199,7 @@ class UserSecurity extends React.Component {
         id: this.props.data.individual.id,
       };
 
-      this.setState({ disablingTwoFactorAuth: true, error: null });
+      this.setState({ isDisablingTwoFactorAuth: true, error: null });
 
       await this.props.removeTwoFactorAuthTokenFromIndividual({
         variables: {
@@ -207,7 +207,7 @@ class UserSecurity extends React.Component {
         },
       });
       this.props.refetchLoggedInUser(); // No need to await
-      this.setState({ disablingTwoFactorAuth: false, error: null });
+      this.setState({ isDisablingTwoFactorAuth: false, error: null });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
       this.setState({ disableError: errorMsg });
@@ -391,7 +391,6 @@ class UserSecurity extends React.Component {
       secret,
       base32,
       otpAuthUrl,
-      disablingTwoFactorAuth,
       enablingTwoFactorAuth,
       recoveryCodes,
       showRecoveryCodesModal,
@@ -472,12 +471,12 @@ class UserSecurity extends React.Component {
                   my={1}
                   minWidth={140}
                   buttonStyle={'danger'}
-                  onClick={() => this.setState({ disablingTwoFactorAuth: true })}
+                  onClick={() => this.setState({ isDisablingTwoFactorAuth: true })}
                 >
                   <FormattedMessage id="TwoFactorAuth.Disable.Button" defaultMessage="Disable 2FA" />
                 </StyledButton>
-                {disablingTwoFactorAuth && (
-                  <StyledModal width="570px" onClose={() => this.setState({ disablingTwoFactorAuth: false })}>
+                {isDisablingTwoFactorAuth && (
+                  <StyledModal width="570px" onClose={() => this.setState({ isDisablingTwoFactorAuth: false })}>
                     <ModalHeader>
                       <FormattedMessage
                         id="TwoFactorAuth.Disable.Header"
@@ -505,7 +504,7 @@ class UserSecurity extends React.Component {
                     </ModalBody>
                     <ModalFooter>
                       <Container display="flex" justifyContent="flex-end">
-                        <StyledButton mx={20} onClick={() => this.setState({ disablingTwoFactorAuth: false })}>
+                        <StyledButton mx={20} onClick={() => this.setState({ isDisablingTwoFactorAuth: false })}>
                           <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                         </StyledButton>
                         <StyledButton
