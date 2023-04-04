@@ -21,7 +21,7 @@ const ManageContributions = ({ account }: AdminSectionProps) => {
   return (
     <Container minHeight={[null, 800]}>
       <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-        <FormattedMessage defaultMessage="Manage Contributions" />
+        <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
       </H1>
       <Box py={'32px'}>
         <RecurringContributionsContainer

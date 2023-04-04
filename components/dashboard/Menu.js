@@ -65,10 +65,8 @@ OrganizationSettingsMenuLinks.propTypes = {
 };
 
 const Menu = ({ collective, isAccountantOnly }) => {
-  // const { formatMessage } = useIntl();
   const isHost = isHostAccount(collective);
   const isIndividual = isIndividualAccount(collective);
-  // const isSimpleOrg = collective.type === 'ORGANIZATION' && !isHost;
   const [expandedSection, setExpanded] = React.useState(null);
 
   return (
@@ -135,13 +133,12 @@ const Menu = ({ collective, isAccountantOnly }) => {
           icon={<Cog size={16} />}
           if={isHost && !isAccountantOnly}
           setExpanded={setExpanded}
-          section="SETTINGS"
+          section="FISCAL_HOST_SETTINGS"
           goToSection={FISCAL_HOST_SECTIONS.FISCAL_HOSTING}
-          expanded={expandedSection === 'SETTINGS'}
+          expanded={expandedSection === 'FISCAL_HOST_SETTINGS'}
           subMenu={
             <React.Fragment>
               <MenuLink isSub collective={collective} section={FISCAL_HOST_SECTIONS.FISCAL_HOSTING} />
-
               <MenuLink isSub collective={collective} section={FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS} />
               <MenuLink isSub collective={collective} section={FISCAL_HOST_SECTIONS.RECEIVING_MONEY} />
               <MenuLink isSub collective={collective} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />
@@ -168,13 +165,13 @@ const Menu = ({ collective, isAccountantOnly }) => {
       <MenuGroup>
         <MenuSectionHeader>
           {isType(collective, ORGANIZATION) ? (
-            <FormattedMessage defaultMessage="Organization Dashboard" />
+            <FormattedMessage id="OrganizationDashboard" defaultMessage="Organization Dashboard" />
           ) : isType(collective, USER) ? (
-            <FormattedMessage defaultMessage="User Dashboard" />
+            <FormattedMessage id="UserDashboard" defaultMessage="User Dashboard" />
           ) : isType(collective, COLLECTIVE) ? (
-            <FormattedMessage defaultMessage="Collective Dashboard" />
+            <FormattedMessage id="CollectiveDashboard" defaultMessage="Collective Dashboard" />
           ) : (
-            <FormattedMessage defaultMessage="Dashboard" />
+            <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
           )}
         </MenuSectionHeader>
 
