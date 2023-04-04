@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { css } from '@styled-system/css';
 import { get } from 'lodash';
 import styled from 'styled-components';
@@ -8,7 +7,6 @@ import { isURL } from 'validator';
 
 import { uploadImageWithXHR } from '../lib/api';
 import { CustomScrollbarCSS } from '../lib/styled-components-shared-styles';
-import { stripHTML } from '../lib/utils';
 
 import Container from './Container';
 import HTMLContent from './HTMLContent';
@@ -16,7 +14,73 @@ import LoadingPlaceholder from './LoadingPlaceholder';
 import MessageBox from './MessageBox';
 import StyledTag from './StyledTag';
 
-const TrixEditorContainer = styled.div`
+type RichTextEditorContainerProps = {
+  /** This component is borderless by default. Set this to `true` to change that. */
+  withBorders?: boolean;
+  /** If truthy, will display a red outline */
+  error?: any;
+  /** Min height for the full component */
+  editorMinHeight?: number | string | number[] | string[];
+  /** Max height for the full component */
+  editorMaxHeight?: number | string | number[] | string[];
+  toolbarBackgroundColor?: string;
+  /** If true, the toolbar will be sticky */
+  withStickyToolbar?: boolean;
+  /** Version of the editor */
+  version: 'default' | 'simplified';
+  /** If position is sticky, this prop defines the `top` property. Support responsive arrays */
+  toolbarTop?: number | string | number[] | string[];
+  /** Useful to compensate the height of the toolbar when editing inline */
+  toolbarOffsetY?: number | string | number[] | string[];
+  isDisabled?: boolean;
+};
+
+type RichTextEditorProps = RichTextEditorContainerProps & {
+  /** If not provided, an id will be automatically generated which will require a component update */
+  id?: string;
+  defaultValue?: string;
+  placeholder?: string;
+  /** A unique identified for the category of uploaded files. Required if version is not "simplified" */
+  kind?: string;
+  /** Font size for the text */
+  fontSize?: string;
+  autoFocus?: boolean;
+  /** Called when text is changed with html content as first param and text content as second param */
+  onChange?: (event: React.FormEvent<HTMLInputElement>) => void;
+  /** A name for the input */
+  inputName?: string;
+  /** Change this prop to force a re-render of the component */
+  reset?: boolean;
+  /** If true, max text length will be displayed at the bottom right */
+  showCount?: boolean;
+  /** Max length of the text */
+  maxLength?: number;
+  /** This component is borderless by default. Set this to `true` to change that. */
+  withBorders?: boolean;
+  /** If truthy, will display a red outline */
+  error?: any;
+  /** Min height for the full component */
+  editorMinHeight?: number | string | number[] | string[];
+  /** Max height for the full component */
+  editorMaxHeight?: number | string | number[] | string[];
+  toolbarBackgroundColor?: string;
+  /** If true, the toolbar will be sticky */
+  withStickyToolbar?: boolean;
+  /** Version of the editor */
+  version: 'default' | 'simplified';
+  /** If position is sticky, this prop defines the `top` property. Support responsive arrays */
+  toolbarTop?: number | string | number[] | string[];
+  /** Useful to compensate the height of the toolbar when editing inline */
+  toolbarOffsetY?: number | string | number[] | string[];
+  disabled?: boolean;
+
+  videoEmbedEnabled?: boolean;
+  'data-cy': string;
+  /** Called when an image is being uploaded to set a boolean */
+  setUploading: (uploading: boolean) => void;
+};
+
+const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
   ${props =>
     props.withBorders &&
     css({
@@ -163,56 +227,18 @@ const TrixEditorContainer = styled.div`
 
 const SUPPORTED_SERVICE_URLS = { youTube: 'https://www.youtube-nocookie.com/embed/', anchorFm: 'https://anchor.fm/' };
 
+type RichTextEditorState = {
+  id: string;
+  value: string;
+  text: string;
+  error: any;
+};
+
 /**
  * A React wrapper around the Trix library to edit rich text.
  * Produces HTML and clear text.
  */
-export default class RichTextEditor extends React.Component {
-  static propTypes = {
-    /** If not provided, an id will be automatically generated which will require a component update */
-    id: PropTypes.string,
-    defaultValue: PropTypes.string,
-    value: PropTypes.string,
-    placeholder: PropTypes.string,
-    toolbarBackgroundColor: PropTypes.string.isRequired,
-    /** A unique identified for the category of uploaded files. Required if version is not "simplified" */
-    kind: PropTypes.string,
-    /** Font size for the text */
-    fontSize: PropTypes.string,
-    autoFocus: PropTypes.bool,
-    /** Called when text is changed with html content as first param and text content as second param */
-    onChange: PropTypes.func,
-    /** A name for the input */
-    inputName: PropTypes.string,
-    /** Change this prop to reset the value */
-    reset: PropTypes.any,
-    /** If true, max text length will be displayed at the bottom right */
-    showCount: PropTypes.bool,
-    /** max length which is allowed */
-    maxLength: PropTypes.number,
-    /** Whether the toolbar should stick to the top */
-    withStickyToolbar: PropTypes.bool,
-    /** This component is borderless by default. Set this to `true` to change that. */
-    withBorders: PropTypes.bool,
-    /** This component is borderless by default. Set this to `true` to change that. */
-    version: PropTypes.oneOf(['default', 'simplified']),
-    /** Whether the field should be disabled */
-    disabled: PropTypes.bool,
-    /** If position is sticky, this prop defines the `top` property. Support responsive arrays */
-    toolbarTop: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-    /** Useful to compensate the height of the toolbar when editing inline */
-    toolbarOffsetY: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-    /** Min height for the full component */
-    editorMinHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-    editorMaxHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-    /** If truthy, will display a red outline */
-    error: PropTypes.any,
-    'data-cy': PropTypes.string,
-    videoEmbedEnabled: PropTypes.bool,
-    /** Called when an image is being uploaded to set a boolean */
-    setUploading: PropTypes.func,
-  };
-
+export default class RichTextEditor extends React.Component<RichTextEditorProps, RichTextEditorState> {
   static defaultProps = {
     withStickyToolbar: false,
     toolbarTop: 0,
@@ -228,13 +254,13 @@ export default class RichTextEditor extends React.Component {
     super(props);
     this.editorRef = React.createRef();
     this.mainContainerRef = React.createRef();
-    this.state = { id: props.id, error: null };
+    this.state = { id: props.id, error: null, value: this.prepareHTML(props.defaultValue), text: '' };
     this.isReady = false;
 
+    // Load Trix
     if (typeof window !== 'undefined') {
-      this.Trix = require('trix');
-      this.Trix.config.blockAttributes.heading1 = { tagName: 'h3' };
-      this.Trix.config.attachments.preview.caption = { name: false, size: false };
+      this.Trix = require('trix').default;
+      document.addEventListener('trix-before-initialize', this.trixBeforeInitialize);
     }
   }
 
@@ -242,6 +268,7 @@ export default class RichTextEditor extends React.Component {
     if (!this.state.id) {
       this.setState({ id: uuid() });
     } else if (!this.isReady) {
+      // Initialize Trix
       this.initialize();
     }
   }
@@ -250,49 +277,57 @@ export default class RichTextEditor extends React.Component {
     if (!this.isReady) {
       this.initialize();
     } else if (oldProps.reset !== this.props.reset) {
-      this.editorRef.current.editor.loadHTML('');
+      this.getEditor().loadHTML('');
     }
   }
 
   componentWillUnmount() {
+    document.removeEventListener('trix-before-initialize', this.trixBeforeInitialize);
     if (this.isReady) {
       this.editorRef.current.removeEventListener('trix-change', this.handleChange);
-      this.editorRef.current.removeEventListener('trix-attachment-add', this.handleUpload);
+      this.editorRef.current.removeEventListener('trix-attachment-add', this.handleAttachmentAdd);
       this.editorRef.current.removeEventListener('trix-attachment-add', this.handleFileAccept);
       this.editorRef.current.removeEventListener('trix-action-invoke', this.trixActionInvoke);
+      this.editorRef.current.removeEventListener('trix-initialize', this.trixInitialize);
     }
+  }
+
+  private editorRef = null;
+  private mainContainerRef = null;
+  private isReady: boolean = false;
+  private Trix;
+
+  prepareHTML(html: string): string {
+    if (!html) {
+      return '';
+    }
+
+    const parser = new DOMParser();
+    const htmlDoc = parser.parseFromString(html, 'text/html');
+
+    // Find all <figure> tags with data-trix-content-type="--embed-iframe-video" and add a data-trix-attachment to them
+    const figures = htmlDoc.querySelectorAll('figure[data-trix-content-type="--embed-iframe-video"]');
+    figures.forEach(figure => {
+      const iframe = figure.querySelector('iframe');
+      const dataTrixAttachment = { content: iframe.outerHTML, contentType: '--embed-iframe-video' };
+      figure.setAttribute('data-trix-attachment', JSON.stringify(dataTrixAttachment));
+    });
+
+    return htmlDoc.querySelector('body').innerHTML;
   }
 
   getEditor() {
     return this.editorRef.current.editor;
   }
 
-  initialize = () => {
+  initialize = async () => {
     if (this.Trix && this.editorRef.current) {
       // Listen for changes
       this.editorRef.current.addEventListener('trix-change', this.handleChange, false);
-      this.editorRef.current.addEventListener('trix-attachment-add', this.handleUpload);
+      this.editorRef.current.addEventListener('trix-attachment-add', this.handleAttachmentAdd);
       this.editorRef.current.addEventListener('trix-file-accept', this.handleFileAccept);
       this.editorRef.current.addEventListener('trix-action-invoke', this.trixActionInvoke);
-      this.editorRef.current.addEventListener('trix-initialize', event => {
-        if (this.props.videoEmbedEnabled) {
-          this.replaceEmbeddedIFrames(this.props.value || this.props.defaultValue);
-          this.trixEmbed(event);
-        }
-        // Some special handling for links
-        if (this.mainContainerRef.current) {
-          // We must listen when the user presses the 'Enter' key and when the user clicks the 'Link' button as well
-          const linkInput = this.mainContainerRef.current.querySelector("[data-trix-input][name='href']");
-          linkInput?.addEventListener('keydown', e => {
-            if (e.key === 'Enter') {
-              this.handleLink();
-            }
-          });
-
-          const addLinkBtn = this.mainContainerRef.current.querySelector("[data-trix-method='setAttribute']");
-          addLinkBtn?.addEventListener('click', this.handleLink);
-        }
-      });
+      this.editorRef.current.addEventListener('trix-initialize', this.trixInitialize);
 
       // Component ready!
       this.isReady = true;
@@ -301,40 +336,42 @@ export default class RichTextEditor extends React.Component {
 
   /** ---- Trix handlers ---- */
 
-  replaceEmbeddedIFrames = value => {
-    const iframeRegex = new RegExp(`<iframe.+?iframe>`, 'ig');
-    let match;
-    let lastIndex = 0;
+  trixBeforeInitialize = () => {
+    this.Trix.config.blockAttributes.heading1 = { tagName: 'h3' };
+    this.Trix.config.attachments.preview.caption = { name: false, size: false };
+  };
 
-    while ((match = iframeRegex.exec(value))) {
-      if (lastIndex === 0) {
-        this.getEditor().loadHTML('');
-      }
-      const iframe = match[0];
-      const position = match.index;
-      const preText = value.substring(lastIndex, position);
-      this.getEditor().setSelectedRange([lastIndex, position]);
-      this.getEditor().insertHTML(preText);
-      const attachment = new this.Trix.Attachment({ content: iframe });
-      this.getEditor().insertAttachment(attachment);
-      lastIndex = match.index + iframe.length;
-      const postText = value.substring(lastIndex, value.length);
-      this.getEditor().insertHTML(postText);
+  trixInitialize = event => {
+    if (this.props.videoEmbedEnabled) {
+      this.injectTrixEmbedButton(event);
+    }
+    // Some special handling for links
+    if (this.mainContainerRef.current) {
+      // We must listen when the user presses the 'Enter' key and when the user clicks the 'Link' button as well
+      const linkInput = this.mainContainerRef.current.querySelector("[data-trix-input][name='href']");
+      linkInput?.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          this.handleLink();
+        }
+      });
+
+      const addLinkBtn = this.mainContainerRef.current.querySelector("[data-trix-method='setAttribute']");
+      addLinkBtn?.addEventListener('click', this.handleLink);
     }
   };
 
-  trixEmbed = e => {
+  injectTrixEmbedButton = e => {
     const videoEmbedButton = `<button type="button" tabindex="-1" data-trix-action="x-video-dialog-open" title="Attach Video" class="trix-button trix-button--icon trix-button--video-attach">Attach Video</button>`;
     const videoEmbedDialog = `
-            <div class="trix-dialog" data-trix-dialog="video-url" data-trix-dialog-attribute="video">
-              <div class="trix-dialog__link-fields">
-                <input type="url" name="video-url" class="trix-input trix-input--dialog trix-input--dialog-embed" placeholder="Enter Video URL…" aria-label="Video URL" data-trix-input="">
-                <div class="trix-button-group">
-                  <input type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-add-embed">
-                </div>
-              </div>
-              <strong>Note: Only YouTube and Anchor.fm links are supported.</strong>
-            </div>`;
+      <div class="trix-dialog" data-trix-dialog="video-url" data-trix-dialog-attribute="video">
+        <div class="trix-dialog__link-fields">
+          <input type="url" name="video-url" class="trix-input trix-input--dialog trix-input--dialog-embed" placeholder="Enter Video URL…" aria-label="Video URL" data-trix-input="">
+          <div class="trix-button-group">
+            <input type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-add-embed">
+          </div>
+        </div>
+        <strong>Note: Only YouTube links are supported.</strong>
+      </div>`;
     const { toolbarElement } = e.target;
     const attachFilesButton = toolbarElement.querySelector('[data-trix-action=attachFiles]');
     attachFilesButton.insertAdjacentHTML('afterend', videoEmbedButton);
@@ -364,9 +401,7 @@ export default class RichTextEditor extends React.Component {
   constructVideoEmbedURL = (service, id) => {
     if (service === 'youtube') {
       return `${SUPPORTED_SERVICE_URLS.youTube}${id}`;
-    } /* else if (service === 'vimeo') {
-      return `https://player.vimeo.com/video/${id}`;
-    } */ else if (service === 'anchorFm') {
+    } else if (service === 'anchorFm') {
       return `${SUPPORTED_SERVICE_URLS.anchorFm}${id}`;
     } else {
       return null;
@@ -379,10 +414,7 @@ export default class RichTextEditor extends React.Component {
         '(?:https?://)?(?:www\\.)?youtu(?:\\.be/|be\\.com/\\S*(?:watch|embed)(?:(?:(?=/[^&\\s?]+(?!\\S))/)|(?:\\S*v=|v/)))([^&\\s?]+)',
         'i',
       ),
-      vimeo: new RegExp(
-        '(http|https)?://(www\\.)?vimeo\\.com/(?:channels/(?:\\w+/)?|groups/([^/]*)/videos/|)(\\d+)(?:|/?)',
-      ),
-      anchorFm: /^(http|https)?:\/\/(www\.)?anchor\.fm\/([^/]+)(\/embed)?(\/episodes\/)?([^/]+)?\/?$/,
+      anchorFm: /^(http|https)?:\/\/(www\.)?anchor\.fm\/([^/]+)(\/embed)?(\/episodes\/)?([^/]+)?\/?$/, // TODO: moved to https://podcasters.spotify.com
     };
     for (const service in regexps) {
       const matches = regexps[service].exec(videoLink);
@@ -403,6 +435,7 @@ export default class RichTextEditor extends React.Component {
   embedIframe = videoLink => {
     const { id, service } = this.parseServiceLink(videoLink);
     const embedLink = this.constructVideoEmbedURL(service, id);
+    const Trix = this.Trix;
     if (embedLink) {
       const sanitizedLink = embedLink.replace(/["\\]/g, ''); // Small security enhancement, prevents going out of `src`
       const videoServices = ['youtube', 'vimeo'];
@@ -419,7 +452,7 @@ export default class RichTextEditor extends React.Component {
         };
       }
 
-      this.getEditor().insertAttachment(new this.Trix.Attachment(attachmentData));
+      this.getEditor().insertAttachment(new Trix.Attachment(attachmentData));
     }
   };
 
@@ -436,6 +469,11 @@ export default class RichTextEditor extends React.Component {
     if (this.state.error) {
       this.setState({ error: null });
     }
+
+    // If showing count, we have to store the text value in state
+    if (this.props.showCount) {
+      this.setState({ text: e.target.innerText });
+    }
   };
 
   handleFileAccept = e => {
@@ -449,16 +487,22 @@ export default class RichTextEditor extends React.Component {
     }
   };
 
-  handleUpload = e => {
+  handleAttachmentAdd = e => {
     const { attachment } = e;
     const attachmentContent = get(attachment, 'attachment.attributes.values.content');
-    const isVideoAttachment =
+    const isEmbedAttachment =
       attachmentContent?.includes(`<iframe src="${SUPPORTED_SERVICE_URLS.youTube}`) ||
       attachmentContent?.includes(`<iframe src="${SUPPORTED_SERVICE_URLS.anchorFm}`);
-    if (isVideoAttachment) {
+    if (isEmbedAttachment) {
       return;
     } else if (!attachment.file) {
-      attachment.remove(); // Remove unknown stuff, for example when copy-pasting HTML
+      // Nothing to upload if there's no file
+      const url = get(attachment, 'attachment.attributes.values.url');
+
+      if (!/https:\/\/opencollective-(production|staging)\.s3[.-]us-west-1\.amazonaws\.com/.test(url)) {
+        attachment.remove(); // Remove unknown stuff, usually when copy-pasting HTML
+      }
+
       return;
     }
 
@@ -590,7 +634,6 @@ export default class RichTextEditor extends React.Component {
 
   render() {
     const {
-      defaultValue,
       withStickyToolbar,
       toolbarTop,
       toolbarOffsetY,
@@ -603,7 +646,6 @@ export default class RichTextEditor extends React.Component {
       disabled,
       error,
       fontSize,
-      value,
       version,
       showCount,
       maxLength,
@@ -612,8 +654,8 @@ export default class RichTextEditor extends React.Component {
 
     return !this.state.id ? (
       <LoadingPlaceholder
-        maxHeight={editorMaxHeight ? editorMaxHeight + 56 : undefined}
-        height={editorMinHeight ? editorMinHeight + 56 : 200}
+        maxHeight={editorMaxHeight && typeof editorMaxHeight === 'number' ? editorMaxHeight + 56 : undefined}
+        height={editorMinHeight && typeof editorMinHeight === 'number' ? editorMinHeight + 56 : 200}
       />
     ) : (
       <TrixEditorContainer
@@ -635,31 +677,25 @@ export default class RichTextEditor extends React.Component {
             {this.state.error.toString()}
           </MessageBox>
         )}
-        <input id={this.state.id} value={value || defaultValue} type="hidden" name={inputName} />
+
+        <input id={this.state.id} value={this.state.value} type="hidden" name={inputName} />
         <HTMLContent fontSize={fontSize}>
-          {!showCount ? (
-            <trix-editor
-              ref={this.editorRef}
-              input={this.state.id}
-              autofocus={autoFocus ? true : undefined}
-              placeholder={placeholder}
-            />
-          ) : (
-            <Container position="relative">
-              <trix-editor
-                ref={this.editorRef}
-                input={this.state.id}
-                autofocus={autoFocus ? true : undefined}
-                placeholder={placeholder}
-              />
-              <Container position="absolute" bottom="1em" right="1em">
+          <Container position="relative">
+            {React.createElement('trix-editor', {
+              ref: this.editorRef,
+              input: this.state.id,
+              autofocus: autoFocus ? true : undefined,
+              placeholder: placeholder,
+            })}
+            <Container position="absolute" bottom="1em" right="1em">
+              {showCount && (
                 <StyledTag textTransform="uppercase">
-                  <span>{stripHTML(value || defaultValue).length}</span>
+                  <span>{this.state.text.length}</span>
                   {maxLength && <span> / {maxLength}</span>}
                 </StyledTag>
-              </Container>
+              )}
             </Container>
-          )}
+          </Container>
         </HTMLContent>
       </TrixEditorContainer>
     );
