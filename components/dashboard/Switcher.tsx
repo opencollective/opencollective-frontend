@@ -1,31 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Plus } from '@styled-icons/fa-solid/Plus';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { css } from '@styled-system/css';
-import { flatten, groupBy, isNil, mapValues, omitBy, orderBy, uniqBy } from 'lodash';
+import { flatten, groupBy, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../../lib/constants/collectives';
-import { isPastEvent } from '../../lib/events';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../lib/i18n/collective-type';
-import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
-import Collapse from '../Collapse';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
-import LoadingPlaceholder from '../LoadingPlaceholder';
 import { Dropdown, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
 import StyledRoundButton from '../StyledRoundButton';
-import { H1, P, Span } from '../Text';
+import { Span } from '../Text';
 
 const StyledMenuEntry = styled(Link)`
   display: flex;
@@ -100,6 +94,10 @@ const ChevronUpDown = ({ style }) => (
   </svg>
 );
 
+ChevronUpDown.propTypes = {
+  style: PropTypes.object,
+};
+
 const StyledDropdownContent = styled(DropdownContent)`
   border-radius: 8px;
   right: 0;
@@ -138,11 +136,16 @@ const getAdminMembershipsForArchived = memoizeOne(loggedInUser => {
   return adminMembershipsForArchived;
 });
 
-const MenuEntry = ({ account, isActive, activeSlug }) => {
+const MenuEntry = ({ account, activeSlug }) => {
   const [expanded, setExpanded] = React.useState(false);
   return (
     <React.Fragment>
-      <StyledMenuEntry key={account.id} href={`/dashboard/${account.slug}`} title={account.name} $isActive={isActive}>
+      <StyledMenuEntry
+        key={account.id}
+        href={`/dashboard/${account.slug}`}
+        title={account.name}
+        $isActive={activeSlug === account.sug}
+      >
         <Flex overflow="hidden" alignItems="center" gridGap="12px">
           <Avatar collective={account} size={32} />
           <Span truncateOverflow>{account.name}</Span>
@@ -164,21 +167,26 @@ const MenuEntry = ({ account, isActive, activeSlug }) => {
         )}
       </StyledMenuEntry>
       {expanded &&
-        account.children?.map(account => (
+        account?.children?.map(child => (
           <StyledMenuEntry
-            key={account.id}
-            href={`/dashboard/${account.slug}`}
-            title={account.name}
-            $isActive={activeSlug === account.slug}
+            key={child?.id}
+            href={`/dashboard/${child.slug}`}
+            title={child.name}
+            $isActive={activeSlug === child.slug}
           >
             <Flex overflow="hidden" alignItems="center" gridGap="12px">
-              <Avatar ml={4} collective={account} size={32} />
-              <Span truncateOverflow>{account.name}</Span>
+              <Avatar ml={4} collective={child} size={32} />
+              <Span truncateOverflow>{child.name}</Span>
             </Flex>
           </StyledMenuEntry>
         ))}
     </React.Fragment>
   );
+};
+
+MenuEntry.propTypes = {
+  account: PropTypes.object,
+  activeSlug: PropTypes.string,
 };
 
 /**
@@ -240,7 +248,7 @@ const MembershipsList = ({ memberships, activeSlug }) => {
   return (
     <Box as="ul" p={0} my={2}>
       {sortMemberships(memberships).map(({ collective: account }) => (
-        <MenuEntry key={account.id} account={account} isActive={account.slug === activeSlug} activeSlug={activeSlug} />
+        <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />
       ))}
     </Box>
   );
@@ -249,6 +257,7 @@ const MembershipsList = ({ memberships, activeSlug }) => {
 MembershipsList.propTypes = {
   user: PropTypes.object,
   memberships: PropTypes.array,
+  activeSlug: PropTypes.string,
 };
 
 const Switcher = () => {
@@ -256,6 +265,7 @@ const Switcher = () => {
   const intl = useIntl();
   const router = useRouter();
   const { slug } = router.query;
+  const activeSlug = Array.isArray(slug) ? slug[0] : slug;
 
   const loggedInUserCollective = LoggedInUser?.collective;
 
@@ -313,12 +323,7 @@ const Switcher = () => {
                           <StyledHr width="100%" borderColor="black.300" />
                         </Flex>
                         {memberships?.map(({ collective: account }) => (
-                          <MenuEntry
-                            key={account.id}
-                            account={account}
-                            isActive={account.slug === slug}
-                            activeSlug={slug}
-                          />
+                          <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />
                         ))}
                       </div>
                     );

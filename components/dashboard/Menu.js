@@ -12,7 +12,7 @@ import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective.lib';
-import { getCollectiveTypeKey, isOneOfTypes, isType } from '../../lib/collective-sections';
+import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import { HOST_SECTIONS } from '../host-dashboard/constants';
