@@ -153,7 +153,7 @@ const Transactions = ({
     hasProcessingOrders: null,
   });
 
-  const pathname = isDashboard
+  const transactionsRoute = isDashboard
     ? `/dashboard/transactions/${account?.slug}`
     : `${getCollectivePageCanonicalURL(account)}/transactions`;
 
@@ -216,7 +216,7 @@ const Transactions = ({
 
   function updateFilters(queryParams) {
     return router.push({
-      pathname,
+      pathname: transactionsRoute,
       query: buildFilterLinkParams({ ...queryParams, offset: null }),
     });
   }
@@ -358,7 +358,7 @@ const Transactions = ({
                 values={{
                   ResetLink(text) {
                     return (
-                      <Link data-cy="reset-transactions-filters" href={pathname}>
+                      <Link data-cy="reset-transactions-filters" href={transactionsRoute}>
                         <span>{text}</span>
                       </Link>
                     );
@@ -374,7 +374,6 @@ const Transactions = ({
             <TransactionsList
               isLoading={loading}
               collective={account}
-              //  nbPlaceholders={variables.limit}
               transactions={transactionsAndProcessingOrders}
               displayActions
               onMutationSuccess={() => refetch()}
