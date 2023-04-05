@@ -24,7 +24,7 @@ import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
-import ExpensesPage from '../components/expenses/ExpensesPage';
+import Expenses from '../components/expenses/ExpensesPage';
 import { parseChronologicalOrderInput } from '../components/expenses/filters/ExpensesOrder';
 import { expenseHostFields, expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box } from '../components/Grid';
@@ -165,7 +165,7 @@ class ExpensePage extends React.Component {
         />
         <Container position="relative" minHeight={[null, 800]}>
           <Box maxWidth={Dimensions.MAX_SECTION_WIDTH} m="0 auto" px={[2, 3, 4]} py={[0, 5]}>
-            <ExpensesPage
+            <Expenses
               data={data}
               refetch={refetch}
               query={query}

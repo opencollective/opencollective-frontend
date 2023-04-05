@@ -56,7 +56,6 @@ AdminPanelSideBar.propTypes = {
     type: PropTypes.string,
     isHost: PropTypes.bool,
   }),
-  // LoggedInUser: PropTypes.object,
   isAccountantOnly: PropTypes.bool,
   onRoute: PropTypes.func,
 };

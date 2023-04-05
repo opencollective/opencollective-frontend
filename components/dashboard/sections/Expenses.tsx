@@ -76,19 +76,17 @@ const Expenses = (props: AdminSectionProps) => {
   });
 
   return (
-    <React.Fragment>
-      <ExpensesPage
-        data={data}
-        refetch={refetch}
-        query={query}
-        error={error}
-        loading={loading}
-        variables={variables}
-        LoggedInUser={LoggedInUser}
-        collectiveSlug={variables.collectiveSlug}
-        isDashboard
-      />
-    </React.Fragment>
+    <ExpensesPage
+      data={data}
+      refetch={refetch}
+      query={query}
+      error={error}
+      loading={loading}
+      variables={variables}
+      LoggedInUser={LoggedInUser}
+      collectiveSlug={variables.collectiveSlug}
+      isDashboard
+    />
   );
 };
 

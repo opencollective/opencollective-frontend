@@ -180,12 +180,7 @@ const Expenses = props => {
         </Box>
         {!isDashboard && (
           <Box minWidth={270} width={['100%', null, null, 275]} mt={[0, 48]}>
-            <ExpenseInfoSidebar
-              isLoading={loading}
-              collective={data?.account}
-              host={data?.account?.host}
-              // showExpenseTypeFilters
-            >
+            <ExpenseInfoSidebar isLoading={loading} collective={data?.account} host={data?.account?.host}>
               {data?.account?.expensesTags.length > 0 && (
                 <React.Fragment>
                   <H5 mb={3}>

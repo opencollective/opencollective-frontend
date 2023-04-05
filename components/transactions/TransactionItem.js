@@ -46,7 +46,7 @@ export const getDisplayedAmount = (transaction, collective) => {
   const hasOrder = transaction.order !== null;
   const isExpense = transaction.kind === TransactionKind.EXPENSE;
 
-  const isSelf = transaction.fromAccount?.slug === collective.slug;
+  const isSelf = transaction.fromAccount.slug === collective.slug;
   const isProcessingOrPending =
     hasOrder && [ORDER_STATUS.PROCESSING, ORDER_STATUS.PENDING].includes(transaction.order?.status);
 

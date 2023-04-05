@@ -17,7 +17,6 @@ import { H2 } from '../Text';
 import AccountSettings from './sections/AccountSettings';
 import Expenses from './sections/Expenses';
 import FinancialContributions from './sections/FinancialContributions';
-import Home from './sections/Home';
 import HostVirtualCards from './sections/HostVirtualCards';
 import InvoicesReceipts from './sections/InvoicesReceipts';
 import ManageContributions from './sections/ManageContributions';
@@ -43,11 +42,10 @@ const ADMIN_PANEL_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
   [COLLECTIVE_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
   [COLLECTIVE_SECTIONS.TEAM]: TeamSettings,
-  [COLLECTIVE_SECTIONS.HOME]: Home,
+  // NEW
   [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
   [COLLECTIVE_SECTIONS.EXPENSES]: Expenses,
   [COLLECTIVE_SECTIONS.TRANSACTIONS]: Transactions,
-  // [COLLECTIVE_SECTIONS.VIRTUAL_CARDS]: VirtualCards,
 };
 
 const FISCAL_HOST_SETTINGS_SECTIONS = {

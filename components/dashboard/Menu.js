@@ -158,7 +158,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             </React.Fragment>
           }
         >
-          Fiscal Host Settings
+          <FormattedMessage id="AdminPanel.FiscalHostSettings" defaultMessage="Fiscal Host Settings" />
         </MenuLink>
       </MenuGroup>
 
@@ -201,18 +201,6 @@ const Menu = ({ collective, isAccountantOnly }) => {
           section={COLLECTIVE_SECTIONS.TRANSACTIONS}
           icon={<Transfer size={16} />}
         />
-
-        <MenuLink
-          collective={collective}
-          section={COLLECTIVE_SECTIONS.VIRTUAL_CARDS}
-          icon={<CreditCard size={16} />}
-          if={
-            isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT]) &&
-            hasFeature(collective.host, FEATURES.VIRTUAL_CARDS) &&
-            collective.isApproved
-          }
-        />
-
         <MenuLink
           collective={collective}
           icon={<Cog size={16} />}
@@ -236,16 +224,6 @@ const Menu = ({ collective, isAccountantOnly }) => {
                 collective={collective}
                 section={COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS}
                 if={isType(collective, COLLECTIVE)}
-              />
-              <MenuLink
-                isSub
-                collective={collective}
-                section={COLLECTIVE_SECTIONS.VIRTUAL_CARDS}
-                if={
-                  isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT]) &&
-                  hasFeature(collective.host, FEATURES.VIRTUAL_CARDS) &&
-                  collective.isApproved
-                }
               />
               <MenuLink
                 isSub
