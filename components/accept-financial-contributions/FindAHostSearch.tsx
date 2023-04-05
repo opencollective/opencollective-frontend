@@ -1,5 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
+import { take } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -13,7 +14,7 @@ import { P } from '../Text';
 import FeaturedFiscalHostResults from './FeaturedFiscalHostResults';
 import OtherFiscalHostResults from './OtherFiscalHostResults';
 
-function useNonEmptyResultCache(data) {
+function useNonEmptyResultCache<T extends { hosts: { nodes: unknown[] } }>(data: T) {
   const nonEmptyResult = React.useRef(data);
   React.useEffect(() => {
     if (data && data?.hosts?.nodes?.length !== 0) {
@@ -108,7 +109,8 @@ export default function FindAHostSearch(props: {
   const hosts = displayData?.hosts?.nodes || [];
 
   const featuredHosts = hosts.filter(host => host.isTrustedHost);
-  const otherHosts = hosts.filter(host => !host.isTrustedHost);
+  const topHosts = take(featuredHosts, 3);
+  const otherHosts = [...featuredHosts.slice(topHosts.length), ...hosts.filter(host => !host.isTrustedHost)];
 
   return (
     <React.Fragment>
@@ -118,11 +120,11 @@ export default function FindAHostSearch(props: {
         </MessageBox>
       )}
 
-      {featuredHosts.length !== 0 && (
+      {topHosts.length !== 0 && (
         <Box mb={3}>
           <FeaturedFiscalHostResults
             collective={props.collective}
-            hosts={featuredHosts}
+            hosts={topHosts}
             onHostApplyClick={props.onHostApplyClick}
           />
         </Box>
@@ -132,7 +134,7 @@ export default function FindAHostSearch(props: {
           <OtherFiscalHostResults
             collective={props.collective}
             hosts={otherHosts}
-            totalCount={displayData.hosts.totalCount - featuredHosts.length}
+            totalCount={displayData.hosts.totalCount - topHosts.length}
             onHostApplyClick={props.onHostApplyClick}
           />
         </Box>
