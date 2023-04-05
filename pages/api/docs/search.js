@@ -1,13 +1,10 @@
 export default async function handle(req, res) {
   const { query } = req.query;
-  const apiUrl = `https://api.gitbook.com/v1/spaces/-LWSZizTt4ZC1UNDV89f/search?query=${query}`;
+  const apiUrl = new URL(`${process.env.API_URL}/docs/search?api_key=${process.env.API_KEY}`);
+  apiUrl.searchParams.set('query', query);
 
-  const result = await fetch(apiUrl, {
-    method: req.method,
-    headers: {
-      Authorization: `Bearer ${process.env.GITBOOK_API_KEY}`,
-    },
-  });
-  const json = await result.json();
-  return res.status(result.status).send(json);
+  const json = await fetch(apiUrl).then(result => result.json());
+
+  res.setHeader('Content-Type', 'application/json');
+  res.json(json);
 }
