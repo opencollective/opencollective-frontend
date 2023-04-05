@@ -15,19 +15,22 @@ import {
   GridProps,
   layout,
   LayoutProps,
+  position,
+  PositionProps,
   space,
   SpaceProps,
   typography,
   TypographyProps,
 } from 'styled-system';
 
-export const boxProps = compose(space, color, layout, typography, flexbox, grid);
+export const boxProps = compose(space, color, layout, typography, flexbox, grid, position);
 
 type BoxProps = SpaceProps &
   ColorProps &
   FlexboxProps &
   GridProps &
   LayoutProps &
+  PositionProps &
   TypographyProps & {
     gap?: string | number;
     css?: string | object;

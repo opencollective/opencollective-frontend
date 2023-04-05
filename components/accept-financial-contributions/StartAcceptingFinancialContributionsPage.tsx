@@ -4,12 +4,15 @@ import styled from 'styled-components';
 
 import { Currency } from '../../lib/constants/currency';
 import { Collective } from '../../lib/graphql/types/v2/graphql';
+import useDebounced from '../../lib/hooks/useDebounced';
 
 import HowToUseOpenCollective from '../fiscal-hosting/HowCanAFiscalHostHelpSection';
 import { Box, Flex, Grid } from '../Grid';
 import InputTypeCountry from '../InputTypeCountry';
+import SearchIcon from '../SearchIcon';
 import StyledCard from '../StyledCard';
 import StyledFilters from '../StyledFilters';
+import StyledInput from '../StyledInput';
 import StyledLink from '../StyledLink';
 import StyledSelect from '../StyledSelect';
 import { H1, P } from '../Text';
@@ -45,7 +48,17 @@ const I18nMessages = defineMessages({
   ANY_CURRENCY: {
     defaultMessage: 'Any currency',
   },
+  SEARCH_PLACEHOLDER: {
+    id: 'findAFiscalHost.searchPlaceholder',
+    defaultMessage: 'Search by name',
+  },
 });
+
+const SearchInput = styled(StyledInput)`
+  width: 100%;
+  border-radius: 20px;
+  padding-left: 30px;
+`;
 
 export default function StartAcceptingFinancialContributionsPage(props: StartAcceptingFinancialContributionsPageProps) {
   const intl = useIntl();
@@ -55,6 +68,9 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
   const [selectedCountry, setSelectedCountry] = React.useState('ALL');
   const currencyOptions = [allCurrenciesSelectOption, ...Currency.map(c => ({ value: c, label: c }))];
   const [selectedCurrency, setSelectedCurrency] = React.useState(currencyOptions[0]);
+  const [searchTerm, setSearchTerm] = React.useState('');
+
+  const debouncedSearchTerm = useDebounced(searchTerm, 500);
 
   const communityTags = selectedCommunityType.reduce((tags, community) => {
     return [...tags, ...CommunityTypesToTags[community]];
@@ -102,6 +118,23 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         padding="32px 24px"
       >
         <P mb={2} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
+          <FormattedMessage defaultMessage="Search for a Fiscal Host" />
+        </P>
+
+        <Box position="relative">
+          <Box ml="12px" mt="12px" position="absolute">
+            <SearchIcon size={16} fill="#aaaaaa" />
+          </Box>
+
+          <SearchInput
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            padding="20px"
+            placeholder={intl.formatMessage(I18nMessages.SEARCH_PLACEHOLDER)}
+          />
+        </Box>
+
+        <P mb={2} mt={4} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
           <FormattedMessage defaultMessage="What categories describe your work?" />
         </P>
         <StyledFilters
@@ -144,6 +177,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         <FindAHostSearch
           collective={props.collective}
           communityTags={communityTags}
+          searchTerm={debouncedSearchTerm}
           selectedCountry={selectedCountry}
           selectedCurrency={selectedCurrency.value}
           onHostApplyClick={host => {
@@ -152,7 +186,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         />
       </Box>
 
-      <Box mt={3} width={['300px', '400px', '600px', '927px']}>
+      <Box mt={4} width={['300px', '400px', '600px', '927px']}>
         <HowToUseOpenCollective />
       </Box>
     </Flex>

@@ -25,8 +25,21 @@ function useNonEmptyResultCache(data) {
 }
 
 const FindAFiscalHostQuery = gql`
-  query FindAFiscalHostQuery($tags: [String], $limit: Int, $country: [CountryISO], $currency: String) {
-    hosts(tag: $tags, limit: $limit, tagSearchOperator: OR, country: $country, currency: $currency) {
+  query FindAFiscalHostQuery(
+    $tags: [String]
+    $limit: Int
+    $country: [CountryISO]
+    $currency: String
+    $searchTerm: String
+  ) {
+    hosts(
+      tag: $tags
+      limit: $limit
+      tagSearchOperator: OR
+      country: $country
+      currency: $currency
+      searchTerm: $searchTerm
+    ) {
       totalCount
       nodes {
         id
@@ -56,6 +69,7 @@ export default function FindAHostSearch(props: {
   communityTags: string[];
   selectedCountry: string;
   selectedCurrency: string;
+  searchTerm: string;
   collective: Account;
   onHostApplyClick: (host: Partial<Host>) => void;
 }) {
@@ -66,6 +80,7 @@ export default function FindAHostSearch(props: {
     };
   }>(FindAFiscalHostQuery, {
     variables: {
+      searchTerm: props.searchTerm,
       tags: props.communityTags.length !== 0 ? props.communityTags : undefined,
       country: props.selectedCountry !== 'ALL' ? [props.selectedCountry] : null,
       currency: props.selectedCurrency !== 'ANY' ? props.selectedCurrency : null,
