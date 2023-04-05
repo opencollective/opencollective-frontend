@@ -34,10 +34,10 @@ export default function OtherFiscalHostResults({
   return (
     <Box>
       <Flex>
-        <P fontSize="24px" lineHeight="32px" fontWeight="700" color="black.900">
+        <P mr={3} fontSize="24px" lineHeight="32px" fontWeight="700" color="black.900">
           <FormattedMessage defaultMessage="Other Hosts" />
         </P>
-        <P ml={1} fontSize="14px" lineHeight="32px" fontWeight="400" color="black.900">
+        <P fontSize="14px" lineHeight="32px" fontWeight="400" color="black.900">
           <FormattedMessage
             defaultMessage="{ hostCount, plural, one {# host} other {# hosts} } found"
             values={{

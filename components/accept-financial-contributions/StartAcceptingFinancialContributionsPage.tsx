@@ -6,10 +6,11 @@ import { Currency } from '../../lib/constants/currency';
 import { Collective } from '../../lib/graphql/types/v2/graphql';
 
 import HowToUseOpenCollective from '../fiscal-hosting/HowCanAFiscalHostHelpSection';
-import { Box, Flex } from '../Grid';
+import { Box, Flex, Grid } from '../Grid';
 import InputTypeCountry from '../InputTypeCountry';
 import StyledCard from '../StyledCard';
 import StyledFilters from '../StyledFilters';
+import StyledLink from '../StyledLink';
 import StyledSelect from '../StyledSelect';
 import { H1, P } from '../Text';
 
@@ -21,14 +22,11 @@ export type StartAcceptingFinancialContributionsPageProps = {
 };
 
 const Illustration = styled.img`
-  width: 160px;
-  height: 160px;
+  width: 150px;
+  height: 150px;
   object-fit: cover;
 `;
 
-<<<<<<< HEAD
-const CommunityTypes = ['Open Source', 'Mutual Aid', 'Climate', 'BLM', 'Indigenous', 'Education', 'Festival'];
-=======
 const CommunityTypesToTags = {
   'Open Source': ['open source', 'opensource', 'open-source'],
   'Mutual Aid': ['mutual aid', 'covid', 'covid-19'],
@@ -39,7 +37,6 @@ const CommunityTypesToTags = {
 };
 
 const CommunityTypes = Object.keys(CommunityTypesToTags);
->>>>>>> adjust-wording-and-tags-filter-find-a-host
 
 const I18nMessages = defineMessages({
   ALL_COUNTRIES: {
@@ -59,40 +56,53 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
   const currencyOptions = [allCurrenciesSelectOption, ...Currency.map(c => ({ value: c, label: c }))];
   const [selectedCurrency, setSelectedCurrency] = React.useState(currencyOptions[0]);
 
-<<<<<<< HEAD
-=======
   const communityTags = selectedCommunityType.reduce((tags, community) => {
     return [...tags, ...CommunityTypesToTags[community]];
   }, []);
 
->>>>>>> adjust-wording-and-tags-filter-find-a-host
   return (
     <Flex my={5} alignItems="center" flexDirection="column">
-      <Illustration
-        alt="A place to grow and thrive illustration"
-        src="/static/images/fiscal-hosting/what-is-a-fiscalhost-illustration.png"
-      />
-      <Box mt={4} mb={4}>
-        <H1
-          fontSize={['20px', '32px']}
-          lineHeight={['24px', '40px']}
-          fontWeight="700"
-          color="black.900"
-          textAlign="center"
-        >
-          <FormattedMessage id="contributions.startAccepting" defaultMessage="Start accepting contributions" />
-        </H1>
-        <P mt={3} fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700" textAlign="center">
-          <FormattedMessage defaultMessage="Choose who will hold the money on your behalf" />
-        </P>
-      </Box>
-      <StyledCard width={['300px', '400px', '600px', '800px']} padding="32px 24px">
+      <Grid width={['300px', '400px', '600px', '927px']} gridTemplateColumns="auto auto" gridTemplateRows="auto" py={4}>
+        <Box gridColumn="1" justifySelf="center" gridRow={['2', '2', '1 / span 2']} my={2}>
+          <Illustration
+            alt="A place to grow and thrive illustration"
+            src="/static/images/fiscal-hosting/what-is-a-fiscalhost-illustration.png"
+          />
+        </Box>
+        <Box gridColumn={['1', '1', '2']} gridRow="1">
+          <H1
+            textAlign={['justify', 'justify', 'left']}
+            fontSize={['20px', '32px']}
+            lineHeight={['24px', '40px']}
+            fontWeight="700"
+            color="black.900"
+          >
+            <FormattedMessage defaultMessage="Accept contributions through a Fiscal Host" />
+          </H1>
+        </Box>
+        <Box gridColumn={['1', '1', '2']} gridRow={['3', '3', '2']}>
+          <P my={3} fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
+            <FormattedMessage defaultMessage="A fiscal host is an organization that welcomes others to operate through their structure, so projects can use the host’s legal entity and bank account instead of setting up their own. The host provides administrative services, oversight, and support. " />
+          </P>
+          <Box textAlign={['center', 'center', 'left']}>
+            <StyledLink
+              buttonSize="tiny"
+              buttonStyle="secondary"
+              href="https://opencollective.com/fiscal-hosting"
+              openInNewTab
+            >
+              <FormattedMessage id="home.knowMore" defaultMessage="Know more" />
+            </StyledLink>
+          </Box>
+        </Box>
+      </Grid>
+      <StyledCard
+        borderStyle={[null, null, 'solid', 'solid']}
+        width={['300px', '400px', '600px', '927px']}
+        padding="32px 24px"
+      >
         <P mb={2} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
-<<<<<<< HEAD
-          <FormattedMessage defaultMessage="What type of community are you?" />
-=======
           <FormattedMessage defaultMessage="What categories describe your work?" />
->>>>>>> adjust-wording-and-tags-filter-find-a-host
         </P>
         <StyledFilters
           multiSelect
@@ -105,18 +115,14 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         <Flex gap={'40px'} flexWrap="wrap" mt={4}>
           <Box flexGrow={1}>
             <P fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb={2}>
-<<<<<<< HEAD
-              <FormattedMessage defaultMessage="Where would your collective be most active?" />
-=======
               <FormattedMessage defaultMessage="Where are your financial contributors based?" />
->>>>>>> adjust-wording-and-tags-filter-find-a-host
             </P>
             <InputTypeCountry
               value={selectedCountry}
               onChange={setSelectedCountry}
               customOptions={[allCountriesSelectOption]}
             />
-            <P color="black.600" fontWeight="400" fontSize="11px" lineHeight="16px">
+            <P color="black.600" fontWeight="400" fontSize="11px" lineHeight="16px" mt={2}>
               <FormattedMessage defaultMessage="If multiple areas, please select most prominent of them all." />
             </P>
           </Box>
@@ -134,14 +140,10 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         </Flex>
       </StyledCard>
 
-      <Box mt={3} width={['360px', '500px', '700px', '900px']}>
+      <Box mt={4} width={['300px', '400px', '600px', '927px']}>
         <FindAHostSearch
           collective={props.collective}
-<<<<<<< HEAD
-          selectedCommunityType={selectedCommunityType}
-=======
           communityTags={communityTags}
->>>>>>> adjust-wording-and-tags-filter-find-a-host
           selectedCountry={selectedCountry}
           selectedCurrency={selectedCurrency.value}
           onHostApplyClick={host => {
@@ -150,7 +152,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         />
       </Box>
 
-      <Box mt={3} width={['360px', '500px', '700px', '900px']}>
+      <Box mt={3} width={['300px', '400px', '600px', '927px']}>
         <HowToUseOpenCollective />
       </Box>
     </Flex>

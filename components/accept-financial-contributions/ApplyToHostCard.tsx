@@ -101,8 +101,9 @@ export default function ApplyToHostCard(props: {
             }}
             buttonStyle="primary"
             width="100%"
+            textTransform="capitalize"
           >
-            <FormattedMessage id="Apply" defaultMessage="Apply" />
+            <FormattedMessage id="home.knowMore" defaultMessage="Know more" />
           </StyledButton>
         </Box>
       </StyledCollectiveCardWrapper>

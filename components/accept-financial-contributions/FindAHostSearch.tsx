@@ -98,7 +98,7 @@ export default function FindAHostSearch(props: {
   return (
     <React.Fragment>
       {isEmpty && (
-        <MessageBox mb={3} type="warning">
+        <MessageBox my={3} type="warning">
           <FormattedMessage defaultMessage="We could not find a host that matches all your criteria." />
         </MessageBox>
       )}
