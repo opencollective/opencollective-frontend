@@ -66,6 +66,8 @@ UserMenuLinkEntry.propTypes = {
 };
 
 const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, logOutHandler }) => {
+  const useDashboard = LoggedInUser.hasEarlyAccess('dashboard');
+
   return (
     <Box>
       <UserMenuLinkEntry as={Span} isMobileMenuLink={isMobileView} onClick={() => setShowNewsAndUpdates(true)}>
@@ -88,19 +90,45 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
           ) : null
         }
       </Query>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={getSettingsRoute(LoggedInUser.collective)}>
+      <UserMenuLinkEntry
+        isMobileMenuLink={isMobileView}
+        href={
+          useDashboard ? `/dashboard/info/${LoggedInUser.collective.slug}` : getSettingsRoute(LoggedInUser.collective)
+        }
+      >
         <FormattedMessage id="Settings" defaultMessage="Settings" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/manage-contributions`}>
+      <UserMenuLinkEntry
+        isMobileMenuLink={isMobileView}
+        href={
+          useDashboard
+            ? `/dashboard/manage-contributions/${LoggedInUser.collective.slug}`
+            : `/${LoggedInUser.collective.slug}/manage-contributions`
+        }
+      >
         <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/submitted-expenses`}>
+      <UserMenuLinkEntry
+        isMobileMenuLink={isMobileView}
+        href={
+          useDashboard
+            ? `/dashboard/expenses/${LoggedInUser.collective.slug}`
+            : `/${LoggedInUser.collective.slug}/submitted-expenses`
+        }
+      >
         <FormattedMessage id="home.feature.manageExpenses" defaultMessage="Manage Expenses" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/transactions`}>
+      <UserMenuLinkEntry
+        isMobileMenuLink={isMobileView}
+        href={
+          useDashboard
+            ? `/dashboard/transactions/${LoggedInUser.collective.slug}`
+            : `/${LoggedInUser.collective.slug}/transactions`
+        }
+      >
         <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href="/applications">
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={'/applications'}>
         <FormattedMessage id="menu.applications" defaultMessage="Applications" />
       </UserMenuLinkEntry>
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} as="a" href="/help">
