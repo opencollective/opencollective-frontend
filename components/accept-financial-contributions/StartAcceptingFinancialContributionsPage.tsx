@@ -26,7 +26,20 @@ const Illustration = styled.img`
   object-fit: cover;
 `;
 
+<<<<<<< HEAD
 const CommunityTypes = ['Open Source', 'Mutual Aid', 'Climate', 'BLM', 'Indigenous', 'Education', 'Festival'];
+=======
+const CommunityTypesToTags = {
+  'Open Source': ['open source', 'opensource', 'open-source'],
+  'Mutual Aid': ['mutual aid', 'covid', 'covid-19'],
+  Education: ['education', 'meetup', 'tech meetup'],
+  'Civic Tech': [''],
+  'Arts & Culture': ['arts and culture', 'art', 'arts', 'visual art', 'visual arts', 'music'],
+  Climate: ['climate', 'climate change', 'climate crisis', 'climate action', 'climate emergency'],
+};
+
+const CommunityTypes = Object.keys(CommunityTypesToTags);
+>>>>>>> adjust-wording-and-tags-filter-find-a-host
 
 const I18nMessages = defineMessages({
   ALL_COUNTRIES: {
@@ -46,6 +59,13 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
   const currencyOptions = [allCurrenciesSelectOption, ...Currency.map(c => ({ value: c, label: c }))];
   const [selectedCurrency, setSelectedCurrency] = React.useState(currencyOptions[0]);
 
+<<<<<<< HEAD
+=======
+  const communityTags = selectedCommunityType.reduce((tags, community) => {
+    return [...tags, ...CommunityTypesToTags[community]];
+  }, []);
+
+>>>>>>> adjust-wording-and-tags-filter-find-a-host
   return (
     <Flex my={5} alignItems="center" flexDirection="column">
       <Illustration
@@ -68,7 +88,11 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
       </Box>
       <StyledCard width={['300px', '400px', '600px', '800px']} padding="32px 24px">
         <P mb={2} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
+<<<<<<< HEAD
           <FormattedMessage defaultMessage="What type of community are you?" />
+=======
+          <FormattedMessage defaultMessage="What categories describe your work?" />
+>>>>>>> adjust-wording-and-tags-filter-find-a-host
         </P>
         <StyledFilters
           multiSelect
@@ -81,7 +105,11 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         <Flex gap={'40px'} flexWrap="wrap" mt={4}>
           <Box flexGrow={1}>
             <P fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb={2}>
+<<<<<<< HEAD
               <FormattedMessage defaultMessage="Where would your collective be most active?" />
+=======
+              <FormattedMessage defaultMessage="Where are your financial contributors based?" />
+>>>>>>> adjust-wording-and-tags-filter-find-a-host
             </P>
             <InputTypeCountry
               value={selectedCountry}
@@ -109,7 +137,11 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
       <Box mt={3} width={['360px', '500px', '700px', '900px']}>
         <FindAHostSearch
           collective={props.collective}
+<<<<<<< HEAD
           selectedCommunityType={selectedCommunityType}
+=======
+          communityTags={communityTags}
+>>>>>>> adjust-wording-and-tags-filter-find-a-host
           selectedCountry={selectedCountry}
           selectedCurrency={selectedCurrency.value}
           onHostApplyClick={host => {

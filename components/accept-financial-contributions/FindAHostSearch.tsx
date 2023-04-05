@@ -53,7 +53,7 @@ const FindAFiscalHostQuery = gql`
 `;
 
 export default function FindAHostSearch(props: {
-  selectedCommunityType: string[];
+  communityTags: string[];
   selectedCountry: string;
   selectedCurrency: string;
   collective: Account;
@@ -66,7 +66,7 @@ export default function FindAHostSearch(props: {
     };
   }>(FindAFiscalHostQuery, {
     variables: {
-      tags: props.selectedCommunityType.length !== 0 ? props.selectedCommunityType : undefined,
+      tags: props.communityTags.length !== 0 ? props.communityTags : undefined,
       country: props.selectedCountry !== 'ALL' ? [props.selectedCountry] : null,
       currency: props.selectedCurrency !== 'ANY' ? props.selectedCurrency : null,
       limit: 50,
