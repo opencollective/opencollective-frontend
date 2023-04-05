@@ -1,12 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
+import jwt from 'jsonwebtoken';
 import { isEqual } from 'lodash';
-import Router from 'next/router';
+import Router, { withRouter } from 'next/router';
+import { injectIntl } from 'react-intl';
 
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
-import { LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
+import { withTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+
+import { TOAST_TYPE, withToasts } from './ToastProvider';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,
@@ -20,6 +25,9 @@ export const UserContext = React.createContext({
 class UserProvider extends React.Component {
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired,
+    addToast: PropTypes.func,
+    twoFactorAuthPrompt: PropTypes.object,
+    router: PropTypes.object,
     token: PropTypes.string,
     client: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
@@ -35,7 +43,6 @@ class UserProvider extends React.Component {
     loadingLoggedInUser: true,
     LoggedInUser: null,
     errorLoggedInUser: null,
-    enforceTwoFactorAuthForLoggedInUser: null,
   };
 
   async componentDidMount() {
@@ -72,22 +79,18 @@ class UserProvider extends React.Component {
 
   logout = async () => {
     removeFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    await this.props.client.resetStore();
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
+    await this.props.client.resetStore();
   };
 
-  login = async (token, options = {}) => {
-    const { getLoggedInUser } = this.props;
-    const { twoFactorAuthenticatorCode, recoveryCode } = options;
+  login = async token => {
+    const { getLoggedInUser, twoFactorAuthPrompt } = this.props;
     try {
-      const LoggedInUser = token
-        ? await getLoggedInUser({ token, twoFactorAuthenticatorCode, recoveryCode })
-        : await getLoggedInUser();
+      const LoggedInUser = token ? await getLoggedInUser({ token }) : await getLoggedInUser();
       this.setState({
         loadingLoggedInUser: false,
         errorLoggedInUser: null,
         LoggedInUser,
-        enforceTwoFactorAuthForLoggedInUser: false,
       });
       return LoggedInUser;
     } catch (error) {
@@ -99,17 +102,50 @@ class UserProvider extends React.Component {
       // Store the error
       this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
       if (error.message.includes('Two-factor authentication is enabled')) {
-        this.setState({ enforceTwoFactorAuthForLoggedInUser: true });
-        throw new Error(error.message);
-      }
-      if (error.type === 'too_many_requests') {
-        this.setState({ enforceTwoFactorAuthForLoggedInUser: false });
-        throw new Error(error.message);
-      }
-      // We don't want to catch "Two-factor authentication code failed. Please try again" here
-      if (error.type === 'unauthorized' && error.message.includes('Cannot use this token')) {
-        this.setState({ enforceTwoFactorAuthForLoggedInUser: false });
-        throw new Error(error.message);
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          try {
+            const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+            const decodedToken = jwt.decode(token);
+
+            const result = await twoFactorAuthPrompt.open({
+              supportedMethods: decodedToken.supported2FAMethods ?? ['totp', 'recovery_code'],
+            });
+            const LoggedInUser = await getLoggedInUser({
+              token: getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN),
+              twoFactorAuthenticatorCode: result.code,
+              twoFactorAuthenticationType: result.type,
+            });
+            if (result.type === 'recovery_code') {
+              this.props.router.replace({
+                pathname: '/[slug]/admin/user-security',
+                query: { slug: LoggedInUser.collective.slug },
+              });
+            } else {
+              this.setState({
+                loadingLoggedInUser: false,
+                errorLoggedInUser: null,
+                LoggedInUser,
+              });
+            }
+
+            return LoggedInUser;
+          } catch (e) {
+            this.setState({ loadingLoggedInUser: false, errorLoggedInUser: e.message });
+            this.props.addToast({
+              type: TOAST_TYPE.ERROR,
+              message: e.message,
+            });
+
+            // stop trying to get the code.
+            if (
+              e.type === 'too_many_requests' ||
+              (e.type === 'unauthorized' && e.message.includes('Cannot use this token'))
+            ) {
+              throw new Error(e.message);
+            }
+          }
+        }
       }
     }
   };
@@ -158,6 +194,8 @@ const withUser = WrappedComponent => {
   return WithUser;
 };
 
-export default withApollo(withLoggedInUser(UserProvider));
+export default withToasts(
+  injectIntl(withApollo(withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(UserProvider))))),
+);
 
 export { UserConsumer, withUser };

@@ -72,8 +72,8 @@ const Menu = ({ collective, isAccountantOnly }) => {
           <MenuSectionHeader>
             <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
           </MenuSectionHeader>
-          <MenuLink collective={collective} section={HOST_SECTIONS.EXPENSES} if={!isAccountantOnly} />
-          <MenuLink collective={collective} section={HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS} if={!isAccountantOnly} />
+          <MenuLink collective={collective} section={HOST_SECTIONS.EXPENSES} />
+          <MenuLink collective={collective} section={HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS} />
           <MenuLink
             collective={collective}
             section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS}
@@ -99,7 +99,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             if={isType(collective, ORGANIZATION) && isHost}
           >
             <OrganizationSettingsMenuLinks collective={collective} isAccountantOnly={isAccountantOnly} />
-            <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} />
+            <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} if={!isAccountantOnly} />
           </SubMenu>
           <SubMenu
             label={<FormattedMessage id="AdminPanel.FiscalHostSettings" defaultMessage="Fiscal Host Settings" />}

@@ -9,9 +9,7 @@ describe('create an update', () => {
     cy.get('[data-cy="update-content-editor"] trix-toolbar').as('toolbar');
     cy.get('@editor').type('This is some bold HTML{selectall}');
     cy.get('@toolbar').find('.trix-button--icon-bold').click();
-    cy.wait(100);
     cy.getByDataCy('edit-update-submit-btn').click();
-    cy.wait(1000);
     cy.get('[data-cy=updateTitle]', { timeout: 10000 }).contains('New update');
     cy.get('[data-cy=meta]').contains('draft');
     cy.get('[data-cy="privateIcon"]').should('not.exist');
@@ -32,9 +30,8 @@ describe('create an update', () => {
 
 describe('random user cannot see update', () => {
   it('cannot view private update', () => {
-    cy.visit('/testcollective/updates');
+    cy.signup({ redirect: '/testcollective/updates' });
     cy.get('[data-cy=updateTitle]').first().click(); // The update created in the describe block above.
-    cy.wait(500);
     cy.get('[data-cy=mesgBox]').contains('Contribute to');
     cy.get('[data-cy=mesgBox]').contains('to see this Update');
   });

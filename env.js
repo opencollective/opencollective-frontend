@@ -42,6 +42,7 @@ const defaults = {
   API_PROXY: 'true',
   OPENCOLLECTIVE_OAUTH_URL: 'https://opencollective.com',
   OPENCOLLECTIVE_OAUTH_SCOPES: 'email',
+  SENTRY_TRACES_SAMPLE_RATE: null,
 };
 
 if (['production', 'staging'].includes(process.env.OC_ENV)) {

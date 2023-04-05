@@ -57,7 +57,7 @@ interface CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -287,7 +287,7 @@ type UserDetails {
   Returns true if user account is limited (user can't use any feature)
   """
   isLimited: Boolean
-  hasSeenLatestChangelogEntry: Boolean!
+  hasSeenLatestChangelogEntry: Boolean
   hasTwoFactorAuth: Boolean
 
   """
@@ -2083,6 +2083,7 @@ type CollectiveStatsType {
   totalNetAmountReceived: Int
   yearlyBudget: Int
   yearlyBudgetManaged: Int
+    @deprecated(reason: "2023-03-01: This field will be removed soon, please use totalMoneyManaged from GraphQL V2")
   activeRecurringContributions: JSON
 }
 
@@ -2209,7 +2210,7 @@ type Collective implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2467,7 +2468,7 @@ type Event implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2725,7 +2726,7 @@ type Fund implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2983,7 +2984,7 @@ type Organization implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -3242,7 +3243,7 @@ type Project implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -3742,7 +3743,7 @@ type User implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -4002,7 +4003,7 @@ type Vendor implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -5057,7 +5058,7 @@ input OrderInputType {
   quantity: Int = 1
   totalAmount: Int
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   platformFee: Int
   isFeesOnTop: Boolean
   currency: String

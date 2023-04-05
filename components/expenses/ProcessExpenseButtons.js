@@ -130,6 +130,8 @@ const ProcessExpenseButtons = ({
   onSuccess,
   onModalToggle,
   onDelete,
+  isMoreActions,
+  displaySecurityChecks,
 }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
   const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
@@ -250,7 +252,7 @@ const ProcessExpenseButtons = ({
           }
         />
       )}
-      {permissions.canDelete && (
+      {permissions.canDelete && !isMoreActions && (
         <DeleteExpenseButton
           buttonProps={getButtonProps()}
           expense={expense}
@@ -258,7 +260,9 @@ const ProcessExpenseButtons = ({
           onDelete={onDelete}
         />
       )}
-      {expense?.securityChecks?.length && <SecurityChecksButton {...buttonProps} minWidth={0} expense={expense} />}
+      {displaySecurityChecks && expense?.securityChecks?.length && (
+        <SecurityChecksButton {...buttonProps} minWidth={0} expense={expense} />
+      )}
     </React.Fragment>
   );
 };
@@ -300,9 +304,12 @@ ProcessExpenseButtons.propTypes = {
   onSuccess: PropTypes.func,
   /** Called when the expense gets deleted */
   onDelete: PropTypes.func,
+  /** Checks if the delete action is inside the more actions button */
+  isMoreActions: PropTypes.bool,
   /** Called when a modal is opened/closed with a boolean like (isOpen) */
   onModalToggle: PropTypes.func,
   displayMarkAsIncomplete: PropTypes.bool,
+  displaySecurityChecks: PropTypes.bool,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
@@ -314,6 +321,7 @@ export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
 
 ProcessExpenseButtons.defaultProps = {
   buttonProps: DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
+  displaySecurityChecks: true,
 };
 
 export default ProcessExpenseButtons;

@@ -16,7 +16,6 @@ import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';
 import { PAYMENT_METHOD_SERVICE, PAYMENT_METHOD_TYPE } from '../../lib/constants/payment-methods';
 import { TierTypes } from '../../lib/constants/tiers-types';
-import { TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { isPastEvent } from '../../lib/events';
@@ -26,7 +25,7 @@ import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { confirmPayment } from '../../lib/stripe/confirm-payment';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
-import { getCollectivePageRoute, isTrustedRedirectHost } from '../../lib/url-helpers';
+import { followOrderRedirectUrl, getCollectivePageRoute } from '../../lib/url-helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
@@ -330,11 +329,20 @@ class ContributionFlow extends React.Component {
           )}/${this.props.collective.slug}`
         : `${window.location.origin}/${this.props.collective.slug}`;
 
-      const returnUrl = `${baseRoute}/donate/success?OrderId=${order.id}`;
+      const returnUrl = new URL(`${baseRoute}/donate/success`);
+      returnUrl.searchParams.set('OrderId', order.id);
+
+      const queryParams = this.getQueryParams();
+      if (queryParams.redirect) {
+        returnUrl.searchParams.set('redirect', queryParams.redirect);
+        if (queryParams.shouldRedirectParent) {
+          returnUrl.searchParams.set('shouldRedirectParent', queryParams.shouldRedirectParent);
+        }
+      }
 
       try {
         await confirmPayment(stripeData?.stripe, stripeData?.paymentIntentClientSecret, {
-          returnUrl,
+          returnUrl: returnUrl.href,
           elements: stripeData?.elements,
           type: stepPayment?.paymentMethod?.type,
           paymentMethodId: stepPayment?.paymentMethod?.data?.stripePaymentMethodId,
@@ -393,31 +401,9 @@ class ContributionFlow extends React.Component {
     this.props.refetchLoggedInUser(); // to update memberships
     const queryParams = this.getQueryParams();
     if (isValidExternalRedirect(queryParams.redirect)) {
-      const url = new URL(queryParams.redirect);
-      url.searchParams.set('orderId', order.legacyId);
-      url.searchParams.set('orderIdV2', order.id);
-      url.searchParams.set('status', order.status);
-      const transaction = find(order.transactions, { type: TransactionTypes.CREDIT });
-      if (transaction) {
-        url.searchParams.set('transactionid', transaction.legacyId);
-        url.searchParams.set('transactionIdV2', transaction.id);
-      }
-
-      const verb = 'donate';
-      const fallback = `/${this.props.collective.slug}/${verb}/success?OrderId=${order.id}`;
-      if (isTrustedRedirectHost(url.host)) {
-        if (queryParams.shouldRedirectParent) {
-          window.parent.location.href = url.href;
-        } else {
-          window.location.href = url.href;
-        }
-      } else {
-        await this.props.router.push({
-          pathname: '/external-redirect',
-          query: { url: url.href, fallback, shouldRedirectParent: queryParams.shouldRedirectParent },
-        });
-        return this.scrollToTop();
-      }
+      followOrderRedirectUrl(this.props.router, this.props.collective, order, queryParams.redirect, {
+        shouldRedirectParent: queryParams.shouldRedirectParent,
+      });
     } else {
       const email = this.state.stepProfile?.email;
       return this.pushStepRoute('success', { replace: false, query: { OrderId: order.id, email } });
@@ -1059,7 +1045,8 @@ class ContributionFlow extends React.Component {
                       <CollectiveTitleContainer collective={collective} useLink>
                         <FormattedMessage
                           id="ContributionFlow.backToCollectivePage"
-                          defaultMessage="Back to Collective Page"
+                          defaultMessage="Back to {accountName}'s Page"
+                          values={{ accountName: collective.name }}
                         />
                       </CollectiveTitleContainer>
                     </Box>

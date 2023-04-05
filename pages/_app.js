@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { ApolloProvider } from '@apollo/client';
-// import { omit } from 'lodash';
 import App from 'next/app';
 import Router from 'next/router';
 import { SessionProvider } from 'next-auth/react';
@@ -134,16 +133,16 @@ class OpenCollectiveFrontendApp extends App {
             <ThemeProvider theme={theme}>
               <StripeProviderSSR>
                 <RawIntlProvider value={intl}>
-                  <UserProvider>
-                    <NewsAndUpdatesProvider>
-                      <ToastProvider>
+                  <ToastProvider>
+                    <UserProvider>
+                      <NewsAndUpdatesProvider>
                         <Component {...pageProps} />
                         <GlobalToasts />
                         <GlobalNewsAndUpdates />
                         <TwoFactorAuthenticationModal />
-                      </ToastProvider>
-                    </NewsAndUpdatesProvider>
-                  </UserProvider>
+                      </NewsAndUpdatesProvider>
+                    </UserProvider>
+                  </ToastProvider>
                 </RawIntlProvider>
               </StripeProviderSSR>
             </ThemeProvider>

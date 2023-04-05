@@ -140,7 +140,7 @@ const CloseButton = styled.button.attrs({
 `;
 
 /** Simple tag to display a short string */
-const StyledTag = ({ closeButtonProps, children, ...props }) => {
+const StyledTag = ({ closeButtonProps = null, children, ...props }) => {
   return !closeButtonProps ? (
     <StyledTagBase {...props}>{children}</StyledTagBase>
   ) : (

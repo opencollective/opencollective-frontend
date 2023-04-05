@@ -277,7 +277,6 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
                   name: props.fromAccount?.name,
                   email: LoggedInUser?.email ?? props?.fromAccount?.email,
                 }}
-                stepDetails={props.stepDetails}
                 paymentIntentId={paymentIntent.id}
                 paymentIntentClientSecret={paymentIntent.client_secret}
                 onChange={props.onChange}

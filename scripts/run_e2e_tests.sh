@@ -5,7 +5,8 @@ npx maildev@2.0.5 &
 MAILDEV_PID=$!
 
 echo "> Starting stripe webhook listener"
-stripe --api-key $STRIPE_WEBHOOK_KEY listen --forward-connect-to localhost:3060/webhooks/stripe &
+export STRIPE_WEBHOOK_SIGNING_SECRET=$(stripe --api-key $STRIPE_WEBHOOK_KEY listen --forward-connect-to localhost:3060/webhooks/stripe --print-secret)
+stripe --api-key $STRIPE_WEBHOOK_KEY listen --forward-connect-to localhost:3060/webhooks/stripe > /dev/null &
 STRIPE_WEBHOOK_PID=$!
 
 echo "> Starting api server"
@@ -74,7 +75,7 @@ wait_for_service IMAGES 127.0.0.1 3001
 echo ""
 echo "> Running cypress tests"
 
-npx cypress run ${CYPRESS_RECORD} --env OC_ENV=$OC_ENV --spec "test/cypress/integration/${CYPRESS_TEST_FILES}"
+npx cypress@12.7.0 run ${CYPRESS_RECORD} --env OC_ENV=$OC_ENV --spec "test/cypress/integration/${CYPRESS_TEST_FILES}"
 
 RETURN_CODE=$?
 if [ $RETURN_CODE -ne 0 ]; then

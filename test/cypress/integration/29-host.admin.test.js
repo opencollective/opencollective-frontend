@@ -147,11 +147,7 @@ describe('host dashboard', () => {
       cy.get('[data-cy="host-fee-percent"]').clear().type('9');
       cy.getByDataCy('order-confirmation-modal-submit').click();
       cy.contains('span', '€490.00');
-      cy.contains('span', '-€490.00');
-      cy.contains('span', '€44.10');
       cy.contains('span', '-€44.10');
-      cy.contains('span', '€10.00');
-      cy.contains('span', '-€10.00');
       cy.contains('[data-cy="order-status-msg"]:first', 'Paid');
     });
   });

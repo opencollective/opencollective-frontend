@@ -80,6 +80,7 @@ const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?
     const end = process.hrtime.bigint();
     const executionTime = Math.round(Number(end - start) / 1000000);
     const apiExecutionTime = result.headers.get('Execution-Time');
+    const graphqlCache = result.headers.get('GraphQL-Cache');
     const latencyTime = apiExecutionTime ? executionTime - Number(apiExecutionTime) : null;
     const body = JSON.parse(options.body);
     if (body.operationName || body.variables) {
@@ -103,6 +104,7 @@ const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?
         variables,
         executionTime ? `in ${executionTime}ms` : '',
         latencyTime ? `latency=${latencyTime}ms` : '',
+        graphqlCache ? `GraphQL Cache ${graphqlCache}` : '',
       );
     }
   }

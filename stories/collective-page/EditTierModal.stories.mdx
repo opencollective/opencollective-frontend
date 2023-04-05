@@ -1,5 +1,8 @@
 import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
 import EditTierModal from '../../components/edit-collective/tiers/EditTierModal';
+import ToastProvider from '../../components/ToastProvider';
+import { UserContext } from '../../components/UserProvider';
+import { loggedInUser } from '../mocks/loggedInUser';
 
 <Meta title="Collective Page/EditTierModal" component={EditTierModal} argTypes={{}} />
 
@@ -19,7 +22,9 @@ export const DefaultStory = props => <EditTierModal {...props} />;
       },
     }}
   >
-    <EditTierModal collective={{ type: 'ORGANIZATION', currency: 'USD', isActive: true }} />
+    <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+      <EditTierModal collective={{ type: 'ORGANIZATION', currency: 'USD', isActive: true }} />
+    </UserContext.Provider>
   </Story>
 </Canvas>
 
@@ -33,6 +38,8 @@ export const DefaultStory = props => <EditTierModal {...props} />;
       },
     }}
   >
-    <EditTierModal collective={{ type: 'ORGANIZATION', currency: 'USD', isActive: true }} tier={{ id: 'xpto' }} />
+    <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+      <EditTierModal collective={{ type: 'ORGANIZATION', currency: 'USD', isActive: true }} tier={{ id: 'xpto' }} />
+    </UserContext.Provider>
   </Story>
 </Canvas>

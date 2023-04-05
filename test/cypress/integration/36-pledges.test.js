@@ -84,6 +84,10 @@ describe('Pledges', () => {
 });
 
 describe('check FAQ context in each pledge is valid or not', () => {
+  beforeEach(() => {
+    cy.login({ redirect: `/pledges/new` });
+  });
+
   it('verify what is pledge ?', () => {
     cy.get('[data-cy="whatIsAPledge"]').click();
     cy.get('[data-cy="whatIsAPledge"]').should('contain', 'towards a collective that hasn’t been created yet. If you');

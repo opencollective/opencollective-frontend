@@ -126,7 +126,23 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
                 currencyDisplay="full"
                 prependProps={{ color: 'black.500' }}
                 required
-                onChange={value => {
+                onChange={(value, event) => {
+                  // Increase/Decrease the amount by $0.5 instead of $0.01 when using the arrows
+                  // inputEvent.inputType is `insertReplacementText` when the value is changed using the arrows
+                  if (event.nativeEvent.inputType === 'insertReplacementText') {
+                    const previousValue = data?.amount;
+                    const isTopArrowClicked = value - previousValue === 1;
+                    const isBottomArrowClicked = value - previousValue === -1;
+                    // We use value in cents, 1 cent is already increased/decreased by the input field itself when arrow was clicked
+                    // so we need to increase/decrease the value by 49 cents to get the desired increament/decreament of $0.5
+                    const valueChange = 49;
+
+                    if (isTopArrowClicked) {
+                      value = Math.round((value + valueChange) / 50) * 50;
+                    } else if (isBottomArrowClicked) {
+                      value = Math.round((value - valueChange) / 50) * 50;
+                    }
+                  }
                   dispatchChange('amount', value);
                 }}
               />
