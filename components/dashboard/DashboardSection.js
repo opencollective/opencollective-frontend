@@ -4,6 +4,13 @@ import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import AccountSettings from '../admin-panel/sections/AccountSettings';
+import FinancialContributions from '../admin-panel/sections/FinancialContributions';
+import HostVirtualCards from '../admin-panel/sections/HostVirtualCards';
+import InvoicesReceipts from '../admin-panel/sections/InvoicesReceipts';
+import NotificationsSettings from '../admin-panel/sections/NotificationsSettings';
+import PendingContributions from '../admin-panel/sections/PendingContributions';
+import TeamSettings from '../admin-panel/sections/Team';
 import Container from '../Container';
 import { Box } from '../Grid';
 import PendingApplications from '../host-dashboard/applications/PendingApplications';
@@ -14,15 +21,8 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 import { H2 } from '../Text';
 
-import AccountSettings from './sections/AccountSettings';
 import Expenses from './sections/Expenses';
-import FinancialContributions from './sections/FinancialContributions';
-import HostVirtualCards from './sections/HostVirtualCards';
-import InvoicesReceipts from './sections/InvoicesReceipts';
 import ManageContributions from './sections/ManageContributions';
-import NotificationsSettings from './sections/NotificationsSettings';
-import PendingContributions from './sections/PendingContributions';
-import TeamSettings from './sections/Team';
 import Transactions from './sections/Transactions';
 import {
   COLLECTIVE_SECTIONS,
