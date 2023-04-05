@@ -196,6 +196,9 @@ export const MenuContainer = styled.ul`
   margin-bottom: 100px;
   max-width: 100%;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  grid-gap: 4px;
   a {
     color: ${props => props.theme.colors.black[900]};
     &:hover {

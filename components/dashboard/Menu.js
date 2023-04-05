@@ -15,6 +15,7 @@ import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../l
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 
+import Container from '../Container';
 import { HOST_SECTIONS } from '../host-dashboard/constants';
 
 import {
@@ -70,7 +71,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
   const [expandedSection, setExpanded] = React.useState(null);
 
   return (
-    <React.Fragment>
+    <Container>
       {/** Host dashboard */}
       <MenuGroup if={isHost} mb={24}>
         <MenuSectionHeader>
@@ -370,7 +371,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
           Organization Settings
         </MenuLink>
       </MenuGroup>
-    </React.Fragment>
+    </Container>
   );
 };
 

@@ -102,6 +102,7 @@ const StyledDropdownContent = styled(DropdownContent)`
   border-radius: 8px;
   right: 0;
   left: 0;
+  margin-top: 8px;
 `;
 
 const getAllAdminMemberships = memoizeOne(loggedInUser => {
@@ -292,7 +293,7 @@ const Switcher = () => {
                 <ChevronUpDown style={{ height: 20, width: 20 }} />
               </DropdownButton>
             </Flex>
-            <Container mt={2} maxWidth={'100%'} {...dropdownProps}>
+            <Container maxWidth={'100%'} {...dropdownProps}>
               <StyledDropdownContent>
                 <Flex p={2} flexDirection="column" gridGap={3}>
                   <StyledMenuEntry
