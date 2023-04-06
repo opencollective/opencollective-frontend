@@ -206,9 +206,9 @@ const Menu = ({ collective, isAccountantOnly }) => {
           icon={<Cog size={16} />}
           if={!isHost}
           setExpanded={setExpanded}
-          section="COLL_SETTINGS"
+          section="SETTINGS"
           goToSection={COLLECTIVE_SECTIONS.INFO}
-          expanded={expandedSection === 'COLL_SETTINGS'}
+          expanded={expandedSection === 'SETTINGS'}
           subMenu={
             <React.Fragment>
               <MenuLink isSub collective={collective} section={COLLECTIVE_SECTIONS.INFO} />
@@ -326,7 +326,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             </React.Fragment>
           }
         >
-          Settings
+          <FormattedMessage id="Settings" defaultMessage="Settings" />
         </MenuLink>
 
         {/* org settings for hosts */}
@@ -346,7 +346,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             </React.Fragment>
           }
         >
-          Organization Settings
+          <FormattedMessage id="AdminPanel.OrganizationSettings" defaultMessage="Organization Settings" />
         </MenuLink>
       </MenuGroup>
     </Container>
