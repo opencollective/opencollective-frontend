@@ -5,7 +5,7 @@ import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { getSuggestedTags, isIndividualAccount } from '../../lib/collective.lib';
+import { getSuggestedTags } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -91,18 +91,19 @@ const Expenses = props => {
 
   const hasFilters = hasFilter(query);
   const isSelfHosted = data?.account?.id === data?.account?.host?.id;
-  const onlySubmittedExpenses = collectiveSlug === LoggedInUser?.collective.slug;
+  const onlyShowSubmittedExpenses = collectiveSlug === LoggedInUser?.collective.slug;
+
   return (
     <Container>
       <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-        {onlySubmittedExpenses ? (
+        {onlyShowSubmittedExpenses ? (
           <FormattedMessage defaultMessage="Submitted Expenses" />
         ) : (
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         )}
       </H1>
       <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}>
-        {!onlySubmittedExpenses && (
+        {!onlyShowSubmittedExpenses && (
           <Box flex="0 1" flexBasis={['100%', null, '380px']}>
             <ExpensesDirection
               value={query.direction || 'RECEIVED'}
