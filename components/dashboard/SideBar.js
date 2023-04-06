@@ -5,9 +5,9 @@ import styled from 'styled-components';
 import { Box } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 
+import AccountSwitcher from './AccountSwitcher';
 import Menu from './Menu';
 import { MenuContainer } from './MenuComponents';
-import Switcher from './Switcher';
 
 const SidebarContainer = styled(Box)`
   border-right: 1px solid #e6e8eb;
@@ -24,7 +24,7 @@ const AdminPanelSideBar = ({ collective, isAccountantOnly, isLoading, selectedSe
     <SidebarContainer {...props}>
       <Sticky>
         <MenuContainer>
-          <Switcher collective={collective} isLoading={isLoading} />
+          <AccountSwitcher collective={collective} isLoading={isLoading} />
           {isLoading ? (
             <Box py={3}>
               {[...Array(5).keys()].map(i => (

@@ -174,7 +174,7 @@ MenuEntry.propTypes = {
   activeSlug: PropTypes.string,
 };
 
-const Switcher = () => {
+const AccountSwitcher = () => {
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
@@ -250,9 +250,9 @@ const Switcher = () => {
   );
 };
 
-Switcher.propTypes = {
+AccountSwitcher.propTypes = {
   collective: PropTypes.object,
   isLoading: PropTypes.bool,
 };
 
-export default Switcher;
+export default AccountSwitcher;
