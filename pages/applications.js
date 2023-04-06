@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { getDashboardRoute } from '../lib/url-helpers';
+
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import { Flex } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
@@ -25,7 +27,7 @@ class Apps extends React.Component {
             <StyledLink
               href={
                 LoggedInUser.hasEarlyAccess('dashboard')
-                  ? `/dashboard/for-developers/${LoggedInUser.collective.slug}`
+                  ? getDashboardRoute(LoggedInUser.collective, 'for-developrs')
                   : `/${LoggedInUser.collective.slug}/admin/for-developers`
               }
             >
