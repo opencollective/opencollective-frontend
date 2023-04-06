@@ -27,7 +27,7 @@ class Apps extends React.Component {
             <StyledLink
               href={
                 LoggedInUser.hasEarlyAccess('dashboard')
-                  ? getDashboardRoute(LoggedInUser.collective, 'for-developrs')
+                  ? getDashboardRoute(LoggedInUser.collective, 'for-developers')
                   : `/${LoggedInUser.collective.slug}/admin/for-developers`
               }
             >
