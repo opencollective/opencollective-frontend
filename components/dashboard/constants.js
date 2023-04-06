@@ -57,7 +57,6 @@ export const COLLECTIVE_SECTIONS = {
   FOR_DEVELOPERS: 'for-developers',
   HOST: 'host',
   INFO: 'info',
-  HOME: 'home',
   EXPENSES: 'expenses',
   MANAGE_CONTRIBUTIONS: 'manage-contributions',
   TRANSACTIONS: 'transactions',
@@ -107,10 +106,6 @@ export const PAGE_TITLES = defineMessages({
 });
 
 export const SECTION_LABELS = defineMessages({
-  [ALL_SECTIONS.HOME]: {
-    id: 'home',
-    defaultMessage: 'Home',
-  },
   [ALL_SECTIONS.EXPENSES]: {
     id: 'Expenses',
     defaultMessage: 'Expenses',
