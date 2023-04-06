@@ -57,6 +57,7 @@ const StyledFilters = ({
   filters,
   onChange,
   disabled = false,
+  disabledFilters = [],
   getLabel = defaultGetLabel,
   selected = undefined,
   minButtonWidth = undefined,
@@ -76,7 +77,7 @@ const StyledFilters = ({
               onClick={isSelected ? undefined : () => onChange(filter)}
               data-selected={isSelected}
               minWidth={minButtonWidth}
-              disabled={disabled}
+              disabled={disabled || disabledFilters.includes(filter)}
               height={buttonHeight}
               padding={buttonPadding}
             >
@@ -95,6 +96,7 @@ StyledFilters.propTypes = {
   onChange: PropTypes.func.isRequired,
   selected: PropTypes.string,
   disabled: PropTypes.bool,
+  disabledFilters: PropTypes.arrayOf(PropTypes.string),
   buttonGrow: PropTypes.any,
   minButtonWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   buttonHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

@@ -100,6 +100,7 @@ const Expenses = props => {
       <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}>
         <Box flex="0 1" flexBasis={['100%', null, '380px']}>
           <ExpensesDirection
+            account={data?.account}
             value={query.direction || 'RECEIVED'}
             onChange={direction => {
               const newFilters = { ...query, direction };
