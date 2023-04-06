@@ -49,7 +49,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
   } else {
     const isAdmin = loggedInUser?.isAdminOfCollective(account);
     const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
-    return !isAdmin && isAccountant ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.MANAGE_CONTRIBUTIONS;
+    return !isAdmin && isAccountant ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.EXPENSES;
   }
 };
 
