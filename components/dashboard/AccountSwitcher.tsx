@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { Account, Collective } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 
@@ -94,36 +95,24 @@ const StyledDropdownContent = styled(DropdownContent)`
   overflow-y: scroll;
 `;
 
-const getAllAdminMemberships = memoizeOne(loggedInUser => {
-  // Personal profile already includes incognito contributions
-  const adminMemberships = loggedInUser?.memberOf?.filter(m => m.role === 'ADMIN' && !m.collective.isIncognito);
-  const childrenAdminMemberships = flatten(adminMemberships?.map(m => m.collective.children)).map(c => ({
-    collective: c,
-    role: 'ADMIN', // Admin role is inherited from parent
-  }));
-  const uniqueMemberships = uniqBy([...(adminMemberships ?? []), ...childrenAdminMemberships], m => m.collective.id);
+const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
+  let administratedAccounts =
+    loggedInUser?.memberOf.filter(m => m.role === 'ADMIN' && !m.collective.isIncognito).map(m => m.collective) || [];
 
-  return uniqueMemberships.filter(Boolean);
-});
+  // Filter out accounts if the user is also an admin of the parent of that account (since we already show the parent)
+  const childAccountIds = flatten(administratedAccounts.map(a => a.children)).map((a: { id: number }) => a.id);
+  administratedAccounts = administratedAccounts.filter(a => !childAccountIds.includes(a.id));
+  administratedAccounts = uniqBy([...administratedAccounts], a => a.id).filter(Boolean);
 
-const getAdminMemberships = memoizeOne(loggedInUser => {
-  // Personal profile already includes incognito contributions
-  const adminMemberships = loggedInUser?.memberOf?.filter(
-    m => m.role === 'ADMIN' && !m.collective.isIncognito && !m.collective.isArchived,
-  );
+  // Filter out Archived accounts and group it separately
+  const archivedAccounts = administratedAccounts.filter(a => a.isArchived);
+  const activeAccounts = administratedAccounts.filter(a => !a.isArchived);
 
-  // Filter out something if I am also an admin of the parent
-  const childrenAdminAccountIds = flatten(adminMemberships?.map(m => m.collective.children)).map((c: any) => c.id);
-
-  return adminMemberships?.filter(m => !childrenAdminAccountIds.includes(m.collective.id));
-});
-
-const getAdminMembershipsForArchived = memoizeOne(loggedInUser => {
-  // Personal profile already includes incognito contributions
-  const adminMembershipsForArchived = loggedInUser?.memberOf?.filter(
-    m => m.role === 'ADMIN' && !m.collective.isIncognito && m.collective.isArchived,
-  );
-  return adminMembershipsForArchived;
+  const groupedAccounts = groupBy(activeAccounts, a => a.type);
+  if (archivedAccounts?.length > 0) {
+    groupedAccounts.archived = archivedAccounts;
+  }
+  return groupedAccounts;
 });
 
 const MenuEntry = ({ account, activeSlug }) => {
@@ -191,16 +180,10 @@ const AccountSwitcher = () => {
 
   const loggedInUserCollective = LoggedInUser?.collective;
 
-  const allMemberships = getAllAdminMemberships(LoggedInUser);
-  const rootActiveMemberships = getAdminMemberships(LoggedInUser);
-  const rootArchivedMemberships = getAdminMembershipsForArchived(LoggedInUser);
-  const groupedMemberships = groupBy(rootActiveMemberships, m => m.collective.type);
-
-  if (rootArchivedMemberships?.length > 0) {
-    groupedMemberships.ARCHIVED = rootArchivedMemberships;
-  }
-
-  const activeAccount = allMemberships.find(m => m.collective.slug === slug)?.collective || loggedInUserCollective;
+  const groupedAccounts = getGroupedAdministratedAccounts(LoggedInUser);
+  const rootAccounts = flatten(Object.values(groupedAccounts));
+  const allAdministratedAccounts = [...rootAccounts, ...flatten(rootAccounts.map(a => a.children))];
+  const activeAccount = allAdministratedAccounts.find(a => a.slug === slug) || loggedInUserCollective;
 
   return (
     <Dropdown trigger="click">
@@ -230,7 +213,7 @@ const AccountSwitcher = () => {
                     <Span truncateOverflow>{loggedInUserCollective?.name}</Span>
                   </Flex>
                 </StyledMenuEntry>
-                {Object.entries(groupedMemberships).map(([collectiveType, memberships]) => {
+                {Object.entries(groupedAccounts).map(([collectiveType, accounts]) => {
                   return (
                     <div key={collectiveType}>
                       <Flex alignItems="center" px={1} mb={1}>
@@ -246,9 +229,9 @@ const AccountSwitcher = () => {
                         </Span>
                         <StyledHr width="100%" borderColor="black.300" />
                       </Flex>
-                      {memberships
-                        ?.sort((a, b) => a.collective.name.localeCompare(b.collective.name))
-                        .map(({ collective: account }) => (
+                      {accounts
+                        ?.sort((a, b) => a.name.localeCompare(b.name))
+                        .map(account => (
                           <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />
                         ))}
                     </div>
