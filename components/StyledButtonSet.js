@@ -78,7 +78,7 @@ const StyledButtonItem = ({
       customBorderRadius={customBorderRadius}
       {...buttonProps}
       {...(buttonPropsBuilder ? buttonPropsBuilder({ item, index, isSelected: isPicked }) : {})}
-      {...(isAlwaysShown ? { display: 'block' } : {})}
+      {...(isAlwaysShown ? { display: 'inline-block' } : {})}
     >
       {children({ item, isSelected: isPicked })}
     </ButtonItem>
