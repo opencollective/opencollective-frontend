@@ -21,19 +21,17 @@ const Transactions = (props: AdminSectionProps) => {
   const { transactions, account } = data || {};
 
   return (
-    <React.Fragment>
-      <TransactionsPage
-        transactions={transactions}
-        account={account}
-        variables={variables}
-        LoggedInUser={LoggedInUser}
-        error={error}
-        loading={loading}
-        refetch={refetch}
-        router={router}
-        isDashboard
-      />
-    </React.Fragment>
+    <TransactionsPage
+      transactions={transactions}
+      account={account}
+      variables={variables}
+      LoggedInUser={LoggedInUser}
+      error={error}
+      loading={loading}
+      refetch={refetch}
+      router={router}
+      isDashboard
+    />
   );
 };
 
