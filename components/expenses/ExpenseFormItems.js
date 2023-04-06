@@ -24,7 +24,7 @@ import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseItemForm from './ExpenseItemForm';
 
 /** Init a new expense item with default attributes */
-const newExpenseItem = attrs => ({
+export const newExpenseItem = attrs => ({
   id: uuid(), // we generate it here to properly key lists, but it won't be submitted to API
   incurredAt: toIsoDateStr(new Date()),
   description: '',
