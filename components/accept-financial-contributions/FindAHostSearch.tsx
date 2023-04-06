@@ -84,6 +84,10 @@ export default function FindAHostSearch(props: {
   const scrollRef = React.useRef<HTMLDivElement>();
   const [queryPage, setQueryPage] = React.useState(1);
 
+  React.useEffect(() => {
+    setQueryPage(1);
+  }, [props.communityTags, props.selectedCountry, props.selectedCurrency, props.searchTerm]);
+
   const onPageChange = React.useCallback(
     (page: number) => {
       setQueryPage(page);
