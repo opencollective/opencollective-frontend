@@ -90,11 +90,10 @@ class SigninPage extends React.Component {
   }
 
   async initialize() {
-    const token = this.props.token || this.props.router.query.token;
-    if (token) {
+    if (this.props.token) {
       let user;
       try {
-        user = await this.props.login(token);
+        user = await this.props.login(this.props.token);
 
         // If given token is invalid, try to login with the old one
         if (!user) {
