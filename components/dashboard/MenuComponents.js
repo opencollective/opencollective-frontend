@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
@@ -80,23 +80,28 @@ const ExpandButton = styled.button`
 `;
 
 export const MenuLink = ({
-  collective,
   section,
   children,
   onClick,
-  isSelected,
   if: conditional,
   isBeta,
   icon = null,
-  subMenu = null,
-  isSub = false,
-  expanded = false,
-  setExpanded,
+  renderSubMenu,
+  parentSection = null,
   goToSection,
 }) => {
   const router = useRouter();
-  const { selectedSection } = React.useContext(DashboardContext);
+  const { selectedSection, expandedSection, setExpandedSection, account } = React.useContext(DashboardContext);
+  const expanded = expandedSection === section;
   const { formatMessage } = useIntl();
+  const isSelected = section && selectedSection === section;
+
+  useEffect(() => {
+    if (parentSection && isSelected) {
+      setExpandedSection?.(parentSection);
+    }
+  }, [isSelected]);
+
   if (conditional === false) {
     return null;
   }
@@ -105,12 +110,13 @@ export const MenuLink = ({
     children = formatMessage(SECTION_LABELS[section]);
   }
   const handleClick = e => {
-    setExpanded?.(section);
+    setExpandedSection?.(section);
     onClick?.(e);
     if (goToSection) {
-      router.push({ pathname: getDashboardRoute(collective, goToSection) });
+      router.push({ pathname: getDashboardRoute(account, goToSection) });
     }
   };
+
   const renderButtonContent = () => (
     <Flex alignItems="center" justifyContent="space-between" flex={1}>
       <Flex alignItems="center" gridGap="8px">
@@ -120,13 +126,13 @@ export const MenuLink = ({
           {isBeta ? ' (Beta)' : ''}
         </Span>
       </Flex>
-      {subMenu && (
+      {renderSubMenu && (
         <ExpandButton
           onClick={e => {
             e.preventDefault();
             e.stopPropagation();
 
-            setExpanded(expanded ? null : section);
+            setExpandedSection(expanded ? null : section);
           }}
         >
           {expanded ? <ChevronUp size="16px" /> : <ChevronDown size="16px" />}
@@ -136,7 +142,7 @@ export const MenuLink = ({
   );
   return (
     <React.Fragment>
-      <MenuLinkContainer isSelected={isSelected || (section && selectedSection === section)} isSub={isSub}>
+      <MenuLinkContainer isSelected={isSelected} isSub={!!parentSection}>
         {onClick ? (
           <StyledLink as="button" onClick={handleClick} data-cy={`menu-item-${section}`}>
             {renderButtonContent()}
@@ -144,16 +150,16 @@ export const MenuLink = ({
         ) : (
           <Link
             onClick={handleClick}
-            href={getDashboardRoute(collective, goToSection ? goToSection : section)}
+            href={getDashboardRoute(account, goToSection ? goToSection : section)}
             data-cy={`menu-item-${section}`}
           >
             {renderButtonContent()}
           </Link>
         )}
       </MenuLinkContainer>
-      {subMenu && (
+      {renderSubMenu && (
         <ReactAnimateHeight duration={150} height={expanded ? 'auto' : 0}>
-          {subMenu}
+          {renderSubMenu({ parentSection: section })}
         </ReactAnimateHeight>
       )}
     </React.Fragment>
@@ -165,19 +171,13 @@ MenuLink.propTypes = {
   section: PropTypes.string,
   selectedSection: PropTypes.string,
   children: PropTypes.node,
-  isSelected: PropTypes.bool,
   isBeta: PropTypes.bool,
   isStrong: PropTypes.bool,
   onClick: PropTypes.func,
   afterClick: PropTypes.func,
   icon: PropTypes.node,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-  }),
-  subMenu: PropTypes.node,
-  isSub: PropTypes.bool,
-  expanded: PropTypes.bool,
-  setExpanded: PropTypes.func,
+  renderSubMenu: PropTypes.node,
+  parentSection: PropTypes.string,
   goToSection: PropTypes.string,
 };
 
@@ -193,7 +193,6 @@ export const MenuSectionHeader = styled.div`
 
 export const MenuContainer = styled.ul`
   margin: 0;
-  margin-bottom: 100px;
   max-width: 100%;
   position: relative;
   display: flex;

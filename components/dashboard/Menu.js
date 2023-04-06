@@ -25,50 +25,15 @@ import {
   HOST_DASHBOARD_SECTIONS,
   ORG_BUDGET_SECTIONS,
 } from './constants';
+import { DashboardContext } from './DashboardContext';
 import { MenuGroup, MenuLink, MenuSectionHeader } from './MenuComponents';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
-const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
-  return (
-    <React.Fragment>
-      {!isAccountantOnly && (
-        <React.Fragment>
-          <MenuLink isSub collective={collective} section={ABOUT_ORG_SECTIONS.INFO} />
-          <MenuLink isSub collective={collective} section={ABOUT_ORG_SECTIONS.COLLECTIVE_PAGE} />
-          <MenuLink isSub collective={collective} section={ABOUT_ORG_SECTIONS.CONNECTED_ACCOUNTS} />
-          <MenuLink isSub collective={collective} section={ABOUT_ORG_SECTIONS.TEAM} />
-          <MenuLink isSub collective={collective} section={ORG_BUDGET_SECTIONS.PAYMENT_METHODS} />
-        </React.Fragment>
-      )}
-      <MenuLink isSub collective={collective} section={ORG_BUDGET_SECTIONS.PAYMENT_RECEIPTS} />
-      {!isAccountantOnly && (
-        <React.Fragment>
-          <MenuLink isSub collective={collective} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
-          <MenuLink isSub collective={collective} section={ALL_SECTIONS.WEBHOOKS} />
-          <MenuLink isSub collective={collective} section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS} />
-          <MenuLink isSub collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
-          <MenuLink isSub collective={collective} section={FISCAL_HOST_SECTIONS.SECURITY} />
-          <MenuLink isSub collective={collective} section={ALL_SECTIONS.ADVANCED} />
-          {!isHostAccount(collective) && (
-            <MenuLink isSub collective={collective} section={ALL_SECTIONS.FISCAL_HOSTING} />
-          )}
-        </React.Fragment>
-      )}
-    </React.Fragment>
-  );
-};
-
-OrganizationSettingsMenuLinks.propTypes = {
-  collective: PropTypes.object,
-  isAccountantOnly: PropTypes.bool,
-};
-
-const Menu = ({ collective, isAccountantOnly }) => {
-  const isHost = isHostAccount(collective);
-  const isIndividual = isIndividualAccount(collective);
-  const [expandedSection, setExpanded] = React.useState(null);
-
+const Menu = ({ isAccountantOnly }) => {
+  const { account } = React.useContext(DashboardContext);
+  const isHost = isHostAccount(account);
+  const isIndividual = isIndividualAccount(account);
   return (
     <Container>
       {/** Host dashboard */}
@@ -76,83 +41,55 @@ const Menu = ({ collective, isAccountantOnly }) => {
         <MenuSectionHeader>
           <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
         </MenuSectionHeader>
-        <MenuLink
-          setExpanded={setExpanded}
-          collective={collective}
-          section={HOST_DASHBOARD_SECTIONS.HOST_EXPENSES}
-          icon={<Receipt size={16} />}
-        />
-        <MenuLink
-          collective={collective}
-          section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS}
-          icon={<Coin size={16} />}
-          setExpanded={setExpanded}
-        />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_EXPENSES} icon={<Receipt size={16} />} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} icon={<Coin size={16} />} />
 
         <MenuLink
-          collective={collective}
           section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS}
           icon={<Coin size={16} />}
           if={!isAccountantOnly}
         />
 
         <MenuLink
-          collective={collective}
           section={HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS}
           if={!isAccountantOnly}
           icon={<Inbox size={16} />}
-          setExpanded={setExpanded}
         />
         <MenuLink
-          collective={collective}
           section={HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES}
           if={!isAccountantOnly}
           icon={<NetworkChart size={16} />}
-          setExpanded={setExpanded}
         />
         <MenuLink
-          collective={collective}
           section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS}
           icon={<CreditCard size={16} />}
-          if={!isAccountantOnly && hasFeature(collective, FEATURES.VIRTUAL_CARDS)}
-          setExpanded={setExpanded}
+          if={!isAccountantOnly && hasFeature(account, FEATURES.VIRTUAL_CARDS)}
         />
-        <MenuLink
-          collective={collective}
-          section={HOST_DASHBOARD_SECTIONS.REPORTS}
-          isBeta
-          icon={<Chart size={16} />}
-          setExpanded={setExpanded}
-        />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} isBeta icon={<Chart size={16} />} />
 
         <MenuLink
-          collective={collective}
           icon={<Cog size={16} />}
           if={isHost && !isAccountantOnly}
-          setExpanded={setExpanded}
           section="FISCAL_HOST_SETTINGS"
           goToSection={FISCAL_HOST_SECTIONS.FISCAL_HOSTING}
-          expanded={expandedSection === 'FISCAL_HOST_SETTINGS'}
-          subMenu={
+          renderSubMenu={({ parentSection }) => (
             <React.Fragment>
-              <MenuLink isSub collective={collective} section={FISCAL_HOST_SECTIONS.FISCAL_HOSTING} />
-              <MenuLink isSub collective={collective} section={FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS} />
-              <MenuLink isSub collective={collective} section={FISCAL_HOST_SECTIONS.RECEIVING_MONEY} />
-              <MenuLink isSub collective={collective} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />
+              <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.FISCAL_HOSTING} />
+              <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS} />
+              <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.RECEIVING_MONEY} />
+              <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={FISCAL_HOST_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS}
-                if={hasFeature(collective, FEATURES.VIRTUAL_CARDS)}
+                if={hasFeature(account, FEATURES.VIRTUAL_CARDS)}
               />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={FISCAL_HOST_SECTIONS.POLICIES}
-                if={isOneOfTypes(collective, [USER, ORGANIZATION])}
+                if={isOneOfTypes(account, [USER, ORGANIZATION])}
               />
             </React.Fragment>
-          }
+          )}
         >
           <FormattedMessage id="AdminPanel.FiscalHostSettings" defaultMessage="Fiscal Host Settings" />
         </MenuLink>
@@ -161,166 +98,130 @@ const Menu = ({ collective, isAccountantOnly }) => {
       {/** User/org/collective/event/project dashbord */}
       <MenuGroup>
         <MenuSectionHeader>
-          {isType(collective, ORGANIZATION) ? (
+          {isType(account, ORGANIZATION) ? (
             <FormattedMessage id="OrganizationDashboard" defaultMessage="Organization Dashboard" />
-          ) : isType(collective, USER) ? (
+          ) : isType(account, USER) ? (
             <FormattedMessage id="UserDashboard" defaultMessage="User Dashboard" />
-          ) : isType(collective, COLLECTIVE) ? (
+          ) : isType(account, COLLECTIVE) ? (
             <FormattedMessage id="CollectiveDashboard" defaultMessage="Collective Dashboard" />
           ) : (
             <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
           )}
         </MenuSectionHeader>
 
+        <MenuLink section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} icon={<Coin size={16} />} />
         <MenuLink
-          collective={collective}
-          section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS}
-          icon={<Coin size={16} />}
-          setExpanded={setExpanded}
-        />
-        <MenuLink
-          setExpanded={setExpanded}
-          collective={collective}
           section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
           icon={<Coin size={16} />}
-          if={isSelfHostedAccount(collective) && !isAccountantOnly && isType(collective, COLLECTIVE)}
+          if={isSelfHostedAccount(account) && !isAccountantOnly && isType(account, COLLECTIVE)}
         />
+        <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} icon={<Receipt size={16} />} />
+        <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} icon={<Transfer size={16} />} />
         <MenuLink
-          setExpanded={setExpanded}
-          collective={collective}
-          section={COLLECTIVE_SECTIONS.EXPENSES}
-          icon={<Receipt size={16} />}
-        />
-        <MenuLink
-          setExpanded={setExpanded}
-          collective={collective}
-          section={COLLECTIVE_SECTIONS.TRANSACTIONS}
-          icon={<Transfer size={16} />}
-        />
-        <MenuLink
-          collective={collective}
           icon={<Cog size={16} />}
           if={!isHost}
-          setExpanded={setExpanded}
           section="SETTINGS"
           goToSection={COLLECTIVE_SECTIONS.INFO}
-          expanded={expandedSection === 'SETTINGS'}
-          subMenu={
+          renderSubMenu={({ parentSection }) => (
             <React.Fragment>
-              <MenuLink isSub collective={collective} section={COLLECTIVE_SECTIONS.INFO} />
-              <MenuLink isSub collective={collective} section={COLLECTIVE_SECTIONS.COLLECTIVE_PAGE} />
+              <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.INFO} />
+              <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.COLLECTIVE_PAGE} />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={COLLECTIVE_SECTIONS.COLLECTIVE_GOALS}
-                if={isOneOfTypes(collective, [COLLECTIVE, PROJECT])}
+                if={isOneOfTypes(account, [COLLECTIVE, PROJECT])}
               />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS}
-                if={isType(collective, COLLECTIVE)}
+                if={isType(account, COLLECTIVE)}
               />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={COLLECTIVE_SECTIONS.POLICIES}
-                if={isOneOfTypes(collective, [COLLECTIVE, FUND])}
+                if={isOneOfTypes(account, [COLLECTIVE, FUND])}
               />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={COLLECTIVE_SECTIONS.CUSTOM_EMAIL}
-                if={isOneOfTypes(collective, [COLLECTIVE, EVENT, PROJECT])}
+                if={isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT])}
               />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={COLLECTIVE_SECTIONS.EXPORT}
-                if={isOneOfTypes(collective, [COLLECTIVE, EVENT, PROJECT])}
+                if={isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT])}
               />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={COLLECTIVE_SECTIONS.HOST}
-                if={isOneOfTypes(collective, [COLLECTIVE, FUND])}
+                if={isOneOfTypes(account, [COLLECTIVE, FUND])}
               />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={COLLECTIVE_SECTIONS.TEAM}
-                if={isOneOfTypes(collective, [COLLECTIVE, FUND, ORGANIZATION, EVENT, PROJECT])}
+                if={isOneOfTypes(account, [COLLECTIVE, FUND, ORGANIZATION, EVENT, PROJECT])}
               />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={COLLECTIVE_SECTIONS.PAYMENT_METHODS}
-                if={['ACTIVE', 'AVAILABLE'].includes(collective.features.USE_PAYMENT_METHODS)}
+                if={['ACTIVE', 'AVAILABLE'].includes(account.features.USE_PAYMENT_METHODS)}
               />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS}
                 if={isIndividual}
               />
-              <MenuLink isSub collective={collective} section={COLLECTIVE_SECTIONS.NOTIFICATIONS} if={isIndividual} />
+              <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.NOTIFICATIONS} if={isIndividual} />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={ORG_BUDGET_SECTIONS.GIFT_CARDS}
-                if={['ACTIVE', 'AVAILABLE'].includes(collective.features.EMIT_GIFT_CARDS)}
+                if={['ACTIVE', 'AVAILABLE'].includes(account.features.EMIT_GIFT_CARDS)}
               />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={COLLECTIVE_SECTIONS.VIRTUAL_CARDS}
                 if={
-                  isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT]) &&
-                  hasFeature(collective.host, FEATURES.VIRTUAL_CARDS) &&
-                  collective.isApproved
+                  isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT]) &&
+                  hasFeature(account.host, FEATURES.VIRTUAL_CARDS) &&
+                  account.isApproved
                 }
               />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={COLLECTIVE_SECTIONS.TICKETS}
-                if={isType(collective, EVENT)}
+                if={isType(account, EVENT)}
               />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={COLLECTIVE_SECTIONS.TIERS}
-                if={isOneOfTypes(collective, [COLLECTIVE, FUND, EVENT, PROJECT])}
+                if={isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT])}
               />
-              <MenuLink isSub collective={collective} section={COLLECTIVE_SECTIONS.WEBHOOKS} />
+              <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.WEBHOOKS} />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={COLLECTIVE_SECTIONS.AUTHORIZED_APPS}
-                if={isType(collective, USER)}
+                if={isType(account, USER)}
               />
-              <MenuLink isSub collective={collective} section={COLLECTIVE_SECTIONS.USER_SECURITY} if={isIndividual} />
+              <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.USER_SECURITY} if={isIndividual} />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS}
-                if={isOneOfTypes(collective, [COLLECTIVE, USER])}
+                if={isOneOfTypes(account, [COLLECTIVE, USER])}
               />
-              <MenuLink isSub collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
+              <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
               <MenuLink
-                isSub
-                collective={collective}
+                parentSection={parentSection}
                 section={FISCAL_HOST_SECTIONS.SECURITY}
-                if={isOneOfTypes(collective, [COLLECTIVE, FUND, ORGANIZATION])}
+                if={isOneOfTypes(account, [COLLECTIVE, FUND, ORGANIZATION])}
               />
-              <MenuLink isSub collective={collective} section={COLLECTIVE_SECTIONS.ADVANCED} />
-              <MenuGroup if={isSelfHostedAccount(collective) && !isAccountantOnly} mt={24}>
-                <MenuLink isSub collective={collective} section={FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS} />
-                <MenuLink isSub collective={collective} section={FISCAL_HOST_SECTIONS.RECEIVING_MONEY} />
-                <MenuLink isSub collective={collective} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />
+              <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.ADVANCED} />
+              <MenuGroup if={isSelfHostedAccount(account) && !isAccountantOnly} mt={24}>
+                <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS} />
+                <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.RECEIVING_MONEY} />
+                <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />
               </MenuGroup>
             </React.Fragment>
-          }
+          )}
         >
           <FormattedMessage id="Settings" defaultMessage="Settings" />
         </MenuLink>
@@ -328,19 +229,38 @@ const Menu = ({ collective, isAccountantOnly }) => {
         {/* org settings for hosts */}
 
         <MenuLink
-          collective={collective}
           icon={<Cog size={16} />}
-          if={isType(collective, ORGANIZATION) && isHost}
-          setExpanded={setExpanded}
+          if={isType(account, ORGANIZATION) && isHost}
           section="ORG_SETTINGS"
           goToSection={ABOUT_ORG_SECTIONS.INFO}
-          expanded={expandedSection === 'ORG_SETTINGS'}
-          subMenu={
+          renderSubMenu={({ parentSection }) => (
             <React.Fragment>
-              <OrganizationSettingsMenuLinks collective={collective} isAccountantOnly={isAccountantOnly} />
-              <MenuLink isSub collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} if={!isAccountantOnly} />
+              {!isAccountantOnly && (
+                <React.Fragment>
+                  <MenuLink parentSection={parentSection} section={ABOUT_ORG_SECTIONS.INFO} />
+                  <MenuLink parentSection={parentSection} section={ABOUT_ORG_SECTIONS.COLLECTIVE_PAGE} />
+                  <MenuLink parentSection={parentSection} section={ABOUT_ORG_SECTIONS.CONNECTED_ACCOUNTS} />
+                  <MenuLink parentSection={parentSection} section={ABOUT_ORG_SECTIONS.TEAM} />
+                  <MenuLink parentSection={parentSection} section={ORG_BUDGET_SECTIONS.PAYMENT_METHODS} />
+                </React.Fragment>
+              )}
+              <MenuLink parentSection={parentSection} section={ORG_BUDGET_SECTIONS.PAYMENT_RECEIPTS} />
+              <MenuLink parentSection={parentSection} section={ORG_BUDGET_SECTIONS.TIERS} if={!isAccountantOnly} />
+              {!isAccountantOnly && (
+                <React.Fragment>
+                  <MenuLink parentSection={parentSection} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
+                  <MenuLink parentSection={parentSection} section={ALL_SECTIONS.WEBHOOKS} />
+                  <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS} />
+                  <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
+                  <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.SECURITY} />
+                  <MenuLink parentSection={parentSection} section={ALL_SECTIONS.ADVANCED} />
+                  {!isHostAccount(account) && (
+                    <MenuLink parentSection={parentSection} section={ALL_SECTIONS.FISCAL_HOSTING} />
+                  )}
+                </React.Fragment>
+              )}
             </React.Fragment>
-          }
+          )}
         >
           <FormattedMessage id="AdminPanel.OrganizationSettings" defaultMessage="Organization Settings" />
         </MenuLink>
@@ -351,19 +271,6 @@ const Menu = ({ collective, isAccountantOnly }) => {
 
 Menu.propTypes = {
   isAccountantOnly: PropTypes.bool,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    name: PropTypes.string,
-    type: PropTypes.string,
-    isHost: PropTypes.bool,
-    host: PropTypes.object,
-    settings: PropTypes.object,
-    features: PropTypes.shape({
-      USE_PAYMENT_METHODS: PropTypes.string,
-      EMIT_GIFT_CARDS: PropTypes.string,
-    }),
-    isApproved: PropTypes.bool,
-  }),
 };
 
 export default Menu;

@@ -114,6 +114,7 @@ const DashboardPage = () => {
   const account = data?.account;
   const notification = getNotification(intl, account);
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
+  const [expandedSection, setExpandedSection] = React.useState(null);
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   const titleBase = account?.isHost
@@ -121,7 +122,7 @@ const DashboardPage = () => {
     : intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' });
 
   return (
-    <DashboardContext.Provider value={{ selectedSection }}>
+    <DashboardContext.Provider value={{ selectedSection, expandedSection, setExpandedSection, account }}>
       <Page noRobots collective={account} title={account ? `${account.name} - ${titleBase}` : titleBase}>
         {!blocker && (
           <AdminPanelTopBar
