@@ -154,19 +154,22 @@ const MenuEntry = ({ account, activeSlug }) => {
         )}
       </StyledMenuEntry>
       {expanded &&
-        account?.children?.map(child => (
-          <StyledMenuEntry
-            key={child?.id}
-            href={`/dashboard/${child.slug}`}
-            title={child.name}
-            $isActive={activeSlug === child.slug}
-          >
-            <Flex overflow="hidden" alignItems="center" gridGap="12px">
-              <Avatar ml={4} collective={child} size={32} />
-              <Span truncateOverflow>{child.name}</Span>
-            </Flex>
-          </StyledMenuEntry>
-        ))}
+        account?.children
+          ?.slice() // Create a copy to that we can sort the otherwise immutable array
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map(child => (
+            <StyledMenuEntry
+              key={child?.id}
+              href={`/dashboard/${child.slug}`}
+              title={child.name}
+              $isActive={activeSlug === child.slug}
+            >
+              <Flex overflow="hidden" alignItems="center" gridGap="12px">
+                <Avatar ml={4} collective={child} size={32} />
+                <Span truncateOverflow>{child.name}</Span>
+              </Flex>
+            </StyledMenuEntry>
+          ))}
     </React.Fragment>
   );
 };
@@ -240,9 +243,11 @@ const AccountSwitcher = () => {
                         </Span>
                         <StyledHr width="100%" borderColor="black.300" />
                       </Flex>
-                      {memberships?.map(({ collective: account }) => (
-                        <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />
-                      ))}
+                      {memberships
+                        ?.sort((a, b) => a.collective.name.localeCompare(b.collective.name))
+                        .map(({ collective: account }) => (
+                          <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />
+                        ))}
                     </div>
                   );
                 })}
