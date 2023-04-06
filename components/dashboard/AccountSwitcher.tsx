@@ -30,7 +30,6 @@ const StyledMenuEntry = styled(Link)`
   padding: 8px;
   margin-bottom: 4px;
   cursor: pointer;
-  background: none;
   color: inherit;
   border: none;
   font: inherit;
@@ -116,13 +115,14 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
 
 const MenuEntry = ({ account, activeSlug }) => {
   const [expanded, setExpanded] = React.useState(false);
+
   return (
     <React.Fragment>
       <StyledMenuEntry
         key={account.id}
         href={`/dashboard/${account.slug}`}
         title={account.name}
-        $isActive={activeSlug === account.sug}
+        $isActive={activeSlug === account.slug}
       >
         <Flex overflow="hidden" alignItems="center" gridGap="12px">
           <Avatar collective={account} size={32} />
@@ -182,7 +182,7 @@ const AccountSwitcher = () => {
   const groupedAccounts = getGroupedAdministratedAccounts(LoggedInUser);
   const rootAccounts = flatten(Object.values(groupedAccounts));
   const allAdministratedAccounts = [...rootAccounts, ...flatten(rootAccounts.map(a => a.children))];
-  const activeAccount = allAdministratedAccounts.find(a => a.slug === slug) || loggedInUserCollective;
+  const activeAccount = allAdministratedAccounts.find(a => a.slug === activeSlug) || loggedInUserCollective;
 
   return (
     <Dropdown trigger="click">
@@ -205,7 +205,7 @@ const AccountSwitcher = () => {
                   key={loggedInUserCollective?.id}
                   href={`/dashboard/${loggedInUserCollective?.slug}`}
                   title={loggedInUserCollective?.name}
-                  $isActive={slug === loggedInUserCollective?.slug}
+                  $isActive={activeSlug === loggedInUserCollective?.slug}
                 >
                   <Flex alignItems="center" gridGap="12px">
                     <Avatar collective={loggedInUserCollective} size={32} />
