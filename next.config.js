@@ -160,11 +160,11 @@ const nextConfig = {
         permanent: false,
       },
       // Legacy host dashboard (/host/dashboard)
-      // {
-      //   source: '/:slug/dashboard/:section*',
-      //   destination: '/:slug/admin/:section*',
-      //   permanent: false,
-      // },
+      {
+        source: '/:slug/dashboard/:section*',
+        destination: '/:slug/admin/:section*',
+        permanent: false,
+      },
       // Legacy subscriptions
       {
         source: '/subscriptions',
