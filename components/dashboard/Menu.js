@@ -104,9 +104,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
           if={!isAccountantOnly}
           icon={<Inbox size={16} />}
           setExpanded={setExpanded}
-        >
-          Applications
-        </MenuLink>
+        />
         <MenuLink
           collective={collective}
           section={HOST_SECTIONS.HOSTED_COLLECTIVES}
