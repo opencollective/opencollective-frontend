@@ -10,7 +10,6 @@ import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { Account, Collective } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 
