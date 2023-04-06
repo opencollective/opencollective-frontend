@@ -87,6 +87,8 @@ const StyledDropdownContent = styled(DropdownContent)`
   right: 0;
   left: 0;
   margin-top: 8px;
+  max-height: 70vh;
+  overflow-y: scroll;
 `;
 
 const getAllAdminMemberships = memoizeOne(loggedInUser => {
