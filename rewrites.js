@@ -131,7 +131,7 @@ exports.REWRITES = [
     destination: '/dashboard',
   },
   {
-    source: '/dashboard/:section?/:slug/:subpath*',
+    source: '/dashboard/:slug/:section?/:subpath*',
     destination: '/dashboard',
   },
   {

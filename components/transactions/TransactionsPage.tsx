@@ -155,7 +155,7 @@ const Transactions = ({
   });
 
   const transactionsRoute = isDashboard
-    ? `/dashboard/transactions/${account?.slug}`
+    ? `/dashboard/${account?.slug}/transactions`
     : `${getCollectivePageCanonicalURL(account)}/transactions`;
 
   useEffect(() => {

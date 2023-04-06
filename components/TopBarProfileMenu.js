@@ -11,7 +11,7 @@ import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
-import { getSettingsRoute } from '../lib/url-helpers';
+import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
@@ -93,7 +93,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
       <UserMenuLinkEntry
         isMobileMenuLink={isMobileView}
         href={
-          useDashboard ? `/dashboard/info/${LoggedInUser.collective.slug}` : getSettingsRoute(LoggedInUser.collective)
+          useDashboard ? getDashboardRoute(LoggedInUser.collective, 'info') : getSettingsRoute(LoggedInUser.collective)
         }
       >
         <FormattedMessage id="Settings" defaultMessage="Settings" />
@@ -102,7 +102,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
         isMobileMenuLink={isMobileView}
         href={
           useDashboard
-            ? `/dashboard/manage-contributions/${LoggedInUser.collective.slug}`
+            ? getDashboardRoute(LoggedInUser.collective, 'manage-contributions')
             : `/${LoggedInUser.collective.slug}/manage-contributions`
         }
       >
@@ -112,7 +112,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
         isMobileMenuLink={isMobileView}
         href={
           useDashboard
-            ? `/dashboard/expenses/${LoggedInUser.collective.slug}`
+            ? getDashboardRoute(LoggedInUser.collective, 'expenses')
             : `/${LoggedInUser.collective.slug}/submitted-expenses`
         }
       >
@@ -122,7 +122,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
         isMobileMenuLink={isMobileView}
         href={
           useDashboard
-            ? `/dashboard/transactions/${LoggedInUser.collective.slug}`
+            ? getDashboardRoute(LoggedInUser.collective, 'transactions')
             : `/${LoggedInUser.collective.slug}/transactions`
         }
       >
