@@ -187,7 +187,10 @@ const AccountSwitcher = () => {
   const rootActiveMemberships = getAdminMemberships(LoggedInUser);
   const rootArchivedMemberships = getAdminMembershipsForArchived(LoggedInUser);
   const groupedMemberships = groupBy(rootActiveMemberships, m => m.collective.type);
-  groupedMemberships.ARCHIVED = rootArchivedMemberships;
+
+  if (rootArchivedMemberships.length > 0) {
+    groupedMemberships.ARCHIVED = rootArchivedMemberships;
+  }
 
   const activeAccount = allMemberships.find(m => m.collective.slug === slug)?.collective || loggedInUserCollective;
 
