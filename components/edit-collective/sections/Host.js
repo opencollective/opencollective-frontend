@@ -497,7 +497,7 @@ class Host extends React.Component {
                       buttonSize="medium"
                       as={Link}
                       fontSize="13px"
-                      href={`${collective.slug}/accept-financial-contributions/host?newFlow=true`}
+                      href={`${collective.slug}/accept-financial-contributions/host`}
                     >
                       <FormattedMessage defaultMessage="Choose a Fiscal Host" />
                     </StyledLink>

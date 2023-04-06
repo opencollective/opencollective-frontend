@@ -153,7 +153,7 @@ class ContributionCategoryPicker extends React.Component {
                     <Image src={acceptHostIllustration} alt={intl.formatMessage(this.messages.host)} />
                     <HoverImage src={acceptHostHoverIllustration} alt={intl.formatMessage(this.messages.host)} />
                   </Box>
-                  <Link href={`/${router.query.slug}/accept-financial-contributions/host?newFlow=true`}>
+                  <Link href={`/${router.query.slug}/accept-financial-contributions/host`}>
                     <StyledButton
                       fontSize="13px"
                       buttonStyle="primary"
