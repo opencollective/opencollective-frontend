@@ -16,7 +16,6 @@ import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import Container from '../Container';
-import { HOST_SECTIONS } from '../host-dashboard/constants';
 
 import {
   ABOUT_ORG_SECTIONS,
@@ -80,15 +79,14 @@ const Menu = ({ collective, isAccountantOnly }) => {
         <MenuLink
           setExpanded={setExpanded}
           collective={collective}
-          section={HOST_SECTIONS.HOST_EXPENSES}
+          section={HOST_DASHBOARD_SECTIONS.HOST_EXPENSES}
           icon={<Receipt size={16} />}
         />
         <MenuLink
           collective={collective}
-          section={HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS}
+          section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS}
           icon={<Coin size={16} />}
           setExpanded={setExpanded}
-          expanded={expandedSection === HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS}
         />
 
         <MenuLink
@@ -100,14 +98,14 @@ const Menu = ({ collective, isAccountantOnly }) => {
 
         <MenuLink
           collective={collective}
-          section={HOST_SECTIONS.PENDING_APPLICATIONS}
+          section={HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS}
           if={!isAccountantOnly}
           icon={<Inbox size={16} />}
           setExpanded={setExpanded}
         />
         <MenuLink
           collective={collective}
-          section={HOST_SECTIONS.HOSTED_COLLECTIVES}
+          section={HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES}
           if={!isAccountantOnly}
           icon={<NetworkChart size={16} />}
           setExpanded={setExpanded}
@@ -121,7 +119,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
         />
         <MenuLink
           collective={collective}
-          section={HOST_SECTIONS.REPORTS}
+          section={HOST_DASHBOARD_SECTIONS.REPORTS}
           isBeta
           icon={<Chart size={16} />}
           setExpanded={setExpanded}

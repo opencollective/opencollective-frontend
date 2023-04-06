@@ -1,5 +1,5 @@
 export const HOST_SECTIONS = {
-  HOST_EXPENSES: 'host-expenses',
+  EXPENSES: 'expenses',
   HOSTED_COLLECTIVES: 'hosted-collectives',
   PENDING_APPLICATIONS: 'pending-applications',
   REPORTS: 'reports',
