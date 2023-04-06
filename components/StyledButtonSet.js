@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import Container from './Container';
 import StyledButton from './StyledButton';
 
-const StyledButtonItem = styled(StyledButton)`
+const ButtonItem = styled(StyledButton)`
   border-radius: 0;
   line-height: 1.5;
   flex-grow: 1;
@@ -37,8 +37,66 @@ const StyledButtonItem = styled(StyledButton)`
   }
 `;
 
-StyledButtonItem.propTypes = {
+ButtonItem.propTypes = {
   combo: PropTypes.bool,
+};
+
+const StyledButtonItem = ({
+  index,
+  size,
+  item,
+  children,
+  selected,
+  buttonProps,
+  buttonPropsBuilder,
+  onChange,
+  combo,
+  disabled,
+  customBorderRadius,
+}) => {
+  const isPicked = item === selected;
+  const [isAlwaysShown, setIsAlwaysShown] = useState(isPicked);
+
+  useEffect(() => {
+    if (isPicked && !isAlwaysShown) {
+      setIsAlwaysShown(true);
+    }
+  }, [isPicked, isAlwaysShown]);
+
+  return (
+    <ButtonItem
+      combo={combo || undefined}
+      color={isPicked ? 'white' : 'black.400'}
+      buttonSize={size}
+      buttonStyle={isPicked ? 'primary' : undefined}
+      onClick={onChange && (() => onChange(item))}
+      className={isPicked ? 'selected' : undefined}
+      disabled={disabled}
+      aria-pressed={isPicked}
+      type="button"
+      py="8px"
+      customBorderRadius={customBorderRadius}
+      {...buttonProps}
+      {...(buttonPropsBuilder ? buttonPropsBuilder({ item, index, isSelected: isPicked }) : {})}
+      {...(isAlwaysShown ? { display: 'block' } : {})}
+    >
+      {children({ item, isSelected: isPicked })}
+    </ButtonItem>
+  );
+};
+
+StyledButtonItem.propTypes = {
+  index: PropTypes.number,
+  item: PropTypes.any.isRequired,
+  children: PropTypes.func.isRequired,
+  size: PropTypes.oneOf(['small', 'medium', 'large', 'tiny']),
+  selected: PropTypes.any,
+  onChange: PropTypes.func,
+  combo: PropTypes.bool,
+  disabled: PropTypes.bool,
+  buttonPropsBuilder: PropTypes.func,
+  buttonProps: PropTypes.object,
+  customBorderRadius: PropTypes.string,
 };
 
 const StyledButtonSet = ({
@@ -57,22 +115,19 @@ const StyledButtonSet = ({
   <Container display="flex" {...props}>
     {items.map((item, index) => (
       <StyledButtonItem
-        combo={combo || undefined}
-        color={item === selected ? 'white' : 'black.400'}
         key={item}
-        buttonSize={size}
-        buttonStyle={item === selected ? 'primary' : undefined}
-        onClick={onChange && (() => onChange(item))}
-        className={item === selected ? 'selected' : undefined}
+        index={index}
+        item={item}
+        size={size}
+        selected={selected}
+        buttonProps={buttonProps}
+        buttonPropsBuilder={buttonPropsBuilder}
+        onChange={onChange}
+        combo={combo}
         disabled={disabled}
-        aria-pressed={item === selected}
-        type="button"
-        py="8px"
         customBorderRadius={customBorderRadius}
-        {...buttonProps}
-        {...(buttonPropsBuilder ? buttonPropsBuilder({ item, index, isSelected: item === selected }) : {})}
       >
-        {children({ item, isSelected: item === selected })}
+        {children}
       </StyledButtonItem>
     ))}
   </Container>
