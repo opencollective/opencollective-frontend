@@ -57,7 +57,6 @@ const StyledFilters = ({
   filters,
   onChange,
   disabled = false,
-  disabledFilters = [],
   getLabel = defaultGetLabel,
   selected = undefined,
   minButtonWidth = undefined,
@@ -77,7 +76,7 @@ const StyledFilters = ({
               onClick={isSelected ? undefined : () => onChange(filter)}
               data-selected={isSelected}
               minWidth={minButtonWidth}
-              disabled={disabled || disabledFilters.includes(filter)}
+              disabled={disabled}
               height={buttonHeight}
               padding={buttonPadding}
             >

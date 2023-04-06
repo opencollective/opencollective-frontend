@@ -1,8 +1,6 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
-import { isIndividualAccount } from '../../../lib/collective.lib';
-
 import StyledFilters from '../../StyledFilters';
 
 const I18NLabels = defineMessages({
@@ -15,15 +13,13 @@ const DIRECTIONS = Object.keys(I18NLabels);
 type ExpensesDirectionProps = {
   value: 'RECEIVED' | 'SUBMITTED' | null | undefined;
   onChange: (direction: 'RECEIVED' | 'SUBMITTED') => void;
-  account?: { type: string };
 };
 
-export const ExpensesDirection = ({ onChange, value, account }: ExpensesDirectionProps) => {
+export const ExpensesDirection = ({ onChange, value }: ExpensesDirectionProps) => {
   const intl = useIntl();
   return (
     <StyledFilters
       filters={DIRECTIONS}
-      disabledFilters={account && isIndividualAccount(account) ? ['RECEIVED'] : []}
       selected={value || DIRECTIONS[0]}
       minButtonWidth="100%"
       onChange={onChange}

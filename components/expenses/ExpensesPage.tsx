@@ -5,7 +5,7 @@ import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { getSuggestedTags } from '../../lib/collective.lib';
+import { getSuggestedTags, isIndividualAccount } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -30,7 +30,7 @@ const ORDER_SELECT_STYLE = { control: { background: 'white' } };
 
 const Expenses = props => {
   const router = useRouter();
-  const { query, LoggedInUser, data, loading, variables, refetch, isDashboard } = props;
+  const { query, collectiveSlug, LoggedInUser, data, loading, variables, refetch, isDashboard } = props;
 
   const expensesRoute = isDashboard
     ? `/dashboard/${data?.account?.slug}/expenses`
@@ -91,27 +91,32 @@ const Expenses = props => {
 
   const hasFilters = hasFilter(query);
   const isSelfHosted = data?.account?.id === data?.account?.host?.id;
-
+  const onlySubmittedExpenses = collectiveSlug === LoggedInUser?.collective.slug;
   return (
     <Container>
       <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-        <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+        {onlySubmittedExpenses ? (
+          <FormattedMessage defaultMessage="Submitted Expenses" />
+        ) : (
+          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+        )}
       </H1>
       <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}>
-        <Box flex="0 1" flexBasis={['100%', null, '380px']}>
-          <ExpensesDirection
-            account={data?.account}
-            value={query.direction || 'RECEIVED'}
-            onChange={direction => {
-              const newFilters = { ...query, direction };
-              updateFilters(newFilters);
-            }}
-          />
-        </Box>
-        <Box flex="12 1 150px">
+        {!onlySubmittedExpenses && (
+          <Box flex="0 1" flexBasis={['100%', null, '380px']}>
+            <ExpensesDirection
+              value={query.direction || 'RECEIVED'}
+              onChange={direction => {
+                const newFilters = { ...query, direction };
+                updateFilters(newFilters);
+              }}
+            />
+          </Box>
+        )}
+        <Box flex="12 1 160px">
           <SearchBar defaultValue={query.searchTerm} onSubmit={searchTerm => handleSearch(searchTerm)} height="40px" />
         </Box>
-        <Box flex="1 1 150px">
+        <Box flex="0 1 160px">
           <ExpensesOrder
             value={query.orderBy}
             onChange={orderBy => updateFilters({ ...query, orderBy })}
