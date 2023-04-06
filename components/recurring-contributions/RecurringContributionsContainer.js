@@ -99,7 +99,7 @@ const RecurringContributionsContainer = ({
   ]);
 
   if (isLoading) {
-    return <LoadingPlaceholder maxHeight="400px" mt={3} />;
+    return <LoadingPlaceholder height="400px" mt={3} />;
   }
 
   return (
