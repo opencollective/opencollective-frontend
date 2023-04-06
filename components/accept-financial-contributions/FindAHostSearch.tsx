@@ -6,9 +6,10 @@ import { FormattedMessage } from 'react-intl';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { Account, Host } from '../../lib/graphql/types/v2/graphql';
 
-import { Box } from '../Grid';
+import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
+import Pager from '../Pager';
 import { P } from '../Text';
 
 import FeaturedFiscalHostResults from './FeaturedFiscalHostResults';
@@ -29,6 +30,7 @@ const FindAFiscalHostQuery = gql`
   query FindAFiscalHostQuery(
     $tags: [String]
     $limit: Int
+    $offset: Int
     $country: [CountryISO]
     $currency: String
     $searchTerm: String
@@ -36,12 +38,15 @@ const FindAFiscalHostQuery = gql`
     hosts(
       tag: $tags
       limit: $limit
+      offset: $offset
       tagSearchOperator: OR
       country: $country
       currency: $currency
       searchTerm: $searchTerm
     ) {
       totalCount
+      limit
+      offset
       nodes {
         id
         legacyId
@@ -66,6 +71,8 @@ const FindAFiscalHostQuery = gql`
   }
 `;
 
+const PerPage = 30;
+
 export default function FindAHostSearch(props: {
   communityTags: string[];
   selectedCountry: string;
@@ -74,9 +81,22 @@ export default function FindAHostSearch(props: {
   collective: Account;
   onHostApplyClick: (host: Partial<Host>) => void;
 }) {
+  const scrollRef = React.useRef<HTMLDivElement>();
+  const [queryPage, setQueryPage] = React.useState(1);
+
+  const onPageChange = React.useCallback(
+    (page: number) => {
+      setQueryPage(page);
+      scrollRef.current.scrollIntoView();
+    },
+    [scrollRef],
+  );
+
   const { data, loading } = useQuery<{
     hosts: {
       totalCount: number;
+      limit: number;
+      offset: number;
       nodes: Pick<Host, 'slug' | 'currency' | 'totalHostedCollectives' | 'hostFeePercent' | 'isTrustedHost'>[];
     };
   }>(FindAFiscalHostQuery, {
@@ -85,7 +105,8 @@ export default function FindAHostSearch(props: {
       tags: props.communityTags.length !== 0 ? props.communityTags : undefined,
       country: props.selectedCountry !== 'ALL' ? [props.selectedCountry] : null,
       currency: props.selectedCurrency !== 'ANY' ? props.selectedCurrency : null,
-      limit: 50,
+      limit: PerPage,
+      offset: (queryPage - 1) * PerPage,
     },
     context: API_V2_CONTEXT,
   });
@@ -106,6 +127,9 @@ export default function FindAHostSearch(props: {
   const isEmpty = data?.hosts?.nodes?.length === 0;
   const displayData = isEmpty ? cachedNonEmptyResult : data;
 
+  const currentPage = Math.ceil(displayData.hosts.offset / displayData.hosts.limit) + 1;
+  const totalPages = Math.ceil(displayData.hosts.totalCount / displayData.hosts.limit);
+
   const hosts = displayData?.hosts?.nodes || [];
 
   const featuredHosts = hosts.filter(host => host.isTrustedHost);
@@ -114,6 +138,8 @@ export default function FindAHostSearch(props: {
 
   return (
     <React.Fragment>
+      <div ref={scrollRef} />
+
       {isEmpty && (
         <MessageBox my={3} type="warning">
           <FormattedMessage defaultMessage="We could not find a host that matches all your criteria." />
@@ -139,6 +165,10 @@ export default function FindAHostSearch(props: {
           />
         </Box>
       )}
+
+      <Flex justifyContent="center">
+        <Pager currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
+      </Flex>
     </React.Fragment>
   );
 }

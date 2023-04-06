@@ -189,6 +189,17 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
       <Box mt={4} width={['300px', '400px', '600px', '927px']}>
         <HowToUseOpenCollective />
       </Box>
+
+      <Box textAlign={['center', 'center', 'left']}>
+        <StyledLink
+          buttonSize="medium"
+          buttonStyle="primary"
+          href="https://opencollective.com/fiscal-hosting"
+          openInNewTab
+        >
+          <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
+        </StyledLink>
+      </Box>
     </Flex>
   );
 }
