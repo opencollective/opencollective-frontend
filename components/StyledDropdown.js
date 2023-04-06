@@ -7,7 +7,6 @@ import useKeyBoardShortcut, { ESCAPE_KEY } from '../lib/hooks/useKeyboardKey';
 export const DropdownContent = styled.div`
   display: none;
   position: absolute;
-  z-index: 1;
   max-width: 320px;
   z-index: 1000000;
   border-radius: 4px;

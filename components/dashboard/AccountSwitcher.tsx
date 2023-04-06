@@ -34,7 +34,6 @@ const StyledMenuEntry = styled(Link)`
   color: inherit;
   border: none;
   font: inherit;
-  outline: inherit;
   max-width: 100%;
   text-align: left;
   border-radius: 8px;
@@ -58,16 +57,20 @@ const DropdownButton = styled.button`
   display: flex;
   background: white;
   border: 1px solid #e6e8eb;
-  outline: none;
   width: 100%;
   border-radius: 6px;
   padding: 8px;
   align-items: center;
   justify-content: space-between;
   transition: all 50ms ease-out;
-  &:hover {
+  cursor: pointer;
+
+  &:hover,
+  :active,
+  :focus {
     background: #f9f9f9;
   }
+
   div {
     white-space: nowrap;
     overflow: hidden;
