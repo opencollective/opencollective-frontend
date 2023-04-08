@@ -5489,7 +5489,7 @@ export type MutationAddFundsArgs = {
   amount: AmountInput;
   description: Scalars['String'];
   fromAccount: AccountReferenceInput;
-  hostFeePercent: Scalars['Float'];
+  hostFeePercent?: InputMaybe<Scalars['Float']>;
   invoiceTemplate?: InputMaybe<Scalars['String']>;
   memo?: InputMaybe<Scalars['String']>;
   processedAt?: InputMaybe<Scalars['DateTime']>;
@@ -7767,6 +7767,7 @@ export type QueryHostArgs = {
 /** This is the root query */
 export type QueryHostsArgs = {
   country?: InputMaybe<Array<InputMaybe<CountryIso>>>;
+  currency?: InputMaybe<Scalars['String']>;
   includeArchived?: InputMaybe<Scalars['Boolean']>;
   isActive?: InputMaybe<Scalars['Boolean']>;
   limit?: Scalars['Int'];

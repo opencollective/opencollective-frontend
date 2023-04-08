@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { isNil, omit, omitBy, pick } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -12,7 +11,6 @@ import { getErrorFromGraphqlException } from '../../lib/errors';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../../lib/url-helpers';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
-import { collectiveNavbarFieldsFragment, processingOrderFragment } from '../collective-page/graphql/fragments';
 import Container from '../Container';
 import ErrorPage from '../ErrorPage';
 import { Box, Flex } from '../Grid';
@@ -27,80 +25,9 @@ import { H1 } from '../Text';
 
 import { getDefaultKinds, parseTransactionKinds } from './filters/TransactionsKindFilter';
 import { parseTransactionPaymentMethodTypes } from './filters/TransactionsPaymentMethodTypeFilter';
-import { transactionsQueryCollectionFragment } from './graphql/fragments';
 import TransactionsDownloadCSV from './TransactionsDownloadCSV';
 import TransactionsFilters from './TransactionsFilters';
 import TransactionsList from './TransactionsList';
-
-export const transactionsPageQuery = gql`
-  query TransactionsPage(
-    $slug: String!
-    $limit: Int!
-    $offset: Int!
-    $type: TransactionType
-    $paymentMethodType: [PaymentMethodType]
-    $minAmount: Int
-    $maxAmount: Int
-    $dateFrom: DateTime
-    $dateTo: DateTime
-    $searchTerm: String
-    $kind: [TransactionKind]
-    $includeIncognitoTransactions: Boolean
-    $includeGiftCardTransactions: Boolean
-    $includeChildrenTransactions: Boolean
-  ) {
-    account(slug: $slug) {
-      id
-      legacyId
-      slug
-      name
-      type
-      createdAt
-      imageUrl(height: 256)
-      currency
-      settings
-      features {
-        id
-        ...NavbarFields
-      }
-      ... on AccountWithParent {
-        parent {
-          id
-          slug
-        }
-      }
-      processingOrders: orders(filter: OUTGOING, includeIncognito: true, status: [PENDING, PROCESSING]) {
-        totalCount
-        nodes {
-          id
-          ...ProcessingOrderFields
-        }
-      }
-    }
-    transactions(
-      account: { slug: $slug }
-      limit: $limit
-      offset: $offset
-      type: $type
-      paymentMethodType: $paymentMethodType
-      minAmount: $minAmount
-      maxAmount: $maxAmount
-      dateFrom: $dateFrom
-      dateTo: $dateTo
-      searchTerm: $searchTerm
-      kind: $kind
-      includeIncognitoTransactions: $includeIncognitoTransactions
-      includeGiftCardTransactions: $includeGiftCardTransactions
-      includeChildrenTransactions: $includeChildrenTransactions
-      includeDebts: true
-    ) {
-      ...TransactionsQueryCollectionFragment
-    }
-  }
-  ${transactionsQueryCollectionFragment}
-  ${collectiveNavbarFieldsFragment}
-  ${processingOrderFragment}
-`;
 
 const EXPENSES_PER_PAGE = 15;
 
