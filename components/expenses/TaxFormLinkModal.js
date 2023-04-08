@@ -1,19 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
-import { get } from 'lodash';
+import { get, range } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import { Box } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
-import StyledLink from '../StyledLink';
 import StyledSelect from '../StyledSelect';
 import { H2, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
@@ -29,14 +29,7 @@ const setTaxFormMutation = gql`
 `;
 
 const arrayOfYears = () => {
-  const max = new Date().getFullYear();
-  const min = 2018;
-  const years = [];
-
-  for (let i = max; i >= min; i--) {
-    years.push(i);
-  }
-  return years;
+  return range(2018, new Date().getFullYear());
 };
 
 const TaxFormLinkModal = ({ account, year, onClose, expenseData }) => {
@@ -57,16 +50,12 @@ const TaxFormLinkModal = ({ account, year, onClose, expenseData }) => {
       <ModalBody>
         <MessageBox type="info" withIcon>
           <FormattedMessage
-            defaultMessage="Please upload the tax form to the {linkToTaxFormsFolder}. Copy the link to the file and paste it in the field below."
+            defaultMessage="Please upload the tax form to the <Link>Google Drive Folder</Link>. Copy the link to the file and paste it in the field below."
             values={{
-              linkToTaxFormsFolder: (
-                <StyledLink
-                  href="https://drive.google.com/drive/folders/1ga_-6tBTqADvngRr9nbxRKf7yoSne1n1?usp=share_link"
-                  openInNewTab
-                >
-                  Google Drive Folder
-                </StyledLink>
-              ),
+              linkToTaxFormsFolder: getI18nLink({
+                href: 'https://drive.google.com/drive/folders/1ga_-6tBTqADvngRr9nbxRKf7yoSne1n1?usp=share_link',
+                openInNewTab: true,
+              }),
             }}
           />
         </MessageBox>
