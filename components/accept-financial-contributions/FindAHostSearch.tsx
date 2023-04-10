@@ -119,7 +119,7 @@ export default function FindAHostSearch(props: {
 
   if (loading) {
     return (
-      <Box mt={2}>
+      <Box mt={3}>
         <P fontSize="24px" lineHeight="32px" fontWeight="700" color="black.900">
           <FormattedMessage defaultMessage="Finding the right host for you..." />
         </P>
@@ -145,13 +145,13 @@ export default function FindAHostSearch(props: {
       <div ref={scrollRef} />
 
       {isEmpty && (
-        <MessageBox my={3} type="warning">
+        <MessageBox mt={3} mb={4} type="warning">
           <FormattedMessage defaultMessage="We could not find a host that matches all your criteria." />
         </MessageBox>
       )}
 
       {topHosts.length !== 0 && (
-        <Box mb={3}>
+        <Box my={4}>
           <FeaturedFiscalHostResults
             collective={props.collective}
             hosts={topHosts}
@@ -160,7 +160,7 @@ export default function FindAHostSearch(props: {
         </Box>
       )}
       {otherHosts.length !== 0 && (
-        <Box padding={4}>
+        <Box my={4} padding={4}>
           <OtherFiscalHostResults
             collective={props.collective}
             hosts={otherHosts}

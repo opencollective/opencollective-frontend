@@ -173,7 +173,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         </Flex>
       </StyledCard>
 
-      <Box mt={4} width={['300px', '400px', '600px', '927px']}>
+      <Box width={['300px', '400px', '600px', '927px']}>
         <FindAHostSearch
           collective={props.collective}
           communityTags={communityTags}
