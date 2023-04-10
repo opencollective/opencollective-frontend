@@ -25,7 +25,7 @@ import { isSupportedExpenseType } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { getCollectivePageRoute, getSettingsRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute, getSettingsRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -309,12 +309,17 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.SETTINGS,
       component: (
-        <Link href={getSettingsRoute(collective)} data-cy="edit-collective-btn">
+        <Link
+          href={LoggedInUser.hasEarlyAccess('dashboard') ? getDashboardRoute(collective) : getSettingsRoute(collective)}
+          data-cy="edit-collective-btn"
+        >
           <ActionButton tabIndex="-1">
             <Settings size="1em" />
             <Span ml={2}>
               {collective.isHost ? (
                 <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
+              ) : LoggedInUser.hasEarlyAccess('dashboard') ? (
+                <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
               ) : (
                 <FormattedMessage id="Settings" defaultMessage="Settings" />
               )}
@@ -374,7 +379,13 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
-        <Link href={`${getCollectivePageRoute(collective)}/manage-contributions`}>
+        <Link
+          href={
+            LoggedInUser?.hasEarlyAccess('dashboard')
+              ? getDashboardRoute(collective, 'manage-contributions')
+              : `${getCollectivePageRoute(collective)}/manage-contributions`
+          }
+        >
           <ActionButton tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>

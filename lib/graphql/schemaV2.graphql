@@ -13800,6 +13800,16 @@ type Mutation {
   ): Account!
 
   """
+  [Root only] Edits account type from User to Organization
+  """
+  editAccountType(
+    """
+    Account to change the type for
+    """
+    account: AccountReferenceInput!
+  ): Account!
+
+  """
   [Root only] Clears the cache for a given account
   """
   clearCacheForAccount(
