@@ -5509,6 +5509,7 @@ export type MutationAddPlatformTipToTransactionArgs = {
 export type MutationAddTwoFactorAuthTokenToIndividualArgs = {
   account: AccountReferenceInput;
   token: Scalars['String'];
+  type?: InputMaybe<TwoFactorMethod>;
 };
 
 
@@ -6036,7 +6037,8 @@ export type MutationRemovePayoutMethodArgs = {
 /** This is the root mutation */
 export type MutationRemoveTwoFactorAuthTokenFromIndividualArgs = {
   account: AccountReferenceInput;
-  code: Scalars['String'];
+  code?: InputMaybe<Scalars['String']>;
+  type?: InputMaybe<TwoFactorMethod>;
 };
 
 
@@ -8504,6 +8506,12 @@ export type TransferWiseRequiredField = {
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
 };
+
+/** A two factor authentication method */
+export enum TwoFactorMethod {
+  TOTP = 'TOTP',
+  YUBIKEY_OTP = 'YUBIKEY_OTP'
+}
 
 /** This represents an Update */
 export type Update = {
