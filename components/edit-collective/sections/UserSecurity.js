@@ -111,6 +111,7 @@ class UserSecurity extends React.Component {
     this.state = {
       error: null,
       isDisablingTwoFactorAuth: false,
+      isDisablingTwoFactorAuthLoading: false,
       disableError: null,
       recoveryCodes: null,
       enablingTwoFactorAuth: false,
@@ -199,7 +200,7 @@ class UserSecurity extends React.Component {
         id: this.props.data.individual.id,
       };
 
-      this.setState({ isDisablingTwoFactorAuth: true, error: null });
+      this.setState({ isDisablingTwoFactorAuthLoading: true, error: null });
 
       await this.props.removeTwoFactorAuthTokenFromIndividual({
         variables: {
@@ -207,10 +208,14 @@ class UserSecurity extends React.Component {
         },
       });
       this.props.refetchLoggedInUser(); // No need to await
-      this.setState({ isDisablingTwoFactorAuth: false, error: null });
+      this.setState({ isDisablingTwoFactorAuth: false, isDisablingTwoFactorAuthLoading: false, error: null });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
-      this.setState({ disableError: errorMsg });
+      this.setState({
+        disableError: errorMsg,
+        isDisablingTwoFactorAuth: false,
+        isDisablingTwoFactorAuthLoading: false,
+      });
     }
   }
 
@@ -395,6 +400,7 @@ class UserSecurity extends React.Component {
       recoveryCodes,
       showRecoveryCodesModal,
       isDisablingTwoFactorAuth,
+      isDisablingTwoFactorAuthLoading,
     } = this.state;
 
     const { loading } = data;
@@ -509,7 +515,7 @@ class UserSecurity extends React.Component {
                         </StyledButton>
                         <StyledButton
                           buttonStyle="danger"
-                          loading={isDisablingTwoFactorAuth}
+                          loading={isDisablingTwoFactorAuthLoading}
                           onClick={this.disableTwoFactorAuth}
                         >
                           <FormattedMessage id="actions.continue" defaultMessage="Continue" />
