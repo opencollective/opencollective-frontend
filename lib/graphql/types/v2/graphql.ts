@@ -5370,6 +5370,8 @@ export type Mutation = {
   editAccountFreezeStatus: Account;
   /** Edit the settings for the given account. Scope: "account" or "host". */
   editAccountSetting: Account;
+  /** [Root only] Edits account type from User to Organization */
+  editAccountType: Account;
   /** Edit a comment. Scope: "conversations", "expenses" or "updates". */
   editComment?: Maybe<Comment>;
   /** Edit a conversation. Scope: "conversations". */
@@ -5824,6 +5826,12 @@ export type MutationEditAccountSettingArgs = {
   account: AccountReferenceInput;
   key: Scalars['AccountSettingsKey'];
   value: Scalars['JSON'];
+};
+
+
+/** This is the root mutation */
+export type MutationEditAccountTypeArgs = {
+  account: AccountReferenceInput;
 };
 
 

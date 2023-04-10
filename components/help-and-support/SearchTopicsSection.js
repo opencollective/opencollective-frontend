@@ -135,7 +135,7 @@ const SearchTopics = () => {
       <Flex mt={['9px', '32px']} flexDirection="column" ref={innerRef}>
         <Box ref={setRefElement} data-cy="search-input">
           <SearchForm
-            width={['1', '248px', '608px']}
+            width={['1', '500px', '608px']}
             borderRadius="100px"
             placeholder={intl.formatMessage({ defaultMessage: 'Type keywords to search for topics' })}
             showSearchButton
@@ -161,7 +161,7 @@ const SearchTopics = () => {
         </Box>
         {showSearchResults && (
           <SearchResultPopup
-            width={['180px', '248px', '700px']}
+            width={['302px', '650px', '700px']}
             ref={setPopperElement}
             style={styles.popper}
             {...attributes.popper}

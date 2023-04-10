@@ -95,6 +95,7 @@ StyledFilters.propTypes = {
   onChange: PropTypes.func.isRequired,
   selected: PropTypes.string,
   disabled: PropTypes.bool,
+  disabledFilters: PropTypes.arrayOf(PropTypes.string),
   buttonGrow: PropTypes.any,
   minButtonWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   buttonHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
