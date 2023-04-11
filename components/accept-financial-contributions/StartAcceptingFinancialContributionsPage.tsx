@@ -78,7 +78,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
     setSelectedCommunityType([]);
     setSelectedCountry('ALL');
     setSelectedCurrency(currencyOptions[0]);
-  }, [debouncedSearchTerm])
+  }, [debouncedSearchTerm]);
 
   const communityTags = selectedCommunityType.reduce((tags, community) => {
     return [...tags, ...CommunityTypesToTags[community]];
@@ -115,7 +115,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
               href="https://opencollective.com/fiscal-hosting"
               openInNewTab
             >
-              <FormattedMessage id="home.knowMore" defaultMessage="Know more" />
+              <FormattedMessage defaultMessage="Learn more" />
             </StyledLink>
           </Box>
         </Box>

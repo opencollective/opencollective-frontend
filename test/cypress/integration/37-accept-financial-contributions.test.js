@@ -106,7 +106,7 @@ describe('Accept financial contributions flow', () => {
     it('Successfully applies to a host', () => {
       cy.visit(`/${collectiveSlug}/accept-financial-contributions/host?newFlow=true`);
       cy.getByDataCy('brusselstogetherasbl-collective-card').within(() => {
-        cy.contains('Know more').click({ force: true });
+        cy.contains('Learn more').click({ force: true });
       });
 
       cy.contains('BrusselsTogether is a platform for the new generation of associations transparent by design.');
