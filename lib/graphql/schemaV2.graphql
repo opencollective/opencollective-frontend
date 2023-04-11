@@ -13033,6 +13033,11 @@ type Mutation {
     account: AccountReferenceInput!
 
     """
+    The two factor method to add, defaults to TOTP
+    """
+    type: TwoFactorMethod
+
+    """
     The generated secret to save to the Individual
     """
     token: String!
@@ -13048,9 +13053,14 @@ type Mutation {
     account: AccountReferenceInput!
 
     """
+    The two factor method to remove. Removes all if empty
+    """
+    type: TwoFactorMethod
+
+    """
     The 6-digit 2FA code
     """
-    code: String!
+    code: String @deprecated(reason: "2FA code to validate this action must be set via 2FA header")
   ): Individual!
 
   """
@@ -14297,6 +14307,14 @@ type AddTwoFactorAuthTokenToIndividualResponse {
   The recovery codes for the Individual to write down
   """
   recoveryCodes: [String]
+}
+
+"""
+A two factor authentication method
+"""
+enum TwoFactorMethod {
+  TOTP
+  YUBIKEY_OTP
 }
 
 input AccountUpdateInput {

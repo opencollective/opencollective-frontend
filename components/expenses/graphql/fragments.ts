@@ -407,6 +407,60 @@ export const expensePageExpenseFieldsFragment = gql`
         name
         imageUrl
       }
+      transaction {
+        id
+        amount {
+          valueInCents
+          currency
+        }
+        platformFee {
+          valueInCents
+          currency
+        }
+        hostFee {
+          valueInCents
+          currency
+        }
+        paymentProcessorFee {
+          valueInCents
+          currency
+        }
+        netAmount {
+          valueInCents
+          currency
+        }
+        taxAmount {
+          valueInCents
+          currency
+        }
+        taxInfo {
+          id
+          rate
+          type
+          percentage
+        }
+        fromAccount {
+          id
+          slug
+          name
+          ... on AccountWithHost {
+            hostFeePercent
+          }
+        }
+        toAccount {
+          id
+          slug
+          name
+          ... on AccountWithHost {
+            hostFeePercent
+          }
+        }
+        expense {
+          id
+          currency
+          amount
+        }
+      }
     }
     recurringExpense {
       id
