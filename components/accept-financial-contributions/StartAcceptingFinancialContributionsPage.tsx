@@ -73,6 +73,13 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
 
   const debouncedSearchTerm = useDebounced(searchTerm, 500);
 
+  // reset filters when doing textual search
+  React.useEffect(() => {
+    setSelectedCommunityType([]);
+    setSelectedCountry('ALL');
+    setSelectedCurrency(currencyOptions[0]);
+  }, [debouncedSearchTerm])
+
   const communityTags = selectedCommunityType.reduce((tags, community) => {
     return [...tags, ...CommunityTypesToTags[community]];
   }, []);
