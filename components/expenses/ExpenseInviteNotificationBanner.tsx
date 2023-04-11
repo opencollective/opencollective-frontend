@@ -2,19 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { pick } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { checkUserExistence, signin } from '../../lib/api';
+import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { getWebsiteUrl } from '../../lib/utils';
 
-import { Box, Flex } from '../../components/Grid';
-import StyledButton from '../../components/StyledButton';
-import StyledCard from '../../components/StyledCard';
-import StyledLink from '../../components/StyledLink';
-import { H4, P } from '../../components/Text';
+import { Flex } from '../Grid';
+import StyledButton from '../StyledButton';
+import StyledCard from '../StyledCard';
+import StyledLink from '../StyledLink';
+import { H4, P } from '../Text';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import pidgeon from '../../public/static/images/pidgeon.png';
 
@@ -32,6 +34,8 @@ const PidgeonIllustration = styled.img.attrs({ src: pidgeon })`
 `;
 
 const ResendDraftInviteButton = ({ expense }) => {
+  const { addToast } = useToasts();
+  const intl = useIntl();
   const [resendDraftInvite, { loading, error, data }] = useMutation(resendDraftExpenseInviteMutation, {
     context: API_V2_CONTEXT,
   });
@@ -44,7 +48,20 @@ const ResendDraftInviteButton = ({ expense }) => {
       mr={1}
       loading={loading}
       disabled={success}
-      onClick={() => resendDraftInvite({ variables: { expense: pick(expense, ['id', 'legacyId']) } })}
+      onClick={async () => {
+        try {
+          await resendDraftInvite({ variables: { expense: pick(expense, ['id', 'legacyId']) } });
+          addToast({
+            type: TOAST_TYPE.SUCCESS,
+            message: <FormattedMessage id="ResendInviteSuccessful" defaultMessage="Invite sent" />,
+          });
+        } catch (e) {
+          addToast({
+            type: TOAST_TYPE.ERROR,
+            message: i18nGraphqlException(intl, e),
+          });
+        }
+      }}
     >
       {success ? (
         <FormattedMessage id="ResendInviteSuccessful" defaultMessage="Invite sent" />
@@ -97,9 +114,10 @@ ResendSignInEmailButton.propTypes = {
 };
 
 const ExpenseInviteNotificationBanner = props => {
+  const canResendEmail = Boolean(props.expense.permissions?.canVerifyDraftExpense);
   return (
     <StyledCard py={3} px="26px" mb={4} borderStyle={'solid'} data-cy="expense-draft-banner">
-      <Flex>
+      <Flex flexDirection={['column', null, 'row']} alignItems="center">
         <PidgeonIllustration alt="" />
         <Flex ml={[0, 2]} maxWidth="448px" flexDirection="column">
           <H4 mb="10px" fontWeight="500">
@@ -128,16 +146,18 @@ const ExpenseInviteNotificationBanner = props => {
               />
             )}
           </P>
-          <Box mt="10px">
-            {props.createdUser ? (
-              <ResendSignInEmailButton createdUser={props.createdUser} />
-            ) : (
-              <ResendDraftInviteButton expense={props.expense} />
-            )}
-            <StyledLink href="/help" buttonStyle="standard" buttonSize="tiny">
-              <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
-            </StyledLink>
-          </Box>
+          {canResendEmail && (
+            <Flex mt="10px" flexWrap="wrap" gap="8px">
+              {props.createdUser ? (
+                <ResendSignInEmailButton createdUser={props.createdUser} />
+              ) : (
+                <ResendDraftInviteButton expense={props.expense} />
+              )}
+              <StyledLink href="/help" buttonStyle="standard" buttonSize="tiny">
+                <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
+              </StyledLink>
+            </Flex>
+          )}
         </Flex>
       </Flex>
     </StyledCard>

@@ -191,8 +191,8 @@ const ExpenseSummary = ({
         <LoadingPlaceholder height={68} mb={3} />
       ) : (
         <div data-cy="expense-summary-items">
-          {expenseItems.map(attachment => (
-            <React.Fragment key={attachment.id}>
+          {expenseItems.map((attachment, attachmentIdx) => (
+            <React.Fragment key={attachment.id || attachmentIdx}>
               <Flex my={24} flexWrap="wrap">
                 {(isReceipt || attachment.url) && (
                   <Box mr={3} mb={3} width={['100%', 'auto']}>
