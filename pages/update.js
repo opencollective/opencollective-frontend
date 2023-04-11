@@ -5,6 +5,7 @@ import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, uniqBy, update } from 'lodash';
 import { withRouter } from 'next/router';
 
+import { shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
@@ -132,6 +133,7 @@ class UpdatePage extends React.Component {
         description={stripHTML(update.summary)}
         canonicalURL={`${getCollectivePageCanonicalURL(account)}/updates/${updateSlug}`}
         metaTitle={`${update.title} - ${account.name}`}
+        noRobots={!shouldIndexAccountOnSearchEngines(account)}
       >
         <CollectiveNavbar
           collective={account}
