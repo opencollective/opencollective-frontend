@@ -67,6 +67,12 @@ export const transactionsPageQuery = gql`
           slug
         }
       }
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+        }
+      }
       processingOrders: orders(filter: OUTGOING, includeIncognito: true, status: [PENDING, PROCESSING]) {
         totalCount
         nodes {
