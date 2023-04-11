@@ -6,8 +6,6 @@
 import propTypes from '@styled-system/prop-types';
 import styled from 'styled-components';
 import {
-  border,
-  BorderProps,
   color,
   ColorProps,
   compose,
@@ -17,23 +15,19 @@ import {
   GridProps,
   layout,
   LayoutProps,
-  position,
-  PositionProps,
   space,
   SpaceProps,
   typography,
   TypographyProps,
 } from 'styled-system';
 
-export const boxProps = compose(space, color, layout, typography, flexbox, grid, position, border);
+export const boxProps = compose(space, color, layout, typography, flexbox, grid);
 
 type BoxProps = SpaceProps &
   ColorProps &
   FlexboxProps &
   GridProps &
-  BorderProps &
   LayoutProps &
-  PositionProps &
   TypographyProps & {
     gap?: string | number;
     css?: string | object;

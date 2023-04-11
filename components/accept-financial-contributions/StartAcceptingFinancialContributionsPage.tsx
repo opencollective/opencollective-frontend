@@ -6,6 +6,7 @@ import { Currency } from '../../lib/constants/currency';
 import { Collective } from '../../lib/graphql/types/v2/graphql';
 import useDebounced from '../../lib/hooks/useDebounced';
 
+import Container from '../Container';
 import HowToUseOpenCollective from '../fiscal-hosting/HowCanAFiscalHostHelpSection';
 import { Box, Flex, Grid } from '../Grid';
 import InputTypeCountry from '../InputTypeCountry';
@@ -121,10 +122,10 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
           <FormattedMessage defaultMessage="Search for a Fiscal Host" />
         </P>
 
-        <Box position="relative">
-          <Box ml="12px" mt="12px" position="absolute">
+        <Container position="relative">
+          <Container ml="12px" mt="12px" position="absolute">
             <SearchIcon size={16} fill="#aaaaaa" />
-          </Box>
+          </Container>
 
           <SearchInput
             value={searchTerm}
@@ -132,7 +133,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
             padding="20px"
             placeholder={intl.formatMessage(I18nMessages.SEARCH_PLACEHOLDER)}
           />
-        </Box>
+        </Container>
 
         <P mb={2} mt={4} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
           <FormattedMessage defaultMessage="What categories describe your work?" />

@@ -71,7 +71,7 @@ const FindAFiscalHostQuery = gql`
   }
 `;
 
-const PerPage = 30;
+const NB_HOST_PER_PAGE = 30;
 
 export default function FindAHostSearch(props: {
   communityTags: string[];
@@ -109,8 +109,8 @@ export default function FindAHostSearch(props: {
       tags: props.communityTags.length !== 0 ? props.communityTags : undefined,
       country: props.selectedCountry !== 'ALL' ? [props.selectedCountry] : null,
       currency: props.selectedCurrency !== 'ANY' ? props.selectedCurrency : null,
-      limit: PerPage,
-      offset: (queryPage - 1) * PerPage,
+      limit: NB_HOST_PER_PAGE,
+      offset: (queryPage - 1) * NB_HOST_PER_PAGE,
     },
     context: API_V2_CONTEXT,
   });
