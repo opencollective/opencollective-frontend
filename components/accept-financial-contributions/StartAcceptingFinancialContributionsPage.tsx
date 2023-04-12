@@ -86,7 +86,14 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
 
   return (
     <Flex my={5} alignItems="center" flexDirection="column">
-      <Grid width={['300px', '400px', '600px', '927px']} gridTemplateColumns="auto auto" gridTemplateRows="auto" py={4}>
+      <Box
+        display="grid"
+        paddingX={[null, null, null, '100px']}
+        width={['300px', '400px', '600px', '927px']}
+        gridTemplateColumns="auto auto"
+        gridTemplateRows="auto"
+        py={4}
+      >
         <Box gridColumn="1" justifySelf="center" gridRow={['2', '2', '1 / span 2']} my={2}>
           <Illustration
             alt="A place to grow and thrive illustration"
@@ -119,7 +126,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
             </StyledLink>
           </Box>
         </Box>
-      </Grid>
+      </Box>
       <StyledCard
         borderStyle={[null, null, 'solid', 'solid']}
         width={['300px', '400px', '600px', '927px']}
