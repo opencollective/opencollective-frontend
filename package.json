@@ -165,7 +165,8 @@
     "test:e2e:3": "cross-env TZ=UTC cypress run --spec \"test/cypress/integration/3*.js\"",
     "test:jest": "cross-env NODE_ENV=test TZ=UTC jest components lib pages",
     "test:update": "npm run test:jest -- --updateSnapshot",
-    "type:check": "tsc"
+    "type:check": "tsc",
+    "jest": "cross-env NODE_ENV=test TZ=UTC jest"
   },
   "devDependencies": {
     "@babel/core": "^7.17.0",

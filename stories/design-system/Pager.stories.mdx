@@ -1,0 +1,15 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import Pager from '../../components/Pager';
+
+<Meta title="Design system/Pager" component={Pager} />
+
+### Base
+
+<Canvas>
+  <Story name="Base">
+    {() => {
+      const [currentPage, setCurrentPage] = React.useState(1);
+      return <Pager totalPages={100} currentPage={currentPage} onPageChange={setCurrentPage} />;
+    }}
+  </Story>
+</Canvas>
