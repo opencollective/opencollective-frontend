@@ -48,13 +48,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
         id
         ...NavbarFields
       }
-      ordersFromCollective(subscriptionsOnly: true) {
-        id
-        isSubscriptionActive
-      }
-      memberOf(onlyActiveCollectives: true, limit: 1) {
-        id
-      }
       stats {
         id
         balance
@@ -70,10 +63,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
           all
           users
           organizations
-        }
-        transactions {
-          id
-          all
         }
       }
       connectedTo: memberOf(role: "CONNECTED_COLLECTIVE", limit: 1) {
@@ -104,11 +93,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
         slug
         type
         settings
-        plan {
-          id
-          hostFees
-          hostFeeSharePercent
-        }
         features {
           id
           VIRTUAL_CARDS

@@ -42,11 +42,6 @@ const hostedCollectivesQuery = gql`
       type
       settings
       hostFeePercent
-      plan {
-        id
-        hostFees
-        hostFeeSharePercent
-      }
       memberOf(
         role: HOST
         limit: $limit

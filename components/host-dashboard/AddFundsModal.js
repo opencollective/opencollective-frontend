@@ -184,10 +184,6 @@ const addFundsAccountQuery = gql`
         slug
         name
         settings
-        plan {
-          id
-          hostFees
-        }
         policies {
           REQUIRE_2FA_FOR_ADMINS
         }
@@ -200,10 +196,6 @@ const addFundsAccountQuery = gql`
           slug
           name
           settings
-          plan {
-            id
-            hostFees
-          }
           policies {
             REQUIRE_2FA_FOR_ADMINS
           }
@@ -392,7 +384,7 @@ const AddFundsModal = ({ collective, ...props }) => {
 
   // From the Collective page we pass host and collective as API v1 objects
   // From the Host dashboard we pass host and collective as API v2 objects
-  const canAddHostFee = host?.plan?.hostFees && collective.id !== host?.id;
+  const canAddHostFee = collective.id !== host?.id;
   const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const canAddPlatformTip = host?.isTrustedHost;
