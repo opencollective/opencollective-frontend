@@ -8,7 +8,7 @@ import useDebounced from '../../lib/hooks/useDebounced';
 
 import Container from '../Container';
 import HowToUseOpenCollective from '../fiscal-hosting/HowCanAFiscalHostHelpSection';
-import { Box, Flex, Grid } from '../Grid';
+import { Box, Flex } from '../Grid';
 import InputTypeCountry from '../InputTypeCountry';
 import SearchIcon from '../SearchIcon';
 import StyledCard from '../StyledCard';
