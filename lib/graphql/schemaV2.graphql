@@ -4922,6 +4922,11 @@ type ExpensePermissions {
   Whether the current user can unschedule this expense payment
   """
   canUnschedulePayment: Boolean!
+
+  """
+  Whether the current user can verify this draft expense
+  """
+  canVerifyDraftExpense: Boolean!
   edit: Permission!
   editTags: Permission!
   delete: Permission!
@@ -4934,6 +4939,7 @@ type ExpensePermissions {
   markAsUnpaid: Permission!
   comment: Permission!
   unschedulePayment: Permission!
+  verifyDraftExpense: Permission!
 }
 
 """
@@ -9710,6 +9716,7 @@ type Query {
     Limit the search to collectives belonging to these countries
     """
     country: [CountryISO]
+    currency: String
 
     """
     Filter hosts by tags (multiple = OR)
@@ -12826,14 +12833,14 @@ type Mutation {
     amount: AmountInput!
 
     """
+    The host fee percent to apply to the order, as a float between 0 and 100
+    """
+    hostFeePercent: Float
+
+    """
     A short description of the contribution
     """
     description: String!
-
-    """
-    The host fee percent to apply to the order, as a float between 0 and 100
-    """
-    hostFeePercent: Float!
 
     """
     A private note for the host
