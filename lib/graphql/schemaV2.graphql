@@ -464,7 +464,7 @@ interface Account {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -2483,7 +2483,7 @@ type Host implements Account & AccountWithContributions {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -3400,7 +3400,7 @@ type PaymentMethod {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -5609,7 +5609,7 @@ type Bot implements Account {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -6127,7 +6127,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -6974,7 +6974,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -7697,7 +7697,7 @@ type Individual implements Account {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -8390,7 +8390,7 @@ type Organization implements Account & AccountWithContributions {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -9023,7 +9023,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -9837,7 +9837,7 @@ type Query {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -11868,7 +11868,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -12481,7 +12481,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -13896,6 +13896,26 @@ type Mutation {
   ): [Expense]!
 
   """
+  [Root only] A mutation to set the tax from for an account.
+  """
+  setTaxForm(
+    """
+    Reference to the Account the tax form should be set.
+    """
+    account: AccountReferenceInput!
+
+    """
+    The tax from link.
+    """
+    taxFormLink: URL!
+
+    """
+    The tax form year.
+    """
+    year: Int!
+  ): SetTaxFormResult
+
+  """
   Add platform tips to a transaction. Scope: "transactions".
   """
   addPlatformTipToTransaction(
@@ -15002,7 +15022,8 @@ input ExpenseInviteDraftInput {
 }
 
 input ExpenseInvitee {
-  id: Int
+  id: Int @deprecated(reason: "2023-04-12: Please use legacyId")
+  legacyId: Int
   slug: String
   name: String
   email: String
@@ -15610,6 +15631,10 @@ type BanAccountResponse {
   The accounts impacted by the mutation
   """
   accounts: [Account!]!
+}
+
+type SetTaxFormResult {
+  success: Boolean!
 }
 
 input TransactionReferenceInput {
