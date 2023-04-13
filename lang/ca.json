@@ -296,7 +296,7 @@
   "b8rZxx": "Based on default host fees, can be changed at settling time",
   "Back": "Enrere",
   "BacsDebit": "Bacs Debit",
-  "Balance": "Saldo",
+  "Balance": "Balance",
   "BalanceAmount": "Saldo {balance}",
   "BankAccount": "Compte bancari",
   "bankaccount.instructions.account": "The bank account details you added above.",
