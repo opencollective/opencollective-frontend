@@ -11,7 +11,6 @@ import { formatDate, getWebsiteUrl } from '../../../lib/utils';
 import CollectiveCard from '../../CollectiveCard';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import HostsWithData from '../../HostsWithData';
 import { getI18nLink } from '../../I18nFormatters';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
@@ -77,7 +76,7 @@ class Host extends React.Component {
 
   async changeHost(newHost = { id: null }) {
     const { collective } = this.props;
-    this.setState({ showModal: false });
+
     if (newHost.id === get(collective, 'host.id')) {
       return;
     }
@@ -92,7 +91,7 @@ class Host extends React.Component {
         this.updateSelectedOption('noHost');
       }
     } finally {
-      this.setState({ isSubmitting: false });
+      this.setState({ isSubmitting: false, showModal: false });
     }
   }
 
@@ -326,7 +325,12 @@ class Host extends React.Component {
                   >
                     <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
                   </StyledButton>
-                  <StyledButton buttonStyle="primary" onClick={() => this.changeHost()} data-cy="continue">
+                  <StyledButton
+                    buttonStyle="primary"
+                    loading={this.state.isSubmitting}
+                    onClick={() => this.changeHost()}
+                    data-cy="continue"
+                  >
                     {/** TODO(i18n): This should be internationalized */}
                     {action}
                   </StyledButton>
@@ -493,41 +497,16 @@ class Host extends React.Component {
               {selectedOption === 'findHost' && (
                 <div>
                   <Container display="flex" alignItems="baseline" mt={2}>
-                    <H4 fontSize="13px" mr={2}>
-                      <FormattedMessage
-                        id="collective.edit.host.suggestedHosts.title"
-                        defaultMessage="Suggested Hosts"
-                      />
-                    </H4>
                     <StyledLink
+                      buttonStyle="primary"
+                      buttonSize="medium"
                       as={Link}
                       fontSize="13px"
                       href={`${collective.slug}/accept-financial-contributions/host`}
                     >
-                      <FormattedMessage id="collective.edit.host.viewAllHosts" defaultMessage="View all Fiscal Hosts" />
+                      <FormattedMessage defaultMessage="Choose a Fiscal Host" />
                     </StyledLink>
                   </Container>
-                  {collective.tags && collective.tags.length > 0 && (
-                    <Container color="#666f80" fontSize="12px">
-                      <FormattedMessage
-                        id="collective.edit.host.suggestedHosts.description"
-                        defaultMessage="Based on the tags ({tags})"
-                        values={{
-                          tags: collective.tags.join(', '),
-                        }}
-                      />
-                    </Container>
-                  )}
-                  <HostsWithData
-                    limit={6}
-                    tags={collective.tags}
-                    empty={
-                      <FormattedMessage
-                        id="collective.edit.host.suggestedHosts.empty"
-                        defaultMessage="No suggestions. Please look at all Hosts or consider creating a new one."
-                      />
-                    }
-                  />
                 </div>
               )}
             </Box>

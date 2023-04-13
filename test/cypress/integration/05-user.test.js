@@ -5,7 +5,7 @@ const scrollToSection = section => {
 };
 
 describe('New users profiles', () => {
-  before(() => {
+  beforeEach(() => {
     cy.visit('/xdamman');
   });
 

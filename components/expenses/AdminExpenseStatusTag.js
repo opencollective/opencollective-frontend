@@ -140,6 +140,7 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
                         permissions={expense.permissions}
                         onModalToggle={isOpen => setClosable(!isOpen)}
                         onSuccess={() => setShowPopup(false)}
+                        displaySecurityChecks={false}
                       />
                     )}
                     {expense?.permissions?.canMarkAsIncomplete && (

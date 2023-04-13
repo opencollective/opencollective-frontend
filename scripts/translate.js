@@ -26,6 +26,7 @@ const DUPLICATED_IGNORED_MESSAGES = new Set([
   'rejected', // Can have different masculine/feminine for some languages based on the context
   'status', // Can have different masculine/feminine for some languages based on the context
   'type', // Can have different masculine/feminine for some languages based on the context
+  'unknown', // Can have different translations if it is "unknown user" or "unknown type"
 ]);
 
 // Aggregates the default messages that were extracted from the app's

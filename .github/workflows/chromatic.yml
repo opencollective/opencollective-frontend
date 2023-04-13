@@ -1,0 +1,24 @@
+name: 'Chromatic'
+
+on:
+  workflow_dispatch:
+
+jobs:
+  chromatic-deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      # Publish to Chromatic
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          buildScriptName: "styleguide:build"
+          onlyChanged: true
+          exitZeroOnChanges: true # 👈 Option to prevent the workflow from failing

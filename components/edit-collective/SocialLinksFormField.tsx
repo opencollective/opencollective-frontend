@@ -1,9 +1,11 @@
 import React from 'react';
-import { Plus, Times } from '@styled-icons/fa-solid';
-import { DragIndicator } from '@styled-icons/material';
+import { closestCenter, DndContext } from '@dnd-kit/core';
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Plus } from '@styled-icons/fa-solid/Plus';
+import { Times } from '@styled-icons/fa-solid/Times';
+import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { sortBy } from 'lodash';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { FormattedMessage } from 'react-intl';
 
 import { SocialLink, SocialLinkInput, SocialLinkType } from '../../lib/graphql/types/v2/graphql';
@@ -21,91 +23,84 @@ export type SocialLinksFormFieldProps = {
   onChange: (value: SocialLinkInput[]) => void;
 };
 
-export default function SocialLinksFormField({ value, touched, onChange }: SocialLinksFormFieldProps) {
+export default function SocialLinksFormField({ value = [], touched, onChange }: SocialLinksFormFieldProps) {
+  const [items, setItems] = React.useState(value.map(({ url, type }, i) => ({ url, type, sortId: i.toString() })));
+
+  React.useEffect(() => {
+    onChange(items.map(({ url, type }) => ({ url, type })));
+  }, [items]);
+
   const onItemChange = React.useCallback(
-    (socialLink, index) => {
-      const newValues = [...value.slice(0, index), socialLink, ...value.slice(index + 1)];
-      onChange(
-        newValues.map(sl => ({
-          url: sl.url,
-          type: sl.type,
-        })),
-      );
+    (socialLink, sortId) => {
+      const newItems = items.map(item => {
+        if (item.sortId === sortId) {
+          return { ...item, ...socialLink };
+        }
+        return item;
+      });
+      setItems(newItems);
     },
-    [value, onChange],
+    [items, onChange],
   );
 
   const onRemoveItem = React.useCallback(
-    index => {
-      const newValues = [...value.slice(0, index), ...value.slice(index + 1)];
-      onChange(
-        newValues.map(sl => ({
-          url: sl.url,
-          type: sl.type,
-        })),
-      );
+    sortId => {
+      const newItems = items.filter(item => item.sortId !== sortId);
+      setItems(newItems);
     },
-    [value, onChange],
+    [items, onChange],
   );
 
   const addItem = React.useCallback(() => {
-    const newValues = [...value, { url: '', type: SocialLinkType.WEBSITE }];
-    onChange(
-      newValues.map(sl => ({
-        url: sl.url,
-        type: sl.type,
-      })),
-    );
-  }, [value, onChange]);
+    const newItems = [...items, { url: '', type: SocialLinkType.WEBSITE }].map((item, i) => ({
+      ...item,
+      sortId: i.toString(),
+    }));
+    setItems(newItems);
+  }, [items, onChange]);
 
-  const onMoveItem = React.useCallback(
-    (fromIndex: number, toIndex: number) => {
-      const movingItem = value[fromIndex];
-      const newValues = [...value.slice(0, fromIndex), ...value.slice(fromIndex + 1)];
-      newValues.splice(toIndex, 0, movingItem);
-      onChange(
-        newValues.map(sl => ({
-          url: sl.url,
-          type: sl.type,
-        })),
-      );
-    },
-    [value, onChange],
-  );
+  function handleDragEnd(event) {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = items.findIndex(item => item.sortId === active.id);
+      const newIndex = items.findIndex(item => item.sortId === over.id);
+      const newItems = arrayMove(items, oldIndex, newIndex);
+      setItems(newItems);
+    }
+  }
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <Flex width="100%" flexDirection="column">
-        {(value || []).map((socialLink, i) => {
-          return (
-            <SocialLinkItem
-              // eslint-disable-next-line react/no-array-index-key
-              key={i}
-              index={i}
-              error={touched && !isValidUrl(socialLink.url)}
-              onMoveItem={onMoveItem}
-              value={socialLink}
-              onChange={onItemChange}
-              onRemoveItem={onRemoveItem}
-            />
-          );
-        })}
-        <Flex mt={2} justifyContent="center">
-          <StyledButton
-            disabled={value.length >= 10}
-            type="button"
-            buttonSize="tiny"
-            buttonStyle="standard"
-            onClick={addItem}
-          >
-            <Plus size="10px" />
-            <Span ml={2}>
-              <FormattedMessage defaultMessage="Add social link" />
-            </Span>
-          </StyledButton>
-        </Flex>
+        <SortableContext items={items.map(item => item.sortId)} strategy={verticalListSortingStrategy}>
+          {items.map(socialLink => {
+            return (
+              <SocialLinkItem
+                key={socialLink.sortId}
+                error={touched && !isValidUrl(socialLink.url)}
+                value={socialLink}
+                onChange={onItemChange}
+                onRemoveItem={onRemoveItem}
+              />
+            );
+          })}
+          <Flex mt={2} justifyContent="center">
+            <StyledButton
+              disabled={value.length >= 10}
+              type="button"
+              buttonSize="tiny"
+              buttonStyle="standard"
+              onClick={addItem}
+            >
+              <Plus size="10px" />
+              <Span ml={2}>
+                <FormattedMessage defaultMessage="Add social link" />
+              </Span>
+            </StyledButton>
+          </Flex>
+        </SortableContext>
       </Flex>
-    </DndProvider>
+    </DndContext>
   );
 }
 
@@ -176,6 +171,26 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
       value: SocialLinkType.SLACK.toString(),
       label: 'Slack',
     },
+    {
+      value: SocialLinkType.DISCOURSE.toString(),
+      label: 'Discourse',
+    },
+    {
+      value: SocialLinkType.PIXELFED.toString(),
+      label: 'Pixelfed',
+    },
+    {
+      value: SocialLinkType.GHOST.toString(),
+      label: 'Ghost',
+    },
+    {
+      value: SocialLinkType.PEERTUBE.toString(),
+      label: 'PeerTube',
+    },
+    {
+      value: SocialLinkType.TIKTOK.toString(),
+      label: 'TikTok',
+    },
   ];
 
   return (
@@ -191,47 +206,18 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
 }
 
 type SocialLinkItemProps = {
-  value: SocialLink;
+  value: SocialLink & { sortId: string };
   error?: boolean;
-  index: number;
-  onMoveItem: (fromIndex: number, toIndex: number) => void;
-  onChange: (value: SocialLink, index: number) => void;
-  onRemoveItem: (index: number) => void;
+  onChange: (value: SocialLink, sortId: string) => void;
+  onRemoveItem: (sortId: string) => void;
 };
 
-function SocialLinkItem({ value, error, index, onChange, onRemoveItem, onMoveItem }: SocialLinkItemProps) {
-  const ref = React.useRef<HTMLDivElement>(null);
-  const [{ handlerId, isOver }, drop] = useDrop({
-    accept: 'SocialLink',
-    collect(monitor) {
-      return {
-        handlerId: monitor.getHandlerId(),
-        isOver: monitor.isOver(),
-      };
-    },
-    hover(item: { index: number }) {
-      if (!ref.current) {
-        return;
-      }
-      const dragIndex = item.index;
-      const hoverIndex = index;
-      if (dragIndex === hoverIndex) {
-        return;
-      }
-
-      onMoveItem(dragIndex, hoverIndex);
-
-      item.index = hoverIndex;
-    },
-  });
-
-  const [, drag, dragPreview] = useDrag(
-    () => ({
-      type: 'SocialLink',
-      item: { index },
-    }),
-    [value],
-  );
+function SocialLinkItem({ value, error, onChange, onRemoveItem }: SocialLinkItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: value.sortId });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
 
   const onFieldChange = React.useCallback(
     (field, fieldValue) => {
@@ -240,20 +226,51 @@ function SocialLinkItem({ value, error, index, onChange, onRemoveItem, onMoveIte
           ...value,
           [field]: fieldValue,
         },
-        index,
+        value.sortId,
       );
     },
-    [onChange, index],
+    [onChange, value],
   );
 
-  const onRemove = React.useCallback(() => {
-    onRemoveItem(index);
-  }, [onRemoveItem, index]);
+  const onUrlChange = React.useCallback(
+    e => {
+      const newUrl = e.target.value;
+      onChange(
+        {
+          type: typeFromUrl(newUrl) ?? value.type,
+          url: newUrl,
+        },
+        value.sortId,
+      );
+    },
+    [onChange, value],
+  );
 
-  drag(drop(ref));
+  const onUrlBlur = React.useCallback(() => {
+    const hasSchemaRegexp = /^[^:]+:\/\//;
+
+    if (value.url.trim() === '') {
+      return;
+    }
+
+    if (!value.url.match(hasSchemaRegexp)) {
+      onChange(
+        {
+          ...value,
+          url: `https://${value.url}`,
+        },
+        value.sortId,
+      );
+    }
+  }, [onChange, value]);
+
+  const onRemove = React.useCallback(() => {
+    onRemoveItem(value.sortId);
+  }, [onRemoveItem, value.sortId]);
+
   return (
-    <Flex ref={dragPreview} opacity={isOver ? 0 : 1} alignItems="center" my={1} gap="5px" data-handler-id={handlerId}>
-      <div ref={ref}>
+    <Flex ref={setNodeRef} style={style} alignItems="center" my={1} gap="5px">
+      <div {...listeners} {...attributes}>
         <DragIndicator size="15px" style={{ cursor: 'grab' }} />
       </div>
       <Flex flexGrow={1} flexWrap="wrap" gap="5px">
@@ -265,14 +282,48 @@ function SocialLinkItem({ value, error, index, onChange, onRemoveItem, onMoveIte
           error={error}
           flexGrow={1}
           value={value.url}
-          onChange={e => onFieldChange('url', e.target.value)}
+          onBlur={onUrlBlur}
+          onChange={onUrlChange}
           placeholder="https://opencollective.com/"
         />
       </Flex>
 
-      <StyledButton padding={0} width="20px" height="20px" type="button" buttonStyle="borderless" onClick={onRemove}>
+      <StyledButton
+        tabIndex={-1}
+        padding={0}
+        width="20px"
+        height="20px"
+        type="button"
+        buttonStyle="borderless"
+        onClick={onRemove}
+      >
         <Times size="10px" />
       </StyledButton>
     </Flex>
   );
+}
+
+const knownSocialLinkDomains = [
+  { type: SocialLinkType.DISCORD, regexp: /^(https:\/\/)?discord.com/ },
+  { type: SocialLinkType.FACEBOOK, regexp: /^(https:\/\/)?(www\.)?facebook.com/ },
+  { type: SocialLinkType.GITHUB, regexp: /^(https:\/\/)?github.com/ },
+  { type: SocialLinkType.GITLAB, regexp: /^(https:\/\/)?gitlab.com/ },
+  { type: SocialLinkType.INSTAGRAM, regexp: /^(https:\/\/)?(www\.)?instagram.com/ },
+  { type: SocialLinkType.LINKEDIN, regexp: /^(https:\/\/)?(www\.)?linkedin.com/ },
+  { type: SocialLinkType.MEETUP, regexp: /^(https:\/\/)?meetup.com/ },
+  { type: SocialLinkType.SLACK, regexp: /^(https:\/\/)?[^.]+.?slack.com/ },
+  { type: SocialLinkType.TIKTOK, regexp: /^(https:\/\/)?(www\.)?tiktok.com/ },
+  { type: SocialLinkType.TUMBLR, regexp: /^(https:\/\/)?[^.]+\.?tumblr.com/ },
+  { type: SocialLinkType.TWITTER, regexp: /^(https:\/\/)?twitter.com/ },
+  { type: SocialLinkType.YOUTUBE, regexp: /^(https:\/\/)?(www\.)?youtube.com/ },
+];
+
+function typeFromUrl(url: string): SocialLinkType | null {
+  for (const knownDomain of knownSocialLinkDomains) {
+    if (url.match(knownDomain.regexp)) {
+      return knownDomain.type;
+    }
+  }
+
+  return null;
 }

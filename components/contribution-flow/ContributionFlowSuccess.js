@@ -15,7 +15,13 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
-import { facebookShareURL, getCollectivePageRoute, mastodonShareURL, tweetURL } from '../../lib/url-helpers';
+import {
+  facebookShareURL,
+  followOrderRedirectUrl,
+  getCollectivePageRoute,
+  mastodonShareURL,
+  tweetURL,
+} from '../../lib/url-helpers';
 import { getWebsiteUrl } from '../../lib/utils';
 
 import Container from '../../components/Container';
@@ -28,6 +34,7 @@ import StyledLink from '../../components/StyledLink';
 import { H3, P } from '../../components/Text';
 import { withUser } from '../../components/UserProvider';
 
+import { isValidExternalRedirect } from '../../pages/external-redirect';
 import Link from '../Link';
 
 import { orderSuccessFragment } from './graphql/fragments';
@@ -96,6 +103,15 @@ const successMsgs = defineMessages({
   },
 });
 
+const isAccountFediverse = account => {
+  return (
+    account &&
+    (account.tags?.includes('mastodon') ||
+      account.tags?.includes('fediverse') ||
+      (account.socialLinks || []).map(el => el.type).includes('MASTODON'))
+  );
+};
+
 const getMainTag = collective => {
   if (collective.host?.slug === 'opensource' || collective.tags?.includes('open source')) {
     return 'open source';
@@ -114,6 +130,20 @@ class ContributionFlowSuccess extends React.Component {
     isEmbed: PropTypes.bool,
     data: PropTypes.object,
   };
+
+  componentDidUpdate() {
+    const {
+      router: { query: queryParams },
+      data: { order },
+    } = this.props;
+    if (order && queryParams.redirect) {
+      if (isValidExternalRedirect(queryParams.redirect)) {
+        followOrderRedirectUrl(this.props.router, this.props.collective, order, queryParams.redirect, {
+          shouldRedirectParent: queryParams.shouldRedirectParent,
+        });
+      }
+    }
+  }
 
   renderCallsToAction = () => {
     const { LoggedInUser, data, isEmbed, router } = this.props;
@@ -224,18 +254,17 @@ class ContributionFlowSuccess extends React.Component {
     const { order } = data;
     const shareURL = `${getWebsiteUrl()}/${collective.slug}`;
     const isProcessing = order?.status === ORDER_STATUS.PROCESSING;
+    const isFediverse = order && (isAccountFediverse(order.toAccount) || isAccountFediverse(order.toAccount.parent));
 
     if (!data.loading && !order) {
       return (
         <Flex justifyContent="center" py={[5, 6]}>
           <MessageBox type="warning" withIcon>
-            <FormattedMessage id="Order.NotFound" defaultMessage="This order doesn't exist" />
+            <FormattedMessage id="Order.NotFound" defaultMessage="This contribution doesn't exist" />
           </MessageBox>
         </Flex>
       );
     }
-
-    const isFediverse = order?.toAccount?.tags?.includes('mastodon') || order?.toAccount?.tags?.includes('fediverse');
 
     return (
       <React.Fragment>

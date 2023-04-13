@@ -10,6 +10,126 @@ Open Collective is a financial and legal toolbox for grassroots groups. We suppo
 
 <strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>
 
+<!--## [Open Collective Foundation](https://opencollective.foundation/): Finance Admin
+
+$60k/year for 40 hrs/wk (or 30 hrs/wk pro rata). Must live in the US. Applications open until March 24th.
+
+[Open Collective Foundation (OCF)](http://opencollective.foundation/) is a nonprofit fiscal sponsor with an open source tech platform, that is enabling 500+ groups to access 501(c)(3) status and fundraise in full transparency. [Our Collectives](https://opencollective.com/foundation#category-CONTRIBUTIONS) include mutual aid groups, public interest open source tech, social justice movements, humanitarian aid, climate action, and many kinds of communities with missions focused on education, civic engagement, and positive social impact. [Solidarity is our guiding principle](https://blog.opencollective.com/solidarity-as-our-guiding-principle/). Our Collectives raised over $30m in 2022, representing 100x growth since 2019. We are scaling our team to meet increasing demand.
+
+### What Makes Us Different
+
+OCF is a tech-first nonprofit. We are one node in a growing international network of 30+ fiscal sponsor organizations who use [Open Collective](https://opencollective.com/), an open source software platform for transparent fundraising and money management, to create efficiencies with money and amplify impact in communities. Globally, the network supports 15,000+ Collectives. Our tech platform and mission are all about transparency, collective collaboration, and practicality—we apply the same principles to how we run OCF as an organization.
+
+### Learn more
+
+- [Website](https://opencollective.foundation/)
+- [2022 year in review](https://blog.opencollective.com/ocf-2022/)
+- [2-minute explainer video](https://youtu.be/269SyUQmL_U)
+- [Values & Mission](https://docs.opencollective.foundation/about/mission-and-values)
+- [Blog](https://blog.opencollective.com/tag/ocf/)
+- [Team](https://docs.opencollective.foundation/about/team)
+- [Documentation](https://docs.opencollective.foundation/)
+
+### Tasks & required skills/experience
+
+Accounts payable & receivable processing in a 501(c)(3) nonprofit
+A key part of our service is receiving money and paying out expenses for our Collectives. We need someone with nonprofit financial admin/bookkeeping skills.
+
+### Responding to user support inquiries
+
+Answering questions, pointing people to documentation, customer service skills. Our financial admin processes are 'front of house' services that often directly involve our Collective members.
+
+### Who we're looking for
+
+An operations and community-oriented person who is:
+
+- Excited to be a driving force behind our operational functions and to support our Collectives to make the best use of our services
+- Self-motivated and autonomous, to thrive in our fully remote, high-trust, low-hierarchy environment
+- Comfortable with and excited about technology, able to learn new digital tools quickly, and eager to understand the ins and outs of the Open Collective software platform
+- Based in the United States
+
+#### Additional desired experience
+
+(We don’t expect you to have all of these! Any of them would be a bonus).
+
+- Fiscal sponsorship
+- Fast-growth organizations and start-ups
+- Tech tools like Slack, Loom, Google Workspace, Trello, Loomio, GitHub (extra points if you’ve used Open Collective, of course!)
+- Experience in collectives, cooperatives, activism, radical movements, solidarity economy
+
+### Compensation & role details
+
+- This is a fully remote position (we don't have any physical offices and our team is distributed across time zones)
+- Highly flexible schedule (we have a few weekly meetings and the rest us up to you)
+- - Open to applicants anywhere in the United States (sorry, we can't consider international candidates)
+- The pay will be $60k plus benefits (including health insurance)
+- We are seeking someone to commit 30-40 hours per week (pro rata pay for less than 40 hours)
+
+### To apply
+
+[Fill out this form!](https://docs.google.com/forms/d/e/1FAIpQLSfbI-cg19Wv9eN9WiZ37de-mKCNDFoasRQEDXlhVtE8CI_Mcg/viewform)
+
+If you have questions, reach out to [contact@opencollective.foundation](mailto:contact@opencollective.foundation)-->
+
+<!-- ## [Open Source Collective](https://www.oscollective.org/): Operations Coordinator
+
+$60 ~ $80k yearly salary for 40 hrs/wk. Salary range contingent on experience.
+Must live within 4 hrs of EST time zone. Applications open until February 17th.
+
+[Open Source Collective](https://oscollective.org/) (OSC) is a non-profit fiscal sponsor for [over 3,000 open source projects](https://opencollective.com/opensource). Our mission is to create a sustainable and healthy open source ecosystem through our services which allow our collectives access 501(c)(6) status and the tools and support to fundraise and disburse those funds in full transparency. Our Collectives are on track to raise $20m in 2023. We are scaling quickly, and growing our team to meet increasing demand.
+
+### What Makes Us Different
+
+OSC is a tech-first nonprofit. We are one node in a growing international network of 30+ fiscal sponsor organizations who use [Open Collective](https://opencollective.com/), an open source software platform for transparent fundraising and money management, to create efficiencies with money and amplify impact in communities. Globally, the network supports 15,000 groups to raise and spend $35M a year. Our tech platform and mission are all about transparency, collective collaboration, and practicality—and we apply the same principles to how we run OSC as an organization.
+
+### Learn more
+
+- OSC's [Website](https://www.oscollective.org/), [mission & values](https://docs.oscollective.org/mission-values-and-strategy), and [strategy](https://blog.opencollective.com/open-source-collectives-strategy-2022-2025/)
+- [What is Open Source Collective (video)](https://www.youtube.com/watch?v=ubfYuAMm3_c)
+- [What is Open Collective (video)](https://www.youtube.com/@OpenCollective)
+- [Our documentation](https://docs.oscollective.org/)
+
+### Who we're looking for
+
+An operations and community oriented person who is:
+
+- Excited to support our Collectives to make the best use of our services
+- Self-motivated and autonomous, able to thrive in our fully remote, high-trust, low-hierarchy environment
+- Technology driven, able to learn new digital tools quickly, and eager to understand the ins and outs of the Open Collective software platform
+- Experienced with working openly or excited to develop this practice
+
+### Must-have skills
+
+- Financial administration skills (accounts receivable and payable—you will process incoming contributions and outgoing expenses, so you need a basic understanding of budgets and finance processes)
+- Helpdesk support and customer service - you'll support Collectives through the application process and answer day-to-day questions. Experience writing or updating user guides is ideal.
+- Detail oriented, practical and organized, great at handling information overload and finding the path forward
+- Flexible and comfortable working in a fast-paced, quickly-scaling startup environment
+
+### Additional desired experience
+
+(We don’t expect you to have all of these! Any of them would be a bonus)
+
+- 501(c)(3) or (c)(6) nonprofit and/or fiscal sponsorship
+- Fast-growth organizations and start-ups
+- Tech tools like Slack, Loom, Airtable, Google Workspace, Asana, Loomio & GitHub (extra points if you’ve used Open Collective, of course!)
+
+### Compensation & role details
+
+- This is a fully remote position (we don't have any physical offices and our team is distributed across time zones)
+- Flexible schedule (we have a few weekly meetings and the rest us up to you)
+- Open to applicants anywhere within 4 hours of the EST time zone.
+- The pay range will be $60k ~ $80k plus benefits. Pay scale is contingent on experience.
+- This is a full-time position and we are seeking someone to commit 40 hours per week
+- 25 days off for vacation + 10 days off for chosen holidays
+- $1K per year for improving your workspace, buying tools, and other office expenses that help you perform better.
+- An opportunity to travel when we have retreats (Weeks of face-to-face work every ~8 months) with transportation, allocation, and meals covered during our time together. The last one was in September 2022 in Marseille, France.
+
+### Apply for the Open Source Collective Operations Coordinator Position
+
+Please fill out [this form](https://docs.google.com/forms/d/e/1FAIpQLSfRC2ZivuNQdklHlsABKhdXf42EweeNk9jJUXy02mjbftyWzA/viewform) to apply.
+
+If you have questions, reach out to [hello@oscollective.org](mailto:hello@oscollective.org)-->
+
 <!--
 Right now, [Open Collective](https://opencollective.com) is hiring for a Senior UX Designer.
 

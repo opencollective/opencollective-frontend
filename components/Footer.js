@@ -1,9 +1,10 @@
 import React from 'react';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Github } from '@styled-icons/fa-brands/Github';
+import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
 import { Slack } from '@styled-icons/fa-brands/Slack';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
-import { Blog } from '@styled-icons/icomoon/Blog';
+// import { Blog } from '@styled-icons/icomoon/Blog';
 import { Mail } from '@styled-icons/octicons/Mail';
 import { truncate } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -333,13 +334,22 @@ const Footer = () => {
             maxWidth="230px"
             flexWrap="wrap"
           >
+            {/*
             <SocialLink href="https://blog.opencollective.com/" aria-label="Open Collective Blog link">
               <Blog size={16} />
             </SocialLink>
-            <SocialLink href="https://twitter.com/opencollect" aria-label="Open Collective Twitter link">
+            */}
+            <SocialLink href="https://twitter.com/opencollect" rel="me" aria-label="Open Collective Twitter link">
               <Twitter size={16} />
             </SocialLink>
-            <SocialLink href="https://github.com/opencollective" aria-label="Open Collective Github link">
+            <SocialLink
+              href="https://mastodon.opencollective.com/@opencollective"
+              rel="me"
+              aria-label="Open Collective Mastodon link"
+            >
+              <Mastodon size={16} />
+            </SocialLink>
+            <SocialLink href="https://github.com/opencollective" rel="me" aria-label="Open Collective Github link">
               <Github size={16} />
             </SocialLink>
             <SocialLink href="https://slack.opencollective.com" aria-label="Open Collective Slack link">

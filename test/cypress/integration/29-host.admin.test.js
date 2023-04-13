@@ -117,6 +117,41 @@ describe('host dashboard', () => {
     });
   });
 
+  describe('Pending `Contributions', () => {
+    it('Create new pending contribution', () => {
+      cy.login({ redirect: '/brusselstogetherasbl/admin/pending-contributions' });
+      cy.get('[data-cy="create-pending-contribution"]:first').click();
+      cy.get('[data-cy="create-pending-contribution-to"]:first').type('Veganizer');
+      cy.wait(2000);
+      cy.contains('[data-cy=select-option]', 'Veganizer BXL').click();
+      cy.get('[data-cy="create-pending-contribution-child"]:first').click();
+      cy.contains('[data-cy=select-option]', 'None').click();
+      cy.get('[data-cy="create-pending-contribution-source"]:first').type('Xavier');
+      cy.wait(2000);
+      cy.contains('[data-cy=select-option]', 'Xavier').click();
+      cy.get('[data-cy="create-pending-contribution-contact-name"]:first').type('Xavier');
+      cy.get('[data-cy="create-pending-contribution-fromAccountInfo-email"').type('yourname@yourhost.com');
+      cy.get('[data-cy="create-pending-contribution-amount"]:first').type('500');
+      cy.get('[data-cy="create-pending-contribution-expectedAt"]:first').click();
+      cy.contains('[data-cy=select-option]', '1 month').click();
+      cy.get('[data-cy="create-pending-contribution-submit-btn"]:first').click();
+      cy.wait(2000);
+      cy.get('[data-cy="expense-title"]:first').click();
+      cy.contains('[data-cy="expense-description"]', 'Financial contribution to Veganizer BXL');
+      cy.get('[data-cy="MARK_AS_EXPIRED-button"]:first').click();
+      cy.get('[data-cy="confirmation-modal-continue"]:first').click();
+      cy.contains('[data-cy="order-status-msg"]', 'Expired');
+      cy.get('[data-cy="MARK_AS_PAID-button"]:first').click();
+      cy.get('[data-cy="payment-processor-fee"]').clear().type('4');
+      cy.get('[data-cy="platform-tip"]').clear().type('10');
+      cy.get('[data-cy="host-fee-percent"]').clear().type('9');
+      cy.getByDataCy('order-confirmation-modal-submit').click();
+      cy.contains('span', '€490.00');
+      cy.contains('span', '-€44.10');
+      cy.contains('[data-cy="order-status-msg"]:first', 'Paid');
+    });
+  });
+
   describe('expenses tab', () => {
     let expense;
 

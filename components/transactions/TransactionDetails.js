@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Info } from '@styled-icons/feather/Info';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -179,16 +180,24 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               <DetailDescription>{order.memo}</DetailDescription>
             </React.Fragment>
           )}
-          {order?.processedAt && (
-            <React.Fragment>
-              <DetailTitle>
-                <Span textTransform="capitalize">
-                  <FormattedMessage id="processedAt" defaultMessage="Fund received date" />
-                </Span>
-              </DetailTitle>
-              <DetailDescription>{intl.formatDate(order.processedAt, { timeZone: 'UTC' })}</DetailDescription>
-            </React.Fragment>
-          )}
+          {order?.processedAt &&
+            (transaction.kind === TransactionKind.ADDED_FUNDS ||
+              (!paymentMethod && transaction.kind === TransactionKind.CONTRIBUTION)) && (
+              <React.Fragment>
+                <DetailTitle>
+                  <span>
+                    <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
+                    {` `}
+                    <StyledTooltip content={() => <FormattedMessage defaultMessage="Date the funds were received." />}>
+                      <InfoCircle size={13} />
+                    </StyledTooltip>
+                  </span>
+                </DetailTitle>
+                <DetailDescription>
+                  {intl.formatDate(order.processedAt, { dateStyle: 'long', timeZone: 'UTC' })}
+                </DetailDescription>
+              </React.Fragment>
+            )}
         </Flex>
       )}
       <Flex flexDirection="column" width={[1, 0.35]}>

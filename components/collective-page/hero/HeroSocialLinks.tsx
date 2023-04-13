@@ -1,45 +1,51 @@
 import React from 'react';
-import { Discord, Mastodon, Meetup, Tumblr } from '@styled-icons/fa-brands';
-import { Facebook, Github, Gitlab, Globe, Instagram, Linkedin, Slack, Twitter, Youtube } from '@styled-icons/feather';
+import { Discord } from '@styled-icons/fa-brands/Discord';
+import { Discourse } from '@styled-icons/fa-brands/Discourse';
+import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
+import { Meetup } from '@styled-icons/fa-brands/Meetup';
+import { Tiktok } from '@styled-icons/fa-brands/Tiktok';
+import { Tumblr } from '@styled-icons/fa-brands/Tumblr';
+import { Facebook } from '@styled-icons/feather/Facebook';
+import { Github } from '@styled-icons/feather/Github';
+import { Gitlab } from '@styled-icons/feather/Gitlab';
+import { Globe } from '@styled-icons/feather/Globe';
+import { Instagram } from '@styled-icons/feather/Instagram';
+import { Linkedin } from '@styled-icons/feather/Linkedin';
+import { Slack } from '@styled-icons/feather/Slack';
+import { Twitter } from '@styled-icons/feather/Twitter';
+import { Youtube } from '@styled-icons/feather/Youtube';
+import { Pixelfed } from '@styled-icons/remix-line/Pixelfed';
 
 import { SocialLink, SocialLinkType } from '../../../lib/graphql/types/v2/graphql';
 
 import StyledLink from '../../StyledLink';
 import StyledRoundButton from '../../StyledRoundButton';
 
+const SocialLinkIcon = {
+  [SocialLinkType.DISCORD]: Discord,
+  [SocialLinkType.FACEBOOK]: Facebook,
+  [SocialLinkType.GITHUB]: Github,
+  [SocialLinkType.GITLAB]: Gitlab,
+  [SocialLinkType.INSTAGRAM]: Instagram,
+  [SocialLinkType.MASTODON]: Mastodon,
+  [SocialLinkType.MATTERMOST]: Globe,
+  [SocialLinkType.TWITTER]: Twitter,
+  [SocialLinkType.YOUTUBE]: Youtube,
+  [SocialLinkType.TUMBLR]: Tumblr,
+  [SocialLinkType.MEETUP]: Meetup,
+  [SocialLinkType.SLACK]: Slack,
+  [SocialLinkType.LINKEDIN]: Linkedin,
+  [SocialLinkType.GIT]: Globe,
+  [SocialLinkType.WEBSITE]: Globe,
+  [SocialLinkType.DISCOURSE]: Discourse,
+  [SocialLinkType.PIXELFED]: Pixelfed,
+  [SocialLinkType.GHOST]: Globe,
+  [SocialLinkType.PEERTUBE]: Globe,
+  [SocialLinkType.TIKTOK]: Tiktok,
+};
+
 function iconForSocialLinkType(type: SocialLinkType) {
-  switch (type) {
-    case SocialLinkType.DISCORD:
-      return Discord;
-    case SocialLinkType.FACEBOOK:
-      return Facebook;
-    case SocialLinkType.GITHUB:
-      return Github;
-    case SocialLinkType.GITLAB:
-      return Gitlab;
-    case SocialLinkType.INSTAGRAM:
-      return Instagram;
-    case SocialLinkType.MASTODON:
-      return Mastodon;
-    case SocialLinkType.MATTERMOST:
-      return Globe;
-    case SocialLinkType.WEBSITE:
-      return Globe;
-    case SocialLinkType.TWITTER:
-      return Twitter;
-    case SocialLinkType.YOUTUBE:
-      return Youtube;
-    case SocialLinkType.TUMBLR:
-      return Tumblr;
-    case SocialLinkType.MEETUP:
-      return Meetup;
-    case SocialLinkType.SLACK:
-      return Slack;
-    case SocialLinkType.LINKEDIN:
-      return Linkedin;
-    default:
-      return Globe;
-  }
+  return SocialLinkIcon[type] || Globe;
 }
 
 export type HeroSocialLinksProps = {
@@ -58,7 +64,7 @@ export default function HeroSocialLinks({ socialLinks, relMe }: HeroSocialLinksP
         openInNewTabNoFollow={!relMe}
         openInNewTabNoFollowRelMe={!!relMe}
       >
-        <StyledRoundButton size={32} mr={3}>
+        <StyledRoundButton size={32} mt={2} mr={3}>
           <Icon size={12} />
         </StyledRoundButton>
       </StyledLink>

@@ -10,7 +10,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { isURL } from 'validator';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { WebhookEventsList } from '../../../lib/constants/notificationEvents';
+import { WebhookEvents, WebhookEventsList } from '../../../lib/constants/notificationEvents';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { gqlV1 } from '../../../lib/graphql/helpers';
 import { i18nWebhookEventType } from '../../../lib/i18n/webhook-event-type';
@@ -76,17 +76,13 @@ class Webhooks extends React.Component {
     if (collectiveType !== CollectiveType.COLLECTIVE) {
       removeList.push(
         'collective.comment.created',
-        'collective.expense.created',
         'collective.expense.deleted',
         'collective.expense.updated',
         'collective.expense.rejected',
         'collective.expense.approved',
         'collective.expense.paid',
         'collective.monthly',
-        'collective.transaction.created',
         'collective.transaction.paid',
-        'collective.update.created',
-        'collective.update.published',
       );
     }
     if (collectiveType !== CollectiveType.ORGANIZATION) {
@@ -97,6 +93,15 @@ class Webhooks extends React.Component {
     }
     if (!isHost) {
       removeList.push('collective.apply', 'collective.approved', 'collective.created');
+    }
+
+    if ([CollectiveType.USER, CollectiveType.ORGANIZATION].includes(collectiveType) && !isHost) {
+      removeList.push(
+        'collective.update.created',
+        'collective.update.published',
+        'collective.expense.created',
+        'collective.transaction.created',
+      );
     }
 
     return difference(WebhookEventsList, removeList);
@@ -221,6 +226,17 @@ class Webhooks extends React.Component {
               )}
             </Flex>
           </Box>
+          {data.Collective.isHost &&
+            [WebhookEvents.COLLECTIVE_EXPENSE_CREATED, WebhookEvents.COLLECTIVE_TRANSACTION_CREATED].includes(
+              webhook.type,
+            ) && (
+              <MessageBox type="warning" mt={2} withIcon>
+                <FormattedMessage
+                  defaultMessage="This event will only be triggered when the activity occurs on {host}'s account, not on its hosted initiatives."
+                  values={{ host: this.props.collectiveSlug }}
+                />
+              </MessageBox>
+            )}
           {this.state.moreInfoModal && (
             <WebhookActivityInfoModal
               activity={this.state.moreInfoModal}

@@ -35,6 +35,7 @@ const OrderStatusTag = ({ status, ...props }) => {
       letterSpacing="0.8px"
       textTransform="uppercase"
       data-cy="order-status-msg"
+      fontSize="10px"
       {...props}
     >
       {i18nOrderStatus(intl, status)}

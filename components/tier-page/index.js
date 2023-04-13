@@ -176,9 +176,7 @@ class TierPage extends Component {
     return (
       <Container>
         {/** ---- Hero / Banner ---- */}
-        <Container position="sticky" top={0} zIndex={999}>
-          <CollectiveNavbar collective={collective} selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE} isAdmin={canEdit} />
-        </Container>
+        <CollectiveNavbar collective={collective} selectedCategory={NAVBAR_CATEGORIES.CONTRIBUTE} isAdmin={canEdit} />
         <Container position="relative">
           <Container position="absolute" width={1} zIndex={-1} overflow="hidden">
             <TierCover backgroundImage={collective.backgroundImage} />

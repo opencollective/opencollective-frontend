@@ -38,12 +38,8 @@ describe('Onboarding modal', () => {
     cy.focused().type('https://opencollective.com/testCollective');
     cy.contains('Add social link').click();
     cy.focused().type('https://twitter.com/testCollective');
-    cy.get('[data-cy="social-link-type-picker"]').eq(1).click();
-    cy.contains('Twitter').click();
     cy.contains('Add social link').click();
     cy.focused().type('https://github.com/testCollective');
-    cy.get('[data-cy="social-link-type-picker"]').eq(2).click();
-    cy.contains('GitHub').click();
     // Finish creating collective
     cy.get('[data-cy="finish-button"]').click();
     cy.get('[data-cy="welcome-collective"]').contains('Welcome to your new Collective!');

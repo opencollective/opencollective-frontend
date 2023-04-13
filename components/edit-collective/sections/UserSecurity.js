@@ -7,13 +7,11 @@ import { Info } from '@styled-icons/feather/Info';
 import { saveAs } from 'file-saver';
 import { Field, Form, Formik } from 'formik';
 import { get } from 'lodash';
-import dynamic from 'next/dynamic';
 import QRCode from 'qrcode.react';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import speakeasy from 'speakeasy';
 import styled from 'styled-components';
 
-import ROLES from '../../../lib/constants/roles';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { compose } from '../../../lib/utils';
@@ -21,10 +19,12 @@ import { compose } from '../../../lib/utils';
 import ConfirmationModal from '../../ConfirmationModal';
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
+import { getI18nLink } from '../../I18nFormatters';
 import Image from '../../Image';
 import Loading from '../../Loading';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
+import { PasswordStrengthBar } from '../../PasswordStrengthBar';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
 import StyledInput from '../../StyledInput';
@@ -34,9 +34,6 @@ import StyledTooltip from '../../StyledTooltip';
 import { H3, P } from '../../Text';
 import { TOAST_TYPE, withToasts } from '../../ToastProvider';
 import { withUser } from '../../UserProvider';
-
-// Dynamic imports
-const PasswordStrengthBar = dynamic(() => import('react-password-strength-bar'));
 
 const messages = defineMessages({
   errorWrongLength: {
@@ -97,6 +94,7 @@ class UserSecurity extends React.Component {
       hasRole: PropTypes.func.isRequired,
       email: PropTypes.string.isRequired,
     }),
+    login: PropTypes.func.isRequired,
     refetchLoggedInUser: PropTypes.func.isRequired,
     data: PropTypes.shape({
       individual: PropTypes.object,
@@ -112,7 +110,8 @@ class UserSecurity extends React.Component {
     super(props);
     this.state = {
       error: null,
-      disablingTwoFactorAuth: false,
+      isDisablingTwoFactorAuth: false,
+      isDisablingTwoFactorAuthLoading: false,
       disableError: null,
       recoveryCodes: null,
       enablingTwoFactorAuth: false,
@@ -195,24 +194,28 @@ class UserSecurity extends React.Component {
     }
   }
 
-  async disableTwoFactorAuth(values) {
+  async disableTwoFactorAuth() {
     try {
-      const { twoFactorAuthenticatorCode } = values;
       const account = {
         id: this.props.data.individual.id,
       };
 
+      this.setState({ isDisablingTwoFactorAuthLoading: true, error: null });
+
       await this.props.removeTwoFactorAuthTokenFromIndividual({
         variables: {
           account,
-          code: twoFactorAuthenticatorCode,
         },
       });
       this.props.refetchLoggedInUser(); // No need to await
-      this.setState({ disablingTwoFactorAuth: false, error: null });
+      this.setState({ isDisablingTwoFactorAuth: false, isDisablingTwoFactorAuthLoading: false, error: null });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
-      this.setState({ disableError: errorMsg });
+      this.setState({
+        disableError: errorMsg,
+        isDisablingTwoFactorAuth: false,
+        isDisablingTwoFactorAuthLoading: false,
+      });
     }
   }
 
@@ -237,9 +240,11 @@ class UserSecurity extends React.Component {
 
     try {
       this.setState({ passwordLoading: true });
-      await this.props.setPassword({
-        variables: { password, currentPassword },
-      });
+      const hadPassword = this.props.LoggedInUser.hasPassword;
+      const result = await this.props.setPassword({ variables: { password, currentPassword } });
+      if (result.data.setPassword.token) {
+        await this.props.login(result.data.setPassword.token);
+      }
       await this.props.refetchLoggedInUser();
       this.setState({
         currentPassword: '',
@@ -251,7 +256,7 @@ class UserSecurity extends React.Component {
       });
       this.props.addToast({
         type: TOAST_TYPE.SUCCESS,
-        message: this.props.LoggedInUser.hasPassword ? (
+        message: hadPassword ? (
           <FormattedMessage defaultMessage="Password successfully updated" />
         ) : (
           <FormattedMessage defaultMessage="Password successfully set" />
@@ -331,6 +336,17 @@ class UserSecurity extends React.Component {
             mt={2}
             mb={2}
             width="100%"
+            hint={
+              <FormattedMessage
+                defaultMessage="Strong password recommended. Short or weak one restricted. <link>The strength of a password is a function of length, complexity, and unpredictability.</link>"
+                values={{
+                  link: getI18nLink({
+                    href: 'https://en.wikipedia.org/wiki/Password_strength',
+                    openInNewTab: true,
+                  }),
+                }}
+              />
+            }
           >
             <StyledInput
               key={`current-password-${passwordKey}`}
@@ -345,13 +361,14 @@ class UserSecurity extends React.Component {
             />
           </StyledInputField>
 
-          <PasswordStrengthBar
-            style={{ visibility: password ? 'visible' : 'hidden' }}
-            password={this.state.password}
-            onChangeScore={passwordScore => {
-              this.setState({ passwordScore });
-            }}
-          />
+          <div data-cy="password-strength-bar">
+            <PasswordStrengthBar
+              password={password}
+              onChangeScore={passwordScore => {
+                this.setState({ passwordScore });
+              }}
+            />
+          </div>
 
           <StyledButton
             my={2}
@@ -379,10 +396,11 @@ class UserSecurity extends React.Component {
       secret,
       base32,
       otpAuthUrl,
-      disablingTwoFactorAuth,
       enablingTwoFactorAuth,
       recoveryCodes,
       showRecoveryCodesModal,
+      isDisablingTwoFactorAuth,
+      isDisablingTwoFactorAuthLoading,
     } = this.state;
 
     const { loading } = data;
@@ -398,10 +416,6 @@ class UserSecurity extends React.Component {
       twoFactorAuthenticatorCode: '',
     };
 
-    const initialDisableFormValues = {
-      twoFactorAuthenticatorCode: '',
-    };
-
     const validate = values => {
       const errors = {};
 
@@ -412,16 +426,9 @@ class UserSecurity extends React.Component {
       return errors;
     };
 
-    const canManagePassword =
-      this.props.LoggedInUser.hasPassword ||
-      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'opencollective' }) ||
-      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'opensource' }) ||
-      this.props.LoggedInUser.hasRole([ROLES.ADMIN, ROLES.MEMBER], { slug: 'foundation' }) ||
-      process.env.OC_ENV !== 'production';
-
     return (
       <Flex flexDirection="column">
-        {canManagePassword && this.renderPasswordManagement()}
+        {this.renderPasswordManagement()}
 
         <H3 fontSize="18px" fontWeight="700" mb={2}>
           <FormattedMessage id="TwoFactorAuth" defaultMessage="Two-factor authentication" />
@@ -470,87 +477,52 @@ class UserSecurity extends React.Component {
                   my={1}
                   minWidth={140}
                   buttonStyle={'danger'}
-                  onClick={() => this.setState({ disablingTwoFactorAuth: true })}
+                  onClick={() => this.setState({ isDisablingTwoFactorAuth: true })}
                 >
                   <FormattedMessage id="TwoFactorAuth.Disable.Button" defaultMessage="Disable 2FA" />
                 </StyledButton>
-                {disablingTwoFactorAuth && (
-                  <Formik
-                    validate={validate}
-                    initialValues={initialDisableFormValues}
-                    onSubmit={this.disableTwoFactorAuth}
-                  >
-                    {formik => {
-                      const { values, errors, touched, handleSubmit, isSubmitting } = formik;
-
-                      return (
-                        <StyledModal width="570px" onClose={() => this.setState({ disablingTwoFactorAuth: false })}>
-                          <ModalHeader>
-                            <FormattedMessage
-                              id="TwoFactorAuth.Disable.Header"
-                              defaultMessage="Are you sure you want to remove two-factor authentication from your account?"
-                            />
-                          </ModalHeader>
-                          <ModalBody>
-                            <MessageBox type="warning" withIcon my={3}>
-                              <FormattedMessage
-                                id="TwoFactorAuth.Disable.Warning"
-                                defaultMessage="Removing 2FA from your account can make it less secure."
-                              />
-                            </MessageBox>
-                            {disableError && (
-                              <MessageBox type="error" withIcon mb={3}>
-                                {disableError}
-                              </MessageBox>
-                            )}
-                            <P>
-                              <FormattedMessage
-                                id="TwoFactorAuth.Disable.Info"
-                                defaultMessage="If you would like to remove 2FA from your account, you will need to enter the code from your authenticator app one more time."
-                              />
-                            </P>
-                            <Form>
-                              <StyledInputField
-                                name="twoFactorAuthenticatorCode"
-                                htmlFor="twoFactorAuthenticatorCode"
-                                error={touched.twoFactorAuthenticatorCode && errors.twoFactorAuthenticatorCode}
-                                label={intl.formatMessage(messages.inputLabel)}
-                                value={values.twoFactorAuthenticatorCode}
-                                required
-                                mt={2}
-                                mb={3}
-                              >
-                                {inputProps => (
-                                  <Field
-                                    as={StyledInput}
-                                    {...inputProps}
-                                    width={240}
-                                    minHeight={75}
-                                    fontSize="20px"
-                                    autoComplete="off"
-                                    placeholder="123456"
-                                    pattern="[0-9]{6}"
-                                    inputMode="numeric"
-                                    autoFocus
-                                  />
-                                )}
-                              </StyledInputField>
-                            </Form>
-                          </ModalBody>
-                          <ModalFooter>
-                            <Container display="flex" justifyContent="flex-end">
-                              <StyledButton mx={20} onClick={() => this.setState({ disablingTwoFactorAuth: false })}>
-                                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-                              </StyledButton>
-                              <StyledButton buttonStyle="danger" loading={isSubmitting} onClick={handleSubmit}>
-                                <FormattedMessage id="actions.continue" defaultMessage="Continue" />
-                              </StyledButton>
-                            </Container>
-                          </ModalFooter>
-                        </StyledModal>
-                      );
-                    }}
-                  </Formik>
+                {isDisablingTwoFactorAuth && (
+                  <StyledModal width="570px" onClose={() => this.setState({ isDisablingTwoFactorAuth: false })}>
+                    <ModalHeader>
+                      <FormattedMessage
+                        id="TwoFactorAuth.Disable.Header"
+                        defaultMessage="Are you sure you want to remove two-factor authentication from your account?"
+                      />
+                    </ModalHeader>
+                    <ModalBody>
+                      <MessageBox type="warning" withIcon my={3}>
+                        <FormattedMessage
+                          id="TwoFactorAuth.Disable.Warning"
+                          defaultMessage="Removing 2FA from your account can make it less secure."
+                        />
+                      </MessageBox>
+                      {disableError && (
+                        <MessageBox type="error" withIcon mb={3}>
+                          {disableError}
+                        </MessageBox>
+                      )}
+                      <P>
+                        <FormattedMessage
+                          id="TwoFactorAuth.Disable.Info"
+                          defaultMessage="If you would like to remove 2FA from your account, you will need to enter the code from your authenticator app one more time."
+                        />
+                      </P>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Container display="flex" justifyContent="flex-end">
+                        <StyledButton mx={20} onClick={() => this.setState({ isDisablingTwoFactorAuth: false })}>
+                          <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+                        </StyledButton>
+                        <StyledButton
+                          buttonStyle="danger"
+                          loading={isDisablingTwoFactorAuthLoading}
+                          onClick={this.disableTwoFactorAuth}
+                        >
+                          <FormattedMessage id="actions.continue" defaultMessage="Continue" />
+                        </StyledButton>
+                      </Container>
+                    </ModalFooter>
+                  </StyledModal>
                 )}
               </Container>
             </Fragment>
@@ -784,8 +756,8 @@ const addTwoFactorAuthToIndividualMutation = gql`
 `;
 
 const removeTwoFactorAuthFromIndividualMutation = gql`
-  mutation RemoveTwoFactorAuthFromIndividual($account: AccountReferenceInput!, $code: String!) {
-    removeTwoFactorAuthTokenFromIndividual(account: $account, code: $code) {
+  mutation RemoveTwoFactorAuthFromIndividual($account: AccountReferenceInput!) {
+    removeTwoFactorAuthTokenFromIndividual(account: $account) {
       id
       hasTwoFactorAuth
     }
@@ -811,20 +783,14 @@ const accountHasTwoFactorAuthQuery = gql`
 const setPasswordMutation = gql`
   mutation SetPassword($password: String!, $currentPassword: String) {
     setPassword(password: $password, currentPassword: $currentPassword) {
-      id
-      hasPassword
+      individual {
+        id
+        hasPassword
+      }
+      token
     }
   }
 `;
-
-const addAccountHasTwoFactorAuthData = graphql(accountHasTwoFactorAuthQuery, {
-  options: props => ({
-    context: API_V2_CONTEXT,
-    variables: {
-      slug: props.slug,
-    },
-  }),
-});
 
 const addGraphql = compose(
   graphql(setPasswordMutation, {
@@ -839,7 +805,14 @@ const addGraphql = compose(
     name: 'removeTwoFactorAuthTokenFromIndividual',
     options: { context: API_V2_CONTEXT },
   }),
-  addAccountHasTwoFactorAuthData,
+  graphql(accountHasTwoFactorAuthQuery, {
+    options: props => ({
+      context: API_V2_CONTEXT,
+      variables: {
+        slug: props.slug,
+      },
+    }),
+  }),
 );
 
 export default injectIntl(withToasts(withUser(addGraphql(UserSecurity))));

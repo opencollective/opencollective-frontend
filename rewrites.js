@@ -31,6 +31,14 @@ exports.REWRITES = [
     destination: '/signinLinkSent',
   },
   {
+    source: '/reset-password/sent',
+    destination: '/reset-password-sent',
+  },
+  {
+    source: '/reset-password/completed',
+    destination: '/reset-password-completed',
+  },
+  {
     source: '/oauth/authorize',
     destination: '/oauth/authorize',
   },
@@ -87,6 +95,10 @@ exports.REWRITES = [
     destination: '/signin',
   },
   {
+    source: '/reset-password/:token?',
+    destination: '/reset-password',
+  },
+  {
     source: '/confirm/email/:token',
     destination: '/confirmEmail',
   },
@@ -113,6 +125,14 @@ exports.REWRITES = [
   {
     source: '/:parentCollectiveSlug/projects/(new|create)',
     destination: '/create-project',
+  },
+  {
+    source: '/dashboard',
+    destination: '/dashboard',
+  },
+  {
+    source: '/dashboard/:slug/:section?/:subpath*',
+    destination: '/dashboard',
   },
   {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',
@@ -147,7 +167,8 @@ exports.REWRITES = [
     destination: '/orders',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders/:OrderId([0-9]+)',
+    source:
+      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/(orders|contributions)/:OrderId([0-9]+)',
     destination: '/order',
   },
   {

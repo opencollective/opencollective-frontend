@@ -31,7 +31,7 @@ describe('event.createOrder page', () => {
 
     // Create Ticket
     cy.contains('a', 'Create Ticket').click();
-    cy.get('[data-cy="admin-panel-container"] [data-cy="create-contribute-tier"]').click();
+    cy.get('[data-cy="admin-panel-container"] [data-cy="create-ticket"]').click();
     cy.get('[data-cy=name]').type('Free ticket');
     cy.get('input[data-cy=amount]').type('0');
     cy.getByDataCy('confirm-btn').click();
@@ -45,7 +45,7 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy="contribution-quantity"]').should('exist');
 
     cy.getByDataCy('cf-next-step').click();
-    cy.getByDataCy('cf-next-step').contains('Make contribution').click();
+    cy.getByDataCy('cf-next-step').contains('Get ticket').click();
 
     cy.wait(500);
     cy.getByDataCy('order-success', { timeout: 20000 });
@@ -56,7 +56,7 @@ describe('event.createOrder page', () => {
 
     // Create Ticket
     cy.contains('a', 'Create Ticket').click();
-    cy.get('[data-cy="admin-panel-container"] [data-cy="create-contribute-tier"]').click();
+    cy.get('[data-cy="admin-panel-container"] [data-cy="create-ticket"]').click();
     cy.get('[data-cy=name]').type('Paying Ticket');
     cy.get('input[data-cy=amount]').type('10');
     cy.getByDataCy('confirm-btn').click();
@@ -76,7 +76,7 @@ describe('event.createOrder page', () => {
 
     cy.useAnyPaymentMethod();
     cy.wait(500);
-    cy.contains('button', 'Contribute $10').click();
+    cy.contains('button', 'Get ticket').click();
     cy.wait(500);
     cy.getByDataCy('order-success', { timeout: 20000 });
   });
@@ -86,7 +86,7 @@ describe('event.createOrder page', () => {
 
     // Create Ticket
     cy.contains('a', 'Create Ticket').click();
-    cy.get('[data-cy="admin-panel-container"] [data-cy="create-contribute-tier"]').click();
+    cy.get('[data-cy="admin-panel-container"] [data-cy="create-ticket"]').click();
     cy.get('[data-cy=name]').type('Flexible Paying Ticket');
     cy.get('[data-cy=amountType]').click();
     cy.contains('[data-cy=select-option]', 'Flexible').click();
@@ -109,7 +109,7 @@ describe('event.createOrder page', () => {
 
     cy.useAnyPaymentMethod();
     cy.wait(500);
-    cy.contains('button', 'Contribute $10').click();
+    cy.contains('button', 'Get ticket').click();
     cy.wait(500);
     cy.getByDataCy('order-success', { timeout: 20000 });
   });
@@ -128,7 +128,7 @@ describe('event.createOrder page', () => {
     cy.contains('a', 'Create Ticket').click();
 
     // Create tickets
-    cy.get('[data-cy="admin-panel-container"] [data-cy="create-contribute-tier"]').click();
+    cy.get('[data-cy="admin-panel-container"] [data-cy="create-ticket"]').click();
     cy.get('[data-cy=name]').type('Ticket with VAT');
     cy.get('input[data-cy=amount]').type('10');
     cy.getByDataCy('confirm-btn').click();
@@ -224,7 +224,7 @@ describe('event.createOrder page', () => {
     cy.getByDataCy('cf-next-step').click();
     cy.useAnyPaymentMethod();
     cy.wait(500);
-    cy.contains('button', 'Contribute $96.80').click();
+    cy.contains('button', 'Get tickets').click();
     cy.wait(500);
     cy.getByDataCy('order-success', { timeout: 20000 });
   });

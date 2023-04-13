@@ -95,6 +95,18 @@ const PrivateIconContainer = styled.div`
   }
 `;
 
+const formatFileSize = sizeInBytes => {
+  if (sizeInBytes < 1024) {
+    return `${sizeInBytes} bytes`;
+  } else if (sizeInBytes < 1048576) {
+    return `${(sizeInBytes / 1024).toFixed(2)} KB`;
+  } else if (sizeInBytes < 1073741824) {
+    return `${(sizeInBytes / 1048576).toFixed(2)} MB`;
+  } else {
+    return `${(sizeInBytes / 1073741824).toFixed(2)} GB`;
+  }
+};
+
 /**
  * To display the preview of a file uploaded on Open Collective.
  * Supports images and PDFs.
@@ -108,6 +120,7 @@ const UploadedFilePreview = ({
   maxHeight,
   alt,
   fileName,
+  fileSize,
   showFileName,
   border,
   ...props
@@ -155,16 +168,21 @@ const UploadedFilePreview = ({
         {content}
       </CardContainer>
       {showFileName && (
-        <Container mt="6px" maxWidth={size || 100}>
+        <Container mt="4px" maxWidth={size || 100} textAlign="left" px={1}>
           {isLoading ? (
             <LoadingPlaceholder height={12} />
           ) : fileName ? (
-            <FileName fontSize="12px" color="black.600" fontWeight="500">
+            <FileName fontSize="13px" color="black.700" fontWeight="700">
               {fileName}
             </FileName>
           ) : (
-            <P fontStyle="italic" fontSize="12px" color="black.600">
+            <P fontStyle="italic" fontSize="13px" color="black.700">
               <FormattedMessage id="File.NoFilename" defaultMessage="No filename" />
+            </P>
+          )}
+          {fileSize && (
+            <P mt="2px" fontSize="11px" lineHeight="16px" color="black.600" fontWeight="400">
+              {formatFileSize(fileSize)}
             </P>
           )}
         </Container>
@@ -182,6 +200,7 @@ UploadedFilePreview.propTypes = {
   alt: PropTypes.string,
   fileName: PropTypes.string,
   onClick: PropTypes.func,
+  fileSize: PropTypes.number,
   border: PropTypes.string,
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   maxHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),

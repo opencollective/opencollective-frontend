@@ -100,7 +100,7 @@ const canContribute = (collective, LoggedInUser) => {
   }
 };
 
-const ContributeTier = ({ intl, collective, tier, enableEditing, isPreview, ...props }) => {
+const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
   const { LoggedInUser } = useLoggedInUser();
   const { stats } = tier;
   const currency = tier.currency || collective.currency;
@@ -136,7 +136,6 @@ const ContributeTier = ({ intl, collective, tier, enableEditing, isPreview, ...p
       data-cy="contribute-card-tier"
       isPreview={isPreview}
       disableCTA={!isPreview && isDisabled}
-      enableEditing={enableEditing}
       tier={tier}
       collective={collective}
       {...props}
@@ -266,12 +265,7 @@ ContributeTier.propTypes = {
   }),
   /** @ignore */
   intl: PropTypes.object.isRequired,
-  enableEditing: PropTypes.bool,
   isPreview: PropTypes.bool,
-};
-
-ContributeTier.defaultProps = {
-  enableEditing: false,
 };
 
 export default injectIntl(ContributeTier);

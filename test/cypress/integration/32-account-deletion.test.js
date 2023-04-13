@@ -1,4 +1,5 @@
 import mockRecaptcha from '../mocks/recaptcha';
+import { randomSlug } from '../support/faker';
 
 describe('Account Deletion', () => {
   let collectiveSlug = null;
@@ -22,17 +23,17 @@ describe('Account Deletion', () => {
   });
 
   it('Should delete user', () => {
-    const userParams = { name: 'New Tester' };
+    const userSlug = randomSlug();
+    const userParams = { name: userSlug };
     const visitParams = { onBeforeLoad: mockRecaptcha };
-    cy.signup({ user: userParams, visitParams }).then(user => {
-      cy.visit(`/${user.collective.slug}/admin/advanced`);
-      cy.contains('button', 'Delete this account').click();
-      cy.get('[data-cy=delete]').click();
-      cy.wait(1000);
-      cy.location().should(location => {
-        expect(location.search).to.eq('?type=USER');
-      });
-      cy.contains('h1', 'Your account has been deleted.');
+
+    cy.signup({ user: userParams, visitParams, redirect: `/${userSlug}/admin/advanced` });
+    cy.contains('button', 'Delete this account').click();
+    cy.get('[data-cy=delete]').click();
+    cy.wait(1000);
+    cy.location().should(location => {
+      expect(location.search).to.eq('?type=USER');
     });
+    cy.contains('h1', 'Your account has been deleted.');
   });
 });

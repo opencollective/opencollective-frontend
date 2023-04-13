@@ -71,9 +71,19 @@ export function PayWithStripeForm({
               email: bilingDetails?.email,
             },
           },
+          terms: {
+            bancontact: 'always',
+            card: 'always',
+            ideal: 'always',
+            sepaDebit: 'always',
+            sofort: 'always',
+            auBecsDebit: 'always',
+            usBankAccount: 'always',
+          },
         }}
         onChange={onElementChange}
       />
+
       {hasSaveCheckBox && (
         <Flex mt={3} alignItems="center" color="black.700">
           <StyledCheckbox

@@ -10,7 +10,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { i18nExpenseType } from '../../lib/i18n/expense';
 
-import { EDIT_COLLECTIVE_SECTIONS } from '../edit-collective/Menu';
+import { ALL_SECTIONS } from '../admin-panel/constants';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
@@ -166,7 +166,7 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
                           values={{
                             Link: getI18nLink({
                               as: Link,
-                              href: `/${host.slug}/admin/${EDIT_COLLECTIVE_SECTIONS.FISCAL_HOSTING}`,
+                              href: `/${host.slug}/admin/${ALL_SECTIONS.FISCAL_HOSTING}`,
                               openInNewTab: true,
                             }),
                           }}

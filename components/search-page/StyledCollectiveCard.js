@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import { getCollectiveMainTag } from '../../lib/collective.lib';
 import { IGNORED_TAGS } from '../../lib/constants/collectives';
-import { getIntlDisplayNames } from '../../lib/i18n';
+import { getCountryDisplayName, getFlagEmoji } from '../../lib/i18n/countries';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -130,14 +130,6 @@ const CollectiveContainer = ({ useLink, collective, children }) => {
   }
 };
 
-const getFlagEmoji = countryCode => {
-  const codePoints = countryCode
-    .toUpperCase()
-    .split('')
-    .map(char => 127397 + char.charCodeAt());
-  return String.fromCodePoint(...codePoints);
-};
-
 CollectiveContainer.propTypes = {
   useLink: PropTypes.bool,
   collective: PropTypes.object.isRequired,
@@ -160,10 +152,9 @@ const StyledCollectiveCard = ({
   ...props
 }) => {
   const intl = useIntl();
-  const regionNames = getIntlDisplayNames(intl.locale, 'region');
   const collectiveCountry = collective.location?.country || collective.parent?.location?.country;
   const countryString = collectiveCountry
-    ? `${getFlagEmoji(collectiveCountry)} ${regionNames.of(collectiveCountry)}`
+    ? `${getFlagEmoji(collectiveCountry)} ${getCountryDisplayName(intl.locale, collectiveCountry)}`
     : null;
 
   return (

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Plus } from '@styled-icons/boxicons-regular';
+import { Plus } from '@styled-icons/boxicons-regular/Plus';
 import { Settings } from '@styled-icons/feather/Settings';
 import { groupBy, isEmpty, uniqBy } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -8,7 +8,7 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { isPastEvent } from '../lib/events';
-import { getSettingsRoute } from '../lib/url-helpers';
+import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
 
 import Avatar from './Avatar';
 import Collapse from './Collapse';
@@ -55,7 +55,11 @@ const MembershipLine = ({ user, membership }) => {
       {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
         <StyledLink
           as={Link}
-          href={getSettingsRoute(membership.collective)}
+          href={
+            user?.hasEarlyAccess('dashboard')
+              ? getDashboardRoute(membership.collective)
+              : getSettingsRoute(membership.collective)
+          }
           ml={1}
           color="black.500"
           title={intl.formatMessage({ id: 'AdminPanel.button', defaultMessage: 'Admin' })}

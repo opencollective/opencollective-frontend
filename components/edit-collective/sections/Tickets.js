@@ -23,8 +23,6 @@ const prepareCards = (collective, sortedTiers) => {
         tier,
         hideContributors: true,
         hideCTA: true,
-        enableEditing: true,
-        forcedType: 'TICKET',
       },
     };
   });

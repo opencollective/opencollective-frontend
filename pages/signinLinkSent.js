@@ -54,7 +54,7 @@ class SignInLinkSent extends Component {
             <br />
             <FormattedMessage
               id="signinLinkSent."
-              defaultMessage="<Link>Learn more</Link> about passwordless login."
+              defaultMessage="<Link>Learn more</Link> about our login system."
               values={{
                 Link: getI18nLink({
                   href: 'https://docs.opencollective.com/help/product/log-in-system',

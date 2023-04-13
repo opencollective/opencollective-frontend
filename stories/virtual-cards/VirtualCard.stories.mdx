@@ -1,8 +1,7 @@
 import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
 import VirtualCard from '../../components/edit-collective/VirtualCard';
 import { webpackCollective, openSourceHost } from '../mocks/collectives';
-
-import ToastProvider, { ToastContext, TOAST_TYPE } from '../../components/ToastProvider';
+import ToastProvider from '../../components/ToastProvider';
 import { UserContext } from '../../components/UserProvider';
 import { loggedInUser } from '../mocks/loggedInUser';
 
@@ -25,25 +24,24 @@ export const DefaultStory = props => <VirtualCard {...props} />;
     }}
   >
     <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
-      <ToastProvider>
-        <VirtualCard
-          host={openSourceHost}
-          virtualCard={{
-            account: webpackCollective,
-            data: { status: 'active' },
-            last4: '9012',
-            privateData: { cvv: '321', expiryDate: '12/30', cardNumber: '5432123456789012' },
-            currency: 'USD',
-            provider: 'STRIPE',
-            spendingLimitAmount: 50000,
-            spendingLimitInterval: 'MONTHLY',
-            createdAt: '2022-09-29T05:00:00Z',
-          }}
-          canEditVirtualCard
-          canPauseOrResumeVirtualCard
-          canDeleteVirtualCard
-        />
-      </ToastProvider>
+      <VirtualCard
+        host={openSourceHost}
+        virtualCard={{
+          account: openSourceHost,
+          assignee: webpackCollective,
+          data: { status: 'active' },
+          last4: '9012',
+          privateData: { cvv: '321', expiryDate: '12/30', cardNumber: '5432123456789012' },
+          currency: 'USD',
+          provider: 'STRIPE',
+          spendingLimitAmount: 50000,
+          spendingLimitInterval: 'MONTHLY',
+          createdAt: '2022-09-29T05:00:00Z',
+        }}
+        canEditVirtualCard
+        canPauseOrResumeVirtualCard
+        canDeleteVirtualCard
+      />
     </UserContext.Provider>
   </Story>
 </Canvas>
@@ -60,24 +58,23 @@ export const DefaultStory = props => <VirtualCard {...props} />;
       },
     }}
   >
-    <ToastProvider>
-      <VirtualCard
-        host={openSourceHost}
-        virtualCard={{
-          account: webpackCollective,
-          data: { status: 'active' },
-          last4: '9012',
-          privateData: { cvv: '321', expiryDate: '12/30', cardNumber: '5432123456789012' },
-          currency: 'USD',
-          provider: 'STRIPE',
-          spendingLimitAmount: 50000,
-          spendingLimitInterval: 'MONTHLY',
-          createdAt: '2022-09-29T05:00:00Z',
-        }}
-        canEditVirtualCard
-        canPauseOrResumeVirtualCard
-        canDeleteVirtualCard
-      />
-    </ToastProvider>
+    <VirtualCard
+      host={openSourceHost}
+      virtualCard={{
+        account: openSourceHost,
+        assignee: webpackCollective,
+        data: { status: 'active' },
+        last4: '9012',
+        privateData: { cvv: '321', expiryDate: '12/30', cardNumber: '5432123456789012' },
+        currency: 'USD',
+        provider: 'STRIPE',
+        spendingLimitAmount: 50000,
+        spendingLimitInterval: 'MONTHLY',
+        createdAt: '2022-09-29T05:00:00Z',
+      }}
+      canEditVirtualCard
+      canPauseOrResumeVirtualCard
+      canDeleteVirtualCard
+    />
   </Story>
 </Canvas>

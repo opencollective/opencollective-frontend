@@ -32,9 +32,9 @@ describe('create a collective', () => {
     cy.getByDataCy('ccf-category-picker-button-community').click();
     cy.getByDataCy('ccf-form-name').type('Bees are vicious');
     cy.getByDataCy('ccf-form-description').type('I do not like them');
-    cy.get('[data-cy=styled-input-tags-open]').click();
-    cy.get('[data-cy=styled-input-tags-add-suggestion-meetup]').click();
-    cy.get('[data-cy=styled-input-tags-input]').type('opencollective-tag{enter}{esc}');
+    cy.get('[data-cy=tags-select]').click();
+    cy.get('[data-cy=tags-select-option-meetup]').click();
+    cy.get('[data-cy=tags-select-input]').type('opencollective-tag{enter}{esc}', { delay: 750 });
     cy.get('[data-cy=ccf-form-tags]').contains('opencollective-tag');
     cy.get('[data-cy="custom-checkbox"').click();
     cy.get('[data-cy=ccf-form-submit]').click();

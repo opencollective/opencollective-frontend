@@ -1,6 +1,9 @@
 import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
 import ProcessExpenseButtons from '../../components/expenses/ProcessExpenseButtons';
 import { webpackCollective } from '../mocks/collectives';
+import ToastProvider from '../../components/ToastProvider';
+import { UserContext } from '../../components/UserProvider';
+import { loggedInUser } from '../mocks/loggedInUser';
 
 <Meta title="Expenses/ProcessExpenseButtons" component={ProcessExpenseButtons} />
 
@@ -8,17 +11,20 @@ import { webpackCollective } from '../mocks/collectives';
   <Story name="All buttons">
     {() => {
       return (
-        <ProcessExpenseButtons
-          expense={{ legacyId: 42, amount: 4200 }}
-          collective={webpackCollective}
-          permissions={{
-            canApprove: true,
-            canUnapprove: true,
-            canReject: true,
-            canPay: true,
-            canMarkAsUnpaid: true,
-          }}
-        />
+        <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+          <ProcessExpenseButtons
+            expense={{ legacyId: 42, amount: 4200 }}
+            collective={webpackCollective}
+            permissions={{
+              approve: true,
+              canApprove: true,
+              canUnapprove: true,
+              canReject: true,
+              canPay: true,
+              canMarkAsUnpaid: true,
+            }}
+          />
+        </UserContext.Provider>
       );
     }}
   </Story>
@@ -28,14 +34,17 @@ import { webpackCollective } from '../mocks/collectives';
   <Story name="Displayed buttons is based on the permissions">
     {() => {
       return (
-        <ProcessExpenseButtons
-          expense={{ legacyId: 42, amount: 4200 }}
-          collective={webpackCollective}
-          permissions={{
-            canApprove: true,
-            canReject: true,
-          }}
-        />
+        <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+          <ProcessExpenseButtons
+            expense={{ legacyId: 42, amount: 4200 }}
+            collective={webpackCollective}
+            permissions={{
+              approve: true,
+              canApprove: true,
+              canReject: true,
+            }}
+          />
+        </UserContext.Provider>
       );
     }}
   </Story>

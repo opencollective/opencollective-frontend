@@ -29,7 +29,7 @@ const paymentMethodsQuery = gql`
     account(slug: $slug) {
       id
       paymentMethods(
-        type: [CREDITCARD, US_BANK_ACCOUNT, SEPA_DEBIT, GIFTCARD, PREPAID, COLLECTIVE]
+        type: [CREDITCARD, US_BANK_ACCOUNT, SEPA_DEBIT, BACS_DEBIT, GIFTCARD, PREPAID, COLLECTIVE]
         includeExpired: true
       ) {
         id
@@ -96,7 +96,7 @@ type PaymentMethodListProps = {
   fromAccount?: Individual;
   disabledPaymentMethodTypes: string[];
   stepSummary: object;
-  stepDetails: { amount: number; currency: string };
+  stepDetails: { amount: number; currency: string; interval?: string };
   stepPayment: { key: string; isKeyOnly?: boolean };
   isEmbed: boolean;
   isSubmitting: boolean;
@@ -134,6 +134,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
 
   const paymentMethodOptions = React.useMemo(() => {
     return generatePaymentMethodOptions(
+      intl,
       paymentMethodsData?.account?.paymentMethods ?? [],
       props.fromAccount,
       props.stepDetails,
@@ -274,7 +275,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
               <PayWithStripeForm
                 bilingDetails={{
                   name: props.fromAccount?.name,
-                  email: LoggedInUser?.email,
+                  email: LoggedInUser?.email ?? props?.fromAccount?.email,
                 }}
                 paymentIntentId={paymentIntent.id}
                 paymentIntentClientSecret={paymentIntent.client_secret}

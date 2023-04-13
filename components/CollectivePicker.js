@@ -74,7 +74,7 @@ export const DefaultCollectiveLabel = ({ value: collective }) => (
 
 DefaultCollectiveLabel.propTypes = {
   value: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     type: PropTypes.string,
     name: PropTypes.string,
     slug: PropTypes.string,

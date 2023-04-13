@@ -57,13 +57,13 @@ const YourInitiativeIsNearlyThere = () => (
         <H1 fontSize="32px" lineHeight="40px" letterSpacing="-0.008em" color="black.900" textAlign="center" mb="14px">
           <FormattedMessage
             id="OCFHostApplication.yourInitiativeIsNearlyThere"
-            defaultMessage="Your initiative is nearly there!"
+            defaultMessage="Your Collective is nearly there!"
           />
         </H1>
         <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.600">
           <FormattedMessage
             id="OCFHostApplication.yourInitiativeIsNearlyThere.description"
-            defaultMessage="We need to undertake our internal process to get everything ready. {lineBreak}{lineBreak} In the meantime, check out these useful links."
+            defaultMessage="Thank you for submitting an application to be fiscally hosted by OCF! Applications will be reviewed within 2 weeks.{lineBreak}{lineBreak} Our small but mighty team is here to help you Monday to Friday across multiple timezones. We aim to respond to inquiries within 3 business days."
             values={{
               lineBreak: <br />,
             }}

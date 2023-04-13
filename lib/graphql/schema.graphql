@@ -57,7 +57,7 @@ interface CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -175,10 +175,10 @@ interface CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -287,11 +287,11 @@ type UserDetails {
   Returns true if user account is limited (user can't use any feature)
   """
   isLimited: Boolean
-  hasSeenLatestChangelogEntry: Boolean!
+  hasSeenLatestChangelogEntry: Boolean
   hasTwoFactorAuth: Boolean
 
   """
-  Has the account a password set? For authenticated user: scope: "account".
+  Has the account a password set?
   """
   hasPassword: Boolean
   isRoot: Boolean!
@@ -1016,6 +1016,11 @@ enum SocialLinkType {
   GITLAB
   GIT
   WEBSITE
+  DISCOURSE
+  PIXELFED
+  GHOST
+  PEERTUBE
+  TIKTOK
 }
 
 """
@@ -2078,6 +2083,7 @@ type CollectiveStatsType {
   totalNetAmountReceived: Int
   yearlyBudget: Int
   yearlyBudgetManaged: Int
+    @deprecated(reason: "2023-03-01: This field will be removed soon, please use totalMoneyManaged from GraphQL V2")
   activeRecurringContributions: JSON
 }
 
@@ -2204,7 +2210,7 @@ type Collective implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2235,6 +2241,11 @@ type Collective implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -2354,14 +2365,14 @@ type Collective implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -2457,7 +2468,7 @@ type Event implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2488,6 +2499,11 @@ type Event implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -2607,14 +2623,14 @@ type Event implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -2710,7 +2726,7 @@ type Fund implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2741,6 +2757,11 @@ type Fund implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -2860,14 +2881,14 @@ type Fund implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -2963,7 +2984,7 @@ type Organization implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -2994,6 +3015,11 @@ type Organization implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -3113,14 +3139,14 @@ type Organization implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -3217,7 +3243,7 @@ type Project implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -3248,6 +3274,11 @@ type Project implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -3367,14 +3398,14 @@ type Project implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -3712,7 +3743,7 @@ type User implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -3743,6 +3774,11 @@ type User implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -3862,14 +3898,14 @@ type User implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -3967,7 +4003,7 @@ type Vendor implements CollectiveInterface {
   endsAt: DateString
   timezone: String
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   currency: String
   image: String
   imageUrl(height: Int, format: ImageFormat): String
@@ -3998,6 +4034,11 @@ type Vendor implements CollectiveInterface {
   Returns whether this host is trusted or not
   """
   isTrustedHost: Boolean!
+
+  """
+  Returns whether this user has two factor authentication enabled
+  """
+  isTwoFactorAuthEnabled: Boolean
 
   """
   Returns whether this host accepts applications for new collectives
@@ -4117,14 +4158,14 @@ type Vendor implements CollectiveInterface {
   """
   supportedExpenseTypes: [String!]!
   role: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
 
   """
   The URL of the repository
   """
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
   updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
     @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
@@ -4771,10 +4812,10 @@ input CollectiveInputType {
   name: String
   legalName: String
   company: String
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLinkInput!]
   description: String
   longDescription: String
@@ -4950,10 +4991,10 @@ input CollectiveAttributesInputType {
   description: String
   longDescription: String
   expensePolicy: String
-  website: String
-  twitterHandle: String
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   location: LocationInputType
   startsAt: String
   endsAt: String
@@ -4991,10 +5032,10 @@ input UserInputType {
   image: String
   username: String @deprecated(reason: "2022-01-13: Not used anymore. Will be ignored")
   description: String
-  twitterHandle: String
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String
-  website: String
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   newsletterOptIn: Boolean
   location: LocationInputType
 }
@@ -5017,7 +5058,7 @@ input OrderInputType {
   quantity: Int = 1
   totalAmount: Int
   hostFeePercent: Float
-  platformFeePercent: Int
+  platformFeePercent: Float
   platformFee: Int
   isFeesOnTop: Boolean
   currency: String

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -28,8 +29,9 @@ const StepLabel = styled(Span)`
 
 const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, isCrypto }) => {
   if (stepDetails.amount || stepDetails.cryptoAmount) {
-    const amount = isCrypto ? stepDetails.cryptoAmount : stepDetails.amount;
-    const totalAmount = amount + (stepDetails.platformTip || 0);
+    const totalAmount = isCrypto
+      ? get(stepDetails, 'cryptoAmount', 0)
+      : get(stepDetails, 'amount', 0) + get(stepDetails, 'platformTip', 0);
     return (
       <FormattedMoneyAmount
         interval={stepDetails.interval}

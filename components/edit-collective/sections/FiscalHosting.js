@@ -7,7 +7,7 @@ import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import useKeyboardShortcut, { ENTER_KEY } from '../../../lib/hooks/useKeyboardKey';
 
-import { adminPanelQuery } from '../../../pages/admin-panel';
+import { adminPanelQuery } from '../../admin-panel/queries';
 import Container from '../../Container';
 import StyledButton from '../../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';

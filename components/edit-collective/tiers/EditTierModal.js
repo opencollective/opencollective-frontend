@@ -120,7 +120,6 @@ function FormFields({ collective, values, hideTypeSelect }) {
     // No interval for products and tickets
     if ([PRODUCT, TICKET].includes(values.type)) {
       formik.setFieldValue('interval', null);
-      formik.setFieldValue('amountType', FIXED);
     }
   }, [values.interval, values.type]);
 
@@ -171,6 +170,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
         label={intl.formatMessage({ id: 'Fields.name', defaultMessage: 'Name' })}
         labelFontWeight="bold"
         mt="3"
+        required
       >
         {({ field }) => <StyledInput data-cy={field.name} placeholder="E.g. Donation" {...field} />}
       </StyledInputFormikField>
@@ -301,7 +301,9 @@ function FormFields({ collective, values, hideTypeSelect }) {
               onChange={value =>
                 form.setFieldValue(
                   field.name,
-                  value ? { currency: field.value?.currency ?? collective.currency, valueInCents: value } : null,
+                  !isNil(value) && !isNaN(value)
+                    ? { currency: field.value?.currency ?? collective.currency, valueInCents: value }
+                    : null,
                 )
               }
               onBlur={() => form.setFieldTouched(field.name, true)}
@@ -708,6 +710,7 @@ export const editTiersFieldsFragment = gql`
     type
     useStandalonePage
     singleTicket
+    invoiceTemplate
   }
 `;
 
@@ -783,21 +786,14 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
   const initialValues = React.useMemo(() => {
     if (isEditing) {
       return {
-        ...omit(tier, [
-          '__typename',
-          'endsAt',
-          'slug',
-          'legacyId',
-          'invoiceTemplate',
-          'customFields',
-          'availableQuantity',
-        ]),
+        ...omit(tier, ['__typename', 'endsAt', 'slug', 'legacyId', 'customFields', 'availableQuantity']),
         amount: omit(tier.amount, '__typename'),
         interval: getIntervalFromContributionFrequency(tier.frequency),
         goal: omit(tier.goal, '__typename'),
         minimumAmount: omit(tier.minimumAmount, '__typename'),
         description: tier.description || '',
         presets: tier.presets || [1000],
+        invoiceTemplate: tier.invoiceTemplate,
       };
     } else {
       return {

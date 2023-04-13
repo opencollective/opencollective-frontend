@@ -1,6 +1,9 @@
 import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
 import UnhostAccountModal from '../../components/host-dashboard/UnhostAccountModal';
 import { webpackCollective } from '../mocks/collectives';
+import ToastProvider from '../../components/ToastProvider';
+import { UserContext } from '../../components/UserProvider';
+import { loggedInUser } from '../mocks/loggedInUser';
 
 <Meta title="Host Dashboard/UnhostAccountModal" component={UnhostAccountModal} argTypes={{}} />
 
@@ -20,7 +23,9 @@ export const DefaultStory = props => <UnhostAccountModal {...props} />;
       },
     }}
   >
-    <UnhostAccountModal collective={webpackCollective} host={webpackCollective.host} />
+    <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+      <UnhostAccountModal collective={webpackCollective} host={webpackCollective.host} />
+    </UserContext.Provider>
   </Story>
 </Canvas>
 
@@ -36,9 +41,11 @@ export const DefaultStory = props => <UnhostAccountModal {...props} />;
       },
     }}
   >
-    <UnhostAccountModal
-      collective={{ ...webpackCollective, stats: { balance: { valueInCents: 1000, currency: 'USD' } } }}
-      host={webpackCollective.host}
-    />
+    <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+      <UnhostAccountModal
+        collective={{ ...webpackCollective, stats: { balance: { valueInCents: 1000, currency: 'USD' } } }}
+        host={webpackCollective.host}
+      />
+    </UserContext.Provider>
   </Story>
 </Canvas>

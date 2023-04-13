@@ -4,7 +4,7 @@ import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
-import { CollectiveType } from '../lib/constants/collectives';
+import { CollectiveType, IGNORED_TAGS } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
@@ -46,6 +46,12 @@ const oscHostApplicationPageQuery = gql`
         }
       }
     }
+    tagStats(host: { slug: "opensource" }, limit: 6) {
+      nodes {
+        id
+        tag
+      }
+    }
   }
 `;
 
@@ -72,6 +78,8 @@ const formValues = {
   collective: {
     name: '',
     slug: '',
+    description: '',
+    tags: [],
   },
   applicationData: {
     typeOfProject: null,
@@ -120,9 +128,10 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
   const collective = data?.account;
   const canApplyWithCollective = collective && collective.isAdmin && collective.type === CollectiveType.COLLECTIVE;
   const hasHost = collective && collective?.host?.id;
+  const popularTags = hostData?.tagStats.nodes.map(({ tag }) => tag).filter(tag => !IGNORED_TAGS.includes(tag));
 
   React.useEffect(() => {
-    if (collectiveSlug && collective && (!canApplyWithCollective || hasHost)) {
+    if (step === 'form' && collectiveSlug && collective && (!canApplyWithCollective || hasHost)) {
       addToast({
         type: TOAST_TYPE.ERROR,
         title: intl.formatMessage(messages['error.title']),
@@ -162,6 +171,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
                 typeOfProject: handle ? 'CODE' : null,
                 repositoryUrl: handle ? `https://github.com/${handle}` : '',
                 licenseSpdxId,
+                useGithubValidation: true,
               },
             });
           }}
@@ -180,6 +190,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
           loadingCollective={loadingCollective}
           canApplyWithCollective={canApplyWithCollective && !hasHost}
           refetchLoggedInUser={refetchLoggedInUser}
+          popularTags={popularTags}
         />
       )}
       {step === 'success' && <YourInitiativeIsNearlyThere />}

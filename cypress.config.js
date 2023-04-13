@@ -2,6 +2,7 @@
 const { defineConfig } = require('cypress');
 
 module.exports = defineConfig({
+  experimentalMemoryManagement: true,
   viewportWidth: 1200,
   viewportHeight: 1660,
   projectId: 'yt5kwm',
@@ -29,6 +30,14 @@ module.exports = defineConfig({
         if (browser.name === 'chrome') {
           launchOptions.args.push('--lang=en-US');
         }
+      });
+
+      on('task', {
+        // Allows to log messages from a test using `cy.task('log', 'message')`
+        log(...message) {
+          console.log(...message); // eslint-disable-line no-console
+          return null;
+        },
       });
 
       config.baseUrl = process.env.WEBSITE_URL || 'http://localhost:3000';

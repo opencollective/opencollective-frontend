@@ -35,7 +35,7 @@ const msg = defineMessages({
     defaultMessage: 'Who will receive the money for this expense?',
   },
   nameLabel: {
-    id: `ExpenseForm.inviteNameLabel`,
+    id: `ContactName`,
     defaultMessage: 'Contact name',
   },
   emailTitle: {

@@ -1,4 +1,3 @@
-import { TaxType } from '@opencollective/taxes';
 import { isEmpty, isNil, sumBy, uniq } from 'lodash';
 
 import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
@@ -7,8 +6,7 @@ import { Currency, PayPalSupportedCurrencies } from '../../../lib/constants/curr
 import expenseTypes from '../../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../../lib/constants/payout-method';
 
-import { validateTaxGST } from '../ExpenseGSTFormikFields';
-import { validateTaxVAT } from '../ExpenseVATFormikFields';
+import { validateTaxInput } from '../../taxes/TaxesFormikFields';
 
 export const checkRequiresAddress = values => {
   const collectiveTypesRequiringAddress = [CollectiveType.INDIVIDUAL, CollectiveType.USER, CollectiveType.ORGANIZATION];
@@ -52,17 +50,7 @@ export const validateExpenseTaxes = (intl, taxes) => {
   if (!enabledTaxes.length) {
     return null;
   } else {
-    const taxesErrors = enabledTaxes.map(tax => {
-      switch (tax.type) {
-        case TaxType.GST:
-          return validateTaxGST(intl, tax);
-        case TaxType.VAT:
-          return validateTaxVAT(intl, tax);
-        default:
-          return `Tax type ${tax.type} is not supported`; // No i18n because it's a developer error
-      }
-    });
-
+    const taxesErrors = enabledTaxes.map(tax => validateTaxInput(intl, tax));
     const hasErrors = taxesErrors.some(errors => !isEmpty(errors));
     return hasErrors ? taxesErrors : null;
   }
@@ -83,9 +71,8 @@ export const getSupportedCurrencies = (collective, payoutMethod) => {
 
   const isPayPal = payoutMethod?.type === PayoutMethodType.PAYPAL;
   if (isPayPal) {
-    return PayPalSupportedCurrencies.includes(collective?.currency)
-      ? uniq([collective?.currency, ...PayPalSupportedCurrencies])
-      : PayPalSupportedCurrencies;
+    const defaultCurrency = PayPalSupportedCurrencies.includes(collective?.currency) ? collective.currency : 'USD';
+    return uniq([defaultCurrency, ...PayPalSupportedCurrencies]);
   } else if (payoutMethod?.type === PayoutMethodType.OTHER) {
     return Currency.includes(collective?.currency) ? uniq([collective?.currency, ...Currency]) : Currency;
   } else {

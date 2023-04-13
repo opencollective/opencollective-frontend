@@ -81,10 +81,34 @@ describe('Accept financial contributions flow', () => {
     it('Successfully applies to a host', () => {
       cy.visit(`/${collectiveSlug}/accept-financial-contributions`);
       cy.getByDataCy('afc-picker-host-button').click();
-      cy.getByDataCy('afc-host-collective-card').should('have.length', 3);
+      cy.getByDataCy('afc-host-collective-card').should('have.length', 5);
       cy.get(':nth-child(2) > [data-cy="afc-host-collective-card"]').within(() => {
         cy.getByDataCy('afc-host-apply-button').click();
       });
+      cy.contains('BrusselsTogether is a platform for the new generation of associations transparent by design.');
+      cy.getByDataCy('host-apply-modal-next').click();
+      cy.getByDataCy('afc-host-submit-button').click();
+      cy.url().should('include', '/success');
+      cy.contains('You have applied to be hosted by BrusselsTogether ASBL');
+      cy.getByDataCy('afc-success-host-settings-link').should('not.exist');
+    });
+  });
+
+  describe('Apply to fiscal host - new flow', () => {
+    let collectiveSlug;
+
+    beforeEach(() => {
+      cy.login();
+      return cy.createHostedCollective({ type: 'COLLECTIVE' }).then(collective => {
+        collectiveSlug = collective.slug;
+      });
+    });
+    it('Successfully applies to a host', () => {
+      cy.visit(`/${collectiveSlug}/accept-financial-contributions/host?newFlow=true`);
+      cy.getByDataCy('brusselstogetherasbl-collective-card').within(() => {
+        cy.contains('Learn more').click({ force: true });
+      });
+
       cy.contains('BrusselsTogether is a platform for the new generation of associations transparent by design.');
       cy.getByDataCy('host-apply-modal-next').click();
       cy.getByDataCy('afc-host-submit-button').click();

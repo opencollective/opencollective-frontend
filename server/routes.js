@@ -5,11 +5,7 @@ const express = require('express');
 const proxy = require('express-http-proxy');
 const { template, trim } = require('lodash');
 
-const { sendMessage } = require('./email');
 const intl = require('./intl');
-const logger = require('./logger');
-const prependHttp = require('prepend-http');
-
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
 const maxAge = (maxAge = 60) => {
@@ -57,66 +53,31 @@ module.exports = (expressApp, nextApp) => {
 
   // NOTE: in production and staging environment, this is currently not used
   // we use Cloudflare workers to route the request directly to the API
-  app.use(
-    '/api',
-    proxy(baseApiUrl, {
-      parseReqBody: false,
-      proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
-        for (const key of ['oc-env', 'oc-secret', 'oc-application']) {
-          if (srcReq.headers[key]) {
-            proxyReqOpts.headers[key] = srcReq.headers[key];
+  if (process.env.API_PROXY === 'true') {
+    app.use(
+      '/api',
+      proxy(baseApiUrl, {
+        parseReqBody: false,
+        proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
+          for (const key of ['oc-env', 'oc-secret', 'oc-application']) {
+            if (srcReq.headers[key]) {
+              proxyReqOpts.headers[key] = srcReq.headers[key];
+            }
           }
-        }
-        proxyReqOpts.headers['oc-frontend-api-proxy'] = '1';
-        proxyReqOpts.headers['oc-frontend-ip'] = srcReq.ip;
-        proxyReqOpts.headers['X-Forwarded-For'] = srcReq.ip;
-        return proxyReqOpts;
-      },
-      proxyReqPathResolver: req => {
-        const [pathname, search] = req.url.split('?');
-        const searchParams = new URLSearchParams(search);
-        searchParams.set('api_key', process.env.API_KEY);
-        return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
-      },
-    }),
-  );
-
-  /**
-   * Contact Form
-   */
-  app.post('/contact/send-message', express.json(), async (req, res) => {
-    const body = req.body;
-
-    if (!(body && body.name && body.email && body.message)) {
-      res.status(400).send('All inputs required');
-    }
-
-    let additionalLink = '';
-    if (body.link) {
-      const bodyLink = prependHttp(body.link);
-      additionalLink = `Additional Link: <a href="${bodyLink}">${bodyLink}</a></br>`;
-    }
-
-    logger.info(`Contact From: ${body.name} <${body.email}>`);
-    logger.info(`Contact Subject: ${body.topic}`);
-    logger.info(`Contact Message: ${body.message}`);
-    if (additionalLink) {
-      logger.info(`Contact Link: ${additionalLink}`);
-    }
-
-    await sendMessage({
-      to: 'support@opencollective.freshdesk.com',
-      from: `${body.name} <${body.email}>`,
-      subject: `${body.topic}`,
-      html: `
-            ${body.message}
-            <br/>
-            ${additionalLink}
-        `,
-    });
-
-    res.status(200).send({ sent: true });
-  });
+          proxyReqOpts.headers['oc-frontend-api-proxy'] = '1';
+          proxyReqOpts.headers['oc-frontend-ip'] = srcReq.ip;
+          proxyReqOpts.headers['X-Forwarded-For'] = srcReq.ip;
+          return proxyReqOpts;
+        },
+        proxyReqPathResolver: req => {
+          const [pathname, search] = req.url.split('?');
+          const searchParams = new URLSearchParams(search);
+          searchParams.set('api_key', process.env.API_KEY);
+          return `${pathname.replace(/api/, '/')}?${searchParams.toString()}`;
+        },
+      }),
+    );
+  }
 
   /**
    * Prevent indexation from search engines

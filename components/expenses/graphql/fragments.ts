@@ -187,6 +187,11 @@ export const expensePageExpenseFieldsFragment = gql`
       id
       url
       name
+      info {
+        id
+        name
+        size
+      }
     }
     payee {
       id
@@ -384,6 +389,7 @@ export const expensePageExpenseFieldsFragment = gql`
       canMarkAsIncomplete
       canComment
       canUnschedulePayment
+      canVerifyDraftExpense
       approve {
         allowed
         reason
@@ -401,6 +407,60 @@ export const expensePageExpenseFieldsFragment = gql`
         slug
         name
         imageUrl
+      }
+      transaction {
+        id
+        amount {
+          valueInCents
+          currency
+        }
+        platformFee {
+          valueInCents
+          currency
+        }
+        hostFee {
+          valueInCents
+          currency
+        }
+        paymentProcessorFee {
+          valueInCents
+          currency
+        }
+        netAmount {
+          valueInCents
+          currency
+        }
+        taxAmount {
+          valueInCents
+          currency
+        }
+        taxInfo {
+          id
+          rate
+          type
+          percentage
+        }
+        fromAccount {
+          id
+          slug
+          name
+          ... on AccountWithHost {
+            hostFeePercent
+          }
+        }
+        toAccount {
+          id
+          slug
+          name
+          ... on AccountWithHost {
+            hostFeePercent
+          }
+        }
+        expense {
+          id
+          currency
+          amount
+        }
       }
     }
     recurringExpense {
@@ -429,6 +489,9 @@ export const expensesListFieldsFragment = gql`
     createdAt
     tags
     amount
+    comments {
+      totalCount
+    }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
       currency

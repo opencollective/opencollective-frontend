@@ -85,7 +85,7 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
   } else if (account.settings.disableCustomContributions && !isCrypto && !tier) {
     return { reason: CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
   } else if (
-    !account.host.supportedPaymentMethods?.length ||
+    (!isCrypto && !account.host.supportedPaymentMethods?.length) ||
     (tierHasFixedInterval(tier) && !canContributeRecurring(account, loggedInUser))
   ) {
     return {
