@@ -260,7 +260,7 @@ class ContributionFlowSuccess extends React.Component {
       return (
         <Flex justifyContent="center" py={[5, 6]}>
           <MessageBox type="warning" withIcon>
-            <FormattedMessage id="Order.NotFound" defaultMessage="This order doesn't exist" />
+            <FormattedMessage id="Order.NotFound" defaultMessage="This contribution doesn't exist" />
           </MessageBox>
         </Flex>
       );
