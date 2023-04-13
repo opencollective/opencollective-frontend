@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import dayjs from 'dayjs';
 import { Form, Formik, useFormikContext } from 'formik';
@@ -12,13 +13,14 @@ import { requireFields, verifyEmailPattern } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { CreatePendingContributionModalQuery, OrderPageQuery } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { i18nTaxType } from '../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../lib/policies';
 import { omitDeep } from '../../lib/utils';
 
 import CollectivePicker, { DefaultCollectiveLabel } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import { Flex } from '../Grid';
+import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
@@ -31,6 +33,7 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal
 import StyledSelect from '../StyledSelect';
 import StyledTextarea from '../StyledTextarea';
 import StyledTooltip from '../StyledTooltip';
+import { TaxesFormikFields } from '../taxes/TaxesFormikFields';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { TwoFactorAuthRequiredMessage } from '../TwoFactorAuthRequiredMessage';
@@ -46,6 +49,7 @@ const EDITABLE_FIELDS = [
   'memo',
   'ponumber',
   'paymentMethod',
+  'tax',
 ];
 
 const debouncedLazyQuery = debounce((searchFunc, variables) => {
@@ -217,8 +221,17 @@ const Field = styled(StyledInputFormikField).attrs({
   labelFontWeight: '700',
 })``;
 
+const getApplicableTaxType = (collective, host) => {
+  if (accountHasVAT(collective, host)) {
+    return TaxType.VAT;
+  } else if (accountHasGST(host || collective)) {
+    return TaxType.GST;
+  }
+};
+
 const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePendingContributionFormProps) => {
-  const { values, isSubmitting, setFieldValue } = useFormikContext<any>();
+  const formik = useFormikContext<any>();
+  const { values, isSubmitting, setFieldValue } = formik;
   const intl = useIntl();
 
   const [getCollectiveInfo, { data, loading: collectiveLoading }] = useLazyQuery(
@@ -245,6 +258,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const childAccount = values.childAccount?.id && childrenOptions.find(option => option.id === values.childAccount?.id);
   const canAddHostFee = host?.plan?.hostFees;
   const hostFeePercent = host.hostFeePercent;
+  const applicableTax = getApplicableTaxType(collective, host);
   const tiersOptions = childAccount
     ? getTiersOptions(intl, childAccount?.tiers?.nodes || [])
     : getTiersOptions(intl, collective?.tiers?.nodes || []);
@@ -301,7 +315,10 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     { value: 'CHECK', label: intl.formatMessage({ id: 'PaymentMethod.Check', defaultMessage: 'Check' }) },
   ];
 
-  const hostFee = values.amount?.valueInCents && Math.round(values.amount.valueInCents * (values.hostFeePercent / 100));
+  const amountInCents = values.amount?.valueInCents || 0;
+  const taxAmount = !values.tax?.rate ? 0 : Math.round(amountInCents - amountInCents / (1 + values.tax.rate));
+  const grossAmount = amountInCents - taxAmount;
+  const hostFee = Math.round(grossAmount * (values.hostFeePercent / 100));
 
   return (
     <Form data-cy="create-pending-contribution-form">
@@ -323,7 +340,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               onBlur={() => form.setFieldTouched(field.name, true)}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               collective={field.value}
-              disabled={edit}
+              disabled={Boolean(edit)}
             />
           )}
         </Field>
@@ -525,6 +542,24 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
             </Field>
           )}
         </Flex>
+        {applicableTax && (
+          <Box mt={3}>
+            <TaxesFormikFields
+              taxType={applicableTax}
+              formik={formik}
+              formikValuePath="tax"
+              isOptional
+              dispatchDefaultValueOnMount={false}
+              labelProps={{ fontSize: '16px', fontWeight: '700' }}
+              idNumberLabelRenderer={shortTaxTypeLabel =>
+                intl.formatMessage(
+                  { defaultMessage: "Contributor's {taxName} identifier" },
+                  { taxName: shortTaxTypeLabel },
+                )
+              }
+            />
+          </Box>
+        )}
         <Field
           name="expectedAt"
           htmlFor="CreatePendingContribution-expectedAt"
@@ -596,8 +631,29 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           currency={currency}
           label={<FormattedMessage id="AddFundsModal.fundingAmount" defaultMessage="Funding amount" />}
         />
+        {Boolean(values.tax?.rate) && (
+          <React.Fragment>
+            <AmountDetailsLine
+              value={-taxAmount}
+              currency={currency}
+              label={`${i18nTaxType(intl, values.tax.type, 'long')} (${Math.round(values.tax.rate * 100)}%)`}
+            />
+            <StyledHr my={1} borderColor="black.200" />
+            <AmountDetailsLine
+              value={grossAmount}
+              currency={currency}
+              label={
+                <FormattedMessage
+                  defaultMessage="Gross amount without {taxName}"
+                  values={{ taxName: i18nTaxType(intl, values.tax.type, 'short') }}
+                />
+              }
+            />
+            {canAddHostFee && <StyledHr my={1} borderColor="black.200" />}
+          </React.Fragment>
+        )}
         <AmountDetailsLine
-          value={hostFee || 0}
+          value={-hostFee || 0}
           currency={currency}
           label={
             <FormattedMessage
@@ -609,7 +665,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         />
         <StyledHr my={2} borderColor="black.300" />
         <AmountDetailsLine
-          value={values.amount?.valueInCents - hostFee || 0}
+          value={grossAmount - hostFee}
           currency={currency}
           label={<FormattedMessage id="AddFundsModal.netAmount" defaultMessage="Net amount received by collective" />}
           isLargeAmount
@@ -701,6 +757,7 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
           enableReinitialize={true}
           validate={validate}
           onSubmit={async values => {
+            const amountWithoutTax = Math.round(values.amount.valueInCents / (1 + (values.tax?.rate || 0)));
             if (edit) {
               const order = omitDeep(
                 {
@@ -709,6 +766,7 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
                   fromAccount: buildAccountReference(values.fromAccount),
                   tier: !values.tier ? null : { id: values.tier.id },
                   expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
+                  amount: { ...values.amount, valueInCents: amountWithoutTax },
                 },
                 ['__typename'],
               );
@@ -734,6 +792,7 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
                 childAccount: undefined,
                 tier: !values.tier ? null : { id: values.tier.id },
                 expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
+                amount: { ...values.amount, valueInCents: amountWithoutTax },
               };
 
               const result = await createPendingOrder({ variables: { order } });
