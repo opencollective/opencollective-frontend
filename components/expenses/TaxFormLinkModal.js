@@ -52,7 +52,7 @@ const TaxFormLinkModal = ({ account, year, onClose, expenseData }) => {
           <FormattedMessage
             defaultMessage="Please upload the tax form to the <Link>Google Drive Folder</Link>. Copy the link to the file and paste it in the field below."
             values={{
-              linkToTaxFormsFolder: getI18nLink({
+              Link: getI18nLink({
                 href: 'https://drive.google.com/drive/folders/1ga_-6tBTqADvngRr9nbxRKf7yoSne1n1?usp=share_link',
                 openInNewTab: true,
               }),
