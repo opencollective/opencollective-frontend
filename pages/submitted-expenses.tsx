@@ -149,6 +149,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
 
   render() {
     const { collectiveSlug, data, query } = this.props;
+    const searchTerm = Array.isArray(query.searchTerm) ? query.searchTerm[0] : query.searchTerm;
     const hasFilters = this.hasFilter(query);
     const pageUrl = `${getCollectivePageCanonicalURL(data.account)}/submitted-expenses`;
 
@@ -181,7 +182,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
                   <Box mx="auto" />
                   <SearchFormContainer p={2}>
                     <SearchBar
-                      defaultValue={query.searchTerm}
+                      defaultValue={searchTerm}
                       onSubmit={searchTerm => this.handleSearch(searchTerm, data.account)}
                       placeholder={undefined}
                     />

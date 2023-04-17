@@ -7,7 +7,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getCollectivePageMetadata, shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
@@ -71,7 +71,11 @@ class ConversationsPage extends React.Component {
   getPageMetaData(collective) {
     const baseMetadata = getCollectivePageMetadata(collective);
     if (collective) {
-      return { ...baseMetadata, title: `${collective.name}'s conversations` };
+      return {
+        ...baseMetadata,
+        title: `${collective.name}'s conversations`,
+        noRobots: !shouldIndexAccountOnSearchEngines(collective),
+      };
     } else {
       return { ...baseMetadata, title: 'Conversations' };
     }

@@ -198,7 +198,7 @@ const ExpenseBudgetItem = ({
                         ),
                       }}
                     />
-                    {Boolean(expense?.comments.totalCount) && (
+                    {Boolean(expense?.comments?.totalCount) && (
                       <React.Fragment>
                         {' • '}
                         {expense?.comments.totalCount}

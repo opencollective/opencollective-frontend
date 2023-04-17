@@ -16,10 +16,10 @@ describe('New organization profile', () => {
     });
   });
 
-  it('Should not have no-index meta', () => {
+  it('Should have no-index meta if no activity', () => {
     // Wait for page to be loaded
     cy.getByDataCy('collective-title');
-    cy.get('meta[name="robots"]').should('not.exist');
+    cy.get('meta[name="robots"]').should('exist');
   });
 
   it('Has a team section', () => {
@@ -35,6 +35,7 @@ describe('New organization profile', () => {
     it('Can filter by expense/contributions', () => {
       cy.visit('/idonethis');
       scrollToSection('transactions');
+      cy.get('meta[name="robots"]').should('not.exist'); // Should not have it since there's soe financial activity
 
       // Filter for expenses
       cy.get('button[data-cy="filter-button expenses"]').click();

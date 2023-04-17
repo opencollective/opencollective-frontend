@@ -95,7 +95,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
       await confirmOrder({ variables: { order: orderUpdate, action: 'MARK_AS_PAID' } });
       addToast({
         type: TOAST_TYPE.SUCCESS,
-        message: intl.formatMessage({ defaultMessage: 'Order confirmed successfully' }),
+        message: intl.formatMessage({ defaultMessage: 'Contribution confirmed successfully' }),
       });
       onSuccess?.();
       onClose();

@@ -1,4 +1,3 @@
-import React from 'react';
 import styledPropTypes from '@styled-system/prop-types';
 import styled from 'styled-components';
 import {
@@ -31,8 +30,7 @@ type StyledCardProps = BackgroundProps &
   SpaceProps &
   TypographyProps &
   ShadowProps &
-  ColorProps &
-  React.HTMLProps<HTMLDivElement>;
+  ColorProps;
 
 /**
  * A simple styled-component to contain content in a card UI using styled-system.

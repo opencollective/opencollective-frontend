@@ -23,3 +23,12 @@ export const DefaultStory = props => {
 <Story name="Default">{DefaultStory.bind({})}</Story>
 
 <ArgsTable story="Default" />
+
+## MultiSelect
+
+export const MultiSelectStory = props => {
+  const [selected, setSelected] = React.useState([]);
+  return <StyledFilters {...props} selected={selected} onChange={setSelected} />;
+};
+
+<Story name="MultiSelect">{MultiSelectStory.bind({})}</Story>

@@ -298,7 +298,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const paymentMethodOptions = [
     { value: 'UNKNOWN', label: intl.formatMessage({ id: 'Unknown', defaultMessage: 'Unknown' }) },
     { value: 'BANK_TRANSFER', label: intl.formatMessage({ defaultMessage: 'Bank Transfer' }) },
-    { value: 'CHECK', label: intl.formatMessage({ id: 'Check', defaultMessage: 'Check' }) },
+    { value: 'CHECK', label: intl.formatMessage({ id: 'PaymentMethod.Check', defaultMessage: 'Check' }) },
   ];
 
   const hostFee = values.amount?.valueInCents && Math.round(values.amount.valueInCents * (values.hostFeePercent / 100));
@@ -309,7 +309,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         <Field
           name="toAccount"
           htmlFor="CreatePendingContribution-toAccount"
-          label={<FormattedMessage defaultMessage="Create pending order for:" />}
+          label={<FormattedMessage defaultMessage="Create pending contribution for:" />}
           labelFontSize="16px"
           labelFontWeight="700"
         >
@@ -346,7 +346,9 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
                 onChange={({ value }) => form.setFieldValue(field.name, value ? { id: value?.id } : null)}
                 isLoading={collectiveLoading}
                 collectives={childrenOptions}
-                customOptions={[{ value: null, label: intl.formatMessage({ defaultMessage: 'None' }) }]}
+                customOptions={[
+                  { value: null, label: intl.formatMessage({ id: 'Account.None', defaultMessage: 'None' }) },
+                ]}
                 isSearchable={childrenOptions.length > 10}
                 collective={childAccount}
                 disabled={!values.toAccount}
@@ -440,7 +442,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           label={<FormattedMessage id="Fields.PONumber" defaultMessage="PO Number" />}
           mt={3}
           hint={
-            <FormattedMessage defaultMessage="External reference code for this order. This is usually a reference number from the contributor accounting system." />
+            <FormattedMessage defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system." />
           }
           required={false}
         >
@@ -717,7 +719,7 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
                 type: TOAST_TYPE.SUCCESS,
                 message: (
                   <FormattedMessage
-                    defaultMessage="Pending order #{orderId} updated"
+                    defaultMessage="Pending contribution #{orderId} updated"
                     values={{ orderId: result.data.editPendingOrder.legacyId }}
                   />
                 ),
@@ -740,7 +742,7 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
                 type: TOAST_TYPE.SUCCESS,
                 message: (
                   <FormattedMessage
-                    defaultMessage="Pending order created with reference #{orderId}"
+                    defaultMessage="Pending contribution created with reference #{orderId}"
                     values={{ orderId: result.data.createPendingOrder.legacyId }}
                   />
                 ),

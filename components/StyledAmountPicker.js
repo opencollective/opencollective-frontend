@@ -12,13 +12,13 @@ import StyledButtonSet from './StyledButtonSet';
 const getButtonDisplay = (index, options, isSelected) => {
   if (index === 0 || index === options.length - 1 || isSelected) {
     // Ensure first, last and selected values are always displayed
-    return 'block';
+    return 'inline-block';
   } else if (index < 2) {
     // Limit to 4 on medium screens
-    return ['none', 'block'];
+    return ['none', 'inline-block'];
   } else if (index < 4) {
     // Limit to 3 on small screens
-    return ['none', null, 'block'];
+    return ['none', null, 'inline-block'];
   } else {
     // Never show more than 5 options
     return 'none';

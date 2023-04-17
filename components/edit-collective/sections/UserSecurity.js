@@ -110,7 +110,8 @@ class UserSecurity extends React.Component {
     super(props);
     this.state = {
       error: null,
-      disablingTwoFactorAuth: false,
+      isDisablingTwoFactorAuth: false,
+      isDisablingTwoFactorAuthLoading: false,
       disableError: null,
       recoveryCodes: null,
       enablingTwoFactorAuth: false,
@@ -193,24 +194,28 @@ class UserSecurity extends React.Component {
     }
   }
 
-  async disableTwoFactorAuth(values) {
+  async disableTwoFactorAuth() {
     try {
-      const { twoFactorAuthenticatorCode } = values;
       const account = {
         id: this.props.data.individual.id,
       };
 
+      this.setState({ isDisablingTwoFactorAuthLoading: true, error: null });
+
       await this.props.removeTwoFactorAuthTokenFromIndividual({
         variables: {
           account,
-          code: twoFactorAuthenticatorCode,
         },
       });
       this.props.refetchLoggedInUser(); // No need to await
-      this.setState({ disablingTwoFactorAuth: false, error: null });
+      this.setState({ isDisablingTwoFactorAuth: false, isDisablingTwoFactorAuthLoading: false, error: null });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err).message;
-      this.setState({ disableError: errorMsg });
+      this.setState({
+        disableError: errorMsg,
+        isDisablingTwoFactorAuth: false,
+        isDisablingTwoFactorAuthLoading: false,
+      });
     }
   }
 
@@ -391,10 +396,11 @@ class UserSecurity extends React.Component {
       secret,
       base32,
       otpAuthUrl,
-      disablingTwoFactorAuth,
       enablingTwoFactorAuth,
       recoveryCodes,
       showRecoveryCodesModal,
+      isDisablingTwoFactorAuth,
+      isDisablingTwoFactorAuthLoading,
     } = this.state;
 
     const { loading } = data;
@@ -407,10 +413,6 @@ class UserSecurity extends React.Component {
     const doesAccountAlreadyHave2FA = get(account, 'hasTwoFactorAuth', false);
 
     const initialSetupFormValues = {
-      twoFactorAuthenticatorCode: '',
-    };
-
-    const initialDisableFormValues = {
       twoFactorAuthenticatorCode: '',
     };
 
@@ -475,87 +477,52 @@ class UserSecurity extends React.Component {
                   my={1}
                   minWidth={140}
                   buttonStyle={'danger'}
-                  onClick={() => this.setState({ disablingTwoFactorAuth: true })}
+                  onClick={() => this.setState({ isDisablingTwoFactorAuth: true })}
                 >
                   <FormattedMessage id="TwoFactorAuth.Disable.Button" defaultMessage="Disable 2FA" />
                 </StyledButton>
-                {disablingTwoFactorAuth && (
-                  <Formik
-                    validate={validate}
-                    initialValues={initialDisableFormValues}
-                    onSubmit={this.disableTwoFactorAuth}
-                  >
-                    {formik => {
-                      const { values, errors, touched, handleSubmit, isSubmitting } = formik;
-
-                      return (
-                        <StyledModal width="570px" onClose={() => this.setState({ disablingTwoFactorAuth: false })}>
-                          <ModalHeader>
-                            <FormattedMessage
-                              id="TwoFactorAuth.Disable.Header"
-                              defaultMessage="Are you sure you want to remove two-factor authentication from your account?"
-                            />
-                          </ModalHeader>
-                          <ModalBody>
-                            <MessageBox type="warning" withIcon my={3}>
-                              <FormattedMessage
-                                id="TwoFactorAuth.Disable.Warning"
-                                defaultMessage="Removing 2FA from your account can make it less secure."
-                              />
-                            </MessageBox>
-                            {disableError && (
-                              <MessageBox type="error" withIcon mb={3}>
-                                {disableError}
-                              </MessageBox>
-                            )}
-                            <P>
-                              <FormattedMessage
-                                id="TwoFactorAuth.Disable.Info"
-                                defaultMessage="If you would like to remove 2FA from your account, you will need to enter the code from your authenticator app one more time."
-                              />
-                            </P>
-                            <Form>
-                              <StyledInputField
-                                name="twoFactorAuthenticatorCode"
-                                htmlFor="twoFactorAuthenticatorCode"
-                                error={touched.twoFactorAuthenticatorCode && errors.twoFactorAuthenticatorCode}
-                                label={intl.formatMessage(messages.inputLabel)}
-                                value={values.twoFactorAuthenticatorCode}
-                                required
-                                mt={2}
-                                mb={3}
-                              >
-                                {inputProps => (
-                                  <Field
-                                    as={StyledInput}
-                                    {...inputProps}
-                                    width={240}
-                                    minHeight={75}
-                                    fontSize="20px"
-                                    autoComplete="off"
-                                    placeholder="123456"
-                                    pattern="[0-9]{6}"
-                                    inputMode="numeric"
-                                    autoFocus
-                                  />
-                                )}
-                              </StyledInputField>
-                            </Form>
-                          </ModalBody>
-                          <ModalFooter>
-                            <Container display="flex" justifyContent="flex-end">
-                              <StyledButton mx={20} onClick={() => this.setState({ disablingTwoFactorAuth: false })}>
-                                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-                              </StyledButton>
-                              <StyledButton buttonStyle="danger" loading={isSubmitting} onClick={handleSubmit}>
-                                <FormattedMessage id="actions.continue" defaultMessage="Continue" />
-                              </StyledButton>
-                            </Container>
-                          </ModalFooter>
-                        </StyledModal>
-                      );
-                    }}
-                  </Formik>
+                {isDisablingTwoFactorAuth && (
+                  <StyledModal width="570px" onClose={() => this.setState({ isDisablingTwoFactorAuth: false })}>
+                    <ModalHeader>
+                      <FormattedMessage
+                        id="TwoFactorAuth.Disable.Header"
+                        defaultMessage="Are you sure you want to remove two-factor authentication from your account?"
+                      />
+                    </ModalHeader>
+                    <ModalBody>
+                      <MessageBox type="warning" withIcon my={3}>
+                        <FormattedMessage
+                          id="TwoFactorAuth.Disable.Warning"
+                          defaultMessage="Removing 2FA from your account can make it less secure."
+                        />
+                      </MessageBox>
+                      {disableError && (
+                        <MessageBox type="error" withIcon mb={3}>
+                          {disableError}
+                        </MessageBox>
+                      )}
+                      <P>
+                        <FormattedMessage
+                          id="TwoFactorAuth.Disable.Info"
+                          defaultMessage="If you would like to remove 2FA from your account, you will need to enter the code from your authenticator app one more time."
+                        />
+                      </P>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Container display="flex" justifyContent="flex-end">
+                        <StyledButton mx={20} onClick={() => this.setState({ isDisablingTwoFactorAuth: false })}>
+                          <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+                        </StyledButton>
+                        <StyledButton
+                          buttonStyle="danger"
+                          loading={isDisablingTwoFactorAuthLoading}
+                          onClick={this.disableTwoFactorAuth}
+                        >
+                          <FormattedMessage id="actions.continue" defaultMessage="Continue" />
+                        </StyledButton>
+                      </Container>
+                    </ModalFooter>
+                  </StyledModal>
                 )}
               </Container>
             </Fragment>
@@ -789,8 +756,8 @@ const addTwoFactorAuthToIndividualMutation = gql`
 `;
 
 const removeTwoFactorAuthFromIndividualMutation = gql`
-  mutation RemoveTwoFactorAuthFromIndividual($account: AccountReferenceInput!, $code: String!) {
-    removeTwoFactorAuthTokenFromIndividual(account: $account, code: $code) {
+  mutation RemoveTwoFactorAuthFromIndividual($account: AccountReferenceInput!) {
+    removeTwoFactorAuthTokenFromIndividual(account: $account) {
       id
       hasTwoFactorAuth
     }

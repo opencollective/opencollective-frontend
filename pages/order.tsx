@@ -408,7 +408,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                   textTransform="uppercase"
                   closeButtonProps={undefined}
                 >
-                  <FormattedMessage id="Order" defaultMessage="Order" /> #{order.legacyId}
+                  <FormattedMessage defaultMessage="Contribution" /> #{order.legacyId}
                 </StyledTag>
                 <Tags order={order} canEdit />
               </Flex>
@@ -430,7 +430,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                   <OrderDetails>
                     <StyledTooltip
                       content={
-                        <FormattedMessage defaultMessage="External reference code for this order. This is usually a reference number from the contributor accounting system." />
+                        <FormattedMessage defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system." />
                       }
                       containerCursor="default"
                     >
@@ -524,6 +524,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
 
                       <FormattedMessage defaultMessage="Payment Fees not Considered" />
                       <FormattedMessage
+                        id="contribution.createdAt"
                         defaultMessage="Created on {date}"
                         values={{
                           date: <DateTime value={order.createdAt} dateStyle={'medium'} timeStyle="short" />,

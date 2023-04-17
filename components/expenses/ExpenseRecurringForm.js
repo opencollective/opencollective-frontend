@@ -31,7 +31,7 @@ const ExpenseRecurringForm = ({ recurring, onChange }) => {
         <FormattedMessage id="Expense.Summary.Recurring.CheckboxTitle" defaultMessage="Is this a recurring expense?" />
       </P>
 
-      <P mt={2}>
+      <Box mt={2}>
         <StyledCheckbox
           name="tos"
           label={
@@ -47,7 +47,7 @@ const ExpenseRecurringForm = ({ recurring, onChange }) => {
           checked={isRecurring}
           onChange={({ checked }) => handleSetRecurring(checked)}
         />
-      </P>
+      </Box>
 
       {isRecurring && (
         <Flex flexDirection={['column', 'row']} mt={2}>

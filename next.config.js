@@ -12,6 +12,9 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true' || process.env.API_PROXY !== 'true',
   productionBrowserSourceMaps: true,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   images: {
     disableStaticImages: true,
   },

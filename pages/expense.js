@@ -38,6 +38,7 @@ import {
 } from '../components/expenses/graphql/fragments';
 import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollectiveInfoStickyBar';
 import PrivateCommentsMessage from '../components/expenses/PrivateCommentsMessage';
+import TaxFormLinkModal from '../components/expenses/TaxFormLinkModal';
 import { Box, Flex } from '../components/Grid';
 import HTMLContent from '../components/HTMLContent';
 import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
@@ -208,6 +209,7 @@ class ExpensePage extends React.Component {
       tos: false,
       newsletterOptIn: false,
       createdUser: null,
+      showTaxLinkModal: false,
     };
 
     this.pollingInterval = 60;
@@ -544,17 +546,30 @@ class ExpensePage extends React.Component {
             )}
             {showTaxFormMsg && (
               <MessageBox type="warning" withIcon={true} mb={4}>
-                <FormattedMessage
-                  id="expenseNeedsTaxFormMessage.msg"
-                  defaultMessage="We need your tax information before we can pay you. You will receive an email with a link to fill out a form. If you have not received the email within 24 hours, check your spam, then contact <I18nSupportLink>support</I18nSupportLink>. Questions? See <Link>help docs about taxes</Link>."
-                  values={{
-                    I18nSupportLink,
-                    Link: getI18nLink({
-                      href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/tax-information',
-                      openInNewTab: true,
-                    }),
-                  }}
-                />
+                <Container>
+                  <FormattedMessage
+                    id="expenseNeedsTaxFormMessage.msg"
+                    defaultMessage="We need your tax information before we can pay you. You will receive an email with a link to fill out a form. If you have not received the email within 24 hours, check your spam, then contact <I18nSupportLink>support</I18nSupportLink>. Questions? See <Link>help docs about taxes</Link>."
+                    values={{
+                      I18nSupportLink,
+                      Link: getI18nLink({
+                        href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/tax-information',
+                        openInNewTab: true,
+                      }),
+                    }}
+                  />
+                </Container>
+                {LoggedInUser?.isRoot && (
+                  <Container pt={3} textAlign="right">
+                    <StyledButton
+                      buttonStyle="secondary"
+                      buttonSize="tiny"
+                      onClick={() => this.setState({ showTaxLinkModal: true })}
+                    >
+                      <FormattedMessage defaultMessage="Add tax form" />
+                    </StyledButton>
+                  </Container>
+                )}
               </MessageBox>
             )}
             {status === PAGE_STATUS.VIEW &&
@@ -784,6 +799,14 @@ class ExpensePage extends React.Component {
           collective={collective}
           host={host}
         />
+        {this.state.showTaxLinkModal && (
+          <TaxFormLinkModal
+            account={expense.payee}
+            year={new Date(expense.createdAt).getFullYear()}
+            onClose={() => this.setState({ showTaxLinkModal: false })}
+            expenseData={data}
+          />
+        )}
       </Page>
     );
   }
