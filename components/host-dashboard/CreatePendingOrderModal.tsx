@@ -525,7 +525,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
                   </StyledTooltip>
                 </span>
               }
-              ml={3}
+              ml="8px"
               required={false}
             >
               {({ form, field }) => (
