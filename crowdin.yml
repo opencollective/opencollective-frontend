@@ -6,6 +6,8 @@ files:
       - '*.test.html'
       - '*.??.html'
       - '*.??-??.html'
+      - /public/static
+      - '*.ach-UG.html'
     translation: /%original_path%/%file_name%.%locale%.html
 commit_message: 'i18n(%language%): update %original_file_name%'
-append_commit_message: false
+append_commit_message: 

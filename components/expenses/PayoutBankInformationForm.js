@@ -7,6 +7,8 @@ import { get, kebabCase, partition, set } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
+import { createError, ERROR } from '../../lib/errors';
+import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
@@ -48,6 +50,8 @@ const requiredFieldsQuery = gql`
               type
               required
               example
+              minLength
+              maxLength
               validationRegexp
               refreshRequirementsOnChange
               valuesAllowed {
@@ -78,19 +82,28 @@ const CUSTOM_METHOD_LABEL_BY_CURRENCY = {
 };
 
 const Input = ({ input, getFieldName, disabled, currency, loading, refetch, formik, host }) => {
+  const intl = useIntl();
   const isAccountHolderName = input.key === 'accountHolderName';
   const fieldName = isAccountHolderName ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
   const required = disabled ? false : input.required;
   let validate = required ? value => (value ? undefined : `${input.name} is required`) : undefined;
   if (input.type === 'text') {
-    if (input.validationRegexp) {
+    if (input.validationRegexp || input.minLength || input.maxLength) {
       validate = value => {
-        const matches = new RegExp(input.validationRegexp).test(value);
-        // TODO(intl): This should be internationalized, ideally with `formatFormErrorMessage`
         if (!value && required) {
-          return `${input.name} is required`;
-        } else if (!matches && value) {
-          return input.validationError || `Invalid ${input.name}`;
+          return formatFormErrorMessage(intl, createError(ERROR.FORM_FIELD_REQUIRED));
+        }
+        if (input.validationRegexp) {
+          const matches = new RegExp(input.validationRegexp).test(value);
+          if (!matches && value) {
+            return input.validationError || formatFormErrorMessage(intl, createError(ERROR.FORM_FIELD_PATTERN));
+          }
+        }
+        if (value && input.minLength && value.length < input.minLength) {
+          return input.validationError || formatFormErrorMessage(intl, createError(ERROR.FORM_FIELD_MIN_LENGTH));
+        }
+        if (value && input.maxLength && value.length > input.maxLength) {
+          return input.validationError || formatFormErrorMessage(intl, createError(ERROR.FORM_FIELD_MAX_LENGTH));
         }
       };
     }
@@ -116,6 +129,8 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
                       error={(meta.touched || disabled) && meta.error}
                       disabled={disabled}
                       width="100%"
+                      maxLength={input.maxLength}
+                      minLength={input.minLength}
                       value={inputValue || ''}
                     />
                     {isAccountHolderName && inputValue && inputValue.match(/^[^\s]{1}\b/) && (
