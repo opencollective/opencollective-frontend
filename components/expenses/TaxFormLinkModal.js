@@ -29,7 +29,7 @@ const setTaxFormMutation = gql`
 `;
 
 const arrayOfYears = () => {
-  return range(2018, new Date().getFullYear());
+  return range(2018, new Date().getFullYear() + 1);
 };
 
 const TaxFormLinkModal = ({ account, year, onClose, expenseData }) => {
