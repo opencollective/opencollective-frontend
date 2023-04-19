@@ -6,6 +6,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { OrderUpdateInput } from '../lib/graphql/types/v2/graphql';
+import { i18nTaxType } from '../lib/i18n/taxes';
 import { getCurrentDateInUTC } from '../lib/utils';
 
 import Container from './Container';
@@ -18,8 +20,36 @@ import StyledInputAmount from './StyledInputAmount';
 import StyledInputPercentage from './StyledInputPercentage';
 import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from './StyledModal';
 import StyledTooltip from './StyledTooltip';
-import { P, Span } from './Text';
+import { Label, P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
+
+export const confirmContributionFieldsFragment = gql`
+  fragment ConfirmContributionFields on Order {
+    id
+    hostFeePercent
+    totalAmount {
+      valueInCents
+      currency
+    }
+    amount {
+      currency
+      valueInCents
+    }
+    taxAmount {
+      currency
+      valueInCents
+    }
+    tax {
+      id
+      type
+      rate
+    }
+    platformTipAmount {
+      currency
+      valueInCents
+    }
+  }
+`;
 
 const confirmContributionMutation = gql`
   mutation ConfirmContribution($order: OrderUpdateInput!, $action: ProcessOrderAction!) {
@@ -31,20 +61,15 @@ const confirmContributionMutation = gql`
         canMarkAsPaid
         canMarkAsExpired
       }
-      amount {
-        currency
-        valueInCents
-      }
-      platformTipAmount {
-        currency
-        valueInCents
-      }
+      ...ConfirmContributionFields
     }
   }
+  ${confirmContributionFieldsFragment}
 `;
 
 const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
-  const defaultHostFeePercent = order.hostFeePercent || order.toAccount.bankTransfersHostFeePercent;
+  const defaultHostFeePercent = order.hostFeePercent || order.toAccount.bankTransfersHostFeePercent || 0;
+  const defaultTaxPercent = order.tax?.rate * 100 || 0;
   const platformTipAmount = order.platformTipAmount?.valueInCents || 0;
   const amountInitiated = order.amount.valueInCents + platformTipAmount;
   const currency = order.amount.currency;
@@ -52,22 +77,24 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
   const [platformTip, setPlatformTip] = useState(platformTipAmount);
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
   const [hostFeePercent, setHostFeePercent] = useState(defaultHostFeePercent);
+  const [taxPercent, setTaxPercent] = useState(defaultTaxPercent);
   const [processedAt, setProcessedAt] = useState(getCurrentDateInUTC());
   const intl = useIntl();
   const { addToast } = useToasts();
-  const [confirmOrder, { loading }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
+  const [confirmOrder, { loading: submitting }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
   const amount = amountReceived - platformTip;
-  const hostFee = Math.round(amount * hostFeePercent) / 100;
-  const netAmount = amount - paymentProcessorFee - hostFee;
+  const taxAmount = Math.round(amount * taxPercent) / 100;
+  const hostFee = Math.round((amount - taxAmount) * hostFeePercent) / 100;
+  const netAmount = amount - paymentProcessorFee - hostFee - taxAmount;
   const canAddHostFee = !order.toAccount.isHost;
 
   const triggerAction = async () => {
     // Prevent submitting the action if another one is being submitted at the same time
-    if (loading) {
+    if (submitting) {
       return;
     }
 
-    const orderUpdate = {
+    const orderUpdate: OrderUpdateInput = {
       id: order.id,
     };
 
@@ -85,6 +112,10 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
 
     if (defaultHostFeePercent !== hostFeePercent) {
       orderUpdate.hostFeePercent = hostFeePercent;
+    }
+
+    if (defaultTaxPercent !== taxPercent) {
+      orderUpdate.tax = { ...order.tax, rate: taxPercent / 100 };
     }
 
     if (processedAt) {
@@ -125,23 +156,19 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
               />
             </Span>
             <Box fontSize="16px" lineHeight="24px" fontWeight="700" mt={['8px', 0]}>
-              <FormattedMoneyAmount
-                width="142px"
-                amount={amountInitiated}
-                currency={currency}
-                precision={2}
-                amountStyles={null}
-              />
+              <FormattedMoneyAmount amount={amountInitiated} currency={currency} precision={2} amountStyles={null} />
             </Box>
           </Flex>
         </Container>
         <StyledHr borderStyle="solid" mt="16px" mb="16px" />
         <Container>
           <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
-            <Span fontSize="14px" lineHeight="20px" fontWeight="400">
+            <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-amountReceived">
               <FormattedMessage defaultMessage="Amount received" />
-            </Span>
+            </Label>
+            {/* @ts-ignore StyledInputAmount not typed yet */}
             <StyledInputAmount
+              id="confirmContribution-amountReceived"
               name="amountReceived"
               data-cy="amount-received"
               width="142px"
@@ -154,10 +181,12 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
         <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
         <Container>
           <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
-            <Span fontSize="14px" lineHeight="20px" fontWeight="400">
+            <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-processorFee">
               <FormattedMessage id="contribution.paymentFee" defaultMessage="Payment processor fee" />
-            </Span>
+            </Label>
+            {/* @ts-ignore StyledInputAmount not typed yet */}
             <StyledInputAmount
+              id="confirmContribution-processorFee"
               name="paymentProcessorFee"
               data-cy="payment-processor-fee"
               width="142px"
@@ -170,10 +199,12 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
         <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
         <Container>
           <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
-            <Span fontSize="14px" lineHeight="20px" fontWeight="400">
+            <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-platformTip">
               <FormattedMessage defaultMessage="Platform tip amount" />
-            </Span>
+            </Label>
+            {/* @ts-ignore StyledInputAmount not typed yet */}
             <StyledInputAmount
+              id="confirmContribution-platformTip"
               name="platformTip"
               data-cy="platform-tip"
               width="142px"
@@ -183,15 +214,38 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
             />
           </Flex>
         </Container>
+        {Boolean(order.taxAmount) && (
+          <Fragment>
+            <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
+            <Container>
+              <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
+                <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-taxRate">
+                  <FormattedMessage
+                    defaultMessage="{taxName} rate"
+                    values={{ taxName: i18nTaxType(intl, order.tax.type, 'full') }}
+                  />
+                </Label>
+                <StyledInputPercentage
+                  id="confirmContribution-taxRate"
+                  name="tax.rate"
+                  data-cy="host-fee-percent"
+                  value={taxPercent}
+                  onChange={value => setTaxPercent(value)}
+                />
+              </Flex>
+            </Container>
+          </Fragment>
+        )}
         {canAddHostFee && (
           <Fragment>
             <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
             <Container>
               <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
-                <Span fontSize="14px" lineHeight="20px" fontWeight="400">
+                <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-hostFee">
                   <FormattedMessage id="HostFee" defaultMessage="Host fee" />
-                </Span>
+                </Label>
                 <StyledInputPercentage
+                  id="confirmContribution-hostFee"
                   name="hostFeePercent"
                   data-cy="host-fee-percent"
                   value={hostFeePercent}
@@ -204,7 +258,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
         <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
         <Container>
           <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
-            <Span fontSize="14px" lineHeight="20px" fontWeight="400">
+            <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-processedAt">
               <span>
                 <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
                 {` `}
@@ -212,8 +266,9 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
                   <InfoCircle size={16} />
                 </StyledTooltip>
               </span>
-            </Span>
+            </Label>
             <StyledInput
+              id="confirmContribution-processedAt"
               name="processedAt"
               type="date"
               data-cy="processedAt"
@@ -227,8 +282,16 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
           <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
             <Span fontSize="14px" lineHeight="20px" fontWeight="500">
               <FormattedMessage
-                defaultMessage="Amount for {collective}:"
-                values={{ collective: order.toAccount.name }}
+                id="withColon"
+                defaultMessage="{item}:"
+                values={{
+                  item: (
+                    <FormattedMessage
+                      defaultMessage="Amount for {collective}"
+                      values={{ collective: order.toAccount.name }}
+                    />
+                  ),
+                }}
               />
             </Span>
             <Box fontSize="16px" lineHeight="24px" fontWeight="700" ml="16px">
@@ -240,7 +303,11 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
         <Container>
           <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
             <Span fontSize="12px" lineHeight="20px" fontWeight="500">
-              <FormattedMessage defaultMessage="Payment Processor Fee:" />
+              <FormattedMessage
+                id="withColon"
+                defaultMessage="{item}:"
+                values={{ item: <FormattedMessage defaultMessage="Payment Processor Fee" /> }}
+              />
             </Span>
             <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
               <FormattedMoneyAmount
@@ -251,10 +318,24 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
               />
             </Box>
           </Flex>
+          {Boolean(taxAmount) && (
+            <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
+              <Span fontSize="12px" lineHeight="20px" fontWeight="500">
+                {i18nTaxType(intl, order.tax.type, 'full')}
+              </Span>
+              <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
+                <FormattedMoneyAmount amount={taxAmount} currency={currency} precision={2} amountStyles={null} />
+              </Box>
+            </Flex>
+          )}
           {canAddHostFee && (
             <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
               <Span fontSize="12px" lineHeight="20px" fontWeight="500">
-                <FormattedMessage defaultMessage="Host Fee:" />
+                <FormattedMessage
+                  id="withColon"
+                  defaultMessage="{item}:"
+                  values={{ item: <FormattedMessage defaultMessage="Host Fee" /> }}
+                />
               </Span>
               <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
                 <FormattedMoneyAmount amount={hostFee} currency={currency} precision={2} amountStyles={null} />
@@ -264,8 +345,16 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
           <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
             <Span fontSize="12px" lineHeight="20px" fontWeight="500">
               <FormattedMessage
-                defaultMessage="Net Amount for {collective}:"
-                values={{ collective: order.toAccount.name }}
+                id="withColon"
+                defaultMessage="{item}:"
+                values={{
+                  item: (
+                    <FormattedMessage
+                      defaultMessage="Net Amount for {collective}"
+                      values={{ collective: order.toAccount.name }}
+                    />
+                  ),
+                }}
               />
             </Span>
             <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
@@ -275,7 +364,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
         </Container>
       </ModalBody>
       <ModalFooter isFullWidth>
-        <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">
+        <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="wrap">
           <StyledButton
             buttonStyle="secondary"
             onClick={onClose}
@@ -288,6 +377,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
           <StyledButton
             minWidth={240}
             buttonStyle="primary"
+            loading={submitting}
             type="submit"
             onClick={() => triggerAction()}
             data-cy="order-confirmation-modal-submit"
