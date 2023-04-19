@@ -47,7 +47,8 @@ function waitOrderStatus(status = 'PAID') {
   cy.retryChain(
     () =>
       cy.get('@collective').then(col => {
-        return cy.visit(`${col.slug}/orders`);
+        cy.visit(`${col.slug}/orders`);
+        return cy.contains('Financial contribution to'); // orders loaded
       }),
     () => {
       if (cy.$$(`[data-cy='order-${status}']`).length === 0) {
