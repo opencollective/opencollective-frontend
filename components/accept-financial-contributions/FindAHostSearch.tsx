@@ -9,7 +9,7 @@ import { Account, Host } from '../../lib/graphql/types/v2/graphql';
 import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
-import Pager from '../Pager';
+import Pagination from '../Pagination';
 import { P } from '../Text';
 
 import FeaturedFiscalHostResults from './FeaturedFiscalHostResults';
@@ -132,9 +132,6 @@ export default function FindAHostSearch(props: {
   const isEmpty = data?.hosts?.nodes?.length === 0;
   const displayData = isEmpty ? cachedNonEmptyResult : data;
 
-  const currentPage = Math.ceil(displayData.hosts.offset / displayData.hosts.limit) + 1;
-  const totalPages = Math.ceil(displayData.hosts.totalCount / displayData.hosts.limit);
-
   const hosts = displayData?.hosts?.nodes || [];
 
   const featuredHosts = hosts.filter(host => host.isTrustedHost);
@@ -172,7 +169,13 @@ export default function FindAHostSearch(props: {
       )}
 
       <Flex justifyContent="center">
-        <Pager currentPage={currentPage} totalPages={totalPages} onPageChange={onPageChange} />
+        <Pagination
+          variant="list"
+          offset={displayData.hosts.offset}
+          limit={displayData.hosts.limit}
+          total={displayData.hosts.totalCount}
+          onPageChange={onPageChange}
+        />
       </Flex>
     </React.Fragment>
   );
