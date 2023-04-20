@@ -3042,6 +3042,7 @@
   "WebhookEvents.COLLECTIVE_UPDATE_CREATED": "New update drafted",
   "WebhookEvents.CONNECTED_ACCOUNT_CREATED": "已添加关联账号",
   "WebhookEvents.TICKET_CONFIRMED": "工单已确认",
+  "WebhookEvents.VIRTUAL_CARD_PURCHASE": "New virtual card purchase",
   "webhooks.remove": "移除 Webhook",
   "webhooks.save": "保存 {count} 个 webhook",
   "webhooks.url.label": "链接",
