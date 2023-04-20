@@ -41,7 +41,7 @@ import PrivateCommentsMessage from '../components/expenses/PrivateCommentsMessag
 import TaxFormLinkModal from '../components/expenses/TaxFormLinkModal';
 import { Box, Flex } from '../components/Grid';
 import HTMLContent from '../components/HTMLContent';
-import { getI18nLink, I18nSupportLink } from '../components/I18nFormatters';
+import { getI18nLink, I18nSupportLink, WebsiteName } from '../components/I18nFormatters';
 import CommentIcon from '../components/icons/CommentIcon';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
 import LinkCollective from '../components/LinkCollective';
@@ -628,8 +628,8 @@ class ExpensePage extends React.Component {
                         <MessageBox type="info" fontSize="12px">
                           <FormattedMessage
                             id="Expense.SignUpInfoBox"
-                            defaultMessage="You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on Open Collective."
-                            values={{ collectiveName: collective.name }}
+                            defaultMessage="You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on {WebsiteName}."
+                            values={{ collectiveName: collective.name, WebsiteName }}
                           />
                         </MessageBox>
                         <Box mt={3}>

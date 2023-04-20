@@ -5,7 +5,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
-import { getI18nLink } from './I18nFormatters';
+import { getI18nLink, WebsiteName } from './I18nFormatters';
 import Image from './Image';
 import Link from './Link';
 import MessageBox from './MessageBox';
@@ -331,8 +331,8 @@ const CreateProfile = ({
           <MessageBox type="warning" mt="24px">
             <Box fontSize="14px" fontWeight={400} lineHeight="20px">
               <FormattedMessage
-                defaultMessage="{email} is already registered on Open Collective. Would you like to Sign In instead?"
-                values={{ email: <strong>{email}</strong> }}
+                defaultMessage="{email} is already registered on {WebsiteName}. Would you like to Sign In instead?"
+                values={{ email: <strong>{email}</strong>, WebsiteName }}
               />
               <Box mt="8px">
                 <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting} asLink>
