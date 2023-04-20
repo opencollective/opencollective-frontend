@@ -8,7 +8,6 @@ import Container from './Container';
 import StyledButton, { StyledButtonProps } from './StyledButton';
 
 type ButtonItemProps = {
-  combo: boolean;
   customBorderRadius: string;
 };
 
@@ -38,8 +37,7 @@ const ButtonItem = styled(StyledButton)<ButtonItemProps>`
     margin-left: -1px;
   }
   &:last-child {
-    border-radius: ${({ combo, customBorderRadius }) =>
-      combo ? '0' : `0 ${customBorderRadius} ${customBorderRadius} 0`};
+    border-radius: ${({ customBorderRadius }) => `0 ${customBorderRadius} ${customBorderRadius} 0`};
   }
 `;
 
@@ -50,7 +48,6 @@ type StyledButtonItemProps<T> = {
   size: ButtonSize;
   selected?: T;
   onChange?: (item: T) => void;
-  combo: boolean;
   disabled?: boolean;
   buttonPropsBuilder?: ({
     item,
@@ -74,7 +71,6 @@ const StyledButtonItem = ({
   buttonProps,
   buttonPropsBuilder,
   onChange,
-  combo,
   disabled,
   customBorderRadius,
 }: StyledButtonItemProps<string | number>) => {
@@ -90,7 +86,6 @@ const StyledButtonItem = ({
   return (
     <ButtonItem
       as={undefined as any}
-      combo={combo}
       color={isSelected ? 'white' : 'black.400'}
       buttonSize={size}
       buttonStyle={isSelected ? 'primary' : undefined}
@@ -121,8 +116,6 @@ type StyledButtonSetProps<T> = {
   selected?: T;
   /** An optional func called with the new item when option changes */
   onChange?: (item: T) => void;
-  /** Setting to style last item to look good in combination with a text input */
-  combo?: boolean;
   /** Disable user input */
   disabled?: boolean;
   /** Similar to `buttonProps` but allow props to be added dynamically based on item */
@@ -148,7 +141,6 @@ const StyledButtonSet = ({
   buttonProps,
   buttonPropsBuilder,
   onChange,
-  combo = false,
   disabled,
   customBorderRadius = '4px',
   ...props
@@ -164,7 +156,6 @@ const StyledButtonSet = ({
         buttonProps={buttonProps}
         buttonPropsBuilder={buttonPropsBuilder}
         onChange={onChange}
-        combo={combo}
         disabled={disabled}
         customBorderRadius={customBorderRadius}
       >
