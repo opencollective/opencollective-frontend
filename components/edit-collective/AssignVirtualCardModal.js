@@ -29,7 +29,7 @@ const initialValues = {
   expiryDate: undefined,
   cvv: undefined,
   assignee: undefined,
-  provider: undefined,
+  provider: 'STRIPE',
   cardName: undefined,
 };
 
@@ -248,12 +248,9 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
                   id="provider"
                   inputId="provider"
                   placeholder="Select"
-                  options={[
-                    { key: 'PRIVACY', value: 'PRIVACY', label: 'Privacy' },
-                    { key: 'STRIPE', value: 'STRIPE', label: 'Stripe' },
-                  ]}
+                  options={[{ key: 'STRIPE', value: 'STRIPE', label: 'Stripe' }]}
                   isSearchable={false}
-                  disabled={isBusy}
+                  disabled={true}
                   onChange={option => formik.setFieldValue('provider', option.value)}
                 />
               )}
