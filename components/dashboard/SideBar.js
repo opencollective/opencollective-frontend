@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import { Box } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import { ShareFeedbackButton } from '../ShareFeedbackButton';
 
 import AccountSwitcher from './AccountSwitcher';
 import Menu from './Menu';
@@ -25,6 +26,9 @@ const AdminPanelSideBar = ({ collective, isAccountantOnly, isLoading, selectedSe
       <Sticky>
         <MenuContainer>
           <AccountSwitcher collective={collective} isLoading={isLoading} />
+          <Box mt={2}>
+            <ShareFeedbackButton show />
+          </Box>
           {isLoading ? (
             <Box py={3}>
               {[...Array(5).keys()].map(i => (
