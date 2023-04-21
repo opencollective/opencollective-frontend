@@ -222,7 +222,8 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
               mt="17px"
               data-cy="create-pending-contribution"
             >
-              Create +
+              <FormattedMessage id="create" defaultMessage="Create" />
+              &nbsp;+
             </StyledButton>
             {showCreatePendingOrderModal && (
               <CreatePendingOrderModal

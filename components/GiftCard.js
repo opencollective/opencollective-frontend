@@ -9,6 +9,7 @@ import CollectiveCard from './gift-cards/CollectiveCard';
 import Container from './Container';
 import Currency from './Currency';
 import { Box, Flex } from './Grid';
+import { WebsiteName } from './I18nFormatters';
 import Link from './Link';
 import { P, Span } from './Text';
 
@@ -84,9 +85,10 @@ class GiftCard extends React.Component {
           <Text fontSize={['12px', '14px']}>
             <FormattedMessage
               id="giftcard.user.text"
-              defaultMessage="Contribute on Open Collective with this Gift Card, courtesy of {emitter}."
+              defaultMessage="Contribute on {WebsiteName} with this Gift Card, courtesy of {emitter}."
               values={{
                 emitter: <WhiteLink href={`/${emitter.slug}`}>{emitter.name}</WhiteLink>,
+                WebsiteName,
               }}
             />
           </Text>

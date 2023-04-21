@@ -8,14 +8,12 @@ import { gqlV1 } from '../lib/graphql/helpers';
 
 import Container from './Container';
 import Currency from './Currency';
-import { Box, Flex, Grid } from './Grid';
+import { Box, Flex } from './Grid';
 import I18nFormatters from './I18nFormatters';
 import Image from './Image';
-import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import Page from './Page';
-import PledgeCard from './PledgeCard';
 import StyledLink from './StyledLink';
 import { H2, H3, H5, P } from './Text';
 import { withUser } from './UserProvider';
@@ -104,19 +102,6 @@ const PledgedCollectivePage = ({ collective }) => {
           </Box>
         </Flex>
       </Container>
-
-      <Container display="flex" justifyContent="center" position="relative" top={-30}>
-        <StyledLink
-          as={Link}
-          href={`/${collective.slug}/pledges/new`}
-          buttonStyle="primary"
-          buttonSize="large"
-          data-cy="makeAPledgeButton"
-        >
-          <FormattedMessage id="menu.createPledge" defaultMessage="Make a Pledge" />
-        </StyledLink>
-      </Container>
-
       <Container
         display="flex"
         alignItems="center"
@@ -159,26 +144,6 @@ const PledgedCollectivePage = ({ collective }) => {
         </P>
       </Container>
 
-      <Grid
-        maxWidth={800}
-        mx="auto"
-        mb={5}
-        px={3}
-        data-cy="contributersGrouped"
-        gridTemplateColumns="repeat(auto-fill, minmax(165px, 1fr))"
-        gridGap={24}
-      >
-        {pledges.map((pledge, index) => (
-          <Container position="relative" key={pledge.id} data-cy="contributers">
-            {index === 0 && (
-              <Container position="absolute" right={15} top={-10}>
-                <Image src="/static/icons/first-pledge-badge.svg" alt="first pledge" width={32} height={32} />
-              </Container>
-            )}
-            <PledgeCard {...pledge} />
-          </Container>
-        ))}
-      </Grid>
       <Box px={3}>
         <Container
           alignItems="center"
