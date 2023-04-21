@@ -251,6 +251,7 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
                   options={[{ key: 'STRIPE', value: 'STRIPE', label: 'Stripe' }]}
                   isSearchable={false}
                   disabled={true}
+                  value={{ key: 'STRIPE', value: 'STRIPE', label: 'Stripe' }}
                   onChange={option => formik.setFieldValue('provider', option.value)}
                 />
               )}
