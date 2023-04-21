@@ -6331,8 +6331,10 @@ export type Order = {
   quantity?: Maybe<Scalars['Int']>;
   status?: Maybe<OrderStatus>;
   tags: Array<Maybe<Scalars['String']>>;
+  tax?: Maybe<TaxInfo>;
   /** Tax amount */
   taxAmount?: Maybe<Amount>;
+  /** @deprecated 2023-04-13: Please use `tax` instead. */
   taxes: Array<Maybe<OrderTax>>;
   tier?: Maybe<Tier>;
   toAccount?: Maybe<Account>;
@@ -6404,7 +6406,12 @@ export type OrderCreateInput = {
   quantity?: Scalars['Int'];
   /** Tags associated to the order */
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
-  /** Use this field to set the taxes associated to this order */
+  /** The tax to apply to the order */
+  tax?: InputMaybe<TaxInput>;
+  /**
+   * Use this field to set the taxes associated to this order
+   * @deprecated 2023-04-11: Please use `tax` instead
+   */
   taxes?: InputMaybe<Array<InputMaybe<OrderTaxInput>>>;
   /** The tier you are contributing to */
   tier?: InputMaybe<TierReferenceInput>;
@@ -6489,7 +6496,7 @@ export enum OrderTaxType {
 }
 
 export type OrderUpdateInput = {
-  /** Amount received by collective, excluding any tips or fees */
+  /** Amount received by collective, excluding any tips, taxes or fees */
   amount?: InputMaybe<AmountInput>;
   /** Host fee percent to be applied to the order */
   hostFeePercent?: InputMaybe<Scalars['Float']>;
@@ -6503,6 +6510,8 @@ export type OrderUpdateInput = {
   platformTip?: InputMaybe<AmountInput>;
   /** Date the funds were received */
   processedAt?: InputMaybe<Scalars['DateTime']>;
+  /** The tax to apply to the order */
+  tax?: InputMaybe<TaxInput>;
 };
 
 export type OrderWithPayment = {
@@ -7073,22 +7082,21 @@ export type PendingOrderCreateInput = {
   /** Public order description */
   description?: InputMaybe<Scalars['String']>;
   /** When is the money expected? */
-  expectedAt?: InputMaybe<Scalars['DateString']>;
+  expectedAt?: InputMaybe<Scalars['DateTime']>;
   /** The profile making the contribution. */
   fromAccount: AccountReferenceInput;
   /** Additional information about the contributing profile */
   fromAccountInfo?: InputMaybe<OrderFromAccountInfo>;
+  /** Custom Host fee percent for this order */
   hostFeePercent?: InputMaybe<Scalars['Float']>;
   /** Private memo for the host */
   memo?: InputMaybe<Scalars['String']>;
   /** Payment method expected for this order */
   paymentMethod?: InputMaybe<Scalars['String']>;
-  /** Platform tip attached to this order */
-  platformTipAmount?: InputMaybe<AmountInput>;
   /** External identifier for the order */
   ponumber?: InputMaybe<Scalars['String']>;
-  /** Use this field to set the taxes associated to this order */
-  taxes?: InputMaybe<Array<InputMaybe<OrderTaxInput>>>;
+  /** The tax to apply to the order */
+  tax?: InputMaybe<TaxInput>;
   /** The tier you are contributing to */
   tier?: InputMaybe<TierReferenceInput>;
   /** The collective you want to contribute to */
@@ -7111,11 +7119,12 @@ export type PendingOrderEditInput = {
   /** Public order description */
   description?: InputMaybe<Scalars['String']>;
   /** When is the money expected? */
-  expectedAt?: InputMaybe<Scalars['DateString']>;
+  expectedAt?: InputMaybe<Scalars['DateTime']>;
   /** The profile making the contribution. */
   fromAccount?: InputMaybe<AccountReferenceInput>;
   /** Additional information about the contributing profile */
   fromAccountInfo?: InputMaybe<OrderFromAccountInfo>;
+  /** Custom Host fee percent for this order */
   hostFeePercent?: InputMaybe<Scalars['Float']>;
   /** The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re) */
   id?: InputMaybe<Scalars['String']>;
@@ -7125,12 +7134,10 @@ export type PendingOrderEditInput = {
   memo?: InputMaybe<Scalars['String']>;
   /** Payment method expected for this order */
   paymentMethod?: InputMaybe<Scalars['String']>;
-  /** Platform tip attached to this order */
-  platformTipAmount?: InputMaybe<AmountInput>;
   /** External identifier for the order */
   ponumber?: InputMaybe<Scalars['String']>;
-  /** Use this field to set the taxes associated to this order */
-  taxes?: InputMaybe<Array<InputMaybe<OrderTaxInput>>>;
+  /** The tax to apply to the order */
+  tax?: InputMaybe<TaxInput>;
   /** The tier you are contributing to */
   tier?: InputMaybe<TierReferenceInput>;
 };
@@ -7744,6 +7751,7 @@ export type QueryExpenseArgs = {
 export type QueryExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
+  customData?: InputMaybe<Scalars['JSON']>;
   dateFrom?: InputMaybe<Scalars['DateTime']>;
   dateTo?: InputMaybe<Scalars['DateTime']>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
@@ -8107,7 +8115,7 @@ export type TaxInfo = {
    * @deprecated Please use `rate` instead
    */
   percentage: Scalars['Int'];
-  /** Percentage applied, between 0-100 */
+  /** Percentage applied, between 0-1 */
   rate: Scalars['Float'];
   /** Identifier for this tax (GST, VAT, etc) */
   type: OrderTaxType;
@@ -8115,6 +8123,10 @@ export type TaxInfo = {
 
 /** Input to set taxes for an expense */
 export type TaxInput = {
+  /** An optional tax amount to make sure the tax displayed in your frontend matches the one calculated by the API */
+  amount?: InputMaybe<AmountInput>;
+  /** Country ISO code of the entity paying the tax */
+  country?: InputMaybe<CountryIso>;
   /** Tax identification number, if any */
   idNumber?: InputMaybe<Scalars['String']>;
   /** Tax rate as a float number between 0 and 1 */
