@@ -688,6 +688,7 @@ const ApplyToHostModal = ({ hostSlug, collective, show, onClose, onSuccess, rout
 ApplyToHostModal.propTypes = {
   hostSlug: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
+  show: PropTypes.bool.isRequired,
   /** If not provided, the default is to ad a success toast and to call onClose */
   onSuccess: PropTypes.func,
   /** Use this to force the value for `collective`. If not specified, user's administrated collectives will be displayed instead */
