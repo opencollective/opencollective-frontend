@@ -54,7 +54,7 @@ const StyledProfileButton = styled(StyledButton)`
 const UserMenuLinkEntry = props => {
   const { isMobileMenuLink } = props;
   return (
-    <ListItem mb="6px" py={isMobileMenuLink ? '2' : '0'}>
+    <ListItem py={isMobileMenuLink ? '2' : '0'}>
       <StyledLink as={Link} fontWeight="500" fontSize="14px" lineHeight="20px" color="black.800" {...props} />
       {isMobileMenuLink && <StyledHr mt={2} borderStyle="solid" borderColor="rgba(49, 50, 51, 0.1)" />}
     </ListItem>
@@ -460,14 +460,14 @@ class TopBarProfileMenu extends React.Component {
     return (
       <div className="LoginTopBarProfileButton">
         {status === 'loading' && (
-          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
+          <P color="#D5DAE0" fontSize="14px" px={3} py={2} display="inline-block">
             <FormattedMessage id="loading" defaultMessage="loading" />
             &hellip;
           </P>
         )}
 
         {status === 'loggingout' && (
-          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
+          <P color="#D5DAE0" fontSize="14px" px={3} py={2} display="inline-block">
             <FormattedMessage id="loggingout" defaultMessage="logging out" />
             &hellip;
           </P>

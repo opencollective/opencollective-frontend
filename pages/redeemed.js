@@ -143,11 +143,11 @@ class RedeemedPage extends React.Component {
     } else {
       return (
         <div>
-          <Title fontSize={['3rem', null, '4rem']}>
+          <Title fontSize={['30px', null, '40px']}>
             <FormattedMessage id="redeemed.success" defaultMessage="Gift Card Redeemed!" /> 🎉
           </Title>
           <Flex flexWrap="wrap" maxWidth={750} m="0 auto" alignItems="center">
-            <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+            <Subtitle fontSize={['15px', null, '20px']} maxWidth={['90%', '640px']}>
               <Box>
                 <FormattedMessage
                   id="redeemed.subtitle.line1"
@@ -245,7 +245,7 @@ class RedeemedPage extends React.Component {
                       />
                     </H5>
                   </Box>
-                  <SearchForm fontSize="1.4rem" />
+                  <SearchForm fontSize="14px" />
                 </SearchFormContainer>
               </Box>
 

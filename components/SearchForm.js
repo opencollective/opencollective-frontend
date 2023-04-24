@@ -66,8 +66,8 @@ class SearchForm extends React.Component {
       onFocus,
       autoComplete = 'on',
       fontStyle = 'italic',
-      letterSpacing = '0.1rem',
-      fontSize = '1.2rem',
+      letterSpacing = '1px',
+      fontSize = '12px',
       lineHeight,
       fontWeight,
     } = this.props;

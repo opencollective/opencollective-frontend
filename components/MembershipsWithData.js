@@ -92,14 +92,14 @@ class MembershipsWithData extends React.Component {
           flexDirection="row"
           justifyContent="center"
           overflow="hidden"
-          margin="1rem 0"
+          margin="10px 0"
         >
           {collectiveIds.map(id => (
             <Membership key={id} memberships={groupedMemberships[id]} LoggedInUser={LoggedInUser} />
           ))}
         </Container>
         {memberships.length % 10 === 0 && memberships.length >= limit && (
-          <Container textAlign="center" margin="1rem">
+          <Container textAlign="center" margin="10px">
             <StyledButton buttonSize="small" onClick={this.fetchMore}>
               {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
               {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}

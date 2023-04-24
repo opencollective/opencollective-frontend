@@ -82,14 +82,14 @@ class CollectivesWithData extends React.Component {
           flexDirection="row"
           justifyContent="center"
           overflow="hidden"
-          margin="1rem 0"
+          margin="10px 0"
         >
           {collectives.map(collective => (
             <CollectiveCard m={1} key={collective.id} collective={collective} />
           ))}
         </Container>
         {collectives.length % 10 === 0 && collectives.length >= limit && (
-          <Container margin="1rem" textAlign="center">
+          <Container margin="10px" textAlign="center">
             <StyledButton onClick={this.fetchMore}>
               {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
               {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}

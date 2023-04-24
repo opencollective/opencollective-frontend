@@ -209,11 +209,16 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
               menuPortal: styles => ({ ...styles, zIndex: 9999 }),
               control: (baseStyles, state) => ({
                 ...baseStyles,
+                fontSize: '14px',
                 boxShadow: `inset 0px 2px 2px ${colors.primary[50]}`,
                 borderColor: state.isFocused ? colors.primary[500] : colors.black[300],
                 '&:hover': {
                   borderColor: state.isFocused ? colors.primary[500] : colors.primary[300],
                 },
+              }),
+              option: (baseStyles, state) => ({
+                ...baseStyles,
+                fontSize: '14px',
               }),
             }}
           />

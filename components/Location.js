@@ -56,7 +56,7 @@ class Location extends React.Component {
       <LocationSection id="location">
         <Container margin="30px 10px">
           {this.props.showTitle && <h1>Location</h1>}
-          <Container font-size="1.7rem" margin="5px 0px">
+          <Container font-size="17px" margin="5px 0px">
             {name}
           </Container>
           <Container className="address" color="black.600">

@@ -249,7 +249,7 @@ class CreateEventForm extends React.Component {
             )}
           </div>
         </Container>
-        <Container margin="5rem auto 1rem" textAlign="center">
+        <Container margin="50px auto 10px" textAlign="center">
           <StyledButton
             buttonStyle="primary"
             onClick={this.handleSubmit}

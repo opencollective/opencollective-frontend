@@ -192,7 +192,7 @@ const AccountSwitcher = () => {
             <DropdownButton {...triggerProps}>
               <div>
                 <Avatar collective={activeAccount} size={32} />
-                <Span truncateOverflow>{activeAccount?.name}</Span>
+                <span className="text-ellipsis text-sm">{activeAccount?.name}</span>
               </div>
 
               <ChevronUpDown size={20} />

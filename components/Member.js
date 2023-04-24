@@ -19,7 +19,7 @@ const MemberContainer = styled.div`
   position: relative;
 
   .USER {
-    margin: 0.5rem 0.25rem;
+    margin: 5px 2.5px;
   }
 
   .small {
@@ -33,7 +33,7 @@ const MemberContainer = styled.div`
   .ORGANIZATION,
   .COLLECTIVE {
     width: 200px;
-    margin: 1rem;
+    margin: 10px;
   }
 `;
 
@@ -120,16 +120,16 @@ ${totalDonationsStr}`;
             <LinkCollective collective={this.props.member.member} target="_top" title={title}>
               <Flex mt={2}>
                 <Avatar collective={member} radius={45} className="noFrame" />
-                <Container padding="1rem" paddingTop="0" textAlign="left" overflow="hidden" display="none">
-                  <Container fontSize="1.7rem">{name}</Container>
-                  <Container fontSize="1.4rem" color="black.600">
+                <Container padding="10px" paddingTop="0" textAlign="left" overflow="hidden" display="none">
+                  <Container fontSize="17px">{name}</Container>
+                  <Container fontSize="14px" color="black.600">
                     {firstSentence(description || member.description, 64)}
                   </Container>
-                  <Container className="since" fontSize="1.4rem">
+                  <Container className="since" fontSize="14px">
                     {memberSinceStr}
                   </Container>
                   {totalDonationsStr && (
-                    <Container className="totalDonations" fontSize="1.4rem" color="black.600">
+                    <Container className="totalDonations" fontSize="14px" color="black.600">
                       {totalDonationsStr}
                     </Container>
                   )}

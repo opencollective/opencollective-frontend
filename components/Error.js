@@ -6,7 +6,7 @@ import { H1 } from './Text';
 const ErrorComponent = ({ message }) => {
   return (
     <div className="Error">
-      <H1 textAlign="center" padding="8rem">
+      <H1 textAlign="center" padding="80px">
         {message || 'unknown error'}
       </H1>
     </div>

@@ -287,7 +287,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                     maxLength={CONTRIBUTION_POLICY_MAX_LENGTH}
                     error={formik.errors.contributionPolicy}
                     version="simplified"
-                    editorMinHeight="20rem"
+                    editorMinHeight="200px"
                     editorMaxHeight={500}
                     id={inputProps.id}
                     inputName={inputProps.name}
@@ -323,7 +323,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                 maxLength={EXPENSE_POLICY_MAX_LENGTH}
                 error={formik.errors.expensePolicy}
                 version="simplified"
-                editorMinHeight="20rem"
+                editorMinHeight="200px"
                 editorMaxHeight={500}
                 id={inputProps.id}
                 inputName={inputProps.name}
@@ -414,7 +414,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               }}
               checked={Boolean(formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze)}
             />
-            <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
+            <P fontSize="14px" lineHeight="18px" color="black.600" ml="22px">
               <FormattedMessage defaultMessage="Freezing the collective will prevent them from accepting and distributing contributions till they meet the requirements. This is a security measure to make sure the admins are within their rights. Read More." />
             </P>
             {formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.applies === 'ALL_COLLECTIVES' &&
@@ -460,16 +460,16 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             }
           />
           <Flex
-            ml="2.2rem"
-            mt="1rem"
+            ml="22px"
+            mt="10px"
             alignItems="center"
             color={!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled ? 'black.600' : undefined}
           >
-            <P mr="2rem">
+            <P mr="20px">
               <FormattedMessage defaultMessage="Enforce for expenses above:" />
             </P>
             <StyledInputAmount
-              maxWidth="11em"
+              maxWidth="110px"
               disabled={
                 isSettingPolicies ||
                 authorCannotApproveExpenseEnforcedByHost ||
@@ -497,8 +497,8 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
           {collective?.isHost && (
             <React.Fragment>
               <P
-                ml="2.2rem"
-                mt="1rem"
+                ml="22px"
+                mt="10px"
                 color={!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled ? 'black.600' : undefined}
               >
                 <StyledCheckbox
@@ -525,8 +525,8 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                 />
               </P>
               <P
-                ml="2.2rem"
-                mt="1rem"
+                ml="22px"
+                mt="10px"
                 color={
                   !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.appliesToHostedCollectives
                     ? 'black.600'
@@ -561,7 +561,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             </React.Fragment>
           )}
           {numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled) && (
-            <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
+            <P fontSize="14px" lineHeight="18px" color="black.600" ml="22px">
               <FormattedMessage
                 id="editCollective.expenseApprovalsPolicy.authorCannotApprove.minAdminRequired"
                 defaultMessage="You need to have at least two admins to enable this policy."

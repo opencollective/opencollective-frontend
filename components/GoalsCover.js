@@ -33,7 +33,7 @@ const GoalContainer = styled.div`
 
   .caption {
     display: inline-block;
-    padding: 1rem 0.5rem 1rem 0.5rem;
+    padding: 10px 5px 10px 5px;
     font-size: 13px;
     line-height: 15px;
   }
@@ -79,7 +79,7 @@ const GoalContainer = styled.div`
       bottom: 76px;
 
       .caption {
-        margin-top: -5.5rem;
+        margin-top: -55px;
       }
     `}
 
@@ -88,7 +88,7 @@ const GoalContainer = styled.div`
       if (props.goal.position === 'below') {
         return css`
           height: 50px;
-          padding-top: 4rem;
+          padding-top: 40px;
           border-right-style: dotted;
           border-right-color: ${props.theme.colors.primary[300]};
         `;
@@ -122,15 +122,15 @@ const GoalContainer = styled.div`
 const BarContainer = styled.div`
   position: relative;
   width: 100%;
-  margin: 6rem auto 1rem;
+  margin: 60px auto 10px;
   min-height: 80px;
 
   .withGoals {
-    margin-top: 10rem;
+    margin-top: 100px;
   }
 
   .max-level-above-1 {
-    margin-top: 15rem;
+    margin-top: 150px;
   }
 
   @media (max-width: 1400px) {

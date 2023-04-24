@@ -23,7 +23,7 @@ const StyledCardElement = styled(CardElement)`
   border-style: solid;
   border-color: rgb(204, 204, 204);
   border-image: initial;
-  padding: 1rem;
+  padding: 10px;
   border-radius: 3px;
 `;
 

@@ -32,8 +32,8 @@
 .mkt-page-gift-cards .wrapper {
     max-width: 1232px;
     margin: 0 auto;
-    padding-left: 1.6rem;
-    padding-right: 1.6rem;
+    padding-left: 16px;
+    padding-right: 16px;
 }
 
 .mkt-page-gift-cards .center {
@@ -248,8 +248,8 @@
 }
 
 .mkt-page-gift-cards .mx1 {
-    margin-left: 1.6rem;
-    margin-right: 1.6rem;
+    margin-left: 16px;
+    margin-right: 16px;
 }
 
 .mkt-page-gift-cards .flex {

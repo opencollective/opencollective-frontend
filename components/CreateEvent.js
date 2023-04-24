@@ -147,7 +147,7 @@ class CreateEvent extends React.Component {
                   onChange={this.resetError}
                   loading={this.state.status === 'loading' || this.state.result.success}
                 />
-                <Container textAlign="center" marginBottom="5rem">
+                <Container textAlign="center" marginBottom="50px">
                   <Container style={{ color: 'green' }}>{this.state.result.success}</Container>
                   <Container style={{ color: 'red' }}>{this.state.result.error}</Container>
                 </Container>

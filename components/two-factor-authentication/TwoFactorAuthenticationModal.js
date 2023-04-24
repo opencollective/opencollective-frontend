@@ -202,7 +202,7 @@ export default function TwoFactorAuthenticationModal() {
             </P>
           </Flex>
         )}
-        <ModalFooter isFullWidth dividerMargin="1rem 0">
+        <ModalFooter isFullWidth dividerMargin="10px 0">
           <Flex justifyContent="right" flexWrap="wrap">
             {cancellable && (
               <StyledButton disabled={confirming} mr={2} minWidth={120} onClick={cancel}>

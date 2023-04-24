@@ -75,7 +75,7 @@ const GithubRepositories = ({ repositories, setGithubInfo, ...fieldProps }) => {
 
         {repositories.length === 0 && (
           <Container my={3}>
-            <H4 textAlign="center" fontSize="1.4rem" color="black.400">
+            <H4 textAlign="center" fontSize="14px" color="black.400">
               No repository match
             </H4>
           </Container>
