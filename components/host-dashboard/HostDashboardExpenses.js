@@ -187,7 +187,9 @@ const HostDashboardExpenses = ({ hostSlug }) => {
                   id="host.disputes.warning"
                   defaultMessage="There are disputed charges that need review."
                 />{' '}
-                <Link href={`/${hostSlug}/admin/orders?status=DISPUTED`}>Disputed Orders</Link>{' '}
+                <Link href={`/${hostSlug}/admin/orders?status=DISPUTED`}>
+                  <FormattedMessage defaultMessage="Disputed Contributions" />
+                </Link>{' '}
               </P>
             )}
             {hasInReviewOrders && (
@@ -196,7 +198,9 @@ const HostDashboardExpenses = ({ hostSlug }) => {
                   id="host.in_review.warning"
                   defaultMessage="There are charges under review that need attention."
                 />{' '}
-                <Link href={`/${hostSlug}/admin/orders?status=IN_REVIEW`}>In Review Orders</Link>{' '}
+                <Link href={`/${hostSlug}/admin/orders?status=IN_REVIEW`}>
+                  <FormattedMessage defaultMessage="In Review Contributions" />
+                </Link>{' '}
               </P>
             )}
           </Flex>
