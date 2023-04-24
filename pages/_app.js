@@ -9,6 +9,7 @@ import { ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import theme from '../lib/theme';
+import defaultColors from '../lib/theme/colors';
 import withData from '../lib/withData';
 
 import StripeProviderSSR from '../components/StripeProvider';
@@ -145,6 +146,23 @@ class OpenCollectiveFrontendApp extends App {
             </StripeProviderSSR>
           </ThemeProvider>
         </ApolloProvider>
+        <style jsx global>
+          {`
+            :root {
+              --primary-color-900: ${defaultColors.primary[900]};
+              --primary-color-800: ${defaultColors.primary[800]};
+              --primary-color-700: ${defaultColors.primary[700]};
+              --primary-color-600: ${defaultColors.primary[600]};
+              --primary-color-500: ${defaultColors.primary[500]};
+              --primary-color-400: ${defaultColors.primary[400]};
+              --primary-color-300: ${defaultColors.primary[300]};
+              --primary-color-200: ${defaultColors.primary[200]};
+              --primary-color-100: ${defaultColors.primary[100]};
+              --primary-color-50: ${defaultColors.primary[50]};
+              --primary-color-base: ${defaultColors.primary.base};
+            }
+          `}
+        </style>
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />
         ))}

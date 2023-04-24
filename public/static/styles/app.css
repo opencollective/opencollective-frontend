@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @font-face {
   font-family: 'Inter';
   font-style:  normal;
@@ -110,7 +114,6 @@ html {
   --gunmetal: #505559;
   --fade-blue: #97b7f3;
 
-  font-size: 62.5%;
   height: 100%;
   width: 100%;
 }
@@ -136,27 +139,21 @@ body > div:first-child {
   min-height: 100%;
 }
 
-@media (max-width: 600px) {
-  html {
-    font-size: 55%;
-  }
-}
-
 section {
-  margin: 3rem 0px;
+  margin: 30px 0px;
 }
 
-h1 {
+/* h1 {
   text-align: center;
   margin: 40px 0px 20px;
-  font-size: 4rem;
+  font-size: 40px;
   letter-spacing: -1.2px;
-}
+} */
 
-h2,
+/* h2,
 h3 {
   letter-spacing: -0.4px;
-}
+} */
 
 .map {
   border: 1px solid #eee;
@@ -207,7 +204,7 @@ a {
 /** @deprecated These legacy styles from `Body.js` should be removed */
 .content {
   max-width: 1260px;
-  padding: 2rem 30px;
+  padding: 20px 30px;
   margin: 0 auto;
   line-height: 1.5;
   overflow: hidden;
@@ -215,7 +212,7 @@ a {
 
 @media (max-width: 420px) {
   .content {
-    padding: 1rem 1.5rem;
+    padding: 10px 15px;
   }
 }
 
@@ -228,23 +225,6 @@ a {
   box-sizing: border-box;
 }
 
-body {
-  color: #333;
-  font-size: 14px;
-}
-
-a {
-  text-decoration: none;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 500;
-}
-
-label {
-  display: inline-block;
-  font-weight: 700;
-}
 
 .form-control {
   width: 100%;
