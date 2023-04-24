@@ -19,23 +19,19 @@ export const ModalFooter = ({ children, isFullWidth = true, showDivider = true, 
   </div>
 );
 
-// type ModalHeader = {
-//   children: React.ReactNode;
-//   dividerMargin?: string;
-//   isFullWidth?: boolean;
-//   showDivider?: boolean;
-// };
+type ModalHeaderProps = {
+  title: string;
+  icon?: React.ReactNode;
+};
 
-// export const ModalHeader = ({ children, title, icon }) => (
-//   <div className="flex items-center gap-3">
-//     {icon}
-//     {title && (
-//       <Dialog.Title as="h3" className="text-xl font-medium leading-6 text-gray-900">
-//         {title}
-//       </Dialog.Title>
-//     )}
-//   </div>
-// );
+export const ModalHeader = ({ title, icon }: ModalHeaderProps) => (
+  <div className="flex items-center gap-3">
+    {icon}
+    <Dialog.Title as="h3" className="text-xl font-medium leading-6 text-gray-900">
+      {title}
+    </Dialog.Title>
+  </div>
+);
 
 const modalStyles = cva(
   'relative w-full transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all',
@@ -59,13 +55,10 @@ type ModalProps = {
   show: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  icon?: React.ReactNode;
-  title?: React.ReactNode;
-  footer?: React.ReactNode;
   hideCloseIcon?: boolean;
 } & VariantProps<typeof modalStyles>;
 
-export default function Modal({ show, onClose, icon, title, footer, hideCloseIcon, children, width }: ModalProps) {
+export default function Modal({ show, onClose, hideCloseIcon, children, width }: ModalProps) {
   return (
     <Transition appear show={show} as={Fragment}>
       <Dialog as="div" className="relative z-[3000]" onClose={onClose}>
@@ -107,18 +100,7 @@ export default function Modal({ show, onClose, icon, title, footer, hideCloseIco
                     </button>
                   </div>
                 )}
-                {(icon || title) && (
-                  <div className="flex items-center gap-3">
-                    {icon}
-                    {title && (
-                      <Dialog.Title as="h3" className="text-xl font-medium leading-6 text-gray-900">
-                        {title}
-                      </Dialog.Title>
-                    )}
-                  </div>
-                )}
                 {children}
-                {footer && <ModalFooter>{footer}</ModalFooter>}
               </Dialog.Panel>
             </Transition.Child>
           </div>

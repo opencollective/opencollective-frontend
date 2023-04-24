@@ -1,11 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
+import { gql, OperationVariables, QueryResult } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
-import { Dialog, Transition } from '@headlessui/react';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
@@ -14,25 +12,10 @@ import Image from './Image';
 import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
+import Modal, { ModalFooter, ModalHeader } from './Modal';
 import StyledButton from './StyledButton';
 import StyledCarousel from './StyledCarousel';
 import StyledLink from './StyledLink';
-import StyledModal, { ModalBody, ModalFooter as OldModalFooter, ModalHeader as OldModalHeader } from './StyledModal';
-import Modal, { ModalHeader, ModalFooter } from './Modal';
-import { P } from './Text';
-
-const ModalHeaderWrapper = styled(OldModalHeader)`
-  height: 58px;
-`;
-
-const ModalWrapper = styled(StyledModal)`
-  padding-top: 8px;
-  padding-bottom: 0px;
-`;
-
-const ModalFooterWrapper = styled(OldModalFooter)`
-  height: 65px;
-`;
 
 const newsAndUpdatesQuery = gql`
   query ChangelogUpdates($limit: Int) {
@@ -148,29 +131,14 @@ const NewsAndUpdatesModal = ({ show, onClose, ...modalProps }) => {
             />
           </div>
         }
-      ></ModalHeader>
+      />
 
-      {/* <ModalHeaderWrapper onClose={onClose}>
-        <Flex width="100%">
-          <Flex>
-            <Span>
-              <Image
-                width={32}
-                height={32}
-                src="/static/images/updates-and-news-modal-icon.svg"
-                alt="Updates and News Icon"
-              />
-            </Span>
-            <P fontSize={['25px', '28px']} fontWeight="500" lineHeight="36px" color="black.900" ml={16} mt="18px">
-              <FormattedMessage id="NewsAndUpdates.link.whatsNew" defaultMessage="What's new" />
-            </P>
-          </Flex>
-        </Flex>
-      </ModalHeaderWrapper> */}
       <hr />
 
       <Query query={newsAndUpdatesQuery} variables={{ limit: 5 }} context={API_V2_CONTEXT}>
-        {({ data, loading, error }) => renderStyledCarousel(data, loading, error, onClose)}
+        {({ data, loading, error }: QueryResult<any, OperationVariables>) =>
+          renderStyledCarousel(data, loading, error, onClose)
+        }
       </Query>
       <ModalFooter showDivider>
         <div className="flex justify-between gap-2">
