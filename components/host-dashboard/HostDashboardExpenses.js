@@ -91,8 +91,11 @@ const hostDashboardExpensesQuery = gql`
   ${hostInfoCardFields}
 `;
 
+/**
+ * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
+ */
 const onExpenseUpdate = (updatedExpense, cache, filteredStatus) => {
-  if (updatedExpense.status !== filteredStatus) {
+  if (filteredStatus && filteredStatus !== 'ALL' && updatedExpense.status !== filteredStatus) {
     cache.modify({
       fields: {
         expenses(existingExpenses, { readField }) {
@@ -124,7 +127,7 @@ const getVariablesFromQuery = query => {
   return {
     offset: parseInt(query.offset) || 0,
     limit: (parseInt(query.limit) || NB_EXPENSES_DISPLAYED) * 2,
-    status: isValidStatus(query.status) ? query.status : null,
+    status: query.status === 'ALL' ? null : isValidStatus(query.status) ? query.status : 'READY_TO_PAY',
     type: query.type,
     tags: query.tag ? [query.tag] : undefined,
     minAmount: amountRange[0] && amountRange[0] * 100,
@@ -134,6 +137,13 @@ const getVariablesFromQuery = query => {
     dateTo,
     orderBy,
     searchTerm: query.searchTerm,
+  };
+};
+
+const enforceDefaultParamsOnQuery = query => {
+  return {
+    ...query,
+    status: query.status || 'READY_TO_PAY',
   };
 };
 
@@ -147,14 +157,12 @@ const hasParams = query => {
 
 const HostDashboardExpenses = ({ hostSlug }) => {
   const router = useRouter() || {};
-  const query = router.query;
+  const query = enforceDefaultParamsOnQuery(router.query);
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const hasFilters = React.useMemo(() => hasParams(query), [query]);
   const pageRoute = `/${hostSlug}/admin/expenses`;
-  const expenses = useQuery(hostDashboardExpensesQuery, {
-    variables: { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) },
-    context: API_V2_CONTEXT,
-  });
+  const queryVariables = { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) };
+  const expenses = useQuery(hostDashboardExpensesQuery, { variables: queryVariables, context: API_V2_CONTEXT });
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
   React.useEffect(() => {
     if (query.paypalApprovalError && !paypalPreApprovalError) {
@@ -166,7 +174,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
   const { data, error, loading } = expenses;
   const { hasDisputedOrders, hasInReviewOrders } = data?.host || {};
   const getQueryParams = newParams => {
-    return omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+    return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
   };
 
   return (
@@ -290,6 +298,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           <ExpensesFilters
             collective={data.host}
             filters={query}
+            explicitAllForStatus
             onChange={queryParams =>
               router.push({
                 pathname: pageRoute,
