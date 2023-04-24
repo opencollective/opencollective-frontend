@@ -53,14 +53,11 @@ export default function Pagination(props: PaginationProps) {
       return null;
     }
 
-    if ('route' in props) {
-      return (page: number) => `${props.route}?limit=${props.limit}&offset=${props.limit * (page - 1)}`;
-    }
-
-    const baseUrl = router.asPath.split('?')[0];
+    const baseUrl = 'route' in props ? props.route : router.asPath.split('?')[0];
     return (page: number) => {
       const query = new URLSearchParams(qs.encode(omit(router.query, props.ignoredQueryParams)));
       query.set('offset', `${props.limit * (page - 1)}`);
+      query.set('limit', `${props.limit}`);
       return `${baseUrl}?${query.toString()}`;
     };
   }, [props.limit, !useCallback && props.route, !useCallback && props.ignoredQueryParams, !useCallback && router]);

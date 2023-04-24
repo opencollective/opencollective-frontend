@@ -194,6 +194,7 @@ class EditUpdateForm extends React.Component {
                         onChange={e => this.tryUpdateDate('makePublicOn', e.target.value)}
                         width="100%"
                         maxWidth="40em"
+                        min={toIsoDateStr(new Date())}
                       />
                     )}
                   </StyledInputField>
