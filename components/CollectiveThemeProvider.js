@@ -9,6 +9,8 @@ import { isHexColor } from 'validator';
 import defaultTheme, { generateTheme } from '../lib/theme';
 import defaultColors from '../lib/theme/colors';
 
+import DefaultPaletteStyle from './DefaultPaletteStyle';
+
 /**
  * A special `ThemeProvider` that plugs the custom collective theme, defined by the color
  * from `collective.settings.collectivePage.primaryColor`.
@@ -104,24 +106,7 @@ export default class CollectiveThemeProvider extends React.PureComponent {
         ) : (
           <React.Fragment>{children}</React.Fragment>
         )}
-        {/* eslint-disable-next-line react/no-unknown-property */}
-        <style jsx global>
-          {`
-            :root {
-              --primary-color-900: ${primaryPalette[900]};
-              --primary-color-800: ${primaryPalette[800]};
-              --primary-color-700: ${primaryPalette[700]};
-              --primary-color-600: ${primaryPalette[600]};
-              --primary-color-500: ${primaryPalette[500]};
-              --primary-color-400: ${primaryPalette[400]};
-              --primary-color-300: ${primaryPalette[300]};
-              --primary-color-200: ${primaryPalette[200]};
-              --primary-color-100: ${primaryPalette[100]};
-              --primary-color-50: ${primaryPalette[50]};
-              --primary-color-base: ${primaryPalette.base};
-            }
-          `}
-        </style>
+        <DefaultPaletteStyle palette={primaryPalette} />
       </ThemeProvider>
     );
   }

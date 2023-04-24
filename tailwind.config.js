@@ -17,7 +17,6 @@ module.exports = {
           700: 'var(--primary-color-700)',
           800: 'var(--primary-color-800)',
           900: 'var(--primary-color-900)',
-          default: 'var(--primary-color-base)',
         },
         green: defaultColors.green,
         red: defaultColors.red,
