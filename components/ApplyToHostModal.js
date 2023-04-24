@@ -24,12 +24,12 @@ import { getI18nLink } from './I18nFormatters';
 import Link from './Link';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import MessageBox from './MessageBox';
+import Modal, { ModalFooter } from './Modal';
 import StepsProgress from './StepsProgress';
 import StyledButton from './StyledButton';
 import StyledCheckbox from './StyledCheckbox';
 import StyledHr from './StyledHr';
 import StyledInputFormikField from './StyledInputFormikField';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import StyledTextarea from './StyledTextarea';
 import { H1, P, Span } from './Text';
 import { TOAST_TYPE, useToasts } from './ToastProvider';
@@ -187,8 +187,6 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, is
         onClick={onBack || onClose}
         disabled={isSubmitting}
         buttonStyle="standard"
-        mt={[2, 3]}
-        mb={2}
         px={3}
       >
         {onBack ? (
@@ -203,8 +201,6 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, is
           disabled={!canSubmit}
           loading={isSubmitting}
           onClick={onSubmit}
-          mt={[2, 3]}
-          mb={2}
           ml={3}
           px={3}
           minWidth={153}
@@ -218,8 +214,6 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, is
           loading={isSubmitting}
           buttonStyle="primary"
           onClick={onSubmit}
-          mt={[2, 3]}
-          mb={2}
           ml={3}
           px={3}
           minWidth={153}
@@ -234,8 +228,6 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, is
           loading={isSubmitting}
           buttonStyle="primary"
           onClick={onSubmit}
-          mt={[2, 3]}
-          mb={2}
           ml={3}
           px={3}
           minWidth={153}
@@ -263,7 +255,7 @@ ConfirmButtons.propTypes = {
  * A modal to apply to a given host
  * This modal triggers a query when mounted
  */
-const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ...props }) => {
+const ApplyToHostModal = ({ hostSlug, collective, show, onClose, onSuccess, router, ...props }) => {
   const query = collective ? applyToHostQuery : applyToHostWithAccountsQuery;
   const { data, loading, error } = useQuery(query, {
     ...GQL_CONTEXT,
@@ -294,16 +286,16 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   }, [useTwoSteps]);
 
   return (
-    <StyledModal onClose={onClose} width="570px" {...props}>
+    <Modal show={show} onClose={onClose} width="xl" {...props}>
       {loading ? (
         <React.Fragment>
-          <ModalHeader hideCloseIcon>
+          <div>
             <LoadingPlaceholder width="100%" height={163} />
-          </ModalHeader>
-          <ModalBody>
+          </div>
+          <div>
             <StyledHr my={32} borderColor="black.300" />
             <LoadingPlaceholder width="100%" height={225} />
-          </ModalBody>
+          </div>
         </React.Fragment>
       ) : (
         <Formik
@@ -365,7 +357,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
         >
           {({ handleSubmit, values, setFieldValue }) => (
             <React.Fragment>
-              <ModalHeader hideCloseIcon>
+              <div>
                 {loading ? (
                   <LoadingPlaceholder width="100%" height={163} />
                 ) : host ? (
@@ -413,9 +405,9 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                     </Box>
                   </Flex>
                 ) : null}
-              </ModalHeader>
+              </div>
 
-              <ModalBody>
+              <div>
                 {loading ? (
                   <LoadingPlaceholder width="100%" height={250} />
                 ) : !host ? (
@@ -661,7 +653,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                     )}
                   </Form>
                 )}
-              </ModalBody>
+              </div>
               <ModalFooter isFullWidth>
                 {step === STEPS.INFORMATION && (
                   <Flex justifyContent="flex-end">
@@ -689,7 +681,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
           )}
         </Formik>
       )}
-    </StyledModal>
+    </Modal>
   );
 };
 

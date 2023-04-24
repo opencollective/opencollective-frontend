@@ -84,10 +84,11 @@ class ApplyToHostBtn extends React.Component {
     return (
       <Fragment>
         {this.renderButton()}
-
-        {this.state.showModal && !isHidden && (
-          <ApplyToHostModal hostSlug={hostSlug} onClose={() => router.push(hostSlug)} />
-        )}
+        <ApplyToHostModal
+          show={this.state.showModal && !isHidden}
+          hostSlug={hostSlug}
+          onClose={() => router.push(hostSlug)}
+        />
       </Fragment>
     );
   }
