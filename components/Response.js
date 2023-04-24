@@ -50,15 +50,15 @@ class Response extends React.Component {
           overflow="hidden"
         >
           <Avatar collective={user} radius={40} />
-          <Container padding="0.25rem 1rem">
-            <Container fontSize="1.5rem">
+          <Container padding="2.5px 10px">
+            <Container fontSize="15px">
               {user.isIncognito ? <FormattedMessage id="profile.incognito" defaultMessage="Incognito" /> : name}
             </Container>
-            <Container fontSize="1.2rem" color="black.600">
+            <Container fontSize="12px" color="black.600">
               {description || user.description}
             </Container>
             {count > 1 && (
-              <Container pt={1} fontSize="1.2rem" color="black.600">
+              <Container pt={1} fontSize="12px" color="black.600">
                 <FormattedMessage defaultMessage="{count} tickets" values={{ count }} />
               </Container>
             )}
