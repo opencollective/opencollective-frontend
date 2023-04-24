@@ -58,7 +58,7 @@ export default function ConfirmTierDeleteModal({ isDeleting, onClose, onConfirmD
         </Flex>
         <InputSwitch
           checked={keepRecurringContributions}
-          onChange={event => setKeepRecurringContributions(event.target.checked)}
+          onChange={checked => setKeepRecurringContributions(checked)}
         />
       </Flex>
       <ModalFooter isFullWidth dividerMargin="1.2em 0">

@@ -148,7 +148,7 @@ class EditTwitterAccount extends React.Component {
               id={`${notificationType}.active`}
               name={`${notificationType}.active`}
               checked={connectedAccount.settings[notificationType].active}
-              onChange={event => this.handleChange(notificationType, 'active', event.target.checked)}
+              onChange={checked => this.handleChange(notificationType, 'active', checked)}
             />
           </div>
         </Flex>

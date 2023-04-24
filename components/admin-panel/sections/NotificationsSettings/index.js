@@ -418,7 +418,7 @@ const NotificationsSettings = ({ account, subpath }) => {
                   name={`newsletter-switch`}
                   checked={data?.account?.newsletterOptIn}
                   isLoading={setNewsletterOptInLoading}
-                  onChange={event => setNewsletterOptIn({ variables: { newsletterOptIn: event.target.checked } })}
+                  onChange={checked => setNewsletterOptIn({ variables: { newsletterOptIn: checked } })}
                 />
               </Flex>
               <StyledHr width="100%" mt={3} borderStyle="dashed" />
