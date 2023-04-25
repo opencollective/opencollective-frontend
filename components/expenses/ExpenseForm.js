@@ -34,7 +34,7 @@ import ExpenseFormItems, { addNewExpenseItem, newExpenseItem } from './ExpenseFo
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
 import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';
-import { validateExpenseItem } from './ExpenseItemForm';
+import { prepareExpenseItemForSubmit, validateExpenseItem } from './ExpenseItemForm';
 import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseRecurringBanner from './ExpenseRecurringBanner';
 import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
@@ -167,15 +167,7 @@ export const prepareExpenseForSubmit = expenseData => {
     payoutMethod,
     attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
-    items: expenseData.items.map(item => {
-      return pick(item, [
-        ...(item.__isNew ? [] : ['id']), // Omit item's ids that were created for keying purposes
-        ...(isInvoice || isGrant ? [] : ['url']), // never submit URLs for invoices or requests
-        'description',
-        'incurredAt',
-        'amount',
-      ]);
-    }),
+    items: expenseData.items.map(item => prepareExpenseItemForSubmit(item, isInvoice, isGrant)),
   };
 };
 

@@ -3566,7 +3566,7 @@ type TaxInfo {
   percentage: Int! @deprecated(reason: "Please use `rate` instead")
 
   """
-  Percentage applied, between 0-100
+  Percentage applied, between 0-1
   """
   rate: Float!
 

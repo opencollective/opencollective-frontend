@@ -865,7 +865,8 @@ type Order {
   platformTipAmount: Amount
   platformTipEligible: Boolean
   tags: [String]!
-  taxes: [OrderTax]!
+  tax: TaxInfo
+  taxes: [OrderTax]! @deprecated(reason: "2023-04-13: Please use `tax` instead.")
 
   """
   This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order.
@@ -1084,7 +1085,7 @@ type TaxInfo {
   percentage: Int! @deprecated(reason: "Please use `rate` instead")
 
   """
-  Percentage applied, between 0-100
+  Percentage applied, between 0-1
   """
   rate: Float!
 
@@ -14216,6 +14217,16 @@ input TaxInput {
   Tax identification number, if any
   """
   idNumber: String
+
+  """
+  Country ISO code of the entity paying the tax
+  """
+  country: CountryISO
+
+  """
+  An optional tax amount to make sure the tax displayed in your frontend matches the one calculated by the API
+  """
+  amount: AmountInput
 }
 
 """
@@ -15186,9 +15197,14 @@ input OrderCreateInput {
   platformTipAmount: AmountInput
 
   """
+  The tax to apply to the order
+  """
+  tax: TaxInput
+
+  """
   Use this field to set the taxes associated to this order
   """
-  taxes: [OrderTaxInput]
+  taxes: [OrderTaxInput] @deprecated(reason: "2023-04-11: Please use `tax` instead")
 
   """
   The tier you are contributing to
@@ -15396,9 +15412,14 @@ input OrderUpdateInput {
   legacyId: Int
 
   """
-  Amount received by collective, excluding any tips or fees
+  Amount received by collective, excluding any tips, taxes or fees
   """
   amount: AmountInput
+
+  """
+  The tax to apply to the order
+  """
+  tax: TaxInput
 
   """
   Amount paid in fees for the payment processor
@@ -15480,14 +15501,9 @@ input PendingOrderCreateInput {
   toAccount: AccountReferenceInput!
 
   """
-  Platform tip attached to this order
+  The tax to apply to the order
   """
-  platformTipAmount: AmountInput
-
-  """
-  Use this field to set the taxes associated to this order
-  """
-  taxes: [OrderTaxInput]
+  tax: TaxInput
 
   """
   The tier you are contributing to
@@ -15517,7 +15533,11 @@ input PendingOrderCreateInput {
   """
   When is the money expected?
   """
-  expectedAt: DateString
+  expectedAt: DateTime
+
+  """
+  Custom Host fee percent for this order
+  """
   hostFeePercent: Float
 }
 
@@ -15551,14 +15571,9 @@ input PendingOrderEditInput {
   fromAccountInfo: OrderFromAccountInfo
 
   """
-  Platform tip attached to this order
+  The tax to apply to the order
   """
-  platformTipAmount: AmountInput
-
-  """
-  Use this field to set the taxes associated to this order
-  """
-  taxes: [OrderTaxInput]
+  tax: TaxInput
 
   """
   The tier you are contributing to
@@ -15588,7 +15603,11 @@ input PendingOrderEditInput {
   """
   When is the money expected?
   """
-  expectedAt: DateString
+  expectedAt: DateTime
+
+  """
+  Custom Host fee percent for this order
+  """
   hostFeePercent: Float
 }
 

@@ -12,6 +12,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
+import { confirmContributionFieldsFragment } from '../ContributionConfirmationModal';
 import { Box, Flex } from '../Grid';
 import CreatePendingOrderModal from '../host-dashboard/CreatePendingOrderModal';
 import Link from '../Link';
@@ -66,14 +67,7 @@ const accountOrdersQuery = gql`
         description
         createdAt
         status
-        amount {
-          valueInCents
-          currency
-        }
-        platformTipAmount {
-          valueInCents
-          currency
-        }
+        ...ConfirmContributionFields
         paymentMethod {
           id
           providerType
@@ -112,6 +106,7 @@ const accountOrdersQuery = gql`
       }
     }
   }
+  ${confirmContributionFieldsFragment}
 `;
 
 const ORDERS_PER_PAGE = 15;
@@ -227,7 +222,8 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
               mt="17px"
               data-cy="create-pending-contribution"
             >
-              Create +
+              <FormattedMessage id="create" defaultMessage="Create" />
+              &nbsp;+
             </StyledButton>
             {showCreatePendingOrderModal && (
               <CreatePendingOrderModal

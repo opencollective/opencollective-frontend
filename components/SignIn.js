@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import { WebsiteName } from './I18nFormatters';
 import Image from './Image';
 import Link from './Link';
 import StyledButton from './StyledButton';
@@ -339,8 +340,8 @@ export default class SignIn extends React.Component {
               fontWeight={400}
             >
               <FormattedMessage
-                defaultMessage="{email} does not exist on Open Collective. Would you like to create an account with this email?"
-                values={{ email: <strong>{email}</strong> }}
+                defaultMessage="{email} does not exist on {WebsiteName}. Would you like to create an account with this email?"
+                values={{ email: <strong>{email}</strong>, WebsiteName }}
               />{' '}
               <Box mt="24px">
                 <Span mr="40px">

@@ -142,6 +142,9 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
       border-color: #c4c7cc;
       margin-bottom: 0;
       background: white;
+      &:not(:first-child) {
+        margin-left: min(1.5vw, 10px);
+      }
     }
 
     .trix-button {
