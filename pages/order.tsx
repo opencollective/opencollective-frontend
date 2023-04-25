@@ -614,6 +614,20 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                               />
                             </Span>
                           )}
+                          {order.platformTipAmount && (
+                            <FormattedMessage
+                              defaultMessage="{value} (Platform Tip)"
+                              values={{
+                                value: (
+                                  <FormattedMoneyAmount
+                                    currency={order.platformTipAmount.currency}
+                                    amount={order.platformTipAmount.valueInCents}
+                                    amountStyles={null}
+                                  />
+                                ),
+                              }}
+                            />
+                          )}
                         </div>
                         <span>
                           <FormattedMessage
