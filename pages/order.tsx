@@ -142,6 +142,14 @@ const orderPageQuery = gql`
           name
           imageUrl
         }
+        relatedTransactions(kind: [PLATFORM_TIP]) {
+          id
+          type
+          netAmount {
+            currency
+            valueInCents
+          }
+        }
       }
     }
     account(slug: $collectiveSlug) {
@@ -576,6 +584,9 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                       transaction.type === 'CREDIT' &&
                       transaction.netAmount?.valueInCents !== displayedAmount.valueInCents &&
                       transaction.paymentProcessorFee?.valueInCents !== 0;
+                   const platformTip = transaction.relatedTransactions?.filter(t => t.type === 'CREDIT')[0]?.netAmount?.valueInCents;
+                   const platformTipCurrency = transaction.relatedTransactions?.filter(t => t.type === 'CREDIT')[0]?.netAmount?.currency;
+                    const displayPlatformTip = platformTip !== undefined && platformTip !== 0;
 
                     return (
                       <TransactionDetails key={transaction.id}>
@@ -614,14 +625,14 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                               />
                             </Span>
                           )}
-                          {order.platformTipAmount && (
+                          {displayPlatformTip && (
                             <FormattedMessage
                               defaultMessage="{value} (Platform Tip)"
                               values={{
                                 value: (
                                   <FormattedMoneyAmount
-                                    currency={order.platformTipAmount.currency}
-                                    amount={order.platformTipAmount.valueInCents}
+                                    currency={platformTipCurrency}
+                                    amount={platformTip}
                                     amountStyles={null}
                                   />
                                 ),
