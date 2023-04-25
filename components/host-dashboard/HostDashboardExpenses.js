@@ -29,7 +29,7 @@ import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
-import { H1, P } from '../Text';
+import { H1 } from '../Text';
 
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
@@ -164,49 +164,12 @@ const HostDashboardExpenses = ({ hostSlug }) => {
   }, [query.paypalApprovalError]);
 
   const { data, error, loading } = expenses;
-  const { hasDisputedOrders, hasInReviewOrders } = data?.host || {};
   const getQueryParams = newParams => {
     return omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
   };
 
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
-      {!loading && (hasDisputedOrders || hasInReviewOrders) && (
-        <MessageBox type="warning" withIcon mb={3}>
-          <Flex
-            flexDirection={hasDisputedOrders && hasInReviewOrders ? 'column' : 'row'}
-            gridGap={'8px'}
-            flexWrap={'wrap'}
-          >
-            <P fontWeight={700}>
-              <FormattedMessage id="host.fraudProtectionWarning" defaultMessage="Fraud Protection Warning" />
-            </P>
-            {hasDisputedOrders && (
-              <P>
-                <FormattedMessage
-                  id="host.disputes.warning"
-                  defaultMessage="There are disputed charges that need review."
-                />{' '}
-                <Link href={`/${hostSlug}/admin/orders?status=DISPUTED`}>
-                  <FormattedMessage defaultMessage="Disputed Contributions" />
-                </Link>{' '}
-              </P>
-            )}
-            {hasInReviewOrders && (
-              <P>
-                <FormattedMessage
-                  id="host.in_review.warning"
-                  defaultMessage="There are charges under review that need attention."
-                />{' '}
-                <Link href={`/${hostSlug}/admin/orders?status=IN_REVIEW`}>
-                  <FormattedMessage defaultMessage="In Review Contributions" />
-                </Link>{' '}
-              </P>
-            )}
-          </Flex>
-        </MessageBox>
-      )}
-
       <Flex mb={24} alignItems="center" flexWrap="wrap">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
