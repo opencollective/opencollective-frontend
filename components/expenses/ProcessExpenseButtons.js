@@ -132,6 +132,7 @@ const ProcessExpenseButtons = ({
   onDelete,
   isMoreActions,
   displaySecurityChecks,
+  displayApproveExpense,
 }) => {
   const [selectedAction, setSelectedAction] = React.useState(null);
   const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
@@ -171,20 +172,21 @@ const ProcessExpenseButtons = ({
 
   return (
     <React.Fragment>
-      {(permissions.approve.allowed || permissions.approve.reason === PERMISSION_CODES.AUTHOR_CANNOT_APPROVE) && (
-        <PermissionButton
-          {...getButtonProps('APPROVE')}
-          buttonStyle="secondary"
-          data-cy="approve-button"
-          icon={<ApproveIcon size={12} />}
-          permission={permissions.approve}
-          label={
-            <ButtonLabel>
-              <FormattedMessage id="actions.approve" defaultMessage="Approve" />
-            </ButtonLabel>
-          }
-        />
-      )}
+      {displayApproveExpense &&
+        (permissions.approve.allowed || permissions.approve.reason === PERMISSION_CODES.AUTHOR_CANNOT_APPROVE) && (
+          <PermissionButton
+            {...getButtonProps('APPROVE')}
+            buttonStyle="secondary"
+            data-cy="approve-button"
+            icon={<ApproveIcon size={12} />}
+            permission={permissions.approve}
+            label={
+              <ButtonLabel>
+                <FormattedMessage id="actions.approve" defaultMessage="Approve" />
+              </ButtonLabel>
+            }
+          />
+        )}
       {permissions.canPay && (
         <PayExpenseButton
           {...getButtonProps('PAY')}
@@ -310,6 +312,7 @@ ProcessExpenseButtons.propTypes = {
   onModalToggle: PropTypes.func,
   displayMarkAsIncomplete: PropTypes.bool,
   displaySecurityChecks: PropTypes.bool,
+  displayApproveExpense: PropTypes.bool,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
@@ -322,6 +325,7 @@ export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
 ProcessExpenseButtons.defaultProps = {
   buttonProps: DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
   displaySecurityChecks: true,
+  displayApproveExpense: true,
 };
 
 export default ProcessExpenseButtons;

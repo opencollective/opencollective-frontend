@@ -6,7 +6,10 @@ import { expensePageExpenseFieldsFragment } from '../../components/expenses/grap
 import { API_V2_CONTEXT } from '../graphql/helpers';
 import { Expense, ProcessExpensePaymentParams } from '../graphql/types/v2/graphql';
 
-type ProcessExpenseAction = (paymentParams?: ProcessExpensePaymentParams) => Promise<void>;
+type ProcessExpenseAction = (params?: {
+  paymentParams?: ProcessExpensePaymentParams;
+  message?: string;
+}) => Promise<void>;
 type ProcessExpenseActionName =
   | 'APPROVE'
   | 'REJECT'
@@ -37,9 +40,15 @@ const processExpenseMutation = gql`
     $id: String
     $legacyId: Int
     $action: ExpenseProcessAction!
+    $message: String
     $paymentParams: ProcessExpensePaymentParams
   ) {
-    processExpense(expense: { id: $id, legacyId: $legacyId }, action: $action, paymentParams: $paymentParams) {
+    processExpense(
+      expense: { id: $id, legacyId: $legacyId }
+      action: $action
+      message: $message
+      paymentParams: $paymentParams
+    ) {
       id
       ...ExpensePageExpenseFields
     }
@@ -55,16 +64,18 @@ export default function useProcessExpense(opts: UseProcessExpenseOptions): UsePr
   });
 
   const makeProcessExpenseAction = React.useMemo(
-    () => (action: ProcessExpenseActionName) => async paymentParams => {
-      setCurrentAction(action);
-      const variables = { id: opts.expense.id, legacyId: opts.expense.legacyId, action, paymentParams };
-      try {
-        await processExpense({ variables });
-      } finally {
-        setCurrentAction(null);
-      }
-    },
-    [opts.expense.id, opts.expense.legacyId, processExpense],
+    () =>
+      (action: ProcessExpenseActionName) =>
+      async ({ paymentParams, message }: { paymentParams?: ProcessExpensePaymentParams; message?: string } = {}) => {
+        setCurrentAction(action);
+        const variables = { id: opts.expense.id, legacyId: opts.expense.legacyId, action, paymentParams, message };
+        try {
+          await processExpense({ variables });
+        } finally {
+          setCurrentAction(null);
+        }
+      },
+    [opts.expense?.id, opts.expense?.legacyId, processExpense],
   );
 
   const approve = React.useMemo(() => makeProcessExpenseAction('APPROVE'), [makeProcessExpenseAction]);
