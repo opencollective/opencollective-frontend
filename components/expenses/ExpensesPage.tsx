@@ -139,7 +139,7 @@ const Expenses = props => {
         )}
       </Box>
       {isSelfHosted && LoggedInUser?.isHostAdmin(data?.account) && data.scheduledExpenses?.totalCount > 0 && (
-        <ScheduledExpensesBanner host={data.account} />
+        <ScheduledExpensesBanner hostSlug={data.account.slug} />
       )}
       <Flex justifyContent="space-between" flexWrap="wrap" gridGap={[0, 3, 5]}>
         <Box flex="1 1 500px" minWidth={300} mb={5} mt={['16px', '46px']}>

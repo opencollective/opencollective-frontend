@@ -12,6 +12,7 @@ import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
+import { getScheduledExpensesQueryVariables, scheduledExpensesQuery } from '../host-dashboard/ScheduledExpensesBanner';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
@@ -150,7 +151,16 @@ const ProcessExpenseButtons = ({
 
     try {
       const variables = { id: expense.id, legacyId: expense.legacyId, action, paymentParams };
-      await processExpense({ variables });
+      const refetchQueries = [];
+      if (action === 'SCHEDULE_FOR_PAYMENT' || action === 'UNSCHEDULE_PAYMENT') {
+        refetchQueries.push({
+          query: scheduledExpensesQuery,
+          context: API_V2_CONTEXT,
+          variables: getScheduledExpensesQueryVariables(host.slug),
+        });
+      }
+
+      await processExpense({ variables, refetchQueries });
       return true;
     } catch (e) {
       // Display a toast with light variant since we're in a modal
