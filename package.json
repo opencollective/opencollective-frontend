@@ -293,7 +293,8 @@
       "eslint-config-next",
       "@storybook/*",
       "@shopify/address",
-      "storybook-addon-designs"
+      "storybook-addon-designs",
+      "eslint-plugin-jsx-a11y"
     ]
   }
 }
