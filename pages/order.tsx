@@ -584,73 +584,71 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                       transaction.type === 'CREDIT' &&
                       transaction.netAmount?.valueInCents !== displayedAmount.valueInCents &&
                       transaction.paymentProcessorFee?.valueInCents !== 0;
-                   const platformTip = transaction.relatedTransactions?.filter(t => t.type === 'CREDIT')[0]?.netAmount?.valueInCents;
-                   const platformTipCurrency = transaction.relatedTransactions?.filter(t => t.type === 'CREDIT')[0]?.netAmount?.currency;
+                    const platformTip = transaction.relatedTransactions?.filter(t => t.type === 'CREDIT')[0]?.netAmount
+                      ?.valueInCents;
+                    const platformTipCurrency = transaction.relatedTransactions?.filter(t => t.type === 'CREDIT')[0]
+                      ?.netAmount?.currency;
                     const displayPlatformTip = platformTip !== undefined && platformTip !== 0;
 
                     return (
-                      <TransactionDetails key={transaction.id}>
-                        <span>{transaction.description}</span>
-                        <FormattedMoneyAmount
-                          currency={displayedAmount.currency}
-                          precision={2}
-                          amount={displayedAmount.valueInCents}
-                        />
-                        <div>
-                          {Boolean(transaction.taxAmount?.valueInCents) && (
-                            <Span display="block">
-                              <FormattedMoneyAmount
-                                currency={transaction.taxAmount.currency}
-                                precision={2}
-                                amount={transaction.taxAmount.valueInCents}
-                                amountStyles={null}
-                              />{' '}
-                              ({round(transaction.taxInfo.rate * 100, 2)}%{' '}
-                              {i18nTaxType(intl, transaction.taxInfo.type, 'long')})
-                            </Span>
-                          )}
-                          {displayPaymentFees && (
-                            <Span display="block">
-                              <FormattedMessage
-                                defaultMessage="{value} (Payment Processor Fee)"
-                                values={{
-                                  value: (
-                                    <FormattedMoneyAmount
-                                      currency={transaction.paymentProcessorFee.currency}
-                                      amount={transaction.paymentProcessorFee.valueInCents}
-                                      amountStyles={null}
-                                    />
-                                  ),
-                                }}
-                              />
-                            </Span>
-                          )}
-                          {displayPlatformTip && (
+                      <React.Fragment key={transaction.id}>
+                        <TransactionDetails>
+                          <span>{transaction.description}</span>
+                          <FormattedMoneyAmount
+                            currency={displayedAmount.currency}
+                            precision={2}
+                            amount={displayedAmount.valueInCents}
+                          />
+                          <div>
+                            {Boolean(transaction.taxAmount?.valueInCents) && (
+                              <Span display="block">
+                                <FormattedMoneyAmount
+                                  currency={transaction.taxAmount.currency}
+                                  precision={2}
+                                  amount={transaction.taxAmount.valueInCents}
+                                  amountStyles={null}
+                                />{' '}
+                                ({round(transaction.taxInfo.rate * 100, 2)}%{' '}
+                                {i18nTaxType(intl, transaction.taxInfo.type, 'long')})
+                              </Span>
+                            )}
+                            {displayPaymentFees && (
+                              <Span display="block">
+                                <FormattedMessage
+                                  defaultMessage="{value} (Payment Processor Fee)"
+                                  values={{
+                                    value: (
+                                      <FormattedMoneyAmount
+                                        currency={transaction.paymentProcessorFee.currency}
+                                        amount={transaction.paymentProcessorFee.valueInCents}
+                                        amountStyles={null}
+                                      />
+                                    ),
+                                  }}
+                                />
+                              </Span>
+                            )}
+                          </div>
+                          <span>
                             <FormattedMessage
-                              defaultMessage="{value} (Platform Tip)"
+                              defaultMessage="{type, select, CREDIT {Received by} DEBIT {Paid by} other {}} {account} on {date}"
                               values={{
-                                value: (
-                                  <FormattedMoneyAmount
-                                    currency={platformTipCurrency}
-                                    amount={platformTip}
-                                    amountStyles={null}
-                                  />
-                                ),
+                                type: transaction.type,
+                                date: <DateTime value={transaction.createdAt} dateStyle={'short'} timeStyle="short" />,
+                                account: <LinkCollective collective={transaction.account} />,
                               }}
                             />
-                          )}
-                        </div>
-                        <span>
-                          <FormattedMessage
-                            defaultMessage="{type, select, CREDIT {Received by} DEBIT {Paid by} other {}} {account} on {date}"
-                            values={{
-                              type: transaction.type,
-                              date: <DateTime value={transaction.createdAt} dateStyle={'short'} timeStyle="short" />,
-                              account: <LinkCollective collective={transaction.account} />,
-                            }}
-                          />
-                        </span>
-                      </TransactionDetails>
+                          </span>
+                        </TransactionDetails>
+                        {displayPlatformTip && (
+                          <TransactionDetails>
+                            <FormattedMessage defaultMessage="Platform Tip" />
+                            <FormattedMoneyAmount currency={platformTipCurrency} precision={2} amount={platformTip} />
+                            <React.Fragment></React.Fragment>
+                            <FormattedMessage defaultMessage="The tip amount contributed to Open Collective" />
+                          </TransactionDetails>
+                        )}
+                      </React.Fragment>
                     );
                   })
                 )}
