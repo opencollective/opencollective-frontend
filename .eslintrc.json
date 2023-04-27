@@ -9,7 +9,7 @@
     "react-hooks",
     "simple-import-sort",
     "formatjs",
-    "jsx-a11y"
+    "jsx-a11y" // https://github.com/brendanmorrell/eslint-plugin-styled-components-a11y/issues/52
   ],
   "rules": {
     "no-console": "error",
