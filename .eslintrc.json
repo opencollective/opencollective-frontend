@@ -3,14 +3,7 @@
   "ignorePatterns": ["./lib/graphql/types/*"],
   "env": { "jest": true },
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint/eslint-plugin",
-    "graphql",
-    "react-hooks",
-    "simple-import-sort",
-    "formatjs",
-    "jsx-a11y" // https://github.com/brendanmorrell/eslint-plugin-styled-components-a11y/issues/52
-  ],
+  "plugins": ["@typescript-eslint/eslint-plugin", "graphql", "react-hooks", "simple-import-sort", "formatjs"],
   "rules": {
     "no-console": "error",
     "require-atomic-updates": "off",
@@ -118,6 +111,7 @@
     "formatjs/no-emoji": ["off"],
     "formatjs/no-multiple-plurals": ["off"],
     // styled-components-a11y
+    "jsx-a11y/no-autofocus": ["off"],
     "styled-components-a11y/html-has-lang": ["off"],
     "styled-components-a11y/iframe-has-title": ["off"]
   },
