@@ -230,32 +230,30 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           <HostInfoCard host={data.host} />
         )}
       </Box>
-      {!expenses.loading && data?.host && (
-        <ScheduledExpensesBanner
-          host={data.host}
-          expenses={paginatedExpenses.nodes}
-          onSubmit={() => {
-            expenses.refetch();
-          }}
-          secondButton={
-            !(query.status === 'SCHEDULED_FOR_PAYMENT' && query.payout === 'BANK_ACCOUNT') ? (
-              <StyledButton
-                buttonSize="tiny"
-                buttonStyle="successSecondary"
-                mr={1}
-                onClick={() => {
-                  router.push({
-                    pathname: pageRoute,
-                    query: getQueryParams({ status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', offset: null }),
-                  });
-                }}
-              >
-                <FormattedMessage id="expenses.list" defaultMessage="List Expenses" />
-              </StyledButton>
-            ) : null
-          }
-        />
-      )}
+      <ScheduledExpensesBanner
+        hostSlug={hostSlug}
+        expenses={paginatedExpenses.nodes}
+        onSubmit={() => {
+          expenses.refetch();
+        }}
+        secondButton={
+          !(query.status === 'SCHEDULED_FOR_PAYMENT' && query.payout === 'BANK_ACCOUNT') ? (
+            <StyledButton
+              buttonSize="tiny"
+              buttonStyle="successSecondary"
+              mr={1}
+              onClick={() => {
+                router.push({
+                  pathname: pageRoute,
+                  query: getQueryParams({ status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', offset: null }),
+                });
+              }}
+            >
+              <FormattedMessage id="expenses.list" defaultMessage="List Expenses" />
+            </StyledButton>
+          ) : null
+        }
+      />
       <Box mb={34}>
         {data?.host ? (
           <ExpensesFilters
