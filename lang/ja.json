@@ -912,6 +912,7 @@
   "DropZone.UploadBox": "一つまたは複数のファイルをドラッグ＆ドロップするか、 <i18n-link>こちらをクリックしてファイルを選択</i18n-link>してください。",
   "DsfNxu": "Keep this field empty to use the default title: {receiptTitlePlaceholder}.",
   "dT6mUk": "取得日: {date}",
+  "Dtil7S": "Your session has expired. Please sign-in again.",
   "DVdz90": "Error updating custom email message: {error}",
   "dwABvu": "Sample payload:",
   "E+4HIb": "Email us and find how you can contribute with your time to add to the research about sharing ownership within organizations.",
