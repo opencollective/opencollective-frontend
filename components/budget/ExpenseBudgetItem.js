@@ -78,15 +78,11 @@ const ExpenseContainer = styled.div`
   ${space}
   cursor: pointer;
   transition: background 0.1s;
-  text-align: left;
 
   ${props =>
     props.useDrawer &&
     css`
       &:hover {
-        background: #f8fafc;
-      }
-      &:focus-visible {
         background: #f8fafc;
       }
       ${props => props.selected && `background: #f8fafc;`}
@@ -142,7 +138,6 @@ const ExpenseBudgetItem = ({
   return (
     <Fragment>
       <ExpenseContainer
-        as={useDrawer ? 'button' : 'div'}
         px={[3, '24px']}
         py={3}
         data-cy={`expense-container-${expense?.legacyId}`}
