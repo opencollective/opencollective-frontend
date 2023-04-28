@@ -325,8 +325,6 @@ ProcessExpenseButtons.propTypes = {
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
   buttonSize: 'small',
   minWidth: 130,
-  mx: 2,
-  mt: 2,
 };
 
 ProcessExpenseButtons.defaultProps = {

@@ -12,6 +12,8 @@ import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';
 import { P } from '../Text';
 
+import ExpenseDrawer from './ExpenseDrawer';
+
 const ExpenseContainer = styled.div`
   ${props =>
     !props.isFirst &&
@@ -73,12 +75,16 @@ const ExpensesList = ({
   onProcess,
   expenseFieldForTotalAmount,
 }) => {
+  const [expenseInDrawer, setExpenseInDrawer] = React.useState(null);
+  const [selectedId, setSelectedId] = React.useState(null);
+
   if (!expenses?.length && !isLoading) {
     return null;
   }
 
   return (
     <StyledCard>
+      <ExpenseDrawer open={Boolean(selectedId)} handleClose={() => setSelectedId(null)} expense={expenseInDrawer} />
       {isLoading ? (
         [...new Array(nbPlaceholders)].map((_, idx) => (
           // eslint-disable-next-line react/no-array-index-key
@@ -99,6 +105,11 @@ const ExpensesList = ({
                 onDelete={onDelete}
                 onProcess={onProcess}
                 suggestedTags={suggestedTags}
+                selected={selectedId === expense.id}
+                expandExpense={() => {
+                  setExpenseInDrawer(expense);
+                  setSelectedId(expense.id);
+                }}
               />
             </ExpenseContainer>
           ))}

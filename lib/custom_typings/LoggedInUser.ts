@@ -13,6 +13,7 @@ export type LoggedInUser = {
   isAdminOfCollectiveOrHost: (collective: any) => boolean;
   isHostAdmin: (collective: any) => boolean;
   isSelf: (collective: any) => boolean;
+  isRoot: boolean;
   canEditComment: (comment: any) => boolean;
   canEditEvent: (event: any) => boolean;
   canEditProject: (project: any) => boolean;

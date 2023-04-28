@@ -15,7 +15,14 @@ const msg = defineMessages({
 /**
  * A lock icon with a tooltip indicating that this info is private
  */
-const PrivateInfoIcon = ({ children, size, tooltipProps, withoutTooltip, color, ...props }) => {
+const PrivateInfoIcon = ({
+  children = undefined,
+  size = '0.9em',
+  tooltipProps = undefined,
+  withoutTooltip = undefined,
+  color = '#75777A',
+  ...props
+}) => {
   const { formatMessage } = useIntl();
   const icon = <Lock size={size} color={color} {...props} />;
 
@@ -41,11 +48,6 @@ PrivateInfoIcon.propTypes = {
   tooltipProps: PropTypes.object,
   withoutTooltip: PropTypes.bool,
   color: PropTypes.string,
-};
-
-PrivateInfoIcon.defaultProps = {
-  size: '0.9em',
-  color: '#75777A',
 };
 
 export default PrivateInfoIcon;
