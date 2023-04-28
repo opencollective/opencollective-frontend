@@ -460,7 +460,7 @@ function Expense(props) {
     <Box ref={expenseTopRef}>
       <ExpenseHeader inDrawer={inDrawer}>
         <FormattedMessage
-          id="ExpenseSummaryTitle"
+          id="ExpenseTitle"
           defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} <LinkExpense>{id}</LinkExpense> to <LinkCollective>{collectiveName}</LinkCollective>"
           values={{
             type: expense?.type,
