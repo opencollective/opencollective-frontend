@@ -230,6 +230,7 @@ type ExportTransactionsCSVModalProps = {
   collective: Account;
   host?: Account;
   accounts?: Account[];
+  filters?: Record<string, string>;
 };
 
 const ExportTransactionsCSVModal = ({
@@ -238,6 +239,7 @@ const ExportTransactionsCSVModal = ({
   dateInterval,
   host,
   accounts,
+  filters,
   ...props
 }: ExportTransactionsCSVModalProps) => {
   const isHostReport = Boolean(host);
@@ -317,9 +319,22 @@ const ExportTransactionsCSVModal = ({
         url.searchParams.set('account', accounts.map(a => a.slug).join(','));
       }
     } else {
-      url.searchParams.set('includeChildrenTransactions', '1');
-      url.searchParams.set('includeIncognitoTransactions', '1');
-      url.searchParams.set('includeGiftCardTransactions', '1');
+      if (!filters?.ignoreGiftCardsTransactions) {
+        url.searchParams.set('includeGiftCardTransactions', '1');
+      }
+      if (!filters?.ignoreIncognitoTransactions) {
+        url.searchParams.set('includeIncognitoTransactions', '1');
+      }
+      if (!filters?.ignoreChildrenTransactions) {
+        url.searchParams.set('includeChildrenTransactions', '1');
+      }
+      for (const key in omit(filters, [
+        'ignoreGiftCardsTransactions',
+        'ignoreIncognitoTransactions',
+        'ignoreChildrenTransactions',
+      ])) {
+        url.searchParams.set(key, filters[key]);
+      }
     }
     if (from) {
       url.searchParams.set('dateFrom', simpleDateToISOString(from, false, timezoneType));
@@ -367,6 +382,14 @@ const ExportTransactionsCSVModal = ({
               values={{
                 accounts: accounts.map(a => a.slug).join(', '),
               }}
+            />
+          </MessageBox>
+        )}
+        {!isEmpty(filters) && (
+          <MessageBox type="warning" withIcon mt={3}>
+            <FormattedMessage
+              id="ExportTransactionsCSVModal.FiltersWarning"
+              defaultMessage="This report is affected by the filters set in the transactions page."
             />
           </MessageBox>
         )}
