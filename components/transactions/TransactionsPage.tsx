@@ -4,6 +4,7 @@ import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { isNil, omit, omitBy, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { isIndividualAccount } from '../../lib/collective.lib';
 import roles from '../../lib/constants/roles';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { parseDateInterval } from '../../lib/date-utils';
@@ -133,7 +134,7 @@ const Transactions = ({
   function checkCanDownloadInvoices() {
     if (!account || !LoggedInUser) {
       return false;
-    } else if (account.type !== 'ORGANIZATION' && account.type !== 'USER') {
+    } else if (account.type !== 'ORGANIZATION' && !isIndividualAccount(account)) {
       return false;
     } else {
       return (
