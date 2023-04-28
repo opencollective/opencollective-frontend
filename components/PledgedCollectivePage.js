@@ -124,10 +124,10 @@ const PledgedCollectivePage = ({ collective }) => {
               amount: (
                 <Currency
                   data-cy="currencyAmount"
-                  fontWeight="bold"
                   value={pledgeStats.total}
                   currency={collective.currency}
                   precision={0}
+                  styles={{ fontWeight: 'bold' }}
                 />
               ),
             }}

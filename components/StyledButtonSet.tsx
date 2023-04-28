@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { ButtonSize } from '../lib/theme/variants/button';
 
-import Container from './Container';
+import Container, { ContainerProps } from './Container';
 import StyledButton, { StyledButtonProps } from './StyledButton';
 
 type ButtonItemProps = {
@@ -85,7 +85,6 @@ const StyledButtonItem = ({
 
   return (
     <ButtonItem
-      as={undefined as any}
       color={isSelected ? 'white' : 'black.400'}
       buttonSize={size}
       buttonStyle={isSelected ? 'primary' : undefined}
@@ -99,6 +98,7 @@ const StyledButtonItem = ({
       {...buttonProps}
       {...(buttonPropsBuilder ? buttonPropsBuilder({ item, index, isSelected }) : {})}
       {...(isAlwaysShown ? { display: 'inline-block' } : {})}
+      as={undefined}
     >
       {children({ item, isSelected })}
     </ButtonItem>
@@ -131,6 +131,9 @@ type StyledButtonSetProps<T> = {
   /** Button Props */
   buttonProps?: StyledButtonProps;
   customBorderRadius?: string;
+  /** An optional set of props passed to the `Container` */
+  styles?: ContainerProps;
+  'data-cy'?: string;
 };
 
 const StyledButtonSet = ({
@@ -143,9 +146,11 @@ const StyledButtonSet = ({
   onChange,
   disabled,
   customBorderRadius = '4px',
+  styles = {},
+  'data-cy': dataCy,
   ...props
 }: StyledButtonSetProps<string | number>) => (
-  <Container display="flex" {...props}>
+  <Container display="flex" data-cy={dataCy} {...styles} {...props} as={undefined}>
     {items.map((item, index) => (
       <StyledButtonItem
         key={item}

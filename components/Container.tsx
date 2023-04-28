@@ -37,7 +37,7 @@ import {
   WhiteSpaceProps,
 } from '../lib/styled-system-custom-properties';
 
-type ContainerProps = FlexboxProps &
+export type ContainerProps = FlexboxProps &
   BackgroundProps &
   BorderProps &
   ShadowProps &
