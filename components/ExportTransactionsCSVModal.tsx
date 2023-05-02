@@ -252,7 +252,7 @@ const ExportTransactionsCSVModal = ({
     () => getSelectedPeriodOptionFromInterval(tmpDateInterval as any),
     [tmpDateInterval],
   );
-  const datePresetPptions = React.useMemo(() => {
+  const datePresetOptions = React.useMemo(() => {
     return Object.keys(PERIOD_FILTER_PRESETS).map(presetKey => ({
       value: presetKey,
       label: PERIOD_FILTER_PRESETS[presetKey].label,
@@ -363,7 +363,7 @@ const ExportTransactionsCSVModal = ({
           <MessageBox type="warning" withIcon mt={3}>
             <FormattedMessage
               id="ExportTransactionsCSVModal.FilteredCollectivesWarning"
-              defaultMessage="This report is affected by the collective filtter and will include all transactions from the following accounts: {accounts}"
+              defaultMessage="This report is affected by the collective filter and will include all transactions from the following accounts: {accounts}"
               values={{
                 accounts: accounts.map(a => a.slug).join(', '),
               }}
@@ -382,7 +382,7 @@ const ExportTransactionsCSVModal = ({
               {inputProps => (
                 <StyledSelect
                   {...inputProps}
-                  options={datePresetPptions}
+                  options={datePresetOptions}
                   onChange={({ value }) => setTmpDateInterval(PERIOD_FILTER_PRESETS[value].getInterval())}
                   value={datePresetSelectedOption}
                   width="100%"

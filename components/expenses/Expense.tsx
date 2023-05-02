@@ -26,7 +26,7 @@ import CommentForm from '../conversations/CommentForm';
 import Thread from '../conversations/Thread';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
-import { getI18nLink, I18nSupportLink } from '../I18nFormatters';
+import { getI18nLink, I18nSupportLink, WebsiteName } from '../I18nFormatters';
 import CommentIcon from '../icons/CommentIcon';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Link from '../Link';
@@ -571,8 +571,8 @@ function Expense(props) {
                   <MessageBox type="info" fontSize="12px">
                     <FormattedMessage
                       id="Expense.SignUpInfoBox"
-                      defaultMessage="You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on Open Collective."
-                      values={{ collectiveName: collective.name }}
+                      defaultMessage="You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on {WebsiteName}."
+                      values={{ collectiveName: collective.name, WebsiteName }}
                     />
                   </MessageBox>
                   <Box mt={3}>

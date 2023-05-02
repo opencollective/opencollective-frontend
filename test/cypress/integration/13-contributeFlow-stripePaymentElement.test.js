@@ -33,9 +33,9 @@ function contributeWithNewUsBankAccount({ name } = {}) {
       return iframe.contents().find('body');
     })
     .within(() => {
-      cy.contains('Agree').click();
-      cy.contains('Success').click(); // Bank account with name 'Success'
-      cy.contains('Link account').click();
+      cy.get('[data-testid="agree-button"]').click();
+      cy.get('[data-testid="success"]').click(); // Bank account with name 'Success'
+      cy.get('[data-testid="select-button"]').click();
       cy.get('[data-testid="done-button"]').click();
     });
 
