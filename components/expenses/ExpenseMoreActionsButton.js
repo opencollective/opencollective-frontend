@@ -134,16 +134,18 @@ const ExpenseMoreActionsButton = ({
             )}
             {permissions?.canSeeInvoiceInfo && expense?.type === expenseTypes.INVOICE && (
               <ExpenseInvoiceDownloadHelper expense={expense} collective={collective} onError={onError}>
-                {({ isLoading, downloadInvoice }) => (
-                  <Action loading={isLoading} onClick={downloadInvoice} disabled={isDisabled}>
-                    <IconDownload size="16px" />
-                    {isLoading ? (
-                      <FormattedMessage id="loading" defaultMessage="loading" />
-                    ) : (
-                      <FormattedMessage id="Download" defaultMessage="Download" />
-                    )}
-                  </Action>
-                )}
+                {({ isLoading, downloadInvoice }) => {
+                  return (
+                    <Action onClick={downloadInvoice} disabled={isDisabled || isLoading}>
+                      <IconDownload size="16px" />
+                      {isLoading ? (
+                        <FormattedMessage id="loading" defaultMessage="loading" />
+                      ) : (
+                        <FormattedMessage id="Download" defaultMessage="Download" />
+                      )}
+                    </Action>
+                  );
+                }}
               </ExpenseInvoiceDownloadHelper>
             )}
             <Action

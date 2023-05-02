@@ -135,8 +135,6 @@ export const expenseHostFields = gql`
     }
     supportedPayoutMethods
     isTrustedHost
-    hasDisputedOrders
-    hasInReviewOrders
     plan {
       id
     }
@@ -513,6 +511,7 @@ export const expensesListFieldsFragment = gql`
       createdAt
       currency
       type
+      imageUrl
       stats {
         id
         balanceWithBlockedFunds {
@@ -580,6 +579,7 @@ export const expensesListFieldsFragment = gql`
       type
       slug
       name
+      imageUrl
     }
   }
 `;

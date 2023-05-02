@@ -2,10 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import jwt from 'jsonwebtoken';
-import { isEqual } from 'lodash';
+import { get, isEqual } from 'lodash';
 import Router, { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
 
+import { createError, ERROR, formatErrorMessage } from '../lib/errors';
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
@@ -32,6 +33,7 @@ class UserProvider extends React.Component {
     client: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     children: PropTypes.node,
+    intl: PropTypes.object,
     /**
      * If not used inside of NextJS (ie. in styleguide), the code that checks if we are
      * on `/signin` that uses `Router` will crash. Setting this prop bypass this behavior.
@@ -84,7 +86,8 @@ class UserProvider extends React.Component {
   };
 
   login = async token => {
-    const { getLoggedInUser, twoFactorAuthPrompt } = this.props;
+    const { getLoggedInUser, twoFactorAuthPrompt, intl } = this.props;
+
     try {
       const LoggedInUser = token ? await getLoggedInUser({ token }) : await getLoggedInUser();
       this.setState({
@@ -94,9 +97,21 @@ class UserProvider extends React.Component {
       });
       return LoggedInUser;
     } catch (error) {
-      // If token from localStorage is invalid or expired, delete it
-      if (!token && ['Invalid token', 'Expired token'].includes(error.message)) {
+      // Malformed tokens are detected and removed by the frontend in `lib/hooks/withLoggedInUser.js` (search for "malformed")
+      // Invalid tokens are ignored in the API, the user is treated as unauthenticated (see `parseJwt` in `server/middleware/authentication.js`)
+      // There can therefore only be two types of errors here:
+      // - Network/server errors: we'll display a message
+      // - Expired tokens: we'll logout the user with a "Your session has expired. Please sign-in again." message
+      const errorType = get(error, 'networkError.result.error.type');
+
+      // For expired tokens, we directly logout & show a toast as we want to make sure it gets
+      // displayed not matter what page the user is on.
+      if (!token && errorType === 'jwt_expired') {
         this.logout();
+        this.setState({ loadingLoggedInUser: false });
+        const message = formatErrorMessage(intl, createError(ERROR.JWT_EXPIRED));
+        this.props.addToast({ type: TOAST_TYPE.ERROR, message });
+        return null;
       }
 
       // Store the error
@@ -195,7 +210,7 @@ const withUser = WrappedComponent => {
 };
 
 export default withToasts(
-  injectIntl(withApollo(withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(UserProvider))))),
+  injectIntl(withApollo(withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(injectIntl(UserProvider)))))),
 );
 
 export { UserConsumer, withUser };

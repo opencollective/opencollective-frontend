@@ -63,10 +63,10 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
 
   if (isLoading) {
     return (
-      <div>
+      <Container width="100%" px={2}>
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
-      </div>
+      </Container>
     );
   }
 
@@ -74,7 +74,7 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
   if (AdminSectionComponent) {
     return (
       <Container width="100%">
-        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} />
+        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} isDashboard={true} />
       </Container>
     );
   }

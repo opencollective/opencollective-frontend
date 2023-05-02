@@ -165,7 +165,7 @@ describe('host dashboard', () => {
     });
 
     it('Process expense', () => {
-      cy.login({ redirect: '/brusselstogetherasbl/admin/expenses' });
+      cy.login({ redirect: '/brusselstogetherasbl/admin/expenses?status=ALL' });
       cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
 
       // Defaults to pending, approve it

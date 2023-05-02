@@ -12,6 +12,9 @@ import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';
 import { P } from '../Text';
 
+import NewExpenseDrawer from './NewExpenseDrawer';
+import ExpenseDrawer from './ExpenseDrawer';
+
 const ExpenseContainer = styled.div`
   ${props =>
     !props.isFirst &&
@@ -73,12 +76,26 @@ const ExpensesList = ({
   onProcess,
   expenseFieldForTotalAmount,
 }) => {
+  const [expenseInDrawer, setExpenseInDrawer] = React.useState(null);
+  const [selectedId, setSelectedId] = React.useState(null);
+  const [useNewDrawer, setUseNewDrawer] = React.useState(true);
+
   if (!expenses?.length && !isLoading) {
     return null;
   }
 
   return (
     <StyledCard>
+      <NewExpenseDrawer
+        open={useNewDrawer && Boolean(selectedId)}
+        handleClose={() => setSelectedId(null)}
+        expense={expenseInDrawer}
+      />
+      <ExpenseDrawer
+        open={!useNewDrawer && Boolean(selectedId)}
+        handleClose={() => setSelectedId(null)}
+        expense={expenseInDrawer}
+      />
       {isLoading ? (
         [...new Array(nbPlaceholders)].map((_, idx) => (
           // eslint-disable-next-line react/no-array-index-key
@@ -99,6 +116,20 @@ const ExpensesList = ({
                 onDelete={onDelete}
                 onProcess={onProcess}
                 suggestedTags={suggestedTags}
+                selected={selectedId === expense.id}
+                expandExpense={() => {
+                  // if the command key is held down, open the expense in a new tab
+                  if (window?.event?.metaKey) {
+                    console.log('command down');
+                    setUseNewDrawer(false);
+                  } else {
+                    console.log('command up');
+
+                    setUseNewDrawer(true);
+                  }
+                  setExpenseInDrawer(expense);
+                  setSelectedId(expense.id);
+                }}
               />
             </ExpenseContainer>
           ))}
