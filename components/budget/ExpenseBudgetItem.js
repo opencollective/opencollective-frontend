@@ -167,7 +167,7 @@ const ExpenseBudgetItem = ({
                 <StyledTooltip
                   content={
                     useDrawer ? (
-                      <FormattedMessage id="Expense.Expand" defaultMessage="Expand expense" />
+                      <FormattedMessage id="Expense.SeeDetails" defaultMessage="See expense details" />
                     ) : (
                       <FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />
                     )

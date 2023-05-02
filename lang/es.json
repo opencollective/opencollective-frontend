@@ -1156,6 +1156,7 @@
   "Expense.SaveReceipt": "Guardar recibo",
   "expense.schedule.btn": "Programar el Pago con {paymentMethod}",
   "expense.scheduledForPayment": "Programado para el pago",
+  "Expense.SeeDetails": "See expense details",
   "Expense.SendInvite": "Enviar invitación",
   "Expense.SignUpInfoBox": "You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on {WebsiteName}.",
   "expense.status": "Estado",

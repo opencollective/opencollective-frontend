@@ -1156,6 +1156,7 @@
   "Expense.SaveReceipt": "Uložiť príjmový doklad",
   "expense.schedule.btn": "Plánovať platbu pomocou {paymentMethod}",
   "expense.scheduledForPayment": "Naplánovaná platba",
+  "Expense.SeeDetails": "See expense details",
   "Expense.SendInvite": "Odoslať pozvánku",
   "Expense.SignUpInfoBox": "You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on {WebsiteName}.",
   "expense.status": "Stav",

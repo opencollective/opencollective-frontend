@@ -1156,6 +1156,7 @@
   "Expense.SaveReceipt": "Spara kvitto",
   "expense.schedule.btn": "Schemalägg att betala med {paymentMethod}",
   "expense.scheduledForPayment": "Schemalagd för betalning",
+  "Expense.SeeDetails": "See expense details",
   "Expense.SendInvite": "Skicka inbjudan",
   "Expense.SignUpInfoBox": "You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on {WebsiteName}.",
   "expense.status": "Status",
