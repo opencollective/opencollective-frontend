@@ -19,7 +19,7 @@ import Expense from './Expense';
 const DrawerContainer = styled.div`
   display: flex;
   height: 100%;
-  max-width: 768px; //896px
+  max-width: 768px;
   width: 100vw;
   flex-direction: column;
 `;
