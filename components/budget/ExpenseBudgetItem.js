@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -110,6 +111,11 @@ const ExpenseBudgetItem = ({
     (hasProcessButtons(expense.permissions) || expense.permissions.canMarkAsIncomplete);
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency?.currency !== expense.currency;
+
+  const { LoggedInUser } = useLoggedInUser();
+  const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isAdminOfCollective(host);
+  const isExpenseToHostCollective = expense?.account?.id === host?.id;
+  const isApproveBtnSecondary = isLoggedInUserExpenseHostAdmin && !isExpenseToHostCollective;
 
   return (
     <ExpenseContainer data-cy={`expense-container-${expense?.legacyId}`}>
@@ -336,6 +342,7 @@ const ExpenseBudgetItem = ({
           <ButtonsContainer>
             <ProcessExpenseButtons
               host={host}
+              displayApproveExpense={!isApproveBtnSecondary}
               collective={expense.account}
               expense={expense}
               permissions={expense.permissions}
@@ -403,6 +410,7 @@ ExpenseBudgetItem.propTypes = {
     }),
     /** If available, this `account` will be used to link expense in place of the `collective` */
     account: PropTypes.shape({
+      id: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string,
       stats: PropTypes.shape({
