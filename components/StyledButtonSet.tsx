@@ -133,7 +133,6 @@ type StyledButtonSetProps<T> = {
   customBorderRadius?: string;
   /** An optional set of props passed to the `Container` */
   styles?: ContainerProps;
-  'data-cy'?: string;
 };
 
 const StyledButtonSet = ({
@@ -147,10 +146,9 @@ const StyledButtonSet = ({
   disabled,
   customBorderRadius = '4px',
   styles = {},
-  'data-cy': dataCy,
   ...props
 }: StyledButtonSetProps<string | number>) => (
-  <Container display="flex" data-cy={dataCy} {...styles} {...props} as={undefined}>
+  <Container display="flex" {...styles} {...props} as={undefined}>
     {items.map((item, index) => (
       <StyledButtonItem
         key={item}

@@ -17,7 +17,6 @@ type CurrencyProps = {
   precision?: number | 'auto';
   /** An optional set of props passed to the `Span` */
   styles?: TextProps;
-  'data-cy'?: string;
 };
 
 /**
@@ -31,7 +30,7 @@ const Currency = ({
   formatWithSeparators = false,
   precision = 0,
   styles = {},
-  'data-cy': dataCy,
+  ...props
 }: CurrencyProps) => {
   const { locale } = useIntl();
   if (precision === 'auto') {
@@ -45,14 +44,14 @@ const Currency = ({
     // TODO: This approach is not great because the position of the currency depends on the locale
     const floatAmount = value / 100;
     return (
-      <Span whiteSpace="nowrap" {...styles} data-cy={dataCy} as={undefined}>
+      <Span whiteSpace="nowrap" {...styles} {...props} as={undefined}>
         {getCurrencySymbol(currency)}
         {floatAmount.toLocaleString(locale)}
       </Span>
     );
   } else {
     return (
-      <Span whiteSpace="nowrap" {...styles} data-cy={dataCy} as={undefined}>
+      <Span whiteSpace="nowrap" {...styles} {...props} as={undefined}>
         {formatCurrency(value, currency, { precision, locale })}
       </Span>
     );
