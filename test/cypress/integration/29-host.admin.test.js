@@ -153,33 +153,49 @@ describe('host dashboard', () => {
   });
 
   describe('expenses tab', () => {
-    let expense;
-
     before(() => {
       // 207 - BrusselsTogether
       cy.createExpense({
         userEmail: user.email,
         account: { legacyId: 207 },
         payee: { legacyId: user.CollectiveId },
-      }).then(e => (expense = e));
+      }).as('expense');
     });
 
-    it('Process expense', () => {
-      cy.login({ redirect: '/brusselstogetherasbl/admin/expenses?status=ALL' });
-      cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
+    it('Process host expense', () => {
+      cy.get('@expense').then(expense => {
+        cy.login({ redirect: `/brusselstogether/expenses/${expense.legacyId}` });
+      });
 
       // Defaults to pending, approve it
-      cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Pending');
-      cy.get('@currentExpense').find('[data-cy="approve-button"]').click();
-      cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Approved');
+      cy.contains('More actions').click();
+      cy.contains('Approve').click();
+      cy.getByDataCy('expense-status-msg').contains('Approved');
+
+      cy.visit('/brusselstogetherasbl/admin/expenses?status=ALL');
+      cy.get('@expense').then(expense => {
+        cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
+      });
 
       // Unapprove
       cy.get('@currentExpense').find('[data-cy="unapprove-button"]').click();
       cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Pending');
 
       // Approve
-      cy.get('@currentExpense').find('[data-cy="approve-button"]').click();
-      cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Approved');
+
+      cy.get('@expense').then(expense => {
+        cy.login({ redirect: `/brusselstogether/expenses/${expense.legacyId}` });
+      });
+
+      // Defaults to pending, approve it
+      cy.contains('More actions').click();
+      cy.contains('Approve').click();
+      cy.getByDataCy('expense-status-msg').contains('Approved');
+
+      cy.visit('/brusselstogetherasbl/admin/expenses?status=ALL');
+      cy.get('@expense').then(expense => {
+        cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
+      });
 
       // Security Check
       cy.get('@currentExpense').find('[data-cy="pay-button"]').click();
