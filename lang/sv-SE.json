@@ -1255,7 +1255,7 @@
   "ExportImages.AllFinancial": "Alla finansiella bidragsgivare",
   "ExportImages.Title": "Du kan exportera bilder som visar de ekonomiska bidragsgivarna för varje nivå.",
   "ExportTransactionsCSVModal.ExportTimeWarning": "We're exporting {rows} {rows, plural, one {row} other {rows}}, this can take up to {expectedTimeInMinutes} {expectedTimeInMinutes, plural, one {minute} other {minutes}}.",
-  "ExportTransactionsCSVModal.FilteredCollectivesWarning": "This report is affected by the collective filtter and will include all transactions from the following accounts: {accounts}",
+  "ExportTransactionsCSVModal.FilteredCollectivesWarning": "This report is affected by the collective filter and will include all transactions from the following accounts: {accounts}",
   "ExportTransactionsCSVModal.RowsWarning": "Sorry, the requested file is would take too long to be exported. Row count ({rows}) above limit.",
   "ExportTransactionsCSVModal.SelectAll": "Select all",
   "ExportTransactionsCSVModal.Title": "Export Transactions",

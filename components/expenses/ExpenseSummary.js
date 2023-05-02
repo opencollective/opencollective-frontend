@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
@@ -87,6 +88,11 @@ const ExpenseSummary = ({
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
 
+  const { LoggedInUser } = useLoggedInUser();
+  const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
+  const isExpenseToHostCollective = expense?.account?.id === expense?.account?.host?.id;
+  const isApproveBtnSecondary = isLoggedInUserExpenseHostAdmin && !isExpenseToHostCollective;
+
   const processButtons = (
     <Flex
       display="flex"
@@ -99,6 +105,7 @@ const ExpenseSummary = ({
       <ExpenseMoreActionsButton
         onEdit={onEdit}
         expense={expense}
+        displayApproveExpense={isApproveBtnSecondary}
         onDelete={() => {
           onDelete?.(expense);
           onClose?.();
@@ -109,6 +116,7 @@ const ExpenseSummary = ({
           <ProcessExpenseButtons
             expense={expense}
             isMoreActions
+            displayApproveExpense={!isApproveBtnSecondary}
             permissions={expense?.permissions}
             collective={collective}
             host={host}
@@ -370,6 +378,12 @@ ExpenseSummary.propTypes = {
     tags: PropTypes.arrayOf(PropTypes.string),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
     amountInAccountCurrency: AmountPropTypeShape,
+    account: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      host: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+      }).isRequired,
+    }).isRequired,
     items: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string,

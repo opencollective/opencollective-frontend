@@ -135,6 +135,10 @@ const ExpenseBudgetItem = ({
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency?.currency !== expense.currency;
 
+  const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isAdminOfCollective(host);
+  const isExpenseToHostCollective = expense?.account?.id === host?.id;
+  const isApproveBtnSecondary = isLoggedInUserExpenseHostAdmin && !isExpenseToHostCollective;
+
   return (
     <Fragment>
       <ExpenseContainer
@@ -309,9 +313,7 @@ const ExpenseBudgetItem = ({
                   />
                 )}
                 {shouldDisplayStatusTagActions ? (
-                  <Box data-expand="false">
-                    <AdminExpenseStatusTag host={host} collective={expense.account} expense={expense} p="3px 8px" />
-                  </Box>
+                  <AdminExpenseStatusTag host={host} collective={expense.account} expense={expense} p="3px 8px" />
                 ) : (
                   <ExpenseStatusTag
                     status={expense.status}
@@ -360,7 +362,6 @@ const ExpenseBudgetItem = ({
                         fontSize="11px"
                         cursor="pointer"
                         buttonSize="tiny"
-                        data-expand="false"
                         onClick={() => showFilesPreview(true)}
                         px={2}
                         ml={-2}
@@ -387,18 +388,17 @@ const ExpenseBudgetItem = ({
             )}
           </Box>
           {showProcessActions && expense?.permissions && !isExpensePaidOrRejected && (
-            <Box data-expand="false">
-              <ButtonsContainer>
-                <ProcessExpenseButtons
-                  host={host}
-                  collective={expense.account}
-                  expense={expense}
-                  permissions={expense.permissions}
-                  buttonProps={{ ...DEFAULT_PROCESS_EXPENSE_BTN_PROPS, mx: 0, py: 2, minWidth: 100 }}
-                  onSuccess={onProcess}
-                />
-              </ButtonsContainer>
-            </Box>
+            <ButtonsContainer>
+              <ProcessExpenseButtons
+                host={host}
+                displayApproveExpense={!isApproveBtnSecondary}
+                collective={expense.account}
+                expense={expense}
+                permissions={expense.permissions}
+                buttonProps={{ ...DEFAULT_PROCESS_EXPENSE_BTN_PROPS, mx: 1, py: 2 }}
+                onSuccess={onProcess}
+              />
+            </ButtonsContainer>
           )}
         </Flex>
       </ExpenseContainer>
@@ -461,6 +461,7 @@ ExpenseBudgetItem.propTypes = {
     }),
     /** If available, this `account` will be used to link expense in place of the `collective` */
     account: PropTypes.shape({
+      id: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string,
       stats: PropTypes.shape({
