@@ -76,7 +76,7 @@ const ExpenseContainer = styled.div`
   border: 0;
   background: white;
   ${space}
-  cursor: pointer;
+
   transition: background 0.1s;
 
   ${props =>
