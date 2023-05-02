@@ -1157,7 +1157,7 @@
   "expense.schedule.btn": "Schedule to Pay with {paymentMethod}",
   "expense.scheduledForPayment": "Запланированный платеж",
   "Expense.SendInvite": "Отправить приглашение",
-  "Expense.SignUpInfoBox": "You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on Open Collective.",
+  "Expense.SignUpInfoBox": "You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on {WebsiteName}.",
   "expense.status": "Статус",
   "Expense.Status.Refunded": "Возврат средств произведен",
   "Expense.Submitted": "Expense submitted",

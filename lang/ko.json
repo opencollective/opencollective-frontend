@@ -1157,7 +1157,7 @@
   "expense.schedule.btn": "Schedule to Pay with {paymentMethod}",
   "expense.scheduledForPayment": "Scheduled for payment",
   "Expense.SendInvite": "초대 보내기",
-  "Expense.SignUpInfoBox": "You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on Open Collective.",
+  "Expense.SignUpInfoBox": "You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on {WebsiteName}.",
   "expense.status": "상태",
   "Expense.Status.Refunded": "Refunded",
   "Expense.Submitted": "비용 요청 제출됨",

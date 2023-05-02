@@ -1157,7 +1157,7 @@
   "expense.schedule.btn": "Planifier pour payer avec {paymentMethod}",
   "expense.scheduledForPayment": "Paiement programmé",
   "Expense.SendInvite": "Envoyer une invitation",
-  "Expense.SignUpInfoBox": "You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on Open Collective.",
+  "Expense.SignUpInfoBox": "You need to create an account to receive a payment from {collectiveName}, by clicking 'Join and Submit' you agree to create an account on {WebsiteName}.",
   "expense.status": "Statut",
   "Expense.Status.Refunded": "Remboursée",
   "Expense.Submitted": "Dépense envoyée",
