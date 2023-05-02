@@ -96,7 +96,6 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
     toAccount,
     fromAccount,
     host,
-    uuid,
     platformFee,
     hostFee,
     paymentMethod,
@@ -272,7 +271,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               <StyledButton
                 buttonSize="small"
                 loading={loadingInvoice}
-                onClick={downloadInvoiceWith({ transactionUuid: uuid, toCollectiveSlug: toAccount.slug })}
+                onClick={downloadInvoiceWith({ transactionId: transaction.id, toCollectiveSlug: toAccount.slug })}
                 minWidth={140}
                 background="transparent"
                 textTransform="capitalize"
@@ -294,6 +293,8 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
 TransactionDetails.propTypes = {
   displayActions: PropTypes.bool,
   transaction: PropTypes.shape({
+    id: PropTypes.string,
+    idV2: PropTypes.string,
     isRefunded: PropTypes.bool,
     isRefund: PropTypes.bool,
     kind: PropTypes.oneOf(Object.values(TransactionKind)),
