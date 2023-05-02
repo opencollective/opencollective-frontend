@@ -83,7 +83,7 @@ const ExpenseSummary = ({
   const isGrant = expense?.type === expenseTypes.GRANT;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
-  const expenseItems = expense?.items.length > 0 ? expense.items : expense?.draft?.items || [];
+  const expenseItems = expense?.items?.length > 0 ? expense.items : expense?.draft?.items || [];
   const expenseTaxes = expense?.taxes?.length > 0 ? expense.taxes : expense?.draft?.taxes || [];
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
