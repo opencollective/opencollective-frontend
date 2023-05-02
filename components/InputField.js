@@ -165,6 +165,7 @@ class InputField extends React.Component {
     focus: PropTypes.bool,
     help: PropTypes.string,
     error: PropTypes.string,
+    formModified: PropTypes.bool,
   };
 
   constructor(props) {
@@ -424,8 +425,8 @@ class InputField extends React.Component {
             </Box>
             <SocialLinksFormField
               value={this.state.value || field.defaultValue}
-              touched={this.state.modified}
               onChange={event => this.handleChange(event)}
+              touched={field.formModified}
             />
           </Box>
         );

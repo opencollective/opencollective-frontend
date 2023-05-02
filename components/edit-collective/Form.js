@@ -830,6 +830,7 @@ class EditCollectiveForm extends React.Component {
                       min={field.min}
                       overflow="hidden"
                       required={field.required}
+                      formModified={this.state.modified}
                     />
                   ))}
                 </div>
