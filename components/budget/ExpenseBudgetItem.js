@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
 import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
