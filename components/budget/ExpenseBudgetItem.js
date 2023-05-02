@@ -82,9 +82,6 @@ const ExpenseContainer = styled.div`
   ${props =>
     props.useDrawer &&
     css`
-      &:hover {
-        background: #f8fafc;
-      }
       ${props => props.selected && `background: #f8fafc;`}
     `}
 
@@ -145,22 +142,12 @@ const ExpenseBudgetItem = ({
         px={[3, '24px']}
         py={3}
         data-cy={`expense-container-${expense?.legacyId}`}
-        data-expand="true"
         selected={selected}
         useDrawer={useDrawer}
-        {...(useDrawer && {
-          onClick: e => {
-            const onTarget = e.target.closest('[data-expand="true"]');
-            const onBlockedTarget = e.target.closest('[data-expand="false"]');
-            if (onTarget && !onBlockedTarget) {
-              expandExpense();
-            }
-          },
-        })}
       >
         <Flex justifyContent="space-between" flexWrap="wrap">
           <Flex flex="1" minWidth="max(50%, 200px)" maxWidth={[null, '70%']} mr="24px">
-            <Box mr={3} data-expand="false">
+            <Box mr={3}>
               {isLoading ? (
                 <LoadingPlaceholder width={40} height={40} />
               ) : (
@@ -178,14 +165,26 @@ const ExpenseBudgetItem = ({
             ) : (
               <Box>
                 <StyledTooltip
-                  content={<FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />}
+                  content={
+                    useDrawer ? (
+                      <FormattedMessage id="Expense.Expand" defaultMessage="Expand expense" />
+                    ) : (
+                      <FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />
+                    )
+                  }
                   delayHide={0}
                 >
                   <StyledLink
-                    as={Link}
                     underlineOnHover
-                    data-expand="false"
-                    href={`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`}
+                    {...(useDrawer
+                      ? {
+                          as: 'button',
+                          onClick: expandExpense,
+                        }
+                      : {
+                          as: Link,
+                          href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
+                        })}
                   >
                     <AutosizeText
                       value={expense.description}
@@ -214,7 +213,7 @@ const ExpenseBudgetItem = ({
 
                 <P mt="5px" fontSize="12px" color="black.700">
                   {isAdminView ? (
-                    <LinkCollective data-expand="false" collective={expense.account} />
+                    <LinkCollective collective={expense.account} />
                   ) : (
                     <FormattedMessage
                       defaultMessage="from {payee} to {account}"
