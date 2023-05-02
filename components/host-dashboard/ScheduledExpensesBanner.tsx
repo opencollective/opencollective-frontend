@@ -16,14 +16,17 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const scheduledExpensesQuery = gql`
-  query ScheduledExpensesBanner(
-    $hostId: String!
-    $limit: Int!
-    $status: ExpenseStatusFilter
-    $payoutMethodType: PayoutMethodType
-  ) {
-    expenses(host: { id: $hostId }, limit: $limit, status: $status, payoutMethodType: $payoutMethodType) {
+export const scheduledExpensesQuery = gql`
+  query ScheduledExpensesBanner($hostSlug: String!, $limit: Int!, $payoutMethodType: PayoutMethodType) {
+    host(slug: $hostSlug) {
+      id
+    }
+    expenses(
+      host: { slug: $hostSlug }
+      status: SCHEDULED_FOR_PAYMENT
+      limit: $limit
+      payoutMethodType: $payoutMethodType
+    ) {
       totalCount
       offset
       limit
@@ -34,14 +37,18 @@ const scheduledExpensesQuery = gql`
   }
 `;
 
-const ScheduledExpensesBanner = ({ host, onSubmit, secondButton, expenses }) => {
+export const getScheduledExpensesQueryVariables = hostSlug => ({
+  hostSlug,
+  limit: 100,
+  payoutMethodType: 'BANK_ACCOUNT',
+});
+
+const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
   const scheduledExpenses = useQuery(scheduledExpensesQuery, {
-    variables: { hostId: host.id, limit: 100, status: 'SCHEDULED_FOR_PAYMENT', payoutMethodType: 'BANK_ACCOUNT' },
+    variables: getScheduledExpensesQueryVariables(hostSlug),
     context: API_V2_CONTEXT,
   });
-  React.useEffect(() => {
-    scheduledExpenses.refetch();
-  }, [expenses]);
+
   const { addToast } = useToasts();
   const intl = useIntl();
   const [showConfirmationModal, setConfirmationModalDisplay] = React.useState(false);
@@ -57,7 +64,7 @@ const ScheduledExpensesBanner = ({ host, onSubmit, secondButton, expenses }) => 
     try {
       await request(`${getWebsiteUrl()}/api/services/transferwise/pay-batch`, {
         method: 'POST',
-        body: JSON.stringify({ expenseIds, hostId: host.id }),
+        body: JSON.stringify({ expenseIds, hostId: scheduledExpenses.data.host.id }),
         headers: addAuthTokenToHeader(),
       });
       setConfirmationModalDisplay(false);
@@ -141,10 +148,7 @@ const ScheduledExpensesBanner = ({ host, onSubmit, secondButton, expenses }) => 
 };
 
 ScheduledExpensesBanner.propTypes = {
-  host: PropTypes.shape({
-    id: PropTypes.string,
-  }).isRequired,
-  expenses: PropTypes.array,
+  hostSlug: PropTypes.string.isRequired,
   onSubmit: PropTypes.func,
   secondButton: PropTypes.node,
 };
