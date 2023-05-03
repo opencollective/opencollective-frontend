@@ -795,6 +795,7 @@
   "createCollective.form.error.slug": "Please use fewer than 30 characters",
   "createCollective.form.error.slug.hyphen": "Collective slug URL cannot start or end with a hyphen",
   "createCollective.form.error.slug.taken": "Το URL χρησιμοποιείται ήδη",
+  "createCollective.form.locationPlaceholder": "Where are you based?",
   "createCollective.form.nameLabel": "Όνομα Κολεκτίβας",
   "createCollective.form.slugLabel": "Ορίστε το URL σας",
   "createCollective.form.suggestedLabel": "Προτεινόμενη",
