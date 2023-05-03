@@ -1,19 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get, isNil } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { capitalize } from '../lib/utils';
 
+import SocialLinksFormField from './edit-collective/SocialLinksFormField';
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import CollectiveTagsInput from './CollectiveTagsInput';
 import { Box, Flex } from './Grid';
 import InputSwitch from './InputSwitch';
-import InputTypeCountry from './InputTypeCountry';
 import InputTypeLocation from './InputTypeLocation';
 import StyledButton from './StyledButton';
 import StyledCheckbox from './StyledCheckbox';
 import StyledInputGroup from './StyledInputGroup';
+import StyledInputLocation from './StyledInputLocation';
 import StyledInputTags from './StyledInputTags';
 import StyledSelect from './StyledSelect';
 import StyledTextarea from './StyledTextarea';
@@ -163,6 +165,7 @@ class InputField extends React.Component {
     focus: PropTypes.bool,
     help: PropTypes.string,
     error: PropTypes.string,
+    formModified: PropTypes.bool,
   };
 
   constructor(props) {
@@ -396,48 +399,38 @@ class InputField extends React.Component {
         );
         break;
 
-      case 'country':
+      case 'address':
         this.input = (
-          <div>
-            {horizontal && (
-              <Flex flexWrap="wrap" p={1}>
-                <Box width={[1, 2 / 12]}>
-                  <label>{capitalize(field.label)}</label>
-                </Box>
-                <Box width={[1, 10 / 12]}>
-                  <InputTypeCountry
-                    name={field.name}
-                    inputId={field.name}
-                    value={field.value}
-                    defaultValue={field.defaultValue}
-                    onChange={this.handleChange}
-                  />
-                </Box>
-              </Flex>
+          <Flex flexWrap="wrap" p={1}>
+            {field.label && (
+              <Box width={1}>
+                <Label label={capitalize(field.label)} isPrivate={field.isPrivate} />
+              </Box>
             )}
-            {!horizontal && (
-              <Flex flexWrap="wrap" p={1}>
-                {field.label && (
-                  <Box width={1}>
-                    <label>{`${capitalize(field.label)}`}</label>
-                  </Box>
-                )}
-                <Box width={1}>
-                  <InputTypeCountry
-                    name={field.name}
-                    inputId={field.name}
-                    value={field.value}
-                    defaultValue={field.defaultValue}
-                    onChange={this.handleChange}
-                  />
-                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
-                </Box>
-              </Flex>
-            )}
-          </div>
+            <Box width={1}>
+              <StyledInputLocation
+                location={this.state.value || field.defaultValue}
+                onChange={event => this.handleChange(event)}
+              />
+              {field.description && <HelpBlock>{field.description}</HelpBlock>}
+            </Box>
+          </Flex>
         );
         break;
-
+      case 'socialLinks':
+        this.input = (
+          <Box p={1}>
+            <Box my="5px" fontWeight={700}>
+              <FormattedMessage defaultMessage="Social Links" />
+            </Box>
+            <SocialLinksFormField
+              value={this.state.value || field.defaultValue}
+              onChange={event => this.handleChange(event)}
+              touched={field.formModified}
+            />
+          </Box>
+        );
+        break;
       case 'currency':
         value = value || field.defaultValue;
         value = typeof value === 'number' ? value / 100 : '';

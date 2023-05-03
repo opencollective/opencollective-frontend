@@ -1667,6 +1667,7 @@ export type CollectiveCreateInput = {
   description: Scalars['String'];
   /** @deprecated 2022-06-03: Please use repositoryUrl */
   githubHandle?: InputMaybe<Scalars['String']>;
+  location?: InputMaybe<LocationInput>;
   name: Scalars['String'];
   /** @deprecated 2023-01-16: Please use socialLinks */
   repositoryUrl?: InputMaybe<Scalars['String']>;
@@ -6555,7 +6556,7 @@ export type Organization = Account & AccountWithContributions & {
   features: CollectiveFeatures;
   /** @deprecated 2022-06-03: Please use repositoryUrl */
   githubHandle?: Maybe<Scalars['String']>;
-  /** If the organization if a host account, this will return the matching Host object */
+  /** If the organization is a host account, this will return the matching Host object */
   host?: Maybe<Host>;
   id: Scalars['String'];
   imageUrl?: Maybe<Scalars['String']>;

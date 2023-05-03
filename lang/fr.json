@@ -795,6 +795,7 @@
   "createCollective.form.error.slug": "Veuillez utiliser moins de 30 caractères",
   "createCollective.form.error.slug.hyphen": "L'identifiant du Collectif ne peut pas commencer ni se terminer par un trait d'union",
   "createCollective.form.error.slug.taken": "Cette URL est déjà utilisée",
+  "createCollective.form.locationPlaceholder": "Where are you based?",
   "createCollective.form.nameLabel": "Nom du Collectif",
   "createCollective.form.slugLabel": "Définissez votre URL",
   "createCollective.form.suggestedLabel": "Suggéré",

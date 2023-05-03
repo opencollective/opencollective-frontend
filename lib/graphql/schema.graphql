@@ -804,14 +804,9 @@ type LocationType {
   id: String
 
   """
-  A short name for the location (eg. Google Headquarters)
+  A short name for the location (eg. Open Collective Headquarters)
   """
   name: String
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
 
   """
   Two letters country code (eg. FR, BE...etc)
@@ -827,6 +822,11 @@ type LocationType {
   Longitude
   """
   long: Float
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
 
   """
   Structured JSON address
@@ -4857,7 +4857,7 @@ Input type for Location
 """
 input LocationInputType {
   """
-  A short name for the location (eg. Google Headquarters)
+  A short name for the location (eg. Open Collective Headquarters)
   """
   name: String
 
@@ -4880,6 +4880,11 @@ input LocationInputType {
   Longitude
   """
   long: Float
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
 }
 
 """
