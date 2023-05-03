@@ -4,8 +4,7 @@ import StepProfile from '../../components/contribution-flow/StepProfile';
 import StepDetails from '../../components/contribution-flow/StepDetails';
 import { webpackCollective } from '../mocks/collectives';
 import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-const stripePromise = loadStripe('storybookStripeId');
+import { stripePromise } from '../stripe-helper';
 
 <Meta title="Contribution Flow/StepPayment" component={StepPayment} />
 
