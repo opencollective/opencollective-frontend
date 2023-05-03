@@ -795,6 +795,7 @@
   "createCollective.form.error.slug": "Bitte verwende weniger als 30 Zeichen",
   "createCollective.form.error.slug.hyphen": "Der Alias eines Kollektivs kann weder mit einem Bindestrich beginnen noch enden",
   "createCollective.form.error.slug.taken": "URL bereits vergeben",
+  "createCollective.form.locationPlaceholder": "Where are you based?",
   "createCollective.form.nameLabel": "Kollektiv-Name",
   "createCollective.form.slugLabel": "URL festlegen",
   "createCollective.form.suggestedLabel": "Empfohlen",
