@@ -795,6 +795,7 @@
   "createCollective.form.error.slug": "נא להשתמש בפחות מ־30 תווים",
   "createCollective.form.error.slug.hyphen": "הקישור לדף הקבוצה לא יכול להכיל מקף (\"-\") בהתחלה או בסוף",
   "createCollective.form.error.slug.taken": "הכתובת כבר תפוסה",
+  "createCollective.form.locationPlaceholder": "Where are you based?",
   "createCollective.form.nameLabel": "שם הקבוצה",
   "createCollective.form.slugLabel": "הגדרת הכתובת שלך",
   "createCollective.form.suggestedLabel": "הצעה",
