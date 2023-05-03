@@ -71,9 +71,7 @@ const StyledInputLocation = ({
           fieldProps={{ labelFontSize, labelFontWeight }}
           required={required}
           onCountryChange={structured =>
-            onChange(
-              pick({ ...(location || DEFAULT_LOCATION), structured }, ['name', 'address', 'country', 'structured']),
-            )
+            onChange(pick({ ...(location || DEFAULT_LOCATION), structured }, ['country', 'structured']))
           }
         />
       ) : (
@@ -93,7 +91,10 @@ const StyledInputLocation = ({
               minHeight={100}
               placeholder="P. Sherman 42&#10;Wallaby Way&#10;Sydney"
               defaultValue={location?.address || ''}
-              onChange={e => onChange({ ...(location || DEFAULT_LOCATION), address: e.target.value })}
+              onChange={e => {
+                const address = e.target.value;
+                onChange(pick({ ...(location || DEFAULT_LOCATION), address }, ['country', 'address']));
+              }}
             />
           )}
         </StyledInputField>
