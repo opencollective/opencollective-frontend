@@ -155,12 +155,12 @@ const hasParams = query => {
   });
 };
 
-const HostDashboardExpenses = ({ hostSlug }) => {
+const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   const router = useRouter() || {};
   const query = enforceDefaultParamsOnQuery(router.query);
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const hasFilters = React.useMemo(() => hasParams(query), [query]);
-  const pageRoute = `/${hostSlug}/admin/expenses`;
+  const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-expenses` : `/${hostSlug}/admin/expenses`;
   const queryVariables = { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) };
   const expenses = useQuery(hostDashboardExpensesQuery, { variables: queryVariables, context: API_V2_CONTEXT });
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
@@ -320,7 +320,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
 
 HostDashboardExpenses.propTypes = {
   hostSlug: PropTypes.string.isRequired,
-  isNewAdmin: PropTypes.bool,
+  isDashboard: PropTypes.bool,
 };
 
 export default HostDashboardExpenses;

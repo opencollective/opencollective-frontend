@@ -4,7 +4,8 @@ import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
 import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
 import { get, includes, size } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import { space } from 'styled-system';
 
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -55,6 +56,7 @@ const ButtonsContainer = styled.div.attrs({ 'data-cy': 'expense-actions' })`
   display: flex;
   flex-wrap: wrap;
   margin-top: 8px;
+  grid-gap: 8px;
   transition: opacity 0.05s;
   justify-content: flex-end;
 
@@ -68,7 +70,20 @@ const ButtonsContainer = styled.div.attrs({ 'data-cy': 'expense-actions' })`
 `;
 
 const ExpenseContainer = styled.div`
-  padding: 16px 27px;
+  outline: none;
+  display: block;
+  width: 100%;
+  border: 0;
+  background: white;
+  ${space}
+
+  transition: background 0.1s;
+
+  ${props =>
+    props.useDrawer &&
+    css`
+      ${props => props.selected && `background: #f8fafc;`}
+    `}
 
   @media (hover: hover) {
     &:not(:hover):not(:focus-within) ${ButtonsContainer} {
@@ -97,8 +112,13 @@ const ExpenseBudgetItem = ({
   view,
   suggestedTags,
   onProcess,
+  selected,
+  expandExpense,
 }) => {
   const [hasFilesPreview, showFilesPreview] = React.useState(false);
+  const { LoggedInUser } = useLoggedInUser();
+  const useDrawer = LoggedInUser?.hasEarlyAccess('expense-drawer');
+
   const featuredProfile = isInverted ? expense?.account : expense?.payee;
   const isAdminView = view === 'admin';
   const isSubmitterView = view === 'submitter';
@@ -112,13 +132,18 @@ const ExpenseBudgetItem = ({
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency?.currency !== expense.currency;
 
-  const { LoggedInUser } = useLoggedInUser();
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isAdminOfCollective(host);
   const isExpenseToHostCollective = expense?.account?.id === host?.id;
   const isApproveBtnSecondary = isLoggedInUserExpenseHostAdmin && !isExpenseToHostCollective;
 
   return (
-    <ExpenseContainer data-cy={`expense-container-${expense?.legacyId}`}>
+    <ExpenseContainer
+      px={[3, '24px']}
+      py={3}
+      data-cy={`expense-container-${expense?.legacyId}`}
+      selected={selected}
+      useDrawer={useDrawer}
+    >
       <Flex justifyContent="space-between" flexWrap="wrap">
         <Flex flex="1" minWidth="max(50%, 200px)" maxWidth={[null, '70%']} mr="24px">
           <Box mr={3}>
@@ -137,13 +162,26 @@ const ExpenseBudgetItem = ({
           ) : (
             <Box>
               <StyledTooltip
-                content={<FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />}
+                content={
+                  useDrawer ? (
+                    <FormattedMessage id="Expense.SeeDetails" defaultMessage="See expense details" />
+                  ) : (
+                    <FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />
+                  )
+                }
                 delayHide={0}
               >
                 <StyledLink
-                  as={Link}
                   underlineOnHover
-                  href={`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`}
+                  {...(useDrawer
+                    ? {
+                        as: 'button',
+                        onClick: expandExpense,
+                      }
+                    : {
+                        as: Link,
+                        href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
+                      })}
                 >
                   <AutosizeText
                     value={expense.description}
@@ -424,6 +462,8 @@ ExpenseBudgetItem.propTypes = {
       }),
     }),
   }),
+  selected: PropTypes.bool,
+  expandExpense: PropTypes.func,
 };
 
 ExpenseBudgetItem.defaultProps = {
