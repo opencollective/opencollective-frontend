@@ -943,6 +943,7 @@ ExpenseForm.propTypes = {
       location: PropTypes.shape({
         address: PropTypes.string,
         country: PropTypes.string,
+        structured: PropTypes.object,
       }),
       payoutMethods: PropTypes.arrayOf(
         PropTypes.shape({

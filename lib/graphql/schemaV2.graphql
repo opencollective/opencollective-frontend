@@ -8619,7 +8619,7 @@ type Organization implements Account & AccountWithContributions {
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
   """
-  If the organization if a host account, this will return the matching Host object
+  If the organization is a host account, this will return the matching Host object
   """
   host: Host
 }
@@ -14249,9 +14249,45 @@ input CollectiveCreateInput {
   slug: String!
   description: String!
   tags: [String]
+  location: LocationInput
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   settings: JSON
+}
+
+"""
+Input type for Geographic location
+"""
+input LocationInput {
+  """
+  A short name for the location (eg. Open Collective Headquarters)
+  """
+  name: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
+  country: CountryISO
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
 }
 
 input IndividualCreateInput {
@@ -14675,41 +14711,6 @@ input ExpenseAttachedFileInput {
   URL of the file
   """
   url: URL!
-}
-
-"""
-Input type for Geographic location
-"""
-input LocationInput {
-  """
-  A short name for the location (eg. Open Collective Headquarters)
-  """
-  name: String
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
-
-  """
-  Two letters country code (eg. FR, BE...etc)
-  """
-  country: CountryISO
-
-  """
-  Latitude
-  """
-  lat: Float
-
-  """
-  Longitude
-  """
-  long: Float
-
-  """
-  Structured JSON address
-  """
-  structured: JSON
 }
 
 """

@@ -177,7 +177,7 @@ AdminPanelPage.getInitialProps = async ({ query: { slug, section = null, subpath
     slug,
     section,
     subpath,
-    scripts: { googleMaps: true }, // TODO: This should be enabled only for events
+    scripts: { googleMaps: true }, // To enable location autocomplete
   };
 };
 

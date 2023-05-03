@@ -795,6 +795,7 @@
   "createCollective.form.error.slug": "Por favor, utiliza menos de 30 caracteres",
   "createCollective.form.error.slug.hyphen": "La URL del slug colectivo no puede iniciar o terminar con un guión",
   "createCollective.form.error.slug.taken": "La URL ya existe",
+  "createCollective.form.locationPlaceholder": "Where are you based?",
   "createCollective.form.nameLabel": "Nombre del Colectivo",
   "createCollective.form.slugLabel": "Establece tu URL",
   "createCollective.form.suggestedLabel": "Sugerido",

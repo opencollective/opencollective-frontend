@@ -795,6 +795,7 @@
   "createCollective.form.error.slug": "Please use fewer than 30 characters",
   "createCollective.form.error.slug.hyphen": "Collective slug URL cannot start or end with a hyphen",
   "createCollective.form.error.slug.taken": "Adresa URL je již obsazena",
+  "createCollective.form.locationPlaceholder": "Where are you based?",
   "createCollective.form.nameLabel": "Název kolektivu",
   "createCollective.form.slugLabel": "Nastavte adresu URL",
   "createCollective.form.suggestedLabel": "Navrhované",

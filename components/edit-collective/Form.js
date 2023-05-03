@@ -57,7 +57,6 @@ import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
-import SocialLinksFormField from './SocialLinksFormField';
 
 const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, USER } = CollectiveType;
 
@@ -233,10 +232,6 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.currency.placeholder',
         defaultMessage: 'Select currency',
       },
-      'address.label': {
-        id: 'collective.address.label',
-        defaultMessage: 'Address',
-      },
       'VAT.label': {
         id: 'EditCollective.VAT',
         defaultMessage: 'VAT settings',
@@ -308,11 +303,7 @@ class EditCollectiveForm extends React.Component {
     this.setState(state => {
       const collective = cloneDeep(state.collective);
 
-      // GraphQL schema has address embedded within location
-      // mutation expects { location: { address: '' } }
-      if (['address', 'country'].includes(fieldname)) {
-        collective.location[fieldname] = value;
-      } else if (fieldname === 'VAT') {
+      if (fieldname === 'VAT') {
         set(collective, 'settings.VAT.type', value);
       } else if (fieldname === 'VAT-number') {
         set(collective, 'settings.VAT.number', value);
@@ -380,8 +371,6 @@ class EditCollectiveForm extends React.Component {
   getFieldDefaultValue(field) {
     if (field.defaultValue !== undefined) {
       return field.defaultValue;
-    } else if (['address', 'country'].includes(field.name)) {
-      return get(this.state.collective.location, field.name);
     }
 
     return this.state.collective[field.name];
@@ -670,20 +659,6 @@ class EditCollectiveForm extends React.Component {
           when: () => collective.type !== EVENT,
         },
         {
-          name: 'address',
-          placeholder: '',
-          maxLength: 255,
-          type: 'textarea',
-          when: () => collective.type !== EVENT,
-          // TODO: Use structured here to be consistent with other places
-        },
-        {
-          name: 'country',
-          type: 'country',
-          placeholder: 'Select country',
-          when: () => collective.type !== EVENT,
-        },
-        {
           name: 'startsAt',
           type: 'datetime-local',
           defaultValue: dayjs(collective.startsAt).tz(collective.timezone).format('YYYY-MM-DDTHH:mm'),
@@ -708,7 +683,7 @@ class EditCollectiveForm extends React.Component {
           name: 'location',
           placeholder: '',
           type: 'location',
-          when: () => collective.type === EVENT,
+          when: () => collective.type !== USER,
         },
         {
           name: 'privateInstructions',
@@ -744,6 +719,17 @@ class EditCollectiveForm extends React.Component {
           type: 'collective-tags',
           placeholder: intl.formatMessage(this.messages['tags.input.placeholder']),
           when: () => ![EVENT, PROJECT, FUND].includes(collective.type),
+        },
+        {
+          name: 'socialLinks',
+          type: 'socialLinks',
+          defaultValue: get(this.state.collective, 'socialLinks'),
+        },
+        {
+          name: 'location',
+          type: 'address',
+          when: () => collective.type === USER,
+          isPrivate: true,
         },
       ],
       'fiscal-hosting': [
@@ -844,20 +830,9 @@ class EditCollectiveForm extends React.Component {
                       min={field.min}
                       overflow="hidden"
                       required={field.required}
+                      formModified={this.state.modified}
                     />
                   ))}
-                  {section === 'info' && (
-                    <Box p={1}>
-                      <Box my="5px" fontWeight={700}>
-                        <FormattedMessage defaultMessage="Social Links" />
-                      </Box>
-                      <SocialLinksFormField
-                        value={this.state.collective?.socialLinks}
-                        touched={this.state.modified}
-                        onChange={value => this.handleChange('socialLinks', value)}
-                      />
-                    </Box>
-                  )}
                 </div>
               </div>
             )}

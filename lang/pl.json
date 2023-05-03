@@ -795,6 +795,7 @@
   "createCollective.form.error.slug": "Proszę użyć mniej niż 30 znaków",
   "createCollective.form.error.slug.hyphen": "Zbiorczy adres URL [slug], nie może zaczynać ani kończyć się myślnikiem",
   "createCollective.form.error.slug.taken": "Adres URL jest już zajęty",
+  "createCollective.form.locationPlaceholder": "Where are you based?",
   "createCollective.form.nameLabel": "Nazwa zbiórki",
   "createCollective.form.slugLabel": "Ustaw adres URL",
   "createCollective.form.suggestedLabel": "Polecane",
