@@ -118,7 +118,8 @@ class ExpensePage extends React.Component {
   }
 
   render() {
-    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, client, legacyExpenseId, edit } = this.props;
+    const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, client, legacyExpenseId, edit, draftKey } =
+      this.props;
     const { hasRefetchedDataForUser } = this.state;
     const isRefetchingDataForUser = LoggedInUser && !hasRefetchedDataForUser;
 
@@ -163,6 +164,7 @@ class ExpensePage extends React.Component {
               stopPolling={stopPolling}
               isRefetchingDataForUser={isRefetchingDataForUser}
               edit={edit}
+              draftKey={draftKey}
             />
           </Box>
           <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={80}>
