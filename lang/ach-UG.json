@@ -795,6 +795,7 @@
   "createCollective.form.error.slug": "crwdns17728:0crwdne17728:0",
   "createCollective.form.error.slug.hyphen": "crwdns17730:0crwdne17730:0",
   "createCollective.form.error.slug.taken": "crwdns21793:0crwdne21793:0",
+  "createCollective.form.locationPlaceholder": "crwdns25571:0crwdne25571:0",
   "createCollective.form.nameLabel": "crwdns17732:0crwdne17732:0",
   "createCollective.form.slugLabel": "crwdns17734:0crwdne17734:0",
   "createCollective.form.suggestedLabel": "crwdns17736:0crwdne17736:0",
