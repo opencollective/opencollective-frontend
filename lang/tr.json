@@ -795,6 +795,7 @@
   "createCollective.form.error.slug": "Lütfen 30 karakteri geçmeyin",
   "createCollective.form.error.slug.hyphen": "Collective slug URL cannot start or end with a hyphen",
   "createCollective.form.error.slug.taken": "URL çoktan alınmış",
+  "createCollective.form.locationPlaceholder": "Where are you based?",
   "createCollective.form.nameLabel": "Koleksiyon adı",
   "createCollective.form.slugLabel": "Set your URL",
   "createCollective.form.suggestedLabel": "Önerilen",
