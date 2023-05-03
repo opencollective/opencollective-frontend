@@ -795,6 +795,7 @@
   "createCollective.form.error.slug": "请使用小于 30 个字符。",
   "createCollective.form.error.slug.hyphen": "Collective slug URL cannot start or end with a hyphen",
   "createCollective.form.error.slug.taken": "连接已被使用",
+  "createCollective.form.locationPlaceholder": "Where are you based?",
   "createCollective.form.nameLabel": "Collective 名称",
   "createCollective.form.slugLabel": "设置您的 URL",
   "createCollective.form.suggestedLabel": "已建议",
