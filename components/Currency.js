@@ -24,16 +24,16 @@ const Currency = ({ formatWithSeparators, currency, precision, value, ...styles 
     // TODO: This approach is not great because the position of the currency depends on the locale
     const floatAmount = value / 100;
     return (
-      <Span {...styles} whiteSpace="nowrap">
+      <span {...styles} whiteSpace="nowrap">
         {getCurrencySymbol(currency)}
         {floatAmount.toLocaleString(locale)}
-      </Span>
+      </span>
     );
   } else {
     return (
-      <Span {...styles} whiteSpace="nowrap">
+      <span {...styles} whiteSpace="nowrap">
         {formatCurrency(value, currency, { precision, locale })}
-      </Span>
+      </span>
     );
   }
 };

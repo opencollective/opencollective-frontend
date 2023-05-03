@@ -33,12 +33,12 @@ const FormattedMoneyAmount = ({
   isCrypto,
 }) => {
   if (!currency) {
-    return <Span {...amountStyles}>{EMPTY_AMOUNT_PLACEHOLDER}</Span>;
+    return <span {...amountStyles}>{EMPTY_AMOUNT_PLACEHOLDER}</span>;
   }
 
   const formattedAmount =
     isNaN(amount) || isNil(amount) ? (
-      <Span {...amountStyles}>{EMPTY_AMOUNT_PLACEHOLDER}</Span>
+      <span {...amountStyles}>{EMPTY_AMOUNT_PLACEHOLDER}</span>
     ) : (
       <Currency
         value={amount}

@@ -529,7 +529,7 @@ export const ExpenseHeader = ({ expense }) => {
           id="slide-over-title"
         >
           <span>{expense.description} </span>
-          <span className="text-gray-400">#{expense.legacyId}</span>
+          {/* <span className="text-gray-400">#{expense.legacyId}</span> */}
         </h2>
         <ExpenseStatus status={expense.status} />
       </div>
@@ -566,9 +566,9 @@ export const getExpenseStatusMsgType = status => {
   }
 };
 
-function ExpenseStatus({ status }) {
+export function ExpenseStatus({ status, size="medium" }) {
   const intl = useIntl();
-  const statusStyles = cva('inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-sm font-medium', {
+  const statusStyles = cva('inline-flex items-center rounded-md  font-medium gap-x-1.5 py-1 px-2', {
     variants: {
       type: {
         error: 'bg-red-100 text-red-700 fill-red-700',
@@ -576,10 +576,17 @@ function ExpenseStatus({ status }) {
         info: 'bg-blue-100 text-blue-700 fill-blue-500',
         success: 'bg-green-100 text-green-700 fill-green-500',
       },
+      size: {
+        small: 'text-xs',
+        medium: 'text-sm',
+      },
+    },
+    defaultVariants: {
+      size: 'medium',
     },
   });
   return (
-    <span className={statusStyles({ type: getExpenseStatusMsgType(status) })}>
+    <span className={statusStyles({ type: getExpenseStatusMsgType(status), size })}>
       <svg className="h-1.5 w-1.5" viewBox="0 0 6 6" aria-hidden="true">
         <circle cx="3" cy="3" r="3" />
       </svg>

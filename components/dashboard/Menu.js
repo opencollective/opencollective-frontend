@@ -9,7 +9,15 @@ import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { Transfer } from '@styled-icons/boxicons-regular/Transfer';
 import { Inbox } from '@styled-icons/octicons/Inbox';
 import { FormattedMessage } from 'react-intl';
-
+import {
+  CircleStackIcon,
+  CreditCardIcon,
+  InboxIcon,
+  NewspaperIcon,
+  UserGroupIcon,
+  ChartBarIcon,
+  Cog6ToothIcon,
+} from '@heroicons/react/24/outline';
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective.lib';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
@@ -35,40 +43,53 @@ const Menu = ({ isAccountantOnly }) => {
   const isHost = isHostAccount(account);
   const isIndividual = isIndividualAccount(account);
   return (
-    <Container>
+    <div className="space-y-1">
       {/** Host dashboard */}
       <MenuGroup if={isHost} mb={24}>
         <MenuSectionHeader>
           <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
         </MenuSectionHeader>
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_EXPENSES} icon={<Receipt size={16} />} />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} icon={<Coin size={16} />} />
-
         <MenuLink
-          section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS}
-          icon={<Coin size={16} />}
-          if={!isAccountantOnly}
+          section={HOST_DASHBOARD_SECTIONS.HOST_EXPENSES}
+          //icon={<NewspaperIcon className={'h-6 w-6 shrink-0'} />}
+          icon={NewspaperIcon}
+          item={{ icon: NewspaperIcon }}
         />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} item={{ icon: CircleStackIcon }}>
+          Contributions
+        </MenuLink>
+
+        {/* <MenuLink
+          section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS}
+          // icon={<Coin size={16} />}
+          icon={Coin}
+          if={!isAccountantOnly}
+        /> */}
 
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS}
           if={!isAccountantOnly}
-          icon={<Inbox size={16} />}
-        />
+          // icon={<Inbox size={16} />}
+          item={{ icon: InboxIcon }}
+        >
+          Applications
+        </MenuLink>
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES}
           if={!isAccountantOnly}
-          icon={<NetworkChart size={16} />}
+          item={{ icon: UserGroupIcon }}
+          // icon={<NetworkChart size={16} />}
         />
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS}
-          icon={<CreditCard size={16} />}
+          // icon={<CreditCard size={16} />}
+          item={{ icon: CreditCardIcon }}
           if={!isAccountantOnly && hasFeature(account, FEATURES.VIRTUAL_CARDS)}
         />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} isBeta icon={<Chart size={16} />} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} item={{ icon: ChartBarIcon }} />
 
         <MenuLink
-          icon={<Cog size={16} />}
+          item={{ icon: Cog6ToothIcon }}
           if={isHost && !isAccountantOnly}
           section="FISCAL_HOST_SETTINGS"
           goToSection={FISCAL_HOST_SECTIONS.FISCAL_HOSTING}
@@ -91,12 +112,12 @@ const Menu = ({ isAccountantOnly }) => {
             </React.Fragment>
           )}
         >
-          <FormattedMessage id="AdminPanel.FiscalHostSettings" defaultMessage="Fiscal Host Settings" />
+          Settings{/* <FormattedMessage id="AdminPanel.FiscalHostSettings" defaultMessage="Fiscal Host Settings" /> */}
         </MenuLink>
       </MenuGroup>
 
       {/** User/org/collective/event/project dashbord */}
-      <MenuGroup>
+      <MenuGroup if={!isHost}>
         <MenuSectionHeader>
           {isType(account, ORGANIZATION) ? (
             <FormattedMessage id="OrganizationDashboard" defaultMessage="Organization Dashboard" />
@@ -108,16 +129,16 @@ const Menu = ({ isAccountantOnly }) => {
             <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
           )}
         </MenuSectionHeader>
-        <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} icon={<Receipt size={16} />} />
-        <MenuLink section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} icon={<Coin size={16} />} />
+        <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} item={{ icon: Receipt }} />
+        <MenuLink section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} item={{ icon: Coin }} />
         <MenuLink
           section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
-          icon={<Coin size={16} />}
+          item={{ icon: Coin }}
           if={isSelfHostedAccount(account) && !isAccountantOnly && isType(account, COLLECTIVE)}
         />
-        <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} icon={<Transfer size={16} />} />
+        <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} item={{ icon: Transfer }} />
         <MenuLink
-          icon={<Cog size={16} />}
+          item={{ icon: Cog6ToothIcon }}
           if={!isHost}
           section="SETTINGS"
           goToSection={COLLECTIVE_SECTIONS.INFO}
@@ -228,7 +249,7 @@ const Menu = ({ isAccountantOnly }) => {
         {/* org settings for hosts */}
 
         <MenuLink
-          icon={<Cog size={16} />}
+          item={{ icon: Cog6ToothIcon }}
           if={isType(account, ORGANIZATION) && isHost}
           section="ORG_SETTINGS"
           goToSection={ABOUT_ORG_SECTIONS.INFO}
@@ -264,7 +285,7 @@ const Menu = ({ isAccountantOnly }) => {
           <FormattedMessage id="AdminPanel.OrganizationSettings" defaultMessage="Organization Settings" />
         </MenuLink>
       </MenuGroup>
-    </Container>
+    </div>
   );
 };
 

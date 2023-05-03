@@ -4,12 +4,12 @@ import { gql, useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-
+import { cx } from 'class-variance-authority';
 import EXPENSE_STATUS from '../../lib/constants/expense-status';
 import { parseDateInterval } from '../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { useLazyGraphQLPaginatedResults } from '../../lib/hooks/useLazyGraphQLPaginatedResults';
-
+import { BarsArrowUpIcon, FunnelIcon } from '@heroicons/react/20/solid';
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import DismissibleMessage from '../DismissibleMessage';
 import ExpensesFilters from '../expenses/ExpensesFilters';
@@ -154,6 +154,19 @@ const hasParams = query => {
     return ![...ROUTE_PARAMS, 'offset', 'limit', 'paypalApprovalError', 'orderBy'].includes(key) && value;
   });
 };
+const stats = [
+  { name: 'Paypal balance', value: '$125,091.00', refill: true },
+  { name: 'Wise balance', value: '$12,787.00', refill: true },
+  { name: 'Expenses to pay', value: '$25,988.00' },
+];
+
+const tabs = [
+  { name: 'Ready to pay', href: '#', count: '24', current: true },
+  { name: 'Scheduled for payment', href: '#', count: '2', current: false },
+  { name: 'On hold', href: '#', count: '4', current: false },
+  { name: 'Incomplete', count: '18', href: '#', current: false },
+  { name: 'Recently paid', href: '#', current: false },
+];
 
 const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   const router = useRouter() || {};
@@ -177,13 +190,13 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   };
 
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
+    <Box maxWidth={1400} m="0 auto" px={2}>
       <Flex mb={24} alignItems="center" flexWrap="wrap">
-        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-        </H1>
+        </h1>{' '}
         <Box mx="auto" />
-        <Box p={2}>
+        {/* <Box p={2}>
           <SearchBar
             defaultValue={query.searchTerm}
             onSubmit={searchTerm =>
@@ -193,9 +206,107 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
               })
             }
           />
-        </Box>
+        </Box> */}
       </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
+      {/* Stats */}
+      <div className="mb-6 border-b border-b-gray-900/10 lg:border-t lg:border-t-gray-900/5">
+        <dl className="mx-auto grid max-w-7xl grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:px-2 xl:px-0">
+          {stats.map((stat, statIdx) => (
+            <div
+              key={stat.name}
+              className={cx(
+                statIdx % 2 === 1 ? 'sm:border-l' : statIdx === 2 ? 'lg:border-l' : '',
+                'flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-t border-gray-900/5 px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8',
+              )}
+            >
+              <dt className="text-sm font-medium leading-6 text-gray-500">{stat.name}</dt>
+              {stat.refill ? <dd className={cx('text-blue-600', 'text-xs font-medium')}>Refill</dd> : null}
+              <dd className="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900">
+                {stat.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+      {/* <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" /> */}
+
+      <div>
+        {/* <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+          Search candidates
+        </label> */}
+        <div className="my-2 flex rounded-md shadow-sm">
+          <div className="relative flex flex-grow items-stretch focus-within:z-10">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <FunnelIcon className="h-5 w-5 text-gray-300" aria-hidden="true" />
+            </div>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              className="block w-full rounded-none rounded-l-md border-0 py-1.5 pl-10 text-gray-500 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              placeholder="Filter..."
+              defaultValue="status:READY_TO_PAY"
+            />
+          </div>
+          <button
+            type="button"
+            className="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+          >
+            <BarsArrowUpIcon className="-ml-0.5 h-5 w-5 text-gray-400" aria-hidden="true" />
+            Oldest first
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div className="sm:hidden">
+          <label htmlFor="tabs" className="sr-only">
+            Select a tab
+          </label>
+          {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
+          <select
+            id="tabs"
+            name="tabs"
+            className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+            defaultValue={tabs.find(tab => tab.current).name}
+          >
+            {tabs.map(tab => (
+              <option key={tab.name}>{tab.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className="hidden sm:block">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+              {tabs.map(tab => (
+                <a
+                  key={tab.name}
+                  href="#"
+                  className={cx(
+                    tab.current
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-700',
+                    'flex whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium',
+                  )}
+                  aria-current={tab.current ? 'page' : undefined}
+                >
+                  {tab.name}
+                  {tab.count ? (
+                    <span
+                      className={cx(
+                        tab.current ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-900',
+                        'ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
+                      )}
+                    >
+                      {tab.count}
+                    </span>
+                  ) : null}
+                </a>
+              ))}
+            </nav>
+          </div>
+        </div>
+      </div>
       {paypalPreApprovalError && (
         <DismissibleMessage>
           {({ dismiss }) => (
@@ -221,7 +332,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
           )}
         </DismissibleMessage>
       )}
-      <Box mb={4}>
+      {/* <Box mb={4}>
         {loading ? (
           <LoadingPlaceholder height={150} />
         ) : error ? (
@@ -229,8 +340,8 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
         ) : (
           <HostInfoCard host={data.host} />
         )}
-      </Box>
-      <ScheduledExpensesBanner
+      </Box> */}
+      {/* <ScheduledExpensesBanner
         hostSlug={hostSlug}
         expenses={paginatedExpenses.nodes}
         onSubmit={() => {
@@ -253,8 +364,8 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
             </StyledButton>
           ) : null
         }
-      />
-      <Box mb={34}>
+      /> */}
+      {/* <Box mb={34}>
         {data?.host ? (
           <ExpensesFilters
             collective={data.host}
@@ -270,7 +381,8 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
         ) : loading ? (
           <LoadingPlaceholder height={70} />
         ) : null}
-      </Box>
+      </Box> */}
+
       {error ? null : !loading && !data.expenses?.nodes.length ? (
         <MessageBox type="info" withIcon data-cy="zero-expense-message">
           {hasFilters ? (

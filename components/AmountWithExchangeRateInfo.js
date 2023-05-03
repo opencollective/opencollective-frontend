@@ -57,8 +57,25 @@ const ContentContainer = styled.div`
   margin-right: 4px;
 `;
 
-const AmountWithExchangeRateInfo = ({ amount: { exchangeRate, currency, value, valueInCents }, showCurrencyCode }) => {
+const AmountWithExchangeRateInfo = ({
+  amount: { exchangeRate, currency, value, valueInCents },
+  showCurrencyCode,
+  showTooltip,
+}) => {
   const intl = useIntl();
+  const content = (
+    <ContentContainer>
+      {exchangeRate?.isApproximate && `~ `}
+      <FormattedMoneyAmount
+        amount={valueInCents ?? Math.round(value * 100)}
+        currency={currency}
+        precision={2}
+        amountStyles={null}
+        showCurrencyCode={showCurrencyCode}
+      />
+    </ContentContainer>
+  );
+  if (!showTooltip) return content;
   return (
     <StyledTooltip
       display="block"
@@ -67,16 +84,7 @@ const AmountWithExchangeRateInfo = ({ amount: { exchangeRate, currency, value, v
       content={() => formatFxRateInfo(intl, exchangeRate)}
     >
       <Flex flexWrap="noWrap" alignItems="center">
-        <ContentContainer>
-          {exchangeRate?.isApproximate && `~ `}
-          <FormattedMoneyAmount
-            amount={valueInCents ?? Math.round(value * 100)}
-            currency={currency}
-            precision={2}
-            amountStyles={null}
-            showCurrencyCode={showCurrencyCode}
-          />
-        </ContentContainer>
+        {content}
         <InfoCircle size="1em" />
       </Flex>
     </StyledTooltip>

@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import ReactAnimateHeight from 'react-animate-height';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
-
+import { cx } from 'class-variance-authority';
 import { getDashboardRoute } from '../../lib/url-helpers';
 
 import { Box, Flex } from '../Grid';
@@ -89,13 +89,15 @@ export const MenuLink = ({
   renderSubMenu,
   parentSection = null,
   goToSection,
+  item,
+  AyCon,
 }) => {
   const router = useRouter();
   const { selectedSection, expandedSection, setExpandedSection, account } = React.useContext(DashboardContext);
   const expanded = expandedSection === section;
   const { formatMessage } = useIntl();
   const isSelected = section && selectedSection === section;
-
+  console.log({ isSelected });
   useEffect(() => {
     if (parentSection && isSelected) {
       setExpandedSection?.(parentSection);
@@ -106,8 +108,8 @@ export const MenuLink = ({
     return null;
   }
 
-  if (!children && SECTION_LABELS[section]) {
-    children = formatMessage(SECTION_LABELS[section]);
+  if (!children && SECTION_LABELS[item?.section || section]) {
+    children = formatMessage(SECTION_LABELS[item?.section || section]);
   }
   const handleClick = e => {
     setExpandedSection?.(section);
@@ -142,7 +144,36 @@ export const MenuLink = ({
   );
   return (
     <React.Fragment>
-      <MenuLinkContainer isSelected={isSelected} isSub={!!parentSection}>
+      <li key={section}>
+        <Link
+          href={getDashboardRoute(account, section)}
+          className={cx(
+            isSelected ? 'bg-gray-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600',
+            'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+          )}
+        >
+          {AyCon && (
+            <AyCon
+              className={cx(
+                isSelected ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600',
+                'h-6 w-6 shrink-0',
+              )}
+              aria-hidden="true"
+            />
+          )}
+          {item?.icon && (
+            <item.icon
+              className={cx(
+                isSelected ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600',
+                'h-6 w-6 shrink-0',
+              )}
+              aria-hidden="true"
+            />
+          )}
+          {children}
+        </Link>
+      </li>
+      {/* <li isSelected={isSelected} isSub={!!parentSection}>
         {onClick ? (
           <StyledLink as="button" onClick={handleClick} data-cy={`menu-item-${section}`}>
             {renderButtonContent()}
@@ -156,7 +187,7 @@ export const MenuLink = ({
             {renderButtonContent()}
           </Link>
         )}
-      </MenuLinkContainer>
+      </li> */}
       {renderSubMenu && (
         <ReactAnimateHeight duration={150} height={expanded ? 'auto' : 0}>
           {renderSubMenu({ parentSection: section })}
@@ -192,35 +223,31 @@ export const MenuSectionHeader = styled.div`
 `;
 
 export const MenuContainer = styled.ul`
-  margin: 0;
-  max-width: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  grid-gap: 4px;
-  a {
-    color: ${props => props.theme.colors.black[900]};
-    &:hover {
-      color: ${props => props.theme.colors.black[700]};
-    }
-  }
+  // margin: 0;
+  // max-width: 100%;
+  // position: relative;
+  // display: flex;
+  // flex-direction: column;
+  // grid-gap: 4px;
+  // a {
+  //   color: ${props => props.theme.colors.black[900]};
+  //   &:hover {
+  //     color: ${props => props.theme.colors.black[700]};
+  //   }
+  // }
 
-  &,
-  & ul {
-    list-style-type: none;
-    padding: 0;
-    & li {
-      padding: 2px 0;
-    }
-  }
+  // &,
+  // & ul {
+  //   list-style-type: none;
+  //   padding: 0;
+  //   & li {
+  //     padding: 2px 0;
+  //   }
+  // }
 `;
 
 export const MenuGroup = ({ if: conditional, children, ...props }) => {
-  return conditional === false ? null : (
-    <Box as="ul" {...props}>
-      {children}
-    </Box>
-  );
+  return conditional === false ? null : <ul className="space-y-1">{children}</ul>;
 };
 
 MenuGroup.propTypes = {

@@ -123,55 +123,65 @@ const DashboardPage = () => {
 
   return (
     <DashboardContext.Provider value={{ selectedSection, expandedSection, setExpandedSection, account }}>
-      <Page noRobots collective={account} title={account ? `${account.name} - ${titleBase}` : titleBase}>
-        {!blocker && (
-          <AdminPanelTopBar
+      {/* <Page noRobots collective={account} title={account ? `${account.name} - ${titleBase}` : titleBase}> */}
+      {!blocker && (
+        <AdminPanelTopBar
+          isLoading={isLoading}
+          collective={data?.account}
+          collectiveSlug={slug}
+          selectedSection={selectedSection}
+          display={['flex', null, 'none']}
+        />
+      )}
+      {Boolean(notification) && <NotificationBar {...notification} />}
+      {blocker ? (
+        <Flex flexDirection="column" alignItems="center" my={6}>
+          <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
+            {blocker}
+          </MessageBox>
+          {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
+        </Flex>
+      ) : (
+        <div
+          className="relative flex"
+          // flexDirection={['column', 'column', 'row']}
+          // justifyContent={'flex-start'}
+          // minHeight={600}
+          // gridGap={16}
+          data-cy="admin-panel-container"
+        >
+          <AdminPanelSideBar
             isLoading={isLoading}
-            collective={data?.account}
-            collectiveSlug={slug}
+            collective={account}
             selectedSection={selectedSection}
-            display={['flex', null, 'none']}
+            display={['none', 'none', 'block']}
+            isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
           />
-        )}
-        {Boolean(notification) && <NotificationBar {...notification} />}
-        {blocker ? (
-          <Flex flexDirection="column" alignItems="center" my={6}>
-            <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
-              {blocker}
-            </MessageBox>
-            {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
-          </Flex>
-        ) : (
-          <Flex
-            flexDirection={['column', 'column', 'row']}
-            justifyContent={'space-between'}
-            minHeight={600}
-            gridGap={16}
-            data-cy="admin-panel-container"
-          >
-            <AdminPanelSideBar
-              isLoading={isLoading}
-              collective={account}
-              selectedSection={selectedSection}
-              display={['none', 'none', 'block']}
-              isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
-            />
-            {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
-              <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
-            ) : (
-              <Box flex="0 1 1000px" py={'32px'} px={[1, '24px']}>
-                <AdminPanelSection
-                  section={selectedSection}
-                  isLoading={isLoading}
-                  collective={account}
-                  subpath={subpath}
-                />
-              </Box>
-            )}
-            <Box flex="0 100 300px" />
-          </Flex>
-        )}
-      </Page>
+
+          <main className="">
+            <div className="">
+              <div className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
+                {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
+                  <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
+                ) : (
+                  <AdminPanelSection
+                    section={selectedSection}
+                    isLoading={isLoading}
+                    collective={account}
+                    subpath={subpath}
+                  />
+                )}
+              </div>
+            </div>
+          </main>
+
+          <aside className="fixed inset-y-0 right-0 hidden w-96 overflow-y-auto border-l border-gray-200 bg-green-100 px-4 py-6 sm:px-6 lg:px-8 xl:block">
+            {/* Secondary column (hidden on smaller screens) */}
+            asd
+          </aside>
+        </div>
+      )}
+      {/* </Page> */}
     </DashboardContext.Provider>
   );
 };
