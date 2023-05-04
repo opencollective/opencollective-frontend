@@ -5,7 +5,7 @@ import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import dayjs from 'dayjs';
 import { Form, Formik, useFormikContext } from 'formik';
-import { debounce, pick } from 'lodash';
+import { debounce, omit, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -733,6 +733,7 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
         ponumber: edit.pendingContributionData?.ponumber,
         memo: edit.pendingContributionData?.memo,
         paymentMethod: edit.pendingContributionData?.paymentMethod,
+        tax: edit.tax && omit(edit.tax, ['id']),
       }
     : { hostFeePercent: host?.hostFeePercent };
 
