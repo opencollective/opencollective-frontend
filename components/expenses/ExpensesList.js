@@ -106,7 +106,8 @@ const ExpensesList = ({
                 onProcess={onProcess}
                 suggestedTags={suggestedTags}
                 selected={selectedId === expense.id}
-                expandExpense={() => {
+                expandExpense={e => {
+                  e.preventDefault();
                   setExpenseInDrawer(expense);
                   setSelectedId(expense.id);
                 }}

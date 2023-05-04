@@ -175,7 +175,8 @@ const ExpenseBudgetItem = ({
                   underlineOnHover
                   {...(useDrawer
                     ? {
-                        as: 'button',
+                        as: Link,
+                        href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
                         onClick: expandExpense,
                       }
                     : {
