@@ -111,7 +111,6 @@ function Expense(props) {
     isRefetchingDataForUser,
     legacyExpenseId,
   } = props;
-
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
@@ -726,7 +725,7 @@ Expense.propTypes = {
   legacyExpenseId: PropTypes.number,
   draftKey: PropTypes.string,
   edit: PropTypes.string,
-  client: PropTypes.object.isRequired,
+  client: PropTypes.object,
   data: PropTypes.object.isRequired,
   loading: PropTypes.bool,
   error: PropTypes.any,
@@ -735,7 +734,7 @@ Expense.propTypes = {
   startPolling: PropTypes.func,
   stopPolling: PropTypes.func,
   isRefetchingDataForUser: PropTypes.bool,
-  drawerActionsContainer: PropTypes.element,
+  drawerActionsContainer: PropTypes.object,
 
   expensesTags: PropTypes.arrayOf(
     PropTypes.shape({

@@ -5,6 +5,7 @@ import MUIDrawer from '@mui/material/Drawer';
 import { XMark } from '@styled-icons/heroicons-outline/XMark';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
+import { useApolloClient } from '@apollo/client';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
@@ -49,8 +50,8 @@ const CloseDrawerButton = styled(StyledRoundButton)`
 export default function ExpenseDrawer({ open, handleClose, expense }) {
   const drawerActionsRef = React.useRef(null);
   const [drawerActionsContainer, setDrawerActionsContainer] = useState(null);
-
-  const [getExpense, { data, loading, error, startPolling, stopPolling, refetch, fetchMore, client }] = useLazyQuery(
+  const client = useApolloClient();
+  const [getExpense, { data, loading, error, startPolling, stopPolling, refetch, fetchMore }] = useLazyQuery(
     expensePageQuery,
     {
       variables: getVariableFromProps({ legacyExpenseId: expense?.legacyId }),
