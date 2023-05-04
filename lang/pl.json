@@ -1993,6 +1993,7 @@
   "NCP.SectionFetchError": "Napotkaliśmy błąd podczas pobierania danych dla tej sekcji.",
   "Nd9ioQ": "Karta pomyślnie zaktualizowana",
   "NetAmountFor": "Kwota netto dla {name}",
+  "NewContribute.completeCaptchToContinue": "Complete the captcha form to continue",
   "NewContribute.crypto.donationDescription": "Użyj poniższego adresu, aby wpłacić {amount} z Twojego portfela",
   "NewContribute.crypto.QRCodeCopyButton": "Kliknij, aby skopiować adres portfela",
   "NewContribute.noPaymentMethodsAvailable": "Brak dostępnych metod płatności.",

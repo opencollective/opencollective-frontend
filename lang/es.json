@@ -1993,6 +1993,7 @@
   "NCP.SectionFetchError": "Encontramos un error al recuperar los datos de esta sección.",
   "Nd9ioQ": "Tarjeta actualizada con éxito",
   "NetAmountFor": "Saldo neto de {name}",
+  "NewContribute.completeCaptchToContinue": "Complete the captcha form to continue",
   "NewContribute.crypto.donationDescription": "Utiliza la siguiente dirección para donar {amount} de tu monedero",
   "NewContribute.crypto.QRCodeCopyButton": "Haz clic para copiar la dirección del monedero",
   "NewContribute.noPaymentMethodsAvailable": "No hay métodos de pago disponibles.",
