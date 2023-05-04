@@ -150,6 +150,7 @@ const orderPageQuery = gql`
       slug
       name
       type
+      isHost
       imageUrl
       backgroundImageUrl
       isActive
@@ -194,7 +195,15 @@ const orderPageQuery = gql`
           slug
           imageUrl
           backgroundImageUrl
-          twitterHandle
+        }
+      }
+      ... on Organization {
+        host {
+          id
+          name
+          slug
+          imageUrl
+          backgroundImageUrl
         }
       }
     }
