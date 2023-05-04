@@ -442,7 +442,7 @@ ExpenseSummary.propTypes = {
           type: PropTypes.string,
           rate: PropTypes.number,
         }).isRequired,
-      ).isRequired,
+      ),
     }),
     permissions: PropTypes.shape({
       canSeeInvoiceInfo: PropTypes.bool,

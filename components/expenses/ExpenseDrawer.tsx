@@ -84,7 +84,8 @@ export default function ExpenseDrawer({ open, handleClose, expense }) {
             <Box px={[3, '24px']}>
               <Expense
                 data={{ ...data, expense: { ...expense, ...data?.expense } }}
-                loading={loading}
+                // Making sure to initially set loading to true before the query is called
+                loading={loading || (!data && !error)}
                 error={error}
                 refetch={refetch}
                 client={client}
