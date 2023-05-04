@@ -83,7 +83,8 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
   const { addToast } = useToasts();
   const [confirmOrder, { loading: submitting }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
   const amount = amountReceived - platformTip;
-  const taxAmount = Math.round(amount * taxPercent) / 100;
+  const grossAmount = amount / (1 + taxPercent / 100);
+  const taxAmount = taxPercent ? amount - grossAmount : null;
   const hostFee = Math.round((amount - taxAmount) * hostFeePercent) / 100;
   const netAmount = amount - paymentProcessorFee - hostFee - taxAmount;
   const canAddHostFee = !order.toAccount.isHost;
