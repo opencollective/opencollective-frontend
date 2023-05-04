@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useLazyQuery } from '@apollo/client';
+import { useApolloClient, useLazyQuery } from '@apollo/client';
 import MUIDrawer from '@mui/material/Drawer';
 import { XMark } from '@styled-icons/heroicons-outline/XMark';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
-import { useApolloClient } from '@apollo/client';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
