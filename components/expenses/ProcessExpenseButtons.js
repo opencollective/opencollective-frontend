@@ -57,7 +57,8 @@ export const hasProcessButtons = permissions => {
     permissions.canPay ||
     permissions.canMarkAsUnpaid ||
     permissions.canMarkAsSpam ||
-    permissions.canDelete
+    permissions.canDelete ||
+    permissions.canUnschedulePayment
   );
 };
 
