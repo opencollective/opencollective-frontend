@@ -38,6 +38,7 @@ const StepPayment = ({
         stepSummary={stepSummary}
         stepDetails={stepDetails}
         stepPayment={stepPayment}
+        stepProfile={stepProfile}
         isEmbed={isEmbed}
         isSubmitting={isSubmitting}
         hideCreditCardPostalCode={hideCreditCardPostalCode}

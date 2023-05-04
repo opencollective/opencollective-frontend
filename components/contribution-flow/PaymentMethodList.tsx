@@ -8,7 +8,14 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Account, Host, Individual, PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
+import {
+  Account,
+  CaptchaInput,
+  Host,
+  Individual,
+  LocationInput,
+  PaymentMethodLegacyType,
+} from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getStripe } from '../../lib/stripe';
 import usePaymentIntent from '../../lib/stripe/usePaymentIntent';
@@ -95,6 +102,7 @@ type PaymentMethodListProps = {
   toAccount: Account;
   fromAccount?: Individual;
   disabledPaymentMethodTypes: string[];
+  stepProfile: { email?: string; name?: string; legalName?: string; location?: LocationInput; captcha?: CaptchaInput };
   stepSummary: object;
   stepDetails: { amount: number; currency: string; interval?: string };
   stepPayment: { key: string; isKeyOnly?: boolean };
@@ -121,7 +129,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
   });
 
   const hostSupportedPaymentMethods = props.host?.supportedPaymentMethods ?? [];
-  const [paymentIntent, stripe, loadingPaymentIntent] = usePaymentIntent({
+  const [paymentIntent, stripe, loadingPaymentIntent, paymentIntentCreateError] = usePaymentIntent({
     skip: !hostSupportedPaymentMethods.includes(PaymentMethodLegacyType.PAYMENT_INTENT),
     amount: { valueInCents: props.stepDetails.amount, currency: props.stepDetails.currency },
     fromAccount: props.fromAccount.isGuest
@@ -129,6 +137,12 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
       : typeof props.fromAccount.id === 'string'
       ? { id: props.fromAccount.id }
       : { legacyId: props.fromAccount.id },
+    guestInfo: {
+      email: props.stepProfile?.email,
+      name: props.stepProfile?.name,
+      location: props.stepProfile?.location,
+      captcha: props.stepProfile?.captcha,
+    },
     toAccount: pick(props.toAccount, 'id'),
   });
 
@@ -202,6 +216,17 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
 
   if (error) {
     return <MessageBoxGraphqlError error={error} />;
+  }
+
+  if (paymentIntentCreateError?.message === 'You need to provide a valid captcha token') {
+    return (
+      <MessageBox type="warning" withIcon>
+        <FormattedMessage
+          id="NewContribute.completeCaptchToContinue"
+          defaultMessage="Complete the captcha form to continue"
+        />
+      </MessageBox>
+    );
   }
 
   if (isEmpty(paymentMethodOptions)) {
