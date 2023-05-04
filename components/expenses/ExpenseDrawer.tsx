@@ -7,6 +7,7 @@ import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 
 import { getVariableFromProps } from '../../pages/expense';
 import Container from '../Container';
@@ -57,6 +58,9 @@ export default function ExpenseDrawer({ open, handleClose, expense }) {
     },
   );
 
+  const twoFactorPrompt = useTwoFactorAuthenticationPrompt();
+  const disableEnforceFocus = Boolean(twoFactorPrompt?.isOpen);
+
   useEffect(() => {
     if (open) {
       getExpense();
@@ -69,7 +73,7 @@ export default function ExpenseDrawer({ open, handleClose, expense }) {
   }, [open]);
 
   return (
-    <MUIDrawer anchor="right" open={open} onClose={handleClose}>
+    <MUIDrawer anchor="right" open={open} onClose={handleClose} disableEnforceFocus={disableEnforceFocus}>
       <DrawerContainer>
         <Flex flex={1} flexDirection="column" overflowY="scroll">
           <Container position="relative" py={'24px'}>
