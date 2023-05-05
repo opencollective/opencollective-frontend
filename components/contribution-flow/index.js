@@ -62,6 +62,7 @@ import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
 import {
   getContributeProfiles,
   getGQLV2AmountInput,
+  getGuestInfoFromStepProfile,
   getTotalAmount,
   isSupportedInterval,
   NEW_CREDIT_CARD_KEY,
@@ -247,7 +248,7 @@ class ContributionFlow extends React.Component {
 
     let fromAccount, guestInfo;
     if (stepProfile.isGuest) {
-      guestInfo = pick(stepProfile, ['email', 'name', 'legalName', 'location', 'captcha']);
+      guestInfo = getGuestInfoFromStepProfile(stepProfile);
     } else {
       fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
     }
