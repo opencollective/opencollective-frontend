@@ -1993,6 +1993,7 @@
   "NCP.SectionFetchError": "Vi stötte på ett fel när data hämtades för detta avsnitt.",
   "Nd9ioQ": "Kortet har uppdaterats",
   "NetAmountFor": "Nettobelopp för {name}",
+  "NewContribute.completeCaptchToContinue": "Complete the captcha form to continue",
   "NewContribute.crypto.donationDescription": "Använd adressen nedan för att donera {amount} från din plånbok",
   "NewContribute.crypto.QRCodeCopyButton": "Klicka för att kopiera plånboksadress",
   "NewContribute.noPaymentMethodsAvailable": "Inga betalningsmetoder tillgängliga.",

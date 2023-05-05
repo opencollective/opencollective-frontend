@@ -1993,6 +1993,7 @@
   "NCP.SectionFetchError": "We encountered an error while retrieving the data for this section.",
   "Nd9ioQ": "カードの更新に成功しました",
   "NetAmountFor": "Net amount for {name}",
+  "NewContribute.completeCaptchToContinue": "Complete the captcha form to continue",
   "NewContribute.crypto.donationDescription": "Use the address below to donate {amount} from your wallet",
   "NewContribute.crypto.QRCodeCopyButton": "Click to copy wallet address",
   "NewContribute.noPaymentMethodsAvailable": "No payment methods available.",

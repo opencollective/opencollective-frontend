@@ -1993,6 +1993,7 @@
   "NCP.SectionFetchError": "We encountered an error while retrieving the data for this section.",
   "Nd9ioQ": "Card successfully updated",
   "NetAmountFor": "Сумма для {name} после вычета налогов",
+  "NewContribute.completeCaptchToContinue": "Complete the captcha form to continue",
   "NewContribute.crypto.donationDescription": "Use the address below to donate {amount} from your wallet",
   "NewContribute.crypto.QRCodeCopyButton": "Нажмите, чтобы скопировать адрес кошелька",
   "NewContribute.noPaymentMethodsAvailable": "No payment methods available.",

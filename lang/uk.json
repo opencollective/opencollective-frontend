@@ -1993,6 +1993,7 @@
   "NCP.SectionFetchError": "Ми зіткнулися з помилкою під час отримання даних для цього розділу.",
   "Nd9ioQ": "Картку успішно оновлено",
   "NetAmountFor": "Чиста сума для {name}",
+  "NewContribute.completeCaptchToContinue": "Complete the captcha form to continue",
   "NewContribute.crypto.donationDescription": "Use the address below to donate {amount} from your wallet",
   "NewContribute.crypto.QRCodeCopyButton": "Клацніть, щоб скопіювати адресу гаманця",
   "NewContribute.noPaymentMethodsAvailable": "Немає доступних способів оплати.",
