@@ -52,7 +52,7 @@ const MarkExpenseAsIncompleteModal = ({ expense, onClose }) => {
   };
 
   return (
-    <StyledModal role="alertdialog" width="432px" onClose={onClose}>
+    <StyledModal role="alertdialog" width="432px" onClose={onClose} trapFocus>
       <ModalHeader>
         <FormattedMessage defaultMessage="Mark as incomplete" />
       </ModalHeader>

@@ -382,7 +382,7 @@ ExpenseSummary.propTypes = {
       id: PropTypes.string.isRequired,
       host: PropTypes.shape({
         id: PropTypes.string.isRequired,
-      }).isRequired,
+      }),
     }).isRequired,
     items: PropTypes.arrayOf(
       PropTypes.shape({
@@ -392,13 +392,13 @@ ExpenseSummary.propTypes = {
         amount: PropTypes.number.isRequired,
         url: PropTypes.string,
       }).isRequired,
-    ).isRequired,
+    ),
     taxes: PropTypes.arrayOf(
       PropTypes.shape({
         type: PropTypes.string,
         rate: PropTypes.number,
       }).isRequired,
-    ).isRequired,
+    ),
     payee: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
@@ -442,7 +442,7 @@ ExpenseSummary.propTypes = {
           type: PropTypes.string,
           rate: PropTypes.number,
         }).isRequired,
-      ).isRequired,
+      ),
     }),
     permissions: PropTypes.shape({
       canSeeInvoiceInfo: PropTypes.bool,
