@@ -72,7 +72,11 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
         </Container>
       )}
 
-      {!isFixedInterval && supportsRecurring && (
+      {isFixedInterval ? (
+        <P fontSize="20px" fontWeight="500" color="black.800" mb={3}>
+          {i18nInterval(intl, tier.interval)}
+        </P>
+      ) : supportsRecurring ? (
         <StyledButtonSet
           id="interval"
           justifyContent="center"
@@ -97,7 +101,7 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
             </Span>
           )}
         </StyledButtonSet>
-      )}
+      ) : null}
 
       {!isFixedContribution ? (
         <Box mb="30px">
