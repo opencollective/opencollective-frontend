@@ -8,7 +8,85 @@ Do you want to get paid to work on your passion for open source, mutual aid, and
 
 Open Collective is a financial and legal toolbox for grassroots groups. We support 15,000 groups and 30+ nonprofits around the world with one shared backend solution for fundraising and money management. This year our Collectives are on track to raise and spend $35 million dollars in full transparency.
 
-<strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>
+<!--<strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>-->
+
+
+##Customer Support Representative
+
+[Open Collective](https://opencollective.com/) is currently seeking a Customer Support Representative who is passionate about the future of money, collective work, transparent budgets, open source, mutual aid, and distributed leadership. 
+
+###Responsibilities
+
+- Understanding user needs, providing solutions to user support inquiries, directing users to documentation, and conversing with them in a friendly and professional manner
+- Troubleshooting technical issues related to our products or services
+- Following clear, specific directions to solve basic user software issues
+- Collaborating with other teams to ensure the timely resolution of customer issues
+- Identifying and escalating complex issues to the appropriate department
+- Providing feedback on the efficiency of the customer service process and subsequent solutions
+- Adjusting to ever-evolving (ever-improving!) workflows
+
+###Who we’re looking for
+
+This position requires:
+
+- Fluency in English
+- Strong customer service skills and sensibilities
+- Excellent communication and interpersonal skills
+- The ability to learn new digital tools quickly
+
+We want to work with someone who is:
+
+- Inspired by Open Collective’s mission to make communities sustainable
+- Excited to support/educate our users to make the best use of the Open Collective platform
+- Self-motivated and autonomous, able to thrive in our fully remote, asynchronous environment
+- Detail-oriented, practical and organized
+- Great at handling information overload and finding the path forward
+- Flexible and comfortable working in a fast-paced startup environment
+- Eager to understand the ins and outs of the Open Collective software platform
+- Experienced with working openly or excited to develop this practice
+
+Not required, but a bonus:
+
+- Fluency in language(s) other than English (we have users all over the world)
+- Basic experience with databases (we use PostgreSQL) and/or Metabase to identify and fix data related issues
+- Experience writing or updating user guides/documentation
+- Experience working with online tools like Slack for daily communication, Loom for asynchronous recordings, Google for file sharing and copy editing, Coda for everything, Loomio for decision making, GitHub for product development, and Around for video-conferencing (extra points if you’ve used Open Collective, of course!)
+- Experience in collaborative communities like the ones that use our platform (open source projects, art collectives, cooperatives, activist groups, solidarity economy projects)
+
+###Compensation and benefits
+
+- USD $25-30/hr
+- About 10 hours per week (to start)
+- Fully remote position (i.e., suitable for digital nomads and people seeking to “work-from-home” - we don't have any physical offices) 
+- Highly flexible schedule (only a couple weekly meetings; the work is largely asynchronous, as our team is distributed across time zones)
+- Twenty-five days of paid time off per year, plus 10 days for chosen holidays
+- USD $500 per year toward workspace expenses
+- An opportunity (though not strictly required) to travel when we have full-team in-person retreats with transportation, accommodation, and meals covered during our time together (the last one was in September 2022 in La Ciotat, France)
+- Opportunity to grow in the role, with support for professional development and encouragement to influence strategy and share ideas
+
+###A little about Open Collective
+
+[Open Collective](https://opencollective.com/), an open-source software company founded in 2015, is committed to supporting grassroots groups and communities around the world with transparent fundraising, money management, and legal tools. We're proud to have supported over 15,000 groups and 30+ nonprofits globally, raising and spending $35 million dollars in full transparency. Our platform helps open source projects, community projects, and mutual aid groups thrive all over the world, and we are on a long-term path toward [community governance](http://opencollective.com/e2c).
+
+“Open Collective” means transparency (“Open”) and community (“Collective”), and thus our platform is built on values of openness, transparency, and collective collaboration. The team is a group of optimistic, driven, nerdy, and open people. Our culture, though ever-changing and sometimes chaotic like many start-ups, is also oriented toward care, candor, rigor, generosity, and autonomy. (You can read more about our values in our [Community Guidelines](https://docs.opencollective.com/help/about/the-open-collective-way/community-guidelines).)
+
+Our international, fully-remote, highly-collaborative team currently includes members in Spain, France, Belgium, Germany, the UK, Romania, the United States, Mexico, Canada, Indonesia, Brazil, India, and New Zealand. To learn more about the company, [watch this 50-second video](https://www.youtube.com/watch?v=SfHeSpoSHTM), skim through our [blog](https://blog.opencollective.com), and read about our [strategy](https://blog.opencollective.com/oc-strategy-2023-2024/). We look forward to learning more about you, too!
+
+###The support team
+
+The support team at Open Collective is currently based in Indonesia, Canada, the UK, and the US. We are responsible for providing exceptional customer service and support to our users, ensuring that their inquiries and concerns are resolved in a timely and professional manner. We are a new and growing team, and we need to your help as we continually improve and optimize our user support systems, utilizing performance analytic reports to inform strategic decision-making and reduce workload and ticket response times, while - of course - continuing to provide quality customer support.
+
+A few more notes about our team:
+
+* We are a small shop, and you will have significant influence over the way this work evolves
+* We use Slack and other tools a lot for asynchronous discussion, since we are spread all over the world
+* We work closely with the administrators of “fiscal hosts” using the platform (think of them as power users) to ensure we perform well
+* We work in a fast-paced environment, but are trying to create spaces for slowness and reflection
+
+###Join us!
+
+We’d love to hear from you. Applications are open through May 21. [To apply](https://coda.io/form/Application-Open-Collective-Customer-Support-Representative_dJ3tGEm2kIw). If you have any questions, reach out to us at [support@opencollective.com](mailto:support@opencollective.com). 
+
 
 <!--## [Open Collective Foundation](https://opencollective.foundation/): Finance Admin
 
