@@ -47,7 +47,7 @@ const RecurringContributionsCard = ({
   const { formatMessage } = useIntl();
   const isError = status === ORDER_STATUS.ERROR;
   const isRejected = status === ORDER_STATUS.REJECTED;
-  const isActive = status === ORDER_STATUS.ACTIVE || isError;
+  const isActive = [ORDER_STATUS.ACTIVE, ORDER_STATUS.PROCESSING].includes(status) || isError;
 
   return (
     <StyledCollectiveCard
