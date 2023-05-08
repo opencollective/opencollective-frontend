@@ -6,11 +6,10 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
-import { Box, Flex } from '../Grid';
+import { Flex } from '../Grid';
+import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
-import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
-import StyledTextarea from '../StyledTextarea';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
@@ -36,6 +35,7 @@ const processExpenseMutation = gql`
 const MarkExpenseAsIncompleteModal = ({ expense, onClose }) => {
   const intl = useIntl();
   const [message, setMessage] = React.useState();
+  const [uploading, setUploading] = React.useState(false);
   const mutationOptions = { context: API_V2_CONTEXT };
   const [processExpense, { loading }] = useMutation(processExpenseMutation, mutationOptions);
   const { addToast } = useToasts();
@@ -57,33 +57,30 @@ const MarkExpenseAsIncompleteModal = ({ expense, onClose }) => {
         <FormattedMessage defaultMessage="Mark as incomplete" />
       </ModalHeader>
       <ModalBody pt={2}>
-        <P color="black.700" lineHeight="20px">
+        <P mb={3} color="black.700" lineHeight="20px">
           <FormattedMessage defaultMessage="Please mention the reason why this expense has been marked as incomplete. The reason will be shared with the user and also be documented as a comment under the expense." />
         </P>
-        <Box>
-          <StyledInputField
-            name="reason"
-            label={<FormattedMessage defaultMessage="Please specify the reason" />}
-            labelFontSize="13px"
-            labelFontWeight={600}
-            labelColor="black.700"
-            required
-            mt={3}
-          >
-            {inputProps => (
-              <StyledTextarea
-                {...inputProps}
-                minHeight={100}
-                placeholder={intl.formatMessage(messages.reasonPlaceholder)}
-                onChange={e => setMessage(e.target.value)}
-              />
-            )}
-          </StyledInputField>
-        </Box>
+        <RichTextEditor
+          kind="COMMENT"
+          version="simplified"
+          withBorders
+          editorMinHeight={150}
+          placeholder={intl.formatMessage(messages.reasonPlaceholder)}
+          fontSize="13px"
+          onChange={e => setMessage(e.target.value)}
+          setUploading={setUploading}
+        />
       </ModalBody>
       <ModalFooter>
         <Flex gap="16px" justifyContent="flex-end">
-          <StyledButton buttonStyle="secondary" buttonSize="small" onClick={onConfirm} minWidth={180} loading={loading}>
+          <StyledButton
+            disabled={uploading}
+            buttonStyle="secondary"
+            buttonSize="small"
+            onClick={onConfirm}
+            minWidth={180}
+            loading={loading}
+          >
             <FormattedMessage defaultMessage="Confirm and mark as incomplete" />
           </StyledButton>
           <StyledButton buttonStyle="standard" buttonSize="small" onClick={onClose}>
