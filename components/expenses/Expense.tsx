@@ -677,7 +677,7 @@ function Expense(props) {
           <Box mb={3} pt={3}>
             {loading ? (
               <LoadingPlaceholder width="100%" height="44px" />
-            ) : (
+            ) : expense ? (
               <Thread
                 collective={collective}
                 hasMore={expense.comments?.totalCount > threadItems.length}
@@ -686,7 +686,7 @@ function Expense(props) {
                 onCommentDeleted={onCommentDeleted}
                 loading={loading}
               />
-            )}
+            ) : null}
           </Box>
 
           {expense?.permissions.canComment && (
