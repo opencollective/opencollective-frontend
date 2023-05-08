@@ -525,7 +525,7 @@ function Expense(props) {
           <ExpenseSummary
             expense={status === PAGE_STATUS.EDIT_SUMMARY ? editedExpense : expense}
             host={host}
-            isLoading={loading}
+            isLoading={loading || !expense}
             isEditing={status === PAGE_STATUS.EDIT_SUMMARY}
             isLoadingLoggedInUser={loadingLoggedInUser || isRefetchingDataForUser}
             collective={collective}
