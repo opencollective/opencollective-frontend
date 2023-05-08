@@ -110,9 +110,15 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
   const isPaid = expense?.status === expenseStatus.PAID;
   const displayedHost = expense?.host ?? host;
 
-  return isLoading ? (
-    <LoadingPlaceholder height={150} mt={3} />
-  ) : (
+  if (isLoading) {
+    <LoadingPlaceholder height={150} mt={3} />;
+  }
+
+  if (!payee) {
+    return null;
+  }
+
+  return (
     <Flex
       flexDirection={['column', 'row']}
       alignItems={['stretch', 'flex-start']}
