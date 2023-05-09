@@ -133,8 +133,10 @@ const ExpenseBudgetItem = ({
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency?.currency !== expense.currency;
 
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isAdminOfCollective(host);
+  const isLoggedInUserExpenseAccountAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isExpenseToHostCollective = expense?.account?.id === host?.id;
-  const isApproveBtnSecondary = isLoggedInUserExpenseHostAdmin && !isExpenseToHostCollective;
+  const isApproveBtnSecondary =
+    isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAccountAdmin && !isExpenseToHostCollective;
 
   return (
     <ExpenseContainer
