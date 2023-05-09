@@ -10,11 +10,11 @@ Open Collective is a financial and legal toolbox for grassroots groups. We suppo
 
 <!--<strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>-->
 
-##Customer Support Representative
+## Customer Support Representative
 
 [Open Collective](https://opencollective.com/) is currently seeking a Customer Support Representative who is passionate about the future of money, collective work, transparent budgets, open source, mutual aid, and distributed leadership.
 
-###Responsibilities
+### Responsibilities
 
 - Understanding user needs, providing solutions to user support inquiries, directing users to documentation, and conversing with them in a friendly and professional manner
 - Troubleshooting technical issues related to our products or services
@@ -24,7 +24,7 @@ Open Collective is a financial and legal toolbox for grassroots groups. We suppo
 - Providing feedback on the efficiency of the customer service process and subsequent solutions
 - Adjusting to ever-evolving (ever-improving!) workflows
 
-###Who we’re looking for
+### Who we’re looking for
 
 This position requires:
 
@@ -52,7 +52,7 @@ Not required, but a bonus:
 - Experience working with online tools like Slack for daily communication, Loom for asynchronous recordings, Google for file sharing and copy editing, Coda for everything, Loomio for decision making, GitHub for product development, and Around for video-conferencing (extra points if you’ve used Open Collective, of course!)
 - Experience in collaborative communities like the ones that use our platform (open source projects, art collectives, cooperatives, activist groups, solidarity economy projects)
 
-###Compensation and benefits
+### Compensation and benefits
 
 - USD $25-30/hr
 - About 10 hours per week (to start)
@@ -63,7 +63,7 @@ Not required, but a bonus:
 - An opportunity (though not strictly required) to travel when we have full-team in-person retreats with transportation, accommodation, and meals covered during our time together (the last one was in September 2022 in La Ciotat, France)
 - Opportunity to grow in the role, with support for professional development and encouragement to influence strategy and share ideas
 
-###A little about Open Collective
+### A little about Open Collective
 
 [Open Collective](https://opencollective.com/), an open-source software company founded in 2015, is committed to supporting grassroots groups and communities around the world with transparent fundraising, money management, and legal tools. We're proud to have supported over 15,000 groups and 30+ nonprofits globally, raising and spending $35 million dollars in full transparency. Our platform helps open source projects, community projects, and mutual aid groups thrive all over the world, and we are on a long-term path toward [community governance](http://opencollective.com/e2c).
 
@@ -71,7 +71,7 @@ Not required, but a bonus:
 
 Our international, fully-remote, highly-collaborative team currently includes members in Spain, France, Belgium, Germany, the UK, Romania, the United States, Mexico, Canada, Indonesia, Brazil, India, and New Zealand. To learn more about the company, [watch this 50-second video](https://www.youtube.com/watch?v=SfHeSpoSHTM), skim through our [blog](https://blog.opencollective.com), and read about our [strategy](https://blog.opencollective.com/oc-strategy-2023-2024/). We look forward to learning more about you, too!
 
-###The support team
+### The support team
 
 The support team at Open Collective is currently based in Indonesia, Canada, the UK, and the US. We are responsible for providing exceptional customer service and support to our users, ensuring that their inquiries and concerns are resolved in a timely and professional manner. We are a new and growing team, and we need to your help as we continually improve and optimize our user support systems, utilizing performance analytic reports to inform strategic decision-making and reduce workload and ticket response times, while - of course - continuing to provide quality customer support.
 
@@ -82,7 +82,7 @@ A few more notes about our team:
 - We work closely with the administrators of “fiscal hosts” using the platform (think of them as power users) to ensure we perform well
 - We work in a fast-paced environment, but are trying to create spaces for slowness and reflection
 
-###Join us!
+### Join us!
 
 We’d love to hear from you. Applications are open through May 21. [To apply](https://coda.io/form/Application-Open-Collective-Customer-Support-Representative_dJ3tGEm2kIw). If you have any questions, reach out to us at [support@opencollective.com](mailto:support@opencollective.com).
 
