@@ -10,10 +10,9 @@ Open Collective is a financial and legal toolbox for grassroots groups. We suppo
 
 <!--<strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>-->
 
-
 ##Customer Support Representative
 
-[Open Collective](https://opencollective.com/) is currently seeking a Customer Support Representative who is passionate about the future of money, collective work, transparent budgets, open source, mutual aid, and distributed leadership. 
+[Open Collective](https://opencollective.com/) is currently seeking a Customer Support Representative who is passionate about the future of money, collective work, transparent budgets, open source, mutual aid, and distributed leadership.
 
 ###Responsibilities
 
@@ -57,7 +56,7 @@ Not required, but a bonus:
 
 - USD $25-30/hr
 - About 10 hours per week (to start)
-- Fully remote position (i.e., suitable for digital nomads and people seeking to “work-from-home” - we don't have any physical offices) 
+- Fully remote position (i.e., suitable for digital nomads and people seeking to “work-from-home” - we don't have any physical offices)
 - Highly flexible schedule (only a couple weekly meetings; the work is largely asynchronous, as our team is distributed across time zones)
 - Twenty-five days of paid time off per year, plus 10 days for chosen holidays
 - USD $500 per year toward workspace expenses
@@ -78,15 +77,14 @@ The support team at Open Collective is currently based in Indonesia, Canada, the
 
 A few more notes about our team:
 
-* We are a small shop, and you will have significant influence over the way this work evolves
-* We use Slack and other tools a lot for asynchronous discussion, since we are spread all over the world
-* We work closely with the administrators of “fiscal hosts” using the platform (think of them as power users) to ensure we perform well
-* We work in a fast-paced environment, but are trying to create spaces for slowness and reflection
+- We are a small shop, and you will have significant influence over the way this work evolves
+- We use Slack and other tools a lot for asynchronous discussion, since we are spread all over the world
+- We work closely with the administrators of “fiscal hosts” using the platform (think of them as power users) to ensure we perform well
+- We work in a fast-paced environment, but are trying to create spaces for slowness and reflection
 
 ###Join us!
 
-We’d love to hear from you. Applications are open through May 21. [To apply](https://coda.io/form/Application-Open-Collective-Customer-Support-Representative_dJ3tGEm2kIw). If you have any questions, reach out to us at [support@opencollective.com](mailto:support@opencollective.com). 
-
+We’d love to hear from you. Applications are open through May 21. [To apply](https://coda.io/form/Application-Open-Collective-Customer-Support-Representative_dJ3tGEm2kIw). If you have any questions, reach out to us at [support@opencollective.com](mailto:support@opencollective.com).
 
 <!--## [Open Collective Foundation](https://opencollective.foundation/): Finance Admin
 
