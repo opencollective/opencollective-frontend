@@ -1714,7 +1714,7 @@
   "HostApplication.form.publicInformation": "Denna information är offentlig. Lägg inte till någon personlig information som namn eller adresser i detta fält.",
   "HostApplication.form.readFaqs": "Vanliga frågor",
   "HostApplication.form.RepositoryUrlLabel": "Ditt repo eller organisation",
-  "HostApplication.form.subheading": "Introducera ditt kollektiv, vänligen skriv allt som kan hjälpa oss att ge er den bästa servicen vi kan! Har du funderingar? {faqLink}",
+  "HostApplication.form.subheading": "Introduce your Collective, please include as much context as possible so we can give you the best service we can! Have doubts? {faqLink}",
   "HostApplication.form.team": "Ditt team",
   "HostApplication.form.tellUsMoreHelpText": "Vi vill veta mer om dig och hur vi kan hjälpa dig.",
   "HostApplication.form.tellUsMoreLabel": "Berätta om ditt projekt, vad du jobbar med och vad du behöver från oss.",
