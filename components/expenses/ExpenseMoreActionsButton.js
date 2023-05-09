@@ -21,9 +21,9 @@ import { Flex } from '../Grid';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
 
+import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
-import MarkExpenseAsIncompleteModal from './MarkExpenseAsIncompleteModal';
 
 const Action = styled.button`
   ${margin}
@@ -110,7 +110,7 @@ const ExpenseMoreActionsButton = ({
       >
         {({ setOpen }) => (
           <Flex flexDirection="column">
-            {permissions?.canApprove && props.displayApproveExpense && (
+            {permissions?.canApprove && props.isViewingExpenseInHostContext && (
               <Action
                 loading={processExpense.loading && processExpense.currentAction === 'APPROVE'}
                 disabled={processExpense.loading || isDisabled}
@@ -184,7 +184,11 @@ const ExpenseMoreActionsButton = ({
         )}
       </PopupMenu>
       {showMarkAsIncompleteModal && (
-        <MarkExpenseAsIncompleteModal expense={expense} onClose={() => setMarkAsIncompleteModal(false)} />
+        <ConfirmProcessExpenseModal
+          type="MARK_AS_INCOMPLETE"
+          expense={expense}
+          onClose={() => setMarkAsIncompleteModal(false)}
+        />
       )}
       {hasDeleteConfirm && (
         <ExpenseConfirmDeletion
@@ -222,12 +226,12 @@ ExpenseMoreActionsButton.propTypes = {
   onModalToggle: PropTypes.func,
   onEdit: PropTypes.func,
   linkAction: PropTypes.oneOf(['link', 'copy']),
-  displayApproveExpense: PropTypes.bool,
+  isViewingExpenseInHostContext: PropTypes.bool,
 };
 
 ExpenseMoreActionsButton.defaultProps = {
   linkAction: 'copy',
-  displayApproveExpense: false,
+  isViewingExpenseInHostContext: false,
 };
 
 export default ExpenseMoreActionsButton;

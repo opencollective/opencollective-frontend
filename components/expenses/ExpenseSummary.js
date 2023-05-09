@@ -91,7 +91,7 @@ const ExpenseSummary = ({
   const { LoggedInUser } = useLoggedInUser();
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
   const isExpenseToHostCollective = expense?.account?.id === expense?.account?.host?.id;
-  const isApproveBtnSecondary = isLoggedInUserExpenseHostAdmin && !isExpenseToHostCollective;
+  const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isExpenseToHostCollective;
 
   const processButtons = (
     <Flex
@@ -105,7 +105,7 @@ const ExpenseSummary = ({
       <ExpenseMoreActionsButton
         onEdit={onEdit}
         expense={expense}
-        displayApproveExpense={isApproveBtnSecondary}
+        isViewingExpenseInHostContext={isViewingExpenseInHostContext}
         onDelete={() => {
           onDelete?.(expense);
           onClose?.();
@@ -116,7 +116,7 @@ const ExpenseSummary = ({
           <ProcessExpenseButtons
             expense={expense}
             isMoreActions
-            displayApproveExpense={!isApproveBtnSecondary}
+            isViewingExpenseInHostContext={isViewingExpenseInHostContext}
             permissions={expense?.permissions}
             collective={collective}
             host={host}
