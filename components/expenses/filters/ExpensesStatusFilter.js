@@ -41,7 +41,7 @@ const ExpenseStatusFilter = ({ value, onChange, ignoredExpenseStatus = IGNORED_E
 
 ExpenseStatusFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.oneOf([...Object.values(expenseStatus), 'READY_TO_PAY']),
+  value: PropTypes.oneOf([...Object.values(expenseStatus), 'ALL', 'READY_TO_PAY']),
   ignoredExpenseStatus: PropTypes.arrayOf(PropTypes.oneOf(Object.values(expenseStatus))),
 };
 

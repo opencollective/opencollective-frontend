@@ -33,9 +33,9 @@ function contributeWithNewUsBankAccount({ name } = {}) {
       return iframe.contents().find('body');
     })
     .within(() => {
-      cy.contains('Agree').click();
-      cy.contains('Success').click(); // Bank account with name 'Success'
-      cy.contains('Link account').click();
+      cy.get('[data-testid="agree-button"]').click();
+      cy.get('[data-testid="success"]').click(); // Bank account with name 'Success'
+      cy.get('[data-testid="select-button"]').click();
       cy.get('[data-testid="done-button"]').click();
     });
 
@@ -47,7 +47,8 @@ function waitOrderStatus(status = 'PAID') {
   cy.retryChain(
     () =>
       cy.get('@collective').then(col => {
-        return cy.visit(`${col.slug}/orders`);
+        cy.visit(`${col.slug}/orders`);
+        return cy.contains('Financial contribution to'); // orders loaded
       }),
     () => {
       if (cy.$$(`[data-cy='order-${status}']`).length === 0) {

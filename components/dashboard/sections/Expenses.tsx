@@ -84,7 +84,7 @@ const Expenses = (props: AdminSectionProps) => {
       loading={loading}
       variables={variables}
       LoggedInUser={LoggedInUser}
-      collectiveSlug={variables.collectiveSlug}
+      onlySubmittedExpenses={LoggedInUser?.collective.slug === variables.collectiveSlug}
       isDashboard
     />
   );

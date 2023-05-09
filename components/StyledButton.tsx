@@ -25,7 +25,7 @@ import { ButtonSize, buttonSize, ButtonStyle, buttonStyle } from '../lib/theme/v
 
 import StyledSpinner from './StyledSpinner';
 
-type StyledButtonProps = BackgroundProps &
+export type StyledButtonProps = BackgroundProps &
   BorderProps &
   FlexboxProps &
   LayoutProps &

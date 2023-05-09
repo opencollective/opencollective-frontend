@@ -1,6 +1,6 @@
 import React from 'react';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
-import { find, get, isEmpty, sortBy, uniqBy } from 'lodash';
+import { find, get, isEmpty, pick, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { canContributeRecurring, getCollectivePageMetadata } from '../../lib/collective.lib';
@@ -376,3 +376,7 @@ export const contributionRequiresAddress = stepDetails => {
 export const contributionRequiresLegalName = stepDetails => {
   return stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 500e2;
 };
+
+export function getGuestInfoFromStepProfile(stepProfile) {
+  return pick(stepProfile, ['email', 'name', 'legalName', 'location', 'captcha']);
+}

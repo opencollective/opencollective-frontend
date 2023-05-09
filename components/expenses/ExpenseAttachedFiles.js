@@ -37,7 +37,7 @@ const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expens
           </ExpenseInvoiceDownloadHelper>
         </Box>
       )}
-      {files.map((file, idx) => (
+      {files?.map((file, idx) => (
         <Box key={file.id || file.url} mr={3} mb={3}>
           <UploadedFilePreview
             size={88}
@@ -70,7 +70,7 @@ ExpenseAttachedFiles.propTypes = {
       id: PropTypes.string,
       url: PropTypes.string.isRequired,
     }).isRequired,
-  ).isRequired,
+  ),
   /** If provided, a link to remove the file will be displayed */
   onRemove: PropTypes.func,
 };

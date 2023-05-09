@@ -119,7 +119,7 @@ const SecurityChecksModal = ({ expense, onClose, onConfirm, ...modalProps }) => 
   const [scope, setScope] = React.useState();
 
   return (
-    <StyledModal onClose={onClose} width="680px" data-cy="security-check-modal" {...modalProps}>
+    <StyledModal trapFocus onClose={onClose} width="680px" data-cy="security-check-modal" {...modalProps}>
       <ModalHeader onClose={onClose}>
         <Box>
           <H1 color="black.900" fontSize="20px" lineHeight="28px">

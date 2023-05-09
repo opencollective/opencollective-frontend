@@ -147,8 +147,16 @@ function createLink({ twoFactorAuthContext }) {
 
   const linkFetch = process.browser ? fetch : serverSideFetch;
 
-  const apiV1DefaultLink = new HttpLink({ uri: getGraphqlUrl('v1'), fetch: linkFetch });
-  const apiV2DefaultLink = new HttpLink({ uri: getGraphqlUrl('v2'), fetch: linkFetch });
+  const apiV1DefaultLink = new HttpLink({
+    uri: getGraphqlUrl('v1'),
+    fetch: linkFetch,
+    headers: { 'Apollo-Require-Preflight': 'true' },
+  });
+  const apiV2DefaultLink = new HttpLink({
+    uri: getGraphqlUrl('v2'),
+    fetch: linkFetch,
+    headers: { 'Apollo-Require-Preflight': 'true' },
+  });
 
   // Setup internal links handling to be able to split traffic to different API servers
   const apiV1Link =

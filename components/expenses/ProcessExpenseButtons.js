@@ -12,12 +12,14 @@ import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
+import { getScheduledExpensesQueryVariables, scheduledExpensesQuery } from '../host-dashboard/ScheduledExpensesBanner';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
+import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import DeleteExpenseButton from './DeleteExpenseButton';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
@@ -56,7 +58,8 @@ export const hasProcessButtons = permissions => {
     permissions.canPay ||
     permissions.canMarkAsUnpaid ||
     permissions.canMarkAsSpam ||
-    permissions.canDelete
+    permissions.canDelete ||
+    permissions.canUnschedulePayment
   );
 };
 
@@ -132,7 +135,9 @@ const ProcessExpenseButtons = ({
   onDelete,
   isMoreActions,
   displaySecurityChecks,
+  isViewingExpenseInHostContext,
 }) => {
+  const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] = React.useState();
   const [selectedAction, setSelectedAction] = React.useState(null);
   const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
   const mutationOptions = { context: API_V2_CONTEXT, update: onUpdate };
@@ -150,7 +155,16 @@ const ProcessExpenseButtons = ({
 
     try {
       const variables = { id: expense.id, legacyId: expense.legacyId, action, paymentParams };
-      await processExpense({ variables });
+      const refetchQueries = [];
+      if (action === 'SCHEDULE_FOR_PAYMENT' || action === 'UNSCHEDULE_PAYMENT') {
+        refetchQueries.push({
+          query: scheduledExpensesQuery,
+          context: API_V2_CONTEXT,
+          variables: getScheduledExpensesQueryVariables(host.slug),
+        });
+      }
+
+      await processExpense({ variables, refetchQueries });
       return true;
     } catch (e) {
       // Display a toast with light variant since we're in a modal
@@ -171,20 +185,21 @@ const ProcessExpenseButtons = ({
 
   return (
     <React.Fragment>
-      {(permissions.approve.allowed || permissions.approve.reason === PERMISSION_CODES.AUTHOR_CANNOT_APPROVE) && (
-        <PermissionButton
-          {...getButtonProps('APPROVE')}
-          buttonStyle="secondary"
-          data-cy="approve-button"
-          icon={<ApproveIcon size={12} />}
-          permission={permissions.approve}
-          label={
-            <ButtonLabel>
-              <FormattedMessage id="actions.approve" defaultMessage="Approve" />
-            </ButtonLabel>
-          }
-        />
-      )}
+      {!isViewingExpenseInHostContext &&
+        (permissions.approve.allowed || permissions.approve.reason === PERMISSION_CODES.AUTHOR_CANNOT_APPROVE) && (
+          <PermissionButton
+            {...getButtonProps('APPROVE')}
+            buttonStyle="secondary"
+            data-cy="approve-button"
+            icon={<ApproveIcon size={12} />}
+            permission={permissions.approve}
+            label={
+              <ButtonLabel>
+                <FormattedMessage id="actions.approve" defaultMessage="Approve" />
+              </ButtonLabel>
+            }
+          />
+        )}
       {permissions.canPay && (
         <PayExpenseButton
           {...getButtonProps('PAY')}
@@ -196,7 +211,7 @@ const ProcessExpenseButtons = ({
           error={error}
         />
       )}
-      {permissions.canReject && (
+      {permissions.canReject && !isViewingExpenseInHostContext && (
         <StyledButton {...getButtonProps('REJECT')} buttonStyle="dangerSecondary" data-cy="reject-button">
           <RejectIcon size={14} />
           <ButtonLabel>
@@ -222,11 +237,25 @@ const ProcessExpenseButtons = ({
         </StyledButton>
       )}
 
-      {permissions.canUnapprove && (
+      {permissions.canUnapprove && !isViewingExpenseInHostContext && (
         <StyledButton {...getButtonProps('UNAPPROVE')} buttonStyle="dangerSecondary" data-cy="unapprove-button">
           <UnapproveIcon size={12} />
           <ButtonLabel>
             <FormattedMessage id="expense.unapprove.btn" defaultMessage="Unapprove" />
+          </ButtonLabel>
+        </StyledButton>
+      )}
+
+      {permissions.canUnapprove && isViewingExpenseInHostContext && (
+        <StyledButton
+          {...getButtonProps('UNAPPROVE')}
+          onClick={() => setConfirmProcessExpenseAction('REQUEST_RE_APPROVAL')}
+          buttonStyle="dangerSecondary"
+          data-cy="request-re-approval-button"
+        >
+          <UnapproveIcon size={12} />
+          <ButtonLabel>
+            <FormattedMessage id="expense.requestReApproval.btn" defaultMessage="Request re-approval" />
           </ButtonLabel>
         </StyledButton>
       )}
@@ -262,6 +291,14 @@ const ProcessExpenseButtons = ({
       )}
       {displaySecurityChecks && expense?.securityChecks?.length && (
         <SecurityChecksButton {...buttonProps} minWidth={0} expense={expense} />
+      )}
+
+      {confirmProcessExpenseAction && (
+        <ConfirmProcessExpenseModal
+          type={confirmProcessExpenseAction}
+          onClose={() => setConfirmProcessExpenseAction(null)}
+          expense={expense}
+        />
       )}
     </React.Fragment>
   );
@@ -310,18 +347,18 @@ ProcessExpenseButtons.propTypes = {
   onModalToggle: PropTypes.func,
   displayMarkAsIncomplete: PropTypes.bool,
   displaySecurityChecks: PropTypes.bool,
+  isViewingExpenseInHostContext: PropTypes.bool,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
   buttonSize: 'small',
   minWidth: 130,
-  mx: 2,
-  mt: 2,
 };
 
 ProcessExpenseButtons.defaultProps = {
   buttonProps: DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
   displaySecurityChecks: true,
+  isViewingExpenseInHostContext: false,
 };
 
 export default ProcessExpenseButtons;

@@ -30,7 +30,7 @@ const ORDER_SELECT_STYLE = { control: { background: 'white' } };
 
 const Expenses = props => {
   const router = useRouter();
-  const { query, collectiveSlug, LoggedInUser, data, loading, variables, refetch, isDashboard } = props;
+  const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, onlySubmittedExpenses } = props;
 
   const expensesRoute = isDashboard
     ? `/dashboard/${data?.account?.slug}/expenses`
@@ -38,7 +38,7 @@ const Expenses = props => {
 
   useEffect(() => {
     const queryParameters = {
-      ...omit(query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
+      ...omit(query, ['offset', 'collec', 'parentCollectiveSlug']),
     };
     if (!isDashboard) {
       addParentToURLIfMissing(router, data?.account, `/expenses`, queryParameters);
@@ -91,19 +91,18 @@ const Expenses = props => {
 
   const hasFilters = hasFilter(query);
   const isSelfHosted = data?.account?.id === data?.account?.host?.id;
-  const onlyShowSubmittedExpenses = collectiveSlug === LoggedInUser?.collective.slug;
 
   return (
     <Container>
       <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-        {onlyShowSubmittedExpenses ? (
+        {onlySubmittedExpenses ? (
           <FormattedMessage defaultMessage="Submitted Expenses" />
         ) : (
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         )}
       </H1>
       <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}>
-        {!onlyShowSubmittedExpenses && (
+        {!onlySubmittedExpenses && (
           <Box flex="0 1" flexBasis={['100%', null, '380px']}>
             <ExpensesDirection
               value={query.direction || 'RECEIVED'}
@@ -139,7 +138,7 @@ const Expenses = props => {
         )}
       </Box>
       {isSelfHosted && LoggedInUser?.isHostAdmin(data?.account) && data.scheduledExpenses?.totalCount > 0 && (
-        <ScheduledExpensesBanner host={data.account} />
+        <ScheduledExpensesBanner hostSlug={data.account.slug} />
       )}
       <Flex justifyContent="space-between" flexWrap="wrap" gridGap={[0, 3, 5]}>
         <Box flex="1 1 500px" minWidth={300} mb={5} mt={['16px', '46px']}>
@@ -227,8 +226,6 @@ const Expenses = props => {
 };
 
 Expenses.propTypes = {
-  collectiveSlug: PropTypes.string,
-  parentCollectiveSlug: PropTypes.string,
   LoggedInUser: PropTypes.object,
   query: PropTypes.shape({
     type: PropTypes.string,
@@ -268,6 +265,7 @@ Expenses.propTypes = {
     }),
   }),
   isDashboard: PropTypes.bool,
+  onlySubmittedExpenses: PropTypes.bool,
 };
 
 export default Expenses;

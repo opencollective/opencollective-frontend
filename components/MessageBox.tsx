@@ -113,7 +113,7 @@ const MessageBox = ({ type = 'white', withIcon = false, isLoading, children, ...
           </Box>
         )}
 
-        <Box>{children}</Box>
+        <Box flex={1}>{children}</Box>
       </Flex>
     </Message>
   );

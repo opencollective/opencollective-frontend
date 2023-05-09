@@ -4,10 +4,12 @@ import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
 import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
 import { get, includes, size } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import { space } from 'styled-system';
 
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -54,6 +56,7 @@ const ButtonsContainer = styled.div.attrs({ 'data-cy': 'expense-actions' })`
   display: flex;
   flex-wrap: wrap;
   margin-top: 8px;
+  grid-gap: 8px;
   transition: opacity 0.05s;
   justify-content: flex-end;
 
@@ -67,7 +70,20 @@ const ButtonsContainer = styled.div.attrs({ 'data-cy': 'expense-actions' })`
 `;
 
 const ExpenseContainer = styled.div`
-  padding: 16px 27px;
+  outline: none;
+  display: block;
+  width: 100%;
+  border: 0;
+  background: white;
+  ${space}
+
+  transition: background 0.1s;
+
+  ${props =>
+    props.useDrawer &&
+    css`
+      ${props => props.selected && `background: #f8fafc;`}
+    `}
 
   @media (hover: hover) {
     &:not(:hover):not(:focus-within) ${ButtonsContainer} {
@@ -96,8 +112,13 @@ const ExpenseBudgetItem = ({
   view,
   suggestedTags,
   onProcess,
+  selected,
+  expandExpense,
 }) => {
   const [hasFilesPreview, showFilesPreview] = React.useState(false);
+  const { LoggedInUser } = useLoggedInUser();
+  const useDrawer = LoggedInUser?.hasEarlyAccess('expense-drawer');
+
   const featuredProfile = isInverted ? expense?.account : expense?.payee;
   const isAdminView = view === 'admin';
   const isSubmitterView = view === 'submitter';
@@ -111,8 +132,18 @@ const ExpenseBudgetItem = ({
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency?.currency !== expense.currency;
 
+  const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isAdminOfCollective(host);
+  const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
+  const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
+
   return (
-    <ExpenseContainer data-cy={`expense-container-${expense?.legacyId}`}>
+    <ExpenseContainer
+      px={[3, '24px']}
+      py={3}
+      data-cy={`expense-container-${expense?.legacyId}`}
+      selected={selected}
+      useDrawer={useDrawer}
+    >
       <Flex justifyContent="space-between" flexWrap="wrap">
         <Flex flex="1" minWidth="max(50%, 200px)" maxWidth={[null, '70%']} mr="24px">
           <Box mr={3}>
@@ -131,13 +162,27 @@ const ExpenseBudgetItem = ({
           ) : (
             <Box>
               <StyledTooltip
-                content={<FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />}
+                content={
+                  useDrawer ? (
+                    <FormattedMessage id="Expense.SeeDetails" defaultMessage="See expense details" />
+                  ) : (
+                    <FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />
+                  )
+                }
                 delayHide={0}
               >
                 <StyledLink
-                  as={Link}
                   underlineOnHover
-                  href={`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`}
+                  {...(useDrawer
+                    ? {
+                        as: Link,
+                        href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
+                        onClick: expandExpense,
+                      }
+                    : {
+                        as: Link,
+                        href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
+                      })}
                 >
                   <AutosizeText
                     value={expense.description}
@@ -336,6 +381,7 @@ const ExpenseBudgetItem = ({
           <ButtonsContainer>
             <ProcessExpenseButtons
               host={host}
+              isViewingExpenseInHostContext={isViewingExpenseInHostContext}
               collective={expense.account}
               expense={expense}
               permissions={expense.permissions}
@@ -403,6 +449,7 @@ ExpenseBudgetItem.propTypes = {
     }),
     /** If available, this `account` will be used to link expense in place of the `collective` */
     account: PropTypes.shape({
+      id: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string,
       stats: PropTypes.shape({
@@ -414,8 +461,13 @@ ExpenseBudgetItem.propTypes = {
           }),
         ]),
       }),
+      parent: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+      }),
     }),
   }),
+  selected: PropTypes.bool,
+  expandExpense: PropTypes.func,
 };
 
 ExpenseBudgetItem.defaultProps = {

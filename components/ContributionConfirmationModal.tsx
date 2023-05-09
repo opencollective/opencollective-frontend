@@ -2,11 +2,12 @@ import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
+import { omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { OrderUpdateInput } from '../lib/graphql/types/v2/graphql';
+import { OrderUpdateInput, TaxInput } from '../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../lib/i18n/taxes';
 import { getCurrentDateInUTC } from '../lib/utils';
 
@@ -83,7 +84,8 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
   const { addToast } = useToasts();
   const [confirmOrder, { loading: submitting }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
   const amount = amountReceived - platformTip;
-  const taxAmount = Math.round(amount * taxPercent) / 100;
+  const grossAmount = amount / (1 + taxPercent / 100);
+  const taxAmount = taxPercent ? amount - grossAmount : null;
   const hostFee = Math.round((amount - taxAmount) * hostFeePercent) / 100;
   const netAmount = amount - paymentProcessorFee - hostFee - taxAmount;
   const canAddHostFee = !order.toAccount.isHost;
@@ -115,7 +117,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
     }
 
     if (defaultTaxPercent !== taxPercent) {
-      orderUpdate.tax = { ...order.tax, rate: taxPercent / 100 };
+      orderUpdate.tax = { ...omit(order.tax, ['id']), rate: taxPercent / 100 } as TaxInput;
     }
 
     if (processedAt) {

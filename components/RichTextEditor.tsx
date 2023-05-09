@@ -46,7 +46,7 @@ type RichTextEditorProps = RichTextEditorContainerProps & {
   fontSize?: string;
   autoFocus?: boolean;
   /** Called when text is changed with html content as first param and text content as second param */
-  onChange?: (event: React.FormEvent<HTMLInputElement>) => void;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   /** A name for the input */
   inputName?: string;
   /** Change this prop to force a re-render of the component */
@@ -142,6 +142,9 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
       border-color: #c4c7cc;
       margin-bottom: 0;
       background: white;
+      &:not(:first-child) {
+        margin-left: min(1.5vw, 10px);
+      }
     }
 
     .trix-button {

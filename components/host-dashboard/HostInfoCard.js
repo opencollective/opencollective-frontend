@@ -97,37 +97,46 @@ const HostInfoCard = ({ host }) => {
   const mainTransferwiseBalance = getMainTransferwiseBalance(host.transferwiseBalances, host.currency);
   return (
     <StyledCard display={['block', null, 'flex']} justifyContent="space-evenly" px={4} py={22}>
-      <Flex flexDirection="column" justifyContent="space-between" flex="1 1 33%">
-        <Flex alignItems="center" width="100%">
-          <Box mr={3}>
-            <PayPal size={14} style={{ color: '#9D9FA3' }} />
-          </Box>
-          <ColumnTitle>
-            <FormattedMessage id="ServiceBalance" defaultMessage="{service} balance" values={{ service: 'Paypal' }} />
-          </ColumnTitle>
-          <PaypalPreApprovalDetailsIcon paymentMethod={host.paypalPreApproval} />
-        </Flex>
-        <Flex justifyContent="space-between" py={3}>
-          <Span color="black.400" fontSize="15px">
-            {host.currency}
-          </Span>
-          <Span fontSize="15px">
-            <FormattedMoneyAmount
-              showCurrencyCode={false}
-              currency={host.paypalPreApproval?.balance.currency || host.currency}
-              amount={
-                !host.paypalPreApproval || hasPaypalPreApprovalExpired(host.paypalPreApproval)
-                  ? null
-                  : host.paypalPreApproval.balance.valueInCents
-              }
-            />
-          </Span>
-        </Flex>
-        <Container display="inline-block" ml="-16px">
-          <ConnectPaypalButton host={host} paymentMethod={host.paypalPreApproval} />
-        </Container>
-      </Flex>
-      <Separator />
+      {host.paypalPreApproval && (
+        <React.Fragment>
+          <Flex flexDirection="column" justifyContent="space-between" flex="1 1 33%">
+            <Flex alignItems="center" width="100%">
+              <Box mr={3}>
+                <PayPal size={14} style={{ color: '#9D9FA3' }} />
+              </Box>
+              <ColumnTitle>
+                <FormattedMessage
+                  id="ServiceBalance"
+                  defaultMessage="{service} balance"
+                  values={{ service: 'Paypal' }}
+                />
+              </ColumnTitle>
+              <PaypalPreApprovalDetailsIcon paymentMethod={host.paypalPreApproval} />
+            </Flex>
+            <Flex justifyContent="space-between" py={3}>
+              <Span color="black.400" fontSize="15px">
+                {host.currency}
+              </Span>
+              <Span fontSize="15px">
+                <FormattedMoneyAmount
+                  showCurrencyCode={false}
+                  currency={host.paypalPreApproval?.balance.currency || host.currency}
+                  amount={
+                    !host.paypalPreApproval || hasPaypalPreApprovalExpired(host.paypalPreApproval)
+                      ? null
+                      : host.paypalPreApproval.balance.valueInCents
+                  }
+                />
+              </Span>
+            </Flex>
+            <Container display="inline-block" ml="-16px">
+              <ConnectPaypalButton host={host} paymentMethod={host.paypalPreApproval} />
+            </Container>
+          </Flex>
+          <Separator />
+        </React.Fragment>
+      )}
+
       <Flex flexDirection="column" justifyContent="space-between" flex="1 1 33%">
         <Flex alignItems="center" width="100%">
           <Box mr={3}>

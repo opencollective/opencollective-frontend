@@ -13,6 +13,7 @@ import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
 import Container from '../Container';
 import DismissibleMessage from '../DismissibleMessage';
 import { Flex } from '../Grid';
+import { WebsiteName } from '../I18nFormatters';
 import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
 import StyledRoundButton from '../StyledRoundButton';
 import StyledTooltip from '../StyledTooltip';
@@ -57,7 +58,11 @@ const ChangelogTrigger = props => {
   };
 
   const TooltipContent = (
-    <FormattedMessage id="ChangelogTrigger.tooltip.content" defaultMessage="What's new with Open Collective" />
+    <FormattedMessage
+      id="ChangelogTrigger.tooltip.content"
+      defaultMessage="What's new with {WebsiteName}"
+      values={{ WebsiteName }}
+    />
   );
 
   if (!LoggedInUser) {

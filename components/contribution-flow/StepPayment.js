@@ -33,11 +33,11 @@ const StepPayment = ({
       <PaymentMethodList
         host={collective.host}
         toAccount={collective}
-        fromAccount={stepProfile}
         disabledPaymentMethodTypes={disabledPaymentMethodTypes}
         stepSummary={stepSummary}
         stepDetails={stepDetails}
         stepPayment={stepPayment}
+        stepProfile={stepProfile}
         isEmbed={isEmbed}
         isSubmitting={isSubmitting}
         hideCreditCardPostalCode={hideCreditCardPostalCode}
