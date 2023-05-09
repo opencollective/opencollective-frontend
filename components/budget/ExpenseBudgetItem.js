@@ -133,8 +133,8 @@ const ExpenseBudgetItem = ({
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency?.currency !== expense.currency;
 
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isAdminOfCollective(host);
-  const isExpenseToHostCollective = expense?.account?.id === host?.id;
-  const isApproveBtnSecondary = isLoggedInUserExpenseHostAdmin && !isExpenseToHostCollective;
+  const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
+  const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
 
   return (
     <ExpenseContainer
@@ -381,7 +381,7 @@ const ExpenseBudgetItem = ({
           <ButtonsContainer>
             <ProcessExpenseButtons
               host={host}
-              displayApproveExpense={!isApproveBtnSecondary}
+              isViewingExpenseInHostContext={isViewingExpenseInHostContext}
               collective={expense.account}
               expense={expense}
               permissions={expense.permissions}
@@ -460,6 +460,9 @@ ExpenseBudgetItem.propTypes = {
             valueInCents: PropTypes.number,
           }),
         ]),
+      }),
+      parent: PropTypes.shape({
+        id: PropTypes.string.isRequired,
       }),
     }),
   }),

@@ -178,7 +178,8 @@ describe('host dashboard', () => {
       });
 
       // Unapprove
-      cy.get('@currentExpense').find('[data-cy="unapprove-button"]').click();
+      cy.get('@currentExpense').find('[data-cy="request-re-approval-button"]').click();
+      cy.contains('Confirm and request re-approval').click();
       cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Pending');
 
       // Approve
@@ -218,12 +219,9 @@ describe('host dashboard', () => {
       cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Approved');
 
       // Unapprove
-      cy.get('@currentExpense').find('[data-cy="unapprove-button"]').click();
+      cy.get('@currentExpense').find('[data-cy="request-re-approval-button"]').click();
+      cy.contains('Confirm and request re-approval').click();
       cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Pending');
-
-      // Reject
-      cy.get('@currentExpense').find('[data-cy="reject-button"]').click();
-      cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Rejected');
     });
   });
 

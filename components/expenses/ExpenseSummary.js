@@ -90,8 +90,8 @@ const ExpenseSummary = ({
 
   const { LoggedInUser } = useLoggedInUser();
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
-  const isExpenseToHostCollective = expense?.account?.id === expense?.account?.host?.id;
-  const isApproveBtnSecondary = isLoggedInUserExpenseHostAdmin && !isExpenseToHostCollective;
+  const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
+  const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
 
   const processButtons = (
     <Flex
@@ -105,7 +105,7 @@ const ExpenseSummary = ({
       <ExpenseMoreActionsButton
         onEdit={onEdit}
         expense={expense}
-        displayApproveExpense={isApproveBtnSecondary}
+        isViewingExpenseInHostContext={isViewingExpenseInHostContext}
         onDelete={() => {
           onDelete?.(expense);
           onClose?.();
@@ -116,7 +116,7 @@ const ExpenseSummary = ({
           <ProcessExpenseButtons
             expense={expense}
             isMoreActions
-            displayApproveExpense={!isApproveBtnSecondary}
+            isViewingExpenseInHostContext={isViewingExpenseInHostContext}
             permissions={expense?.permissions}
             collective={collective}
             host={host}
@@ -381,6 +381,9 @@ ExpenseSummary.propTypes = {
     account: PropTypes.shape({
       id: PropTypes.string.isRequired,
       host: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+      }),
+      parent: PropTypes.shape({
         id: PropTypes.string.isRequired,
       }),
     }).isRequired,

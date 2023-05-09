@@ -10,14 +10,15 @@ type ProcessExpenseAction = (params?: {
   paymentParams?: ProcessExpensePaymentParams;
   message?: string;
 }) => Promise<void>;
-type ProcessExpenseActionName =
+export type ProcessExpenseActionName =
   | 'APPROVE'
   | 'REJECT'
   | 'PAY'
   | 'MARK_AS_SPAM'
   | 'UNAPPROVE'
   | 'MARK_AS_UNPAID'
-  | 'UNSCHEDULE_PAYMENT';
+  | 'UNSCHEDULE_PAYMENT'
+  | 'MARK_AS_INCOMPLETE';
 
 type UseProcessExpenseHook = {
   loading: boolean;
@@ -28,6 +29,7 @@ type UseProcessExpenseHook = {
   markAsSpam: ProcessExpenseAction;
   unapprove: ProcessExpenseAction;
   markAsUnpaid: ProcessExpenseAction;
+  markAsIncomplete: ProcessExpenseAction;
   unschedulePayment: ProcessExpenseAction;
 };
 
@@ -61,6 +63,7 @@ export default function useProcessExpense(opts: UseProcessExpenseOptions): UsePr
   const [currentAction, setCurrentAction] = React.useState<ProcessExpenseActionName | null>(null);
   const [processExpense, mutationResult] = useMutation(processExpenseMutation, {
     context: API_V2_CONTEXT,
+    refetchQueries: ['ExpensePage'],
   });
 
   const makeProcessExpenseAction = React.useMemo(
@@ -84,6 +87,10 @@ export default function useProcessExpense(opts: UseProcessExpenseOptions): UsePr
   const markAsSpam = React.useMemo(() => makeProcessExpenseAction('MARK_AS_SPAM'), [makeProcessExpenseAction]);
   const unapprove = React.useMemo(() => makeProcessExpenseAction('UNAPPROVE'), [makeProcessExpenseAction]);
   const markAsUnpaid = React.useMemo(() => makeProcessExpenseAction('MARK_AS_UNPAID'), [makeProcessExpenseAction]);
+  const markAsIncomplete = React.useMemo(
+    () => makeProcessExpenseAction('MARK_AS_INCOMPLETE'),
+    [makeProcessExpenseAction],
+  );
   const unschedulePayment = React.useMemo(
     () => makeProcessExpenseAction('UNSCHEDULE_PAYMENT'),
     [makeProcessExpenseAction],
@@ -98,6 +105,7 @@ export default function useProcessExpense(opts: UseProcessExpenseOptions): UsePr
     markAsSpam,
     unapprove,
     markAsUnpaid,
+    markAsIncomplete,
     unschedulePayment,
   };
 }
