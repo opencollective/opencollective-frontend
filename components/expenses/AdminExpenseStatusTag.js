@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import ReactDOM from 'react-dom';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
 
@@ -12,13 +12,13 @@ import useKeyboardKey, { ESCAPE_KEY } from '../../lib/hooks/useKeyboardKey';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
 
 import { Box, Flex } from '../Grid';
-import StyledButton from '../StyledButton';
 import StyledSpinner from '../StyledSpinner';
 import StyledTag from '../StyledTag';
 
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
+import ExpenseMoreActionsButtons from './ExpenseMoreActionsButtons';
 import { getExpenseStatusMsgType } from './ExpenseStatusTag';
-import ProcessExpenseButtons, { ButtonLabel, hasProcessButtons } from './ProcessExpenseButtons';
+import { hasProcessButtons } from './ProcessExpenseButtons';
 
 const ExpenseStatusTag = styled(StyledTag)`
   cursor: pointer;
@@ -35,7 +35,6 @@ const PopupContainer = styled(`div`)`
   font-size: 12px;
   text-transform: initial;
   white-space: normal;
-  min-width: 200px;
   background: #ffffff;
   box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
 
@@ -75,15 +74,13 @@ const ChevronDownIcon = styled(ChevronDown)`
   color: inherit;
 `;
 
-const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
+const AdminExpenseStatusTag = ({ expense, collective, ...props }) => {
   const intl = useIntl();
   const wrapperRef = React.useRef();
   const [showPopup, setShowPopup] = React.useState(false);
-  const [isClosable, setClosable] = React.useState(true);
   const [showMarkAsIncompleteModal, setMarkAsIncompleteModal] = React.useState(false);
   const hideProcessExpenseButtons =
     expense?.status === expenseStatus.APPROVED && !hasProcessButtons(expense?.permissions);
-  const buttonProps = { px: 2, py: 2, isBorderless: true, width: '100%', textAlign: 'left' };
 
   const onClick = () => {
     setShowPopup(true);
@@ -91,7 +88,7 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
 
   // Close when clicking outside
   useGlobalBlur(wrapperRef, outside => {
-    if (outside && isClosable && showPopup && !document.getElementById('mark-expense-as-unpaid-modal')) {
+    if (outside && showPopup && !document.getElementById('mark-expense-as-unpaid-modal')) {
       setShowPopup(false);
     }
   });
@@ -99,9 +96,7 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
   // Closes the modal upon the `ESC` key press.
   useKeyboardKey({
     callback: () => {
-      if (isClosable) {
-        setShowPopup(false);
-      }
+      setShowPopup(false);
     },
     keyMatch: ESCAPE_KEY,
   });
@@ -133,28 +128,7 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
                 <PopupContainer ref={ref} style={style} onMouseEnter={onClick}>
                   <Flex alignItems="center" ref={wrapperRef} flexDirection="column" p={2}>
                     {!hideProcessExpenseButtons && (
-                      <ProcessExpenseButtons
-                        host={host}
-                        buttonProps={buttonProps}
-                        collective={collective}
-                        expense={expense}
-                        permissions={expense.permissions}
-                        onModalToggle={isOpen => setClosable(!isOpen)}
-                        onSuccess={() => setShowPopup(false)}
-                        displaySecurityChecks={false}
-                      />
-                    )}
-                    {expense?.permissions?.canMarkAsIncomplete && (
-                      <StyledButton
-                        {...buttonProps}
-                        onClick={() => {
-                          setMarkAsIncompleteModal(true);
-                        }}
-                      >
-                        <ButtonLabel>
-                          <FormattedMessage id="actions.markAsIncomplete" defaultMessage="Mark as Incomplete" />
-                        </ButtonLabel>
-                      </StyledButton>
+                      <ExpenseMoreActionsButtons expense={expense} collective={collective} />
                     )}
                   </Flex>
                   <Arrow ref={arrowProps.ref} style={arrowProps.style} />

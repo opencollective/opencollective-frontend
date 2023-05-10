@@ -102,6 +102,13 @@ const getNbAttachedFiles = expense => {
   }
 };
 
+const getShouldDisplayStatusTagActions = expense => {
+  const isExpensePaidOrRejected = [expenseStatus.REJECTED, expenseStatus.PAID].includes(expense?.status);
+  return (
+    (isExpensePaidOrRejected || expense?.status === expenseStatus.APPROVED) && hasProcessButtons(expense.permissions)
+  );
+};
+
 const ExpenseBudgetItem = ({
   isLoading,
   host,
@@ -126,9 +133,7 @@ const ExpenseBudgetItem = ({
   const pendingReceipt = isCharge && expense?.items?.every(i => i.url === null);
   const nbAttachedFiles = !isAdminView ? 0 : getNbAttachedFiles(expense);
   const isExpensePaidOrRejected = [expenseStatus.REJECTED, expenseStatus.PAID].includes(expense?.status);
-  const shouldDisplayStatusTagActions =
-    (isExpensePaidOrRejected || expense?.status === expenseStatus.APPROVED) &&
-    (hasProcessButtons(expense.permissions) || expense.permissions.canMarkAsIncomplete);
+  const shouldDisplayStatusTagActions = getShouldDisplayStatusTagActions(expense);
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency?.currency !== expense.currency;
 

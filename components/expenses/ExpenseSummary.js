@@ -115,7 +115,7 @@ const ExpenseSummary = ({
         <Flex flexWrap="wrap" gridGap={[2, 3]}>
           <ProcessExpenseButtons
             expense={expense}
-            isMoreActions
+            isMoreActions={false}
             isViewingExpenseInHostContext={isViewingExpenseInHostContext}
             permissions={expense?.permissions}
             collective={collective}
