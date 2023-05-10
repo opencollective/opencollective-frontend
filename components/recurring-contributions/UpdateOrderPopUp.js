@@ -94,27 +94,6 @@ const tiersQuery = gql`
           }
         }
       }
-      ... on Organization {
-        tiers {
-          nodes {
-            id
-            name
-            interval
-            amount {
-              value
-              valueInCents
-              currency
-            }
-            minimumAmount {
-              value
-              valueInCents
-              currency
-            }
-            amountType
-            presets
-          }
-        }
-      }
     }
   }
 `;
