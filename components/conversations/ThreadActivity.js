@@ -80,6 +80,14 @@ const ACTIVITIES_INFO = {
       defaultMessage: 'Expense unapproved',
     }),
   },
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED: {
+    type: 'warning',
+    icon: UnapprovedIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.ReApprovalRequested',
+      defaultMessage: 'Re-approval requested',
+    }),
+  },
   COLLECTIVE_EXPENSE_UPDATED: {
     type: 'info',
     icon: EditIcon,
