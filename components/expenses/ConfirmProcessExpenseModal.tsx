@@ -37,6 +37,36 @@ const messages = defineMessages({
   MARK_AS_INCOMPLETE_CONFIRM_BUTTON: {
     defaultMessage: 'Confirm and mark as incomplete',
   },
+  APPROVE_TITLE: {
+    id: 'actions.approve',
+    defaultMessage: 'Approve',
+  },
+  APPROVE_DESCRIPTION: {
+    defaultMessage:
+      'You may add a note that will be shared with the user and also be documented as a comment under the expense.',
+  },
+  APPROVE_CONFIRM_BUTTON: {
+    id: 'actions.approve',
+    defaultMessage: 'Approve',
+  },
+  UNAPPROVE_TITLE: {
+    id: 'expense.unapprove.btn',
+    defaultMessage: 'Unapprove',
+  },
+  UNAPPROVE_DESCRIPTION: {
+    defaultMessage:
+      'Please mention the reason why this expense has been unapproved. The reason will be shared with the user and also be documented as a comment under the expense.',
+  },
+  UNAPPROVE_CONFIRM_BUTTON: { id: 'expense.unapprove.btn', defaultMessage: 'Unapprove' },
+  REJECT_TITLE: {
+    id: 'actions.reject',
+    defaultMessage: 'Reject',
+  },
+  REJECT_DESCRIPTION: {
+    defaultMessage:
+      'Please mention the reason why this expense has been rejected. The reason will be shared with the user and also be documented as a comment under the expense.',
+  },
+  REJECT_CONFIRM_BUTTON: { id: 'actions.reject', defaultMessage: 'Reject' },
 });
 
 const MessagesPerType: Record<
@@ -53,9 +83,29 @@ const MessagesPerType: Record<
     description: messages.MARK_AS_INCOMPLETE_DESCRIPTION,
     confirmBtn: messages.MARK_AS_INCOMPLETE_CONFIRM_BUTTON,
   },
+  APPROVE: {
+    title: messages.APPROVE_TITLE,
+    description: messages.APPROVE_DESCRIPTION,
+    confirmBtn: messages.APPROVE_CONFIRM_BUTTON,
+  },
+  UNAPPROVE: {
+    title: messages.UNAPPROVE_TITLE,
+    description: messages.UNAPPROVE_DESCRIPTION,
+    confirmBtn: messages.UNAPPROVE_CONFIRM_BUTTON,
+  },
+  REJECT: {
+    title: messages.REJECT_TITLE,
+    description: messages.REJECT_DESCRIPTION,
+    confirmBtn: messages.REJECT_CONFIRM_BUTTON,
+  },
 };
 
-export type ConfirmProcessExpenseModalType = 'REQUEST_RE_APPROVAL' | 'MARK_AS_INCOMPLETE';
+export type ConfirmProcessExpenseModalType =
+  | 'REQUEST_RE_APPROVAL'
+  | 'MARK_AS_INCOMPLETE'
+  | 'APPROVE'
+  | 'UNAPPROVE'
+  | 'REJECT';
 
 export type ConfirmProcessExpenseModalProps = {
   type: ConfirmProcessExpenseModalType;
@@ -85,6 +135,24 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
         }
         case 'REQUEST_RE_APPROVAL': {
           await processExpense.unapprove({
+            message,
+          });
+          break;
+        }
+        case 'APPROVE': {
+          await processExpense.approve({
+            message,
+          });
+          break;
+        }
+        case 'UNAPPROVE': {
+          await processExpense.unapprove({
+            message,
+          });
+          break;
+        }
+        case 'REJECT': {
+          await processExpense.reject({
             message,
           });
           break;
