@@ -1094,6 +1094,7 @@
   "Expense.Activity.MarkedAsUnpaid": "Витрати позначено не сплаченими",
   "Expense.Activity.Paid": "Витрати сплачено",
   "Expense.Activity.Processing": "Обробка витрат",
+  "Expense.Activity.ReApprovalRequested": "Re-approval requested",
   "Expense.Activity.Rejected": "Витрати відхилено",
   "Expense.Activity.ScheduledForPayment": "Витрати заплановані для платежів",
   "Expense.Activity.Unapproved": "Витрати несхвалено",

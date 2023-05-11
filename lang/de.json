@@ -1094,6 +1094,7 @@
   "Expense.Activity.MarkedAsUnpaid": "Ausgabe als nicht bezahlt markiert",
   "Expense.Activity.Paid": "Ausgabe bezahlt",
   "Expense.Activity.Processing": "Ausgabe in Bearbeitung",
+  "Expense.Activity.ReApprovalRequested": "Re-approval requested",
   "Expense.Activity.Rejected": "Ausgabe abgelehnt",
   "Expense.Activity.ScheduledForPayment": "Ausgabe zur Bezahlung vorgesehen",
   "Expense.Activity.Unapproved": "Ausgabe unbestätigt",

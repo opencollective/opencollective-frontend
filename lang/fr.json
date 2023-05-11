@@ -1094,6 +1094,7 @@
   "Expense.Activity.MarkedAsUnpaid": "Dépense marquée comme impayée",
   "Expense.Activity.Paid": "Dépense payée",
   "Expense.Activity.Processing": "Dépense en cours de traitement",
+  "Expense.Activity.ReApprovalRequested": "Re-approval requested",
   "Expense.Activity.Rejected": "Dépense rejetée",
   "Expense.Activity.ScheduledForPayment": "Dépense programmée pour le paiement",
   "Expense.Activity.Unapproved": "Dépense dé-approuvée",

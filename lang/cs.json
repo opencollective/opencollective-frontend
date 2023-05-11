@@ -1094,6 +1094,7 @@
   "Expense.Activity.MarkedAsUnpaid": "Výdaj označen jako nezaplacený",
   "Expense.Activity.Paid": "Výdaj uhrazen",
   "Expense.Activity.Processing": "Výdaj se zpracovává",
+  "Expense.Activity.ReApprovalRequested": "Re-approval requested",
   "Expense.Activity.Rejected": "Výdaj zamítnut",
   "Expense.Activity.ScheduledForPayment": "Expense scheduled for payment",
   "Expense.Activity.Unapproved": "Výdaj neschválen",

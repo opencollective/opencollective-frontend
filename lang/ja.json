@@ -1094,6 +1094,7 @@
   "Expense.Activity.MarkedAsUnpaid": "支払われていない経費としてマークしました",
   "Expense.Activity.Paid": "経費を支払いました",
   "Expense.Activity.Processing": "経費の支払い手続きを開始しました",
+  "Expense.Activity.ReApprovalRequested": "Re-approval requested",
   "Expense.Activity.Rejected": "経費の申請を却下しました",
   "Expense.Activity.ScheduledForPayment": "Expense scheduled for payment",
   "Expense.Activity.Unapproved": "経費を不承認としました",

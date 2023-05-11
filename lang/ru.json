@@ -1094,6 +1094,7 @@
   "Expense.Activity.MarkedAsUnpaid": "Расходы, помеченные как неоплаченные",
   "Expense.Activity.Paid": "Расход выплачен",
   "Expense.Activity.Processing": "Обработка расхода",
+  "Expense.Activity.ReApprovalRequested": "Re-approval requested",
   "Expense.Activity.Rejected": "Расход отклонён",
   "Expense.Activity.ScheduledForPayment": "Expense scheduled for payment",
   "Expense.Activity.Unapproved": "Расход не одобрен",

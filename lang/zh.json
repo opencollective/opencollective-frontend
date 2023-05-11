@@ -1094,6 +1094,7 @@
   "Expense.Activity.MarkedAsUnpaid": "Expense marked as unpaid",
   "Expense.Activity.Paid": "已付支出",
   "Expense.Activity.Processing": "支出处理中",
+  "Expense.Activity.ReApprovalRequested": "Re-approval requested",
   "Expense.Activity.Rejected": "支出已拒绝",
   "Expense.Activity.ScheduledForPayment": "Expense scheduled for payment",
   "Expense.Activity.Unapproved": "支出未批准",

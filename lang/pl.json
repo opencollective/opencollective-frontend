@@ -1094,6 +1094,7 @@
   "Expense.Activity.MarkedAsUnpaid": "Wydatki oznaczone jako niezapłacone",
   "Expense.Activity.Paid": "Wydatki zapłacone",
   "Expense.Activity.Processing": "Przetwarzane wydatki",
+  "Expense.Activity.ReApprovalRequested": "Re-approval requested",
   "Expense.Activity.Rejected": "Koszt odrzucony",
   "Expense.Activity.ScheduledForPayment": "Koszty zaplanowane do zapłaty",
   "Expense.Activity.Unapproved": "Wydatki niezatwierdzone",

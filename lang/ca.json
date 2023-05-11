@@ -1094,6 +1094,7 @@
   "Expense.Activity.MarkedAsUnpaid": "Expense marked as unpaid",
   "Expense.Activity.Paid": "Expense paid",
   "Expense.Activity.Processing": "Expense processing",
+  "Expense.Activity.ReApprovalRequested": "Re-approval requested",
   "Expense.Activity.Rejected": "Expense rejected",
   "Expense.Activity.ScheduledForPayment": "Expense scheduled for payment",
   "Expense.Activity.Unapproved": "Expense unapproved",
