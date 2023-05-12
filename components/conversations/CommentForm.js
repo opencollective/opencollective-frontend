@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
+import { Lock } from '@styled-icons/material/Lock';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import commentTypes from '../../lib/constants/commentTypes';
 import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -17,6 +19,7 @@ import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
 import SignInOrJoinFree, { SignInOverlayBackground } from '../SignInOrJoinFree';
 import StyledButton from '../StyledButton';
+import StyledTooltip from '../StyledTooltip';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
 
@@ -40,6 +43,10 @@ const messages = defineMessages({
   postReply: {
     id: 'CommentForm.PostReply',
     defaultMessage: 'Post reply',
+  },
+  postNote: {
+    id: 'CommentForm.PostNote',
+    defaultMessage: 'Post note',
   },
   signInLabel: {
     id: 'CommentForm.SignIn',
@@ -99,6 +106,7 @@ const CommentForm = ({
   loadingLoggedInUser,
   LoggedInUser,
   isDisabled,
+  availableTypes,
 }) => {
   const [createComment, { loading, error }] = useMutation(createCommentMutation, mutationOptions);
   const intl = useIntl();
@@ -108,13 +116,14 @@ const CommentForm = ({
   const [uploading, setUploading] = useState(false);
   const { formatMessage } = intl;
 
-  const submitForm = async event => {
-    event.preventDefault();
-    event.stopPropagation();
+  const postComment = async type => {
     if (!html) {
       setValidationError(createError(ERROR.FORM_FIELD_REQUIRED));
     } else {
       const comment = prepareCommentParams(html, ConversationId, ExpenseId, UpdateId);
+      if (type) {
+        comment.type = type;
+      }
       const response = await createComment({ variables: { comment } });
       setResetValue(response.data.createComment.id);
       if (onSuccess) {
@@ -138,7 +147,7 @@ const CommentForm = ({
           </SignInOverlayBackground>
         </ContainerOverlay>
       )}
-      <form onSubmit={submitForm} data-cy="comment-form">
+      <div data-cy="comment-form">
         {loadingLoggedInUser ? (
           <LoadingPlaceholder height={232} />
         ) : (
@@ -171,17 +180,40 @@ const CommentForm = ({
         )}
         <Flex mt={3} alignItems="center" gap={12}>
           <StyledButton
-            type="submit"
             minWidth={150}
             buttonStyle="primary"
             disabled={isDisabled || !LoggedInUser || uploading}
             loading={loading}
             data-cy="submit-comment-btn"
+            onClick={() => postComment()}
           >
             {formatMessage(uploading ? messages.uploadingImage : messages.postReply)}
           </StyledButton>
+          {availableTypes?.includes(commentTypes.PRIVATE_NOTE) && (
+            <StyledTooltip
+              content={
+                <FormattedMessage
+                  id="CommentForm.Note.Tooltip"
+                  defaultMessage="Notes are only visible to Fiscal Host admins."
+                />
+              }
+            >
+              <StyledButton
+                minWidth={150}
+                buttonStyle="secondary"
+                disabled={isDisabled || !LoggedInUser || uploading}
+                loading={loading}
+                data-cy="submit-note-btn"
+                onClick={() => postComment(commentTypes.PRIVATE_NOTE)}
+              >
+                <Lock size="1em" />
+                &nbsp;
+                {formatMessage(uploading ? messages.uploadingImage : messages.postNote)}
+              </StyledButton>
+            </StyledTooltip>
+          )}
         </Flex>
-      </form>
+      </div>
     </Container>
   );
 };
@@ -199,6 +231,8 @@ CommentForm.propTypes = {
   onSuccess: PropTypes.func,
   /** disable the inputs */
   isDisabled: PropTypes.bool,
+  /** Available comment types */
+  availableTypes: PropTypes.arrayOf(PropTypes.oneOf(Object.values(commentTypes))),
   /** @ignore from withUser */
   loadingLoggedInUser: PropTypes.bool,
   /** @ignore from withUser */

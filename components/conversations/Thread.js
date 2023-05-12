@@ -1,7 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Paperclip } from '@styled-icons/feather/Paperclip';
 import { FormattedMessage } from 'react-intl';
 import styled, { css, withTheme } from 'styled-components';
+
+import commentTypes from '../../lib/constants/commentTypes';
+import defaultColors from '../../lib/theme/colors';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -15,6 +19,11 @@ import ThreadActivity, { getActivityIcon, isSupportedActivity } from './ThreadAc
 const CommentIcon = styled(CommentIconLib).attrs({
   size: 16,
   color: '#9a9a9a',
+})``;
+
+const NoteIcon = styled(Paperclip).attrs({
+  size: 16,
+  color: defaultColors.blue[400],
 })``;
 
 const ItemContainer = styled.div`
@@ -51,17 +60,20 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
     <div data-cy="thread">
       {items.map((item, idx) => {
         switch (item.__typename) {
-          case 'Comment':
+          case 'Comment': {
+            const isPrivateNote = item.type === commentTypes.PRIVATE_NOTE;
             return (
               <Box key={`comment-${item.id}`}>
                 <Flex>
                   <Flex flexDirection="column" alignItems="center" width="40px">
-                    <Box my={2}>
-                      <CommentIcon />
-                    </Box>
-                    <Container width="1px" height="100%" background="#E8E9EB" />
+                    <Box my={2}>{isPrivateNote ? <NoteIcon /> : <CommentIcon />}</Box>
+                    <Container
+                      width="1px"
+                      height="100%"
+                      background={isPrivateNote ? defaultColors.blue[400] : '#E8E9EB'}
+                    />
                   </Flex>
-                  <ItemContainer isLast={idx + 1 === items.length}>
+                  <ItemContainer isLast={idx + 1 === items.length} isContextual={isPrivateNote}>
                     <Comment
                       comment={item}
                       canDelete={isAdmin || Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
@@ -74,6 +86,7 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
                 </Flex>
               </Box>
             );
+          }
           case 'Activity':
             return !isSupportedActivity(item) ? null : (
               <Box key={`activity-${item.id}`}>
