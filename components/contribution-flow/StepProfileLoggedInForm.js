@@ -34,7 +34,7 @@ const getProfileInfo = (stepProfile, profiles) => {
   }
 };
 
-const StepProfileLoggedInForm = ({ profiles, onChange, collective, data, stepDetails }) => {
+const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, stepDetails }) => {
   const profileInfo = getProfileInfo(data, profiles);
   const isContributingFromSameHost = data?.host?.id === collective.host.legacyId;
 
@@ -43,6 +43,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, data, stepDet
       <Box mb={4}>
         <ContributeProfilePicker
           profiles={profiles}
+          tier={tier}
           selectedProfile={data}
           onChange={profile => onChange({ stepProfile: profile, stepPayment: null })}
         />
@@ -120,6 +121,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, data, stepDet
 StepProfileLoggedInForm.propTypes = {
   data: PropTypes.object,
   stepDetails: PropTypes.object,
+  tier: PropTypes.object,
   onChange: PropTypes.func,
   profiles: PropTypes.arrayOf(PropTypes.object),
   collective: PropTypes.shape({
