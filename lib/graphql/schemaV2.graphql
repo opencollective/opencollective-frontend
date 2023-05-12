@@ -2064,6 +2064,11 @@ type Comment {
   account: Account
 
   """
+  The type of this comment
+  """
+  type: CommentType
+
+  """
   Returns a map of reactions counts for this comment
   """
   reactions: JSON
@@ -2072,6 +2077,21 @@ type Comment {
   Returns the list of reactions added to this comment by logged in user
   """
   userReactions: [String]
+}
+
+"""
+All supported comment contexts
+"""
+enum CommentType {
+  """
+  Default regular comment
+  """
+  COMMENT
+
+  """
+  Comment is visible only to host admins
+  """
+  PRIVATE_NOTE
 }
 
 """
@@ -14528,6 +14548,11 @@ input CommentCreateInput {
   ConversationId: String @deprecated(reason: "2022-08-26: Please use \"conversation\"")
   conversation: ConversationReferenceInput
   update: UpdateReferenceInput
+
+  """
+  The type of the comment
+  """
+  type: CommentType
 }
 
 input ConversationReferenceInput {
