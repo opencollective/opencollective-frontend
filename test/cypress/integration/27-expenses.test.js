@@ -585,6 +585,8 @@ describe('New expense flow', () => {
     it('Delete expense', () => {
       cy.login({ email: user.email, redirect: expenseUrl });
       cy.getByDataCy('reject-button').click();
+      cy.getByDataCy('confirm-action-text').type('rejected!');
+      cy.getByDataCy('confirm-action-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Rejected');
 
       // Now delete the expense
