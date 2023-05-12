@@ -172,6 +172,7 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
           {intl.formatMessage(MessagesPerType[type].description)}
         </P>
         <RichTextEditor
+          data-cy="confirm-action-text"
           kind="COMMENT"
           version="simplified"
           withBorders
@@ -185,6 +186,7 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
       <ModalFooter>
         <Flex gap="16px" justifyContent="flex-end">
           <StyledButton
+            data-cy="confirm-action-button"
             disabled={uploading}
             buttonStyle="secondary"
             buttonSize="small"
