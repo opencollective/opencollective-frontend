@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Paperclip } from '@styled-icons/feather/Paperclip';
+import { Lock } from '@styled-icons/material/Lock';
 import { FormattedMessage } from 'react-intl';
 import styled, { css, withTheme } from 'styled-components';
 
@@ -20,7 +20,7 @@ const CommentIcon = styled(CommentIconLib).attrs({
   color: '#9a9a9a',
 })``;
 
-const NoteIcon = styled(Paperclip).attrs(props => ({
+const NoteIcon = styled(Lock).attrs(props => ({
   size: 16,
   color: props.theme.colors.blue[400],
 }))``;
