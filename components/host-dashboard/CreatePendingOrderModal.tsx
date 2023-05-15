@@ -140,7 +140,6 @@ const createPendingContributionModalCollectiveQuery = gql`
         tiers {
           nodes {
             id
-            id
             slug
             legacyId
             name
