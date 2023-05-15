@@ -2066,7 +2066,7 @@ type Comment {
   """
   The type of this comment
   """
-  type: CommentType
+  type: CommentType!
 
   """
   Returns a map of reactions counts for this comment
@@ -4368,7 +4368,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
-  COLLECTIVE_EXPENSE_REQUEST_RE_APPROVAL
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED
   COLLECTIVE_EXPENSE_UNAPPROVED
   COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
@@ -4943,6 +4943,7 @@ type ExpensePermissions {
   Whether the current user can verify this draft expense
   """
   canVerifyDraftExpense: Boolean!
+  canUsePrivateNote: Boolean!
   edit: Permission!
   editTags: Permission!
   delete: Permission!
@@ -4954,6 +4955,7 @@ type ExpensePermissions {
   markAsSpam: Permission!
   markAsUnpaid: Permission!
   comment: Permission!
+  usePrivateNote: Permission!
   unschedulePayment: Permission!
   verifyDraftExpense: Permission!
 }
@@ -11448,7 +11450,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
-  COLLECTIVE_EXPENSE_REQUEST_RE_APPROVAL
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED
   COLLECTIVE_EXPENSE_UNAPPROVED
   COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
@@ -14552,7 +14554,7 @@ input CommentCreateInput {
   """
   The type of the comment
   """
-  type: CommentType
+  type: CommentType = COMMENT
 }
 
 input ConversationReferenceInput {
