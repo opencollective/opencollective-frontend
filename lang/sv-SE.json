@@ -1095,6 +1095,7 @@
   "Expense.Activity.MarkedAsUnpaid": "Utgift markerad som obetald",
   "Expense.Activity.Paid": "Utgift betald",
   "Expense.Activity.Processing": "Utlägg bearbetas",
+  "Expense.Activity.ReApprovalRequested": "Re-approval requested",
   "Expense.Activity.Rejected": "Utgift nekad",
   "Expense.Activity.ScheduledForPayment": "Utgift schemalagd för betalning",
   "Expense.Activity.Unapproved": "Utgift ej godkänd",

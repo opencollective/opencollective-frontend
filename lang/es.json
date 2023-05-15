@@ -1095,6 +1095,7 @@
   "Expense.Activity.MarkedAsUnpaid": "Gasto marcado como no pagado",
   "Expense.Activity.Paid": "Gasto pagado",
   "Expense.Activity.Processing": "Procesamiento de gasto",
+  "Expense.Activity.ReApprovalRequested": "Re-approval requested",
   "Expense.Activity.Rejected": "Gasto rechazado",
   "Expense.Activity.ScheduledForPayment": "Gasto programado para el pago",
   "Expense.Activity.Unapproved": "Gasto no aprobado",

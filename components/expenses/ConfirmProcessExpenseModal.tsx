@@ -134,7 +134,7 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
           break;
         }
         case 'REQUEST_RE_APPROVAL': {
-          await processExpense.unapprove({
+          await processExpense.requestReApproval({
             message,
           });
           break;

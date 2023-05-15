@@ -1021,6 +1021,11 @@ interface Transaction {
   permissions: TransactionPermissions
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -4343,6 +4348,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_REQUEST_RE_APPROVAL
   COLLECTIVE_EXPENSE_UNAPPROVED
   COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
@@ -6504,6 +6510,11 @@ type Credit implements Transaction {
   permissions: TransactionPermissions!
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -6612,6 +6623,11 @@ type Debit implements Transaction {
   permissions: TransactionPermissions!
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -11412,6 +11428,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_REQUEST_RE_APPROVAL
   COLLECTIVE_EXPENSE_UNAPPROVED
   COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
@@ -14899,6 +14916,11 @@ enum ExpenseProcessAction {
   To mark the expense as pending after it has been approved
   """
   UNAPPROVE
+
+  """
+  To request re-approval of the expense, marking it as pending.
+  """
+  REQUEST_RE_APPROVAL
 
   """
   To mark the expense as rejected
