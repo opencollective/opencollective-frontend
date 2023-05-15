@@ -106,7 +106,7 @@ const CommentForm = ({
   loadingLoggedInUser,
   LoggedInUser,
   isDisabled,
-  availableTypes,
+  canUsePrivateNote,
 }) => {
   const [createComment, { loading, error }] = useMutation(createCommentMutation, mutationOptions);
   const intl = useIntl();
@@ -116,7 +116,10 @@ const CommentForm = ({
   const [uploading, setUploading] = useState(false);
   const { formatMessage } = intl;
 
-  const postComment = async type => {
+  const postComment = async event => {
+    event.preventDefault();
+    const type = event.nativeEvent.submitter.name === 'submit-note' ? commentTypes.PRIVATE_NOTE : commentTypes.COMMENT;
+
     if (!html) {
       setValidationError(createError(ERROR.FORM_FIELD_REQUIRED));
     } else {
@@ -147,7 +150,7 @@ const CommentForm = ({
           </SignInOverlayBackground>
         </ContainerOverlay>
       )}
-      <div data-cy="comment-form">
+      <form onSubmit={postComment} data-cy="comment-form">
         {loadingLoggedInUser ? (
           <LoadingPlaceholder height={232} />
         ) : (
@@ -185,11 +188,12 @@ const CommentForm = ({
             disabled={isDisabled || !LoggedInUser || uploading}
             loading={loading}
             data-cy="submit-comment-btn"
-            onClick={() => postComment()}
+            type="submit"
+            name="submit-comment"
           >
             {formatMessage(uploading ? messages.uploadingImage : messages.postReply)}
           </StyledButton>
-          {availableTypes?.includes(commentTypes.PRIVATE_NOTE) && (
+          {canUsePrivateNote && (
             <StyledTooltip
               content={
                 <FormattedMessage
@@ -204,7 +208,8 @@ const CommentForm = ({
                 disabled={isDisabled || !LoggedInUser || uploading}
                 loading={loading}
                 data-cy="submit-note-btn"
-                onClick={() => postComment(commentTypes.PRIVATE_NOTE)}
+                type="submit"
+                name="submit-note"
               >
                 <Lock size="1em" />
                 &nbsp;
@@ -213,7 +218,7 @@ const CommentForm = ({
             </StyledTooltip>
           )}
         </Flex>
-      </div>
+      </form>
     </Container>
   );
 };
@@ -231,8 +236,8 @@ CommentForm.propTypes = {
   onSuccess: PropTypes.func,
   /** disable the inputs */
   isDisabled: PropTypes.bool,
-  /** Available comment types */
-  availableTypes: PropTypes.arrayOf(PropTypes.oneOf(Object.values(commentTypes))),
+  /** Can post comment as private note */
+  canUsePrivateNote: PropTypes.bool,
   /** @ignore from withUser */
   loadingLoggedInUser: PropTypes.bool,
   /** @ignore from withUser */

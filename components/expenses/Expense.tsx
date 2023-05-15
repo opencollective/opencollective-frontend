@@ -12,7 +12,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getCollectiveTypeForUrl, getSuggestedTags } from '../../lib/collective.lib';
-import commentTypes from '../../lib/constants/commentTypes';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
@@ -237,10 +236,6 @@ function Expense(props) {
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;
   const isEditingExistingExpense = isEditing && expense !== undefined;
   const inDrawer = Boolean(drawerActionsContainer);
-  const availableTypes = [commentTypes.COMMENT];
-  if (LoggedInUser?.isHostAdmin(data.expense.account)) {
-    availableTypes.push(commentTypes.PRIVATE_NOTE);
-  }
 
   const handlePolling = debounce(() => {
     if (state.isPollingEnabled) {
@@ -705,7 +700,7 @@ function Expense(props) {
                   ExpenseId={expense && expense.id}
                   disabled={!expense}
                   onSuccess={onCommentAdded}
-                  availableTypes={availableTypes}
+                  canUsePrivateNote={expense.permissions.canUsePrivateNote}
                 />
               </Box>
             </Flex>

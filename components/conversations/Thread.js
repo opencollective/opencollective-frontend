@@ -5,7 +5,6 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css, withTheme } from 'styled-components';
 
 import commentTypes from '../../lib/constants/commentTypes';
-import defaultColors from '../../lib/theme/colors';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -21,10 +20,10 @@ const CommentIcon = styled(CommentIconLib).attrs({
   color: '#9a9a9a',
 })``;
 
-const NoteIcon = styled(Paperclip).attrs({
+const NoteIcon = styled(Paperclip).attrs(props => ({
   size: 16,
-  color: defaultColors.blue[400],
-})``;
+  color: props.theme.colors.blue[400],
+}))``;
 
 const ItemContainer = styled.div`
   width: 100%;
@@ -70,10 +69,10 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
                     <Container
                       width="1px"
                       height="100%"
-                      background={isPrivateNote ? defaultColors.blue[400] : '#E8E9EB'}
+                      background={isPrivateNote ? theme.colors.blue[400] : '#E8E9EB'}
                     />
                   </Flex>
-                  <ItemContainer isLast={idx + 1 === items.length} isContextual={isPrivateNote}>
+                  <ItemContainer isLast={idx + 1 === items.length}>
                     <Comment
                       comment={item}
                       canDelete={isAdmin || Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}

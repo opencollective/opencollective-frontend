@@ -389,6 +389,7 @@ export const expensePageExpenseFieldsFragment = gql`
       canComment
       canUnschedulePayment
       canVerifyDraftExpense
+      canUsePrivateNote
       approve {
         allowed
         reason
