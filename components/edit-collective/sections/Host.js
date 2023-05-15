@@ -181,7 +181,11 @@ class Host extends React.Component {
         <Fragment>
           <Flex flexDirection={['column', 'row']}>
             <Box p={1} mr={3} width={[1, 1 / 2]}>
-              <CollectiveCard collective={collective.host} membership={hostMembership} />
+              <CollectiveCard
+                collective={collective.host}
+                membership={hostMembership}
+                hideRoles={!collective.isActive}
+              />
             </Box>
             <Box>
               {!collective.isActive && (
