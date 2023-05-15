@@ -28,8 +28,11 @@ export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
 export const STRIPE_PAYMENT_ELEMENT_KEY = 'stripe-payment-element';
 const PAYPAL_MAX_AMOUNT = 999999999; // See MAX_VALUE_EXCEEDED https://developer.paypal.com/api/rest/reference/orders/v2/errors/#link-createorder
 
-const memberCanBeUsedToContribute = (member, account) => {
+const memberCanBeUsedToContribute = (member, account, canUseIncognito) => {
   if (member.role !== roles.ADMIN) {
+    return false;
+  } else if (!canUseIncognito && member.collective.isIncognito) {
+    // Incognito can't be used to contribute if not allowed
     return false;
   } else if (
     [CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(member.collective.type) &&
@@ -42,11 +45,21 @@ const memberCanBeUsedToContribute = (member, account) => {
   }
 };
 
-export const getContributeProfiles = (loggedInUser, collective) => {
+/*
+ **Cannot use contributions for events and "Tickets" tiers, because we need the ticket holder's identity
+ */
+export const canUseIncognitoForContribution = tier => {
+  return !tier || tier.type !== 'TICKET';
+};
+
+export const getContributeProfiles = (loggedInUser, collective, tier) => {
   if (!loggedInUser) {
     return [];
   } else {
-    const filteredMembers = loggedInUser.memberOf.filter(member => memberCanBeUsedToContribute(member, collective));
+    const canUseIncognito = canUseIncognitoForContribution(tier);
+    const filteredMembers = loggedInUser.memberOf.filter(member =>
+      memberCanBeUsedToContribute(member, collective, canUseIncognito),
+    );
     const personalProfile = { email: loggedInUser.email, image: loggedInUser.image, ...loggedInUser.collective };
     const contributorProfiles = [personalProfile];
     filteredMembers.forEach(member => {
