@@ -289,10 +289,8 @@ const ProcessExpenseButtons = ({
       {permissions.canMarkAsUnpaid && (
         <MarkExpenseAsUnpaidButton
           data-cy="mark-as-unpaid-button"
+          expense={expense}
           {...getButtonProps('MARK_AS_UNPAID')}
-          onConfirm={shouldRefundPaymentProcessorFee =>
-            triggerAction('MARK_AS_UNPAID', { shouldRefundPaymentProcessorFee })
-          }
         />
       )}
       {permissions.canDelete && !isMoreActions && (
