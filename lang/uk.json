@@ -624,6 +624,8 @@
   "Comment.PostedOn": "Опубліковано {createdAt, date, long}",
   "CommentForm.placeholder": "Введіть текст повідомлення...",
   "CommentForm.PostReply": "Опублікувати відповідь",
+  "CommentForm.PrivateNote.Tooltip": "Private comments are only visible to Fiscal Host admins.",
+  "CommentForm.PrivateNoteCheckbox": "Post private comment",
   "CommentForm.SignIn": "Увійдіть, щоб коментувати:",
   "comments.count": "{n, plural, one {# коментар} other {# коментарів}}",
   "community": "Спільнота",

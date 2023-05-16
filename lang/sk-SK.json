@@ -624,6 +624,8 @@
   "Comment.PostedOn": "Vložené dňa {createdAt, date, long}",
   "CommentForm.placeholder": "Napíšte vašu správu...",
   "CommentForm.PostReply": "Odpovedať",
+  "CommentForm.PrivateNote.Tooltip": "Private comments are only visible to Fiscal Host admins.",
+  "CommentForm.PrivateNoteCheckbox": "Post private comment",
   "CommentForm.SignIn": "Prosím prihláste sa, aby ste mohli komentovať:",
   "comments.count": "{n, plural, one {# komentár} few {# komentáre} other {# komentárov}}",
   "community": "Komunita",

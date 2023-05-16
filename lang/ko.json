@@ -624,6 +624,8 @@
   "Comment.PostedOn": "{createdAt, date, long}에 작성됨",
   "CommentForm.placeholder": "Type your message...",
   "CommentForm.PostReply": "답글 작성",
+  "CommentForm.PrivateNote.Tooltip": "Private comments are only visible to Fiscal Host admins.",
+  "CommentForm.PrivateNoteCheckbox": "Post private comment",
   "CommentForm.SignIn": "댓글을 작성하려면 로그인하세요:",
   "comments.count": "{n, plural, one {# comment} other {# comments}}",
   "community": "커뮤니티",

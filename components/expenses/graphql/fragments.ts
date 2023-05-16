@@ -319,6 +319,7 @@ export const expensePageExpenseFieldsFragment = gql`
         isApproved
         host {
           id
+          legacyId
           ...ExpenseHostFields
           transferwise {
             id
@@ -388,6 +389,7 @@ export const expensePageExpenseFieldsFragment = gql`
       canComment
       canUnschedulePayment
       canVerifyDraftExpense
+      canUsePrivateNote
       approve {
         allowed
         reason

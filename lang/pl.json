@@ -624,6 +624,8 @@
   "Comment.PostedOn": "Opublikowano {createdAt, date, long}",
   "CommentForm.placeholder": "Wpisz wiadomość...",
   "CommentForm.PostReply": "Odpowiedź na post",
+  "CommentForm.PrivateNote.Tooltip": "Private comments are only visible to Fiscal Host admins.",
+  "CommentForm.PrivateNoteCheckbox": "Post private comment",
   "CommentForm.SignIn": "Zaloguj się, aby skomentować:",
   "comments.count": "{n, plural, one {# komentarz} few {# komentarze} many {# komentarzy} other {# komentarze}}",
   "community": "Społeczność",

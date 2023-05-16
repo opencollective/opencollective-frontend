@@ -624,6 +624,8 @@
   "Comment.PostedOn": "Posted on {createdAt, date, long}",
   "CommentForm.placeholder": "Zde napište svou zprávu...",
   "CommentForm.PostReply": "Odeslat odpověď",
+  "CommentForm.PrivateNote.Tooltip": "Private comments are only visible to Fiscal Host admins.",
+  "CommentForm.PrivateNoteCheckbox": "Post private comment",
   "CommentForm.SignIn": "Pro komentování se přihlaste:",
   "comments.count": "{n, plural, one {# comment} other {# comments}}",
   "community": "Komunita",

@@ -624,6 +624,8 @@
   "Comment.PostedOn": "Posted on {createdAt, date, long}",
   "CommentForm.placeholder": "Type your message...",
   "CommentForm.PostReply": "Post reply",
+  "CommentForm.PrivateNote.Tooltip": "Private comments are only visible to Fiscal Host admins.",
+  "CommentForm.PrivateNoteCheckbox": "Post private comment",
   "CommentForm.SignIn": "Inicieu sessió per a comentar:",
   "comments.count": "{n, plural, one {# comment} other {# comments}}",
   "community": "Community",

@@ -700,6 +700,7 @@ function Expense(props) {
                   ExpenseId={expense && expense.id}
                   disabled={!expense}
                   onSuccess={onCommentAdded}
+                  canUsePrivateNote={expense.permissions.canUsePrivateNote}
                 />
               </Box>
             </Flex>
