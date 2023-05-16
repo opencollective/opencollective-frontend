@@ -165,11 +165,9 @@ export const orderSuccessFragment = gql`
       socialLinks {
         type
       }
-      ... on AccountWithContributions {
-        # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
-        contributors(limit: 1, roles: [BACKER, ATTENDEE]) {
-          totalCount
-        }
+      stats {
+        id
+        contributorsCount
       }
       ... on AccountWithParent {
         parent {
