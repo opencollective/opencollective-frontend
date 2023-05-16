@@ -262,9 +262,9 @@ const contributionsSectionQuery = gql`
                 backgroundImageUrl(height: 200)
               }
             }
-            # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
-            backers: members(role: [BACKER], limit: 1) {
-              totalCount
+            stats {
+              id
+              contributorsCount
             }
           }
         }

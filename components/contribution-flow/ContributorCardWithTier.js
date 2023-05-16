@@ -51,7 +51,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
               values={{
                 contributors: (
                   <span style={{ color: 'black.900' }}>
-                    <b>{collective.contributors?.totalCount || 1}</b>
+                    <b>{collective.stats?.contributorsCount || 1}</b>
                   </span>
                 ),
               }}
