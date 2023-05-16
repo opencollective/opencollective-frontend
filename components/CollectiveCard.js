@@ -189,7 +189,7 @@ class CollectiveCard extends React.Component {
       route = `/${collective.slug}`;
     }
 
-    const backersCount = get(collective, 'backers.totalCount');
+    const backersCount = get(collective, 'stats.backers.all');
 
     return (
       <Link href={route} target="_top">
