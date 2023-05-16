@@ -76,7 +76,7 @@ class Host extends React.Component {
 
   async changeHost(newHost = { id: null }) {
     const { collective } = this.props;
-    this.setState({ showModal: false });
+
     if (newHost.id === get(collective, 'host.id')) {
       return;
     }
@@ -91,7 +91,7 @@ class Host extends React.Component {
         this.updateSelectedOption('noHost');
       }
     } finally {
-      this.setState({ isSubmitting: false });
+      this.setState({ isSubmitting: false, showModal: false });
     }
   }
 
@@ -181,7 +181,11 @@ class Host extends React.Component {
         <Fragment>
           <Flex flexDirection={['column', 'row']}>
             <Box p={1} mr={3} width={[1, 1 / 2]}>
-              <CollectiveCard collective={collective.host} membership={hostMembership} />
+              <CollectiveCard
+                collective={collective.host}
+                membership={hostMembership}
+                hideRoles={!collective.isActive}
+              />
             </Box>
             <Box>
               {!collective.isActive && (
@@ -325,7 +329,12 @@ class Host extends React.Component {
                   >
                     <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
                   </StyledButton>
-                  <StyledButton buttonStyle="primary" onClick={() => this.changeHost()} data-cy="continue">
+                  <StyledButton
+                    buttonStyle="primary"
+                    loading={this.state.isSubmitting}
+                    onClick={() => this.changeHost()}
+                    data-cy="continue"
+                  >
                     {/** TODO(i18n): This should be internationalized */}
                     {action}
                   </StyledButton>

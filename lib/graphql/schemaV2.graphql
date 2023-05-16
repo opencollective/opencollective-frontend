@@ -464,7 +464,7 @@ interface Account {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -865,7 +865,8 @@ type Order {
   platformTipAmount: Amount
   platformTipEligible: Boolean
   tags: [String]!
-  taxes: [OrderTax]!
+  tax: TaxInfo
+  taxes: [OrderTax]! @deprecated(reason: "2023-04-13: Please use `tax` instead.")
 
   """
   This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order.
@@ -1020,6 +1021,11 @@ interface Transaction {
   permissions: TransactionPermissions
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -1084,7 +1090,7 @@ type TaxInfo {
   percentage: Int! @deprecated(reason: "Please use `rate` instead")
 
   """
-  Percentage applied, between 0-100
+  Percentage applied, between 0-1
   """
   rate: Float!
 
@@ -2058,6 +2064,11 @@ type Comment {
   account: Account
 
   """
+  The type of this comment
+  """
+  type: CommentType!
+
+  """
   Returns a map of reactions counts for this comment
   """
   reactions: JSON
@@ -2066,6 +2077,21 @@ type Comment {
   Returns the list of reactions added to this comment by logged in user
   """
   userReactions: [String]
+}
+
+"""
+All supported comment contexts
+"""
+enum CommentType {
+  """
+  Default regular comment
+  """
+  COMMENT
+
+  """
+  Comment is visible only to host admins
+  """
+  PRIVATE_NOTE
 }
 
 """
@@ -2483,7 +2509,7 @@ type Host implements Account & AccountWithContributions {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -2865,12 +2891,12 @@ type Host implements Account & AccountWithContributions {
   """
   Returns whether the host has any Stripe disputed orders
   """
-  hasDisputedOrders: Boolean!
+  hasDisputedOrders: Boolean
 
   """
   Returns whether the host has any Stripe in review orders
   """
-  hasInReviewOrders: Boolean!
+  hasInReviewOrders: Boolean
 }
 
 """
@@ -2946,7 +2972,11 @@ type ContributorCollection implements Collection {
   nodes: [Contributor]
 }
 
-"\n    A person or an entity that contributes financially or by any other mean to the mission\n    of the collective. While \"Member\" is dedicated to permissions, this type is meant\n    to surface all the public contributors.\n  "
+"""
+A person or an entity that contributes financially or by any other mean to the mission
+of the collective. While "Member" is dedicated to permissions, this type is meant
+to surface all the public contributors.
+"""
 type Contributor {
   """
   A unique identifier for this member
@@ -2961,7 +2991,7 @@ type Contributor {
   """
   All the roles for a given contributor
   """
-  roles: [ContributorRole]
+  roles: [MemberRole]
 
   """
   True if the contributor is a collective admin
@@ -3017,21 +3047,6 @@ type Contributor {
   A public message from contributors to describe their contributions
   """
   publicMessage: String
-}
-
-"""
-Possible roles for a contributor. Extends `Member.Role`.
-"""
-enum ContributorRole {
-  HOST
-  ADMIN
-  MEMBER
-  CONTRIBUTOR
-  BACKER
-  ATTENDEE
-  FOLLOWER
-  CONNECTED_COLLECTIVE
-  ACCOUNTANT
 }
 
 input AccountReferenceInput {
@@ -3400,7 +3415,7 @@ type PaymentMethod {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -4353,6 +4368,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED
   COLLECTIVE_EXPENSE_UNAPPROVED
   COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
@@ -4922,6 +4938,12 @@ type ExpensePermissions {
   Whether the current user can unschedule this expense payment
   """
   canUnschedulePayment: Boolean!
+
+  """
+  Whether the current user can verify this draft expense
+  """
+  canVerifyDraftExpense: Boolean!
+  canUsePrivateNote: Boolean!
   edit: Permission!
   editTags: Permission!
   delete: Permission!
@@ -4933,7 +4955,9 @@ type ExpensePermissions {
   markAsSpam: Permission!
   markAsUnpaid: Permission!
   comment: Permission!
+  usePrivateNote: Permission!
   unschedulePayment: Permission!
+  verifyDraftExpense: Permission!
 }
 
 """
@@ -5603,7 +5627,7 @@ type Bot implements Account {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -6121,7 +6145,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -6508,6 +6532,11 @@ type Credit implements Transaction {
   permissions: TransactionPermissions!
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -6616,6 +6645,11 @@ type Debit implements Transaction {
   permissions: TransactionPermissions!
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -6968,7 +7002,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -7691,7 +7725,7 @@ type Individual implements Account {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -7782,7 +7816,11 @@ type Individual implements Account {
     offset: Int! = 0
   ): OAuthApplicationCollection
 
-  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see their own address\n            - Hosts can see the address of users submitting expenses to their collectives\n        "
+  """
+  Address. This field is public for hosts, otherwise:
+    - Users can see their own address
+    - Hosts can see the address of users submitting expenses to their collectives
+  """
   location: Location
   categories: [String]!
   stats: AccountStats
@@ -8384,7 +8422,7 @@ type Organization implements Account & AccountWithContributions {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -8475,7 +8513,11 @@ type Organization implements Account & AccountWithContributions {
     offset: Int! = 0
   ): OAuthApplicationCollection
 
-  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.\n            - Hosts can see the address of organizations submitting expenses to their collectives.\n        "
+  """
+  Address. This field is public for hosts, otherwise:
+    - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.
+    - Hosts can see the address of organizations submitting expenses to their collectives.
+  """
   location: Location
   categories: [String]!
   stats: AccountStats
@@ -8612,7 +8654,7 @@ type Organization implements Account & AccountWithContributions {
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
   """
-  If the organization if a host account, this will return the matching Host object
+  If the organization is a host account, this will return the matching Host object
   """
   host: Host
 }
@@ -9017,7 +9059,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -9622,6 +9664,11 @@ type Query {
     Whether to include expenses from children of the account (Events and Projects)
     """
     includeChildrenExpenses: Boolean! = false
+
+    """
+    Only return expenses that contains this custom data. Requires being an admin of the collective, payee or host.
+    """
+    customData: JSON
   ): ExpenseCollection!
   fund(
     """
@@ -9710,6 +9757,7 @@ type Query {
     Limit the search to collectives belonging to these countries
     """
     country: [CountryISO]
+    currency: String
 
     """
     Filter hosts by tags (multiple = OR)
@@ -9830,7 +9878,7 @@ type Query {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -9921,6 +9969,16 @@ type Query {
     """
     throwIfMissing: Boolean! = true
   ): Tier
+
+  """
+  Fetch a single transaction
+  """
+  transaction(
+    """
+    The public id identifying the transaction (ie: rvelja97-pkzqbgq7-bbzyx6wd-50o8n4rm)
+    """
+    id: String
+  ): Transaction
   transactions(
     """
     Reference of the account(s) assigned to the main side of the transaction (CREDIT -> recipient, DEBIT -> sender)
@@ -11392,6 +11450,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED
   COLLECTIVE_EXPENSE_UNAPPROVED
   COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
@@ -11861,7 +11920,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -12474,7 +12533,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -12826,14 +12885,14 @@ type Mutation {
     amount: AmountInput!
 
     """
+    The host fee percent to apply to the order, as a float between 0 and 100
+    """
+    hostFeePercent: Float
+
+    """
     A short description of the contribution
     """
     description: String!
-
-    """
-    The host fee percent to apply to the order, as a float between 0 and 100
-    """
-    hostFeePercent: Float!
 
     """
     A private note for the host
@@ -13032,6 +13091,11 @@ type Mutation {
     account: AccountReferenceInput!
 
     """
+    The two factor method to add, defaults to TOTP
+    """
+    type: TwoFactorMethod
+
+    """
     The generated secret to save to the Individual
     """
     token: String!
@@ -13047,9 +13111,14 @@ type Mutation {
     account: AccountReferenceInput!
 
     """
+    The two factor method to remove. Removes all if empty
+    """
+    type: TwoFactorMethod
+
+    """
     The 6-digit 2FA code
     """
-    code: String!
+    code: String @deprecated(reason: "2FA code to validate this action must be set via 2FA header")
   ): Individual!
 
   """
@@ -13711,7 +13780,7 @@ type Mutation {
   """
   Creates a Stripe payment intent
   """
-  createPaymentIntent(paymentIntent: PaymentIntentInput!): PaymentIntent!
+  createPaymentIntent(paymentIntent: PaymentIntentInput!, guestInfo: GuestInfoInput): PaymentIntent!
 
   """
   To submit a new order. Scope: "orders".
@@ -13799,6 +13868,16 @@ type Mutation {
   ): Account!
 
   """
+  [Root only] Edits account type from User to Organization
+  """
+  editAccountType(
+    """
+    Account to change the type for
+    """
+    account: AccountReferenceInput!
+  ): Account!
+
+  """
   [Root only] Clears the cache for a given account
   """
   clearCacheForAccount(
@@ -13867,6 +13946,26 @@ type Mutation {
     """
     destinationAccount: AccountReferenceInput!
   ): [Expense]!
+
+  """
+  [Root only] A mutation to set the tax from for an account.
+  """
+  setTaxForm(
+    """
+    Reference to the Account the tax form should be set.
+    """
+    account: AccountReferenceInput!
+
+    """
+    The tax from link.
+    """
+    taxFormLink: URL!
+
+    """
+    The tax form year.
+    """
+    year: Int!
+  ): SetTaxFormResult
 
   """
   Add platform tips to a transaction. Scope: "transactions".
@@ -14164,6 +14263,16 @@ input TaxInput {
   Tax identification number, if any
   """
   idNumber: String
+
+  """
+  Country ISO code of the entity paying the tax
+  """
+  country: CountryISO
+
+  """
+  An optional tax amount to make sure the tax displayed in your frontend matches the one calculated by the API
+  """
+  amount: AmountInput
 }
 
 """
@@ -14186,9 +14295,45 @@ input CollectiveCreateInput {
   slug: String!
   description: String!
   tags: [String]
+  location: LocationInput
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   settings: JSON
+}
+
+"""
+Input type for Geographic location
+"""
+input LocationInput {
+  """
+  A short name for the location (eg. Open Collective Headquarters)
+  """
+  name: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
+  country: CountryISO
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
 }
 
 input IndividualCreateInput {
@@ -14286,6 +14431,14 @@ type AddTwoFactorAuthTokenToIndividualResponse {
   The recovery codes for the Individual to write down
   """
   recoveryCodes: [String]
+}
+
+"""
+A two factor authentication method
+"""
+enum TwoFactorMethod {
+  TOTP
+  YUBIKEY_OTP
 }
 
 input AccountUpdateInput {
@@ -14397,6 +14550,11 @@ input CommentCreateInput {
   ConversationId: String @deprecated(reason: "2022-08-26: Please use \"conversation\"")
   conversation: ConversationReferenceInput
   update: UpdateReferenceInput
+
+  """
+  The type of the comment
+  """
+  type: CommentType = COMMENT
 }
 
 input ConversationReferenceInput {
@@ -14581,10 +14739,8 @@ input ExpenseItemCreateInput {
   """
   When was the money spent?
   """
-  incurredAt: DateString
+  incurredAt: DateTime
 }
-
-scalar DateString
 
 input ExpenseAttachedFileInput {
   """
@@ -14604,41 +14760,6 @@ input ExpenseAttachedFileInput {
   URL of the file
   """
   url: URL!
-}
-
-"""
-Input type for Geographic location
-"""
-input LocationInput {
-  """
-  A short name for the location (eg. Open Collective Headquarters)
-  """
-  name: String
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
-
-  """
-  Two letters country code (eg. FR, BE...etc)
-  """
-  country: CountryISO
-
-  """
-  Latitude
-  """
-  lat: Float
-
-  """
-  Longitude
-  """
-  long: Float
-
-  """
-  Structured JSON address
-  """
-  structured: JSON
 }
 
 """
@@ -14776,7 +14897,7 @@ input ExpenseItemInput {
   """
   When was the money spent?
   """
-  incurredAt: DateString
+  incurredAt: DateTime
 }
 
 input NewAccountOrReferenceInput {
@@ -14822,6 +14943,11 @@ enum ExpenseProcessAction {
   To mark the expense as pending after it has been approved
   """
   UNAPPROVE
+
+  """
+  To request re-approval of the expense, marking it as pending.
+  """
+  REQUEST_RE_APPROVAL
 
   """
   To mark the expense as rejected
@@ -14967,7 +15093,8 @@ input ExpenseInviteDraftInput {
 }
 
 input ExpenseInvitee {
-  id: Int
+  id: Int @deprecated(reason: "2023-04-12: Please use legacyId")
+  legacyId: Int
   slug: String
   name: String
   email: String
@@ -15124,9 +15251,14 @@ input OrderCreateInput {
   platformTipAmount: AmountInput
 
   """
+  The tax to apply to the order
+  """
+  tax: TaxInput
+
+  """
   Use this field to set the taxes associated to this order
   """
-  taxes: [OrderTaxInput]
+  taxes: [OrderTaxInput] @deprecated(reason: "2023-04-11: Please use `tax` instead")
 
   """
   The tier you are contributing to
@@ -15334,9 +15466,14 @@ input OrderUpdateInput {
   legacyId: Int
 
   """
-  Amount received by collective, excluding any tips or fees
+  Amount received by collective, excluding any tips, taxes or fees
   """
   amount: AmountInput
+
+  """
+  The tax to apply to the order
+  """
+  tax: TaxInput
 
   """
   Amount paid in fees for the payment processor
@@ -15418,14 +15555,9 @@ input PendingOrderCreateInput {
   toAccount: AccountReferenceInput!
 
   """
-  Platform tip attached to this order
+  The tax to apply to the order
   """
-  platformTipAmount: AmountInput
-
-  """
-  Use this field to set the taxes associated to this order
-  """
-  taxes: [OrderTaxInput]
+  tax: TaxInput
 
   """
   The tier you are contributing to
@@ -15455,7 +15587,11 @@ input PendingOrderCreateInput {
   """
   When is the money expected?
   """
-  expectedAt: DateString
+  expectedAt: DateTime
+
+  """
+  Custom Host fee percent for this order
+  """
   hostFeePercent: Float
 }
 
@@ -15489,14 +15625,9 @@ input PendingOrderEditInput {
   fromAccountInfo: OrderFromAccountInfo
 
   """
-  Platform tip attached to this order
+  The tax to apply to the order
   """
-  platformTipAmount: AmountInput
-
-  """
-  Use this field to set the taxes associated to this order
-  """
-  taxes: [OrderTaxInput]
+  tax: TaxInput
 
   """
   The tier you are contributing to
@@ -15526,7 +15657,11 @@ input PendingOrderEditInput {
   """
   When is the money expected?
   """
-  expectedAt: DateString
+  expectedAt: DateTime
+
+  """
+  Custom Host fee percent for this order
+  """
   hostFeePercent: Float
 }
 
@@ -15577,6 +15712,10 @@ type BanAccountResponse {
   accounts: [Account!]!
 }
 
+type SetTaxFormResult {
+  success: Boolean!
+}
+
 input TransactionReferenceInput {
   """
   The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -15596,13 +15735,11 @@ input UpdateCreateInput {
   title: String!
   isPrivate: Boolean
   isChangelog: Boolean
-  makePublicOn: IsoDateString
+  makePublicOn: DateTime
   html: String!
   fromAccount: AccountReferenceInput
   account: AccountReferenceInput!
 }
-
-scalar IsoDateString
 
 """
 Input type for UpdateType

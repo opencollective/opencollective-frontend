@@ -14,6 +14,7 @@ import ConfirmationModal from '../../ConfirmationModal';
 import Container from '../../Container';
 import PayoutBankInformationForm from '../../expenses/PayoutBankInformationForm';
 import { Box, Flex } from '../../Grid';
+import { WebsiteName } from '../../I18nFormatters';
 import Image from '../../Image';
 import Loading from '../../Loading';
 import StyledButton from '../../StyledButton';
@@ -240,7 +241,8 @@ const BankTransfer = props => {
                 <P mr={2}>
                   <FormattedMessage
                     id="paymentMethod.manual.edit.description"
-                    defaultMessage='Contributors can choose "Bank Transfer" as a payment method at checkout and instructions will be automatically emailed to them. Once received, you can mark the transaction as confirmed to credit the budget on Open Collective.'
+                    defaultMessage='Contributors can choose "Bank Transfer" as a payment method at checkout and instructions will be automatically emailed to them. Once received, you can mark the transaction as confirmed to credit the budget on {WebsiteName}.'
+                    values={{ WebsiteName }}
                   />
                 </P>
                 <Image alt="" src="/static/images/ManualPaymentMethod-BankTransfer.png" width={350} height={168} />

@@ -14,12 +14,35 @@ import { Update as UpdateIcon } from '@styled-icons/material/Update';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled, { useTheme } from 'styled-components';
 
+import { renderDetailsString } from '../../lib/transactions';
+
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';
-import { Flex } from '../Grid';
+import { Box as Container, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import StyledLink from '../StyledLink';
 import { P, Span } from '../Text';
+
+const ExpenseTransactionRenderer = ({ activity }) => {
+  const intl = useIntl();
+  if (!activity.transaction) {
+    return null;
+  }
+
+  return (
+    <Container fontSize="12px" mt={2}>
+      {renderDetailsString({
+        ...activity.transaction,
+        isCredit: activity.transaction.type === 'CREDIT',
+        intl,
+      })}
+    </Container>
+  );
+};
+
+ExpenseTransactionRenderer.propTypes = {
+  activity: PropTypes.object,
+};
 
 /**
  * Defines activities display metadata.
@@ -55,6 +78,14 @@ const ACTIVITIES_INFO = {
     message: defineMessage({
       id: 'Expense.Activity.Unapproved',
       defaultMessage: 'Expense unapproved',
+    }),
+  },
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED: {
+    type: 'warning',
+    icon: UnapprovedIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.ReApprovalRequested',
+      defaultMessage: 'Re-approval requested',
     }),
   },
   COLLECTIVE_EXPENSE_UPDATED: {
@@ -96,6 +127,7 @@ const ACTIVITIES_INFO = {
       id: 'Expense.Activity.Paid',
       defaultMessage: 'Expense paid',
     }),
+    DataRenderer: ExpenseTransactionRenderer,
   },
   COLLECTIVE_EXPENSE_PROCESSING: {
     type: 'info',
@@ -175,11 +207,12 @@ const ActivityMessage = styled.span`
 `;
 
 const ThreadActivity = ({ activity }) => {
-  const { formatMessage } = useIntl();
+  const intl = useIntl();
   const theme = useTheme();
   const activityColor = getActivityColor(activity.type, theme);
   const message = ACTIVITIES_INFO[activity.type]?.message;
   const details = activity.data?.message || activity.data?.error?.message;
+  const DataRenderer = ACTIVITIES_INFO[activity.type]?.DataRenderer;
 
   return (
     <div>
@@ -207,7 +240,9 @@ const ThreadActivity = ({ activity }) => {
       {message && (
         <ActivityParagraph activityColor={activityColor} mt={1} fontSize="12px" whiteSpace="pre-line">
           <ActivityMessage color={activityColor}>
-            {formatMessage(message, { movedFromCollective: activity.data?.movedFromCollective?.name || 'collective' })}
+            {intl.formatMessage(message, {
+              movedFromCollective: activity.data?.movedFromCollective?.name || 'collective',
+            })}
           </ActivityMessage>
           {details && (
             <Fragment>
@@ -215,6 +250,7 @@ const ThreadActivity = ({ activity }) => {
               {details}
             </Fragment>
           )}
+          {DataRenderer && <DataRenderer activity={activity} />}
         </ActivityParagraph>
       )}
     </div>

@@ -179,6 +179,11 @@ const addFundsAccountQuery = gql`
           }
         }
       }
+      ... on AccountWithParent {
+        parent {
+          id
+        }
+      }
       ... on Host {
         id
         slug
@@ -329,6 +334,21 @@ const Field = styled(StyledInputFormikField).attrs({
   labelFontWeight: '700',
 })``;
 
+const checkCanAddHostFee = account => {
+  // No host, or no account, no host fees
+  if (!account?.host) {
+    return false;
+  }
+
+  if (account.parent) {
+    // No host fees for child of independent collective
+    return account.host.id !== account.parent.id;
+  }
+
+  // No host fees for Host Organizations or Independent Collectives
+  return account.host.id !== account.id;
+};
+
 const AddFundsModal = ({ collective, ...props }) => {
   const { LoggedInUser } = useLoggedInUser();
   const [fundDetails, setFundDetails] = useState({});
@@ -367,7 +387,7 @@ const AddFundsModal = ({ collective, ...props }) => {
       {
         context: API_V2_CONTEXT,
         query: getBudgetSectionQuery(true, false, false),
-        variables: getBudgetSectionQueryVariables(collective.slug, host?.slug, false),
+        variables: getBudgetSectionQueryVariables(collective.slug, false),
       },
       { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
     ],
@@ -390,9 +410,9 @@ const AddFundsModal = ({ collective, ...props }) => {
     return null;
   }
 
-  // From the Collective page we pass host and collective as API v1 objects
-  // From the Host dashboard we pass host and collective as API v2 objects
-  const canAddHostFee = host?.plan?.hostFees && collective.id !== host?.id;
+  // From the Collective page we pass collective as API v1 objects
+  // From the Host dashboard we pass collective as API v2 objects
+  const canAddHostFee = checkCanAddHostFee(account);
   const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const canAddPlatformTip = host?.isTrustedHost;

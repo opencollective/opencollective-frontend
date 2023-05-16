@@ -135,8 +135,6 @@ export const expenseHostFields = gql`
     }
     supportedPayoutMethods
     isTrustedHost
-    hasDisputedOrders
-    hasInReviewOrders
     plan {
       id
     }
@@ -321,6 +319,7 @@ export const expensePageExpenseFieldsFragment = gql`
         isApproved
         host {
           id
+          legacyId
           ...ExpenseHostFields
           transferwise {
             id
@@ -389,6 +388,8 @@ export const expensePageExpenseFieldsFragment = gql`
       canMarkAsIncomplete
       canComment
       canUnschedulePayment
+      canVerifyDraftExpense
+      canUsePrivateNote
       approve {
         allowed
         reason
@@ -406,6 +407,60 @@ export const expensePageExpenseFieldsFragment = gql`
         slug
         name
         imageUrl
+      }
+      transaction {
+        id
+        amount {
+          valueInCents
+          currency
+        }
+        platformFee {
+          valueInCents
+          currency
+        }
+        hostFee {
+          valueInCents
+          currency
+        }
+        paymentProcessorFee {
+          valueInCents
+          currency
+        }
+        netAmount {
+          valueInCents
+          currency
+        }
+        taxAmount {
+          valueInCents
+          currency
+        }
+        taxInfo {
+          id
+          rate
+          type
+          percentage
+        }
+        fromAccount {
+          id
+          slug
+          name
+          ... on AccountWithHost {
+            hostFeePercent
+          }
+        }
+        toAccount {
+          id
+          slug
+          name
+          ... on AccountWithHost {
+            hostFeePercent
+          }
+        }
+        expense {
+          id
+          currency
+          amount
+        }
       }
     }
     recurringExpense {

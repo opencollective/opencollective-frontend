@@ -51,7 +51,7 @@ const AccountSettings = () => {
 
   return (
     <React.Fragment>
-      <StyledInputField htmlFor="ban-accounts-picker" label="Account" flex="1 1">
+      <StyledInputField htmlFor="accounts-picker" label="Account" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync
             inputId={id}

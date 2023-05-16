@@ -1,0 +1,38 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import Pagination from '../../components/Pagination';
+
+<Meta title="Design system/Pagination" component={Pagination} />
+
+### Base
+
+<Canvas>
+  <Story name="Base">
+    {() => {
+      const PER_PAGE = 10;
+      const [currentPage, setCurrentPage] = React.useState(1);
+      return (
+        <Pagination total={100} limit={PER_PAGE} offset={(currentPage - 1) * PER_PAGE} onPageChange={setCurrentPage} />
+      );
+    }}
+  </Story>
+</Canvas>
+
+### List
+
+<Canvas>
+  <Story name="List">
+    {() => {
+      const PER_PAGE = 10;
+      const [currentPage, setCurrentPage] = React.useState(1);
+      return (
+        <Pagination
+          variant="list"
+          total={100}
+          limit={PER_PAGE}
+          offset={(currentPage - 1) * PER_PAGE}
+          onPageChange={setCurrentPage}
+        />
+      );
+    }}
+  </Story>
+</Canvas>

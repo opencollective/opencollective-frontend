@@ -581,6 +581,7 @@ export const searchPageQuery = gql`
         currency
         stats {
           id
+          contributorsCount
           totalAmountReceived(useCache: true) {
             currency
             valueInCents
@@ -607,9 +608,6 @@ export const searchPageQuery = gql`
               country
             }
           }
-        }
-        backers: members(role: BACKER) {
-          totalCount
         }
       }
       limit

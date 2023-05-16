@@ -6,8 +6,8 @@ CROWDIN_BRANCH=i18n/crowdin
 git branch -D $CROWDIN_BRANCH
 git pull &&
   git checkout $CROWDIN_BRANCH &&
-  git merge -Xours main &&
+  git merge -m "Merge branch 'main' into i18n/crowdin" -Xours main &&
   npm run build:langs &&
-  langs:update-progress &&
+  npm run langs:update-progress &&
   git status &&
   echo "Eventually commit the changes above, and if everything looks ok, run 'git push origin $CROWDIN_BRANCH'"

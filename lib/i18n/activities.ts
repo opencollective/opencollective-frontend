@@ -466,10 +466,10 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
     defaultMessage: 'New pending contribution',
   },
   ORDER_THANKYOU: {
-    defaultMessage: 'New order',
+    defaultMessage: 'New contribution',
   },
   ORDERS_SUSPICIOUS: {
-    defaultMessage: 'Suspicious order',
+    defaultMessage: 'Suspicious contribution',
   },
   ACTIVATED_COLLECTIVE_AS_HOST: {
     defaultMessage: 'Activated as host',

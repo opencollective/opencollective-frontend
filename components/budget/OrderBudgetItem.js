@@ -170,7 +170,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
           ) : (
             <Flex>
               <StyledTag variant="rounded-left" fontSize="10px" fontWeight="500" mr={1} textTransform="uppercase">
-                <FormattedMessage id="Order" defaultMessage="Order" /> #{order.legacyId}
+                <FormattedMessage defaultMessage="Contribution" /> #{order.legacyId}
               </StyledTag>
               <OrderStatusTag status={order.status} />
             </Flex>
@@ -206,7 +206,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
                   <DetailColumnHeader>
                     <StyledTooltip
                       content={
-                        <FormattedMessage defaultMessage="External reference code for this order. This is usually a reference number from the contributor accounting system." />
+                        <FormattedMessage defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system." />
                       }
                       containerCursor="default"
                     >

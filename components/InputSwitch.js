@@ -1,6 +1,6 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import Switch from '@material-ui/core/Switch';
+import Switch from '@mui/material/Switch';
+import { withStyles } from '@mui/styles';
 
 export default withStyles({
   switchBase: {

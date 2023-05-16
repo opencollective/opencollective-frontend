@@ -556,20 +556,37 @@ describe('New expense flow', () => {
       cy.visit(expenseUrl);
       cy.get('[data-cy="expense-status-msg"]').contains('Pending');
       cy.getByDataCy('approve-button').click();
+      cy.getByDataCy('confirm-action-text').type('Approved once');
+      cy.getByDataCy('confirm-action-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Approved');
+      cy.getByDataCy('comment-body').contains('Approved once').should('exist');
       cy.getByDataCy('unapprove-button').click();
+      cy.getByDataCy('confirm-action-text').type('Unapproved once');
+      cy.getByDataCy('confirm-action-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Pending');
+      cy.getByDataCy('comment-body').contains('Unapproved once').should('exist');
       cy.getByDataCy('approve-button').click();
+      cy.getByDataCy('confirm-action-text').type('Approved twice');
+      cy.getByDataCy('confirm-action-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Approved');
+      cy.getByDataCy('comment-body').contains('Approved twice').should('exist');
       cy.getByDataCy('unapprove-button').click();
+      cy.getByDataCy('confirm-action-text').type('Unapproved twice');
+      cy.getByDataCy('confirm-action-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Pending');
+      cy.getByDataCy('comment-body').contains('Unapproved twice').should('exist');
       cy.getByDataCy('reject-button').click();
+      cy.getByDataCy('confirm-action-text').type('Rejected once');
+      cy.getByDataCy('confirm-action-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Rejected');
+      cy.getByDataCy('comment-body').contains('Rejected once').should('exist');
     });
 
     it('Delete expense', () => {
       cy.login({ email: user.email, redirect: expenseUrl });
       cy.getByDataCy('reject-button').click();
+      cy.getByDataCy('confirm-action-text').type('rejected!');
+      cy.getByDataCy('confirm-action-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Rejected');
 
       // Now delete the expense

@@ -34,6 +34,7 @@ const ExpensesFilters = ({
   filters,
   onChange,
   ignoredExpenseStatus,
+  explicitAllForStatus = false,
   showOrderFilter = true,
   wrap = true,
 }) => {
@@ -42,7 +43,8 @@ const ExpensesFilters = ({
     value: filters?.[name],
     onChange: value => {
       const preparedValue = valueModifier ? valueModifier(value) : value;
-      onChange({ ...filters, [name]: value === 'ALL' ? null : preparedValue });
+      const shouldNullValue = value === 'ALL' && !(explicitAllForStatus && name === 'status');
+      onChange({ ...filters, [name]: shouldNullValue ? null : preparedValue });
     },
   });
 
@@ -94,6 +96,7 @@ ExpensesFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
   showOrderFilter: PropTypes.bool,
+  explicitAllForStatus: PropTypes.bool,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     createdAt: PropTypes.string,

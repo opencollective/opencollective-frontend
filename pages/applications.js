@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { getDashboardRoute } from '../lib/url-helpers';
+
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import { Flex } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
@@ -22,7 +24,13 @@ class Apps extends React.Component {
             <MessageBox type="info" withIcon>
               <FormattedMessage defaultMessage="Applications have been deprecated in favor of personal token" />
             </MessageBox>
-            <StyledLink href={`/${LoggedInUser.collective.slug}/admin/for-developers`}>
+            <StyledLink
+              href={
+                LoggedInUser.hasEarlyAccess('dashboard')
+                  ? getDashboardRoute(LoggedInUser.collective, 'for-developers')
+                  : `/${LoggedInUser.collective.slug}/admin/for-developers`
+              }
+            >
               <StyledButton buttonStyle="primary" buttonSize="medium" mt={3}>
                 <FormattedMessage defaultMessage="View personal tokens" />
               </StyledButton>

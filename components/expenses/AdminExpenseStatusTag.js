@@ -16,8 +16,8 @@ import StyledButton from '../StyledButton';
 import StyledSpinner from '../StyledSpinner';
 import StyledTag from '../StyledTag';
 
+import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import { getExpenseStatusMsgType } from './ExpenseStatusTag';
-import MarkExpenseAsIncompleteModal from './MarkExpenseAsIncompleteModal';
 import ProcessExpenseButtons, { ButtonLabel } from './ProcessExpenseButtons';
 
 const ExpenseStatusTag = styled(StyledTag)`
@@ -164,7 +164,11 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
           )}
       </Manager>
       {showMarkAsIncompleteModal && (
-        <MarkExpenseAsIncompleteModal expense={expense} onClose={() => setMarkAsIncompleteModal(false)} />
+        <ConfirmProcessExpenseModal
+          type="MARK_AS_INCOMPLETE"
+          expense={expense}
+          onClose={() => setMarkAsIncompleteModal(false)}
+        />
       )}
     </React.Fragment>
   );

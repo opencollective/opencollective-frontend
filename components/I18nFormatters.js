@@ -34,6 +34,8 @@ export const I18nPrivacyLink = msg => (
   </Link>
 );
 
+export const WebsiteName = 'Open Collective';
+
 const I18nFormatters = {
   strong: I18nBold,
   i: I18nItalic,
@@ -43,6 +45,7 @@ const I18nFormatters = {
   SignInLink: I18nSignInLink,
   TOSLink: I18nTOSLink,
   PrivacyPolicyLink: I18nPrivacyLink,
+  WebsiteName,
 };
 
 export default I18nFormatters;

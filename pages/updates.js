@@ -6,6 +6,7 @@ import { cloneDeep, omitBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
+import { shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 
@@ -81,6 +82,7 @@ class UpdatesPage extends React.Component {
           collective={collective}
           LoggedInUser={LoggedInUser}
           canonicalURL={`${getCollectivePageCanonicalURL(collective)}/updates`}
+          noRobots={!shouldIndexAccountOnSearchEngines(collective)}
         />
 
         <Body>

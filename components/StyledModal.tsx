@@ -178,7 +178,7 @@ CollectiveModalHeader.propTypes = {
   collective: PropTypes.shape({
     name: PropTypes.string,
   }),
-  customText: PropTypes.string,
+  customText: PropTypes.node,
 };
 
 CollectiveModalHeader.displayName = 'Header';
