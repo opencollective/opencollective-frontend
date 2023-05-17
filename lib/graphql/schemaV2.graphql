@@ -1182,6 +1182,11 @@ type Expense {
   status: ExpenseStatus!
 
   """
+  Whether this expense is on hold
+  """
+  onHold: Boolean
+
+  """
   Returns the list of comments for this expense, or `null` if user is not allowed to see them
   """
   comments(
@@ -4376,6 +4381,8 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM
   COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
   COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_PUT_ON_HOLD
+  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
@@ -4944,6 +4951,8 @@ type ExpensePermissions {
   """
   canVerifyDraftExpense: Boolean!
   canUsePrivateNote: Boolean!
+  canHold: Boolean!
+  canRelease: Boolean!
   edit: Permission!
   editTags: Permission!
   delete: Permission!
@@ -4958,6 +4967,8 @@ type ExpensePermissions {
   usePrivateNote: Permission!
   unschedulePayment: Permission!
   verifyDraftExpense: Permission!
+  hold: Permission!
+  release: Permission!
 }
 
 """
@@ -11458,6 +11469,8 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM
   COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
   COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_PUT_ON_HOLD
+  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
@@ -11581,6 +11594,11 @@ enum ExpenseStatusFilter {
   Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
   """
   READY_TO_PAY
+
+  """
+  Only expenses that are on hold
+  """
+  ON_HOLD
 }
 
 """
@@ -14983,6 +15001,16 @@ enum ExpenseProcessAction {
   To mark the expense as incomplete and notify the payee it requires more information
   """
   MARK_AS_INCOMPLETE
+
+  """
+  To put the expense on hold
+  """
+  HOLD
+
+  """
+  To release the expense from hold
+  """
+  RELEASE
 }
 
 """
