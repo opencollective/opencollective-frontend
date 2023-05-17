@@ -4,7 +4,7 @@ import { useMutation } from '@apollo/client';
 import { Plus } from '@styled-icons/boxicons-regular/Plus';
 import { Trash } from '@styled-icons/boxicons-regular/Trash';
 import { get } from 'lodash';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../lib/errors';
 
@@ -19,16 +19,9 @@ import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import { H2, P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { useReceipt } from '../hooks/useReceipt';
 
 import ReceiptTemplateForm from './ReceiptTemplateForm';
-
-const messages = defineMessages({
-  extraInfoPlaceholder: {
-    id: 'EditHostInvoice.extraInfoPlaceholder',
-    defaultMessage:
-      "Add any other text to appear on payment receipts, such as your organization's tax ID number, info about tax deductibility of contributions, or a custom thank you message.",
-  },
-});
 
 const BILL_TO_OPTIONS = [
   {
@@ -46,30 +39,19 @@ const BILL_TO_OPTIONS = [
 const InvoicesReceipts = ({ collective }) => {
   const intl = useIntl();
   const { addToast } = useToasts();
-
-  // For invoice Title
-  const defaultReceiptTitlePlaceholder = 'Payment Receipt';
-  const defaultReceiptTitle = get(collective.settings, 'invoice.templates.default.title');
-  const defaultAlternativeReceiptTitle = get(collective.settings, 'invoice.templates.alternative.title', null);
+  const defaultReceipt = useReceipt({ template: 'default', settings: collective.settings });
+  const alternativeReceipt = useReceipt({ template: 'alternative', settings: collective.settings });
   const [setSettings, { loading, error, data }] = useMutation(editCollectiveSettingsMutation);
-  const [receiptTitle, setReceiptTitle] = React.useState(defaultReceiptTitle);
-  const [alternativeReceiptTitle, setAlternativeReceiptTitle] = React.useState(defaultAlternativeReceiptTitle);
   const [showAlternativeReceiptsSection, setShowAlternativeReceiptsSection] = React.useState(
-    defaultAlternativeReceiptTitle !== null,
+    alternativeReceipt.values.title !== undefined,
   );
   const [isFieldChanged, setIsFieldChanged] = React.useState(false);
   const isSaved =
-    get(data, 'editCollective.settings.invoice.templates.default.title') === receiptTitle &&
-    get(data, 'editCollective.settings.invoice.templates.alternative.title', null) === alternativeReceiptTitle;
-
-  // For invoice extra info
-  const defaultInfo = get(collective.settings, 'invoice.templates.default.info');
-  const defaultAlternativeInfo = get(collective.settings, 'invoice.templates.alternative.info');
-  const [info, setInfo] = React.useState(defaultInfo);
-  const [alternativeInfo, setAlternativeInfo] = React.useState(defaultAlternativeInfo);
+    get(data, 'editCollective.settings.invoice.templates.default.title') === defaultReceipt.values.title &&
+    get(data, 'editCollective.settings.invoice.templates.alternative.title') === alternativeReceipt.values.title;
   const infoIsSaved =
-    get(data, 'editCollective.settings.invoice.templates.default.info') === info &&
-    get(data, 'editCollective.settings.invoice.templates.alternative.info') === alternativeInfo;
+    get(data, 'editCollective.settings.invoice.templates.default.info') === defaultReceipt.values.info &&
+    get(data, 'editCollective.settings.invoice.templates.alternative.info') === alternativeReceipt.values.info;
 
   // For Bill To
   const getBillToOption = value => BILL_TO_OPTIONS.find(option => option.value === value) || BILL_TO_OPTIONS[0];
@@ -78,40 +60,27 @@ const InvoicesReceipts = ({ collective }) => {
   const billToIsSaved = getInExpenseTemplate(collective, 'billTo') === billTo;
 
   const deleteAlternativeReceipt = () => {
-    setAlternativeReceiptTitle(null);
-    setAlternativeInfo(null);
+    alternativeReceipt.changeValues({ title: undefined, info: undefined });
     setShowAlternativeReceiptsSection(false);
     setIsFieldChanged(true);
   };
 
   const getInvoiceTemplatesObj = () => {
-    const templates = { default: { title: receiptTitle, info: info } };
     const expenseTemplates = { default: { billTo } };
+    const templates = {};
 
-    if (alternativeReceiptTitle || alternativeInfo) {
-      templates.alternative = { title: alternativeReceiptTitle, info: alternativeInfo };
+    templates.default = { title: defaultReceipt.values.title, info: defaultReceipt.values.info };
+
+    const { title: alternativeTitle, info: alternativeInfo } = alternativeReceipt.values;
+
+    if (alternativeTitle || alternativeInfo) {
+      templates.alternative = { title: alternativeTitle, info: alternativeInfo };
     }
 
     return { templates, expenseTemplates };
   };
 
-  const onChangeDefault = (title, info) => {
-    if (title) {
-      setReceiptTitle(title === '' ? defaultReceiptTitlePlaceholder : title);
-    }
-    if (info) {
-      setInfo(info);
-    }
-    setIsFieldChanged(true);
-  };
-
-  const onChangeAlternate = (title, info) => {
-    if (title) {
-      setAlternativeReceiptTitle(title);
-    }
-    if (info) {
-      setAlternativeInfo(info);
-    }
+  const onChangeField = () => {
     setIsFieldChanged(true);
   };
 
@@ -158,7 +127,7 @@ const InvoicesReceipts = ({ collective }) => {
           defaultMessage="You can customize the title (and add custom text) on automatically generated receipts for financial contributions to your Collective(s), e.g., 'donation receipt' or 'tax receipt' or a phrase appropriate for your legal entity type, language, and location. Keep this field empty to use the default title:"
         />
         {/** Un-localized on purpose, because it's not localized in the actual invoice */}
-        &nbsp;<i>{defaultReceiptTitlePlaceholder}</i>.
+        &nbsp;<i>{defaultReceipt.placeholders.title}</i>.
       </P>
       {error && (
         <MessageBox type="error" fontSize="14px" withIcon mb={3}>
@@ -166,18 +135,7 @@ const InvoicesReceipts = ({ collective }) => {
         </MessageBox>
       )}
       <Flex flexWrap="wrap" flexDirection="column" width="100%">
-        <ReceiptTemplateForm
-          defaultTemplate
-          value={{
-            title: defaultReceiptTitlePlaceholder === receiptTitle || receiptTitle === null ? null : receiptTitle,
-            info,
-          }}
-          placeholders={{
-            title: defaultReceiptTitlePlaceholder,
-            info: intl.formatMessage(messages.extraInfoPlaceholder),
-          }}
-          onChange={onChangeDefault}
-        />
+        <ReceiptTemplateForm receipt={defaultReceipt} onChange={onChangeField} />
         <SettingsSectionTitle>
           <FormattedMessage defaultMessage="Alternative receipt template" />
         </SettingsSectionTitle>
@@ -207,11 +165,7 @@ const InvoicesReceipts = ({ collective }) => {
         {showAlternativeReceiptsSection && (
           <Container mt="26px" mb="24px">
             <Flex flexWrap="wrap" flexDirection="column" width="100%">
-              <ReceiptTemplateForm
-                value={{ title: alternativeReceiptTitle, info: alternativeInfo }}
-                placeholders={{ title: 'Custom Receipt', info: intl.formatMessage(messages.extraInfoPlaceholder) }}
-                onChange={onChangeAlternate}
-              />
+              <ReceiptTemplateForm receipt={alternativeReceipt} onChange={onChangeField} />
             </Flex>
             <StyledButton
               buttonStyle="danger"
