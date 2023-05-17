@@ -117,7 +117,7 @@ const onExpenseUpdate = (updatedExpense, cache, filteredStatus) => {
 const NB_EXPENSES_DISPLAYED = 10;
 
 const isValidStatus = status => {
-  return Boolean(status === 'READY_TO_PAY' || EXPENSE_STATUS[status]);
+  return [...Object.values(EXPENSE_STATUS), 'READY_TO_PAY', 'ON_HOLD'].includes(status);
 };
 
 const getVariablesFromQuery = query => {
@@ -260,6 +260,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
             collective={data.host}
             filters={query}
             explicitAllForStatus
+            displayOnHoldPseudoStatus
             onChange={queryParams =>
               router.push({
                 pathname: pageRoute,
