@@ -6,6 +6,8 @@ import { Cogs as CogsIcon } from '@styled-icons/fa-solid/Cogs';
 import { AlertOctagon as ErrorIcon } from '@styled-icons/feather/AlertOctagon';
 import { Edit as EditIcon } from '@styled-icons/feather/Edit';
 import { FileText as InvitedIcon } from '@styled-icons/feather/FileText';
+import { Pause as PauseIcon } from '@styled-icons/feather/Pause';
+import { Play as PlayIcon } from '@styled-icons/feather/Play';
 import { Plus as PlusIcon } from '@styled-icons/feather/Plus';
 import { UserCheck as ApprovedIcon } from '@styled-icons/feather/UserCheck';
 import { UserMinus as UnapprovedIcon } from '@styled-icons/feather/UserMinus';
@@ -167,6 +169,22 @@ const ACTIVITIES_INFO = {
     message: defineMessage({
       id: 'Expense.Activity.MarkedAsIncomplete',
       defaultMessage: 'Expense marked as incomplete',
+    }),
+  },
+  COLLECTIVE_EXPENSE_PUT_ON_HOLD: {
+    type: 'error',
+    icon: PauseIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.PutOnHold',
+      defaultMessage: 'Expense was put on hold',
+    }),
+  },
+  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD: {
+    type: 'info',
+    icon: PlayIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.ReleasedFromHold',
+      defaultMessage: 'Expense was released from hold',
     }),
   },
 };
