@@ -67,6 +67,27 @@ const messages = defineMessages({
       'Please mention the reason why this expense has been rejected. The reason will be shared with the user and also be documented as a comment under the expense.',
   },
   REJECT_CONFIRM_BUTTON: { id: 'actions.reject', defaultMessage: 'Reject' },
+  HOLD_TITLE: {
+    defaultMessage: 'Put expense on hold',
+  },
+  HOLD_DESCRIPTION: {
+    defaultMessage:
+      'Expense is still approved but can not be paid out until it is released. Expense is also not displayed in ready to pay.',
+  },
+  HOLD_CONFIRM_BUTTON: {
+    defaultMessage: 'Put on Hold',
+  },
+  RELEASE_TITLE: {
+    id: 'actions.release',
+    defaultMessage: 'Release Hold',
+  },
+  RELEASE_DESCRIPTION: {
+    defaultMessage: 'Expense is can be paid out and is displayed in ready to pay list.',
+  },
+  RELEASE_CONFIRM_BUTTON: {
+    id: 'actions.release',
+    defaultMessage: 'Release Hold',
+  },
 });
 
 const MessagesPerType: Record<
@@ -98,6 +119,16 @@ const MessagesPerType: Record<
     description: messages.REJECT_DESCRIPTION,
     confirmBtn: messages.REJECT_CONFIRM_BUTTON,
   },
+  HOLD: {
+    title: messages.HOLD_TITLE,
+    description: messages.HOLD_DESCRIPTION,
+    confirmBtn: messages.HOLD_CONFIRM_BUTTON,
+  },
+  RELEASE: {
+    title: messages.RELEASE_TITLE,
+    description: messages.RELEASE_DESCRIPTION,
+    confirmBtn: messages.RELEASE_CONFIRM_BUTTON,
+  },
 };
 
 export type ConfirmProcessExpenseModalType =
@@ -105,7 +136,9 @@ export type ConfirmProcessExpenseModalType =
   | 'MARK_AS_INCOMPLETE'
   | 'APPROVE'
   | 'UNAPPROVE'
-  | 'REJECT';
+  | 'REJECT'
+  | 'HOLD'
+  | 'RELEASE';
 
 export type ConfirmProcessExpenseModalProps = {
   type: ConfirmProcessExpenseModalType;
@@ -153,6 +186,18 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
         }
         case 'REJECT': {
           await processExpense.reject({
+            message,
+          });
+          break;
+        }
+        case 'HOLD': {
+          await processExpense.hold({
+            message,
+          });
+          break;
+        }
+        case 'RELEASE': {
+          await processExpense.release({
             message,
           });
           break;
