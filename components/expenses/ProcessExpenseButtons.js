@@ -193,7 +193,7 @@ const ProcessExpenseButtons = ({
         (permissions.approve.allowed || permissions.approve.reason === PERMISSION_CODES.AUTHOR_CANNOT_APPROVE) && (
           <PermissionButton
             {...getButtonProps('APPROVE')}
-            onClick={() => setConfirmProcessExpenseAction('APPROVE')}
+            onClick={() => triggerAction('APPROVE')}
             buttonStyle="secondary"
             data-cy="approve-button"
             icon={<ApproveIcon size={12} />}
@@ -289,10 +289,8 @@ const ProcessExpenseButtons = ({
       {permissions.canMarkAsUnpaid && (
         <MarkExpenseAsUnpaidButton
           data-cy="mark-as-unpaid-button"
+          expense={expense}
           {...getButtonProps('MARK_AS_UNPAID')}
-          onConfirm={shouldRefundPaymentProcessorFee =>
-            triggerAction('MARK_AS_UNPAID', { shouldRefundPaymentProcessorFee })
-          }
         />
       )}
       {permissions.canDelete && !isMoreActions && (

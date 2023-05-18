@@ -219,7 +219,7 @@ describe('host dashboard', () => {
       cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Approved');
 
       // Unapprove
-      cy.get('@currentExpense').find('[data-cy="request-re-approval-button"]').click();
+      cy.get('@currentExpense').find('[data-cy="request-re-approval-button"]').click({ force: true });
       cy.contains('Confirm and request re-approval').click();
       cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Pending');
     });

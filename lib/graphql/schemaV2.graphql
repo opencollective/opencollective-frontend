@@ -15033,6 +15033,11 @@ input ProcessExpensePaymentParams {
   shouldRefundPaymentProcessorFee: Boolean
 
   """
+  New expense status when triggering MARK_AS_UNPAID
+  """
+  markAsUnPaidStatus: MarkAsUnPaidExpenseStatus = APPROVED
+
+  """
   Bypass automatic integrations (ie. PayPal, Transferwise) to process the expense manually
   """
   forceManual: Boolean
@@ -15041,6 +15046,12 @@ input ProcessExpensePaymentParams {
   Who is responsible for paying any due fees.
   """
   feesPayer: FeesPayer = COLLECTIVE
+}
+
+enum MarkAsUnPaidExpenseStatus {
+  APPROVED
+  INCOMPLETE
+  ERROR
 }
 
 input ExpenseInviteDraftInput {
