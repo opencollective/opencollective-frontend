@@ -193,7 +193,7 @@ const ProcessExpenseButtons = ({
         (permissions.approve.allowed || permissions.approve.reason === PERMISSION_CODES.AUTHOR_CANNOT_APPROVE) && (
           <PermissionButton
             {...getButtonProps('APPROVE')}
-            onClick={() => setConfirmProcessExpenseAction('APPROVE')}
+            onClick={() => triggerAction('APPROVE')}
             buttonStyle="secondary"
             data-cy="approve-button"
             icon={<ApproveIcon size={12} />}
