@@ -12,7 +12,6 @@ const loggedInUserQuery = gql`
       name
       email
       imageUrl(height: 90)
-      type
     }
   }
 `;
