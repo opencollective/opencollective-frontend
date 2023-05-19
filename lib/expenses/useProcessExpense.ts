@@ -19,7 +19,9 @@ export type ProcessExpenseActionName =
   | 'MARK_AS_UNPAID'
   | 'UNSCHEDULE_PAYMENT'
   | 'REQUEST_RE_APPROVAL'
-  | 'MARK_AS_INCOMPLETE';
+  | 'MARK_AS_INCOMPLETE'
+  | 'HOLD'
+  | 'RELEASE';
 
 type UseProcessExpenseHook = {
   loading: boolean;
@@ -33,6 +35,8 @@ type UseProcessExpenseHook = {
   markAsIncomplete: ProcessExpenseAction;
   unschedulePayment: ProcessExpenseAction;
   requestReApproval: ProcessExpenseAction;
+  hold: ProcessExpenseAction;
+  release: ProcessExpenseAction;
 };
 
 type UseProcessExpenseOptions = {
@@ -102,6 +106,8 @@ export default function useProcessExpense(opts: UseProcessExpenseOptions): UsePr
     () => makeProcessExpenseAction('REQUEST_RE_APPROVAL'),
     [makeProcessExpenseAction],
   );
+  const hold = React.useMemo(() => makeProcessExpenseAction('HOLD'), [makeProcessExpenseAction]);
+  const release = React.useMemo(() => makeProcessExpenseAction('RELEASE'), [makeProcessExpenseAction]);
 
   return {
     loading: mutationResult.loading,
@@ -115,5 +121,7 @@ export default function useProcessExpense(opts: UseProcessExpenseOptions): UsePr
     markAsIncomplete,
     requestReApproval,
     unschedulePayment,
+    hold,
+    release,
   };
 }

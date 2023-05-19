@@ -37,6 +37,7 @@ const ExpensesFilters = ({
   explicitAllForStatus = false,
   showOrderFilter = true,
   wrap = true,
+  displayOnHoldPseudoStatus = false,
 }) => {
   const getFilterProps = (name, valueModifier) => ({
     inputId: `expenses-filter-${name}`,
@@ -78,7 +79,11 @@ const ExpensesFilters = ({
         <FilterLabel htmlFor="expenses-filter-status">
           <FormattedMessage id="expense.status" defaultMessage="Status" />
         </FilterLabel>
-        <ExpensesStatusFilter {...getFilterProps('status')} ignoredExpenseStatus={ignoredExpenseStatus} />
+        <ExpensesStatusFilter
+          {...getFilterProps('status')}
+          ignoredExpenseStatus={ignoredExpenseStatus}
+          displayOnHoldPseudoStatus={displayOnHoldPseudoStatus}
+        />
       </FilterContainer>
       {showOrderFilter && (
         <FilterContainer>
@@ -103,6 +108,7 @@ ExpensesFilters.propTypes = {
   }).isRequired,
   wrap: PropTypes.bool,
   ignoredExpenseStatus: PropTypes.arrayOf(PropTypes.oneOf(Object.values(expenseStatus))),
+  displayOnHoldPseudoStatus: PropTypes.bool,
 };
 
 export default React.memo(ExpensesFilters);

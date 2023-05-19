@@ -4407,7 +4407,7 @@ type Query {
     orderDirection: OrderDirection = ASC
     limit: Int = 10
     offset: Int = 0
-  ): CollectiveSearchResults
+  ): CollectiveSearchResults @deprecated(reason: "2023-05-16: Please use \"Accounts\" on GraphQL V2")
 
   """
   Returns all public hosts that are open for applications
