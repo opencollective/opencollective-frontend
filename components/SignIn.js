@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { signIn } from 'next-auth/react';
 import Head from 'next/head';
+import { signIn } from 'next-auth/react';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
