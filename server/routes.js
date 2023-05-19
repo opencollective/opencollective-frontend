@@ -5,6 +5,11 @@ const express = require('express');
 const proxy = require('express-http-proxy');
 const { template, trim } = require('lodash');
 
+const fetch = require('node-fetch');
+const { pipeline } = require('stream');
+const { promisify } = require('util');
+const streamPipeline = promisify(pipeline);
+
 const intl = require('./intl');
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
@@ -49,6 +54,25 @@ module.exports = (expressApp, nextApp) => {
 
   app.get('/favicon.*', maxAge(300000), (req, res) => {
     return res.sendFile(path.join(__dirname, '../public/static/images/favicon.ico.png'));
+  });
+
+  // Helper to enable downloading files that are on S3 (on another origin)
+  app.get('/download-file', async (req, res) => {
+    const { url } = req.query;
+    if (!url) {
+      return res.status(400).json({ error: 'Missing url parameter' });
+    } else if (!/https:\/\/opencollective-(production|staging)\.s3[.-]us-west-1\.amazonaws\.com/.test(url)) {
+      return res.status(400).json({ error: 'Only files from Open Collecive are allowed' });
+    }
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Unexpected response: ${response.statusText}`);
+    }
+
+    const fileName = url.split('/').pop();
+    res.setHeader('Content-Type', response.headers.get('Content-Type'));
+    res.setHeader('Content-Disposition', `attachment; ${fileName}`);
+    await streamPipeline(response.body, res);
   });
 
   // NOTE: in production and staging environment, this is currently not used

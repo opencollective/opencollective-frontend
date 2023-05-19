@@ -2,13 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
 import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
-import { get, includes, size } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { get, includes } from 'lodash';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { space } from 'styled-system';
 
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
+import { getFilesFromExpense } from '../../lib/expenses';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
@@ -20,7 +21,6 @@ import { AvatarWithLink } from '../AvatarWithLink';
 import Container from '../Container';
 import DateTime from '../DateTime';
 import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
-import ExpenseFilesPreviewModal from '../expenses/ExpenseFilesPreviewModal';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTypeTag from '../expenses/ExpenseTypeTag';
 import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
@@ -28,6 +28,7 @@ import ProcessExpenseButtons, {
   DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
   hasProcessButtons,
 } from '../expenses/ProcessExpenseButtons';
+import FilesViewerModal from '../FilesViewerModal';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import CommentIcon from '../icons/CommentIcon';
@@ -92,16 +93,6 @@ const ExpenseContainer = styled.div`
   }
 `;
 
-const getNbAttachedFiles = expense => {
-  if (!expense) {
-    return 0;
-  } else if (expense.type === expenseTypes.INVOICE) {
-    return size(expense.attachedFiles);
-  } else {
-    return size(expense.attachedFiles) + size(expense.items.filter(({ url }) => Boolean(url)));
-  }
-};
-
 const ExpenseBudgetItem = ({
   isLoading,
   host,
@@ -115,16 +106,17 @@ const ExpenseBudgetItem = ({
   selected,
   expandExpense,
 }) => {
-  const [hasFilesPreview, showFilesPreview] = React.useState(false);
+  const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
+  const [showFilesViewerModal, setShowFilesViewerModal] = React.useState(false);
   const useDrawer = LoggedInUser?.hasEarlyAccess('expense-drawer');
-
   const featuredProfile = isInverted ? expense?.account : expense?.payee;
   const isAdminView = view === 'admin';
   const isSubmitterView = view === 'submitter';
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const pendingReceipt = isCharge && expense?.items?.every(i => i.url === null);
-  const nbAttachedFiles = !isAdminView ? 0 : getNbAttachedFiles(expense);
+  const files = React.useMemo(() => getFilesFromExpense(expense), [expense]);
+  const nbAttachedFiles = !isAdminView ? 0 : files.length;
   const isExpensePaidOrRejected = [expenseStatus.REJECTED, expenseStatus.PAID].includes(expense?.status);
   const shouldDisplayStatusTagActions =
     (isExpensePaidOrRejected || expense?.status === expenseStatus.APPROVED) &&
@@ -352,7 +344,7 @@ const ExpenseBudgetItem = ({
                       fontSize="11px"
                       cursor="pointer"
                       buttonSize="tiny"
-                      onClick={() => showFilesPreview(true)}
+                      onClick={() => setShowFilesViewerModal(true)}
                       px={2}
                       ml={-2}
                       isBorderless
@@ -391,11 +383,16 @@ const ExpenseBudgetItem = ({
           </ButtonsContainer>
         )}
       </Flex>
-      {hasFilesPreview && (
-        <ExpenseFilesPreviewModal
-          collective={expense.account}
-          expense={expense}
-          onClose={() => showFilesPreview(false)}
+      {showFilesViewerModal && (
+        <FilesViewerModal
+          files={files}
+          parentTitle={intl.formatMessage(
+            {
+              defaultMessage: 'Expense #{expenseId} attachment',
+            },
+            { expenseId: expense.legacyId },
+          )}
+          onClose={() => setShowFilesViewerModal(false)}
         />
       )}
     </ExpenseContainer>

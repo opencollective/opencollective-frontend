@@ -4,7 +4,7 @@ import { Download } from '@styled-icons/feather/Download';
 import { FileText } from '@styled-icons/feather/FileText';
 import { endsWith, max } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { imagePreview } from '../lib/image-utils';
 
@@ -67,20 +67,16 @@ const CardContainer = styled(Container)`
 
 const MainContainer = styled(Container)`
   text-align: center;
-  ${props =>
-    props.hasOnClick &&
-    css`
-      cursor: pointer;
-      &:hover ${CardContainer} {
-        ${FileTextIcon} {
-          opacity: 0.25;
-        }
-        ${DownloadIcon} {
-          opacity: 1;
-          animation: ${fadeInDown} 0.3s;
-        }
-      }
-    `}
+  cursor: pointer;
+  &:hover ${CardContainer} {
+    ${FileTextIcon} {
+      opacity: 0.25;
+    }
+    ${DownloadIcon} {
+      opacity: 1;
+      animation: ${fadeInDown} 0.3s;
+    }
+  }
 `;
 
 const FileName = styled(P)`
@@ -112,21 +108,22 @@ const formatFileSize = sizeInBytes => {
  * Supports images and PDFs.
  */
 const UploadedFilePreview = ({
-  isPrivate,
-  isLoading,
-  isDownloading,
+  isPrivate = false,
+  isLoading = false,
+  isDownloading = false,
   url,
-  size,
-  maxHeight,
-  alt,
-  fileName,
-  fileSize,
-  showFileName,
-  border,
+  size = 88,
+  maxHeight = undefined,
+  alt = 'Uploaded file preview',
+  fileName = undefined,
+  fileSize = undefined,
+  showFileName = undefined,
+  border = '1px solid #dcdee0',
+  openFileViewer = undefined,
   ...props
 }) => {
   let content = null;
-  const isText = endsWith(url, 'csv') || endsWith(url, 'txt') || endsWith(url, 'pdf');
+  const isText = endsWith(url, 'csv') || endsWith(url, 'txt');
 
   if (isLoading) {
     content = <LoadingPlaceholder borderRadius={8} />;
@@ -157,12 +154,16 @@ const UploadedFilePreview = ({
   return (
     <MainContainer
       {...props}
-      hasOnClick={Boolean(url || props.onClick)}
+      hasOnClick={true}
       maxWidth={size}
-      as={url ? Link : 'div'}
-      href={url}
-      title={fileName}
-      openInNewTab
+      {...(isText || !openFileViewer
+        ? { href: url, openInNewTab: true, as: Link }
+        : {
+            onClick: () => {
+              openFileViewer(url);
+            },
+            as: 'div',
+          })}
     >
       <CardContainer size={size} maxHeight={maxHeight} title={fileName} border={border}>
         {content}
@@ -204,12 +205,7 @@ UploadedFilePreview.propTypes = {
   border: PropTypes.string,
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   maxHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-};
-
-UploadedFilePreview.defaultProps = {
-  size: 88,
-  border: '1px solid #dcdee0',
-  alt: 'Uploaded file preview',
+  openFileViewer: PropTypes.func,
 };
 
 export default UploadedFilePreview;

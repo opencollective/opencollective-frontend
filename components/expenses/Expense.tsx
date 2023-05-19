@@ -15,7 +15,7 @@ import { getCollectiveTypeForUrl, getSuggestedTags } from '../../lib/collective.
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
-import { getPayoutProfiles } from '../../lib/expenses';
+import { getFilesFromExpense, getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
@@ -24,6 +24,7 @@ import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import CommentForm from '../conversations/CommentForm';
 import Thread from '../conversations/Thread';
+import FilesViewerModal from '../FilesViewerModal';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
 import { getI18nLink, I18nSupportLink, WebsiteName } from '../I18nFormatters';
@@ -34,7 +35,6 @@ import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
-import StyledCard from '../StyledCard';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
 import { H1, H5, Span } from '../Text';
@@ -42,7 +42,6 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import { editExpenseMutation, verifyExpenseMutation } from './graphql/mutations';
 import { expensePageQuery } from './graphql/queries';
-import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 import ExpenseForm, { msg as expenseFormMsg, prepareExpenseForSubmit } from './ExpenseForm';
 import ExpenseInviteNotificationBanner from './ExpenseInviteNotificationBanner';
 import ExpenseMissingReceiptNotificationBanner from './ExpenseMissingReceiptNotificationBanner';
@@ -125,8 +124,9 @@ function Expense(props) {
     newsletterOptIn: false,
     createdUser: null,
     showTaxLinkModal: false,
+    showFilesViewerModal: false,
   });
-
+  const [openUrl, setOpenUrl] = useState(null);
   const pollingInterval = 60;
   let pollingTimeout = null;
   let pollingStarted = false;
@@ -206,10 +206,7 @@ function Expense(props) {
   const loggedInAccount = data?.loggedInAccount;
   const collective = expense?.account;
   const host = collective?.host;
-  const canSeeInvoiceInfo = expense?.permissions.canSeeInvoiceInfo;
-  const isInvoiceOrSettlement = [expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense?.type);
   const isDraft = expense?.status === expenseStatus.DRAFT;
-  const hasAttachedFiles = (isInvoiceOrSettlement && canSeeInvoiceInfo) || expense?.attachedFiles?.length > 0;
   const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
   const isMissingReceipt =
     expense?.status === expenseStatus.PAID &&
@@ -387,6 +384,13 @@ function Expense(props) {
     });
   };
 
+  const openFileViewer = url => {
+    setOpenUrl(url);
+    setState({ ...state, showFilesViewerModal: true });
+  };
+
+  const files = React.useMemo(() => getFilesFromExpense(expense), [expense]);
+
   const confirmSaveButtons = (
     <Flex flex={1} flexWrap="wrap" gridGap={[2, 3]}>
       <StyledButton
@@ -535,23 +539,11 @@ function Expense(props) {
             canEditTags={get(expense, 'permissions.canEditTags', false)}
             showProcessButtons
             drawerActionsContainer={drawerActionsContainer}
+            openFileViewer={openFileViewer}
           />
 
           {status !== PAGE_STATUS.EDIT_SUMMARY && (
             <React.Fragment>
-              {hasAttachedFiles && (
-                <StyledCard mt="32px" p="32px">
-                  <H5 fontSize="16px" fontWeight="700" mb={3}>
-                    <FormattedMessage id="Downloads" defaultMessage="Downloads" />
-                  </H5>
-                  <ExpenseAttachedFiles
-                    files={expense.attachedFiles}
-                    collective={collective}
-                    expense={expense}
-                    showInvoice={canSeeInvoiceInfo}
-                  />
-                </StyledCard>
-              )}
               {expense?.privateMessage && (
                 <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
                   <H5 fontSize="16px" mb={3}>
@@ -713,6 +705,20 @@ function Expense(props) {
           year={new Date(expense.createdAt).getFullYear()}
           onClose={() => setState(state => ({ ...state, showTaxLinkModal: false }))}
           refetchExpense={refetch}
+        />
+      )}
+
+      {state.showFilesViewerModal && (
+        <FilesViewerModal
+          files={files}
+          parentTitle={intl.formatMessage(
+            {
+              defaultMessage: 'Expense #{expenseId} attachment',
+            },
+            { expenseId: expense.legacyId },
+          )}
+          openFileUrl={openUrl}
+          onClose={() => setState(state => ({ ...state, showFilesViewerModal: false }))}
         />
       )}
     </Box>

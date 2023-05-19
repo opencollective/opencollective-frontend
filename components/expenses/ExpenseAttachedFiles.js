@@ -2,13 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import expenseTypes from '../../lib/constants/expenseTypes';
-
 import { Box, Flex } from '../Grid';
 import StyledLinkButton from '../StyledLinkButton';
 import UploadedFilePreview from '../UploadedFilePreview';
-
-import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
 
 const getFileName = (intl, idx, totalNbFiles) => {
   if (totalNbFiles === 1) {
@@ -18,25 +14,10 @@ const getFileName = (intl, idx, totalNbFiles) => {
   }
 };
 
-const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expense }) => {
+const ExpenseAttachedFiles = ({ files, onRemove, openFileViewer }) => {
   const intl = useIntl();
   return (
     <Flex flexWrap="wrap">
-      {showInvoice && [expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense.type) && (
-        <Box mr={3} mb={3}>
-          <ExpenseInvoiceDownloadHelper expense={expense} collective={collective}>
-            {({ isLoading, downloadInvoice }) => (
-              <UploadedFilePreview
-                onClick={downloadInvoice}
-                isDownloading={isLoading}
-                size={88}
-                showFileName
-                fileName={intl.formatMessage({ defaultMessage: 'Download expense' })}
-              />
-            )}
-          </ExpenseInvoiceDownloadHelper>
-        </Box>
-      )}
       {files?.map((file, idx) => (
         <Box key={file.id || file.url} mr={3} mb={3}>
           <UploadedFilePreview
@@ -45,6 +26,7 @@ const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expens
             fileName={file.name || getFileName(intl, idx, files.length)}
             fileSize={file.info?.size}
             showFileName
+            openFileViewer={openFileViewer}
           />
           {onRemove && (
             <Box ml="4px" mt="2px">
@@ -60,11 +42,6 @@ const ExpenseAttachedFiles = ({ files, onRemove, showInvoice, collective, expens
 };
 
 ExpenseAttachedFiles.propTypes = {
-  showInvoice: PropTypes.bool,
-  /** Required if showInvoice is true */
-  expense: PropTypes.object,
-  /** Required if showInvoice is true */
-  collective: PropTypes.object,
   files: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string,
@@ -73,6 +50,7 @@ ExpenseAttachedFiles.propTypes = {
   ),
   /** If provided, a link to remove the file will be displayed */
   onRemove: PropTypes.func,
+  openFileViewer: PropTypes.func,
 };
 
 export default ExpenseAttachedFiles;

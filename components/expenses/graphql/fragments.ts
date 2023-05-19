@@ -174,6 +174,12 @@ export const expensePageExpenseFieldsFragment = gql`
       description
       amount
       url
+      file {
+        id
+        ... on ImageFileInfo {
+          width
+        }
+      }
     }
     taxes {
       id
@@ -189,6 +195,9 @@ export const expensePageExpenseFieldsFragment = gql`
         id
         name
         size
+        ... on ImageFileInfo {
+          width
+        }
       }
     }
     payee {
@@ -596,6 +605,12 @@ export const expensesListAdminFieldsFragment = gql`
       incurredAt
       url
       amount
+      file {
+        id
+        ... on ImageFileInfo {
+          width
+        }
+      }
     }
     taxes {
       id
@@ -606,6 +621,12 @@ export const expensesListAdminFieldsFragment = gql`
       id
       url
       name
+      info {
+        id
+        ... on ImageFileInfo {
+          width
+        }
+      }
     }
     securityChecks {
       level

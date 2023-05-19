@@ -51,6 +51,8 @@ const COMMON_DIRECTIVES = {
     'https://www.google.com',
     'https://api.cryptonator.com',
     'https://plausible.io',
+    'opencollective-production.s3.us-west-1.amazonaws.com',
+    'opencollective-staging.s3.us-west-1.amazonaws.com',
   ],
   scriptSrc: [
     SELF,
@@ -65,6 +67,7 @@ const COMMON_DIRECTIVES = {
     'https://*.hcaptcha.com',
     'https://www.google.com',
     'https://plausible.io',
+    'unpkg.com',
   ],
   frameSrc: [
     'blob:', // For expense invoice previews in the modal, as they're rendered in a blob
