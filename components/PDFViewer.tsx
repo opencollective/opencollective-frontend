@@ -4,6 +4,8 @@ import { throttle } from 'lodash';
 import { Document, Page, pdfjs } from 'react-pdf';
 import styled from 'styled-components';
 
+import Loading from './Loading';
+
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 
 const DocumentContainer = styled.div`
@@ -15,7 +17,7 @@ const DocumentContainer = styled.div`
 const PDFViewer = ({ pdfUrl, contentWrapperRef }) => {
   const [numPages, setNumPages] = useState(null);
   const [wrapperWidth, setWrapperWidth] = useState(0);
-  const [firstPageWidth, setFirstPageWidth] = useState(0);
+  const [pageWidth, setPageWidth] = useState(0);
 
   const throttledSetWrapperWidth = useCallback(
     throttle(w => {
@@ -42,6 +44,7 @@ const PDFViewer = ({ pdfUrl, contentWrapperRef }) => {
     <DocumentContainer>
       <Document
         file={pdfUrl}
+        loading={<Loading />}
         onLoadSuccess={({ numPages }) => {
           setNumPages(numPages);
         }}
@@ -49,15 +52,17 @@ const PDFViewer = ({ pdfUrl, contentWrapperRef }) => {
         {Array.from(new Array(numPages), (el, index) => (
           <Page
             className="pdf-page"
-            scale={1}
             pageNumber={index + 1}
             key={`page_${index + 1}`}
             onLoadSuccess={page => {
               if (page._pageIndex === 0) {
-                setFirstPageWidth(page.originalWidth);
+                // Use first page's width as default page width
+                // and set it to 1.5 times of original width
+                // to make it more readable
+                setPageWidth(page.originalWidth * 1.5);
               }
             }}
-            width={Math.min(wrapperWidth, firstPageWidth)}
+            width={Math.min(wrapperWidth, pageWidth)}
           />
         ))}
       </Document>

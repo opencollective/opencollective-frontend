@@ -8,6 +8,7 @@ import { XMark } from '@styled-icons/heroicons-outline/XMark';
 import { themeGet } from '@styled-system/theme-get';
 import FocusTrap from 'focus-trap-react';
 import { endsWith } from 'lodash';
+import dynamic from 'next/dynamic';
 import { createPortal } from 'react-dom';
 import { useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
@@ -16,10 +17,15 @@ import useKeyBoardShortcut, { ARROW_LEFT_KEY, ARROW_RIGHT_KEY } from '../lib/hoo
 import { imagePreview } from '../lib/image-utils';
 
 import { Box, Flex } from './Grid';
-import PDFViewer from './PDFViewer';
+import Loading from './LoadingPlaceholder';
 import { fadeIn } from './StyledKeyframes';
 import StyledTooltip from './StyledTooltip';
 import UploadedFilePreview from './UploadedFilePreview';
+
+const PDFViewer = dynamic(() => import('./PDFViewer'), {
+  ssr: false,
+  loading: () => <Loading />,
+});
 
 const GlobalModalStyle = createGlobalStyle`
   body {
