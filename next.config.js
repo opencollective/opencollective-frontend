@@ -70,11 +70,7 @@ const nextConfig = {
       new CopyPlugin({
         patterns: [
           {
-            from: require.resolve(
-              // This package is imported by react-pdf and is not in our package.json
-              // eslint-disable-next-line node/no-extraneous-require
-              'pdfjs-dist/build/pdf.worker.min.js',
-            ),
+            from: require.resolve('pdfjs-dist/build/pdf.worker.min.js'),
             to: path.join(__dirname, 'public'),
           },
         ],
