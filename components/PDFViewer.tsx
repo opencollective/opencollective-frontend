@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { throttle } from 'lodash';
 import { Document, Page, pdfjs } from 'react-pdf';
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
-// pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 import styled from 'styled-components';
+
+pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 
 const DocumentContainer = styled.div`
   .pdf-page {
