@@ -337,7 +337,7 @@ const ExpenseSummary = ({
               <LoadingPlaceholder height={20} maxWidth={150} />
             ) : (
               <Span fontWeight="bold" fontSize="16px">
-                <FormattedMessage defaultMessage="Attachments" />
+                <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
               </Span>
             )}
             <StyledHr flex="1 1" borderColor="black.300" ml={2} />

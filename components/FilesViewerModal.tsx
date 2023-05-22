@@ -283,7 +283,7 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
               <StyledTooltip
                 containerCursor="pointer"
                 noArrow
-                content={intl.formatMessage({ defaultMessage: 'Download' })}
+                content={intl.formatMessage({ id: 'Download', defaultMessage: 'Download' })}
                 delayHide={0}
               >
                 <ButtonLink
@@ -307,7 +307,7 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
               <StyledTooltip
                 containerCursor="pointer"
                 noArrow
-                content={intl.formatMessage({ defaultMessage: 'Close' })}
+                content={intl.formatMessage({ id: 'Close', defaultMessage: 'Close' })}
                 delayHide={0}
               >
                 <Button onClick={onClose}>
