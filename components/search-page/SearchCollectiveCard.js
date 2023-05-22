@@ -57,16 +57,16 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
           ) : (
             <React.Fragment>
               <P fontSize="12px" lineHeight="18px">
-                {collective.backers.totalCount > 0 && (
+                {collective.stats?.contributorsCount > 0 && (
                   <Box pb="6px">
                     <Span fontSize="14px" fontWeight={700} color="black.900">
-                      {collective.backers.totalCount}
+                      {collective.stats.contributorsCount}
                     </Span>
                     {` `}
                     <Span fontSize="12px" fontWeight={400} color="black.700">
                       <FormattedMessage
                         defaultMessage="Financial {count, plural, one {Contributor} other {Contributors}}"
-                        values={{ count: collective.backers.totalCount }}
+                        values={{ count: collective.stats.contributorsCount }}
                       />
                     </Span>
                   </Box>
@@ -134,6 +134,7 @@ SearchCollectiveCard.propTypes = {
     description: PropTypes.string,
     isHost: PropTypes.bool,
     stats: PropTypes.shape({
+      contributorsCount: PropTypes.number,
       totalAmountReceived: PropTypes.shape({
         valueInCents: PropTypes.number,
         currency: PropTypes.string,
@@ -146,9 +147,6 @@ SearchCollectiveCard.propTypes = {
     host: PropTypes.shape({
       totalHostedCollectives: PropTypes.number,
       hostFeePercent: PropTypes.number,
-    }),
-    backers: PropTypes.shape({
-      totalCount: PropTypes.number,
     }),
   }).isRequired,
 };

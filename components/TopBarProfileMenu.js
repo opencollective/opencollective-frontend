@@ -77,6 +77,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
         query={memberInvitationsCountQuery}
         variables={{ memberAccount: { slug: LoggedInUser.collective.slug } }}
         context={API_V2_CONTEXT}
+        errorPolicy="all"
       >
         {({ data, loading }) =>
           loading === false && data && data.memberInvitations && data.memberInvitations.length > 0 ? (

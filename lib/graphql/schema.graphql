@@ -98,8 +98,8 @@ interface CollectiveInterface {
   List of all collectives that are related to this collective with their membership relationship. Can filter by role (BACKER/MEMBER/ADMIN/HOST/FOLLOWER)
   """
   members(
-    limit: Int
-    offset: Int
+    limit: Int = 100
+    offset: Int = 0
 
     """
     Type of User: USER/ORGANIZATION
@@ -515,7 +515,11 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 """
 scalar JSON
 
-"\n    A person or an entity that contributes financially or by any other mean to the mission\n    of the collective. While \"Member\" is dedicated to permissions, this type is meant\n    to surface all the public contributors.\n  "
+"""
+A person or an entity that contributes financially or by any other mean to the mission
+of the collective. While "Member" is dedicated to permissions, this type is meant
+to surface all the public contributors.
+"""
 type Contributor {
   """
   A unique identifier for this member
@@ -2300,7 +2304,15 @@ type Collective implements CollectiveInterface {
   """
   Get all the members of this collective (admins, members, backers, followers)
   """
-  members(limit: Int, offset: Int, type: String, role: String, TierId: Int, tierSlug: String, roles: [String]): [Member]
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    type: String
+    role: String
+    TierId: Int
+    tierSlug: String
+    roles: [String]
+  ): [Member]
 
   """
   Get all the collective this collective is a member of (as a member, backer, follower, etc.)
@@ -2558,7 +2570,15 @@ type Event implements CollectiveInterface {
   """
   Get all the members of this collective (admins, members, backers, followers)
   """
-  members(limit: Int, offset: Int, type: String, role: String, TierId: Int, tierSlug: String, roles: [String]): [Member]
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    type: String
+    role: String
+    TierId: Int
+    tierSlug: String
+    roles: [String]
+  ): [Member]
 
   """
   Get all the collective this collective is a member of (as a member, backer, follower, etc.)
@@ -2816,7 +2836,15 @@ type Fund implements CollectiveInterface {
   """
   Get all the members of this collective (admins, members, backers, followers)
   """
-  members(limit: Int, offset: Int, type: String, role: String, TierId: Int, tierSlug: String, roles: [String]): [Member]
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    type: String
+    role: String
+    TierId: Int
+    tierSlug: String
+    roles: [String]
+  ): [Member]
 
   """
   Get all the collective this collective is a member of (as a member, backer, follower, etc.)
@@ -3074,7 +3102,15 @@ type Organization implements CollectiveInterface {
   """
   Get all the members of this collective (admins, members, backers, followers)
   """
-  members(limit: Int, offset: Int, type: String, role: String, TierId: Int, tierSlug: String, roles: [String]): [Member]
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    type: String
+    role: String
+    TierId: Int
+    tierSlug: String
+    roles: [String]
+  ): [Member]
 
   """
   Get all the collective this collective is a member of (as a member, backer, follower, etc.)
@@ -3333,7 +3369,15 @@ type Project implements CollectiveInterface {
   """
   Get all the members of this collective (admins, members, backers, followers)
   """
-  members(limit: Int, offset: Int, type: String, role: String, TierId: Int, tierSlug: String, roles: [String]): [Member]
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    type: String
+    role: String
+    TierId: Int
+    tierSlug: String
+    roles: [String]
+  ): [Member]
 
   """
   Get all the collective this collective is a member of (as a member, backer, follower, etc.)
@@ -3481,6 +3525,7 @@ type Expense implements Transaction {
   id: Int
   idV2: String
   refundTransaction: Transaction
+  isRefund: Boolean
   uuid: String
   type: String
   kind: String
@@ -3608,7 +3653,7 @@ interface Transaction {
   """
   netAmountInCollectiveCurrency(
     """
-    Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
+    Fetch HOST_FEE transaction and integrate in calculation for retro-compatibility.
     """
     fetchHostFee: Boolean = false
   ): Int
@@ -3619,7 +3664,7 @@ interface Transaction {
   """
   hostFeeInHostCurrency(
     """
-    Fetch HOST_FEE transaction for retro-compatiblity.
+    Fetch HOST_FEE transaction for retro-compatibility.
     """
     fetchHostFee: Boolean = false
   ): Int
@@ -3639,6 +3684,7 @@ interface Transaction {
   createdAt: DateString
   updatedAt: DateString
   refundTransaction: Transaction
+  isRefund: Boolean
   invoiceTemplate: String
 }
 
@@ -3649,6 +3695,7 @@ type Order implements Transaction {
   id: Int
   idV2: String
   refundTransaction: Transaction
+  isRefund: Boolean
   uuid: String
   type: String
   kind: String
@@ -3833,7 +3880,15 @@ type User implements CollectiveInterface {
   """
   Get all the members of this collective (admins, members, backers, followers)
   """
-  members(limit: Int, offset: Int, type: String, role: String, TierId: Int, tierSlug: String, roles: [String]): [Member]
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    type: String
+    role: String
+    TierId: Int
+    tierSlug: String
+    roles: [String]
+  ): [Member]
 
   """
   Get all the collective this collective is a member of (as a member, backer, follower, etc.)
@@ -4093,7 +4148,15 @@ type Vendor implements CollectiveInterface {
   """
   Get all the members of this collective (admins, members, backers, followers)
   """
-  members(limit: Int, offset: Int, type: String, role: String, TierId: Int, tierSlug: String, roles: [String]): [Member]
+  members(
+    limit: Int = 100
+    offset: Int = 0
+    type: String
+    role: String
+    TierId: Int
+    tierSlug: String
+    roles: [String]
+  ): [Member]
 
   """
   Get all the collective this collective is a member of (as a member, backer, follower, etc.)
@@ -4247,7 +4310,7 @@ type Query {
     """
     throwIfMissing: Boolean = true
   ): CollectiveInterface
-  Tier(id: Int!): Tier
+  Tier(id: Int!): Tier @deprecated(reason: "2023-05-04: Please use GraphQL V2")
   LoggedInUser: UserDetails
   allInvoices(fromCollectiveSlug: String!): [InvoiceType]
   TransactionInvoice(
@@ -4255,9 +4318,14 @@ type Query {
     Slug of the transaction.
     """
     transactionUuid: String!
-  ): InvoiceType
+  ): InvoiceType @deprecated(reason: "2023-05-04: Please fetch transactions with GraphQL v2")
 
-  "\n    Given a collective, returns all its transactions:\n    - Debit transactions made by collective without using a gift card\n    - Debit transactions made using a gift card from collective\n    - Credit transactions made to collective\n    "
+  """
+  Given a collective, returns all its transactions:
+  - Debit transactions made by collective without using a gift card
+  - Debit transactions made using a gift card from collective
+  - Credit transactions made to collective
+  """
   allTransactions(
     CollectiveId: Int
     collectiveSlug: String
@@ -4339,7 +4407,7 @@ type Query {
     orderDirection: OrderDirection = ASC
     limit: Int = 10
     offset: Int = 0
-  ): CollectiveSearchResults
+  ): CollectiveSearchResults @deprecated(reason: "2023-05-16: Please use \"Accounts\" on GraphQL V2")
 
   """
   Returns all public hosts that are open for applications
@@ -4361,7 +4429,7 @@ type Query {
     onlyOpenHosts: Boolean = true
     minNbCollectivesHosted: Int! = 0
   ): CollectiveSearchResults
-  allCollectiveTags: [String]
+  allCollectiveTags: [String] @deprecated(reason: "2023-05-04: Please use `tagStats` on GraphQL V2 instead")
   allMembers(
     CollectiveId: Int
     collectiveSlug: String
@@ -4385,6 +4453,7 @@ type Query {
   [AUTHENTICATED] Returns the pending invitations
   """
   memberInvitations(CollectiveId: Int, MemberCollectiveId: Int): [MemberInvitation]
+    @deprecated(reason: "2023-05-04: Please use GraphQL V2")
   allEvents(
     """
     Slug of the parent collective
@@ -4397,7 +4466,7 @@ type Query {
     If null, returns all events, if false returns only events that are not archived, if true only returns events that have been archived
     """
     isArchived: Boolean
-  ): [CollectiveInterface]
+  ): [CollectiveInterface] @deprecated(reason: "2023-05-04: Please use GraphQL V2")
   PaymentMethod(id: Int, code: String): PaymentMethodType
 
   """

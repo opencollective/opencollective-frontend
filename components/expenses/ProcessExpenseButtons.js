@@ -145,6 +145,11 @@ const ProcessExpenseButtons = ({
   const intl = useIntl();
   const { addToast } = useToasts();
 
+  React.useEffect(() => {
+    onModalToggle?.(!!confirmProcessExpenseAction);
+    return () => onModalToggle?.(false);
+  }, [confirmProcessExpenseAction, onModalToggle]);
+
   const triggerAction = async (action, paymentParams) => {
     // Prevent submitting the action if another one is being submitted at the same time
     if (loading) {
@@ -179,7 +184,6 @@ const ProcessExpenseButtons = ({
       ...buttonProps,
       disabled: loading && !isSelectedAction,
       loading: loading && isSelectedAction,
-      onClick: () => triggerAction(action),
     };
   };
 
@@ -189,6 +193,7 @@ const ProcessExpenseButtons = ({
         (permissions.approve.allowed || permissions.approve.reason === PERMISSION_CODES.AUTHOR_CANNOT_APPROVE) && (
           <PermissionButton
             {...getButtonProps('APPROVE')}
+            onClick={() => triggerAction('APPROVE')}
             buttonStyle="secondary"
             data-cy="approve-button"
             icon={<ApproveIcon size={12} />}
@@ -203,7 +208,6 @@ const ProcessExpenseButtons = ({
       {permissions.canPay && (
         <PayExpenseButton
           {...getButtonProps('PAY')}
-          onClick={null}
           onSubmit={triggerAction}
           expense={expense}
           collective={collective}
@@ -212,7 +216,12 @@ const ProcessExpenseButtons = ({
         />
       )}
       {permissions.canReject && !isViewingExpenseInHostContext && (
-        <StyledButton {...getButtonProps('REJECT')} buttonStyle="dangerSecondary" data-cy="reject-button">
+        <StyledButton
+          {...getButtonProps('REJECT')}
+          onClick={() => setConfirmProcessExpenseAction('REJECT')}
+          buttonStyle="dangerSecondary"
+          data-cy="reject-button"
+        >
           <RejectIcon size={14} />
           <ButtonLabel>
             <FormattedMessage id="actions.reject" defaultMessage="Reject" />
@@ -238,7 +247,12 @@ const ProcessExpenseButtons = ({
       )}
 
       {permissions.canUnapprove && !isViewingExpenseInHostContext && (
-        <StyledButton {...getButtonProps('UNAPPROVE')} buttonStyle="dangerSecondary" data-cy="unapprove-button">
+        <StyledButton
+          {...getButtonProps('UNAPPROVE')}
+          onClick={() => setConfirmProcessExpenseAction('UNAPPROVE')}
+          buttonStyle="dangerSecondary"
+          data-cy="unapprove-button"
+        >
           <UnapproveIcon size={12} />
           <ButtonLabel>
             <FormattedMessage id="expense.unapprove.btn" defaultMessage="Unapprove" />
@@ -262,6 +276,7 @@ const ProcessExpenseButtons = ({
       {permissions.canUnschedulePayment && (
         <StyledButton
           {...getButtonProps('UNSCHEDULE_PAYMENT')}
+          onClick={() => triggerAction('UNSCHEDULE_PAYMENT')}
           buttonStyle="dangerSecondary"
           data-cy="unapprove-button"
         >
@@ -274,11 +289,8 @@ const ProcessExpenseButtons = ({
       {permissions.canMarkAsUnpaid && (
         <MarkExpenseAsUnpaidButton
           data-cy="mark-as-unpaid-button"
+          expense={expense}
           {...getButtonProps('MARK_AS_UNPAID')}
-          onClick={null}
-          onConfirm={shouldRefundPaymentProcessorFee =>
-            triggerAction('MARK_AS_UNPAID', { shouldRefundPaymentProcessorFee })
-          }
         />
       )}
       {permissions.canDelete && !isMoreActions && (
@@ -296,7 +308,10 @@ const ProcessExpenseButtons = ({
       {confirmProcessExpenseAction && (
         <ConfirmProcessExpenseModal
           type={confirmProcessExpenseAction}
-          onClose={() => setConfirmProcessExpenseAction(null)}
+          onClose={() => {
+            setConfirmProcessExpenseAction(null);
+            onModalToggle?.(false);
+          }}
           expense={expense}
         />
       )}
