@@ -56,15 +56,15 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
             </P>
           ) : (
             <P mt={3} fontSize="12px" lineHeight="18px">
-              {account.backers?.totalCount > 0 && (
+              {account.stats?.contributorsCount > 0 && (
                 <FormattedMessage
                   id="StyledMembershipCard.backers.all"
                   defaultMessage="{count, plural, one {{prettyCount} contributor} other {{prettyCount} contributors}}"
                   values={{
-                    count: account.backers.totalCount,
+                    count: account.stats.contributorsCount,
                     prettyCount: (
                       <Span fontWeight="bold" fontSize="16px">
-                        {account.backers.totalCount}
+                        {account.stats.contributorsCount}
                       </Span>
                     ),
                   }}
@@ -87,8 +87,8 @@ StyledMembershipCard.propTypes = {
       isHost: PropTypes.bool,
       isIncognito: PropTypes.bool,
       name: PropTypes.string,
-      backers: PropTypes.shape({
-        totalCount: PropTypes.number,
+      stats: PropTypes.shape({
+        contributorsCount: PropTypes.number,
       }),
     }),
     description: PropTypes.string,

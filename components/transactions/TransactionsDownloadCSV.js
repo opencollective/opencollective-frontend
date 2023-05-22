@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
+import omit from 'lodash/omit';
 import { FormattedMessage } from 'react-intl';
 
 import { parseDateInterval } from '../../lib/date-utils';
@@ -41,6 +42,7 @@ const TransactionsDownloadCSV = ({ collective, query }) => {
       {displayModal && (
         <ExportTransactionsCSVModal
           dateInterval={query.period && parseDateInterval(query.period)}
+          filters={omit(query, ['period', 'collectiveSlug'])}
           collective={collective}
           onClose={() => setDisplayModal(false)}
         />

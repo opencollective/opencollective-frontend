@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
+import { uniqWith } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -261,9 +262,9 @@ const contributionsSectionQuery = gql`
                 backgroundImageUrl(height: 200)
               }
             }
-            # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
-            backers: members(role: [BACKER], limit: 1) {
-              totalCount
+            stats {
+              id
+              contributorsCount
             }
           }
         }
@@ -364,7 +365,10 @@ const SectionContributions = ({ collective }) => {
         >
           <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
             {(!loading || (isLoadingMore && loading)) &&
-              memberOf?.nodes.map(membership => (
+              uniqWith(
+                memberOf?.nodes,
+                (member1, member2) => member1.role === member2.role && member1?.account.id === member2?.account.id,
+              ).map(membership => (
                 <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
                   <StyledMembershipCard membership={membership} />
                 </MembershipCardContainer>

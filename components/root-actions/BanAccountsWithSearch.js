@@ -25,7 +25,7 @@ import { banAccountsMutation } from './BanAccounts';
 import BanAccountsSummary from './BanAccountsSummary';
 
 export const searchQuery = gql`
-  query SearchPage($term: String!, $offset: Int) {
+  query BanAccountSearch($term: String!, $offset: Int) {
     accounts(
       searchTerm: $term
       limit: 30
@@ -75,12 +75,6 @@ export const searchQuery = gql`
             slug
             backgroundImageUrl
           }
-        }
-        backers: members(role: BACKER) {
-          totalCount
-        }
-        memberOf(role: BACKER) {
-          totalCount
         }
       }
       limit

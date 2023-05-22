@@ -1021,6 +1021,11 @@ interface Transaction {
   permissions: TransactionPermissions
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -1175,6 +1180,11 @@ type Expense {
   The state of the expense (pending, approved, paid, rejected...etc)
   """
   status: ExpenseStatus!
+
+  """
+  Whether this expense is on hold
+  """
+  onHold: Boolean
 
   """
   Returns the list of comments for this expense, or `null` if user is not allowed to see them
@@ -2059,6 +2069,11 @@ type Comment {
   account: Account
 
   """
+  The type of this comment
+  """
+  type: CommentType!
+
+  """
   Returns a map of reactions counts for this comment
   """
   reactions: JSON
@@ -2067,6 +2082,21 @@ type Comment {
   Returns the list of reactions added to this comment by logged in user
   """
   userReactions: [String]
+}
+
+"""
+All supported comment contexts
+"""
+enum CommentType {
+  """
+  Default regular comment
+  """
+  COMMENT
+
+  """
+  Comment is visible only to host admins
+  """
+  PRIVATE_NOTE
 }
 
 """
@@ -4343,6 +4373,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED
   COLLECTIVE_EXPENSE_UNAPPROVED
   COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
@@ -4350,6 +4381,8 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM
   COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
   COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_PUT_ON_HOLD
+  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
@@ -4917,6 +4950,9 @@ type ExpensePermissions {
   Whether the current user can verify this draft expense
   """
   canVerifyDraftExpense: Boolean!
+  canUsePrivateNote: Boolean!
+  canHold: Boolean!
+  canRelease: Boolean!
   edit: Permission!
   editTags: Permission!
   delete: Permission!
@@ -4928,8 +4964,11 @@ type ExpensePermissions {
   markAsSpam: Permission!
   markAsUnpaid: Permission!
   comment: Permission!
+  usePrivateNote: Permission!
   unschedulePayment: Permission!
   verifyDraftExpense: Permission!
+  hold: Permission!
+  release: Permission!
 }
 
 """
@@ -6504,6 +6543,11 @@ type Credit implements Transaction {
   permissions: TransactionPermissions!
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -6612,6 +6656,11 @@ type Debit implements Transaction {
   permissions: TransactionPermissions!
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -11412,6 +11461,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED
   COLLECTIVE_EXPENSE_UNAPPROVED
   COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
@@ -11419,6 +11469,8 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM
   COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
   COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_PUT_ON_HOLD
+  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
@@ -11542,6 +11594,11 @@ enum ExpenseStatusFilter {
   Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
   """
   READY_TO_PAY
+
+  """
+  Only expenses that are on hold
+  """
+  ON_HOLD
 }
 
 """
@@ -14511,6 +14568,11 @@ input CommentCreateInput {
   ConversationId: String @deprecated(reason: "2022-08-26: Please use \"conversation\"")
   conversation: ConversationReferenceInput
   update: UpdateReferenceInput
+
+  """
+  The type of the comment
+  """
+  type: CommentType = COMMENT
 }
 
 input ConversationReferenceInput {
@@ -14901,6 +14963,11 @@ enum ExpenseProcessAction {
   UNAPPROVE
 
   """
+  To request re-approval of the expense, marking it as pending.
+  """
+  REQUEST_RE_APPROVAL
+
+  """
   To mark the expense as rejected
   """
   REJECT
@@ -14934,6 +15001,16 @@ enum ExpenseProcessAction {
   To mark the expense as incomplete and notify the payee it requires more information
   """
   MARK_AS_INCOMPLETE
+
+  """
+  To put the expense on hold
+  """
+  HOLD
+
+  """
+  To release the expense from hold
+  """
+  RELEASE
 }
 
 """
@@ -14956,6 +15033,11 @@ input ProcessExpensePaymentParams {
   shouldRefundPaymentProcessorFee: Boolean
 
   """
+  New expense status when triggering MARK_AS_UNPAID
+  """
+  markAsUnPaidStatus: MarkAsUnPaidExpenseStatus = APPROVED
+
+  """
   Bypass automatic integrations (ie. PayPal, Transferwise) to process the expense manually
   """
   forceManual: Boolean
@@ -14964,6 +15046,12 @@ input ProcessExpensePaymentParams {
   Who is responsible for paying any due fees.
   """
   feesPayer: FeesPayer = COLLECTIVE
+}
+
+enum MarkAsUnPaidExpenseStatus {
+  APPROVED
+  INCOMPLETE
+  ERROR
 }
 
 input ExpenseInviteDraftInput {
