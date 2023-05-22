@@ -1159,7 +1159,7 @@
   "Expense.Recurring.Edit.Description": "Uma vez que a freqüência e a data final estão definidas, você não pode editá-las. Você sempre pode cancelar as despesas recorrentes e enviar uma nova.",
   "Expense.Recurring.EditWarning.Description": "Quaisquer alterações que você fizer nesta despesa, se aplicarão a futuras recorrências.",
   "Expense.Recurring.EditWarning.Ends": "ends {endsAt, date, medium}",
-  "Expense.Recurring.EditWarning.Title": "This is a recurring expense.",
+  "Expense.Recurring.EditWarning.Title": "Esta é uma despesa recorrente.",
   "expense.rejected": "Rejeitado",
   "expense.RemoveItem": "Remover item",
   "expense.RemoveReceipt": "Remover recibo",
