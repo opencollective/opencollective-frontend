@@ -26,6 +26,8 @@ const ExpenseStatusFilter = ({
   ...props
 }) => {
   const intl = useIntl();
+  ignoredExpenseStatus = ignoredExpenseStatus || [];
+
   if (!displayOnHoldPseudoStatus) {
     ignoredExpenseStatus.push('ON_HOLD');
   }
