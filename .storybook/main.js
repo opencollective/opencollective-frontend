@@ -1,8 +1,13 @@
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
-
 module.exports = {
   stories: ['../stories/index.stories.mdx', '../stories/**/*.stories.mdx', '../stories/**/*.stories.@(js|jsx|ts|tsx)'],
-  addons: ['@storybook/addon-links', '@storybook/addon-docs', '@storybook/addon-essentials', 'storybook-addon-designs'],
+  addons: [
+    '@storybook/addon-links',
+    '@storybook/addon-docs',
+    '@storybook/addon-essentials',
+    'storybook-addon-designs',
+    '@storybook/addon-mdx-gfm',
+  ],
   webpackFinal: config => {
     // mjs
     config.module.rules.push({
@@ -13,7 +18,11 @@ module.exports = {
     config.plugins.push(new NodePolyfillPlugin());
     return config;
   },
-  core: {
-    builder: 'webpack5',
+  framework: {
+    name: '@storybook/nextjs',
+    options: {},
+  },
+  docs: {
+    autodocs: true,
   },
 };
