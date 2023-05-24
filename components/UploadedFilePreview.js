@@ -154,7 +154,6 @@ const UploadedFilePreview = ({
   return (
     <MainContainer
       {...props}
-      hasOnClick={true}
       maxWidth={size}
       {...(isText || !openFileViewer
         ? { href: url, openInNewTab: true, as: Link }
