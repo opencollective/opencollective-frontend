@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { throttle } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import { Document, Page, pdfjs } from 'react-pdf';
 import styled from 'styled-components';
 
 import Loading from './Loading';
 import { Span } from './Text';
-import { FormattedMessage } from 'react-intl';
 
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 
