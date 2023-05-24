@@ -1,3 +1,4 @@
+const fetch = require('node-fetch');
 const { pipeline } = require('stream');
 const { promisify } = require('util');
 const streamPipeline = promisify(pipeline);
