@@ -53,7 +53,7 @@ const RecurringContributionsCard = ({
     <StyledCollectiveCard
       {...props}
       collective={collective}
-      bodyHeight="350px"
+      bodyHeight="400px"
       tag={
         <StyledTag
           display="inline-block"
