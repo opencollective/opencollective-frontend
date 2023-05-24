@@ -780,6 +780,7 @@
   "conversations.subtitle": "Faisons avancer la discussion ! C'est un espace où la communauté peut échanger, poser des questions, vous remercier, et faire avancer les choses collectivement.",
   "Conversations.ViewAll": "Voir toutes les Conversations",
   "CopyLink": "Copier le lien",
+  "CountOfTotalCount": "{count} of {totalCount}",
   "cover.bar.balance": "Solde aujourd'hui",
   "cover.bar.monthlyBudget": "Budget mensuel estimé",
   "cover.bar.yearlyBudget": "Estimation du budget annuel",

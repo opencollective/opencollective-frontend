@@ -780,6 +780,7 @@
   "conversations.subtitle": "Давайте начнем обсуждение! Это место, где сообщество может общаться, задавать вопросы, высказывать благодарность и вместе заниматься делами.",
   "Conversations.ViewAll": "Просмотреть все обсуждения",
   "CopyLink": "Скопировать ссылку",
+  "CountOfTotalCount": "{count} of {totalCount}",
   "cover.bar.balance": "Баланс",
   "cover.bar.monthlyBudget": "Предполагаемый месячный бюджет",
   "cover.bar.yearlyBudget": "Предполагаемый годовой бюджет",

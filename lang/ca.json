@@ -780,6 +780,7 @@
   "conversations.subtitle": "Let’s get the discussion going! This is a space for the community to converse, ask questions, say thank you, and get things done together.",
   "Conversations.ViewAll": "Mostra totes les converses",
   "CopyLink": "Copia l'enllaç",
+  "CountOfTotalCount": "{count} of {totalCount}",
   "cover.bar.balance": "Saldo d'avui",
   "cover.bar.monthlyBudget": "Pressupost mensual estimat",
   "cover.bar.yearlyBudget": "Pressupost anual estimat",

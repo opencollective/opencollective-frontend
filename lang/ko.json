@@ -780,6 +780,7 @@
   "conversations.subtitle": "Let’s get the discussion going! This is a space for the community to converse, ask questions, say thank you, and get things done together.",
   "Conversations.ViewAll": "View all Conversations",
   "CopyLink": "주소 복사",
+  "CountOfTotalCount": "{count} of {totalCount}",
   "cover.bar.balance": "Today's Balance",
   "cover.bar.monthlyBudget": "Estimated Monthly Budget",
   "cover.bar.yearlyBudget": "예상 연간 예산",

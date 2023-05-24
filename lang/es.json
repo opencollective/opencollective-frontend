@@ -780,6 +780,7 @@
   "conversations.subtitle": "¡Pongamos en marcha la discusión! Este es un espacio para que la comunidad converse, haga preguntas, de las gracias, y haga las cosas juntos.",
   "Conversations.ViewAll": "Ver todas las Conversaciones",
   "CopyLink": "Copiar enlace",
+  "CountOfTotalCount": "{count} of {totalCount}",
   "cover.bar.balance": "Saldo actual",
   "cover.bar.monthlyBudget": "Presupuesto mensual estimado",
   "cover.bar.yearlyBudget": "Presupuesto anual estimado",

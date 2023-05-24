@@ -780,6 +780,7 @@
   "conversations.subtitle": "Let’s get the discussion going! This is a space for the community to converse, ask questions, say thank you, and get things done together.",
   "Conversations.ViewAll": "查看所有对话",
   "CopyLink": "复制链接",
+  "CountOfTotalCount": "{count} of {totalCount}",
   "cover.bar.balance": "今日结余",
   "cover.bar.monthlyBudget": "月度预估预算",
   "cover.bar.yearlyBudget": "年度预算",

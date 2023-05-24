@@ -780,6 +780,7 @@
   "conversations.subtitle": "Почнімо обговорення! Це простір спільноти для спілкування, питань, подяки та спільних справ.",
   "Conversations.ViewAll": "Переглянути всі розмови",
   "CopyLink": "Копіювати посилання",
+  "CountOfTotalCount": "{count} of {totalCount}",
   "cover.bar.balance": "Баланс на сьогодні",
   "cover.bar.monthlyBudget": "Приблизний місячний бюджет",
   "cover.bar.yearlyBudget": "Приблизний річний бюджет",

@@ -780,6 +780,7 @@
   "conversations.subtitle": "Rozbehnite diskusiu! Toto je priestor pre komunitu, aby ste sa mohli rozprávať, klásť otázky, vyjadriť vďaku a spoločne niečo urobiť.",
   "Conversations.ViewAll": "Zobraziť všetky Konverzácie",
   "CopyLink": "Kopírovať odkaz",
+  "CountOfTotalCount": "{count} of {totalCount}",
   "cover.bar.balance": "Dnešný Zostatok",
   "cover.bar.monthlyBudget": "Odhadovaný Mesačný Rozpočet",
   "cover.bar.yearlyBudget": "Odhadovaný Ročný Rozpočet",

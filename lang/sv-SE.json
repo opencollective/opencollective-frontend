@@ -780,6 +780,7 @@
   "conversations.subtitle": "Låt oss få igång diskussionen! Detta är ett utrymme för medlemmar att chatta, ställa frågor, säga tack, och få saker gjorda tillsammans.",
   "Conversations.ViewAll": "Visa forumet",
   "CopyLink": "Kopiera länk",
+  "CountOfTotalCount": "{count} of {totalCount}",
   "cover.bar.balance": "Dagens saldo",
   "cover.bar.monthlyBudget": "Uppskattad månadsbudget",
   "cover.bar.yearlyBudget": "Uppskattad årsbudget",

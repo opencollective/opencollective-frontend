@@ -7,10 +7,9 @@ import { ArrowTopRightOnSquare } from '@styled-icons/heroicons-outline/ArrowTopR
 import { XMark } from '@styled-icons/heroicons-outline/XMark';
 import { themeGet } from '@styled-system/theme-get';
 import FocusTrap from 'focus-trap-react';
-import { endsWith } from 'lodash';
 import dynamic from 'next/dynamic';
 import { createPortal } from 'react-dom';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
 
 import useKeyBoardShortcut, { ARROW_LEFT_KEY, ARROW_RIGHT_KEY } from '../lib/hooks/useKeyboardKey';
@@ -20,6 +19,7 @@ import { Box, Flex } from './Grid';
 import Loading from './LoadingPlaceholder';
 import { fadeIn } from './StyledKeyframes';
 import StyledTooltip from './StyledTooltip';
+import { Span } from './Text';
 import UploadedFilePreview from './UploadedFilePreview';
 
 const PDFViewer = dynamic(() => import('./PDFViewer'), {
@@ -264,21 +264,25 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
 
           <Header>
             <Box px={2}>
-              <span>
+              <Span>
                 {parentTitle ? (
-                  <span style={{ opacity: '70%' }}>
+                  <Span letterSpacing="0" opacity="70%">
                     {parentTitle}{' '}
                     {hasMultipleFiles && (
-                      <span>
-                        {selectedIndex + 1} of {nbFiles}
-                      </span>
+                      <Span letterSpacing="0">
+                        <FormattedMessage
+                          id="CountOfTotalCount"
+                          defaultMessage="{count} of {totalCount}"
+                          values={{ count: selectedIndex + 1, totalCount: nbFiles }}
+                        />
+                      </Span>
                     )}{' '}
                     /{' '}
-                  </span>
+                  </Span>
                 ) : null}
 
-                <span>{getFileTitle(selectedItem)}</span>
-              </span>
+                <Span>{getFileTitle(selectedItem)}</Span>
+              </Span>
             </Box>
             <Flex alignItems="center" gridGap={2}>
               <StyledTooltip
