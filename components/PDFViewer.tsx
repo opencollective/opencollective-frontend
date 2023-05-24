@@ -5,6 +5,8 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import styled from 'styled-components';
 
 import Loading from './Loading';
+import { Span } from './Text';
+import { FormattedMessage } from 'react-intl';
 
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 
@@ -48,6 +50,11 @@ const PDFViewer = ({ pdfUrl, contentWrapperRef }) => {
         onLoadSuccess={({ numPages }) => {
           setNumPages(numPages);
         }}
+        error={
+          <Span color="white.full" fontSize={'16px'}>
+            <FormattedMessage defaultMessage="Failed to load PDF file." id="PDFViewer.error" />
+          </Span>
+        }
       >
         {Array.from(new Array(numPages), (el, index) => (
           <Page
