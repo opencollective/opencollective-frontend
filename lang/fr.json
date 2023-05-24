@@ -2334,6 +2334,7 @@
   "PB3Bh9": "{ hostCount, plural, one {# host} other {# hosts} } found",
   "pbQZea": "UTC",
   "pCwxIS": "Propulsé par Open Collective, une plate-forme pour collecter et dépenser de l'argent en toute transparence. Les pourboires des contributeurs nous permettent de garder Open Collective gratuit pour les Collectifs. Merci pour votre soutien !",
+  "PDFViewer.error": "Failed to load PDF file.",
   "pe+mUc": "Expense Tags",
   "PEfD6k": "{count, plural, one {collective} other {collectives}}",
   "pELiNl": "Montant attendu",

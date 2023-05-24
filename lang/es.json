@@ -2334,6 +2334,7 @@
   "PB3Bh9": "{ hostCount, plural, one {# Anfitrión} other {# Anfitriones} } encontrado(s)",
   "pbQZea": "UTC",
   "pCwxIS": "Impulsado por Open Collective, una plataforma para recaudar y gastar dinero con total transparencia. Con las propinas de colaboradores como tú se puede mantener este servicio gratuito para los Colectivos. ¡Gracias por tu apoyo!",
+  "PDFViewer.error": "Failed to load PDF file.",
   "pe+mUc": "Etiquetas de Gasto",
   "PEfD6k": "{count, plural, one {Colectivo}other {Colectivos}}",
   "pELiNl": "Monto previsto",

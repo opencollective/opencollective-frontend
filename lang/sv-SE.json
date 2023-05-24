@@ -2334,6 +2334,7 @@
   "PB3Bh9": "{ hostCount, plural, one {# host} other {# hosts} } found",
   "pbQZea": "Koordinerad universell tid, UTC",
   "pCwxIS": "Drivs av Open Collective, en plattform för att samla in och spendera pengar helt transparent. Bidrag från givare som du hjälper till att hålla denna tjänst gratis för kollektiv. Tack för ditt stöd!",
+  "PDFViewer.error": "Failed to load PDF file.",
   "pe+mUc": "Expense Tags",
   "PEfD6k": "{count, plural, one {kollektiv} other {kollektiv}}",
   "pELiNl": "Expected Amount",

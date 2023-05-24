@@ -2334,6 +2334,7 @@
   "PB3Bh9": "{ hostCount, plural, one {# host} other {# hosts} } found",
   "pbQZea": "UTC",
   "pCwxIS": "Powered by Open Collective, a platform to raise and spend money in full transparency. Tips from contributors like you help keep this service free for Collectives. Thanks for any support!",
+  "PDFViewer.error": "Failed to load PDF file.",
   "pe+mUc": "Expense Tags",
   "PEfD6k": "{count, plural, one {collective} other {collectives}}",
   "pELiNl": "Expected Amount",

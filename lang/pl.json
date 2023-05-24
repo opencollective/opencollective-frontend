@@ -2334,6 +2334,7 @@
   "PB3Bh9": "Znalezniono { hostCount, plural, one {# gospodarza} few {# gospodarzy} many {# gospodarzy} other {# gospodarzy} }",
   "pbQZea": "UTC",
   "pCwxIS": "Oparte na Open Collective, platformie do zbierania i wydawania pieniędzy z pełną przejrzystością. Wskazówki od współpracowników takich jak Ty pomagają utrzymać ten serwis za darmo dla Zbiorów. Dziękujemy za każde wsparcie!",
+  "PDFViewer.error": "Failed to load PDF file.",
   "pe+mUc": "Znaczniki wydatków",
   "PEfD6k": "{count, plural, one {zbiórka} few {zbiórki} many {zbiórek} other {zbiorki}}",
   "pELiNl": "Przewidywana kwota",

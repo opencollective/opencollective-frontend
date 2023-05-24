@@ -2334,6 +2334,7 @@
   "PB3Bh9": "{ hostCount, plural, one {# host} other {# hosts} } found",
   "pbQZea": "UTC",
   "pCwxIS": "Poháňané platformou Open Collective, ktorá umožňuje získavať a míňať peniaze úplne transparentne. Odmeny od prispievateľov, ako ste vy, pomáhajú udržať túto službu bezplatnú pre kolektívy. Budeme vďační za akúkoľvek podporu!",
+  "PDFViewer.error": "Failed to load PDF file.",
   "pe+mUc": "Expense Tags",
   "PEfD6k": "{count, plural, one {kolektív} few {kolektívy} other {kolektívy}}",
   "pELiNl": "Expected Amount",
