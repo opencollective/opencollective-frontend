@@ -225,8 +225,9 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
 
   const renderFile = ({ url, info, file }, contentWrapperRef) => {
     let content = null;
-    const isText = endsWith(url, 'csv') || endsWith(url, 'txt');
-    const isPdf = endsWith(url, 'pdf');
+    const fileExtension = url?.split('.')?.pop()?.toLowerCase();
+    const isText = ['csv', 'txt'].includes(fileExtension);
+    const isPdf = fileExtension === 'pdf';
     const alt = getFileTitle(selectedItem);
 
     if (isText) {
