@@ -2,7 +2,85 @@
  * Mocks for expenses as returned by API V2
  */
 
+import { openSourceHost } from './collectives';
 import { payoutMethodPaypal } from './payout-methods';
+
+export const listItemExpense = {
+  legacyId: 1234,
+  description: 'March invoice',
+  payoutMethod: payoutMethodPaypal,
+  privateMessage: 'Please pay the money fast',
+  currency: 'USD',
+  type: 'INVOICE',
+  createdAt: '2020-04-22T06:00:00Z',
+  tags: ['communications', 'food', 'team', 'potatoes', 'music', 'more', 'tags', 'and', 'stuff'],
+  items: [
+    {
+      id: '7934a6bb-1f54-4b69-891b-2cca14cbe8fa',
+      incurredAt: '2020-02-14',
+      description: 'Hosting for the website',
+      amount: 5600,
+    },
+  ],
+  attachedFiles: [
+    {
+      url: 'url',
+    },
+    {
+      url: 'url2',
+    },
+  ],
+  securityChecks: [
+    {
+      details: 'security details',
+      level: 'HIGH',
+      message: 'security message',
+      scope: 'COLLECTIVE',
+    },
+  ],
+  amount: 5600,
+  account: {
+    ...openSourceHost,
+    stats: {
+      balanceWithBlockedFunds: {
+        valueInCents: 10000000,
+      },
+    },
+  },
+  payee: {
+    id: 'v6r0gonw-x8kv75ml-74j9z3yq-emla4pdy',
+    slug: 'betree',
+    imageUrl: 'https://images-staging.opencollective.com/betree/a65d6a6/avatar.png',
+    type: 'INDIVIDUAL',
+    name: 'Benjamin Piouffle',
+    location: {
+      address: '1749 Wheeler Blv, New York, New York 31636 United States',
+      country: 'FR',
+    },
+  },
+  createdByAccount: {
+    id: 'v6r0gonw-x8kv75ml-74j9z3yq-emla4pdy',
+    slug: 'betree',
+    imageUrl: 'https://images-staging.opencollective.com/betree/a65d6a6/avatar.png',
+    type: 'INDIVIDUAL',
+    name: 'Benjamin Piouffle',
+  },
+  status: 'APPROVED',
+  permissions: {
+    approve: {
+      allowed: false,
+      reason: null,
+      reasonDetails: null,
+    },
+    canHold: true,
+    canMarkAsIncomplete: true,
+    canPay: true,
+    canRelease: true,
+    canSeeInvoiceInfo: true,
+    canUsePrivateNote: true,
+    canVerifyDraftExpense: true,
+  },
+};
 
 export const expenseInvoice = {
   description: 'March invoice',

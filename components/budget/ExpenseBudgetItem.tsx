@@ -31,6 +31,7 @@ import ProcessExpenseButtons, {
 } from '../expenses/ProcessExpenseButtons';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
+import { I18nBold } from '../I18nFormatters';
 import CommentIcon from '../icons/CommentIcon';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
@@ -44,12 +45,12 @@ import TransactionSign from '../TransactionSign';
 
 const DetailColumnHeader = styled.div`
   font-style: normal;
-  font-weight: bold;
-  font-size: 9px;
-  line-height: 14px;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: #c4c7cc;
+  color: #4d4f51;
   margin-bottom: 2px;
 `;
 
@@ -223,38 +224,22 @@ const ExpenseBudgetItem = ({
                     }}
                   />
                 )}
-                {' • '}
-                <DateTime value={expense.createdAt} dateStyle={undefined} timeStyle={undefined} />
-                {isAdminView && (
+                {isAdminView && Boolean(expense?.comments?.totalCount) && (
                   <React.Fragment>
                     {' • '}
-                    <FormattedMessage
-                      id="BalanceAmount"
-                      defaultMessage="Balance {balance}"
-                      values={{
-                        balance: (
-                          <FormattedMoneyAmount
-                            amount={get(
-                              expense.account,
-                              'stats.balanceWithBlockedFunds.valueInCents',
-                              get(expense.account, 'stats.balanceWithBlockedFunds', 0) as number,
-                            )}
-                            currency={expense.account.currency}
-                            amountStyles={{ color: 'black.700' }}
-                          />
-                        ),
-                      }}
-                    />
-                    {Boolean(expense?.comments?.totalCount) && (
-                      <React.Fragment>
-                        {' • '}
-                        {expense?.comments.totalCount}
-                        &nbsp;
-                        <CommentIcon size={14} color="#4D4F51" />
-                      </React.Fragment>
-                    )}
+                    {expense?.comments.totalCount}
+                    &nbsp;
+                    <CommentIcon size={14} color="#4D4F51" />
                   </React.Fragment>
                 )}
+              </P>
+              <P mt="5px" fontSize="12px" color="black.700">
+                <FormattedMessage
+                  defaultMessage="On {shortDate}"
+                  values={{
+                    shortDate: <DateTime value={expense.createdAt} dateStyle={undefined} timeStyle={undefined} />,
+                  }}
+                />
               </P>
             </Box>
           )}
@@ -286,6 +271,28 @@ const ExpenseBudgetItem = ({
               </React.Fragment>
             )}
           </Flex>
+          {isAdminView && (
+            <Box color="black.700" fontSize="12px" mb={2}>
+              <FormattedMessage
+                id="CollectiveBalanceAmount"
+                defaultMessage="Collective Balance <strong>{balance}</strong>"
+                values={{
+                  strong: I18nBold,
+                  balance: (
+                    <FormattedMoneyAmount
+                      amount={get(
+                        expense.account,
+                        'stats.balanceWithBlockedFunds.valueInCents',
+                        get(expense.account, 'stats.balanceWithBlockedFunds', 0) as number,
+                      )}
+                      currency={expense.account.currency}
+                      amountStyles={{ color: 'black.700' }}
+                    />
+                  ),
+                }}
+              />
+            </Box>
+          )}
           {isLoading ? (
             <LoadingPlaceholder height={20} width={140} />
           ) : (
