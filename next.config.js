@@ -66,6 +66,7 @@ const nextConfig = {
 
     // Copy pdfjs worker to public folder (used by PDFViewer component)
     // (Workaround for working with react-pdf and CommonJS - if moving to ESM this can be removed)
+    // TODO(ESM): Move this to standard ESM
     config.plugins.push(
       new CopyPlugin({
         patterns: [
