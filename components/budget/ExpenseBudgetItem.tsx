@@ -9,6 +9,7 @@ import { space } from 'styled-system';
 
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
+import { Amount, Expense, ExpenseStatus, Host } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
@@ -69,6 +70,7 @@ const ButtonsContainer = styled.div.attrs({ 'data-cy': 'expense-actions' })`
   }
 `;
 
+type ExpenseContainerProps = { useDrawer?: boolean; selected?: boolean };
 const ExpenseContainer = styled.div`
   outline: none;
   display: block;
@@ -79,9 +81,9 @@ const ExpenseContainer = styled.div`
 
   transition: background 0.1s;
 
-  ${props =>
+  ${(props: ExpenseContainerProps) =>
     props.useDrawer &&
-    css`
+    css<ExpenseContainerProps>`
       ${props => props.selected && `background: #f8fafc;`}
     `}
 
@@ -114,7 +116,7 @@ const ExpenseBudgetItem = ({
   onProcess,
   selected,
   expandExpense,
-}) => {
+}: ExpenseBudgetItemProps) => {
   const [hasFilesPreview, showFilesPreview] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
   const useDrawer = LoggedInUser?.hasEarlyAccess('expense-drawer');
@@ -125,7 +127,7 @@ const ExpenseBudgetItem = ({
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const pendingReceipt = isCharge && expense?.items?.every(i => i.url === null);
   const nbAttachedFiles = !isAdminView ? 0 : getNbAttachedFiles(expense);
-  const isExpensePaidOrRejected = [expenseStatus.REJECTED, expenseStatus.PAID].includes(expense?.status);
+  const isExpensePaidOrRejected = [ExpenseStatus.REJECTED, ExpenseStatus.PAID].includes(expense?.status);
   const shouldDisplayStatusTagActions =
     (isExpensePaidOrRejected || expense?.status === expenseStatus.APPROVED) &&
     (hasProcessButtons(expense.permissions) || expense.permissions.canMarkAsIncomplete);
@@ -222,7 +224,7 @@ const ExpenseBudgetItem = ({
                   />
                 )}
                 {' • '}
-                <DateTime value={expense.createdAt} />
+                <DateTime value={expense.createdAt} dateStyle={undefined} timeStyle={undefined} />
                 {isAdminView && (
                   <React.Fragment>
                     {' • '}
@@ -235,7 +237,7 @@ const ExpenseBudgetItem = ({
                             amount={get(
                               expense.account,
                               'stats.balanceWithBlockedFunds.valueInCents',
-                              get(expense.account, 'stats.balanceWithBlockedFunds', 0),
+                              get(expense.account, 'stats.balanceWithBlockedFunds', 0) as number,
                             )}
                             currency={expense.account.currency}
                             amountStyles={{ color: 'black.700' }}
@@ -278,7 +280,7 @@ const ExpenseBudgetItem = ({
                 </div>
                 {isMultiCurrency && (
                   <Container color="black.600" fontSize="13px" my={1}>
-                    <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency} />
+                    <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency as any} />
                   </Container>
                 )}
               </React.Fragment>
@@ -400,6 +402,22 @@ const ExpenseBudgetItem = ({
       )}
     </ExpenseContainer>
   );
+};
+
+type ExpenseBudgetItemProps = {
+  isLoading?: boolean;
+  /** Set this to true to invert who's displayed (payee or collective) */
+  isInverted?: boolean;
+  showAmountSign?: boolean;
+  onDelete?: () => void;
+  onProcess?: () => void;
+  showProcessActions?: boolean;
+  view?: 'public' | 'admin' | 'submitter';
+  host: Host;
+  suggestedTags: string[];
+  expense: Expense & { amountInAccountCurrency: Amount };
+  selected: boolean;
+  expandExpense?: () => void;
 };
 
 ExpenseBudgetItem.propTypes = {

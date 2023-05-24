@@ -40,6 +40,7 @@ export type StyledButtonProps = BackgroundProps &
     loading?: boolean;
     asLink?: boolean;
     isBorderless?: boolean;
+    cursor?: string;
     type?: 'button' | 'submit' | 'reset';
   };
 
