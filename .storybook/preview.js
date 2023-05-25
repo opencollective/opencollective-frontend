@@ -12,7 +12,6 @@ import { withDesign } from 'storybook-addon-designs';
 import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
-import { WithNextRouter } from 'storybook-addon-next-router/dist/decorators';
 import ToastProvider from '../components/ToastProvider';
 
 Object.defineProperty(nextImage, 'default', {
@@ -42,5 +41,4 @@ export const decorators = [
     </ApolloProvider>
   ),
   withDesign,
-  WithNextRouter,
 ];

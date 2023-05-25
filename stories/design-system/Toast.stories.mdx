@@ -10,19 +10,21 @@ import theme from '../../lib/theme';
   argTypes={{
     variant: { options: ['light', 'dark'], defaultValue: 'dark', control: { type: 'radio' } },
     timeLeft: { defaultValue: 10000, control: { type: 'range', min: 0, max: 60000, step: 1000 } },
+  }}
+  args={{
+    variant: 'dark',
+    timeLeft: 10000,
     toast: {
-      defaultValue: {
-        id: 'Test',
-        type: 'ERROR',
-        title: 'A toast title',
-        createdAt: Date.now(),
-        message: (
-          <p style={{ margin: 0 }}>
-            A toast message that can have <a href="https://opencollective.com">links</a> or <i>text formatting</i> --
-            it's pretty flexible!
-          </p>
-        ),
-      },
+      id: 'Test',
+      type: 'ERROR',
+      title: 'A toast title',
+      createdAt: Date.now(),
+      message: (
+        <p style={{ margin: 0 }}>
+          A toast message that can have <a href="https://opencollective.com">links</a> or <i>text formatting</i> -- it's
+          pretty flexible!
+        </p>
+      ),
     },
   }}
 />
