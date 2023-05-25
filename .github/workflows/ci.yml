@@ -148,6 +148,7 @@ jobs:
       - run: npm run type:check
 
   e2e:
+    if: github.ref_name != 'i18n/crowdin'
     needs: build
     uses: ./.github/workflows/e2e.yml
     secrets: inherit
