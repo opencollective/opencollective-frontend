@@ -29,7 +29,7 @@ import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
-import { H1, P } from '../Text';
+import { H1 } from '../Text';
 
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
@@ -91,8 +91,11 @@ const hostDashboardExpensesQuery = gql`
   ${hostInfoCardFields}
 `;
 
+/**
+ * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
+ */
 const onExpenseUpdate = (updatedExpense, cache, filteredStatus) => {
-  if (updatedExpense.status !== filteredStatus) {
+  if (filteredStatus && filteredStatus !== 'ALL' && updatedExpense.status !== filteredStatus) {
     cache.modify({
       fields: {
         expenses(existingExpenses, { readField }) {
@@ -114,7 +117,7 @@ const onExpenseUpdate = (updatedExpense, cache, filteredStatus) => {
 const NB_EXPENSES_DISPLAYED = 10;
 
 const isValidStatus = status => {
-  return Boolean(status === 'READY_TO_PAY' || EXPENSE_STATUS[status]);
+  return [...Object.values(EXPENSE_STATUS), 'READY_TO_PAY', 'ON_HOLD'].includes(status);
 };
 
 const getVariablesFromQuery = query => {
@@ -124,7 +127,7 @@ const getVariablesFromQuery = query => {
   return {
     offset: parseInt(query.offset) || 0,
     limit: (parseInt(query.limit) || NB_EXPENSES_DISPLAYED) * 2,
-    status: isValidStatus(query.status) ? query.status : null,
+    status: query.status === 'ALL' ? null : isValidStatus(query.status) ? query.status : 'READY_TO_PAY',
     type: query.type,
     tags: query.tag ? [query.tag] : undefined,
     minAmount: amountRange[0] && amountRange[0] * 100,
@@ -137,6 +140,13 @@ const getVariablesFromQuery = query => {
   };
 };
 
+const enforceDefaultParamsOnQuery = query => {
+  return {
+    ...query,
+    status: query.status || 'READY_TO_PAY',
+  };
+};
+
 const ROUTE_PARAMS = ['hostCollectiveSlug', 'view', 'slug', 'section'];
 
 const hasParams = query => {
@@ -145,16 +155,14 @@ const hasParams = query => {
   });
 };
 
-const HostDashboardExpenses = ({ hostSlug }) => {
+const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   const router = useRouter() || {};
-  const query = router.query;
+  const query = enforceDefaultParamsOnQuery(router.query);
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const hasFilters = React.useMemo(() => hasParams(query), [query]);
-  const pageRoute = `/${hostSlug}/admin/expenses`;
-  const expenses = useQuery(hostDashboardExpensesQuery, {
-    variables: { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) },
-    context: API_V2_CONTEXT,
-  });
+  const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-expenses` : `/${hostSlug}/admin/expenses`;
+  const queryVariables = { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) };
+  const expenses = useQuery(hostDashboardExpensesQuery, { variables: queryVariables, context: API_V2_CONTEXT });
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
   React.useEffect(() => {
     if (query.paypalApprovalError && !paypalPreApprovalError) {
@@ -164,45 +172,12 @@ const HostDashboardExpenses = ({ hostSlug }) => {
   }, [query.paypalApprovalError]);
 
   const { data, error, loading } = expenses;
-  const { hasDisputedOrders, hasInReviewOrders } = data?.host || {};
   const getQueryParams = newParams => {
-    return omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+    return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
   };
 
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
-      {!loading && (hasDisputedOrders || hasInReviewOrders) && (
-        <MessageBox type="warning" withIcon mb={3}>
-          <Flex
-            flexDirection={hasDisputedOrders && hasInReviewOrders ? 'column' : 'row'}
-            gridGap={'8px'}
-            flexWrap={'wrap'}
-          >
-            <P fontWeight={700}>
-              <FormattedMessage id="host.fraudProtectionWarning" defaultMessage="Fraud Protection Warning" />
-            </P>
-            {hasDisputedOrders && (
-              <P>
-                <FormattedMessage
-                  id="host.disputes.warning"
-                  defaultMessage="There are disputed charges that need review."
-                />{' '}
-                <Link href={`/${hostSlug}/admin/orders?status=DISPUTED`}>Disputed Orders</Link>{' '}
-              </P>
-            )}
-            {hasInReviewOrders && (
-              <P>
-                <FormattedMessage
-                  id="host.in_review.warning"
-                  defaultMessage="There are charges under review that need attention."
-                />{' '}
-                <Link href={`/${hostSlug}/admin/orders?status=IN_REVIEW`}>In Review Orders</Link>{' '}
-              </P>
-            )}
-          </Flex>
-        </MessageBox>
-      )}
-
       <Flex mb={24} alignItems="center" flexWrap="wrap">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
@@ -255,37 +230,37 @@ const HostDashboardExpenses = ({ hostSlug }) => {
           <HostInfoCard host={data.host} />
         )}
       </Box>
-      {!expenses.loading && data?.host && (
-        <ScheduledExpensesBanner
-          host={data.host}
-          expenses={paginatedExpenses.nodes}
-          onSubmit={() => {
-            expenses.refetch();
-          }}
-          secondButton={
-            !(query.status === 'SCHEDULED_FOR_PAYMENT' && query.payout === 'BANK_ACCOUNT') ? (
-              <StyledButton
-                buttonSize="tiny"
-                buttonStyle="successSecondary"
-                mr={1}
-                onClick={() => {
-                  router.push({
-                    pathname: pageRoute,
-                    query: getQueryParams({ status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', offset: null }),
-                  });
-                }}
-              >
-                <FormattedMessage id="expenses.list" defaultMessage="List Expenses" />
-              </StyledButton>
-            ) : null
-          }
-        />
-      )}
+      <ScheduledExpensesBanner
+        hostSlug={hostSlug}
+        expenses={paginatedExpenses.nodes}
+        onSubmit={() => {
+          expenses.refetch();
+        }}
+        secondButton={
+          !(query.status === 'SCHEDULED_FOR_PAYMENT' && query.payout === 'BANK_ACCOUNT') ? (
+            <StyledButton
+              buttonSize="tiny"
+              buttonStyle="successSecondary"
+              mr={1}
+              onClick={() => {
+                router.push({
+                  pathname: pageRoute,
+                  query: getQueryParams({ status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', offset: null }),
+                });
+              }}
+            >
+              <FormattedMessage id="expenses.list" defaultMessage="List Expenses" />
+            </StyledButton>
+          ) : null
+        }
+      />
       <Box mb={34}>
         {data?.host ? (
           <ExpensesFilters
             collective={data.host}
             filters={query}
+            explicitAllForStatus
+            displayOnHoldPseudoStatus
             onChange={queryParams =>
               router.push({
                 pathname: pageRoute,
@@ -346,7 +321,7 @@ const HostDashboardExpenses = ({ hostSlug }) => {
 
 HostDashboardExpenses.propTypes = {
   hostSlug: PropTypes.string.isRequired,
-  isNewAdmin: PropTypes.bool,
+  isDashboard: PropTypes.bool,
 };
 
 export default HostDashboardExpenses;

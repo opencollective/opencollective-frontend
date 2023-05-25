@@ -4,6 +4,7 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { FastField, Field } from 'formik';
 import { first, get, groupBy, isEmpty, omit, pick } from 'lodash';
+import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { compareNames } from '../../lib/collective.lib';
@@ -222,6 +223,7 @@ const ExpenseFormPayeeStep = ({
   resetDefaultStep,
   formPersister,
   getDefaultExpense,
+  drawerActionsContainer,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -303,6 +305,90 @@ const ExpenseFormPayeeStep = ({
           }}
         />
       );
+
+  const actionButtons = (
+    <Flex flex={1} gridGap={[2, 3]} flexWrap="wrap">
+      {onCancel && (
+        <StyledButton
+          type="button"
+          width={['100%', 'auto']}
+          whiteSpace="nowrap"
+          data-cy="expense-cancel"
+          onClick={() => {
+            onCancel?.();
+          }}
+        >
+          <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+        </StyledButton>
+      )}
+      <StyledButton
+        type="button"
+        width={['100%', 'auto']}
+        whiteSpace="nowrap"
+        data-cy="expense-next"
+        buttonStyle="primary"
+        disabled={!stepOneCompleted}
+        onClick={async () => {
+          const allErrors = await formik.validateForm();
+          // Get the relevant errors for the payee step, ignores data.currency in the because it is related to expense amount.
+          const errors = omit(pick(allErrors, ['payee', 'payoutMethod', 'payeeLocation']), [
+            'payoutMethod.data.currency',
+          ]);
+          if (isEmpty(flattenObjectDeep(errors))) {
+            onNext?.();
+          } else {
+            // We use set touched here to display errors on fields that are not dirty.
+            // eslint-disable-next-line no-console
+            console.log('ExpenseFormPayeeStep > Validation failed', errors);
+            formik.setTouched(errors);
+            formik.setErrors(errors);
+          }
+        }}
+      >
+        <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
+        &nbsp;→
+      </StyledButton>
+      {showResetModal ? (
+        <ConfirmationModal
+          onClose={() => setShowResetModal(false)}
+          header={editingExpense ? formatMessage(msg.cancelEditExpense) : formatMessage(msg.clearExpenseForm)}
+          body={
+            editingExpense ? formatMessage(msg.confirmCancelEditExpense) : formatMessage(msg.confirmClearExpenseForm)
+          }
+          continueHandler={() => {
+            if (editingExpense) {
+              onCancel();
+            } else {
+              resetDefaultStep();
+              formik.resetForm({ values: getDefaultExpense(collective) });
+              if (formPersister) {
+                formPersister.clearValues();
+                window.scrollTo(0, 0);
+              }
+            }
+            setShowResetModal(false);
+          }}
+          {...(editingExpense && {
+            continueLabel: formatMessage({ defaultMessage: 'Yes, cancel editing' }),
+            cancelLabel: formatMessage({ defaultMessage: 'No, continue editing' }),
+          })}
+        />
+      ) : (
+        <StyledButton
+          type="button"
+          buttonStyle="borderless"
+          width={['100%', 'auto']}
+          color="red.500"
+          whiteSpace="nowrap"
+          onClick={() => setShowResetModal(true)}
+          marginLeft={'auto'}
+        >
+          <Undo size={11} />
+          <Span mx={1}>{formatMessage(editingExpense ? msg.cancelEditExpense : msg.clearExpenseForm)}</Span>
+        </StyledButton>
+      )}
+    </Flex>
+  );
 
   return (
     <Fragment>
@@ -454,106 +540,16 @@ const ExpenseFormPayeeStep = ({
 
       {isMissing2FA && <TwoFactorAuthRequiredMessage mt={4} />}
 
-      {values.payee && !isMissing2FA && (
-        <Fragment>
-          <StyledHr flex="1" mt={4} borderColor="black.300" />
-          <Flex mt={3} flexWrap="wrap">
-            {onCancel && (
-              <StyledButton
-                type="button"
-                width={['100%', 'auto']}
-                mx={[2, 0]}
-                mr={[null, 3]}
-                mt={2}
-                whiteSpace="nowrap"
-                data-cy="expense-cancel"
-                onClick={() => {
-                  onCancel?.();
-                }}
-              >
-                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </StyledButton>
-            )}
-            <StyledButton
-              type="button"
-              width={['100%', 'auto']}
-              mx={[2, 0]}
-              mr={[null, 3]}
-              mt={2}
-              whiteSpace="nowrap"
-              data-cy="expense-next"
-              buttonStyle="primary"
-              disabled={!stepOneCompleted}
-              onClick={async () => {
-                const allErrors = await formik.validateForm();
-                // Get the relevant errors for the payee step, ignores data.currency in the because it is related to expense amount.
-                const errors = omit(pick(allErrors, ['payee', 'payoutMethod', 'payeeLocation']), [
-                  'payoutMethod.data.currency',
-                ]);
-                if (isEmpty(flattenObjectDeep(errors))) {
-                  onNext?.();
-                } else {
-                  // We use set touched here to display errors on fields that are not dirty.
-                  // eslint-disable-next-line no-console
-                  console.log('ExpenseFormPayeeStep > Validation failed', errors);
-                  formik.setTouched(errors);
-                  formik.setErrors(errors);
-                }
-              }}
-            >
-              <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
-              &nbsp;→
-            </StyledButton>
-            <StyledHr flex="1" borderColor="white.full" mx={2} />
-            {showResetModal ? (
-              <ConfirmationModal
-                onClose={() => setShowResetModal(false)}
-                header={editingExpense ? formatMessage(msg.cancelEditExpense) : formatMessage(msg.clearExpenseForm)}
-                body={
-                  editingExpense
-                    ? formatMessage(msg.confirmCancelEditExpense)
-                    : formatMessage(msg.confirmClearExpenseForm)
-                }
-                continueHandler={() => {
-                  if (editingExpense) {
-                    onCancel();
-                  } else {
-                    resetDefaultStep();
-                    formik.resetForm({ values: getDefaultExpense(collective) });
-                    if (formPersister) {
-                      formPersister.clearValues();
-                      window.scrollTo(0, 0);
-                    }
-                  }
-                  setShowResetModal(false);
-                }}
-                {...(editingExpense && {
-                  continueLabel: formatMessage({ defaultMessage: 'Yes, cancel editing' }),
-                  cancelLabel: formatMessage({ defaultMessage: 'No, continue editing' }),
-                })}
-              />
-            ) : (
-              <Flex float="right">
-                <StyledButton
-                  type="button"
-                  buttonStyle="borderless"
-                  width={['100%', 'auto']}
-                  color="red.500"
-                  mt={1}
-                  mx={[2, 0]}
-                  mr={[null, 3]}
-                  whiteSpace="nowrap"
-                  onClick={() => setShowResetModal(true)}
-                  float="right"
-                >
-                  <Undo size={11} />
-                  <Span mx={1}>{formatMessage(editingExpense ? msg.cancelEditExpense : msg.clearExpenseForm)}</Span>
-                </StyledButton>
-              </Flex>
-            )}
-          </Flex>
-        </Fragment>
-      )}
+      {values.payee &&
+        !isMissing2FA &&
+        (drawerActionsContainer ? (
+          createPortal(actionButtons, drawerActionsContainer)
+        ) : (
+          <Fragment>
+            <StyledHr flex="1" mt={4} mb={3} borderColor="black.300" />
+            {actionButtons}
+          </Fragment>
+        ))}
     </Fragment>
   );
 };
@@ -582,6 +578,7 @@ ExpenseFormPayeeStep.propTypes = {
     }),
     settings: PropTypes.object,
   }).isRequired,
+  drawerActionsContainer: PropTypes.object,
 };
 
 export default ExpenseFormPayeeStep;

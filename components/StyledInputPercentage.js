@@ -4,7 +4,7 @@ import { clamp, round } from 'lodash';
 
 import StyledInputGroup from './StyledInputGroup';
 
-const StyledInputPercentage = ({ value, onChange, onBlur, ...props }) => {
+const StyledInputPercentage = ({ value, onChange, onBlur = null, ...props }) => {
   return (
     <StyledInputGroup
       append="%"

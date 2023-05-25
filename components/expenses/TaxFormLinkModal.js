@@ -29,10 +29,10 @@ const setTaxFormMutation = gql`
 `;
 
 const arrayOfYears = () => {
-  return range(2018, new Date().getFullYear());
+  return range(2018, new Date().getFullYear() + 1);
 };
 
-const TaxFormLinkModal = ({ account, year, onClose, expenseData }) => {
+const TaxFormLinkModal = ({ account, year, onClose, refetchExpense }) => {
   const [taxFormLink, setTaxFormLink] = React.useState(null);
   const taxYearOptions = arrayOfYears().map(year => ({ key: year, value: year, label: year }));
   const defaultTaxYearOption = taxYearOptions.filter(option => option.value === year)[0];
@@ -115,7 +115,7 @@ const TaxFormLinkModal = ({ account, year, onClose, expenseData }) => {
                     type: TOAST_TYPE.SUCCESS,
                     message: <FormattedMessage defaultMessage="Tax form submitted" />,
                   });
-                  await expenseData.refetch();
+                  await refetchExpense();
                 } else {
                   addToast({
                     type: TOAST_TYPE.ERROR,
@@ -143,8 +143,8 @@ TaxFormLinkModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   /** the year for which the tax form should be set */
   year: PropTypes.number,
-  /** expense data to refetch after submitting the tax form */
-  expenseData: PropTypes.object,
+  /** function to refetch expense data after submitting the tax form */
+  refetchExpense: PropTypes.object,
 };
 
 export default TaxFormLinkModal;

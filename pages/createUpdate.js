@@ -42,7 +42,7 @@ const BackButtonWrapper = styled(Container)`
 `;
 
 const CreateUpdateWrapper = styled(Flex)`
-  @media (max-width: 600px) {
+  @media (max-width: 830px) {
     flex-direction: column;
   }
 `;
@@ -159,7 +159,7 @@ class CreateUpdatePage extends React.Component {
                   <Container display="flex" color="#71757A" fontSize="14px" alignItems="center">
                     <ArrowBack size={18} />
                     <Box as="span" mx={2}>
-                      Back
+                      <FormattedMessage id="Back" defaultMessage="Back" />
                     </Box>
                   </Container>
                 </Link>

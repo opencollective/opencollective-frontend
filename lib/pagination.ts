@@ -1,4 +1,4 @@
-import { range as lodashRange } from 'lodash';
+import lodashRange from 'lodash/range';
 
 export type PaginationElement = number | 'right_elipsis' | 'left_elipsis';
 

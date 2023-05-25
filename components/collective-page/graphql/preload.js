@@ -33,7 +33,7 @@ export const preloadCollectivePageGraphqlQueries = async (slug, client) => {
       queries.push(
         client.query({
           query: getBudgetSectionQuery(Boolean(collective.host), isIndividual),
-          variables: getBudgetSectionQueryVariables(slug, collective.host?.slug, isIndividual),
+          variables: getBudgetSectionQueryVariables(slug, isIndividual),
           context: API_V2_CONTEXT,
         }),
       );

@@ -6,6 +6,8 @@ import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { Edit as IconEdit } from '@styled-icons/feather/Edit';
 import { Flag as FlagIcon } from '@styled-icons/feather/Flag';
 import { Link as IconLink } from '@styled-icons/feather/Link';
+import { Pause as PauseIcon } from '@styled-icons/feather/Pause';
+import { Play as PlayIcon } from '@styled-icons/feather/Play';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -13,6 +15,7 @@ import styled from 'styled-components';
 import { margin } from 'styled-system';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
+import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import useClipboard from '../../lib/hooks/useClipboard';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -20,9 +23,9 @@ import { Flex } from '../Grid';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
 
+import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
-import MarkExpenseAsIncompleteModal from './MarkExpenseAsIncompleteModal';
 
 const Action = styled.button`
   ${margin}
@@ -72,12 +75,16 @@ const ExpenseMoreActionsButton = ({
   onDelete,
   ...props
 }) => {
-  const [showMarkAsIncompleteModal, setMarkAsIncompleteModal] = React.useState(false);
+  const [processModal, setProcessModal] = React.useState(false);
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
 
   const router = useRouter();
   const permissions = expense?.permissions;
+
+  const processExpense = useProcessExpense({
+    expense,
+  });
 
   const showDeleteConfirmMoreActions = isOpen => {
     setDeleteConfirm(isOpen);
@@ -105,10 +112,24 @@ const ExpenseMoreActionsButton = ({
       >
         {({ setOpen }) => (
           <Flex flexDirection="column">
+            {permissions?.canApprove && props.isViewingExpenseInHostContext && (
+              <Action
+                loading={processExpense.loading && processExpense.currentAction === 'APPROVE'}
+                disabled={processExpense.loading || isDisabled}
+                onClick={async () => {
+                  setOpen(false);
+                  await processExpense.approve();
+                }}
+              >
+                <Check size={12} />
+                <FormattedMessage id="actions.approve" defaultMessage="Approve" />
+              </Action>
+            )}
             {permissions?.canMarkAsIncomplete && (
               <Action
+                disabled={processExpense.loading || isDisabled}
                 onClick={() => {
-                  setMarkAsIncompleteModal(true);
+                  setProcessModal('MARK_AS_INCOMPLETE');
                   setOpen(false);
                 }}
               >
@@ -116,18 +137,42 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.markAsIncomplete" defaultMessage="Mark as Incomplete" />
               </Action>
             )}
+            {permissions?.canHold && (
+              <Action
+                disabled={processExpense.loading || isDisabled}
+                onClick={() => {
+                  setProcessModal('HOLD');
+                  setOpen(false);
+                }}
+              >
+                <PauseIcon size={14} />
+                <FormattedMessage id="actions.hold" defaultMessage="Put On Hold" />
+              </Action>
+            )}
+            {permissions?.canRelease && (
+              <Action
+                disabled={processExpense.loading || isDisabled}
+                onClick={() => {
+                  setProcessModal('RELEASE');
+                  setOpen(false);
+                }}
+              >
+                <PlayIcon size={14} />
+                <FormattedMessage id="actions.release" defaultMessage="Release Hold" />
+              </Action>
+            )}
             {permissions?.canDelete && (
               <Action
                 data-cy="more-actions-delete-expense-btn"
                 onClick={() => showDeleteConfirmMoreActions(true)}
-                disabled={isDisabled}
+                disabled={processExpense.loading || isDisabled}
               >
                 <IconTrash size="16px" />
                 <FormattedMessage id="actions.delete" defaultMessage="Delete" />
               </Action>
             )}
             {permissions?.canEdit && (
-              <Action data-cy="edit-expense-btn" onClick={onEdit} disabled={isDisabled}>
+              <Action data-cy="edit-expense-btn" onClick={onEdit} disabled={processExpense.loading || isDisabled}>
                 <IconEdit size="16px" />
                 <FormattedMessage id="Edit" defaultMessage="Edit" />
               </Action>
@@ -135,7 +180,7 @@ const ExpenseMoreActionsButton = ({
             {permissions?.canSeeInvoiceInfo && expense?.type === expenseTypes.INVOICE && (
               <ExpenseInvoiceDownloadHelper expense={expense} collective={collective} onError={onError}>
                 {({ isLoading, downloadInvoice }) => (
-                  <Action loading={isLoading} onClick={downloadInvoice} disabled={isDisabled}>
+                  <Action loading={isLoading} onClick={downloadInvoice} disabled={processExpense.loading || isDisabled}>
                     <IconDownload size="16px" />
                     {isLoading ? (
                       <FormattedMessage id="loading" defaultMessage="loading" />
@@ -152,7 +197,7 @@ const ExpenseMoreActionsButton = ({
                   ? router.push(`${getCollectivePageRoute(collective)}/expenses/${expense.legacyId}`)
                   : copy(window.location.href)
               }
-              disabled={isDisabled}
+              disabled={processExpense.loading || isDisabled}
             >
               {isCopied ? <Check size="16px" /> : <IconLink size="16px" />}
               {isCopied ? (
@@ -164,8 +209,8 @@ const ExpenseMoreActionsButton = ({
           </Flex>
         )}
       </PopupMenu>
-      {showMarkAsIncompleteModal && (
-        <MarkExpenseAsIncompleteModal expense={expense} onClose={() => setMarkAsIncompleteModal(false)} />
+      {processModal && (
+        <ConfirmProcessExpenseModal type={processModal} expense={expense} onClose={() => setProcessModal(false)} />
       )}
       {hasDeleteConfirm && (
         <ExpenseConfirmDeletion
@@ -203,10 +248,12 @@ ExpenseMoreActionsButton.propTypes = {
   onModalToggle: PropTypes.func,
   onEdit: PropTypes.func,
   linkAction: PropTypes.oneOf(['link', 'copy']),
+  isViewingExpenseInHostContext: PropTypes.bool,
 };
 
 ExpenseMoreActionsButton.defaultProps = {
   linkAction: 'copy',
+  isViewingExpenseInHostContext: false,
 };
 
 export default ExpenseMoreActionsButton;

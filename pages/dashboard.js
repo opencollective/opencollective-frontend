@@ -15,7 +15,7 @@ import AdminPanelSection from '../components/dashboard/DashboardSection';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
 import AdminPanelTopBar from '../components/dashboard/TopBar';
-import { Box, Flex, Grid } from '../components/Grid';
+import { Box, Flex } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
@@ -142,13 +142,11 @@ const DashboardPage = () => {
             {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
           </Flex>
         ) : (
-          <Grid
-            gridTemplateColumns={['1fr', null, 'repeat(4, minmax(0, 1fr))']}
-            maxWidth={1280}
+          <Flex
+            flexDirection={['column', 'column', 'row']}
+            justifyContent={'space-between'}
             minHeight={600}
             gridGap={16}
-            m="0 auto"
-            pr={3}
             data-cy="admin-panel-container"
           >
             <AdminPanelSideBar
@@ -161,7 +159,7 @@ const DashboardPage = () => {
             {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
             ) : (
-              <Box gridColumn={'span 3 / span 3'} py={'32px'} px={'24px'}>
+              <Box flex="0 1 1000px" py={'32px'} px={[1, '24px']}>
                 <AdminPanelSection
                   section={selectedSection}
                   isLoading={isLoading}
@@ -170,7 +168,8 @@ const DashboardPage = () => {
                 />
               </Box>
             )}
-          </Grid>
+            <Box flex="0 100 300px" />
+          </Flex>
         )}
       </Page>
     </DashboardContext.Provider>

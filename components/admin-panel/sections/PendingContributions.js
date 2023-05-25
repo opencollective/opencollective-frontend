@@ -14,6 +14,7 @@ const FinancialContributions = ({ hostSlug }) => {
       title={<FormattedMessage id="PendingContributions" defaultMessage="Pending Contributions" />}
       showPlatformTip
       canCreatePendingOrder
+      showDisputesWarning
     />
   );
 };

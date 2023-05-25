@@ -73,7 +73,7 @@ class EmbedContributionFlowPage extends React.Component {
     const account = data?.account;
     const path = router.asPath;
     const rawPath = path.replace(new RegExp(`^/embed/${account?.slug}/`), '/');
-    addParentToURLIfMissing(router, account, rawPath, null, { prefix: '/embed' });
+    addParentToURLIfMissing(router, account, rawPath, undefined, { prefix: '/embed' });
   }
 
   componentDidUpdate(prevProps) {

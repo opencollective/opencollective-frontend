@@ -135,8 +135,6 @@ export const expenseHostFields = gql`
     }
     supportedPayoutMethods
     isTrustedHost
-    hasDisputedOrders
-    hasInReviewOrders
     plan {
       id
     }
@@ -152,6 +150,7 @@ export const expensePageExpenseFieldsFragment = gql`
     currency
     type
     status
+    onHold
     privateMessage
     tags
     amount
@@ -321,6 +320,7 @@ export const expensePageExpenseFieldsFragment = gql`
         isApproved
         host {
           id
+          legacyId
           ...ExpenseHostFields
           transferwise {
             id
@@ -390,6 +390,9 @@ export const expensePageExpenseFieldsFragment = gql`
       canComment
       canUnschedulePayment
       canVerifyDraftExpense
+      canUsePrivateNote
+      canHold
+      canRelease
       approve {
         allowed
         reason
@@ -540,6 +543,8 @@ export const expensesListFieldsFragment = gql`
       canSeeInvoiceInfo
       canEditTags
       canUnschedulePayment
+      canHold
+      canRelease
       approve {
         allowed
         reason
@@ -587,6 +592,7 @@ export const expensesListFieldsFragment = gql`
 export const expensesListAdminFieldsFragment = gql`
   fragment ExpensesListAdminFieldsFragment on Expense {
     id
+    onHold
     payoutMethod {
       id
       type

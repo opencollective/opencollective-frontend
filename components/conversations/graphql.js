@@ -7,6 +7,7 @@ export const commentFieldsFragment = gql`
     html
     reactions
     userReactions
+    type
     fromAccount {
       id
       type

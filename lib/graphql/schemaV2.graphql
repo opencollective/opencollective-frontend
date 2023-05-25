@@ -1021,6 +1021,11 @@ interface Transaction {
   permissions: TransactionPermissions
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -1175,6 +1180,11 @@ type Expense {
   The state of the expense (pending, approved, paid, rejected...etc)
   """
   status: ExpenseStatus!
+
+  """
+  Whether this expense is on hold
+  """
+  onHold: Boolean
 
   """
   Returns the list of comments for this expense, or `null` if user is not allowed to see them
@@ -2059,6 +2069,11 @@ type Comment {
   account: Account
 
   """
+  The type of this comment
+  """
+  type: CommentType!
+
+  """
   Returns a map of reactions counts for this comment
   """
   reactions: JSON
@@ -2067,6 +2082,21 @@ type Comment {
   Returns the list of reactions added to this comment by logged in user
   """
   userReactions: [String]
+}
+
+"""
+All supported comment contexts
+"""
+enum CommentType {
+  """
+  Default regular comment
+  """
+  COMMENT
+
+  """
+  Comment is visible only to host admins
+  """
+  PRIVATE_NOTE
 }
 
 """
@@ -2866,12 +2896,12 @@ type Host implements Account & AccountWithContributions {
   """
   Returns whether the host has any Stripe disputed orders
   """
-  hasDisputedOrders: Boolean!
+  hasDisputedOrders: Boolean
 
   """
   Returns whether the host has any Stripe in review orders
   """
-  hasInReviewOrders: Boolean!
+  hasInReviewOrders: Boolean
 }
 
 """
@@ -2947,7 +2977,11 @@ type ContributorCollection implements Collection {
   nodes: [Contributor]
 }
 
-"\n    A person or an entity that contributes financially or by any other mean to the mission\n    of the collective. While \"Member\" is dedicated to permissions, this type is meant\n    to surface all the public contributors.\n  "
+"""
+A person or an entity that contributes financially or by any other mean to the mission
+of the collective. While "Member" is dedicated to permissions, this type is meant
+to surface all the public contributors.
+"""
 type Contributor {
   """
   A unique identifier for this member
@@ -2962,7 +2996,7 @@ type Contributor {
   """
   All the roles for a given contributor
   """
-  roles: [ContributorRole]
+  roles: [MemberRole]
 
   """
   True if the contributor is a collective admin
@@ -3018,21 +3052,6 @@ type Contributor {
   A public message from contributors to describe their contributions
   """
   publicMessage: String
-}
-
-"""
-Possible roles for a contributor. Extends `Member.Role`.
-"""
-enum ContributorRole {
-  HOST
-  ADMIN
-  MEMBER
-  CONTRIBUTOR
-  BACKER
-  ATTENDEE
-  FOLLOWER
-  CONNECTED_COLLECTIVE
-  ACCOUNTANT
 }
 
 input AccountReferenceInput {
@@ -4354,6 +4373,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED
   COLLECTIVE_EXPENSE_UNAPPROVED
   COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
@@ -4361,6 +4381,8 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM
   COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
   COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_PUT_ON_HOLD
+  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
@@ -4928,6 +4950,9 @@ type ExpensePermissions {
   Whether the current user can verify this draft expense
   """
   canVerifyDraftExpense: Boolean!
+  canUsePrivateNote: Boolean!
+  canHold: Boolean!
+  canRelease: Boolean!
   edit: Permission!
   editTags: Permission!
   delete: Permission!
@@ -4939,8 +4964,11 @@ type ExpensePermissions {
   markAsSpam: Permission!
   markAsUnpaid: Permission!
   comment: Permission!
+  usePrivateNote: Permission!
   unschedulePayment: Permission!
   verifyDraftExpense: Permission!
+  hold: Permission!
+  release: Permission!
 }
 
 """
@@ -6515,6 +6543,11 @@ type Credit implements Transaction {
   permissions: TransactionPermissions!
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -6623,6 +6656,11 @@ type Debit implements Transaction {
   permissions: TransactionPermissions!
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -7789,7 +7827,11 @@ type Individual implements Account {
     offset: Int! = 0
   ): OAuthApplicationCollection
 
-  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see their own address\n            - Hosts can see the address of users submitting expenses to their collectives\n        "
+  """
+  Address. This field is public for hosts, otherwise:
+    - Users can see their own address
+    - Hosts can see the address of users submitting expenses to their collectives
+  """
   location: Location
   categories: [String]!
   stats: AccountStats
@@ -8482,7 +8524,11 @@ type Organization implements Account & AccountWithContributions {
     offset: Int! = 0
   ): OAuthApplicationCollection
 
-  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.\n            - Hosts can see the address of organizations submitting expenses to their collectives.\n        "
+  """
+  Address. This field is public for hosts, otherwise:
+    - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.
+    - Hosts can see the address of organizations submitting expenses to their collectives.
+  """
   location: Location
   categories: [String]!
   stats: AccountStats
@@ -8619,7 +8665,7 @@ type Organization implements Account & AccountWithContributions {
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
   """
-  If the organization if a host account, this will return the matching Host object
+  If the organization is a host account, this will return the matching Host object
   """
   host: Host
 }
@@ -9934,6 +9980,16 @@ type Query {
     """
     throwIfMissing: Boolean! = true
   ): Tier
+
+  """
+  Fetch a single transaction
+  """
+  transaction(
+    """
+    The public id identifying the transaction (ie: rvelja97-pkzqbgq7-bbzyx6wd-50o8n4rm)
+    """
+    id: String
+  ): Transaction
   transactions(
     """
     Reference of the account(s) assigned to the main side of the transaction (CREDIT -> recipient, DEBIT -> sender)
@@ -11405,6 +11461,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED
   COLLECTIVE_EXPENSE_UNAPPROVED
   COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
@@ -11412,6 +11469,8 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM
   COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
   COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_PUT_ON_HOLD
+  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
@@ -11535,6 +11594,11 @@ enum ExpenseStatusFilter {
   Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
   """
   READY_TO_PAY
+
+  """
+  Only expenses that are on hold
+  """
+  ON_HOLD
 }
 
 """
@@ -13734,7 +13798,7 @@ type Mutation {
   """
   Creates a Stripe payment intent
   """
-  createPaymentIntent(paymentIntent: PaymentIntentInput!): PaymentIntent!
+  createPaymentIntent(paymentIntent: PaymentIntentInput!, guestInfo: GuestInfoInput): PaymentIntent!
 
   """
   To submit a new order. Scope: "orders".
@@ -14249,9 +14313,45 @@ input CollectiveCreateInput {
   slug: String!
   description: String!
   tags: [String]
+  location: LocationInput
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   settings: JSON
+}
+
+"""
+Input type for Geographic location
+"""
+input LocationInput {
+  """
+  A short name for the location (eg. Open Collective Headquarters)
+  """
+  name: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
+  country: CountryISO
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
 }
 
 input IndividualCreateInput {
@@ -14468,6 +14568,11 @@ input CommentCreateInput {
   ConversationId: String @deprecated(reason: "2022-08-26: Please use \"conversation\"")
   conversation: ConversationReferenceInput
   update: UpdateReferenceInput
+
+  """
+  The type of the comment
+  """
+  type: CommentType = COMMENT
 }
 
 input ConversationReferenceInput {
@@ -14652,10 +14757,8 @@ input ExpenseItemCreateInput {
   """
   When was the money spent?
   """
-  incurredAt: DateString
+  incurredAt: DateTime
 }
-
-scalar DateString
 
 input ExpenseAttachedFileInput {
   """
@@ -14675,41 +14778,6 @@ input ExpenseAttachedFileInput {
   URL of the file
   """
   url: URL!
-}
-
-"""
-Input type for Geographic location
-"""
-input LocationInput {
-  """
-  A short name for the location (eg. Open Collective Headquarters)
-  """
-  name: String
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
-
-  """
-  Two letters country code (eg. FR, BE...etc)
-  """
-  country: CountryISO
-
-  """
-  Latitude
-  """
-  lat: Float
-
-  """
-  Longitude
-  """
-  long: Float
-
-  """
-  Structured JSON address
-  """
-  structured: JSON
 }
 
 """
@@ -14847,7 +14915,7 @@ input ExpenseItemInput {
   """
   When was the money spent?
   """
-  incurredAt: DateString
+  incurredAt: DateTime
 }
 
 input NewAccountOrReferenceInput {
@@ -14895,6 +14963,11 @@ enum ExpenseProcessAction {
   UNAPPROVE
 
   """
+  To request re-approval of the expense, marking it as pending.
+  """
+  REQUEST_RE_APPROVAL
+
+  """
   To mark the expense as rejected
   """
   REJECT
@@ -14928,6 +15001,16 @@ enum ExpenseProcessAction {
   To mark the expense as incomplete and notify the payee it requires more information
   """
   MARK_AS_INCOMPLETE
+
+  """
+  To put the expense on hold
+  """
+  HOLD
+
+  """
+  To release the expense from hold
+  """
+  RELEASE
 }
 
 """
@@ -14950,6 +15033,11 @@ input ProcessExpensePaymentParams {
   shouldRefundPaymentProcessorFee: Boolean
 
   """
+  New expense status when triggering MARK_AS_UNPAID
+  """
+  markAsUnPaidStatus: MarkAsUnPaidExpenseStatus = APPROVED
+
+  """
   Bypass automatic integrations (ie. PayPal, Transferwise) to process the expense manually
   """
   forceManual: Boolean
@@ -14958,6 +15046,12 @@ input ProcessExpensePaymentParams {
   Who is responsible for paying any due fees.
   """
   feesPayer: FeesPayer = COLLECTIVE
+}
+
+enum MarkAsUnPaidExpenseStatus {
+  APPROVED
+  INCOMPLETE
+  ERROR
 }
 
 input ExpenseInviteDraftInput {
@@ -15680,13 +15774,11 @@ input UpdateCreateInput {
   title: String!
   isPrivate: Boolean
   isChangelog: Boolean
-  makePublicOn: IsoDateString
+  makePublicOn: DateTime
   html: String!
   fromAccount: AccountReferenceInput
   account: AccountReferenceInput!
 }
-
-scalar IsoDateString
 
 """
 Input type for UpdateType

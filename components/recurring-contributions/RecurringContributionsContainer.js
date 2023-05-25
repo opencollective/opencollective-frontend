@@ -49,7 +49,8 @@ const CollectiveCardContainer = styled.div`
 `;
 
 const filterContributions = (contributions, filterName) => {
-  const isActive = ({ status }) => status === ORDER_STATUS.ACTIVE || status === ORDER_STATUS.ERROR;
+  const isActive = ({ status }) =>
+    status === ORDER_STATUS.ACTIVE || status === ORDER_STATUS.ERROR || ORDER_STATUS.PROCESSING;
   const isInactive = ({ status }) => status === ORDER_STATUS.CANCELLED || status === ORDER_STATUS.REJECTED;
   switch (filterName) {
     case FILTERS.ACTIVE:

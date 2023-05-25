@@ -244,7 +244,7 @@ const StepSummary = ({
   const { amount, quantity } = stepDetails;
   const tierType = tier?.type;
   const hostCountry = get(collective.host, 'location.country');
-  const collectiveCountry = collective.location.country || get(collective.parent, 'location.country');
+  const collectiveCountry = collective.location?.country || get(collective.parent, 'location.country');
   const currency = isCrypto ? stepDetails.currency.value : tier?.amount.currency || collective.currency;
 
   const [formState, setFormState] = useState({ isEnabled: false, error: false });
@@ -315,9 +315,7 @@ StepSummary.propTypes = {
     /** Number of items to order */
     quantity: PropTypes.number,
     /** Currency of the order (for crypto flow) */
-    currency: {
-      value: PropTypes.string,
-    },
+    currency: PropTypes.string,
   }),
   stepProfile: PropTypes.shape({
     location: PropTypes.shape({

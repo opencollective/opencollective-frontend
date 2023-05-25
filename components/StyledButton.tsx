@@ -25,7 +25,7 @@ import { ButtonSize, buttonSize, ButtonStyle, buttonStyle } from '../lib/theme/v
 
 import StyledSpinner from './StyledSpinner';
 
-type StyledButtonProps = BackgroundProps &
+export type StyledButtonProps = BackgroundProps &
   BorderProps &
   FlexboxProps &
   LayoutProps &
@@ -57,6 +57,7 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
   border-radius: 100px;
   letter-spacing: -0.4px;
   font-weight: 500;
+  min-width: max-content;
 
   &:disabled {
     cursor: not-allowed;

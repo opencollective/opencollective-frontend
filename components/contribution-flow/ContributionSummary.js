@@ -231,22 +231,62 @@ const ContributionSummary = ({
       )}
       <StyledHr borderColor="black.500" my={1} />
       {stepDetails?.interval && stepDetails?.interval !== INTERVALS.oneTime && (
-        <P color="black.700" fontSize="11px" fontStyle="italic" mt={2}>
-          <FormattedMessage
-            id="ContributionSummary.NextCharge"
-            defaultMessage="If you select PayPal, you will be charged on the same day each month. Otherwise the next charge will be on {date} and then the first day of {interval, select, month {each month} year {the same month each year} other {}}. You can cancel or edit this contribution by going to 'Manage Contributions'."
-            values={{
-              date: (
-                <FormattedDate
-                  value={getNextChargeDate(new Date(), stepDetails.interval)}
-                  day="numeric"
-                  month="long"
-                  year="numeric"
-                />
-              ),
-              interval: stepDetails.interval,
-            }}
-          />
+        <P color="black.800" fontSize="12px" mt={3}>
+          {!stepPayment || stepPayment.isKeyOnly ? (
+            <FormattedMessage
+              id="ContributionSummary.NextCharge"
+              defaultMessage="If you select PayPal, you will be charged on the same day each month. Otherwise the next charge will be on {date} and then the first day of {interval, select, month {each month} year {the same month each year} other {}}. You can cancel or edit this contribution by going to 'Manage Contributions'."
+              values={{
+                date: (
+                  <FormattedDate
+                    value={getNextChargeDate(new Date(), stepDetails.interval)}
+                    day="numeric"
+                    month="long"
+                    year="numeric"
+                  />
+                ),
+                interval: stepDetails.interval,
+              }}
+            />
+          ) : (
+            <React.Fragment>
+              <FormattedMessage
+                id="withColon"
+                defaultMessage="{item}:"
+                values={{ item: <FormattedMessage defaultMessage="Next charge date" /> }}
+              />{' '}
+              <FormattedDate
+                value={getNextChargeDate(new Date(), stepDetails.interval, stepPayment?.paymentMethod?.service)}
+                day="numeric"
+                month="long"
+                year="numeric"
+              />
+              <Box display="inline-block" ml={1} verticalAlign="text-bottom">
+                <StyledTooltip
+                  verticalAlign="top"
+                  content={
+                    <FormattedMessage
+                      id="ContributionSummary.NextCharge"
+                      defaultMessage="If you select PayPal, you will be charged on the same day each month. Otherwise the next charge will be on {date} and then the first day of {interval, select, month {each month} year {the same month each year} other {}}. You can cancel or edit this contribution by going to 'Manage Contributions'."
+                      values={{
+                        date: (
+                          <FormattedDate
+                            value={getNextChargeDate(new Date(), stepDetails.interval)}
+                            day="numeric"
+                            month="long"
+                            year="numeric"
+                          />
+                        ),
+                        interval: stepDetails.interval,
+                      }}
+                    />
+                  }
+                >
+                  <InfoCircle size="15px" color="#76777A" />
+                </StyledTooltip>
+              </Box>
+            </React.Fragment>
+          )}
         </P>
       )}
     </Container>
