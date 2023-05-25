@@ -7,17 +7,34 @@ async function downloadFileHandler(req, res) {
   const { url } = req.query;
   if (!url) {
     return res.status(400).json({ error: 'Missing url parameter' });
-  } else if (!/https:\/\/opencollective-(production|staging)\.s3[.-]us-west-1\.amazonaws\.com/.test(url)) {
-    return res.status(400).json({ error: 'Only files from Open Collecive are allowed' });
   }
+
+  const S3Url = /https:\/\/opencollective-(production|staging)\.s3[.-]us-west-1\.amazonaws\.com/;
+  const RestApiCsvTransactionsUrl = /https:\/\/rest\.opencollective\.com\/v2\/[^/]+\/transactions\.csv/;
+
+  if (!S3Url.test(url) && !RestApiCsvTransactionsUrl.test(url)) {
+    return res
+      .status(400)
+      .json({ error: 'Only files from Open Collective S3 buckets and specific REST API are allowed' });
+  }
+
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Unexpected response: ${response.statusText}`);
   }
 
-  const fileName = url.split('/').pop();
+  const contentDisposition = response.headers.get('Content-Disposition');
+  let fileName = url.split('/').pop();
+
+  if (contentDisposition) {
+    const match = contentDisposition.match(/filename="([^"]*)"/i);
+    if (match && match[1]) {
+      fileName = match[1];
+    }
+  }
+
   res.setHeader('Content-Type', response.headers.get('Content-Type'));
-  res.setHeader('Content-Disposition', `attachment; ${fileName}`);
+  res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
   await streamPipeline(response.body, res);
 }
 

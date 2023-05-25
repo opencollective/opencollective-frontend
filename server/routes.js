@@ -53,7 +53,7 @@ module.exports = (expressApp, nextApp) => {
   });
 
   // Helper to enable downloading files that are on S3 (on another origin)
-  app.get('/download-file', downloadFileHandler);
+  app.get('/api/download-file', downloadFileHandler);
 
   // NOTE: in production and staging environment, this is currently not used
   // we use Cloudflare workers to route the request directly to the API
