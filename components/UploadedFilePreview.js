@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Download } from '@styled-icons/feather/Download';
 import { FileText } from '@styled-icons/feather/FileText';
-import { endsWith, max } from 'lodash';
+import { max } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { imagePreview } from '../lib/image-utils';
+import { getFileExtensionFromUrl } from '../lib/url-helpers';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import Container from './Container';
@@ -123,7 +124,8 @@ const UploadedFilePreview = ({
   ...props
 }) => {
   let content = null;
-  const isText = endsWith(url, 'csv') || endsWith(url, 'txt');
+  const fileExtension = getFileExtensionFromUrl(url);
+  const isText = ['csv', 'txt'].includes(fileExtension);
 
   if (isLoading) {
     content = <LoadingPlaceholder borderRadius={8} />;

@@ -14,6 +14,7 @@ import styled, { createGlobalStyle, css } from 'styled-components';
 
 import useKeyBoardShortcut, { ARROW_LEFT_KEY, ARROW_RIGHT_KEY } from '../lib/hooks/useKeyboardKey';
 import { imagePreview } from '../lib/image-utils';
+import { getFileExtensionFromUrl } from '../lib/url-helpers';
 
 import { Box, Flex } from './Grid';
 import Loading from './LoadingPlaceholder';
@@ -209,7 +210,8 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
 
   const renderFile = ({ url, info, name }, contentWrapperRef) => {
     let content = null;
-    const fileExtension = url?.split('.')?.pop()?.toLowerCase();
+    const fileExtension = getFileExtensionFromUrl(url);
+
     const isText = ['csv', 'txt'].includes(fileExtension);
     const isPdf = fileExtension === 'pdf';
 
