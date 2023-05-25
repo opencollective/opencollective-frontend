@@ -12,13 +12,22 @@ async function downloadFileHandler(req, res) {
     return res.status(400).json({ error: 'Missing url parameter' });
   }
 
-  const S3Url = /https:\/\/opencollective-(production|staging)\.s3[.-]us-west-1\.amazonaws\.com/;
-  const RestApiCsvTransactionsUrl = /https:\/\/rest\.opencollective\.com\/v2\/[^/]+\/transactions\.csv/;
+  const hostname = req.get('original-hostname') || req.hostname;
+  const isProd = hostname === 'opencollective.com';
+
+  const S3Url = new RegExp(
+    `^https:\\/\\/opencollective-${isProd ? 'production' : 'staging'}\\.s3[.-]us-west-1\\.amazonaws\\.com`,
+  );
+
+  const RestApiCsvTransactionsUrl = new RegExp(
+    `^https:\\/\\/rest${isProd ? '' : '-staging'}\\.opencollective\\.com\\/v2\\/[^/]+\\/transactions\\.csv`,
+  );
 
   if (!S3Url.test(url) && !RestApiCsvTransactionsUrl.test(url)) {
-    return res
-      .status(400)
-      .json({ error: 'Only files from Open Collective S3 buckets and specific REST API are allowed' });
+    return res.status(400).json({
+      error:
+        'Only files from Open Collective S3 buckets and specific REST API are allowed - to the correct environment',
+    });
   }
 
   const response = await fetch(url);
