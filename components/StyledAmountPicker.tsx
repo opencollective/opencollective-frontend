@@ -60,6 +60,12 @@ const StyledAmountPicker = ({ presets, currency, value, onChange }: StyledAmount
     <Flex width="100%">
       {options.length > 0 && (
         <StyledButtonSet
+          id="amount"
+          data-cy="amount-picker"
+          role="group"
+          aria-label="Contribution amount"
+          width="100%"
+          justifyContent="center"
           items={options}
           buttonProps={{ px: 2, py: '5px' }}
           selected={value}
@@ -67,14 +73,6 @@ const StyledAmountPicker = ({ presets, currency, value, onChange }: StyledAmount
             display: getButtonDisplay(index, options, isSelected),
           })}
           onChange={onChange}
-          data-cy="amount-picker"
-          styles={{
-            id: 'amount',
-            role: 'group',
-            'aria-label': 'Contribution amount',
-            width: '100%',
-            justifyContent: 'center',
-          }}
         >
           {({ item, isSelected }) => {
             switch (item) {

@@ -105,7 +105,7 @@ const StyledButtonItem = ({
   );
 };
 
-type StyledButtonSetProps<T> = {
+type StyledButtonSetProps<T> = Omit<ContainerProps, 'onChange' | 'size' | 'selected'> & {
   /** A list of elements to build buttons uppon */
   items: Array<T>;
   /** Button child content renderer. Get passed an object like { item, isSelected } */
@@ -131,8 +131,6 @@ type StyledButtonSetProps<T> = {
   /** Button Props */
   buttonProps?: StyledButtonProps;
   customBorderRadius?: string;
-  /** An optional set of props passed to the `Container` */
-  styles?: ContainerProps;
 };
 
 const StyledButtonSet = ({
@@ -145,10 +143,9 @@ const StyledButtonSet = ({
   onChange,
   disabled,
   customBorderRadius = '4px',
-  styles = {},
   ...props
 }: StyledButtonSetProps<string | number>) => (
-  <Container display="flex" {...styles} {...props} as={undefined}>
+  <Container display="flex" {...props} as={undefined}>
     {items.map((item, index) => (
       <StyledButtonItem
         key={item}

@@ -6,7 +6,7 @@ import { Currency as CurrencyEnum } from '../lib/graphql/types/v2/graphql';
 
 import { Span, TextProps } from './Text';
 
-type CurrencyProps = {
+type CurrencyProps = TextProps & {
   /** The amount to display, in cents */
   value: number;
   /** The currency (eg. `USD`, `EUR`...etc) */
@@ -15,8 +15,6 @@ type CurrencyProps = {
   formatWithSeparators?: boolean;
   /** How many numbers should we display after the comma. When `auto` is given, decimals are only displayed if necessary. */
   precision?: number | 'auto';
-  /** An optional set of props passed to the `Span` */
-  styles?: TextProps;
 };
 
 /**
@@ -24,14 +22,7 @@ type CurrencyProps = {
  *
  * ⚠️ Abbreviated mode is only for English at the moment. Abbreviated amount will not be internationalized.
  */
-const Currency = ({
-  value,
-  currency,
-  formatWithSeparators = false,
-  precision = 0,
-  styles = {},
-  ...props
-}: CurrencyProps) => {
+const Currency = ({ value, currency, formatWithSeparators = false, precision = 0, ...props }: CurrencyProps) => {
   const { locale } = useIntl();
   if (precision === 'auto') {
     precision = value % 100 === 0 ? 0 : 2;
@@ -44,14 +35,14 @@ const Currency = ({
     // TODO: This approach is not great because the position of the currency depends on the locale
     const floatAmount = value / 100;
     return (
-      <Span whiteSpace="nowrap" {...styles} {...props} as={undefined}>
+      <Span whiteSpace="nowrap" {...props} as={undefined}>
         {getCurrencySymbol(currency)}
         {floatAmount.toLocaleString(locale)}
       </Span>
     );
   } else {
     return (
-      <Span whiteSpace="nowrap" {...styles} {...props} as={undefined}>
+      <Span whiteSpace="nowrap" {...props} as={undefined}>
         {formatCurrency(value, currency, { precision, locale })}
       </Span>
     );
