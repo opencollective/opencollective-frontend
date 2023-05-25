@@ -37,6 +37,57 @@ const messages = defineMessages({
   MARK_AS_INCOMPLETE_CONFIRM_BUTTON: {
     defaultMessage: 'Confirm and mark as incomplete',
   },
+  APPROVE_TITLE: {
+    id: 'actions.approve',
+    defaultMessage: 'Approve',
+  },
+  APPROVE_DESCRIPTION: {
+    defaultMessage:
+      'You may add a note that will be shared with the user and also be documented as a comment under the expense.',
+  },
+  APPROVE_CONFIRM_BUTTON: {
+    id: 'actions.approve',
+    defaultMessage: 'Approve',
+  },
+  UNAPPROVE_TITLE: {
+    id: 'expense.unapprove.btn',
+    defaultMessage: 'Unapprove',
+  },
+  UNAPPROVE_DESCRIPTION: {
+    defaultMessage:
+      'Please mention the reason why this expense has been unapproved. The reason will be shared with the user and also be documented as a comment under the expense.',
+  },
+  UNAPPROVE_CONFIRM_BUTTON: { id: 'expense.unapprove.btn', defaultMessage: 'Unapprove' },
+  REJECT_TITLE: {
+    id: 'actions.reject',
+    defaultMessage: 'Reject',
+  },
+  REJECT_DESCRIPTION: {
+    defaultMessage:
+      'Please mention the reason why this expense has been rejected. The reason will be shared with the user and also be documented as a comment under the expense.',
+  },
+  REJECT_CONFIRM_BUTTON: { id: 'actions.reject', defaultMessage: 'Reject' },
+  HOLD_TITLE: {
+    defaultMessage: 'Put expense on hold',
+  },
+  HOLD_DESCRIPTION: {
+    defaultMessage:
+      'Expense is still approved but can not be paid out until it is released. Expense is also not displayed in ready to pay.',
+  },
+  HOLD_CONFIRM_BUTTON: {
+    defaultMessage: 'Put on Hold',
+  },
+  RELEASE_TITLE: {
+    id: 'actions.release',
+    defaultMessage: 'Release Hold',
+  },
+  RELEASE_DESCRIPTION: {
+    defaultMessage: 'Expense is can be paid out and is displayed in ready to pay list.',
+  },
+  RELEASE_CONFIRM_BUTTON: {
+    id: 'actions.release',
+    defaultMessage: 'Release Hold',
+  },
 });
 
 const MessagesPerType: Record<
@@ -53,9 +104,41 @@ const MessagesPerType: Record<
     description: messages.MARK_AS_INCOMPLETE_DESCRIPTION,
     confirmBtn: messages.MARK_AS_INCOMPLETE_CONFIRM_BUTTON,
   },
+  APPROVE: {
+    title: messages.APPROVE_TITLE,
+    description: messages.APPROVE_DESCRIPTION,
+    confirmBtn: messages.APPROVE_CONFIRM_BUTTON,
+  },
+  UNAPPROVE: {
+    title: messages.UNAPPROVE_TITLE,
+    description: messages.UNAPPROVE_DESCRIPTION,
+    confirmBtn: messages.UNAPPROVE_CONFIRM_BUTTON,
+  },
+  REJECT: {
+    title: messages.REJECT_TITLE,
+    description: messages.REJECT_DESCRIPTION,
+    confirmBtn: messages.REJECT_CONFIRM_BUTTON,
+  },
+  HOLD: {
+    title: messages.HOLD_TITLE,
+    description: messages.HOLD_DESCRIPTION,
+    confirmBtn: messages.HOLD_CONFIRM_BUTTON,
+  },
+  RELEASE: {
+    title: messages.RELEASE_TITLE,
+    description: messages.RELEASE_DESCRIPTION,
+    confirmBtn: messages.RELEASE_CONFIRM_BUTTON,
+  },
 };
 
-export type ConfirmProcessExpenseModalType = 'REQUEST_RE_APPROVAL' | 'MARK_AS_INCOMPLETE';
+export type ConfirmProcessExpenseModalType =
+  | 'REQUEST_RE_APPROVAL'
+  | 'MARK_AS_INCOMPLETE'
+  | 'APPROVE'
+  | 'UNAPPROVE'
+  | 'REJECT'
+  | 'HOLD'
+  | 'RELEASE';
 
 export type ConfirmProcessExpenseModalProps = {
   type: ConfirmProcessExpenseModalType;
@@ -84,7 +167,37 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
           break;
         }
         case 'REQUEST_RE_APPROVAL': {
+          await processExpense.requestReApproval({
+            message,
+          });
+          break;
+        }
+        case 'APPROVE': {
+          await processExpense.approve({
+            message,
+          });
+          break;
+        }
+        case 'UNAPPROVE': {
           await processExpense.unapprove({
+            message,
+          });
+          break;
+        }
+        case 'REJECT': {
+          await processExpense.reject({
+            message,
+          });
+          break;
+        }
+        case 'HOLD': {
+          await processExpense.hold({
+            message,
+          });
+          break;
+        }
+        case 'RELEASE': {
+          await processExpense.release({
             message,
           });
           break;
@@ -104,6 +217,7 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
           {intl.formatMessage(MessagesPerType[type].description)}
         </P>
         <RichTextEditor
+          data-cy="confirm-action-text"
           kind="COMMENT"
           version="simplified"
           withBorders
@@ -117,6 +231,7 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
       <ModalFooter>
         <Flex gap="16px" justifyContent="flex-end">
           <StyledButton
+            data-cy="confirm-action-button"
             disabled={uploading}
             buttonStyle="secondary"
             buttonSize="small"

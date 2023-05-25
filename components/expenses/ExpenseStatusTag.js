@@ -18,6 +18,7 @@ export const getExpenseStatusMsgType = status => {
       return 'error';
     case expenseStatus.PENDING:
     case expenseStatus.UNVERIFIED:
+    case 'ON_HOLD':
       return 'warning';
     case expenseStatus.SCHEDULED_FOR_PAYMENT:
     case expenseStatus.APPROVED:
