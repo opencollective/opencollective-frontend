@@ -1,21 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import { Box, Flex } from '../Grid';
 import StyledLinkButton from '../StyledLinkButton';
 import UploadedFilePreview from '../UploadedFilePreview';
 
-const getFileName = (intl, idx, totalNbFiles) => {
-  if (totalNbFiles === 1) {
-    return intl.formatMessage({ id: 'File.AttachedFile', defaultMessage: 'Attached file' });
-  } else {
-    return intl.formatMessage({ defaultMessage: 'Attached file {number}' }, { number: idx + 1 });
-  }
-};
-
 const ExpenseAttachedFiles = ({ files, onRemove, openFileViewer }) => {
-  const intl = useIntl();
   return (
     <Flex flexWrap="wrap">
       {files?.map((file, idx) => (
@@ -23,7 +14,7 @@ const ExpenseAttachedFiles = ({ files, onRemove, openFileViewer }) => {
           <UploadedFilePreview
             size={88}
             url={file.url}
-            fileName={file.name || getFileName(intl, idx, files.length)}
+            fileName={file.name}
             fileSize={file.info?.size}
             showFileName
             openFileViewer={openFileViewer}

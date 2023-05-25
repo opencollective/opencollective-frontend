@@ -115,7 +115,7 @@ const ExpenseBudgetItem = ({
   const isSubmitterView = view === 'submitter';
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const pendingReceipt = isCharge && expense?.items?.every(i => i.url === null);
-  const files = React.useMemo(() => getFilesFromExpense(expense), [expense]);
+  const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense]);
   const nbAttachedFiles = !isAdminView ? 0 : files.length;
   const isExpensePaidOrRejected = [expenseStatus.REJECTED, expenseStatus.PAID].includes(expense?.status);
   const shouldDisplayStatusTagActions =

@@ -188,23 +188,6 @@ FilesViewerModal.propTypes = {
   ),
 };
 
-const getFileName = url => {
-  const parts = url?.split('/');
-  return parts[parts?.length - 1];
-};
-
-const getFileTitle = file => {
-  if (!file) {
-    return null;
-  } else if (file.name) {
-    return file.name;
-  } else if (file.description) {
-    return file.description;
-  } else {
-    return getFileName(file?.url);
-  }
-};
-
 export default function FilesViewerModal({ onClose, parentTitle, files, openFileUrl }) {
   const intl = useIntl();
   const initialIndex = openFileUrl ? files?.findIndex(f => f.url === openFileUrl) : 0;
@@ -219,27 +202,26 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
   useKeyBoardShortcut({ callback: onArrowLeft, keyMatch: ARROW_LEFT_KEY });
 
   const selectedItem = files?.length ? files[selectedIndex] : null;
+
   const nbFiles = files?.length || 0;
   const hasMultipleFiles = nbFiles > 1;
   const contentWrapperRef = React.useRef(null);
 
-  const renderFile = ({ url, info, file }, contentWrapperRef) => {
+  const renderFile = ({ url, info, name }, contentWrapperRef) => {
     let content = null;
     const fileExtension = url?.split('.')?.pop()?.toLowerCase();
     const isText = ['csv', 'txt'].includes(fileExtension);
     const isPdf = fileExtension === 'pdf';
-    const alt = getFileTitle(selectedItem);
 
     if (isText) {
-      content = <UploadedFilePreview url={url} alt={alt} />;
+      content = <UploadedFilePreview size={288} url={url} alt={name} showFileName fileName={name} color="black.200" />;
     } else if (isPdf) {
       content = <PDFViewer pdfUrl={url} contentWrapperRef={contentWrapperRef} />;
     } else {
-      // Attached files can have `info` object, expense items a `file` object
-      const { width: imageWidth } = info || file || {};
+      const { width: imageWidth } = info || {};
       const maxWidth = 1200;
       const resizeWidth = Math.min(maxWidth, imageWidth ?? maxWidth);
-      content = <StyledImg src={imagePreview(url, null, { width: resizeWidth })} alt={alt} />;
+      content = <StyledImg src={imagePreview(url, null, { width: resizeWidth })} alt={name} />;
     }
 
     return <Content>{content}</Content>;
@@ -281,7 +263,7 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
                   </Span>
                 ) : null}
 
-                <Span>{getFileTitle(selectedItem)}</Span>
+                <Span>{selectedItem.name}</Span>
               </Span>
             </Box>
             <Flex alignItems="center" gridGap={2}>
@@ -292,8 +274,10 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
                 delayHide={0}
               >
                 <ButtonLink
-                  href={`/download-file?url=${encodeURIComponent(selectedItem?.url)}`}
-                  download={getFileName(selectedItem?.url)}
+                  /* To enable downloading files from S3 directly we're using a /api/download-file endpoint 
+                  to stream the file and set the correct headers. */
+                  href={`/api/download-file?url=${encodeURIComponent(selectedItem?.url)}`}
+                  download
                   target="_blank"
                 >
                   <ArrowDownTray size={24} />
