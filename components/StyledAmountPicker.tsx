@@ -90,11 +90,9 @@ const StyledAmountPicker = ({ presets, currency, value, onChange }: StyledAmount
                 );
               default:
                 return (
-                  typeof item === 'number' && (
-                    <ButtonText isSelected={isSelected}>
-                      <Currency value={item} currency={currency} formatWithSeparators precision="auto" />
-                    </ButtonText>
-                  )
+                  <ButtonText isSelected={isSelected}>
+                    <Currency value={item as number} currency={currency} formatWithSeparators precision="auto" />
+                  </ButtonText>
                 );
             }
           }}
