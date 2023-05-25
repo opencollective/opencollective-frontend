@@ -3,6 +3,9 @@ const { pipeline } = require('stream');
 const { promisify } = require('util');
 const streamPipeline = promisify(pipeline);
 
+/* Helper to enable downloading files that are on S3 since Chrome and Firefox does 
+   not allow cross-origin downloads when using the download attribute on an anchor tag, 
+   see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-download. */
 async function downloadFileHandler(req, res) {
   const { url } = req.query;
   if (!url) {
