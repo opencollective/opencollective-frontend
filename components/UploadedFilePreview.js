@@ -155,6 +155,7 @@ const UploadedFilePreview = ({
 
   return (
     <MainContainer
+      color="black.700"
       {...props}
       maxWidth={size}
       {...(isText || !openFileViewer
@@ -174,11 +175,11 @@ const UploadedFilePreview = ({
           {isLoading ? (
             <LoadingPlaceholder height={12} />
           ) : fileName ? (
-            <FileName fontSize="13px" color="black.700" fontWeight="700">
+            <FileName fontSize="13px" fontWeight="700">
               {fileName}
             </FileName>
           ) : (
-            <P fontStyle="italic" fontSize="13px" color="black.700">
+            <P fontStyle="italic" fontSize="13px">
               <FormattedMessage id="File.NoFilename" defaultMessage="No filename" />
             </P>
           )}
