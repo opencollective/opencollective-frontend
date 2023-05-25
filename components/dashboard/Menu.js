@@ -33,6 +33,7 @@ const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 const Menu = ({ isAccountantOnly }) => {
   const { account } = React.useContext(DashboardContext);
   const isHost = isHostAccount(account);
+  const isUserHost = account.isHost === true && isType(account, USER); // for legacy compatibility for users who are hosts
   const isIndividual = isIndividualAccount(account);
   return (
     <Container>
@@ -118,7 +119,7 @@ const Menu = ({ isAccountantOnly }) => {
         <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} icon={<Transfer size={16} />} />
         <MenuLink
           icon={<Cog size={16} />}
-          if={!isHost}
+          if={!isHost || isUserHost}
           section="SETTINGS"
           goToSection={COLLECTIVE_SECTIONS.INFO}
           renderSubMenu={({ parentSection }) => (
