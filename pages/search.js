@@ -320,7 +320,7 @@ class SearchPage extends React.Component {
                 borderRadius="100px"
                 fontSize="16px"
                 height="58px"
-                placeholder={intl.formatMessage({ defaultMessage: 'Search by name, slug, tag, description...' })}
+                placeholder={intl.formatMessage({ defaultMessage: 'Search by name, handle, tag, description...' })}
                 value={this.state.term}
                 onChange={value => this.setState({ term: value })}
                 onSubmit={this.refetch}
