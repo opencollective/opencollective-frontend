@@ -25,6 +25,7 @@ env:
   FRONTEND_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend
   API_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-api
   IMAGES_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-images
+  PDF_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-pdf
   TERM: xterm
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   STRIPE_WEBHOOK_KEY: ${{ secrets.STRIPE_WEBHOOK_KEY }}
@@ -129,6 +130,12 @@ jobs:
           repository: opencollective/opencollective-images
           path: opencollective-images
 
+      - name: Checkout (PDF)
+        uses: actions/checkout@v3
+        with:
+          repository: opencollective/opencollective-pdf
+          path: opencollective-pdf
+
       # Prepare API
 
       - name: Restore node_modules (api)
@@ -163,6 +170,24 @@ jobs:
 
       - name: Build (images)
         working-directory: opencollective-images
+        run: npm run build
+
+      # Prepare PDF
+
+      - name: Restore node_modules (pdf)
+        uses: actions/cache@v3
+        id: pdf-node-modules
+        with:
+          path: opencollective-pdf/node_modules
+          key: ${{ runner.os }}-pdf-node-modules-${{ hashFiles('opencollective-pdf/package-lock.json') }}
+
+      - name: Install dependencies (pdf)
+        working-directory: opencollective-pdf
+        if: steps.pdf-node-modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Build (pdf)
+        working-directory: opencollective-pdf
         run: npm run build
 
       # Prepare Frontend
@@ -210,8 +235,12 @@ jobs:
         if: steps.next-build.outputs.cache-hit != 'true'
         run: npm run build
 
+      # Seed DB
+
       - name: Setup DB
         run: ./scripts/setup_db.sh
+
+      # Run tests
 
       - name: Run E2E with Cypress
         run: ./scripts/run_e2e_tests.sh

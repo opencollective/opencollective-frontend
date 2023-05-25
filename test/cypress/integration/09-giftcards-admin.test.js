@@ -37,6 +37,13 @@ describe('Gift cards admin', () => {
       expect(links).to.have.lengthOf(numberOfGiftCards);
     });
 
+    // Download the PDF
+    cy.getByDataCy('download-gift-cards-btn').click();
+    const fileRegex = new RegExp(`${collectiveSlug}-giftcards-\\d+\\.pdf$`);
+    cy.waitForDownload(fileRegex).then(file => {
+      cy.task('readPdf', file).should('contain', '$542.00	Gift	Card	from	TestOrg');
+    });
+
     // Links should also be added to gift cards list
     cy.contains('a[href$="/admin/gift-cards"]', 'Back to Gift Cards list').click();
     cy.getByDataCy('vc-details').should($giftCards => {

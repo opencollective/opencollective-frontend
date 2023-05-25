@@ -1,6 +1,9 @@
 // eslint-disable-next-line node/no-unpublished-require
 const { defineConfig } = require('cypress');
 const fs = require('fs');
+const { readPdf } = require('./test/cypress/scripts/read-pdf.ts');
+const { listFiles } = require('./test/cypress/scripts/list-files.ts');
+const { getTextFromPdfContent } = require('./test/cypress/scripts/get-text-from-pdf-content.ts');
 
 module.exports = defineConfig({
   experimentalMemoryManagement: true,
@@ -22,6 +25,7 @@ module.exports = defineConfig({
   fixturesFolder: 'test/cypress/fixtures',
   screenshotsFolder: 'test/cypress/screenshots',
   videosFolder: 'test/cypress/videos',
+  downloadsFolder: 'test/cypress/downloads',
   e2e: {
     setupNodeEvents(on, config) {
       // eslint-disable-next-line node/no-unpublished-require
@@ -39,6 +43,9 @@ module.exports = defineConfig({
           console.log(...message); // eslint-disable-line no-console
           return null;
         },
+        readPdf,
+        listFiles,
+        getTextFromPdfContent,
       });
 
       // Delete videos if the test succeeds

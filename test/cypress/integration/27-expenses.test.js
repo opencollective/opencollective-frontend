@@ -722,6 +722,7 @@ describe('Expense flow', () => {
   describe('Actions on expense', () => {
     let collective;
     let user;
+    let expense;
     let expenseUrl;
 
     before(() => {
@@ -734,10 +735,27 @@ describe('Expense flow', () => {
 
     beforeEach(() => {
       cy.createExpense({
+        type: 'INVOICE',
         userEmail: user.email,
         account: { legacyId: collective.id },
         payee: { legacyId: user.CollectiveId },
-      }).then(expense => (expenseUrl = `/${collective.slug}/expenses/${expense.legacyId}`));
+        description: 'Expense for E2E tests',
+      }).then(createdExpense => {
+        expense = createdExpense;
+        expenseUrl = `/${collective.slug}/expenses/${expense.legacyId}`;
+      });
+    });
+
+    it('Downloads PDF', () => {
+      cy.visit(expenseUrl);
+      cy.getByDataCy('download-expense-invoice-btn').click();
+      const fileRegex = new RegExp(`Expense-${expense.legacyId}-.*.pdf`);
+      cy.waitForDownload(fileRegex).then(file => {
+        cy.task('readPdf', file)
+          .should('contain', `Expense	#${expense.legacyId}:	Expense	for	E2E	tests`)
+          .should('contain', 'Collective:	Test	Collective')
+          .should('contain', '$10.00');
+      });
     });
 
     it('Approve, unapprove, reject and pay actions on expense', () => {

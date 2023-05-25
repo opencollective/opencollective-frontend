@@ -105,7 +105,14 @@ export default class CreateGiftCardsSuccess extends React.Component {
                 })}
               >
                 {({ loading, downloadFile }) => (
-                  <StyledButton minWidth={270} m={2} buttonSize="large" loading={loading} onClick={downloadFile}>
+                  <StyledButton
+                    minWidth={270}
+                    m={2}
+                    buttonSize="large"
+                    loading={loading}
+                    onClick={downloadFile}
+                    data-cy="download-gift-cards-btn"
+                  >
                     <Printer size="1em" />
                     &nbsp;
                     <FormattedMessage id="CreateGiftCardsSuccess.Download" defaultMessage="Download cards" />

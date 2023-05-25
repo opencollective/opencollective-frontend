@@ -12,6 +12,7 @@ coverage
 .nyc_output
 test/cypress/screenshots
 test/cypress/videos
+test/cypress/downloads
 dist
 stage
 *.swp
