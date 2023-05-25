@@ -30,3 +30,16 @@ export const Default = {
     return <ExpenseBudgetItem {...args} />;
   },
 };
+
+export const MultiCurrency = {
+  ...Default,
+  args: {
+    expense: {
+      ...listItemExpense,
+      amountInAccountCurrency: {
+        currency: 'BRL',
+        valueInCents: 10000,
+      },
+    },
+  },
+};

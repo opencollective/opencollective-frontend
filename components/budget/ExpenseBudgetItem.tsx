@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
-import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
 import { get, includes, size } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -24,7 +23,6 @@ import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
 import ExpenseFilesPreviewModal from '../expenses/ExpenseFilesPreviewModal';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTypeTag from '../expenses/ExpenseTypeTag';
-import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
 import ProcessExpenseButtons, {
   DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
   hasProcessButtons,
@@ -36,23 +34,11 @@ import CommentIcon from '../icons/CommentIcon';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
-import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
 import Tags from '../Tags';
 import { H3, P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
-
-const DetailColumnHeader = styled.div`
-  font-style: normal;
-  font-weight: 500;
-  font-size: 12px;
-  line-height: 16px;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: #4d4f51;
-  margin-bottom: 2px;
-`;
 
 const ButtonsContainer = styled.div.attrs({ 'data-cy': 'expense-actions' })`
   display: flex;
@@ -212,34 +198,47 @@ const ExpenseBudgetItem = ({
                 </StyledLink>
               </StyledTooltip>
 
-              <P mt="5px" fontSize="12px" color="black.700">
-                {isAdminView ? (
-                  <LinkCollective collective={expense.account} />
-                ) : (
-                  <FormattedMessage
-                    defaultMessage="from {payee} to {account}"
-                    values={{
-                      payee: <LinkCollective collective={expense.payee} />,
-                      account: <LinkCollective collective={expense.account} />,
-                    }}
-                  />
-                )}
-                {isAdminView && Boolean(expense?.comments?.totalCount) && (
-                  <React.Fragment>
-                    {' • '}
-                    {expense?.comments.totalCount}
-                    &nbsp;
-                    <CommentIcon size={14} color="#4D4F51" />
-                  </React.Fragment>
-                )}
+              <P mt="4px" lineHeight="20px" fontSize="14px" color="black.700">
+                <FormattedMessage
+                  defaultMessage="From {payee} to {account}"
+                  values={{
+                    payee: <LinkCollective collective={expense.payee} />,
+                    account: <LinkCollective collective={expense.account} />,
+                  }}
+                />
               </P>
-              <P mt="5px" fontSize="12px" color="black.700">
+              <P mt="8px" lineHeight="20px" fontSize="14px" color="black.700">
                 <FormattedMessage
                   defaultMessage="On {shortDate}"
                   values={{
                     shortDate: <DateTime value={expense.createdAt} dateStyle={undefined} timeStyle={undefined} />,
                   }}
                 />
+                {isAdminView && Boolean(expense?.comments?.totalCount) && (
+                  <React.Fragment>
+                    {' • '}
+                    <CommentIcon size={14} color="#4D4F51" />
+                    &nbsp;
+                    {expense?.comments.totalCount}
+                  </React.Fragment>
+                )}
+              </P>
+              <P lineHeight="20px" fontSize="14px" mt="8px" color="black.700">
+                {nbAttachedFiles > 0 && (
+                  <Box mr={[3, 4]}>
+                    {isLoading ? (
+                      <LoadingPlaceholder height={15} width={90} />
+                    ) : (
+                      <StyledLink textDecoration="underline" cursor="pointer" onClick={() => showFilesPreview(true)}>
+                        <FormattedMessage
+                          id="ExepenseAttachments.count"
+                          defaultMessage="Attachments ({count})"
+                          values={{ count: nbAttachedFiles }}
+                        />
+                      </StyledLink>
+                    )}
+                  </Box>
+                )}
               </P>
             </Box>
           )}
@@ -309,7 +308,16 @@ const ExpenseBudgetItem = ({
                 </Box>
               )}
               {(isAdminView || isSubmitterView) && (
-                <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} mb={0} py={0} mr="2px" fontSize="9px" />
+                <ExpenseTypeTag
+                  type={expense.type}
+                  legacyId={expense.legacyId}
+                  mb={0}
+                  py={0}
+                  mr="2px"
+                  fontSize="12px"
+                  fontWeight="500"
+                  color="black.700"
+                />
               )}
               {shouldDisplayStatusTagActions ? (
                 <AdminExpenseStatusTag host={host} collective={expense.account} expense={expense} p="3px 8px" />
@@ -331,54 +339,7 @@ const ExpenseBudgetItem = ({
       </Flex>
       <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}>
         <Box mt={2}>
-          {isAdminView || isSubmitterView ? (
-            <Flex>
-              <Box mr={[3, 4]}>
-                <DetailColumnHeader>
-                  <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
-                </DetailColumnHeader>
-                <Box mt="6px">
-                  <PayoutMethodTypeWithIcon
-                    isLoading={isLoading}
-                    type={expense?.payoutMethod?.type}
-                    iconSize="10px"
-                    fontSize="11px"
-                    fontWeight="normal"
-                    color="black.700"
-                  />
-                </Box>
-              </Box>
-              {nbAttachedFiles > 0 && (
-                <Box mr={[3, 4]}>
-                  <DetailColumnHeader>
-                    <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
-                  </DetailColumnHeader>
-                  {isLoading ? (
-                    <LoadingPlaceholder height={15} width={90} />
-                  ) : (
-                    <StyledButton
-                      color="black.700"
-                      fontSize="11px"
-                      cursor="pointer"
-                      buttonSize="tiny"
-                      onClick={() => showFilesPreview(true)}
-                      px={2}
-                      ml={-2}
-                      isBorderless
-                    >
-                      <MaximizeIcon size={10} />
-                      &nbsp;&nbsp;
-                      <FormattedMessage
-                        id="ExepenseAttachments.count"
-                        defaultMessage="{count, plural, one {# attachment} other {# attachments}}"
-                        values={{ count: nbAttachedFiles }}
-                      />
-                    </StyledButton>
-                  )}
-                </Box>
-              )}
-            </Flex>
-          ) : (
+          {!(isAdminView || isSubmitterView) && (
             <Tags
               expense={expense}
               canEdit={get(expense, 'permissions.canEditTags', false)}

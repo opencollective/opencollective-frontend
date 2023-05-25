@@ -65,6 +65,9 @@ export const listItemExpense = {
     type: 'INDIVIDUAL',
     name: 'Benjamin Piouffle',
   },
+  comments: {
+    totalCount: 10,
+  },
   status: 'APPROVED',
   permissions: {
     approve: {

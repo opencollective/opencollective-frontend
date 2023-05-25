@@ -16,7 +16,7 @@ import {
   TypographyProps,
 } from 'styled-system';
 
-import { textDecoration, whiteSpace } from '../lib/styled-system-custom-properties';
+import { CursorProps, textDecoration, TextDecorationProps, whiteSpace } from '../lib/styled-system-custom-properties';
 import { ButtonSize, buttonSize, ButtonStyle, buttonStyle } from '../lib/theme/variants/button';
 
 type StyledLinkProps = BorderProps &
@@ -24,6 +24,8 @@ type StyledLinkProps = BorderProps &
   SpaceProps &
   TypographyProps &
   ColorProps &
+  CursorProps &
+  TextDecorationProps &
   React.HTMLProps<HTMLAnchorElement> & {
     buttonStyle?: ButtonStyle;
     buttonSize?: ButtonSize;
