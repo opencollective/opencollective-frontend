@@ -2,6 +2,24 @@ import { gql } from '@apollo/client';
 
 import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
 
+export const commentFieldsFragment = gql`
+  fragment CommentFields on Comment {
+    id
+    createdAt
+    html
+    reactions
+    userReactions
+    type
+    fromAccount {
+      id
+      type
+      name
+      slug
+      imageUrl
+    }
+  }
+`;
+
 export const loggedInAccountExpensePayoutFieldsFragment = gql`
   fragment LoggedInAccountExpensePayoutFields on Individual {
     id
