@@ -38,11 +38,10 @@ describe('Gift cards admin', () => {
     });
 
     // Download the PDF
+    // Mock date to make sure we have the same filename
     cy.getByDataCy('download-gift-cards-btn').click();
-    const fileRegex = new RegExp(`${collectiveSlug}-giftcards-\\d+\\.pdf$`);
-    cy.waitForDownload(fileRegex).then(file => {
-      cy.task('readPdf', file).should('contain', '$542.00	Gift	Card	from	TestOrg');
-    });
+    const filename = `${collectiveSlug}-giftcards.pdf`;
+    cy.getDownloadedPDFContent(filename).should('contain', '$542.00	Gift	Card	from	TestOrg');
 
     // Links should also be added to gift cards list
     cy.contains('a[href$="/admin/gift-cards"]', 'Back to Gift Cards list').click();

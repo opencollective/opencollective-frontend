@@ -68,7 +68,7 @@ export default class CreateGiftCardsSuccess extends React.Component {
   };
 
   renderManualSuccess() {
-    const filename = `${this.props.collectiveSlug}-giftcards-${Date.now()}.pdf`;
+    const filename = `${this.props.collectiveSlug}-giftcards.pdf`;
     const downloadUrl = giftCardsDownloadUrl(filename);
 
     return (

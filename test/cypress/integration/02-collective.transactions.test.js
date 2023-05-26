@@ -21,15 +21,16 @@ describe('collective.transactions', () => {
     cy.login({ redirect: '/brusselstogether/transactions' });
     cy.contains('button[data-cy=transaction-details]', 'View Details').first().click();
     cy.getByDataCy('download-transaction-receipt-btn').first().click();
-    cy.waitForDownload('brusselstogether_2017-12-04_b961becd-cb85-6c70-6ec5-075151203084.pdf').then(file => {
-      cy.task('readPdf', file)
-        .should('contain', 'BrusselsTogether	ASBL') // Bill from
-        .should('contain', 'Frederik') // Bill to
-        .should('contain', 'brusselstogetherasbl_b961becd-cb85-6c70-6ec5-075151203084')
-        .should('contain', `Contribution	#1037`)
-        .should('contain', '2017-12-04')
-        .should('contain', 'monthly	recurring	subscription')
-        .should('contain', '$10.00');
-    });
+    cy.getByDataCy('download-transaction-receipt-btn').first().should('have.attr', 'data-loading', 'true'); // Downloading
+    cy.getByDataCy('download-transaction-receipt-btn').first().should('have.attr', 'data-loading', 'false'); // Downloaded
+    const filename = 'brusselstogether_2017-12-04_b961becd-cb85-6c70-6ec5-075151203084.pdf';
+    cy.getDownloadedPDFContent(filename)
+      .should('contain', 'BrusselsTogether	ASBL') // Bill from
+      .should('contain', 'Frederik') // Bill to
+      .should('contain', 'brusselstogetherasbl_b961becd-cb85-6c70-6ec5-075151203084')
+      .should('contain', `Contribution	#1037`)
+      .should('contain', '2017-12-04')
+      .should('contain', 'monthly	recurring	subscription')
+      .should('contain', '€10.00');
   });
 });

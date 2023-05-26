@@ -5,6 +5,7 @@ node_modules
 npm-debug.log.*
 ./report.*.json
 *.log
+logs
 yarn.lock
 .DS_Store
 build

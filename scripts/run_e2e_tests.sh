@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p logs
+
 echo "> Starting maildev server"
 npx maildev@2.0.5 &
 MAILDEV_PID=$!
@@ -35,7 +37,7 @@ if [ -z "$IMAGES_FOLDER" ]; then
 else
   cd $IMAGES_FOLDER
 fi
-npm start &
+npm start >../logs/images-service.txt 2>&1 &
 IMAGES_PID=$!
 cd -
 
@@ -45,7 +47,7 @@ if [ -z "$PDF_FOLDER" ]; then
 else
   cd $PDF_FOLDER
 fi
-PORT=3002 npm start &
+PORT=3002 npm start >../logs/pdf-service.txt 2>&1 &
 PDF_PID=$!
 cd -
 

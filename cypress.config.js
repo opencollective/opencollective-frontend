@@ -1,8 +1,6 @@
 // eslint-disable-next-line node/no-unpublished-require
 const { defineConfig } = require('cypress');
 const fs = require('fs');
-const { readPdf } = require('./test/cypress/scripts/read-pdf.ts');
-const { listFiles } = require('./test/cypress/scripts/list-files.ts');
 const { getTextFromPdfContent } = require('./test/cypress/scripts/get-text-from-pdf-content.ts');
 
 module.exports = defineConfig({
@@ -43,8 +41,6 @@ module.exports = defineConfig({
           console.log(...message); // eslint-disable-line no-console
           return null;
         },
-        readPdf,
-        listFiles,
         getTextFromPdfContent,
       });
 

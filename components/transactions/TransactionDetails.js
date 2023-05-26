@@ -320,6 +320,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
             {showDownloadInvoiceButton && (
               <StyledButton
                 buttonSize="small"
+                data-loading={loadingInvoice}
                 loading={loadingInvoice}
                 onClick={downloadInvoiceWith({
                   transactionUuid: uuid,

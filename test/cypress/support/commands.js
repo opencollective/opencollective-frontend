@@ -229,6 +229,7 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
           createExpense(expense: $expense, account: $account) {
             id
             legacyId
+            createdAt
             account {
               id
               slug
@@ -616,39 +617,14 @@ Cypress.Commands.add(
 /**
  * Wait for a file to be downloaded
  */
-Cypress.Commands.add('waitForDownload', fileMatcher => {
-  waitForDownload(fileMatcher);
+Cypress.Commands.add('getDownloadedPDFContent', (filename, options) => {
+  const downloadFolder = Cypress.config('downloadsFolder');
+  cy.readFile(`${downloadFolder}/${filename}`, null, options).then(pdfFileContent => {
+    cy.task('getTextFromPdfContent', pdfFileContent);
+  });
 });
 
 // ---- Private ----
-
-function waitForDownload(fileMatcher, timeout = 10000) {
-  const downloadFolder = Cypress.config('downloadsFolder');
-  cy.task('listFiles', downloadFolder).then(files => {
-    let file;
-    if (fileMatcher instanceof RegExp) {
-      file = files.find(file => fileMatcher.test(file));
-    } else if (typeof fileMatcher === 'string') {
-      file = files.find(file => file.endsWith(fileMatcher));
-    } else if (typeof fileMatcher === 'function') {
-      file = files.find(fileMatcher);
-    } else {
-      throw new Error(`Invalid fileMatcher: ${fileMatcher}`);
-    }
-
-    if (file) {
-      return file;
-    } else if (timeout > 0) {
-      cy.wait(100);
-      return waitForDownload(fileMatcher, timeout - 100);
-    } else {
-      const filesListStr = files.length > 0 ? files.join(', ') : 'None';
-      return assert.fail(
-        `Could not find file for ${fileMatcher}: waitForDownload timed out. Downloaded files: ${filesListStr}`,
-      );
-    }
-  });
-}
 
 /**
  * @param {object} user - should have `email` and `id` set

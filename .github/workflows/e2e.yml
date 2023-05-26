@@ -8,6 +8,8 @@ env:
   OC_ENV: ci
   NODE_ENV: test
   WEBSITE_URL: http://localhost:3000
+  IMAGES_URL: http://localhost:3001
+  PDF_SERVICE_URL: http://localhost:3002
   API_URL: http://localhost:3060
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
   CI: true
@@ -15,7 +17,6 @@ env:
   E2E_TEST: 1
   PGHOST: localhost
   PGUSER: postgres
-  IMAGES_URL: http://localhost:3001
   CYPRESS_RECORD: false
   CYPRESS_VIDEO: false
   CYPRESS_VIDEO_UPLOAD_ON_PASSES: false
@@ -131,7 +132,7 @@ jobs:
           path: opencollective-images
 
       - name: Checkout (PDF)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: opencollective/opencollective-pdf
           path: opencollective-pdf
@@ -246,6 +247,7 @@ jobs:
         run: ./scripts/run_e2e_tests.sh
         env:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
+
       - name: Archive test recordings
         uses: actions/upload-artifact@v3
         with:
@@ -253,6 +255,13 @@ jobs:
           path: |
             test/cypress/screenshots
             test/cypress/videos
+        if: ${{ failure() }}
+
+      - name: Archive download folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: downloads
+          path: test/cypress/downloads
         if: ${{ failure() }}
 
       - name: Report Coverage
