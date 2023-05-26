@@ -1,12 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
+
+import { getDefaultFileName } from '../../lib/expenses';
 
 import { Box, Flex } from '../Grid';
 import StyledLinkButton from '../StyledLinkButton';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 const ExpenseAttachedFiles = ({ files, onRemove, openFileViewer }) => {
+  const intl = useIntl();
   return (
     <Flex flexWrap="wrap">
       {files?.map((file, idx) => (
@@ -14,7 +17,7 @@ const ExpenseAttachedFiles = ({ files, onRemove, openFileViewer }) => {
           <UploadedFilePreview
             size={88}
             url={file.url}
-            fileName={file.name}
+            fileName={file.name || getDefaultFileName(intl, idx, files.length)}
             fileSize={file.info?.size}
             showFileName
             openFileViewer={openFileViewer}
