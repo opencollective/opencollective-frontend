@@ -243,6 +243,7 @@
     "jest-styled-components": "^7.1.1",
     "jsdoc-api": "^8.0.0",
     "lint-staged": "^10.5.4",
+    "lost-pixel": "^3.4.0",
     "markdown-loader": "^8.0.0",
     "mkdirp": "^3.0.0",
     "node-polyfill-webpack-plugin": "^2.0.1",
