@@ -117,3 +117,9 @@ To add new files or dependencies to this exported package, have a look at [scrip
 If you have any questions, ping us on Slack
 (https://slack.opencollective.com) or on Twitter
 ([@opencollect](https://twitter.com/opencollect)).
+
+## Thanks
+
+<a href="https://www.lost-pixel.com/"><img src="https://user-images.githubusercontent.com/29632358/168112844-77e76a0d-b96f-4bc8-b753-cd39f4afd428.png" width="100" height="100" alt="Lost Pixel" /></a>
+
+Thanks to [Lost Pixel](https://www.lost-pixel.com/) for providing the visual testing platform that helps us review UI changes and catch visual regressions.
