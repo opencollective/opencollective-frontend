@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { Flex } from '../../Grid';
-import PreviewModal from '../../PreviewModal';
-import StyledButton from '../../StyledButton';
-import StyledInput from '../../StyledInput';
-import StyledTextarea from '../../StyledTextarea';
-import { Label, P, Span } from '../../Text';
-import { ReceiptField, ReceiptTemplate, UseReceipt } from '../hooks/useReceipt';
+import { Flex } from '../../../Grid';
+import PreviewModal from '../../../PreviewModal';
+import StyledButton from '../../../StyledButton';
+import StyledInput from '../../../StyledInput';
+import StyledTextarea from '../../../StyledTextarea';
+import { Label, P, Span } from '../../../Text';
+
+import { ReceiptField, ReceiptTemplate, UseReceipt } from './hooks/useReceipt';
 
 type ReceiptTemplateFormProps = {
   receipt: UseReceipt;

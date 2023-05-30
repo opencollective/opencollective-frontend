@@ -6,21 +6,21 @@ import { Trash } from '@styled-icons/boxicons-regular/Trash';
 import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { i18nGraphqlException } from '../../../lib/errors';
+import { i18nGraphqlException } from '../../../../lib/errors';
 
-import { editCollectiveSettingsMutation } from '../../collective-page/graphql/mutations';
-import Container from '../../Container';
-import SettingsSectionTitle from '../../edit-collective/sections/SettingsSectionTitle';
-import { Box, Flex } from '../../Grid';
-import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
-import StyledHr from '../../StyledHr';
-import StyledInputField from '../../StyledInputField';
-import StyledSelect from '../../StyledSelect';
-import { H2, P, Span } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
-import { useReceipt } from '../hooks/useReceipt';
+import { editCollectiveSettingsMutation } from '../../../collective-page/graphql/mutations';
+import Container from '../../../Container';
+import SettingsSectionTitle from '../../../edit-collective/sections/SettingsSectionTitle';
+import { Box, Flex } from '../../../Grid';
+import MessageBox from '../../../MessageBox';
+import StyledButton from '../../../StyledButton';
+import StyledHr from '../../../StyledHr';
+import StyledInputField from '../../../StyledInputField';
+import StyledSelect from '../../../StyledSelect';
+import { H2, P, Span } from '../../../Text';
+import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
 
+import { useReceipt } from './hooks/useReceipt';
 import ReceiptTemplateForm from './ReceiptTemplateForm';
 
 const BILL_TO_OPTIONS = [

@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import AccountSettings from '../admin-panel/sections/AccountSettings';
 import FinancialContributions from '../admin-panel/sections/FinancialContributions';
 import HostVirtualCards from '../admin-panel/sections/HostVirtualCards';
-import InvoicesReceipts from '../admin-panel/sections/InvoicesReceipts';
+import InvoicesReceipts from '../admin-panel/sections/invoices-receipts/InvoicesReceipts';
 import NotificationsSettings from '../admin-panel/sections/NotificationsSettings';
 import PendingContributions from '../admin-panel/sections/PendingContributions';
 import TeamSettings from '../admin-panel/sections/Team';
