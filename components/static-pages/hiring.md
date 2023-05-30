@@ -84,7 +84,7 @@ A few more notes about our team:
 
 ### Join us!
 
-We’d love to hear from you. Applications are open through May 21. [To apply](https://coda.io/form/Application-Open-Collective-Customer-Support-Representative_dJ3tGEm2kIw). If you have any questions, reach out to us at [support@opencollective.com](mailto:support@opencollective.com).
+We’d love to hear from you. Applications are open through June 2nd. [To apply](https://coda.io/form/Application-Open-Collective-Customer-Support-Representative_dJ3tGEm2kIw). If you have any questions, reach out to us at [support@opencollective.com](mailto:support@opencollective.com).
 
 <!--## [Open Collective Foundation](https://opencollective.foundation/): Finance Admin
 

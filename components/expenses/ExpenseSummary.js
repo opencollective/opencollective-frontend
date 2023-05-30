@@ -158,7 +158,7 @@ const ExpenseSummary = ({
             <Box>
               <ExpenseStatusTag
                 display="block"
-                status={expense.status}
+                status={expense.onHold ? 'ON_HOLD' : expense.status}
                 letterSpacing="0.8px"
                 fontWeight="bold"
                 fontSize="12px"
@@ -374,6 +374,7 @@ ExpenseSummary.propTypes = {
     invoiceInfo: PropTypes.string,
     createdAt: PropTypes.string,
     status: PropTypes.oneOf(Object.values(expenseStatus)),
+    onHold: PropTypes.bool,
     type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
     tags: PropTypes.arrayOf(PropTypes.string),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),

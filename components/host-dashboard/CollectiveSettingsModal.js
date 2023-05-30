@@ -78,8 +78,8 @@ const DISPLAYED_EXPENSE_TYPES = [EXPENSE_TYPE.INVOICE, EXPENSE_TYPE.RECEIPT, EXP
 
 const EXPENSE_TYPE_OPTIONS = [
   { value: null, label: <FormattedMessage defaultMessage="Use global host settings" /> },
-  { value: true, label: <FormattedMessage defaultMessage="Enabled" /> },
-  { value: false, label: <FormattedMessage defaultMessage="Disabled" /> },
+  { value: true, label: <FormattedMessage id="ExpenseType.Enabled" defaultMessage="Enabled" /> },
+  { value: false, label: <FormattedMessage id="ExpenseType.Disabled" defaultMessage="Disabled" /> },
 ];
 
 const EXPENSE_TYPE_SELECT_STYLES = {

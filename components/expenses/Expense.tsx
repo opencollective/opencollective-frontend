@@ -12,6 +12,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getCollectiveTypeForUrl, getSuggestedTags } from '../../lib/collective.lib';
+import CommentType from '../../lib/constants/commentTypes';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
@@ -701,6 +702,7 @@ function Expense(props) {
                   disabled={!expense}
                   onSuccess={onCommentAdded}
                   canUsePrivateNote={expense.permissions.canUsePrivateNote}
+                  defaultType={expense.onHold ? CommentType.PRIVATE_NOTE : CommentType.COMMENT}
                 />
               </Box>
             </Flex>

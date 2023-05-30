@@ -6,6 +6,8 @@ import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { Edit as IconEdit } from '@styled-icons/feather/Edit';
 import { Flag as FlagIcon } from '@styled-icons/feather/Flag';
 import { Link as IconLink } from '@styled-icons/feather/Link';
+import { Pause as PauseIcon } from '@styled-icons/feather/Pause';
+import { Play as PlayIcon } from '@styled-icons/feather/Play';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -73,7 +75,7 @@ const ExpenseMoreActionsButton = ({
   onDelete,
   ...props
 }) => {
-  const [showMarkAsIncompleteModal, setMarkAsIncompleteModal] = React.useState(false);
+  const [processModal, setProcessModal] = React.useState(false);
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
 
@@ -127,12 +129,36 @@ const ExpenseMoreActionsButton = ({
               <Action
                 disabled={processExpense.loading || isDisabled}
                 onClick={() => {
-                  setMarkAsIncompleteModal(true);
+                  setProcessModal('MARK_AS_INCOMPLETE');
                   setOpen(false);
                 }}
               >
                 <FlagIcon size={14} />
                 <FormattedMessage id="actions.markAsIncomplete" defaultMessage="Mark as Incomplete" />
+              </Action>
+            )}
+            {permissions?.canHold && (
+              <Action
+                disabled={processExpense.loading || isDisabled}
+                onClick={() => {
+                  setProcessModal('HOLD');
+                  setOpen(false);
+                }}
+              >
+                <PauseIcon size={14} />
+                <FormattedMessage id="actions.hold" defaultMessage="Put On Hold" />
+              </Action>
+            )}
+            {permissions?.canRelease && (
+              <Action
+                disabled={processExpense.loading || isDisabled}
+                onClick={() => {
+                  setProcessModal('RELEASE');
+                  setOpen(false);
+                }}
+              >
+                <PlayIcon size={14} />
+                <FormattedMessage id="actions.release" defaultMessage="Release Hold" />
               </Action>
             )}
             {permissions?.canDelete && (
@@ -183,12 +209,8 @@ const ExpenseMoreActionsButton = ({
           </Flex>
         )}
       </PopupMenu>
-      {showMarkAsIncompleteModal && (
-        <ConfirmProcessExpenseModal
-          type="MARK_AS_INCOMPLETE"
-          expense={expense}
-          onClose={() => setMarkAsIncompleteModal(false)}
-        />
+      {processModal && (
+        <ConfirmProcessExpenseModal type={processModal} expense={expense} onClose={() => setProcessModal(false)} />
       )}
       {hasDeleteConfirm && (
         <ExpenseConfirmDeletion
