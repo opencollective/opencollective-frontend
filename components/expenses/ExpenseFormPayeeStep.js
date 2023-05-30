@@ -140,53 +140,57 @@ const refreshPayoutProfile = (formik, payoutProfiles) => {
   formik.setValues({ ...formik.values, draft: omit(formik.values.draft, ['payee']), payee });
 };
 
+const sortProfiles = profiles => {
+  return profiles?.sort((a, b) => a.slug.localeCompare(b.slug)) || [];
+};
+
 const getPayeeOptions = (intl, payoutProfiles) => {
-  const profileOptions = payoutProfiles.map(value => ({
-    value,
-    label: value.name,
-    [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
-  }));
-
-  const profilesByType = groupBy(profileOptions, p => p.value.type);
-
-  const myself = profilesByType[INDIVIDUAL] || [];
-  const myOrganizations = profilesByType[ORGANIZATION] || [];
-
-  myOrganizations.push({
-    label: null,
-    value: null,
-    isDisabled: true,
-    [FLAG_NEW_COLLECTIVE]: true,
-    types: [CollectiveType.ORGANIZATION],
-    __background__: 'white',
-  });
+  const profilesByType = groupBy(payoutProfiles, p => p.type);
+  const getOption = profile => ({ value: profile, label: profile.name, [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true });
+  const getProfileOptions = type => sortProfiles(profilesByType[type]).map(getOption);
 
   const payeeOptions = [
-    { options: myself, label: intl.formatMessage({ defaultMessage: 'Myself' }) },
-    { options: myOrganizations, label: intl.formatMessage({ id: 'organization', defaultMessage: 'My Organizations' }) },
+    {
+      label: intl.formatMessage({ defaultMessage: 'Myself' }),
+      options: getProfileOptions(INDIVIDUAL),
+    },
+    {
+      label: intl.formatMessage({ id: 'organization', defaultMessage: 'My Organizations' }),
+      options: [
+        ...getProfileOptions(ORGANIZATION),
+        {
+          label: null,
+          value: null,
+          isDisabled: true,
+          [FLAG_NEW_COLLECTIVE]: true,
+          types: [ORGANIZATION],
+          __background__: 'white',
+        },
+      ],
+    },
   ];
 
   if (profilesByType[COLLECTIVE]?.length) {
     payeeOptions.push({
-      options: profilesByType[COLLECTIVE],
+      options: getProfileOptions(COLLECTIVE),
       label: intl.formatMessage({ id: 'collective', defaultMessage: 'My Collectives' }),
     });
   }
   if (profilesByType[FUND]?.length) {
     payeeOptions.push({
-      options: profilesByType[FUND],
+      options: getProfileOptions(FUND),
       label: intl.formatMessage({ id: 'funds', defaultMessage: 'My Funds' }),
     });
   }
   if (profilesByType[PROJECT]?.length) {
     payeeOptions.push({
-      options: profilesByType[PROJECT],
+      options: getProfileOptions(PROJECT),
       label: intl.formatMessage({ defaultMessage: 'My Projects' }),
     });
   }
   if (profilesByType[EVENT]?.length) {
     payeeOptions.push({
-      options: profilesByType[EVENT],
+      options: getProfileOptions(EVENT),
       label: intl.formatMessage({ id: 'events', defaultMessage: 'My Events' }),
     });
   }
