@@ -19,7 +19,7 @@ const meta = {
   parameters: {
     design: {
       type: 'figma',
-      url: 'https://www.figma.com/file/KinuveYf4WUlRIXzMTnmIsmO/%5BOC-Design%5D-Lab-%F0%9F%A7%AA?type=design&node-id=20102-89475&t=QBAQoPTR78mPGHKc-0',
+      url: 'https://www.figma.com/file/ZQBMWhnGGtRWeIZknFW1eP/%5BOC-Design%5D-Production-Ready-%E2%9C%85?type=design&node-id=20530-95717&t=GtndoZH2SYmLFcvS-11',
     },
   },
 };

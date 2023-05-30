@@ -27,9 +27,9 @@ import ProcessExpenseButtons, {
   DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
   hasProcessButtons,
 } from '../expenses/ProcessExpenseButtons';
+import { SecurityChecksButton } from '../expenses/SecurityChecksModal';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import { Box, Flex } from '../Grid';
-import { I18nBold } from '../I18nFormatters';
+import { Box, Flex, Grid } from '../Grid';
 import CommentIcon from '../icons/CommentIcon';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
@@ -39,6 +39,88 @@ import StyledTooltip from '../StyledTooltip';
 import Tags from '../Tags';
 import { H3, P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
+
+const ExpenseBlockGrid = styled(Grid)`
+  grid-gap: 2px;
+  grid-template-columns: auto max-content minmax(min-content, max-content);
+  grid-template-rows: repeat(3, min-content);
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr min-content;
+    grid-template-rows: repeat(4, min-content);
+  }
+`;
+
+const SummaryGridItem = styled.div`
+  display: flex;
+  grid-row-start: 1;
+  grid-column-start: 1;
+
+  @media (max-width: 720px) {
+    grid-row-end: span 1;
+  }
+`;
+
+const DetailsGridItem = styled.div`
+  grid-column-start: 2;
+  grid-column-end: span 2;
+  grid-row-start: 1;
+
+  flex-direction: column;
+  display: flex;
+  align-items: flex-end;
+
+  @media (max-width: 720px) {
+    align-items: flex-start;
+    grid-column-start: 1;
+    grid-row-start: 2;
+    border-top: 1px solid #dcdde0;
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+`;
+
+const ActionsGridItem = styled.div.attrs({ 'data-cy': 'expense-actions' })`
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  transition: opacity 0.05s;
+  justify-content: flex-end;
+
+  & > *:last-child {
+    margin-right: 0;
+  }
+
+  grid-column-start: 2;
+  grid-row-start: 2;
+
+  @media (max-width: 720px) {
+    justify-content: center;
+    grid-column-start: 1;
+    grid-column-end: span 2;
+    grid-row-start: 4;
+  }
+`;
+
+const ExpenseCheckGridItem = styled.div`
+  grid-column-start: 3;
+  grid-row-start: 2;
+  margin-top: 8px;
+
+  @media (max-width: 720px) {
+    grid-column-start: 2;
+    grid-row-start: 1;
+  }
+`;
+
+const TagsGridItem = styled.div`
+  grid-column-start: 1;
+  grid-row-start: 2;
+
+  @media (max-width: 720px) {
+    grid-row-start: 3;
+  }
+`;
 
 const ButtonsContainer = styled.div.attrs({ 'data-cy': 'expense-actions' })`
   display: flex;
@@ -133,8 +215,8 @@ const ExpenseBudgetItem = ({
       selected={selected}
       useDrawer={useDrawer}
     >
-      <Flex justifyContent="space-between" flexWrap="wrap">
-        <Flex flex="1" minWidth="max(50%, 200px)" maxWidth={[null, '70%']} mr="24px">
+      <ExpenseBlockGrid>
+        <SummaryGridItem>
           <Box mr={3}>
             {isLoading ? (
               <LoadingPlaceholder width={40} height={40} />
@@ -242,16 +324,9 @@ const ExpenseBudgetItem = ({
               </P>
             </Box>
           )}
-        </Flex>
-        <Flex flexDirection={['row', 'column']} mt={[3, 0]} flexWrap="wrap" alignItems={['center', 'flex-end']}>
-          <Flex
-            my={2}
-            mr={[3, 0]}
-            flexDirection="column"
-            minWidth={100}
-            alignItems="flex-end"
-            data-cy="transaction-amount"
-          >
+        </SummaryGridItem>
+        <DetailsGridItem>
+          <Flex my={2} mr={[3, 0]} flexDirection="column" minWidth={100} data-cy="transaction-amount">
             {isLoading ? (
               <LoadingPlaceholder height={19} width={120} />
             ) : (
@@ -270,28 +345,6 @@ const ExpenseBudgetItem = ({
               </React.Fragment>
             )}
           </Flex>
-          {isAdminView && (
-            <Box color="black.700" fontSize="12px" mb={2}>
-              <FormattedMessage
-                id="CollectiveBalanceAmount"
-                defaultMessage="Collective Balance <strong>{balance}</strong>"
-                values={{
-                  strong: I18nBold,
-                  balance: (
-                    <FormattedMoneyAmount
-                      amount={get(
-                        expense.account,
-                        'stats.balanceWithBlockedFunds.valueInCents',
-                        get(expense.account, 'stats.balanceWithBlockedFunds', 0) as number,
-                      )}
-                      currency={expense.account.currency}
-                      amountStyles={{ color: 'black.700' }}
-                    />
-                  ),
-                }}
-              />
-            </Box>
-          )}
           {isLoading ? (
             <LoadingPlaceholder height={20} width={140} />
           ) : (
@@ -335,20 +388,9 @@ const ExpenseBudgetItem = ({
               )}
             </Flex>
           )}
-        </Flex>
-      </Flex>
-      <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}>
-        <Box mt={2}>
-          {!(isAdminView || isSubmitterView) && (
-            <Tags
-              expense={expense}
-              canEdit={get(expense, 'permissions.canEditTags', false)}
-              suggestedTags={suggestedTags}
-            />
-          )}
-        </Box>
-        {showProcessActions && expense?.permissions && !isExpensePaidOrRejected && (
-          <ButtonsContainer>
+        </DetailsGridItem>
+        <ActionsGridItem>
+          {showProcessActions && !isLoading && expense?.permissions && !isExpensePaidOrRejected && (
             <ProcessExpenseButtons
               host={host}
               isViewingExpenseInHostContext={isViewingExpenseInHostContext}
@@ -357,10 +399,30 @@ const ExpenseBudgetItem = ({
               permissions={expense.permissions}
               buttonProps={{ ...DEFAULT_PROCESS_EXPENSE_BTN_PROPS, mx: 1, py: 2 }}
               onSuccess={onProcess}
+              displaySecurityChecks={false}
             />
-          </ButtonsContainer>
-        )}
-      </Flex>
+          )}
+        </ActionsGridItem>
+        <ExpenseCheckGridItem>
+          {showProcessActions && !isLoading && expense?.securityChecks?.length > 0 && (
+            <SecurityChecksButton minWidth={0} expense={expense} />
+          )}
+        </ExpenseCheckGridItem>
+        <TagsGridItem>
+          <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}>
+            <Box mt={2}>
+              {!(isAdminView || isSubmitterView) && (
+                <Tags
+                  expense={expense}
+                  canEdit={get(expense, 'permissions.canEditTags', false)}
+                  suggestedTags={suggestedTags}
+                />
+              )}
+            </Box>
+          </Flex>
+        </TagsGridItem>
+      </ExpenseBlockGrid>
+
       {hasFilesPreview && (
         <ExpenseFilesPreviewModal
           collective={expense.account}
@@ -451,6 +513,7 @@ ExpenseBudgetItem.propTypes = {
         id: PropTypes.string.isRequired,
       }),
     }),
+    securityChecks: PropTypes.array,
   }),
   selected: PropTypes.bool,
   expandExpense: PropTypes.func,
