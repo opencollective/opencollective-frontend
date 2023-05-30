@@ -2674,7 +2674,7 @@
   "Subscriptions.Cancelled": "Cancelado",
   "Subscriptions.ContributedToDate": "Contribuído até a data",
   "Subscriptions.FeesOnTopTooltip": "Contribuição mais gorjeta de plataforma",
-  "Subscriptions.Status": "{status, select, ACTIVE {Contribuição ativa} CANCELLED {Contribuição cancelada} ERROR {Erro} REJECTED {Contribuição rejeitada} other {}}",
+  "Subscriptions.Status": "{status, select, ACTIVE {Active contribution} CANCELLED {Cancelled contribution} ERROR {Error} REJECTED {Rejected contribution} PROCESSING {Processing} NEW {Processing} other {}}",
   "Success": "Sucesso",
   "suKNE1": "Host Fees charged to Collectives during this time period (these are added continuously to your budget).",
   "Summary": "Resumo",

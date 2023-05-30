@@ -2674,7 +2674,7 @@
   "Subscriptions.Cancelled": "Anulowane",
   "Subscriptions.ContributedToDate": "Wsparcie do dziś",
   "Subscriptions.FeesOnTopTooltip": "Składka wraz z napiwkiem dla Platformy",
-  "Subscriptions.Status": "{status, select, ACTIVE {Składka aktywna} CANCELLED {Składka anulowana} ERROR {Błąd} REJECTED {Składka odrzucona} other {}}",
+  "Subscriptions.Status": "{status, select, ACTIVE {Active contribution} CANCELLED {Cancelled contribution} ERROR {Error} REJECTED {Rejected contribution} PROCESSING {Processing} NEW {Processing} other {}}",
   "Success": "Wykonane",
   "suKNE1": "Opłaty gospodarza naliczane dla Zbiórek są pobierane w tym okresie (są one dodawane na bieżąco do budżetu).",
   "Summary": "Podsumowanie",

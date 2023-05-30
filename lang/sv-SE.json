@@ -2674,7 +2674,7 @@
   "Subscriptions.Cancelled": "Avslutad",
   "Subscriptions.ContributedToDate": "Bidraget hittills",
   "Subscriptions.FeesOnTopTooltip": "Bidrag plus bidrag till plattformen",
-  "Subscriptions.Status": "{status, select, ACTIVE {Aktivt bidrag} CANCELLED {Avbrutet bidrag} ERROR {Fel} REJECTED {Nekade bidrag} other {}}",
+  "Subscriptions.Status": "{status, select, ACTIVE {Active contribution} CANCELLED {Cancelled contribution} ERROR {Error} REJECTED {Rejected contribution} PROCESSING {Processing} NEW {Processing} other {}}",
   "Success": "Klart",
   "suKNE1": "Värdavgifter som har debiteras detta kollektiv under denna tidsperiod (dessa läggs kontinuerligt till din budget).",
   "Summary": "Summering",

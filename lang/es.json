@@ -2674,7 +2674,7 @@
   "Subscriptions.Cancelled": "Cancelado",
   "Subscriptions.ContributedToDate": "Contribuido hasta la fecha",
   "Subscriptions.FeesOnTopTooltip": "Contribución más Propina de Plataforma",
-  "Subscriptions.Status": "{status, select, ACTIVE {Contribución activa} CANCELLED {Contribución cancelada} ERROR {Error} REJECTED {Contribución rechazada} other {}}",
+  "Subscriptions.Status": "{status, select, ACTIVE {Active contribution} CANCELLED {Cancelled contribution} ERROR {Error} REJECTED {Rejected contribution} PROCESSING {Processing} NEW {Processing} other {}}",
   "Success": "Éxito",
   "suKNE1": "Tarifas de Anfitrión cobradas a los Colectivos durante este periodo de tiempo (estos se añaden continuamente a tu presupuesto).",
   "Summary": "Resumen",
