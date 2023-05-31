@@ -389,7 +389,7 @@ const ExportTransactionsCSVModal = ({
           <MessageBox type="warning" withIcon mt={3}>
             <FormattedMessage
               id="ExportTransactionsCSVModal.FiltersWarning"
-              defaultMessage="This report is affected by the filters set in the transactions page."
+              defaultMessage="This report is affected by the filters set on the transactions page."
             />
           </MessageBox>
         )}
