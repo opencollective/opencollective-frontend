@@ -1,23 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { BarChartAlt2 as Chart } from '@styled-icons/boxicons-regular/BarChartAlt2';
-import { Cog } from '@styled-icons/boxicons-regular/Cog';
-import { Coin } from '@styled-icons/boxicons-regular/Coin';
-import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
-import { NetworkChart } from '@styled-icons/boxicons-regular/NetworkChart';
-import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
-import { Transfer } from '@styled-icons/boxicons-regular/Transfer';
-import { Inbox } from '@styled-icons/octicons/Inbox';
+
 import { FormattedMessage } from 'react-intl';
+// import {
+//   CircleStackIcon,
+//   CreditCardIcon,
+//   Inbox,
+//   NewspaperIcon,
+//   Building,
+//   BarChart3,
+//   Cog6ToothIcon,
+//   ArrowRightLeft,
+// } from '@heroicons/react/24/outline';
+
 import {
-  CircleStackIcon,
-  CreditCardIcon,
-  InboxIcon,
-  NewspaperIcon,
-  UserGroupIcon,
-  ChartBarIcon,
-  Cog6ToothIcon,
-} from '@heroicons/react/24/outline';
+  Receipt,
+  Coins,
+  CreditCard,
+  Settings,
+  Network,
+  Building,
+  Inbox,
+  BarChart3,
+  ArrowRightLeft,
+  Home,
+} from 'lucide-react';
+
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective.lib';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
@@ -43,19 +51,27 @@ const Menu = ({ isAccountantOnly }) => {
   const isHost = isHostAccount(account);
   const isIndividual = isIndividualAccount(account);
   return (
-    <div className="space-y-1">
+    <div className="mt-6 space-y-1">
       {/** Host dashboard */}
       <MenuGroup if={isHost} mb={24}>
-        <MenuSectionHeader>
+        {/* <MenuSectionHeader>
           <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
-        </MenuSectionHeader>
+        </MenuSectionHeader> */}
+        <MenuLink
+          section={HOST_DASHBOARD_SECTIONS.HOME}
+          //icon={<NewspaperIcon className={'h-6 w-6 shrink-0'} />}
+          // icon={NewspaperIcon}
+          item={{ icon: Home }}
+        >
+          Home
+        </MenuLink>
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOST_EXPENSES}
           //icon={<NewspaperIcon className={'h-6 w-6 shrink-0'} />}
-          icon={NewspaperIcon}
-          item={{ icon: NewspaperIcon }}
+          // icon={NewspaperIcon}
+          item={{ icon: Receipt }}
         />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} item={{ icon: CircleStackIcon }}>
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} item={{ icon: Coins }}>
           Contributions
         </MenuLink>
 
@@ -70,26 +86,26 @@ const Menu = ({ isAccountantOnly }) => {
           section={HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS}
           if={!isAccountantOnly}
           // icon={<Inbox size={16} />}
-          item={{ icon: InboxIcon }}
+          item={{ icon: Inbox }}
         >
           Applications
         </MenuLink>
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES}
           if={!isAccountantOnly}
-          item={{ icon: UserGroupIcon }}
+          item={{ icon: Building }}
           // icon={<NetworkChart size={16} />}
         />
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS}
           // icon={<CreditCard size={16} />}
-          item={{ icon: CreditCardIcon }}
+          item={{ icon: CreditCard }}
           if={!isAccountantOnly && hasFeature(account, FEATURES.VIRTUAL_CARDS)}
         />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} item={{ icon: ChartBarIcon }} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} item={{ icon: BarChart3 }} />
 
         <MenuLink
-          item={{ icon: Cog6ToothIcon }}
+          item={{ icon: Settings }}
           if={isHost && !isAccountantOnly}
           section="FISCAL_HOST_SETTINGS"
           goToSection={FISCAL_HOST_SECTIONS.FISCAL_HOSTING}
@@ -118,27 +134,39 @@ const Menu = ({ isAccountantOnly }) => {
 
       {/** User/org/collective/event/project dashbord */}
       <MenuGroup if={!isHost}>
-        <MenuSectionHeader>
-          {isType(account, ORGANIZATION) ? (
-            <FormattedMessage id="OrganizationDashboard" defaultMessage="Organization Dashboard" />
-          ) : isType(account, USER) ? (
-            <FormattedMessage id="UserDashboard" defaultMessage="User Dashboard" />
-          ) : isType(account, COLLECTIVE) ? (
-            <FormattedMessage id="CollectiveDashboard" defaultMessage="Collective Dashboard" />
-          ) : (
-            <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-          )}
-        </MenuSectionHeader>
+        {isHost && (
+          <MenuSectionHeader if={isHost}>
+            {isType(account, ORGANIZATION) ? (
+              <FormattedMessage id="OrganizationDashboard" defaultMessage="Organization Dashboard" />
+            ) : isType(account, USER) ? (
+              <FormattedMessage id="UserDashboard" defaultMessage="User Dashboard" />
+            ) : isType(account, COLLECTIVE) ? (
+              <FormattedMessage id="CollectiveDashboard" defaultMessage="Collective Dashboard" />
+            ) : (
+              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+            )}
+          </MenuSectionHeader>
+        )}
+        <MenuLink
+          section={COLLECTIVE_SECTIONS.HOME}
+          //icon={<NewspaperIcon className={'h-6 w-6 shrink-0'} />}
+          // icon={NewspaperIcon}
+          item={{ icon: Home }}
+        >
+          Home
+        </MenuLink>
         <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} item={{ icon: Receipt }} />
-        <MenuLink section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} item={{ icon: Coin }} />
+        <MenuLink section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} item={{ icon: Coins }}>
+          Contributions
+        </MenuLink>
         <MenuLink
           section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
-          item={{ icon: Coin }}
+          item={{ icon: Coins }}
           if={isSelfHostedAccount(account) && !isAccountantOnly && isType(account, COLLECTIVE)}
         />
-        <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} item={{ icon: Transfer }} />
+        <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} item={{ icon: ArrowRightLeft }} />
         <MenuLink
-          item={{ icon: Cog6ToothIcon }}
+          item={{ icon: Settings }}
           if={!isHost}
           section="SETTINGS"
           goToSection={COLLECTIVE_SECTIONS.INFO}
@@ -249,7 +277,7 @@ const Menu = ({ isAccountantOnly }) => {
         {/* org settings for hosts */}
 
         <MenuLink
-          item={{ icon: Cog6ToothIcon }}
+          item={{ icon: Settings }}
           if={isType(account, ORGANIZATION) && isHost}
           section="ORG_SETTINGS"
           goToSection={ABOUT_ORG_SECTIONS.INFO}

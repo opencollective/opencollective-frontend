@@ -14,6 +14,8 @@ import { parseAmountRange } from '../budget/filters/AmountFilter';
 import DismissibleMessage from '../DismissibleMessage';
 import ExpensesFilters from '../expenses/ExpensesFilters';
 import ExpensesList from '../expenses/ExpensesList';
+import Tabs from '../ui/tabs-updated';
+import Alert from '../ui/alert';
 import { parseChronologicalOrderInput } from '../expenses/filters/ExpensesOrder';
 import {
   expenseHostFields,
@@ -83,6 +85,25 @@ const hostDashboardExpensesQuery = gql`
         ...ExpensesListAdminFieldsFragment
       }
     }
+
+    countReadyToPay: expenses(host: { slug: $hostSlug }, limit: 1, offset: 0, status: READY_TO_PAY) {
+      totalCount
+    }
+    countScheduledForPayment: expenses(
+      host: { slug: $hostSlug }
+      limit: 1
+      offset: 0
+      status: SCHEDULED_FOR_PAYMENT
+      payoutMethodType: BANK_ACCOUNT
+    ) {
+      totalCount
+    }
+    countOnHold: expenses(host: { slug: $hostSlug }, limit: 1, offset: 0, status: ON_HOLD) {
+      totalCount
+    }
+    countIncomplete: expenses(host: { slug: $hostSlug }, limit: 1, offset: 0, status: INCOMPLETE) {
+      totalCount
+    }
   }
 
   ${expensesListFieldsFragment}
@@ -114,7 +135,7 @@ const onExpenseUpdate = (updatedExpense, cache, filteredStatus) => {
   }
 };
 
-const NB_EXPENSES_DISPLAYED = 10;
+const NB_EXPENSES_DISPLAYED = 20;
 
 const isValidStatus = status => {
   return Boolean(status === 'READY_TO_PAY' || EXPENSE_STATUS[status]);
@@ -157,24 +178,18 @@ const hasParams = query => {
 const stats = [
   { name: 'Paypal balance', value: '$125,091.00', refill: true },
   { name: 'Wise balance', value: '$12,787.00', refill: true },
-  { name: 'Expenses to pay', value: '$25,988.00' },
 ];
 
-const tabs = [
-  { name: 'Ready to pay', href: '#', count: '24', current: true },
-  { name: 'Scheduled for payment', href: '#', count: '2', current: false },
-  { name: 'On hold', href: '#', count: '4', current: false },
-  { name: 'Incomplete', count: '18', href: '#', current: false },
-  { name: 'Recently paid', href: '#', current: false },
-];
-
-const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
+const HostDashboardExpenses = ({ hostSlug, isDashboard, settings }) => {
+  console.log({ settingsInHostDashb: settings });
   const router = useRouter() || {};
+
   const query = enforceDefaultParamsOnQuery(router.query);
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const hasFilters = React.useMemo(() => hasParams(query), [query]);
   const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-expenses` : `/${hostSlug}/admin/expenses`;
   const queryVariables = { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) };
+  console.log({ queryVariables, query });
   const expenses = useQuery(hostDashboardExpensesQuery, { variables: queryVariables, context: API_V2_CONTEXT });
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
   React.useEffect(() => {
@@ -185,12 +200,70 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   }, [query.paypalApprovalError]);
 
   const { data, error, loading } = expenses;
+  const [tabs, setTabs] = React.useState([
+    { label: 'Ready to pay', count: data?.countReadyToPay?.totalCount },
+    { label: 'Scheduled for payment', count: data?.countScheduledForPayment?.totalCount },
+    { label: 'On hold', count: data?.countOnHold?.totalCount },
+    { label: 'Incomplete', count: data?.countIncomplete?.totalCount },
+    { label: 'Recently paid' },
+  ]);
+  console.log({ query, data });
+  const [selectedTab, setTab] = React.useState(tabs[0].label);
+
   const getQueryParams = newParams => {
-    return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+    const newNewParams = omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+    console.log({ newParams, newNewParams });
+    return newNewParams;
   };
+  React.useEffect(() => {
+    // update tab counts
+    if (data?.countReadyToPay) {
+      setTabs([
+        { label: 'Ready to pay', count: data?.countReadyToPay?.totalCount },
+        { label: 'Scheduled for payment', count: data?.countScheduledForPayment?.totalCount },
+        { label: 'On hold', count: data?.countOnHold?.totalCount },
+        { label: 'Incomplete', count: data?.countIncomplete?.totalCount },
+        { label: 'Recently paid' },
+      ]);
+    }
+  }, [data]);
+  React.useEffect(() => {
+    switch (selectedTab) {
+      case 'Ready to pay':
+        router.push({
+          pathname: pageRoute,
+          query: getQueryParams({ status: 'READY_TO_PAY', payout: null, offset: null }),
+        });
+        break;
+      case 'Scheduled for payment':
+        router.push({
+          pathname: pageRoute,
+          query: getQueryParams({ status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', offset: null }),
+        });
+        break;
+      case 'On hold':
+        router.push({
+          pathname: pageRoute,
+          query: getQueryParams({ status: 'ON_HOLD', payout: null, offset: null }),
+        });
+        break;
+      case 'Incomplete':
+        router.push({
+          pathname: pageRoute,
+          query: getQueryParams({ status: 'INCOMPLETE', payout: null, offset: null }),
+        });
+        break;
+      case 'Recently paid':
+        router.push({
+          pathname: pageRoute,
+          query: getQueryParams({ status: 'PAID', payout: null, offset: null }),
+        });
+        break;
+    }
+  }, [selectedTab]);
 
   return (
-    <Box maxWidth={1400} m="0 auto" px={2}>
+    <div className="w-full max-w-screen-xl">
       <Flex mb={24} alignItems="center" flexWrap="wrap">
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
@@ -210,7 +283,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
       </Flex>
       {/* Stats */}
       <div className="mb-6 border-b border-b-gray-900/10 lg:border-t lg:border-t-gray-900/5">
-        <dl className="mx-auto grid max-w-7xl grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:px-2 xl:px-0">
+        <dl className=" grid max-w-7xl grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:px-2 xl:px-0">
           {stats.map((stat, statIdx) => (
             <div
               key={stat.name}
@@ -230,10 +303,8 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
       </div>
       {/* <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" /> */}
 
-      <div>
-        {/* <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-          Search candidates
-        </label> */}
+      {/* <div>
+    
         <div className="my-2 flex rounded-md shadow-sm">
           <div className="relative flex flex-grow items-stretch focus-within:z-10">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -256,57 +327,9 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
             Oldest first
           </button>
         </div>
-      </div>
+      </div> */}
 
-      <div>
-        <div className="sm:hidden">
-          <label htmlFor="tabs" className="sr-only">
-            Select a tab
-          </label>
-          {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
-          <select
-            id="tabs"
-            name="tabs"
-            className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-            defaultValue={tabs.find(tab => tab.current).name}
-          >
-            {tabs.map(tab => (
-              <option key={tab.name}>{tab.name}</option>
-            ))}
-          </select>
-        </div>
-        <div className="hidden sm:block">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-              {tabs.map(tab => (
-                <a
-                  key={tab.name}
-                  href="#"
-                  className={cx(
-                    tab.current
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-700',
-                    'flex whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium',
-                  )}
-                  aria-current={tab.current ? 'page' : undefined}
-                >
-                  {tab.name}
-                  {tab.count ? (
-                    <span
-                      className={cx(
-                        tab.current ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-900',
-                        'ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
-                      )}
-                    >
-                      {tab.count}
-                    </span>
-                  ) : null}
-                </a>
-              ))}
-            </nav>
-          </div>
-        </div>
-      </div>
+      <Tabs tabs={tabs} selected={selectedTab} onChange={setTab} />
       {paypalPreApprovalError && (
         <DismissibleMessage>
           {({ dismiss }) => (
@@ -383,50 +406,30 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
         ) : null}
       </Box> */}
 
-      {error ? null : !loading && !data.expenses?.nodes.length ? (
-        <MessageBox type="info" withIcon data-cy="zero-expense-message">
-          {hasFilters ? (
-            <FormattedMessage
-              id="ExpensesList.Empty"
-              defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
-              values={{
-                ResetLink(text) {
-                  return (
-                    <Link data-cy="reset-expenses-filters" href={{ pathname: pageRoute }}>
-                      {text}
-                    </Link>
-                  );
-                },
-              }}
-            />
-          ) : (
-            <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
-          )}
-        </MessageBox>
-      ) : (
-        <React.Fragment>
-          <ExpensesList
-            isLoading={loading}
-            host={data?.host}
-            nbPlaceholders={paginatedExpenses.limit}
-            expenses={paginatedExpenses.nodes}
-            view="admin"
-            onProcess={(expense, cache) => {
-              hasFilters && onExpenseUpdate(expense, cache, query.status);
-            }}
+      <React.Fragment>
+        <ExpensesList
+          settings={settings}
+          isLoading={loading}
+          loadingCount={tabs.find(t => t.label === selectedTab)?.count}
+          host={data?.host}
+          nbPlaceholders={paginatedExpenses.limit}
+          expenses={paginatedExpenses.nodes}
+          view="admin"
+          onProcess={(expense, cache) => {
+            hasFilters && onExpenseUpdate(expense, cache, query.status);
+          }}
+        />
+        <Flex mt={5} justifyContent="center">
+          <Pagination
+            route={pageRoute}
+            total={paginatedExpenses.totalCount}
+            limit={paginatedExpenses.limit}
+            offset={paginatedExpenses.offset}
+            ignoredQueryParams={ROUTE_PARAMS}
           />
-          <Flex mt={5} justifyContent="center">
-            <Pagination
-              route={pageRoute}
-              total={paginatedExpenses.totalCount}
-              limit={paginatedExpenses.limit}
-              offset={paginatedExpenses.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-          </Flex>
-        </React.Fragment>
-      )}
-    </Box>
+        </Flex>
+      </React.Fragment>
+    </div>
   );
 };
 

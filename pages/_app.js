@@ -13,9 +13,13 @@ import defaultColors from '../lib/theme/colors';
 import withData from '../lib/withData';
 
 import DefaultPaletteStyle from '../components/DefaultPaletteStyle';
+import Layout from '../components/LayoutTwo';
 import StripeProviderSSR from '../components/StripeProvider';
 import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
 import UserProvider from '../components/UserProvider';
+import { TooltipProvider } from '../components/ui/tooltip';
+
+import PrototypeSettings from '../components/PrototypeSettings';
 
 import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
@@ -59,7 +63,7 @@ class OpenCollectiveFrontendApp extends App {
 
   constructor() {
     super(...arguments);
-    this.state = { hasError: false, errorEventId: undefined };
+    this.state = { hasError: false, errorEventId: undefined, settings: { tables: true } };
   }
 
   static async getInitialProps({ Component, ctx, client }) {
@@ -124,6 +128,7 @@ class OpenCollectiveFrontendApp extends App {
 
   render() {
     const { client, Component, pageProps, scripts, locale, messages } = this.props;
+    const { settings } = this.state;
 
     const intl = createIntl({ locale: locale || 'en', defaultLocale: 'en', messages }, cache);
 
@@ -133,16 +138,26 @@ class OpenCollectiveFrontendApp extends App {
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
               <RawIntlProvider value={intl}>
-                <ToastProvider>
-                  <UserProvider>
-                    <NewsAndUpdatesProvider>
-                      <Component {...pageProps} />
-                      <GlobalToasts />
-                      <GlobalNewsAndUpdates />
-                      <TwoFactorAuthenticationModal />
-                    </NewsAndUpdatesProvider>
-                  </UserProvider>
-                </ToastProvider>
+                <TooltipProvider delayDuration={300}>
+                  <ToastProvider>
+                    <UserProvider>
+                      <NewsAndUpdatesProvider>
+                        <Layout>
+                          <Component {...pageProps} settings={settings} />
+                        </Layout>
+                        <GlobalToasts />
+                        <GlobalNewsAndUpdates />
+                        <TwoFactorAuthenticationModal />
+                        <PrototypeSettings
+                          settings={settings}
+                          setSetting={newSetting => {
+                            this.setState({ settings: { ...settings, ...newSetting } });
+                          }}
+                        />
+                      </NewsAndUpdatesProvider>
+                    </UserProvider>
+                  </ToastProvider>
+                </TooltipProvider>
               </RawIntlProvider>
             </StripeProviderSSR>
           </ThemeProvider>

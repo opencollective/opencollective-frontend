@@ -35,7 +35,7 @@ const parseQuery = (routerQuery, account) => {
     orderBy,
   };
 };
-const EXPENSES_PER_PAGE = 10;
+const EXPENSES_PER_PAGE = 20;
 
 const getVariables = (query, slug) => {
   const amountRange = parseAmountRange(query.amount);
@@ -86,6 +86,7 @@ const Expenses = (props: AdminSectionProps) => {
       LoggedInUser={LoggedInUser}
       onlySubmittedExpenses={LoggedInUser?.collective.slug === variables.collectiveSlug}
       isDashboard
+      settings={props.settings}
     />
   );
 };

@@ -33,12 +33,12 @@ const FormattedMoneyAmount = ({
   isCrypto,
 }) => {
   if (!currency) {
-    return <span {...amountStyles}>{EMPTY_AMOUNT_PLACEHOLDER}</span>;
+    return <span className="font-bold text-slate-900">{EMPTY_AMOUNT_PLACEHOLDER}</span>;
   }
 
   const formattedAmount =
     isNaN(amount) || isNil(amount) ? (
-      <span {...amountStyles}>{EMPTY_AMOUNT_PLACEHOLDER}</span>
+      <span className="font-bold text-slate-900">{EMPTY_AMOUNT_PLACEHOLDER}</span>
     ) : (
       <Currency
         value={amount}
@@ -53,9 +53,9 @@ const FormattedMoneyAmount = ({
     interval = getIntervalFromContributionFrequency(frequency);
   }
 
-  const currencyCode = showCurrencyCode ? <Span {...currencyCodeStyles}>{currency}</Span> : '';
+  const currencyCode = showCurrencyCode ? <span className="font-regular">{currency}</span> : '';
   if (isCrypto) {
-    return <Span {...amountStyles}>{`${amount} ${currency}`}</Span>;
+    return <span className="font-bold text-slate-900">{`${amount} ${currency}`}</span>;
   } else if (!interval || interval === INTERVALS.flexible || interval === INTERVALS.oneTime) {
     return (
       <FormattedMessage

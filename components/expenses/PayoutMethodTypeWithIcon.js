@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
@@ -16,68 +16,50 @@ import { Span } from '../Text';
 /**
  * Shows the data of the given payout method
  */
-const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color, iconSize, name }) => {
+const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color, iconSize, onlyIcon, name }) => {
   if (isLoading) {
     return <LoadingPlaceholder height={15} width={90} />;
   }
 
+  let icon, label;
+
   switch (type) {
     case PayoutMethodType.PAYPAL:
-      return (
-        <Flex alignItems="center">
-          <PaypalIcon size={iconSize} color="#192f86" />
-          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
-            PayPal
-          </Span>
-        </Flex>
-      );
+      icon = <PaypalIcon size={iconSize} color="#192f86" />;
+      label = 'PayPal';
+      break;
+
     case PayoutMethodType.BANK_ACCOUNT:
-      return (
-        <Flex alignItems="center">
-          <BankIcon size={iconSize} color="#9D9FA3" />
-          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
-            <FormattedMessage id="BankAccount" defaultMessage="Bank account" />
-          </Span>
-        </Flex>
-      );
+      icon = <BankIcon size={iconSize} color="#9D9FA3" />;
+      label = <FormattedMessage id="BankAccount" defaultMessage="Bank account" />;
+      break;
     case PayoutMethodType.ACCOUNT_BALANCE:
-      return (
-        <Flex alignItems="center">
-          <OtherIcon size={iconSize} color="#9D9FA3" />
-          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
-            Open Collective
-          </Span>
-        </Flex>
-      );
+      icon = <OtherIcon size={iconSize} color="#9D9FA3" />;
+      label = 'Open Collective';
+      break;
+
     case INVITE:
-      return (
-        <Flex alignItems="center">
-          <Avatar name="?" size={iconSize} backgroundColor="blue.100" color="blue.400" fontWeight="500" />
-          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
-            <FormattedMessage id="PayoutMethod.Type.ToBeDefined" defaultMessage="Not yet set" />
-          </Span>
-        </Flex>
-      );
+      icon = <Avatar name="?" size={iconSize} backgroundColor="blue.100" color="blue.400" fontWeight="500" />;
+      label = <FormattedMessage id="PayoutMethod.Type.ToBeDefined" defaultMessage="Not yet set" />;
+      break;
+
     case VIRTUAL_CARD:
-      return (
-        <Flex alignItems="center">
-          <CreditCard size={iconSize} color="#9D9FA3" />
-          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
-            {name || <FormattedMessage id="PayoutMethod.Type.VirtualCard" defaultMessage="Virtual Card" />}
-          </Span>
-        </Flex>
-      );
+      icon = <CreditCard size={iconSize} color="#9D9FA3" />;
+      label = name || <FormattedMessage id="PayoutMethod.Type.VirtualCard" defaultMessage="Virtual Card" />;
+      break;
+
     case PayoutMethodType.OTHER:
     default:
-      return (
-        <Flex alignItems="center">
-          <OtherIcon size={iconSize} color="#9D9FA3" />
-          <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
-            <FormattedMessage id="PayoutMethod.Type.Other" defaultMessage="Other" />
-          </Span>
-        </Flex>
-      );
+      icon = <OtherIcon size={iconSize} color="#9D9FA3" />;
+      label = <FormattedMessage id="PayoutMethod.Type.Other" defaultMessage="Other" />;
   }
+
+  return (
+    <div className="flex items-center gap-2 truncate">
+      {icon}
+      {!onlyIcon ? <span className="truncate text-xs">{label}</span> : null}
+    </div>
+  );
 };
 
 PayoutMethodTypeWithIcon.propTypes = {
@@ -88,6 +70,7 @@ PayoutMethodTypeWithIcon.propTypes = {
   color: PropTypes.string,
   iconSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   name: PropTypes.string,
+  onlyIcon: PropTypes.bool,
 };
 
 PayoutMethodTypeWithIcon.defaultProps = {

@@ -191,13 +191,13 @@ class SigninPage extends React.Component {
   render() {
     return (
       <div className="LoginPage">
-        <Header
+        {/* <Header
           title={this.props.form === 'signin' ? 'Sign In' : 'Create Account'}
           description="Create your profile on Open Collective and show the world the open collectives that you are contributing to."
           menuItems={{ solutions: false, product: false, company: false, docs: false }}
           showSearch={false}
           showProfileAndChangelogMenu={false}
-        />
+        /> */}
         <Body>
           <Flex flexDirection="column" alignItems="center" my={[4, 6]} p={2}>
             {this.renderContent()}

@@ -10,6 +10,7 @@ export const HOST_DASHBOARD_SECTIONS = {
   COLLECTIVES: 'collectives',
   OVERVIEW: 'info',
   REPORTS: 'reports',
+  HOME: 'home',
   // Existing Host Dashboard Sections
   HOST_EXPENSES: 'host-expenses',
   FINANCIAL_CONTRIBUTIONS: 'orders',
@@ -48,6 +49,7 @@ export const FISCAL_HOST_SECTIONS = {
 };
 
 export const COLLECTIVE_SECTIONS = {
+  HOME: 'home',
   ADVANCED: 'advanced',
   AUTHORIZED_APPS: 'authorized-apps',
   COLLECTIVE_GOALS: 'goals',

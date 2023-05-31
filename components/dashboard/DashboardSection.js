@@ -24,6 +24,7 @@ import { H2 } from '../Text';
 import Expenses from './sections/Expenses';
 import ManageContributions from './sections/ManageContributions';
 import Transactions from './sections/Transactions';
+import ActivityLog from './sections/ActivityLog';
 import {
   COLLECTIVE_SECTIONS,
   FISCAL_HOST_SECTIONS,
@@ -31,6 +32,7 @@ import {
   LEGACY_COLLECTIVE_SETTINGS_SECTIONS,
   SECTION_LABELS,
 } from './constants';
+import { ALL_SECTIONS } from '../admin-panel/constants';
 
 const ADMIN_PANEL_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
@@ -46,6 +48,7 @@ const ADMIN_PANEL_SECTIONS = {
   [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
   [COLLECTIVE_SECTIONS.EXPENSES]: Expenses,
   [COLLECTIVE_SECTIONS.TRANSACTIONS]: Transactions,
+  [COLLECTIVE_SECTIONS.HOME]: ActivityLog,
 };
 
 const FISCAL_HOST_SETTINGS_SECTIONS = {
@@ -58,7 +61,7 @@ const Title = styled(H2)`
   line-height: 32px;
 `;
 
-const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
+const AdminPanelSection = ({ collective, isLoading, section, subpath, settings }) => {
   const { formatMessage } = useIntl();
 
   if (isLoading) {
@@ -74,7 +77,13 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
   if (AdminSectionComponent) {
     return (
       <Container width="100%">
-        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} isDashboard={true} />
+        <AdminSectionComponent
+          settings={settings}
+          account={collective}
+          hostSlug={collective.slug}
+          subpath={subpath}
+          isDashboard={true}
+        />
       </Container>
     );
   }
@@ -84,7 +93,7 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
   if (FiscalHostSettingsComponent) {
     return (
       <Container width="100%">
-        <FiscalHostSettingsComponent collective={collective} />
+        <FiscalHostSettingsComponent isDashboard={true} collective={collective} settings={settings} />
       </Container>
     );
   }

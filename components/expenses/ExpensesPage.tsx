@@ -30,7 +30,8 @@ const ORDER_SELECT_STYLE = { control: { background: 'white' } };
 
 const Expenses = props => {
   const router = useRouter();
-  const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, onlySubmittedExpenses } = props;
+  const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, onlySubmittedExpenses, settings } =
+    props;
 
   const expensesRoute = isDashboard
     ? `/dashboard/${data?.account?.slug}/expenses`
@@ -93,27 +94,28 @@ const Expenses = props => {
   const isSelfHosted = data?.account?.id === data?.account?.host?.id;
 
   return (
-    <Container>
-      <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+    <div className="max-w-screen-xl w-full">
+      <h1 className="mb-4 text-3xl font-bold tracking-tight text-gray-900">
         {onlySubmittedExpenses ? (
           <FormattedMessage defaultMessage="Submitted Expenses" />
         ) : (
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         )}
-      </H1>
-      <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}>
-        {!onlySubmittedExpenses && (
-          <Box flex="0 1" flexBasis={['100%', null, '380px']}>
-            <ExpensesDirection
-              value={query.direction || 'RECEIVED'}
-              onChange={direction => {
-                const newFilters = { ...query, direction };
-                updateFilters(newFilters);
-              }}
-            />
-          </Box>
-        )}
-        <Box flex="12 1 160px">
+      </h1>
+      {!onlySubmittedExpenses && (
+        <Box flex="0 1" flexBasis={['100%', null, '380px']}>
+          <ExpensesDirection
+            value={query.direction || 'RECEIVED'}
+            onChange={direction => {
+              const newFilters = { ...query, direction };
+              updateFilters(newFilters);
+            }}
+          />
+        </Box>
+      )}
+      {/* <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}> */}
+
+      {/* <Box flex="12 1 160px">
           <SearchBar defaultValue={query.searchTerm} onSubmit={searchTerm => handleSearch(searchTerm)} height="40px" />
         </Box>
         <Box flex="0 1 160px">
@@ -122,9 +124,9 @@ const Expenses = props => {
             onChange={orderBy => updateFilters({ ...query, orderBy })}
             styles={ORDER_SELECT_STYLE}
           />
-        </Box>
-      </Flex>
-      <Box mx="8px">
+        </Box> */}
+      {/* </Flex> */}
+      {/* <Box mx="8px">
         {data?.account ? (
           <ExpensesFilters
             collective={data.account}
@@ -136,12 +138,12 @@ const Expenses = props => {
         ) : (
           <LoadingPlaceholder height={70} />
         )}
-      </Box>
+      </Box> */}
       {isSelfHosted && LoggedInUser?.isHostAdmin(data?.account) && data.scheduledExpenses?.totalCount > 0 && (
         <ScheduledExpensesBanner hostSlug={data.account.slug} />
       )}
       <Flex justifyContent="space-between" flexWrap="wrap" gridGap={[0, 3, 5]}>
-        <Box flex="1 1 500px" minWidth={300} mb={5} mt={['16px', '46px']}>
+        <Box flex="1 1 500px" minWidth={300} mb={5}>
           {!loading && !data.expenses?.nodes.length ? (
             <MessageBox type="info" withIcon data-cy="zero-expense-message">
               {hasFilters ? (
@@ -163,6 +165,7 @@ const Expenses = props => {
           ) : (
             <React.Fragment>
               <ExpensesList
+                settings={settings}
                 isLoading={loading}
                 collective={data?.account}
                 host={data?.account?.isHost ? data?.account : data?.account?.host}
@@ -171,6 +174,13 @@ const Expenses = props => {
                 suggestedTags={suggestedTags(data?.account)}
                 isInverted={query.direction === 'SUBMITTED'}
                 view={query.direction === 'SUBMITTED' ? 'submitter' : undefined}
+                context={
+                  onlySubmittedExpenses
+                    ? 'individual-submitted'
+                    : query.direction === 'SUBMITTED'
+                    ? 'submitted'
+                    : 'received'
+                }
               />
               <Flex mt={5} justifyContent="center">
                 <Pagination
@@ -221,7 +231,7 @@ const Expenses = props => {
           </Box>
         )}
       </Flex>
-    </Container>
+    </div>
   );
 };
 
@@ -266,6 +276,7 @@ Expenses.propTypes = {
   }),
   isDashboard: PropTypes.bool,
   onlySubmittedExpenses: PropTypes.bool,
+  settings: PropTypes.object,
 };
 
 export default Expenses;

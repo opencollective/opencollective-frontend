@@ -43,13 +43,13 @@ const messages = defineMessages({
 
 const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
-    return ALL_SECTIONS.INFO;
+    return ALL_SECTIONS.HOME;
   } else if (isHostAccount(account)) {
-    return ALL_SECTIONS.HOST_EXPENSES;
+    return ALL_SECTIONS.HOME;
   } else {
     const isAdmin = loggedInUser?.isAdminOfCollective(account);
     const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
-    return !isAdmin && isAccountant ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.EXPENSES;
+    return !isAdmin && isAccountant ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.HOME;
   }
 };
 
@@ -97,12 +97,12 @@ const getIsAccountantOnly = (LoggedInUser, account) => {
   return LoggedInUser && !LoggedInUser.isAdminOfCollective(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account);
 };
 
-const DashboardPage = () => {
+const DashboardPage = ({ settings }) => {
   const intl = useIntl();
   const router = useRouter();
   const { slug, section, subpath } = router.query;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
-
+  console.log({ settingsInDashboard: settings });
   // Redirect to the dashboard of the logged in user if no slug is provided
   useEffect(() => {
     if (!slug && LoggedInUser) {
@@ -142,14 +142,7 @@ const DashboardPage = () => {
           {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
         </Flex>
       ) : (
-        <div
-          className="relative flex"
-          // flexDirection={['column', 'column', 'row']}
-          // justifyContent={'flex-start'}
-          // minHeight={600}
-          // gridGap={16}
-          data-cy="admin-panel-container"
-        >
+        <div className="relative flex h-full" data-cy="admin-panel-container">
           <AdminPanelSideBar
             isLoading={isLoading}
             collective={account}
@@ -158,27 +151,19 @@ const DashboardPage = () => {
             isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
           />
 
-          <main className="">
-            <div className="">
-              <div className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
-                {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
-                  <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
-                ) : (
-                  <AdminPanelSection
-                    section={selectedSection}
-                    isLoading={isLoading}
-                    collective={account}
-                    subpath={subpath}
-                  />
-                )}
-              </div>
-            </div>
+          <main className="page flex-1">
+            {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
+              <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
+            ) : (
+              <AdminPanelSection
+                section={selectedSection}
+                isLoading={isLoading}
+                collective={account}
+                subpath={subpath}
+                settings={settings}
+              />
+            )}
           </main>
-
-          <aside className="fixed inset-y-0 right-0 hidden w-96 overflow-y-auto border-l border-gray-200 bg-green-100 px-4 py-6 sm:px-6 lg:px-8 xl:block">
-            {/* Secondary column (hidden on smaller screens) */}
-            asd
-          </aside>
         </div>
       )}
       {/* </Page> */}

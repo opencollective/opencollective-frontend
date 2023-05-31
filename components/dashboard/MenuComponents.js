@@ -97,7 +97,7 @@ export const MenuLink = ({
   const expanded = expandedSection === section;
   const { formatMessage } = useIntl();
   const isSelected = section && selectedSection === section;
-  console.log({ isSelected });
+
   useEffect(() => {
     if (parentSection && isSelected) {
       setExpandedSection?.(parentSection);
@@ -148,14 +148,14 @@ export const MenuLink = ({
         <Link
           href={getDashboardRoute(account, section)}
           className={cx(
-            isSelected ? 'bg-gray-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600',
-            'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
+            isSelected ? 'bg-slate-50 text-blue-600' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-600',
+            'group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
           )}
         >
           {AyCon && (
             <AyCon
               className={cx(
-                isSelected ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600',
+                isSelected ? 'text-blue-600' : 'text-slate-400 group-hover:text-blue-600',
                 'h-6 w-6 shrink-0',
               )}
               aria-hidden="true"
@@ -164,9 +164,10 @@ export const MenuLink = ({
           {item?.icon && (
             <item.icon
               className={cx(
-                isSelected ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600',
+                isSelected ? 'text-blue-600' : 'text-slate-400 group-hover:text-blue-600',
                 'h-6 w-6 shrink-0',
               )}
+              strokeWidth="1.5"
               aria-hidden="true"
             />
           )}

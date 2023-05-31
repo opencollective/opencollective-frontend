@@ -566,7 +566,7 @@ export const getExpenseStatusMsgType = status => {
   }
 };
 
-export function ExpenseStatus({ status, size="medium" }) {
+export function ExpenseStatus({ status, size }:any) {
   const intl = useIntl();
   const statusStyles = cva('inline-flex items-center rounded-md  font-medium gap-x-1.5 py-1 px-2', {
     variants: {

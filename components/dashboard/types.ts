@@ -4,4 +4,5 @@ export type AdminSectionProps = {
   account: Partial<Account>;
   subpath: string;
   hostSlug: string;
+  settings: any;
 };

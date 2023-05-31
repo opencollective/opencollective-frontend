@@ -73,17 +73,19 @@ const HelpAndSupport = ({ action, formConfirmation }) => {
 
   return (
     <Page description={formatMessage(messages.defaultTitle)}>
-      {action === 'contact' ? (
-        renderFormContent(formConfirmation)
-      ) : (
-        <React.Fragment>
-          <HowCanWeHelp />
-          <SearchTopics />
-          <BrowseTopics />
-          <HowOCWorks />
-          <WeAreHereIfYouWantToTalk />
-        </React.Fragment>
-      )}
+      <div className="page">
+        {action === 'contact' ? (
+          renderFormContent(formConfirmation)
+        ) : (
+          <React.Fragment>
+            <HowCanWeHelp />
+            <SearchTopics />
+            <BrowseTopics />
+            <HowOCWorks />
+            <WeAreHereIfYouWantToTalk />
+          </React.Fragment>
+        )}
+      </div>
     </Page>
   );
 };

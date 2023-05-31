@@ -9,6 +9,7 @@ import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
+import { themeGet } from '@styled-system/theme-get';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../lib/i18n/collective-type';
@@ -43,11 +44,11 @@ const StyledMenuEntry = styled(Link)`
   ${props =>
     props.$isActive
       ? css({
-          backgroundColor: 'primary.100',
+          backgroundColor: 'slate.100',
         })
       : css({
           ':hover': {
-            backgroundColor: 'black.50',
+            backgroundColor: 'slate.100',
           },
         })}
 `;
@@ -55,7 +56,7 @@ const StyledMenuEntry = styled(Link)`
 const DropdownButton = styled.button`
   display: flex;
   background: white;
-  border: 1px solid #e6e8eb;
+  border: 1px solid ${themeGet('colors.slate.200')};
   width: 100%;
   border-radius: 6px;
   padding: 8px;
@@ -67,7 +68,7 @@ const DropdownButton = styled.button`
   &:hover,
   :active,
   :focus {
-    background: #f9f9f9;
+    background: ${themeGet('colors.slate.50')};
   }
 
   div {
@@ -117,7 +118,7 @@ const MenuEntry = ({ account, activeSlug }) => {
   const [expanded, setExpanded] = React.useState(false);
 
   return (
-    <React.Fragment>
+    <div className="text-slate-900">
       <StyledMenuEntry
         key={account.id}
         href={`/dashboard/${account.slug}`}
@@ -161,7 +162,7 @@ const MenuEntry = ({ account, activeSlug }) => {
               </Flex>
             </StyledMenuEntry>
           ))}
-    </React.Fragment>
+    </div>
   );
 };
 
@@ -187,12 +188,12 @@ const AccountSwitcher = () => {
   return (
     <Dropdown trigger="click">
       {({ triggerProps, dropdownProps }) => (
-        <React.Fragment>
+        <div className="relative">
           <Flex alignItems="center">
             <DropdownButton {...triggerProps}>
               <div>
                 <Avatar collective={activeAccount} size={32} />
-                <span className="text-ellipsis text-sm">{activeAccount?.name}</span>
+                <span className="text-ellipsis text-sm text-slate-900">{activeAccount?.name}</span>
               </div>
 
               <ChevronUpDown size={20} />
@@ -209,7 +210,7 @@ const AccountSwitcher = () => {
                 >
                   <Flex alignItems="center" gridGap="12px">
                     <Avatar collective={loggedInUserCollective} size={32} />
-                    <Span truncateOverflow>{loggedInUserCollective?.name}</Span>
+                    <span className="truncate text-slate-900">{loggedInUserCollective?.name}</span>
                   </Flex>
                 </StyledMenuEntry>
                 {Object.entries(groupedAccounts).map(([collectiveType, accounts]) => {
@@ -239,7 +240,7 @@ const AccountSwitcher = () => {
               </Flex>
             </StyledDropdownContent>
           </Container>
-        </React.Fragment>
+        </div>
       )}
     </Dropdown>
   );

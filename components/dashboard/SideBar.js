@@ -11,7 +11,7 @@ import { MenuContainer } from './MenuComponents';
 
 const SidebarContainer = styled(Box)`
   border-right: 1px solid #e6e8eb;
-  flex: 0 2 300px;
+  flex: 0 1 280px;
 `;
 
 const Sticky = styled.div`

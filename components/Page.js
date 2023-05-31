@@ -34,7 +34,7 @@ const Page = ({
 
   return (
     <Fragment>
-      <Header
+      {/* <Header
         showSearch={showSearch}
         title={title}
         noRobots={noRobots}
@@ -47,9 +47,9 @@ const Page = ({
         menuItems={menuItems}
         LoggedInUser={LoggedInUser}
         showProfileAndChangelogMenu={showProfileAndChangelogMenu}
-      />
+      /> */}
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
-      {showFooter && <Footer />}
+      {/* {showFooter && <Footer />} */}
     </Fragment>
   );
 };

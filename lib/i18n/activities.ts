@@ -60,49 +60,49 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: 'Expense deleted',
   },
   COLLECTIVE_EXPENSE_UPDATED: {
-    defaultMessage: '<Expense>Expense</Expense> from <FromAccount></FromAccount> to <Account></Account> updated',
+    defaultMessage: 'updated <Expense>Expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
   },
   COLLECTIVE_EXPENSE_REJECTED: {
-    defaultMessage: 'Rejected <Expense>expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
+    defaultMessage: 'rejected <Expense>expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
   },
   COLLECTIVE_EXPENSE_APPROVED: {
-    defaultMessage: 'Approved <Expense>expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
+    defaultMessage: 'approved <Expense>expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
   },
   COLLECTIVE_EXPENSE_UNAPPROVED: {
-    defaultMessage: 'Unapproved <Expense>expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
+    defaultMessage: 'unapproved <Expense>expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
   },
   COLLECTIVE_EXPENSE_MOVED: {
-    defaultMessage: '<Expense>Expense</Expense> moved from <FromAccount></FromAccount> to <Account></Account>',
+    defaultMessage: 'moved <Expense>Expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
   },
   COLLECTIVE_EXPENSE_PAID: {
-    defaultMessage: 'Paid <Expense>expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
+    defaultMessage: 'paid <Expense>expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
   },
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID: {
-    defaultMessage: 'Marked <Expense>expense</Expense> as unpaid',
+    defaultMessage: 'marked <Expense>expense</Expense> as unpaid',
   },
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM: {
-    defaultMessage: 'Marked <Expense>expense</Expense> as SPAM',
+    defaultMessage: 'marked <Expense>expense</Expense> as SPAM',
   },
   COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE: {
-    defaultMessage: 'Marked <Expense>expense</Expense> as incomplete',
+    defaultMessage: 'marked <Expense>expense</Expense> as incomplete',
   },
   COLLECTIVE_EXPENSE_PROCESSING: {
-    defaultMessage: '<Expense>Expense</Expense> processing',
+    defaultMessage: 'processing <Expense>Expense</Expense>',
   },
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT: {
-    defaultMessage: '<Expense>Expense</Expense> scheduled for payment',
+    defaultMessage: 'scheduled <Expense>Expense</Expense> for payment',
   },
   COLLECTIVE_EXPENSE_ERROR: {
     defaultMessage: '<Expense>Expense</Expense> payment failed',
   },
   COLLECTIVE_EXPENSE_INVITE_DRAFTED: {
-    defaultMessage: 'Invited someone to submit <Expense>expense</Expense> to <Account></Account>',
+    defaultMessage: 'invited someone to submit <Expense>expense</Expense> to <Account></Account>',
   },
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED: {
-    defaultMessage: 'New draft created for <Expense>recurring expense</Expense> on <Account></Account>',
+    defaultMessage: 'created new draft for <Expense>recurring expense</Expense> on <Account></Account>',
   },
   COLLECTIVE_EXPENSE_MISSING_RECEIPT: {
-    defaultMessage: 'Notified admins about a missing receipt for <Expense>expense</Expense> on <Account></Account>',
+    defaultMessage: 'notified admins about a missing receipt for <Expense>expense</Expense> on <Account></Account>',
   },
   TAXFORM_REQUEST: {
     defaultMessage: 'Tax form request sent to <Account></Account>',
