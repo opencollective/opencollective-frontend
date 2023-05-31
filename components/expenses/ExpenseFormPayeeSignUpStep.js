@@ -55,11 +55,11 @@ const msg = defineMessages({
   },
   orgSlugLabel: {
     id: 'createCollective.form.slugLabel',
-    defaultMessage: 'Set your URL',
+    defaultMessage: 'Set your profile URL',
   },
   orgSlugErrorTaken: {
     id: 'createCollective.form.error.slug.taken',
-    defaultMessage: 'URL already taken',
+    defaultMessage: 'Profile URL already taken',
   },
   orgWebsiteLabel: {
     id: 'createOrg.form.websiteLabel',

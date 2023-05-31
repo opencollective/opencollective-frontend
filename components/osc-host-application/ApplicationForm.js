@@ -117,7 +117,7 @@ const messages = defineMessages({
   },
   errorSlugHyphen: {
     id: 'createCollective.form.error.slug.hyphen',
-    defaultMessage: 'Collective slug URL cannot start or end with a hyphen',
+    defaultMessage: 'Collective handle cannot start or end with a hyphen',
   },
   name: {
     id: 'OCFHostApplication.name.label',
@@ -129,7 +129,7 @@ const messages = defineMessages({
   },
   slug: {
     id: 'createCollective.form.slugLabel',
-    defaultMessage: 'Set your URL',
+    defaultMessage: 'Set your profile URL',
   },
   repositoryUrl: {
     id: 'HostApplication.form.RepositoryUrlLabel',

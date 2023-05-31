@@ -92,8 +92,8 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Create Event',
       },
       'slug.label': {
-        id: 'collective.changeUrl.label',
-        defaultMessage: 'URL slug',
+        id: 'account.slug.label',
+        defaultMessage: 'Handle',
       },
       'type.label': { id: 'collective.type.label', defaultMessage: 'Type' },
       'name.label': { id: 'Fields.displayName', defaultMessage: 'Display name' },
