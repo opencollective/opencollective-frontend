@@ -117,7 +117,7 @@ function Expense(props) {
   const router = useRouter();
   const { addToast } = useToasts();
   const [state, setState] = useState({
-    error: null,
+    error: error || null,
     status: draftKey && data?.expense?.status === expenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
     editedExpense: null,
     isSubmitting: false,
@@ -188,6 +188,11 @@ function Expense(props) {
       scrollToExpenseTop();
     }
   }, [state.status]);
+
+  // Update error state when error prop changes (from Expense query)
+  useEffect(() => {
+    setState(state => ({ ...state, error }));
+  }, [error]);
 
   const [editExpense] = useMutation(editExpenseMutation, {
     context: API_V2_CONTEXT,
@@ -481,9 +486,9 @@ function Expense(props) {
         />
       </ExpenseHeader>
 
-      {error && (
+      {state.error && (
         <MessageBox type="error" withIcon mb={4}>
-          {formatErrorMessage(intl, error)}
+          {formatErrorMessage(intl, state.error)}
         </MessageBox>
       )}
       {showTaxFormMsg && (
