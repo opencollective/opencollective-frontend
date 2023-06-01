@@ -3,6 +3,7 @@
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 const { withSentryConfig } = require('@sentry/nextjs');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const path = require('path');
 require('./env');
@@ -62,6 +63,20 @@ const nextConfig = {
         }),
       );
     }
+
+    // Copy pdfjs worker to public folder (used by PDFViewer component)
+    // (Workaround for working with react-pdf and CommonJS - if moving to ESM this can be removed)
+    // TODO(ESM): Move this to standard ESM
+    config.plugins.push(
+      new CopyPlugin({
+        patterns: [
+          {
+            from: require.resolve('pdfjs-dist/build/pdf.worker.min.js'),
+            to: path.join(__dirname, 'public'),
+          },
+        ],
+      }),
+    );
 
     config.module.rules.push({
       test: /\.md$/,
