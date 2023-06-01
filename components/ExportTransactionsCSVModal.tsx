@@ -183,15 +183,15 @@ const FieldLabels = {
   netAmount: <FormattedMessage defaultMessage="Net Amount" />,
   balance: <FormattedMessage id="Balance" defaultMessage="Balance" />,
   currency: <FormattedMessage id="Currency" defaultMessage="Currency" />,
-  accountSlug: <FormattedMessage defaultMessage="Account Slug" />,
+  accountSlug: <FormattedMessage defaultMessage="Account Handle" />,
   accountName: <FormattedMessage defaultMessage="Account Name" />,
   accountType: <FormattedMessage defaultMessage="Account Type" />,
   accountEmail: <FormattedMessage defaultMessage="Account Email" />,
-  oppositeAccountSlug: <FormattedMessage defaultMessage="Opposite Account Slug" />,
+  oppositeAccountSlug: <FormattedMessage defaultMessage="Opposite Account Handle" />,
   oppositeAccountName: <FormattedMessage defaultMessage="Opposite Account Name" />,
   oppositeAccountType: <FormattedMessage defaultMessage="Opposite Account Type" />,
   oppositeAccountEmail: <FormattedMessage defaultMessage="Opposite Account Email" />,
-  hostSlug: <FormattedMessage defaultMessage="Host Slug" />,
+  hostSlug: <FormattedMessage defaultMessage="Host Handle" />,
   hostName: <FormattedMessage defaultMessage="Host Name" />,
   hostType: <FormattedMessage defaultMessage="Host Type" />,
   orderId: <FormattedMessage defaultMessage="Contribution ID" />,
@@ -389,7 +389,7 @@ const ExportTransactionsCSVModal = ({
           <MessageBox type="warning" withIcon mt={3}>
             <FormattedMessage
               id="ExportTransactionsCSVModal.FiltersWarning"
-              defaultMessage="This report is affected by the filters set in the transactions page."
+              defaultMessage="This report is affected by the filters set on the transactions page."
             />
           </MessageBox>
         )}
