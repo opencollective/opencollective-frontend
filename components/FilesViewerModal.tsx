@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { ChevronLeft } from '@styled-icons/boxicons-regular/ChevronLeft';
 import { ChevronRight } from '@styled-icons/boxicons-regular/ChevronRight';
 import { ArrowDownTray } from '@styled-icons/heroicons-outline/ArrowDownTray';
@@ -176,20 +175,18 @@ const StyledImg = styled.img`
   width: 100%;
 `;
 
-FilesViewerModal.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  parentTitle: PropTypes.string,
-  /** Specifies what file url to open first (opens first if undefined) */
-  openFileUrl: PropTypes.string,
-  files: PropTypes.arrayOf(
-    PropTypes.shape({
-      url: PropTypes.string,
-      name: PropTypes.string,
-    }),
-  ),
+type FilesViewerModalProps = {
+  onClose: () => void;
+  parentTitle?: string;
+  files?: {
+    url: string;
+    name: string;
+    info?: { width: number };
+  }[];
+  openFileUrl?: string;
 };
 
-export default function FilesViewerModal({ onClose, parentTitle, files, openFileUrl }) {
+export default function FilesViewerModal({ onClose, parentTitle, files, openFileUrl }: FilesViewerModalProps) {
   const intl = useIntl();
   const initialIndex = openFileUrl ? files?.findIndex(f => f.url === openFileUrl) : 0;
   const [selectedIndex, setSelectedIndex] = useState(initialIndex);
@@ -208,7 +205,10 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
   const hasMultipleFiles = nbFiles > 1;
   const contentWrapperRef = React.useRef(null);
 
-  const renderFile = ({ url, info, name }, contentWrapperRef) => {
+  const renderFile = (
+    { url, info, name }: { url: string; name: string; info?: { width: number } },
+    contentWrapperRef,
+  ) => {
     let content = null;
     const fileExtension = getFileExtensionFromUrl(url);
 
