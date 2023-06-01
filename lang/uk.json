@@ -2674,7 +2674,7 @@
   "Subscriptions.Cancelled": "Скасовані",
   "Subscriptions.ContributedToDate": "Нараховано на сьогодні",
   "Subscriptions.FeesOnTopTooltip": "Contribution plus Platform Tip",
-  "Subscriptions.Status": "{status, select, ACTIVE {Активний внесок} CANCELLED {Скасований внесок} ERROR {Помилка} REJECTED {Відхилений внесок} other {}}",
+  "Subscriptions.Status": "{status, select, ACTIVE {Active contribution} CANCELLED {Cancelled contribution} ERROR {Error} REJECTED {Rejected contribution} PROCESSING {Processing} NEW {Processing} other {}}",
   "Success": "Вдалося",
   "suKNE1": "Host Fees charged to Collectives during this time period (these are added continuously to your budget).",
   "Summary": "Підсумок",
