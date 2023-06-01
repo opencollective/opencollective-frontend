@@ -47,7 +47,7 @@ const RecurringContributionsCard = ({
   const { formatMessage } = useIntl();
   const isError = status === ORDER_STATUS.ERROR;
   const isRejected = status === ORDER_STATUS.REJECTED;
-  const isActive = [ORDER_STATUS.ACTIVE, ORDER_STATUS.PROCESSING, ORDER_STATUS.NEW].includes(status) || isError;
+  const isEditable = [ORDER_STATUS.ACTIVE, ORDER_STATUS.PROCESSING, ORDER_STATUS.NEW].includes(status) || isError;
 
   return (
     <StyledCollectiveCard
@@ -161,7 +161,7 @@ const RecurringContributionsCard = ({
             />
           </P>
         </Box>
-        {isAdmin && isActive && (
+        {isAdmin && isEditable && (
           <StyledButton
             buttonSize="tiny"
             onClick={onEdit}
