@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { cx } from 'class-variance-authority';
 
 import { Box } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -8,21 +9,24 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import AccountSwitcher from './AccountSwitcher';
 import Menu from './Menu';
 import { MenuContainer } from './MenuComponents';
-
-const SidebarContainer = styled(Box)`
-  border-right: 1px solid #e6e8eb;
-  flex: 0 1 280px;
-`;
+import { SettingsContext } from '../../lib/SettingsContext';
 
 const Sticky = styled.div`
-  padding: 24px 16px;
+  padding: 20px 16px;
   position: sticky;
   top: 0;
 `;
 
 const AdminPanelSideBar = ({ collective, isAccountantOnly, isLoading, selectedSection, onRoute, ...props }) => {
+  const { settings } = React.useContext(SettingsContext);
   return (
-    <SidebarContainer {...props}>
+    <div
+      className={cx(
+        'w-full max-w-[280px] shrink-0 border-r border-slate-200/75 ',
+        settings.sidebarGrayBg ? 'bg-slate-50/75 ' : settings.mainGrayBg ? 'bg-white' : '',
+        settings.shadowsSidebar ? 'shadow-inner' : '',
+      )}
+    >
       <Sticky>
         <MenuContainer>
           <AccountSwitcher collective={collective} isLoading={isLoading} />
@@ -40,11 +44,11 @@ const AdminPanelSideBar = ({ collective, isAccountantOnly, isLoading, selectedSe
               ))}
             </Box>
           ) : (
-            <Menu {...{ collective, selectedSection, onRoute, isAccountantOnly }} />
+            <Menu settings={settings} {...{ collective, selectedSection, onRoute, isAccountantOnly }} />
           )}
         </MenuContainer>
       </Sticky>
-    </SidebarContainer>
+    </div>
   );
 };
 

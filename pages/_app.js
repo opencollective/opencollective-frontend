@@ -42,7 +42,7 @@ import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
 import GlobalToasts from '../components/GlobalToasts';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
 import ToastProvider from '../components/ToastProvider';
-
+import { SettingsContext } from '../lib/SettingsContext';
 // Use JSDOM on server-side so that react-intl can render rich messages
 // See https://github.com/formatjs/react-intl/blob/c736c2e6c6096b1d5ad1fb6be85fa374891d0a6c/docs/Getting-Started.md#domparser
 if (!process.browser) {
@@ -52,6 +52,24 @@ if (!process.browser) {
 // This is optional but highly recommended
 // since it prevents memory leak
 const cache = createIntlCache();
+
+// eslint-disable-next-line react/prop-types
+const SettingsProvider = ({ children }) => {
+  const [settings, setSettings] = React.useState({
+    tables: true,
+    sidebarGrayBg: false,
+    mainGrayBg: false,
+    headerDarkBg: false,
+    headerGrayBg: false,
+    simpleProfileDropdown: true,
+    shadows: true,
+    shadowsSidebar: false,
+  });
+
+  const value = { settings, setSettings };
+
+  return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
+};
 
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
@@ -63,7 +81,17 @@ class OpenCollectiveFrontendApp extends App {
 
   constructor() {
     super(...arguments);
-    this.state = { hasError: false, errorEventId: undefined, settings: { tables: true } };
+    this.state = {
+      hasError: false,
+      errorEventId: undefined,
+      settings: {
+        tables: true,
+        sidebarGrayBg: false,
+        mainGrayBg: false,
+        headerDarkBg: false,
+        simpleProfileDropdown: true,
+      },
+    };
   }
 
   static async getInitialProps({ Component, ctx, client }) {
@@ -128,39 +156,35 @@ class OpenCollectiveFrontendApp extends App {
 
   render() {
     const { client, Component, pageProps, scripts, locale, messages } = this.props;
-    const { settings } = this.state;
 
     const intl = createIntl({ locale: locale || 'en', defaultLocale: 'en', messages }, cache);
 
     return (
       <Fragment>
         <ApolloProvider client={client}>
-          <ThemeProvider theme={theme}>
-            <StripeProviderSSR>
-              <RawIntlProvider value={intl}>
-                <TooltipProvider delayDuration={300}>
-                  <ToastProvider>
-                    <UserProvider>
-                      <NewsAndUpdatesProvider>
-                        <Layout>
-                          <Component {...pageProps} settings={settings} />
-                        </Layout>
-                        <GlobalToasts />
-                        <GlobalNewsAndUpdates />
-                        <TwoFactorAuthenticationModal />
-                        <PrototypeSettings
-                          settings={settings}
-                          setSetting={newSetting => {
-                            this.setState({ settings: { ...settings, ...newSetting } });
-                          }}
-                        />
-                      </NewsAndUpdatesProvider>
-                    </UserProvider>
-                  </ToastProvider>
-                </TooltipProvider>
-              </RawIntlProvider>
-            </StripeProviderSSR>
-          </ThemeProvider>
+          <SettingsProvider>
+            <ThemeProvider theme={theme}>
+              <StripeProviderSSR>
+                <RawIntlProvider value={intl}>
+                  <TooltipProvider delayDuration={300}>
+                    <ToastProvider>
+                      <UserProvider>
+                        <NewsAndUpdatesProvider>
+                          <Layout>
+                            <Component {...pageProps} />
+                          </Layout>
+                          <GlobalToasts />
+                          <GlobalNewsAndUpdates />
+                          <TwoFactorAuthenticationModal />
+                          <PrototypeSettings />
+                        </NewsAndUpdatesProvider>
+                      </UserProvider>
+                    </ToastProvider>
+                  </TooltipProvider>
+                </RawIntlProvider>
+              </StripeProviderSSR>
+            </ThemeProvider>
+          </SettingsProvider>
         </ApolloProvider>
         <DefaultPaletteStyle palette={defaultColors.primary} />
 

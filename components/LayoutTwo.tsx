@@ -34,6 +34,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 import { Calculator, Calendar, CreditCard, Settings, Smile, User } from 'lucide-react';
 
 import CommandDialog from './ui/command';
+import { SettingsContext } from '../lib/SettingsContext';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -106,10 +107,24 @@ export const MenuItem = React.forwardRef<
 >(({ className, onClick, href, children, ...props }, ref) => {
   const router = useRouter();
   const isActive = router.pathname === href;
+  const { settings } = React.useContext(SettingsContext);
 
   const styles = cx(
-    'bg-background z-10 flex items-center rounded px-4 py-2 text-sm font-medium transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:bg-slate-100 focus-visible:text-slate-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50',
-    isActive ? 'bg-slate-100/75 text-slate-900' : 'text-slate-500',
+    'bg-background z-10 flex items-center rounded px-3 py-2 text-sm font-medium transition-colors  focus:outline-none disabled:pointer-events-none disabled:opacity-50',
+    settings.headerDarkBg
+      ? [
+          isActive ? 'bg-white/10 text-white' : 'text-white/75 hover:bg-white/10 hover:text-white',
+          ' focus-visible:bg-blue-100 focus-visible:text-blue-900',
+        ]
+      : settings.headerGrayBg
+      ? [
+          isActive ? 'bg-slate-100 text-slate-900' : 'text-slate-500',
+          'hover:bg-slate-100 hover:text-slate-900 focus-visible:bg-slate-100 focus-visible:text-slate-900',
+        ]
+      : [
+          isActive ? 'bg-slate-100/75 text-slate-900' : 'text-slate-500',
+          'hover:bg-slate-100 hover:text-slate-900 focus-visible:bg-slate-100 focus-visible:text-slate-900',
+        ],
   );
 
   const trigger = href ? (
@@ -130,11 +145,12 @@ export const MenuItem = React.forwardRef<
 });
 MenuItem.displayName = 'MenuItem';
 
-export default function Layout({ children, settings }) {
+export default function Layout({ children }) {
   const { LoggedInUser, loadingLoggedInUser, logout } = useLoggedInUser();
   const [commandDialogOpen, setCommandDialogOpen] = useState(false);
   const loggedIn = !!LoggedInUser;
   const router = useRouter();
+  const { settings } = React.useContext(SettingsContext);
 
   console.log({ router, asPath: router.asPath, pathname: router.pathname });
   const loggedInOnHome = loggedIn && router.asPath === '/home';
@@ -152,8 +168,17 @@ export default function Layout({ children, settings }) {
     },
   ];
   return (
-    <div className={classNames('flex h-screen flex-col bg-white')}>
-      <nav className="block border-b bg-white">
+    <div className={classNames('flex h-screen flex-col')}>
+      <nav
+        className={cx(
+          'block  ',
+          settings.headerDarkBg
+            ? 'bg-blue-900 text-white'
+            : settings.headerGrayBg
+            ? 'border-b bg-slate-50/75'
+            : 'border-b bg-white',
+        )}
+      >
         <div className="mx-auto px-5">
           <div className="flex h-16 justify-between">
             <div className="flex flex-1 items-center">
@@ -375,7 +400,7 @@ export default function Layout({ children, settings }) {
                   <TooltipTrigger>
                     <button
                       type="button"
-                      className="mr-2 flex-shrink-0 rounded-full bg-white p-1 text-slate-400 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      className="mr-2 flex-shrink-0 rounded-full p-1 text-slate-400 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
                       <span className="sr-only">View notifications</span>
                       <svg
@@ -400,7 +425,7 @@ export default function Layout({ children, settings }) {
                 <Menu as="div" className="relative">
                   <Tooltip>
                     <TooltipTrigger>
-                      <Menu.Button className="group flex items-center gap-1 p-1 text-slate-400 hover:text-slate-500 focus:outline-none focus:outline-none ">
+                      <Menu.Button className="group flex items-center gap-1 p-1 text-slate-400 hover:text-slate-500 focus:outline-none ">
                         <span className="sr-only">Open new items menu</span>
                         <div className="rounded-full p-1 group-hover:bg-slate-100 group-focus:bg-slate-100 group-focus:ring-2 group-focus:ring-blue-500 group-focus:ring-offset-2">
                           <Plus className="h-5 w-5  " />
@@ -583,7 +608,9 @@ export default function Layout({ children, settings }) {
           </div>
         </div>
       )}
-      <main className="flex flex-1 flex-col">{children}</main>
+      <main className={cx('flex flex-1 flex-col ', settings.mainGrayBg ? 'bg-slate-50/75' : 'bg-white', settings.shadows ? "shadow-inner" : "")}>
+        {children}
+      </main>
       <Footer />
       {/* <footer className="w-full border border-red-500">Footer</footer> */}
     </div>

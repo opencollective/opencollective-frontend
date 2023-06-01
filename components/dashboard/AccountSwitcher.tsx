@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { themeGet } from '@styled-system/theme-get';
-
+import { ChevronsUpDown } from 'lucide-react';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 
@@ -22,7 +22,8 @@ import { Dropdown, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
 import StyledRoundButton from '../StyledRoundButton';
 import { Span } from '../Text';
-
+import { SettingsContext } from '../../lib/SettingsContext';
+import { cva } from 'class-variance-authority';
 const StyledMenuEntry = styled(Link)`
   display: flex;
   align-items: center;
@@ -51,38 +52,6 @@ const StyledMenuEntry = styled(Link)`
             backgroundColor: 'slate.100',
           },
         })}
-`;
-
-const DropdownButton = styled.button`
-  display: flex;
-  background: white;
-  border: 1px solid ${themeGet('colors.slate.200')};
-  width: 100%;
-  border-radius: 6px;
-  padding: 8px;
-  align-items: center;
-  justify-content: space-between;
-  transition: all 50ms ease-out;
-  cursor: pointer;
-
-  &:hover,
-  :active,
-  :focus {
-    background: ${themeGet('colors.slate.50')};
-  }
-
-  div {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: flex;
-    grid-gap: 12px;
-    align-items: center;
-  }
-
-  svg {
-    flex-shrink: 0;
-  }
 `;
 
 const StyledDropdownContent = styled(DropdownContent)`
@@ -173,6 +142,8 @@ MenuEntry.propTypes = {
 
 const AccountSwitcher = () => {
   const { LoggedInUser } = useLoggedInUser();
+  const { settings } = React.useContext(SettingsContext);
+
   const intl = useIntl();
   const router = useRouter();
   const { slug } = router.query;
@@ -184,20 +155,48 @@ const AccountSwitcher = () => {
   const rootAccounts = flatten(Object.values(groupedAccounts));
   const allAdministratedAccounts = [...rootAccounts, ...flatten(rootAccounts.map(a => a.children))];
   const activeAccount = allAdministratedAccounts.find(a => a.slug === activeSlug) || loggedInUserCollective;
-
+  const isPersonalProfile = activeAccount?.slug === LoggedInUser?.collective.slug;
   return (
     <Dropdown trigger="click">
       {({ triggerProps, dropdownProps }) => (
         <div className="relative">
           <Flex alignItems="center">
-            <DropdownButton {...triggerProps}>
-              <div>
+            <button
+              className={cva(
+                'group flex w-full cursor-pointer items-center justify-between border-slate-200 hover:border-blue-700 p-2 outline-2 transition-colors ',
+                {
+                  variants: {
+                    bg: {
+                      white: ' bg-white  hover:bg-slate-50  ',
+                      gray: ' bg-transparent hover:bg-white ',
+                    },
+                    border: {
+                      true: 'border ',
+                      false: 'border-0',
+                    },
+                    round: {
+                      true: 'rounded-full',
+                      false: 'rounded-lg',
+                    },
+                  },
+                },
+              )({ bg: settings.sidebarGrayBg ? 'gray' : 'white', border: true, round: false })}
+              {...triggerProps}
+            >
+              <div className="flex items-center gap-3">
+                <div className="relative">
                 <Avatar collective={activeAccount} size={32} />
-                <span className="text-ellipsis text-sm text-slate-900">{activeAccount?.name}</span>
+                {!isPersonalProfile && <div className="absolute z-20 -right-1 -bottom-1 w-1/2 h-1/2 rounded-full bg-white flex items-center justify-center"><Avatar collective={LoggedInUser?.collective} size={16} /></div>}
+                </div>
+                <div className="flex flex-col items-start truncate">
+                <span className="truncate text-sm font-medium text-slate-900">{activeAccount?.name}</span>
+                <span className="truncate text-xs text-slate-700">{isPersonalProfile ? "Personal profile" : activeAccount?.isHost ? "Fiscal Host Admin" : "Collective Admin"}</span>
+
+                </div>
               </div>
 
-              <ChevronUpDown size={20} />
-            </DropdownButton>
+              <ChevronsUpDown size={20} className="shrink-0 text-slate-500 group-hover:text-slate-900" />
+            </button>
           </Flex>
           <Container maxWidth={'100%'} {...dropdownProps}>
             <StyledDropdownContent>

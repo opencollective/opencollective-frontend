@@ -21,6 +21,7 @@ import { P } from '../Text';
 
 import ExpenseDrawer from './ExpenseDrawer';
 import NewExpenseDrawer, { ExpenseStatus } from './NewExpenseDrawer';
+import { SettingsContext } from '../../lib/SettingsContext';
 
 const ExpenseContainer = styled.div<{ isFirst?: boolean }>`
   ${props =>
@@ -83,12 +84,12 @@ const ExpensesList = ({
   onProcess,
   expenseFieldForTotalAmount,
   loadingCount,
-  settings,
   context,
 }) => {
   const [expenseInDrawer, setExpenseInDrawer] = React.useState(null);
   const [selectedId, setSelectedId] = React.useState(null);
   const [useNewDrawer, setUseNewDrawer] = React.useState(false);
+  const { settings } = React.useContext(SettingsContext);
 
   // if (!expenses?.length && !isLoading) {
   //   return null;

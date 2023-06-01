@@ -29,7 +29,7 @@ const StyledAvatar = styled(Flex).attrs<StyledAvatarProps>(props => ({
 }))<StyledAvatarProps>`
   align-items: center;
   background-color: ${({ theme, type }) =>
-    type === 'USER' || type === 'INDIVIDUAL' ? themeGet('colors.black.100')({ theme }) : 'none'};
+    type === 'USER' || type === 'INDIVIDUAL' ? themeGet('colors.black.100')({ theme }) : 'white'};
   color: ${themeGet('colors.black.400')};
   background-position: center center;
   background-repeat: no-repeat;

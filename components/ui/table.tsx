@@ -38,7 +38,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cx(
-      'group border-b transition-colors data-[state=selected]:bg-slate-100',
+      'data-[state=selected]:bg-slate-100 group border-b  transition-colors',
       highlightOnHover && 'hover:bg-slate-100/50',
       className,
     )}
@@ -52,7 +52,7 @@ const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<
     <th
       ref={ref}
       className={cx(
-        'h-12  px-4 text-left align-middle font-medium text-slate-500 [&:has([role=checkbox])]:pr-0',
+        '[&:has([role=checkbox])]:pr-0  h-12 px-4 text-left align-middle font-medium text-slate-500',
         className,
       )}
       {...props}
@@ -63,7 +63,7 @@ TableHead.displayName = 'TableHead';
 
 const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(
   ({ className, ...props }, ref) => (
-    <td ref={ref} className={cx('align-middle [&:has([role=checkbox])]:pr-0', className)} {...props} />
+    <td ref={ref} className={cx('[&:has([role=checkbox])]:pr-0 align-middle', className)} {...props} />
   ),
 );
 TableCell.displayName = 'TableCell';

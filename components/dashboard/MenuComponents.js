@@ -13,7 +13,7 @@ import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import StyledLink from '../StyledLink';
 import { Span } from '../Text';
-
+import { SettingsContext } from '../../lib/SettingsContext';
 import { SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
 
@@ -90,8 +90,9 @@ export const MenuLink = ({
   parentSection = null,
   goToSection,
   item,
-  AyCon,
 }) => {
+  const { settings } = React.useContext(SettingsContext);
+
   const router = useRouter();
   const { selectedSection, expandedSection, setExpandedSection, account } = React.useContext(DashboardContext);
   const expanded = expandedSection === section;
@@ -142,25 +143,23 @@ export const MenuLink = ({
       )}
     </Flex>
   );
+  const { sidebarGrayBg } = settings;
   return (
     <React.Fragment>
       <li key={section}>
         <Link
           href={getDashboardRoute(account, section)}
           className={cx(
-            isSelected ? 'bg-slate-50 text-blue-600' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-600',
+            isSelected
+              ? sidebarGrayBg
+                ? 'bg-slate-100 text-blue-600'
+                : 'bg-slate-50 text-blue-600'
+              : sidebarGrayBg
+              ? 'text-slate-700 hover:bg-slate-100 hover:text-blue-600'
+              : 'text-slate-700 hover:bg-slate-50 hover:text-blue-600',
             'group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
           )}
         >
-          {AyCon && (
-            <AyCon
-              className={cx(
-                isSelected ? 'text-blue-600' : 'text-slate-400 group-hover:text-blue-600',
-                'h-6 w-6 shrink-0',
-              )}
-              aria-hidden="true"
-            />
-          )}
           {item?.icon && (
             <item.icon
               className={cx(

@@ -149,6 +149,7 @@ const DashboardPage = ({ settings }) => {
             selectedSection={selectedSection}
             display={['none', 'none', 'block']}
             isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
+            settings={settings}
           />
 
           <main className="page flex-1">
