@@ -160,5 +160,8 @@ module.exports = (expressApp, nextApp) => {
     );
   });
 
+  // TODO(ESM): Can be removed when moving to ESM bundling this file in another way (for react-pdf)
+  app.use('/pdf.worker.min.js', express.static(path.join(__dirname, '../public/pdf.worker.min.js')));
+
   return nextApp.getRequestHandler();
 };
