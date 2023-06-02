@@ -43,5 +43,5 @@ scripts/publish-components/.tmp
 # Sentry
 .sentryclirc
 
-# pdfjs worker
+# pdfjs worker - copied from node_modules by webpack (see next.config.js)
 public/static/scripts/pdf.worker.min.js
