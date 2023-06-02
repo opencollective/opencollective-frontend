@@ -44,4 +44,4 @@ scripts/publish-components/.tmp
 .sentryclirc
 
 # pdfjs worker
-public/pdf.worker.min.js
+public/static/scripts/pdf.worker.min.js

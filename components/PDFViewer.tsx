@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import Loading from './Loading';
 import { Span } from './Text';
 
-pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+pdfjs.GlobalWorkerOptions.workerSrc = '/static/scripts/pdf.worker.min.js';
 
 const DocumentContainer = styled.div`
   .pdf-page {
