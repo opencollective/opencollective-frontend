@@ -72,7 +72,7 @@ const nextConfig = {
         patterns: [
           {
             from: require.resolve('pdfjs-dist/build/pdf.worker.min.js'),
-            to: path.join(__dirname, 'public'),
+            to: path.join(__dirname, 'public/static/scripts'),
           },
         ],
       }),
