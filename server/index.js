@@ -8,6 +8,7 @@ const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const cloudflareIps = require('cloudflare-ip/ips.json');
 const throng = require('throng');
+const uuid = require('uuid');
 
 const intl = require('./intl');
 const logger = require('./logger');
@@ -42,6 +43,11 @@ const start = id =>
     // Not much documentation on this,
     // but we should ensure this goes to the default Next.js handler
     app.get('/__nextjs_original-stack-frame', nextApp.getRequestHandler());
+
+    app.use((req, res, next) => {
+      req.id = uuid.v4();
+      next();
+    });
 
     hyperwatch(app);
 
