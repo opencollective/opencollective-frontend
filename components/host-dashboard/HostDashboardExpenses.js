@@ -304,12 +304,12 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
               hasFilters && onExpenseUpdate(expense, cache, query.status);
             }}
             useDrawer
-            openExpenseLegacyId={Number(router.query.openExpense)}
+            openExpenseLegacyId={Number(router.query.openExpenseId)}
             setOpenExpenseLegacyId={legacyId => {
               router.push(
                 {
                   pathname: pageRoute,
-                  query: getQueryParams({ ...query, openExpense: legacyId }),
+                  query: getQueryParams({ ...query, openExpenseId: legacyId }),
                 },
                 undefined,
                 { shallow: true },

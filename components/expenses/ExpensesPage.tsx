@@ -172,12 +172,12 @@ const Expenses = props => {
                 isInverted={query.direction === 'SUBMITTED'}
                 view={query.direction === 'SUBMITTED' ? 'submitter' : undefined}
                 useDrawer={isDashboard}
-                openExpenseLegacyId={Number(router.query.openExpense)}
+                openExpenseLegacyId={Number(router.query.openExpenseId)}
                 setOpenExpenseLegacyId={legacyId => {
                   router.push(
                     {
                       pathname: expensesRoute,
-                      query: buildFilterLinkParams({ ...query, openExpense: legacyId }),
+                      query: buildFilterLinkParams({ ...query, openExpenseId: legacyId }),
                     },
                     undefined,
                     { shallow: true },
