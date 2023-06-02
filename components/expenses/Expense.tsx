@@ -468,26 +468,30 @@ function Expense(props) {
   return (
     <Box ref={expenseTopRef}>
       <ExpenseHeader inDrawer={inDrawer}>
-        <FormattedMessage
-          id="ExpenseTitle"
-          defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} <LinkExpense>{id}</LinkExpense> to <LinkCollective>{collectiveName}</LinkCollective>"
-          values={{
-            type: expense?.type,
-            id: expense?.legacyId,
-            LinkExpense: text => {
-              if (inDrawer) {
-                return (
-                  <Link href={`/${expense?.account.slug}/expenses/${expense?.legacyId}`}>
-                    <span>#{text}</span>
-                  </Link>
-                );
-              }
-              return <span>#{text}</span>;
-            },
-            collectiveName: expense?.account.name,
-            LinkCollective: text => <LinkCollective collective={expense?.account}>{text}</LinkCollective>,
-          }}
-        />
+        {expense?.type && expense?.account ? (
+          <FormattedMessage
+            id="ExpenseTitle"
+            defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} <LinkExpense>{id}</LinkExpense> to <LinkCollective>{collectiveName}</LinkCollective>"
+            values={{
+              type: expense?.type,
+              id: expense?.legacyId,
+              LinkExpense: text => {
+                if (inDrawer) {
+                  return (
+                    <Link href={`/${expense?.account.slug}/expenses/${expense?.legacyId}`}>
+                      <span>#{text}</span>
+                    </Link>
+                  );
+                }
+                return <span>#{text}</span>;
+              },
+              collectiveName: expense?.account.name,
+              LinkCollective: text => <LinkCollective collective={expense?.account}>{text}</LinkCollective>,
+            }}
+          />
+        ) : (
+          <LoadingPlaceholder height={32} maxWidth={'200px'} />
+        )}
       </ExpenseHeader>
 
       {state.error && (
@@ -740,7 +744,7 @@ Expense.propTypes = {
   draftKey: PropTypes.string,
   edit: PropTypes.string,
   client: PropTypes.object,
-  data: PropTypes.object.isRequired,
+  data: PropTypes.object,
   loading: PropTypes.bool,
   error: PropTypes.any,
   refetch: PropTypes.func,

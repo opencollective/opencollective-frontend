@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useApolloClient, useLazyQuery } from '@apollo/client';
 import MUIDrawer from '@mui/material/Drawer';
 import { XMark } from '@styled-icons/heroicons-outline/XMark';
@@ -46,34 +45,43 @@ const CloseDrawerButton = styled(StyledRoundButton)`
   right: 16px;
 `;
 
-export default function ExpenseDrawer({ open, handleClose, expense }) {
+type ExpenseDrawerProps = {
+  handleClose: () => void;
+  openExpenseLegacyId?: number;
+  initialExpenseValues?: any;
+};
+
+export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initialExpenseValues }: ExpenseDrawerProps) {
   const drawerActionsRef = React.useRef(null);
   const [drawerActionsContainer, setDrawerActionsContainer] = useState(null);
   const client = useApolloClient();
   const [getExpense, { data, loading, error, startPolling, stopPolling, refetch, fetchMore }] = useLazyQuery(
     expensePageQuery,
     {
-      variables: getVariableFromProps({ legacyExpenseId: expense?.legacyId }),
       context: API_V2_CONTEXT,
     },
   );
-
   const twoFactorPrompt = useTwoFactorAuthenticationPrompt();
   const disableEnforceFocus = Boolean(twoFactorPrompt?.isOpen);
 
   useEffect(() => {
-    if (open) {
-      getExpense();
+    if (openExpenseLegacyId) {
+      getExpense({ variables: getVariableFromProps({ legacyExpenseId: openExpenseLegacyId }) });
 
       // Use timeout to set the ref just after the drawer is open to prevent setting it to undefined
       setTimeout(() => {
         setDrawerActionsContainer(drawerActionsRef?.current);
       }, 0);
     }
-  }, [open]);
+  }, [openExpenseLegacyId]);
 
   return (
-    <MUIDrawer anchor="right" open={open} onClose={handleClose} disableEnforceFocus={disableEnforceFocus}>
+    <MUIDrawer
+      anchor="right"
+      open={Boolean(openExpenseLegacyId)}
+      onClose={handleClose}
+      disableEnforceFocus={disableEnforceFocus}
+    >
       <DrawerContainer>
         <Flex flex={1} flexDirection="column" overflowY="scroll">
           <Container position="relative" py={'24px'}>
@@ -83,14 +91,16 @@ export default function ExpenseDrawer({ open, handleClose, expense }) {
 
             <Box px={[3, '24px']}>
               <Expense
-                data={{ ...data, expense: { ...expense, ...data?.expense } }}
+                /* If there is already some expense data from ExpensesList (beyond the legacyId) we can 
+                  intialize the data object with that to immediately display some data */
+                data={initialExpenseValues ? { ...data, expense: { ...initialExpenseValues, ...data?.expense } } : data}
                 // Making sure to initially set loading to true before the query is called
                 loading={loading || (!data && !error)}
                 error={error}
                 refetch={refetch}
                 client={client}
                 fetchMore={fetchMore}
-                legacyExpenseId={expense?.legacyId}
+                legacyExpenseId={openExpenseLegacyId}
                 startPolling={startPolling}
                 stopPolling={stopPolling}
                 drawerActionsContainer={drawerActionsContainer}
@@ -98,6 +108,7 @@ export default function ExpenseDrawer({ open, handleClose, expense }) {
             </Box>
           </Container>
         </Flex>
+
         <DrawerActionsContainer
           flexWrap="wrap"
           gridGap={2}
@@ -110,11 +121,3 @@ export default function ExpenseDrawer({ open, handleClose, expense }) {
     </MUIDrawer>
   );
 }
-
-ExpenseDrawer.propTypes = {
-  open: PropTypes.bool,
-  handleClose: PropTypes.func,
-  expense: PropTypes.shape({
-    legacyId: PropTypes.number,
-  }),
-};

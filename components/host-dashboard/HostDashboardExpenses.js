@@ -303,6 +303,18 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
             onProcess={(expense, cache) => {
               hasFilters && onExpenseUpdate(expense, cache, query.status);
             }}
+            useDrawer
+            openExpenseLegacyId={Number(router.query.openExpense)}
+            setOpenExpenseLegacyId={legacyId => {
+              router.push(
+                {
+                  pathname: pageRoute,
+                  query: getQueryParams({ ...query, openExpense: legacyId }),
+                },
+                undefined,
+                { shallow: true },
+              );
+            }}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination
