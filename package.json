@@ -24,7 +24,7 @@
     "@mui/material": "5.12.2",
     "@mui/styles": "5.12.0",
     "@opencollective/taxes": "4.0.2",
-    "@popperjs/core": "2.11.7",
+    "@popperjs/core": "2.11.8",
     "@sentry/browser": "^7.49.0",
     "@sentry/nextjs": "^7.49.0",
     "@shopify/address": "4.1.0",
