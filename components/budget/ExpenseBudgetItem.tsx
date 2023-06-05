@@ -303,7 +303,11 @@ const ExpenseBudgetItem = ({
                     {isLoading ? (
                       <LoadingPlaceholder height={15} width={90} />
                     ) : (
-                      <StyledLink textDecoration="underline" cursor="pointer" onClick={() => setShowFilesViewerModal(true)}>
+                      <StyledLink
+                        textDecoration="underline"
+                        cursor="pointer"
+                        onClick={() => setShowFilesViewerModal(true)}
+                      >
                         <FormattedMessage
                           id="ExepenseAttachments.count"
                           defaultMessage="Attachments ({count})"
