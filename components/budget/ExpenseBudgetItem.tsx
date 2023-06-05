@@ -179,8 +179,8 @@ const ExpenseBudgetItem = ({
 }: ExpenseBudgetItemProps) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
+  const [showFilesViewerModal, setShowFilesViewerModal] = React.useState(false);
   const useDrawer = LoggedInUser?.hasEarlyAccess('expense-drawer');
-
   const featuredProfile = isInverted ? expense?.account : expense?.payee;
   const isAdminView = view === 'admin';
   const isSubmitterView = view === 'submitter';

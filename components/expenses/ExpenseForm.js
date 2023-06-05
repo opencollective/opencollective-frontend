@@ -501,7 +501,8 @@ const ExpenseFormBody = ({
         disabled={!stepTwoCompleted || !formik.isValid}
         loading={formik.isSubmitting}
         onClick={() => {
-          if (formRef.current) {
+          // When used inside the drawer, the submit button is rendered outside the form (with a portal). The form must be manually submitted.
+          if (drawerActionsContainer && formRef.current) {
             formRef.current.requestSubmit();
           }
         }}
