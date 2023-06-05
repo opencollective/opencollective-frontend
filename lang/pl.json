@@ -1108,6 +1108,7 @@
   "expense.approved": "Zaakceptowano",
   "Expense.AttachedReceipts": "Załączone rachunki",
   "Expense.Attachment": "Załącznik",
+  "Expense.Attachments": "Attachments",
   "expense.completed": "Wykonane",
   "Expense.DeleteDetails": "Spowoduje to trwałe usunięcie wydatku oraz wszystkich załączników i komentarzy.",
   "Expense.Direction.Received": "Otrzymane",

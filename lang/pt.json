@@ -1108,6 +1108,7 @@
   "expense.approved": "Aprovado",
   "Expense.AttachedReceipts": "Recibos anexados",
   "Expense.Attachment": "Anexo",
+  "Expense.Attachments": "Attachments",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "This will permanently delete the expense and all attachments and comments.",
   "Expense.Direction.Received": "Received",

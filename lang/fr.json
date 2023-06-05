@@ -1108,6 +1108,7 @@
   "expense.approved": "Approuvée",
   "Expense.AttachedReceipts": "Reçus joints",
   "Expense.Attachment": "Pièce jointe",
+  "Expense.Attachments": "Attachments",
   "expense.completed": "Completé",
   "Expense.DeleteDetails": "Cela supprimera définitivement cette dépense, toutes les pièces jointes et tous les commentaires.",
   "Expense.Direction.Received": "Reçues",

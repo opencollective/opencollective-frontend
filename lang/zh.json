@@ -1108,6 +1108,7 @@
   "expense.approved": "已接受",
   "Expense.AttachedReceipts": "收据附件",
   "Expense.Attachment": "附件",
+  "Expense.Attachments": "Attachments",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "This will permanently delete the expense and all attachments and comments.",
   "Expense.Direction.Received": "Received",
