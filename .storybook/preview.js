@@ -1,4 +1,4 @@
-import { ThemeProvider, createGlobalStyle, css } from 'styled-components';
+import { ThemeProvider } from 'styled-components';
 import { RouterContext } from 'next/dist/shared/lib/router-context';
 import { IntlProvider } from 'react-intl';
 import theme from '../lib/theme';
@@ -15,19 +15,6 @@ import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
 import ToastProvider from '../components/ToastProvider';
-import { parseToBoolean } from '../lib/utils';
-
-const MUST_DISABLE_ANIMATIONS = parseToBoolean(process.env.STORYBOOK_DISABLE_CSS_ANIMATIONS);
-
-const ControlAnimations = createGlobalStyle`
-  ${({ disable }) =>
-    disable &&
-    css`
-      * {
-        animation-play-state: paused !important;
-      }
-    `}
-`;
 
 Object.defineProperty(nextImage, 'default', {
   configurable: true,
@@ -48,7 +35,6 @@ export const decorators = [
         <IntlProvider locale="en">
           <UserProvider>
             <ToastProvider>
-              <ControlAnimations disable={MUST_DISABLE_ANIMATIONS} />
               <Story />
             </ToastProvider>
           </UserProvider>
