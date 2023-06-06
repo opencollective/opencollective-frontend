@@ -297,7 +297,8 @@
       "@storybook/*",
       "@shopify/address",
       "jest-styled-components",
-      "storybook-addon-designs"
+      "storybook-addon-designs",
+      "styled-jsx"
     ]
   }
 }
