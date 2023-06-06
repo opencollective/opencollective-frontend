@@ -25,9 +25,10 @@ export const boxProps = compose(space, color, layout, typography, flexbox, grid)
 
 type BoxProps = SpaceProps &
   ColorProps &
+  FlexboxProps &
+  GridProps &
   LayoutProps &
-  TypographyProps &
-  FlexboxProps & {
+  TypographyProps & {
     gap?: string | number;
     css?: string | object;
   };
@@ -61,7 +62,7 @@ export const Flex = styled(Box)<FlexProps>(
 
 Flex.displayName = 'Flex';
 
-export const Grid = styled.div<BoxProps & GridProps>(
+export const Grid = styled.div<BoxProps>(
   {
     boxSizing: 'border-box',
     display: 'grid',

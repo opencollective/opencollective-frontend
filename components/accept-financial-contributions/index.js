@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 
 import AcceptContributionsOurselvesOrOrg from './AcceptContributionsOurselvesOrOrg';
-import ApplyToHost from './ApplyToHost';
 import ContributionCategoryPicker from './ContributionCategoryPicker';
+import StartAcceptingFinancialContributionsPage from './StartAcceptingFinancialContributionsPage';
 import SuccessPage from './SuccessPage';
 
 class AcceptFinancialContributions extends Component {
@@ -41,7 +41,9 @@ class AcceptFinancialContributions extends Component {
     }
 
     if (path === 'host') {
-      return <ApplyToHost collective={this.props.collective} onChange={this.handleChange} />;
+      return (
+        <StartAcceptingFinancialContributionsPage collective={this.props.collective} onChange={this.handleChange} />
+      );
     } else {
       return <AcceptContributionsOurselvesOrOrg collective={this.props.collective} />;
     }

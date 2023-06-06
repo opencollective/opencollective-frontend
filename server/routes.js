@@ -5,11 +5,8 @@ const express = require('express');
 const proxy = require('express-http-proxy');
 const { template, trim } = require('lodash');
 
-const { sendMessage } = require('./email');
+const downloadFileHandler = require('./download-file');
 const intl = require('./intl');
-const logger = require('./logger');
-const prependHttp = require('prepend-http');
-
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
 const maxAge = (maxAge = 60) => {
@@ -55,6 +52,11 @@ module.exports = (expressApp, nextApp) => {
     return res.sendFile(path.join(__dirname, '../public/static/images/favicon.ico.png'));
   });
 
+  /* Helper to enable downloading files that are on S3 since Chrome and Firefox does 
+   not allow cross-origin downloads when using the download attribute on an anchor tag, 
+   see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-download. */
+  app.get('/api/download-file', downloadFileHandler);
+
   // NOTE: in production and staging environment, this is currently not used
   // we use Cloudflare workers to route the request directly to the API
   if (process.env.API_PROXY === 'true') {
@@ -82,57 +84,6 @@ module.exports = (expressApp, nextApp) => {
       }),
     );
   }
-
-  /**
-   * Contact Form
-   */
-  app.post('/contact/send-message', express.json(), async (req, res) => {
-    const body = req.body;
-
-    if (!(body && body.name && body.email && body.message)) {
-      res.status(400).send('All inputs required');
-    }
-
-    let additionalLink = '';
-    if (body.link) {
-      const bodyLink = prependHttp(body.link);
-      additionalLink = `Additional Link: <a href="${bodyLink}">${bodyLink}</a></br>`;
-    }
-
-    let relatedCollectives = 'Related Collectives: ';
-    if (body.relatedCollectives?.length > 0) {
-      relatedCollectives = body.relatedCollectives
-        .slice(0, 50)
-        .map(url => `<a href='${url}'>${url}</a>`)
-        .join(', ');
-    }
-
-    logger.info(`Contact From: ${body.name} <${body.email}>`);
-    logger.info(`Contact Subject: ${body.topic}`);
-    logger.info(`Contact Message: ${body.message}`);
-    if (body.relatedCollectives?.length > 0) {
-      logger.info(`${relatedCollectives}`);
-    }
-    if (additionalLink) {
-      logger.info(`Contact Link: ${additionalLink}`);
-    }
-
-    await sendMessage({
-      to: 'support@opencollective.freshdesk.com',
-      from: `${body.name} <${body.email}>`,
-      subject: `${body.topic}`,
-      html: `
-            ${body.message}
-            <br/>
-            ${body.relatedCollectives?.length > 0 ? relatedCollectives : ''}
-            <br/>
-            <br/>
-            ${additionalLink}
-        `,
-    });
-
-    res.status(200).send({ sent: true });
-  });
 
   /**
    * Prevent indexation from search engines

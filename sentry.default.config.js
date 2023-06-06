@@ -20,6 +20,8 @@ export default {
     /^No collective found with slug/, // We throw exceptions for these, but they're not really errors
     /Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this/, // Creates a lot of noise in Sentry but it does not seem to have a real impact
     /Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive/,
+    'ResizeObserver loop limit exceeded',
+    'ResizeObserver loop completed with undelivered notifications.',
   ],
   denyUrls: [
     // Chrome extensions

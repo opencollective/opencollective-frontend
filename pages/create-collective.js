@@ -56,6 +56,12 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
   );
 };
 
+CreateCollectivePage.getInitialProps = () => {
+  return {
+    scripts: { googleMaps: true }, // To enable location autocomplete
+  };
+};
+
 CreateCollectivePage.propTypes = {
   loadingLoggedInUser: PropTypes.bool.isRequired,
   LoggedInUser: PropTypes.object,

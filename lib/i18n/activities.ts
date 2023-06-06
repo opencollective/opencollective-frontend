@@ -237,11 +237,14 @@ export const ActivityDescriptionI18n = defineMessages({
   USER_PASSWORD_SET: {
     defaultMessage: 'Changed password',
   },
-  TWO_FACTOR_CODE_ADDED: {
+  TWO_FACTOR_METHOD_ADDED: {
     defaultMessage: 'Two factor authentication added',
   },
-  TWO_FACTOR_CODE_DELETED: {
+  TWO_FACTOR_METHOD_DELETED: {
     defaultMessage: 'Two factor authentication removed',
+  },
+  TWO_FACTOR_CODE_REQUESTED: {
+    defaultMessage: 'Two factor authentication code requested',
   },
   // Gift cards
   USER_CARD_CLAIMED: {
@@ -466,10 +469,10 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
     defaultMessage: 'New pending contribution',
   },
   ORDER_THANKYOU: {
-    defaultMessage: 'New order',
+    defaultMessage: 'New contribution',
   },
   ORDERS_SUSPICIOUS: {
-    defaultMessage: 'Suspicious order',
+    defaultMessage: 'Suspicious contribution',
   },
   ACTIVATED_COLLECTIVE_AS_HOST: {
     defaultMessage: 'Activated as host',

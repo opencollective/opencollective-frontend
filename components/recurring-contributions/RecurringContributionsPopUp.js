@@ -8,6 +8,7 @@ import { themeGet } from '@styled-system/theme-get';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
@@ -91,7 +92,12 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
     context: API_V2_CONTEXT,
   });
 
-  const mainMenu = menuState === 'mainMenu' && (status === 'ACTIVE' || status === 'ERROR');
+  const mainMenu =
+    menuState === 'mainMenu' &&
+    (status === ORDER_STATUS.ACTIVE ||
+      status === ORDER_STATUS.ERROR ||
+      status === ORDER_STATUS.PROCESSING ||
+      status === ORDER_STATUS.NEW);
   const cancelMenu = menuState === 'cancelMenu';
   const updateOrderMenu = menuState === 'updateOrderMenu';
   const paymentMethodMenu = menuState === 'paymentMethodMenu';

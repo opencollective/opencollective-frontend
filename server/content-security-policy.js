@@ -72,6 +72,7 @@ const COMMON_DIRECTIVES = {
     'www.youtube-nocookie.com',
     'opencollective.com',
     'anchor.fm',
+    'podcasters.spotify.com',
     'js.stripe.com',
     '*.paypal.com',
     '*.openstreetmap.org',
@@ -150,6 +151,10 @@ const getContentSecurityPolicyConfig = () => {
           'opencollective-staging.s3.us-west-1.amazonaws.com',
           'opencollective-staging.s3-us-west-1.amazonaws.com',
         ],
+        connectSrc: [
+          'opencollective-staging.s3.us-west-1.amazonaws.com',
+          'opencollective-staging.s3-us-west-1.amazonaws.com',
+        ],
       }),
       reportUri: ['https://o105108.ingest.sentry.io/api/1736806/security/?sentry_key=2ab0f7da3f56423d940f36370df8d625'],
     };
@@ -158,6 +163,10 @@ const getContentSecurityPolicyConfig = () => {
       reportOnly: false,
       directives: generateDirectives({
         imgSrc: [
+          'opencollective-production.s3.us-west-1.amazonaws.com',
+          'opencollective-production.s3-us-west-1.amazonaws.com',
+        ],
+        connectSrc: [
           'opencollective-production.s3.us-west-1.amazonaws.com',
           'opencollective-production.s3-us-west-1.amazonaws.com',
         ],

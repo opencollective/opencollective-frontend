@@ -464,7 +464,7 @@ interface Account {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -825,6 +825,11 @@ type Order {
   amount: Amount!
 
   """
+  Tax amount
+  """
+  taxAmount: Amount
+
+  """
   Total order amount, including all taxes and platform tip
   """
   totalAmount: Amount!
@@ -860,7 +865,8 @@ type Order {
   platformTipAmount: Amount
   platformTipEligible: Boolean
   tags: [String]!
-  taxes: [OrderTax]!
+  tax: TaxInfo
+  taxes: [OrderTax]! @deprecated(reason: "2023-04-13: Please use `tax` instead.")
 
   """
   This represents a MemberOf relationship (ie: Collective backed by an Individual) attached to the Order.
@@ -1015,6 +1021,11 @@ interface Transaction {
   permissions: TransactionPermissions
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -1079,7 +1090,7 @@ type TaxInfo {
   percentage: Int! @deprecated(reason: "Please use `rate` instead")
 
   """
-  Percentage applied, between 0-100
+  Percentage applied, between 0-1
   """
   rate: Float!
 
@@ -1171,6 +1182,11 @@ type Expense {
   status: ExpenseStatus!
 
   """
+  Whether this expense is on hold
+  """
+  onHold: Boolean
+
+  """
   Returns the list of comments for this expense, or `null` if user is not allowed to see them
   """
   comments(
@@ -1209,7 +1225,7 @@ type Expense {
   """
   The account from where the expense was paid
   """
-  host: Account
+  host: Host
 
   """
   The payout method to use for this expense
@@ -1270,6 +1286,11 @@ type Expense {
   quote: ExpenseQuote
   recurringExpense: RecurringExpense
   securityChecks: [SecurityCheck]
+
+  """
+  Custom data for this expense
+  """
+  customData: JSON
 }
 
 """
@@ -2048,6 +2069,11 @@ type Comment {
   account: Account
 
   """
+  The type of this comment
+  """
+  type: CommentType!
+
+  """
   Returns a map of reactions counts for this comment
   """
   reactions: JSON
@@ -2056,6 +2082,21 @@ type Comment {
   Returns the list of reactions added to this comment by logged in user
   """
   userReactions: [String]
+}
+
+"""
+All supported comment contexts
+"""
+enum CommentType {
+  """
+  Default regular comment
+  """
+  COMMENT
+
+  """
+  Comment is visible only to host admins
+  """
+  PRIVATE_NOTE
 }
 
 """
@@ -2134,380 +2175,6 @@ type Location {
   Structured JSON address
   """
   structured: JSON
-}
-
-"""
-A payout method
-"""
-type PayoutMethod {
-  """
-  Unique identifier for this payout method
-  """
-  id: String!
-
-  """
-  The type of this payout method (usually the payment provider)
-  """
-  type: PayoutMethodType
-
-  """
-  A friendly name for users to easily find their payout methods
-  """
-  name: String
-
-  """
-  Whether this payout method has been saved to be used for future payouts
-  """
-  isSaved: Boolean
-
-  """
-  The actual data for this payout method. Content depends on the type.
-  """
-  data: JSON
-}
-
-enum PayoutMethodType {
-  OTHER
-  PAYPAL
-  BANK_ACCOUNT
-  ACCOUNT_BALANCE
-  CREDIT_CARD
-}
-
-"""
-Fields for an expense's attached file
-"""
-type ExpenseAttachedFile {
-  """
-  Unique identifier for this file
-  """
-  id: String!
-  url: URL
-
-  """
-  The file info associated with this item (if any)
-  """
-  info: FileInfo
-
-  """
-  The original filename
-  """
-  name: String @deprecated(reason: "2023-01-23: We're moving this field to \"file.name\"")
-}
-
-"""
-Fields for an expense item
-"""
-type ExpenseItem {
-  """
-  Unique identifier for this expense item
-  """
-  id: String!
-
-  """
-  Amount of this item
-  """
-  amount: Int!
-
-  """
-  The date on which the item was created
-  """
-  createdAt: DateTime!
-
-  """
-  The date on which the item was last updated
-  """
-  updatedAt: DateTime!
-
-  """
-  The date on which the expense took place
-  """
-  incurredAt: DateTime!
-
-  """
-  A description for this item. Enforced for new items, but old expenses may not have one.
-  """
-  description: String
-  url: URL
-
-  """
-  The file associated with this item (if any)
-  """
-  file: FileInfo
-}
-
-"""
-All supported expense types
-"""
-enum FeesPayer {
-  """
-  The collective will be responsible for paying the fees
-  """
-  COLLECTIVE
-
-  """
-  The payee will be responsible for paying the fees (they'll be deduced from the total amount)
-  """
-  PAYEE
-}
-
-"""
-Fields for the user permissions on an expense
-"""
-type ExpensePermissions {
-  id: String!
-
-  """
-  Whether the current user can edit the expense
-  """
-  canEdit: Boolean!
-
-  """
-  Tags permissions are a bit different, and can be edited by admins even if the expense has already been paid
-  """
-  canEditTags: Boolean!
-
-  """
-  Whether the current user can edit the expense
-  """
-  canDelete: Boolean!
-
-  """
-  Whether the current user can the the invoice info for this expense
-  """
-  canSeeInvoiceInfo: Boolean!
-
-  """
-  Whether the current user can trigger the payment for this expense
-  """
-  canPay: Boolean!
-
-  """
-  Whether the current user can approve this expense
-  """
-  canApprove: Boolean!
-
-  """
-  Whether the current user can unapprove this expense
-  """
-  canUnapprove: Boolean!
-
-  """
-  Whether the current user can reject this expense
-  """
-  canReject: Boolean!
-
-  """
-  Whether the current user can mark this expense as spam
-  """
-  canMarkAsSpam: Boolean!
-
-  """
-  Whether the current user can mark this expense as unpaid
-  """
-  canMarkAsUnpaid: Boolean!
-
-  """
-  Whether the current user can mark this expense as incomplete
-  """
-  canMarkAsIncomplete: Boolean!
-
-  """
-  Whether the current user can comment and see comments for this expense
-  """
-  canComment: Boolean!
-
-  """
-  Whether the current user can unschedule this expense payment
-  """
-  canUnschedulePayment: Boolean!
-  edit: Permission!
-  editTags: Permission!
-  delete: Permission!
-  seeInvoiceInfo: Permission!
-  pay: Permission!
-  approve: Permission!
-  unapprove: Permission!
-  reject: Permission!
-  markAsSpam: Permission!
-  markAsUnpaid: Permission!
-  comment: Permission!
-  unschedulePayment: Permission!
-}
-
-type Permission {
-  allowed: Boolean!
-  reason: String
-  reasonDetails: JSON
-}
-
-"""
-An activity describing something that happened on the platform
-"""
-type Activity {
-  """
-  Unique identifier for this activity
-  """
-  id: String!
-
-  """
-  The type of the activity
-  """
-  type: ActivityType!
-
-  """
-  The date on which the ConnectedAccount was created
-  """
-  createdAt: DateTime!
-
-  """
-  The account that authored by this activity, if any
-  """
-  fromAccount: Account
-
-  """
-  The account targeted by this activity, if any
-  """
-  account: Account
-
-  """
-  The host under which this activity happened, if any
-  """
-  host: Host
-
-  """
-  The person who triggered the action, if any
-  """
-  individual: Individual
-
-  """
-  The expense related to this activity, if any
-  """
-  expense: Expense
-
-  """
-  The order related to this activity, if any
-  """
-  order: Order
-
-  """
-  The transaction related to this activity, if any
-  """
-  transaction: Transaction
-
-  """
-  Data attached to this activity (if any)
-  """
-  data: JSON!
-
-  """
-  Specifies whether this is a system generated activity
-  """
-  isSystem: Boolean!
-}
-
-enum ActivityType {
-  ACTIVITY_ALL
-  CONNECTED_ACCOUNT_CREATED
-  CONNECTED_ACCOUNT_ERROR
-  COLLECTIVE_CREATED_GITHUB
-  COLLECTIVE_APPLY
-  COLLECTIVE_APPROVED
-  COLLECTIVE_REJECTED
-  COLLECTIVE_CREATED
-  COLLECTIVE_EDITED
-  COLLECTIVE_DELETED
-  COLLECTIVE_UNHOSTED
-  ORGANIZATION_COLLECTIVE_CREATED
-  COLLECTIVE_FROZEN
-  COLLECTIVE_UNFROZEN
-  COLLECTIVE_CONVERSATION_CREATED
-  UPDATE_COMMENT_CREATED
-  EXPENSE_COMMENT_CREATED
-  CONVERSATION_COMMENT_CREATED
-  COLLECTIVE_EXPENSE_CREATED
-  COLLECTIVE_EXPENSE_DELETED
-  COLLECTIVE_EXPENSE_UPDATED
-  COLLECTIVE_EXPENSE_REJECTED
-  COLLECTIVE_EXPENSE_APPROVED
-  COLLECTIVE_EXPENSE_UNAPPROVED
-  COLLECTIVE_EXPENSE_MOVED
-  COLLECTIVE_EXPENSE_PAID
-  COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
-  COLLECTIVE_EXPENSE_MARKED_AS_SPAM
-  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
-  COLLECTIVE_EXPENSE_PROCESSING
-  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
-  COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
-  COLLECTIVE_EXPENSE_ERROR
-  COLLECTIVE_EXPENSE_INVITE_DRAFTED
-  COLLECTIVE_EXPENSE_RECURRING_DRAFTED
-  COLLECTIVE_EXPENSE_MISSING_RECEIPT
-  TAXFORM_REQUEST
-  COLLECTIVE_VIRTUAL_CARD_ADDED
-  COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
-  COLLECTIVE_VIRTUAL_CARD_SUSPENDED
-  COLLECTIVE_VIRTUAL_CARD_DELETED
-  VIRTUAL_CARD_REQUESTED
-  VIRTUAL_CARD_CHARGE_DECLINED
-  VIRTUAL_CARD_PURCHASE
-  COLLECTIVE_MEMBER_INVITED
-  COLLECTIVE_MEMBER_CREATED
-  COLLECTIVE_CORE_MEMBER_ADDED
-  COLLECTIVE_CORE_MEMBER_INVITED
-  COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED
-  COLLECTIVE_CORE_MEMBER_REMOVED
-  COLLECTIVE_CORE_MEMBER_EDITED
-  COLLECTIVE_TRANSACTION_CREATED
-  COLLECTIVE_UPDATE_CREATED
-  COLLECTIVE_UPDATE_PUBLISHED
-  COLLECTIVE_CONTACT
-  HOST_APPLICATION_CONTACT
-  CONTRIBUTION_REJECTED
-  SUBSCRIPTION_ACTIVATED
-  SUBSCRIPTION_CANCELED
-  TICKET_CONFIRMED
-  ORDER_CANCELED_ARCHIVED_COLLECTIVE
-  ORDER_PENDING
-  ORDER_PENDING_CRYPTO
-  ORDER_PENDING_CONTRIBUTION_NEW
-  ORDER_PENDING_CONTRIBUTION_REMINDER
-  ORDER_PROCESSING
-  ORDER_PAYMENT_FAILED
-  ORDER_THANKYOU
-  ORDER_PENDING_CREATED
-  ORDER_PENDING_FOLLOWUP
-  ORDER_PENDING_RECEIVED
-  ORDERS_SUSPICIOUS
-  BACKYOURSTACK_DISPATCH_CONFIRMED
-  PAYMENT_FAILED
-  PAYMENT_CREDITCARD_CONFIRMATION
-  PAYMENT_CREDITCARD_EXPIRING
-  USER_CREATED
-  USER_NEW_TOKEN
-  USER_SIGNIN
-  USER_RESET_PASSWORD
-  OAUTH_APPLICATION_AUTHORIZED
-  TWO_FACTOR_CODE_ADDED
-  TWO_FACTOR_CODE_DELETED
-  USER_CHANGE_EMAIL
-  USER_PAYMENT_METHOD_CREATED
-  USER_PASSWORD_SET
-  USER_CARD_CLAIMED
-  USER_CARD_INVITED
-  WEBHOOK_STRIPE_RECEIVED
-  WEBHOOK_PAYPAL_RECEIVED
-  COLLECTIVE_MONTHLY_REPORT
-  ACTIVATED_COLLECTIVE_AS_HOST
-  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
-  DEACTIVATED_COLLECTIVE_AS_HOST
-  ADDED_FUND_TO_ORG
-  COLLECTIVE_TRANSACTION_PAID
-  COLLECTIVE_USER_ADDED
-  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
-  COLLECTIVE_VIRTUAL_CARD_CREATED
-  SUBSCRIPTION_CONFIRMED
-  COLLECTIVE_COMMENT_CREATED
 }
 
 """
@@ -2847,7 +2514,7 @@ type Host implements Account & AccountWithContributions {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -2900,7 +2567,7 @@ type Host implements Account & AccountWithContributions {
   payoutMethods: [PayoutMethod]
 
   """
-  The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders".
+  The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
   """
   paymentMethods(
     type: [PaymentMethodType]
@@ -3075,7 +2742,8 @@ type Host implements Account & AccountWithContributions {
   platformContributionAvailable: Boolean!
   contributionPolicy: String
   hostFeePercent: Float
-  totalHostedCollectives: Int
+  totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
+  totalHostedAccounts: Int
   isOpenToApplications: Boolean
   termsUrl: URL
   plan: HostPlan!
@@ -3228,12 +2896,32 @@ type Host implements Account & AccountWithContributions {
   """
   Returns whether the host has any Stripe disputed orders
   """
-  hasDisputedOrders: Boolean!
+  hasDisputedOrders: Boolean
 
   """
   Returns whether the host has any Stripe in review orders
   """
-  hasInReviewOrders: Boolean!
+  hasInReviewOrders: Boolean
+
+  """
+  Returns agreements with Hosted Accounts
+  """
+  hostedAccountAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter by accounts participating in the agreement
+    """
+    accounts: [AccountReferenceInput]
+  ): AgreementCollection!
 }
 
 """
@@ -3309,7 +2997,11 @@ type ContributorCollection implements Collection {
   nodes: [Contributor]
 }
 
-"\n    A person or an entity that contributes financially or by any other mean to the mission\n    of the collective. While \"Member\" is dedicated to permissions, this type is meant\n    to surface all the public contributors.\n  "
+"""
+A person or an entity that contributes financially or by any other mean to the mission
+of the collective. While "Member" is dedicated to permissions, this type is meant
+to surface all the public contributors.
+"""
 type Contributor {
   """
   A unique identifier for this member
@@ -3324,7 +3016,7 @@ type Contributor {
   """
   All the roles for a given contributor
   """
-  roles: [ContributorRole]
+  roles: [MemberRole]
 
   """
   True if the contributor is a collective admin
@@ -3380,21 +3072,6 @@ type Contributor {
   A public message from contributors to describe their contributions
   """
   publicMessage: String
-}
-
-"""
-Possible roles for a contributor. Extends `Member.Role`.
-"""
-enum ContributorRole {
-  HOST
-  ADMIN
-  MEMBER
-  CONTRIBUTOR
-  BACKER
-  ATTENDEE
-  FOLLOWER
-  CONNECTED_COLLECTIVE
-  ACCOUNTANT
 }
 
 input AccountReferenceInput {
@@ -3631,6 +3308,44 @@ type TagStat {
 }
 
 """
+A payout method
+"""
+type PayoutMethod {
+  """
+  Unique identifier for this payout method
+  """
+  id: String!
+
+  """
+  The type of this payout method (usually the payment provider)
+  """
+  type: PayoutMethodType
+
+  """
+  A friendly name for users to easily find their payout methods
+  """
+  name: String
+
+  """
+  Whether this payout method has been saved to be used for future payouts
+  """
+  isSaved: Boolean
+
+  """
+  The actual data for this payout method. Content depends on the type.
+  """
+  data: JSON
+}
+
+enum PayoutMethodType {
+  OTHER
+  PAYPAL
+  BANK_ACCOUNT
+  ACCOUNT_BALANCE
+  CREDIT_CARD
+}
+
+"""
 PaymentMethod model
 """
 type PaymentMethod {
@@ -3725,7 +3440,7 @@ type PaymentMethod {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -3809,7 +3524,7 @@ enum ConnectedAccountService {
   github
   twitter
   transferwise
-  privacy
+  privacy @deprecated(reason: "Not using this service anymore")
   thegivingblock
   meetup @deprecated(reason: "Not using this service anymore")
 }
@@ -4032,6 +3747,7 @@ type AccountStats {
   ): Amount!
   yearlyBudget: Amount!
   yearlyBudgetManaged: Amount!
+    @deprecated(reason: "2023-03-01: This field will be removed soon, please use totalMoneyManaged")
 
   """
   Total net amount received
@@ -4295,7 +4011,7 @@ type TimeSeriesAmountNode {
 }
 
 """
-Statistics aith amounts
+Statistics with amounts
 """
 type AmountStats {
   """
@@ -4626,6 +4342,12 @@ type AccountPermissions {
   addFunds: Permission!
 }
 
+type Permission {
+  allowed: Boolean!
+  reason: String
+  reasonDetails: JSON
+}
+
 """
 A collection of webhooks
 """
@@ -4645,6 +4367,114 @@ type Webhook {
   activityType: ActivityType
   webhookUrl: URL
   account: Account!
+}
+
+enum ActivityType {
+  ACTIVITY_ALL
+  CONNECTED_ACCOUNT_CREATED
+  CONNECTED_ACCOUNT_ERROR
+  COLLECTIVE_CREATED_GITHUB
+  COLLECTIVE_APPLY
+  COLLECTIVE_APPROVED
+  COLLECTIVE_REJECTED
+  COLLECTIVE_CREATED
+  COLLECTIVE_EDITED
+  COLLECTIVE_DELETED
+  COLLECTIVE_UNHOSTED
+  ORGANIZATION_COLLECTIVE_CREATED
+  COLLECTIVE_FROZEN
+  COLLECTIVE_UNFROZEN
+  COLLECTIVE_CONVERSATION_CREATED
+  UPDATE_COMMENT_CREATED
+  EXPENSE_COMMENT_CREATED
+  CONVERSATION_COMMENT_CREATED
+  COLLECTIVE_EXPENSE_CREATED
+  COLLECTIVE_EXPENSE_DELETED
+  COLLECTIVE_EXPENSE_UPDATED
+  COLLECTIVE_EXPENSE_REJECTED
+  COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED
+  COLLECTIVE_EXPENSE_UNAPPROVED
+  COLLECTIVE_EXPENSE_MOVED
+  COLLECTIVE_EXPENSE_PAID
+  COLLECTIVE_EXPENSE_MARKED_AS_UNPAID
+  COLLECTIVE_EXPENSE_MARKED_AS_SPAM
+  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
+  COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_PUT_ON_HOLD
+  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD
+  COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
+  COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
+  COLLECTIVE_EXPENSE_ERROR
+  COLLECTIVE_EXPENSE_INVITE_DRAFTED
+  COLLECTIVE_EXPENSE_RECURRING_DRAFTED
+  COLLECTIVE_EXPENSE_MISSING_RECEIPT
+  TAXFORM_REQUEST
+  COLLECTIVE_VIRTUAL_CARD_ADDED
+  COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
+  COLLECTIVE_VIRTUAL_CARD_SUSPENDED
+  COLLECTIVE_VIRTUAL_CARD_DELETED
+  VIRTUAL_CARD_REQUESTED
+  VIRTUAL_CARD_CHARGE_DECLINED
+  VIRTUAL_CARD_PURCHASE
+  COLLECTIVE_MEMBER_INVITED
+  COLLECTIVE_MEMBER_CREATED
+  COLLECTIVE_CORE_MEMBER_ADDED
+  COLLECTIVE_CORE_MEMBER_INVITED
+  COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED
+  COLLECTIVE_CORE_MEMBER_REMOVED
+  COLLECTIVE_CORE_MEMBER_EDITED
+  COLLECTIVE_TRANSACTION_CREATED
+  COLLECTIVE_UPDATE_CREATED
+  COLLECTIVE_UPDATE_PUBLISHED
+  COLLECTIVE_CONTACT
+  HOST_APPLICATION_CONTACT
+  CONTRIBUTION_REJECTED
+  SUBSCRIPTION_ACTIVATED
+  SUBSCRIPTION_CANCELED
+  TICKET_CONFIRMED
+  ORDER_CANCELED_ARCHIVED_COLLECTIVE
+  ORDER_PENDING
+  ORDER_PENDING_CRYPTO
+  ORDER_PENDING_CONTRIBUTION_NEW
+  ORDER_PENDING_CONTRIBUTION_REMINDER
+  ORDER_PROCESSING
+  ORDER_PAYMENT_FAILED
+  ORDER_THANKYOU
+  ORDER_PENDING_CREATED
+  ORDER_PENDING_FOLLOWUP
+  ORDER_PENDING_RECEIVED
+  ORDERS_SUSPICIOUS
+  BACKYOURSTACK_DISPATCH_CONFIRMED
+  PAYMENT_FAILED
+  PAYMENT_CREDITCARD_CONFIRMATION
+  PAYMENT_CREDITCARD_EXPIRING
+  USER_CREATED
+  USER_NEW_TOKEN
+  USER_SIGNIN
+  USER_RESET_PASSWORD
+  OAUTH_APPLICATION_AUTHORIZED
+  TWO_FACTOR_CODE_ADDED
+  TWO_FACTOR_CODE_DELETED
+  TWO_FACTOR_CODE_REQUESTED
+  USER_CHANGE_EMAIL
+  USER_PAYMENT_METHOD_CREATED
+  USER_PASSWORD_SET
+  USER_CARD_CLAIMED
+  USER_CARD_INVITED
+  WEBHOOK_STRIPE_RECEIVED
+  WEBHOOK_PAYPAL_RECEIVED
+  COLLECTIVE_MONTHLY_REPORT
+  ACTIVATED_COLLECTIVE_AS_HOST
+  ACTIVATED_COLLECTIVE_AS_INDEPENDENT
+  DEACTIVATED_COLLECTIVE_AS_HOST
+  ADDED_FUND_TO_ORG
+  COLLECTIVE_TRANSACTION_PAID
+  COLLECTIVE_USER_ADDED
+  COLLECTIVE_VIRTUAL_CARD_ASSIGNED
+  COLLECTIVE_VIRTUAL_CARD_CREATED
+  SUBSCRIPTION_CONFIRMED
+  COLLECTIVE_COMMENT_CREATED
 }
 
 """
@@ -4987,6 +4817,267 @@ type ExpenseStats {
   Number of grants
   """
   grantsCount: Int!
+}
+
+"""
+A collection of "Agreement"
+"""
+type AgreementCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Agreement!]
+}
+
+"""
+An agreement
+"""
+type Agreement {
+  id: String
+  title: String!
+  createdBy: Account!
+  account: Account!
+  host: Host!
+  expiresAt: DateTime
+  attachment: FileInfo
+}
+
+"""
+Fields for an expense's attached file
+"""
+type ExpenseAttachedFile {
+  """
+  Unique identifier for this file
+  """
+  id: String!
+  url: URL
+
+  """
+  The file info associated with this item (if any)
+  """
+  info: FileInfo
+
+  """
+  The original filename
+  """
+  name: String @deprecated(reason: "2023-01-23: We're moving this field to \"file.name\"")
+}
+
+"""
+Fields for an expense item
+"""
+type ExpenseItem {
+  """
+  Unique identifier for this expense item
+  """
+  id: String!
+
+  """
+  Amount of this item
+  """
+  amount: Int!
+
+  """
+  The date on which the item was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date on which the item was last updated
+  """
+  updatedAt: DateTime!
+
+  """
+  The date on which the expense took place
+  """
+  incurredAt: DateTime!
+
+  """
+  A description for this item. Enforced for new items, but old expenses may not have one.
+  """
+  description: String
+  url: URL
+
+  """
+  The file associated with this item (if any)
+  """
+  file: FileInfo
+}
+
+"""
+All supported expense types
+"""
+enum FeesPayer {
+  """
+  The collective will be responsible for paying the fees
+  """
+  COLLECTIVE
+
+  """
+  The payee will be responsible for paying the fees (they'll be deduced from the total amount)
+  """
+  PAYEE
+}
+
+"""
+Fields for the user permissions on an expense
+"""
+type ExpensePermissions {
+  id: String!
+
+  """
+  Whether the current user can edit the expense
+  """
+  canEdit: Boolean!
+
+  """
+  Tags permissions are a bit different, and can be edited by admins even if the expense has already been paid
+  """
+  canEditTags: Boolean!
+
+  """
+  Whether the current user can edit the expense
+  """
+  canDelete: Boolean!
+
+  """
+  Whether the current user can the the invoice info for this expense
+  """
+  canSeeInvoiceInfo: Boolean!
+
+  """
+  Whether the current user can trigger the payment for this expense
+  """
+  canPay: Boolean!
+
+  """
+  Whether the current user can approve this expense
+  """
+  canApprove: Boolean!
+
+  """
+  Whether the current user can unapprove this expense
+  """
+  canUnapprove: Boolean!
+
+  """
+  Whether the current user can reject this expense
+  """
+  canReject: Boolean!
+
+  """
+  Whether the current user can mark this expense as spam
+  """
+  canMarkAsSpam: Boolean!
+
+  """
+  Whether the current user can mark this expense as unpaid
+  """
+  canMarkAsUnpaid: Boolean!
+
+  """
+  Whether the current user can mark this expense as incomplete
+  """
+  canMarkAsIncomplete: Boolean!
+
+  """
+  Whether the current user can comment and see comments for this expense
+  """
+  canComment: Boolean!
+
+  """
+  Whether the current user can unschedule this expense payment
+  """
+  canUnschedulePayment: Boolean!
+
+  """
+  Whether the current user can verify this draft expense
+  """
+  canVerifyDraftExpense: Boolean!
+  canUsePrivateNote: Boolean!
+  canHold: Boolean!
+  canRelease: Boolean!
+  edit: Permission!
+  editTags: Permission!
+  delete: Permission!
+  seeInvoiceInfo: Permission!
+  pay: Permission!
+  approve: Permission!
+  unapprove: Permission!
+  reject: Permission!
+  markAsSpam: Permission!
+  markAsUnpaid: Permission!
+  comment: Permission!
+  usePrivateNote: Permission!
+  unschedulePayment: Permission!
+  verifyDraftExpense: Permission!
+  hold: Permission!
+  release: Permission!
+}
+
+"""
+An activity describing something that happened on the platform
+"""
+type Activity {
+  """
+  Unique identifier for this activity
+  """
+  id: String!
+
+  """
+  The type of the activity
+  """
+  type: ActivityType!
+
+  """
+  The date on which the ConnectedAccount was created
+  """
+  createdAt: DateTime!
+
+  """
+  The account that authored by this activity, if any
+  """
+  fromAccount: Account
+
+  """
+  The account targeted by this activity, if any
+  """
+  account: Account
+
+  """
+  The host under which this activity happened, if any
+  """
+  host: Host
+
+  """
+  The person who triggered the action, if any
+  """
+  individual: Individual
+
+  """
+  The expense related to this activity, if any
+  """
+  expense: Expense
+
+  """
+  The order related to this activity, if any
+  """
+  order: Order
+
+  """
+  The transaction related to this activity, if any
+  """
+  transaction: Transaction
+
+  """
+  Data attached to this activity (if any)
+  """
+  data: JSON!
+
+  """
+  Specifies whether this is a system generated activity
+  """
+  isSystem: Boolean!
 }
 
 """
@@ -5591,7 +5682,7 @@ type Bot implements Account {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -5644,7 +5735,7 @@ type Bot implements Account {
   payoutMethods: [PayoutMethod]
 
   """
-  The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders".
+  The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
   """
   paymentMethods(
     type: [PaymentMethodType]
@@ -6109,7 +6200,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -6162,7 +6253,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   payoutMethods: [PayoutMethod]
 
   """
-  The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders".
+  The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
   """
   paymentMethods(
     type: [PaymentMethodType]
@@ -6320,6 +6411,21 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   isApproved: Boolean!
 
   """
+  Returns agreements this account has with its host
+  """
+  hostAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AgreementCollection!
+
+  """
   Number of unique financial contributors.
   """
   totalFinancialContributors(
@@ -6401,6 +6507,21 @@ interface AccountWithHost {
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
+
+  """
+  Returns agreements this account has with its host
+  """
+  hostAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AgreementCollection!
 }
 
 """
@@ -6496,6 +6617,11 @@ type Credit implements Transaction {
   permissions: TransactionPermissions!
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -6604,6 +6730,11 @@ type Debit implements Transaction {
   permissions: TransactionPermissions!
   isOrderRejected: Boolean!
   refundTransaction: Transaction
+
+  """
+  The opposite transaction (CREDIT -> DEBIT, DEBIT -> CREDIT)
+  """
+  oppositeTransaction: Transaction
   relatedTransactions(
     """
     Filter by kind
@@ -6956,7 +7087,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -7009,7 +7140,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   payoutMethods: [PayoutMethod]
 
   """
-  The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders".
+  The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
   """
   paymentMethods(
     type: [PaymentMethodType]
@@ -7165,6 +7296,21 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Returns whether it's approved by the Fiscal Host
   """
   isApproved: Boolean!
+
+  """
+  Returns agreements this account has with its host
+  """
+  hostAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AgreementCollection!
 
   """
   Number of unique financial contributors.
@@ -7679,7 +7825,7 @@ type Individual implements Account {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -7732,7 +7878,7 @@ type Individual implements Account {
   payoutMethods: [PayoutMethod]
 
   """
-  The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders".
+  The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
   """
   paymentMethods(
     type: [PaymentMethodType]
@@ -7770,7 +7916,11 @@ type Individual implements Account {
     offset: Int! = 0
   ): OAuthApplicationCollection
 
-  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see their own address\n            - Hosts can see the address of users submitting expenses to their collectives\n        "
+  """
+  Address. This field is public for hosts, otherwise:
+    - Users can see their own address
+    - Hosts can see the address of users submitting expenses to their collectives
+  """
   location: Location
   categories: [String]!
   stats: AccountStats
@@ -7870,7 +8020,7 @@ type Individual implements Account {
   If the individual is a host account, this will return the matching Host object
   """
   host: Host
-  hasSeenLatestChangelogEntry: Boolean!
+  hasSeenLatestChangelogEntry: Boolean
   oAuthAuthorizations(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8372,7 +8522,7 @@ type Organization implements Account & AccountWithContributions {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -8425,7 +8575,7 @@ type Organization implements Account & AccountWithContributions {
   payoutMethods: [PayoutMethod]
 
   """
-  The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders".
+  The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
   """
   paymentMethods(
     type: [PaymentMethodType]
@@ -8463,7 +8613,11 @@ type Organization implements Account & AccountWithContributions {
     offset: Int! = 0
   ): OAuthApplicationCollection
 
-  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.\n            - Hosts can see the address of organizations submitting expenses to their collectives.\n        "
+  """
+  Address. This field is public for hosts, otherwise:
+    - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.
+    - Hosts can see the address of organizations submitting expenses to their collectives.
+  """
   location: Location
   categories: [String]!
   stats: AccountStats
@@ -8600,7 +8754,7 @@ type Organization implements Account & AccountWithContributions {
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
   """
-  If the organization if a host account, this will return the matching Host object
+  If the organization is a host account, this will return the matching Host object
   """
   host: Host
 }
@@ -9005,7 +9159,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -9058,7 +9212,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   payoutMethods: [PayoutMethod]
 
   """
-  The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders".
+  The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
   """
   paymentMethods(
     type: [PaymentMethodType]
@@ -9216,6 +9370,21 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   isApproved: Boolean!
 
   """
+  Returns agreements this account has with its host
+  """
+  hostAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AgreementCollection!
+
+  """
   Number of unique financial contributors.
   """
   totalFinancialContributors(
@@ -9342,6 +9511,26 @@ type Query {
     tagSearchOperator: TagSearchOperator! = AND
 
     """
+    Included collectives which are archived
+    """
+    includeArchived: Boolean
+
+    """
+    Only return "active" accounts with Financial Contributions enabled if true.
+    """
+    isActive: Boolean
+
+    """
+    Whether to skip recent suspicious accounts (48h)
+    """
+    skipRecentAccounts: Boolean = false
+
+    """
+    Limit the search to collectives belonging to these countries
+    """
+    country: [CountryISO]
+
+    """
     Host hosting the account
     """
     host: [AccountReferenceInput]
@@ -9357,16 +9546,6 @@ type Query {
     isHost: Boolean
 
     """
-    Included collectives which are archived
-    """
-    includeArchived: Boolean
-
-    """
-    Only return "active" accounts with Financial Contributions enabled if true.
-    """
-    isActive: Boolean
-
-    """
     Only accounts with custom contribution (/donate) enabled
     """
     hasCustomContributionsEnabled: Boolean
@@ -9378,16 +9557,6 @@ type Query {
       @deprecated(
         reason: "2022-04-22: Introduced for Hacktoberfest. Reference: https://github.com/opencollective/opencollective-api/pull/7440#issuecomment-1121504508"
       )
-
-    """
-    Whether to skip recent suspicious accounts (48h)
-    """
-    skipRecentAccounts: Boolean = false
-
-    """
-    Limit the search to collectives belonging to these countries
-    """
-    country: [CountryISO]
 
     """
     The order of results. Defaults to [RANK, DESC] (or [CREATED_AT, DESC] if `supportedPaymentMethodService` is provided)
@@ -9610,6 +9779,11 @@ type Query {
     Whether to include expenses from children of the account (Events and Projects)
     """
     includeChildrenExpenses: Boolean! = false
+
+    """
+    Only return expenses that contains this custom data. Requires being an admin of the collective, payee or host.
+    """
+    customData: JSON
   ): ExpenseCollection!
   fund(
     """
@@ -9665,14 +9839,45 @@ type Query {
     offset: Int! = 0
 
     """
-    Filter hosts by tags (multiple = OR)
+    Search accounts related to this term based on name, description, tags, slug, and location
     """
-    tags: [String] @deprecated(reason: "2020-06-30: Please use tag (singular)")
+    searchTerm: String
+
+    """
+    Only accounts that match these tags
+    """
+    tag: [String]
+
+    """
+    Operator to use when searching with tags. Defaults to 'AND'
+    """
+    tagSearchOperator: TagSearchOperator! = AND
+
+    """
+    Included collectives which are archived
+    """
+    includeArchived: Boolean
+
+    """
+    Only return "active" accounts with Financial Contributions enabled if true.
+    """
+    isActive: Boolean
+
+    """
+    Whether to skip recent suspicious accounts (48h)
+    """
+    skipRecentAccounts: Boolean = false
+
+    """
+    Limit the search to collectives belonging to these countries
+    """
+    country: [CountryISO]
+    currency: String
 
     """
     Filter hosts by tags (multiple = OR)
     """
-    tag: [String]
+    tags: [String] @deprecated(reason: "2020-06-30: Please use tag (singular)")
   ): HostCollection
   individual(
     """
@@ -9788,7 +9993,7 @@ type Query {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -9879,6 +10084,16 @@ type Query {
     """
     throwIfMissing: Boolean! = true
   ): Tier
+
+  """
+  Fetch a single transaction
+  """
+  transaction(
+    """
+    The public id identifying the transaction (ie: rvelja97-pkzqbgq7-bbzyx6wd-50o8n4rm)
+    """
+    id: String
+  ): Transaction
   transactions(
     """
     Reference of the account(s) assigned to the main side of the transaction (CREDIT -> recipient, DEBIT -> sender)
@@ -11350,6 +11565,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_UPDATED
   COLLECTIVE_EXPENSE_REJECTED
   COLLECTIVE_EXPENSE_APPROVED
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED
   COLLECTIVE_EXPENSE_UNAPPROVED
   COLLECTIVE_EXPENSE_MOVED
   COLLECTIVE_EXPENSE_PAID
@@ -11357,6 +11573,8 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM
   COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE
   COLLECTIVE_EXPENSE_PROCESSING
+  COLLECTIVE_EXPENSE_PUT_ON_HOLD
+  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
@@ -11410,6 +11628,7 @@ enum ActivityAndClassesType {
   OAUTH_APPLICATION_AUTHORIZED
   TWO_FACTOR_CODE_ADDED
   TWO_FACTOR_CODE_DELETED
+  TWO_FACTOR_CODE_REQUESTED
   USER_CHANGE_EMAIL
   USER_PAYMENT_METHOD_CREATED
   USER_PASSWORD_SET
@@ -11480,6 +11699,11 @@ enum ExpenseStatusFilter {
   Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
   """
   READY_TO_PAY
+
+  """
+  Only expenses that are on hold
+  """
+  ON_HOLD
 }
 
 """
@@ -11819,7 +12043,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -11872,7 +12096,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   payoutMethods: [PayoutMethod]
 
   """
-  The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders".
+  The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
   """
   paymentMethods(
     type: [PaymentMethodType]
@@ -12028,6 +12252,21 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Returns whether it's approved by the Fiscal Host
   """
   isApproved: Boolean!
+
+  """
+  Returns agreements this account has with its host
+  """
+  hostAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AgreementCollection!
 
   """
   Number of unique financial contributors.
@@ -12432,7 +12671,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     dateFrom: DateTime
 
     """
-    Only return orders that were created after this date
+    Only return orders that were created before this date
     """
     dateTo: DateTime
 
@@ -12485,7 +12724,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   payoutMethods: [PayoutMethod]
 
   """
-  The list of payment methods that this collective can use to pay for Orders. Admin only. Scope: "orders".
+  The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
   """
   paymentMethods(
     type: [PaymentMethodType]
@@ -12643,6 +12882,21 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   isApproved: Boolean!
 
   """
+  Returns agreements this account has with its host
+  """
+  hostAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AgreementCollection!
+
+  """
   Number of unique financial contributors.
   """
   totalFinancialContributors(
@@ -12763,15 +13017,55 @@ type Mutation {
   Add funds to the given account. Scope: "host".
   """
   addFunds(
+    """
+    The account that will be used as the source of the funds
+    """
     fromAccount: AccountReferenceInput!
+
+    """
+    The account that will receive the funds
+    """
     account: AccountReferenceInput!
+
+    """
+    The tier to which the funds will be added
+    """
     tier: TierReferenceInput
+
+    """
+    The total amount of the order, including taxes
+    """
     amount: AmountInput!
-    description: String!
-    memo: String
-    processedAt: DateTime
+
+    """
+    The host fee percent to apply to the order, as a float between 0 and 100
+    """
     hostFeePercent: Float
+
+    """
+    A short description of the contribution
+    """
+    description: String!
+
+    """
+    A private note for the host
+    """
+    memo: String
+
+    """
+    The date at which the order was processed
+    """
+    processedAt: DateTime
+
+    """
+    The invoice template to use for this order
+    """
     invoiceTemplate: String
+
+    """
+    The tax to apply to the order
+    """
+    tax: TaxInput
   ): Order!
 
   """
@@ -12950,6 +13244,11 @@ type Mutation {
     account: AccountReferenceInput!
 
     """
+    The two factor method to add, defaults to TOTP
+    """
+    type: TwoFactorMethod
+
+    """
     The generated secret to save to the Individual
     """
     token: String!
@@ -12965,9 +13264,14 @@ type Mutation {
     account: AccountReferenceInput!
 
     """
+    The two factor method to remove. Removes all if empty
+    """
+    type: TwoFactorMethod
+
+    """
     The 6-digit 2FA code
     """
-    code: String!
+    code: String @deprecated(reason: "2FA code to validate this action must be set via 2FA header")
   ): Individual!
 
   """
@@ -13629,7 +13933,7 @@ type Mutation {
   """
   Creates a Stripe payment intent
   """
-  createPaymentIntent(paymentIntent: PaymentIntentInput!): PaymentIntent!
+  createPaymentIntent(paymentIntent: PaymentIntentInput!, guestInfo: GuestInfoInput): PaymentIntent!
 
   """
   To submit a new order. Scope: "orders".
@@ -13717,6 +14021,16 @@ type Mutation {
   ): Account!
 
   """
+  [Root only] Edits account type from User to Organization
+  """
+  editAccountType(
+    """
+    Account to change the type for
+    """
+    account: AccountReferenceInput!
+  ): Account!
+
+  """
   [Root only] Clears the cache for a given account
   """
   clearCacheForAccount(
@@ -13785,6 +14099,26 @@ type Mutation {
     """
     destinationAccount: AccountReferenceInput!
   ): [Expense]!
+
+  """
+  [Root only] A mutation to set the tax from for an account.
+  """
+  setTaxForm(
+    """
+    Reference to the Account the tax form should be set.
+    """
+    account: AccountReferenceInput!
+
+    """
+    The tax from link.
+    """
+    taxFormLink: URL!
+
+    """
+    The tax form year.
+    """
+    year: Int!
+  ): SetTaxFormResult
 
   """
   Add platform tips to a transaction. Scope: "transactions".
@@ -14062,6 +14396,111 @@ type Mutation {
     order: OrderReferenceInput
     expense: ExpenseReferenceInput
   ): TagResponse!
+
+  """
+  Add an agreement for the given host account. Scope: "host".
+  """
+  addAgreement(
+    """
+    Agreement title.
+    """
+    title: NonEmptyString!
+
+    """
+    Optional date in which this agreement expires.
+    """
+    expiresAt: DateTime
+
+    """
+    Host where the agreement will be created.
+    """
+    host: AccountReferenceInput!
+
+    """
+    Account that is a party in this agreement
+    """
+    account: AccountReferenceInput!
+
+    """
+    Agreement attachment
+    """
+    attachment: Upload
+  ): Agreement!
+
+  """
+  Edit an agreement for the given host account. Scope: "host".
+  """
+  editAgreement(
+    """
+    Agreement to update.
+    """
+    agreement: AgreementReferenceInput!
+
+    """
+    Updated agreement title
+    """
+    title: NonEmptyString
+
+    """
+    Optional date in which this agreement expires.
+    """
+    expiresAt: DateTime
+  ): Agreement!
+
+  """
+  Delete an agreement for the given host account. Scope: "host".
+  """
+  deleteAgreement(
+    """
+    Agreement to delete.
+    """
+    agreement: AgreementReferenceInput!
+  ): Agreement!
+}
+
+"""
+Input to set taxes for an expense
+"""
+input TaxInput {
+  """
+  Tax type
+  """
+  type: TaxType!
+
+  """
+  Tax rate as a float number between 0 and 1
+  """
+  rate: Float!
+
+  """
+  Tax identification number, if any
+  """
+  idNumber: String
+
+  """
+  Country ISO code of the entity paying the tax
+  """
+  country: CountryISO
+
+  """
+  An optional tax amount to make sure the tax displayed in your frontend matches the one calculated by the API
+  """
+  amount: AmountInput
+}
+
+"""
+The type of a tax like GST, VAT, etc
+"""
+enum TaxType {
+  """
+  European Value Added Tax
+  """
+  VAT
+
+  """
+  New Zealand Good and Services Tax
+  """
+  GST
 }
 
 input CollectiveCreateInput {
@@ -14069,9 +14508,45 @@ input CollectiveCreateInput {
   slug: String!
   description: String!
   tags: [String]
+  location: LocationInput
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   settings: JSON
+}
+
+"""
+Input type for Geographic location
+"""
+input LocationInput {
+  """
+  A short name for the location (eg. Open Collective Headquarters)
+  """
+  name: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
+  country: CountryISO
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
 }
 
 input IndividualCreateInput {
@@ -14169,6 +14644,14 @@ type AddTwoFactorAuthTokenToIndividualResponse {
   The recovery codes for the Individual to write down
   """
   recoveryCodes: [String]
+}
+
+"""
+A two factor authentication method
+"""
+enum TwoFactorMethod {
+  TOTP
+  YUBIKEY_OTP
 }
 
 input AccountUpdateInput {
@@ -14280,6 +14763,11 @@ input CommentCreateInput {
   ConversationId: String @deprecated(reason: "2022-08-26: Please use \"conversation\"")
   conversation: ConversationReferenceInput
   update: UpdateReferenceInput
+
+  """
+  The type of the comment
+  """
+  type: CommentType = COMMENT
 }
 
 input ConversationReferenceInput {
@@ -14430,6 +14918,11 @@ input ExpenseCreateInput {
   The list of taxes that should be applied to the expense (VAT, GST, etc...)
   """
   tax: [ExpenseTaxInput]
+
+  """
+  Custom data to be stored in the expense
+  """
+  customData: JSON
 }
 
 input PayoutMethodInput {
@@ -14459,10 +14952,8 @@ input ExpenseItemCreateInput {
   """
   When was the money spent?
   """
-  incurredAt: DateString
+  incurredAt: DateTime
 }
-
-scalar DateString
 
 input ExpenseAttachedFileInput {
   """
@@ -14485,41 +14976,6 @@ input ExpenseAttachedFileInput {
 }
 
 """
-Input type for Geographic location
-"""
-input LocationInput {
-  """
-  A short name for the location (eg. Open Collective Headquarters)
-  """
-  name: String
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
-
-  """
-  Two letters country code (eg. FR, BE...etc)
-  """
-  country: CountryISO
-
-  """
-  Latitude
-  """
-  lat: Float
-
-  """
-  Longitude
-  """
-  long: Float
-
-  """
-  Structured JSON address
-  """
-  structured: JSON
-}
-
-"""
 Input to set taxes for an expense
 """
 input ExpenseTaxInput {
@@ -14534,21 +14990,6 @@ input ExpenseTaxInput {
   Tax identification number, if any
   """
   idNumber: String
-}
-
-"""
-The type of a tax like GST, VAT, etc
-"""
-enum TaxType {
-  """
-  European Value Added Tax
-  """
-  VAT
-
-  """
-  New Zealand Good and Services Tax
-  """
-  GST
 }
 
 input RecurringExpenseInput {
@@ -14638,6 +15079,11 @@ input ExpenseUpdateInput {
   The list of taxes that should be applied to the expense (VAT, GST, etc...)
   """
   tax: [ExpenseTaxInput]
+
+  """
+  Custom data to be stored in the expense
+  """
+  customData: JSON
 }
 
 input ExpenseItemInput {
@@ -14664,7 +15110,7 @@ input ExpenseItemInput {
   """
   When was the money spent?
   """
-  incurredAt: DateString
+  incurredAt: DateTime
 }
 
 input NewAccountOrReferenceInput {
@@ -14712,6 +15158,11 @@ enum ExpenseProcessAction {
   UNAPPROVE
 
   """
+  To request re-approval of the expense, marking it as pending.
+  """
+  REQUEST_RE_APPROVAL
+
+  """
   To mark the expense as rejected
   """
   REJECT
@@ -14745,6 +15196,16 @@ enum ExpenseProcessAction {
   To mark the expense as incomplete and notify the payee it requires more information
   """
   MARK_AS_INCOMPLETE
+
+  """
+  To put the expense on hold
+  """
+  HOLD
+
+  """
+  To release the expense from hold
+  """
+  RELEASE
 }
 
 """
@@ -14767,6 +15228,11 @@ input ProcessExpensePaymentParams {
   shouldRefundPaymentProcessorFee: Boolean
 
   """
+  New expense status when triggering MARK_AS_UNPAID
+  """
+  markAsUnPaidStatus: MarkAsUnPaidExpenseStatus = APPROVED
+
+  """
   Bypass automatic integrations (ie. PayPal, Transferwise) to process the expense manually
   """
   forceManual: Boolean
@@ -14775,6 +15241,12 @@ input ProcessExpensePaymentParams {
   Who is responsible for paying any due fees.
   """
   feesPayer: FeesPayer = COLLECTIVE
+}
+
+enum MarkAsUnPaidExpenseStatus {
+  APPROVED
+  INCOMPLETE
+  ERROR
 }
 
 input ExpenseInviteDraftInput {
@@ -14787,6 +15259,11 @@ input ExpenseInviteDraftInput {
   Longer text to attach to the expense
   """
   longDescription: String
+
+  """
+  Currency that should be used for the payout. Defaults to the account currency
+  """
+  currency: Currency
 
   """
   Tags associated to the expense (ie. Food, Engineering...)
@@ -14804,14 +15281,14 @@ input ExpenseInviteDraftInput {
   privateMessage: String
 
   """
-  Tax ID, VAT number...etc This information will be printed on your invoice.
+  Custom information to print on the invoice
   """
   invoiceInfo: String
 
   """
-  Note to be sent to the invited user through email.
+  The payout method that will be used to reimburse the expense
   """
-  recipientNote: String
+  payoutMethod: PayoutMethodInput
 
   """
   The list of items for this expense. Total amount will be computed from them.
@@ -14834,13 +15311,24 @@ input ExpenseInviteDraftInput {
   payeeLocation: LocationInput
 
   """
-  The payout method that will be used to reimburse the expense
+  The list of taxes that should be applied to the expense (VAT, GST, etc...)
   """
-  payoutMethod: PayoutMethodInput
+  tax: [ExpenseTaxInput]
+
+  """
+  Custom data to be stored in the expense
+  """
+  customData: JSON
+
+  """
+  Note to be sent to the invited user through email.
+  """
+  recipientNote: String
 }
 
 input ExpenseInvitee {
-  id: Int
+  id: Int @deprecated(reason: "2023-04-12: Please use legacyId")
+  legacyId: Int
   slug: String
   name: String
   email: String
@@ -14997,9 +15485,14 @@ input OrderCreateInput {
   platformTipAmount: AmountInput
 
   """
+  The tax to apply to the order
+  """
+  tax: TaxInput
+
+  """
   Use this field to set the taxes associated to this order
   """
-  taxes: [OrderTaxInput]
+  taxes: [OrderTaxInput] @deprecated(reason: "2023-04-11: Please use `tax` instead")
 
   """
   The tier you are contributing to
@@ -15207,9 +15700,14 @@ input OrderUpdateInput {
   legacyId: Int
 
   """
-  Amount received by collective, excluding any tips or fees
+  Amount received by collective, excluding any tips, taxes or fees
   """
   amount: AmountInput
+
+  """
+  The tax to apply to the order
+  """
+  tax: TaxInput
 
   """
   Amount paid in fees for the payment processor
@@ -15291,14 +15789,9 @@ input PendingOrderCreateInput {
   toAccount: AccountReferenceInput!
 
   """
-  Platform tip attached to this order
+  The tax to apply to the order
   """
-  platformTipAmount: AmountInput
-
-  """
-  Use this field to set the taxes associated to this order
-  """
-  taxes: [OrderTaxInput]
+  tax: TaxInput
 
   """
   The tier you are contributing to
@@ -15328,7 +15821,11 @@ input PendingOrderCreateInput {
   """
   When is the money expected?
   """
-  expectedAt: DateString
+  expectedAt: DateTime
+
+  """
+  Custom Host fee percent for this order
+  """
   hostFeePercent: Float
 }
 
@@ -15362,14 +15859,9 @@ input PendingOrderEditInput {
   fromAccountInfo: OrderFromAccountInfo
 
   """
-  Platform tip attached to this order
+  The tax to apply to the order
   """
-  platformTipAmount: AmountInput
-
-  """
-  Use this field to set the taxes associated to this order
-  """
-  taxes: [OrderTaxInput]
+  tax: TaxInput
 
   """
   The tier you are contributing to
@@ -15399,7 +15891,11 @@ input PendingOrderEditInput {
   """
   When is the money expected?
   """
-  expectedAt: DateString
+  expectedAt: DateTime
+
+  """
+  Custom Host fee percent for this order
+  """
   hostFeePercent: Float
 }
 
@@ -15450,6 +15946,10 @@ type BanAccountResponse {
   accounts: [Account!]!
 }
 
+type SetTaxFormResult {
+  success: Boolean!
+}
+
 input TransactionReferenceInput {
   """
   The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -15469,13 +15969,11 @@ input UpdateCreateInput {
   title: String!
   isPrivate: Boolean
   isChangelog: Boolean
-  makePublicOn: IsoDateString
+  makePublicOn: DateTime
   html: String!
   fromAccount: AccountReferenceInput
   account: AccountReferenceInput!
 }
-
-scalar IsoDateString
 
 """
 Input type for UpdateType
@@ -15639,4 +16137,21 @@ input SocialLinkInput {
 type TagResponse {
   order: Order
   expense: Expense
+}
+
+"""
+The `Upload` scalar type represents a file upload.
+"""
+scalar Upload
+
+input AgreementReferenceInput {
+  """
+  The public id identifying the agreement (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the agreement (ie: 580)
+  """
+  legacyId: Int
 }

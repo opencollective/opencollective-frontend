@@ -114,7 +114,14 @@ const AccountSettings = ({ account, section }) => {
     if (collective.location === null) {
       CollectiveInputType.location = null;
     } else {
-      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long', 'country']);
+      CollectiveInputType.location = pick(collective.location, [
+        'name',
+        'address',
+        'lat',
+        'long',
+        'country',
+        'structured',
+      ]);
     }
     setState({ ...state, status: 'loading' });
     try {

@@ -135,8 +135,6 @@ export const expenseHostFields = gql`
     }
     supportedPayoutMethods
     isTrustedHost
-    hasDisputedOrders
-    hasInReviewOrders
     plan {
       id
     }
@@ -152,6 +150,7 @@ export const expensePageExpenseFieldsFragment = gql`
     currency
     type
     status
+    onHold
     privateMessage
     tags
     amount
@@ -176,6 +175,12 @@ export const expensePageExpenseFieldsFragment = gql`
       description
       amount
       url
+      file {
+        id
+        ... on ImageFileInfo {
+          width
+        }
+      }
     }
     taxes {
       id
@@ -191,6 +196,9 @@ export const expensePageExpenseFieldsFragment = gql`
         id
         name
         size
+        ... on ImageFileInfo {
+          width
+        }
       }
     }
     payee {
@@ -321,6 +329,7 @@ export const expensePageExpenseFieldsFragment = gql`
         isApproved
         host {
           id
+          legacyId
           ...ExpenseHostFields
           transferwise {
             id
@@ -389,6 +398,10 @@ export const expensePageExpenseFieldsFragment = gql`
       canMarkAsIncomplete
       canComment
       canUnschedulePayment
+      canVerifyDraftExpense
+      canUsePrivateNote
+      canHold
+      canRelease
       approve {
         allowed
         reason
@@ -406,6 +419,60 @@ export const expensePageExpenseFieldsFragment = gql`
         slug
         name
         imageUrl
+      }
+      transaction {
+        id
+        amount {
+          valueInCents
+          currency
+        }
+        platformFee {
+          valueInCents
+          currency
+        }
+        hostFee {
+          valueInCents
+          currency
+        }
+        paymentProcessorFee {
+          valueInCents
+          currency
+        }
+        netAmount {
+          valueInCents
+          currency
+        }
+        taxAmount {
+          valueInCents
+          currency
+        }
+        taxInfo {
+          id
+          rate
+          type
+          percentage
+        }
+        fromAccount {
+          id
+          slug
+          name
+          ... on AccountWithHost {
+            hostFeePercent
+          }
+        }
+        toAccount {
+          id
+          slug
+          name
+          ... on AccountWithHost {
+            hostFeePercent
+          }
+        }
+        expense {
+          id
+          currency
+          amount
+        }
       }
     }
     recurringExpense {
@@ -485,6 +552,8 @@ export const expensesListFieldsFragment = gql`
       canSeeInvoiceInfo
       canEditTags
       canUnschedulePayment
+      canHold
+      canRelease
       approve {
         allowed
         reason
@@ -532,6 +601,7 @@ export const expensesListFieldsFragment = gql`
 export const expensesListAdminFieldsFragment = gql`
   fragment ExpensesListAdminFieldsFragment on Expense {
     id
+    onHold
     payoutMethod {
       id
       type
@@ -543,6 +613,12 @@ export const expensesListAdminFieldsFragment = gql`
       incurredAt
       url
       amount
+      file {
+        id
+        ... on ImageFileInfo {
+          width
+        }
+      }
     }
     taxes {
       id
@@ -553,6 +629,12 @@ export const expensesListAdminFieldsFragment = gql`
       id
       url
       name
+      info {
+        id
+        ... on ImageFileInfo {
+          width
+        }
+      }
     }
     securityChecks {
       level

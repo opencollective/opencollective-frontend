@@ -244,7 +244,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
           )}
         </Box>
       </Flex>
-      {displayActions && ( // Let us overide so we can hide buttons in the collective page
+      {displayActions && ( // Let us override so we can hide buttons in the collective page
         <Flex flexDirection="column" width={[1, 0.3]}>
           <Flex flexWrap="wrap" justifyContent={['flex-start', 'flex-end']} alignItems="center" mt={[2, 0]}>
             {(showRefundButton || showRejectButton) && (

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field } from 'formik';
-import { escape, get, isEmpty, unescape } from 'lodash';
+import { escape, get, isEmpty, pick, unescape } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isURL } from 'validator';
 
@@ -83,6 +83,20 @@ export const validateExpenseItem = (expense, item) => {
   }
 
   return errors;
+};
+
+export const prepareExpenseItemForSubmit = (item, isInvoice, isGrant) => {
+  // The frontend currently ignores the time part of the date, we default to midnight UTC
+  const incurredAt = item.incurredAt?.match(/^\d{4}-\d{2}-\d{2}$/) ? `${item.incurredAt}T00:00:00Z` : item.incurredAt;
+  return {
+    incurredAt,
+    ...pick(item, [
+      ...(item.__isNew ? [] : ['id']), // Omit item's ids that were created for keying purposes
+      ...(isInvoice || isGrant ? [] : ['url']), // never submit URLs for invoices or requests
+      'description',
+      'amount',
+    ]),
+  };
 };
 
 const AttachmentLabel = () => (

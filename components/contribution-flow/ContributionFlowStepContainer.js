@@ -97,6 +97,7 @@ class ContributionFlowStepContainer extends React.Component {
           <StepProfile
             profiles={this.props.contributeProfiles}
             collective={collective}
+            tier={tier}
             stepDetails={stepDetails}
             onChange={this.props.onChange}
             data={stepProfile}

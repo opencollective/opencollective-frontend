@@ -123,9 +123,9 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
           }
           header={
             selectedAction === 'MARK_AS_PAID' ? (
-              <FormattedMessage id="Order.MarkPaidConfirm" defaultMessage="Mark this order as paid?" />
+              <FormattedMessage id="Order.MarkPaidConfirm" defaultMessage="Mark this contribution as paid?" />
             ) : (
-              <FormattedMessage id="Order.MarkExpiredConfirm" defaultMessage="Mark this order as expired?" />
+              <FormattedMessage id="Order.MarkExpiredConfirm" defaultMessage="Mark this contribution as expired?" />
             )
           }
         >

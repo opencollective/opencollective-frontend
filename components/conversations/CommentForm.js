@@ -1,22 +1,26 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
+import { Lock } from '@styled-icons/material/Lock';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import commentTypes from '../../lib/constants/commentTypes';
 import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import ContainerOverlay from '../ContainerOverlay';
-import { Flex } from '../Grid';
+import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
 import SignInOrJoinFree, { SignInOverlayBackground } from '../SignInOrJoinFree';
 import StyledButton from '../StyledButton';
+import StyledCheckbox from '../StyledCheckbox';
+import StyledTooltip from '../StyledTooltip';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
 
@@ -99,22 +103,29 @@ const CommentForm = ({
   loadingLoggedInUser,
   LoggedInUser,
   isDisabled,
+  canUsePrivateNote,
+  defaultType = commentTypes.COMMENT,
 }) => {
   const [createComment, { loading, error }] = useMutation(createCommentMutation, mutationOptions);
   const intl = useIntl();
   const [html, setHtml] = useState('');
   const [resetValue, setResetValue] = useState();
+  const [asPrivateNote, setPrivateNote] = useState(defaultType === commentTypes.PRIVATE_NOTE);
   const [validationError, setValidationError] = useState();
   const [uploading, setUploading] = useState(false);
   const { formatMessage } = intl;
 
-  const submitForm = async event => {
+  const postComment = async event => {
     event.preventDefault();
-    event.stopPropagation();
+    const type = asPrivateNote ? commentTypes.PRIVATE_NOTE : commentTypes.COMMENT;
+
     if (!html) {
       setValidationError(createError(ERROR.FORM_FIELD_REQUIRED));
     } else {
       const comment = prepareCommentParams(html, ConversationId, ExpenseId, UpdateId);
+      if (type) {
+        comment.type = type;
+      }
       const response = await createComment({ variables: { comment } });
       setResetValue(response.data.createComment.id);
       if (onSuccess) {
@@ -138,7 +149,7 @@ const CommentForm = ({
           </SignInOverlayBackground>
         </ContainerOverlay>
       )}
-      <form onSubmit={submitForm} data-cy="comment-form">
+      <form onSubmit={postComment} data-cy="comment-form">
         {loadingLoggedInUser ? (
           <LoadingPlaceholder height={232} />
         ) : (
@@ -169,14 +180,39 @@ const CommentForm = ({
             {formatErrorMessage(intl, getErrorFromGraphqlException(error))}
           </MessageBox>
         )}
+        {canUsePrivateNote && (
+          <Box mt={3} alignItems="center" gap={12}>
+            <StyledTooltip
+              content={
+                <FormattedMessage
+                  id="CommentForm.PrivateNote.Tooltip"
+                  defaultMessage="Private comments are only visible to Fiscal Host admins."
+                />
+              }
+            >
+              <StyledCheckbox
+                name="privateNote"
+                label={
+                  <React.Fragment>
+                    <FormattedMessage id="CommentForm.PrivateNoteCheckbox" defaultMessage="Post private comment" />{' '}
+                    <Lock size="1em" />
+                  </React.Fragment>
+                }
+                checked={asPrivateNote}
+                onChange={() => setPrivateNote(!asPrivateNote)}
+              />
+            </StyledTooltip>
+          </Box>
+        )}
         <Flex mt={3} alignItems="center" gap={12}>
           <StyledButton
-            type="submit"
             minWidth={150}
             buttonStyle="primary"
             disabled={isDisabled || !LoggedInUser || uploading}
             loading={loading}
             data-cy="submit-comment-btn"
+            type="submit"
+            name="submit-comment"
           >
             {formatMessage(uploading ? messages.uploadingImage : messages.postReply)}
           </StyledButton>
@@ -199,6 +235,10 @@ CommentForm.propTypes = {
   onSuccess: PropTypes.func,
   /** disable the inputs */
   isDisabled: PropTypes.bool,
+  /** Default type of comment */
+  defaultType: PropTypes.oneOf(Object.values(commentTypes)),
+  /** Can post comment as private note */
+  canUsePrivateNote: PropTypes.bool,
   /** @ignore from withUser */
   loadingLoggedInUser: PropTypes.bool,
   /** @ignore from withUser */

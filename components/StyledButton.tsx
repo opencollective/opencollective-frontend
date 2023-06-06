@@ -19,13 +19,13 @@ import {
   TypographyProps,
 } from 'styled-system';
 
-import { textTransform, TextTransformProps, whiteSpace } from '../lib/styled-system-custom-properties';
+import { textTransform, TextTransformProps, whiteSpace, WhiteSpaceProps } from '../lib/styled-system-custom-properties';
 import theme from '../lib/theme';
 import { ButtonSize, buttonSize, ButtonStyle, buttonStyle } from '../lib/theme/variants/button';
 
 import StyledSpinner from './StyledSpinner';
 
-type StyledButtonProps = BackgroundProps &
+export type StyledButtonProps = BackgroundProps &
   BorderProps &
   FlexboxProps &
   LayoutProps &
@@ -33,6 +33,7 @@ type StyledButtonProps = BackgroundProps &
   TypographyProps &
   ColorProps &
   TextTransformProps &
+  WhiteSpaceProps &
   React.HTMLProps<HTMLButtonElement> & {
     buttonStyle?: ButtonStyle;
     buttonSize?: ButtonSize;
@@ -56,6 +57,7 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
   border-radius: 100px;
   letter-spacing: -0.4px;
   font-weight: 500;
+  min-width: max-content;
 
   &:disabled {
     cursor: not-allowed;

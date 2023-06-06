@@ -17,15 +17,14 @@ import MessageBox from '../MessageBox';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
+import { TaxesFormikFields } from '../taxes/TaxesFormikFields';
 import { P, Span } from '../Text';
 
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
-import ExpenseGSTFormikFields from './ExpenseGSTFormikFields';
 import ExpenseItemForm from './ExpenseItemForm';
-import ExpenseVATFormikFields from './ExpenseVATFormikFields';
 
 /** Init a new expense item with default attributes */
-const newExpenseItem = attrs => ({
+export const newExpenseItem = attrs => ({
   id: uuid(), // we generate it here to properly key lists, but it won't be submitted to API
   incurredAt: toIsoDateStr(new Date()),
   description: '',
@@ -142,17 +141,6 @@ class ExpenseFormItems extends React.PureComponent {
     }
   }
 
-  renderTaxFormFields(taxType, isOptional) {
-    switch (taxType) {
-      case TaxType.VAT:
-        return <ExpenseVATFormikFields formik={this.props.form} isOptional={isOptional} />;
-      case TaxType.GST:
-        return <ExpenseGSTFormikFields formik={this.props.form} isOptional={isOptional} />;
-      default:
-        return `Tax not supported: ${taxType}`;
-    }
-  }
-
   hasTaxFields(taxType) {
     if (!taxType) {
       return false;
@@ -262,7 +250,14 @@ class ExpenseFormItems extends React.PureComponent {
         {taxType && !hasTaxFields && <StyledHr borderColor="black.300" borderStyle="dotted" mb={24} mt={24} />}
         <Flex justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" mt={24}>
           <Box flexBasis={['100%', null, null, '50%']} mb={3}>
-            {hasTaxFields && this.renderTaxFormFields(taxType, Boolean(values.payee?.isInvite))}
+            {hasTaxFields && (
+              <TaxesFormikFields
+                taxType={taxType}
+                formik={this.props.form}
+                formikValuePath="taxes.0"
+                isOptional={Boolean(values.payee?.isInvite)}
+              />
+            )}
           </Box>
           <Box mb={3} ml={[0, null, null, 4]} flexBasis={['100%', null, null, 'auto']}>
             <ExpenseAmountBreakdown currency={values.currency} items={items} taxes={values.taxes} />

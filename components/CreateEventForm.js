@@ -38,7 +38,7 @@ class CreateEventForm extends React.Component {
     };
 
     this.messages = defineMessages({
-      'slug.label': { id: 'collective.slug.label', defaultMessage: 'url' },
+      'slug.label': { id: 'account.slug.label', defaultMessage: 'Handle' },
       'type.label': { id: 'event.type.label', defaultMessage: 'Type' },
       'name.label': { id: 'Fields.name', defaultMessage: 'Name' },
       'amount.label': { id: 'Fields.amount', defaultMessage: 'Amount' },

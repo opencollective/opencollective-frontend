@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { compose, omit, pick } from 'lodash';
+import { compose, omit } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
@@ -14,6 +14,7 @@ import { getPayoutProfiles } from '../lib/expenses';
 import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
+import UrlQueryHelper from '../lib/UrlQueryHelper';
 import { parseToBoolean } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -47,16 +48,22 @@ import { withUser } from '../components/UserProvider';
 
 const STEPS = { ...EXPENSE_FORM_STEPS, SUMMARY: 'summary' };
 
+const CreateExpensePageUrlQueryHelper = new UrlQueryHelper({
+  collectiveSlug: { type: 'string' },
+  parentCollectiveSlug: { type: 'string' },
+  customData: { type: 'json' },
+});
+
 class CreateExpensePage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, parentCollectiveSlug } }) {
-    return { collectiveSlug, parentCollectiveSlug };
+  static getInitialProps({ query: query }) {
+    return CreateExpensePageUrlQueryHelper.decode(query);
   }
 
   static propTypes = {
     /** from getInitialProps */
     collectiveSlug: PropTypes.string.isRequired,
-    /** from getInitialProps */
     parentCollectiveSlug: PropTypes.string,
+    customData: PropTypes.object,
     /** from withUser */
     LoggedInUser: PropTypes.object,
     /** from withUser */
@@ -207,24 +214,10 @@ class CreateExpensePage extends React.Component {
   onFormSubmit = async expense => {
     try {
       if (expense.payee.isInvite) {
-        const expenseDraft = pick(expense, [
-          'description',
-          'longDescription',
-          'tags',
-          'type',
-          'privateMessage',
-          'invoiceInfo',
-          'recipientNote',
-          'items',
-          'attachedFiles',
-          'payeeLocation',
-          'payoutMethod',
-        ]);
-        expenseDraft['payee'] = pick(expense.payee, ['id', 'slug', 'name', 'email', 'isInvite', 'organization']);
         const result = await this.props.draftExpenseAndInviteUser({
           variables: {
             account: { id: this.props.data.account.id },
-            expense: expenseDraft,
+            expense: { ...prepareExpenseForSubmit(expense), customData: this.props.customData },
           },
         });
         if (this.state.formPersister) {
@@ -255,7 +248,7 @@ class CreateExpensePage extends React.Component {
       const result = await this.props.createExpense({
         variables: {
           account: { id: this.props.data.account.id },
-          expense: prepareExpenseForSubmit(expense),
+          expense: { ...prepareExpenseForSubmit(expense), customData: this.props.customData },
           recurring,
         },
       });

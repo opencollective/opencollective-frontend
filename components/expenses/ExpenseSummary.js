@@ -2,12 +2,14 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { includes } from 'lodash';
+import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
@@ -25,6 +27,7 @@ import { H1, H4, P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
+import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 import ExpenseMoreActionsButton from './ExpenseMoreActionsButton';
 import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseStatusTag from './ExpenseStatusTag';
@@ -66,13 +69,15 @@ const ExpenseSummary = ({
   isLoading,
   isLoadingLoggedInUser,
   isEditing,
-  borderless,
+  borderless = undefined,
   canEditTags,
   suggestedTags,
   showProcessButtons,
-  onClose,
+  onClose = undefined,
   onDelete,
   onEdit,
+  drawerActionsContainer,
+  openFileViewer,
   ...props
 }) => {
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
@@ -80,11 +85,53 @@ const ExpenseSummary = ({
   const isGrant = expense?.type === expenseTypes.GRANT;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
-  const expenseItems = expense?.items.length > 0 ? expense.items : expense?.draft?.items || [];
+  const expenseItems = expense?.items?.length > 0 ? expense.items : expense?.draft?.items || [];
   const expenseTaxes = expense?.taxes?.length > 0 ? expense.taxes : expense?.draft?.taxes || [];
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
 
+  const { LoggedInUser } = useLoggedInUser();
+  const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
+  const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
+  const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
+
+  const processButtons = (
+    <Flex
+      display="flex"
+      flex={1}
+      justifyContent="space-between"
+      flexDirection={['column-reverse', 'row']}
+      alignItems={['flex-end', 'center']}
+      gridGap={[2, 3]}
+    >
+      <ExpenseMoreActionsButton
+        onEdit={onEdit}
+        expense={expense}
+        isViewingExpenseInHostContext={isViewingExpenseInHostContext}
+        onDelete={() => {
+          onDelete?.(expense);
+          onClose?.();
+        }}
+      />
+      {Boolean(showProcessButtons && existsInAPI && collective && hasProcessButtons(expense?.permissions)) && (
+        <Flex flexWrap="wrap" gridGap={[2, 3]}>
+          <ProcessExpenseButtons
+            expense={expense}
+            isMoreActions
+            isViewingExpenseInHostContext={isViewingExpenseInHostContext}
+            permissions={expense?.permissions}
+            collective={collective}
+            host={host}
+            onDelete={() => {
+              onDelete?.(expense);
+              onClose?.();
+            }}
+            displayMarkAsIncomplete
+          />
+        </Flex>
+      )}
+    </Flex>
+  );
   return (
     <StyledCard
       p={borderless ? 0 : [16, 24, 32]}
@@ -101,7 +148,11 @@ const ExpenseSummary = ({
       >
         <Flex mr={[0, 2]}>
           <H4 fontWeight="500" data-cy="expense-description">
-            {isLoading ? <LoadingPlaceholder height={32} minWidth={250} /> : expense.description}
+            {!expense?.description && isLoading ? (
+              <LoadingPlaceholder height={32} minWidth={250} />
+            ) : (
+              expense.description
+            )}
           </H4>
         </Flex>
         <Flex mb={[3, 0]} justifyContent={['space-between', 'flex-end']} alignItems="center">
@@ -109,10 +160,10 @@ const ExpenseSummary = ({
             <Box>
               <ExpenseStatusTag
                 display="block"
-                status={expense.status}
+                status={expense.onHold ? 'ON_HOLD' : expense.status}
                 letterSpacing="0.8px"
-                fontWeight="600"
-                fontSize="10px"
+                fontWeight="bold"
+                fontSize="12px"
                 showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
                 showTaxFormMsg={expense.payee.isAdmin}
               />
@@ -122,7 +173,7 @@ const ExpenseSummary = ({
       </Flex>
       <Tags expense={expense} isLoading={isLoading} canEdit={canEditTags} suggestedTags={suggestedTags} />
       <Flex alignItems="center" mt={3}>
-        {isLoading ? (
+        {isLoading && !expense ? (
           <LoadingPlaceholder height={24} width={200} />
         ) : (
           <React.Fragment>
@@ -172,7 +223,7 @@ const ExpenseSummary = ({
       )}
 
       <Flex my={4} alignItems="center">
-        {isLoading ? (
+        {!expense && isLoading ? (
           <LoadingPlaceholder height={20} maxWidth={150} />
         ) : (
           <Span fontWeight="bold" fontSize="16px">
@@ -187,12 +238,12 @@ const ExpenseSummary = ({
         )}
         <StyledHr flex="1 1" borderColor="black.300" ml={2} />
       </Flex>
-      {isLoading ? (
+      {!expense && isLoading ? (
         <LoadingPlaceholder height={68} mb={3} />
       ) : (
         <div data-cy="expense-summary-items">
-          {expenseItems.map(attachment => (
-            <React.Fragment key={attachment.id}>
+          {expenseItems.map((attachment, attachmentIdx) => (
+            <React.Fragment key={attachment.id || attachmentIdx}>
               <Flex my={24} flexWrap="wrap">
                 {(isReceipt || attachment.url) && (
                   <Box mr={3} mb={3} width={['100%', 'auto']}>
@@ -202,6 +253,7 @@ const ExpenseSummary = ({
                       isPrivate={!attachment.url && !isLoading}
                       size={[640, 48]}
                       maxHeight={48}
+                      openFileViewer={openFileViewer}
                     />
                   </Box>
                 )}
@@ -253,7 +305,7 @@ const ExpenseSummary = ({
       )}
       <Flex flexDirection="column" alignItems="flex-end" mt={4} mb={2}>
         <Flex alignItems="center">
-          {isLoading ? (
+          {!expense && isLoading ? (
             <LoadingPlaceholder height={18} width={150} />
           ) : (
             <ExpenseAmountBreakdown
@@ -278,6 +330,22 @@ const ExpenseSummary = ({
           </Flex>
         )}
       </Flex>
+      {expense?.attachedFiles?.length > 0 && (
+        <React.Fragment>
+          <Flex my={4} alignItems="center">
+            {!expense && isLoading ? (
+              <LoadingPlaceholder height={20} maxWidth={150} />
+            ) : (
+              <Span fontWeight="bold" fontSize="16px">
+                <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
+              </Span>
+            )}
+            <StyledHr flex="1 1" borderColor="black.300" ml={2} />
+          </Flex>
+          <ExpenseAttachedFiles files={expense.attachedFiles} openFileViewer={openFileViewer} />
+        </React.Fragment>
+      )}
+
       <ExpensePayeeDetails
         isLoading={isLoading}
         host={host}
@@ -285,44 +353,15 @@ const ExpenseSummary = ({
         collective={collective}
         isDraft={!isEditing && expense?.status === expenseStatus.DRAFT}
       />
-      {!isEditing && (
-        <Container
-          display="flex"
-          width={1}
-          justifyContent="space-between"
-          flexDirection={['column-reverse', null, 'row']}
-          alignItems="flex-end"
-          borderTop="1px solid #DCDEE0"
-          mt={4}
-          pt={12}
-        >
-          <ExpenseMoreActionsButton
-            onEdit={onEdit}
-            expense={expense}
-            mt={['16px', null, '8px']}
-            onDelete={() => {
-              onDelete?.(expense);
-              onClose?.();
-            }}
-          />
-          {Boolean(showProcessButtons && existsInAPI && collective && hasProcessButtons(expense?.permissions)) && (
-            <Flex flexWrap="wrap">
-              <ProcessExpenseButtons
-                expense={expense}
-                isMoreActions
-                permissions={expense?.permissions}
-                collective={collective}
-                host={host}
-                onDelete={() => {
-                  onDelete?.(expense);
-                  onClose?.();
-                }}
-                displayMarkAsIncomplete
-              />
-            </Flex>
-          )}
-        </Container>
-      )}
+      {!isEditing &&
+        (drawerActionsContainer ? (
+          createPortal(processButtons, drawerActionsContainer)
+        ) : (
+          <Fragment>
+            <StyledHr flex="1" mt={4} mb={3} borderColor="black.300" />
+            {processButtons}
+          </Fragment>
+        ))}
     </StyledCard>
   );
 };
@@ -354,10 +393,20 @@ ExpenseSummary.propTypes = {
     invoiceInfo: PropTypes.string,
     createdAt: PropTypes.string,
     status: PropTypes.oneOf(Object.values(expenseStatus)),
+    onHold: PropTypes.bool,
     type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
     tags: PropTypes.arrayOf(PropTypes.string),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
     amountInAccountCurrency: AmountPropTypeShape,
+    account: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      host: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+      }),
+      parent: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+      }),
+    }).isRequired,
     items: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string,
@@ -366,13 +415,19 @@ ExpenseSummary.propTypes = {
         amount: PropTypes.number.isRequired,
         url: PropTypes.string,
       }).isRequired,
-    ).isRequired,
+    ),
+    attachedFiles: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string,
+        url: PropTypes.string.isRequired,
+      }).isRequired,
+    ),
     taxes: PropTypes.arrayOf(
       PropTypes.shape({
         type: PropTypes.string,
         rate: PropTypes.number,
       }).isRequired,
-    ).isRequired,
+    ),
     payee: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
@@ -416,7 +471,7 @@ ExpenseSummary.propTypes = {
           type: PropTypes.string,
           rate: PropTypes.number,
         }).isRequired,
-      ).isRequired,
+      ),
     }),
     permissions: PropTypes.shape({
       canSeeInvoiceInfo: PropTypes.bool,
@@ -437,10 +492,14 @@ ExpenseSummary.propTypes = {
   borderless: PropTypes.bool,
   /** Passed down from ExpenseModal */
   onClose: PropTypes.func,
-  /** Passed down from pages/expense.js */
+  /** Passed down from Expense */
   onEdit: PropTypes.func,
-  /** Passed down from either ExpenseModal or pages/expense.js */
+  /** Passed down from either ExpenseModal or Expense */
   onDelete: PropTypes.func,
+  /** Passwed down from Expense */
+  openFileViewer: PropTypes.func,
+  /** Reference to the actions container element in the Expense Drawer */
+  drawerActionsContainer: PropTypes.object,
 };
 
 export default ExpenseSummary;

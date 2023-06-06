@@ -3,6 +3,7 @@
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 const { withSentryConfig } = require('@sentry/nextjs');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const path = require('path');
 require('./env');
@@ -12,6 +13,9 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true' || process.env.API_PROXY !== 'true',
   productionBrowserSourceMaps: true,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   images: {
     disableStaticImages: true,
   },
@@ -60,17 +64,20 @@ const nextConfig = {
       );
     }
 
-    if (process.env.WEBPACK_BUNDLE_ANALYZER) {
-      // eslint-disable-next-line node/no-unpublished-require
-      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-      config.plugins.push(
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'static',
-          generateStatsFile: true,
-          openAnalyzer: false,
-        }),
-      );
-    }
+    // Copy pdfjs worker to public folder (used by PDFViewer component)
+    // (Workaround for working with react-pdf and CommonJS - if moving to ESM this can be removed)
+    // TODO(ESM): Move this to standard ESM
+    config.plugins.push(
+      new CopyPlugin({
+        patterns: [
+          {
+            from: require.resolve('pdfjs-dist/build/pdf.worker.min.js'),
+            to: path.join(__dirname, 'public/static/scripts'),
+          },
+        ],
+      }),
+    );
+
     config.module.rules.push({
       test: /\.md$/,
       use: ['babel-loader', 'raw-loader', 'markdown-loader'],
@@ -215,12 +222,22 @@ const nextConfig = {
 // Bypasses conflict bug between @sentry/nextjs and depcheck
 const isDepcheck = process.argv[1]?.includes('.bin/depcheck');
 
-module.exports = isDepcheck
-  ? nextConfig
-  : withSentryConfig({
-      ...nextConfig,
-      sentry: {
-        disableServerWebpackPlugin: true,
-        disableClientWebpackPlugin: true,
-      },
-    });
+let exportedConfig = nextConfig;
+if (!isDepcheck) {
+  exportedConfig = withSentryConfig({
+    ...nextConfig,
+    sentry: {
+      disableServerWebpackPlugin: true,
+      disableClientWebpackPlugin: true,
+    },
+  });
+}
+if (process.env.ANALYZE) {
+  // eslint-disable-next-line node/no-unpublished-require
+  const withBundleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: true,
+  });
+  exportedConfig = withBundleAnalyzer(exportedConfig);
+}
+
+module.exports = exportedConfig;

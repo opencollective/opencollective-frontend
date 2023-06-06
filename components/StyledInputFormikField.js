@@ -22,6 +22,7 @@ const StyledInputFormikField = ({
   flex = undefined,
   width = undefined,
   display = undefined,
+  flexGrow = undefined,
   ...props
 }) => {
   const intl = useIntl();
@@ -30,7 +31,7 @@ const StyledInputFormikField = ({
   return (
     <FieldComponent name={name} validate={validate}>
       {({ field, form, meta }) => (
-        <Container flex={flex} width={width} display={display}>
+        <Container flex={flex} width={width} display={display} flexGrow={flexGrow}>
           <StyledInputField error={Boolean(meta.error)} {...props} htmlFor={htmlFor}>
             <React.Fragment>
               {children({
@@ -76,6 +77,7 @@ StyledInputFormikField.propTypes = {
   flex: PropTypes.any,
   display: PropTypes.any,
   width: PropTypes.any,
+  flexGrow: PropTypes.any,
 };
 
 export default StyledInputFormikField;

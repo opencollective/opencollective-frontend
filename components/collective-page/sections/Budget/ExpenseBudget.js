@@ -34,7 +34,13 @@ import {
   TagMarker,
 } from './common';
 
-const budgetSectionExpenseQuery = gql`
+const makeLabel = (intl, label) => {
+  return label === 'OTHERS_COMBINED'
+    ? intl.formatMessage({ id: 'Tags.OthersCombined', defaultMessage: 'Others Combined' })
+    : label;
+};
+
+export const budgetSectionExpenseQuery = gql`
   query BudgetSectionExpenseQuery($slug: String!, $from: DateTime, $to: DateTime) {
     account(slug: $slug) {
       id
@@ -65,6 +71,7 @@ const budgetSectionExpenseQuery = gql`
     }
   }
 `;
+
 const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
   const [tmpDateInterval, setTmpDateInterval] = React.useState(defaultTimeInterval);
   const [graphType, setGraphType] = React.useState(GRAPH_TYPES.LIST);
@@ -155,10 +162,10 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
                 />,
               ]}
               rows={data?.account?.stats.expensesTags.map((expenseTag, i) =>
-                makeBudgetTableRow(expenseTag.id + expenseTag.count, [
+                makeBudgetTableRow(expenseTag.label + expenseTag.count, [
                   <React.Fragment key={expenseTag.label}>
                     <TagMarker color={COLORS[i % COLORS.length]} />
-                    {expenseTag.label}
+                    {makeLabel(intl, expenseTag.label)}
                   </React.Fragment>,
                   expenseTag.count,
                   formatCurrency(expenseTag.amount.valueInCents, expenseTag.amount.currency),
@@ -206,7 +213,9 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
                 width="100%"
                 height="300px"
                 options={{
-                  labels: data?.account?.stats.expensesTags.map(expenseTag => capitalize(expenseTag.label)),
+                  labels: data?.account?.stats.expensesTags.map(expenseTag =>
+                    capitalize(makeLabel(intl, expenseTag.label)),
+                  ),
                   colors: COLORS,
                   chart: {
                     id: 'chart-budget-expenses-pie',

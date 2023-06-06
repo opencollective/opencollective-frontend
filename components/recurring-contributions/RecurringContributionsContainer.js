@@ -49,7 +49,11 @@ const CollectiveCardContainer = styled.div`
 `;
 
 const filterContributions = (contributions, filterName) => {
-  const isActive = ({ status }) => status === ORDER_STATUS.ACTIVE || status === ORDER_STATUS.ERROR;
+  const isActive = ({ status }) =>
+    status === ORDER_STATUS.ACTIVE ||
+    status === ORDER_STATUS.ERROR ||
+    ORDER_STATUS.PROCESSING ||
+    status === ORDER_STATUS.NEW;
   const isInactive = ({ status }) => status === ORDER_STATUS.CANCELLED || status === ORDER_STATUS.REJECTED;
   switch (filterName) {
     case FILTERS.ACTIVE:
@@ -99,7 +103,7 @@ const RecurringContributionsContainer = ({
   ]);
 
   if (isLoading) {
-    return <LoadingPlaceholder maxHeight="400px" mt={3} />;
+    return <LoadingPlaceholder height="400px" mt={3} />;
   }
 
   return (

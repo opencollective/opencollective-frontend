@@ -12,8 +12,10 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
+import { confirmContributionFieldsFragment } from '../ContributionConfirmationModal';
 import { Box, Flex } from '../Grid';
 import CreatePendingOrderModal from '../host-dashboard/CreatePendingOrderModal';
+import { DisputedContributionsWarning } from '../host-dashboard/DisputedContributionsWarning';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
@@ -45,6 +47,7 @@ const accountOrdersQuery = gql`
       currency
       legacyId
       name
+      isHost
     }
     orders(
       account: { slug: $accountSlug }
@@ -66,14 +69,7 @@ const accountOrdersQuery = gql`
         description
         createdAt
         status
-        amount {
-          valueInCents
-          currency
-        }
-        platformTipAmount {
-          valueInCents
-          currency
-        }
+        ...ConfirmContributionFields
         paymentMethod {
           id
           providerType
@@ -112,6 +108,7 @@ const accountOrdersQuery = gql`
       }
     }
   }
+  ${confirmContributionFieldsFragment}
 `;
 
 const ORDERS_PER_PAGE = 15;
@@ -127,7 +124,7 @@ const getVariablesFromQuery = (query, forcedStatus) => {
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || ORDERS_PER_PAGE,
-    status: searchTerm ? null : forcedStatus ? forcedStatus : isValidStatus(query.status) ? query.status : null,
+    status: forcedStatus ? forcedStatus : isValidStatus(query.status) ? query.status : null,
     minAmount: amountRange[0] && amountRange[0] * 100,
     maxAmount: amountRange[1] && amountRange[1] * 100,
     dateFrom,
@@ -227,7 +224,8 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
               mt="17px"
               data-cy="create-pending-contribution"
             >
-              Create +
+              <FormattedMessage id="create" defaultMessage="Create" />
+              &nbsp;+
             </StyledButton>
             {showCreatePendingOrderModal && (
               <CreatePendingOrderModal
@@ -239,6 +237,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
           </React.Fragment>
         )}
       </Flex>
+      {Boolean(data?.account?.isHost && isHostAdmin) && <DisputedContributionsWarning hostSlug={accountSlug} />}
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : !loading && !data.orders?.nodes.length ? (
@@ -258,7 +257,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
               }}
             />
           ) : (
-            <FormattedMessage id="orders.empty" defaultMessage="No orders" />
+            <FormattedMessage id="orders.empty" defaultMessage="No contribution" />
           )}
         </MessageBox>
       ) : (

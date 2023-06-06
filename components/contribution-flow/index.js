@@ -62,6 +62,7 @@ import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
 import {
   getContributeProfiles,
   getGQLV2AmountInput,
+  getGuestInfoFromStepProfile,
   getTotalAmount,
   isSupportedInterval,
   NEW_CREDIT_CARD_KEY,
@@ -247,7 +248,7 @@ class ContributionFlow extends React.Component {
 
     let fromAccount, guestInfo;
     if (stepProfile.isGuest) {
-      guestInfo = pick(stepProfile, ['email', 'name', 'legalName', 'location', 'captcha']);
+      guestInfo = getGuestInfoFromStepProfile(stepProfile);
     } else {
       fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
     }
@@ -420,8 +421,8 @@ class ContributionFlow extends React.Component {
   getContributeProfiles = memoizeOne(getContributeProfiles);
 
   getDefaultStepProfile() {
-    const { LoggedInUser, loadingLoggedInUser, collective } = this.props;
-    const profiles = this.getContributeProfiles(LoggedInUser, collective);
+    const { LoggedInUser, loadingLoggedInUser, collective, tier } = this.props;
+    const profiles = this.getContributeProfiles(LoggedInUser, collective, tier);
     const queryParams = this.getQueryParams();
 
     // We want to wait for the user to be logged in before matching the profile
@@ -1007,7 +1008,7 @@ class ContributionFlow extends React.Component {
                     order={this.state.createdOrder}
                     disabledPaymentMethodTypes={queryParams.disabledPaymentMethodTypes}
                     hideCreditCardPostalCode={queryParams.hideCreditCardPostalCode}
-                    contributeProfiles={this.getContributeProfiles(LoggedInUser, collective)}
+                    contributeProfiles={this.getContributeProfiles(LoggedInUser, collective, tier)}
                   />
                   {!nextStep && shouldDisplayCaptcha && (
                     <Flex mt={40} justifyContent="center">

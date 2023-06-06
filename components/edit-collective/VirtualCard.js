@@ -324,13 +324,13 @@ const getLimitIntervalString = spendingLimitInterval => {
     case VirtualCardLimitInterval.DAILY:
       return (
         <Fragment>
-          /<FormattedMessage defaultMessage="day" />
+          /<FormattedMessage id="Frequency.Day.Short" defaultMessage="day" />
         </Fragment>
       );
     case VirtualCardLimitInterval.WEEKLY:
       return (
         <Fragment>
-          /<FormattedMessage defaultMessage="wk" />
+          /<FormattedMessage id="Frequency.Week.Short" defaultMessage="wk" />
         </Fragment>
       );
     case VirtualCardLimitInterval.MONTHLY:

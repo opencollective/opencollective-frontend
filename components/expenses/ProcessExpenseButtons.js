@@ -12,12 +12,14 @@ import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
+import { getScheduledExpensesQueryVariables, scheduledExpensesQuery } from '../host-dashboard/ScheduledExpensesBanner';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
+import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import DeleteExpenseButton from './DeleteExpenseButton';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
@@ -56,7 +58,8 @@ export const hasProcessButtons = permissions => {
     permissions.canPay ||
     permissions.canMarkAsUnpaid ||
     permissions.canMarkAsSpam ||
-    permissions.canDelete
+    permissions.canDelete ||
+    permissions.canUnschedulePayment
   );
 };
 
@@ -131,13 +134,21 @@ const ProcessExpenseButtons = ({
   onModalToggle,
   onDelete,
   isMoreActions,
+  displaySecurityChecks,
+  isViewingExpenseInHostContext,
 }) => {
+  const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] = React.useState();
   const [selectedAction, setSelectedAction] = React.useState(null);
   const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
   const mutationOptions = { context: API_V2_CONTEXT, update: onUpdate };
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
   const intl = useIntl();
   const { addToast } = useToasts();
+
+  React.useEffect(() => {
+    onModalToggle?.(!!confirmProcessExpenseAction);
+    return () => onModalToggle?.(false);
+  }, [confirmProcessExpenseAction, onModalToggle]);
 
   const triggerAction = async (action, paymentParams) => {
     // Prevent submitting the action if another one is being submitted at the same time
@@ -149,7 +160,16 @@ const ProcessExpenseButtons = ({
 
     try {
       const variables = { id: expense.id, legacyId: expense.legacyId, action, paymentParams };
-      await processExpense({ variables });
+      const refetchQueries = [];
+      if (action === 'SCHEDULE_FOR_PAYMENT' || action === 'UNSCHEDULE_PAYMENT') {
+        refetchQueries.push({
+          query: scheduledExpensesQuery,
+          context: API_V2_CONTEXT,
+          variables: getScheduledExpensesQueryVariables(host.slug),
+        });
+      }
+
+      await processExpense({ variables, refetchQueries });
       return true;
     } catch (e) {
       // Display a toast with light variant since we're in a modal
@@ -164,30 +184,30 @@ const ProcessExpenseButtons = ({
       ...buttonProps,
       disabled: loading && !isSelectedAction,
       loading: loading && isSelectedAction,
-      onClick: () => triggerAction(action),
     };
   };
 
   return (
     <React.Fragment>
-      {(permissions.approve.allowed || permissions.approve.reason === PERMISSION_CODES.AUTHOR_CANNOT_APPROVE) && (
-        <PermissionButton
-          {...getButtonProps('APPROVE')}
-          buttonStyle="secondary"
-          data-cy="approve-button"
-          icon={<ApproveIcon size={12} />}
-          permission={permissions.approve}
-          label={
-            <ButtonLabel>
-              <FormattedMessage id="actions.approve" defaultMessage="Approve" />
-            </ButtonLabel>
-          }
-        />
-      )}
+      {!isViewingExpenseInHostContext &&
+        (permissions.approve.allowed || permissions.approve.reason === PERMISSION_CODES.AUTHOR_CANNOT_APPROVE) && (
+          <PermissionButton
+            {...getButtonProps('APPROVE')}
+            onClick={() => triggerAction('APPROVE')}
+            buttonStyle="secondary"
+            data-cy="approve-button"
+            icon={<ApproveIcon size={12} />}
+            permission={permissions.approve}
+            label={
+              <ButtonLabel>
+                <FormattedMessage id="actions.approve" defaultMessage="Approve" />
+              </ButtonLabel>
+            }
+          />
+        )}
       {permissions.canPay && (
         <PayExpenseButton
           {...getButtonProps('PAY')}
-          onClick={null}
           onSubmit={triggerAction}
           expense={expense}
           collective={collective}
@@ -195,8 +215,13 @@ const ProcessExpenseButtons = ({
           error={error}
         />
       )}
-      {permissions.canReject && (
-        <StyledButton {...getButtonProps('REJECT')} buttonStyle="dangerSecondary" data-cy="reject-button">
+      {permissions.canReject && !isViewingExpenseInHostContext && (
+        <StyledButton
+          {...getButtonProps('REJECT')}
+          onClick={() => setConfirmProcessExpenseAction('REJECT')}
+          buttonStyle="dangerSecondary"
+          data-cy="reject-button"
+        >
           <RejectIcon size={14} />
           <ButtonLabel>
             <FormattedMessage id="actions.reject" defaultMessage="Reject" />
@@ -221,17 +246,37 @@ const ProcessExpenseButtons = ({
         </StyledButton>
       )}
 
-      {permissions.canUnapprove && (
-        <StyledButton {...getButtonProps('UNAPPROVE')} buttonStyle="dangerSecondary" data-cy="unapprove-button">
+      {permissions.canUnapprove && !isViewingExpenseInHostContext && (
+        <StyledButton
+          {...getButtonProps('UNAPPROVE')}
+          onClick={() => setConfirmProcessExpenseAction('UNAPPROVE')}
+          buttonStyle="dangerSecondary"
+          data-cy="unapprove-button"
+        >
           <UnapproveIcon size={12} />
           <ButtonLabel>
             <FormattedMessage id="expense.unapprove.btn" defaultMessage="Unapprove" />
           </ButtonLabel>
         </StyledButton>
       )}
+
+      {permissions.canUnapprove && isViewingExpenseInHostContext && (
+        <StyledButton
+          {...getButtonProps('UNAPPROVE')}
+          onClick={() => setConfirmProcessExpenseAction('REQUEST_RE_APPROVAL')}
+          buttonStyle="dangerSecondary"
+          data-cy="request-re-approval-button"
+        >
+          <UnapproveIcon size={12} />
+          <ButtonLabel>
+            <FormattedMessage id="expense.requestReApproval.btn" defaultMessage="Request re-approval" />
+          </ButtonLabel>
+        </StyledButton>
+      )}
       {permissions.canUnschedulePayment && (
         <StyledButton
           {...getButtonProps('UNSCHEDULE_PAYMENT')}
+          onClick={() => triggerAction('UNSCHEDULE_PAYMENT')}
           buttonStyle="dangerSecondary"
           data-cy="unapprove-button"
         >
@@ -244,11 +289,8 @@ const ProcessExpenseButtons = ({
       {permissions.canMarkAsUnpaid && (
         <MarkExpenseAsUnpaidButton
           data-cy="mark-as-unpaid-button"
+          expense={expense}
           {...getButtonProps('MARK_AS_UNPAID')}
-          onClick={null}
-          onConfirm={shouldRefundPaymentProcessorFee =>
-            triggerAction('MARK_AS_UNPAID', { shouldRefundPaymentProcessorFee })
-          }
         />
       )}
       {permissions.canDelete && !isMoreActions && (
@@ -259,7 +301,20 @@ const ProcessExpenseButtons = ({
           onDelete={onDelete}
         />
       )}
-      {expense?.securityChecks?.length && <SecurityChecksButton {...buttonProps} minWidth={0} expense={expense} />}
+      {displaySecurityChecks && expense?.securityChecks?.length && (
+        <SecurityChecksButton {...buttonProps} minWidth={0} expense={expense} />
+      )}
+
+      {confirmProcessExpenseAction && (
+        <ConfirmProcessExpenseModal
+          type={confirmProcessExpenseAction}
+          onClose={() => {
+            setConfirmProcessExpenseAction(null);
+            onModalToggle?.(false);
+          }}
+          expense={expense}
+        />
+      )}
     </React.Fragment>
   );
 };
@@ -306,17 +361,19 @@ ProcessExpenseButtons.propTypes = {
   /** Called when a modal is opened/closed with a boolean like (isOpen) */
   onModalToggle: PropTypes.func,
   displayMarkAsIncomplete: PropTypes.bool,
+  displaySecurityChecks: PropTypes.bool,
+  isViewingExpenseInHostContext: PropTypes.bool,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
   buttonSize: 'small',
   minWidth: 130,
-  mx: 2,
-  mt: 2,
 };
 
 ProcessExpenseButtons.defaultProps = {
   buttonProps: DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
+  displaySecurityChecks: true,
+  isViewingExpenseInHostContext: false,
 };
 
 export default ProcessExpenseButtons;

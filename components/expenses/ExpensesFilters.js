@@ -34,15 +34,18 @@ const ExpensesFilters = ({
   filters,
   onChange,
   ignoredExpenseStatus,
+  explicitAllForStatus = false,
   showOrderFilter = true,
   wrap = true,
+  displayOnHoldPseudoStatus = false,
 }) => {
   const getFilterProps = (name, valueModifier) => ({
     inputId: `expenses-filter-${name}`,
     value: filters?.[name],
     onChange: value => {
       const preparedValue = valueModifier ? valueModifier(value) : value;
-      onChange({ ...filters, [name]: value === 'ALL' ? null : preparedValue });
+      const shouldNullValue = value === 'ALL' && !(explicitAllForStatus && name === 'status');
+      onChange({ ...filters, [name]: shouldNullValue ? null : preparedValue });
     },
   });
 
@@ -76,7 +79,11 @@ const ExpensesFilters = ({
         <FilterLabel htmlFor="expenses-filter-status">
           <FormattedMessage id="expense.status" defaultMessage="Status" />
         </FilterLabel>
-        <ExpensesStatusFilter {...getFilterProps('status')} ignoredExpenseStatus={ignoredExpenseStatus} />
+        <ExpensesStatusFilter
+          {...getFilterProps('status')}
+          ignoredExpenseStatus={ignoredExpenseStatus}
+          displayOnHoldPseudoStatus={displayOnHoldPseudoStatus}
+        />
       </FilterContainer>
       {showOrderFilter && (
         <FilterContainer>
@@ -94,12 +101,14 @@ ExpensesFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
   showOrderFilter: PropTypes.bool,
+  explicitAllForStatus: PropTypes.bool,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     createdAt: PropTypes.string,
   }).isRequired,
   wrap: PropTypes.bool,
   ignoredExpenseStatus: PropTypes.arrayOf(PropTypes.oneOf(Object.values(expenseStatus))),
+  displayOnHoldPseudoStatus: PropTypes.bool,
 };
 
 export default React.memo(ExpensesFilters);

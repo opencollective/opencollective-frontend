@@ -18,8 +18,7 @@ describe('event.create.test.js', () => {
     cy.get('.inputs .inputField.name input', { timeout: 20000 }).type(title);
     cy.get('.inputField.endsAt input').type('2050-01-20T13:00');
     cy.get('.geosuggest__input').type('Superfilles');
-    cy.wait(700);
-    cy.get('.geosuggest__suggests > :nth-child(1)').click();
+    cy.contains('.geosuggest__suggests > :nth-child(1)', 'Super').click();
     cy.get('#location .address').contains('Lesbroussart');
     cy.get('#location .address').contains('1050');
     cy.contains('button', 'Create Event').click();
@@ -38,7 +37,7 @@ describe('event.create.test.js', () => {
     cy.getByDataCy('confirm-btn').click();
     cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
 
-    cy.getByDataCy('menu-item-tickets').click();
+    // Create another ticket
     cy.getByDataCy('create-ticket').click();
     cy.get('[data-cy=name]').type('Paid ticket');
     cy.get('input[data-cy=amount]').type('15');

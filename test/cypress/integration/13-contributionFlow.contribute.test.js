@@ -139,7 +139,7 @@ describe('Contribution Flow: Order', () => {
         // Payment
         cy.getByDataCy('cf-next-step').click();
         cy.checkStepsProgress({ enabled: ['profile', 'details', 'payment'] });
-
+        cy.contains('Next charge date: June 1, 2042');
         cy.get('#PaymentMethod').then($paymentMethod => {
           // Checks if the organization already has a payment method configured
           if ($paymentMethod.text().includes('VISA **** 4242')) {
