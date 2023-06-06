@@ -2,6 +2,9 @@ name: 'Lost Pixel'
 
 on: [push]
 
+env:
+  STORYBOOK_DISABLE_CSS_ANIMATIONS: true
+
 jobs:
   lost-pixel-build:
     runs-on: ubuntu-latest
