@@ -3831,7 +3831,8 @@ type AccountStats {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(
-    limit: Int! = 30
+    limit: Int! = 100
+    truncate: Int = 7
 
     """
     Calculate amount after this date
@@ -4323,7 +4324,6 @@ type ActivitySubscription {
 All supported Activity channels we can broadcast to
 """
 enum ActivityChannel {
-  gitter
   slack
   twitter
   webhook
@@ -4454,8 +4454,8 @@ enum ActivityType {
   USER_SIGNIN
   USER_RESET_PASSWORD
   OAUTH_APPLICATION_AUTHORIZED
-  TWO_FACTOR_CODE_ADDED
-  TWO_FACTOR_CODE_DELETED
+  TWO_FACTOR_METHOD_ADDED
+  TWO_FACTOR_METHOD_DELETED
   TWO_FACTOR_CODE_REQUESTED
   USER_CHANGE_EMAIL
   USER_PAYMENT_METHOD_CREATED
@@ -11626,8 +11626,8 @@ enum ActivityAndClassesType {
   USER_SIGNIN
   USER_RESET_PASSWORD
   OAUTH_APPLICATION_AUTHORIZED
-  TWO_FACTOR_CODE_ADDED
-  TWO_FACTOR_CODE_DELETED
+  TWO_FACTOR_METHOD_ADDED
+  TWO_FACTOR_METHOD_DELETED
   TWO_FACTOR_CODE_REQUESTED
   USER_CHANGE_EMAIL
   USER_PAYMENT_METHOD_CREATED
@@ -13546,21 +13546,6 @@ type Mutation {
     Reference of the expense to process
     """
     expense: ExpenseReferenceInput!
-  ): Expense!
-
-  """
-  To verify and unverified expense. Scope: "expenses".
-  """
-  verifyExpense(
-    """
-    Reference of the expense to process
-    """
-    expense: ExpenseReferenceInput!
-
-    """
-    Expense draft key if invited to submit expense
-    """
-    draftKey: String
   ): Expense!
 
   """
