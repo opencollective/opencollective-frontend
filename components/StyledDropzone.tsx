@@ -1,9 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { Download as DownloadIcon } from '@styled-icons/feather/Download';
 import { isNil, omit } from 'lodash';
-import { useDropzone } from 'react-dropzone';
+import { Accept, useDropzone } from 'react-dropzone';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
@@ -21,7 +20,7 @@ export const DROPZONE_ACCEPT_IMAGES = { 'image/*': ['.jpeg', '.png'] };
 export const DROPZONE_ACCEPT_PDF = { 'application/pdf': ['.pdf'] };
 export const DROPZONE_ACCEPT_ALL = { ...DROPZONE_ACCEPT_IMAGES, ...DROPZONE_ACCEPT_PDF };
 
-const Dropzone = styled(Container)`
+const Dropzone = styled(Container)<{ onClick?: () => void; error?: any }>`
   border: 1px dashed #c4c7cc;
   border-radius: 10px;
   text-align: center;
@@ -102,7 +101,7 @@ const StyledDropzone = ({
   isMulti,
   kind,
   ...props
-}) => {
+}: StyledDropzoneProps) => {
   const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess, onReject, kind, accept };
   const { uploadFiles, isUploading, uploadProgress } = useImageUploader(imgUploaderParams);
   const dropzoneParams = { accept, minSize, maxSize, multiple: isMulti, onDrop: uploadFiles };
@@ -192,7 +191,7 @@ const StyledDropzone = ({
                     onKeyDown={event => {
                       if (event.key === 'Enter') {
                         event.preventDefault();
-                        dropProps.onClick();
+                        dropProps.onClick(null);
                       }
                     }}
                   >
@@ -209,43 +208,43 @@ const StyledDropzone = ({
   );
 };
 
-StyledDropzone.propTypes = {
+type StyledDropzoneProps = {
   /** Called back with the uploaded files on success */
-  onSuccess: PropTypes.func,
-  /** Name for the input */
-  name: PropTypes.string,
+  onSuccess: () => void;
   /** Called back with the rejectd files */
-  onReject: PropTypes.func,
+  onReject: () => void;
+  /** Name for the input */
+  name: string;
   /** Content to show inside the dropzone. Defaults to message "Drag and drop one or..." */
-  children: PropTypes.node,
+  children: React.ReactChildren;
   /** Force loading state to be displayed */
-  isLoading: PropTypes.bool,
+  isLoading: boolean;
   /** Use this to override the loading progress indicator */
-  loadingProgress: PropTypes.number,
+  loadingProgress: number;
   /** Font size used for the default messages */
-  fontSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  fontSize: number | string;
   /** Min height of the container */
-  minHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  minHeight: number;
   /** To have square container */
-  size: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+  size: number;
   /** A function to generate mock images */
-  mockImageGenerator: PropTypes.func,
+  mockImageGenerator: () => void;
   /** Whether the dropzone should accept multiple files */
-  isMulti: PropTypes.bool,
+  isMulti: boolean;
   /** Filetypes to accept */
-  accept: PropTypes.object,
+  accept: Accept;
   /** Min file size */
-  minSize: PropTypes.number,
+  minSize: number;
   /** Max file size */
-  maxSize: PropTypes.number,
+  maxSize: number;
   /** A truthy/falsy value defining if the field has an error (ie. if it's required) */
-  error: PropTypes.any,
+  error: any;
   /** required field */
-  required: PropTypes.bool,
+  required: boolean;
   /** if set, the image will be displayed and a "replace" banner will be added */
-  value: PropTypes.string,
+  value: string;
   /** A unique identified for the category of uploaded files */
-  kind: PropTypes.string.isRequired,
+  kind: string;
 };
 
 StyledDropzone.defaultProps = {
