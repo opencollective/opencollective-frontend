@@ -2,7 +2,7 @@ import React from 'react';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { Download as DownloadIcon } from '@styled-icons/feather/Download';
 import { isNil, omit } from 'lodash';
-import { Accept, useDropzone } from 'react-dropzone';
+import { Accept, FileRejection, useDropzone } from 'react-dropzone';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
@@ -83,7 +83,6 @@ const ReplaceContainer = styled.div`
  * A dropzone to upload one or multiple files
  */
 const StyledDropzone = ({
-  onSuccess,
   onReject,
   children,
   isLoading,
@@ -102,9 +101,20 @@ const StyledDropzone = ({
   kind,
   ...props
 }: StyledDropzoneProps) => {
-  const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess, onReject, kind, accept };
+  const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess: props.onSuccess, onReject, kind, accept };
   const { uploadFiles, isUploading, uploadProgress } = useImageUploader(imgUploaderParams);
-  const dropzoneParams = { accept, minSize, maxSize, multiple: isMulti, onDrop: uploadFiles };
+
+  const onDrop = React.useCallback(
+    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+      if (props.collectFilesOnly) {
+        props.onSuccess(acceptedFiles, fileRejections);
+      } else {
+        uploadFiles(acceptedFiles, fileRejections);
+      }
+    },
+    [props.collectFilesOnly, props.onSuccess, uploadFiles],
+  );
+  const dropzoneParams = { accept, minSize, maxSize, multiple: isMulti, onDrop };
   const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneParams);
 
   minHeight = size || minHeight;
@@ -209,8 +219,6 @@ const StyledDropzone = ({
 };
 
 type StyledDropzoneProps = {
-  /** Called back with the uploaded files on success */
-  onSuccess: () => void;
   /** Called back with the rejectd files */
   onReject: () => void;
   /** Name for the input */
@@ -229,8 +237,6 @@ type StyledDropzoneProps = {
   size: number;
   /** A function to generate mock images */
   mockImageGenerator: () => void;
-  /** Whether the dropzone should accept multiple files */
-  isMulti: boolean;
   /** Filetypes to accept */
   accept: Accept;
   /** Min file size */
@@ -245,13 +251,37 @@ type StyledDropzoneProps = {
   value: string;
   /** A unique identified for the category of uploaded files */
   kind: string;
-};
+} & (
+  | {
+      /** Collect File only, do not upload files */
+      collectFilesOnly: true;
+      /** Whether the dropzone should accept multiple files */
+      isMulti?: boolean;
+      /** Called back with the uploaded files on success */
+      onSuccess: (acceptedFiles: File[], fileRejections: FileRejection[]) => void;
+    }
+  | ({
+      collectFilesOnly?: false;
+    } & (
+      | {
+          isMulti?: true;
+          /** Called back with the uploaded files on success */
+          onSuccess: (fileUrls: string[]) => void;
+        }
+      | {
+          isMulti: false;
+          /** Called back with the uploaded files on success */
+          onSuccess: (fileUrls: string) => void;
+        }
+    ))
+);
 
 StyledDropzone.defaultProps = {
   minHeight: 96,
   mockImageGenerator: () => `https://loremflickr.com/120/120?lock=${uuid()}`,
   isMulti: true,
   fontSize: '14px',
+  collectFilesOnly: false,
 };
 
 export default StyledDropzone;
