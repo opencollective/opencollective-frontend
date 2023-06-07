@@ -7,14 +7,4 @@ export const config: Partial<CustomProjectConfig> = {
   },
   lostPixelProjectId: process.env.LOST_PIXEL_PROJECT_ID,
   apiKey: process.env.LOST_PIXEL_API_KEY,
-  beforeScreenshot: async page => {
-    await page.addStyleTag({
-      content: `
-        * {
-          animation-play-state: paused !important;
-          animation: none !important;
-        }
-      `,
-    });
-  },
 };
