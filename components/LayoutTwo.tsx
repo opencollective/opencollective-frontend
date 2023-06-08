@@ -19,6 +19,7 @@ import Footer from './NewFooter';
 // import Link from 'next/link';
 import Link from './Link';
 import PopoverMenu from './Popover';
+import ChangelogTrigger from './changelog/ChangelogTrigger';
 
 // import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
@@ -152,7 +153,6 @@ export default function Layout({ children }) {
   const router = useRouter();
   const { settings } = React.useContext(SettingsContext);
 
-  console.log({ router, asPath: router.asPath, pathname: router.pathname });
   const loggedInOnHome = loggedIn && router.asPath === '/home';
 
   const userNavigation = [
@@ -266,7 +266,7 @@ export default function Layout({ children }) {
                                     </div>
                                   ))}
                                 </div>
-                                <div className="bg-slate-50 p-8">
+                                {/* <div className="bg-slate-50 p-8">
                                   <div className="flex justify-between">
                                     <h3 className="text-sm font-semibold leading-6 text-slate-500">News & updates</h3>
                                     <Link href="#" className="text-sm font-semibold leading-6 text-indigo-600">
@@ -296,35 +296,37 @@ export default function Layout({ children }) {
                                       </li>
                                     ))}
                                   </ul>
-                                </div>
+                                </div> */}
                               </div>
                             </Popover.Panel>
                           </Transition>
                         </div>
                       </Popover>
                     </div>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <button
-                          className="relative flex h-full cursor-pointer items-center rounded p-1 hover:bg-slate-100"
-                          onClick={() => setCommandDialogOpen(true)}
-                        >
-                          <svg
-                            className="h-5 w-5 text-slate-400"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            aria-hidden="true"
+                    <div>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <button
+                            className="relative flex h-full cursor-pointer items-center rounded p-1 hover:bg-slate-100"
+                            onClick={() => setCommandDialogOpen(true)}
                           >
-                            <path
-                              fillRule="evenodd"
-                              d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>Search</TooltipContent>
-                    </Tooltip>
+                            <svg
+                              className="h-5 w-5 text-slate-400"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                              aria-hidden="true"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>Search Collectives (⌘+K)</TooltipContent>
+                      </Tooltip>
+                    </div>
                     {commandDialogOpen && (
                       <CommandDialog open={commandDialogOpen} setOpen={val => setCommandDialogOpen(val)} />
                     )}
@@ -395,8 +397,8 @@ export default function Layout({ children }) {
 
             {/* end new paste */}
             {loggedIn ? (
-              <div className=" ml-4 flex items-center">
-                <Tooltip>
+              <div className=" ml-4 flex items-center gap-4">
+                {/* <Tooltip>
                   <TooltipTrigger>
                     <button
                       type="button"
@@ -420,20 +422,19 @@ export default function Layout({ children }) {
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>No new notifications</TooltipContent>
-                </Tooltip>
-
+                </Tooltip> */}
                 <Menu as="div" className="relative">
                   <Tooltip>
                     <TooltipTrigger>
-                      <Menu.Button className="group flex items-center gap-1 p-1 text-slate-400 hover:text-slate-500 focus:outline-none ">
+                      <Menu.Button className="group flex items-center gap-1  text-slate-400 hover:text-slate-500 focus:outline-none ">
                         <span className="sr-only">Open new items menu</span>
-                        <div className="rounded-full p-1 group-hover:bg-slate-100 group-focus:bg-slate-100 group-focus:ring-2 group-focus:ring-blue-500 group-focus:ring-offset-2">
+                        <div className="rounded-full p-2.5 group-hover:bg-slate-100 group-focus:bg-slate-100 group-focus:ring-2 group-focus:ring-blue-500 group-focus:ring-offset-2">
                           <Plus className="h-5 w-5  " />
                         </div>
                         {/* <ChevronDownIcon className="h-5 w-5" aria-hidden="true" /> */}
                       </Menu.Button>
                     </TooltipTrigger>
-                    <TooltipContent>Create</TooltipContent>
+                    <TooltipContent>New</TooltipContent>
                   </Tooltip>
                   <Transition
                     as={Fragment}
@@ -446,9 +447,8 @@ export default function Layout({ children }) {
                   >
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       {[
-                        { name: 'Create Collective', href: '#' },
-                        { name: 'Create Organization', href: '#' },
-                        { name: 'Submit expense', href: '#' },
+                        { name: 'New Collective', href: '#' },
+                        { name: 'New Organization', href: '#' },
                       ].map(item => (
                         <Menu.Item key={item.name}>
                           {({ active }) => {
@@ -473,7 +473,9 @@ export default function Layout({ children }) {
                   </Transition>
                 </Menu>
 
-                <div className="relative ml-4 flex-shrink-0">
+                <ChangelogTrigger />
+
+                <div className="relative flex-shrink-0">
                   {(LoggedInUser || loadingLoggedInUser) && (
                     <Menu as="div" className="relative">
                       <Menu.Button className="group flex items-center gap-2 focus:outline-none">
@@ -608,7 +610,13 @@ export default function Layout({ children }) {
           </div>
         </div>
       )}
-      <main className={cx('flex flex-1 flex-col ', settings.mainGrayBg ? 'bg-slate-50/75' : 'bg-white', settings.shadows ? "shadow-inner" : "")}>
+      <main
+        className={cx(
+          'flex flex-1 flex-col ',
+          settings.mainGrayBg ? 'bg-slate-50/75' : 'bg-white',
+          settings.shadows ? 'shadow-inner' : '',
+        )}
+      >
         {children}
       </main>
       <Footer />

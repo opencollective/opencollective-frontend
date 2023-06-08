@@ -157,7 +157,7 @@ const Menu = ({ isAccountantOnly }) => {
         </MenuLink>
         <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} item={{ icon: Receipt }} />
         <MenuLink section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} item={{ icon: Coins }}>
-          Contributions
+          Recurring Contributions
         </MenuLink>
         <MenuLink
           section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}

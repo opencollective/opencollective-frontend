@@ -65,7 +65,7 @@ class SearchForm extends React.Component {
           />
           <input
             className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 sm:text-sm"
-            placeholder="Search..."
+            placeholder="Search Collectives..."
             autoFocus
             onChange={e => this.setState({ query: e.target.value })}
           />

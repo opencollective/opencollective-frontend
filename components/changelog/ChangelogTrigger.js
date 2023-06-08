@@ -17,7 +17,7 @@ import { WebsiteName } from '../I18nFormatters';
 import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
 import StyledRoundButton from '../StyledRoundButton';
 import StyledTooltip from '../StyledTooltip';
-
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import ChangelogNotificationDropdown from './ChangelogNotificationDropdown';
 
 const FlameIcon = styled(StyledRoundButton)`
@@ -57,14 +57,6 @@ const ChangelogTrigger = props => {
     });
   };
 
-  const TooltipContent = (
-    <FormattedMessage
-      id="ChangelogTrigger.tooltip.content"
-      defaultMessage="What's new with {WebsiteName}"
-      values={{ WebsiteName }}
-    />
-  );
-
   if (!LoggedInUser) {
     return null;
   }
@@ -72,16 +64,25 @@ const ChangelogTrigger = props => {
   return (
     <Flex>
       {hasSeenNewUpdates ? (
-        <StyledTooltip content={TooltipContent}>
-          <FlameIcon
-            height={height}
-            width={width}
-            onClick={handleShowNewUpdates}
-            backgroundColor="black.100"
-            backgroundSize={backgroundSize}
-            url="/static/images/flame-default.svg"
-          />
-        </StyledTooltip>
+        <Tooltip>
+          <TooltipTrigger>
+            <FlameIcon
+              height={height}
+              width={width}
+              onClick={handleShowNewUpdates}
+              backgroundColor="black.100"
+              backgroundSize={backgroundSize}
+              url="/static/images/flame-default.svg"
+            />
+          </TooltipTrigger>
+          <TooltipContent>
+            <FormattedMessage
+              id="ChangelogTrigger.tooltip.content"
+              defaultMessage="What's new with {WebsiteName}"
+              values={{ WebsiteName }}
+            />
+          </TooltipContent>
+        </Tooltip>
       ) : (
         <Container>
           <FlameIcon

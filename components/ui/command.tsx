@@ -2,7 +2,43 @@ import React, { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 
 import SearchForm from '../NewSearchForm';
-
+import Avatar from '../Avatar';
+const recentlyVisited = [
+  {
+    id: 8686,
+    slug: 'opencollective',
+    type: 'ORGANIZATION',
+    isIncognito: false,
+    name: 'Open Collective',
+    currency: 'USD',
+    isHost: true,
+    endsAt: null,
+    imageUrl: 'https://images.opencollective.com/opencollective/019a512/logo.png',
+  },
+  {
+    id: 14076,
+    slug: 'keepassxc',
+    type: 'COLLECTIVE',
+    isIncognito: false,
+    name: 'KeePassXC',
+    currency: 'USD',
+    isHost: false,
+    endsAt: null,
+    imageUrl: 'https://images.opencollective.com/keepassxc/3a25727/logo.png',
+    categories: [],
+  },
+  {
+    id: 48347,
+    slug: 'cobudget',
+    type: 'COLLECTIVE',
+    isIncognito: false,
+    name: 'Cobudget',
+    currency: 'EUR',
+    isHost: false,
+    endsAt: null,
+    imageUrl: 'https://images.opencollective.com/cobudget/84e4d55/logo.png',
+  },
+];
 export default function CommandMenu({ open, setOpen }: any) {
   return (
     <Transition.Root show={open} as={Fragment} appear>
@@ -31,6 +67,20 @@ export default function CommandMenu({ open, setOpen }: any) {
           >
             <Dialog.Panel className="mx-auto max-w-xl transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
               <SearchForm autoFocus onClose={() => setOpen(false)} />
+              <div className="pt-4 pb-2">
+                <h3 className="text-xs px-4 font-medium text-slate-800 mb-2">Recently visited profiles</h3>
+                <div className="space-y-1 px-2">
+                  {recentlyVisited.map(collective => (
+                    <div
+                      key={collective.id}
+                      className="flex items-center gap-2 p-2 hover:bg-slate-100 rounded-md cursor-pointer"
+                    >
+                      <Avatar collective={collective} radius={32} />{' '}
+                      <p className="text-sm font-medium text-slate-800">{collective.name}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </Dialog.Panel>
           </Transition.Child>
         </div>
