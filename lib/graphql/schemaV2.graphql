@@ -879,6 +879,11 @@ type Order {
   permissions: OrderPermissions!
 
   """
+  The list of activities (ie. approved, edited, etc) for this Order ordered by date ascending
+  """
+  activities: ActivityCollection!
+
+  """
   Data related to the order
   """
   data: JSON
@@ -1285,6 +1290,10 @@ type Expense {
   requestedByAccount: Account
   quote: ExpenseQuote
   recurringExpense: RecurringExpense
+
+  """
+  [Admin only] Security checks for this expense. Only available to expenses under trusted hosts.
+  """
   securityChecks: [SecurityCheck]
 
   """
@@ -2902,6 +2911,26 @@ type Host implements Account & AccountWithContributions {
   Returns whether the host has any Stripe in review orders
   """
   hasInReviewOrders: Boolean
+
+  """
+  Returns agreements with Hosted Accounts
+  """
+  hostedAccountAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter by accounts participating in the agreement
+    """
+    accounts: [AccountReferenceInput]
+  ): AgreementCollection!
 }
 
 """
@@ -4800,6 +4829,29 @@ type ExpenseStats {
 }
 
 """
+A collection of "Agreement"
+"""
+type AgreementCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Agreement!]
+}
+
+"""
+An agreement
+"""
+type Agreement {
+  id: String
+  title: String!
+  createdBy: Account!
+  account: Account!
+  host: Host!
+  expiresAt: DateTime
+  attachment: FileInfo
+}
+
+"""
 Fields for an expense's attached file
 """
 type ExpenseAttachedFile {
@@ -5196,9 +5248,24 @@ type OrderPermissions {
   canMarkAsPaid: Boolean!
 
   """
-  Whether the current user edit this pending order
+  Whether the current user can edit this pending order
   """
   canEdit: Boolean!
+
+  """
+  Whether the current user can see private activities for this order
+  """
+  canSeePrivateActivities: Boolean!
+}
+
+"""
+A collection of "Activities"
+"""
+type ActivityCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Activity!]
 }
 
 type PendingOrderData {
@@ -6368,6 +6435,21 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   isApproved: Boolean!
 
   """
+  Returns agreements this account has with its host
+  """
+  hostAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AgreementCollection!
+
+  """
   Number of unique financial contributors.
   """
   totalFinancialContributors(
@@ -6449,6 +6531,21 @@ interface AccountWithHost {
   Returns whether it's active: can accept financial contributions and pay expenses.
   """
   isActive: Boolean!
+
+  """
+  Returns agreements this account has with its host
+  """
+  hostAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AgreementCollection!
 }
 
 """
@@ -7223,6 +7320,21 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Returns whether it's approved by the Fiscal Host
   """
   isApproved: Boolean!
+
+  """
+  Returns agreements this account has with its host
+  """
+  hostAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AgreementCollection!
 
   """
   Number of unique financial contributors.
@@ -9280,6 +9392,21 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   Returns whether it's approved by the Fiscal Host
   """
   isApproved: Boolean!
+
+  """
+  Returns agreements this account has with its host
+  """
+  hostAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AgreementCollection!
 
   """
   Number of unique financial contributors.
@@ -11428,16 +11555,6 @@ enum CountryISO {
   EH
 }
 
-"""
-A collection of "Activities"
-"""
-type ActivityCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Activity!]
-}
-
 enum ActivityAndClassesType {
   ACTIVITY_ALL
   CONNECTED_ACCOUNT_CREATED
@@ -12151,6 +12268,21 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   isApproved: Boolean!
 
   """
+  Returns agreements this account has with its host
+  """
+  hostAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AgreementCollection!
+
+  """
   Number of unique financial contributors.
   """
   totalFinancialContributors(
@@ -12762,6 +12894,21 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Returns whether it's approved by the Fiscal Host
   """
   isApproved: Boolean!
+
+  """
+  Returns agreements this account has with its host
+  """
+  hostAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AgreementCollection!
 
   """
   Number of unique financial contributors.
@@ -14248,6 +14395,66 @@ type Mutation {
     order: OrderReferenceInput
     expense: ExpenseReferenceInput
   ): TagResponse!
+
+  """
+  Add an agreement for the given host account. Scope: "host".
+  """
+  addAgreement(
+    """
+    Agreement title.
+    """
+    title: NonEmptyString!
+
+    """
+    Optional date in which this agreement expires.
+    """
+    expiresAt: DateTime
+
+    """
+    Host where the agreement will be created.
+    """
+    host: AccountReferenceInput!
+
+    """
+    Account that is a party in this agreement
+    """
+    account: AccountReferenceInput!
+
+    """
+    Agreement attachment
+    """
+    attachment: Upload
+  ): Agreement!
+
+  """
+  Edit an agreement for the given host account. Scope: "host".
+  """
+  editAgreement(
+    """
+    Agreement to update.
+    """
+    agreement: AgreementReferenceInput!
+
+    """
+    Updated agreement title
+    """
+    title: NonEmptyString
+
+    """
+    Optional date in which this agreement expires.
+    """
+    expiresAt: DateTime
+  ): Agreement!
+
+  """
+  Delete an agreement for the given host account. Scope: "host".
+  """
+  deleteAgreement(
+    """
+    Agreement to delete.
+    """
+    agreement: AgreementReferenceInput!
+  ): Agreement!
 }
 
 """
@@ -15929,4 +16136,21 @@ input SocialLinkInput {
 type TagResponse {
   order: Order
   expense: Expense
+}
+
+"""
+The `Upload` scalar type represents a file upload.
+"""
+scalar Upload
+
+input AgreementReferenceInput {
+  """
+  The public id identifying the agreement (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the agreement (ie: 580)
+  """
+  legacyId: Int
 }
