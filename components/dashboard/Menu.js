@@ -5,6 +5,8 @@ import { Cog } from '@styled-icons/boxicons-regular/Cog';
 import { Coin } from '@styled-icons/boxicons-regular/Coin';
 import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
 import { NetworkChart } from '@styled-icons/boxicons-regular/NetworkChart';
+import { File } from '@styled-icons/boxicons-regular/File';
+
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { Transfer } from '@styled-icons/boxicons-regular/Transfer';
 import { Inbox } from '@styled-icons/octicons/Inbox';
@@ -49,6 +51,8 @@ const Menu = ({ isAccountantOnly }) => {
           icon={<Coin size={16} />}
           if={!isAccountantOnly}
         />
+
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS} icon={<File size={16} />} />
 
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS}

@@ -12,6 +12,7 @@ export const HOST_DASHBOARD_SECTIONS = {
   REPORTS: 'reports',
   // Existing Host Dashboard Sections
   HOST_EXPENSES: 'host-expenses',
+  HOST_AGREEMENTS: 'host-agreements',
   FINANCIAL_CONTRIBUTIONS: 'orders',
   PENDING_CONTRIBUTIONS: 'pending-contributions',
   HOSTED_COLLECTIVES: 'hosted-collectives',
@@ -124,6 +125,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.HOST_EXPENSES]: {
     id: 'Expenses',
     defaultMessage: 'Expenses',
+  },
+  [ALL_SECTIONS.HOST_AGREEMENTS]: {
+    id: 'Agreements',
+    defaultMessage: 'Agreements',
   },
   [ALL_SECTIONS.FINANCIAL_CONTRIBUTIONS]: {
     id: 'FinancialContributions',
