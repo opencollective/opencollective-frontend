@@ -17,6 +17,7 @@ const load = async app => {
 
   const redisClient = await createRedisClient();
   if (!redisClient) {
+    logger.warn(`redisClient not available, rate-limiter disabled`);
     return;
   }
 

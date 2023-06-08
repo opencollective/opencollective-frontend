@@ -3,6 +3,9 @@ const { createRedisClient } = require('./redis');
 
 const redisProvider = async () => {
   const redisClient = await createRedisClient();
+  if (!redisClient) {
+    logger.warn(`redis client not available, redisProvider in compatibility mode`);
+  }
 
   return {
     clear: async () => redisClient?.flushAll(),
