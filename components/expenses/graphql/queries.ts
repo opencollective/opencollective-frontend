@@ -1,10 +1,8 @@
 import { gql } from '@apollo/client';
 
-import {
-  commentFieldsFragment,
-  expensePageExpenseFieldsFragment,
-  loggedInAccountExpensePayoutFieldsFragment,
-} from './fragments';
+import { commentFieldsFragment } from '../../conversations/graphql';
+
+import { expensePageExpenseFieldsFragment, loggedInAccountExpensePayoutFieldsFragment } from './fragments';
 
 export const expensePageQuery = gql`
   query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalPaidExpensesDateFrom: DateTime) {
