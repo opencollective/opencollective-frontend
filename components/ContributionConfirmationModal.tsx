@@ -28,6 +28,38 @@ export const confirmContributionFieldsFragment = gql`
   fragment ConfirmContributionFields on Order {
     id
     hostFeePercent
+    pendingContributionData {
+      expectedAt
+      paymentMethod
+      ponumber
+      memo
+      fromAccountInfo {
+        name
+        email
+      }
+    }
+    memo
+    fromAccount {
+      id
+      slug
+      name
+      imageUrl
+    }
+    toAccount {
+      id
+      slug
+      name
+      imageUrl
+      ... on AccountWithHost {
+        bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
+      }
+    }
+    createdByAccount {
+      id
+      slug
+      name
+      imageUrl
+    }
     totalAmount {
       valueInCents
       currency
@@ -49,6 +81,7 @@ export const confirmContributionFieldsFragment = gql`
       currency
       valueInCents
     }
+    platformTipEligible
   }
 `;
 
@@ -301,6 +334,34 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
             </Box>
           </Flex>
         </Container>
+        {Boolean(platformTipAmount) && (
+          <Container mt={2}>
+            <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>
+              <Span fontSize="12px" lineHeight="20px" fontWeight="500">
+                <FormattedMessage
+                  id="withColon"
+                  defaultMessage="{item}:"
+                  values={{
+                    item: (
+                      <FormattedMessage
+                        defaultMessage="{service} platform tip"
+                        values={{ service: 'Open Collective' }}
+                      />
+                    ),
+                  }}
+                />
+              </Span>
+              <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
+                <FormattedMoneyAmount
+                  amount={platformTipAmount}
+                  currency={currency}
+                  precision={2}
+                  amountStyles={null}
+                />
+              </Box>
+            </Flex>
+          </Container>
+        )}
         <StyledHr borderStyle="dashed" mt="16px" mb="16px" />
         <Container>
           <Flex justifyContent={['center', 'right']} alignItems="center" flexWrap={['wrap', 'nowrap']}>

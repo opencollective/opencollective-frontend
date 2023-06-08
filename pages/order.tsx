@@ -60,38 +60,6 @@ const orderPageQuery = gql`
       }
       createdAt
       processedAt
-      pendingContributionData {
-        expectedAt
-        paymentMethod
-        ponumber
-        memo
-        fromAccountInfo {
-          name
-          email
-        }
-      }
-      memo
-      fromAccount {
-        id
-        slug
-        name
-        imageUrl
-      }
-      toAccount {
-        id
-        slug
-        name
-        imageUrl
-        ... on AccountWithHost {
-          bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
-        }
-      }
-      createdByAccount {
-        id
-        slug
-        name
-        imageUrl
-      }
       permissions {
         id
         canMarkAsExpired
@@ -523,7 +491,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                 {isPending ? (
                   <React.Fragment>
                     <TransactionDetails>
-                      <FormattedMessage defaultMessage="Expected Amount" />
+                      <FormattedMessage defaultMessage="Expected Total Amount" />
                       <FormattedMoneyAmount
                         currency={order.amount.currency}
                         precision={2}
@@ -555,19 +523,29 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                         />
                       </TransactionDetails>
                     )}
-                    <TransactionDetails>
-                      <FormattedMessage defaultMessage="Expected Host Fees" />
-                      <FormattedMoneyAmount
-                        currency={order.amount.currency}
-                        precision={2}
-                        amount={
-                          (order.amount.valueInCents - (order.taxAmount?.valueInCents || 0)) *
-                          (order.hostFeePercent / -100)
-                        }
-                      />
-                      <React.Fragment></React.Fragment>
-                      <FormattedMessage defaultMessage="Based on default host fees, can be changed at settling time" />
-                    </TransactionDetails>
+                    {Boolean(order.hostFeePercent) && (
+                      <TransactionDetails>
+                        <FormattedMessage defaultMessage="Expected Host Fees" />
+                        <FormattedMoneyAmount
+                          currency={order.amount.currency}
+                          precision={2}
+                          amount={
+                            (order.amount.valueInCents - (order.taxAmount?.valueInCents || 0)) *
+                            (order.hostFeePercent / -100)
+                          }
+                        />
+                        <FormattedMessage defaultMessage="Based on default host fees, can be changed at settling time" />
+                      </TransactionDetails>
+                    )}
+                    {Boolean(order.platformTipAmount?.valueInCents) && (
+                      <TransactionDetails>
+                        <FormattedMessage defaultMessage="Expected Platform Tip" />
+                        <FormattedMoneyAmount
+                          currency={order.platformTipAmount.currency}
+                          amount={-order.platformTipAmount.valueInCents}
+                        />
+                      </TransactionDetails>
+                    )}
                   </React.Fragment>
                 ) : (
                   orderBy(accountTransactions, ['legacyId'], ['desc']).map(transaction => {

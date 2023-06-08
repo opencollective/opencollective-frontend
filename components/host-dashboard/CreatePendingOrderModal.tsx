@@ -19,6 +19,7 @@ import { omitDeep } from '../../lib/utils';
 
 import CollectivePicker, { DefaultCollectiveLabel } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import { confirmContributionFieldsFragment } from '../ContributionConfirmationModal';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -40,6 +41,7 @@ import { TwoFactorAuthRequiredMessage } from '../TwoFactorAuthRequiredMessage';
 
 const EDITABLE_FIELDS = [
   'amount',
+  'platformTipAmount',
   'description',
   'expectedAt',
   'fromAccount',
@@ -166,8 +168,10 @@ const editPendingContributionMutation = gql`
       legacyId
       id
       status
+      ...ConfirmContributionFields
     }
   }
+  ${confirmContributionFieldsFragment}
 `;
 
 const validate = values => {
@@ -315,6 +319,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   ];
 
   const amountInCents = values.amount?.valueInCents || 0;
+  const tipAmount = values.platformTipAmount?.valueInCents || 0;
   const taxAmount = !values.tax?.rate ? 0 : Math.round(amountInCents - amountInCents / (1 + values.tax.rate));
   const grossAmount = amountInCents - taxAmount;
   const hostFee = Math.round(grossAmount * (values.hostFeePercent / 100));
@@ -477,7 +482,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           <Field
             name="amount.valueInCents"
             htmlFor="CreatePendingContribution-amount"
-            label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}
+            label={<FormattedMessage id="TotalAmount" defaultMessage="Total amount" />}
             required
             flex="1 1"
           >
@@ -492,18 +497,35 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
                 maxWidth="100%"
                 onChange={value => form.setFieldValue(field.name, value)}
                 onBlur={() => form.setFieldTouched(field.name, true)}
-                currencyDisplay={undefined}
-                min={undefined}
-                max={undefined}
-                precision={undefined}
-                defaultValue={undefined}
-                isEmpty={undefined}
-                hasCurrencyPicker={undefined}
-                onCurrencyChange={undefined}
-                availableCurrencies={undefined}
               />
             )}
           </Field>
+          {/** Can only edit platform tip if already set on the contribution */}
+          {Boolean(edit?.platformTipAmount?.valueInCents || edit?.platformTipEligible) && (
+            <Box ml={2} flex="1 1">
+              <Field
+                name="platformTipAmount.valueInCents"
+                htmlFor="CreatePendingContribution-tip"
+                label={<FormattedMessage id="Transaction.kind.PLATFORM_TIP" defaultMessage="Platform tip" />}
+                required
+                flex="1 1"
+              >
+                {({ form, field }) => (
+                  <StyledInputAmount
+                    id={field.id}
+                    data-cy="create-pending-contribution-tip-amount"
+                    currency={currency}
+                    placeholder="0.00"
+                    error={field.error}
+                    value={field.value}
+                    maxWidth="100%"
+                    onChange={value => form.setFieldValue(field.name, value)}
+                    onBlur={() => form.setFieldTouched(field.name, true)}
+                  />
+                )}
+              </Field>
+            </Box>
+          )}
           {(true || canAddHostFee) && (
             <Field
               name="hostFeePercent"
@@ -662,9 +684,16 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
             />
           }
         />
+        {Boolean(tipAmount) && (
+          <AmountDetailsLine
+            value={-tipAmount || 0}
+            currency={currency}
+            label={<FormattedMessage defaultMessage="{service} platform tip" values={{ service: 'Open Collective' }} />}
+          />
+        )}
         <StyledHr my={2} borderColor="black.300" />
         <AmountDetailsLine
-          value={grossAmount - hostFee}
+          value={grossAmount - hostFee - tipAmount}
           currency={currency}
           label={<FormattedMessage id="AddFundsModal.netAmount" defaultMessage="Net amount received by collective" />}
           isLargeAmount
@@ -734,7 +763,7 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
         paymentMethod: edit.pendingContributionData?.paymentMethod,
         tax: edit.tax && omit(edit.tax, ['id']),
       }
-    : { hostFeePercent: host?.hostFeePercent };
+    : { hostFeePercent: host?.hostFeePercent || 0 };
 
   const error = createOrderError || editOrderError;
 
@@ -767,6 +796,7 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
                   tier: !values.tier ? null : { id: values.tier.id },
                   expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
                   amount: { ...values.amount, valueInCents: amountWithoutTax },
+                  platformTipAmount: values.platformTipAmount?.valueInCents ? values.platformTipAmount : null,
                 },
                 ['__typename'],
               );
