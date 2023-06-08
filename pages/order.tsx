@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useLazyQuery } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
-import { isEmpty, orderBy, round, toNumber } from 'lodash';
+import { isEmpty, orderBy, partition, round, toNumber } from 'lodash';
 import { GetServerSideProps } from 'next';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -290,6 +290,24 @@ const OverdueTag = styled.span`
   border-radius: 4px;
 `;
 
+const getTransactionsToDisplay = (account, transactions) => {
+  if (!transactions?.length) {
+    return [];
+  }
+
+  const isTipTransaction = t => ['PLATFORM_TIP', 'PLATFORM_TIP_DEBT'].includes(t.kind);
+  const isOwnAccount = t => t.account.id === account.id;
+
+  const [tipTransactions, otherTransactions] = partition(transactions, isTipTransaction);
+  const accountTransactions = otherTransactions.filter(t => t.account.id === account.id);
+  let tipTransactionsToDisplay = tipTransactions.filter(isOwnAccount);
+  if (tipTransactionsToDisplay.length === 0 && tipTransactions.length > 0) {
+    tipTransactionsToDisplay = tipTransactions.filter(t => t.kind === 'PLATFORM_TIP' && t.type === 'DEBIT');
+  }
+
+  return [...accountTransactions, ...tipTransactionsToDisplay];
+};
+
 export default function OrderPage(props: OrderPageQuery & { error: any }) {
   const { LoggedInUser } = useLoggedInUser();
   const [fetchData, query] = useLazyQuery<OrderPageQuery, OrderPageQueryVariables>(orderPageQuery, {
@@ -322,8 +340,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
     return <Custom404 />;
   }
 
-  const accountTransactions = order?.transactions?.filter(t => t.account.id === account.id);
-
+  const displayedTransactions = getTransactionsToDisplay(account, order.transactions);
   return (
     <Page
       collective={account}
@@ -548,7 +565,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                     )}
                   </React.Fragment>
                 ) : (
-                  orderBy(accountTransactions, ['legacyId'], ['desc']).map(transaction => {
+                  orderBy(displayedTransactions, ['legacyId'], ['desc']).map(transaction => {
                     const displayedAmount = getDisplayedAmount(transaction, account);
                     const displayPaymentFees =
                       transaction.type === 'CREDIT' &&
