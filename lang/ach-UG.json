@@ -3042,6 +3042,7 @@
   "WebhookEvents.COLLECTIVE_UPDATE_CREATED": "crwdns24351:0crwdne24351:0",
   "WebhookEvents.CONNECTED_ACCOUNT_CREATED": "crwdns21408:0crwdne21408:0",
   "WebhookEvents.TICKET_CONFIRMED": "crwdns21412:0crwdne21412:0",
+  "WebhookEvents.VIRTUAL_CARD_PURCHASE": "crwdns25685:0crwdne25685:0",
   "webhooks.remove": "crwdns20574:0crwdne20574:0",
   "webhooks.save": "crwdns20576:0{count}crwdne20576:0",
   "webhooks.url.label": "crwdns20580:0crwdne20580:0",
