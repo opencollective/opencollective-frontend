@@ -180,6 +180,7 @@ const StyledInputAmount = ({
         )
       }
       onWheel={e => {
+        // Prevent changing the value when scrolling on the input
         e.preventDefault();
         e.target.blur();
       }}
