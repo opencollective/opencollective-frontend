@@ -208,6 +208,7 @@ export const expensePageExpenseFieldsFragment = gql`
       legalName
       type
       isAdmin
+      isActive
       location {
         id
         address

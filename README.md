@@ -1,7 +1,9 @@
 # Open Collective Frontend
 
-[![Dependency Status](https://david-dm.org/opencollective/opencollective-frontend/status.svg)](https://david-dm.org/opencollective/opencollective-frontend)
+![GitHub](https://img.shields.io/github/license/opencollective/opencollective-frontend)
 [![Crowdin](https://d322cqt584bo4o.cloudfront.net/opencollective/localized.svg)](https://crowdin.com/project/opencollective)
+![React Version](https://img.shields.io/github/package-json/dependency-version/opencollective/opencollective-frontend/react)
+![Next.JS Version](https://img.shields.io/github/package-json/dependency-version/opencollective/opencollective-frontend/next)
 
 <p align="center">
   <a href="https://github.com/opencollective/opencollective-frontend">
