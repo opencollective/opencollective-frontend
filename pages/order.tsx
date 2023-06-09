@@ -510,9 +510,9 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                     <TransactionDetails>
                       <FormattedMessage defaultMessage="Expected Total Amount" />
                       <FormattedMoneyAmount
-                        currency={order.amount.currency}
+                        currency={order.totalAmount.currency}
                         precision={2}
-                        amount={order.amount.valueInCents}
+                        amount={order.totalAmount.valueInCents}
                       />
 
                       <FormattedMessage defaultMessage="Payment Fees not Considered" />

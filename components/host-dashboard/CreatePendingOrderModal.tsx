@@ -323,6 +323,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const taxAmount = !values.tax?.rate ? 0 : Math.round(amountInCents - amountInCents / (1 + values.tax.rate));
   const grossAmount = amountInCents - taxAmount;
   const hostFee = Math.round(grossAmount * (values.hostFeePercent / 100));
+  const fundingAmount = amountInCents + tipAmount;
 
   return (
     <Form data-cy="create-pending-contribution-form">
@@ -482,7 +483,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           <Field
             name="amount.valueInCents"
             htmlFor="CreatePendingContribution-amount"
-            label={<FormattedMessage id="TotalAmount" defaultMessage="Total amount" />}
+            label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}
             required
             flex="1 1"
           >
@@ -648,41 +649,9 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         </P>
         <StyledHr my={2} borderColor="black.300" />
         <AmountDetailsLine
-          value={values.amount?.valueInCents || 0}
+          value={fundingAmount || 0}
           currency={currency}
           label={<FormattedMessage id="AddFundsModal.fundingAmount" defaultMessage="Funding amount" />}
-        />
-        {Boolean(values.tax?.rate) && (
-          <React.Fragment>
-            <AmountDetailsLine
-              value={-taxAmount}
-              currency={currency}
-              label={`${i18nTaxType(intl, values.tax.type, 'long')} (${Math.round(values.tax.rate * 100)}%)`}
-            />
-            <StyledHr my={1} borderColor="black.200" />
-            <AmountDetailsLine
-              value={grossAmount}
-              currency={currency}
-              label={
-                <FormattedMessage
-                  defaultMessage="Gross amount without {taxName}"
-                  values={{ taxName: i18nTaxType(intl, values.tax.type, 'short') }}
-                />
-              }
-            />
-            {canAddHostFee && <StyledHr my={1} borderColor="black.200" />}
-          </React.Fragment>
-        )}
-        <AmountDetailsLine
-          value={-hostFee || 0}
-          currency={currency}
-          label={
-            <FormattedMessage
-              id="AddFundsModal.hostFees"
-              defaultMessage="Host fee charged to collective ({hostFees})"
-              values={{ hostFees: `${values.hostFeePercent}%` }}
-            />
-          }
         />
         {Boolean(tipAmount) && (
           <AmountDetailsLine
@@ -691,9 +660,34 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
             label={<FormattedMessage defaultMessage="{service} platform tip" values={{ service: 'Open Collective' }} />}
           />
         )}
-        <StyledHr my={2} borderColor="black.300" />
+        {Boolean(values.tax?.rate) && (
+          <React.Fragment>
+            <AmountDetailsLine
+              value={-taxAmount}
+              currency={currency}
+              label={`${i18nTaxType(intl, values.tax.type, 'long')} (${Math.round(values.tax.rate * 100)}%)`}
+            />
+            <StyledHr my={1} borderColor="black.200" />
+          </React.Fragment>
+        )}
+        {Boolean(hostFee) && (
+          <React.Fragment>
+            <AmountDetailsLine
+              value={-hostFee || 0}
+              currency={currency}
+              label={
+                <FormattedMessage
+                  id="AddFundsModal.hostFees"
+                  defaultMessage="Host fee charged to collective ({hostFees})"
+                  values={{ hostFees: `${values.hostFeePercent}%` }}
+                />
+              }
+            />
+            <StyledHr my={1} borderColor="black.200" />
+          </React.Fragment>
+        )}
         <AmountDetailsLine
-          value={grossAmount - hostFee - tipAmount}
+          value={grossAmount - hostFee}
           currency={currency}
           label={<FormattedMessage id="AddFundsModal.netAmount" defaultMessage="Net amount received by collective" />}
           isLargeAmount
