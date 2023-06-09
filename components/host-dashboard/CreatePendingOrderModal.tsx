@@ -234,6 +234,17 @@ const getApplicableTaxType = (collective, host) => {
   }
 };
 
+const getAmountsFromValues = values => {
+  const total = values.totalAmount?.valueInCents || 0;
+  const tip = values.platformTipAmount?.valueInCents || 0;
+  const contribution = total ? total - tip : null;
+  const tax = !values.tax?.rate ? 0 : Math.round(contribution - contribution / (1 + values.tax.rate));
+  const gross = contribution - tax;
+  const hostFee = Math.round(gross * (values.hostFeePercent / 100));
+  const valid = total > 0 && contribution > 0;
+  return { total, tip, contribution, tax, gross, hostFee, valid };
+};
+
 const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePendingContributionFormProps) => {
   const formik = useFormikContext<any>();
   const { values, isSubmitting, setFieldValue } = formik;
@@ -320,13 +331,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     { value: 'CHECK', label: intl.formatMessage({ id: 'PaymentMethod.Check', defaultMessage: 'Check' }) },
   ];
 
-  const amountInCents = values.amount?.valueInCents || 0;
-  const tipAmount = values.platformTipAmount?.valueInCents || 0;
-  const taxAmount = !values.tax?.rate ? 0 : Math.round(amountInCents - amountInCents / (1 + values.tax.rate));
-  const grossAmount = amountInCents - taxAmount;
-  const hostFee = Math.round(grossAmount * (values.hostFeePercent / 100));
-  const fundingAmount = amountInCents + tipAmount;
-
+  const amounts = getAmountsFromValues(values);
   return (
     <Form data-cy="create-pending-contribution-form">
       <ModalBody mt="24px">
@@ -483,9 +488,9 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         </Field>
         <Flex mt={3} flexWrap="wrap">
           <Field
-            name="amount.valueInCents"
+            name="totalAmount.valueInCents"
             htmlFor="CreatePendingContribution-amount"
-            label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}
+            label={<FormattedMessage id="TotalAmount" defaultMessage="Total amount" />}
             required
             flex="1 1"
           >
@@ -500,6 +505,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
                 maxWidth="100%"
                 onChange={value => form.setFieldValue(field.name, value)}
                 onBlur={() => form.setFieldTouched(field.name, true)}
+                required
               />
             )}
           </Field>
@@ -524,6 +530,8 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
                     maxWidth="100%"
                     onChange={value => form.setFieldValue(field.name, value)}
                     onBlur={() => form.setFieldTouched(field.name, true)}
+                    min={field.value ? 0 : undefined}
+                    max={amounts.total ? amounts.total : undefined}
                   />
                 )}
               </Field>
@@ -651,13 +659,13 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         </P>
         <StyledHr my={2} borderColor="black.300" />
         <AmountDetailsLine
-          value={fundingAmount || 0}
+          value={amounts.total || 0}
           currency={currency}
           label={<FormattedMessage id="AddFundsModal.fundingAmount" defaultMessage="Funding amount" />}
         />
-        {Boolean(tipAmount) && (
+        {Boolean(amounts.tip) && (
           <AmountDetailsLine
-            value={-tipAmount || 0}
+            value={-amounts.tip || 0}
             currency={currency}
             label={<FormattedMessage defaultMessage="{service} platform tip" values={{ service: 'Open Collective' }} />}
           />
@@ -665,17 +673,17 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         {Boolean(values.tax?.rate) && (
           <React.Fragment>
             <AmountDetailsLine
-              value={-taxAmount}
+              value={-amounts.tax}
               currency={currency}
               label={`${i18nTaxType(intl, values.tax.type, 'long')} (${Math.round(values.tax.rate * 100)}%)`}
             />
             <StyledHr my={1} borderColor="black.200" />
           </React.Fragment>
         )}
-        {Boolean(hostFee) && (
+        {Boolean(amounts.hostFee) && (
           <React.Fragment>
             <AmountDetailsLine
-              value={-hostFee || 0}
+              value={-amounts.hostFee || 0}
               currency={currency}
               label={
                 <FormattedMessage
@@ -689,26 +697,27 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           </React.Fragment>
         )}
         <AmountDetailsLine
-          value={grossAmount - hostFee}
+          value={amounts.valid ? amounts.gross - amounts.hostFee : null}
           currency={currency}
           label={<FormattedMessage id="AddFundsModal.netAmount" defaultMessage="Net amount received by collective" />}
           isLargeAmount
         />
 
-        {Boolean(tipAmount && amountInCents && tipAmount >= amountInCents) && (
+        {Boolean(amounts.tip && amounts.contribution && amounts.tip >= amounts.contribution) && (
           <MessageBox type="warning" mt={2}>
             <FormattedMessage
               id="Warning.TipAmountContributionWarning"
               defaultMessage="You are about to make a contribution of {contributionAmount} to {accountName} that includes a {tipAmount} tip to the Open Collective platform. The tip amount looks unusually high.{newLine}{newLine}Are you sure you want to do this?"
               values={{
-                contributionAmount: formatCurrency(fundingAmount, currency, { locale: intl.locale }),
-                tipAmount: formatCurrency(tipAmount, currency, { locale: intl.locale }),
-                accountName: collective.name,
+                contributionAmount: formatCurrency(amounts.total, currency, { locale: intl.locale }),
+                tipAmount: formatCurrency(amounts.tip, currency, { locale: intl.locale }),
+                accountName: collective?.name || 'collective',
                 newLine: ' ',
               }}
             />
           </MessageBox>
         )}
+
         {error && <MessageBoxGraphqlError error={error} mt={3} fontSize="13px" />}
       </ModalBody>
       <ModalFooter>
@@ -776,7 +785,6 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
     : { hostFeePercent: host?.hostFeePercent || 0 };
 
   const error = createOrderError || editOrderError;
-
   return (
     <CreatePendingContributionModalContainer {...props} trapFocus onClose={handleClose}>
       <ModalHeader>
@@ -796,12 +804,11 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
           enableReinitialize={true}
           validate={validate}
           onSubmit={async values => {
-            const totalAmount = values.amount.valueInCents;
-            const amountWithoutTax = Math.round(totalAmount / (1 + (values.tax?.rate || 0)));
+            const amounts = getAmountsFromValues(values);
             const tax = !values.tax ? null : cloneDeep(values.tax);
             if (tax) {
               // Populate amount so that API can double-check there's no rounding error
-              tax.amount = { valueInCents: totalAmount - amountWithoutTax, currency: values.amount.currency };
+              tax.amount = { valueInCents: amounts.tax, currency: values.amount.currency };
             }
 
             if (edit) {
@@ -812,7 +819,7 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
                   fromAccount: buildAccountReference(values.fromAccount),
                   tier: !values.tier ? null : { id: values.tier.id },
                   expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
-                  amount: { ...values.amount, valueInCents: amountWithoutTax },
+                  amount: { ...values.amount, valueInCents: amounts.gross },
                   platformTipAmount: values.platformTipAmount?.valueInCents ? values.platformTipAmount : null,
                   tax,
                 },
@@ -840,7 +847,7 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
                 childAccount: undefined,
                 tier: !values.tier ? null : { id: values.tier.id },
                 expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
-                amount: { ...values.amount, valueInCents: amountWithoutTax },
+                amount: { ...values.amount, valueInCents: amounts.gross },
                 tax,
               };
 
