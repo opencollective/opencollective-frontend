@@ -5,7 +5,7 @@ import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import dayjs from 'dayjs';
 import { Form, Formik, useFormikContext } from 'formik';
-import { debounce, omit, pick } from 'lodash';
+import { cloneDeep, debounce, omit, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -786,7 +786,14 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
           enableReinitialize={true}
           validate={validate}
           onSubmit={async values => {
-            const amountWithoutTax = Math.round(values.amount.valueInCents / (1 + (values.tax?.rate || 0)));
+            const totalAmount = values.amount.valueInCents;
+            const amountWithoutTax = Math.round(totalAmount / (1 + (values.tax?.rate || 0)));
+            const tax = !values.tax ? null : cloneDeep(values.tax);
+            if (tax) {
+              // Populate amount so that API can double-check there's no rounding error
+              tax.amount = { valueInCents: totalAmount - amountWithoutTax, currency: values.amount.currency };
+            }
+
             if (edit) {
               const order = omitDeep(
                 {
@@ -797,6 +804,7 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
                   expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
                   amount: { ...values.amount, valueInCents: amountWithoutTax },
                   platformTipAmount: values.platformTipAmount?.valueInCents ? values.platformTipAmount : null,
+                  tax,
                 },
                 ['__typename'],
               );
@@ -823,6 +831,7 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
                 tier: !values.tier ? null : { id: values.tier.id },
                 expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
                 amount: { ...values.amount, valueInCents: amountWithoutTax },
+                tax,
               };
 
               const result = await createPendingOrder({ variables: { order } });
