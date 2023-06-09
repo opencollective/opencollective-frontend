@@ -28,7 +28,7 @@ import { webpackCollective } from '../mocks/collectives';
   <Story name="Invoice type (file not required)">
     {() => {
       return (
-        <Formik initialValues={{ type: 'INVOICE', currency: 'EUR' }}>
+        <Formik initialValues={{ type: 'INVOICE', currency: 'EUR', items: [{ id: '1', incurredAt: '2020-02-07' }] }}>
           {() => (
             <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
               <FieldArray name="items">
