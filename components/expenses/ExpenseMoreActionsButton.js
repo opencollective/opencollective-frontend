@@ -177,7 +177,7 @@ const ExpenseMoreActionsButton = ({
               </Action>
             )}
             {permissions?.canSeeInvoiceInfo && expense?.type === expenseTypes.INVOICE && (
-              <ExpenseInvoiceDownloadHelper expense={expense} collective={collective} onError={onError}>
+              <ExpenseInvoiceDownloadHelper expense={expense} collective={expense.account} onError={onError}>
                 {({ isLoading, downloadInvoice }) => (
                   <Action loading={isLoading} onClick={downloadInvoice} disabled={processExpense.loading || isDisabled}>
                     <IconDownload size="16px" />
