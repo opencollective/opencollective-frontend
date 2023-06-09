@@ -178,7 +178,7 @@ const editPendingContributionMutation = gql`
 
 const validate = values => {
   const errors = requireFields(values, [
-    'amount.valueInCents',
+    'totalAmount.valueInCents',
     'fromAccount',
     'toAccount',
     'expectedAt',
@@ -237,9 +237,9 @@ const getApplicableTaxType = (collective, host) => {
 const getAmountsFromValues = values => {
   const total = values.totalAmount?.valueInCents || 0;
   const tip = values.platformTipAmount?.valueInCents || 0;
-  const contribution = total ? total - tip : null;
-  const tax = !values.tax?.rate ? 0 : Math.round(contribution - contribution / (1 + values.tax.rate));
-  const gross = contribution - tax;
+  const contribution = total ? Math.round(total - tip) : null;
+  const gross = Math.round(contribution / (1 + (values.tax?.rate || 0)));
+  const tax = Math.round(contribution - gross);
   const hostFee = Math.round(gross * (values.hostFeePercent / 100));
   const valid = total > 0 && contribution > 0;
   return { total, tip, contribution, tax, gross, hostFee, valid };
@@ -249,7 +249,6 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const formik = useFormikContext<any>();
   const { values, isSubmitting, setFieldValue } = formik;
   const intl = useIntl();
-
   const [getCollectiveInfo, { data, loading: collectiveLoading }] = useLazyQuery(
     createPendingContributionModalCollectiveQuery,
     {
@@ -353,6 +352,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               collective={field.value}
               disabled={Boolean(edit)}
+              preload
             />
           )}
         </Field>
@@ -505,7 +505,6 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
                 maxWidth="100%"
                 onChange={value => form.setFieldValue(field.name, value)}
                 onBlur={() => form.setFieldTouched(field.name, true)}
-                required
               />
             )}
           </Field>
@@ -839,7 +838,8 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
               });
             } else {
               const order = {
-                ...values,
+                ...omit(values, ['totalAmount']), // Total amount is transformed to amount when passed to the API
+                amount: { ...values.amount, valueInCents: amounts.gross },
                 fromAccount: buildAccountReference(values.fromAccount),
                 toAccount: values.childAccount
                   ? buildAccountReference(values.childAccount)
@@ -847,7 +847,6 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
                 childAccount: undefined,
                 tier: !values.tier ? null : { id: values.tier.id },
                 expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
-                amount: { ...values.amount, valueInCents: amounts.gross },
                 tax,
               };
 
