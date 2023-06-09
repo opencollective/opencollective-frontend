@@ -533,6 +533,12 @@ export const expensesListFieldsFragment = gql`
           currency
         }
       }
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+        }
+      }
       ... on AccountWithParent {
         parent {
           id

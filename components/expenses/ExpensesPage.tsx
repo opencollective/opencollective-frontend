@@ -171,6 +171,18 @@ const Expenses = props => {
                 suggestedTags={suggestedTags(data?.account)}
                 isInverted={query.direction === 'SUBMITTED'}
                 view={query.direction === 'SUBMITTED' ? 'submitter' : undefined}
+                useDrawer={isDashboard}
+                openExpenseLegacyId={Number(router.query.openExpenseId)}
+                setOpenExpenseLegacyId={legacyId => {
+                  router.push(
+                    {
+                      pathname: expensesRoute,
+                      query: buildFilterLinkParams({ ...query, openExpenseId: legacyId }),
+                    },
+                    undefined,
+                    { shallow: true },
+                  );
+                }}
               />
               <Flex mt={5} justifyContent="center">
                 <Pagination
