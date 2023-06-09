@@ -17,7 +17,7 @@ import { margin } from 'styled-system';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import useClipboard from '../../lib/hooks/useClipboard';
-import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { getCollectivePageCanonicalURL, getCollectivePageRoute } from '../../lib/url-helpers';
 
 import { Flex } from '../Grid';
 import PopupMenu from '../PopupMenu';
@@ -66,7 +66,6 @@ const Action = styled.button`
  */
 const ExpenseMoreActionsButton = ({
   expense,
-  collective,
   onError,
   onEdit,
   isDisabled,
@@ -194,8 +193,8 @@ const ExpenseMoreActionsButton = ({
             <Action
               onClick={() =>
                 linkAction === 'link'
-                  ? router.push(`${getCollectivePageRoute(collective)}/expenses/${expense.legacyId}`)
-                  : copy(window.location.href)
+                  ? router.push(`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`)
+                  : copy(`${getCollectivePageCanonicalURL(expense.account)}/expenses/${expense.legacyId}`)
               }
               disabled={processExpense.loading || isDisabled}
             >
@@ -234,12 +233,12 @@ ExpenseMoreActionsButton.propTypes = {
       canSeeInvoiceInfo: PropTypes.bool,
       canMarkAsIncomplete: PropTypes.bool,
     }),
-  }),
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    parent: PropTypes.shape({
+    account: PropTypes.shape({
       slug: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      parent: PropTypes.shape({
+        slug: PropTypes.string.isRequired,
+      }),
     }),
   }),
   /** Called with an error if anything wrong happens */
