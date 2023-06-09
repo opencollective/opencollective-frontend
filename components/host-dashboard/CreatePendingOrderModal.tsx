@@ -9,6 +9,7 @@ import { cloneDeep, debounce, omit, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields, verifyEmailPattern } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { CreatePendingContributionModalQuery, OrderPageQuery } from '../../lib/graphql/types/v2/graphql';
@@ -23,6 +24,7 @@ import { confirmContributionFieldsFragment } from '../ContributionConfirmationMo
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
@@ -693,6 +695,20 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           isLargeAmount
         />
 
+        {Boolean(tipAmount && amountInCents && tipAmount >= amountInCents) && (
+          <MessageBox type="warning" mt={2}>
+            <FormattedMessage
+              id="Warning.TipAmountContributionWarning"
+              defaultMessage="You are about to make a contribution of {contributionAmount} to {accountName} that includes a {tipAmount} tip to the Open Collective platform. The tip amount looks unusually high.{newLine}{newLine}Are you sure you want to do this?"
+              values={{
+                contributionAmount: formatCurrency(fundingAmount, currency, { locale: intl.locale }),
+                tipAmount: formatCurrency(tipAmount, currency, { locale: intl.locale }),
+                accountName: collective.name,
+                newLine: ' ',
+              }}
+            />
+          </MessageBox>
+        )}
         {error && <MessageBoxGraphqlError error={error} mt={3} fontSize="13px" />}
       </ModalBody>
       <ModalFooter>
