@@ -3042,6 +3042,7 @@
   "WebhookEvents.COLLECTIVE_UPDATE_CREATED": "New update drafted",
   "WebhookEvents.CONNECTED_ACCOUNT_CREATED": "חשבון מקושר נוסף",
   "WebhookEvents.TICKET_CONFIRMED": "הכטיס נוצא ואושר",
+  "WebhookEvents.VIRTUAL_CARD_PURCHASE": "New virtual card purchase",
   "webhooks.remove": "הסרת Webhook",
   "webhooks.save": "שמירת {count} Webhooks",
   "webhooks.url.label": "כתובת",
