@@ -3042,6 +3042,7 @@
   "WebhookEvents.COLLECTIVE_UPDATE_CREATED": "New update drafted",
   "WebhookEvents.CONNECTED_ACCOUNT_CREATED": "Під'єднаний обліковий запис додано",
   "WebhookEvents.TICKET_CONFIRMED": "Квиток підтверджено",
+  "WebhookEvents.VIRTUAL_CARD_PURCHASE": "New virtual card purchase",
   "webhooks.remove": "Вилучити вебхук",
   "webhooks.save": "Зберегти {count} вебхуків",
   "webhooks.url.label": "URL-адреса",
