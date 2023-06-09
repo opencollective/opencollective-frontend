@@ -3042,6 +3042,7 @@
   "WebhookEvents.COLLECTIVE_UPDATE_CREATED": "Nueva entrada redactada",
   "WebhookEvents.CONNECTED_ACCOUNT_CREATED": "Cuenta conexa añadida",
   "WebhookEvents.TICKET_CONFIRMED": "Ticket confirmado",
+  "WebhookEvents.VIRTUAL_CARD_PURCHASE": "New virtual card purchase",
   "webhooks.remove": "Eliminar webhook",
   "webhooks.save": "Guardar {count} webhooks",
   "webhooks.url.label": "URL",

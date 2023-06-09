@@ -3042,6 +3042,7 @@
   "WebhookEvents.COLLECTIVE_UPDATE_CREATED": "New update drafted",
   "WebhookEvents.CONNECTED_ACCOUNT_CREATED": "Pripojený účet pridaný",
   "WebhookEvents.TICKET_CONFIRMED": "Vstupenka potvrdená",
+  "WebhookEvents.VIRTUAL_CARD_PURCHASE": "New virtual card purchase",
   "webhooks.remove": "Odstrániť webhook",
   "webhooks.save": "Uložiť {count} webhookov",
   "webhooks.url.label": "URL",

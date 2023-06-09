@@ -176,11 +176,11 @@ const ExpenseBudgetItem = ({
   onProcess,
   selected,
   expandExpense,
+  useDrawer,
 }: ExpenseBudgetItemProps) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const [showFilesViewerModal, setShowFilesViewerModal] = React.useState(false);
-  const useDrawer = LoggedInUser?.hasEarlyAccess('expense-drawer');
   const featuredProfile = isInverted ? expense?.account : expense?.payee;
   const isAdminView = view === 'admin';
   const isSubmitterView = view === 'submitter';
@@ -449,6 +449,7 @@ type ExpenseBudgetItemProps = {
   expense: Expense & { amountInAccountCurrency: Amount };
   selected: boolean;
   expandExpense?: () => void;
+  useDrawer: boolean;
 };
 
 ExpenseBudgetItem.propTypes = {
@@ -518,6 +519,7 @@ ExpenseBudgetItem.propTypes = {
   }),
   selected: PropTypes.bool,
   expandExpense: PropTypes.func,
+  useDrawer: PropTypes.bool,
 };
 
 ExpenseBudgetItem.defaultProps = {

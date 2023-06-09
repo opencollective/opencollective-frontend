@@ -3042,6 +3042,7 @@
   "WebhookEvents.COLLECTIVE_UPDATE_CREATED": "Nowy draft aktualizacji",
   "WebhookEvents.CONNECTED_ACCOUNT_CREATED": "Dodano podłączone konto",
   "WebhookEvents.TICKET_CONFIRMED": "Zgłoszenie potwierdzone",
+  "WebhookEvents.VIRTUAL_CARD_PURCHASE": "New virtual card purchase",
   "webhooks.remove": "Usuń webhook",
   "webhooks.save": "Zapisz {count} webhooków",
   "webhooks.url.label": "Adres URL",
