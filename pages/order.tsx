@@ -250,7 +250,12 @@ const TransactionDetails = ({
   children: [React.ReactNode, React.ReactNode, React.ReactNode?, React.ReactNode?];
   [key: string]: any;
 }) => (
-  <TransactionDetailsWrapper {...props} alignItems="center" justifyContent="space-between">
+  <TransactionDetailsWrapper
+    data-cy="transaction-details-wrapper"
+    {...props}
+    alignItems="center"
+    justifyContent="space-between"
+  >
     <Box>
       <Box fontWeight="400" fontSize="14px" lineHeight="20px" color="black.900">
         {title}
