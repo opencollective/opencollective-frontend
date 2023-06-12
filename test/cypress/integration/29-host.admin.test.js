@@ -1,6 +1,6 @@
 import { Sections } from '../../../components/collective-page/_constants';
 
-import { randomSlug } from '../support/faker';
+import { randomSlug, randStr } from '../support/faker';
 
 const scrollToSection = section => {
   // Wait for collective page to load before disabling smooth scroll
@@ -118,37 +118,63 @@ describe('host dashboard', () => {
   });
 
   describe('Pending `Contributions', () => {
-    it('Create new pending contribution', () => {
+    it('Create new pending contribution, edit it and mark it as paid', () => {
+      // Create contribution
       cy.login({ redirect: '/brusselstogetherasbl/admin/pending-contributions' });
       cy.get('[data-cy="create-pending-contribution"]:first').click();
       cy.get('[data-cy="create-pending-contribution-to"]:first').type('Veganizer');
-      cy.wait(2000);
       cy.contains('[data-cy=select-option]', 'Veganizer BXL').click();
       cy.get('[data-cy="create-pending-contribution-child"]:first').click();
       cy.contains('[data-cy=select-option]', 'None').click();
       cy.get('[data-cy="create-pending-contribution-source"]:first').type('Xavier');
-      cy.wait(2000);
       cy.contains('[data-cy=select-option]', 'Xavier').click();
       cy.get('[data-cy="create-pending-contribution-contact-name"]:first').type('Xavier');
       cy.get('[data-cy="create-pending-contribution-fromAccountInfo-email"').type('yourname@yourhost.com');
       cy.get('[data-cy="create-pending-contribution-amount"]:first').type('500');
+      cy.get('input#CreatePendingContribution-hostFeePercent').type('5'); // 5%
       cy.get('[data-cy="create-pending-contribution-expectedAt"]:first').click();
       cy.contains('[data-cy=select-option]', '1 month').click();
+      const description = `Generous donation ${randStr()}`;
+      cy.getByDataCy('create-pending-contribution-description').type(description);
       cy.get('[data-cy="create-pending-contribution-submit-btn"]:first').click();
-      cy.wait(2000);
-      cy.get('[data-cy="expense-title"]:first').click();
-      cy.contains('[data-cy="expense-description"]', 'Financial contribution to Veganizer BXL');
-      cy.get('[data-cy="MARK_AS_EXPIRED-button"]:first').click();
-      cy.get('[data-cy="confirmation-modal-continue"]:first').click();
-      cy.contains('[data-cy="order-status-msg"]', 'Expired');
-      cy.get('[data-cy="MARK_AS_PAID-button"]:first').click();
-      cy.get('[data-cy="payment-processor-fee"]').clear().type('4');
-      cy.get('[data-cy="platform-tip"]').clear().type('10');
-      cy.get('[data-cy="host-fee-percent"]').clear().type('9');
+      cy.contains('[data-cy="order-PENDING"]:first', description).as('createdContribution');
+      cy.get('@createdContribution').should('contain', 'Pending');
+      cy.get('@createdContribution').should('contain', 'for Veganizer BXL from Xavier');
+      cy.get('@createdContribution').should('contain', '€500.00');
+
+      // Go to contribution page
+      cy.get('@createdContribution').find('[data-cy=contribution-title]').click();
+      cy.getByDataCy('contribution-page-content'); // Wait for page to be loaded
+
+      // Mark as expired
+      cy.getByDataCy('MARK_AS_EXPIRED-button').click();
+      cy.getByDataCy('confirmation-modal-continue').click();
+      cy.contains('[data-cy=order-status-msg]', 'Expired');
+
+      // Mark as paid
+      cy.getByDataCy('MARK_AS_PAID-button').click();
+      cy.getByDataCy('payment-processor-fee').clear().type('4');
+      cy.getByDataCy('platform-tip').clear().type('10');
+      cy.getByDataCy('host-fee-percent').clear().type('9');
       cy.getByDataCy('order-confirmation-modal-submit').click();
-      cy.contains('span', '€490.00');
-      cy.contains('span', '-€44.10');
-      cy.contains('[data-cy="order-status-msg"]:first', 'Paid');
+      cy.contains('[data-cy="order-status-msg"]', 'Paid');
+
+      // Check transactions
+      cy.get('[data-cy=transaction-details-wrapper]:nth-child(1)')
+        .should('contain', description)
+        .should('contain', '€490.00')
+        .should('contain', 'Received by Veganizer BXL')
+        .should('contain', '-€4.00 EUR (Payment Processor Fee)');
+
+      cy.get('[data-cy=transaction-details-wrapper]:nth-child(2)')
+        .should('contain', 'Host Fee')
+        .should('contain', '-€44.10 EUR')
+        .should('contain', 'Paid by Veganizer BXL');
+
+      cy.get('[data-cy=transaction-details-wrapper]:nth-child(3)')
+        .should('contain', 'Financial contribution to Open Collective')
+        .should('contain', '-€10.00 EUR')
+        .should('contain', 'Paid by Xavier Damma');
     });
   });
 
