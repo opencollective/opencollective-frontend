@@ -354,7 +354,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
       title={intl.formatMessage(messages.title, { title: order.description, id: order.legacyId })}
     >
       <CollectiveNavbar collective={account} isLoading={!account} selectedCategory={NAVBAR_CATEGORIES.BUDGET} />
-      <Flex justifyContent="center">
+      <Flex justifyContent="center" data-cy="contribution-page-content">
         <Flex
           maxWidth="1200px"
           py={[0, 5]}
@@ -385,11 +385,11 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                 flexDirection={['column-reverse', 'row']}
                 alignItems={['stretch', 'center']}
                 justifyContent="space-between"
-                data-cy="expense-title"
+                data-cy="contribution-title"
                 mb={1}
               >
                 <Box mr={[0, 2]}>
-                  <H4 fontWeight="500" data-cy="expense-description">
+                  <H4 fontWeight="500" data-cy="contribution-description">
                     {order.description}
                   </H4>
                 </Box>
