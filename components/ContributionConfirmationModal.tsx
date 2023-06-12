@@ -176,7 +176,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
                     ? null
                     : ({
                         type: applicableTax,
-                        ...omit(order.tax, ['id']),
+                        ...omit(order.tax, ['id', '__typename']),
                         rate: taxPercent / 100,
                         amount: { valueInCents: taxAmount, currency },
                       } as TaxInput),
