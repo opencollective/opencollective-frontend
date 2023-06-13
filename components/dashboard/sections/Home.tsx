@@ -11,6 +11,7 @@ import { MessageAltError } from '@styled-icons/boxicons-regular/MessageAltError'
 import { MessageAltX } from '@styled-icons/boxicons-regular/MessageAltX';
 import { Note } from '@styled-icons/boxicons-regular/Note';
 import { Send } from '@styled-icons/boxicons-regular/Send';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -218,8 +219,10 @@ const ActivityListItem = ({ activity, isLast }: ActivityListItemProps) => {
 };
 
 const Home = (props: AdminSectionProps) => {
+  const router = useRouter();
+  const slug = router.query?.as || props.account.slug;
   const { data, loading, error, fetchMore } = useQuery(workspaceHomeQuery, {
-    variables: { slug: props.account.slug, limit: PAGE_SIZE },
+    variables: { slug, limit: PAGE_SIZE },
     context: API_V2_CONTEXT,
     fetchPolicy: 'network-only',
   });
