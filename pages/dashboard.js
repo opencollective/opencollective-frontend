@@ -117,9 +117,7 @@ const DashboardPage = () => {
   const [expandedSection, setExpandedSection] = React.useState(null);
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
-  const titleBase = account?.isHost
-    ? intl.formatMessage({ id: 'AdminPanel.button', defaultMessage: 'Admin' })
-    : intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' });
+  const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
 
   return (
     <DashboardContext.Provider value={{ selectedSection, expandedSection, setExpandedSection, account }}>

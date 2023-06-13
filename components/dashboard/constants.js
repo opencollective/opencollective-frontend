@@ -97,12 +97,12 @@ export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
 ];
 
 export const PAGE_TITLES = defineMessages({
-  [USER]: { id: 'AdminPanel.UserSettings', defaultMessage: 'User Settings' },
-  [ORGANIZATION]: { id: 'AdminPanel.OrganizationSettings', defaultMessage: 'Organization Settings' },
-  [COLLECTIVE]: { id: 'AdminPanel.CollectiveSettings', defaultMessage: 'Collective Settings' },
-  [FUND]: { id: 'AdminPanel.FundSettings', defaultMessage: 'Fund Settings' },
-  [EVENT]: { id: 'AdminPanel.EventSettings', defaultMessage: 'Event Settings' },
-  [PROJECT]: { id: 'AdminPanel.ProjectSettings', defaultMessage: 'Project Settings' },
+  [USER]: { id: 'UserDashboard', defaultMessage: 'User Dashboard' },
+  [ORGANIZATION]: { id: 'OrganizationDashboard', defaultMessage: 'Organization Dashboard' },
+  [COLLECTIVE]: { id: 'CollectiveDashboard', defaultMessage: 'Collective Dashboard' },
+  [FUND]: { id: 'FundDashboard', defaultMessage: 'Fund Dashboard' },
+  [EVENT]: { id: 'EventDashboard', defaultMessage: 'Event Dashboard' },
+  [PROJECT]: { id: 'ProjectDashboard', defaultMessage: 'Project Dashboard' },
 });
 
 export const SECTION_LABELS = defineMessages({
