@@ -120,18 +120,19 @@ CurrencyPicker.propTypes = {
  */
 const StyledInputAmount = ({
   currency,
-  currencyDisplay,
-  min,
-  max,
-  precision,
-  defaultValue,
+  currencyDisplay = 'SYMBOL',
+  name = 'amount',
+  min = 0,
+  max = 1000000000,
+  precision = 2,
+  defaultValue = undefined,
   value,
-  onBlur,
+  onBlur = undefined,
   onChange,
-  isEmpty,
-  hasCurrencyPicker,
-  onCurrencyChange,
-  availableCurrencies,
+  isEmpty = false,
+  hasCurrencyPicker = false,
+  onCurrencyChange = undefined,
+  availableCurrencies = Currency,
   ...props
 }) => {
   const [rawValue, setRawValue] = React.useState(value || defaultValue || '');
@@ -160,6 +161,7 @@ const StyledInputAmount = ({
       maxWidth="10em"
       step="0.01"
       {...props}
+      name={name}
       min={minAmount}
       max={isUndefined(max) ? max : max / 100}
       type="number"
@@ -178,6 +180,7 @@ const StyledInputAmount = ({
         )
       }
       onWheel={e => {
+        // Prevent changing the value when scrolling on the input
         e.preventDefault();
         e.target.blur();
       }}
@@ -234,15 +237,6 @@ StyledInputAmount.propTypes = {
   availableCurrencies: PropTypes.arrayOf(PropTypes.string),
   /** Accept all PropTypes from `StyledInputGroup` */
   ...StyledInputGroup.propTypes,
-};
-
-StyledInputAmount.defaultProps = {
-  min: 0,
-  max: 1000000000,
-  precision: 2,
-  currencyDisplay: 'SYMBOL',
-  name: 'amount',
-  availableCurrencies: Currency,
 };
 
 export default StyledInputAmount;

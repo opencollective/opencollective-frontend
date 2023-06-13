@@ -116,7 +116,7 @@
     "trix": "2.0.5",
     "uuid": "9.0.0",
     "validator": "13.9.0",
-    "winston": "3.8.2"
+    "winston": "3.9.0"
   },
   "scripts": {
     "build": "npm-run-all build:updates build:next build:server",

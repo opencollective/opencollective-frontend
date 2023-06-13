@@ -14,7 +14,14 @@ import { P, Span } from '../Text';
 import AddNewAttachedFilesButton from './AddNewAttachedFilesButton';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 
-const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue, title, description }) => {
+const ExpenseAttachedFilesForm = ({
+  onChange,
+  disabled,
+  defaultValue,
+  title,
+  description,
+  collectFilesOnly = false,
+}) => {
   const [files, setFiles] = React.useState(uniqBy(defaultValue, 'url'));
 
   return (
@@ -39,6 +46,7 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue, title, des
         {files?.length > 0 && (
           <AddNewAttachedFilesButton
             disabled={disabled}
+            collectFilesOnly={collectFilesOnly}
             onSuccess={newFiles => {
               const uploadedFiles = [...files, ...newFiles];
               setFiles(uploadedFiles);
@@ -63,6 +71,7 @@ const ExpenseAttachedFilesForm = ({ onChange, disabled, defaultValue, title, des
       ) : (
         <StyledDropzone
           {...attachmentDropzoneParams}
+          collectFilesOnly={collectFilesOnly}
           name="attachedFiles"
           kind="EXPENSE_ATTACHED_FILE"
           disabled={disabled}
@@ -87,6 +96,7 @@ ExpenseAttachedFilesForm.propTypes = {
   description: PropTypes.element.isRequired,
   disabled: PropTypes.bool,
   onChange: PropTypes.func,
+  collectFilesOnly: PropTypes.bool,
 };
 
 export default ExpenseAttachedFilesForm;

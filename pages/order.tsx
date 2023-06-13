@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useLazyQuery } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
-import { isEmpty, orderBy, round, toNumber } from 'lodash';
+import { isEmpty, orderBy, partition, round, toNumber } from 'lodash';
 import { GetServerSideProps } from 'next';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -60,38 +60,6 @@ const orderPageQuery = gql`
       }
       createdAt
       processedAt
-      pendingContributionData {
-        expectedAt
-        paymentMethod
-        ponumber
-        memo
-        fromAccountInfo {
-          name
-          email
-        }
-      }
-      memo
-      fromAccount {
-        id
-        slug
-        name
-        imageUrl
-      }
-      toAccount {
-        id
-        slug
-        name
-        imageUrl
-        ... on AccountWithHost {
-          bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
-        }
-      }
-      createdByAccount {
-        id
-        slug
-        name
-        imageUrl
-      }
       permissions {
         id
         canMarkAsExpired
@@ -282,7 +250,12 @@ const TransactionDetails = ({
   children: [React.ReactNode, React.ReactNode, React.ReactNode?, React.ReactNode?];
   [key: string]: any;
 }) => (
-  <TransactionDetailsWrapper {...props} alignItems="center" justifyContent="space-between">
+  <TransactionDetailsWrapper
+    data-cy="transaction-details-wrapper"
+    {...props}
+    alignItems="center"
+    justifyContent="space-between"
+  >
     <Box>
       <Box fontWeight="400" fontSize="14px" lineHeight="20px" color="black.900">
         {title}
@@ -322,6 +295,24 @@ const OverdueTag = styled.span`
   border-radius: 4px;
 `;
 
+const getTransactionsToDisplay = (account, transactions) => {
+  if (!transactions?.length) {
+    return [];
+  }
+
+  const isTipTransaction = t => ['PLATFORM_TIP', 'PLATFORM_TIP_DEBT'].includes(t.kind);
+  const isOwnAccount = t => t.account.id === account.id;
+
+  const [tipTransactions, otherTransactions] = partition(transactions, isTipTransaction);
+  const accountTransactions = otherTransactions.filter(t => t.account.id === account.id);
+  let tipTransactionsToDisplay = tipTransactions.filter(isOwnAccount);
+  if (tipTransactionsToDisplay.length === 0 && tipTransactions.length > 0) {
+    tipTransactionsToDisplay = tipTransactions.filter(t => t.kind === 'PLATFORM_TIP' && t.type === 'DEBIT');
+  }
+
+  return [...accountTransactions, ...tipTransactionsToDisplay];
+};
+
 export default function OrderPage(props: OrderPageQuery & { error: any }) {
   const { LoggedInUser } = useLoggedInUser();
   const [fetchData, query] = useLazyQuery<OrderPageQuery, OrderPageQueryVariables>(orderPageQuery, {
@@ -354,8 +345,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
     return <Custom404 />;
   }
 
-  const accountTransactions = order?.transactions?.filter(t => t.account.id === account.id);
-
+  const displayedTransactions = getTransactionsToDisplay(account, order.transactions);
   return (
     <Page
       collective={account}
@@ -364,7 +354,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
       title={intl.formatMessage(messages.title, { title: order.description, id: order.legacyId })}
     >
       <CollectiveNavbar collective={account} isLoading={!account} selectedCategory={NAVBAR_CATEGORIES.BUDGET} />
-      <Flex justifyContent="center">
+      <Flex justifyContent="center" data-cy="contribution-page-content">
         <Flex
           maxWidth="1200px"
           py={[0, 5]}
@@ -395,11 +385,11 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                 flexDirection={['column-reverse', 'row']}
                 alignItems={['stretch', 'center']}
                 justifyContent="space-between"
-                data-cy="expense-title"
+                data-cy="contribution-title"
                 mb={1}
               >
                 <Box mr={[0, 2]}>
-                  <H4 fontWeight="500" data-cy="expense-description">
+                  <H4 fontWeight="500" data-cy="contribution-description">
                     {order.description}
                   </H4>
                 </Box>
@@ -523,11 +513,11 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                 {isPending ? (
                   <React.Fragment>
                     <TransactionDetails>
-                      <FormattedMessage defaultMessage="Expected Amount" />
+                      <FormattedMessage defaultMessage="Expected Total Amount" />
                       <FormattedMoneyAmount
-                        currency={order.amount.currency}
+                        currency={order.totalAmount.currency}
                         precision={2}
-                        amount={order.amount.valueInCents}
+                        amount={order.totalAmount.valueInCents}
                       />
 
                       <FormattedMessage defaultMessage="Payment Fees not Considered" />
@@ -555,22 +545,32 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                         />
                       </TransactionDetails>
                     )}
-                    <TransactionDetails>
-                      <FormattedMessage defaultMessage="Expected Host Fees" />
-                      <FormattedMoneyAmount
-                        currency={order.amount.currency}
-                        precision={2}
-                        amount={
-                          (order.amount.valueInCents - (order.taxAmount?.valueInCents || 0)) *
-                          (order.hostFeePercent / -100)
-                        }
-                      />
-                      <React.Fragment></React.Fragment>
-                      <FormattedMessage defaultMessage="Based on default host fees, can be changed at settling time" />
-                    </TransactionDetails>
+                    {Boolean(order.hostFeePercent) && (
+                      <TransactionDetails>
+                        <FormattedMessage defaultMessage="Expected Host Fees" />
+                        <FormattedMoneyAmount
+                          currency={order.amount.currency}
+                          precision={2}
+                          amount={
+                            (order.amount.valueInCents - (order.taxAmount?.valueInCents || 0)) *
+                            (order.hostFeePercent / -100)
+                          }
+                        />
+                        <FormattedMessage defaultMessage="Based on default host fees, can be changed at settling time" />
+                      </TransactionDetails>
+                    )}
+                    {Boolean(order.platformTipAmount?.valueInCents) && (
+                      <TransactionDetails>
+                        <FormattedMessage defaultMessage="Expected Platform Tip" />
+                        <FormattedMoneyAmount
+                          currency={order.platformTipAmount.currency}
+                          amount={-order.platformTipAmount.valueInCents}
+                        />
+                      </TransactionDetails>
+                    )}
                   </React.Fragment>
                 ) : (
-                  orderBy(accountTransactions, ['legacyId'], ['desc']).map(transaction => {
+                  orderBy(displayedTransactions, ['legacyId'], ['desc']).map(transaction => {
                     const displayedAmount = getDisplayedAmount(transaction, account);
                     const displayPaymentFees =
                       transaction.type === 'CREDIT' &&

@@ -18,6 +18,11 @@ const StyledInputPercentage = ({ value, onChange, onBlur = null, ...props }) => 
       {...props}
       value={isNaN(value) ? '' : value}
       onChange={e => onChange(parseFloat(e.target.value))}
+      onWheel={e => {
+        // Prevent changing the value when scrolling on the input
+        e.preventDefault();
+        e.target.blur();
+      }}
       onBlur={e => {
         const newValue = clamp(round(parseFloat(e.target.value), 2), 0, 100);
         onChange(isNaN(newValue) ? value : newValue);
