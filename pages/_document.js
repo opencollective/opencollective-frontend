@@ -79,6 +79,7 @@ export default class IntlDocument extends Document {
       'HCAPTCHA_SITEKEY',
       'CAPTCHA_ENABLED',
       'CAPTCHA_PROVIDER',
+      'DISABLE_MOCK_UPLOADS',
     ]);
   }
 
