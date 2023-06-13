@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 import {
   background,
@@ -15,6 +14,8 @@ import {
   PositionProps,
   shadow,
   ShadowProps,
+  size,
+  SizeProps,
   space,
   SpaceProps,
   typography,
@@ -51,7 +52,7 @@ type ContainerProps = FlexboxProps &
   SpaceProps &
   TypographyProps &
   WhiteSpaceProps &
-  React.HTMLProps<HTMLDivElement> & {
+  SizeProps & {
     clearfix?: boolean;
   };
 
@@ -71,6 +72,7 @@ const Container = styled.div<ContainerProps>`
   ${position}
   ${layout}
   ${space}
+  ${size}
   ${typography}
   ${whiteSpace}
   ${props =>
