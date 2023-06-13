@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -14,10 +13,28 @@ import { P, Span } from '../Text';
 import AddNewAttachedFilesButton from './AddNewAttachedFilesButton';
 import AttachedFiles from './AttachedFiles';
 
-const AttachedFilesForm = ({ onChange, disabled, defaultValue, title, description, isMulti = true, kind, name }) => {
-  const [files, setFiles] = React.useState(isMulti ? uniqBy(defaultValue, 'url') : defaultValue ? [defaultValue] : []);
+type AttachedFilesFormProps = {
+  onChange: (files: any) => void;
+  disabled?: boolean;
+  defaultValue?: any;
+  title: React.ReactNode;
+  description: React.ReactNode;
+  isMulti?: boolean;
+  kind: string;
+  name: string;
+};
 
-  console.log('files', files);
+const AttachedFilesForm = ({
+  onChange,
+  disabled,
+  defaultValue,
+  title,
+  description,
+  isMulti = true,
+  kind,
+  name,
+}: AttachedFilesFormProps) => {
+  const [files, setFiles] = React.useState(isMulti ? uniqBy(defaultValue, 'url') : defaultValue ? [defaultValue] : []);
   return (
     <div>
       <Flex alignItems="center" my={16}>
@@ -81,18 +98,6 @@ const AttachedFilesForm = ({ onChange, disabled, defaultValue, title, descriptio
       )}
     </div>
   );
-};
-
-AttachedFilesForm.propTypes = {
-  defaultValue: PropTypes.arrayOf(
-    PropTypes.shape({
-      url: PropTypes.string.isRequired,
-    }),
-  ),
-  title: PropTypes.element.isRequired,
-  description: PropTypes.element.isRequired,
-  disabled: PropTypes.bool,
-  onChange: PropTypes.func,
 };
 
 export default AttachedFilesForm;

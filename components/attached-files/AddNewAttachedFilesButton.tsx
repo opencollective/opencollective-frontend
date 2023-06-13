@@ -24,7 +24,7 @@ const AddNewAttachedFilesButton = ({ disabled, mockImageGenerator, onSuccess, is
           <input {...getInputProps()} />
           <StyledButton buttonSize="tiny" type="button" minWidth={135} disabled={disabled} loading={isUploading}>
             +&nbsp;
-            <FormattedMessage id="AttachedFiles.AddAttachedFile" defaultMessage="Add new document" />
+            <FormattedMessage id="ExpenseForm.AddAttachedFile" defaultMessage="Add new document" />
           </StyledButton>
         </div>
       )}

@@ -2,7 +2,7 @@ import React from 'react';
 import { Field, Formik } from 'formik';
 import { isEmpty } from 'lodash';
 import { createPortal } from 'react-dom';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import AttachedFilesForm from '../attached-files/AttachedFilesForm';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -11,17 +11,6 @@ import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import { H4 } from '../Text';
-
-const msg = defineMessages({
-  collectiveLabel: {
-    id: `AgreementForm.collectiveLabel`,
-    defaultMessage: 'Collective',
-  },
-  titleLabel: {
-    id: `AgreementForm.titleLabel`,
-    defaultMessage: 'Title',
-  },
-});
 
 const AgreementForm = ({ onSubmit, hostLegacyId }) => {
   const intl = useIntl();
@@ -36,7 +25,9 @@ const AgreementForm = ({ onSubmit, hostLegacyId }) => {
 
   return (
     <div>
-      <H4>Add Agreement</H4>
+      <H4>
+        <FormattedMessage defaultMessage="Add Agreement" />
+      </H4>
       <Formik
         initialValues={initialValues}
         validate={validate}
@@ -61,7 +52,7 @@ const AgreementForm = ({ onSubmit, hostLegacyId }) => {
               disabled={!formik.isValid}
               loading={formik.isSubmitting}
             >
-              <FormattedMessage id="Submit" defaultMessage="Submit" />
+              <FormattedMessage id="submit" defaultMessage="Submit" />
             </StyledButton>
           );
 
@@ -71,7 +62,7 @@ const AgreementForm = ({ onSubmit, hostLegacyId }) => {
                 {({ field }) => (
                   <StyledInputField
                     name={field.name}
-                    label={intl.formatMessage(msg.collectiveLabel)}
+                    label={intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' })}
                     labelFontSize="13px"
                     flex="1"
                     mt={3}
@@ -103,7 +94,7 @@ const AgreementForm = ({ onSubmit, hostLegacyId }) => {
                 {({ field }) => (
                   <StyledInputField
                     name={field.name}
-                    label={intl.formatMessage(msg.titleLabel)}
+                    label={intl.formatMessage({ id: 'Title', defaultMessage: 'Title' })}
                     labelFontSize="13px"
                     flex="1"
                     mt={3}
@@ -121,7 +112,7 @@ const AgreementForm = ({ onSubmit, hostLegacyId }) => {
                 )}
               </Field>
               <AttachedFilesForm
-                title={<FormattedMessage id="UploadAgreement" defaultMessage="Upload agreement" />}
+                title={<FormattedMessage defaultMessage="Agreement file(s)" />}
                 name="fileUrl"
                 kind="AGREEMENT_ATTACHMENT"
                 isMulti={false}

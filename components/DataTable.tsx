@@ -1,5 +1,6 @@
 import React from 'react';
 import { ColumnDef, flexRender, getCoreRowModel, TableMeta, useReactTable } from '@tanstack/react-table';
+import { FormattedMessage } from 'react-intl';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table';
 import { P } from './Text';
@@ -50,7 +51,11 @@ export function DataTable<TData, TValue>({ columns, data, meta, loading, hideHea
           <TableRow>
             <TableCell colSpan={columns.length}>
               <P p={4} textAlign="center">
-                {loading ? 'Loading...' : 'No results.'}
+                {loading ? (
+                  <FormattedMessage id="Select.Loading" defaultMessage="Loading..." />
+                ) : (
+                  <FormattedMessage defaultMessage="No agreement" />
+                )}
               </P>
             </TableCell>
           </TableRow>

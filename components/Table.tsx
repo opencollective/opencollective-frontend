@@ -1,6 +1,8 @@
-/* eslint-disable react/prop-types */
 import * as React from 'react';
 import styled from 'styled-components';
+
+// We don't care about prop-types since we're in a TypeScript file
+/* eslint-disable react/prop-types */
 
 const StyledTable = styled.div`
   width: 100%;
@@ -75,7 +77,6 @@ const StyledTableCell = styled.td`
 
 const StyledTableCaption = styled.caption`
   margin-top: 16px;
-  // font-size: smaller;
   color: #718096;
 `;
 

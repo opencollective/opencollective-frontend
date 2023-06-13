@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-// TODO: move this to lib
 import { getDefaultFileName } from '../../lib/expenses';
 
 import { Box, Flex } from '../Grid';

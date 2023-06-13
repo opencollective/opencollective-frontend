@@ -4,9 +4,8 @@ import { BarChartAlt2 as Chart } from '@styled-icons/boxicons-regular/BarChartAl
 import { Cog } from '@styled-icons/boxicons-regular/Cog';
 import { Coin } from '@styled-icons/boxicons-regular/Coin';
 import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
-import { NetworkChart } from '@styled-icons/boxicons-regular/NetworkChart';
 import { File } from '@styled-icons/boxicons-regular/File';
-
+import { NetworkChart } from '@styled-icons/boxicons-regular/NetworkChart';
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { Transfer } from '@styled-icons/boxicons-regular/Transfer';
 import { Inbox } from '@styled-icons/octicons/Inbox';

@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import AgreementDrawer from '../agreements/AgreementDrawer';
-import AgreementsList from '../agreements/AgreementsList';
+import AgreementsTable from '../agreements/AgreementsTable';
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
@@ -87,7 +87,7 @@ const HostDashboardAgreements = ({ hostSlug, isDashboard }) => {
         agreement={agreementInDrawer}
         hostLegacyId={data?.host.legacyId} // legacyId required by CollectivePickerAsync
       />
-      <AgreementsList
+      <AgreementsTable
         agreements={data?.host.hostedAccountAgreements}
         error={error}
         loading={loading}
