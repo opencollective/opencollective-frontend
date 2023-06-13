@@ -39,18 +39,14 @@ const NavLinkContainer = styled(Box)`
 `;
 
 const NavButton = styled(StyledButton)`
-  color: ${theme.colors.slate[700]};
+  color: #323334;
   font-weight: 500;
-  font-size: 14px;
-  letter-spacing: 0px;
-  border-radius: 8px;
-
+  font-size: 16px;
   padding: 10px;
   cursor: pointer;
   @media (hover: hover) {
     :hover {
-      color: ${theme.colors.slate[900]};
-      background-color: ${theme.colors.slate[100]} !important;
+      background-color: white !important;
     }
   }
   :focus {
@@ -79,7 +75,9 @@ const MainNavItem = styled(StyledLink)`
   font-size: 14px;
   padding: 12px;
   border-radius: 8px;
-  transition: colors 0.1s;
+  transition-property: color, background-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
   @media (hover: hover) {
     :hover {
       color: ${theme.colors.slate[900]};
@@ -103,8 +101,9 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
     debouncedSetShowMobileMenu(state => !state);
   };
 
-  const loggedInUsingDashboard = LoggedInUser?.hasEarlyAccess('dashboard');
+  const useDashboard = LoggedInUser?.hasEarlyAccess('dashboard');
   const isLoggedOut = !loadingLoggedInUser && !LoggedInUser;
+  const notUsingDashboard = !loadingLoggedInUser && !useDashboard;
 
   return (
     <Flex
@@ -116,10 +115,10 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
       css={{ height: theme.sizes.navbarHeight, background: 'white' }}
       ref={ref}
     >
-      <Link href={loggedInUsingDashboard ? '/dashboard' : '/'}>
+      <Link href={useDashboard ? '/dashboard' : '/'}>
         <Flex alignItems="center">
           <Image width="36" height="36" src="/static/images/opencollective-icon.png" alt="Open Collective" />
-          {!loggedInUsingDashboard && (
+          {notUsingDashboard && (
             <Hide xs sm md>
               <Box mx={2}>
                 <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
@@ -128,8 +127,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
           )}
         </Flex>
       </Link>
-
-      {isLoggedOut ? (
+      {notUsingDashboard ? (
         <Flex alignItems="center" justifyContent={['flex-end', 'flex-end', 'center']} flex="1 1 auto">
           <Hide xs sm>
             <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
@@ -275,39 +273,30 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
           )}
           {showSearchModal && <SearchModal onClose={() => setShowSearchModal(false)} />}
         </Flex>
-      ) : (
-        <Flex alignItems="center" flex="1 1 auto" mx={4} gridGap={3}>
-          <Link href="/dashboard">
-            <MainNavItem as={Container} isActive={router.asPath.startsWith('/dashboard')}>
-              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-            </MainNavItem>
-          </Link>
-          <Link href="/search">
-            <MainNavItem as={Container} isActive={router.asPath.startsWith('/search')}>
-              <FormattedMessage defaultMessage="Explore" />
-            </MainNavItem>
-          </Link>
-          <PopupMenu
-            zIndex={2000}
-            closingEvents={['focusin', 'mouseover']}
-            Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
-              <NavButton isBorderless onMouseOver={onMouseOver} onFocus={onFocus} onClick={onClick} whiteSpace="nowrap">
-                <FormattedMessage id="resources" defaultMessage="Resources" />
-                {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-              </NavButton>
-            )}
-            placement="bottom"
-            popupMarginTop="-10px"
-          >
-            <NavLinkContainer>
-              <Link href="/help">
-                <NavItem as={Container} mt={16} mb={16}>
-                  <FormattedMessage defaultMessage="Help & Support" />
-                </NavItem>
+      ) : useDashboard ? (
+        <Flex flex="1 1 auto">
+          <Hide xs sm>
+            <Flex alignItems="center" flex="1 1 auto" mx={4} gridGap={3}>
+              <Link href="/dashboard">
+                <MainNavItem as={Container} isActive={router.asPath.startsWith('/dashboard')}>
+                  <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+                </MainNavItem>
               </Link>
-            </NavLinkContainer>
-          </PopupMenu>
+              <Link href="/search">
+                <MainNavItem as={Container} isActive={router.asPath.startsWith('/search')}>
+                  <FormattedMessage defaultMessage="Explore" />
+                </MainNavItem>
+              </Link>
+              <Link href="/help">
+                <MainNavItem as={Container} isActive={router.asPath.startsWith('/help')}>
+                  <FormattedMessage defaultMessage="Help & Support" />
+                </MainNavItem>
+              </Link>
+            </Flex>
+          </Hide>
         </Flex>
+      ) : (
+        <Flex flex="1 1 auto"></Flex>
       )}
 
       {showProfileAndChangelogMenu && (
@@ -326,7 +315,9 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
             <MenuIcon color="#aaaaaa" size={24} />
           </Flex>
         </Box>
-        {showMobileMenu && <TopBarMobileMenu closeMenu={toggleMobileMenu} />}
+        {showMobileMenu && (
+          <TopBarMobileMenu closeMenu={toggleMobileMenu} useDashboard={useDashboard} notUsingDashboard={isLoggedOut} />
+        )}
       </Hide>
     </Flex>
   );
