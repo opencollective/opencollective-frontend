@@ -104,6 +104,12 @@ export const ActivityDescriptionI18n = defineMessages({
   COLLECTIVE_EXPENSE_MISSING_RECEIPT: {
     defaultMessage: 'Notified admins about a missing receipt for <Expense>expense</Expense> on <Account></Account>',
   },
+  COLLECTIVE_EXPENSE_PUT_ON_HOLD: {
+    defaultMessage: 'Put <Expense>expense</Expense> on hold',
+  },
+  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD: {
+    defaultMessage: 'Released hold on <Expense>expense</Expense>',
+  },
   TAXFORM_REQUEST: {
     defaultMessage: 'Tax form request sent to <Account></Account>',
   },
