@@ -233,6 +233,8 @@ const Footer = () => {
     </Span>
   );
 
+  const useDashboard = LoggedInUser?.hasEarlyAccess('dashboard');
+
   return (
     <FooterContainer>
       <Container
@@ -260,12 +262,14 @@ const Footer = () => {
             maxWidth="300px"
           >
             <Flex my="12px">
-              <Image
-                src="/static/images/opencollectivelogo-footer-n.svg"
-                alt="Open Collective"
-                height={28}
-                width={167}
-              />
+              <Link href={useDashboard ? '/home' : '/'}>
+                <Image
+                  src="/static/images/opencollectivelogo-footer-n.svg"
+                  alt="Open Collective"
+                  height={28}
+                  width={167}
+                />
+              </Link>
             </Flex>
             <P
               textAlign={['center', 'left']}
