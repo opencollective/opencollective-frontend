@@ -33,7 +33,7 @@ const Expenses = props => {
   const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, onlySubmittedExpenses } = props;
 
   const expensesRoute = isDashboard
-    ? `/dashboard/${data?.account?.slug}/expenses`
+    ? `/dashboard/${variables.collectiveSlug}/expenses`
     : `${getCollectivePageRoute(data?.account)}/expenses`;
 
   useEffect(() => {
@@ -171,6 +171,18 @@ const Expenses = props => {
                 suggestedTags={suggestedTags(data?.account)}
                 isInverted={query.direction === 'SUBMITTED'}
                 view={query.direction === 'SUBMITTED' ? 'submitter' : undefined}
+                useDrawer={isDashboard}
+                openExpenseLegacyId={Number(router.query.openExpenseId)}
+                setOpenExpenseLegacyId={legacyId => {
+                  router.push(
+                    {
+                      pathname: expensesRoute,
+                      query: buildFilterLinkParams({ ...query, openExpenseId: legacyId }),
+                    },
+                    undefined,
+                    { shallow: true },
+                  );
+                }}
               />
               <Flex mt={5} justifyContent="center">
                 <Pagination
@@ -241,6 +253,7 @@ Expenses.propTypes = {
     offset: PropTypes.number.isRequired,
     limit: PropTypes.number.isRequired,
     account: PropTypes.object,
+    collectiveSlug: PropTypes.string,
   }),
   data: PropTypes.shape({
     account: PropTypes.shape({

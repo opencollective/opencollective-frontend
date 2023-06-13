@@ -40,9 +40,8 @@ import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
 import { H1, H5, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-import { editExpenseMutation, verifyExpenseMutation } from './graphql/mutations';
+import { editExpenseMutation } from './graphql/mutations';
 import { expensePageQuery } from './graphql/queries';
 import ExpenseForm, { msg as expenseFormMsg, prepareExpenseForSubmit } from './ExpenseForm';
 import ExpenseInviteNotificationBanner from './ExpenseInviteNotificationBanner';
@@ -105,7 +104,6 @@ function Expense(props) {
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
-  const { addToast } = useToasts();
   const [state, setState] = useState({
     error: error || null,
     status: draftKey && data?.expense?.status === expenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
@@ -134,16 +132,6 @@ function Expense(props) {
         editedExpense: data?.expense,
         isPollingEnabled: false,
       }));
-    }
-
-    const expense = data?.expense;
-    if (
-      expense?.status === expenseStatus.UNVERIFIED &&
-      expense?.permissions?.canEdit &&
-      LoggedInUser &&
-      expense?.createdByAccount?.slug === LoggedInUser?.collective?.slug
-    ) {
-      handleExpenseVerification();
     }
 
     handlePolling();
@@ -187,10 +175,6 @@ function Expense(props) {
   }, [error]);
 
   const [editExpense] = useMutation(editExpenseMutation, {
-    context: API_V2_CONTEXT,
-  });
-
-  const [verifyExpense] = useMutation(verifyExpenseMutation, {
     context: API_V2_CONTEXT,
   });
 
@@ -274,30 +258,6 @@ function Expense(props) {
     const collectiveType = collective.parent ? getCollectiveTypeForUrl(collective) : undefined;
     const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
     return router.replace(`${parentCollectiveSlugRoute}${collectiveTypeRoute}${collective.slug}/expenses`);
-  };
-
-  const handleExpenseVerification = async () => {
-    const expense = data?.expense;
-    await verifyExpense({
-      variables: { expense: { id: expense.id } },
-    });
-
-    const { parentCollectiveSlug, collectiveSlug, legacyExpenseId } = props;
-    const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
-    const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
-    const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
-    await router.push(
-      `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
-    );
-    refetch();
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
-      title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
-      message: (
-        <FormattedMessage id="Expense.SuccessPage" defaultMessage="You can edit or review updates on this page." />
-      ),
-    });
-    scrollToExpenseTop();
   };
 
   const onSummarySubmit = async editedExpense => {
@@ -460,26 +420,30 @@ function Expense(props) {
   return (
     <Box ref={expenseTopRef}>
       <ExpenseHeader inDrawer={inDrawer}>
-        <FormattedMessage
-          id="ExpenseTitle"
-          defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} <LinkExpense>{id}</LinkExpense> to <LinkCollective>{collectiveName}</LinkCollective>"
-          values={{
-            type: expense?.type,
-            id: expense?.legacyId,
-            LinkExpense: text => {
-              if (inDrawer) {
-                return (
-                  <Link href={`/${expense?.account.slug}/expenses/${expense?.legacyId}`}>
-                    <span>#{text}</span>
-                  </Link>
-                );
-              }
-              return <span>#{text}</span>;
-            },
-            collectiveName: expense?.account.name,
-            LinkCollective: text => <LinkCollective collective={expense?.account}>{text}</LinkCollective>,
-          }}
-        />
+        {expense?.type && expense?.account ? (
+          <FormattedMessage
+            id="ExpenseTitle"
+            defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} <LinkExpense>{id}</LinkExpense> to <LinkCollective>{collectiveName}</LinkCollective>"
+            values={{
+              type: expense?.type,
+              id: expense?.legacyId,
+              LinkExpense: text => {
+                if (inDrawer) {
+                  return (
+                    <Link href={`/${expense?.account.slug}/expenses/${expense?.legacyId}`}>
+                      <span>#{text}</span>
+                    </Link>
+                  );
+                }
+                return <span>#{text}</span>;
+              },
+              collectiveName: expense?.account.name,
+              LinkCollective: text => <LinkCollective collective={expense?.account}>{text}</LinkCollective>,
+            }}
+          />
+        ) : (
+          <LoadingPlaceholder height={32} maxWidth={'200px'} />
+        )}
       </ExpenseHeader>
 
       {state.error && (
@@ -732,7 +696,7 @@ Expense.propTypes = {
   draftKey: PropTypes.string,
   edit: PropTypes.string,
   client: PropTypes.object,
-  data: PropTypes.object.isRequired,
+  data: PropTypes.object,
   loading: PropTypes.bool,
   error: PropTypes.any,
   refetch: PropTypes.func,

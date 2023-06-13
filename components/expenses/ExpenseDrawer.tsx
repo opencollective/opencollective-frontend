@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import { useApolloClient, useLazyQuery } from '@apollo/client';
-import { themeGet } from '@styled-system/theme-get';
-import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
@@ -11,52 +9,38 @@ import Drawer from '../Drawer';
 import { expensePageQuery } from './graphql/queries';
 import Expense from './Expense';
 
-export const SummaryHeader = styled.span`
-  > a {
-    color: inherit;
-    text-decoration: underline;
-    outline: none;
-    :hover {
-      color: ${themeGet('colors.black.600')};
-    }
-  }
-`;
-
-export default function ExpenseDrawer({
-  open,
-  handleClose,
-  expense,
-}: {
-  open: boolean;
+type ExpenseDrawerProps = {
   handleClose: () => void;
-  expense?: { legacyId: number };
-}) {
+  openExpenseLegacyId?: number;
+  initialExpenseValues?: any;
+};
+
+export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initialExpenseValues }: ExpenseDrawerProps) {
   const client = useApolloClient();
   const [getExpense, { data, loading, error, startPolling, stopPolling, refetch, fetchMore }] = useLazyQuery(
     expensePageQuery,
     {
-      variables: getVariableFromProps({ legacyExpenseId: expense?.legacyId }),
       context: API_V2_CONTEXT,
     },
   );
 
   useEffect(() => {
-    if (open) {
-      getExpense();
+    if (openExpenseLegacyId) {
+      getExpense({ variables: getVariableFromProps({ legacyExpenseId: openExpenseLegacyId }) });
     }
-  }, [open]);
+  }, [openExpenseLegacyId]);
 
   return (
-    <Drawer open={open} onClose={handleClose} showActionsContainer>
+    <Drawer open={Boolean(openExpenseLegacyId)} onClose={handleClose} showActionsContainer>
       <Expense
-        data={{ ...data, expense: { ...expense, ...data?.expense } }}
+        data={initialExpenseValues ? { ...data, expense: { ...initialExpenseValues, ...data?.expense } } : data}
         // Making sure to initially set loading to true before the query is called
         loading={loading || (!data && !error)}
         error={error}
         refetch={refetch}
         client={client}
         fetchMore={fetchMore}
-        legacyExpenseId={expense?.legacyId}
+        legacyExpenseId={openExpenseLegacyId}
         startPolling={startPolling}
         stopPolling={stopPolling}
       />

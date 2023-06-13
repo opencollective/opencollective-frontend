@@ -8,7 +8,7 @@ import { attachmentDropzoneParams } from './lib/attachments';
 
 import StyledButton from '../StyledButton';
 
-const AddNewAttachedFilesButton = ({ disabled, mockImageGenerator, onSuccess }) => {
+const AddNewAttachedFilesButton = ({ disabled, mockImageGenerator, onSuccess, collectFilesOnly }) => {
   const { isUploading, uploadFiles } = useImageUploader({
     isMulti: true,
     mockImageGenerator,
@@ -17,14 +17,19 @@ const AddNewAttachedFilesButton = ({ disabled, mockImageGenerator, onSuccess }) 
     accept: attachmentDropzoneParams.accept,
   });
 
+  const onDrop = React.useCallback(
+    (acceptedFiles, rejectedFiles) => {
+      if (collectFilesOnly) {
+        onSuccess(acceptedFiles, rejectedFiles);
+      } else {
+        uploadFiles(acceptedFiles, rejectedFiles);
+      }
+    },
+    [collectFilesOnly, uploadFiles, onSuccess],
+  );
+
   return (
-    <Dropzone
-      {...attachmentDropzoneParams}
-      name="addAttachedFile"
-      disabled={disabled}
-      multiple={true}
-      onDrop={uploadFiles}
-    >
+    <Dropzone {...attachmentDropzoneParams} name="addAttachedFile" disabled={disabled} multiple={true} onDrop={onDrop}>
       {({ getRootProps, getInputProps }) => (
         <div {...getRootProps()}>
           <input {...getInputProps()} />
@@ -49,6 +54,7 @@ AddNewAttachedFilesButton.propTypes = {
   disabled: PropTypes.bool,
   onSuccess: PropTypes.func,
   mockImageGenerator: PropTypes.func,
+  collectFilesOnly: PropTypes.bool,
 };
 
 export default AddNewAttachedFilesButton;

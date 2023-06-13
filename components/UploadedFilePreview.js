@@ -159,7 +159,7 @@ const UploadedFilePreview = ({
       {...props}
       maxWidth={size}
       {...(isText || !openFileViewer
-        ? { href: url, openInNewTab: true, as: Link }
+        ? { href: url, openInNewTab: true, as: url.startsWith('/') ? Link : StyledLink }
         : {
             onClick: () => {
               openFileViewer(url);

@@ -1,5 +1,4 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
-import PropTypes from 'prop-types';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import MUIDrawer from '@mui/material/Drawer';
 import { XMark } from '@styled-icons/heroicons-outline/XMark';
 import { themeGet } from '@styled-system/theme-get';

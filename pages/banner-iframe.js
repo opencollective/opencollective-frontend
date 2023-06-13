@@ -335,7 +335,6 @@ class BannerIframe extends React.Component {
       <IFrameContainer linkColor={style} ref={node => (this.node = node)}>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900" />
           <title>{`${collectiveSlug} collectives`}</title>
         </Head>
         {backers.organizations + backers.collectives + backers.users === 0 && (

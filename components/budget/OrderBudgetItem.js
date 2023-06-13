@@ -101,7 +101,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
                       textDecoration="none"
                       color="black.900"
                       fontSize={fontSize}
-                      data-cy="expense-title"
+                      data-cy="contribution-title"
                     >
                       {value}
                     </H3>

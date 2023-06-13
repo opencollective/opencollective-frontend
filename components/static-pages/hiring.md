@@ -8,9 +8,9 @@ Do you want to get paid to work on your passion for open source, mutual aid, and
 
 Open Collective is a financial and legal toolbox for grassroots groups. We support 15,000 groups and 30+ nonprofits around the world with one shared backend solution for fundraising and money management. This year our Collectives are on track to raise and spend $35 million dollars in full transparency.
 
-<!--<strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>-->
+<strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>
 
-## Customer Support Representative
+<!--## Customer Support Representative
 
 [Open Collective](https://opencollective.com/) is currently seeking a Customer Support Representative who is passionate about the future of money, collective work, transparent budgets, open source, mutual aid, and distributed leadership.
 
@@ -84,7 +84,7 @@ A few more notes about our team:
 
 ### Join us!
 
-We’d love to hear from you. Applications are open through June 2nd. [To apply](https://coda.io/form/Application-Open-Collective-Customer-Support-Representative_dJ3tGEm2kIw). If you have any questions, reach out to us at [support@opencollective.com](mailto:support@opencollective.com).
+We’d love to hear from you. Applications are open through June 2nd. [To apply](https://coda.io/form/Application-Open-Collective-Customer-Support-Representative_dJ3tGEm2kIw). If you have any questions, reach out to us at [support@opencollective.com](mailto:support@opencollective.com).-->
 
 <!--## [Open Collective Foundation](https://opencollective.foundation/): Finance Admin
 
