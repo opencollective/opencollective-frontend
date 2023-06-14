@@ -6,6 +6,7 @@ import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { Edit as IconEdit } from '@styled-icons/feather/Edit';
 import { Flag as FlagIcon } from '@styled-icons/feather/Flag';
 import { Link as IconLink } from '@styled-icons/feather/Link';
+import { MinusCircle } from '@styled-icons/feather/MinusCircle';
 import { Pause as PauseIcon } from '@styled-icons/feather/Pause';
 import { Play as PlayIcon } from '@styled-icons/feather/Play';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
@@ -122,6 +123,19 @@ const ExpenseMoreActionsButton = ({
               >
                 <Check size={12} />
                 <FormattedMessage id="actions.approve" defaultMessage="Approve" />
+              </Action>
+            )}
+            {permissions?.canReject && props.isViewingExpenseInHostContext && (
+              <Action
+                loading={processExpense.loading && processExpense.currentAction === 'REJECT'}
+                disabled={processExpense.loading || isDisabled}
+                onClick={async () => {
+                  setProcessModal('REJECT');
+                  setOpen(false);
+                }}
+              >
+                <MinusCircle size={12} />
+                <FormattedMessage id="actions.reject" defaultMessage="Reject" />
               </Action>
             )}
             {permissions?.canMarkAsIncomplete && (
