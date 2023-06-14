@@ -25,6 +25,7 @@ import { isSupportedExpenseType } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute, getDashboardRoute, getSettingsRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
@@ -310,7 +311,11 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
       type: NAVBAR_ACTION_TYPE.SETTINGS,
       component: (
         <Link
-          href={LoggedInUser.hasEarlyAccess('dashboard') ? getDashboardRoute(collective) : getSettingsRoute(collective)}
+          href={
+            LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
+              ? getDashboardRoute(collective)
+              : getSettingsRoute(collective)
+          }
           data-cy="edit-collective-btn"
         >
           <ActionButton tabIndex="-1">
@@ -318,7 +323,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
             <Span ml={2}>
               {collective.isHost ? (
                 <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
-              ) : LoggedInUser.hasEarlyAccess('dashboard') ? (
+              ) : LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) ? (
                 <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
               ) : (
                 <FormattedMessage id="Settings" defaultMessage="Settings" />
@@ -381,7 +386,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
       component: (
         <Link
           href={
-            LoggedInUser?.hasEarlyAccess('dashboard')
+            LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
               ? getDashboardRoute(collective, 'manage-contributions')
               : `${getCollectivePageRoute(collective)}/manage-contributions`
           }
