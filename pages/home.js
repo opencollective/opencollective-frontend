@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
 // import Banner from '../components/collectives/Banner';
@@ -10,6 +10,8 @@ import OpenCollectiveIs from '../components/home/OpenCollectiveIsSection';
 import RaiseMoney from '../components/home/RaiseMoneySection';
 import TheFutureIsCollective from '../components/home/TheFutureIsCollectiveSection';
 import Page from '../components/Page';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { useRouter } from 'next/router';
 
 const messages = defineMessages({
   defaultTitle: {
@@ -23,6 +25,15 @@ const messages = defineMessages({
 
 const HomePage = () => {
   const { formatMessage } = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (router.asPath === '/' && LoggedInUser?.hasEarlyAccess('dashboard')) {
+      router.replace(`/dashboard/${LoggedInUser.getLastDashboardSlug()}`);
+    }
+  }, [LoggedInUser, router.asPath]);
+
   return (
     <Page
       metaTitle={formatMessage(messages.defaultTitle)}

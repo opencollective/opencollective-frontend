@@ -106,7 +106,10 @@ const DashboardPage = () => {
   // Redirect to the dashboard of the logged in user if no slug is provided
   useEffect(() => {
     if (!slug && LoggedInUser) {
-      router.push(`/dashboard/${LoggedInUser.collective.slug}`);
+      router.replace(`/dashboard/${LoggedInUser.getLastDashboardSlug()}`);
+    }
+    if (slug) {
+      LoggedInUser?.saveLastDashboardSlug(slug);
     }
   }, [slug, LoggedInUser]);
 
