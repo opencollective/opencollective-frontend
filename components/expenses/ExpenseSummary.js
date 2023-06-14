@@ -180,7 +180,7 @@ const ExpenseSummary = ({
             <LinkCollective collective={createdByAccount}>
               <Avatar collective={createdByAccount} size={24} />
             </LinkCollective>
-            <P ml={2} fontSize="12px" color="black.600" data-cy="expense-author">
+            <P ml={2} fontSize="12px" color="black.700" data-cy="expense-author">
               {expense.requestedByAccount ? (
                 <FormattedMessage
                   id="Expense.RequestedByOnDate"
@@ -270,12 +270,12 @@ const ExpenseSummary = ({
                         collapsePadding={22}
                       />
                     ) : (
-                      <Span color="black.500" fontStyle="italic">
+                      <Span color="black.600" fontStyle="italic">
                         <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
                       </Span>
                     )}
                     {!isGrant && (
-                      <Span mt={1} fontSize="12px" color="black.500">
+                      <Span mt={1} fontSize="12px" color="black.700">
                         <FormattedMessage
                           id="withColon"
                           defaultMessage="{item}:"
