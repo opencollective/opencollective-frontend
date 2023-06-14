@@ -1,5 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
+import { Plus as PlusIcon } from '@styled-icons/fa-solid/Plus';
 import { isEmpty, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -11,7 +12,7 @@ import AgreementsTable from '../agreements/AgreementsTable';
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
-import { H1 } from '../Text';
+import { H1, Span } from '../Text';
 
 const hostDashboardAgreementsQuery = gql`
   query HostAgreements($hostSlug: String!, $limit: Int!, $offset: Int!, $accounts: [AccountReferenceInput]) {
@@ -72,12 +73,16 @@ const HostDashboardAgreements = ({ hostSlug, isDashboard }) => {
         </H1>
         <Box mx="auto" />
         <StyledButton
+          buttonStyle="primary"
           onClick={() => {
             setAgreementInDrawer(null);
             setAgreementDrawerOpen(true);
           }}
         >
-          New Agreement
+          <Span mr={2}>
+            <FormattedMessage id="HostDashboardAgreements.New" defaultMessage="Add New" />
+          </Span>
+          <PlusIcon size={14} color="#FFFFFF" />
         </StyledButton>
       </Flex>
       <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />

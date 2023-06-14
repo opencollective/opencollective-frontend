@@ -2,7 +2,7 @@ import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { ColumnDef, TableMeta } from '@tanstack/react-table';
 import dayjs from 'dayjs';
-import { FormattedMessage } from 'react-intl';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Agreement } from '../../lib/graphql/types/v2/graphql';
@@ -11,6 +11,7 @@ import { useWindowResize } from '../../lib/hooks/useWindowResize';
 import Avatar from '../Avatar';
 import { DataTable } from '../DataTable';
 import { Box, Flex } from '../Grid';
+import LinkCollective from '../LinkCollective';
 import { Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
@@ -50,7 +51,8 @@ export const cardColumns: ColumnDef<Agreement>[] = [
         <CellButton onClick={() => meta.openAgreement(agreement)}>
           <span>{agreement.title}</span>
           <Flex alignItems="center" py={2} gridGap={2}>
-            <Avatar collective={agreement.account} radius={20} />{' '}
+            <Avatar collective={agreement.account} radius={20} />
+            &nbsp;
             <Span letterSpacing="0" truncateOverflow fontWeight="500">
               {agreement.account.name}
             </Span>
@@ -63,44 +65,49 @@ export const cardColumns: ColumnDef<Agreement>[] = [
 
 export const tableColumns: ColumnDef<Agreement>[] = [
   {
+    accessorKey: 'account',
+    header: () => <FormattedMessage defaultMessage="Account" />,
+    cell: ({ cell }) => {
+      const account = cell.getValue() as Agreement['account'];
+      return (
+        <Flex alignItems="center" p={3} gridGap={2}>
+          <Avatar collective={account} radius={20} />
+          <LinkCollective collective={account}>
+            <Span letterSpacing="0" color="black.700" truncateOverflow fontSize="16px" fontWeight="700">
+              {account.name}
+            </Span>
+          </LinkCollective>
+        </Flex>
+      );
+    },
+  },
+  {
     accessorKey: 'title',
-    header: 'Title',
+    header: () => <FormattedMessage id="Title" defaultMessage="Title" />,
     cell: ({ cell, row, table }) => {
       const title = cell.getValue() as Agreement['title'];
       const agreement = row.original;
       const meta = table.options.meta as AgreementMeta;
       return (
         <CellButton onClick={() => meta.openAgreement(agreement)}>
-          <span>{title}</span>
+          <Span fontSize="16px" fontWeight="700">
+            {title}
+          </Span>
         </CellButton>
       );
     },
   },
-  {
-    accessorKey: 'account',
-    header: 'Collective',
-    cell: ({ cell }) => {
-      const account = cell.getValue() as Agreement['account'];
-      return (
-        <Flex alignItems="center" p={3} gridGap={2}>
-          <Avatar collective={account} radius={20} />{' '}
-          <Span letterSpacing="0" truncateOverflow fontWeight="500">
-            {account?.name}
-          </Span>
-        </Flex>
-      );
-    },
-  },
+
   {
     accessorKey: 'expiresAt',
-    header: 'Expires at',
+    header: () => <FormattedMessage id="Attachment.expiresAt" defaultMessage="Expires" />,
     cell: ({ cell }) => {
       const expiresAt = cell.getValue() as Agreement['expiresAt'];
       return (
-        <Box p={3}>
+        <Box p={3} fontSize="14px">
           {expiresAt ? (
             <Span letterSpacing="0" truncateOverflow>
-              {dayjs(expiresAt).format('MMM D, YYYY')}
+              <FormattedDate value={expiresAt} month="short" day="numeric" year="numeric" />
             </Span>
           ) : (
             <Span fontStyle="italic" color="black.500">
@@ -113,7 +120,7 @@ export const tableColumns: ColumnDef<Agreement>[] = [
   },
   {
     accessorKey: 'attachment',
-    header: '',
+    header: () => <FormattedMessage id="Expense.Attachment" defaultMessage="Attachment" />,
     cell: ({ cell }) => {
       const attachment = cell.getValue() as Agreement['attachment'];
       if (!attachment?.url) {
