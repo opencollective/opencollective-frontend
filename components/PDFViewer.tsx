@@ -63,9 +63,8 @@ const PDFViewer = ({ pdfUrl, contentWrapperRef }) => {
         {Array.from(new Array(numPages), (el, index) => (
           <Page
             className="pdf-page"
-            onLoadError={error => {
-              console.log('PDF page load error:', error);
-            }}
+            loading={null}
+            error={null}
             pageNumber={index + 1}
             key={`page_${index + 1}`}
             onLoadSuccess={page => {
