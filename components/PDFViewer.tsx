@@ -55,10 +55,17 @@ const PDFViewer = ({ pdfUrl, contentWrapperRef }) => {
             <FormattedMessage defaultMessage="Failed to load PDF file." id="PDFViewer.error" />
           </Span>
         }
+        options={{
+          cMapUrl: `/static/cmaps/`,
+          cMapPacked: true,
+        }}
       >
         {Array.from(new Array(numPages), (el, index) => (
           <Page
             className="pdf-page"
+            onLoadError={error => {
+              console.log('PDF page load error:', error);
+            }}
             pageNumber={index + 1}
             key={`page_${index + 1}`}
             onLoadSuccess={page => {
