@@ -29,7 +29,7 @@ const Home = (props: AdminSectionProps) => {
     fetchPolicy: 'network-only',
   });
 
-  const activities: WorkspaceHomeQuery['activityTimeline']['nodes'] = data?.activityTimeline?.nodes || [];
+  const activities: WorkspaceHomeQuery['activities']['nodes'] = data?.activities?.nodes || [];
 
   return (
     <Container>
@@ -63,9 +63,9 @@ const Home = (props: AdminSectionProps) => {
             fetchMore({
               variables: { offset: activities.length },
               updateQuery: (prevResult, { fetchMoreResult }) => {
-                const activityTimeline = fetchMoreResult?.activityTimeline;
-                activityTimeline.nodes = [...prevResult.activityTimeline.nodes, ...activityTimeline.nodes];
-                return { activityTimeline };
+                const activities = fetchMoreResult?.activities;
+                activities.nodes = [...prevResult.activities.nodes, ...activities.nodes];
+                return { activities };
               },
             })
           }

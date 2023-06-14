@@ -76,7 +76,7 @@ const getIcon = (type: ActivityType) => {
 };
 
 type ActivityListItemProps = {
-  activity: WorkspaceHomeQuery['activityTimeline']['nodes'][0];
+  activity: WorkspaceHomeQuery['activities']['nodes'][0];
   isLast: boolean;
 };
 

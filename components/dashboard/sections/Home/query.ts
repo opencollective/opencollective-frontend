@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 export const workspaceHomeQuery = gql`
   query WorkspaceHome($slug: String!, $limit: Int, $offset: Int) {
-    activityTimeline(slug: $slug, limit: $limit, offset: $offset) {
+    activities(account: { slug: $slug }, limit: $limit, offset: $offset, timeline: true) {
       limit
       offset
       totalCount
