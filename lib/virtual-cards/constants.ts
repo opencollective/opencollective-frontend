@@ -68,4 +68,4 @@ export const VirtualCardStatusI18n = defineMessages({
     id: 'virtualCard.status.canceled',
     defaultMessage: 'Canceled',
   },
-})
+});
