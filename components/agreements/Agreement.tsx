@@ -71,14 +71,14 @@ export default function Agreement({ agreement }: AgreementProps) {
         </Flex>
       </Box>
       {agreement.attachment && (
-        <Container my="36px">
+        <Container mt="36px">
           <P fontSize="16px" fontWeight="700" mb="18px">
-            <FormattedMessage defaultMessage="Agreement file(s)" />
+            <FormattedMessage defaultMessage="Agreement file" />
           </P>
           Todo
         </Container>
       )}
-      <StyledHr my="16px" />
+      <StyledHr mt="32px" mb="16px" borderColor="black.300" />
     </div>
   );
 }

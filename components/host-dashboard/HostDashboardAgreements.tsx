@@ -53,14 +53,14 @@ const getVariablesFromQuery = query => {
   };
 };
 
-const HostDashboardAgreements = ({ hostSlug, isDashboard }) => {
+const HostDashboardAgreements = ({ hostSlug }) => {
   const router = useRouter();
   const query = router.query;
   const [agreementDrawerOpen, setAgreementDrawerOpen] = React.useState(false);
   const [agreementInDrawer, setAgreementInDrawer] = React.useState(null);
   //  const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-agreements` : `/${hostSlug}/admin/host-agreements`;
   const queryVariables = { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) };
-  const { data, error, loading } = useQuery(hostDashboardAgreementsQuery, {
+  const { data, error, loading, refetch } = useQuery(hostDashboardAgreementsQuery, {
     variables: queryVariables,
     context: API_V2_CONTEXT,
   });
@@ -87,15 +87,25 @@ const HostDashboardAgreements = ({ hostSlug, isDashboard }) => {
       </Flex>
       <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
       <AgreementDrawer
+        defaultState={agreementInDrawer ? 'view' : 'create'}
         open={agreementDrawerOpen}
-        onClose={() => setAgreementDrawerOpen(false)}
         agreement={agreementInDrawer}
         hostLegacyId={data?.host.legacyId} // legacyId required by CollectivePickerAsync
+        onClose={() => setAgreementDrawerOpen(false)}
+        onCreate={() => {
+          setAgreementDrawerOpen(false);
+          refetch({ ...queryVariables, offset: 0 }); // Resetting offset to 0 since entries are displayed by creation date DESC
+        }}
+        onEdit={() => {
+          // No need to refetch, local Apollo cache is updated automatically
+          setAgreementDrawerOpen(false);
+        }}
       />
       <AgreementsTable
         agreements={data?.host.hostedAccountAgreements}
-        error={error}
         loading={loading}
+        nbPlaceholders={NB_AGREEMENTS_DISPLAYED}
+        emptyMessage={<FormattedMessage defaultMessage="No agreements" />}
         openAgreement={agreement => {
           setAgreementDrawerOpen(true);
           setAgreementInDrawer(agreement);

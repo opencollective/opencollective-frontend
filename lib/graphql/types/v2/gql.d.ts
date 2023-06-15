@@ -30,6 +30,18 @@ export function gql(source: "\n  query AdminPanel($slug: String!) {\n    account
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  fragment AgreementFields on Agreement {\n    id\n    title\n    expiresAt\n    account {\n      id\n      legacyId\n      slug\n      imageUrl\n      name\n    }\n    attachment {\n      id\n      url\n    }\n  }\n"): typeof import('./graphql').AgreementFieldsFragmentDoc;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation AddAgreement(\n    $host: AccountReferenceInput!\n    $account: AccountReferenceInput!\n    $attachment: Upload\n    $title: NonEmptyString!\n    $expiresAt: DateTime\n  ) {\n    addAgreement(host: $host, title: $title, account: $account, attachment: $attachment, expiresAt: $expiresAt) {\n      id\n      ...AgreementFields\n    }\n  }\n  \n"): typeof import('./graphql').AddAgreementDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation EditAgreement($agreement: AgreementReferenceInput!, $title: NonEmptyString!, $expiresAt: DateTime) {\n    editAgreement(agreement: $agreement, title: $title, expiresAt: $expiresAt) {\n      id\n      ...AgreementFields\n    }\n  }\n  \n"): typeof import('./graphql').EditAgreementDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  fragment NavbarFields on CollectiveFeatures {\n    id\n    ABOUT\n    CONNECTED_ACCOUNTS\n    RECEIVE_FINANCIAL_CONTRIBUTIONS\n    RECURRING_CONTRIBUTIONS\n    EVENTS\n    PROJECTS\n    USE_EXPENSES\n    RECEIVE_EXPENSES\n    USE_EXPENSES\n    COLLECTIVE_GOALS\n    TOP_FINANCIAL_CONTRIBUTORS\n    CONVERSATIONS\n    UPDATES\n    TEAM\n    CONTACT_FORM\n    RECEIVE_HOST_APPLICATIONS\n    HOST_DASHBOARD\n    TRANSACTIONS\n    REQUEST_VIRTUAL_CARDS\n  }\n"): typeof import('./graphql').NavbarFieldsFragmentDoc;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -127,6 +139,10 @@ export function gql(source: "\n  mutation EditPendingContribution($order: Pendin
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query DisputedContributionsWarning($hostSlug: String!) {\n    host(slug: $hostSlug) {\n      id\n      slug\n      hasDisputedOrders\n      hasInReviewOrders\n    }\n  }\n"): typeof import('./graphql').DisputedContributionsWarningDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query HostAgreements($hostSlug: String!, $limit: Int!, $offset: Int!, $accounts: [AccountReferenceInput]) {\n    host(slug: $hostSlug) {\n      id\n      legacyId\n      hostedAccountAgreements(limit: $limit, offset: $offset, accounts: $accounts) {\n        totalCount\n        nodes {\n          id\n          title\n          expiresAt\n          account {\n            id\n            legacyId\n            slug\n            imageUrl\n            name\n          }\n          attachment {\n            id\n            url\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').HostAgreementsDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

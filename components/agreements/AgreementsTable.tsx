@@ -1,7 +1,6 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { ColumnDef, TableMeta } from '@tanstack/react-table';
-import dayjs from 'dayjs';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -139,9 +138,10 @@ type AgreementsTableProps = {
   agreements: { nodes: Agreement[] };
   openAgreement: (agreement: Agreement) => void;
   loading?: boolean;
+  nbPlaceholders?: number;
 };
 
-export default function AgreementsTable({ agreements, openAgreement, loading }: AgreementsTableProps) {
+export default function AgreementsTable({ agreements, openAgreement, loading, nbPlaceholders }: AgreementsTableProps) {
   const [isTableView, setIsTableView] = React.useState(true);
   useWindowResize(() => setIsTableView(window.innerWidth > 1024));
   const columns = isTableView ? tableColumns : cardColumns;
@@ -152,6 +152,7 @@ export default function AgreementsTable({ agreements, openAgreement, loading }: 
       data={agreements?.nodes || []}
       meta={{ openAgreement } as AgreementMeta}
       loading={loading}
+      nbPlaceholders={nbPlaceholders}
     />
   );
 }

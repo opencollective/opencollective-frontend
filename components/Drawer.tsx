@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import MUIDrawer from '@mui/material/Drawer';
 import { XMark } from '@styled-icons/heroicons-outline/XMark';
 import { themeGet } from '@styled-system/theme-get';
@@ -56,20 +56,9 @@ export default function Drawer({
   maxWidth?: string;
   showActionsContainer?: boolean;
 }) {
-  const drawerActionsRef = React.useRef(null);
   const [drawerActionsContainer, setDrawerActionsContainer] = useState(null);
   const twoFactorPrompt = useTwoFactorAuthenticationPrompt();
   const disableEnforceFocus = Boolean(twoFactorPrompt?.isOpen);
-
-  useEffect(() => {
-    if (open) {
-      // Use timeout to set the ref just after the drawer is open to prevent setting it to undefined
-      setTimeout(() => {
-        setDrawerActionsContainer(drawerActionsRef?.current);
-      }, 0);
-    }
-  }, [open]);
-
   return (
     <DrawerActionsContext.Provider value={drawerActionsContainer}>
       <MUIDrawer anchor="right" open={open} onClose={onClose} disableEnforceFocus={disableEnforceFocus}>
@@ -90,7 +79,7 @@ export default function Drawer({
               flexShrink="0"
               justifyContent="space-between"
               p={3}
-              ref={drawerActionsRef}
+              ref={ref => setDrawerActionsContainer(ref)}
             />
           )}
         </StyledDrawerContainer>
