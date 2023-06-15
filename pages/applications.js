@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { getDashboardRoute } from '../lib/url-helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
@@ -26,7 +27,7 @@ class Apps extends React.Component {
             </MessageBox>
             <StyledLink
               href={
-                LoggedInUser.hasEarlyAccess('dashboard')
+                LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
                   ? getDashboardRoute(LoggedInUser.collective, 'for-developers')
                   : `/${LoggedInUser.collective.slug}/admin/for-developers`
               }
