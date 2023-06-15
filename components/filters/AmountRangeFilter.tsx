@@ -149,7 +149,7 @@ export default function AmountRangeFilter(props: AmountRangeFilterProps) {
               )}
             </StyledInputField>
             <StyledInputField
-              label={<FormattedMessage defaultMessage="To" />}
+              label={<FormattedMessage id="To" defaultMessage="To" />}
               labelFontWeight="700"
               labelProps={{ fontWeight: 'bold', fontSize: '16px', display: 'flex' }}
               name="amountTo"

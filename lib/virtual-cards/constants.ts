@@ -57,7 +57,7 @@ export const VirtualCardLimitIntervalI18n = defineMessages({
 
 export const VirtualCardStatusI18n = defineMessages({
   [VirtualCardStatus.ACTIVE]: {
-    id: 'virtualCard.status.active',
+    id: 'Subscriptions.Active',
     defaultMessage: 'Active',
   },
   [VirtualCardStatus.INACTIVE]: {
