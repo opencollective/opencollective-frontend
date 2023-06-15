@@ -47,5 +47,4 @@ scripts/publish-components/.tmp
 public/static/scripts/pdf.worker.min.js
 
 # pdfjs character maps - copied from node_modules by webpack (see next.config.js)
-public/static/cmaps/**
-!public/static/cmaps/.keep
+public/static/cmaps
