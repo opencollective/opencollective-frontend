@@ -11,6 +11,7 @@ import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
@@ -23,6 +24,7 @@ import Link from './Link';
 import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
 import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
+import PreviewFeaturesModal from './PreviewFeaturesModal';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
@@ -65,14 +67,30 @@ UserMenuLinkEntry.propTypes = {
   isMobileMenuLink: PropTypes.bool,
 };
 
-const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, logOutHandler }) => {
-  const useDashboard = LoggedInUser.hasEarlyAccess('dashboard');
+const UserAccountLinks = ({
+  setShowNewsAndUpdates,
+  LoggedInUser,
+  isMobileView,
+  logOutHandler,
+  setShowPreviewFeaturesModal,
+}) => {
+  const useDashboard = LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
+  const hasAvailablePreviewFeatures = LoggedInUser?.getAvailablePreviewFeatures()?.length > 0;
 
   return (
     <Box>
       <UserMenuLinkEntry as={Span} isMobileMenuLink={isMobileView} onClick={() => setShowNewsAndUpdates(true)}>
         <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
       </UserMenuLinkEntry>
+      {hasAvailablePreviewFeatures && (
+        <UserMenuLinkEntry
+          as="button"
+          isMobileMenuLink={isMobileView}
+          onClick={() => setShowPreviewFeaturesModal(true)}
+        >
+          <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />
+        </UserMenuLinkEntry>
+      )}
       <Query
         query={memberInvitationsCountQuery}
         variables={{ memberAccount: { slug: LoggedInUser.collective.slug } }}
@@ -165,6 +183,7 @@ UserAccountLinks.propTypes = {
   logOutHandler: PropTypes.func,
   profileMenuLink: PropTypes.bool,
   isMobileView: PropTypes.bool,
+  setShowPreviewFeaturesModal: PropTypes.func,
 };
 
 class TopBarProfileMenu extends React.Component {
@@ -177,7 +196,7 @@ class TopBarProfileMenu extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { showProfileMenu: false, loading: true, showUserAccount: false };
+    this.state = { showProfileMenu: false, showPreviewFeaturesModal: false, loading: true, showUserAccount: false };
   }
 
   componentDidMount() {
@@ -234,7 +253,7 @@ class TopBarProfileMenu extends React.Component {
 
   renderProfileMenu() {
     const { LoggedInUser, setShowNewsAndUpdates } = this.props;
-    const { showUserAccount } = this.state;
+    const { showUserAccount, showPreviewFeaturesModal } = this.state;
 
     return (
       <Container
@@ -321,6 +340,7 @@ class TopBarProfileMenu extends React.Component {
                       LoggedInUser={LoggedInUser}
                       setShowNewsAndUpdates={setShowNewsAndUpdates}
                       logOutHandler={this.logout}
+                      setShowPreviewFeaturesModal={show => this.setState({ showPreviewFeaturesModal: show })}
                     />
                   </Box>
                 </Hide>
@@ -405,11 +425,15 @@ class TopBarProfileMenu extends React.Component {
                   LoggedInUser={LoggedInUser}
                   setShowNewsAndUpdates={setShowNewsAndUpdates}
                   logOutHandler={this.logout}
+                  setShowPreviewFeaturesModal={show => this.setState({ showPreviewFeaturesModal: show })}
                 />
               </Box>
             </Hide>
           )}
         </Flex>
+        {showPreviewFeaturesModal && (
+          <PreviewFeaturesModal onClose={() => this.setState({ showPreviewFeaturesModal: false })} />
+        )}
       </Container>
     );
   }
