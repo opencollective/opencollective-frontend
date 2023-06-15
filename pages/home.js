@@ -11,6 +11,7 @@ import RaiseMoney from '../components/home/RaiseMoneySection';
 import TheFutureIsCollective from '../components/home/TheFutureIsCollectiveSection';
 import Page from '../components/Page';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { useRouter } from 'next/router';
 
 const messages = defineMessages({
@@ -29,7 +30,7 @@ const HomePage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (router.asPath === '/' && LoggedInUser?.hasEarlyAccess('dashboard')) {
+    if (router.asPath === '/' && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)) {
       router.replace(`/dashboard/${LoggedInUser.getLastDashboardSlug()}`);
     }
   }, [LoggedInUser, router.asPath]);

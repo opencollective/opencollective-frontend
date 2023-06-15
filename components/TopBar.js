@@ -24,6 +24,7 @@ import { Span } from './Text';
 import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { useRouter } from 'next/router';
 
 const NavList = styled(Flex)`
@@ -218,7 +219,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
     debouncedSetShowMobileMenu(state => !state);
   };
 
-  const useDashboard = LoggedInUser?.hasEarlyAccess('dashboard');
+  const useDashboard = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
   const isLoggedOut = !loadingLoggedInUser && !LoggedInUser;
   const notUsingDashboard = !loadingLoggedInUser && !useDashboard;
 

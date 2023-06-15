@@ -23,6 +23,7 @@ import StyledLink from './StyledLink';
 import StyledSelect from './StyledSelect';
 import StyledTooltip from './StyledTooltip';
 import { P, Span } from './Text';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 const SocialLink = styled.a`
   align-items: center;
@@ -233,7 +234,7 @@ const Footer = () => {
     </Span>
   );
 
-  const useDashboard = LoggedInUser?.hasEarlyAccess('dashboard');
+  const useDashboard = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
 
   return (
     <FooterContainer>
