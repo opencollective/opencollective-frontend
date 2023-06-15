@@ -5,7 +5,6 @@ import { Undo } from '@styled-icons/fa-solid/Undo';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
-import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -200,17 +199,13 @@ function Expense(props) {
   const [showResetModal, setShowResetModal] = useState(false);
   const payoutProfiles = getPayoutProfiles(loggedInAccount);
 
-  let threadItems;
-  const getThreadItems = memoizeOne((comments = [], activities = []) => {
+  const threadItems = React.useMemo(() => {
+    const comments = expense?.comments?.nodes || [];
+    const activities = expense?.activities || [];
     return sortBy([...comments, ...activities], 'createdAt');
-  });
+  }, [expense]);
 
-  if (expense) {
-    threadItems = getThreadItems(expense.comments?.nodes, expense?.activities);
-  }
-
-  const memoizedSuggestedTags = memoizeOne(getSuggestedTags);
-  const suggestedTags = memoizedSuggestedTags(collective);
+  const suggestedTags = React.useMemo(() => getSuggestedTags(collective), [collective]);
 
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;
   const isEditingExistingExpense = isEditing && expense !== undefined;

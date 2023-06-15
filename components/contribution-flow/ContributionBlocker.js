@@ -84,6 +84,8 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     return { reason: CONTRIBUTION_BLOCKER.NO_CRYPTO_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
   } else if (account.settings.disableCustomContributions && !isCrypto && !tier) {
     return { reason: CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
+  } else if (isCrypto && !account.host.supportedPaymentMethods?.includes('CRYPTO')) {
+    return { reason: CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
   } else if (
     (!isCrypto && !account.host.supportedPaymentMethods?.length) ||
     (tierHasFixedInterval(tier) && !canContributeRecurring(account, loggedInUser))
