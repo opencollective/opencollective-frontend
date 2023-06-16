@@ -120,15 +120,21 @@ export const tableColumns: ColumnDef<Agreement>[] = [
   {
     accessorKey: 'attachment',
     header: () => <FormattedMessage id="Expense.Attachment" defaultMessage="Attachment" />,
+    meta: { align: 'right' },
     cell: ({ cell }) => {
       const attachment = cell.getValue() as Agreement['attachment'];
       if (!attachment?.url) {
-        return null;
+        return <Box size={48} m={3} />;
       }
       return (
-        <Box p={3}>
-          <UploadedFilePreview url={attachment?.url} />
-        </Box>
+        <Flex p={3} justifyContent="flex-end">
+          <UploadedFilePreview
+            url={attachment?.url}
+            size={48}
+            borderRadius="8px"
+            boxShadow="0px 2px 5px rgba(0, 0, 0, 0.14)"
+          />
+        </Flex>
       );
     },
   },
@@ -139,6 +145,7 @@ type AgreementsTableProps = {
   openAgreement: (agreement: Agreement) => void;
   loading?: boolean;
   nbPlaceholders?: number;
+  emptyMessage?: React.ReactNode;
 };
 
 export default function AgreementsTable({ agreements, openAgreement, loading, nbPlaceholders }: AgreementsTableProps) {
@@ -153,6 +160,7 @@ export default function AgreementsTable({ agreements, openAgreement, loading, nb
       meta={{ openAgreement } as AgreementMeta}
       loading={loading}
       nbPlaceholders={nbPlaceholders}
+      emptyMessage={() => <FormattedMessage defaultMessage="No agreements" />}
     />
   );
 }

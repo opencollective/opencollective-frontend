@@ -18,7 +18,7 @@ type AttachedFilesFormProps = {
   disabled?: boolean;
   defaultValue?: any;
   title: React.ReactNode;
-  description: React.ReactNode;
+  description?: React.ReactNode;
   isMulti?: boolean;
   kind: string;
   name: string;
@@ -29,7 +29,7 @@ const AttachedFilesForm = ({
   disabled,
   defaultValue,
   title,
-  description,
+  description = null,
   isMulti = true,
   kind,
   name,
@@ -54,23 +54,24 @@ const AttachedFilesForm = ({
           <PrivateInfoIcon color="#969BA3" size={12} />
         </Span>
         <StyledHr flex="1" borderColor="black.300" mx={2} />
-        {!isMulti && files?.length > 0 && (
+        {isMulti && files?.length > 0 && (
           <AddNewAttachedFilesButton
             isMulti={isMulti}
             kind={kind}
             disabled={disabled}
             onSuccess={data => {
-              const newFiles = isMulti ? data : [data];
-              const uploadedFiles = [...files, ...newFiles];
+              const uploadedFiles = [...files, data];
               setFiles(uploadedFiles);
               onChange(data);
             }}
           />
         )}
       </Flex>
-      <P fontSize="13px" color="black.600" mb={16}>
-        {description}
-      </P>
+      {description && (
+        <P fontSize="13px" color="black.600" mb={16}>
+          {description}
+        </P>
+      )}
       {files?.length > 0 ? (
         <AttachedFiles
           files={files}
@@ -87,12 +88,12 @@ const AttachedFilesForm = ({
           name={name}
           kind={kind}
           isMulti={isMulti}
-          disabled={disabled}
+          disabled={Boolean(disabled)}
           minHeight={72}
+          collectFilesOnly={true}
           onSuccess={data => {
-            const uploadedFiles = isMulti ? data : [data];
-            setFiles(uploadedFiles);
-            onChange(data);
+            setFiles(data);
+            onChange(data[0]);
           }}
         />
       )}

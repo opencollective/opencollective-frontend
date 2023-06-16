@@ -9,7 +9,9 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import AgreementDrawer from '../agreements/AgreementDrawer';
 import AgreementsTable from '../agreements/AgreementsTable';
+import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from '../agreements/fragments';
 import { Box, Flex } from '../Grid';
+import Pagination from '../Pagination';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { H1, Span } from '../Text';
@@ -23,23 +25,12 @@ const hostDashboardAgreementsQuery = gql`
         totalCount
         nodes {
           id
-          title
-          expiresAt
-          account {
-            id
-            legacyId
-            slug
-            imageUrl
-            name
-          }
-          attachment {
-            id
-            url
-          }
+          ...AgreementViewFields
         }
       }
     }
   }
+  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
 `;
 
 const NB_AGREEMENTS_DISPLAYED = 10;
@@ -51,6 +42,11 @@ const getVariablesFromQuery = query => {
     limit: (parseInt(query.limit) || NB_AGREEMENTS_DISPLAYED) * 2,
     accounts: accountIds ? accountIds.split(',').map(id => ({ id })) : undefined,
   };
+};
+
+const hasPagination = (data): boolean => {
+  const totalCount = data?.host?.hostedAccountAgreements?.totalCount;
+  return Boolean(totalCount && totalCount > NB_AGREEMENTS_DISPLAYED);
 };
 
 const HostDashboardAgreements = ({ hostSlug }) => {
@@ -86,8 +82,16 @@ const HostDashboardAgreements = ({ hostSlug }) => {
         </StyledButton>
       </Flex>
       <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
+      <AgreementsTable
+        agreements={data?.host.hostedAccountAgreements}
+        loading={loading}
+        nbPlaceholders={NB_AGREEMENTS_DISPLAYED}
+        openAgreement={agreement => {
+          setAgreementDrawerOpen(true);
+          setAgreementInDrawer(agreement);
+        }}
+      />
       <AgreementDrawer
-        defaultState={agreementInDrawer ? 'view' : 'create'}
         open={agreementDrawerOpen}
         agreement={agreementInDrawer}
         hostLegacyId={data?.host.legacyId} // legacyId required by CollectivePickerAsync
@@ -100,17 +104,21 @@ const HostDashboardAgreements = ({ hostSlug }) => {
           // No need to refetch, local Apollo cache is updated automatically
           setAgreementDrawerOpen(false);
         }}
-      />
-      <AgreementsTable
-        agreements={data?.host.hostedAccountAgreements}
-        loading={loading}
-        nbPlaceholders={NB_AGREEMENTS_DISPLAYED}
-        emptyMessage={<FormattedMessage defaultMessage="No agreements" />}
-        openAgreement={agreement => {
-          setAgreementDrawerOpen(true);
-          setAgreementInDrawer(agreement);
+        onDelete={() => {
+          setAgreementDrawerOpen(false);
+          refetch(queryVariables);
         }}
       />
+      <Flex my={4} justifyContent="center">
+        {hasPagination(data) && (
+          <Pagination
+            variant="input"
+            offset={queryVariables.offset}
+            limit={queryVariables.limit}
+            total={data?.host.hostedAccountAgreements.totalCount}
+          />
+        )}
+      </Flex>
     </Box>
   );
 };

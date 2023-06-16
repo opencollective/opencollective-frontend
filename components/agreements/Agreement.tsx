@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import { Agreement as GraphQLAgreement } from '../../lib/graphql/types/v2/graphql';
 
+import AttachedFiles from '../attached-files/AttachedFiles';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -75,7 +76,7 @@ export default function Agreement({ agreement }: AgreementProps) {
           <P fontSize="16px" fontWeight="700" mb="18px">
             <FormattedMessage defaultMessage="Agreement file" />
           </P>
-          Todo
+          <AttachedFiles files={[agreement.attachment]} />
         </Container>
       )}
       <StyledHr mt="32px" mb="16px" borderColor="black.300" />

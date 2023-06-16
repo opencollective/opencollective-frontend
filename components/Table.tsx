@@ -1,5 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import { textAlign, TextAlignProps } from 'styled-system';
 
 // We don't care about prop-types since we're in a TypeScript file
 /* eslint-disable react/prop-types */
@@ -65,6 +66,8 @@ const StyledTableHead = styled.th`
   &:has([role='checkbox']) {
     padding-right: 0;
   }
+
+  ${textAlign}
 `;
 
 const StyledTableCell = styled.td`
@@ -112,7 +115,7 @@ const TableRow = React.forwardRef<
 ));
 TableRow.displayName = 'TableRow';
 
-const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<HTMLTableCellElement>>(
+const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<HTMLTableCellElement> & TextAlignProps>(
   ({ className, ...props }, ref) => <StyledTableHead ref={ref} className={className} {...props} />,
 );
 TableHead.displayName = 'TableHead';

@@ -12,7 +12,7 @@ interface DataTableProps<TData, TValue> {
   loading?: boolean;
   meta?: TableMeta<any>;
   hideHeader?: boolean;
-  emptyMessage?: React.ReactNode;
+  emptyMessage?: () => React.ReactNode;
   nbPlaceholders?: number;
 }
 
@@ -39,8 +39,9 @@ export function DataTable<TData, TValue>({
           {table.getHeaderGroups().map(headerGroup => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map(header => {
+                const columnMeta = header.column.columnDef.meta || {};
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} textAlign={columnMeta['align'] || 'left'}>
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 );
@@ -75,7 +76,7 @@ export function DataTable<TData, TValue>({
           <TableRow>
             <TableCell colSpan={columns.length}>
               <P p={4} textAlign="center">
-                {emptyMessage || <FormattedMessage defaultMessage="No data" />}
+                {emptyMessage ? emptyMessage() : <FormattedMessage defaultMessage="No data" />}
               </P>
             </TableCell>
           </TableRow>

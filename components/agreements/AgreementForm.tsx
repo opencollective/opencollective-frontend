@@ -1,11 +1,12 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { is } from 'cypress/types/bluebird';
 import { Form, Formik } from 'formik';
 import { cloneDeep, pick } from 'lodash';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { getAccountReferenceInput } from '../../lib/collective.lib';
+import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -22,26 +23,9 @@ import StyledTextarea from '../StyledTextarea';
 import { H4 } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-const FIELD_LABEL_PROPS = { fontSize: 16, fontWeight: 700 };
+import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from './fragments';
 
-const AGREEMENT_FIELDS_FRAGMENT = gql`
-  fragment AgreementFields on Agreement {
-    id
-    title
-    expiresAt
-    account {
-      id
-      legacyId
-      slug
-      imageUrl
-      name
-    }
-    attachment {
-      id
-      url
-    }
-  }
-`;
+const FIELD_LABEL_PROPS = { fontSize: 16, fontWeight: 700 };
 
 const ADD_AGREEMENT_MUTATION = gql`
   mutation AddAgreement(
@@ -53,24 +37,27 @@ const ADD_AGREEMENT_MUTATION = gql`
   ) {
     addAgreement(host: $host, title: $title, account: $account, attachment: $attachment, expiresAt: $expiresAt) {
       id
-      ...AgreementFields
+      ...AgreementViewFields
     }
   }
-  ${AGREEMENT_FIELDS_FRAGMENT}
+  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
 `;
 
 const EDIT_AGREEMENT_MUTATION = gql`
   mutation EditAgreement($agreement: AgreementReferenceInput!, $title: NonEmptyString!, $expiresAt: DateTime) {
     editAgreement(agreement: $agreement, title: $title, expiresAt: $expiresAt) {
       id
-      ...AgreementFields
+      ...AgreementViewFields
     }
   }
-  ${AGREEMENT_FIELDS_FRAGMENT}
+  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
 `;
 
-const ActionButtons = ({ formik }) => (
+const ActionButtons = ({ formik, onCancel }) => (
   <Flex justifyContent="flex-end" width="100%">
+    <StyledButton type="button" minWidth={120} mr={2} onClick={onCancel}>
+      <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+    </StyledButton>
     <StyledButton
       type="submit"
       minWidth={120}
@@ -83,9 +70,9 @@ const ActionButtons = ({ formik }) => (
       }}
     >
       {formik.values.id ? (
-        <FormattedMessage defaultMessage="Edit Agreement" />
-      ) : (
         <FormattedMessage defaultMessage="Save Changes" />
+      ) : (
+        <FormattedMessage defaultMessage="Create Agreement" />
       )}
     </StyledButton>
   </Flex>
@@ -99,10 +86,11 @@ type AgreementFormProps = {
   hostLegacyId: number;
   onCreate: (Agreement) => void;
   onEdit: (Agreement) => void;
+  onCancel: () => void;
   agreement: Agreement;
 };
 
-const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit }: AgreementFormProps) => {
+const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: AgreementFormProps) => {
   const intl = useIntl();
   const { addToast } = useToasts();
   const initialValues = cloneDeep(agreement || {});
@@ -133,7 +121,8 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit }: AgreementF
                 message: intl.formatMessage({ defaultMessage: 'Agreement updated' }),
               });
             } else {
-              const variables = { ...values, host: { legacyId: hostLegacyId } };
+              const account = getAccountReferenceInput(values.account);
+              const variables = { ...values, account, host: { legacyId: hostLegacyId } };
               const result = await submitAgreement({ variables });
               onCreate?.(result.data.addAgreement);
               addToast({
@@ -165,8 +154,9 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit }: AgreementF
                     error={field.error}
                     hostCollectiveIds={[hostLegacyId]}
                     collective={formik.values.account}
+                    disabled={isEditing}
                     onChange={({ value }) => {
-                      formik.setFieldValue('account', { slug: value.slug });
+                      formik.setFieldValue('account', value);
                     }}
                   />
                 )}
@@ -192,8 +182,8 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit }: AgreementF
                 name="attachment"
                 kind="AGREEMENT_ATTACHMENT"
                 isMulti={false}
-                onChange={file => formik.setFieldValue('attachment', file.url)}
-                defaultValue={formik.values.attachment ? [formik.values.attachment] : undefined}
+                onChange={file => formik.setFieldValue('attachment', file)}
+                defaultValue={formik.values.attachment || undefined}
               />
               <StyledInputFormikField
                 name="expiresAt"
@@ -205,10 +195,14 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit }: AgreementF
                 {({ field }) => (
                   <StyledInput
                     {...field}
-                    type="datetime-local"
+                    type="date"
                     width="100%"
                     maxLength={60}
-                    onChange={e => formik.setFieldValue('expiresAt', e.target.value)}
+                    value={stripTime(formik.values.expiresAt)}
+                    onChange={e => {
+                      // Consider date input as UTC
+                      formik.setFieldValue('expiresAt', e.target.value ? `${e.target.value}T00:00:00.000Z` : null);
+                    }}
                   />
                 )}
               </StyledInputFormikField>
@@ -219,15 +213,15 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit }: AgreementF
                 label={intl.formatMessage({ id: 'expense.notes', defaultMessage: 'Notes' })}
                 labelProps={FIELD_LABEL_PROPS}
                 hint={intl.formatMessage({
-                  defaultMessage: 'Private note to the admins that will be displayed as a comment.',
+                  defaultMessage: 'Private note for the host admins.',
                 })}
               >
                 {({ field }) => <StyledTextarea {...field} width="100%" minHeight={125} maxLength={3000} showCount />}
               </StyledInputFormikField>
               {drawerActionsContainer ? (
-                createPortal(<ActionButtons formik={formik} />, drawerActionsContainer)
+                createPortal(<ActionButtons formik={formik} onCancel={onCancel} />, drawerActionsContainer)
               ) : (
-                <ActionButtons formik={formik} />
+                <ActionButtons formik={formik} onCancel={onCancel} />
               )}
             </Form>
           );
