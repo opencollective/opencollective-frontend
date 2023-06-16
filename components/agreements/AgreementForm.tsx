@@ -33,9 +33,17 @@ const ADD_AGREEMENT_MUTATION = gql`
     $account: AccountReferenceInput!
     $attachment: Upload
     $title: NonEmptyString!
+    $notes: String
     $expiresAt: DateTime
   ) {
-    addAgreement(host: $host, title: $title, account: $account, attachment: $attachment, expiresAt: $expiresAt) {
+    addAgreement(
+      host: $host
+      title: $title
+      account: $account
+      attachment: $attachment
+      expiresAt: $expiresAt
+      notes: $notes
+    ) {
       id
       ...AgreementViewFields
     }
@@ -44,8 +52,14 @@ const ADD_AGREEMENT_MUTATION = gql`
 `;
 
 const EDIT_AGREEMENT_MUTATION = gql`
-  mutation EditAgreement($agreement: AgreementReferenceInput!, $title: NonEmptyString!, $expiresAt: DateTime) {
-    editAgreement(agreement: $agreement, title: $title, expiresAt: $expiresAt) {
+  mutation EditAgreement(
+    $agreement: AgreementReferenceInput!
+    $title: NonEmptyString!
+    $expiresAt: DateTime
+    $notes: String
+    $attachment: Upload
+  ) {
+    editAgreement(agreement: $agreement, title: $title, expiresAt: $expiresAt, notes: $notes, attachment: $attachment) {
       id
       ...AgreementViewFields
     }
@@ -113,7 +127,14 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: 
         onSubmit={async values => {
           try {
             if (isEditing) {
-              const variables = { agreement: { id: agreement.id }, ...pick(values, ['title', 'expiresAt']) };
+              const editableFields = ['title', 'expiresAt', 'notes', 'attachment'];
+              const variables = { agreement: { id: agreement.id }, ...pick(values, editableFields) };
+
+              if (variables['attachment']?.id) {
+                // If the attachment is not changed, we don't want to send it to the API
+                delete variables['attachment'];
+              }
+
               const result = await submitAgreement({ variables });
               onEdit?.(result.data.editAgreement);
               addToast({

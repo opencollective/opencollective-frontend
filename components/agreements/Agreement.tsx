@@ -80,6 +80,16 @@ export default function Agreement({ agreement }: AgreementProps) {
         </Container>
       )}
       <StyledHr mt="32px" mb="16px" borderColor="black.300" />
+      {agreement.notes && (
+        <div>
+          <P fontSize="16px" fontWeight="700" mb="18px">
+            <FormattedMessage defaultMessage="Notes" />
+          </P>
+          <P fontSize="13px" fontWeight="400" color="black.800" whiteSpace="pre-line">
+            {agreement.notes}
+          </P>
+        </div>
+      )}
     </div>
   );
 }

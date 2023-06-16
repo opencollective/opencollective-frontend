@@ -76,8 +76,12 @@ const AttachedFilesForm = ({
         <AttachedFiles
           files={files}
           onRemove={idx => {
-            const updatedFiles = [...files];
-            updatedFiles.splice(idx, 1);
+            let updatedFiles = null;
+            if (isMulti) {
+              updatedFiles = [...files];
+              updatedFiles.splice(idx, 1);
+            }
+
             setFiles(updatedFiles);
             onChange(updatedFiles);
           }}

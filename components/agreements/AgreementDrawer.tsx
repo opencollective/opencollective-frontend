@@ -39,8 +39,11 @@ export default function AgreementDrawer({
           hostLegacyId={hostLegacyId}
           agreement={agreement}
           onCreate={onCreate}
-          onEdit={onEdit}
           onCancel={closeDrawer}
+          onEdit={agreement => {
+            onEdit?.(agreement);
+            closeDrawer();
+          }}
         />
       ) : (
         <AgreementWithActions agreement={agreement} onEdit={() => setEditing(true)} onDelete={onDelete} />

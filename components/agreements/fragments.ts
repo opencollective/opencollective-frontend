@@ -5,6 +5,7 @@ export const AGREEMENT_VIEW_FIELDS_FRAGMENT = gql`
     id
     title
     expiresAt
+    notes
     account {
       id
       legacyId
