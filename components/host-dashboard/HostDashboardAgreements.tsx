@@ -11,6 +11,7 @@ import AgreementDrawer from '../agreements/AgreementDrawer';
 import AgreementsTable from '../agreements/AgreementsTable';
 import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from '../agreements/fragments';
 import { Box, Flex } from '../Grid';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
@@ -54,7 +55,6 @@ const HostDashboardAgreements = ({ hostSlug }) => {
   const query = router.query;
   const [agreementDrawerOpen, setAgreementDrawerOpen] = React.useState(false);
   const [agreementInDrawer, setAgreementInDrawer] = React.useState(null);
-  //  const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-agreements` : `/${hostSlug}/admin/host-agreements`;
   const queryVariables = { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) };
   const { data, error, loading, refetch } = useQuery(hostDashboardAgreementsQuery, {
     variables: queryVariables,
@@ -82,43 +82,49 @@ const HostDashboardAgreements = ({ hostSlug }) => {
         </StyledButton>
       </Flex>
       <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
-      <AgreementsTable
-        agreements={data?.host.hostedAccountAgreements}
-        loading={loading}
-        nbPlaceholders={NB_AGREEMENTS_DISPLAYED}
-        openAgreement={agreement => {
-          setAgreementDrawerOpen(true);
-          setAgreementInDrawer(agreement);
-        }}
-      />
-      <AgreementDrawer
-        open={agreementDrawerOpen}
-        agreement={agreementInDrawer}
-        hostLegacyId={data?.host.legacyId} // legacyId required by CollectivePickerAsync
-        onClose={() => setAgreementDrawerOpen(false)}
-        onCreate={() => {
-          setAgreementDrawerOpen(false);
-          refetch({ ...queryVariables, offset: 0 }); // Resetting offset to 0 since entries are displayed by creation date DESC
-        }}
-        onEdit={() => {
-          // No need to refetch, local Apollo cache is updated automatically
-          setAgreementDrawerOpen(false);
-        }}
-        onDelete={() => {
-          setAgreementDrawerOpen(false);
-          refetch(queryVariables);
-        }}
-      />
-      <Flex my={4} justifyContent="center">
-        {hasPagination(data) && (
-          <Pagination
-            variant="input"
-            offset={queryVariables.offset}
-            limit={queryVariables.limit}
-            total={data?.host.hostedAccountAgreements.totalCount}
+      {error ? (
+        <MessageBoxGraphqlError error={error} my={4} />
+      ) : (
+        <React.Fragment>
+          <AgreementsTable
+            agreements={data?.host.hostedAccountAgreements}
+            loading={loading}
+            nbPlaceholders={NB_AGREEMENTS_DISPLAYED}
+            openAgreement={agreement => {
+              setAgreementDrawerOpen(true);
+              setAgreementInDrawer(agreement);
+            }}
           />
-        )}
-      </Flex>
+          <AgreementDrawer
+            open={agreementDrawerOpen}
+            agreement={agreementInDrawer}
+            hostLegacyId={data?.host.legacyId} // legacyId required by CollectivePickerAsync
+            onClose={() => setAgreementDrawerOpen(false)}
+            onCreate={() => {
+              setAgreementDrawerOpen(false);
+              refetch({ ...queryVariables, offset: 0 }); // Resetting offset to 0 since entries are displayed by creation date DESC
+            }}
+            onEdit={() => {
+              // No need to refetch, local Apollo cache is updated automatically
+              setAgreementDrawerOpen(false);
+            }}
+            onDelete={() => {
+              setAgreementDrawerOpen(false);
+              refetch(queryVariables);
+            }}
+          />
+          <Flex my={4} justifyContent="center">
+            {hasPagination(data) && (
+              <Pagination
+                variant="input"
+                offset={queryVariables.offset}
+                limit={queryVariables.limit}
+                total={data?.host.hostedAccountAgreements.totalCount}
+              />
+            )}
+          </Flex>
+        </React.Fragment>
+      )}
     </Box>
   );
 };

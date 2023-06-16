@@ -337,9 +337,6 @@ export const expensePageExpenseFieldsFragment = gql`
             availableCurrencies
           }
         }
-        hostAgreements {
-          totalCount
-        }
       }
 
       # For Hosts with Budget capabilities

@@ -121,7 +121,6 @@ const StyledDropzone = ({
   minHeight = size || minHeight;
   const innerMinHeight = minHeight - 2; // -2 To account for the borders
   const dropProps = getRootProps();
-  console.log({ value });
   return (
     <Dropzone
       {...props}
@@ -255,6 +254,7 @@ type StyledDropzoneProps = {
   kind: string;
   /** To disabled the input */
   disabled?: boolean;
+  value?: any;
 } & (
   | {
       /** Collect File only, do not upload files */

@@ -83,7 +83,7 @@ export default function Agreement({ agreement }: AgreementProps) {
       {agreement.notes && (
         <div>
           <P fontSize="16px" fontWeight="700" mb="18px">
-            <FormattedMessage defaultMessage="Notes" />
+            <FormattedMessage id="expense.notes" defaultMessage="Notes" />
           </P>
           <P fontSize="13px" fontWeight="400" color="black.800" whiteSpace="pre-line">
             {agreement.notes}

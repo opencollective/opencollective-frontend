@@ -1,11 +1,19 @@
-import PropTypes from 'prop-types';
+import React from 'react';
 import styled from 'styled-components';
-import { color, typography, variant } from 'styled-system';
+import { color, ColorProps, typography, TypographyProps, variant } from 'styled-system';
+
+type StyledLinkButtonProps = ColorProps &
+  TypographyProps &
+  React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    hoverColor?: string;
+    variant?: 'danger';
+    underlineOnHover?: boolean;
+  };
 
 /**
  * A button element but with the styles of a anchor element (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a).
  */
-const StyledLinkButton = styled.button`
+const StyledLinkButton = styled.button<StyledLinkButtonProps>`
   background: none;
   border: none;
   padding: 0;
@@ -35,14 +43,6 @@ const StyledLinkButton = styled.button`
 StyledLinkButton.defaultProps = {
   color: '#3385FF',
   hoverColor: '#797d80',
-};
-
-StyledLinkButton.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  color: PropTypes.string,
-  hoverColor: PropTypes.string,
-  variant: PropTypes.oneOf(['danger']),
-  underlineOnHover: PropTypes.bool,
 };
 
 export default StyledLinkButton;

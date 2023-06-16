@@ -2,9 +2,6 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { textAlign, TextAlignProps } from 'styled-system';
 
-// We don't care about prop-types since we're in a TypeScript file
-/* eslint-disable react/prop-types */
-
 const StyledTable = styled.div`
   width: 100%;
   overflow: auto;
