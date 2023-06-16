@@ -204,10 +204,12 @@ const HostVirtualCards = props => {
       withExpensesDateFrom: queryFilter.values.usagePeriod?.from,
       withExpensesDateTo: queryFilter.values.usagePeriod?.to,
       collectiveAccountReferences: queryFilter.values.collectiveSlugs.map(slug => ({ slug })),
-      spentAmountFrom: queryFilter.values.totalSpent?.from
-        ? { valueInCents: queryFilter.values.totalSpent?.from }
+      spentAmountFrom: !isNil(queryFilter.values.totalSpent?.fromAmount)
+        ? { valueInCents: queryFilter.values.totalSpent?.fromAmount }
         : null,
-      spentAmountTo: queryFilter.values.totalSpent?.to ? { valueInCents: queryFilter.values.totalSpent?.to } : null,
+      spentAmountTo: !isNil(queryFilter.values.totalSpent?.toAmount)
+        ? { valueInCents: queryFilter.values.totalSpent?.toAmount }
+        : null,
       hasMissingReceipts: queryFilter.values.missingReceipts,
     },
   });
