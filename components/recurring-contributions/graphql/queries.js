@@ -103,7 +103,7 @@ export const manageContributionsQuery = gql`
           slug
         }
       }
-      orders(filter: OUTGOING, onlySubscriptions: true, includeIncognito: true) {
+      orders(filter: OUTGOING, frequency: RECURRING, includeIncognito: true) {
         totalCount
         nodes {
           id

@@ -944,6 +944,7 @@ enum ContributionFrequency {
   MONTHLY
   YEARLY
   ONETIME
+  RECURRING
 }
 
 """
