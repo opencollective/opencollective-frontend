@@ -320,7 +320,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
                 {onHomeRoute && useDashboard ? (
                   <Link href="/dashboard">
                     <MainNavItem primary as={Container} isActive={isRouteActive('/dashboard')}>
-                      <FormattedMessage id="Dashboard" defaultMessage="Back to Dashboard" />
+                      <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
                     </MainNavItem>
                   </Link>
                 ) : (
