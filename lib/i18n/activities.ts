@@ -2,6 +2,44 @@ import { defineMessages, MessageDescriptor } from 'react-intl';
 
 import { ActivityTypes } from '../constants/activities';
 
+export const ActivityTimelineMessageI18n = defineMessages({
+  COLLECTIVE_EXPENSE_APPROVED: {
+    defaultMessage: '<Individual></Individual> approved <Expense>{expenseDescription}</Expense>',
+  },
+  COLLECTIVE_EXPENSE_ERROR: {
+    defaultMessage: '<FromAccount></FromAccount> expense <Expense>{expenseDescription}</Expense> payment failed',
+  },
+  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE: {
+    defaultMessage: '<Individual></Individual> marked <Expense>{expenseDescription}</Expense> as incomplete',
+  },
+  COLLECTIVE_EXPENSE_PAID: {
+    defaultMessage: '<Individual></Individual> paid <Expense>{expenseDescription}</Expense>',
+  },
+  COLLECTIVE_EXPENSE_REJECTED: {
+    defaultMessage: '<Individual></Individual> rejected <Expense>{expenseDescription}</Expense>',
+  },
+  COLLECTIVE_EXPENSE_UNAPPROVED: {
+    defaultMessage: '<Individual></Individual> unapproved <Expense>{expenseDescription}</Expense>',
+  },
+  COLLECTIVE_EXPENSE_UPDATED: {
+    defaultMessage: '<Individual></Individual> updated <Expense>{expenseDescription}</Expense>',
+  },
+  EXPENSE_COMMENT_CREATED: {
+    defaultMessage: '<Individual></Individual> commented on <Expense>{expenseDescription}</Expense>',
+  },
+  COLLECTIVE_EXPENSE_INVITE_DRAFTED: {
+    defaultMessage:
+      '<Individual></Individual> drafted an <Expense>{expenseDescription}</Expense> on <Account></Account>',
+  },
+  COLLECTIVE_EXPENSE_RECURRING_DRAFTED: {
+    defaultMessage:
+      '<Individual></Individual> recurring <Expense>{expenseDescription}</Expense> expense drafted on <Account></Account>',
+  },
+  COLLECTIVE_UPDATE_PUBLISHED: {
+    defaultMessage: '<Individual></Individual> published an update on <Account></Account>',
+  },
+});
+
 export const ActivityDescriptionI18n = defineMessages({
   // Collective creation & applications
   COLLECTIVE_CREATED: {
@@ -94,7 +132,7 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: 'Marked expense <Expense>{expenseDescription}</Expense> as incomplete',
   },
   COLLECTIVE_EXPENSE_PROCESSING: {
-    defaultMessage: 'Expense <Expense>{expenseDescription}</Expense> processing',
+    defaultMessage: 'Expense <Expense>{expenseDescription}</Expense> is being processed',
   },
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT: {
     defaultMessage: 'Expense <Expense>{expenseDescription}</Expense> scheduled for payment',
@@ -156,7 +194,7 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: 'New update drafted on <Account></Account>',
   },
   COLLECTIVE_UPDATE_PUBLISHED: {
-    defaultMessage: 'Update published on <Account></Account>',
+    defaultMessage: 'Update published on <Account></Account>: {updateTitle}',
   },
   // Contact
   COLLECTIVE_CONTACT: {
@@ -180,7 +218,7 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: 'Requested a virtual card for <Account></Account>',
   },
   VIRTUAL_CARD_PURCHASE: {
-    defaultMessage: 'New <Expense>purchase</Expense> with virtual card',
+    defaultMessage: 'New purchase <Expense>{expenseDescription}</Expense> with virtual card',
   },
   VIRTUAL_CARD_CHARGE_DECLINED: {
     defaultMessage: 'Virtual card charge declined on <Account></Account>',

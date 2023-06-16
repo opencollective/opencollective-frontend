@@ -18,7 +18,7 @@ import { AdminSectionProps } from '../../types';
 import { workspaceHomeQuery } from './query';
 import TimelineItem from './TimelineItem';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 const Home = (props: AdminSectionProps) => {
   const router = useRouter();

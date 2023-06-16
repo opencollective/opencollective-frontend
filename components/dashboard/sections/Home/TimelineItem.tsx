@@ -10,17 +10,18 @@ import { MessageAltError } from '@styled-icons/boxicons-regular/MessageAltError'
 import { MessageAltX } from '@styled-icons/boxicons-regular/MessageAltX';
 import { Note } from '@styled-icons/boxicons-regular/Note';
 import { Send } from '@styled-icons/boxicons-regular/Send';
+import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import type { ActivityType, WorkspaceHomeQuery } from '../../../../lib/graphql/types/v2/graphql';
+import { ActivityDescriptionI18n, ActivityTimelineMessageI18n } from '../../../../lib/i18n/activities';
 
-import ActivityDescription from '../../../admin-panel/sections/ActivityLog/ActivityDescription';
+import { getActivityVariables } from '../../../admin-panel/sections/ActivityLog/ActivityDescription';
 import { AvatarWithLink } from '../../../AvatarWithLink';
 import Container from '../../../Container';
 import DateTime from '../../../DateTime';
 import { Box, Flex } from '../../../Grid';
 import HTMLContent from '../../../HTMLContent';
-import LinkCollective from '../../../LinkCollective';
 import { P } from '../../../Text';
 
 const ItemHeaderWrapper = styled(P)`
@@ -81,8 +82,12 @@ type ActivityListItemProps = {
 };
 
 const TimelineItem = ({ activity, isLast }: ActivityListItemProps) => {
+  const intl = useIntl();
   const secondaryAccount = activity.individual?.id !== activity.account?.id && activity.account;
   const Icon = getIcon(activity.type);
+
+  const html = activity.data?.comment?.html || activity.data?.update?.html;
+  const title = activity.data?.update?.title;
 
   return (
     <Box>
@@ -93,26 +98,29 @@ const TimelineItem = ({ activity, isLast }: ActivityListItemProps) => {
           </IconWrapper>
           {!isLast && <VerticalLine />}
         </Flex>
-        <Box mb="42px">
-          <Flex flex="1" minWidth="max(50%, 200px)" maxWidth={[null, '70%']} mr="24px" mb="12px">
+        <Box mb="42px" overflowX="hidden">
+          <Flex flex="1" mb="12px">
             <Box mr="12px">
               <AvatarWithLink size={40} account={activity.individual} secondaryAccount={secondaryAccount} />
             </Box>
             <Flex flexDirection="column" justifyContent="space-around">
               <ItemHeaderWrapper color="black.800" fontWeight={500}>
-                <LinkCollective collective={activity.individual} />
+                {intl.formatMessage(
+                  ActivityTimelineMessageI18n[activity.type] || ActivityDescriptionI18n[activity.type],
+                  getActivityVariables(intl, activity),
+                )}
               </ItemHeaderWrapper>
               <P fontSize="12px" lineHeight="18px" fontWeight={400} color="black.700">
                 <DateTime value={activity.createdAt} />
               </P>
             </Flex>
           </Flex>
-          <Box color="black.700" fontWeight="600" lineHeight="20px" fontSize="14px">
-            <ActivityDescription activity={activity} />
-          </Box>
-          {activity.data?.comment && (
-            <HTMLContent mt={3} fontSize="13px" lineHeight="20px" content={activity.data.comment.html} />
+          {title && (
+            <P fontSize="15px" lineHeight="20px" fontWeight={500} color="black.800">
+              {title}
+            </P>
           )}
+          {html && <HTMLContent mt={3} fontSize="13px" lineHeight="20px" content={html} />}
         </Box>
       </Flex>
     </Box>
