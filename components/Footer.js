@@ -12,6 +12,7 @@ import styled from 'styled-components';
 
 import languages from '../lib/constants/locales';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 import TranslateIcon from './icons/TranslateIcon';
 import Container from './Container';
@@ -23,7 +24,6 @@ import StyledLink from './StyledLink';
 import StyledSelect from './StyledSelect';
 import StyledTooltip from './StyledTooltip';
 import { P, Span } from './Text';
-import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 const SocialLink = styled.a`
   align-items: center;

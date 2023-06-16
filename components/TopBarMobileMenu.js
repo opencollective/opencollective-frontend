@@ -37,7 +37,7 @@ const SubListItem = styled(ListItem)`
   padding-bottom: 10px;
 `;
 
-const TopBarMobileMenu = ({ closeMenu, notUsingDashboard, useDashboard, onMarketingPage }) => {
+const TopBarMobileMenu = ({ closeMenu, useDashboard, onMarketingPage }) => {
   const [state, setState] = React.useState({
     viewSolutionsMenu: false,
     viewProductsMenu: false,
@@ -158,9 +158,7 @@ const TopBarMobileMenu = ({ closeMenu, notUsingDashboard, useDashboard, onMarket
         data-cy="user-menu"
       >
         <Box as="ul" my={2} pl={0} pb="36px">
-          {notUsingDashboard ? (
-            marketingPageItems
-          ) : useDashboard ? (
+          {useDashboard ? (
             <Fragment>
               <ListItem>
                 <Link href="/dashboard" onClick={closeMenu}>
@@ -187,10 +185,10 @@ const TopBarMobileMenu = ({ closeMenu, notUsingDashboard, useDashboard, onMarket
               )}
             </Fragment>
           ) : (
-            <Fragment></Fragment>
+            marketingPageItems
           )}
         </Box>
-        {notUsingDashboard && (
+        {!useDashboard && (
           <Container
             display="flex"
             alignItems="center"
@@ -236,6 +234,8 @@ const TopBarMobileMenu = ({ closeMenu, notUsingDashboard, useDashboard, onMarket
 TopBarMobileMenu.propTypes = {
   showMobileMenu: PropTypes.bool,
   closeMenu: PropTypes.func,
+  useDashboard: PropTypes.bool,
+  onMarketingPage: PropTypes.bool,
 };
 
 export default injectIntl(withUser(TopBarMobileMenu));

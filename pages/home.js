@@ -1,5 +1,9 @@
 import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
+
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 // import Banner from '../components/collectives/Banner';
 import JoinUsSection from '../components/collectives/sections/JoinUs';
@@ -10,9 +14,6 @@ import OpenCollectiveIs from '../components/home/OpenCollectiveIsSection';
 import RaiseMoney from '../components/home/RaiseMoneySection';
 import TheFutureIsCollective from '../components/home/TheFutureIsCollectiveSection';
 import Page from '../components/Page';
-import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
-import { useRouter } from 'next/router';
 
 const messages = defineMessages({
   defaultTitle: {
