@@ -71,7 +71,7 @@ const NavItem = styled(StyledLink)`
 `;
 
 const MainNavItem = styled(StyledLink)`
-  color: ${theme.colors.slate[700]};
+  color: #334155;
   font-weight: 500;
   font-size: 14px;
   padding: 12px;
@@ -81,11 +81,11 @@ const MainNavItem = styled(StyledLink)`
   transition-duration: 150ms;
   @media (hover: hover) {
     :hover {
-      color: ${theme.colors.slate[900]};
-      background-color: ${theme.colors.slate[100]};
+      color: #0f172a;
+      background-color: #f1f5f9;
     }
   }
-  ${props => props.isActive && `background-color: ${theme.colors.slate[100]};`}
+  ${props => props.isActive && `background-color: #f1f5f9;`}
 `;
 
 const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
