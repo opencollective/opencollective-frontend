@@ -37,7 +37,7 @@ const SubListItem = styled(ListItem)`
   padding-bottom: 10px;
 `;
 
-const TopBarMobileMenu = ({ closeMenu, useDashboard, onMarketingPage }) => {
+const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
   const [state, setState] = React.useState({
     viewSolutionsMenu: false,
     viewProductsMenu: false,
@@ -50,97 +50,6 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onMarketingPage }) => {
       closeMenu();
     }
   });
-  const marketingPageItems = (
-    <Fragment>
-      <ListItem>
-        <Flex
-          justifyContent="space-between"
-          onClick={() => setState({ ...state, viewSolutionsMenu: !state.viewSolutionsMenu })}
-        >
-          <FormattedMessage defaultMessage="Solutions" />
-          <ChevronDown size={20} />
-        </Flex>
-        {state.viewSolutionsMenu && (
-          <Box as="ul" my={2} pl="12px">
-            <SubListItem>
-              <Link href="/collectives" onClick={closeMenu}>
-                <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />
-              </Link>
-            </SubListItem>
-            <SubListItem>
-              <Link href="/become-a-sponsor" onClick={closeMenu}>
-                <FormattedMessage defaultMessage="For Contributors" />
-              </Link>
-            </SubListItem>
-            <SubListItem>
-              <Link href="/become-a-host" onClick={closeMenu}>
-                <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
-              </Link>
-            </SubListItem>
-          </Box>
-        )}
-      </ListItem>
-      <hr />
-      <ListItem>
-        <Flex
-          justifyContent="space-between"
-          onClick={() => setState({ ...state, viewProductsMenu: !state.viewProductsMenu })}
-        >
-          <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
-          <ChevronDown size={20} />
-        </Flex>
-        {state.viewProductsMenu && (
-          <Box as="ul" my={2} pl="12px">
-            <SubListItem>
-              <Link href="/pricing" onClick={closeMenu}>
-                <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
-              </Link>
-            </SubListItem>
-            <SubListItem>
-              <Link href="/how-it-works" onClick={closeMenu}>
-                <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
-              </Link>
-            </SubListItem>
-            <SubListItem>
-              <Link href="/fiscal-hosting" onClick={closeMenu}>
-                <FormattedMessage id="editCollective.fiscalHosting" defaultMessage="Fiscal Hosting" />
-              </Link>
-            </SubListItem>
-          </Box>
-        )}
-      </ListItem>
-      <hr />
-      <ListItem>
-        <Flex
-          justifyContent="space-between"
-          onClick={() => setState({ ...state, viewCompanyMenu: !state.viewCompanyMenu })}
-        >
-          <FormattedMessage id="company" defaultMessage="Company" />
-          <ChevronDown size={20} />
-        </Flex>
-        {state.viewCompanyMenu && (
-          <Box as="ul" my={2} pl="12px">
-            <SubListItem>
-              <a href="https://blog.opencollective.com/" onClick={closeMenu}>
-                <FormattedMessage id="company.blog" defaultMessage="Blog" />
-              </a>
-            </SubListItem>
-            <SubListItem>
-              <Link href="/e2c" onClick={closeMenu}>
-                <FormattedMessage id="OC.e2c" defaultMessage="Exit to Community" />
-              </Link>
-            </SubListItem>
-          </Box>
-        )}
-      </ListItem>
-      <hr />
-      <ListItem>
-        <Link href="/help" onClick={closeMenu}>
-          <FormattedMessage defaultMessage="Help & Support" />
-        </Link>
-      </ListItem>
-    </Fragment>
-  );
   return (
     <React.Fragment>
       <HideGlobalScroll />
@@ -157,8 +66,8 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onMarketingPage }) => {
         boxShadow="0px 8px 12px rgba(20, 20, 20, 0.16)"
         data-cy="user-menu"
       >
-        <Box as="ul" my={2} pl={0} pb="36px">
-          {useDashboard ? (
+        <Box as="ul" my={2} pl={0} pb={2}>
+          {useDashboard && !onHomeRoute ? (
             <Fragment>
               <ListItem>
                 <Link href="/dashboard" onClick={closeMenu}>
@@ -177,23 +86,116 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onMarketingPage }) => {
                   <FormattedMessage defaultMessage="Help & Support" />
                 </Link>
               </ListItem>
-              {onMarketingPage && (
+            </Fragment>
+          ) : (
+            <Fragment>
+              <ListItem>
+                <Flex
+                  justifyContent="space-between"
+                  onClick={() => setState({ ...state, viewSolutionsMenu: !state.viewSolutionsMenu })}
+                >
+                  <FormattedMessage defaultMessage="Solutions" />
+                  <ChevronDown size={20} />
+                </Flex>
+                {state.viewSolutionsMenu && (
+                  <Box as="ul" my={2} pl="12px">
+                    <SubListItem>
+                      <Link href={'/collectives'} onClick={closeMenu}>
+                        <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />
+                      </Link>
+                    </SubListItem>
+                    <SubListItem>
+                      <Link href={'/become-a-sponsor'} onClick={closeMenu}>
+                        <FormattedMessage defaultMessage="For Contributors" />
+                      </Link>
+                    </SubListItem>
+                    <SubListItem>
+                      <Link href={'/become-a-host'} onClick={closeMenu}>
+                        <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />
+                      </Link>
+                    </SubListItem>
+                  </Box>
+                )}
+              </ListItem>
+              <hr />
+              <ListItem>
+                <Flex
+                  justifyContent="space-between"
+                  onClick={() => setState({ ...state, viewProductsMenu: !state.viewProductsMenu })}
+                >
+                  <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
+                  <ChevronDown size={20} />
+                </Flex>
+                {state.viewProductsMenu && (
+                  <Box as="ul" my={2} pl="12px">
+                    <SubListItem>
+                      <Link href={'/pricing'} onClick={closeMenu}>
+                        <FormattedMessage id="menu.pricing" defaultMessage="Pricing" />
+                      </Link>
+                    </SubListItem>
+                    <SubListItem>
+                      <Link href={'/how-it-works'} onClick={closeMenu}>
+                        <FormattedMessage id="menu.howItWorks" defaultMessage="How it Works" />
+                      </Link>
+                    </SubListItem>
+                    <SubListItem>
+                      <Link href={'/fiscal-hosting'} onClick={closeMenu}>
+                        <FormattedMessage id="editCollective.fiscalHosting" defaultMessage="Fiscal Hosting" />
+                      </Link>
+                    </SubListItem>
+                  </Box>
+                )}
+              </ListItem>
+              <hr />
+              <ListItem>
+                <Flex
+                  justifyContent="space-between"
+                  onClick={() => setState({ ...state, viewCompanyMenu: !state.viewCompanyMenu })}
+                >
+                  <FormattedMessage id="company" defaultMessage="Company" />
+                  <ChevronDown size={20} />
+                </Flex>
+                {state.viewCompanyMenu && (
+                  <Box as="ul" my={2} pl="12px">
+                    <SubListItem>
+                      <a href="https://blog.opencollective.com/" onClick={closeMenu}>
+                        <FormattedMessage id="company.blog" defaultMessage="Blog" />
+                      </a>
+                    </SubListItem>
+                    <SubListItem>
+                      <Link href={'/e2c'} onClick={closeMenu}>
+                        <FormattedMessage id="OC.e2c" defaultMessage="Exit to Community" />
+                      </Link>
+                    </SubListItem>
+                  </Box>
+                )}
+              </ListItem>
+              <hr />
+              <ListItem>
+                <Link href={'/help'} onClick={closeMenu}>
+                  <FormattedMessage defaultMessage="Help & Support" />
+                </Link>
+              </ListItem>
+              {useDashboard && (
                 <Fragment>
                   <hr />
-                  {marketingPageItems}
+                  <ListItem>
+                    <Link href="/dashboard" onClick={closeMenu}>
+                      <FormattedMessage id="BackToDashboard" defaultMessage="Back to Dashboard" />
+                    </Link>
+                  </ListItem>
                 </Fragment>
               )}
             </Fragment>
-          ) : (
-            marketingPageItems
           )}
         </Box>
-        {!useDashboard && (
+        {(!useDashboard || onHomeRoute) && (
           <Container
             display="flex"
             alignItems="center"
             width={1}
             p={2}
+            mt={3}
             order={['2', null, '3']}
             borderRadius={16}
             background="#F7F8FA"
@@ -235,7 +237,7 @@ TopBarMobileMenu.propTypes = {
   showMobileMenu: PropTypes.bool,
   closeMenu: PropTypes.func,
   useDashboard: PropTypes.bool,
-  onMarketingPage: PropTypes.bool,
+  onHomeRoute: PropTypes.bool,
 };
 
 export default injectIntl(withUser(TopBarMobileMenu));
