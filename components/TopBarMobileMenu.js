@@ -162,7 +162,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onMarketingPage }) => {
             <Fragment>
               <ListItem>
                 <Link href="/dashboard" onClick={closeMenu}>
-                  <FormattedMessage defaultMessage="Dashboard" />
+                  <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
                 </Link>
               </ListItem>
               <hr />
