@@ -16,7 +16,6 @@ describe('Contribution Flow: Order', () => {
     it('with /apex/contribute/tier/470-sponsors', () => {
       cy.login({ redirect: '/apex/donate/tier/470-sponsors' });
       cy.contains('Contribution details');
-      cy.wait(250);
       cy.get('button[data-cy="cf-next-step"]').click();
       // Ensure we enforce the new URLs
       cy.location('pathname').should('eq', '/apex/contribute/sponsors-470/checkout/profile');
@@ -25,7 +24,6 @@ describe('Contribution Flow: Order', () => {
     it('with /apex/donate/tier/470-sponsors', () => {
       cy.login({ redirect: '/apex/donate/tier/470-sponsors' });
       cy.contains('Contribution details');
-      cy.wait(250);
       cy.get('button[data-cy="cf-next-step"]').click();
       // Ensure we enforce the new URLs
       cy.location('pathname').should('eq', '/apex/contribute/sponsors-470/checkout/profile');
@@ -47,7 +45,6 @@ describe('Contribution Flow: Order', () => {
     it('with a multipart slug', () => {
       cy.login({ redirect: '/apex/contribute/a-multipart-420-470/checkout' });
       cy.contains('Contribution details');
-      cy.wait(250);
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.location('pathname').should('eq', '/apex/contribute/sponsors-470/checkout/profile');
     });

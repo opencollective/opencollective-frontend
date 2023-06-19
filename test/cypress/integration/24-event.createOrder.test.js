@@ -27,7 +27,6 @@ describe('event.createOrder page', () => {
   });
 
   it('makes an order for a free ticket', () => {
-    cy.wait(250);
     createEvent('Free Ticket Event');
 
     // Create Ticket
@@ -53,7 +52,6 @@ describe('event.createOrder page', () => {
   });
 
   it('makes an order for a paying ticket with fixed amount', () => {
-    cy.wait(250);
     createEvent('Paying Ticket Event');
 
     // Create Ticket
@@ -72,7 +70,6 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy="contribution-quantity"]').should('exist');
 
     cy.getByDataCy('cf-next-step').click();
-    cy.wait(250);
 
     // Skip the step profile on the new contribution flow
     cy.getByDataCy('cf-next-step').click();
@@ -85,7 +82,6 @@ describe('event.createOrder page', () => {
   });
 
   it('makes an order for a paying ticket with flexible amount', () => {
-    cy.wait(250);
     createEvent('Flexible Paying Ticket Event');
 
     // Create Ticket
@@ -144,7 +140,6 @@ describe('event.createOrder page', () => {
 
     cy.get('input[type=number][name=quantity]').type('{selectall}8');
     cy.getByDataCy('cf-next-step').click();
-    cy.wait(250);
 
     // Skip the step profile on the new contribution flow
     cy.getByDataCy('cf-next-step').click();
@@ -179,7 +174,6 @@ describe('event.createOrder page', () => {
     cy.getByDataCy('remove-vat-btn').click();
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.contains('Choose payment method');
-    cy.wait(500);
     cy.get('button[data-cy="cf-prev-step"]').click();
 
     // Must provide a valid VAT number
@@ -234,13 +228,13 @@ describe('event.createOrder page', () => {
     cy.wait(500);
     cy.getByDataCy('order-success', { timeout: 20000 });
   });
-});
 
-describe('Outdated Event', () => {
-  it("can't contribute if the event is over", () => {
-    cy.visit('/opensource/events/webpack-webinar');
-    cy.contains('Webinar: How Webpack Reached $400K+/year in Sponsorship & Crowdfunding');
-    cy.get('[data-cy="financial-contributions"]').should('not.exist');
-    cy.get('[data-cy="Tickets"]').should('not.exist');
+  describe('Outdated Event', () => {
+    it("can't contribute if the event is over", () => {
+      cy.visit('/opensource/events/webpack-webinar');
+      cy.contains('Webinar: How Webpack Reached $400K+/year in Sponsorship & Crowdfunding');
+      cy.get('[data-cy="financial-contributions"]').should('not.exist');
+      cy.get('[data-cy="Tickets"]').should('not.exist');
+    });
   });
 });

@@ -39,8 +39,6 @@ describe('New expense flow', () => {
     });
 
     it('submits new expense then edit it', () => {
-      cy.getByDataCy('radio-expense-type-RECEIPT');
-      cy.wait(250);
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
       // Select Payout Method
       cy.getByDataCy('payout-method-select').click();
@@ -151,8 +149,6 @@ describe('New expense flow', () => {
     });
 
     it('can create a new organization', () => {
-      cy.getByDataCy('radio-expense-type-RECEIPT');
-      cy.wait(250);
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
 
       cy.getByDataCy('select-expense-payee').click();
@@ -220,8 +216,6 @@ describe('New expense flow', () => {
         url: 'https://country-service.shopifycloud.com/graphql',
         query: { fixture: 'countries.json' },
       });
-      cy.getByDataCy('radio-expense-type-INVOICE');
-      cy.wait(250);
       cy.getByDataCy('radio-expense-type-INVOICE').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
@@ -247,8 +241,6 @@ describe('New expense flow', () => {
 
     describe('submit on behalf', () => {
       it('can invite an existing user to submit an expense', () => {
-        cy.getByDataCy('radio-expense-type-INVOICE');
-        cy.wait(250);
         cy.getByDataCy('radio-expense-type-INVOICE').click();
 
         cy.getByDataCy('select-expense-payee').click();
@@ -274,7 +266,6 @@ describe('New expense flow', () => {
       it('can invite a third-party user to submit an expense', () => {
         const inviteeEmail = randomEmail();
         cy.getByDataCy('radio-expense-type-INVOICE').click();
-        cy.wait(250);
 
         cy.getByDataCy('select-expense-payee').click();
         cy.getByDataCy('collective-picker-invite-button').click();
@@ -305,7 +296,6 @@ describe('New expense flow', () => {
           .as('createdExpense');
         cy.logout();
         cy.reload();
-        cy.wait(500);
 
         cy.get('@createdExpense').then(createdExpense => {
           cy.visit(`/${createdExpense.collective}/expenses/${createdExpense.expenseId}?key=draft-key`);
