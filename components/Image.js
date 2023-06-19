@@ -1,5 +1,5 @@
 import React from 'react';
-import NextImage from 'next/image';
+import NextImage from 'next/legacy/image';
 
 // Default to no custom loader, will use Squoosh in dev
 let loader;
