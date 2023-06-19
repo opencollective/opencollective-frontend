@@ -43,7 +43,7 @@ const ActivityDescription = ({ activity }) => {
         msg
       ) : (
         <Link
-          href={`${getCollectivePageRoute(activity.order.toAccount)}/orders?searchTerm=%23${activity.order.legacyId}`}
+          href={`${getCollectivePageRoute(activity.order.toAccount)}/contributions/${activity.order.legacyId}`}
           title={activity.order.description}
           openInNewTab
         >

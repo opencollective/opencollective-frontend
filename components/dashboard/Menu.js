@@ -4,6 +4,7 @@ import { BarChartAlt2 as Chart } from '@styled-icons/boxicons-regular/BarChartAl
 import { Cog } from '@styled-icons/boxicons-regular/Cog';
 import { Coin } from '@styled-icons/boxicons-regular/Coin';
 import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
+import { File } from '@styled-icons/boxicons-regular/File';
 import { NetworkChart } from '@styled-icons/boxicons-regular/NetworkChart';
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { Transfer } from '@styled-icons/boxicons-regular/Transfer';
@@ -49,6 +50,12 @@ const Menu = ({ isAccountantOnly }) => {
           section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS}
           icon={<Coin size={16} />}
           if={!isAccountantOnly}
+        />
+
+        <MenuLink
+          section={HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS}
+          icon={<File size={16} />}
+          if={process.env.OC_ENV !== 'production'}
         />
 
         <MenuLink
