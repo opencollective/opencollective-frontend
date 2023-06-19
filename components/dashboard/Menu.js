@@ -51,7 +51,11 @@ const Menu = ({ isAccountantOnly }) => {
           if={!isAccountantOnly}
         />
 
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS} icon={<File size={16} />} />
+        <MenuLink
+          section={HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS}
+          icon={<File size={16} />}
+          if={process.env.OC_ENV !== 'production'}
+        />
 
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS}
