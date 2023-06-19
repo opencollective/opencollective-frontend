@@ -4,6 +4,7 @@ import { BarChartAlt2 as Chart } from '@styled-icons/boxicons-regular/BarChartAl
 import { Cog } from '@styled-icons/boxicons-regular/Cog';
 import { Coin } from '@styled-icons/boxicons-regular/Coin';
 import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
+import { File } from '@styled-icons/boxicons-regular/File';
 import { NetworkChart } from '@styled-icons/boxicons-regular/NetworkChart';
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { Transfer } from '@styled-icons/boxicons-regular/Transfer';
@@ -33,6 +34,7 @@ const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 const Menu = ({ isAccountantOnly }) => {
   const { account } = React.useContext(DashboardContext);
   const isHost = isHostAccount(account);
+  const isUserHost = account.isHost === true && isType(account, USER); // for legacy compatibility for users who are hosts
   const isIndividual = isIndividualAccount(account);
   return (
     <Container>
@@ -48,6 +50,12 @@ const Menu = ({ isAccountantOnly }) => {
           section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS}
           icon={<Coin size={16} />}
           if={!isAccountantOnly}
+        />
+
+        <MenuLink
+          section={HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS}
+          icon={<File size={16} />}
+          if={process.env.OC_ENV !== 'production'}
         />
 
         <MenuLink
@@ -118,7 +126,7 @@ const Menu = ({ isAccountantOnly }) => {
         <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} icon={<Transfer size={16} />} />
         <MenuLink
           icon={<Cog size={16} />}
-          if={!isHost}
+          if={!isHost || isUserHost}
           section="SETTINGS"
           goToSection={COLLECTIVE_SECTIONS.INFO}
           renderSubMenu={({ parentSection }) => (

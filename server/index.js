@@ -34,7 +34,7 @@ const workers = process.env.WEB_CONCURRENCY || 1;
 const desiredServiceLevel = Number(process.env.SERVICE_LEVEL) || 100;
 
 const start = id =>
-  nextApp.prepare().then(() => {
+  nextApp.prepare().then(async () => {
     logger.info(
       `Starting with NODE_ENV=${process.env.NODE_ENV} OC_ENV=${process.env.OC_ENV} API_URL=${process.env.API_URL}`,
     );
@@ -47,9 +47,9 @@ const start = id =>
     // but we should ensure this goes to the default Next.js handler
     app.get('/__nextjs_original-stack-frame', nextApp.getRequestHandler());
 
-    hyperwatch(app);
+    await hyperwatch(app);
 
-    rateLimiter(app);
+    await rateLimiter(app);
 
     if (parseToBooleanDefaultFalse(process.env.SERVICE_LIMITER)) {
       app.use(serviceLimiterMiddleware);

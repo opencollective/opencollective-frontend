@@ -208,6 +208,7 @@ export const expensePageExpenseFieldsFragment = gql`
       legalName
       type
       isAdmin
+      isActive
       location {
         id
         address
@@ -530,6 +531,12 @@ export const expensesListFieldsFragment = gql`
         balanceWithBlockedFunds {
           valueInCents
           currency
+        }
+      }
+      ... on AccountWithHost {
+        host {
+          id
+          slug
         }
       }
       ... on AccountWithParent {

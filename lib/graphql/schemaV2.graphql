@@ -879,6 +879,11 @@ type Order {
   permissions: OrderPermissions!
 
   """
+  The list of activities (ie. approved, edited, etc) for this Order ordered by date ascending
+  """
+  activities: ActivityCollection!
+
+  """
   Data related to the order
   """
   data: JSON
@@ -1182,6 +1187,11 @@ type Expense {
   status: ExpenseStatus!
 
   """
+  The accounts who approved this expense
+  """
+  approvedBy: [Account!]!
+
+  """
   Whether this expense is on hold
   """
   onHold: Boolean
@@ -1285,6 +1295,10 @@ type Expense {
   requestedByAccount: Account
   quote: ExpenseQuote
   recurringExpense: RecurringExpense
+
+  """
+  [Admin only] Security checks for this expense. Only available to expenses under trusted hosts.
+  """
   securityChecks: [SecurityCheck]
 
   """
@@ -3831,7 +3845,8 @@ type AccountStats {
   Returns expense tags for collective sorted by popularity
   """
   expensesTags(
-    limit: Int! = 30
+    limit: Int! = 100
+    truncate: Int = 7
 
     """
     Calculate amount after this date
@@ -4323,7 +4338,6 @@ type ActivitySubscription {
 All supported Activity channels we can broadcast to
 """
 enum ActivityChannel {
-  gitter
   slack
   twitter
   webhook
@@ -4454,8 +4468,8 @@ enum ActivityType {
   USER_SIGNIN
   USER_RESET_PASSWORD
   OAUTH_APPLICATION_AUTHORIZED
-  TWO_FACTOR_CODE_ADDED
-  TWO_FACTOR_CODE_DELETED
+  TWO_FACTOR_METHOD_ADDED
+  TWO_FACTOR_METHOD_DELETED
   TWO_FACTOR_CODE_REQUESTED
   USER_CHANGE_EMAIL
   USER_PAYMENT_METHOD_CREATED
@@ -4468,6 +4482,9 @@ enum ActivityType {
   ACTIVATED_COLLECTIVE_AS_HOST
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT
   DEACTIVATED_COLLECTIVE_AS_HOST
+  AGREEMENT_CREATED
+  AGREEMENT_EDITED
+  AGREEMENT_DELETED
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -4835,6 +4852,11 @@ An agreement
 type Agreement {
   id: String
   title: String!
+
+  """
+  Additional notes about the agreement for the host admins
+  """
+  notes: String
   createdBy: Account!
   account: Account!
   host: Host!
@@ -5239,9 +5261,24 @@ type OrderPermissions {
   canMarkAsPaid: Boolean!
 
   """
-  Whether the current user edit this pending order
+  Whether the current user can edit this pending order
   """
   canEdit: Boolean!
+
+  """
+  Whether the current user can see private activities for this order
+  """
+  canSeePrivateActivities: Boolean!
+}
+
+"""
+A collection of "Activities"
+"""
+type ActivityCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Activity!]
 }
 
 type PendingOrderData {
@@ -6417,7 +6454,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 30
 
     """
     The offset to use to fetch
@@ -6515,7 +6552,7 @@ interface AccountWithHost {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 30
 
     """
     The offset to use to fetch
@@ -7304,7 +7341,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 30
 
     """
     The offset to use to fetch
@@ -9376,7 +9413,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 30
 
     """
     The offset to use to fetch
@@ -9549,14 +9586,6 @@ type Query {
     Only accounts with custom contribution (/donate) enabled
     """
     hasCustomContributionsEnabled: Boolean
-
-    """
-    Only accounts that support one of these payment services will be returned
-    """
-    supportedPaymentMethodService: [PaymentMethodService]
-      @deprecated(
-        reason: "2022-04-22: Introduced for Hacktoberfest. Reference: https://github.com/opencollective/opencollective-api/pull/7440#issuecomment-1121504508"
-      )
 
     """
     The order of results. Defaults to [RANK, DESC] (or [CREATED_AT, DESC] if `supportedPaymentMethodService` is provided)
@@ -11531,16 +11560,6 @@ enum CountryISO {
   EH
 }
 
-"""
-A collection of "Activities"
-"""
-type ActivityCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Activity!]
-}
-
 enum ActivityAndClassesType {
   ACTIVITY_ALL
   CONNECTED_ACCOUNT_CREATED
@@ -11626,8 +11645,8 @@ enum ActivityAndClassesType {
   USER_SIGNIN
   USER_RESET_PASSWORD
   OAUTH_APPLICATION_AUTHORIZED
-  TWO_FACTOR_CODE_ADDED
-  TWO_FACTOR_CODE_DELETED
+  TWO_FACTOR_METHOD_ADDED
+  TWO_FACTOR_METHOD_DELETED
   TWO_FACTOR_CODE_REQUESTED
   USER_CHANGE_EMAIL
   USER_PAYMENT_METHOD_CREATED
@@ -11640,6 +11659,9 @@ enum ActivityAndClassesType {
   ACTIVATED_COLLECTIVE_AS_HOST
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT
   DEACTIVATED_COLLECTIVE_AS_HOST
+  AGREEMENT_CREATED
+  AGREEMENT_EDITED
+  AGREEMENT_DELETED
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -12260,7 +12282,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 30
 
     """
     The offset to use to fetch
@@ -12888,7 +12910,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 30
 
     """
     The offset to use to fetch
@@ -13546,21 +13568,6 @@ type Mutation {
     Reference of the expense to process
     """
     expense: ExpenseReferenceInput!
-  ): Expense!
-
-  """
-  To verify and unverified expense. Scope: "expenses".
-  """
-  verifyExpense(
-    """
-    Reference of the expense to process
-    """
-    expense: ExpenseReferenceInput!
-
-    """
-    Expense draft key if invited to submit expense
-    """
-    draftKey: String
   ): Expense!
 
   """
@@ -14425,6 +14432,11 @@ type Mutation {
     Agreement attachment
     """
     attachment: Upload
+
+    """
+    Additional notes about the agreement for the host admins
+    """
+    notes: String
   ): Agreement!
 
   """
@@ -14445,6 +14457,16 @@ type Mutation {
     Optional date in which this agreement expires.
     """
     expiresAt: DateTime
+
+    """
+    Agreement attachment
+    """
+    attachment: Upload
+
+    """
+    Additional notes about the agreement for the host admins
+    """
+    notes: String
   ): Agreement!
 
   """
@@ -15847,6 +15869,11 @@ input PendingOrderEditInput {
   The contribution amount, without platform contribution and taxes
   """
   amount: AmountInput!
+
+  """
+  Platform tip attached to this order
+  """
+  platformTipAmount: AmountInput
 
   """
   The profile making the contribution.
