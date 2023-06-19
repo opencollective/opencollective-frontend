@@ -10,6 +10,7 @@ import { MessageAltError } from '@styled-icons/boxicons-regular/MessageAltError'
 import { MessageAltX } from '@styled-icons/boxicons-regular/MessageAltX';
 import { Note } from '@styled-icons/boxicons-regular/Note';
 import { Send } from '@styled-icons/boxicons-regular/Send';
+import { Time } from '@styled-icons/boxicons-regular/Time';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -22,6 +23,7 @@ import Container from '../../../Container';
 import DateTime from '../../../DateTime';
 import { Box, Flex } from '../../../Grid';
 import HTMLContent from '../../../HTMLContent';
+import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import { P } from '../../../Text';
 
 const ItemHeaderWrapper = styled(P)`
@@ -77,17 +79,18 @@ const getIcon = (type: ActivityType) => {
 };
 
 type ActivityListItemProps = {
-  activity: WorkspaceHomeQuery['activities']['nodes'][0];
-  isLast: boolean;
+  activity?: WorkspaceHomeQuery['activities']['nodes'][0];
+  isLast?: boolean;
 };
 
 const TimelineItem = ({ activity, isLast }: ActivityListItemProps) => {
   const intl = useIntl();
-  const secondaryAccount = activity.individual?.id !== activity.account?.id && activity.account;
-  const Icon = getIcon(activity.type);
+  const secondaryAccount = activity?.individual?.id !== activity?.account?.id && activity.account;
+  const Icon = activity ? getIcon(activity.type) : Time;
+  const html = activity?.data?.comment?.html || activity?.data?.update?.html;
+  const title = activity?.data?.update?.title;
 
-  const html = activity.data?.comment?.html || activity.data?.update?.html;
-  const title = activity.data?.update?.title;
+  const isLoading = !activity;
 
   return (
     <Box>
@@ -101,18 +104,30 @@ const TimelineItem = ({ activity, isLast }: ActivityListItemProps) => {
         <Box mb="42px" overflowX="hidden">
           <Flex flex="1" mb="12px">
             <Box mr="12px">
-              <AvatarWithLink size={40} account={activity.individual} secondaryAccount={secondaryAccount} />
+              {isLoading ? (
+                <LoadingPlaceholder height={40} width={40} borderRadius="50%" />
+              ) : (
+                <AvatarWithLink size={40} account={activity.individual} secondaryAccount={secondaryAccount} />
+              )}
             </Box>
             <Flex flexDirection="column" justifyContent="space-around">
-              <ItemHeaderWrapper color="black.800" fontWeight={500}>
-                {intl.formatMessage(
-                  ActivityTimelineMessageI18n[activity.type] || ActivityDescriptionI18n[activity.type],
-                  getActivityVariables(intl, activity),
-                )}
-              </ItemHeaderWrapper>
-              <P fontSize="12px" lineHeight="18px" fontWeight={400} color="black.700">
-                <DateTime value={activity.createdAt} />
-              </P>
+              {isLoading ? (
+                <LoadingPlaceholder height={16} width={200} />
+              ) : (
+                <ItemHeaderWrapper color="black.800" fontWeight={500}>
+                  {intl.formatMessage(
+                    ActivityTimelineMessageI18n[activity.type] || ActivityDescriptionI18n[activity.type],
+                    getActivityVariables(intl, activity),
+                  )}
+                </ItemHeaderWrapper>
+              )}
+              {isLoading ? (
+                <LoadingPlaceholder height={12} width={100} />
+              ) : (
+                <P fontSize="12px" lineHeight="18px" fontWeight={400} color="black.700">
+                  <DateTime value={activity.createdAt} />
+                </P>
+              )}
             </Flex>
           </Flex>
           {title && (

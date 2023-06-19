@@ -8,7 +8,6 @@ import type { WorkspaceHomeQuery } from '../../../../lib/graphql/types/v2/graphq
 
 import Container from '../../../Container';
 import { Flex } from '../../../Grid';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
@@ -45,7 +44,13 @@ const Home = (props: AdminSectionProps) => {
         {error ? (
           <MessageBoxGraphqlError error={error} />
         ) : loading ? (
-          <LoadingPlaceholder height={163} />
+          <React.Fragment>
+            <TimelineItem />
+            <TimelineItem />
+            <TimelineItem />
+            <TimelineItem />
+            <TimelineItem isLast />
+          </React.Fragment>
         ) : !activities ? (
           <MessageBox type="info" withIcon>
             <FormattedMessage defaultMessage="No activity yet" />
