@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
+import { Stripe } from '@styled-icons/fa-brands/Stripe';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -50,6 +51,10 @@ export const hostInfoCardFields = gql`
         valueInCents
         currency
       }
+    }
+    stripeIssuingBalance {
+      valueInCents
+      currency
     }
     stats {
       id
@@ -166,6 +171,37 @@ const HostInfoCard = ({ host }) => {
           <ConnectTransferwiseButton isConnected={Boolean(host.transferwise?.balances)} />
         </Container>
       </Flex>
+      {host.stripeIssuingBalance && (
+        <React.Fragment>
+          <Separator />
+          <Flex flexDirection="column" justifyContent="space-between" flex="1 1 33%">
+            <Flex alignItems="center" width="100%">
+              <Box mr={3}>
+                <Stripe size={14} color="#9D9FA3" />
+              </Box>
+              <ColumnTitle>
+                <FormattedMessage
+                  id="ServiceBalance"
+                  defaultMessage="{service} balance"
+                  values={{ service: 'Stripe issuing' }}
+                />
+              </ColumnTitle>
+            </Flex>
+            <Flex justifyContent="space-between" py={3}>
+              <Span color="black.400" fontSize="15px">
+                {host.stripeIssuingBalance?.currency || host.currency}
+              </Span>
+              <Span fontSize="15px">
+                <FormattedMoneyAmount
+                  showCurrencyCode={false}
+                  amount={host.stripeIssuingBalance?.valueInCents}
+                  currency={host.stripeIssuingBalance?.currency || host.currency}
+                />
+              </Span>
+            </Flex>
+          </Flex>
+        </React.Fragment>
+      )}
       <Separator />
       <Flex flexDirection="column" justifyContent="space-between" flex="1 1 33%">
         <Box mb={2}>
@@ -204,6 +240,12 @@ HostInfoCard.propTypes = {
         }),
       ),
     }),
+    stripeIssuingBalance: PropTypes.arrayOf(
+      PropTypes.shape({
+        valueInCents: PropTypes.number,
+        currency: PropTypes.string,
+      }),
+    ),
   }).isRequired,
 };
 

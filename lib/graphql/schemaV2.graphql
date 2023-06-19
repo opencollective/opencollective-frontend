@@ -2823,6 +2823,13 @@ type Host implements Account & AccountWithContributions {
   supportedPayoutMethods: [PayoutMethodType]
 
   """
+
+  """
+  Stripe issuing balance
+  """
+  stripeIssuingBalance: Amount
+
+  """
   Pending applications for this host
   """
   pendingApplications(

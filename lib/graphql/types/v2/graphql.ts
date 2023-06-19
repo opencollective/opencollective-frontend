@@ -4410,6 +4410,8 @@ export type Host = Account & AccountWithContributions & {
   slug: Scalars['String'];
   socialLinks: Array<SocialLink>;
   stats?: Maybe<AccountStats>;
+  /** Stripe issuing balance */
+  stripeIssuingBalance?: Maybe<Amount>;
   /** The list of expense types supported by this account */
   supportedExpenseTypes: Array<ExpenseType>;
   /** The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives */
