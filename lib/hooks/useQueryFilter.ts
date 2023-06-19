@@ -1,6 +1,8 @@
 import React from 'react';
-import { compact, omit, uniq } from 'lodash';
+import { compact, isEmpty, isNil, omit, uniq } from 'lodash';
 import { useRouter } from 'next/router';
+
+import { encodeDateInterval, parseDateInterval } from '../date-utils';
 
 interface CommonFilterDefinition {
   isMulti?: boolean;
@@ -124,3 +126,79 @@ function capitalize(v: string) {
   const first = v[0];
   return `${first.toUpperCase()}${v.slice(1)}`;
 }
+
+export const BooleanFilter = {
+  serialize: v => {
+    if (isNil(v)) {
+      return null;
+    }
+
+    if (v === true) {
+      return 'true';
+    } else {
+      return 'false';
+    }
+  },
+  deserialize: v => {
+    if (isEmpty(v)) {
+      return null;
+    }
+
+    return v === 'true';
+  },
+};
+
+export const DateRangeFilter = {
+  serialize: encodeDateInterval,
+  deserialize: parseDateInterval,
+};
+
+export const AmountRangeFilter = {
+  serialize: v => {
+    if (!v) {
+      return null;
+    }
+
+    const fromAmount = isNil(v.fromAmount) ? 0 : v.fromAmount / 100;
+    const toAmount = isNil(v.toAmount) ? Infinity : v.toAmount / 100;
+    if (fromAmount === toAmount) {
+      return `${fromAmount}`;
+    }
+
+    if (toAmount === Infinity) {
+      if (fromAmount === 0) {
+        return null;
+      }
+      return `${fromAmount}+`;
+    }
+    return `${fromAmount}-${toAmount}`;
+  },
+  deserialize: v => {
+    if (!v || v.length === 0) {
+      return null;
+    }
+
+    if (v.includes('+')) {
+      const [fromAmount] = v.split('+');
+
+      return {
+        fromAmount: fromAmount * 100,
+        toAmount: null,
+      };
+    }
+
+    if (v.includes('-')) {
+      const [fromAmount, toAmount] = v.split('-');
+
+      return {
+        fromAmount: fromAmount * 100,
+        toAmount: toAmount * 100,
+      };
+    }
+
+    return {
+      fromAmount: v * 100,
+      toAmount: v * 100,
+    };
+  },
+};

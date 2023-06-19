@@ -36,6 +36,13 @@ const EXPENSES_PER_PAGE = 15;
 export function getVariablesFromQuery(query) {
   const amountRange = parseAmountRange(query.amount);
   const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
+
+  const virtualCardIds = query.virtualCard
+    ? typeof query.virtualCard === 'string'
+      ? [query.virtualCard]
+      : query.virtualCard
+    : null;
+
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || EXPENSES_PER_PAGE,
@@ -54,6 +61,7 @@ export function getVariablesFromQuery(query) {
     includeGiftCardTransactions: !query.ignoreGiftCardsTransactions,
     includeChildrenTransactions: !query.ignoreChildrenTransactions,
     displayPendingContributions: query.displayPendingContributions !== 'false',
+    virtualCard: virtualCardIds ? virtualCardIds.map(id => ({ id })) : null,
   };
 }
 

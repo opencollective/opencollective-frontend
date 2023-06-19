@@ -6,9 +6,8 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { encodeDateInterval, parseDateInterval } from '../../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import useQueryFilter from '../../../lib/hooks/useQueryFilter';
+import useQueryFilter, { AmountRangeFilter, BooleanFilter, DateRangeFilter } from '../../../lib/hooks/useQueryFilter';
 
 import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal';
 import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';
@@ -130,63 +129,9 @@ const HostVirtualCards = props => {
         serialize: toLower,
         deserialize: toUpper,
       },
-      usagePeriod: {
-        serialize: encodeDateInterval,
-        deserialize: parseDateInterval,
-      },
-      missingReceipts: {
-        serialize: v => (v ? 'true' : ''),
-        deserialize: v => v === 'true',
-      },
-      totalSpent: {
-        serialize: v => {
-          if (!v) {
-            return null;
-          }
-
-          const fromAmount = isNil(v.fromAmount) ? 0 : v.fromAmount / 100;
-          const toAmount = isNil(v.toAmount) ? Infinity : v.toAmount / 100;
-          if (fromAmount === toAmount) {
-            return `${fromAmount}`;
-          }
-
-          if (toAmount === Infinity) {
-            if (fromAmount === 0) {
-              return null;
-            }
-            return `${fromAmount}+`;
-          }
-          return `${fromAmount}-${toAmount}`;
-        },
-        deserialize: v => {
-          if (!v || v.length === 0) {
-            return null;
-          }
-
-          if (v.includes('+')) {
-            const [fromAmount] = v.split('+');
-
-            return {
-              fromAmount: fromAmount * 100,
-              toAmount: null,
-            };
-          }
-
-          if (v.includes('-')) {
-            const [fromAmount, toAmount] = v.split('-');
-
-            return {
-              fromAmount: fromAmount * 100,
-              toAmount: toAmount * 100,
-            };
-          }
-
-          return {
-            fromAmount: v * 100,
-            toAmount: v * 100,
-          };
-        },
-      },
+      usagePeriod: DateRangeFilter,
+      missingReceipts: BooleanFilter,
+      totalSpent: AmountRangeFilter,
     },
   });
 
