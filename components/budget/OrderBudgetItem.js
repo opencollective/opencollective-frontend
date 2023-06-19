@@ -84,7 +84,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
             <LoadingPlaceholder height={60} />
           ) : (
             <Box>
-              <StyledLink as={Link} href={`${getCollectivePageRoute(order.toAccount)}/orders/${order.legacyId}`}>
+              <StyledLink as={Link} href={`${getCollectivePageRoute(order.toAccount)}/contributions/${order.legacyId}`}>
                 <AutosizeText
                   value={order.description}
                   maxLength={255}
