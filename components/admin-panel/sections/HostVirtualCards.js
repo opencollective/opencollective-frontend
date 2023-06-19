@@ -78,6 +78,7 @@ const hostVirtualCardsQuery = gql`
           assignee {
             id
             name
+            email
             slug
             imageUrl
           }

@@ -258,6 +258,26 @@ const ActionsButton = props => {
                         </Action>
                       </React.Fragment>
                     )}
+                    <StyledHr borderColor="black.300" mt={2} mb={2} />
+                    <a
+                      href={`/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Action>
+                        <FormattedMessage defaultMessage="View transactions" />
+                      </Action>
+                    </a>
+                    {virtualCard.assignee?.email && (
+                      <React.Fragment>
+                        <StyledHr borderColor="black.300" mt={2} mb={2} />
+                        <a href={`mailto:${virtualCard.assignee?.email}`} target="_blank" rel="noopener noreferrer">
+                          <Action>
+                            <FormattedMessage defaultMessage="Contact assignee" />
+                          </Action>
+                        </a>
+                      </React.Fragment>
+                    )}
                   </Flex>
                   <Arrow ref={arrowRef} {...arrowProps} />
                 </StyledCard>
@@ -309,6 +329,12 @@ ActionsButton.propTypes = {
     id: PropTypes.string,
     data: PropTypes.object,
     provider: PropTypes.string,
+    account: PropTypes.shape({
+      slug: PropTypes.string,
+    }),
+    assignee: PropTypes.shape({
+      email: PropTypes.string,
+    }),
   }),
   host: PropTypes.object,
   onSuccess: PropTypes.func,
