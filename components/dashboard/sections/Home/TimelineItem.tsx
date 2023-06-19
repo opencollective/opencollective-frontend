@@ -81,9 +81,10 @@ const getIcon = (type: ActivityType) => {
 type ActivityListItemProps = {
   activity?: WorkspaceHomeQuery['activities']['nodes'][0];
   isLast?: boolean;
+  openExpense?: (legacyId: number) => void;
 };
 
-const TimelineItem = ({ activity, isLast }: ActivityListItemProps) => {
+const TimelineItem = ({ activity, isLast, openExpense }: ActivityListItemProps) => {
   const intl = useIntl();
   const secondaryAccount = activity?.individual?.id !== activity?.account?.id && activity.account;
   const Icon = activity ? getIcon(activity.type) : Time;
@@ -117,7 +118,7 @@ const TimelineItem = ({ activity, isLast }: ActivityListItemProps) => {
                 <ItemHeaderWrapper color="black.800" fontWeight={500}>
                   {intl.formatMessage(
                     ActivityTimelineMessageI18n[activity.type] || ActivityDescriptionI18n[activity.type],
-                    getActivityVariables(intl, activity),
+                    getActivityVariables(intl, activity, { onClickExpense: openExpense }),
                   )}
                 </ItemHeaderWrapper>
               )}

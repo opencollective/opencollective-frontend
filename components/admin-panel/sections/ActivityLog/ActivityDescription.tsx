@@ -45,7 +45,13 @@ const CollectiveTag = ({
   );
 };
 
-export const getActivityVariables = (intl, activity) => ({
+export const getActivityVariables = (
+  intl,
+  activity,
+  options?: {
+    onClickExpense?: (id: number) => void;
+  },
+) => ({
   expenseDescription: activity.expense?.description,
   updateTitle: activity.data?.update?.title,
   hasParent: Boolean(activity.account?.parent),
@@ -67,6 +73,7 @@ export const getActivityVariables = (intl, activity) => ({
           collective={activity.expense.account}
           expense={activity.expense}
           title={activity.expense.description}
+          onClick={options?.onClickExpense}
           openInNewTab
         >
           {msg || `#${activity.expense.legacyId}`}

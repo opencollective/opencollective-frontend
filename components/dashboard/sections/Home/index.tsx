@@ -7,6 +7,7 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { WorkspaceHomeQuery } from '../../../../lib/graphql/types/v2/graphql';
 
 import Container from '../../../Container';
+import ExpenseDrawer from '../../../expenses/ExpenseDrawer';
 import { Flex } from '../../../Grid';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -21,6 +22,7 @@ const PAGE_SIZE = 20;
 
 const Home = (props: AdminSectionProps) => {
   const router = useRouter();
+  const [openExpenseLegacyId, setOpenExpenseLegacyId] = React.useState<number | null>(null);
   const slug = router.query?.as || props.account.slug;
   const { data, loading, error, fetchMore } = useQuery(workspaceHomeQuery, {
     variables: { slug, limit: PAGE_SIZE },
@@ -57,7 +59,12 @@ const Home = (props: AdminSectionProps) => {
           </MessageBox>
         ) : (
           activities.map((activity, i) => (
-            <TimelineItem key={activity.id} activity={activity} isLast={i === activities.length - 1} />
+            <TimelineItem
+              key={activity.id}
+              activity={activity}
+              isLast={i === activities.length - 1}
+              openExpense={id => setOpenExpenseLegacyId(id)}
+            />
           ))
         )}
         <StyledButton
@@ -77,6 +84,7 @@ const Home = (props: AdminSectionProps) => {
         >
           <FormattedMessage defaultMessage="View more" />
         </StyledButton>
+        <ExpenseDrawer openExpenseLegacyId={openExpenseLegacyId} handleClose={() => setOpenExpenseLegacyId(null)} />
       </Flex>
     </Container>
   );
