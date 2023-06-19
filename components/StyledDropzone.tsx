@@ -12,6 +12,7 @@ import { useImageUploader } from '../lib/hooks/useImageUploader';
 import Container from './Container';
 import { Box } from './Grid';
 import { getI18nLink } from './I18nFormatters';
+import LocalFilePreview from './LocalFilePreview';
 import StyledSpinner from './StyledSpinner';
 import { P, Span } from './Text';
 import UploadedFilePreview from './UploadedFilePreview';
@@ -83,21 +84,21 @@ const ReplaceContainer = styled.div`
  * A dropzone to upload one or multiple files
  */
 const StyledDropzone = ({
-  onReject,
-  children,
-  isLoading,
-  loadingProgress,
-  minHeight,
+  onReject = undefined,
+  children = null,
+  isLoading = false,
+  loadingProgress = undefined,
+  minHeight = 96,
   size,
-  fontSize,
-  mockImageGenerator,
+  fontSize = '14px',
+  mockImageGenerator = () => `https://loremflickr.com/120/120?lock=${uuid()}`,
   accept,
   minSize,
   maxSize,
   name,
-  error,
+  error = undefined,
   value,
-  isMulti,
+  isMulti = true,
   kind,
   ...props
 }: StyledDropzoneProps) => {
@@ -191,7 +192,7 @@ const StyledDropzone = ({
                     />
                   )}
                 </P>
-              ) : (
+              ) : typeof value === 'string' ? (
                 <React.Fragment>
                   <UploadedFilePreview size={size} url={value} border="none" />
                   <ReplaceContainer
@@ -208,7 +209,9 @@ const StyledDropzone = ({
                     <FormattedMessage id="Image.Replace" defaultMessage="Replace" />
                   </ReplaceContainer>
                 </React.Fragment>
-              )}
+              ) : value instanceof File ? (
+                <LocalFilePreview size={size} file={value} />
+              ) : null}
               {children}
             </React.Fragment>
           )}
@@ -220,23 +223,23 @@ const StyledDropzone = ({
 
 type StyledDropzoneProps = {
   /** Called back with the rejectd files */
-  onReject: () => void;
+  onReject?: () => void;
   /** Name for the input */
   name: string;
   /** Content to show inside the dropzone. Defaults to message "Drag and drop one or..." */
-  children: React.ReactChildren;
+  children?: React.ReactChildren;
   /** Force loading state to be displayed */
-  isLoading: boolean;
+  isLoading?: boolean;
   /** Use this to override the loading progress indicator */
-  loadingProgress: number;
+  loadingProgress?: number;
   /** Font size used for the default messages */
-  fontSize: number | string;
+  fontSize?: number | string;
   /** Min height of the container */
-  minHeight: number;
+  minHeight?: number;
   /** To have square container */
-  size: number;
+  size?: number;
   /** A function to generate mock images */
-  mockImageGenerator: () => void;
+  mockImageGenerator?: () => void;
   /** Filetypes to accept */
   accept: Accept;
   /** Min file size */
@@ -244,13 +247,14 @@ type StyledDropzoneProps = {
   /** Max file size */
   maxSize: number;
   /** A truthy/falsy value defining if the field has an error (ie. if it's required) */
-  error: any;
+  error?: any;
   /** required field */
-  required: boolean;
-  /** if set, the image will be displayed and a "replace" banner will be added */
-  value: string;
+  required?: boolean;
   /** A unique identified for the category of uploaded files */
   kind: string;
+  /** To disabled the input */
+  disabled?: boolean;
+  value?: any;
 } & (
   | {
       /** Collect File only, do not upload files */
@@ -259,6 +263,8 @@ type StyledDropzoneProps = {
       isMulti?: boolean;
       /** Called back with the uploaded files on success */
       onSuccess: (acceptedFiles: File[], fileRejections: FileRejection[]) => void;
+      /** if set, the image will be displayed and a "replace" banner will be added */
+      value?: File;
     }
   | ({
       collectFilesOnly?: false;
@@ -272,16 +278,10 @@ type StyledDropzoneProps = {
           isMulti: false;
           /** Called back with the uploaded files on success */
           onSuccess: (fileUrls: string) => void;
+          /** if set, the image will be displayed and a "replace" banner will be added */
+          value?: string;
         }
     ))
 );
-
-StyledDropzone.defaultProps = {
-  minHeight: 96,
-  mockImageGenerator: () => `https://loremflickr.com/120/120?lock=${uuid()}`,
-  isMulti: true,
-  fontSize: '14px',
-  collectFilesOnly: false,
-};
 
 export default StyledDropzone;

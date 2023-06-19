@@ -24,6 +24,7 @@ import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import CommentForm from '../conversations/CommentForm';
 import Thread from '../conversations/Thread';
+import { useDrawerActionsContainer } from '../Drawer';
 import FilesViewerModal from '../FilesViewerModal';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
@@ -97,18 +98,8 @@ const PrivateNoteLabel = () => {
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
 
 function Expense(props) {
-  const {
-    data,
-    loading,
-    error,
-    refetch,
-    fetchMore,
-    drawerActionsContainer,
-    draftKey,
-    client,
-    isRefetchingDataForUser,
-    legacyExpenseId,
-  } = props;
+  const { data, loading, error, refetch, fetchMore, draftKey, client, isRefetchingDataForUser, legacyExpenseId } =
+    props;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
@@ -129,6 +120,7 @@ function Expense(props) {
   let pollingTimeout = null;
   let pollingStarted = false;
   let pollingPaused = false;
+  const drawerActionsContainer = useDrawerActionsContainer();
 
   useEffect(() => {
     const shouldEditDraft = data?.expense?.status === expenseStatus.DRAFT && draftKey;
