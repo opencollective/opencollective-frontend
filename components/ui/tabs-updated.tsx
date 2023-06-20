@@ -3,7 +3,7 @@ import { cx } from 'class-variance-authority';
 
 export default function Tabs({ tabs, selected, onChange }) {
   return (
-    <div>
+    <div className="flex-1">
       <div className="sm:hidden">
         <label htmlFor="tabs" className="sr-only">
           Select a tab
@@ -21,7 +21,7 @@ export default function Tabs({ tabs, selected, onChange }) {
         </select>
       </div>
       <div className="hidden sm:block">
-        <div className="border-b border-gray-200">
+        <div className="border-b border-gray-200 -mb-px">
           <nav className="-mb-px flex space-x-8" aria-label="Tabs">
             {tabs.map(tab => (
               <button
@@ -42,6 +42,9 @@ export default function Tabs({ tabs, selected, onChange }) {
                       tab.label === selected ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-900',
                       'ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
                     )}
+                    // className={cx(
+                    //   'bg-white ring-gray-300 text-gray-900 ring-1 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
+                    // )}
                   >
                     {tab.count}
                   </span>

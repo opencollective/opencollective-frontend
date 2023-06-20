@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { useToasts } from '../ToastProvider';
 import { cx } from 'class-variance-authority';
 import EXPENSE_STATUS from '../../lib/constants/expense-status';
 import { parseDateInterval } from '../../lib/date-utils';
@@ -16,7 +17,10 @@ import ExpensesFilters from '../expenses/ExpensesFilters';
 import ExpensesList from '../expenses/ExpensesList';
 import Tabs from '../ui/tabs-updated';
 import Alert from '../ui/alert';
-import { parseChronologicalOrderInput } from '../expenses/filters/ExpensesOrder';
+import DashboardHeader from '../DashboardHeader';
+import { SettingsContext } from '../../lib/SettingsContext';
+import { parseChronologicalOrderInput } from '../OrderFilter';
+import ConfirmationModal from '../ConfirmationModal';
 import {
   expenseHostFields,
   expensesListAdminFieldsFragment,
@@ -35,7 +39,7 @@ import { H1 } from '../Text';
 
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
-
+import HeaderFilters from '../Filters';
 const hostDashboardExpensesQuery = gql`
   query HostDashboardExpenses(
     $hostSlug: String!
@@ -112,6 +116,79 @@ const hostDashboardExpensesQuery = gql`
   ${hostInfoCardFields}
 `;
 
+const createHostDashboardExpensesQuery = views => {
+  return gql`
+  query HostDashboardExpenses(
+    $hostSlug: String!
+    $limit: Int!
+    $offset: Int!
+    $type: ExpenseType
+    $tags: [String]
+    $status: ExpenseStatusFilter
+    $minAmount: Int
+    $maxAmount: Int
+    $payoutMethodType: PayoutMethodType
+    $dateFrom: DateTime
+    $dateTo: DateTime
+    $searchTerm: String
+    $orderBy: ChronologicalOrderInput
+  ) {
+    host(slug: $hostSlug) {
+      id
+      ...ExpenseHostFields
+      ...HostInfoCardFields
+      transferwise {
+        id
+        availableCurrencies
+      }
+    }
+    expenses(
+      host: { slug: $hostSlug }
+      limit: $limit
+      offset: $offset
+      type: $type
+      tag: $tags
+      status: $status
+      minAmount: $minAmount
+      maxAmount: $maxAmount
+      payoutMethodType: $payoutMethodType
+      dateFrom: $dateFrom
+      dateTo: $dateTo
+      searchTerm: $searchTerm
+      orderBy: $orderBy
+    ) {
+      totalCount
+      offset
+      limit
+      nodes {
+        id
+        ...ExpensesListFieldsFragment
+        ...ExpensesListAdminFieldsFragment
+      }
+    }
+
+    ${views.map((view, i) => {
+      return `
+      view${i}: expenses(
+      host: { slug: $hostSlug }
+      limit: 1
+      offset: 0
+      ${view.query.type ? `type: ${view.query.type}` : ''}
+      ${view.query.status ? `status: ${view.query.status}` : ''}
+    ){
+      totalCount
+    }`;
+    })}
+
+  }
+
+  ${expensesListFieldsFragment}
+  ${expensesListAdminFieldsFragment}
+  ${expenseHostFields}
+  ${hostInfoCardFields}
+`;
+};
+
 /**
  * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
  */
@@ -141,13 +218,25 @@ const isValidStatus = status => {
   return Boolean(status === 'READY_TO_PAY' || EXPENSE_STATUS[status]);
 };
 
+const getFilterFromQuery = query => {
+  return {
+    status: query.status === 'ALL' ? null : isValidStatus(query.status) ? query.status : undefined,
+    type: query.type,
+    tag: query.tag ? (Array.isArray(query.tag) ? query.tag : [query.tag]) : undefined,
+    amount: query.amount,
+    payout: query.payout,
+    searchTerm: query.searchTerm,
+    hasMissingReceipts: query.hasMissingReceipts,
+  };
+};
+
 const getVariablesFromQuery = query => {
   const amountRange = parseAmountRange(query.amount);
   const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
   const orderBy = query.orderBy && parseChronologicalOrderInput(query.orderBy);
   return {
     offset: parseInt(query.offset) || 0,
-    limit: (parseInt(query.limit) || NB_EXPENSES_DISPLAYED) * 2,
+    limit: parseInt(query.limit) || NB_EXPENSES_DISPLAYED,
     status: query.status === 'ALL' ? null : isValidStatus(query.status) ? query.status : 'READY_TO_PAY',
     type: query.type,
     tags: query.tag ? [query.tag] : undefined,
@@ -175,22 +264,83 @@ const hasParams = query => {
     return ![...ROUTE_PARAMS, 'offset', 'limit', 'paypalApprovalError', 'orderBy'].includes(key) && value;
   });
 };
-const stats = [
-  { name: 'Paypal balance', value: '$125,091.00', refill: true },
-  { name: 'Wise balance', value: '$12,787.00', refill: true },
+
+const filterOptions = [
+  {
+    key: 'type',
+    label: 'Type',
+    options: ['CHARGE', 'GRANT', 'INVOICE', 'REIMBURSEMENT', 'SETTLEMENT', 'UNCLASSIFIED'],
+  },
+  {
+    key: 'payout',
+    label: 'Payout method',
+    options: ['BANK_ACCOUNT', 'PAYPAL', 'ACCOUNT_BALANCE', 'CREDIT_CARD', 'OTHER'],
+  },
+  {
+    key: 'status',
+    label: 'Status',
+    noFilter: 'ALL',
+    options: [
+      'APPROVED',
+      'REJECTED',
+      'PENDING',
+      'READY_TO_PAY',
+      'PAID',
+      'ERROR',
+      'DRAFT',
+      'PROCESSING',
+      'INCOMPLETE',
+      'ON_HOLD',
+      'REJECTED',
+      'SCHEDULED_FOR_PAYMENT',
+      'SPAM',
+    ],
+  },
+  {
+    key: 'amount',
+    label: 'Amount',
+    options: ['0-50', '50-500', '500-5000', '5000+'],
+  },
+  {
+    key: 'searchTerm',
+    label: 'Text search',
+  },
 ];
 
-const HostDashboardExpenses = ({ hostSlug, isDashboard, settings }) => {
-  console.log({ settingsInHostDashb: settings });
+const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   const router = useRouter() || {};
-
+  const intl = useIntl();
   const query = enforceDefaultParamsOnQuery(router.query);
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const hasFilters = React.useMemo(() => hasParams(query), [query]);
   const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-expenses` : `/${hostSlug}/admin/expenses`;
   const queryVariables = { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) };
-  console.log({ queryVariables, query });
-  const expenses = useQuery(hostDashboardExpensesQuery, { variables: queryVariables, context: API_V2_CONTEXT });
+  const filters = getFilterFromQuery(omitBy(query, isEmpty));
+  const [showConfirmationModal, setConfirmationModalDisplay] = React.useState(false);
+  const initViews = [
+    {
+      label: 'Ready to pay',
+      query: { status: 'READY_TO_PAY' },
+    },
+    {
+      label: 'Scheduled for payment',
+      query: { status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT' },
+      actions: [
+        {
+          onClick: () => setConfirmationModalDisplay(true),
+          label: <FormattedMessage id="expenses.scheduled.paybatch" defaultMessage="Pay Batch" />,
+        },
+      ],
+    },
+    { label: 'On hold', query: { status: 'ON_HOLD' } },
+    {
+      label: 'Incomplete',
+      query: { status: 'INCOMPLETE' },
+    },
+    { label: 'Recently paid', query: { status: 'PAID' } },
+  ];
+  const queryWithViews = createHostDashboardExpensesQuery(initViews);
+  const expenses = useQuery(queryWithViews, { variables: queryVariables, context: API_V2_CONTEXT });
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
   React.useEffect(() => {
     if (query.paypalApprovalError && !paypalPreApprovalError) {
@@ -200,161 +350,72 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard, settings }) => {
   }, [query.paypalApprovalError]);
 
   const { data, error, loading } = expenses;
-  const [tabs, setTabs] = React.useState([
-    { label: 'Ready to pay', count: data?.countReadyToPay?.totalCount },
-    { label: 'Scheduled for payment', count: data?.countScheduledForPayment?.totalCount },
-    { label: 'On hold', count: data?.countOnHold?.totalCount },
-    { label: 'Incomplete', count: data?.countIncomplete?.totalCount },
-    { label: 'Recently paid' },
-  ]);
-  console.log({ query, data });
-  const [selectedTab, setTab] = React.useState(tabs[0].label);
 
-  const getQueryParams = newParams => {
-    const newNewParams = omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
-    console.log({ newParams, newNewParams });
-    return newNewParams;
-  };
+  const [views, setViews] = React.useState(initViews);
+
   React.useEffect(() => {
-    // update tab counts
-    if (data?.countReadyToPay) {
-      setTabs([
-        { label: 'Ready to pay', count: data?.countReadyToPay?.totalCount },
-        { label: 'Scheduled for payment', count: data?.countScheduledForPayment?.totalCount },
-        { label: 'On hold', count: data?.countOnHold?.totalCount },
-        { label: 'Incomplete', count: data?.countIncomplete?.totalCount },
-        { label: 'Recently paid' },
-      ]);
+    if (data?.view0) {
+      const viewsUpToDate = views.map((view, i) => {
+        return {
+          ...view,
+          count: data[`view${i}`].totalCount,
+        };
+      });
+      setViews(viewsUpToDate);
     }
   }, [data]);
-  React.useEffect(() => {
-    switch (selectedTab) {
-      case 'Ready to pay':
-        router.push({
-          pathname: pageRoute,
-          query: getQueryParams({ status: 'READY_TO_PAY', payout: null, offset: null }),
-        });
-        break;
-      case 'Scheduled for payment':
-        router.push({
-          pathname: pageRoute,
-          query: getQueryParams({ status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', offset: null }),
-        });
-        break;
-      case 'On hold':
-        router.push({
-          pathname: pageRoute,
-          query: getQueryParams({ status: 'ON_HOLD', payout: null, offset: null }),
-        });
-        break;
-      case 'Incomplete':
-        router.push({
-          pathname: pageRoute,
-          query: getQueryParams({ status: 'INCOMPLETE', payout: null, offset: null }),
-        });
-        break;
-      case 'Recently paid':
-        router.push({
-          pathname: pageRoute,
-          query: getQueryParams({ status: 'PAID', payout: null, offset: null }),
-        });
-        break;
-    }
-  }, [selectedTab]);
+
+  const { settings } = React.useContext(SettingsContext);
 
   return (
     <div className="w-full max-w-screen-xl">
-      <Flex mb={24} alignItems="center" flexWrap="wrap">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-        </h1>{' '}
-        <Box mx="auto" />
-        {/* <Box p={2}>
-          <SearchBar
-            defaultValue={query.searchTerm}
-            onSubmit={searchTerm =>
-              router.push({
-                pathname: pageRoute,
-                query: getQueryParams({ searchTerm, offset: null }),
-              })
-            }
-          />
-        </Box> */}
-      </Flex>
-      {/* Stats */}
-      <div className="mb-6 border-b border-b-gray-900/10 lg:border-t lg:border-t-gray-900/5">
-        <dl className=" grid max-w-7xl grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:px-2 xl:px-0">
-          {stats.map((stat, statIdx) => (
-            <div
-              key={stat.name}
-              className={cx(
-                statIdx % 2 === 1 ? 'sm:border-l' : statIdx === 2 ? 'lg:border-l' : '',
-                'flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-t border-gray-900/5 px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8',
-              )}
-            >
-              <dt className="text-sm font-medium leading-6 text-gray-500">{stat.name}</dt>
-              {stat.refill ? <dd className={cx('text-blue-600', 'text-xs font-medium')}>Refill</dd> : null}
-              <dd className="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900">
-                {stat.value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-      {/* <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" /> */}
+      <HeaderFilters
+        title={<FormattedMessage id="Expenses" defaultMessage="Expenses" />}
+        views={views}
+        filter={filters}
+        query={omitBy(query, (value, key) => !value || ROUTE_PARAMS.includes(key))}
+        filterOptions={filterOptions}
+        orderByOptions={[
+          {
+            label: intl.formatMessage({ id: 'ExpensesOrder.NewestFirst', defaultMessage: 'Newest first' }),
+            value: 'CREATED_AT,DESC',
+          },
+          {
+            label: intl.formatMessage({ id: 'ExpensesOrder.OldestFirst', defaultMessage: 'Oldest first' }),
+            value: 'CREATED_AT,ASC',
+          },
+        ]}
+        onChange={queryParams =>
+          router.push({
+            pathname: pageRoute,
+            query: queryParams,
+          })
+        }
+      />
 
-      {/* <div>
-    
-        <div className="my-2 flex rounded-md shadow-sm">
-          <div className="relative flex flex-grow items-stretch focus-within:z-10">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <FunnelIcon className="h-5 w-5 text-gray-300" aria-hidden="true" />
-            </div>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              className="block w-full rounded-none rounded-l-md border-0 py-1.5 pl-10 text-gray-500 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              placeholder="Filter..."
-              defaultValue="status:READY_TO_PAY"
+      {showConfirmationModal && (
+        <ConfirmationModal
+          zindex={1000}
+          header={<FormattedMessage id="expenses.scheduled.confirmation.title" defaultMessage="Pay Expenses Batch" />}
+          body={
+            <FormattedMessage
+              id="expenses.scheduled.confirmation.body"
+              defaultMessage="Are you sure you want to batch and pay {count, plural, one {# expense} other {# expenses}} scheduled for payment?"
+              values={{ count: data?.countScheduledForPayment?.totalCount }}
             />
-          </div>
-          <button
-            type="button"
-            className="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-          >
-            <BarsArrowUpIcon className="-ml-0.5 h-5 w-5 text-gray-400" aria-hidden="true" />
-            Oldest first
-          </button>
-        </div>
-      </div> */}
-
-      <Tabs tabs={tabs} selected={selectedTab} onChange={setTab} />
-      {paypalPreApprovalError && (
-        <DismissibleMessage>
-          {({ dismiss }) => (
-            <MessageBox type="warning" mb={3} withIcon onClose={dismiss}>
-              {paypalPreApprovalError === 'PRE_APPROVAL_EMAIL_CHANGED' ? (
-                <FormattedMessage
-                  id="paypal.preApproval.emailWarning"
-                  defaultMessage="Warning: the associated PayPal email was changed from {oldEmail} to {newEmail}. If this was not intentional, click {refillBalance} and use the correct account."
-                  values={{
-                    oldEmail: <strong>{query.oldPaypalEmail}</strong>,
-                    newEmail: <strong>{query.newPaypalEmail}</strong>,
-                    refillBalance: (
-                      <q>
-                        <FormattedMessage id="ConnectPaypal.refill" defaultMessage="Refill balance" />
-                      </q>
-                    ),
-                  }}
-                />
-              ) : (
-                paypalPreApprovalError
-              )}
-            </MessageBox>
-          )}
-        </DismissibleMessage>
+          }
+          onClose={() => setConfirmationModalDisplay(false)}
+          continueLabel={
+            <FormattedMessage
+              id="expense.pay.btn"
+              defaultMessage="Pay with {paymentMethod}"
+              values={{ paymentMethod: 'Wise' }}
+            />
+          }
+          continueHandler={() => setConfirmationModalDisplay(false)}
+        />
       )}
+
       {/* <Box mb={4}>
         {loading ? (
           <LoadingPlaceholder height={150} />
@@ -406,11 +467,11 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard, settings }) => {
         ) : null}
       </Box> */}
 
-      <React.Fragment>
+      <div className={settings.fullBleedTable ? '' : ''}>
         <ExpensesList
           settings={settings}
           isLoading={loading}
-          loadingCount={tabs.find(t => t.label === selectedTab)?.count}
+          loadingCount={10}
           host={data?.host}
           nbPlaceholders={paginatedExpenses.limit}
           expenses={paginatedExpenses.nodes}
@@ -428,7 +489,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard, settings }) => {
             ignoredQueryParams={ROUTE_PARAMS}
           />
         </Flex>
-      </React.Fragment>
+      </div>
     </div>
   );
 };

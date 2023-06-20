@@ -16,7 +16,7 @@ import SearchBar from '../../SearchBar';
 import StyledHr from '../../StyledHr';
 import { H1 } from '../../Text';
 import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from '../HostAdminCollectiveFilters';
-
+import Filters from '../../Filters';
 import PendingApplication, { processApplicationAccountFields } from './PendingApplication';
 
 const COLLECTIVES_PER_PAGE = 20;
@@ -112,32 +112,37 @@ const updateQuery = (router, newParams) => {
   return router.push({ pathname, query });
 };
 
+const enforceDefaultParamsOnQuery = query => {
+  return {
+    ...query,
+    status: query.status || 'PENDING',
+  };
+};
+
 const PendingApplications = ({ hostSlug }) => {
   const router = useRouter() || {};
-  const query = router.query;
+  const query = enforceDefaultParamsOnQuery(router.query);
   const hasFilters = React.useMemo(() => checkIfQueryHasFilters(query), [query]);
   const { data, error, loading, variables } = useQuery(pendingApplicationsQuery, {
     variables: { hostSlug, ...getVariablesFromQuery(query) },
     context: API_V2_CONTEXT,
   });
+  const views = [
+    {
+      label: 'Pending',
+      query: { status: 'PENDING' },
+    },
+    { label: 'Rejected', query: { status: 'REJECTED' } },
+    {
+      label: 'Approved',
+      query: { status: 'APPROVED' },
+    },
+  ];
 
   const hostApplications = data?.host?.pendingApplications;
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
-      <Flex alignItems="center" mb={24} flexWrap="wrap">
-        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
-          <FormattedMessage id="host.dashboard.tab.pendingApplications" defaultMessage="Pending applications" />
-        </H1>
-        <Box mx="auto" />
-        <Box p={2}>
-          <SearchBar
-            defaultValue={query.searchTerm}
-            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-          />
-        </Box>
-      </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" />
-      <Box mb={34}>
+    <div>
+      {/* <Box mb={34}>
         {data?.host ? (
           <HostAdminCollectiveFilters
             filters={[COLLECTIVE_FILTER.SORT_BY]}
@@ -152,7 +157,34 @@ const PendingApplications = ({ hostSlug }) => {
         ) : loading ? (
           <LoadingPlaceholder height={70} />
         ) : null}
-      </Box>
+      </Box> */}
+
+      <Filters
+        title={<FormattedMessage defaultMessage="Applications" />}
+        views={views}
+        query={omitBy(query, (value, key) => !value || ROUTE_PARAMS.includes(key))}
+        filterOptions={[
+          {
+            key: 'status',
+            label: 'Status',
+            noFilter: 'ALL',
+            options: ['PENDING', 'APPROVED', 'REJECTED', 'EXPIRED'],
+          },
+          {
+            key: 'searchTerm',
+            label: 'Text search',
+          },
+        ]}
+        orderByKey="sort-by"
+        orderByOptions={[
+          { value: 'most-recent', label: 'Most recent' },
+          { value: 'oldest', label: 'Oldest' },
+        ]}
+        onChange={queryParams => {
+          const pathname = router.asPath.split('?')[0];
+          return router.push({ pathname, query: queryParams });
+        }}
+      />
 
       {error && <MessageBoxGraphqlError error={error} mb={2} />}
 
@@ -188,7 +220,7 @@ const PendingApplications = ({ hostSlug }) => {
           </Flex>
         </React.Fragment>
       )}
-    </Box>
+    </div>
   );
 };
 

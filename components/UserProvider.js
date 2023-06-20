@@ -90,6 +90,7 @@ class UserProvider extends React.Component {
 
     try {
       const LoggedInUser = token ? await getLoggedInUser({ token }) : await getLoggedInUser();
+
       this.setState({
         loadingLoggedInUser: false,
         errorLoggedInUser: null,

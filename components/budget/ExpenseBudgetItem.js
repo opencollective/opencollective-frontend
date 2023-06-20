@@ -120,7 +120,7 @@ const ExpenseBudgetItem = ({
 }) => {
   const [hasFilesPreview, showFilesPreview] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
-  const useDrawer = LoggedInUser?.hasEarlyAccess('expense-drawer');
+  const useDrawer = true;
 
   const featuredProfile = isInverted ? expense?.account : expense?.payee;
   const isAdminView = view === 'admin';

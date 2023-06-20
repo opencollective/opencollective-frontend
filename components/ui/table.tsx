@@ -5,7 +5,7 @@ import { cx } from 'class-variance-authority';
 
 const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
-    <div className="w-full overflow-auto">
+    <div className="w-full overflow-hidden">
       <table ref={ref} className={cx('w-full caption-bottom text-sm', className)} {...props} />
     </div>
   ),
@@ -20,7 +20,7 @@ TableHeader.displayName = 'TableHeader';
 const TableBody = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
   ({ className, ...props }, ref) => (
     <tbody ref={ref} className={cx('[&_tr:last-child]:border-0', className)} {...props} />
-  ),
+  ), //
 );
 TableBody.displayName = 'TableBody';
 
@@ -33,13 +33,13 @@ TableFooter.displayName = 'TableFooter';
 
 const TableRow = React.forwardRef<
   HTMLTableRowElement,
-  React.HTMLAttributes<HTMLTableRowElement> & { highlightOnHover?: boolean }
->(({ className, highlightOnHover, ...props }, ref) => (
+  React.HTMLAttributes<HTMLTableRowElement> & { noBorder?: boolean }
+>(({ className, noBorder, ...props }, ref) => (
   <tr
     ref={ref}
     className={cx(
-      'data-[state=selected]:bg-slate-100 group border-b  transition-colors',
-      highlightOnHover && 'hover:bg-slate-100/50',
+      'data-[state=selected]:bg-slate-100 group transition-colors',
+      noBorder ? 'border-0' : 'border-b',
       className,
     )}
     {...props}

@@ -66,36 +66,30 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath, settings }
 
   if (isLoading) {
     return (
-      <Container width="100%" px={2}>
+      <React.Fragment>
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
-      </Container>
+      </React.Fragment>
     );
   }
 
   const AdminSectionComponent = ADMIN_PANEL_SECTIONS[section];
   if (AdminSectionComponent) {
     return (
-      <Container width="100%">
-        <AdminSectionComponent
-          settings={settings}
-          account={collective}
-          hostSlug={collective.slug}
-          subpath={subpath}
-          isDashboard={true}
-        />
-      </Container>
+      <AdminSectionComponent
+        settings={settings}
+        account={collective}
+        hostSlug={collective.slug}
+        subpath={subpath}
+        isDashboard={true}
+      />
     );
   }
 
   // Fiscal Host Settings
   const FiscalHostSettingsComponent = FISCAL_HOST_SETTINGS_SECTIONS[section];
   if (FiscalHostSettingsComponent) {
-    return (
-      <Container width="100%">
-        <FiscalHostSettingsComponent isDashboard={true} collective={collective} settings={settings} />
-      </Container>
-    );
+    return <FiscalHostSettingsComponent isDashboard={true} collective={collective} settings={settings} />;
   }
 
   // Form

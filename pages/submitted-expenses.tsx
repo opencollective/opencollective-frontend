@@ -27,7 +27,7 @@ import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
 import ExpensesList from '../components/expenses/ExpensesList';
-import { parseChronologicalOrderInput } from '../components/expenses/filters/ExpensesOrder';
+import { parseChronologicalOrderInput } from '../components/OrderFilter';
 import { expenseHostFields, expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';

@@ -152,19 +152,22 @@ const DashboardPage = ({ settings }) => {
             settings={settings}
           />
 
-          <main className="page flex-1">
+          <main className="flex-1 page flex justify-start">
             {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
             ) : (
-              <AdminPanelSection
-                section={selectedSection}
-                isLoading={isLoading}
-                collective={account}
-                subpath={subpath}
-                settings={settings}
-              />
+              <div className="w-full max-w-screen-lg">
+                <AdminPanelSection
+                  section={selectedSection}
+                  isLoading={isLoading}
+                  collective={account}
+                  subpath={subpath}
+                  settings={settings}
+                />
+              </div>
             )}
           </main>
+          {/* <div className={'max-w-[280px] shrink-1'}></div> */}
         </div>
       )}
       {/* </Page> */}

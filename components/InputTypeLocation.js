@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Clear } from '@styled-icons/material/Clear';
 import { themeGet } from '@styled-system/theme-get';
 import { get } from 'lodash';
-import Geosuggest from 'react-geosuggest';
+// import Geosuggest from 'react-geosuggest';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { isURL } from 'validator';
@@ -21,7 +21,7 @@ const ClearIcon = styled(Clear)`
   cursor: pointer;
 `;
 
-const GeoSuggestItem = styled(Geosuggest)`
+const GeoSuggestItem = styled.div`
   .geosuggest {
     font-size: 18px;
     font-size: 10px;

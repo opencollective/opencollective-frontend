@@ -7,10 +7,10 @@ import dayjs from 'dayjs';
 import FlipMove from 'react-flip-move';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
-
+import { Flipped, Flipper } from 'react-flip-toolkit';
 import { DISABLE_ANIMATIONS } from '../../lib/animations';
 import { i18nExpenseStatus, i18nExpenseType } from '../../lib/i18n/expense';
-
+import ExpenseItem from './ExpenseItem';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import ExpenseBudgetItem from '../budget/ExpenseBudgetItem';
 import ExpenseTable from '../ExpenseTable';
@@ -100,14 +100,14 @@ const ExpensesList = ({
     // if (window?.event?.metaKey) {
     //   setUseNewDrawer(false);
     // } else {
-    setUseNewDrawer(true);
-    // }
+    // setUseNewDrawer(true);
+    // // }
     setExpenseInDrawer(expense);
     setSelectedId(expense.id);
   };
 
   return (
-    <div className="mt-4 w-full flex-1">
+    <div className="mt-0 w-full ">
       {settings.tables ? (
         <ExpenseTable
           isLoading={isLoading}

@@ -11,6 +11,7 @@ const PrototypeSettings = () => {
   const setSetting = newSetting => {
     setSettings({ ...settings, ...newSetting });
   };
+
   return (
     <div
       className={cx(
@@ -34,7 +35,7 @@ const PrototypeSettings = () => {
             /> */}
           </div>
           <hr className="mb-4" />
-          <h3 className="mb-2">Style options</h3>
+          {/* <h3 className="mb-2">Style options</h3>
           <div className="space-y-2  ">
             <Switch
               label="Sidebar: gray background"
@@ -66,7 +67,12 @@ const PrototypeSettings = () => {
               enabled={settings.shadowsSidebar}
               setEnabled={value => setSetting({ shadowsSidebar: !settings.shadowsSidebar })}
             />
-          </div>
+            <Switch
+              label="Full bleed table"
+              enabled={settings.fullBleedTable}
+              setEnabled={value => setSetting({ fullBleedTable: !settings.fullBleedTable })}
+            />
+          </div> */}
           <div className="flex flex-1 items-center justify-end">
             <button
               onClick={() => setExpand(!expand)}

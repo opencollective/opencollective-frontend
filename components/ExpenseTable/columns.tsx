@@ -69,7 +69,7 @@ export const columns: ColumnDef<Expense>[] = [
         <button
           // @ts-ignore
           onClick={() => table.options.meta.expandExpense(expense)}
-          className="group/cell flex w-full  max-w-sm cursor-pointer items-center gap-1 overflow-hidden p-4 text-left font-medium text-slate-900"
+          className="group/cell max-w-[360px] whitespace-nowrap w-full cursor-pointer items-center gap-1 overflow-hidden pl-4 px-2 py-4 text-left font-medium text-slate-900"
         >
           <span className="truncate group-hover/cell:underline">{description}</span>{' '}
           <span className="flex-shrink-0 text-slate-400">#{id}</span>
@@ -83,9 +83,9 @@ export const columns: ColumnDef<Expense>[] = [
     cell: ({ cell }) => {
       const account = cell.getValue();
       return (
-        <div className="flex items-center gap-2 truncate p-4  text-slate-500">
+        <div className="flex items-center gap-2 truncate px-2 py-4  text-slate-500 max-w-[160px]">
           {/* @ts-ignore */}
-          <Avatar collective={account} radius={20} /> <span>{account?.name}</span>
+          <Avatar collective={account} radius={20} /> <span className="truncate">{account?.name}</span>
         </div>
       );
     },
@@ -96,9 +96,9 @@ export const columns: ColumnDef<Expense>[] = [
     cell: ({ cell }) => {
       const account = cell.getValue();
       return (
-        <div className="flex items-center gap-2 truncate p-4  text-slate-500">
+        <div className="flex items-center gap-2 truncate px-2 py-4  text-slate-500 max-w-[160px]">
           {/* @ts-ignore */}
-          <Avatar collective={account} radius={20} /> <span>{account?.name}</span>
+          <Avatar collective={account} radius={20} /> <span className="truncate">{account?.name}</span>
         </div>
       );
     },
@@ -109,36 +109,36 @@ export const columns: ColumnDef<Expense>[] = [
     cell: ({ cell }) => {
       const account = cell.getValue();
       return (
-        <div className="flex items-center gap-2 truncate p-4  text-slate-500">
+        <div className="flex items-center gap-2 truncate px-2 py-4  text-slate-500">
           {/* @ts-ignore */}
           <Avatar collective={account} radius={20} /> <span>{account?.name}</span>
         </div>
       );
     },
   },
-  {
-    accessorKey: 'createdAt',
-    header: ({ column }) => {
-      return (
-        <button
-          className="flex items-center whitespace-nowrap  text-slate-500"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          <span>Created at</span>
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </button>
-      );
-    },
-    cell: ({ cell }) => {
-      const createdAt = cell.getValue();
-      return (
-        <div className="whitespace-nowrap p-4 text-slate-500">
-          {/* @ts-ignore */}
-          <span>{dayjs(createdAt).format('MMM D, YYYY')}</span>
-        </div>
-      );
-    },
-  },
+  // {
+  //   accessorKey: 'createdAt',
+  //   header: ({ column }) => {
+  //     return (
+  //       <button
+  //         className="flex items-center whitespace-nowrap  text-slate-500"
+  //         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+  //       >
+  //         <span>Created at</span>
+  //         <ArrowUpDown className="ml-2 h-4 w-4" />
+  //       </button>
+  //     );
+  //   },
+  //   cell: ({ cell }) => {
+  //     const createdAt = cell.getValue();
+  //     return (
+  //       <div className="whitespace-nowrap px-2 py-4 text-slate-500">
+  //         {/* @ts-ignore */}
+  //         <span>{dayjs(createdAt).format('MMM D, YYYY')}</span>
+  //       </div>
+  //     );
+  //   },
+  // },
 
   {
     accessorKey: 'comments.totalCount',
@@ -148,7 +148,7 @@ export const columns: ColumnDef<Expense>[] = [
       //   const comments = row.getValue('comments');
 
       return (
-        <div className="p-4">
+        <div className="px-2 py-4">
           {Number(totalCount) ? (
             <div className="flex flex-shrink-0 items-center gap-1 text-sm font-medium text-gray-500">
               <MessageSquare className="h-4 w-4 flex-shrink-0 " />
@@ -168,7 +168,7 @@ export const columns: ColumnDef<Expense>[] = [
       // @ts-ignore
       const totalCount = attachedFiles?.length;
       return (
-        <div className="p-4">
+        <div className="px-2 py-4">
           {Number(totalCount) ? (
             <div className="flex flex-shrink-0 items-center gap-1 text-sm font-medium text-gray-500">
               <Paperclip className="h-4 w-4 flex-shrink-0 " />
@@ -217,12 +217,12 @@ export const columns: ColumnDef<Expense>[] = [
       // @ts-ignore
       const isMultiCurrency = amountInAccountCurrency && amountInAccountCurrency?.currency !== currency;
       return (
-        <div className="flex flex-auto flex-col justify-end whitespace-nowrap p-4">
+        <div className="flex flex-auto flex-col justify-end whitespace-nowrap px-2 py-4">
           <div className="leading-6 text-slate-900">
             {/* @ts-ignore */}
             <FormattedMoneyAmount amount={amount} currency={currency} precision={2} />
           </div>
-          {isMultiCurrency && (
+          {false && isMultiCurrency && (
             <div className="mt-1 text-xs leading-5 text-slate-500">
               {/* @ts-ignore */}
               <AmountWithExchangeRateInfo showTooltip={false} amount={amountInAccountCurrency} />
@@ -237,7 +237,11 @@ export const columns: ColumnDef<Expense>[] = [
     header: 'Status',
     cell: ({ cell }) => {
       const status = cell.getValue();
-      return <ExpenseStatus size={'small'} status={status} />;
+      return (
+        <div className="flex items-center max-w-[160px] truncate whitespace-nowrap">
+          <ExpenseStatus size={'small'} status={status} />
+        </div>
+      );
     },
   },
   {

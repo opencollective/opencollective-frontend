@@ -157,12 +157,15 @@ const Menu = ({ isAccountantOnly }) => {
         </MenuLink>
         <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} item={{ icon: Receipt }} />
         <MenuLink section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} item={{ icon: Coins }}>
-          Recurring Contributions
+          Contributing
+        </MenuLink>
+        <MenuLink section={'contributors'} item={{ icon: Coins }}>
+          Contributors
         </MenuLink>
         <MenuLink
           section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
           item={{ icon: Coins }}
-          if={isSelfHostedAccount(account) && !isAccountantOnly && isType(account, COLLECTIVE)}
+          // if={isSelfHostedAccount(account) && !isAccountantOnly && isType(account, COLLECTIVE)}
         />
         <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} item={{ icon: ArrowRightLeft }} />
         <MenuLink

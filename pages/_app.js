@@ -90,6 +90,7 @@ class OpenCollectiveFrontendApp extends App {
         mainGrayBg: false,
         headerDarkBg: false,
         simpleProfileDropdown: true,
+        fullBleedTable: true,
       },
     };
   }

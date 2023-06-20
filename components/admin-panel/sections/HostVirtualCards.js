@@ -1,13 +1,13 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
-import { omit, omitBy } from 'lodash';
+import { omit, omitBy, isEmpty } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-
+import DashboardHeader from '../../DashboardHeader';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-
+import Filters from '../../Filters';
 import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal';
 import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';
 import VirtualCardFilters from '../../edit-collective/sections/virtual-cards/VirtualCardFilters';
@@ -25,9 +25,10 @@ const hostVirtualCardsQuery = gql`
     $slug: String
     $limit: Int!
     $offset: Int!
-    $state: String
+    $status: [VirtualCardStatus]
     $merchantAccount: AccountReferenceInput
     $collectiveAccountIds: [AccountReferenceInput]
+    $hasMissingReceipts: Boolean
   ) {
     host(slug: $slug) {
       id
@@ -40,9 +41,10 @@ const hostVirtualCardsQuery = gql`
       hostedVirtualCards(
         limit: $limit
         offset: $offset
-        state: $state
+        status: $status
         merchantAccount: $merchantAccount
         collectiveAccountIds: $collectiveAccountIds
+        hasMissingReceipts: $hasMissingReceipts
       ) {
         totalCount
         limit
@@ -120,12 +122,19 @@ const AddCardPlaceholder = styled(Flex)`
 `;
 
 const VIRTUAL_CARDS_PER_PAGE = 6;
-
+const enforceDefaultParamsOnQuery = query => {
+  return {
+    ...query,
+    status: query.status || 'ACTIVE',
+  };
+};
 const HostVirtualCards = props => {
   const router = useRouter();
   const routerQuery = omit(router.query, ['slug', 'section']);
+  const query = enforceDefaultParamsOnQuery(routerQuery);
+
   const offset = parseInt(routerQuery.offset) || 0;
-  const { state, merchant, collectiveAccountIds } = routerQuery;
+  const { status, merchant, collectiveAccountIds, hasMissingReceipts } = routerQuery;
   const { addToast } = useToasts();
   const { loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
     context: API_V2_CONTEXT,
@@ -133,22 +142,22 @@ const HostVirtualCards = props => {
       slug: props.hostSlug,
       limit: VIRTUAL_CARDS_PER_PAGE,
       offset,
-      state,
+      status: query.status === 'ALL' ? null : query.status ? query.status : 'ACTIVE',
+      hasMissingReceipts: hasMissingReceipts === 'true',
       merchantAccount: { slug: merchant },
       collectiveAccountIds: collectiveAccountIds
         ? collectiveAccountIds.split(',').map(collectiveAccountId => ({ legacyId: parseInt(collectiveAccountId) }))
         : undefined,
     },
   });
-
   const [displayAssignCardModal, setAssignCardModalDisplay] = React.useState(false);
   const [displayCreateVirtualCardModal, setCreateVirtualCardModalDisplay] = React.useState(false);
 
   const handleUpdateFilters = queryParams => {
     return router.push(
       {
-        pathname: `/${props.hostSlug}/admin/host-virtual-cards`,
-        query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
+        pathname: `/dashboard/${props.hostSlug}/host-virtual-cards`,
+        query: omitBy(queryParams, value => !value),
       },
       null,
       { scroll: false },
@@ -174,30 +183,58 @@ const HostVirtualCards = props => {
     setCreateVirtualCardModalDisplay(false);
     refetch();
   };
+  const createVirtualCardAction = {
+    label: <FormattedMessage defaultMessage="Create virtual card" />,
+    onClick: () => setCreateVirtualCardModalDisplay(true),
+  };
+  const views = [
+    {
+      label: 'Active',
+      query: { status: 'ACTIVE' },
+      actions: [createVirtualCardAction],
+    },
+    {
+      label: 'Missing receipts',
+      query: { hasMissingReceipts: 'true', status: 'ACTIVE' },
+      actions: [createVirtualCardAction],
+    },
+    {
+      label: 'Inactive',
+      query: { status: 'INACTIVE' },
+      actions: [createVirtualCardAction],
+    },
+    {
+      label: 'Canceled',
+      query: { status: 'CANCELED' },
+      actions: [createVirtualCardAction],
+    },
+  ];
 
-  if (loading) {
-    return <Loading />;
-  }
-
+  // if (loading) {
+  //   return <Loading />;
+  // }
   return (
-    <Fragment>
-      <Box>
-        <P fontSize="24px" fontWeight="700" lineHeight="32px" mb={3}>
-          <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
-        </P>
-        <P>
-          <FormattedMessage
-            id="Host.VirtualCards.List.Description"
-            defaultMessage="Make payments easier by creating virtual cards. One Collective can have multiple virtual cards. <learnMoreLink>Learn more</learnMoreLink>"
-            values={{
-              learnMoreLink: getI18nLink({
-                href: 'https://docs.opencollective.com/help/fiscal-hosts/virtual-cards',
-                openInNewTabNoFollow: true,
-              }),
-            }}
-          />
-        </P>
-        <Flex mt={3} flexDirection={['row', 'column']}>
+    <div className="w-full max-w-screen-xl">
+      <Filters
+        title={<FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />}
+        filterOptions={[
+          {
+            key: 'status',
+            label: 'Status',
+            noFilter: 'ALL',
+            options: ['ACTIVE', 'INACTIVE', 'CANCELED'],
+          },
+          {
+            key: 'hasMissingReceipts',
+            label: 'Has missing receipts',
+          },
+        ]}
+        views={views}
+        query={query}
+        // orderBy={query.orderBy}
+        onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
+      />
+      {/* <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters
             isCollectiveFilter={true}
             filters={routerQuery}
@@ -206,9 +243,21 @@ const HostVirtualCards = props => {
             virtualCardCollectives={data.host.hostedVirtualCardCollectives.nodes}
             onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
           />
-        </Flex>
-      </Box>
-      <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
+        </Flex> */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 ">
+        {data?.host?.hostedVirtualCards.nodes.map(vc => (
+          <VirtualCard
+            key={vc.id}
+            host={data.host}
+            virtualCard={vc}
+            canEditVirtualCard
+            canPauseOrResumeVirtualCard
+            canDeleteVirtualCard
+            onDeleteRefetchQuery="HostedVirtualCards"
+          />
+        ))}
+      </div>
+      {/* <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
         <AddCardPlaceholder
           width="366px"
           height="248px"
@@ -253,28 +302,17 @@ const HostVirtualCards = props => {
             <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />
           </Box>
         </AddCardPlaceholder>
-        {data.host.hostedVirtualCards.nodes.map(vc => (
-          <VirtualCard
-            key={vc.id}
-            host={data.host}
-            virtualCard={vc}
-            canEditVirtualCard
-            canPauseOrResumeVirtualCard
-            canDeleteVirtualCard
-            onDeleteRefetchQuery="HostedVirtualCards"
-          />
-        ))}
-      </Grid>
+      </Grid> */}
       <Flex mt={5} alignItems="center" flexDirection="column" justifyContent="center">
         <Pagination
-          route={`/${data.host.slug}/admin/host-virtual-cards`}
-          total={data.host.hostedVirtualCards.totalCount}
+          route={`/${data?.host?.slug}/admin/host-virtual-cards`}
+          total={data?.host?.hostedVirtualCards.totalCount}
           limit={VIRTUAL_CARDS_PER_PAGE}
           offset={offset}
           ignoredQueryParams={['slug', 'section']}
         />
         <P mt={1} fontSize="12px">
-          <FormattedMessage id="TotalItems" defaultMessage="Total Items" />: {data.host.hostedVirtualCards.totalCount}
+          <FormattedMessage id="TotalItems" defaultMessage="Total Items" />: {data?.host?.hostedVirtualCards.totalCount}
         </P>
       </Flex>
       {displayAssignCardModal && (
@@ -295,7 +333,7 @@ const HostVirtualCards = props => {
           }}
         />
       )}
-    </Fragment>
+    </div>
   );
 };
 

@@ -25,7 +25,7 @@ import { collectiveNavbarFieldsFragment } from '../components/collective-page/gr
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Expenses from '../components/expenses/ExpensesPage';
-import { parseChronologicalOrderInput } from '../components/expenses/filters/ExpensesOrder';
+import { parseChronologicalOrderInput } from '../components/OrderFilter';
 import { expenseHostFields, expensesListFieldsFragment } from '../components/expenses/graphql/fragments';
 import { Box } from '../components/Grid';
 import Page from '../components/Page';

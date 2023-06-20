@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
+import Filters from '../Filters';
 import { Box, Flex, Grid } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
@@ -123,8 +124,8 @@ const getVariablesFromQuery = query => {
 
 const ROUTE_PARAMS = ['hostCollectiveSlug', 'slug', 'section', 'view'];
 
-const updateQuery = (router, newParams) => {
-  const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+const updateQuery = (router, params) => {
+  const query = omitBy({ params }, (value, key) => !value || ROUTE_PARAMS.includes(key));
   const pathname = router.asPath.split('?')[0];
   return router.push({ pathname, query });
 };
@@ -139,22 +140,45 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
   });
 
   const hostedMemberships = data?.host?.memberOf;
+
+  const views = [
+    {
+      label: 'All',
+      // count:
+      query: { status: null },
+    },
+  ];
+
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
-      <Flex alignItems="center" mb={24} flexWrap="wrap">
-        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
-          <FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />
-        </H1>
-        <Box mx="auto" />
-        <Box p={2}>
-          <SearchBar
-            defaultValue={query.searchTerm}
-            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-          />
-        </Box>
-      </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" />
-      <Box mb={34}>
+    <div>
+      <Filters
+        title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />}
+        // views={views}
+        query={omitBy(query, (value, key) => !value || ROUTE_PARAMS.includes(key))}
+        // setView={setView}
+        // orderBy={query.orderBy}
+        filterOptions={[
+          {
+            key: 'searchTerm',
+            label: 'Text search',
+          },
+          {
+            key: 'fees-structure',
+            label: 'Fees structure',
+            options: ['CUSTOM_FEE', 'DEFAULT'],
+          },
+        ]}
+        orderByKey="sort-by"
+        orderByOptions={[
+          { value: 'most-recent', label: 'Most recent' },
+          { value: 'oldest', label: 'Oldest' },
+        ]}
+        onChange={queryParams => {
+          const pathname = router.asPath.split('?')[0];
+          return router.push({ pathname, query: queryParams });
+        }}
+      />
+      {/* <Box mb={34}>
         {data?.host ? (
           <HostAdminCollectiveFilters
             values={query}
@@ -164,7 +188,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
         ) : loading ? (
           <LoadingPlaceholder height={70} />
         ) : null}
-      </Box>
+      </Box> */}
 
       {error && <MessageBoxGraphqlError error={error} mb={2} />}
 
@@ -203,7 +227,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
           </Flex>
         </React.Fragment>
       )}
-    </Box>
+    </div>
   );
 };
 

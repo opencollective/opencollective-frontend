@@ -14,7 +14,7 @@ import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { expensesPageQuery } from '../../../pages/expenses';
 import { parseAmountRange } from '../../budget/filters/AmountFilter';
 import ExpensesPage from '../../expenses/ExpensesPage';
-import { parseChronologicalOrderInput } from '../../expenses/filters/ExpensesOrder';
+import { parseChronologicalOrderInput } from '../../OrderFilter';
 import { AdminSectionProps } from '../types';
 
 const parseQuery = (routerQuery, account) => {

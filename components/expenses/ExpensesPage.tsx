@@ -21,7 +21,7 @@ import Tags from '../Tags';
 import { H1, H5 } from '../Text';
 
 import { ExpensesDirection } from './filters/ExpensesDirection';
-import ExpensesOrder from './filters/ExpensesOrder';
+import ExpensesOrder from '../OrderFilter';
 import ExpenseInfoSidebar from './ExpenseInfoSidebar';
 import ExpensesFilters from './ExpensesFilters';
 import ExpensesList from './ExpensesList';

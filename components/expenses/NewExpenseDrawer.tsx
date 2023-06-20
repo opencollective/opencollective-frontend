@@ -556,6 +556,7 @@ export const getExpenseStatusMsgType = status => {
       return 'error';
     case expenseStatus.PENDING:
     case expenseStatus.UNVERIFIED:
+    case expenseStatus.INCOMPLETE:
       return 'warning';
     case expenseStatus.SCHEDULED_FOR_PAYMENT:
     case expenseStatus.APPROVED:
@@ -566,7 +567,7 @@ export const getExpenseStatusMsgType = status => {
   }
 };
 
-export function ExpenseStatus({ status, size }:any) {
+export function ExpenseStatus({ status, size }: any) {
   const intl = useIntl();
   const statusStyles = cva('inline-flex items-center rounded-md  font-medium gap-x-1.5 py-1 px-2', {
     variants: {
@@ -587,9 +588,9 @@ export function ExpenseStatus({ status, size }:any) {
   });
   return (
     <span className={statusStyles({ type: getExpenseStatusMsgType(status), size })}>
-      <svg className="h-1.5 w-1.5" viewBox="0 0 6 6" aria-hidden="true">
+      {/* <svg className="h-1.5 w-1.5" viewBox="0 0 6 6" aria-hidden="true">
         <circle cx="3" cy="3" r="3" />
-      </svg>
+      </svg> */}
       {i18nExpenseStatus(intl, status)}
     </span>
   );

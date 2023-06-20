@@ -34,15 +34,13 @@ export default function ExpenseTable({ expenses, host, expandExpense, context, i
 
   console.log({ context, defaultColumnVisibility });
   return (
-    <div className="pb-10">
-      <DataTable
-        columns={columns}
-        data={expenses}
-        meta={{ host, expandExpense }}
-        defaultColumnVisibility={defaultColumnVisibility}
-        loading={isLoading}
-        loadingCount={loadingCount}
-      />
-    </div>
+    <DataTable
+      columns={columns}
+      data={expenses}
+      meta={{ host, expandExpense }}
+      defaultColumnVisibility={defaultColumnVisibility}
+      loading={isLoading}
+      loadingCount={loadingCount}
+    />
   );
 }

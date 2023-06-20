@@ -429,7 +429,7 @@ const VirtualCard = props => {
   };
 
   return (
-    <CardContainer width="366px" height="248px" flexDirection="column">
+    <CardContainer width="100%" height="240px" flexDirection="column">
       <div />
       <Box flexGrow={1} m="24px 24px 0 24px">
         <Flex fontSize="16px" lineHeight="24px" fontWeight="500" justifyContent="space-between">
