@@ -14,7 +14,7 @@ const Container = styled.div`
     `}
 `;
 
-const TransactionsList = ({ transactions, collective, displayActions, onMutationSuccess }) => {
+const TransactionsList = ({ isLoading, transactions, collective, displayActions, onMutationSuccess }) => {
   if (!transactions?.length) {
     return null;
   }
@@ -25,6 +25,7 @@ const TransactionsList = ({ transactions, collective, displayActions, onMutation
         return (
           <Container key={transaction?.id || idx} isFirst={!idx} data-cy="single-transaction">
             <TransactionItem
+              isLoading={isLoading}
               transaction={transaction}
               collective={collective}
               displayActions={displayActions}

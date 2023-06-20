@@ -61,6 +61,7 @@ export const COLLECTIVE_SECTIONS = {
   INFO: 'info',
   EXPENSES: 'expenses',
   MANAGE_CONTRIBUTIONS: 'manage-contributions',
+  CONTRIBUTORS: 'contributors',
   TRANSACTIONS: 'transactions',
   PAYMENT_METHODS: 'payment-methods',
   PAYMENT_RECEIPTS: 'payment-receipts',

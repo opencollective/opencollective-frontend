@@ -30,7 +30,7 @@ import { parseTransactionPaymentMethodTypes } from './filters/TransactionsPaymen
 import TransactionsDownloadCSV from './TransactionsDownloadCSV';
 import TransactionsFilters from './TransactionsFilters';
 import TransactionsList from './TransactionsList';
-
+import Filters from '../Filters';
 const EXPENSES_PER_PAGE = 15;
 
 export function getVariablesFromQuery(query) {
@@ -95,7 +95,9 @@ const Transactions = ({
       refetch();
     }
   }, [LoggedInUser]);
-
+  const queryParameters = {
+    ...omit(router.query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
+  };
   useEffect(() => {
     const queryParameters = {
       ...omit(router.query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
@@ -165,12 +167,6 @@ const Transactions = ({
   });
   const canDownloadInvoices = checkCanDownloadInvoices();
 
-  if (!account && loading) {
-    return <Loading />;
-  } else if (!account) {
-    return <ErrorPage error={error} loading={loading} />;
-  }
-
   const transactionsAndProcessingOrders =
     state.hasProcessingOrders && variables.displayPendingContributions && !variables.offset
       ? [
@@ -181,10 +177,56 @@ const Transactions = ({
 
   return (
     <Container>
-      <Flex justifyContent="space-between" alignItems="baseline">
-        <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-          <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
-        </H1>
+      <Filters
+        title={<FormattedMessage id="menu.transactions" defaultMessage="Transactions" />}
+        query={queryParameters}
+        onChange={queryParams => updateFilters(queryParams)}
+        views={[
+          { label: 'All', query: {} },
+          {
+            label: 'Debit',
+            query: {
+              type: 'DEBIT',
+            },
+          },
+          {
+            label: 'Credit',
+            query: {
+              type: 'CREDIT',
+            },
+          },
+          {
+            label: 'Incoming contributions',
+            query: {
+              type: 'CREDIT',
+              kind: 'CONTRIBUTION',
+            },
+          },
+        ]}
+        filterOptions={[
+          {
+            key: 'type',
+            label: 'Type',
+            options: ['CREDIT', 'DEBIT'],
+          },
+          {
+            key: 'kind',
+            label: 'Kind',
+            options: ['CONTRIBUTION'],
+          },
+          {
+            key: 'amount',
+            label: 'Amount',
+            options: ['0-50', '50-500', '500-5000', '5000+'],
+          },
+          {
+            key: 'searchTerm',
+            label: 'Text search',
+          },
+        ]}
+      />
+      {/* <Flex justifyContent="space-between" alignItems="baseline">
+        <H1 fontSize="32px" lineHeight="40px" fontWeight="normal"></H1>
         <Box flexGrow={[1, 0]}>
           <SearchBar
             placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…' })}
@@ -193,8 +235,8 @@ const Transactions = ({
             onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
           />
         </Box>
-      </Flex>
-      <Flex
+      </Flex> */}
+      {/* <Flex
         mb={['8px', '23px']}
         mt={4}
         mx="8px"
@@ -231,7 +273,7 @@ const Transactions = ({
           )}
           <TransactionsDownloadCSV collective={account} query={router.query} />
         </Flex>
-      </Flex>
+      </Flex> */}
 
       <Flex
         mx="8px"
@@ -239,7 +281,7 @@ const Transactions = ({
         flexDirection={['column', 'row']}
         alignItems={['stretch', 'flex-end']}
       >
-        {state.hasProcessingOrders && (
+        {/* {state.hasProcessingOrders && (
           <StyledCheckbox
             checked={router.query.displayPendingContributions !== 'false' ? true : false}
             onChange={({ checked }) => updateFilters({ displayPendingContributions: checked })}
@@ -280,7 +322,7 @@ const Transactions = ({
               <FormattedMessage id="transactions.excludeIncognito" defaultMessage="Exclude Incognito transactions" />
             }
           />
-        )}
+        )} */}
       </Flex>
 
       <Box mt={['8px', '23px']}>
@@ -319,7 +361,7 @@ const Transactions = ({
             />
             <Flex mt={5} justifyContent="center">
               <Pagination
-                route={`/${account.slug}/transactions`}
+                route={`/${account?.slug}/transactions`}
                 total={transactions?.totalCount}
                 limit={variables.limit}
                 offset={variables.offset}

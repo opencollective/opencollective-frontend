@@ -115,3 +115,36 @@ export const manageContributionsQuery = gql`
   ${collectiveNavbarFieldsFragment}
   ${managedOrderFragment}
 `;
+
+export const contributorsQuery = gql`
+  query RecurringContributions($slug: String!) {
+    account(slug: $slug) {
+      id
+      legacyId
+      slug
+      name
+      type
+      settings
+      imageUrl
+      features {
+        id
+        ...NavbarFields
+      }
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+        }
+      }
+      orders(filter: INCOMING, includeIncognito: true) {
+        totalCount
+        nodes {
+          id
+          ...ManagedOrderFields
+        }
+      }
+    }
+  }
+  ${collectiveNavbarFieldsFragment}
+  ${managedOrderFragment}
+`;

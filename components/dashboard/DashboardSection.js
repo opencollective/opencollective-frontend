@@ -23,6 +23,8 @@ import { H2 } from '../Text';
 
 import Expenses from './sections/Expenses';
 import ManageContributions from './sections/ManageContributions';
+import Contributors from './sections/Contributors';
+
 import Transactions from './sections/Transactions';
 import ActivityLog from './sections/ActivityLog';
 import {
@@ -46,6 +48,7 @@ const ADMIN_PANEL_SECTIONS = {
   [COLLECTIVE_SECTIONS.TEAM]: TeamSettings,
   // NEW
   [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
+  [COLLECTIVE_SECTIONS.CONTRIBUTORS]: Contributors,
   [COLLECTIVE_SECTIONS.EXPENSES]: Expenses,
   [COLLECTIVE_SECTIONS.TRANSACTIONS]: Transactions,
   [COLLECTIVE_SECTIONS.HOME]: ActivityLog,

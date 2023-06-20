@@ -6,14 +6,14 @@ import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Box } from '../../Grid';
-import { manageContributionsQuery } from '../../recurring-contributions/graphql/queries';
+import { contributorsQuery } from '../../recurring-contributions/graphql/queries';
 import RecurringContributionsContainer from '../../recurring-contributions/RecurringContributionsContainer';
 import { H1 } from '../../Text';
 import { AdminSectionProps } from '../types';
 import Filters from '../../Filters';
 
 const ManageContributions = ({ account }: AdminSectionProps) => {
-  const { data, loading } = useQuery(manageContributionsQuery, {
+  const { data, loading } = useQuery(contributorsQuery, {
     variables: { slug: account.slug },
     context: API_V2_CONTEXT,
   });
@@ -22,7 +22,7 @@ const ManageContributions = ({ account }: AdminSectionProps) => {
   return (
     <Container minHeight={[null, 800]}>
       <Filters
-        title={<FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />}
+        title={<FormattedMessage defaultMessage="Contributors" />}
         views={[
           { label: 'Recurring', query: {} },
           { label: 'One-time', query: {} },

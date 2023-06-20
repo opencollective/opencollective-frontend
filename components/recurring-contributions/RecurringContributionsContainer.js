@@ -104,7 +104,7 @@ const RecurringContributionsContainer = ({
 
   return (
     <Container {...props}>
-      {displayFilters && (
+      {/* {displayFilters && (
         <Box mb={3}>
           <StyledSelectFilter
             inputId="recurring-contribution-interval"
@@ -116,7 +116,7 @@ const RecurringContributionsContainer = ({
             data-cy="recurring-contributions-interval"
           />
         </Box>
-      )}
+      )} */}
       {displayedRecurringContributions.length ? (
         <Grid gridGap={24} gridTemplateColumns="repeat(auto-fill, minmax(275px, 1fr))" my={2}>
           {displayedRecurringContributions.map(contribution => (
