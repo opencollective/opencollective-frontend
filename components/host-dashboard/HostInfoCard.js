@@ -44,9 +44,12 @@ export const hostInfoCardFields = gql`
         valueInCents
       }
     }
-    transferwiseBalances {
-      valueInCents
-      currency
+    transferwise {
+      id
+      balances {
+        valueInCents
+        currency
+      }
     }
     stats {
       id
@@ -94,7 +97,7 @@ const getMainTransferwiseBalance = (balances, hostCurrency) => {
  * PayPal & Transferwise balances.
  */
 const HostInfoCard = ({ host }) => {
-  const mainTransferwiseBalance = getMainTransferwiseBalance(host.transferwiseBalances, host.currency);
+  const mainTransferwiseBalance = getMainTransferwiseBalance(host.transferwise?.balances, host.currency);
   return (
     <StyledCard display={['block', null, 'flex']} justifyContent="space-evenly" px={4} py={22}>
       {host.paypalPreApproval && (
@@ -145,7 +148,7 @@ const HostInfoCard = ({ host }) => {
           <ColumnTitle>
             <FormattedMessage id="ServiceBalance" defaultMessage="{service} balance" values={{ service: 'Wise' }} />
           </ColumnTitle>
-          <TransferwiseDetailsIcon size={18} balances={host.transferwiseBalances} />
+          <TransferwiseDetailsIcon size={18} balances={host.transferwise?.balances} />
         </Flex>
         <Flex justifyContent="space-between" py={3}>
           <Span color="black.400" fontSize="15px">
@@ -160,7 +163,7 @@ const HostInfoCard = ({ host }) => {
           </Span>
         </Flex>
         <Container display="inline-block" ml="-16px">
-          <ConnectTransferwiseButton isConnected={Boolean(host.transferwiseBalances)} />
+          <ConnectTransferwiseButton isConnected={Boolean(host.transferwise?.balances)} />
         </Container>
       </Flex>
       <Separator />
@@ -193,12 +196,14 @@ HostInfoCard.propTypes = {
         currency: PropTypes.string.isRequired,
       }).isRequired,
     }),
-    transferwiseBalances: PropTypes.arrayOf(
-      PropTypes.shape({
-        valueInCents: PropTypes.number,
-        currency: PropTypes.string,
-      }),
-    ),
+    transferwise: PropTypes.shape({
+      balances: PropTypes.arrayOf(
+        PropTypes.shape({
+          valueInCents: PropTypes.number,
+          currency: PropTypes.string,
+        }),
+      ),
+    }),
   }).isRequired,
 };
 
