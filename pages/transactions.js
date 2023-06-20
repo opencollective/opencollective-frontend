@@ -145,12 +145,12 @@ class TransactionsPage extends React.Component {
 
   async componentDidMount() {
     const { router, data } = this.props;
-    const Collective = (data && data.account) || this.state.collective;
+    const collective = (data && data.account) || this.state?.collective;
     const queryParameters = {
       ...omit(this.props.query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
     };
-    this.setState({ Collective });
-    addParentToURLIfMissing(router, Collective, `/transactions`, queryParameters);
+    this.setState({ collective });
+    addParentToURLIfMissing(router, collective, `/transactions`, queryParameters);
   }
 
   render() {
