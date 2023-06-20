@@ -74,6 +74,7 @@ const defaultColors = {
     100: '#FFFFC2',
     50: '#FFFFEB',
   },
+
   /** Danger, Error */
   red: {
     900: '#521022',
