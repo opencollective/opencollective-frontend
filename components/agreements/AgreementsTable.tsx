@@ -11,7 +11,9 @@ import Avatar from '../Avatar';
 import { DataTable } from '../DataTable';
 import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
-import { Span } from '../Text';
+import StyledHr from '../StyledHr';
+import StyledLinkButton from '../StyledLinkButton';
+import { P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 const CellButton = styled.button`
@@ -143,12 +145,18 @@ export const tableColumns: ColumnDef<Agreement>[] = [
 type AgreementsTableProps = {
   agreements: { nodes: Agreement[] };
   openAgreement: (agreement: Agreement) => void;
+  resetFilters?: () => void;
   loading?: boolean;
   nbPlaceholders?: number;
-  emptyMessage?: React.ReactNode;
 };
 
-export default function AgreementsTable({ agreements, openAgreement, loading, nbPlaceholders }: AgreementsTableProps) {
+export default function AgreementsTable({
+  agreements,
+  openAgreement,
+  loading,
+  nbPlaceholders,
+  resetFilters,
+}: AgreementsTableProps) {
   const [isTableView, setIsTableView] = React.useState(true);
   useWindowResize(() => setIsTableView(window.innerWidth > 1024));
   const columns = isTableView ? tableColumns : cardColumns;
@@ -160,7 +168,21 @@ export default function AgreementsTable({ agreements, openAgreement, loading, nb
       meta={{ openAgreement } as AgreementMeta}
       loading={loading}
       nbPlaceholders={nbPlaceholders}
-      emptyMessage={() => <FormattedMessage defaultMessage="No agreements" />}
+      emptyMessage={() => (
+        <div>
+          <P fontSize="16px">
+            <FormattedMessage defaultMessage="No agreements" />
+          </P>
+          {resetFilters && (
+            <div>
+              <StyledHr maxWidth={300} m="16px auto" borderColor="black.100" />
+              <StyledLinkButton onClick={resetFilters}>
+                <FormattedMessage defaultMessage="Reset filters" />
+              </StyledLinkButton>
+            </div>
+          )}
+        </div>
+      )}
     />
   );
 }
