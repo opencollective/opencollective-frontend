@@ -36,18 +36,20 @@ const hostDashboardAgreementsQuery = gql`
 
 const NB_AGREEMENTS_DISPLAYED = 10;
 
+const IGNORED_QUERY_PARAMS = ['slug', 'section'];
+
 const getVariablesFromQuery = query => {
   const accountIds = query.accountIds;
   return {
     offset: parseInt(query.offset) || 0,
-    limit: (parseInt(query.limit) || NB_AGREEMENTS_DISPLAYED) * 2,
+    limit: parseInt(query.limit) || NB_AGREEMENTS_DISPLAYED,
     accounts: accountIds ? accountIds.split(',').map(id => ({ id })) : undefined,
   };
 };
 
-const hasPagination = (data): boolean => {
+const hasPagination = (data, queryVariables): boolean => {
   const totalCount = data?.host?.hostedAccountAgreements?.totalCount;
-  return Boolean(totalCount && totalCount > NB_AGREEMENTS_DISPLAYED);
+  return Boolean(queryVariables.offset || (totalCount && totalCount > NB_AGREEMENTS_DISPLAYED));
 };
 
 const HostDashboardAgreements = ({ hostSlug }) => {
@@ -56,7 +58,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
   const [agreementDrawerOpen, setAgreementDrawerOpen] = React.useState(false);
   const [agreementInDrawer, setAgreementInDrawer] = React.useState(null);
   const queryVariables = { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) };
-  const { data, error, loading, refetch } = useQuery(hostDashboardAgreementsQuery, {
+  const { data, previousData, error, loading, refetch } = useQuery(hostDashboardAgreementsQuery, {
     variables: queryVariables,
     context: API_V2_CONTEXT,
   });
@@ -114,12 +116,14 @@ const HostDashboardAgreements = ({ hostSlug }) => {
             }}
           />
           <Flex my={4} justifyContent="center">
-            {hasPagination(data) && (
+            {hasPagination(data || previousData, queryVariables) && (
               <Pagination
                 variant="input"
                 offset={queryVariables.offset}
                 limit={queryVariables.limit}
-                total={data?.host.hostedAccountAgreements.totalCount}
+                total={(data || previousData)?.host?.hostedAccountAgreements?.totalCount || 0}
+                ignoredQueryParams={IGNORED_QUERY_PARAMS}
+                isDisabled={loading}
               />
             )}
           </Flex>
