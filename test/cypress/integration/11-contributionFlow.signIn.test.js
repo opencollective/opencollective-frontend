@@ -10,8 +10,6 @@ describe('Contribution Flow: Sign In', () => {
   beforeEach(() => {
     cy.visit('/apex/donate');
     cy.url().should('contain', 'interval=oneTime&amount=20');
-    // Still need to wait a bit for the query params to be loaded
-    cy.wait(250);
   });
 
   it("Doesn't allow to submit if email is invalid", () => {

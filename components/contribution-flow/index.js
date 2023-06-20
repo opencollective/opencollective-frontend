@@ -159,6 +159,8 @@ class ContributionFlow extends React.Component {
       stripeElements: null,
       isSubmitted: false,
       isSubmitting: false,
+      isInitializing: true,
+      isNavigating: false,
       showSignIn: false,
       createdOrder: null,
       forceSummaryStep: this.getCurrentStepName() !== STEPS.DETAILS, // If not starting the flow with the details step, we force the summary step to make sure contributors have an easy way to review their contribution
@@ -182,7 +184,14 @@ class ContributionFlow extends React.Component {
     };
   }
 
-  componentDidUpdate(oldProps) {
+  async componentDidMount() {
+    if (!this.props.loadingLoggedInUser && this.state.isInitializing) {
+      await this.updateRouteFromState();
+      this.setState({ isInitializing: false });
+    }
+  }
+
+  async componentDidUpdate(oldProps) {
     if (oldProps.LoggedInUser && !this.props.LoggedInUser) {
       // User has logged out, reset the state
       this.setState({ stepProfile: null, stepSummary: null, stepPayment: null });
@@ -204,32 +213,38 @@ class ContributionFlow extends React.Component {
     } else if (oldProps.loadingLoggedInUser && !this.props.loadingLoggedInUser) {
       // Login failed, reset the state to make sure we fallback on guest mode
       this.setState({ stepProfile: this.getDefaultStepProfile() });
-    } else if (!this.props.loadingLoggedInUser) {
-      // Reflect state changes in the URL
-      const currentStepName = this.getCurrentStepName();
-      if (currentStepName !== STEPS.SUCCESS) {
-        const { stepDetails, stepProfile, stepPayment } = this.state;
-        const currentUrlState = this.getQueryParams();
-        const expectedUrlState = stepsDataToUrlParamsData(
-          currentUrlState,
-          stepDetails,
-          stepProfile,
-          stepPayment,
-          this.props.paymentFlow === PAYMENT_FLOW.CRYPTO,
-          this.props.isEmbed,
-        );
-        if (!isEqual(currentUrlState, omitBy(expectedUrlState, isNil))) {
-          const route = this.getRoute(currentStepName);
-          const queryHelper = this.getQueryHelper();
-          this.props.router.replace(
-            { pathname: route, query: omitBy(queryHelper.encode(expectedUrlState), isNil) },
-            null,
-            { scroll: false, shallow: true },
-          );
-        }
-      }
+    } else if (!this.props.loadingLoggedInUser && this.state.isInitializing) {
+      await this.updateRouteFromState();
+      this.setState({ isInitializing: false });
     }
   }
+
+  updateRouteFromState = async () => {
+    const currentStepName = this.getCurrentStepName();
+    if (currentStepName !== STEPS.SUCCESS) {
+      const { stepDetails, stepProfile, stepPayment } = this.state;
+      const currentUrlState = this.getQueryParams();
+      const expectedUrlState = stepsDataToUrlParamsData(
+        currentUrlState,
+        stepDetails,
+        stepProfile,
+        stepPayment,
+        this.props.paymentFlow === PAYMENT_FLOW.CRYPTO,
+        this.props.isEmbed,
+      );
+      if (!isEqual(currentUrlState, omitBy(expectedUrlState, isNil))) {
+        const route = this.getRoute(currentStepName);
+        const queryHelper = this.getQueryHelper();
+        this.setState({ isNavigating: true });
+        await this.props.router.replace(
+          { pathname: route, query: omitBy(queryHelper.encode(expectedUrlState), isNil) },
+          null,
+          { scroll: false, shallow: true },
+        );
+        this.setState({ isNavigating: false });
+      }
+    }
+  };
 
   _getQueryParams = memoizeOne(query => {
     return this.getQueryHelper().decode(query);
@@ -628,9 +643,7 @@ class ContributionFlow extends React.Component {
   /** Navigate to another step, ensuring all route params are preserved */
   pushStepRoute = async (stepName, { query: newQueryParams, replace = false } = {}) => {
     // Reset errors if any
-    if (this.state.error) {
-      this.setState({ error: null });
-    }
+    this.setState({ error: null, isNavigating: true });
 
     // Navigate to the new route
     const { router } = this.props;
@@ -640,6 +653,7 @@ class ContributionFlow extends React.Component {
     const route = this.getRoute(stepName === 'details' ? '' : stepName);
     const navigateFn = replace ? router.replace : router.push;
     await navigateFn({ pathname: route, query: omitBy(encodedQueryParams, value => !value) }, null, { shallow: true });
+    this.setState({ isNavigating: false });
     this.scrollToTop();
 
     // Reinitialize form on success
@@ -996,7 +1010,7 @@ class ContributionFlow extends React.Component {
                     collective={collective}
                     tier={tier}
                     mainState={this.state}
-                    onChange={data => this.setState(data)}
+                    onChange={data => this.setState(data, this.updateRouteFromState)}
                     step={currentStep}
                     isCrypto={isCrypto}
                     showPlatformTip={this.canHavePlatformTips()}
@@ -1039,6 +1053,7 @@ class ContributionFlow extends React.Component {
                       tier={tier}
                       stepDetails={stepDetails}
                       stepSummary={stepSummary}
+                      disabled={this.state.isInitializing || this.state.isNavigating}
                     />
                   </Box>
                   {!isEmbed && (
