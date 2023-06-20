@@ -29,8 +29,8 @@ import UploadedFilePreview from '../UploadedFilePreview';
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 import ExpenseMoreActionsButton from './ExpenseMoreActionsButton';
-import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseStatusTag from './ExpenseStatusTag';
+import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
 import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
 
 export const SummaryHeader = styled(H1)`
@@ -346,12 +346,20 @@ const ExpenseSummary = ({
         </React.Fragment>
       )}
 
-      <ExpensePayeeDetails
+      <Flex mt={4} mb={3} alignItems="center">
+        <Span fontWeight="bold" fontSize="16px">
+          <FormattedMessage defaultMessage="Additional Information" />
+        </Span>
+        <StyledHr flex="1 1" borderColor="black.300" ml={2} />
+      </Flex>
+
+      <ExpenseSummaryAdditionalInformation
         isLoading={isLoading}
         host={host}
         expense={expense}
         collective={collective}
         isDraft={!isEditing && expense?.status === expenseStatus.DRAFT}
+        showCollective
       />
       {!isEditing &&
         (drawerActionsContainer ? (
