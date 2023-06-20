@@ -22,6 +22,7 @@ const getFiltersFromQuery = filter => {
     searchTerm: filter.searchTerm,
     'fees-structure': filter['fees-structure'],
     kind: filter.kind,
+    direction: filter.direction,
     hasMissingReceipts: filter.hasMissingReceipts
       ? 'Has missing receipts'
       : filter.hasMissingReceipts === false
@@ -88,6 +89,13 @@ const getFiltersFromQuery = filter => {
           key,
           value: filterObjs[key],
           label: 'Fee structure is',
+        };
+      }
+      if (key === 'direction') {
+        return {
+          key,
+          value: filterObjs[key],
+          label: 'Direction is',
         };
       }
 

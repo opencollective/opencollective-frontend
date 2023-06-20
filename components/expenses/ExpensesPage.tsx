@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { getSuggestedTags } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
-
+import Filters from '../Filters';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import ScheduledExpensesBanner from '../host-dashboard/ScheduledExpensesBanner';
@@ -25,6 +25,7 @@ import ExpensesOrder from '../OrderFilter';
 import ExpenseInfoSidebar from './ExpenseInfoSidebar';
 import ExpensesFilters from './ExpensesFilters';
 import ExpensesList from './ExpensesList';
+import { filter } from 'cypress/types/lodash';
 
 const ORDER_SELECT_STYLE = { control: { background: 'white' } };
 
@@ -92,17 +93,84 @@ const Expenses = props => {
 
   const hasFilters = hasFilter(query);
   const isSelfHosted = data?.account?.id === data?.account?.host?.id;
-
+  let filterOptions = [
+    {
+      key: 'type',
+      label: 'Type',
+      options: ['CHARGE', 'GRANT', 'INVOICE', 'REIMBURSEMENT', 'SETTLEMENT', 'UNCLASSIFIED'],
+    },
+    {
+      key: 'payout',
+      label: 'Payout method',
+      options: ['BANK_ACCOUNT', 'PAYPAL', 'ACCOUNT_BALANCE', 'CREDIT_CARD', 'OTHER'],
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      noFilter: 'ALL',
+      options: [
+        'APPROVED',
+        'REJECTED',
+        'PENDING',
+        'READY_TO_PAY',
+        'PAID',
+        'ERROR',
+        'DRAFT',
+        'PROCESSING',
+        'INCOMPLETE',
+        'ON_HOLD',
+        'REJECTED',
+        'SCHEDULED_FOR_PAYMENT',
+        'SPAM',
+      ],
+    },
+    {
+      key: 'amount',
+      label: 'Amount',
+      options: ['0-50', '50-500', '500-5000', '5000+'],
+    },
+    {
+      key: 'searchTerm',
+      label: 'Text search',
+    },
+  ];
+  if (!onlySubmittedExpenses) {
+    filterOptions = [
+      {
+        key: 'direction',
+        label: 'Direction',
+        options: ['RECEIVED', 'SUBMITTED'],
+      },
+      ...filterOptions,
+    ];
+  }
   return (
     <div className="max-w-screen-xl w-full">
-      <h1 className="mb-4 text-3xl font-bold tracking-tight text-gray-900">
-        {onlySubmittedExpenses ? (
-          <FormattedMessage defaultMessage="Submitted Expenses" />
-        ) : (
-          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-        )}
-      </h1>
-      {!onlySubmittedExpenses && (
+      <Filters
+        title={
+          onlySubmittedExpenses ? (
+            <FormattedMessage defaultMessage="Submitted Expenses" />
+          ) : (
+            <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+          )
+        }
+        views={
+          onlySubmittedExpenses
+            ? [
+                { label: 'All', query: { status: null } },
+                { label: 'Paid', query: { status: 'PAID' } },
+              ]
+            : [
+                { label: 'Received', query: { direction: 'RECEIVED' } },
+                { label: 'Submitted', query: { direction: 'SUBMITTED' } },
+              ]
+        }
+        query={omit(query, ['offset', 'collec', 'parentCollectiveSlug'])}
+        filterOptions={filterOptions}
+        onChange={queryParams => updateFilters(queryParams)}
+      />
+
+      {/* {!onlySubmittedExpenses && (
         <Box flex="0 1" flexBasis={['100%', null, '380px']}>
           <ExpensesDirection
             value={query.direction || 'RECEIVED'}
@@ -112,7 +180,7 @@ const Expenses = props => {
             }}
           />
         </Box>
-      )}
+      )} */}
       {/* <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}> */}
 
       {/* <Box flex="12 1 160px">

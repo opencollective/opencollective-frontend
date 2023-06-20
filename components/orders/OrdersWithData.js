@@ -31,7 +31,8 @@ import { H1 } from '../Text';
 import OrdersFilters from './OrdersFilters';
 import OrdersList from './OrdersList';
 
-const accountOrdersQuery = gql`
+const createAccountOrdersQuery = views => {
+  return gql`
   query Orders(
     $accountSlug: String
     $limit: Int!
@@ -111,9 +112,25 @@ const accountOrdersQuery = gql`
         }
       }
     }
+
+    ${views.map((view, i) => {
+      if (!view.showCount) return '';
+      return `
+  view${i}: orders(
+    account: { slug: $accountSlug }
+      includeHostedAccounts: true
+      filter: INCOMING
+  limit: 1
+  offset: 0
+  ${view.query.status ? `status: ${view.query.status}` : ''}
+){
+  totalCount
+}`;
+    })}
   }
   ${confirmContributionFieldsFragment}
 `;
+};
 
 const ORDERS_PER_PAGE = 15;
 
@@ -189,18 +206,11 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
   const hasFilters = React.useMemo(() => hasParams(router.query), [router.query]);
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
   const query = router.query;
-
-  const queryVariables = { accountSlug, ...getVariablesFromQuery(query, status) };
-  const queryParams = { variables: queryVariables, context: API_V2_CONTEXT };
-  const { data, error, loading, variables, refetch } = useQuery(accountOrdersQuery, queryParams);
-  const { LoggedInUser } = useLoggedInUser();
-  const prevLoggedInUser = usePrevious(LoggedInUser);
-  const isHostAdmin = LoggedInUser?.isAdminOfCollective(data?.account);
   const pendingContributionAction = {
     label: <FormattedMessage defaultMessage="Create pending contribution" />,
     onClick: () => setShowCreatePendingOrderModal(true),
   };
-  const views = [
+  const initViews = [
     {
       label: 'All',
       query: {},
@@ -209,14 +219,25 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
       label: 'Pending',
       query: { status: 'PENDING' },
       actions: [pendingContributionAction],
+      showCount: true,
     },
-    { label: 'Disputed', query: { status: 'DISPUTED' } },
+    { label: 'Disputed', query: { status: 'DISPUTED' }, showCount: true },
     {
       label: 'In review',
       query: { status: 'IN_REVIEW' },
+      showCount: true,
     },
     { label: 'Paid', query: { status: 'PAID' } },
   ];
+  const queryVariables = { accountSlug, ...getVariablesFromQuery(query, status) };
+  const queryParams = { variables: queryVariables, context: API_V2_CONTEXT };
+  const accountOrdersQuery = React.useMemo(() => createAccountOrdersQuery(initViews), [initViews]);
+
+  const { data, error, loading, variables, refetch } = useQuery(accountOrdersQuery, queryParams);
+  const { LoggedInUser } = useLoggedInUser();
+  const prevLoggedInUser = usePrevious(LoggedInUser);
+
+  const [views, setViews] = React.useState(initViews);
 
   // Refetch data when user logs in
   React.useEffect(() => {
@@ -224,6 +245,18 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
       refetch();
     }
   }, [LoggedInUser]);
+
+  React.useEffect(() => {
+    if (data) {
+      const viewsUpToDate = views.map((view, i) => {
+        return {
+          ...view,
+          count: data[`view${i}`]?.totalCount,
+        };
+      });
+      setViews(viewsUpToDate);
+    }
+  }, [data]);
 
   return (
     <div className="w-full max-w-screen-xl">

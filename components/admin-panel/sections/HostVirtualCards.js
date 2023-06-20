@@ -195,7 +195,7 @@ const HostVirtualCards = props => {
     },
     {
       label: 'Missing receipts',
-      query: { hasMissingReceipts: 'true', status: 'ACTIVE' },
+      query: { hasMissingReceipts: 'true' },
       actions: [createVirtualCardAction],
     },
     {
@@ -213,6 +213,9 @@ const HostVirtualCards = props => {
   // if (loading) {
   //   return <Loading />;
   // }
+  const resetFilter = {
+    status: 'ALL',
+  };
   return (
     <div className="w-full max-w-screen-xl">
       <Filters
@@ -232,7 +235,7 @@ const HostVirtualCards = props => {
         views={views}
         query={query}
         // orderBy={query.orderBy}
-        onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
+        onChange={queryParams => handleUpdateFilters({ ...resetFilter, ...queryParams, offset: null })}
       />
       {/* <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters

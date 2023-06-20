@@ -22,7 +22,7 @@ const ManageContributions = ({ account }: AdminSectionProps) => {
   return (
     <Container minHeight={[null, 800]}>
       <Filters
-        title={<FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />}
+        title={<FormattedMessage defaultMessage="Contributing" />}
         views={[
           { label: 'Recurring', query: {} },
           { label: 'One-time', query: {} },

@@ -1,6 +1,23 @@
 import React from 'react';
 import { cx } from 'class-variance-authority';
 
+// A function to abbreviate large integers (1000 and above) with a letter suffix.
+// For example, 1000 becomes 1K, 1000000 becomes 1M, etc.
+// It should also add once decimal if abbreviating (unless the number is a whole number).
+// For example, 1500 becomes 1.5K, 1500000 becomes 1.5M, etc.
+// If the number is less than 1000, it should return the number as-is.
+const abbreviateNumber = number => {
+  if (number >= 1000000000) {
+    return `${(number / 1000000000).toFixed(1)}B`;
+  } else if (number >= 1000000) {
+    return `${(number / 1000000).toFixed(1)}M`;
+  } else if (number >= 1000) {
+    return `${(number / 1000).toFixed(1)}K`;
+  } else {
+    return number;
+  }
+};
+
 export default function Tabs({ tabs, selected, onChange }) {
   return (
     <div className="flex-1">
@@ -36,7 +53,7 @@ export default function Tabs({ tabs, selected, onChange }) {
                 aria-current={tab.label === selected ? 'page' : undefined}
               >
                 {tab.label}
-                {tab.count ? (
+                {tab.showCount && typeof tab.count !== 'undefined' ? (
                   <span
                     className={cx(
                       tab.label === selected ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-900',
@@ -46,7 +63,7 @@ export default function Tabs({ tabs, selected, onChange }) {
                     //   'bg-white ring-gray-300 text-gray-900 ring-1 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
                     // )}
                   >
-                    {tab.count}
+                    {abbreviateNumber(tab.count)}
                   </span>
                 ) : null}
               </button>

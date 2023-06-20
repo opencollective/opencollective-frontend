@@ -108,83 +108,97 @@ const ExpensesList = ({
 
   return (
     <div className="mt-0 w-full ">
-      {settings.tables ? (
-        <ExpenseTable
-          isLoading={isLoading}
-          loadingCount={loadingCount}
-          expenses={expenses || []}
-          host={host}
-          expandExpense={expandExpense}
-          context={context}
-        />
+      {!isLoading && !expenses.length ? (
+        <div className="w-full text-xl text-gray-400 h-36 flex justify-center items-center text-center">
+          <span>No results matching your query.</span>
+        </div>
       ) : (
-        <React.Fragment>
-          <StyledCard>
-            {isLoading ? (
-              [...new Array(nbPlaceholders)].map((_, idx) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <ExpenseContainer key={idx}>
-                  <ExpenseBudgetItem isLoading />
-                </ExpenseContainer>
-              ))
-            ) : (
-              <FlipMove enterAnimation="fade" leaveAnimation="fade" disableAllAnimations={DISABLE_ANIMATIONS}>
-                {expenses.map(expense => {
-                  return (
-                    <ExpenseContainer key={expense.id} data-cy={`expense-${expense.status}`}>
-                      <ExpenseBudgetItem
-                        isInverted={isInverted}
-                        expense={expense}
-                        host={host}
-                        showProcessActions
-                        view={view}
-                        onDelete={onDelete}
-                        onProcess={onProcess}
-                        suggestedTags={suggestedTags}
-                        selected={selectedId === expense.id}
-                        expandExpense={() => expandExpense(expense)}
-                      />
+        <Fragment>
+          {' '}
+          {settings.tables ? (
+            <ExpenseTable
+              isLoading={isLoading}
+              loadingCount={loadingCount}
+              expenses={expenses || []}
+              host={host}
+              expandExpense={expandExpense}
+              context={context}
+            />
+          ) : (
+            <React.Fragment>
+              <StyledCard>
+                {isLoading ? (
+                  [...new Array(nbPlaceholders)].map((_, idx) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <ExpenseContainer key={idx}>
+                      <ExpenseBudgetItem isLoading />
                     </ExpenseContainer>
-                  );
-                })}
-              </FlipMove>
-            )}
-            {!isLoading && (
-              <FooterContainer>
-                <Flex flexDirection={['row', 'column']} mt={[3, 0]} flexWrap="wrap" alignItems={['center', 'flex-end']}>
-                  <Flex
-                    my={2}
-                    mr={[3, 0]}
-                    minWidth={100}
-                    justifyContent="flex-end"
-                    data-cy="transaction-amount"
-                    flexDirection="column"
-                  >
-                    <Box alignSelf="flex-end">
-                      <FooterLabel color="black.500">
-                        <FormattedMessage id="expense.page.total" defaultMessage="Page Total" />:
-                      </FooterLabel>
-                      <FooterLabel color="black.500">
-                        <ExpensesTotal
-                          expenses={expenses}
-                          collective={collective}
-                          host={host}
-                          expenseFieldForTotalAmount={expenseFieldForTotalAmount}
-                        />
-                      </FooterLabel>
-                    </Box>
-                    <P fontSize="12px" color="black.600">
-                      <FormattedMessage
-                        id="expense.page.description"
-                        defaultMessage="Payment processor fees may apply."
-                      />
-                    </P>
-                  </Flex>
-                </Flex>
-              </FooterContainer>
-            )}
-          </StyledCard>
-        </React.Fragment>
+                  ))
+                ) : (
+                  <FlipMove enterAnimation="fade" leaveAnimation="fade" disableAllAnimations={DISABLE_ANIMATIONS}>
+                    {expenses.map(expense => {
+                      return (
+                        <ExpenseContainer key={expense.id} data-cy={`expense-${expense.status}`}>
+                          <ExpenseBudgetItem
+                            isInverted={isInverted}
+                            expense={expense}
+                            host={host}
+                            showProcessActions
+                            view={view}
+                            onDelete={onDelete}
+                            onProcess={onProcess}
+                            suggestedTags={suggestedTags}
+                            selected={selectedId === expense.id}
+                            expandExpense={() => expandExpense(expense)}
+                          />
+                        </ExpenseContainer>
+                      );
+                    })}
+                  </FlipMove>
+                )}
+                {!isLoading && (
+                  <FooterContainer>
+                    <Flex
+                      flexDirection={['row', 'column']}
+                      mt={[3, 0]}
+                      flexWrap="wrap"
+                      alignItems={['center', 'flex-end']}
+                    >
+                      <Flex
+                        my={2}
+                        mr={[3, 0]}
+                        minWidth={100}
+                        justifyContent="flex-end"
+                        data-cy="transaction-amount"
+                        flexDirection="column"
+                      >
+                        <Box alignSelf="flex-end">
+                          <FooterLabel color="black.500">
+                            <FormattedMessage id="expense.page.total" defaultMessage="Page Total" />:
+                          </FooterLabel>
+                          <FooterLabel color="black.500">
+                            <ExpensesTotal
+                              expenses={expenses}
+                              collective={collective}
+                              host={host}
+                              expenseFieldForTotalAmount={expenseFieldForTotalAmount}
+                            />
+                          </FooterLabel>
+                        </Box>
+                        <P fontSize="12px" color="black.600">
+                          <FormattedMessage
+                            id="expense.page.description"
+                            defaultMessage="Payment processor fees may apply."
+                          />
+                        </P>
+                      </Flex>
+                    </Flex>
+                  </FooterContainer>
+                )}
+              </StyledCard>
+            </React.Fragment>
+          )}
+        </Fragment>
       )}
 
       <NewExpenseDrawer

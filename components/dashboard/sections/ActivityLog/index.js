@@ -343,26 +343,28 @@ const ActivityLog = ({ account }) => {
 
   return (
     <div className="max-w-screen-lg">
-      <div className="mb-6 border rounded-lg border-gray-900/10">
-        <dl className=" grid max-w-7xl grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:px-2 xl:px-0">
-          {stats.map((stat, statIdx) => (
-            <div
-              key={stat.name}
-              className={cx(
-                statIdx % 2 === 1 ? 'sm:border-l' : statIdx === 2 ? 'lg:border-l' : '',
-                'flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-t border-gray-900/5 px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8',
-              )}
-            >
-              <dt className="text-sm font-medium leading-6 text-gray-500">{stat.name}</dt>
-              {stat.refill ? <dd className={'text-blue-600 text-xs font-medium'}>Refill</dd> : null}
-              <dd className="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900">
-                {stat.value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-      <h1 className="mb-10 text-3xl font-bold tracking-tight text-gray-900">Latest activity</h1>
+      {account.isHost && (
+        <div className="mb-6 border rounded-lg border-gray-900/10">
+          <dl className=" grid max-w-7xl grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:px-2 xl:px-0">
+            {stats.map((stat, statIdx) => (
+              <div
+                key={stat.name}
+                className={cx(
+                  statIdx % 2 === 1 ? 'sm:border-l' : statIdx === 2 ? 'lg:border-l' : '',
+                  'flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-t border-gray-900/5 px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8',
+                )}
+              >
+                <dt className="text-sm font-medium leading-6 text-gray-500">{stat.name}</dt>
+                {stat.refill ? <dd className={'text-blue-600 text-xs font-medium'}>Refill</dd> : null}
+                <dd className="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900">
+                  {stat.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
+      <h1 className="mb-10 text-2xl font-bold tracking-tight text-gray-900">Recent activity</h1>
 
       {/* <ActivityFilters
         filters={routerQuery}

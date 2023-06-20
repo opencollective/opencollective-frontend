@@ -94,7 +94,7 @@ const checkIfQueryHasFilters = query =>
 const getVariablesFromQuery = query => {
   return {
     offset: parseInt(query.offset) || 0,
-    limit: parseInt(query.limit) || COLLECTIVES_PER_PAGE,
+    limit: query.limit ? Number(query.limit) : COLLECTIVES_PER_PAGE,
     searchTerm: query.searchTerm,
     hostFeesStructure: query['fees-structure'],
     orderBy: {
@@ -131,6 +131,8 @@ const PendingApplications = ({ hostSlug }) => {
     {
       label: 'Pending',
       query: { status: 'PENDING' },
+      count: data?.host?.pendingApplications?.totalCount,
+      showCount: true,
     },
     { label: 'Rejected', query: { status: 'REJECTED' } },
     {
@@ -182,6 +184,13 @@ const PendingApplications = ({ hostSlug }) => {
         ]}
         onChange={queryParams => {
           const pathname = router.asPath.split('?')[0];
+          if (
+            queryParams.status === 'APPROVED' ||
+            queryParams.status === 'REJECTED' ||
+            queryParams.status === 'EXPIRED'
+          ) {
+            return router.push({ pathname, query: { ...queryParams, limit: 0 } });
+          }
           return router.push({ pathname, query: queryParams });
         }}
       />

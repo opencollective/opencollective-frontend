@@ -168,6 +168,8 @@ const createHostDashboardExpensesQuery = views => {
     }
 
     ${views.map((view, i) => {
+      if (!view.showCount) return '';
+
       return `
       view${i}: expenses(
       host: { slug: $hostSlug }
@@ -321,6 +323,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
     {
       label: 'Ready to pay',
       query: { status: 'READY_TO_PAY' },
+      showCount: true,
     },
     {
       label: 'Scheduled for payment',
@@ -331,25 +334,25 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
           label: <FormattedMessage id="expenses.scheduled.paybatch" defaultMessage="Pay Batch" />,
         },
       ],
+      showCount: true,
     },
-    { label: 'On hold', query: { status: 'ON_HOLD' } },
+    { label: 'On hold', query: { status: 'ON_HOLD' }, showCount: true },
     {
       label: 'Incomplete',
       query: { status: 'INCOMPLETE' },
+      showCount: true,
     },
     { label: 'Recently paid', query: { status: 'PAID' } },
   ];
   const queryWithViews = createHostDashboardExpensesQuery(initViews);
-  const expenses = useQuery(queryWithViews, { variables: queryVariables, context: API_V2_CONTEXT });
-  const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
+  const { data, loading, error } = useQuery(queryWithViews, { variables: queryVariables, context: API_V2_CONTEXT });
+  // const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
   React.useEffect(() => {
     if (query.paypalApprovalError && !paypalPreApprovalError) {
       setPaypalPreApprovalError(query.paypalApprovalError);
       router.replace(pageRoute, omit(query, 'paypalApprovalError'), { shallow: true });
     }
   }, [query.paypalApprovalError]);
-
-  const { data, error, loading } = expenses;
 
   const [views, setViews] = React.useState(initViews);
 
@@ -358,7 +361,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
       const viewsUpToDate = views.map((view, i) => {
         return {
           ...view,
-          count: data[`view${i}`].totalCount,
+          count: data[`view${i}`]?.totalCount,
         };
       });
       setViews(viewsUpToDate);
@@ -366,7 +369,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   }, [data]);
 
   const { settings } = React.useContext(SettingsContext);
-
+  const resetFilter = { status: 'ALL' };
   return (
     <div className="w-full max-w-screen-xl">
       <HeaderFilters
@@ -388,7 +391,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
         onChange={queryParams =>
           router.push({
             pathname: pageRoute,
-            query: queryParams,
+            query: { ...resetFilter, ...queryParams },
           })
         }
       />
@@ -467,29 +470,50 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
         ) : null}
       </Box> */}
 
-      <div className={settings.fullBleedTable ? '' : ''}>
-        <ExpensesList
-          settings={settings}
-          isLoading={loading}
-          loadingCount={10}
-          host={data?.host}
-          nbPlaceholders={paginatedExpenses.limit}
-          expenses={paginatedExpenses.nodes}
-          view="admin"
-          onProcess={(expense, cache) => {
-            hasFilters && onExpenseUpdate(expense, cache, query.status);
-          }}
-        />
-        <Flex mt={5} justifyContent="center">
-          <Pagination
-            route={pageRoute}
-            total={paginatedExpenses.totalCount}
-            limit={paginatedExpenses.limit}
-            offset={paginatedExpenses.offset}
-            ignoredQueryParams={ROUTE_PARAMS}
+      {!loading && data?.expenses?.nodes?.length === 0 ? (
+        <div className="w-full text-xl text-gray-400 h-36 flex justify-center items-center text-center">
+          <span>
+            No expenses match the given filters.{' '}
+            <button
+              className="underline"
+              onClick={() =>
+                router.push({
+                  pathname: pageRoute,
+                  query: { status: 'ALL' },
+                })
+              }
+            >
+              Reset
+            </button>{' '}
+            to see all.
+          </span>
+        </div>
+      ) : (
+        <div className={''}>
+          <ExpensesList
+            settings={settings}
+            isLoading={loading}
+            loadingCount={10}
+            host={data?.host}
+            nbPlaceholders={data?.expenses.limit}
+            expenses={data?.expenses?.nodes || []}
+            view="admin"
+            onProcess={(expense, cache) => {
+              hasFilters && onExpenseUpdate(expense, cache, query.status);
+            }}
           />
-        </Flex>
-      </div>
+
+          <Flex mt={5} justifyContent="center">
+            <Pagination
+              route={pageRoute}
+              total={data?.expenses.totalCount}
+              limit={data?.expenses.limit}
+              offset={data?.expenses.offset}
+              ignoredQueryParams={ROUTE_PARAMS}
+            />
+          </Flex>
+        </div>
+      )}
     </div>
   );
 };

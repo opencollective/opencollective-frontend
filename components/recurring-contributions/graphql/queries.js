@@ -136,7 +136,7 @@ export const contributorsQuery = gql`
           slug
         }
       }
-      orders(filter: INCOMING, includeIncognito: true) {
+      orders(filter: INCOMING, includeIncognito: true, status: ACTIVE) {
         totalCount
         nodes {
           id

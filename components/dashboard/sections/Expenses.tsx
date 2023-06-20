@@ -50,7 +50,7 @@ const getVariables = (query, slug) => {
     fromAccount,
     account,
     offset: query.offset || 0,
-    limit: query.limit || EXPENSES_PER_PAGE,
+    limit: query.limit ?? EXPENSES_PER_PAGE,
     type: query.type,
     status: query.status,
     tags: query.tag ? (query.tag === 'untagged' ? null : [query.tag]) : undefined,
