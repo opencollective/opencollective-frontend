@@ -8,6 +8,7 @@ import { File } from '@styled-icons/boxicons-regular/File';
 import { NetworkChart } from '@styled-icons/boxicons-regular/NetworkChart';
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
 import { Transfer } from '@styled-icons/boxicons-regular/Transfer';
+import { Home } from '@styled-icons/boxicons-solid/Home';
 import { Inbox } from '@styled-icons/octicons/Inbox';
 import { FormattedMessage } from 'react-intl';
 
@@ -116,6 +117,7 @@ const Menu = ({ isAccountantOnly }) => {
             <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
           )}
         </MenuSectionHeader>
+        <MenuLink section={COLLECTIVE_SECTIONS.HOME} icon={<Home size={16} />} if={isIndividual} />
         <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} icon={<Receipt size={16} />} />
         <MenuLink section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} icon={<Coin size={16} />} />
         <MenuLink

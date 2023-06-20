@@ -33,7 +33,7 @@ const defaultColors = {
     500: '#9D9FA3',
     400: '#C4C7CC',
     300: '#DCDEE0',
-    200: '#E8E9EB',
+    200: '#EAEAEC',
     100: '#F0F1F2',
     50: '#F7F8FA',
     transparent: {

@@ -44,6 +44,8 @@ const messages = defineMessages({
 const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return ALL_SECTIONS.INFO;
+  } else if (account?.type === 'INDIVIDUAL') {
+    return ALL_SECTIONS.HOME;
   } else if (isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
   } else {
