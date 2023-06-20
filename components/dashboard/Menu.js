@@ -34,6 +34,7 @@ import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import Container from '../Container';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs-two';
 
 import {
   ABOUT_ORG_SECTIONS,
@@ -52,13 +53,15 @@ const Menu = ({ isAccountantOnly }) => {
   const { account } = React.useContext(DashboardContext);
   const isHost = isHostAccount(account);
   const isIndividual = isIndividualAccount(account);
+  const labelHeaderStyles = 'text-gray-500 text-xs mb-2 mt-4 font-medium tracking-wide';
   return (
     <div className="mt-6 space-y-1">
       {/** Host dashboard */}
       <MenuGroup if={isHost} mb={24}>
-        {/* <MenuSectionHeader>
-          <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
-        </MenuSectionHeader> */}
+        <div className={labelHeaderStyles}>
+          <FormattedMessage defaultMessage="Fiscal Host Dashboard" />
+        </div>
+
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOME}
           //icon={<NewspaperIcon className={'h-6 w-6 shrink-0'} />}
@@ -135,24 +138,25 @@ const Menu = ({ isAccountantOnly }) => {
       </MenuGroup>
 
       {/** User/org/collective/event/project dashbord */}
-      <MenuGroup if={!isHost}>
+      <MenuGroup>
         {isHost && (
-          <MenuSectionHeader if={isHost}>
+          <div className={labelHeaderStyles}>
             {isType(account, ORGANIZATION) ? (
-              <FormattedMessage id="OrganizationDashboard" defaultMessage="Organization Dashboard" />
+              <FormattedMessage defaultMessage="Organization Dashboard" />
             ) : isType(account, USER) ? (
-              <FormattedMessage id="UserDashboard" defaultMessage="User Dashboard" />
+              <FormattedMessage defaultMessage="User" />
             ) : isType(account, COLLECTIVE) ? (
-              <FormattedMessage id="CollectiveDashboard" defaultMessage="Collective Dashboard" />
+              <FormattedMessage defaultMessage="Collective" />
             ) : (
-              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+              ''
             )}
-          </MenuSectionHeader>
+          </div>
         )}
         <MenuLink
           section={COLLECTIVE_SECTIONS.HOME}
           //icon={<NewspaperIcon className={'h-6 w-6 shrink-0'} />}
           // icon={NewspaperIcon}
+          if={!isHost}
           item={{ icon: Home }}
         >
           Home
