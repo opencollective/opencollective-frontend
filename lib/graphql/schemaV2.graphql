@@ -2823,6 +2823,11 @@ type Host implements Account & AccountWithContributions {
   supportedPayoutMethods: [PayoutMethodType]
 
   """
+  Stripe connected account
+  """
+  stripe: StripeConnectedAccount
+
+  """
   Pending applications for this host
   """
   pendingApplications(
@@ -4772,6 +4777,13 @@ type TimeSeriesAmountWithKindNode {
   date: DateTime!
   amount: Amount!
   kind: TransactionKind!
+}
+
+"""
+Stripe connected account properties
+"""
+type StripeConnectedAccount {
+  issuingBalance: Amount
 }
 
 """
