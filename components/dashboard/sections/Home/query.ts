@@ -5,7 +5,6 @@ export const workspaceHomeQuery = gql`
     activities(account: { slug: $slug }, limit: $limit, offset: $offset, timeline: true) {
       limit
       offset
-      totalCount
       nodes {
         id
         createdAt
