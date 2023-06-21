@@ -96,7 +96,7 @@ export const columns: ColumnDef<Expense>[] = [
     cell: ({ cell }) => {
       const account = cell.getValue();
       return (
-        <div className="flex items-center gap-2 truncate px-2 py-4  text-slate-500 max-w-[160px]">
+        <div className="flex items-center gap-2 truncate px-2 py-4  text-slate-500 max-w-[120px]">
           {/* @ts-ignore */}
           <Avatar collective={account} radius={20} /> <span className="truncate">{account?.name}</span>
         </div>
@@ -217,7 +217,7 @@ export const columns: ColumnDef<Expense>[] = [
       // @ts-ignore
       const isMultiCurrency = amountInAccountCurrency && amountInAccountCurrency?.currency !== currency;
       return (
-        <div className="flex flex-auto flex-col justify-end whitespace-nowrap px-2 py-4">
+        <div className="flex flex-auto flex-col justify-end whitespace-nowrap px-1 pr-0 py-4">
           <div className="leading-6 text-slate-900">
             {/* @ts-ignore */}
             <FormattedMoneyAmount amount={amount} currency={currency} precision={2} />
@@ -238,7 +238,7 @@ export const columns: ColumnDef<Expense>[] = [
     cell: ({ cell }) => {
       const status = cell.getValue();
       return (
-        <div className="flex items-center max-w-[160px] truncate whitespace-nowrap">
+        <div className="flex items-center max-w-[160px] justify-end overflow-hidden whitespace-nowrap">
           <ExpenseStatus size={'small'} status={status} />
         </div>
       );

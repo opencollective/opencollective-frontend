@@ -113,7 +113,7 @@ const hostDashboardExpensesQuery = gql`
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
   ${expenseHostFields}
-  ${hostInfoCardFields}
+  # ${hostInfoCardFields}
 `;
 
 const createHostDashboardExpensesQuery = views => {
@@ -187,7 +187,7 @@ const createHostDashboardExpensesQuery = views => {
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
   ${expenseHostFields}
-  ${hostInfoCardFields}
+  # ${hostInfoCardFields}
 `;
 };
 
@@ -239,7 +239,7 @@ const getVariablesFromQuery = query => {
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || NB_EXPENSES_DISPLAYED,
-    status: query.status === 'ALL' ? null : isValidStatus(query.status) ? query.status : 'READY_TO_PAY',
+    status: isValidStatus(query.status) ? query.status : undefined,
     type: query.type,
     tags: query.tag ? [query.tag] : undefined,
     minAmount: amountRange[0] && amountRange[0] * 100,
@@ -255,7 +255,7 @@ const getVariablesFromQuery = query => {
 const enforceDefaultParamsOnQuery = query => {
   return {
     ...query,
-    status: query.status || 'READY_TO_PAY',
+    // status: query.status || 'READY_TO_PAY',
   };
 };
 
@@ -281,7 +281,7 @@ const filterOptions = [
   {
     key: 'status',
     label: 'Status',
-    noFilter: 'ALL',
+    // noFilter: 'ALL',
     options: [
       'APPROVED',
       'REJECTED',
@@ -320,6 +320,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   const filters = getFilterFromQuery(omitBy(query, isEmpty));
   const [showConfirmationModal, setConfirmationModalDisplay] = React.useState(false);
   const initViews = [
+    { label: 'All', query: {} },
     {
       label: 'Ready to pay',
       query: { status: 'READY_TO_PAY' },
@@ -369,7 +370,9 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   }, [data]);
 
   const { settings } = React.useContext(SettingsContext);
-  const resetFilter = { status: 'ALL' };
+  const resetFilter = {
+    // status: 'ALL'
+  };
   return (
     <div className="w-full max-w-screen-xl">
       <HeaderFilters

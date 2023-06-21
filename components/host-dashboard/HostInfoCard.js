@@ -44,10 +44,10 @@ export const hostInfoCardFields = gql`
         valueInCents
       }
     }
-    transferwiseBalances {
-      valueInCents
-      currency
-    }
+    # transferwiseBalances {
+    #   valueInCents
+    #   currency
+    # }
     stats {
       id
       balance {

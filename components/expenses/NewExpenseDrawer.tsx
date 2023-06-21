@@ -569,7 +569,7 @@ export const getExpenseStatusMsgType = status => {
 
 export function ExpenseStatus({ status, size }: any) {
   const intl = useIntl();
-  const statusStyles = cva('inline-flex items-center rounded-md  font-medium gap-x-1.5 py-1 px-2', {
+  const statusStyles = cva('inline-flex items-center rounded-md truncate font-medium gap-x-1.5 py-1 px-2', {
     variants: {
       type: {
         error: 'bg-red-100 text-red-700 fill-red-700',

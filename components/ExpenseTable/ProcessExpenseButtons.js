@@ -295,16 +295,22 @@ const ProcessExpenseButtons = ({
         // </StyledButton>
       )}
       {permissions.canUnschedulePayment && (
-        <StyledButton
-          {...getButtonProps('UNSCHEDULE_PAYMENT')}
-          buttonStyle="dangerSecondary"
-          data-cy="unapprove-button"
-        >
-          <UnapproveIcon size={12} />
-          <ButtonLabel>
+        <Tooltip>
+          <TooltipTrigger>
+            <button
+              {...getButtonProps('UNSCHEDULE_PAYMENT')}
+              className="flex h-6 w-8 items-center justify-center rounded-l-md p-0 text-slate-500 opacity-0 transition-all hover:shadow-md group-hover:opacity-100"
+            >
+              <span className="sr-only">
+                <FormattedMessage id="expense.unschedulePayment.btn" defaultMessage="Unschedule Payment" />
+              </span>
+              <Ban className="h-3.5 w-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
             <FormattedMessage id="expense.unschedulePayment.btn" defaultMessage="Unschedule Payment" />
-          </ButtonLabel>
-        </StyledButton>
+          </TooltipContent>
+        </Tooltip>
       )}
       {permissions.canMarkAsUnpaid && (
         <MarkExpenseAsUnpaidButton
