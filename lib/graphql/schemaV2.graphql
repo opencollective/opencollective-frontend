@@ -2823,8 +2823,6 @@ type Host implements Account & AccountWithContributions {
   supportedPayoutMethods: [PayoutMethodType]
 
   """
-
-  """
   Stripe connected account
   """
   stripe: StripeConnectedAccount
