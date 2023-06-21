@@ -358,7 +358,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   const [views, setViews] = React.useState(initViews);
 
   React.useEffect(() => {
-    if (data?.view0) {
+    if (data) {
       const viewsUpToDate = views.map((view, i) => {
         return {
           ...view,
