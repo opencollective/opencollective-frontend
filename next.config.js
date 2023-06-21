@@ -3,6 +3,7 @@
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 const { withSentryConfig } = require('@sentry/nextjs');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const path = require('path');
 require('./env');
@@ -62,6 +63,32 @@ const nextConfig = {
         }),
       );
     }
+
+    // Copying cMaps to get non-latin characters to work in PDFs (https://github.com/wojtekmaj/react-pdf#support-for-non-latin-characters)
+    config.plugins.push(
+      new CopyPlugin({
+        patterns: [
+          {
+            from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'cmaps'),
+            to: path.join(__dirname, 'public/static/cmaps'),
+          },
+        ],
+      }),
+    );
+
+    // Copy pdfjs worker to public folder (used by PDFViewer component)
+    // (Workaround for working with react-pdf and CommonJS - if moving to ESM this can be removed)
+    // TODO(ESM): Move this to standard ESM
+    config.plugins.push(
+      new CopyPlugin({
+        patterns: [
+          {
+            from: require.resolve('pdfjs-dist/build/pdf.worker.min.js'),
+            to: path.join(__dirname, 'public/static/scripts'),
+          },
+        ],
+      }),
+    );
 
     config.module.rules.push({
       test: /\.md$/,

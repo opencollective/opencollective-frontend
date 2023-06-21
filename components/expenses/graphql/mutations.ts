@@ -12,14 +12,3 @@ export const editExpenseMutation = gql`
 
   ${expensePageExpenseFieldsFragment}
 `;
-
-export const verifyExpenseMutation = gql`
-  mutation VerifyExpense($expense: ExpenseReferenceInput!, $draftKey: String) {
-    verifyExpense(expense: $expense, draftKey: $draftKey) {
-      id
-      ...ExpensePageExpenseFields
-    }
-  }
-
-  ${expensePageExpenseFieldsFragment}
-`;

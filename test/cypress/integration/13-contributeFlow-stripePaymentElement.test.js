@@ -56,7 +56,7 @@ function waitOrderStatus(status = 'PAID') {
       }
     },
     {
-      maxAttempts: 10,
+      maxAttempts: 30,
       wait: 6000,
     },
   );

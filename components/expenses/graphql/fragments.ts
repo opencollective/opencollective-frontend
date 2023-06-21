@@ -175,6 +175,12 @@ export const expensePageExpenseFieldsFragment = gql`
       description
       amount
       url
+      file {
+        id
+        ... on ImageFileInfo {
+          width
+        }
+      }
     }
     taxes {
       id
@@ -190,6 +196,9 @@ export const expensePageExpenseFieldsFragment = gql`
         id
         name
         size
+        ... on ImageFileInfo {
+          width
+        }
       }
     }
     payee {
@@ -199,6 +208,7 @@ export const expensePageExpenseFieldsFragment = gql`
       legalName
       type
       isAdmin
+      isActive
       location {
         id
         address
@@ -523,6 +533,12 @@ export const expensesListFieldsFragment = gql`
           currency
         }
       }
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+        }
+      }
       ... on AccountWithParent {
         parent {
           id
@@ -604,6 +620,12 @@ export const expensesListAdminFieldsFragment = gql`
       incurredAt
       url
       amount
+      file {
+        id
+        ... on ImageFileInfo {
+          width
+        }
+      }
     }
     taxes {
       id
@@ -614,6 +636,12 @@ export const expensesListAdminFieldsFragment = gql`
       id
       url
       name
+      info {
+        id
+        ... on ImageFileInfo {
+          width
+        }
+      }
     }
     securityChecks {
       level

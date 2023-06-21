@@ -5,7 +5,6 @@ import { Undo } from '@styled-icons/fa-solid/Undo';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
-import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -16,7 +15,7 @@ import CommentType from '../../lib/constants/commentTypes';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
-import { getPayoutProfiles } from '../../lib/expenses';
+import { getFilesFromExpense, getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
@@ -25,6 +24,8 @@ import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import CommentForm from '../conversations/CommentForm';
 import Thread from '../conversations/Thread';
+import { useDrawerActionsContainer } from '../Drawer';
+import FilesViewerModal from '../FilesViewerModal';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
 import { getI18nLink, I18nSupportLink, WebsiteName } from '../I18nFormatters';
@@ -35,15 +36,12 @@ import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
-import StyledCard from '../StyledCard';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
 import { H1, H5, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
-import { editExpenseMutation, verifyExpenseMutation } from './graphql/mutations';
+import { editExpenseMutation } from './graphql/mutations';
 import { expensePageQuery } from './graphql/queries';
-import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 import ExpenseForm, { msg as expenseFormMsg, prepareExpenseForSubmit } from './ExpenseForm';
 import ExpenseInviteNotificationBanner from './ExpenseInviteNotificationBanner';
 import ExpenseMissingReceiptNotificationBanner from './ExpenseMissingReceiptNotificationBanner';
@@ -100,24 +98,13 @@ const PrivateNoteLabel = () => {
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
 
 function Expense(props) {
-  const {
-    data,
-    loading,
-    error,
-    refetch,
-    fetchMore,
-    drawerActionsContainer,
-    draftKey,
-    client,
-    isRefetchingDataForUser,
-    legacyExpenseId,
-  } = props;
+  const { data, loading, error, refetch, fetchMore, draftKey, client, isRefetchingDataForUser, legacyExpenseId } =
+    props;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
-  const { addToast } = useToasts();
   const [state, setState] = useState({
-    error: null,
+    error: error || null,
     status: draftKey && data?.expense?.status === expenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
     editedExpense: null,
     isSubmitting: false,
@@ -126,12 +113,14 @@ function Expense(props) {
     newsletterOptIn: false,
     createdUser: null,
     showTaxLinkModal: false,
+    showFilesViewerModal: false,
   });
-
+  const [openUrl, setOpenUrl] = useState(null);
   const pollingInterval = 60;
   let pollingTimeout = null;
   let pollingStarted = false;
   let pollingPaused = false;
+  const drawerActionsContainer = useDrawerActionsContainer();
 
   useEffect(() => {
     const shouldEditDraft = data?.expense?.status === expenseStatus.DRAFT && draftKey;
@@ -142,16 +131,6 @@ function Expense(props) {
         editedExpense: data?.expense,
         isPollingEnabled: false,
       }));
-    }
-
-    const expense = data?.expense;
-    if (
-      expense?.status === expenseStatus.UNVERIFIED &&
-      expense?.permissions?.canEdit &&
-      LoggedInUser &&
-      expense?.createdByAccount?.slug === LoggedInUser?.collective?.slug
-    ) {
-      handleExpenseVerification();
     }
 
     handlePolling();
@@ -180,6 +159,14 @@ function Expense(props) {
     }
   }, [props.edit, props.data, state.status]);
 
+  // Update status when data or draftKey changes
+  useEffect(() => {
+    const status = draftKey && data?.expense?.status === expenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW;
+    if (status !== state.status) {
+      setState(state => ({ ...state, status }));
+    }
+  }, [props.data, draftKey]);
+
   // Scroll to expense's top when changing status
   const prevState = usePrevious(state);
 
@@ -189,11 +176,12 @@ function Expense(props) {
     }
   }, [state.status]);
 
-  const [editExpense] = useMutation(editExpenseMutation, {
-    context: API_V2_CONTEXT,
-  });
+  // Update error state when error prop changes (from Expense query)
+  useEffect(() => {
+    setState(state => ({ ...state, error }));
+  }, [error]);
 
-  const [verifyExpense] = useMutation(verifyExpenseMutation, {
+  const [editExpense] = useMutation(editExpenseMutation, {
     context: API_V2_CONTEXT,
   });
 
@@ -207,10 +195,7 @@ function Expense(props) {
   const loggedInAccount = data?.loggedInAccount;
   const collective = expense?.account;
   const host = collective?.host;
-  const canSeeInvoiceInfo = expense?.permissions.canSeeInvoiceInfo;
-  const isInvoiceOrSettlement = [expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense?.type);
   const isDraft = expense?.status === expenseStatus.DRAFT;
-  const hasAttachedFiles = (isInvoiceOrSettlement && canSeeInvoiceInfo) || expense?.attachedFiles?.length > 0;
   const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
   const isMissingReceipt =
     expense?.status === expenseStatus.PAID &&
@@ -222,17 +207,13 @@ function Expense(props) {
   const [showResetModal, setShowResetModal] = useState(false);
   const payoutProfiles = getPayoutProfiles(loggedInAccount);
 
-  let threadItems;
-  const getThreadItems = memoizeOne((comments = [], activities = []) => {
+  const threadItems = React.useMemo(() => {
+    const comments = expense?.comments?.nodes || [];
+    const activities = expense?.activities || [];
     return sortBy([...comments, ...activities], 'createdAt');
-  });
+  }, [expense]);
 
-  if (expense) {
-    threadItems = getThreadItems(expense.comments?.nodes, expense?.activities);
-  }
-
-  const memoizedSuggestedTags = memoizeOne(getSuggestedTags);
-  const suggestedTags = memoizedSuggestedTags(collective);
+  const suggestedTags = React.useMemo(() => getSuggestedTags(collective), [collective]);
 
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;
   const isEditingExistingExpense = isEditing && expense !== undefined;
@@ -280,30 +261,6 @@ function Expense(props) {
     const collectiveType = collective.parent ? getCollectiveTypeForUrl(collective) : undefined;
     const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
     return router.replace(`${parentCollectiveSlugRoute}${collectiveTypeRoute}${collective.slug}/expenses`);
-  };
-
-  const handleExpenseVerification = async () => {
-    const expense = data?.expense;
-    await verifyExpense({
-      variables: { expense: { id: expense.id } },
-    });
-
-    const { parentCollectiveSlug, collectiveSlug, legacyExpenseId } = props;
-    const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
-    const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
-    const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
-    await router.push(
-      `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
-    );
-    refetch();
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
-      title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
-      message: (
-        <FormattedMessage id="Expense.SuccessPage" defaultMessage="You can edit or review updates on this page." />
-      ),
-    });
-    scrollToExpenseTop();
   };
 
   const onSummarySubmit = async editedExpense => {
@@ -388,6 +345,13 @@ function Expense(props) {
     });
   };
 
+  const openFileViewer = url => {
+    setOpenUrl(url);
+    setState({ ...state, showFilesViewerModal: true });
+  };
+
+  const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense]);
+
   const confirmSaveButtons = (
     <Flex flex={1} flexWrap="wrap" gridGap={[2, 3]}>
       <StyledButton
@@ -459,31 +423,35 @@ function Expense(props) {
   return (
     <Box ref={expenseTopRef}>
       <ExpenseHeader inDrawer={inDrawer}>
-        <FormattedMessage
-          id="ExpenseTitle"
-          defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} <LinkExpense>{id}</LinkExpense> to <LinkCollective>{collectiveName}</LinkCollective>"
-          values={{
-            type: expense?.type,
-            id: expense?.legacyId,
-            LinkExpense: text => {
-              if (inDrawer) {
-                return (
-                  <Link href={`/${expense?.account.slug}/expenses/${expense?.legacyId}`}>
-                    <span>#{text}</span>
-                  </Link>
-                );
-              }
-              return <span>#{text}</span>;
-            },
-            collectiveName: expense?.account.name,
-            LinkCollective: text => <LinkCollective collective={expense?.account}>{text}</LinkCollective>,
-          }}
-        />
+        {expense?.type && expense?.account ? (
+          <FormattedMessage
+            id="ExpenseTitle"
+            defaultMessage="{type, select, CHARGE {Charge} INVOICE {Invoice} RECEIPT {Receipt} GRANT {Grant} SETTLEMENT {Settlement} other {Expense}} <LinkExpense>{id}</LinkExpense> to <LinkCollective>{collectiveName}</LinkCollective>"
+            values={{
+              type: expense?.type,
+              id: expense?.legacyId,
+              LinkExpense: text => {
+                if (inDrawer) {
+                  return (
+                    <Link href={`/${expense?.account.slug}/expenses/${expense?.legacyId}`}>
+                      <span>#{text}</span>
+                    </Link>
+                  );
+                }
+                return <span>#{text}</span>;
+              },
+              collectiveName: expense?.account.name,
+              LinkCollective: text => <LinkCollective collective={expense?.account}>{text}</LinkCollective>,
+            }}
+          />
+        ) : (
+          <LoadingPlaceholder height={32} maxWidth={'200px'} />
+        )}
       </ExpenseHeader>
 
-      {error && (
+      {state.error && (
         <MessageBox type="error" withIcon mb={4}>
-          {formatErrorMessage(intl, error)}
+          {formatErrorMessage(intl, state.error)}
         </MessageBox>
       )}
       {showTaxFormMsg && (
@@ -536,23 +504,11 @@ function Expense(props) {
             canEditTags={get(expense, 'permissions.canEditTags', false)}
             showProcessButtons
             drawerActionsContainer={drawerActionsContainer}
+            openFileViewer={openFileViewer}
           />
 
           {status !== PAGE_STATUS.EDIT_SUMMARY && (
             <React.Fragment>
-              {hasAttachedFiles && (
-                <StyledCard mt="32px" p="32px">
-                  <H5 fontSize="16px" fontWeight="700" mb={3}>
-                    <FormattedMessage id="Downloads" defaultMessage="Downloads" />
-                  </H5>
-                  <ExpenseAttachedFiles
-                    files={expense.attachedFiles}
-                    collective={collective}
-                    expense={expense}
-                    showInvoice={canSeeInvoiceInfo}
-                  />
-                </StyledCard>
-              )}
               {expense?.privateMessage && (
                 <Container mt={4} pb={4} borderBottom="1px solid #DCDEE0">
                   <H5 fontSize="16px" mb={3}>
@@ -718,6 +674,20 @@ function Expense(props) {
           refetchExpense={refetch}
         />
       )}
+
+      {state.showFilesViewerModal && (
+        <FilesViewerModal
+          files={files}
+          parentTitle={intl.formatMessage(
+            {
+              defaultMessage: 'Expense #{expenseId} attachment',
+            },
+            { expenseId: expense.legacyId },
+          )}
+          openFileUrl={openUrl}
+          onClose={() => setState(state => ({ ...state, showFilesViewerModal: false }))}
+        />
+      )}
     </Box>
   );
 }
@@ -729,7 +699,7 @@ Expense.propTypes = {
   draftKey: PropTypes.string,
   edit: PropTypes.string,
   client: PropTypes.object,
-  data: PropTypes.object.isRequired,
+  data: PropTypes.object,
   loading: PropTypes.bool,
   error: PropTypes.any,
   refetch: PropTypes.func,

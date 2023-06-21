@@ -66,7 +66,7 @@ const GlobalModalStyle = createGlobalStyle`
   }
 `;
 
-export const ModalOverlay = styled.div`
+export const ModalOverlay = styled.button`
   position: fixed;
   top: 0;
   left: 0;
@@ -274,7 +274,16 @@ const StyledModal = ({
       <React.Fragment>
         <GlobalModalStyle />
         {hasUnsavedChanges && <WarnIfUnsavedChanges hasUnsavedChanges />}
-        <Wrapper zindex={props.zindex}>
+        <Wrapper
+          zindex={props.zindex}
+          onKeyDown={event => {
+            if (event.key === 'Escape') {
+              event.preventDefault();
+              event.stopPropagation();
+              onEscape();
+            }
+          }}
+        >
           <TrapContainer>
             <Modal ref={modalRef} {...props}>
               {React.Children.map(children, child => {
@@ -285,17 +294,7 @@ const StyledModal = ({
               })}
             </Modal>
           </TrapContainer>
-          <ModalOverlay
-            role="button"
-            tabIndex={0}
-            onClick={closeHandler}
-            onKeyDown={event => {
-              if (event.key === 'Escape') {
-                event.preventDefault();
-                onEscape();
-              }
-            }}
-          />
+          <ModalOverlay tabIndex={0} onClick={closeHandler} />
         </Wrapper>
       </React.Fragment>,
       document.body,

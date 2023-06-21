@@ -94,7 +94,10 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
 
   const mainMenu =
     menuState === 'mainMenu' &&
-    (status === ORDER_STATUS.ACTIVE || status === ORDER_STATUS.ERROR || status === ORDER_STATUS.PROCESSING);
+    (status === ORDER_STATUS.ACTIVE ||
+      status === ORDER_STATUS.ERROR ||
+      status === ORDER_STATUS.PROCESSING ||
+      status === ORDER_STATUS.NEW);
   const cancelMenu = menuState === 'cancelMenu';
   const updateOrderMenu = menuState === 'updateOrderMenu';
   const paymentMethodMenu = menuState === 'paymentMethodMenu';

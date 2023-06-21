@@ -22,7 +22,8 @@ const load = async app => {
   const { input, lib, modules, pipeline, cache } = hyperwatch;
 
   if (redisServerUrl) {
-    cache.setProvider(redisProvider({ serverUrl: redisServerUrl }));
+    const provider = await redisProvider();
+    cache.setProvider(provider);
   }
 
   // Init

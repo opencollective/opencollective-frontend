@@ -27,6 +27,7 @@ import { H1, H4, P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
+import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 import ExpenseMoreActionsButton from './ExpenseMoreActionsButton';
 import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseStatusTag from './ExpenseStatusTag';
@@ -76,6 +77,7 @@ const ExpenseSummary = ({
   onDelete,
   onEdit,
   drawerActionsContainer,
+  openFileViewer,
   ...props
 }) => {
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
@@ -251,6 +253,7 @@ const ExpenseSummary = ({
                       isPrivate={!attachment.url && !isLoading}
                       size={[640, 48]}
                       maxHeight={48}
+                      openFileViewer={openFileViewer}
                     />
                   </Box>
                 )}
@@ -327,6 +330,22 @@ const ExpenseSummary = ({
           </Flex>
         )}
       </Flex>
+      {expense?.attachedFiles?.length > 0 && (
+        <React.Fragment>
+          <Flex my={4} alignItems="center">
+            {!expense && isLoading ? (
+              <LoadingPlaceholder height={20} maxWidth={150} />
+            ) : (
+              <Span fontWeight="bold" fontSize="16px">
+                <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
+              </Span>
+            )}
+            <StyledHr flex="1 1" borderColor="black.300" ml={2} />
+          </Flex>
+          <ExpenseAttachedFiles files={expense.attachedFiles} openFileViewer={openFileViewer} />
+        </React.Fragment>
+      )}
+
       <ExpensePayeeDetails
         isLoading={isLoading}
         host={host}
@@ -395,6 +414,12 @@ ExpenseSummary.propTypes = {
         description: PropTypes.string,
         amount: PropTypes.number.isRequired,
         url: PropTypes.string,
+      }).isRequired,
+    ),
+    attachedFiles: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string,
+        url: PropTypes.string.isRequired,
       }).isRequired,
     ),
     taxes: PropTypes.arrayOf(
@@ -467,10 +492,12 @@ ExpenseSummary.propTypes = {
   borderless: PropTypes.bool,
   /** Passed down from ExpenseModal */
   onClose: PropTypes.func,
-  /** Passed down from pages/expense.js */
+  /** Passed down from Expense */
   onEdit: PropTypes.func,
-  /** Passed down from either ExpenseModal or pages/expense.js */
+  /** Passed down from either ExpenseModal or Expense */
   onDelete: PropTypes.func,
+  /** Passwed down from Expense */
+  openFileViewer: PropTypes.func,
   /** Reference to the actions container element in the Expense Drawer */
   drawerActionsContainer: PropTypes.object,
 };

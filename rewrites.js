@@ -172,7 +172,7 @@ exports.REWRITES = [
     destination: '/order',
   },
   {
-    source: '/:collectiveSlug?/orders/:id([0-9]+)/confirm',
+    source: '/:collectiveSlug?/(orders|contributions)/:id([0-9]+)/confirm',
     destination: '/confirmOrder',
   },
   {
@@ -309,6 +309,10 @@ exports.REWRITES = [
   // set `useFileSystemPublicRoutes` to true (default) in `next.config.js`
   {
     source: '/',
+    destination: '/home',
+  },
+  {
+    source: '/home',
     destination: '/home',
   },
   {
