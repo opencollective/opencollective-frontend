@@ -312,6 +312,10 @@ exports.REWRITES = [
     destination: '/home',
   },
   {
+    source: '/home',
+    destination: '/home',
+  },
+  {
     source: '/collectives',
     destination: '/collectives',
   },

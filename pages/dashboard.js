@@ -44,6 +44,8 @@ const messages = defineMessages({
 const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return ALL_SECTIONS.INFO;
+  } else if (account?.type === 'INDIVIDUAL') {
+    return ALL_SECTIONS.HOME;
   } else if (isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
   } else {
@@ -106,7 +108,10 @@ const DashboardPage = () => {
   // Redirect to the dashboard of the logged in user if no slug is provided
   useEffect(() => {
     if (!slug && LoggedInUser) {
-      router.push(`/dashboard/${LoggedInUser.collective.slug}`);
+      router.replace(`/dashboard/${LoggedInUser.getLastDashboardSlug()}`);
+    }
+    if (slug) {
+      LoggedInUser?.saveLastDashboardSlug(slug);
     }
   }, [slug, LoggedInUser]);
 
@@ -117,9 +122,7 @@ const DashboardPage = () => {
   const [expandedSection, setExpandedSection] = React.useState(null);
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
-  const titleBase = account?.isHost
-    ? intl.formatMessage({ id: 'AdminPanel.button', defaultMessage: 'Admin' })
-    : intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' });
+  const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
 
   return (
     <DashboardContext.Provider value={{ selectedSection, expandedSection, setExpandedSection, account }}>

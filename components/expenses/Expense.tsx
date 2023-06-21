@@ -159,6 +159,14 @@ function Expense(props) {
     }
   }, [props.edit, props.data, state.status]);
 
+  // Update status when data or draftKey changes
+  useEffect(() => {
+    const status = draftKey && data?.expense?.status === expenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW;
+    if (status !== state.status) {
+      setState(state => ({ ...state, status }));
+    }
+  }, [props.data, draftKey]);
+
   // Scroll to expense's top when changing status
   const prevState = usePrevious(state);
 

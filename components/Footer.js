@@ -12,6 +12,7 @@ import styled from 'styled-components';
 
 import languages from '../lib/constants/locales';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 import TranslateIcon from './icons/TranslateIcon';
 import Container from './Container';
@@ -233,6 +234,8 @@ const Footer = () => {
     </Span>
   );
 
+  const useDashboard = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
+
   return (
     <FooterContainer>
       <Container
@@ -260,12 +263,14 @@ const Footer = () => {
             maxWidth="300px"
           >
             <Flex my="12px">
-              <Image
-                src="/static/images/opencollectivelogo-footer-n.svg"
-                alt="Open Collective"
-                height={28}
-                width={167}
-              />
+              <Link href={useDashboard ? '/home' : '/'}>
+                <Image
+                  src="/static/images/opencollectivelogo-footer-n.svg"
+                  alt="Open Collective"
+                  height={28}
+                  width={167}
+                />
+              </Link>
             </Flex>
             <P
               textAlign={['center', 'left']}

@@ -23,6 +23,7 @@ import NotFound from '../NotFound';
 import { H2 } from '../Text';
 
 import Expenses from './sections/Expenses';
+import Home from './sections/Home';
 import ManageContributions from './sections/ManageContributions';
 import Transactions from './sections/Transactions';
 import {
@@ -47,6 +48,7 @@ const ADMIN_PANEL_SECTIONS = {
   // NEW
   [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
   [COLLECTIVE_SECTIONS.EXPENSES]: Expenses,
+  [COLLECTIVE_SECTIONS.HOME]: Home,
   [COLLECTIVE_SECTIONS.TRANSACTIONS]: Transactions,
 };
 

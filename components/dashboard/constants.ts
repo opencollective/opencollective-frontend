@@ -49,6 +49,7 @@ export const FISCAL_HOST_SECTIONS = {
 };
 
 export const COLLECTIVE_SECTIONS = {
+  HOME: 'home',
   ADVANCED: 'advanced',
   AUTHORIZED_APPS: 'authorized-apps',
   COLLECTIVE_GOALS: 'goals',
@@ -73,14 +74,14 @@ export const COLLECTIVE_SECTIONS = {
   VIRTUAL_CARDS: 'virtual-cards',
   WEBHOOKS: 'webhooks',
   ACTIVITY_LOG: 'activity-log',
-};
+} as const;
 
 export const LEGACY_COLLECTIVE_SETTINGS_SECTIONS = {
   ...COLLECTIVE_SECTIONS,
   ...ABOUT_ORG_SECTIONS,
   ...ORG_BUDGET_SECTIONS,
   ...FISCAL_HOST_SECTIONS,
-};
+} as const;
 
 export const ALL_SECTIONS = {
   ...COLLECTIVE_SECTIONS,
@@ -88,7 +89,7 @@ export const ALL_SECTIONS = {
   ...ORG_BUDGET_SECTIONS,
   ...FISCAL_HOST_SECTIONS,
   ...HOST_DASHBOARD_SECTIONS,
-};
+} as const;
 
 export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.REPORTS,
@@ -98,12 +99,12 @@ export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
 ];
 
 export const PAGE_TITLES = defineMessages({
-  [USER]: { id: 'AdminPanel.UserSettings', defaultMessage: 'User Settings' },
-  [ORGANIZATION]: { id: 'AdminPanel.OrganizationSettings', defaultMessage: 'Organization Settings' },
-  [COLLECTIVE]: { id: 'AdminPanel.CollectiveSettings', defaultMessage: 'Collective Settings' },
-  [FUND]: { id: 'AdminPanel.FundSettings', defaultMessage: 'Fund Settings' },
-  [EVENT]: { id: 'AdminPanel.EventSettings', defaultMessage: 'Event Settings' },
-  [PROJECT]: { id: 'AdminPanel.ProjectSettings', defaultMessage: 'Project Settings' },
+  [USER]: { id: 'UserDashboard', defaultMessage: 'User Dashboard' },
+  [ORGANIZATION]: { id: 'OrganizationDashboard', defaultMessage: 'Organization Dashboard' },
+  [COLLECTIVE]: { id: 'CollectiveDashboard', defaultMessage: 'Collective Dashboard' },
+  [FUND]: { id: 'FundDashboard', defaultMessage: 'Fund Dashboard' },
+  [EVENT]: { id: 'EventDashboard', defaultMessage: 'Event Dashboard' },
+  [PROJECT]: { id: 'ProjectDashboard', defaultMessage: 'Project Dashboard' },
 });
 
 export const SECTION_LABELS = defineMessages({
@@ -173,14 +174,6 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.CONNECTED_ACCOUNTS]: {
     id: 'editCollective.menu.connectedAccounts',
     defaultMessage: 'Connected Accounts',
-  },
-  [ALL_SECTIONS.UPDATES]: {
-    id: 'updates',
-    defaultMessage: 'Updates',
-  },
-  [ALL_SECTIONS.CONVERSATIONS]: {
-    id: 'conversations',
-    defaultMessage: 'Conversations',
   },
   [ALL_SECTIONS.EXPORT]: {
     id: 'editCollective.menu.export',
@@ -274,6 +267,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.HOSTED_COLLECTIVES]: {
     id: 'HostedCollectives',
     defaultMessage: 'Hosted Collectives',
+  },
+  [ALL_SECTIONS.HOME]: {
+    id: 'home',
+    defaultMessage: 'Home',
   },
   [ALL_SECTIONS.NOTIFICATIONS]: {
     id: 'NotificationsSettings.Title',

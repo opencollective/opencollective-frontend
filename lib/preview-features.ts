@@ -5,15 +5,17 @@ export const PREVIEW_FEATURE_KEYS = {
   DASHBOARD: 'dashboard',
 };
 
-/**
- * Members and admins of these accounts will see Closed Beta preview features in the Preview Features modal.
- */
-export const closedBetaAccessAccounts: string[] = ['opencollective', 'opensource', 'foundation', 'europe'];
+export type PreviewFeature = {
+  key: string;
+  title: string;
+  description: string;
+  publicBeta: boolean; // If true, the feature will be available to toggle for all users.
+  closedBetaAccessFor?: string[]; // Account slugs. Members and admins of these accounts will see this feature as a Closed Beta preview in the Preview Features modal.
+  enabledByDefaultFor?: string[]; // Account slugs. Members and admins of these accounts will have the feature enabled by default.
+};
 
-export type PreviewFeature = { key: string; title: string; description: string; publicBeta: boolean };
-
 /**
- * List of current preview features. Setting `publicBeta` to `true` will make the feature available to toggle for all users.
+ * List of current preview features.
  */
 export const previewFeatures: PreviewFeature[] = [
   {
@@ -21,5 +23,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Workspace',
     description: 'Introducing improved navigation and a central admin dashboard for all accounts.',
     publicBeta: false,
+    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe'],
+    enabledByDefaultFor: ['opencollective'],
   },
 ];

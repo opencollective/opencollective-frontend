@@ -220,6 +220,10 @@ class ContributionFlow extends React.Component {
   }
 
   updateRouteFromState = async () => {
+    if (this.state.isNavigating) {
+      return;
+    }
+
     const currentStepName = this.getCurrentStepName();
     if (currentStepName !== STEPS.SUCCESS) {
       const { stepDetails, stepProfile, stepPayment } = this.state;
@@ -235,13 +239,14 @@ class ContributionFlow extends React.Component {
       if (!isEqual(currentUrlState, omitBy(expectedUrlState, isNil))) {
         const route = this.getRoute(currentStepName);
         const queryHelper = this.getQueryHelper();
-        this.setState({ isNavigating: true });
-        await this.props.router.replace(
-          { pathname: route, query: omitBy(queryHelper.encode(expectedUrlState), isNil) },
-          null,
-          { scroll: false, shallow: true },
-        );
-        this.setState({ isNavigating: false });
+        this.setState({ isNavigating: true }, async () => {
+          await this.props.router.replace(
+            { pathname: route, query: omitBy(queryHelper.encode(expectedUrlState), isNil) },
+            null,
+            { scroll: false, shallow: true },
+          );
+          this.setState({ isNavigating: false });
+        });
       }
     }
   };
