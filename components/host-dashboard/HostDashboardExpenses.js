@@ -343,7 +343,6 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
       query: { status: 'INCOMPLETE' },
       showCount: true,
     },
-    { label: 'Recently paid', query: { status: 'PAID' } },
   ];
   const queryWithViews = createHostDashboardExpensesQuery(initViews);
   const { data, loading, error } = useQuery(queryWithViews, { variables: queryVariables, context: API_V2_CONTEXT });
