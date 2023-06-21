@@ -136,9 +136,9 @@ const ExpensesList = ({
                   ))
                 ) : (
                   <FlipMove enterAnimation="fade" leaveAnimation="fade" disableAllAnimations={DISABLE_ANIMATIONS}>
-                    {expenses.map(expense => {
+                    {expenses.map((expense, i) => {
                       return (
-                        <ExpenseContainer key={expense.id} data-cy={`expense-${expense.status}`}>
+                        <ExpenseContainer isFirst={i === 0} key={expense.id} data-cy={`expense-${expense.status}`}>
                           <ExpenseBudgetItem
                             isInverted={isInverted}
                             expense={expense}

@@ -107,7 +107,6 @@ const Expenses = props => {
     {
       key: 'status',
       label: 'Status',
-      noFilter: 'ALL',
       options: [
         'APPROVED',
         'REJECTED',
@@ -157,7 +156,7 @@ const Expenses = props => {
         views={
           onlySubmittedExpenses
             ? [
-                { label: 'All', query: { status: null } },
+                { label: 'All', query: {} },
                 { label: 'Paid', query: { status: 'PAID' } },
               ]
             : [
@@ -168,6 +167,7 @@ const Expenses = props => {
         query={omit(query, ['offset', 'collec', 'parentCollectiveSlug'])}
         filterOptions={filterOptions}
         onChange={queryParams => updateFilters(queryParams)}
+        showDisplayAs
       />
 
       {/* {!onlySubmittedExpenses && (

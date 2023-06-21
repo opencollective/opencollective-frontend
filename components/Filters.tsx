@@ -1,9 +1,10 @@
-import React from 'react';
-import { BarsArrowUpIcon, FunnelIcon } from '@heroicons/react/20/solid';
+import React, { useContext } from 'react';
+import { BarsArrowUpIcon, FunnelIcon, CheckIcon } from '@heroicons/react/20/solid';
 import { isEmpty, omit, omitBy } from 'lodash';
 
 import Tabs from './ui/tabs-updated';
-import { ChevronDown, Filter, X } from 'lucide-react';
+import { ArrowUpDown, MessageSquare, MoreHorizontal, Paperclip, Table2, LayoutList, Filter, X } from 'lucide-react';
+
 import FlipMove from 'react-flip-move';
 import { Flipper, Flipped } from 'react-flip-toolkit';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -11,6 +12,11 @@ import OrderFilter from './OrderFilter';
 import { FilterCombo } from './ui/filter';
 import DashboardHeader from './DashboardHeader';
 import { set } from 'cypress/types/lodash';
+import { SettingsContext } from '../lib/SettingsContext';
+import { DropdownMenu, DropdownMenuItem, DropdownMenuItems, DropdownMenuTrigger } from './ui/dropdown';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { Listbox, Transition } from '@headlessui/react';
+import SelectFilter from './SelectFilter';
 
 const getFiltersFromQuery = filter => {
   const filterObjs = {
@@ -113,8 +119,10 @@ export default function Filters({
   views,
   onChange,
   routeParams,
+  showDisplayAs = false,
 }) {
   const [currentView, setView] = React.useState(views?.[0]);
+  const { settings, setSettings } = useContext(SettingsContext);
 
   const getCurrentFilter = query => {
     return omitBy(query, (value, key) => {
@@ -145,6 +153,11 @@ export default function Filters({
       onChange({ ...query, [name]: preparedValue });
     },
   });
+  const viewOptions = [
+    { label: 'Cards', value: 'cards' },
+    { label: 'Table', value: 'table' },
+  ];
+  const currentViewOption = viewOptions.find(v => v.value === (settings.tables ? 'table' : 'cards'));
   return (
     <div>
       <DashboardHeader title={title} primaryAction={currentView?.actions?.[0]} secondaryActions={null} />
@@ -185,7 +198,21 @@ export default function Filters({
             onChange={newQueryParams => onChange({ ...query, ...newQueryParams })}
           />
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2">
+          <SelectFilter
+            options={viewOptions}
+            value={currentViewOption}
+            onChange={option => {
+              setSettings({ ...settings, tables: option.value === 'table' });
+            }}
+            align="center"
+            trigger={
+              <div>{settings.tables ? <Table2 className="" size={16} /> : <LayoutList className="" size={16} />}</div>
+            }
+            triggerTooltip={'Display as'}
+            className="h-8 w-8"
+          />
+
           <OrderFilter options={orderByOptions} {...getFilterProps(orderByKey)} />
         </div>
       </div>

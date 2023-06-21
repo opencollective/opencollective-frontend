@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
+import { BarsArrowUpIcon } from '@heroicons/react/20/solid';
 
 import SelectFilter from './SelectFilter';
 
@@ -17,14 +18,20 @@ const OrderFilter = ({ onChange, options, value, ...props }) => {
       value: 'CREATED_AT,ASC',
     },
   ];
-
+  const option = options.find(o => o.value === value) || options[0];
   return (
     <SelectFilter
       inputId="expenses-order"
       onChange={({ value }) => onChange(value)}
-      value={options.find(o => o.value === value)}
+      value={option}
       options={options}
-      defaultValue={options[0]}
+      trigger={
+        <React.Fragment>
+          <BarsArrowUpIcon className="-ml-0.5 h-5 w-5 text-gray-400" aria-hidden="true" />
+
+          <span className="block truncate">{option.label}</span>
+        </React.Fragment>
+      }
     />
   );
 };

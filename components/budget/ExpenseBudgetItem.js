@@ -143,16 +143,16 @@ const ExpenseBudgetItem = ({
         data-cy={`expense-container-${expense?.legacyId}`}
         data-expand="true"
         selected={selected}
-        useDrawer={useDrawer}
-        {...(useDrawer && {
-          onClick: e => {
-            const onTarget = e.target.closest('[data-expand="true"]');
-            const onBlockedTarget = e.target.closest('[data-expand="false"]');
-            if (onTarget && !onBlockedTarget) {
-              expandExpense();
-            }
-          },
-        })}
+        // useDrawer={useDrawer}
+        // {...(useDrawer && {
+        //   onClick: e => {
+        //     const onTarget = e.target.closest('[data-expand="true"]');
+        //     const onBlockedTarget = e.target.closest('[data-expand="false"]');
+        //     if (onTarget && !onBlockedTarget) {
+        //       expandExpense();
+        //     }
+        //   },
+        // })}
       >
         <Flex justifyContent="space-between" flexWrap="wrap">
           <Flex flex="1" minWidth="max(50%, 200px)" maxWidth={[null, '70%']} mr="24px">
@@ -173,15 +173,16 @@ const ExpenseBudgetItem = ({
               <LoadingPlaceholder height={60} />
             ) : (
               <Box>
-                <StyledTooltip
-                  content={<FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />}
-                  delayHide={0}
-                >
+                <StyledTooltip content={<FormattedMessage defaultMessage="Open expense detaiils" />} delayHide={0}>
                   <StyledLink
                     as={Link}
                     underlineOnHover
                     data-expand="false"
                     href={`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`}
+                    onClick={e => {
+                      e.preventDefault();
+                      expandExpense();
+                    }}
                   >
                     <AutosizeText
                       value={expense.description}

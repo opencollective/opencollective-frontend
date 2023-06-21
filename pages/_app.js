@@ -56,7 +56,7 @@ const cache = createIntlCache();
 // eslint-disable-next-line react/prop-types
 const SettingsProvider = ({ children }) => {
   const [settings, setSettings] = React.useState({
-    tables: true,
+    tables: false,
     sidebarGrayBg: false,
     mainGrayBg: false,
     headerDarkBg: false,
