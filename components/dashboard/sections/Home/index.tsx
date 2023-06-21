@@ -27,7 +27,7 @@ const Home = (props: AdminSectionProps) => {
   const { data, loading, error, fetchMore } = useQuery(workspaceHomeQuery, {
     variables: { slug, limit: PAGE_SIZE },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'network-only',
+    notifyOnNetworkStatusChange: true,
   });
 
   const activities: WorkspaceHomeQuery['activities']['nodes'] = data?.activities?.nodes || [];
@@ -45,7 +45,7 @@ const Home = (props: AdminSectionProps) => {
         </Flex>
         {error ? (
           <MessageBoxGraphqlError error={error} />
-        ) : loading ? (
+        ) : !activities.length && loading ? (
           <React.Fragment>
             <TimelineItem />
             <TimelineItem />
@@ -71,6 +71,7 @@ const Home = (props: AdminSectionProps) => {
           mt={2}
           width="100%"
           buttonSize="small"
+          loading={loading}
           onClick={() =>
             fetchMore({
               variables: { offset: activities.length },
