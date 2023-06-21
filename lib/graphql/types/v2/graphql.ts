@@ -272,6 +272,7 @@ export type AccountTransactionsArgs = {
   searchTerm?: InputMaybe<Scalars['String']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   type?: InputMaybe<TransactionType>;
+  virtualCard?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
 };
 
 
@@ -1308,6 +1309,7 @@ export type BotTransactionsArgs = {
   searchTerm?: InputMaybe<Scalars['String']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   type?: InputMaybe<TransactionType>;
+  virtualCard?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
 };
 
 
@@ -1685,6 +1687,7 @@ export type CollectiveTransactionsArgs = {
   searchTerm?: InputMaybe<Scalars['String']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   type?: InputMaybe<TransactionType>;
+  virtualCard?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
 };
 
 
@@ -3366,6 +3369,7 @@ export type EventTransactionsArgs = {
   searchTerm?: InputMaybe<Scalars['String']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   type?: InputMaybe<TransactionType>;
+  virtualCard?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
 };
 
 
@@ -4222,6 +4226,7 @@ export type FundTransactionsArgs = {
   searchTerm?: InputMaybe<Scalars['String']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   type?: InputMaybe<TransactionType>;
+  virtualCard?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
 };
 
 
@@ -4421,8 +4426,6 @@ export type Host = Account & AccountWithContributions & {
   totalHostedCollectives?: Maybe<Scalars['Int']>;
   transactions: TransactionCollection;
   transferwise?: Maybe<TransferWise>;
-  /** Transferwise balances. Returns null if Transferwise account is not connected. */
-  transferwiseBalances?: Maybe<Array<Maybe<Amount>>>;
   /** @deprecated 2023-01-16: Please use socialLinks */
   twitterHandle?: Maybe<Scalars['String']>;
   type: AccountType;
@@ -4548,11 +4551,17 @@ export type HostHostedVirtualCardMerchantsArgs = {
 /** This represents an Host account */
 export type HostHostedVirtualCardsArgs = {
   collectiveAccountIds?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
+  hasMissingReceipts?: InputMaybe<Scalars['Boolean']>;
   limit?: Scalars['Int'];
   merchantAccount?: InputMaybe<AccountReferenceInput>;
   offset?: Scalars['Int'];
   orderBy?: InputMaybe<ChronologicalOrderInput>;
+  spentAmountFrom?: InputMaybe<AmountInput>;
+  spentAmountTo?: InputMaybe<AmountInput>;
   state?: InputMaybe<Scalars['String']>;
+  status?: InputMaybe<Array<InputMaybe<VirtualCardStatus>>>;
+  withExpensesDateFrom?: InputMaybe<Scalars['DateTime']>;
+  withExpensesDateTo?: InputMaybe<Scalars['DateTime']>;
 };
 
 
@@ -4685,6 +4694,7 @@ export type HostTransactionsArgs = {
   searchTerm?: InputMaybe<Scalars['String']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   type?: InputMaybe<TransactionType>;
+  virtualCard?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
 };
 
 
@@ -5166,6 +5176,7 @@ export type IndividualTransactionsArgs = {
   searchTerm?: InputMaybe<Scalars['String']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   type?: InputMaybe<TransactionType>;
+  virtualCard?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
 };
 
 
@@ -6950,6 +6961,7 @@ export type OrganizationTransactionsArgs = {
   searchTerm?: InputMaybe<Scalars['String']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   type?: InputMaybe<TransactionType>;
+  virtualCard?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
 };
 
 
@@ -7735,6 +7747,7 @@ export type ProjectTransactionsArgs = {
   searchTerm?: InputMaybe<Scalars['String']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   type?: InputMaybe<TransactionType>;
+  virtualCard?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
 };
 
 
@@ -7906,6 +7919,7 @@ export type QueryExpenseArgs = {
 /** This is the root query */
 export type QueryExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
+  chargeHasReceipts?: InputMaybe<Scalars['Boolean']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']>;
   dateFrom?: InputMaybe<Scalars['DateTime']>;
@@ -7924,6 +7938,7 @@ export type QueryExpensesArgs = {
   tag?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   type?: InputMaybe<ExpenseType>;
+  virtualCards?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
 };
 
 
@@ -8089,6 +8104,7 @@ export type QueryTransactionsArgs = {
   searchTerm?: InputMaybe<Scalars['String']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   type?: InputMaybe<TransactionType>;
+  virtualCard?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
 };
 
 
@@ -8651,6 +8667,8 @@ export enum TransactionType {
 export type TransferWise = {
   __typename?: 'TransferWise';
   availableCurrencies?: Maybe<Array<Maybe<Scalars['JSONObject']>>>;
+  /** Transferwise balances. Returns null if Transferwise account is not connected. */
+  balances?: Maybe<Array<Maybe<Amount>>>;
   /** Unique identifier for this Wise object */
   id: Scalars['String'];
   requiredFields?: Maybe<Array<Maybe<TransferWiseRequiredField>>>;
@@ -9143,6 +9161,7 @@ export type VendorTransactionsArgs = {
   searchTerm?: InputMaybe<Scalars['String']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   type?: InputMaybe<TransactionType>;
+  virtualCard?: InputMaybe<Array<InputMaybe<VirtualCardReferenceInput>>>;
 };
 
 
@@ -9201,6 +9220,7 @@ export type VirtualCard = {
   spendingLimitAmount?: Maybe<Scalars['Int']>;
   spendingLimitInterval?: Maybe<VirtualCardLimitInterval>;
   spendingLimitRenewsOn?: Maybe<Scalars['DateTime']>;
+  status?: Maybe<VirtualCardStatus>;
   updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
@@ -9239,6 +9259,13 @@ export enum VirtualCardProvider {
 export type VirtualCardReferenceInput = {
   id?: InputMaybe<Scalars['String']>;
 };
+
+/** The status of a virtual card */
+export enum VirtualCardStatus {
+  ACTIVE = 'ACTIVE',
+  CANCELED = 'CANCELED',
+  INACTIVE = 'INACTIVE'
+}
 
 /** An webhook attached to an account */
 export type Webhook = {
