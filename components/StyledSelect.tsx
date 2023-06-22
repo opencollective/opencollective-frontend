@@ -293,28 +293,33 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
   ${space}
 `;
 
-type StyledSelectCustomComponent = Select &
-  React.ExoticComponent<
-    LayoutProps &
-      TypographyProps &
-      SpaceProps & {
-        intl: IntlShape;
-        /** Alias for isDisabled */
-        inputId: string;
-        disabled?: boolean;
-        useSearchIcon?: boolean;
-        hideDropdownIndicator?: boolean;
-        hideMenu?: boolean;
-        error?: boolean;
-        style?: Record<string, unknown>;
-        onBlur?: Function;
-        onChange?: Function;
-        isLoading?: boolean;
-        isSearchable?: boolean;
-        options?: any;
-        value?: any;
-      }
-  >;
+export type StyledSelectProps = LayoutProps &
+  TypographyProps &
+  SpaceProps & {
+    intl: IntlShape;
+    /** Alias for isDisabled */
+    inputId: string;
+    disabled?: boolean;
+    useSearchIcon?: boolean;
+    hideDropdownIndicator?: boolean;
+    hideMenu?: boolean;
+    error?: boolean;
+    style?: Record<string, unknown>;
+    styles?: Record<string, unknown>;
+    onBlur?: Function;
+    onChange?: Function;
+    isLoading?: boolean;
+    isSearchable?: boolean;
+    isClearable?: boolean;
+    options?: any;
+    value?: any;
+    components?: Record<string, React.ReactNode>;
+    closeMenuOnSelect?: boolean;
+    hideSelectedOptions?: boolean;
+    isMulti?: boolean;
+  };
+
+type StyledSelectCustomComponent = Select & React.ExoticComponent<StyledSelectProps>;
 
 const StyledSelect: StyledSelectCustomComponent = makeStyledSelect(Select);
 
