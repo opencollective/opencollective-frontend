@@ -218,7 +218,7 @@ class ContributionFlow extends React.Component {
           this.props.paymentFlow === PAYMENT_FLOW.CRYPTO,
           this.props.isEmbed,
         );
-        if (!isEqual(currentUrlState, omitBy(expectedUrlState, isNil))) {
+        if (!isEqual(omitBy(currentUrlState, isNil), omitBy(expectedUrlState, isNil))) {
           const route = this.getRoute(currentStepName);
           const queryHelper = this.getQueryHelper();
           this.props.router.replace(
