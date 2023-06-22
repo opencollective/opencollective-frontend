@@ -162,7 +162,7 @@ export function gql(source: "\n  query SelectedAccountInfo($account: String!) {\
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query ScheduledExpensesBanner($hostSlug: String!, $limit: Int!, $payoutMethodType: PayoutMethodType) {\n    host(slug: $hostSlug) {\n      id\n    }\n    expenses(\n      host: { slug: $hostSlug }\n      status: SCHEDULED_FOR_PAYMENT\n      limit: $limit\n      payoutMethodType: $payoutMethodType\n    ) {\n      totalCount\n      offset\n      limit\n      nodes {\n        id\n      }\n    }\n  }\n"): typeof import('./graphql').ScheduledExpensesBannerDocument;
+export function gql(source: "\n  query ScheduledExpensesBanner($hostSlug: String!, $limit: Int!, $payoutMethodType: PayoutMethodType) {\n    host(slug: $hostSlug) {\n      id\n      currency\n    }\n    expenses(\n      host: { slug: $hostSlug }\n      status: SCHEDULED_FOR_PAYMENT\n      limit: $limit\n      payoutMethodType: $payoutMethodType\n    ) {\n      totalCount\n      offset\n      limit\n      nodes {\n        id\n        quote {\n          sourceAmount {\n            valueInCents\n            currency\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').ScheduledExpensesBannerDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

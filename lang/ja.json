@@ -1264,7 +1264,7 @@
   "expenses.ready": "Ready to pay",
   "expenses.scheduled.confirmation.body": "Are you sure you want to batch and pay {count, plural, one {# expense} other {# expenses}} scheduled for payment?",
   "expenses.scheduled.confirmation.title": "Pay Expenses Batch",
-  "expenses.scheduled.notification": "You have {count, plural, one {# expense} other {# expenses}} scheduled for payment.",
+  "expenses.scheduled.notification": "You have {count, plural, one {# expense} other {# expenses}} scheduled for payment that will require {amount} in balance.",
   "expenses.scheduled.paybatch": "Pay Batch",
   "expenses.scheduled.paybatch.success": "Expenses paid! They're now being processed by Wise.",
   "ExpensesList.Empty": "指定の抽出条件に該当する経費がありません。 すべての経費を確認するには<ResetLink>抽出条件をリセット</ResetLink>してください。",

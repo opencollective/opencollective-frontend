@@ -1264,7 +1264,7 @@
   "expenses.ready": "Listo para pagar",
   "expenses.scheduled.confirmation.body": "¿Estás seguro de que quieres hacer un lote y pagar {count, plural, one {# gasto} other {# gastos}} programado para el pago?",
   "expenses.scheduled.confirmation.title": "Pagar el Lote de Gastos",
-  "expenses.scheduled.notification": "Tiene {count, plural, one {# gasto} other {# gastos}} programado para el pago.",
+  "expenses.scheduled.notification": "You have {count, plural, one {# expense} other {# expenses}} scheduled for payment that will require {amount} in balance.",
   "expenses.scheduled.paybatch": "Pagar el Lote",
   "expenses.scheduled.paybatch.success": "¡Gastos pagados! Ahora están siendo procesados por Wise.",
   "ExpensesList.Empty": "Ningún gasto coincide con los filtros dados, <ResetLink>restablézcalos</ResetLink> para ver todos los gastos.",
