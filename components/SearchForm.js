@@ -5,9 +5,7 @@ import { withRouter } from 'next/router';
 import styled from 'styled-components';
 import { borderColor, borderRadius, height, typography } from 'styled-system';
 
-import Container from './Container';
 import { Box, Flex } from './Grid';
-import SearchIcon from './SearchIcon';
 import StyledInput from './StyledInput';
 import StyledRoundButton from './StyledRoundButton';
 import StyledSpinner from './StyledSpinner';

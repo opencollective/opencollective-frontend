@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { Span } from './Text';
+
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
 import Container from './Container';
@@ -18,6 +18,7 @@ import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
 import PreviewFeaturesModal from './PreviewFeaturesModal';
 import StyledButton from './StyledButton';
 import { Dropdown, DropdownContent } from './StyledDropdown';
+import { Span } from './Text';
 
 const StyledProfileButton = styled(StyledButton)`
   padding: 0;
