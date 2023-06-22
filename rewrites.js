@@ -1,5 +1,5 @@
 const createOrderPage = '/contribution-flow';
-const contributionFlowSteps = '/details|profile|payment|checkout|summary|success';
+const contributionFlowSteps = '/details|profile|payment|finalize|summary|success';
 
 exports.REWRITES = [
   {
@@ -210,7 +210,7 @@ exports.REWRITES = [
     destination: '/embed/contribution-flow',
   },
   {
-    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:step(${contributionFlowSteps})?`,
+    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:action(checkout)?/:step(${contributionFlowSteps})?`,
     destination: '/embed/contribution-flow',
   },
   // Tier page

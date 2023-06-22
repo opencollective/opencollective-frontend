@@ -635,8 +635,8 @@ class ContributionFlow extends React.Component {
       });
     }
 
-    // This checkout step is where the QR code is displayed for crypto
-    if (step.name === 'checkout') {
+    // This finalize step is where the QR code is displayed for crypto
+    if (step.name === 'finalize') {
       await this.submitOrder();
     }
 
@@ -814,7 +814,7 @@ class ContributionFlow extends React.Component {
     }
 
     // Hide step payment if using a free tier with fixed price
-    // Also hide payment screen if using crypto payment method, we handle crypto flow in the `checkout` step below
+    // Also hide payment screen if using crypto payment method, we handle crypto flow in the `finalize` step below
     if (!noPaymentRequired && !isCrypto) {
       steps.push({
         name: 'payment',
@@ -849,7 +849,7 @@ class ContributionFlow extends React.Component {
 
     if (isCrypto) {
       steps.push({
-        name: 'checkout',
+        name: 'finalize',
         label: intl.formatMessage(STEP_LABELS.payment),
         isCompleted: !stepProfile?.contributorRejectedCategories,
       });
@@ -1040,10 +1040,10 @@ class ContributionFlow extends React.Component {
                   <Box mt={40}>
                     <ContributionFlowButtons
                       goNext={goNext}
-                      // for crypto flow the user should not be able to go back after the order is created at checkout step
+                      // for crypto flow the user should not be able to go back after the order is created at finalize step
                       // we also don't want to show the back button when linking directly to the payment step with `hideSteps=true`
                       goBack={
-                        (isCrypto && currentStep.name === STEPS.CHECKOUT) ||
+                        (isCrypto && currentStep.name === STEPS.FINALIZE) ||
                         (queryParams.hideSteps && currentStep.name === STEPS.PAYMENT)
                           ? null
                           : goBack
