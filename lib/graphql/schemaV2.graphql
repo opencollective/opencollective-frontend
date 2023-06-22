@@ -5155,6 +5155,11 @@ type Activity {
   order: Order
 
   """
+  The update related to this activity, if any
+  """
+  update: Update
+
+  """
   The transaction related to this activity, if any
   """
   transaction: Transaction
