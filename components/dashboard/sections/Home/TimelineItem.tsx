@@ -11,11 +11,12 @@ import { MessageAltX } from '@styled-icons/boxicons-regular/MessageAltX';
 import { Note } from '@styled-icons/boxicons-regular/Note';
 import { Send } from '@styled-icons/boxicons-regular/Send';
 import { Time } from '@styled-icons/boxicons-regular/Time';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import type { ActivityType, WorkspaceHomeQuery } from '../../../../lib/graphql/types/v2/graphql';
 import { ActivityDescriptionI18n, ActivityTimelineMessageI18n } from '../../../../lib/i18n/activities';
+import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
 import { getActivityVariables } from '../../../admin-panel/sections/ActivityLog/ActivityDescription';
 import { AvatarWithLink } from '../../../AvatarWithLink';
@@ -23,7 +24,9 @@ import Container from '../../../Container';
 import DateTime from '../../../DateTime';
 import { Box, Flex } from '../../../Grid';
 import HTMLContent from '../../../HTMLContent';
+import Link from '../../../Link';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
+import StyledLink from '../../../StyledLink';
 import { P } from '../../../Text';
 
 const ItemHeaderWrapper = styled(P)`
@@ -88,8 +91,7 @@ const TimelineItem = ({ activity, isLast, openExpense }: ActivityListItemProps) 
   const intl = useIntl();
   const secondaryAccount = activity?.individual?.id !== activity?.account?.id && activity.account;
   const Icon = activity ? getIcon(activity.type) : Time;
-  const html = activity?.data?.comment?.html || activity?.data?.update?.html;
-  const title = activity?.data?.update?.title;
+  const html = activity?.data?.comment?.html || activity.update?.summary;
 
   const isLoading = !activity;
 
@@ -131,12 +133,19 @@ const TimelineItem = ({ activity, isLast, openExpense }: ActivityListItemProps) 
               )}
             </Flex>
           </Flex>
-          {title && (
-            <P fontSize="15px" lineHeight="20px" fontWeight={500} color="black.800">
-              {title}
-            </P>
-          )}
+
           {html && <HTMLContent mt={3} fontSize="13px" lineHeight="20px" content={html} />}
+          {activity?.update?.summary && (
+            <Box mt={2}>
+              <StyledLink
+                as={Link}
+                fontSize="12px"
+                href={`${getCollectivePageRoute(activity.account)}/updates/${activity.update.slug}`}
+              >
+                <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
+              </StyledLink>
+            </Box>
+          )}
         </Box>
       </Flex>
     </Box>
