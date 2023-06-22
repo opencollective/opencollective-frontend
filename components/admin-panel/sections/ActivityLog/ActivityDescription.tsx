@@ -114,6 +114,20 @@ export const getActivityVariables = (
         </Link>
       </ResourceTag>
     ),
+  Update: msg =>
+    !activity.update ? (
+      msg
+    ) : (
+      <ResourceTag>
+        <Link
+          href={`${getCollectivePageRoute(activity.account)}/updates/${activity.update.slug}`}
+          title={activity.update.title}
+          openInNewTab
+        >
+          {msg}
+        </Link>
+      </ResourceTag>
+    ),
   MemberRole: () => {
     if (activity.data?.member?.role) {
       return formatMemberRole(intl, activity.data.member.role);
