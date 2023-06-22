@@ -19,6 +19,7 @@ import Hide from './Hide';
 import Image from './Image';
 import Link from './Link';
 import PopupMenu from './PopupMenu';
+import ProfileMenu from './ProfileMenu';
 import SearchModal from './Search';
 import SearchIcon from './SearchIcon';
 import StyledButton from './StyledButton';
@@ -328,7 +329,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
                 )}
               </Hide>
             </Container>
-            <TopBarProfileMenu />
+            {useDashboard ? <ProfileMenu /> : <TopBarProfileMenu />}
           </React.Fragment>
         )}
         <Hide md lg>
