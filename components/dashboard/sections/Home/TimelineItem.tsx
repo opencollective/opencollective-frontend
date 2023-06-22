@@ -91,7 +91,7 @@ const TimelineItem = ({ activity, isLast, openExpense }: ActivityListItemProps) 
   const intl = useIntl();
   const secondaryAccount = activity?.individual?.id !== activity?.account?.id && activity.account;
   const Icon = activity ? getIcon(activity.type) : Time;
-  const html = activity?.data?.comment?.html || activity.update?.summary;
+  const html = activity?.data?.comment?.html || activity?.update?.summary;
 
   const isLoading = !activity;
 
