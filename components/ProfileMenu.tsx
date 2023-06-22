@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-
+import { Span } from './Text';
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
 import Container from './Container';
@@ -149,6 +149,18 @@ const ProfileMenuDropdown = () => {
                 {hasAvailablePreviewFeatures && (
                   <StyledMenuEntry as="button" onClick={() => setShowPreviewFeaturesModal(true)}>
                     <FormattedMessage defaultMessage="Preview Features" />
+                    <Span
+                      fontSize="12px"
+                      ml={1}
+                      style={{ borderRadius: 20 }}
+                      py="2px"
+                      px="6px"
+                      display="inline-block"
+                      bg="primary.200"
+                      color="black.800"
+                    >
+                      <FormattedMessage defaultMessage="New!" />
+                    </Span>
                   </StyledMenuEntry>
                 )}
                 <hr />
