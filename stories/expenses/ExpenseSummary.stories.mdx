@@ -24,16 +24,10 @@ import { openSourceHost } from '../mocks/collectives';
 <Canvas>
   <Story name="Loading">
     {() => {
-      const [isLoading, setLoading] = React.useState(true);
       return (
-        <div>
-          <button onClick={() => setLoading(!isLoading)}>Toggle loading</button>
-          <br />
-          <hr />
-          <br />
-          <ExpenseSummary host={openSourceHost} expense={expenseInvoice} isLoading={isLoading} />
-        </div>
+        <ExpenseSummary isLoading={true} />
       );
     }}
+
   </Story>
 </Canvas>

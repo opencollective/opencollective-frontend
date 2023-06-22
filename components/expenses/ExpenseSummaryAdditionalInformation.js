@@ -121,7 +121,7 @@ const ExpenseSummaryAdditionalInformation = ({
   const displayedHost = expense?.host ?? host;
 
   if (isLoading) {
-    <LoadingPlaceholder height={150} mt={3} />;
+    return <LoadingPlaceholder height={150} mt={3} />;
   }
 
   if (!payee) {
@@ -135,7 +135,7 @@ const ExpenseSummaryAdditionalInformation = ({
       flexWrap={['nowrap', 'wrap', null, 'nowrap']}
       gridGap="12px"
     >
-      {showCollective && (
+      {showCollective && collective && (
         <PrivateInfoColumn data-cy="expense-summary-collective">
           <PrivateInfoColumnHeader>{formatCollectiveType(intl, collective.type)}</PrivateInfoColumnHeader>
           <LinkCollective collective={collective}>
