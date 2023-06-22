@@ -5,6 +5,7 @@ import { create, Mode } from '@transferwise/approve-api-action-helpers';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { addAuthTokenToHeader } from '../../lib/api';
+import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { getWebsiteUrl } from '../../lib/utils';
 
@@ -20,6 +21,7 @@ export const scheduledExpensesQuery = gql`
   query ScheduledExpensesBanner($hostSlug: String!, $limit: Int!, $payoutMethodType: PayoutMethodType) {
     host(slug: $hostSlug) {
       id
+      currency
     }
     expenses(
       host: { slug: $hostSlug }
@@ -32,6 +34,12 @@ export const scheduledExpensesQuery = gql`
       limit
       nodes {
         id
+        quote {
+          sourceAmount {
+            valueInCents
+            currency
+          }
+        }
       }
     }
   }
@@ -96,20 +104,28 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
       });
     }
   };
+  const totalAmount = scheduledExpenses.data.expenses.nodes
+    .filter(expense => !!expense.quote)
+    .reduce((total, expense) => {
+      return total + expense.quote.sourceAmount.valueInCents;
+    }, 0);
 
   return (
     <React.Fragment>
       <MessageBox type="success" mb={4}>
-        <Flex alignItems="center" justifyContent="space-between">
+        <Flex alignItems="baseline" justifyContent="space-between">
           <Box>
             <TransferwiseIcon size="1em" color="#25B869" mr={2} />
             <FormattedMessage
               id="expenses.scheduled.notification"
-              defaultMessage="You have {count, plural, one {# expense} other {# expenses}} scheduled for payment."
-              values={{ count: scheduledExpenses.data.expenses.totalCount }}
+              defaultMessage="You have {count, plural, one {# expense} other {# expenses}} scheduled for payment that will require {amount} in balance."
+              values={{
+                count: scheduledExpenses.data.expenses.totalCount,
+                amount: formatCurrency(totalAmount, scheduledExpenses.data.host.currency),
+              }}
             />
           </Box>
-          <Box>
+          <Flex gap="8px">
             {secondButton}
             <StyledButton
               buttonSize="tiny"
@@ -118,7 +134,7 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
             >
               <FormattedMessage id="expenses.scheduled.paybatch" defaultMessage="Pay Batch" />
             </StyledButton>
-          </Box>
+          </Flex>
         </Flex>
       </MessageBox>
       {showConfirmationModal && (
