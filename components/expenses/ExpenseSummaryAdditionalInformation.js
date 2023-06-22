@@ -47,6 +47,7 @@ const PrivateInfoColumn = styled(Box).attrs({ flexBasis: [0, '185px'] })`
   border-radius: 8px;
   padding: 16px;
   flex: 1 1;
+  min-width: 160px;
 `;
 
 const PrivateInfoColumnHeader = styled(H4).attrs({
@@ -108,8 +109,6 @@ const ExpenseSummaryAdditionalInformation = ({
   isLoadingLoggedInUser,
   isDraft,
   collective,
-  showHost,
-  showCollective,
 }) => {
   const intl = useIntl();
   const payeeLocation = expense?.payeeLocation || expense?.draft?.payeeLocation;
@@ -118,7 +117,6 @@ const ExpenseSummaryAdditionalInformation = ({
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === expenseStatus.PAID;
-  const displayedHost = expense?.host ?? host;
 
   if (isLoading) {
     return <LoadingPlaceholder height={150} mt={3} />;
@@ -135,33 +133,40 @@ const ExpenseSummaryAdditionalInformation = ({
       flexWrap={['nowrap', 'wrap', null, 'nowrap']}
       gridGap="12px"
     >
-      {showCollective && collective && (
+      {collective && (
         <PrivateInfoColumn data-cy="expense-summary-collective">
           <PrivateInfoColumnHeader>{formatCollectiveType(intl, collective.type)}</PrivateInfoColumnHeader>
           <LinkCollective collective={collective}>
             <Flex alignItems="center">
               <Avatar collective={collective} radius={24} />
-              <Span ml={2} color="black.800" fontSize="14px" fontWeight="700" truncateOverflow>
-                {formatAccountName(collective.name, collective.legalName)}
-              </Span>
+              <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
+                <Span color="black.800" fontSize="14px" fontWeight="700" truncateOverflow>
+                  {formatAccountName(collective.name, collective.legalName)}
+                </Span>
+                <Span color="black.900" fontSize="12px" truncateOverflow>
+                  @{collective.slug}
+                </Span>
+              </Flex>
             </Flex>
           </LinkCollective>
-          <Container mt={3} fontSize="14px" color="black.700">
-            <Container fontWeight="700">
-              <FormattedMessage
-                id="withColon"
-                defaultMessage="{item}:"
-                values={{ item: <FormattedMessage id="Balance" defaultMessage="Balance" /> }}
-              />
+          {collective.stats.balanceWithBlockedFunds && (
+            <Container mt={3} fontSize="14px" color="black.700">
+              <Container fontWeight="700">
+                <FormattedMessage
+                  id="withColon"
+                  defaultMessage="{item}:"
+                  values={{ item: <FormattedMessage id="Balance" defaultMessage="Balance" /> }}
+                />
+              </Container>
+              <Box mt={2}>
+                <FormattedMoneyAmount
+                  amount={collective.stats.balanceWithBlockedFunds.valueInCents}
+                  currency={collective.stats.balanceWithBlockedFunds.currency}
+                  amountStyles={null}
+                />
+              </Box>
             </Container>
-            <Box mt={2}>
-              <FormattedMoneyAmount
-                amount={collective.stats.balanceWithBlockedFunds.valueInCents}
-                currency={collective.stats.balanceWithBlockedFunds.currency}
-                amountStyles={null}
-              />
-            </Box>
-          </Container>
+          )}
           {Boolean(collective?.hostAgreements?.totalCount) && (
             <Container mt={3}>
               <StyledLink
@@ -191,7 +196,7 @@ const ExpenseSummaryAdditionalInformation = ({
           )}
         </PrivateInfoColumnHeader>
         <LinkCollective collective={payee}>
-          <Flex alignItems="center" fontSize="12px">
+          <Flex alignItems="center" fontSize="14px">
             {!payee.slug ? (
               <Avatar
                 name={payee.organization?.name || payee.name}
@@ -210,7 +215,7 @@ const ExpenseSummaryAdditionalInformation = ({
                 )}
               </Span>
               {payee.type !== CollectiveType.VENDOR && (payee.organization?.slug || payee.slug) && (
-                <Span color="black.900" fontSize="11px" truncateOverflow>
+                <Span color="black.900" fontSize="12px" truncateOverflow>
                   @{payee.organization?.slug || payee.slug}
                 </Span>
               )}
@@ -269,47 +274,6 @@ const ExpenseSummaryAdditionalInformation = ({
           )}
         </Container>
       </PrivateInfoColumn>
-      {showHost && displayedHost && (
-        <PrivateInfoColumn data-cy="expense-summary-host">
-          <PrivateInfoColumnHeader>
-            {isPaid ? (
-              <FormattedMessage id="expense.PaidFromFiscalhost" defaultMessage="Paid from Fiscal Host" />
-            ) : (
-              <FormattedMessage id="expense.PayFromFiscalhost" defaultMessage="Pay from Fiscal Host" />
-            )}
-          </PrivateInfoColumnHeader>
-          <LinkCollective collective={displayedHost}>
-            <Flex alignItems="center">
-              <Avatar collective={displayedHost} radius={24} />
-              <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
-                {collective?.isActive ? (
-                  formatAccountName(displayedHost.name, displayedHost.legalName)
-                ) : (
-                  <FormattedMessage
-                    id="Fiscalhost.pending"
-                    defaultMessage="{host} (pending)"
-                    values={{
-                      host: formatAccountName(displayedHost.name, displayedHost.legalName),
-                    }}
-                  />
-                )}
-              </Span>
-            </Flex>
-          </LinkCollective>
-          {displayedHost.location && (
-            <P whiteSpace="pre-wrap" fontSize="11px" mt={2}>
-              {displayedHost.location.address}
-            </P>
-          )}
-          {displayedHost.website && (
-            <P mt={2} fontSize="11px">
-              <StyledLink href={displayedHost.website} openInNewTab>
-                {displayedHost.website}
-              </StyledLink>
-            </P>
-          )}
-        </PrivateInfoColumn>
-      )}
     </Flex>
   );
 };
@@ -339,16 +303,7 @@ ExpenseSummaryAdditionalInformation.propTypes = {
   /** Set this to true if the logged in user is currenltly loading */
   isLoadingLoggedInUser: PropTypes.bool,
   host: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    legalName: PropTypes.string,
     slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    website: PropTypes.string,
-    location: PropTypes.shape({
-      address: PropTypes.string,
-      country: PropTypes.string,
-    }),
   }),
   /** Must be provided if isLoading is false */
   expense: PropTypes.shape({
@@ -400,18 +355,6 @@ ExpenseSummaryAdditionalInformation.propTypes = {
       slug: PropTypes.string,
       type: PropTypes.string,
     }),
-    host: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      legalName: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      website: PropTypes.string,
-      location: PropTypes.shape({
-        address: PropTypes.string,
-        country: PropTypes.string,
-      }),
-    }),
     payoutMethod: PropTypes.shape({
       id: PropTypes.string,
       type: PropTypes.oneOf(Object.values(PayoutMethodType)),
@@ -437,8 +380,6 @@ ExpenseSummaryAdditionalInformation.propTypes = {
       totalCount: PropTypes.number,
     }),
   }),
-  showCollective: PropTypes.bool,
-  showHost: PropTypes.bool,
 };
 
 export default ExpenseSummaryAdditionalInformation;

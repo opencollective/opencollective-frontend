@@ -194,19 +194,23 @@ Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserE
  * Create a collective. Admin will be the user designated by `email`. If not
  * provided, the email used will default to `defaultTestUserEmail`.
  */
-Cypress.Commands.add('createHostedCollectiveV2', ({ email = defaultTestUserEmail, testPayload } = {}) => {
-  return cy.createCollectiveV2({
-    email,
-    testPayload,
-    host: { slug: 'opensource' },
-    collective: {
-      repositoryUrl: 'https://github.com/opencollective',
-    },
-    applicationData: {
-      useGithubValidation: true,
-    },
-  });
-});
+Cypress.Commands.add(
+  'createHostedCollectiveV2',
+  ({ email = defaultTestUserEmail, testPayload, ...attributes } = {}) => {
+    return cy.createCollectiveV2({
+      ...attributes,
+      email,
+      testPayload,
+      host: { slug: 'opensource' },
+      collective: {
+        repositoryUrl: 'https://github.com/opencollective',
+      },
+      applicationData: {
+        useGithubValidation: true,
+      },
+    });
+  },
+);
 
 /**
  * Create a expense.

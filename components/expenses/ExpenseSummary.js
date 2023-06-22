@@ -359,7 +359,6 @@ const ExpenseSummary = ({
         expense={expense}
         collective={collective}
         isDraft={!isEditing && expense?.status === expenseStatus.DRAFT}
-        showCollective
       />
       {!isEditing &&
         (drawerActionsContainer ? (
