@@ -138,17 +138,17 @@ const ProfileMenuDropdown = () => {
                 </ProfileHeader>
                 <hr />
                 <StyledMenuEntry href={`/${LoggedInUser.collective.slug}`}>
-                  <FormattedMessage defaultMessage="Profile" />
+                  <FormattedMessage id="menu.profile" defaultMessage="Profile" />
                 </StyledMenuEntry>
                 <StyledMenuEntry href={`/dashboard/${LoggedInUser.collective.slug}`}>
-                  <FormattedMessage defaultMessage="Dashboard" />
+                  <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
                 </StyledMenuEntry>
                 <StyledMenuEntry href={`/dashboard/${LoggedInUser.collective.slug}/info`}>
-                  <FormattedMessage defaultMessage="Settings" />
+                  <FormattedMessage id="Settings" defaultMessage="Settings" />
                 </StyledMenuEntry>
                 {hasAvailablePreviewFeatures && (
                   <StyledMenuEntry as="button" onClick={() => setShowPreviewFeaturesModal(true)}>
-                    <FormattedMessage defaultMessage="Preview Features" />
+                    <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />
                     <Span
                       fontSize="12px"
                       ml={1}
@@ -182,7 +182,7 @@ const ProfileMenuDropdown = () => {
                 </StyledMenuEntry>
                 <hr />
                 <StyledMenuEntry as="button" onClick={() => logout()}>
-                  <FormattedMessage defaultMessage="Log out" /> <LogOut size={14} />
+                  <FormattedMessage id="menu.logout" defaultMessage="Log out" /> <LogOut size={14} />
                 </StyledMenuEntry>
               </Flex>
             </StyledDropdownContent>

@@ -310,7 +310,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
                   </MainNavItem>
                 </Link>
                 <StyledTooltip
-                  content={<FormattedMessage defaultMessage="Search" />}
+                  content={<FormattedMessage id="Search" defaultMessage="Search" />}
                   noArrow
                   place="bottom"
                   delayHide={100}
