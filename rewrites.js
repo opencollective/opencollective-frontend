@@ -128,11 +128,11 @@ exports.REWRITES = [
   },
   {
     source: '/dashboard',
-    destination: '/dashboard',
+    destination: '/home',
   },
   {
     source: '/dashboard/:slug/:section?/:subpath*',
-    destination: '/dashboard',
+    destination: '/home',
   },
   {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',

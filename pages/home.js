@@ -3,10 +3,11 @@ import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
-// import Banner from '../components/collectives/Banner';
 import JoinUsSection from '../components/collectives/sections/JoinUs';
+import Dashboard from '../components/dashboard';
 import CollaborateWithMoney from '../components/home/CollaborateWithMoneySection';
 import DedicatedTeam from '../components/home/DedicatedTeamSection';
 import GetToKnowUs from '../components/home/GetToKnowUsSection';
@@ -27,14 +28,24 @@ const messages = defineMessages({
 
 const HomePage = () => {
   const { formatMessage } = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
+  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const router = useRouter();
-
+  const hasDashboardEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
   useEffect(() => {
-    if (router.asPath === '/' && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)) {
-      router.replace(`/dashboard/${LoggedInUser.getLastDashboardSlug()}`);
+    if (router.asPath === '/' && hasDashboardEnabled) {
+      router.replace(`/dashboard`, undefined, { shallow: true });
+    } else if (router.asPath === '/dashboard' && !hasDashboardEnabled) {
+      router.replace(`/`, undefined, { shallow: true });
     }
-  }, [LoggedInUser, router.asPath]);
+  }, [hasDashboardEnabled]);
+
+  if (hasDashboardEnabled && router.asPath !== '/home') {
+    return <Dashboard />;
+  }
+  // prevent flashing of landing page when loading user, also check if there is a token to prevent showing this to non-logged in users and robots
+  if (getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN) && loadingLoggedInUser) {
+    return null;
+  }
 
   return (
     <Page
@@ -68,7 +79,10 @@ HomePage.getInitialProps = ({ req, res }) => {
     skipDataFromTree = true;
   }
 
-  return { skipDataFromTree };
+  return {
+    skipDataFromTree,
+    scripts: { googleMaps: true },
+  };
 };
 
 export default HomePage;

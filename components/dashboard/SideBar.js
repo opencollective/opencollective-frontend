@@ -20,12 +20,20 @@ const Sticky = styled.div`
   top: 0;
 `;
 
-const AdminPanelSideBar = ({ collective, isAccountantOnly, isLoading, selectedSection, onRoute, ...props }) => {
+const AdminPanelSideBar = ({
+  activeSlug,
+  collective,
+  isAccountantOnly,
+  isLoading,
+  selectedSection,
+  onRoute,
+  ...props
+}) => {
   return (
     <SidebarContainer {...props}>
       <Sticky>
         <MenuContainer>
-          <AccountSwitcher collective={collective} isLoading={isLoading} />
+          <AccountSwitcher activeSlug={activeSlug} isLoading={isLoading} />
           {isLoading ? (
             <Box py={3}>
               {[...Array(5).keys()].map(i => (
@@ -59,6 +67,7 @@ AdminPanelSideBar.propTypes = {
   }),
   isAccountantOnly: PropTypes.bool,
   onRoute: PropTypes.func,
+  activeSlug: PropTypes.string,
 };
 
 export default AdminPanelSideBar;

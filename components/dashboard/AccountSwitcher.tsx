@@ -6,7 +6,6 @@ import { ChevronUpDown } from '@styled-icons/heroicons-outline/ChevronUpDown';
 import { css } from '@styled-system/css';
 import { flatten, groupBy, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -170,13 +169,9 @@ MenuEntry.propTypes = {
   activeSlug: PropTypes.string,
 };
 
-const AccountSwitcher = () => {
+const AccountSwitcher = ({ activeSlug }) => {
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
-  const router = useRouter();
-  const { slug } = router.query;
-  const activeSlug = Array.isArray(slug) ? slug[0] : slug;
-
   const loggedInUserCollective = LoggedInUser?.collective;
 
   const groupedAccounts = getGroupedAdministratedAccounts(LoggedInUser);
