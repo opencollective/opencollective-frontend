@@ -176,7 +176,7 @@ MenuLink.propTypes = {
   onClick: PropTypes.func,
   afterClick: PropTypes.func,
   icon: PropTypes.node,
-  renderSubMenu: PropTypes.node,
+  renderSubMenu: PropTypes.func,
   parentSection: PropTypes.string,
   goToSection: PropTypes.string,
 };

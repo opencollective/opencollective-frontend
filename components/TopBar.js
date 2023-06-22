@@ -4,6 +4,7 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { debounce } from 'lodash';
+import { Search } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -24,6 +25,7 @@ import SearchModal from './Search';
 import SearchIcon from './SearchIcon';
 import StyledButton from './StyledButton';
 import StyledLink from './StyledLink';
+import StyledTooltip from './StyledTooltip';
 import { Span } from './Text';
 import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
@@ -72,6 +74,9 @@ const NavItem = styled(StyledLink)`
 `;
 
 const MainNavItem = styled(StyledLink)`
+  display: flex;
+  align-items: center;
+  gap: 8px;
   color: #334155;
   font-weight: 500;
   font-size: 14px;
@@ -118,6 +123,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
     '/how-it-works',
     '/fiscal-hosting',
     '/e2c',
+    '/help',
   ];
   const onHomeRoute = homepageRoutes.some(isRouteActive);
 
@@ -288,7 +294,6 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
                 </Flex>
               </NavButton>
             )}
-            {showSearchModal && <SearchModal onClose={() => setShowSearchModal(false)} />}
           </Flex>
         ) : (
           <Flex flex="1 1 auto">
@@ -304,11 +309,16 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
                     <FormattedMessage defaultMessage="Explore" />
                   </MainNavItem>
                 </Link>
-                <Link href="/help">
-                  <MainNavItem as={Container} isActive={isRouteActive('/help')}>
-                    <FormattedMessage defaultMessage="Help & Support" />
+                <StyledTooltip
+                  content={<FormattedMessage defaultMessage="Search" />}
+                  noArrow
+                  place="bottom"
+                  delayHide={100}
+                >
+                  <MainNavItem onClick={() => setShowSearchModal(true)}>
+                    <Search size={16} />
                   </MainNavItem>
-                </Link>
+                </StyledTooltip>
               </Flex>
             </Hide>
           </Flex>
@@ -343,6 +353,9 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
           )}
         </Hide>
       </Flex>
+      {showSearchModal && (
+        <SearchModal onClose={() => setShowSearchModal(false)} showLinkToDiscover={onHomeRoute || !useDashboard} />
+      )}
     </Fragment>
   );
 };

@@ -72,7 +72,7 @@ const ChangelogTrigger = props => {
   return (
     <Flex>
       {hasSeenNewUpdates ? (
-        <StyledTooltip content={TooltipContent}>
+        <StyledTooltip delayHide={100} content={TooltipContent} noArrow>
           <FlameIcon
             height={height}
             width={width}

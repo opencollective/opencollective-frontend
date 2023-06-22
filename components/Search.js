@@ -2,53 +2,48 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { Box, Flex } from './Grid';
+import { Flex } from './Grid';
 import Link from './Link';
 import SearchForm from './SearchForm';
 import StyledLink from './StyledLink';
-import StyledLinkButton from './StyledLinkButton';
-import StyledModal, { CloseIcon, ModalBody } from './StyledModal';
-import { Span } from './Text';
+import StyledModal, { ModalBody } from './StyledModal';
 
 /*
  * A modal that appears on top of the page containing a search field.
  */
-const SearchModal = ({ onClose }) => {
+const SearchModal = ({ onClose, showLinkToDiscover = false }) => {
   const intl = useIntl();
   return (
     <StyledModal
+      padding={0}
       position="absolute"
-      top={0}
-      style={{ borderRadius: 0 }}
-      maxWidth="100%"
-      width="100%"
-      height="128px"
+      top={64}
+      style={{ borderRadius: showLinkToDiscover ? 20 : 100 }}
       onClose={onClose}
       overflow="hidden"
     >
-      <ModalBody>
-        <Flex height="48px" alignItems="center" flexDirection="column">
+      <ModalBody mt={0} mb={0}>
+        <Flex flexDirection="column">
           <Flex>
             <SearchForm
               autoFocus
               width={['180px', '248px', '536px']}
               borderRadius="100px"
-              fontSize="12px"
+              borderColor="transparent"
+              fontSize="14px"
+              height="52px"
               placeholder={intl.formatMessage({ defaultMessage: 'Search for Collectives, organizations, and more...' })}
               showSearchButton
               searchButtonStyles={{ width: '32px', height: '32px' }}
             />
-            <Span mt="12px" ml={['10px', '25px']}>
-              <StyledLinkButton onClick={onClose}>
-                <CloseIcon style={{ width: '14px', height: '14px' }} />
-              </StyledLinkButton>
-            </Span>
           </Flex>
-          <Box pt="16px" fontSize="13px">
-            <StyledLink as={Link} href="/search">
-              <FormattedMessage id="home.discoverCollectives" defaultMessage="Discover Collectives" />
-            </StyledLink>
-          </Box>
+          {showLinkToDiscover && (
+            <Flex justifyContent={'center'} p="16px" fontSize="13px" style={{ borderTop: '1px solid #e1e4e6' }}>
+              <StyledLink as={Link} href="/search">
+                <FormattedMessage id="home.discoverCollectives" defaultMessage="Discover Collectives" />
+              </StyledLink>
+            </Flex>
+          )}
         </Flex>
       </ModalBody>
     </StyledModal>
@@ -57,6 +52,7 @@ const SearchModal = ({ onClose }) => {
 
 SearchModal.propTypes = {
   onClose: PropTypes.func,
+  showLinkToDiscover: PropTypes.bool,
 };
 
 export default SearchModal;
