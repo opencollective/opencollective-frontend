@@ -113,7 +113,7 @@ const InviteMemberModal = props => {
 
   return (
     <Container>
-      <StyledModal width={688} onClose={cancelHandler}>
+      <StyledModal width={688} onClose={cancelHandler} trapFocus>
         <ModalHeader mb={4}>
           <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
         </ModalHeader>
@@ -139,6 +139,7 @@ const InviteMemberModal = props => {
               types={[CollectiveType.USER]}
               filterResults={collectives => collectives.filter(c => !membersIds.includes(c.id))}
               data-cy="member-collective-picker"
+              menuPortalTarget={null}
             />
           </Flex>
           <MemberForm

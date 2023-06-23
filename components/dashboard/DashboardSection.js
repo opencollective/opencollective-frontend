@@ -14,6 +14,7 @@ import TeamSettings from '../admin-panel/sections/Team';
 import Container from '../Container';
 import { Box } from '../Grid';
 import PendingApplications from '../host-dashboard/applications/PendingApplications';
+import HostDashboardAgreements from '../host-dashboard/HostDashboardAgreements';
 import HostDashboardExpenses from '../host-dashboard/HostDashboardExpenses';
 import HostDashboardHostedCollectives from '../host-dashboard/HostDashboardHostedCollectives';
 import HostDashboardReports from '../host-dashboard/HostDashboardReports';
@@ -22,6 +23,7 @@ import NotFound from '../NotFound';
 import { H2 } from '../Text';
 
 import Expenses from './sections/Expenses';
+import Home from './sections/Home';
 import ManageContributions from './sections/ManageContributions';
 import Transactions from './sections/Transactions';
 import {
@@ -37,6 +39,7 @@ const ADMIN_PANEL_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS]: FinancialContributions,
   [HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS]: PendingContributions,
   [HOST_DASHBOARD_SECTIONS.HOST_EXPENSES]: HostDashboardExpenses,
+  [HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
   [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: PendingApplications,
   [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
   [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
@@ -45,6 +48,7 @@ const ADMIN_PANEL_SECTIONS = {
   // NEW
   [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
   [COLLECTIVE_SECTIONS.EXPENSES]: Expenses,
+  [COLLECTIVE_SECTIONS.HOME]: Home,
   [COLLECTIVE_SECTIONS.TRANSACTIONS]: Transactions,
 };
 

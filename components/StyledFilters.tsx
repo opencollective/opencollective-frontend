@@ -103,7 +103,7 @@ export default function StyledFilters(props: StyledFiltersProps) {
         }
       }
     },
-    [selected, multiSelect],
+    [selected, multiSelect, onChange],
   );
 
   const isSelected = React.useCallback(

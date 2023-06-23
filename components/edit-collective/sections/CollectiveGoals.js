@@ -61,7 +61,7 @@ class CollectiveGoals extends React.Component {
       balance: { id: 'Balance', defaultMessage: 'Balance' },
       monthlyBudget: { id: 'MonthlyBudget', defaultMessage: 'Monthly budget' },
       yearlyBudget: { id: 'YearlyBudget', defaultMessage: 'Yearly budget' },
-      title: { id: 'goal.title.label', defaultMessage: 'Title' },
+      title: { id: 'Title', defaultMessage: 'Title' },
       description: { id: 'Fields.description', defaultMessage: 'Description' },
       amount: { id: 'Fields.amount', defaultMessage: 'Amount' },
       showToggle: { id: 'goal.show', defaultMessage: 'Show goals on my Profile page' },

@@ -349,7 +349,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
   return (
     <Page
       collective={account}
-      canonicalURL={`${getCollectivePageCanonicalURL(account)}/orders`}
+      canonicalURL={`${getCollectivePageCanonicalURL(account)}/contributions/${order.legacyId}`}
       {...baseMetadata}
       title={intl.formatMessage(messages.title, { title: order.description, id: order.legacyId })}
     >

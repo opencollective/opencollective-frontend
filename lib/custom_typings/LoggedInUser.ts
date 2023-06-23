@@ -1,3 +1,5 @@
+import { PreviewFeature } from '../preview-features';
+
 export type LoggedInUser = {
   id: number;
   collective: {
@@ -21,4 +23,6 @@ export type LoggedInUser = {
   canSeeAdminPanel: (collective: any) => boolean;
   hasEarlyAccess: (earlyAccessFeature: string) => boolean;
   email: string;
+  hasPreviewFeatureEnabled: (featureKey: string) => boolean;
+  getAvailablePreviewFeatures: () => PreviewFeature[];
 };

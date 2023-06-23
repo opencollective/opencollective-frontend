@@ -6,6 +6,7 @@ import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { Edit as IconEdit } from '@styled-icons/feather/Edit';
 import { Flag as FlagIcon } from '@styled-icons/feather/Flag';
 import { Link as IconLink } from '@styled-icons/feather/Link';
+import { MinusCircle } from '@styled-icons/feather/MinusCircle';
 import { Pause as PauseIcon } from '@styled-icons/feather/Pause';
 import { Play as PlayIcon } from '@styled-icons/feather/Play';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
@@ -124,6 +125,19 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.approve" defaultMessage="Approve" />
               </Action>
             )}
+            {permissions?.canReject && props.isViewingExpenseInHostContext && (
+              <Action
+                loading={processExpense.loading && processExpense.currentAction === 'REJECT'}
+                disabled={processExpense.loading || isDisabled}
+                onClick={async () => {
+                  setProcessModal('REJECT');
+                  setOpen(false);
+                }}
+              >
+                <MinusCircle size={12} />
+                <FormattedMessage id="actions.reject" defaultMessage="Reject" />
+              </Action>
+            )}
             {permissions?.canMarkAsIncomplete && (
               <Action
                 disabled={processExpense.loading || isDisabled}
@@ -176,20 +190,25 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="Edit" defaultMessage="Edit" />
               </Action>
             )}
-            {permissions?.canSeeInvoiceInfo && expense?.type === expenseTypes.INVOICE && (
-              <ExpenseInvoiceDownloadHelper expense={expense} collective={expense.account} onError={onError}>
-                {({ isLoading, downloadInvoice }) => (
-                  <Action loading={isLoading} onClick={downloadInvoice} disabled={processExpense.loading || isDisabled}>
-                    <IconDownload size="16px" />
-                    {isLoading ? (
-                      <FormattedMessage id="loading" defaultMessage="loading" />
-                    ) : (
-                      <FormattedMessage id="Download" defaultMessage="Download" />
-                    )}
-                  </Action>
-                )}
-              </ExpenseInvoiceDownloadHelper>
-            )}
+            {permissions?.canSeeInvoiceInfo &&
+              [expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense?.type) && (
+                <ExpenseInvoiceDownloadHelper expense={expense} collective={expense.account} onError={onError}>
+                  {({ isLoading, downloadInvoice }) => (
+                    <Action
+                      loading={isLoading}
+                      onClick={downloadInvoice}
+                      disabled={processExpense.loading || isDisabled}
+                    >
+                      <IconDownload size="16px" />
+                      {isLoading ? (
+                        <FormattedMessage id="loading" defaultMessage="loading" />
+                      ) : (
+                        <FormattedMessage id="Download" defaultMessage="Download" />
+                      )}
+                    </Action>
+                  )}
+                </ExpenseInvoiceDownloadHelper>
+              )}
             <Action
               onClick={() =>
                 linkAction === 'link'

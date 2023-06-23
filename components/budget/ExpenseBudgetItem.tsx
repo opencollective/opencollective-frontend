@@ -310,7 +310,7 @@ const ExpenseBudgetItem = ({
                       >
                         <FormattedMessage
                           id="ExepenseAttachments.count"
-                          defaultMessage="Attachments ({count})"
+                          defaultMessage="{count, plural, one {# attachment} other {# attachments}}"
                           values={{ count: nbAttachedFiles }}
                         />
                       </StyledLink>

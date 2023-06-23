@@ -401,6 +401,7 @@ interface Account {
     The transactions group to filter by
     """
     group: String
+    virtualCard: [VirtualCardReferenceInput]
   ): TransactionCollection!
   orders(
     """
@@ -1185,6 +1186,11 @@ type Expense {
   The state of the expense (pending, approved, paid, rejected...etc)
   """
   status: ExpenseStatus!
+
+  """
+  The accounts who approved this expense
+  """
+  approvedBy: [Account!]!
 
   """
   Whether this expense is on hold
@@ -2460,6 +2466,7 @@ type Host implements Account & AccountWithContributions {
     The transactions group to filter by
     """
     group: String
+    virtualCard: [VirtualCardReferenceInput]
   ): TransactionCollection!
   orders(
     """
@@ -2816,9 +2823,9 @@ type Host implements Account & AccountWithContributions {
   supportedPayoutMethods: [PayoutMethodType]
 
   """
-  Transferwise balances. Returns null if Transferwise account is not connected.
+  Stripe connected account
   """
-  transferwiseBalances: [Amount]
+  stripe: StripeConnectedAccount
 
   """
   Pending applications for this host
@@ -2847,10 +2854,36 @@ type Host implements Account & AccountWithContributions {
   hostedVirtualCards(
     limit: Int! = 100
     offset: Int! = 0
-    state: String = null
+    state: String = null @deprecated(reason: "2023-06-12: Please use status.")
+    status: [VirtualCardStatus]
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
     merchantAccount: AccountReferenceInput = null
     collectiveAccountIds: [AccountReferenceInput] = null
+
+    """
+    Returns virtual cards with expenses from this date.
+    """
+    withExpensesDateFrom: DateTime
+
+    """
+    Returns virtual cards with expenses to this date.
+    """
+    withExpensesDateTo: DateTime
+
+    """
+    Filter virtual cards with at least this amount in cents charged
+    """
+    spentAmountFrom: AmountInput
+
+    """
+    Filter virtual cards with up to this amount in cents charged
+    """
+    spentAmountTo: AmountInput
+
+    """
+    Filter virtual cards by whether they are missing receipts for any charges
+    """
+    hasMissingReceipts: Boolean
   ): VirtualCardCollection!
   hostedVirtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   hostedVirtualCardCollectives(limit: Int! = 100, offset: Int! = 0): AccountCollection!
@@ -3218,6 +3251,10 @@ enum PaymentMethodType {
   SEPA_DEBIT
   BACS_DEBIT
   BANCONTACT
+}
+
+input VirtualCardReferenceInput {
+  id: String
 }
 
 input PaymentMethodReferenceInput {
@@ -4477,6 +4514,9 @@ enum ActivityType {
   ACTIVATED_COLLECTIVE_AS_HOST
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT
   DEACTIVATED_COLLECTIVE_AS_HOST
+  AGREEMENT_CREATED
+  AGREEMENT_EDITED
+  AGREEMENT_DELETED
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -4740,6 +4780,13 @@ type TimeSeriesAmountWithKindNode {
 }
 
 """
+Stripe connected account properties
+"""
+type StripeConnectedAccount {
+  issuingBalance: Amount
+}
+
+"""
 A collection of "HostApplication"
 """
 type HostApplicationCollection implements Collection {
@@ -4771,6 +4818,35 @@ enum HostApplicationStatus {
   APPROVED
   REJECTED
   EXPIRED
+}
+
+"""
+The status of a virtual card
+"""
+enum VirtualCardStatus {
+  ACTIVE
+  INACTIVE
+  CANCELED
+}
+
+"""
+Input type for an amount with the value and currency
+"""
+input AmountInput {
+  """
+  The value in plain
+  """
+  value: Float
+
+  """
+  The currency string
+  """
+  currency: Currency
+
+  """
+  The value in cents
+  """
+  valueInCents: Int
 }
 
 """
@@ -4844,7 +4920,17 @@ An agreement
 type Agreement {
   id: String
   title: String!
-  createdBy: Account!
+
+  """
+  Additional notes about the agreement for the host admins
+  """
+  notes: String
+
+  """
+  The time of creation of this agreement
+  """
+  createdAt: DateTime!
+  createdBy: Account
   account: Account!
   host: Host!
   expiresAt: DateTime
@@ -5072,6 +5158,11 @@ type Activity {
   The order related to this activity, if any
   """
   order: Order
+
+  """
+  The update related to this activity, if any
+  """
+  update: Update
 
   """
   The transaction related to this activity, if any
@@ -5643,6 +5734,7 @@ type Bot implements Account {
     The transactions group to filter by
     """
     group: String
+    virtualCard: [VirtualCardReferenceInput]
   ): TransactionCollection!
   orders(
     """
@@ -6161,6 +6253,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The transactions group to filter by
     """
     group: String
+    virtualCard: [VirtualCardReferenceInput]
   ): TransactionCollection!
   orders(
     """
@@ -6435,19 +6528,19 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   isApproved: Boolean!
 
   """
-  Returns agreements this account has with its host
+  Returns agreements this account has with its host, or null if not enough permissions.
   """
   hostAgreements(
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 30
 
     """
     The offset to use to fetch
     """
     offset: Int! = 0
-  ): AgreementCollection!
+  ): AgreementCollection
 
   """
   Number of unique financial contributors.
@@ -6533,19 +6626,19 @@ interface AccountWithHost {
   isActive: Boolean!
 
   """
-  Returns agreements this account has with its host
+  Returns agreements this account has with its host, or null if not enough permissions.
   """
   hostAgreements(
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 30
 
     """
     The offset to use to fetch
     """
     offset: Int! = 0
-  ): AgreementCollection!
+  ): AgreementCollection
 }
 
 """
@@ -7048,6 +7141,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     The transactions group to filter by
     """
     group: String
+    virtualCard: [VirtualCardReferenceInput]
   ): TransactionCollection!
   orders(
     """
@@ -7322,19 +7416,19 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   isApproved: Boolean!
 
   """
-  Returns agreements this account has with its host
+  Returns agreements this account has with its host, or null if not enough permissions.
   """
   hostAgreements(
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 30
 
     """
     The offset to use to fetch
     """
     offset: Int! = 0
-  ): AgreementCollection!
+  ): AgreementCollection
 
   """
   Number of unique financial contributors.
@@ -7786,6 +7880,7 @@ type Individual implements Account {
     The transactions group to filter by
     """
     group: String
+    virtualCard: [VirtualCardReferenceInput]
   ): TransactionCollection!
   orders(
     """
@@ -8483,6 +8578,7 @@ type Organization implements Account & AccountWithContributions {
     The transactions group to filter by
     """
     group: String
+    virtualCard: [VirtualCardReferenceInput]
   ): TransactionCollection!
   orders(
     """
@@ -8808,6 +8904,11 @@ type TransferWise {
     """
     ignoreBlockedCurrencies: Boolean
   ): [JSONObject]
+
+  """
+  Transferwise balances. Returns null if Transferwise account is not connected.
+  """
+  balances: [Amount]
 }
 
 type TransferWiseRequiredField {
@@ -9120,6 +9221,7 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     The transactions group to filter by
     """
     group: String
+    virtualCard: [VirtualCardReferenceInput]
   ): TransactionCollection!
   orders(
     """
@@ -9394,19 +9496,19 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   isApproved: Boolean!
 
   """
-  Returns agreements this account has with its host
+  Returns agreements this account has with its host, or null if not enough permissions.
   """
   hostAgreements(
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 30
 
     """
     The offset to use to fetch
     """
     offset: Int! = 0
-  ): AgreementCollection!
+  ): AgreementCollection
 
   """
   Number of unique financial contributors.
@@ -9463,6 +9565,7 @@ type VirtualCard {
   name: String
   last4: String
   data: JSONObject
+  status: VirtualCardStatus
   privateData: JSONObject
   provider: String
   spendingLimitAmount: Int
@@ -9575,14 +9678,6 @@ type Query {
     hasCustomContributionsEnabled: Boolean
 
     """
-    Only accounts that support one of these payment services will be returned
-    """
-    supportedPaymentMethodService: [PaymentMethodService]
-      @deprecated(
-        reason: "2022-04-22: Introduced for Hacktoberfest. Reference: https://github.com/opencollective/opencollective-api/pull/7440#issuecomment-1121504508"
-      )
-
-    """
     The order of results. Defaults to [RANK, DESC] (or [CREATED_AT, DESC] if `supportedPaymentMethodService` is provided)
     """
     orderBy: OrderByInput
@@ -9632,6 +9727,11 @@ type Query {
     Only return activities that are of this class/type
     """
     type: [ActivityAndClassesType!] = null
+
+    """
+    If true, return the timeline of activities for this account
+    """
+    timeline: Boolean! = false
   ): ActivityCollection!
   application(
     """
@@ -9808,6 +9908,16 @@ type Query {
     Only return expenses that contains this custom data. Requires being an admin of the collective, payee or host.
     """
     customData: JSON
+
+    """
+    Filter expenses of type charges based on presence of receipts
+    """
+    chargeHasReceipts: Boolean
+
+    """
+    Filter expenses of type charges using these virtual cards
+    """
+    virtualCards: [VirtualCardReferenceInput]
   ): ExpenseCollection!
   fund(
     """
@@ -10233,6 +10343,7 @@ type Query {
     The transactions group to filter by
     """
     group: String
+    virtualCard: [VirtualCardReferenceInput]
   ): TransactionCollection!
   update(
     """
@@ -11654,6 +11765,9 @@ enum ActivityAndClassesType {
   ACTIVATED_COLLECTIVE_AS_HOST
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT
   DEACTIVATED_COLLECTIVE_AS_HOST
+  AGREEMENT_CREATED
+  AGREEMENT_EDITED
+  AGREEMENT_DELETED
   ADDED_FUND_TO_ORG
   COLLECTIVE_TRANSACTION_PAID
   COLLECTIVE_USER_ADDED
@@ -11994,6 +12108,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     The transactions group to filter by
     """
     group: String
+    virtualCard: [VirtualCardReferenceInput]
   ): TransactionCollection!
   orders(
     """
@@ -12268,19 +12383,19 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   isApproved: Boolean!
 
   """
-  Returns agreements this account has with its host
+  Returns agreements this account has with its host, or null if not enough permissions.
   """
   hostAgreements(
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 30
 
     """
     The offset to use to fetch
     """
     offset: Int! = 0
-  ): AgreementCollection!
+  ): AgreementCollection
 
   """
   Number of unique financial contributors.
@@ -12622,6 +12737,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     The transactions group to filter by
     """
     group: String
+    virtualCard: [VirtualCardReferenceInput]
   ): TransactionCollection!
   orders(
     """
@@ -12896,19 +13012,19 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   isApproved: Boolean!
 
   """
-  Returns agreements this account has with its host
+  Returns agreements this account has with its host, or null if not enough permissions.
   """
   hostAgreements(
     """
     The number of results to fetch (default 10, max 1000)
     """
-    limit: Int! = 10
+    limit: Int! = 30
 
     """
     The offset to use to fetch
     """
     offset: Int! = 0
-  ): AgreementCollection!
+  ): AgreementCollection
 
   """
   Number of unique financial contributors.
@@ -13001,26 +13117,6 @@ A PayPal plan to associate with a contribution
 """
 type PaypalPlan {
   id: String!
-}
-
-"""
-Input type for an amount with the value and currency
-"""
-input AmountInput {
-  """
-  The value in plain
-  """
-  value: Float
-
-  """
-  The currency string
-  """
-  currency: Currency
-
-  """
-  The value in cents
-  """
-  valueInCents: Int
 }
 
 """
@@ -14424,6 +14520,11 @@ type Mutation {
     Agreement attachment
     """
     attachment: Upload
+
+    """
+    Additional notes about the agreement for the host admins
+    """
+    notes: String
   ): Agreement!
 
   """
@@ -14444,6 +14545,16 @@ type Mutation {
     Optional date in which this agreement expires.
     """
     expiresAt: DateTime
+
+    """
+    Agreement attachment
+    """
+    attachment: Upload
+
+    """
+    Additional notes about the agreement for the host admins
+    """
+    notes: String
   ): Agreement!
 
   """
@@ -16004,10 +16115,6 @@ input VirtualCardInput {
 enum VirtualCardProvider {
   PRIVACY
   STRIPE
-}
-
-input VirtualCardReferenceInput {
-  id: String
 }
 
 """

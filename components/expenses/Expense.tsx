@@ -5,7 +5,6 @@ import { Undo } from '@styled-icons/fa-solid/Undo';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
-import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -25,6 +24,7 @@ import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import CommentForm from '../conversations/CommentForm';
 import Thread from '../conversations/Thread';
+import { useDrawerActionsContainer } from '../Drawer';
 import FilesViewerModal from '../FilesViewerModal';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
@@ -98,18 +98,8 @@ const PrivateNoteLabel = () => {
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
 
 function Expense(props) {
-  const {
-    data,
-    loading,
-    error,
-    refetch,
-    fetchMore,
-    drawerActionsContainer,
-    draftKey,
-    client,
-    isRefetchingDataForUser,
-    legacyExpenseId,
-  } = props;
+  const { data, loading, error, refetch, fetchMore, draftKey, client, isRefetchingDataForUser, legacyExpenseId } =
+    props;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
@@ -130,6 +120,7 @@ function Expense(props) {
   let pollingTimeout = null;
   let pollingStarted = false;
   let pollingPaused = false;
+  const drawerActionsContainer = useDrawerActionsContainer();
 
   useEffect(() => {
     const shouldEditDraft = data?.expense?.status === expenseStatus.DRAFT && draftKey;
@@ -167,6 +158,14 @@ function Expense(props) {
       router.replace(document.location.pathname);
     }
   }, [props.edit, props.data, state.status]);
+
+  // Update status when data or draftKey changes
+  useEffect(() => {
+    const status = draftKey && data?.expense?.status === expenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW;
+    if (status !== state.status) {
+      setState(state => ({ ...state, status }));
+    }
+  }, [props.data, draftKey]);
 
   // Scroll to expense's top when changing status
   const prevState = usePrevious(state);
@@ -208,17 +207,13 @@ function Expense(props) {
   const [showResetModal, setShowResetModal] = useState(false);
   const payoutProfiles = getPayoutProfiles(loggedInAccount);
 
-  let threadItems;
-  const getThreadItems = memoizeOne((comments = [], activities = []) => {
+  const threadItems = React.useMemo(() => {
+    const comments = expense?.comments?.nodes || [];
+    const activities = expense?.activities || [];
     return sortBy([...comments, ...activities], 'createdAt');
-  });
+  }, [expense]);
 
-  if (expense) {
-    threadItems = getThreadItems(expense.comments?.nodes, expense?.activities);
-  }
-
-  const memoizedSuggestedTags = memoizeOne(getSuggestedTags);
-  const suggestedTags = memoizedSuggestedTags(collective);
+  const suggestedTags = React.useMemo(() => getSuggestedTags(collective), [collective]);
 
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;
   const isEditingExistingExpense = isEditing && expense !== undefined;

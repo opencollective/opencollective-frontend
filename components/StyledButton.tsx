@@ -69,6 +69,7 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
   }
 
   /** Align button icons in the middle */
+  span,
   svg {
     vertical-align: middle;
   }

@@ -8,8 +8,8 @@ import Avatar from './Avatar';
 import LinkCollective from './LinkCollective';
 
 type AvatarWithLinkProps = {
-  account: Account;
-  secondaryAccount: Account | null;
+  account: Pick<Account, 'name' | 'type' | 'isIncognito' | 'slug' | 'imageUrl'>;
+  secondaryAccount: Partial<Account> | null;
   /** The size in pixels */
   size: number;
 };
