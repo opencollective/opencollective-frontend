@@ -180,7 +180,7 @@ const ExpenseSummary = ({
             <LinkCollective collective={createdByAccount}>
               <Avatar collective={createdByAccount} size={24} />
             </LinkCollective>
-            <P ml={2} fontSize="12px" color="black.700" data-cy="expense-author">
+            <P ml={2} fontSize="14px" color="black.700" data-cy="expense-author">
               {expense.requestedByAccount ? (
                 <FormattedMessage
                   id="Expense.RequestedByOnDate"
@@ -262,7 +262,7 @@ const ExpenseSummary = ({
                     {attachment.description ? (
                       <HTMLContent
                         content={attachment.description}
-                        fontSize="12px"
+                        fontSize="14px"
                         color="black.900"
                         collapsable
                         fontWeight="500"

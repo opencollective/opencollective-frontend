@@ -143,7 +143,7 @@ const ExpenseSummaryAdditionalInformation = ({
                 <Span color="black.800" fontSize="14px" fontWeight="700" truncateOverflow>
                   {formatAccountName(collective.name, collective.legalName)}
                 </Span>
-                <Span color="black.900" fontSize="12px" truncateOverflow>
+                <Span color="black.900" fontSize="13px" truncateOverflow>
                   @{collective.slug}
                 </Span>
               </Flex>
@@ -177,8 +177,9 @@ const ExpenseSummaryAdditionalInformation = ({
                 href={`${getDashboardRoute(host, 'host-agreements')}?account=${collective.slug}`}
               >
                 <FormattedMessage
-                  defaultMessage="Host Agreements: {agreementsCount}"
+                  defaultMessage="Host Agreements: <Color>{agreementsCount}</Color>"
                   values={{
+                    Color: text => <Span color="primary.600">{text}</Span>,
                     agreementsCount: collective.hostAgreements.totalCount,
                   }}
                 />
@@ -215,7 +216,7 @@ const ExpenseSummaryAdditionalInformation = ({
                 )}
               </Span>
               {payee.type !== CollectiveType.VENDOR && (payee.organization?.slug || payee.slug) && (
-                <Span color="black.900" fontSize="12px" truncateOverflow>
+                <Span color="black.900" fontSize="13px" truncateOverflow>
                   @{payee.organization?.slug || payee.slug}
                 </Span>
               )}
@@ -225,12 +226,12 @@ const ExpenseSummaryAdditionalInformation = ({
         </LinkCollective>
 
         {payeeLocation && isInvoice && (
-          <Container whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
+          <Container whiteSpace="pre-wrap" fontSize="14px" lineHeight="16px" mt={2}>
             <LocationAddress location={payeeLocation} isLoading={isLoadingLoggedInUser} />
           </Container>
         )}
         {payee.website && (
-          <P mt={2} fontSize="11px">
+          <P mt={2} fontSize="14px">
             <StyledLink href={payee.website} openInNewTab>
               {payee.website}
             </StyledLink>
