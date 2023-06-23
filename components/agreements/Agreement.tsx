@@ -16,6 +16,7 @@ import { H4, P, Span } from '../Text';
 
 type AgreementProps = {
   agreement: GraphQLAgreement;
+  openFileViewer?: (url: string) => void;
 };
 
 const ColumTitle = styled.p`
@@ -37,7 +38,7 @@ const Value = styled(P)`
   color: ${props => props.theme.colors.black[700]};
 `;
 
-export default function Agreement({ agreement }: AgreementProps) {
+export default function Agreement({ agreement, openFileViewer = undefined }: AgreementProps) {
   return (
     <div>
       <H4 fontSize="20px" fontWeight="700">
@@ -48,7 +49,7 @@ export default function Agreement({ agreement }: AgreementProps) {
           <P fontSize="16px" fontWeight="700" mb="18px">
             <FormattedMessage defaultMessage="Agreement file" />
           </P>
-          <AttachedFiles files={[agreement.attachment]} size={128} />
+          <AttachedFiles files={[agreement.attachment]} size={128} openFileViewer={openFileViewer} />
         </Container>
       )}
       <Box mt={30}>

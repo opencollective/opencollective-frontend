@@ -15,6 +15,7 @@ type AgreementDrawerProps = {
   onDelete: (Agreement) => void;
   agreement?: Agreement;
   hostLegacyId: number;
+  onFilePreview: () => void;
 };
 
 export default function AgreementDrawer({
@@ -25,8 +26,10 @@ export default function AgreementDrawer({
   onDelete,
   agreement,
   hostLegacyId,
+  onFilePreview,
 }: AgreementDrawerProps) {
   const [isEditing, setEditing] = React.useState<boolean>(false);
+
   const closeDrawer = React.useCallback(() => {
     setEditing(false);
     onClose();
@@ -46,7 +49,12 @@ export default function AgreementDrawer({
           }}
         />
       ) : (
-        <AgreementWithActions agreement={agreement} onEdit={() => setEditing(true)} onDelete={onDelete} />
+        <AgreementWithActions
+          agreement={agreement}
+          onEdit={() => setEditing(true)}
+          onDelete={onDelete}
+          openFileViewer={onFilePreview}
+        />
       )}
     </Drawer>
   );

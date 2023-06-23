@@ -6,11 +6,13 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { Agreement } from '../../lib/graphql/types/v2/graphql';
 
 import AgreementDrawer from '../agreements/AgreementDrawer';
 import AgreementsTable from '../agreements/AgreementsTable';
 import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from '../agreements/fragments';
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import FilesViewerModal from '../FilesViewerModal';
 import { Box, Flex } from '../Grid';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
@@ -70,6 +72,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
   const query = router.query;
   const [agreementDrawerOpen, setAgreementDrawerOpen] = React.useState(false);
   const [agreementInDrawer, setAgreementInDrawer] = React.useState(null);
+  const [agreementFilePreview, setAgreementFilePreview] = React.useState<Agreement | null>(null);
   const queryVariables = { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) };
   const hasSelectedAccount = Boolean(queryVariables.account);
   const [selectedAccount, setSelectedAccount] = React.useState(undefined);
@@ -138,6 +141,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
             loading={loading}
             nbPlaceholders={NB_AGREEMENTS_DISPLAYED}
             resetFilters={hasSelectedAccount && (() => router.push({ pathname: router.asPath.split('?')[0] }))}
+            onFilePreview={setAgreementFilePreview}
             openAgreement={agreement => {
               setAgreementDrawerOpen(true);
               setAgreementInDrawer(agreement);
@@ -160,6 +164,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
               setAgreementDrawerOpen(false);
               refetch(queryVariables);
             }}
+            onFilePreview={() => setAgreementFilePreview(agreementInDrawer)}
           />
           <Flex my={4} justifyContent="center">
             {hasPagination(data || previousData, queryVariables) && (
@@ -174,6 +179,14 @@ const HostDashboardAgreements = ({ hostSlug }) => {
             )}
           </Flex>
         </React.Fragment>
+      )}
+      {agreementFilePreview && (
+        <FilesViewerModal
+          files={[agreementFilePreview.attachment]}
+          openFileUrl={agreementFilePreview.attachment.url}
+          onClose={() => setAgreementFilePreview(null)}
+          parentTitle={`${agreementFilePreview.account.name} / ${agreementFilePreview.title}`}
+        />
       )}
     </Box>
   );
