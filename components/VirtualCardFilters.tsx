@@ -103,6 +103,7 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
           <FormattedMessage id="virtual-card.collectives.filter" defaultMessage="Assigned Collective" />
         </FilterLabel>
         <StyledSelectFilter
+          intl={intl}
           inputId="virtual-card.collectives.filter"
           onChange={newValue => props.onCollectivesFilterChange(newValue.map(v => v.value))}
           isMulti={true}
@@ -123,6 +124,7 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
           <FormattedMessage id="virtual-card.status.filter" defaultMessage="Status" />
         </FilterLabel>
         <StyledSelectFilter
+          intl={intl}
           inputId="virtual-card.status.filter"
           onChange={newValue => props.onVirtualCardStatusFilter(newValue.map(v => v.value))}
           isMulti={true}
@@ -162,6 +164,7 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
           <FormattedMessage id="virtual-card.missingReceipts.filter" defaultMessage="Receipts" />
         </FilterLabel>
         <StyledSelectFilter
+          intl={intl}
           inputId="virtual-card.missingReceipts.filter"
           onChange={newValue => props.onMissingReceiptsChange(newValue.value)}
           value={missingReceiptValue}
