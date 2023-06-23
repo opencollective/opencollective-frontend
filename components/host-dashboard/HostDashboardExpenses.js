@@ -283,6 +283,9 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
             filters={query}
             explicitAllForStatus
             displayOnHoldPseudoStatus
+            showChargeHasReceiptFilter
+            chargeHasReceiptFilter={queryFilter.values.chargeHasReceipts}
+            onChargeHasReceiptFilterChange={queryFilter.setChargeHasReceipts}
             onChange={queryParams =>
               router.push({
                 pathname: pageRoute,

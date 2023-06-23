@@ -1,5 +1,6 @@
 import React from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { isNil } from 'lodash';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { Collective, VirtualCardStatus } from '../lib/graphql/types/v2/graphql';
@@ -7,10 +8,8 @@ import { VirtualCardStatusI18n } from '../lib/virtual-cards/constants';
 
 import AmountRangeFilter from './filters/AmountRangeFilter';
 import PeriodFilter from './filters/PeriodFilter';
-import Container from './Container';
 import { Flex } from './Grid';
-import StyledCheckbox from './StyledCheckbox';
-import StyledSelect from './StyledSelect';
+import { StyledSelectFilter } from './StyledSelectFilter';
 
 const FilterContainer = styled.div`
   margin-bottom: 8px;
@@ -51,15 +50,59 @@ type VirtualCardFiltersProps = {
   onTotalSpentChange: (amount?: { fromAmount: number; toAmount?: number }) => void;
 };
 
+const I18nMessages = defineMessages({
+  RECEIPT_MISSING: { defaultMessage: 'Receipt missing' },
+  NO_RECEIPT_MISSING: { defaultMessage: 'No receipt missing' },
+  ALL: { defaultMessage: 'All' },
+});
+
 export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
   const intl = useIntl();
+
+  const missingReceiptOptions = React.useMemo(
+    () => [
+      {
+        value: null,
+        label: intl.formatMessage(I18nMessages.ALL),
+      },
+      {
+        value: true,
+        label: intl.formatMessage(I18nMessages.RECEIPT_MISSING),
+      },
+      {
+        value: false,
+        label: intl.formatMessage(I18nMessages.NO_RECEIPT_MISSING),
+      },
+    ],
+    [intl],
+  );
+
+  const missingReceiptValue = React.useMemo(
+    () =>
+      isNil(props.missingReceipts)
+        ? {
+            value: null,
+            label: intl.formatMessage(I18nMessages.ALL),
+          }
+        : props.missingReceipts === true
+        ? {
+            value: true,
+            label: intl.formatMessage(I18nMessages.RECEIPT_MISSING),
+          }
+        : {
+            value: false,
+            label: intl.formatMessage(I18nMessages.NO_RECEIPT_MISSING),
+          },
+    [intl, props.missingReceipts],
+  );
+
   return (
     <Flex flexWrap={'wrap'} gap="18px">
       <FilterContainer>
         <FilterLabel htmlFor="virtual-card.collectives.filter">
           <FormattedMessage id="virtual-card.collectives.filter" defaultMessage="Assigned Collective" />
         </FilterLabel>
-        <StyledSelect
+        <StyledSelectFilter
           inputId="virtual-card.collectives.filter"
           onChange={newValue => props.onCollectivesFilterChange(newValue.map(v => v.value))}
           isMulti={true}
@@ -79,7 +122,7 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
         <FilterLabel htmlFor="virtual-card.status.filter">
           <FormattedMessage id="virtual-card.status.filter" defaultMessage="Status" />
         </FilterLabel>
-        <StyledSelect
+        <StyledSelectFilter
           inputId="virtual-card.status.filter"
           onChange={newValue => props.onVirtualCardStatusFilter(newValue.map(v => v.value))}
           isMulti={true}
@@ -116,15 +159,14 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
       </FilterContainer>
       <FilterContainer>
         <FilterLabel htmlFor="virtual-card.missingReceipts.filter">
-          <FormattedMessage id="virtual-card.missingReceipts.filter" defaultMessage="Missing Receipts" />
+          <FormattedMessage id="virtual-card.missingReceipts.filter" defaultMessage="Receipts" />
         </FilterLabel>
-        <Container height="38px" position="relative" display="flex" alignItems="center">
-          <StyledCheckbox
-            inputId="virtual-card.missingReceipts.filter"
-            checked={props.missingReceipts}
-            onChange={p => props.onMissingReceiptsChange(p.checked)}
-          />
-        </Container>
+        <StyledSelectFilter
+          inputId="virtual-card.missingReceipts.filter"
+          onChange={newValue => props.onMissingReceiptsChange(newValue.value)}
+          value={missingReceiptValue}
+          options={missingReceiptOptions}
+        />
       </FilterContainer>
     </Flex>
   );
