@@ -184,7 +184,7 @@
     "@graphql-codegen/gql-tag-operations-preset": "^2.0.0",
     "@next/bundle-analyzer": "^13.3.0",
     "@rollup/plugin-babel": "^6.0.3",
-    "@rollup/plugin-commonjs": "^24.1.0",
+    "@rollup/plugin-commonjs": "^25.0.0",
     "@rollup/plugin-image": "^3.0.2",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-typescript": "^9.0.1",
