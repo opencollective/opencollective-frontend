@@ -190,20 +190,25 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="Edit" defaultMessage="Edit" />
               </Action>
             )}
-            {permissions?.canSeeInvoiceInfo && expense?.type === expenseTypes.INVOICE && (
-              <ExpenseInvoiceDownloadHelper expense={expense} collective={expense.account} onError={onError}>
-                {({ isLoading, downloadInvoice }) => (
-                  <Action loading={isLoading} onClick={downloadInvoice} disabled={processExpense.loading || isDisabled}>
-                    <IconDownload size="16px" />
-                    {isLoading ? (
-                      <FormattedMessage id="loading" defaultMessage="loading" />
-                    ) : (
-                      <FormattedMessage id="Download" defaultMessage="Download" />
-                    )}
-                  </Action>
-                )}
-              </ExpenseInvoiceDownloadHelper>
-            )}
+            {permissions?.canSeeInvoiceInfo &&
+              [expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense?.type) && (
+                <ExpenseInvoiceDownloadHelper expense={expense} collective={expense.account} onError={onError}>
+                  {({ isLoading, downloadInvoice }) => (
+                    <Action
+                      loading={isLoading}
+                      onClick={downloadInvoice}
+                      disabled={processExpense.loading || isDisabled}
+                    >
+                      <IconDownload size="16px" />
+                      {isLoading ? (
+                        <FormattedMessage id="loading" defaultMessage="loading" />
+                      ) : (
+                        <FormattedMessage id="Download" defaultMessage="Download" />
+                      )}
+                    </Action>
+                  )}
+                </ExpenseInvoiceDownloadHelper>
+              )}
             <Action
               onClick={() =>
                 linkAction === 'link'
