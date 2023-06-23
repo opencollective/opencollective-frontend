@@ -90,7 +90,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
 
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
-      <Flex mb={24} justifyContent="space-between" alignItems="center" flexWrap="wrap">
+      <Flex mb={24} justifyContent="space-between" alignItems="center" flexWrap="wrap" gridGap="16px">
         <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
           <FormattedMessage id="Agreements" defaultMessage="Agreements" />
         </H1>
