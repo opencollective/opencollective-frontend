@@ -429,6 +429,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               customOptions={defaultSources}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               collective={field.value}
+              menuPortalTarget={null}
             />
           )}
         </Field>
