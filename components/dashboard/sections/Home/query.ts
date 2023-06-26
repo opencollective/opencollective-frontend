@@ -1,11 +1,10 @@
 import { gql } from '@apollo/client';
 
 export const workspaceHomeQuery = gql`
-  query WorkspaceHome($slug: String!, $limit: Int, $offset: Int) {
-    activities(account: { slug: $slug }, limit: $limit, offset: $offset, timeline: true) {
+  query WorkspaceHome($slug: String!, $limit: Int, $offset: Int, $type: [ActivityAndClassesType!]) {
+    activities(account: { slug: $slug }, limit: $limit, offset: $offset, type: $type, timeline: true) {
       limit
       offset
-      totalCount
       nodes {
         id
         createdAt
@@ -74,6 +73,13 @@ export const workspaceHomeQuery = gql`
               }
             }
           }
+        }
+        update {
+          id
+          legacyId
+          title
+          summary
+          slug
         }
         individual {
           id

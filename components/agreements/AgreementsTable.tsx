@@ -1,7 +1,7 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { ColumnDef, TableMeta } from '@tanstack/react-table';
-import { FormattedDate, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Agreement } from '../../lib/graphql/types/v2/graphql';
@@ -9,9 +9,12 @@ import { useWindowResize } from '../../lib/hooks/useWindowResize';
 
 import Avatar from '../Avatar';
 import { DataTable } from '../DataTable';
+import DateTime from '../DateTime';
 import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
-import { Span } from '../Text';
+import StyledHr from '../StyledHr';
+import StyledLinkButton from '../StyledLinkButton';
+import { P, Span } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 const CellButton = styled.button`
@@ -48,14 +51,28 @@ export const cardColumns: ColumnDef<Agreement>[] = [
       const meta = table.options.meta as AgreementMeta;
       return (
         <CellButton onClick={() => meta.openAgreement(agreement)}>
-          <span>{agreement.title}</span>
-          <Flex alignItems="center" py={2} gridGap={2}>
-            <Avatar collective={agreement.account} radius={20} />
-            &nbsp;
-            <Span letterSpacing="0" truncateOverflow fontWeight="500">
-              {agreement.account.name}
-            </Span>
+          <Flex alignItems="center" gridGap="16px" mb="16px">
+            <Avatar collective={agreement.account} radius={32} />
+            <Flex flexDirection="column" gridGap="4px">
+              <Span letterSpacing="0" truncateOverflow fontWeight="500">
+                {agreement.account.name}
+              </Span>
+              <Span fontSize="14px" color="black.700" fontWeight="normal">
+                {agreement.expiresAt && <DateTime value={agreement.expiresAt} />}
+                {agreement.expiresAt && agreement.attachment && ' • '}
+                {agreement.attachment && (
+                  <FormattedMessage
+                    id="ExepenseAttachments.count"
+                    defaultMessage="{count, plural, one {# attachment} other {# attachments}}"
+                    values={{ count: 1 }}
+                  />
+                )}
+              </Span>
+            </Flex>
           </Flex>
+          <Span fontSize="16px" fontWeight="700" lineHeight="24px" color="black.800">
+            {agreement.title}
+          </Span>
         </CellButton>
       );
     },
@@ -106,7 +123,7 @@ export const tableColumns: ColumnDef<Agreement>[] = [
         <Box p={3} fontSize="14px">
           {expiresAt ? (
             <Span letterSpacing="0" truncateOverflow>
-              <FormattedDate value={expiresAt} month="short" day="numeric" year="numeric" />
+              <DateTime value={expiresAt} />
             </Span>
           ) : (
             <Span fontStyle="italic" color="black.500">
@@ -143,12 +160,18 @@ export const tableColumns: ColumnDef<Agreement>[] = [
 type AgreementsTableProps = {
   agreements: { nodes: Agreement[] };
   openAgreement: (agreement: Agreement) => void;
+  resetFilters?: () => void;
   loading?: boolean;
   nbPlaceholders?: number;
-  emptyMessage?: React.ReactNode;
 };
 
-export default function AgreementsTable({ agreements, openAgreement, loading, nbPlaceholders }: AgreementsTableProps) {
+export default function AgreementsTable({
+  agreements,
+  openAgreement,
+  loading,
+  nbPlaceholders,
+  resetFilters,
+}: AgreementsTableProps) {
   const [isTableView, setIsTableView] = React.useState(true);
   useWindowResize(() => setIsTableView(window.innerWidth > 1024));
   const columns = isTableView ? tableColumns : cardColumns;
@@ -160,7 +183,21 @@ export default function AgreementsTable({ agreements, openAgreement, loading, nb
       meta={{ openAgreement } as AgreementMeta}
       loading={loading}
       nbPlaceholders={nbPlaceholders}
-      emptyMessage={() => <FormattedMessage defaultMessage="No agreements" />}
+      emptyMessage={() => (
+        <div>
+          <P fontSize="16px">
+            <FormattedMessage defaultMessage="No agreements" />
+          </P>
+          {resetFilters && (
+            <div>
+              <StyledHr maxWidth={300} m="16px auto" borderColor="black.100" />
+              <StyledLinkButton onClick={resetFilters}>
+                <FormattedMessage defaultMessage="Reset filters" />
+              </StyledLinkButton>
+            </div>
+          )}
+        </div>
+      )}
     />
   );
 }
