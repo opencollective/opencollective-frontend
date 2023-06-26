@@ -7,15 +7,6 @@ import { Flex } from './Grid';
 import Hide from './Hide';
 import StyledButton from './StyledButton';
 
-const CommandShortcut = styled.span`
-  font-size: 12px;
-  border: 1px solid #d1d5db;
-  background-color: #f1f5f9;
-  border-radius: 100px;
-  padding: 2px 6px;
-  letter-spacing: 0;
-`;
-
 const SearchButton = styled(StyledButton)`
   display: flex;
   align-items: center;
@@ -27,6 +18,21 @@ const SearchButton = styled(StyledButton)`
   padding: 0 10px;
   max-width: 200px;
   flex: 1;
+
+  .shortcut {
+    font-size: 12px;
+    border: 1px solid #d1d5db;
+    background-color: #f1f5f9;
+    border-radius: 100px;
+    padding: 2px 6px;
+    letter-spacing: 0;
+  }
+
+  &:active {
+    .shortcut {
+      background-color: inherit;
+    }
+  }
 `;
 
 const KeyShortcutSymbol = () => {
@@ -47,7 +53,7 @@ const KeyShortcutSymbol = () => {
 
   return (
     <Hide xs sm>
-      <CommandShortcut>{keySymbol}+K</CommandShortcut>
+      <span className="shortcut">{keySymbol}+K</span>
     </Hide>
   );
 };

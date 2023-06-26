@@ -142,7 +142,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
         justifyContent="space-around"
         css={{ height: theme.sizes.navbarHeight, background: 'white', borderBottom: '1px solid rgb(232, 233, 235)' }}
         ref={ref}
-        gridGap={3}
+        gridGap={[3, 4]}
       >
         <Link href={useDashboard ? (onHomeRoute ? '/home' : '/dashboard') : '/'}>
           <Flex alignItems="center">
