@@ -1,16 +1,37 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { Flex } from '../../Grid';
-import PreviewModal from '../../PreviewModal';
-import StyledButton from '../../StyledButton';
-import StyledInput from '../../StyledInput';
-import StyledTextarea from '../../StyledTextarea';
-import { Label, P, Span } from '../../Text';
+import { Flex } from '../../../Grid';
+import PreviewModal from '../../../PreviewModal';
+import StyledButton from '../../../StyledButton';
+import StyledInput from '../../../StyledInput';
+import StyledTextarea from '../../../StyledTextarea';
+import { Label, P, Span } from '../../../Text';
 
-const ReceiptTemplateForm = ({ showTipForDefaultTitle, value, onChange, placeholders, template }) => {
-  const [showPreview, setShowPreview] = React.useState(false);
+import { ReceiptField, ReceiptTemplate, UseReceipt } from './hooks/useReceipt';
+
+type ReceiptTemplateFormProps = {
+  receipt: UseReceipt;
+  onChange: () => void;
+};
+
+const ReceiptTemplateForm = ({ receipt, onChange }: ReceiptTemplateFormProps) => {
+  const { template, initialValues, placeholders, changeValues } = receipt;
+  const [showPreview, setShowPreview] = useState(false);
+
+  const handleChange = (field: { [key in ReceiptField]?: string }) => {
+    const [[key, value]] = Object.entries(field);
+
+    if (value === '' && key === ReceiptField.Title && template === ReceiptTemplate.Default) {
+      changeValues({ title: placeholders.title });
+    }
+
+    if (value) {
+      changeValues(field);
+    }
+
+    onChange();
+  };
 
   return (
     <React.Fragment>
@@ -20,13 +41,13 @@ const ReceiptTemplateForm = ({ showTipForDefaultTitle, value, onChange, placehol
       <StyledInput
         id={`receipt-title-${template}`}
         placeholder={placeholders.title}
-        defaultValue={value.title}
-        onChange={e => onChange(e.target.value, null)}
+        defaultValue={initialValues.title}
+        onChange={e => handleChange({ [ReceiptField.Title]: e.target.value })}
         width="100%"
         maxWidth={414}
         mt="6px"
       />
-      {showTipForDefaultTitle && (
+      {template === ReceiptTemplate.Default && (
         <P mt="6px">
           <FormattedMessage
             defaultMessage="Keep this field empty to use the default title: {receiptTitlePlaceholder}."
@@ -63,8 +84,8 @@ const ReceiptTemplateForm = ({ showTipForDefaultTitle, value, onChange, placehol
       <StyledTextarea
         id={`custom-message-${template}`}
         placeholder={placeholders.info}
-        defaultValue={value.info}
-        onChange={e => onChange(null, e.target.value)}
+        defaultValue={initialValues.info}
+        onChange={e => handleChange({ [ReceiptField.Info]: e.target.value })}
         width="100%"
         height="150px"
         fontSize="13px"
@@ -82,14 +103,6 @@ const ReceiptTemplateForm = ({ showTipForDefaultTitle, value, onChange, placehol
       )}
     </React.Fragment>
   );
-};
-
-ReceiptTemplateForm.propTypes = {
-  showTipForDefaultTitle: PropTypes.bool,
-  value: PropTypes.shape({ title: PropTypes.string, info: PropTypes.string }).isRequired,
-  onChange: PropTypes.func.isRequired, // Gets an object like { title, info }
-  placeholders: PropTypes.object.isRequired,
-  template: PropTypes.string,
 };
 
 export default ReceiptTemplateForm;

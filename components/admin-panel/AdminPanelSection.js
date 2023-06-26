@@ -17,7 +17,7 @@ import { H2 } from '../Text';
 import AccountSettings from './sections/AccountSettings';
 import FinancialContributions from './sections/FinancialContributions';
 import HostVirtualCards from './sections/HostVirtualCards';
-import InvoicesReceipts from './sections/InvoicesReceipts';
+import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
 import NotificationsSettings from './sections/NotificationsSettings';
 import PendingContributions from './sections/PendingContributions';
 import TeamSettings from './sections/Team';
