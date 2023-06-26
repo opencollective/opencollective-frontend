@@ -195,4 +195,4 @@ const ProfileMenuDropdown = () => {
     </React.Fragment>
   );
 };
-export default withNewsAndUpdates(ProfileMenuDropdown);
+export default ProfileMenuDropdown;
