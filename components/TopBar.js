@@ -4,7 +4,6 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { debounce } from 'lodash';
-import { Search } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -23,9 +22,9 @@ import PopupMenu from './PopupMenu';
 import ProfileMenu from './ProfileMenu';
 import SearchModal from './Search';
 import SearchIcon from './SearchIcon';
+import SearchTrigger from './SearchTrigger';
 import StyledButton from './StyledButton';
 import StyledLink from './StyledLink';
-import StyledTooltip from './StyledTooltip';
 import { Span } from './Text';
 import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
@@ -80,7 +79,8 @@ const MainNavItem = styled(StyledLink)`
   color: #334155;
   font-weight: 500;
   font-size: 14px;
-  padding: 12px;
+  height: 40px;
+  padding: 0 12px;
   border-radius: 8px;
   transition-property: color, background-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -92,13 +92,14 @@ const MainNavItem = styled(StyledLink)`
     }
   }
   ${props => props.isActive && `background-color: #f1f5f9;`}
+  ${props => props.primary && `border: 1px solid #d1d5db;`}
 `;
 
 const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const ref = useRef();
-  const { LoggedInUser } = useLoggedInUser();
+  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const router = useRouter();
 
   // We debounce this function to avoid conflicts between the menu button and TopBarMobileMenu useGlobalBlur hook.
@@ -107,7 +108,6 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
   const toggleMobileMenu = () => {
     debouncedSetShowMobileMenu(state => !state);
   };
-  const useDashboard = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
 
   const isRouteActive = route => {
     const regex = new RegExp(`^${route}(/.*)?$`);
@@ -126,6 +126,11 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
     '/help',
   ];
   const onHomeRoute = homepageRoutes.some(isRouteActive);
+  const onDashboardRoute = isRouteActive('/dashboard');
+
+  const useDashboard =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) ||
+    (onDashboardRoute && !LoggedInUser && loadingLoggedInUser);
 
   return (
     <Fragment>
@@ -137,6 +142,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
         justifyContent="space-around"
         css={{ height: theme.sizes.navbarHeight, background: 'white', borderBottom: '1px solid rgb(232, 233, 235)' }}
         ref={ref}
+        gridGap={[3, 4]}
       >
         <Link href={useDashboard ? (onHomeRoute ? '/home' : '/dashboard') : '/'}>
           <Flex alignItems="center">
@@ -150,9 +156,9 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
             )}
           </Flex>
         </Link>
-        {onHomeRoute || !useDashboard ? (
-          <Flex alignItems="center" justifyContent={['flex-end', 'flex-end', 'center']} flex="1 1 auto">
-            <Hide xs sm>
+        <Hide xs sm>
+          {onHomeRoute || !useDashboard ? (
+            <Flex alignItems="center" justifyContent={['flex-end', 'flex-end', 'center']} flex="1 1 auto">
               <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
                 {menuItems.solutions && (
                   <PopupMenu
@@ -281,69 +287,54 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
                   <Container borderRight="2px solid #DCDDE0" height="20px" padding="5px" />
                 )}
               </NavList>
-            </Hide>
-            {showSearch && (
-              <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
-                <Flex>
-                  <SearchIcon fill="#75777A" size={18} />
-                  <Hide xs sm>
-                    <Span ml="5px">
-                      <FormattedMessage id="Search" defaultMessage="Search" />
-                    </Span>
-                  </Hide>
-                </Flex>
-              </NavButton>
-            )}
-          </Flex>
-        ) : (
-          <Flex flex="1 1 auto">
-            <Hide xs sm>
-              <Flex alignItems="center" flex="1 1 auto" mx={4} gridGap={3}>
-                <Link href="/dashboard">
-                  <MainNavItem as={Container} isActive={isRouteActive('/dashboard')}>
-                    <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-                  </MainNavItem>
-                </Link>
-                <Link href="/search">
-                  <MainNavItem as={Container} isActive={isRouteActive('/search')}>
-                    <FormattedMessage defaultMessage="Explore" />
-                  </MainNavItem>
-                </Link>
-                <StyledTooltip
-                  content={<FormattedMessage id="Search" defaultMessage="Search" />}
-                  noArrow
-                  place="bottom"
-                  delayHide={100}
-                >
-                  <MainNavItem onClick={() => setShowSearchModal(true)}>
-                    <Search size={16} />
-                  </MainNavItem>
-                </StyledTooltip>
-              </Flex>
-            </Hide>
-          </Flex>
-        )}
+              {showSearch && (
+                <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
+                  <Flex>
+                    <SearchIcon fill="#75777A" size={18} />
+                    <Hide xs sm>
+                      <Span ml="5px">
+                        <FormattedMessage id="Search" defaultMessage="Search" />
+                      </Span>
+                    </Hide>
+                  </Flex>
+                </NavButton>
+              )}
+            </Flex>
+          ) : (
+            <Flex flex="1" alignItems="center" gridGap={3}>
+              <Link href="/dashboard">
+                <MainNavItem as={Container} isActive={isRouteActive('/dashboard')}>
+                  <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+                </MainNavItem>
+              </Link>
+              <Link href="/search">
+                <MainNavItem as={Container} isActive={isRouteActive('/search')}>
+                  <FormattedMessage defaultMessage="Explore" />
+                </MainNavItem>
+              </Link>
+            </Flex>
+          )}
+        </Hide>
 
         {showProfileAndChangelogMenu && (
-          <React.Fragment>
-            <Container mr={3}>
-              <Hide xs>
-                {onHomeRoute && useDashboard ? (
-                  <Link href="/dashboard">
-                    <MainNavItem primary as={Container} isActive={isRouteActive('/dashboard')}>
-                      <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-                    </MainNavItem>
-                  </Link>
-                ) : (
-                  <ChangelogTrigger />
-                )}
-              </Hide>
-            </Container>
+          <Flex alignItems="center" gridGap={3} justifyContent="end" flex={1}>
+            {useDashboard && !onHomeRoute && <SearchTrigger setShowSearchModal={setShowSearchModal} />}
+            <Hide xs>
+              {onHomeRoute && useDashboard ? (
+                <Link href="/dashboard">
+                  <MainNavItem primary as={Container} isActive={isRouteActive('/dashboard')}>
+                    <FormattedMessage id="GoToDashboard" defaultMessage="Go to Dashboard" />
+                  </MainNavItem>
+                </Link>
+              ) : (
+                <ChangelogTrigger />
+              )}
+            </Hide>
             {useDashboard ? <ProfileMenu /> : <TopBarProfileMenu />}
-          </React.Fragment>
+          </Flex>
         )}
         <Hide md lg>
-          <Box mx={3} onClick={toggleMobileMenu}>
+          <Box px={2} mr="-8px" onClick={toggleMobileMenu}>
             <Flex as="a">
               <MenuIcon color="#aaaaaa" size={24} />
             </Flex>
