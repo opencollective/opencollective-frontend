@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 // import Banner from '../components/collectives/Banner';
