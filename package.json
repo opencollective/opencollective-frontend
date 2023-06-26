@@ -252,7 +252,7 @@
     "shx": "^0.3.4",
     "storybook": "7.0.23",
     "storybook-addon-designs": "^7.0.0-beta.2",
-    "styled-jsx": "^5.1.2",
+    "styled-jsx": "5.1.1",
     "typescript": "^5.0.0",
     "url-loader": "^4.1.1",
     "webpack": "^5.80.0"
