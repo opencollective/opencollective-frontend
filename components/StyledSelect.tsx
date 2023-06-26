@@ -313,7 +313,7 @@ export type StyledSelectProps = LayoutProps &
     isClearable?: boolean;
     options?: any;
     value?: any;
-    components?: Record<string, React.ReactNode>;
+    components?: Record<string, React.ReactNode | React.Component | React.FunctionComponent>;
     closeMenuOnSelect?: boolean;
     hideSelectedOptions?: boolean;
     isMulti?: boolean;

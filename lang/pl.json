@@ -1271,7 +1271,7 @@
   "expenses.ready": "Gotowy do zapłaty",
   "expenses.scheduled.confirmation.body": "Czy na pewno chcesz dokonać płatności zbiorczej i zapłacić {count, plural, one {# wydatek zaplanowany płatność} few {# wydatki zaplanowane płatności} many {# wydatki zaplanowane płatności} other {# wydatki zaplanowane płatności}}?",
   "expenses.scheduled.confirmation.title": "Pakiet płatności za wydatki",
-  "expenses.scheduled.notification": "Masz {count, plural, one {# wydatk zaplanowany} few {# wydatki zaplanowane} many {# wydatki zaplanowane} other {# wydatki zaplanowane}} do zapłaty.",
+  "expenses.scheduled.notification": "You have {count, plural, one {# expense} other {# expenses}} scheduled for payment that will require {amount} in balance.",
   "expenses.scheduled.paybatch": "Seria płatności",
   "expenses.scheduled.paybatch.success": "Wydatki zapłacone! Są one teraz przetwarzane przez Wise.",
   "ExpensesList.Empty": "Żaden wydatek nie pasuje do podanych filtrów, <ResetLink>resetuj je</ResetLink>, aby zobaczyć wszystkie wydatki.",

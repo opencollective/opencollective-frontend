@@ -263,7 +263,6 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
             <StyledButton
               buttonSize="tiny"
               buttonStyle="successSecondary"
-              mr={1}
               onClick={() => {
                 router.push({
                   pathname: pageRoute,

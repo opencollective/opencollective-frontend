@@ -1271,7 +1271,7 @@
   "expenses.ready": "Pripravené na platbu",
   "expenses.scheduled.confirmation.body": "Ste si istí, že chcete hromadne uhradiť {count, plural, one {# výdavok naplánovaný} few {# výdavky naplánované} other {# výdavkov naplánovaných}} na úhradu?",
   "expenses.scheduled.confirmation.title": "Dávka výdavkov na úhradu",
-  "expenses.scheduled.notification": "Máte {count, plural, one {# výdavok naplánovaný} few {# výdavky naplánované} other {# výdavkov naplánovaných}} na úhradu.",
+  "expenses.scheduled.notification": "You have {count, plural, one {# expense} other {# expenses}} scheduled for payment that will require {amount} in balance.",
   "expenses.scheduled.paybatch": "Uhradiť dávku",
   "expenses.scheduled.paybatch.success": "Výdavky sú uhradené! Teraz ich spracováva spoločnosť Wise.",
   "ExpensesList.Empty": "Žiadny výdavok nezodpovedá zadaným filtrom, <ResetLink>obnovte ich</ResetLink>, aby sa zobrazili všetky výdavky.",

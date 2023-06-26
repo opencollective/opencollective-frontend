@@ -1,15 +1,15 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { css } from '@styled-system/css';
-import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+
+import { Currency as CurrencyEnum } from '../lib/graphql/types/v2/graphql';
 
 import Currency from './Currency';
 import { Flex } from './Grid';
 import StyledButtonSet from './StyledButtonSet';
 
-const getButtonDisplay = (index, options, isSelected) => {
+const getButtonDisplay = (index: number, options: (number | string)[], isSelected: boolean) => {
   if (index === 0 || index === options.length - 1 || isSelected) {
     // Ensure first, last and selected values are always displayed
     return 'inline-block';
@@ -28,7 +28,11 @@ const getButtonDisplay = (index, options, isSelected) => {
 const FONT_SIZES = ['15px', null, '20px'];
 const LINE_HEIGHTS = ['23px', null, '28px'];
 
-const ButtonText = styled.span(props =>
+type ButtonTextProps = {
+  isSelected: boolean;
+};
+
+const ButtonText = styled.span<ButtonTextProps>(props =>
   css({
     lineHeight: LINE_HEIGHTS,
     fontSize: props.isSelected ? FONT_SIZES : ['15px', null, '18px'],
@@ -38,19 +42,19 @@ const ButtonText = styled.span(props =>
 
 export const OTHER_AMOUNT_KEY = 'other';
 
+type StyledAmountPickerProps = {
+  currency: CurrencyEnum;
+  value?: number | string;
+  onChange?: (value: string | number) => void;
+  presets?: number[];
+};
+
 /**
  * A money amount picker that shows a button set to pick between presets.
  */
-const StyledAmountPicker = ({ presets, currency, value, onChange }) => {
-  const [isOtherSelected, setOtherSelected] = React.useState(() => !isNil(value) && !presets?.includes(value));
+const StyledAmountPicker = ({ presets, currency, value, onChange }: StyledAmountPickerProps) => {
   const hasPresets = presets?.length > 0;
-  const options = hasPresets ? [...presets, OTHER_AMOUNT_KEY] : [OTHER_AMOUNT_KEY];
-
-  React.useEffect(() => {
-    if (value && !presets?.includes(value) && !isOtherSelected) {
-      setOtherSelected(true);
-    }
-  }, [presets, value, isOtherSelected]);
+  const options: Array<number | string> = hasPresets ? [...presets, OTHER_AMOUNT_KEY] : [OTHER_AMOUNT_KEY];
 
   return (
     <Flex width="100%">
@@ -68,10 +72,7 @@ const StyledAmountPicker = ({ presets, currency, value, onChange }) => {
           buttonPropsBuilder={({ index, isSelected }) => ({
             display: getButtonDisplay(index, options, isSelected),
           })}
-          onChange={value => {
-            onChange(value);
-            setOtherSelected(false);
-          }}
+          onChange={onChange}
         >
           {({ item, isSelected }) => {
             switch (item) {
@@ -90,7 +91,7 @@ const StyledAmountPicker = ({ presets, currency, value, onChange }) => {
               default:
                 return (
                   <ButtonText isSelected={isSelected}>
-                    <Currency value={item} currency={currency} formatWithSeparators precision="auto" />
+                    <Currency value={item as number} currency={currency} formatWithSeparators precision="auto" />
                   </ButtonText>
                 );
             }
@@ -99,13 +100,6 @@ const StyledAmountPicker = ({ presets, currency, value, onChange }) => {
       )}
     </Flex>
   );
-};
-
-StyledAmountPicker.propTypes = {
-  currency: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  onChange: PropTypes.func,
-  presets: PropTypes.arrayOf(PropTypes.number),
 };
 
 export default StyledAmountPicker;

@@ -1271,7 +1271,7 @@
   "expenses.ready": "Готово до оплати",
   "expenses.scheduled.confirmation.body": "Are you sure you want to batch and pay {count, plural, one {# expense} other {# expenses}} scheduled for payment?",
   "expenses.scheduled.confirmation.title": "Pay Expenses Batch",
-  "expenses.scheduled.notification": "You have {count, plural, one {# expense} other {# expenses}} scheduled for payment.",
+  "expenses.scheduled.notification": "You have {count, plural, one {# expense} other {# expenses}} scheduled for payment that will require {amount} in balance.",
   "expenses.scheduled.paybatch": "Pay Batch",
   "expenses.scheduled.paybatch.success": "Витрати сплачено! Зараз їх обробляє Wise.",
   "ExpensesList.Empty": "No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses.",
