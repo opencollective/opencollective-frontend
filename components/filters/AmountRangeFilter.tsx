@@ -4,6 +4,7 @@ import { isNil } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
+import { Currency } from '../../lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from '../Grid';
 import PopupMenu from '../PopupMenu';
@@ -39,7 +40,7 @@ type AmountRangeFilterProps = {
     fromAmount: number;
     toAmount?: number;
   };
-  currency: string;
+  currency: Currency;
   onChange(value?: { fromAmount: number; toAmount?: number });
 };
 

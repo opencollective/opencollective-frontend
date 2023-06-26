@@ -3,7 +3,7 @@ import { isNil } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { Collective, VirtualCardStatus } from '../lib/graphql/types/v2/graphql';
+import { Collective, Currency, VirtualCardStatus } from '../lib/graphql/types/v2/graphql';
 import { VirtualCardStatusI18n } from '../lib/virtual-cards/constants';
 
 import AmountRangeFilter from './filters/AmountRangeFilter';
@@ -45,7 +45,7 @@ type VirtualCardFiltersProps = {
   missingReceipts?: boolean;
   onMissingReceiptsChange: (v: boolean) => void;
 
-  currency: string;
+  currency: Currency;
   totalSpent?: { fromAmount: number; toAmount?: number };
   onTotalSpentChange: (amount?: { fromAmount: number; toAmount?: number }) => void;
 };
