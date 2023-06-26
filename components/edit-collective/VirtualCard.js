@@ -13,6 +13,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import Avatar from '../Avatar';
 import ConfirmationModal from '../ConfirmationModal';
@@ -35,7 +36,6 @@ const CardContainer = styled(Flex)`
   position: relative;
 
   color: #fff;
-  overflow: hidden;
 
   transition: box-shadow 400ms ease-in-out, transform 500ms ease;
   box-shadow: 0px 0px 4px rgba(20, 20, 20, 0);
@@ -142,6 +142,7 @@ const ActionsButton = props => {
   const [isEditingVirtualCard, setIsEditingVirtualCard] = React.useState(false);
   const [isDeletingVirtualCard, setIsDeletingVirtualCard] = React.useState(false);
   const { addToast } = useToasts();
+  const { LoggedInUser } = useLoggedInUser();
   const { virtualCard, host, canEditVirtualCard, canDeleteVirtualCard, confirmOnPauseCard } = props;
 
   const handleActionSuccess = React.useCallback(
@@ -186,6 +187,8 @@ const ActionsButton = props => {
 
   const isLoading = pauseLoading || resumeLoading;
 
+  const isHostAdmin = LoggedInUser?.isAdminOfCollective(props.host);
+
   return (
     <div ref={wrapperRef}>
       <Manager>
@@ -198,7 +201,7 @@ const ActionsButton = props => {
         </Reference>
         {displayActions && (
           <Popper
-            placement="bottom"
+            placement="top-start"
             modifiers={[
               {
                 name: 'arrow',
@@ -274,6 +277,20 @@ const ActionsButton = props => {
                         <a href={`mailto:${virtualCard.assignee?.email}`} target="_blank" rel="noopener noreferrer">
                           <Action>
                             <FormattedMessage defaultMessage="Contact assignee" />
+                          </Action>
+                        </a>
+                      </React.Fragment>
+                    )}
+                    {isHostAdmin && (
+                      <React.Fragment>
+                        <StyledHr borderColor="black.300" mt={2} mb={2} />
+                        <a
+                          href={`https://dashboard.stripe.com/issuing/cards/${virtualCard?.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Action>
+                            <FormattedMessage defaultMessage="View card in Stripe dashboard" />
                           </Action>
                         </a>
                       </React.Fragment>
@@ -560,6 +577,10 @@ const VirtualCard = props => {
         )}
       </Box>
       <Flex
+        style={{
+          borderBottomLeftRadius: '12px',
+          borderBottomRightRadius: '12px',
+        }}
         backgroundColor="#fff"
         color="black.900"
         minHeight="48px"
