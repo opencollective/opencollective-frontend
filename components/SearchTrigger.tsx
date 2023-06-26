@@ -28,23 +28,42 @@ const SearchButton = styled(StyledButton)`
     letter-spacing: 0;
   }
 
-  &:active {
+  &:active,
+  :hover {
     .shortcut {
       background-color: inherit;
     }
   }
 `;
 
-const KeyShortcutSymbol = () => {
-  const [keySymbol, setKeySymbol] = React.useState(null);
+const getMetaKeySymbol = () => {
+  const platform = window?.navigator?.platform;
+  if (!platform) {
+    return null;
+  }
+  if (platform.includes('Mac')) {
+    return '⌘';
+  } else if (platform.includes('Win') || platform.includes('Linux')) {
+    return 'Ctrl';
+  }
+};
+
+const KeyShortcut = ({ setShowSearchModal }) => {
+  const [keySymbol, setKeySymbol] = React.useState(getMetaKeySymbol());
 
   React.useEffect(() => {
-    const platform = window.navigator.platform;
-    if (platform.includes('Mac')) {
-      setKeySymbol('⌘');
-    } else if (platform.includes('Win') || platform.includes('Linux')) {
-      setKeySymbol('Ctrl');
+    const symbol = getMetaKeySymbol();
+    if (symbol !== keySymbol) {
+      setKeySymbol(symbol);
     }
+
+    const handleKeydown = e => {
+      if (e.key === 'k' && e.metaKey) {
+        setShowSearchModal(show => !show);
+      }
+    };
+    document.addEventListener('keydown', handleKeydown);
+    return () => document.removeEventListener('keydown', handleKeydown);
   }, []);
 
   if (!keySymbol) {
@@ -59,22 +78,12 @@ const KeyShortcutSymbol = () => {
 };
 
 const SearchTrigger = ({ setShowSearchModal }) => {
-  React.useEffect(() => {
-    const handleKeydown = e => {
-      if (e.key === 'k' && e.metaKey) {
-        setShowSearchModal(show => !show);
-      }
-    };
-    document.addEventListener('keydown', handleKeydown);
-    return () => document.removeEventListener('keydown', handleKeydown);
-  }, []);
-
   return (
     <SearchButton onClick={() => setShowSearchModal(true)}>
       <Flex alignItems="center" gridGap="6px">
         <Search size={14} /> <FormattedMessage id="search.placeholder" defaultMessage="Search..." />
       </Flex>
-      <KeyShortcutSymbol />
+      <KeyShortcut setShowSearchModal={setShowSearchModal} />
     </SearchButton>
   );
 };
