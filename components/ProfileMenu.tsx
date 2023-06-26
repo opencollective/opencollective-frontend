@@ -184,14 +184,14 @@ const ProfileMenuDropdown = () => {
                   <FormattedMessage defaultMessage="New Organization" /> <Plus size={14} />
                 </StyledMenuEntry>
                 <hr />
+                <StyledMenuEntry href="/home" openInNewTab>
+                  <FormattedMessage defaultMessage="Open Collective Homepage" /> <ExternalLink size={14} />
+                </StyledMenuEntry>
                 <StyledMenuEntry href="/help" openInNewTab>
                   <FormattedMessage defaultMessage="Help & Support" /> <ExternalLink size={14} />
                 </StyledMenuEntry>
                 <StyledMenuEntry href="https://docs.opencollective.com" openInNewTab>
                   <FormattedMessage defaultMessage="Documentation" /> <ExternalLink size={14} />
-                </StyledMenuEntry>
-                <StyledMenuEntry href="/home" openInNewTab>
-                  <FormattedMessage defaultMessage="Open Collective Homepage" /> <ExternalLink size={14} />
                 </StyledMenuEntry>
                 <hr />
                 <StyledMenuEntry as="button" onClick={() => logout()}>
