@@ -21,6 +21,7 @@ class ContributionFlowButtons extends React.Component {
     paypalButtonProps: PropTypes.object,
     currency: PropTypes.string,
     isCrypto: PropTypes.bool,
+    disabled: PropTypes.bool,
     tier: PropTypes.shape({ type: PropTypes.string }),
     stepDetails: PropTypes.object,
     stepSummary: PropTypes.object,
@@ -50,7 +51,8 @@ class ContributionFlowButtons extends React.Component {
   }
 
   render() {
-    const { goBack, isValidating, nextStep, paypalButtonProps, currency, tier, isCrypto, stepDetails } = this.props;
+    const { goBack, isValidating, nextStep, paypalButtonProps, currency, tier, isCrypto, stepDetails, disabled } =
+      this.props;
     const totalAmount = getTotalAmount(stepDetails, this.props.stepSummary, isCrypto);
     return (
       <Flex flexWrap="wrap" justifyContent="center">
@@ -61,7 +63,7 @@ class ContributionFlowButtons extends React.Component {
               minWidth={!nextStep ? 185 : 145}
               onClick={goBack}
               color="black.600"
-              disabled={isValidating}
+              disabled={disabled || isValidating}
               data-cy="cf-prev-step"
               type="button"
               mt={2}
@@ -79,7 +81,7 @@ class ContributionFlowButtons extends React.Component {
               minWidth={!nextStep ? 185 : 145}
               buttonStyle="primary"
               onClick={this.goNext}
-              disabled={isCrypto && totalAmount <= 0}
+              disabled={disabled || (isCrypto && totalAmount <= 0)}
               loading={isValidating || this.state.isLoadingNext}
               data-cy="cf-next-step"
               type="submit"

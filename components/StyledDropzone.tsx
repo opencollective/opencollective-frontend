@@ -227,7 +227,7 @@ type StyledDropzoneProps = {
   /** Name for the input */
   name: string;
   /** Content to show inside the dropzone. Defaults to message "Drag and drop one or..." */
-  children?: React.ReactChildren;
+  children?: React.ReactNode;
   /** Force loading state to be displayed */
   isLoading?: boolean;
   /** Use this to override the loading progress indicator */

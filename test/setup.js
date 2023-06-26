@@ -1,8 +1,6 @@
 import '../env';
 import 'raf/polyfill';
 
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import Enzyme from 'enzyme';
 import jsdom from 'jsdom';
 
 const { JSDOM } = jsdom;
@@ -27,5 +25,3 @@ function copyProps(src, target) {
   Object.defineProperties(target, props);
 }
 copyProps(document.defaultView, global);
-
-Enzyme.configure({ adapter: new Adapter() });
