@@ -86,6 +86,7 @@ const StyledMenuEntry = styled(Link)`
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  cursor: pointer;
   &:hover {
     background-color: #f4f5f7;
     color: #334155;
