@@ -33,7 +33,7 @@ export default function AgreementDrawer({
   }, [onClose]);
 
   return (
-    <Drawer maxWidth="512px" open={open} onClose={closeDrawer} showActionsContainer>
+    <Drawer maxWidth="512px" open={open} onClose={closeDrawer} showActionsContainer data-cy="agreement-drawer">
       {isEditing || !agreement ? (
         <AgreementForm
           hostLegacyId={hostLegacyId}

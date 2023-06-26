@@ -34,7 +34,7 @@ const StyledInputFormikField = ({
         const showError = Boolean(meta.error && (meta.touched || form.submitCount));
         return (
           <Container flex={flex} width={width} display={display} flexGrow={flexGrow}>
-            <StyledInputField error={Boolean(meta.error)} {...props} htmlFor={htmlFor}>
+            <StyledInputField error={Boolean(meta.error)} {...props} name={name} htmlFor={htmlFor}>
               <React.Fragment>
                 {children({
                   form,
