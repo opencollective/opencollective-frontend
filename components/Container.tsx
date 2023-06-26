@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 import {
   background,
@@ -37,7 +38,7 @@ import {
   WhiteSpaceProps,
 } from '../lib/styled-system-custom-properties';
 
-type ContainerProps = FlexboxProps &
+export type ContainerProps = FlexboxProps &
   BackgroundProps &
   BorderProps &
   ShadowProps &
@@ -52,7 +53,8 @@ type ContainerProps = FlexboxProps &
   SpaceProps &
   TypographyProps &
   WhiteSpaceProps &
-  SizeProps & {
+  SizeProps &
+  React.HTMLProps<HTMLDivElement> & {
     clearfix?: boolean;
   };
 

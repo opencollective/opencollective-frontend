@@ -2,8 +2,15 @@ import getSymbolFromCurrency from 'currency-symbol-map';
 import { isNil, round } from 'lodash';
 
 import { CurrencyPrecision } from './constants/currency-precision';
+import { Amount, Currency } from './graphql/types/v2/graphql';
 
-function getCurrencySymbolFallback(currency) {
+type Options = {
+  locale?: string;
+  minimumFractionDigits?: number;
+  precision?: number;
+};
+
+function getCurrencySymbolFallback(currency: Currency): string {
   return Number(0)
     .toLocaleString('en-US', {
       style: 'currency',
@@ -14,15 +21,15 @@ function getCurrencySymbolFallback(currency) {
     .replace(/(^0\s?)|(\s?0$)/, '');
 }
 
-export function getCurrencySymbol(currency) {
+export function getCurrencySymbol(currency: Currency): string {
   return getSymbolFromCurrency(currency) || getCurrencySymbolFallback(currency);
 }
 
-export const getPrecisionFromAmount = amount => {
+export const getPrecisionFromAmount = (amount: number): number => {
   return amount.toString().slice(-2) === '00' ? 0 : CurrencyPrecision.DEFAULT;
 };
 
-export function graphqlAmountValueInCents(amount) {
+export function graphqlAmountValueInCents(amount: Amount | number | null): number | null {
   if (isNil(amount)) {
     return amount;
   }
@@ -35,7 +42,11 @@ export function graphqlAmountValueInCents(amount) {
   return amount;
 }
 
-export function formatCurrency(amount, currency = 'USD', options = {}) {
+export function formatCurrency(
+  amount: Amount | number | null,
+  currency: Currency = Currency.USD,
+  options: Options = {},
+): string {
   if (isNil(amount)) {
     return '--';
   }
@@ -62,7 +73,7 @@ export function formatCurrency(amount, currency = 'USD', options = {}) {
     maximumFractionDigits = options.precision;
   }
 
-  const formatAmount = currencyDisplay => {
+  const formatAmount = (currencyDisplay: string): string => {
     return amount.toLocaleString(options.locale, {
       style: 'currency',
       currency,
@@ -82,10 +93,10 @@ export function formatCurrency(amount, currency = 'USD', options = {}) {
   }
 }
 
-export const formatValueAsCurrency = (value, options) =>
+export const formatValueAsCurrency = (value: Amount, options: Options): string =>
   formatCurrency(value.valueInCents || value.value * 100, value.currency, options);
 
-export const floatAmountToCents = floatAmount => {
+export const floatAmountToCents = (floatAmount: number | null): number | null => {
   if (isNaN(floatAmount) || floatAmount === null) {
     return floatAmount;
   } else {
@@ -93,7 +104,7 @@ export const floatAmountToCents = floatAmount => {
   }
 };
 
-export const centsAmountToFloat = amount => {
+export const centsAmountToFloat = (amount: number | null): number | null => {
   if (isNaN(amount) || isNil(amount)) {
     return null;
   } else {
@@ -103,12 +114,10 @@ export const centsAmountToFloat = amount => {
 
 /**
  * Small helper to get the value in cents from an amount, works with GQLV1 & GQLV2
- * @param {number|object} amount
- * @returns
  */
-export const getAmountInCents = amount => {
+export const getAmountInCents = (amount: Amount | number | null): number | null => {
   if (amount === null) {
-    return amount;
+    return null;
   } else if (typeof amount === 'number') {
     return amount;
   } else if (typeof amount === 'object') {
@@ -119,5 +128,5 @@ export const getAmountInCents = amount => {
     }
   }
 
-  return amount;
+  return null;
 };
