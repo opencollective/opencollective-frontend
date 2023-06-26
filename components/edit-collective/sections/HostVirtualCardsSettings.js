@@ -11,6 +11,7 @@ import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
 import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
+import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
@@ -24,6 +25,7 @@ const updateAccountSettingsMutation = gql`
   mutation UpdateAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
       id
+      legacyId
       type
       isActive
       settings
@@ -56,6 +58,21 @@ const HostVirtualCards = props => {
             }}
           />
         ),
+      });
+    },
+    // update cache from v1 gql request
+    update(cache, result) {
+      if (!result.data?.editAccountSetting?.settings) {
+        return;
+      }
+
+      cache.modify({
+        id: `Organization:${result.data.editAccountSetting.legacyId}`,
+        fields: {
+          settings() {
+            return result.data.editAccountSetting.settings;
+          },
+        },
       });
     },
   });
@@ -158,6 +175,67 @@ const HostVirtualCards = props => {
             )}
           </StyledInputField>
         </Flex>
+
+        <Flex mt={4} justifyContent="space-between" alignItems="center">
+          <Box lineHeight="20px" fontSize="14px" fontWeight="500">
+            <FormattedMessage id="Host.VirtualCards.AutoPauseUnusedCards.Title" defaultMessage="Pause unused cards" />
+            <P fontSize="11px" fontWeight="400" color="black.600">
+              <FormattedMessage
+                id="Host.VirtualCards.AutoPauseUnusedCards.Description"
+                defaultMessage="Unused cards will be paused after set days of inactivity. The assignee can always un-pause when required."
+              />
+            </P>
+          </Box>
+
+          <StyledInputField
+            name="virtualcards.autopauseUnusedCards.enabled"
+            htmlFor="virtualcards.autopauseUnusedCards.enabled"
+            disabled={updateLoading}
+          >
+            {inputProps => (
+              <InputField
+                name="application"
+                className="horizontal"
+                type="switch"
+                id={inputProps.id}
+                inputName={inputProps.name}
+                onChange={handleSettingsUpdate(inputProps.name)}
+                defaultValue={get(props.collective, `settings.${inputProps.name}`)}
+              />
+            )}
+          </StyledInputField>
+        </Flex>
+        {get(props.collective, `settings.virtualcards.autopauseUnusedCards.enabled`) && (
+          <React.Fragment>
+            <Box mt={3} lineHeight="20px" fontSize="14px" fontWeight="500">
+              <FormattedMessage
+                id="Host.VirtualCards.AutoPauseUnusedCardsPeriod.Title"
+                defaultMessage="Inactivity Duration"
+              />
+            </Box>
+            <Flex alignItems="baseline">
+              <Span mr={3}>
+                <FormattedMessage defaultMessage="Days" />
+              </Span>
+              <StyledInputField
+                mt={3}
+                name="virtualcards.autopauseUnusedCards.period"
+                htmlFor="virtualcards.autopauseUnusedCards.period"
+                disabled={updateLoading}
+              >
+                {inputProps => (
+                  <StyledInput
+                    id={inputProps.id}
+                    name={inputProps.name}
+                    type="number"
+                    defaultValue={get(props.collective, `settings.${inputProps.name}`)}
+                    onBlur={e => handleSettingsUpdate(inputProps.name)(Number(e.target.value))}
+                  />
+                )}
+              </StyledInputField>
+            </Flex>
+          </React.Fragment>
+        )}
 
         <StyledInputField
           name="virtualcards.policy"
