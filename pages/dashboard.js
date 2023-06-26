@@ -104,18 +104,21 @@ const DashboardPage = () => {
   const router = useRouter();
   const { slug, section, subpath } = router.query;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
+  const activeSlug = slug || LoggedInUser?.getLastDashboardSlug();
 
   // Redirect to the dashboard of the logged in user if no slug is provided
   useEffect(() => {
-    if (!slug && LoggedInUser) {
-      router.replace(`/dashboard/${LoggedInUser.getLastDashboardSlug()}`);
-    }
     if (slug) {
       LoggedInUser?.saveLastDashboardSlug(slug);
     }
   }, [slug, LoggedInUser]);
 
-  const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
+  const { data, loading } = useQuery(adminPanelQuery, {
+    context: API_V2_CONTEXT,
+    variables: { slug: activeSlug },
+    skip: !activeSlug,
+  });
+
   const account = data?.account;
   const notification = getNotification(intl, account);
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
@@ -131,7 +134,7 @@ const DashboardPage = () => {
           <AdminPanelTopBar
             isLoading={isLoading}
             collective={data?.account}
-            collectiveSlug={slug}
+            collectiveSlug={activeSlug}
             selectedSection={selectedSection}
             display={['flex', null, 'none']}
           />
@@ -155,6 +158,7 @@ const DashboardPage = () => {
             <AdminPanelSideBar
               isLoading={isLoading}
               collective={account}
+              activeSlug={activeSlug}
               selectedSection={selectedSection}
               display={['none', 'none', 'block']}
               isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}

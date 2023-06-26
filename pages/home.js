@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 // import Banner from '../components/collectives/Banner';
@@ -14,7 +15,6 @@ import OpenCollectiveIs from '../components/home/OpenCollectiveIsSection';
 import RaiseMoney from '../components/home/RaiseMoneySection';
 import TheFutureIsCollective from '../components/home/TheFutureIsCollectiveSection';
 import Page from '../components/Page';
-
 const messages = defineMessages({
   defaultTitle: {
     defaultMessage: 'Raise and spend money with full transparency.',
@@ -29,12 +29,14 @@ const HomePage = () => {
   const { formatMessage } = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const router = useRouter();
+  const shouldRedirectToDashboard =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) && router.asPath === '/';
 
   useEffect(() => {
-    if (router.asPath === '/' && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)) {
-      router.replace(`/dashboard/${LoggedInUser.getLastDashboardSlug()}`);
+    if (shouldRedirectToDashboard) {
+      router.replace('/dashboard');
     }
-  }, [LoggedInUser, router.asPath]);
+  }, [shouldRedirectToDashboard]);
 
   return (
     <Page

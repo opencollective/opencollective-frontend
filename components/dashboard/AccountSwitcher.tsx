@@ -1,12 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/heroicons-outline/ChevronDown';
 import { ChevronUp } from '@styled-icons/heroicons-outline/ChevronUp';
 import { ChevronUpDown } from '@styled-icons/heroicons-outline/ChevronUpDown';
 import { css } from '@styled-system/css';
 import { flatten, groupBy, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -113,7 +111,7 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   return groupedAccounts;
 });
 
-const MenuEntry = ({ account, activeSlug }) => {
+const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }) => {
   const [expanded, setExpanded] = React.useState(false);
 
   return (
@@ -165,17 +163,9 @@ const MenuEntry = ({ account, activeSlug }) => {
   );
 };
 
-MenuEntry.propTypes = {
-  account: PropTypes.object,
-  activeSlug: PropTypes.string,
-};
-
-const AccountSwitcher = () => {
+const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
-  const router = useRouter();
-  const { slug } = router.query;
-  const activeSlug = Array.isArray(slug) ? slug[0] : slug;
 
   const loggedInUserCollective = LoggedInUser?.collective;
 
@@ -243,11 +233,6 @@ const AccountSwitcher = () => {
       )}
     </Dropdown>
   );
-};
-
-AccountSwitcher.propTypes = {
-  collective: PropTypes.object,
-  isLoading: PropTypes.bool,
 };
 
 export default AccountSwitcher;
