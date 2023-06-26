@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 import {
   background,
@@ -52,7 +53,8 @@ export type ContainerProps = FlexboxProps &
   SpaceProps &
   TypographyProps &
   WhiteSpaceProps &
-  SizeProps & {
+  SizeProps &
+  React.HTMLProps<HTMLDivElement> & {
     clearfix?: boolean;
   };
 

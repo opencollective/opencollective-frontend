@@ -44,7 +44,7 @@ const ButtonItem = styled(StyledButton)<ButtonItemProps>`
 type StyledButtonItemProps<T> = {
   index: number;
   item: T;
-  children: ({ item, isSelected }: { item: T; isSelected: boolean }) => ReactNode;
+  children: ReactNode;
   size: ButtonSize;
   selected?: T;
   onChange?: (item: T) => void;
@@ -100,13 +100,13 @@ const StyledButtonItem = ({
       {...(isAlwaysShown ? { display: 'inline-block' } : {})}
       as={undefined}
     >
-      {children({ item, isSelected })}
+      {children}
     </ButtonItem>
   );
 };
 
-type StyledButtonSetProps<T> = Omit<ContainerProps, 'onChange' | 'size' | 'selected'> & {
-  /** A list of elements to build buttons uppon */
+type StyledButtonSetProps<T> = Omit<ContainerProps, 'onChange' | 'size' | 'selected' | 'children'> & {
+  /** A list of elements to build buttons upon */
   items: Array<T>;
   /** Button child content renderer. Get passed an object like { item, isSelected } */
   children: ({ item, isSelected }: { item: T; isSelected: boolean }) => ReactNode;
@@ -159,7 +159,8 @@ const StyledButtonSet = ({
         disabled={disabled}
         customBorderRadius={customBorderRadius}
       >
-        {children}
+        {' '}
+        {children({ item, isSelected: item === selected })}
       </StyledButtonItem>
     ))}
   </Container>

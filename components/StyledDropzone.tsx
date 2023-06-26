@@ -136,7 +136,8 @@ const StyledDropzone = ({
           display="flex"
           justifyContent="center"
           alignItems="center"
-          size="100%"
+          height="100%"
+          width="100%"
           minHeight={innerMinHeight}
         >
           <Container

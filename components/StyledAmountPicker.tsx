@@ -54,7 +54,7 @@ type StyledAmountPickerProps = {
  */
 const StyledAmountPicker = ({ presets, currency, value, onChange }: StyledAmountPickerProps) => {
   const hasPresets = presets?.length > 0;
-  const options = hasPresets ? [...presets, OTHER_AMOUNT_KEY] : [OTHER_AMOUNT_KEY];
+  const options: Array<number | string> = hasPresets ? [...presets, OTHER_AMOUNT_KEY] : [OTHER_AMOUNT_KEY];
 
   return (
     <Flex width="100%">
