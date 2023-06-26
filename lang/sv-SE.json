@@ -1264,7 +1264,7 @@
   "expenses.ready": "Redo att betala",
   "expenses.scheduled.confirmation.body": "Är du säker på att du vill batcha och betala {count, plural, one {# utgift} other {# utgifter}} planerad för betalning?",
   "expenses.scheduled.confirmation.title": "Betala utgifter",
-  "expenses.scheduled.notification": "Du har {count, plural, one {# utgift} other {# utgifter}} planerad för betalning.",
+  "expenses.scheduled.notification": "You have {count, plural, one {# expense} other {# expenses}} scheduled for payment that will require {amount} in balance.",
   "expenses.scheduled.paybatch": "Betala batch",
   "expenses.scheduled.paybatch.success": "Utgifter betalade! Det hanteras nu av Wise.",
   "ExpensesList.Empty": "Ingen kostnad matchar de angivna filterna, <ResetLink>återställ sökningen</ResetLink> för att se alla utgifter.",
