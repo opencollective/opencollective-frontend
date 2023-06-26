@@ -14,7 +14,7 @@ import Container from './Container';
 import { Flex } from './Grid';
 import Hide from './Hide';
 import Link from './Link';
-import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
+import LoginBtn from './LoginBtn';
 import PreviewFeaturesModal from './PreviewFeaturesModal';
 import StyledButton from './StyledButton';
 import { Dropdown, DropdownContent } from './StyledDropdown';
@@ -24,6 +24,7 @@ const StyledProfileButton = styled(StyledButton)`
   padding: 0;
   background-color: white !important;
 `;
+
 const StyledDropdownContent = styled(DropdownContent)`
   top: 52px;
   border-radius: 8px;
@@ -98,6 +99,12 @@ const StyledMenuEntry = styled(Link)`
   svg {
     color: #94a3b8;
   }
+
+  @media screen and (max-width: ${themeGet('breakpoints.0')}) {
+    font-size: 16px;
+    padding: 12px;
+  }
+
   ${props =>
     props.$isActive
       ? css({
@@ -114,6 +121,10 @@ const ProfileMenuDropdown = () => {
   const { LoggedInUser, logout } = useLoggedInUser();
   const hasAvailablePreviewFeatures = LoggedInUser?.getAvailablePreviewFeatures()?.length > 0;
 
+  if (!LoggedInUser) {
+    return <LoginBtn />;
+  }
+
   return (
     <React.Fragment>
       <Dropdown trigger="click">
@@ -121,9 +132,9 @@ const ProfileMenuDropdown = () => {
           <StyledDropdownContainer>
             <StyledProfileButton isBorderless {...triggerProps}>
               <Flex alignItems="center" data-cy="user-menu-trigger">
-                <Avatar collective={get(LoggedInUser, 'collective')} radius={40} mr={2} />
+                <Avatar collective={get(LoggedInUser, 'collective')} radius={40} />
                 <Hide xs>
-                  <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
+                  <ChevronDown ml={2} color="#4E5052" size="1.5em" cursor="pointer" />
                 </Hide>
               </Flex>
             </StyledProfileButton>
@@ -166,21 +177,21 @@ const ProfileMenuDropdown = () => {
                   </StyledMenuEntry>
                 )}
                 <hr />
-                <StyledMenuEntry href={`/create`}>
+                <StyledMenuEntry href="/create">
                   <FormattedMessage defaultMessage="New Collective" /> <Plus size={14} />
                 </StyledMenuEntry>
-                <StyledMenuEntry href={`/organizations/new`}>
+                <StyledMenuEntry href="/organizations/new">
                   <FormattedMessage defaultMessage="New Organization" /> <Plus size={14} />
                 </StyledMenuEntry>
                 <hr />
-                <StyledMenuEntry href={`/home`} openInNewTab>
-                  <FormattedMessage defaultMessage="Open Collective Homepage" /> <ExternalLink size={14} />
-                </StyledMenuEntry>
-                <StyledMenuEntry href={`/help`} openInNewTab>
+                <StyledMenuEntry href="/help" openInNewTab>
                   <FormattedMessage defaultMessage="Help & Support" /> <ExternalLink size={14} />
                 </StyledMenuEntry>
-                <StyledMenuEntry href={`https://docs.opencollective.com`} openInNewTab>
+                <StyledMenuEntry href="https://docs.opencollective.com" openInNewTab>
                   <FormattedMessage defaultMessage="Documentation" /> <ExternalLink size={14} />
+                </StyledMenuEntry>
+                <StyledMenuEntry href="/home" openInNewTab>
+                  <FormattedMessage defaultMessage="Open Collective Homepage" /> <ExternalLink size={14} />
                 </StyledMenuEntry>
                 <hr />
                 <StyledMenuEntry as="button" onClick={() => logout()}>
