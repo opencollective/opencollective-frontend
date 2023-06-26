@@ -80,8 +80,8 @@ const MainNavItem = styled(StyledLink)`
   font-weight: 500;
   font-size: 14px;
   height: 40px;
-  padding: 0 12px;
-  border-radius: 8px;
+  padding: 0 16px;
+  border-radius: 100px;
   transition-property: color, background-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
@@ -142,7 +142,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
         justifyContent="space-around"
         css={{ height: theme.sizes.navbarHeight, background: 'white', borderBottom: '1px solid rgb(232, 233, 235)' }}
         ref={ref}
-        gridGap={[3, 4]}
+        gridGap={3}
       >
         <Link href={useDashboard ? (onHomeRoute ? '/home' : '/dashboard') : '/'}>
           <Flex alignItems="center">
