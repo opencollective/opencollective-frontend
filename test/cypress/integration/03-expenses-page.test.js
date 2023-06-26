@@ -17,6 +17,7 @@ describe('New expense flow ', () => {
     // Filter on amount
     cy.getByDataCy('expenses-filter-amount').click();
     cy.getByDataCy('select-option').contains('$50 to $500').click();
+    cy.get('[data-cy^="expense-container"]').should('have.length', 2);
 
     // Remove tag
     cy.get('[data-cy="expense-tag"] [data-cy="remove-btn"]').click();

@@ -13,19 +13,20 @@ type AttachedFilesProps = {
   files: Array<File | FileInfo>;
   onRemove?: (idx: number) => void;
   openFileViewer?: (idx: number) => void;
+  size?: number;
 };
 
-const AttachedFiles = ({ files, onRemove, openFileViewer }: AttachedFilesProps) => {
+const AttachedFiles = ({ files, onRemove, openFileViewer, size = 88 }: AttachedFilesProps) => {
   const intl = useIntl();
   return (
-    <Flex flexWrap="wrap">
+    <Flex flexWrap="wrap" gridGap="16px">
       {files?.map((file, idx) => (
-        <Box key={file['id'] || file['url'] || `local-file-${idx}`} mr={3} mb={3}>
+        <Box key={file['id'] || file['url'] || `local-file-${idx}`}>
           {file instanceof File ? (
             <LocalFilePreview size={88} file={file} />
           ) : (
             <UploadedFilePreview
-              size={88}
+              size={size}
               url={file.url}
               fileName={file.name || getDefaultFileName(intl, idx, files.length)}
               fileSize={file.size}

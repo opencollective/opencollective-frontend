@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormattedDate, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Agreement as GraphQLAgreement } from '../../lib/graphql/types/v2/graphql';
@@ -7,9 +7,11 @@ import { Agreement as GraphQLAgreement } from '../../lib/graphql/types/v2/graphq
 import AttachedFiles from '../attached-files/AttachedFiles';
 import Avatar from '../Avatar';
 import Container from '../Container';
+import DateTime from '../DateTime';
 import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import StyledHr from '../StyledHr';
+import StyledLink from '../StyledLink';
 import { H4, P, Span } from '../Text';
 
 type AgreementProps = {
@@ -23,6 +25,8 @@ const ColumTitle = styled.p`
   line-height: 16px;
   text-transform: uppercase;
   color: #4d4f51;
+  margin: 0;
+  margin-bottom: 6px;
 `;
 
 const Value = styled(P)`
@@ -30,6 +34,7 @@ const Value = styled(P)`
   font-weight: 700;
   font-size: 14px;
   line-height: 20px;
+  color: ${props => props.theme.colors.black[700]};
 `;
 
 export default function Agreement({ agreement }: AgreementProps) {
@@ -38,47 +43,73 @@ export default function Agreement({ agreement }: AgreementProps) {
       <H4 fontSize="20px" fontWeight="700">
         {agreement.title}
       </H4>
-      <Box mt={30}>
-        <Flex flexWrap="wrap" gridGap={24}>
-          <Box>
-            <ColumTitle>
-              <FormattedMessage defaultMessage="Account" />
-            </ColumTitle>
-            <Value>
-              <Flex alignItems="center" gridGap={2}>
-                <Avatar collective={agreement.account} radius={24} />
-                <LinkCollective collective={agreement.account}>
-                  <Span letterSpacing="0" color="black.700" truncateOverflow>
-                    {agreement.account.name}
-                  </Span>
-                </LinkCollective>
-              </Flex>
-            </Value>
-          </Box>
-          <Box>
-            <ColumTitle>
-              <FormattedMessage defaultMessage="Expiration date" />
-            </ColumTitle>
-            <Value py="2px">
-              {agreement.expiresAt ? (
-                <FormattedDate value={agreement.expiresAt} month="short" day="numeric" year="numeric" />
-              ) : (
-                <Span fontStyle="italic" color="black.500">
-                  <FormattedMessage defaultMessage="Never" />
-                </Span>
-              )}
-            </Value>
-          </Box>
-        </Flex>
-      </Box>
       {agreement.attachment && (
-        <Container mt="36px">
+        <Container mt="30px">
           <P fontSize="16px" fontWeight="700" mb="18px">
             <FormattedMessage defaultMessage="Agreement file" />
           </P>
-          <AttachedFiles files={[agreement.attachment]} />
+          <AttachedFiles files={[agreement.attachment]} size={128} />
         </Container>
       )}
+      <Box mt={30}>
+        <ColumTitle>
+          <FormattedMessage id="Agreement.createdBy" defaultMessage="Created by" />
+        </ColumTitle>
+        <Value>
+          <Flex alignItems="center" gridGap={2}>
+            <Avatar collective={agreement.createdBy} radius={24} />
+            <StyledLink
+              as={LinkCollective}
+              collective={agreement.createdBy}
+              color="black.700"
+              truncateOverflow
+              textDecoration="underline"
+            />
+          </Flex>
+        </Value>
+      </Box>
+      <Box mt={30}>
+        <ColumTitle>
+          <FormattedMessage defaultMessage="Account" />
+        </ColumTitle>
+        <Value>
+          <Flex alignItems="center" gridGap={2}>
+            <Avatar collective={agreement.account} radius={24} />
+            <StyledLink
+              as={LinkCollective}
+              collective={agreement.account}
+              color="black.700"
+              truncateOverflow
+              textDecoration="underline"
+            />
+          </Flex>
+        </Value>
+      </Box>
+      <Flex flexWrap="wrap" gridGap={24} mt={30}>
+        <Box>
+          <ColumTitle>
+            <FormattedMessage defaultMessage="Created on" />
+          </ColumTitle>
+          <Value py="2px">
+            <DateTime value={agreement.createdAt} />
+          </Value>
+        </Box>
+        <Box>
+          <ColumTitle>
+            <FormattedMessage defaultMessage="Expires on" />
+          </ColumTitle>
+          <Value py="2px">
+            {agreement.expiresAt ? (
+              <DateTime value={agreement.expiresAt} />
+            ) : (
+              <Span fontStyle="italic" color="black.500">
+                <FormattedMessage defaultMessage="Never" />
+              </Span>
+            )}
+          </Value>
+        </Box>
+      </Flex>
+
       <StyledHr mt="32px" mb="16px" borderColor="black.300" />
       {agreement.notes && (
         <div>

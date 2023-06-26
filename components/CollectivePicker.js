@@ -392,7 +392,10 @@ class CollectivePicker extends React.PureComponent {
                 </div>
               )}
             </Popper>,
-            document.body,
+            // When `menuPortalTarget` us explicitly set to `null`, we render the menu in the body
+            // without using a portal to body. This addresses a focus issue when rendered in modals
+            // where the create collective form cannot be focused because it's outside the modal.
+            props.menuPortalTarget === null ? this.containerRef?.current : document.body,
           )}
       </Manager>
     );

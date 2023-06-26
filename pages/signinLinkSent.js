@@ -33,7 +33,7 @@ class SignInLinkSent extends Component {
     return (
       <Page title="Login Link Sent" noRobots showFooter={false}>
         <Container pt={[4, 5]} pb={6} px={3} textAlign="center">
-          <Image src="/static/images/sign-in-illustration.png" width="624px" height="372px" />
+          <Image src="/static/images/sign-in-illustration.png" width="624" height="372" />
           <P fontSize="32px" lineHeight="40px" fontWeight={700} color="black.900">
             <FormattedMessage id="SignIn.LinkSent" defaultMessage="Your magic link is on its way!" />
           </P>

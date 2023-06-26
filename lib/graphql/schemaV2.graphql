@@ -4925,7 +4925,12 @@ type Agreement {
   Additional notes about the agreement for the host admins
   """
   notes: String
-  createdBy: Account!
+
+  """
+  The time of creation of this agreement
+  """
+  createdAt: DateTime!
+  createdBy: Account
   account: Account!
   host: Host!
   expiresAt: DateTime
