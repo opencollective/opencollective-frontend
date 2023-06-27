@@ -50,6 +50,7 @@ const Home = (props: AdminSectionProps) => {
   });
 
   const activities: WorkspaceHomeQuery['activities']['nodes'] = data?.activities?.nodes || [];
+  const canViewMore = activities.length >= PAGE_SIZE && activities.length % PAGE_SIZE === 0;
 
   return (
     <Container>
@@ -88,40 +89,37 @@ const Home = (props: AdminSectionProps) => {
             <TimelineItem />
             <TimelineItem />
             <TimelineItem />
-            <TimelineItem isLast />
+            <TimelineItem />
           </React.Fragment>
         ) : !activities ? (
           <MessageBox type="info" withIcon>
             <FormattedMessage defaultMessage="No activity yet" />
           </MessageBox>
         ) : (
-          activities.map((activity, i) => (
-            <TimelineItem
-              key={activity.id}
-              activity={activity}
-              isLast={i === activities.length - 1}
-              openExpense={id => setOpenExpenseLegacyId(id)}
-            />
+          activities.map(activity => (
+            <TimelineItem key={activity.id} activity={activity} openExpense={id => setOpenExpenseLegacyId(id)} />
           ))
         )}
-        <StyledButton
-          mt={2}
-          width="100%"
-          buttonSize="small"
-          loading={loading}
-          onClick={() =>
-            fetchMore({
-              variables: { offset: activities.length },
-              updateQuery: (prevResult, { fetchMoreResult }) => {
-                const activities = fetchMoreResult?.activities;
-                activities.nodes = [...prevResult.activities.nodes, ...activities.nodes];
-                return { activities };
-              },
-            })
-          }
-        >
-          <FormattedMessage defaultMessage="View more" />
-        </StyledButton>
+        {canViewMore && (
+          <StyledButton
+            mt={2}
+            width="100%"
+            buttonSize="small"
+            loading={loading}
+            onClick={() =>
+              fetchMore({
+                variables: { offset: activities.length },
+                updateQuery: (prevResult, { fetchMoreResult }) => {
+                  const activities = fetchMoreResult?.activities;
+                  activities.nodes = [...prevResult.activities.nodes, ...activities.nodes];
+                  return { activities };
+                },
+              })
+            }
+          >
+            <FormattedMessage defaultMessage="View more" />
+          </StyledButton>
+        )}
         <ExpenseDrawer openExpenseLegacyId={openExpenseLegacyId} handleClose={() => setOpenExpenseLegacyId(null)} />
       </Flex>
     </Container>
