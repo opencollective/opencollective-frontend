@@ -57,7 +57,7 @@ const Modal = styled(Container).attrs((props: ModalProps) => ({
 
 Modal.defaultProps = {
   background: 'white',
-  padding: '20px',
+  padding: '24px',
 };
 
 const GlobalModalStyle = createGlobalStyle`
