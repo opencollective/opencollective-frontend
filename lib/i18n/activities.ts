@@ -36,7 +36,7 @@ export const ActivityTimelineMessageI18n = defineMessages({
       '<Individual></Individual> recurring <Expense>{expenseDescription}</Expense> expense drafted on <Account></Account>',
   },
   COLLECTIVE_UPDATE_PUBLISHED: {
-    defaultMessage: '<Individual></Individual> published <Update>{updateTitle}</Update> on <Account></Account>',
+    defaultMessage: '<Individual></Individual> published a new update on <Account></Account>',
   },
 });
 

@@ -18,7 +18,7 @@ import { Span } from '../../../Text';
 
 const ResourceTag = styled.div`
   display: inline-block;
-  background-color: ${props => props.theme.colors.black[100]};
+  background-color: #fff;
   border-radius: 32px;
   padding: 2px 8px;
   font-size: 12px;
