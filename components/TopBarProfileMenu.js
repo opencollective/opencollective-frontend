@@ -87,8 +87,22 @@ const UserAccountLinks = ({
           as="button"
           isMobileMenuLink={isMobileView}
           onClick={() => setShowPreviewFeaturesModal(true)}
+          display="flex"
+          alignItems="center"
+          gridGap={2}
         >
-          <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />
+          <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />{' '}
+          <Span
+            fontSize="12px"
+            ml={1}
+            style={{ borderRadius: 20 }}
+            display="inline-block"
+            px="6px"
+            bg="primary.200"
+            color="black.800"
+          >
+            <FormattedMessage defaultMessage="New!" />
+          </Span>
         </UserMenuLinkEntry>
       )}
       <Query

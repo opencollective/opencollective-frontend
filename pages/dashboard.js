@@ -14,7 +14,6 @@ import { DashboardContext } from '../components/dashboard/DashboardContext';
 import AdminPanelSection from '../components/dashboard/DashboardSection';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
-import AdminPanelTopBar from '../components/dashboard/TopBar';
 import { Box, Flex } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
@@ -104,18 +103,21 @@ const DashboardPage = () => {
   const router = useRouter();
   const { slug, section, subpath } = router.query;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
+  const activeSlug = slug || LoggedInUser?.getLastDashboardSlug();
 
   // Redirect to the dashboard of the logged in user if no slug is provided
   useEffect(() => {
-    if (!slug && LoggedInUser) {
-      router.replace(`/dashboard/${LoggedInUser.getLastDashboardSlug()}`);
-    }
     if (slug) {
       LoggedInUser?.saveLastDashboardSlug(slug);
     }
   }, [slug, LoggedInUser]);
 
-  const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
+  const { data, loading } = useQuery(adminPanelQuery, {
+    context: API_V2_CONTEXT,
+    variables: { slug: activeSlug },
+    skip: !activeSlug,
+  });
+
   const account = data?.account;
   const notification = getNotification(intl, account);
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
@@ -127,15 +129,6 @@ const DashboardPage = () => {
   return (
     <DashboardContext.Provider value={{ selectedSection, expandedSection, setExpandedSection, account }}>
       <Page noRobots collective={account} title={account ? `${account.name} - ${titleBase}` : titleBase}>
-        {!blocker && (
-          <AdminPanelTopBar
-            isLoading={isLoading}
-            collective={data?.account}
-            collectiveSlug={slug}
-            selectedSection={selectedSection}
-            display={['flex', null, 'none']}
-          />
-        )}
         {Boolean(notification) && <NotificationBar {...notification} />}
         {blocker ? (
           <Flex flexDirection="column" alignItems="center" my={6}>
@@ -155,8 +148,8 @@ const DashboardPage = () => {
             <AdminPanelSideBar
               isLoading={isLoading}
               collective={account}
+              activeSlug={activeSlug}
               selectedSection={selectedSection}
-              display={['none', 'none', 'block']}
               isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
             />
             {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (

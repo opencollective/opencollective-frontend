@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { bottom, flex, height, left, position, right, top } from 'styled-system';
 
@@ -28,7 +27,7 @@ export const sm = hidden('sm');
 export const md = hidden('md');
 export const lg = hidden('lg');
 
-const Hide = styled(Box)`
+const Hide = styled(Box)<{ xs?: boolean; sm?: boolean; md?: boolean; lg?: boolean }>`
   ${xs}
   ${sm}
   ${md}
@@ -43,18 +42,5 @@ const Hide = styled(Box)`
   ${top}
   ${flex}
 `;
-
-Hide.propTypes = {
-  xs: PropTypes.bool,
-  sm: PropTypes.bool,
-  md: PropTypes.bool,
-  lg: PropTypes.bool,
-  ...bottom.propTypes,
-  ...height.propTypes,
-  ...left.propTypes,
-  ...position.propTypes,
-  ...right.propTypes,
-  ...top.propTypes,
-};
 
 export default Hide;
