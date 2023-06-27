@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { themeGet } from '@styled-system/theme-get';
+import styled from 'styled-components';
+
 import { Box } from '../Grid';
-import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 
 import AccountSwitcher from './AccountSwitcher';

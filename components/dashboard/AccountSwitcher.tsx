@@ -1,8 +1,7 @@
 import React from 'react';
-
-import { ChevronsUpDown, ChevronDown, ChevronUp } from 'lucide-react';
 import { css } from '@styled-system/css';
 import { flatten, groupBy, uniqBy } from 'lodash';
+import { ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -17,7 +16,7 @@ import Link from '../Link';
 import { Dropdown, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
 import StyledRoundButton from '../StyledRoundButton';
-import { Span, P } from '../Text';
+import { P, Span } from '../Text';
 
 const StyledMenuEntry = styled(Link)`
   display: flex;
