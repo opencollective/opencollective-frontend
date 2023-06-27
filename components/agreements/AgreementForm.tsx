@@ -27,6 +27,23 @@ import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from './fragments';
 
 const FIELD_LABEL_PROPS = { fontSize: 16, fontWeight: 700 };
 
+const AGREEMENT_MUTATION_FIELDS_FRAGMENT = gql`
+  fragment AgreementMutationFields on Agreement {
+    id
+    ...AgreementViewFields
+    account {
+      id
+      ... on AccountWithHost {
+        # Refetch account agreements count to update the cache
+        hostAgreements {
+          totalCount
+        }
+      }
+    }
+  }
+  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
+`;
+
 const ADD_AGREEMENT_MUTATION = gql`
   mutation AddAgreement(
     $host: AccountReferenceInput!
@@ -45,10 +62,10 @@ const ADD_AGREEMENT_MUTATION = gql`
       notes: $notes
     ) {
       id
-      ...AgreementViewFields
+      ...AgreementMutationFields
     }
   }
-  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
+  ${AGREEMENT_MUTATION_FIELDS_FRAGMENT}
 `;
 
 const EDIT_AGREEMENT_MUTATION = gql`
@@ -61,10 +78,10 @@ const EDIT_AGREEMENT_MUTATION = gql`
   ) {
     editAgreement(agreement: $agreement, title: $title, expiresAt: $expiresAt, notes: $notes, attachment: $attachment) {
       id
-      ...AgreementViewFields
+      ...AgreementMutationFields
     }
   }
-  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
+  ${AGREEMENT_MUTATION_FIELDS_FRAGMENT}
 `;
 
 const ActionButtons = ({ formik, onCancel }) => (

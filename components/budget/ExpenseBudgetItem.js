@@ -13,7 +13,7 @@ import { getFilesFromExpense } from '../../lib/expenses';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
-import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
@@ -360,6 +360,25 @@ const ExpenseBudgetItem = ({
                   )}
                 </Box>
               )}
+              {Boolean(expense?.account?.hostAgreements?.totalCount) && (
+                <Box mr={[3, 4]}>
+                  <DetailColumnHeader>
+                    <FormattedMessage defaultMessage="Host Agreements" />
+                  </DetailColumnHeader>
+                  <P fontSize="11px" mt="6px">
+                    <StyledLink
+                      as={Link}
+                      color="black.700"
+                      href={`${getDashboardRoute(host, 'host-agreements')}?account=${expense.account.slug}`}
+                    >
+                      <FormattedMessage
+                        defaultMessage="{count, plural, one {# agreement} other {# agreements}}"
+                        values={{ count: expense.account.hostAgreements.totalCount }}
+                      />
+                    </StyledLink>
+                  </P>
+                </Box>
+              )}
             </Flex>
           ) : (
             <Tags
@@ -449,6 +468,9 @@ ExpenseBudgetItem.propTypes = {
       id: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       currency: PropTypes.string,
+      hostAgreements: PropTypes.shape({
+        totalCount: PropTypes.number,
+      }),
       stats: PropTypes.shape({
         // Collective / Balance can be v1 or v2 there ...
         balanceWithBlockedFunds: PropTypes.oneOfType([
