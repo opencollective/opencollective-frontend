@@ -85,6 +85,7 @@ const MainNavItem = styled(StyledLink)`
   transition-property: color, background-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+  white-space: nowrap;
   @media (hover: hover) {
     :hover {
       color: #0f172a;
@@ -139,10 +140,10 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
         py={showSearch ? 2 : 3}
         alignItems="center"
         flexDirection="row"
-        justifyContent="space-around"
         css={{ height: theme.sizes.navbarHeight, background: 'white', borderBottom: '1px solid rgb(232, 233, 235)' }}
+        justifyContent="space-between"
         ref={ref}
-        gridGap={[3, 4]}
+        gridGap={3}
       >
         <Link href={useDashboard ? (onHomeRoute ? '/home' : '/dashboard') : '/'}>
           <Flex alignItems="center">
@@ -315,34 +316,41 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
             </Flex>
           )}
         </Hide>
-
-        {showProfileAndChangelogMenu && (
-          <Flex alignItems="center" gridGap={3} justifyContent="end" flex={1}>
-            {useDashboard && !onHomeRoute && <SearchTrigger setShowSearchModal={setShowSearchModal} />}
-            <Hide xs>
-              {onHomeRoute && useDashboard ? (
-                <Link href="/dashboard">
-                  <MainNavItem primary as={Container} isActive={isRouteActive('/dashboard')}>
-                    <FormattedMessage id="GoToDashboard" defaultMessage="Go to Dashboard" />
-                  </MainNavItem>
-                </Link>
-              ) : (
-                <ChangelogTrigger />
-              )}
-            </Hide>
-            {useDashboard ? <ProfileMenu /> : <TopBarProfileMenu />}
-          </Flex>
-        )}
-        <Hide md lg>
-          <Box px={2} mr="-8px" onClick={toggleMobileMenu}>
-            <Flex as="a">
-              <MenuIcon color="#aaaaaa" size={24} />
-            </Flex>
-          </Box>
-          {showMobileMenu && (
-            <TopBarMobileMenu closeMenu={toggleMobileMenu} useDashboard={useDashboard} onHomeRoute={onHomeRoute} />
+        <Flex
+          alignItems="center"
+          gridGap={3}
+          justifyContent="end"
+          flexShrink={0}
+          flex={useDashboard && !onHomeRoute ? 1 : 0}
+        >
+          {showProfileAndChangelogMenu && (
+            <Fragment>
+              {useDashboard && !onHomeRoute && <SearchTrigger setShowSearchModal={setShowSearchModal} />}
+              <Hide xs>
+                {onHomeRoute && useDashboard ? (
+                  <Link href="/dashboard">
+                    <MainNavItem primary as={Container} isActive={isRouteActive('/dashboard')}>
+                      <FormattedMessage id="GoToDashboard" defaultMessage="Go to Dashboard" />
+                    </MainNavItem>
+                  </Link>
+                ) : (
+                  <ChangelogTrigger />
+                )}
+              </Hide>
+              {useDashboard ? <ProfileMenu /> : <TopBarProfileMenu />}
+            </Fragment>
           )}
-        </Hide>
+          <Hide md lg>
+            <Box px={2} mr="-8px" onClick={toggleMobileMenu}>
+              <Flex as="a">
+                <MenuIcon color="#aaaaaa" size={24} />
+              </Flex>
+            </Box>
+            {showMobileMenu && (
+              <TopBarMobileMenu closeMenu={toggleMobileMenu} useDashboard={useDashboard} onHomeRoute={onHomeRoute} />
+            )}
+          </Hide>
+        </Flex>
       </Flex>
       {showSearchModal && (
         <SearchModal onClose={() => setShowSearchModal(false)} showLinkToDiscover={onHomeRoute || !useDashboard} />

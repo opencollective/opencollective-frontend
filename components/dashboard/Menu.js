@@ -108,17 +108,19 @@ const Menu = ({ isAccountantOnly }) => {
 
       {/** User/org/collective/event/project dashbord */}
       <MenuGroup>
-        <MenuSectionHeader>
-          {isType(account, ORGANIZATION) ? (
-            <FormattedMessage id="OrganizationDashboard" defaultMessage="Organization Dashboard" />
-          ) : isType(account, USER) ? (
-            <FormattedMessage id="UserDashboard" defaultMessage="User Dashboard" />
-          ) : isType(account, COLLECTIVE) ? (
-            <FormattedMessage id="CollectiveDashboard" defaultMessage="Collective Dashboard" />
-          ) : (
-            <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-          )}
-        </MenuSectionHeader>
+        {isHost && (
+          <MenuSectionHeader>
+            {isType(account, ORGANIZATION) ? (
+              <FormattedMessage id="OrganizationDashboard" defaultMessage="Organization Dashboard" />
+            ) : isType(account, USER) ? (
+              <FormattedMessage id="UserDashboard" defaultMessage="User Dashboard" />
+            ) : isType(account, COLLECTIVE) ? (
+              <FormattedMessage id="CollectiveDashboard" defaultMessage="Collective Dashboard" />
+            ) : (
+              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+            )}
+          </MenuSectionHeader>
+        )}
         <MenuLink section={COLLECTIVE_SECTIONS.HOME} icon={<Home size={16} />} if={isIndividual} />
         <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} icon={<Receipt size={16} />} />
         <MenuLink section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} icon={<Coins size={16} />} />
@@ -236,9 +238,7 @@ const Menu = ({ isAccountantOnly }) => {
         >
           <FormattedMessage id="Settings" defaultMessage="Settings" />
         </MenuLink>
-
         {/* org settings for hosts */}
-
         <MenuLink
           icon={<Settings size={16} />}
           if={isType(account, ORGANIZATION) && isHost}

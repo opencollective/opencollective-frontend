@@ -1,4 +1,5 @@
 import React from 'react';
+import { themeGet } from '@styled-system/theme-get';
 import { Search } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -11,9 +12,15 @@ const SearchButton = styled(StyledButton)`
   color: #6b7280;
   font-weight: 400;
   height: 40px;
-  padding: 0 10px;
-  max-width: 200px;
+  padding: 0 12px;
+  max-width: 360px;
+  min-width: 120px;
   flex: 1;
+
+  @media screen and (max-width: ${themeGet('breakpoints.1')}) {
+    width: 40px;
+    flex: 0;
+  }
 
   .slash {
     border: 1px solid #d1d5db;
@@ -46,7 +53,7 @@ const SearchTrigger = ({ setShowSearchModal }) => {
   return (
     <SearchButton onClick={() => setShowSearchModal(true)}>
       <Flex alignItems="center" gridGap="6px">
-        <Search size={14} />
+        <Search size={16} />
         <Hide xs sm>
           <FormattedMessage
             defaultMessage="Type {slash} to search"

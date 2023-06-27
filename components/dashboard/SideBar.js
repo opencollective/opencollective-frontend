@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-
+import { themeGet } from '@styled-system/theme-get';
 import { Box } from '../Grid';
+import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 
 import AccountSwitcher from './AccountSwitcher';
@@ -11,13 +12,17 @@ import { MenuContainer } from './MenuComponents';
 
 const SidebarContainer = styled(Box)`
   border-right: 1px solid #e6e8eb;
-  flex: 0 2 300px;
+  @media screen and (max-width: ${themeGet('breakpoints.1')}) {
+    border-right: 0;
+    border-bottom: 1px solid #e6e8eb;
+  }
 `;
 
 const Sticky = styled.div`
-  padding: 24px 16px;
+  padding: 16px;
   position: sticky;
   top: 0;
+  z-index: 10;
 `;
 
 const AdminPanelSideBar = ({
@@ -30,26 +35,24 @@ const AdminPanelSideBar = ({
   ...props
 }) => {
   return (
-    <SidebarContainer {...props}>
+    <SidebarContainer {...props} flexGrow={0} flexShrink={0} width={['100%', '100%', '280px']}>
       <Sticky>
         <MenuContainer>
           <AccountSwitcher activeSlug={activeSlug} isLoading={isLoading} />
-          {isLoading ? (
-            <Box py={3}>
-              {[...Array(5).keys()].map(i => (
-                <li key={i}>
-                  <LoadingPlaceholder
-                    height={i === 0 ? 12 : 24}
-                    mb={12}
-                    borderRadius={8}
-                    maxWidth={i === 0 ? '50%' : '70%'}
-                  />
-                </li>
-              ))}
-            </Box>
-          ) : (
-            <Menu {...{ collective, selectedSection, onRoute, isAccountantOnly }} />
-          )}
+
+          <Box py={2}>
+            {isLoading ? (
+              <Box>
+                {[...Array(5).keys()].map(i => (
+                  <li key={i}>
+                    <LoadingPlaceholder height={24} mb={12} borderRadius={8} maxWidth={'70%'} />
+                  </li>
+                ))}
+              </Box>
+            ) : (
+              <Menu {...{ collective, selectedSection, onRoute, isAccountantOnly }} />
+            )}
+          </Box>
         </MenuContainer>
       </Sticky>
     </SidebarContainer>

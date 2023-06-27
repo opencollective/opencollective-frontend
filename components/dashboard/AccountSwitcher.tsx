@@ -1,7 +1,6 @@
 import React from 'react';
-import { ChevronDown } from '@styled-icons/heroicons-outline/ChevronDown';
-import { ChevronUp } from '@styled-icons/heroicons-outline/ChevronUp';
-import { ChevronUpDown } from '@styled-icons/heroicons-outline/ChevronUpDown';
+
+import { ChevronsUpDown, ChevronDown, ChevronUp } from 'lucide-react';
 import { css } from '@styled-system/css';
 import { flatten, groupBy, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -18,7 +17,7 @@ import Link from '../Link';
 import { Dropdown, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
 import StyledRoundButton from '../StyledRoundButton';
-import { Span } from '../Text';
+import { Span, P } from '../Text';
 
 const StyledMenuEntry = styled(Link)`
   display: flex;
@@ -41,11 +40,11 @@ const StyledMenuEntry = styled(Link)`
   ${props =>
     props.$isActive
       ? css({
-          backgroundColor: 'primary.100',
+          backgroundColor: '#f3f4f6',
         })
       : css({
           ':hover': {
-            backgroundColor: 'black.50',
+            backgroundColor: '#f3f4f6',
           },
         })}
 `;
@@ -55,13 +54,14 @@ const DropdownButton = styled.button`
   background: white;
   border: 1px solid #e6e8eb;
   width: 100%;
-  border-radius: 6px;
+  border-radius: 8px;
+  flex-shrink: 0;
   padding: 8px;
   align-items: center;
   justify-content: space-between;
   transition: all 50ms ease-out;
   cursor: pointer;
-
+  overflow: hidden;
   &:hover,
   :active,
   :focus {
@@ -72,20 +72,19 @@ const DropdownButton = styled.button`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: flex;
-    grid-gap: 12px;
-    align-items: center;
   }
 
   svg {
     flex-shrink: 0;
+    color: #4b5563;
   }
 `;
 
 const StyledDropdownContent = styled(DropdownContent)`
-  border-radius: 8px;
+  border-radius: 12px;
   right: 0;
   left: 0;
+  max-width: 100%;
   margin-top: 8px;
   max-height: 70vh;
   overflow-y: scroll;
@@ -178,14 +177,18 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
     <Dropdown trigger="click">
       {({ triggerProps, dropdownProps }) => (
         <React.Fragment>
-          <Flex alignItems="center">
+          <Flex alignItems="center" flex={0}>
             <DropdownButton {...triggerProps}>
-              <div>
+              <Flex alignItems="center" gridGap="12px">
                 <Avatar collective={activeAccount} size={32} />
-                <Span truncateOverflow>{activeAccount?.name}</Span>
-              </div>
+                <div>
+                  <P color="#0f172a" lineHeight="20px" letterSpacing="0" fontWeight="500" truncateOverflow>
+                    {activeAccount?.name}
+                  </P>
+                </div>
+              </Flex>
 
-              <ChevronUpDown size={20} />
+              <ChevronsUpDown size={18} />
             </DropdownButton>
           </Flex>
           <Container maxWidth={'100%'} {...dropdownProps}>

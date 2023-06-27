@@ -54,6 +54,7 @@ class LoginBtn extends React.Component {
           color: 'primary.700',
           display: 'inline-block',
           fontSize: '1.4rem',
+          whiteSpace: 'nowrap',
           px: 3,
           py: 2,
         };

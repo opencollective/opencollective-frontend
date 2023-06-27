@@ -14,7 +14,6 @@ import { DashboardContext } from '../components/dashboard/DashboardContext';
 import AdminPanelSection from '../components/dashboard/DashboardSection';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
-import AdminPanelTopBar from '../components/dashboard/TopBar';
 import { Box, Flex } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
@@ -130,15 +129,6 @@ const DashboardPage = () => {
   return (
     <DashboardContext.Provider value={{ selectedSection, expandedSection, setExpandedSection, account }}>
       <Page noRobots collective={account} title={account ? `${account.name} - ${titleBase}` : titleBase}>
-        {!blocker && (
-          <AdminPanelTopBar
-            isLoading={isLoading}
-            collective={data?.account}
-            collectiveSlug={activeSlug}
-            selectedSection={selectedSection}
-            display={['flex', null, 'none']}
-          />
-        )}
         {Boolean(notification) && <NotificationBar {...notification} />}
         {blocker ? (
           <Flex flexDirection="column" alignItems="center" my={6}>
@@ -160,7 +150,6 @@ const DashboardPage = () => {
               collective={account}
               activeSlug={activeSlug}
               selectedSection={selectedSection}
-              display={['none', 'none', 'block']}
               isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
             />
             {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (

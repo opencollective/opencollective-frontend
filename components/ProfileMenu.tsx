@@ -27,13 +27,13 @@ const StyledProfileButton = styled(StyledButton)`
 
 const StyledDropdownContent = styled(DropdownContent)`
   top: 52px;
-  border-radius: 8px;
+  border-radius: 12px;
   right: 0;
-  width: 240px;
+  width: 260px;
 
-  padding: 4px 0;
+  padding: 8px 0;
   hr {
-    margin: 4px 0;
+    margin: 8px 0;
     border-color: #f3f4f6;
   }
   @media screen and (max-width: ${themeGet('breakpoints.0')}) {
@@ -54,7 +54,6 @@ const StyledDropdownContainer = styled.div`
 `;
 const ProfileHeader = styled.div`
   padding: 4px 16px;
-  margin-top: 4px;
   .name {
     font-size: 14px;
     color: #0f172a;
@@ -78,9 +77,9 @@ const StyledMenuEntry = styled(Link)`
   background-color: transparent;
   color: #334155;
   padding: 8px 12px;
-  margin: 0 4px;
+  margin: 0 8px;
   font-size: 14px;
-  border-radius: 4px;
+  border-radius: 6px;
   white-space: nowrap;
   vertical-align: middle;
   display: flex;
@@ -96,13 +95,21 @@ const StyledMenuEntry = styled(Link)`
       color: #334155;
     }
   }
+
   svg {
     color: #94a3b8;
+    height: 14px;
+    width: 14px;
   }
 
   @media screen and (max-width: ${themeGet('breakpoints.0')}) {
     font-size: 16px;
     padding: 12px;
+
+    svg {
+      height: 16px;
+      width: 16px;
+    }
   }
 
   ${props =>
@@ -178,7 +185,7 @@ const ProfileMenuDropdown = () => {
                 )}
                 <hr />
                 <StyledMenuEntry href="/create">
-                  <FormattedMessage defaultMessage="New Collective" /> <Plus size={14} />
+                  <FormattedMessage defaultMessage="New Collective" /> <Plus />
                 </StyledMenuEntry>
                 <StyledMenuEntry href="/organizations/new">
                   <FormattedMessage defaultMessage="New Organization" /> <Plus size={14} />
