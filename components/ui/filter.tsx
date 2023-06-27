@@ -15,6 +15,7 @@ function formatString(str) {
 }
 
 export function FilterCombo({ filterOptions, filter, onChange }) {
+  const active = false;
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState('');
   // const [pages, setPages] = React.useState([]);
@@ -37,9 +38,14 @@ export function FilterCombo({ filterOptions, filter, onChange }) {
       }}
     >
       {filter ? (
-        <div className="animate-in bg-white duration-500 fade-in text-sm rounded-md overflow-hidden flex items-stretch text-gray-900 font-medium ring-1 ring-gray-300 hover:shadow transition-all shadow-sm">
+        <div
+          className={cn(
+            'animate-in whitespace-nowrap  duration-500 fade-in text-sm rounded-md overflow-hidden flex items-stretch  font-medium  hover:shadow transition-all shadow-sm',
+            active ? 'ring-blue-400 bg-white ring-1 text-blue-900' : 'ring-gray-300 bg-white  ring-1 text-gray-900',
+          )}
+        >
           <PopoverTrigger asChild>
-            <button className="hover:bg-gray-50 pl-2.5 py-1.5 pr-1">
+            <button className={cn(' pl-2.5 py-1.5 pr-1', active ? 'hover:bg-blue-100' : 'hover:bg-gray-50')}>
               <span className="text-gray-500 font-normal">
                 {filter.label} {filter.key === 'searchTerm' && <>&quot;</>}
                 <span className="text-gray-900 font-medium">
@@ -52,7 +58,12 @@ export function FilterCombo({ filterOptions, filter, onChange }) {
 
           <button
             onClick={() => onChange({ [filter.key]: type.noFilter ?? null })}
-            className="hover:bg-gray-50 text-gray-500 hover:text-gray-900 pr-1.5 pl-1 min-h-full flex items-center"
+            className={cn(
+              'hover:bg-gray-50 shrink-0  pr-1.5 pl-1 min-h-full flex items-center',
+              active
+                ? 'hover:bg-blue-100 text-blue-500 hover:text-blue-900'
+                : 'hover:bg-gray-50 text-gray-500 hover:text-gray-900',
+            )}
           >
             <X size={14} />
           </button>
@@ -86,15 +97,13 @@ export function FilterCombo({ filterOptions, filter, onChange }) {
         >
           <CommandInput
             className="focus:outline-none"
-            placeholder={
-              !type ? 'Search filters...' : type.key === 'searchTerm' ? 'Text search' : `Search ${type.label}...`
-            }
+            placeholder={!type ? 'Search...' : type.key === 'searchTerm' ? 'Search term' : `Filter on ${type.label}...`}
             value={search}
             onValueChange={setSearch}
             ref={inputRef}
           />
           {/* <CommandEmpty>No framework found.</CommandEmpty> */}
-          <CommandList>
+          <CommandList className="p-1">
             {!type && (
               <>
                 {filterOptions?.map(type => (
@@ -140,7 +149,7 @@ export function FilterCombo({ filterOptions, filter, onChange }) {
                   setType(null);
                 }}
               >
-                Search for &quot;{search}&quot;
+                Search for &quot;<span className="font-bold">{search}</span>&quot;
               </CommandItem>
             )}
           </CommandList>

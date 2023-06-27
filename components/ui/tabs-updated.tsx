@@ -19,8 +19,9 @@ const abbreviateNumber = number => {
 };
 
 export default function Tabs({ tabs, selected, onChange }) {
+  const selectedTab = tabs.find(tab => tab.label === selected);
   return (
-    <div className="flex-1">
+    <div className="">
       <div className="sm:hidden">
         <label htmlFor="tabs" className="sr-only">
           Select a tab
@@ -30,16 +31,23 @@ export default function Tabs({ tabs, selected, onChange }) {
           id="tabs"
           name="tabs"
           className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-          defaultValue={tabs.find(tab => tab.key === selected)?.label}
+          value={selectedTab?.label ?? null}
+          onChange={e => onChange(e.target.value)}
         >
+          <option disabled selected={!selectedTab} value={null}>
+            Select view
+          </option>
+
           {tabs.map(tab => (
-            <option key={tab.label}>{tab.label}</option>
+            <option key={tab.label} value={tab.label}>
+              {tab.label} {tab.count ? <>({tab.count})</> : null}
+            </option>
           ))}
         </select>
       </div>
       <div className="hidden sm:block">
-        <div className="border-b border-gray-200 -mb-px">
-          <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-6" aria-label="Tabs">
             {tabs.map(tab => (
               <button
                 key={tab.key}

@@ -22,7 +22,7 @@ const AdminPanelSideBar = ({ collective, isAccountantOnly, isLoading, selectedSe
   return (
     <div
       className={cx(
-        'w-full max-w-[280px] shrink-0 border-r border-slate-200/75 ',
+        'sm:block hidden  w-full max-w-[280px] shrink-0 border-r border-slate-200/75 ',
         settings.sidebarGrayBg ? 'bg-slate-50/75 ' : settings.mainGrayBg ? 'bg-white' : '',
         settings.shadowsSidebar ? 'shadow-inner' : '',
       )}

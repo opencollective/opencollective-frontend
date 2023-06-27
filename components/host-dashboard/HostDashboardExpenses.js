@@ -269,6 +269,10 @@ const hasParams = query => {
 
 const filterOptions = [
   {
+    key: 'searchTerm',
+    label: 'Search term',
+  },
+  {
     key: 'type',
     label: 'Type',
     options: ['CHARGE', 'GRANT', 'INVOICE', 'REIMBURSEMENT', 'SETTLEMENT', 'UNCLASSIFIED'],
@@ -302,10 +306,6 @@ const filterOptions = [
     key: 'amount',
     label: 'Amount',
     options: ['0-50', '50-500', '500-5000', '5000+'],
-  },
-  {
-    key: 'searchTerm',
-    label: 'Text search',
   },
 ];
 

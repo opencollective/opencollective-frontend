@@ -152,7 +152,7 @@ const DashboardPage = ({ settings }) => {
             settings={settings}
           />
 
-          <main className="flex-1 page flex justify-start">
+          <main className="flex-1 page flex justify-start overflow-x-auto">
             {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
             ) : (

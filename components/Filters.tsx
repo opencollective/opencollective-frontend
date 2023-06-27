@@ -17,6 +17,7 @@ import { DropdownMenu, DropdownMenuItem, DropdownMenuItems, DropdownMenuTrigger 
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { Listbox, Transition } from '@headlessui/react';
 import SelectFilter from './SelectFilter';
+import { cx } from 'class-variance-authority';
 
 const getFiltersFromQuery = filter => {
   const filterObjs = {
@@ -66,7 +67,7 @@ const getFiltersFromQuery = filter => {
         return {
           key,
           value: filterObjs[key],
-          label: 'Text search is',
+          label: 'Search term is',
         };
       }
       if (key === 'hasMissingReceipts') {
@@ -159,9 +160,9 @@ export default function Filters({
   ];
   const currentViewOption = viewOptions.find(v => v.value === (settings.tables ? 'table' : 'cards'));
   return (
-    <div>
+    <div className="">
       <DashboardHeader title={title} primaryAction={currentView?.actions?.[0]} secondaryActions={null} />
-      <div className="border-b mt-2 border-gray-200 bg-white sticky top-0">
+      <div className="pt-2  bg-white w-full overflow-x-auto whitespace-nowrap ">
         {views?.length > 0 ? (
           <Tabs
             tabs={views}
@@ -176,13 +177,14 @@ export default function Filters({
         )}
       </div>
 
-      <div className="flex items-center justify-between  py-4 group">
-        <div className="flex items-center gap-2">
+      <div className="flex items-end justify-between gap-2 py-4 group">
+        <div className="hidden sm:flex items-center flex-wrap gap-2">
           {filterArray.map(filter => (
             <FilterCombo
               key={`${filter.key}-${filter.value}`}
               filter={filter}
               filterOptions={filterOptions}
+              active={!currentView}
               onChange={newQueryParams => {
                 const newQuery = omitBy(
                   { ...query, ...newQueryParams },
@@ -198,6 +200,19 @@ export default function Filters({
             onChange={newQueryParams => onChange({ ...query, ...newQueryParams })}
           />
         </div>
+
+        <div className="sm:hidden block">
+          <button
+            className={cx(
+              'animate-in bg-white hover:bg-gray-50 duration-400 fade-in text-sm px-2.5 py-1.5 rounded-md  flex items-center flex-nowrap gap-1  font-medium ring-1  ring-gray-300 hover:shadow transition-all',
+              filterArray.length ? 'text-gray-900' : 'text-gray-500 hover:text-gray-900',
+            )}
+          >
+            <Filter size={16} className="text-gray-400" />
+            <span>{filterArray.length ? `${filterArray.length} filters` : 'Add Filter'}</span>
+          </button>
+        </div>
+
         <div className="flex items-center gap-2">
           <SelectFilter
             options={viewOptions}
