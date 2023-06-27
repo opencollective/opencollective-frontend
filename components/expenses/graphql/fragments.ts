@@ -328,6 +328,9 @@ export const expensePageExpenseFieldsFragment = gql`
 
       ... on AccountWithHost {
         isApproved
+        hostAgreements {
+          totalCount
+        }
         host {
           id
           legacyId
