@@ -14,7 +14,6 @@ import OpenCollectiveIs from '../components/home/OpenCollectiveIsSection';
 import RaiseMoney from '../components/home/RaiseMoneySection';
 import TheFutureIsCollective from '../components/home/TheFutureIsCollectiveSection';
 import Page from '../components/Page';
-
 const messages = defineMessages({
   defaultTitle: {
     defaultMessage: 'Raise and spend money with full transparency.',
@@ -29,12 +28,14 @@ const HomePage = () => {
   const { formatMessage } = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const router = useRouter();
+  const shouldRedirectToDashboard =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) && router.asPath === '/';
 
   useEffect(() => {
-    if (router.asPath === '/' && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)) {
-      router.replace(`/dashboard/${LoggedInUser.getLastDashboardSlug()}`);
+    if (shouldRedirectToDashboard) {
+      router.replace('/dashboard');
     }
-  }, [LoggedInUser, router.asPath]);
+  }, [shouldRedirectToDashboard]);
 
   return (
     <Page
