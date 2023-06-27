@@ -35,6 +35,7 @@ const SearchModal = ({ onClose, showLinkToDiscover = false }) => {
               placeholder={intl.formatMessage({ defaultMessage: 'Search for Collectives, organizations, and more...' })}
               showSearchButton
               searchButtonStyles={{ width: '32px', height: '32px' }}
+              closeSearchModal={onClose}
             />
           </Flex>
           {showLinkToDiscover && (

@@ -50,6 +50,7 @@ class SearchForm extends React.Component {
     const searchInput = event.target.elements.q;
     this.setState({ isLoading: true });
     this.props.router.push({ pathname: '/search', query: { q: searchInput.value } });
+    this.props.closeSearchModal?.();
   };
 
   render() {
@@ -150,6 +151,7 @@ SearchForm.propTypes = {
   letterSpacing: PropTypes.string,
   lineHeight: PropTypes.string,
   fontWeight: PropTypes.string,
+  closeSearchModal: PropTypes.func,
 };
 
 export default withRouter(SearchForm);
