@@ -9,6 +9,7 @@ import EXPENSE_STATUS from '../../lib/constants/expense-status';
 import { parseDateInterval } from '../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { useLazyGraphQLPaginatedResults } from '../../lib/hooks/useLazyGraphQLPaginatedResults';
+import useQueryFilter, { BooleanFilter } from '../../lib/hooks/useQueryFilter';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import DismissibleMessage from '../DismissibleMessage';
@@ -49,6 +50,8 @@ const hostDashboardExpensesQuery = gql`
     $dateTo: DateTime
     $searchTerm: String
     $orderBy: ChronologicalOrderInput
+    $chargeHasReceipts: Boolean
+    $virtualCards: [VirtualCardReferenceInput]
   ) {
     host(slug: $hostSlug) {
       id
@@ -73,6 +76,8 @@ const hostDashboardExpensesQuery = gql`
       dateTo: $dateTo
       searchTerm: $searchTerm
       orderBy: $orderBy
+      chargeHasReceipts: $chargeHasReceipts
+      virtualCards: $virtualCards
     ) {
       totalCount
       offset
@@ -162,7 +167,24 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   const hasFilters = React.useMemo(() => hasParams(query), [query]);
   const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-expenses` : `/${hostSlug}/admin/expenses`;
   const queryVariables = { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) };
-  const expenses = useQuery(hostDashboardExpensesQuery, { variables: queryVariables, context: API_V2_CONTEXT });
+
+  const queryFilter = useQueryFilter({
+    filters: {
+      chargeHasReceipts: BooleanFilter,
+      virtualCard: {
+        isMulti: true,
+      },
+    },
+  });
+
+  const expenses = useQuery(hostDashboardExpensesQuery, {
+    variables: {
+      ...queryVariables,
+      chargeHasReceipts: queryFilter.values.chargeHasReceipts,
+      virtualCards: queryFilter.values.virtualCard?.map(id => ({ id })),
+    },
+    context: API_V2_CONTEXT,
+  });
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
   React.useEffect(() => {
     if (query.paypalApprovalError && !paypalPreApprovalError) {
@@ -260,6 +282,9 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
             filters={query}
             explicitAllForStatus
             displayOnHoldPseudoStatus
+            showChargeHasReceiptFilter
+            chargeHasReceiptFilter={queryFilter.values.chargeHasReceipts}
+            onChargeHasReceiptFilterChange={queryFilter.setChargeHasReceipts}
             onChange={queryParams =>
               router.push({
                 pathname: pageRoute,

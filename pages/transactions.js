@@ -46,6 +46,7 @@ export const transactionsPageQuery = gql`
     $includeIncognitoTransactions: Boolean
     $includeGiftCardTransactions: Boolean
     $includeChildrenTransactions: Boolean
+    $virtualCard: [VirtualCardReferenceInput]
   ) {
     account(slug: $slug) {
       id
@@ -97,6 +98,7 @@ export const transactionsPageQuery = gql`
       includeGiftCardTransactions: $includeGiftCardTransactions
       includeChildrenTransactions: $includeChildrenTransactions
       includeDebts: true
+      virtualCard: $virtualCard
     ) {
       ...TransactionsQueryCollectionFragment
     }

@@ -1,16 +1,16 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
-import { omit, omitBy } from 'lodash';
+import { isNil, omit, toLower, toUpper } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import useQueryFilter, { AmountRangeFilter, BooleanFilter, DateRangeFilter } from '../../../lib/hooks/useQueryFilter';
 
 import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal';
 import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';
-import VirtualCardFilters from '../../edit-collective/sections/virtual-cards/VirtualCardFilters';
 import VirtualCard from '../../edit-collective/VirtualCard';
 import { Box, Flex, Grid } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
@@ -19,15 +19,20 @@ import Pagination from '../../Pagination';
 import StyledButton from '../../StyledButton';
 import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import VirtualCardFilters from '../../VirtualCardFilters';
 
 const hostVirtualCardsQuery = gql`
   query HostedVirtualCards(
     $slug: String
     $limit: Int!
     $offset: Int!
-    $state: String
-    $merchantAccount: AccountReferenceInput
-    $collectiveAccountIds: [AccountReferenceInput]
+    $collectiveAccountReferences: [AccountReferenceInput]
+    $status: [VirtualCardStatus]
+    $withExpensesDateFrom: DateTime
+    $withExpensesDateTo: DateTime
+    $spentAmountFrom: AmountInput
+    $spentAmountTo: AmountInput
+    $hasMissingReceipts: Boolean
   ) {
     host(slug: $slug) {
       id
@@ -40,9 +45,13 @@ const hostVirtualCardsQuery = gql`
       hostedVirtualCards(
         limit: $limit
         offset: $offset
-        state: $state
-        merchantAccount: $merchantAccount
-        collectiveAccountIds: $collectiveAccountIds
+        collectiveAccountIds: $collectiveAccountReferences
+        status: $status
+        withExpensesDateFrom: $withExpensesDateFrom
+        withExpensesDateTo: $withExpensesDateTo
+        spentAmountFrom: $spentAmountFrom
+        spentAmountTo: $spentAmountTo
+        hasMissingReceipts: $hasMissingReceipts
       ) {
         totalCount
         limit
@@ -69,24 +78,10 @@ const hostVirtualCardsQuery = gql`
           assignee {
             id
             name
+            email
             slug
             imageUrl
           }
-        }
-      }
-      hostedVirtualCardMerchants {
-        nodes {
-          id
-          type
-          slug
-          name
-          currency
-          location {
-            id
-            address
-            country
-          }
-          imageUrl(height: 64)
         }
       }
       hostedVirtualCardCollectives {
@@ -122,10 +117,28 @@ const AddCardPlaceholder = styled(Flex)`
 const VIRTUAL_CARDS_PER_PAGE = 6;
 
 const HostVirtualCards = props => {
+  const queryFilter = useQueryFilter({
+    ignoreQueryParams: ['slug', 'section'],
+    filters: {
+      collectiveSlugs: {
+        isMulti: true,
+        queryParam: 'collective',
+      },
+      virtualCardStatus: {
+        isMulti: true,
+        queryParam: 'status',
+        serialize: toLower,
+        deserialize: toUpper,
+      },
+      usagePeriod: DateRangeFilter,
+      missingReceipts: BooleanFilter,
+      totalSpent: AmountRangeFilter,
+    },
+  });
+
   const router = useRouter();
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
-  const { state, merchant, collectiveAccountIds } = routerQuery;
   const { addToast } = useToasts();
   const { loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
     context: API_V2_CONTEXT,
@@ -133,27 +146,22 @@ const HostVirtualCards = props => {
       slug: props.hostSlug,
       limit: VIRTUAL_CARDS_PER_PAGE,
       offset,
-      state,
-      merchantAccount: { slug: merchant },
-      collectiveAccountIds: collectiveAccountIds
-        ? collectiveAccountIds.split(',').map(collectiveAccountId => ({ legacyId: parseInt(collectiveAccountId) }))
-        : undefined,
+      status: queryFilter.values.virtualCardStatus,
+      withExpensesDateFrom: queryFilter.values.usagePeriod?.from,
+      withExpensesDateTo: queryFilter.values.usagePeriod?.to,
+      collectiveAccountReferences: queryFilter.values.collectiveSlugs.map(slug => ({ slug })),
+      spentAmountFrom: !isNil(queryFilter.values.totalSpent?.fromAmount)
+        ? { valueInCents: queryFilter.values.totalSpent?.fromAmount }
+        : null,
+      spentAmountTo: !isNil(queryFilter.values.totalSpent?.toAmount)
+        ? { valueInCents: queryFilter.values.totalSpent?.toAmount }
+        : null,
+      hasMissingReceipts: queryFilter.values.missingReceipts,
     },
   });
 
   const [displayAssignCardModal, setAssignCardModalDisplay] = React.useState(false);
   const [displayCreateVirtualCardModal, setCreateVirtualCardModalDisplay] = React.useState(false);
-
-  const handleUpdateFilters = queryParams => {
-    return router.push(
-      {
-        pathname: `/${props.hostSlug}/admin/host-virtual-cards`,
-        query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
-      },
-      null,
-      { scroll: false },
-    );
-  };
 
   const handleAssignCardSuccess = message => {
     addToast({
@@ -199,12 +207,18 @@ const HostVirtualCards = props => {
         </P>
         <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters
-            isCollectiveFilter={true}
-            filters={routerQuery}
-            collective={data.host}
-            virtualCardMerchants={data.host.hostedVirtualCardMerchants.nodes}
-            virtualCardCollectives={data.host.hostedVirtualCardCollectives.nodes}
-            onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
+            collectivesFilter={queryFilter.values.collectiveSlugs}
+            onCollectivesFilterChange={queryFilter.setCollectiveSlugs}
+            collectivesWithVirtualCards={data?.host?.hostedVirtualCardCollectives?.nodes ?? []}
+            virtualCardStatusFilter={queryFilter.values.virtualCardStatus}
+            onVirtualCardStatusFilter={queryFilter.setVirtualCardStatus}
+            expensePeriod={queryFilter.values.usagePeriod}
+            onExpensePeriodChange={queryFilter.setUsagePeriod}
+            missingReceipts={queryFilter.values.missingReceipts}
+            onMissingReceiptsChange={queryFilter.setMissingReceipts}
+            currency={data?.host?.currency}
+            totalSpent={queryFilter.values.totalSpent}
+            onTotalSpentChange={queryFilter.setTotalSpent}
           />
         </Flex>
       </Box>

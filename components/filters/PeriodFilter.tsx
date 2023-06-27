@@ -4,7 +4,6 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { has } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { isValidDate, parseDateInterval, stripTime } from '../../lib/date-utils';
 import dayjs from '../../lib/dayjs';
@@ -19,6 +18,8 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledTooltip from '../StyledTooltip';
 import { Span } from '../Text';
+
+import FilterButtonContainer from './FilterButtonContainer';
 
 const DEFAULT_INTERVAL = { from: '', to: '', timezoneType: 'local' };
 
@@ -80,36 +81,6 @@ const getTimeZoneTypeName = (intl, timezone) => {
     return '';
   }
 };
-
-const TriggerContainer = styled(StyledButton)`
-  min-height: 38px;
-  outline: 0;
-  background: #f7f8fa;
-  padding: 0 16px;
-  width: 100%;
-  text-align: left;
-  font-size: 12px;
-  font-weight: 500;
-  color: hsl(0, 0%, 20%);
-
-  svg {
-    transition: color 0.2s;
-  }
-
-  &:hover {
-    border-color: #c4c7cc;
-    svg {
-      color: #999999;
-    }
-  }
-
-  &:active,
-  &:focus {
-    background: white;
-    color: hsl(0, 0%, 20%);
-    box-shadow: 0 0 0 2px black;
-  }
-`;
 
 type PeriodFilterFormProps = {
   onChange: (interval: { from: string; to: string; timezoneType: string }) => void;
@@ -276,7 +247,7 @@ export const PeriodFilterForm = ({
   );
 };
 
-const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
+const PeriodFilter = ({ onChange, value, inputId, minDate = null, ...props }) => {
   const intervalFromValue = React.useMemo(() => getIntervalFromValue(value), [value]);
   const [tmpDateInterval, setTmpDateInterval] = React.useState(intervalFromValue);
 
@@ -285,7 +256,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
       placement="bottom-start"
       onClose={() => setTmpDateInterval(intervalFromValue)}
       Button={({ onClick }) => (
-        <TriggerContainer onClick={onClick} id={inputId} data-cy="period-filter" {...props}>
+        <FilterButtonContainer onClick={onClick} id={inputId} data-cy="period-filter" {...props}>
           <Flex justifyContent="space-between" alignItems="center">
             <DateRange
               from={parseDateForDateRange(intervalFromValue.from, false)}
@@ -294,7 +265,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
             />
             <ChevronDown size={25} color="#cccccc" />
           </Flex>
-        </TriggerContainer>
+        </FilterButtonContainer>
       )}
     >
       {({ setOpen }) => (
