@@ -429,7 +429,6 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, t
           //justifyContent="end"
           flexShrink={4}
           flexGrow={0}
-          overflow={'hidden'}
           //flex={useDashboard && !onHomeRoute ? 1 : 0}
         >
           {showProfileAndChangelogMenu && (
