@@ -99,7 +99,7 @@ export const AgreementWithActions = ({ agreement, onEdit, onDelete }) => {
                 </Action>
               </Flex>
             </PopupMenu>
-            <StyledButton buttonStyle="secondary" onClick={onEdit}>
+            <StyledButton buttonStyle="secondary" onClick={onEdit} data-cy="btn-edit-agreement">
               <FormattedMessage defaultMessage="Edit Agreement" />
             </StyledButton>
           </Flex>,

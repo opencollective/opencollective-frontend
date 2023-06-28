@@ -49,12 +49,14 @@ export default function Drawer({
   children,
   maxWidth = '768px',
   showActionsContainer,
+  'data-cy': dataCy,
 }: {
   open: boolean;
   onClose: () => void;
   children: React.ReactNode;
   maxWidth?: string;
   showActionsContainer?: boolean;
+  'data-cy'?: string;
 }) {
   const [drawerActionsContainer, setDrawerActionsContainer] = useState(null);
   const twoFactorPrompt = useTwoFactorAuthenticationPrompt();
@@ -62,7 +64,7 @@ export default function Drawer({
   return (
     <DrawerActionsContext.Provider value={drawerActionsContainer}>
       <MUIDrawer anchor="right" open={open} onClose={onClose} disableEnforceFocus={disableEnforceFocus}>
-        <StyledDrawerContainer maxWidth={maxWidth}>
+        <StyledDrawerContainer maxWidth={maxWidth} data-cy={dataCy}>
           <Flex flex={1} flexDirection="column" overflowY="scroll">
             <Container position="relative" py={'24px'}>
               <CloseDrawerButton type="button" isBorderless onClick={onClose}>

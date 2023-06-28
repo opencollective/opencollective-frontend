@@ -178,7 +178,7 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: 
       >
         {formik => {
           return (
-            <Form>
+            <Form data-cy="agreement-form">
               <StyledInputFormikField
                 name="account"
                 label={intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' })}

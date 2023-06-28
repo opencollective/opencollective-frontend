@@ -43,6 +43,12 @@ const selectedAccountInfoQuery = gql`
       name
       slug
       imageUrl
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+        }
+      }
     }
   }
 `;
@@ -82,7 +88,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
     variables: { account: queryVariables.account?.slug },
     context: API_V2_CONTEXT,
     onCompleted: data => {
-      if (selectedAccount === undefined) {
+      if (selectedAccount === undefined && data?.account?.host?.slug === hostSlug) {
         setSelectedAccount(data?.account);
       }
     },
@@ -97,6 +103,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
         <Flex alignItems="center" gridGap="16px" flexWrap="wrap">
           <CollectivePickerAsync
             inputId="agreements-account"
+            data-cy="select-agreements-account"
             width="300px"
             styles={{ control: { borderRadius: '100px', padding: '3px 16px' } }}
             placeholder={intl.formatMessage({ defaultMessage: 'Filter by account' })}
@@ -113,6 +120,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
             }}
           />
           <StyledButton
+            data-cy="btn-new-agreement"
             buttonStyle="primary"
             buttonSize="tiny"
             height="40px"

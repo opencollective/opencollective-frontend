@@ -24,6 +24,7 @@ export function DataTable<TData, TValue>({
   emptyMessage,
   hideHeader,
   nbPlaceholders = 10,
+  ...tableProps
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -33,7 +34,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <Table>
+    <Table {...tableProps}>
       {!hideHeader && (
         <TableHeader>
           {table.getHeaderGroups().map(headerGroup => (

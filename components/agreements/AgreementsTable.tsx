@@ -177,6 +177,7 @@ export default function AgreementsTable({
   const columns = isTableView ? tableColumns : cardColumns;
   return (
     <DataTable
+      data-cy="agreements-table"
       hideHeader={!isTableView}
       columns={columns}
       data={agreements?.nodes || []}
