@@ -22,6 +22,13 @@ export const scheduledExpensesQuery = gql`
     host(slug: $hostSlug) {
       id
       currency
+      transferwise {
+        id
+        amountBatched {
+          valueInCents
+          currency
+        }
+      }
     }
     expenses(
       host: { slug: $hostSlug }
@@ -34,12 +41,6 @@ export const scheduledExpensesQuery = gql`
       limit
       nodes {
         id
-        quote {
-          sourceAmount {
-            valueInCents
-            currency
-          }
-        }
       }
     }
   }
@@ -104,16 +105,13 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
       });
     }
   };
-  const totalAmount = scheduledExpenses.data.expenses.nodes
-    .filter(expense => !!expense.quote)
-    .reduce((total, expense) => {
-      return total + expense.quote.sourceAmount.valueInCents;
-    }, 0);
+
+  const amountBatched = scheduledExpenses.data.host.transferwise.amountBatched;
 
   return (
     <React.Fragment>
       <MessageBox type="success" mb={4}>
-        <Flex alignItems="baseline" justifyContent="space-between">
+        <Flex alignItems="baseline" flexDirection={['column', 'row']} gap="8px">
           <Box>
             <TransferwiseIcon size="1em" color="#25B869" mr={2} />
             <FormattedMessage
@@ -121,7 +119,7 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
               defaultMessage="You have {count, plural, one {# expense} other {# expenses}} scheduled for payment that will require {amount} in balance."
               values={{
                 count: scheduledExpenses.data.expenses.totalCount,
-                amount: formatCurrency(totalAmount, scheduledExpenses.data.host.currency),
+                amount: formatCurrency(amountBatched.valueInCents, amountBatched.currency),
               }}
             />
           </Box>

@@ -10,6 +10,7 @@ import { border, color, space, typography } from 'styled-system';
 
 import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { formatCurrency } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
@@ -43,6 +44,20 @@ const quoteExpenseQuery = gql`
       amountInHostCurrency: amountV2(currencySource: HOST) {
         exchangeRate {
           value
+        }
+      }
+      host {
+        id
+        transferwise {
+          id
+          amountBatched {
+            valueInCents
+            currency
+          }
+          balances {
+            valueInCents
+            currency
+          }
         }
       }
       quote {
@@ -231,8 +246,18 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
     feesPayer: formik.values.feesPayer,
   });
 
+  const amountBatched = quoteQuery.data?.expense.host?.transferwise.amountBatched;
+  const amountInBalance = quoteQuery.data?.expense.host?.transferwise.balances.find(
+    balance => balance.currency === amountBatched?.currency,
+  );
+  const hasFunds =
+    canQuote &&
+    amountInBalance &&
+    amountBatched &&
+    amountInBalance.valueInCents >= amountBatched.valueInCents + amounts.totalAmount?.valueInCents;
+
   return (
-    <StyledModal onClose={onClose} width="100%" minWidth={280} maxWidth={334} data-cy="pay-expense-modal" trapFocus>
+    <StyledModal onClose={onClose} width="100%" minWidth={280} maxWidth={400} data-cy="pay-expense-modal" trapFocus>
       <ModalHeader>
         <H4 fontSize="20px" fontWeight="700">
           <FormattedMessage id="PayExpenseTitle" defaultMessage="Pay expense" />
@@ -470,6 +495,29 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
             </P>
           </MessageBox>
         )}
+        {canQuote && hasFunds === false && (
+          <MessageBox type="error" withIcon my={3} fontSize="12px">
+            <strong>
+              <FormattedMessage id="Warning.NotEnoughFunds" defaultMessage="Not Enough Funds" />
+            </strong>
+            <br />
+            <P mt={2} fontSize="12px" lineHeight="18px">
+              <FormattedMessage
+                id="PayExpenseModal.NotEnoughFundsOnWise"
+                defaultMessage="Your Wise {currency} account has insufficient balance to cover the existing batch plus this expense amount. You need {totalNeeded} and you currently only have {available}.
+Please add funds to your Wise {currency} account."
+                values={{
+                  currency: amountInBalance.currency,
+                  totalNeeded: formatCurrency(
+                    amountBatched.valueInCents + amounts.totalAmount.valueInCents,
+                    amountBatched.currency,
+                  ),
+                  available: formatCurrency(amountInBalance.valueInCents, amountInBalance.currency),
+                }}
+              />
+            </P>
+          </MessageBox>
+        )}
         <Flex flexWrap="wrap" justifyContent="space-evenly">
           <StyledButton
             buttonStyle="success"
@@ -478,7 +526,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
             type="submit"
             loading={formik.isSubmitting}
             data-cy="mark-as-paid-button"
-            disabled={quoteQuery.loading}
+            disabled={quoteQuery.loading || (canQuote && hasFunds === false)}
           >
             {hasManualPayment ? (
               <React.Fragment>

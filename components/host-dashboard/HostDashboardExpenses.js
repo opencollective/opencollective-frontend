@@ -60,6 +60,10 @@ const hostDashboardExpensesQuery = gql`
       transferwise {
         id
         availableCurrencies
+        amountBatched {
+          valueInCents
+          currency
+        }
       }
     }
     expenses(
