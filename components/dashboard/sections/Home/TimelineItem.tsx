@@ -50,7 +50,11 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
           {isLoading ? (
             <LoadingPlaceholder height={40} width={40} borderRadius="50%" />
           ) : (
-            <AvatarWithLink size={40} account={activity.individual} secondaryAccount={secondaryAccount} />
+            <AvatarWithLink
+              size={40}
+              account={activity.individual || activity.fromAccount}
+              secondaryAccount={secondaryAccount}
+            />
           )}
         </Box>
         <Flex flexDirection="column" justifyContent="space-around">
