@@ -73,7 +73,7 @@
     "focus-trap-react": "10.1.4",
     "formik": "2.4.2",
     "glob": "8.1.0",
-    "graphql": "15.8.0",
+    "graphql": "16.7.1",
     "helmet": "7.0.0",
     "jsdom": "22.1.0",
     "jsonwebtoken": "8.5.1",
