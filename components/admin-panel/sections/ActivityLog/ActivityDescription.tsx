@@ -18,10 +18,10 @@ import { Span } from '../../../Text';
 
 const ResourceTag = styled.div`
   display: inline-block;
-  background-color: #fff;
+  background-color: #e5e7eb;
   border-radius: 32px;
   padding: 2px 8px;
-  font-size: 12px;
+  font-size: 14px;
 
   a {
     color: ${props => props.theme.colors.black[800]};
@@ -56,7 +56,7 @@ export const getActivityVariables = (
   updateTitle: activity.data?.update?.title,
   hasParent: Boolean(activity.account?.parent),
   Individual: () => (
-    <Span fontWeight={600}>
+    <Span letterSpacing={0} fontWeight={500}>
       <LinkCollective collective={activity.individual} openInNewTab />
     </Span>
   ),
