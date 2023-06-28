@@ -1,5 +1,5 @@
 import React from 'react';
-import { isNil } from 'lodash';
+import { isNil, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -96,6 +96,16 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
     [intl, props.missingReceipts],
   );
 
+  const collectiveOptions = React.useMemo(() => {
+    return sortBy(
+      props.collectivesWithVirtualCards.map(c => ({
+        value: c.slug,
+        label: c.parentAccount ? `${c.parentAccount.name} - ${c.name}` : c.name,
+      })),
+      'label',
+    );
+  }, [props.collectivesWithVirtualCards]);
+
   return (
     <Flex flexWrap={'wrap'} gap="18px">
       <FilterContainer>
@@ -107,16 +117,14 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
           inputId="virtual-card.collectives.filter"
           onChange={newValue => props.onCollectivesFilterChange(newValue.map(v => v.value))}
           isMulti={true}
+          isSearchable
           value={props.collectivesFilter
             .map(f => props.collectivesWithVirtualCards.find(o => o.slug === f))
             .map(c => ({
               value: c.slug,
               label: c.parentAccount ? `${c.parentAccount.name} - ${c.name}` : c.name,
             }))}
-          options={props.collectivesWithVirtualCards.map(c => ({
-            value: c.slug,
-            label: c.parentAccount ? `${c.parentAccount.name} - ${c.name}` : c.name,
-          }))}
+          options={collectiveOptions}
         />
       </FilterContainer>
       <FilterContainer>
