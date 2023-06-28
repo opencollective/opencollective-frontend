@@ -14,7 +14,7 @@ import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
 import { StyledSelectFilter, TruncatedValueContainer } from '../../../StyledSelectFilter';
-import { H1, H2 } from '../../../Text';
+import { H2 } from '../../../Text';
 import { AdminSectionProps } from '../../types';
 
 import { workspaceHomeQuery } from './query';
