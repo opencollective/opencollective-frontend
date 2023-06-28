@@ -139,10 +139,7 @@ const ProfileMenuDropdown = () => {
           <StyledDropdownContainer>
             <StyledProfileButton isBorderless {...triggerProps}>
               <Flex alignItems="center" data-cy="user-menu-trigger" gridGap={2}>
-                <Avatar collective={get(LoggedInUser, 'collective')} radius={40} />
-                <Hide xs>
-                  <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
-                </Hide>
+                <Avatar collective={get(LoggedInUser, 'collective')} radius={36} />
               </Flex>
             </StyledProfileButton>
             <Hide sm md lg>

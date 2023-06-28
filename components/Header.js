@@ -120,9 +120,12 @@ class Header extends React.Component {
         <div id="top" />
         {withTopBar && (
           <TopBar
+            account={this.props.collective}
             showSearch={this.props.showSearch}
             menuItems={this.props.menuItems}
             showProfileAndChangelogMenu={this.props.showProfileAndChangelogMenu}
+            title={this.props.title}
+            loadingAccount={this.props.loadingAccount}
           />
         )}
         <GlobalWarnings collective={this.props.collective} />

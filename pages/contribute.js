@@ -278,7 +278,7 @@ class TiersPage extends React.Component {
     const { title, subtitle } = this.getTitle(verb, collectiveName);
     return (
       <div>
-        <Header LoggedInUser={LoggedInUser} {...this.getPageMetadata(collective)} />
+        <Header LoggedInUser={LoggedInUser} {...this.getPageMetadata(collective)} collective={collective} />
         <Body>
           {data.loading ? (
             <Loading />

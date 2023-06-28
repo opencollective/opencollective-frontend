@@ -7,7 +7,7 @@ import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-
+import { Menu } from 'lucide-react';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import theme from '../lib/theme';
@@ -28,6 +28,11 @@ import StyledLink from './StyledLink';
 import { Span } from './Text';
 import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
+import Avatar from './Avatar';
+import { getCollectivePageRoute } from '../lib/url-helpers';
+import SiteMenu from './SiteMenu';
+import Loading from './Loading';
+import LoadingPlaceholder from './LoadingPlaceholder';
 
 const NavList = styled(Flex)`
   list-style: none;
@@ -72,20 +77,24 @@ const NavItem = styled(StyledLink)`
   }
 `;
 
-const MainNavItem = styled(StyledLink)`
+const StyledMenuButton = styled(StyledButton)`
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   gap: 8px;
   color: #334155;
   font-weight: 500;
   font-size: 14px;
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 100px;
+  height: 36px;
+  width: 36px;
+  padding: 0;
+  border-radius: 8px;
   transition-property: color, background-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
   white-space: nowrap;
+  border: 1px solid #d1d5db;
   @media (hover: hover) {
     :hover {
       color: #0f172a;
@@ -96,13 +105,69 @@ const MainNavItem = styled(StyledLink)`
   ${props => props.primary && `border: 1px solid #d1d5db;`}
 `;
 
-const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
+const MainNavItem = styled(StyledLink)`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 340px;
+  flex-shrink: 1;
+  color: #0f172a;
+  font-weight: 500;
+  font-size: 14px;
+  height: 36px;
+  padding: 0 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition-property: color, background-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  @media (hover: hover) {
+    :hover {
+      color: #0f172a;
+      background-color: #f1f5f9;
+    }
+  }
+  ${props => props.isActive && `background-color: #f1f5f9;`}
+  ${props => props.primary && `border: 1px solid #d1d5db;`}
+  font-weight: ${props => (props.lightWeight ? `400` : '500')};
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+`;
+
+const DividerIcon = () => {
+  return (
+    <svg
+      className="with-icon_icon__aLCKg"
+      fill="none"
+      height="24"
+      shapeRendering="geometricPrecision"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1"
+      viewBox="0 0 24 24"
+      width="24"
+      style={{ width: 36, height: 36, color: '#DCDDE0', margin: '0 -8px', flexShrink: 0 }}
+      // style="width: 36px; height: 36px;"
+    >
+      <path d="M16.88 3.549L7.12 20.451"></path>
+    </svg>
+  );
+};
+const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, title, loadingAccount }) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const ref = useRef();
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const router = useRouter();
-
   // We debounce this function to avoid conflicts between the menu button and TopBarMobileMenu useGlobalBlur hook.
   const debouncedSetShowMobileMenu = debounce(setShowMobileMenu);
 
@@ -133,32 +198,43 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) ||
     (onDashboardRoute && !LoggedInUser && loadingLoggedInUser);
 
+  // remove first character in router.asPath
+  const onRoute = router.asPath.substring(1);
   return (
     <Fragment>
       <Flex
         px={3}
-        py={showSearch ? 2 : 3}
         alignItems="center"
         flexDirection="row"
-        css={{ height: theme.sizes.navbarHeight, background: 'white', borderBottom: '1px solid rgb(232, 233, 235)' }}
         justifyContent="space-between"
+        css={{ height: theme.sizes.navbarHeight, borderBottom: '1px solid rgb(232, 233, 235)' }}
         ref={ref}
-        gridGap={3}
+        gridGap={2}
       >
-        <Link href={useDashboard ? (onHomeRoute ? '/home' : '/dashboard') : '/'}>
-          <Flex alignItems="center">
-            <Image width="36" height="36" src="/static/images/opencollective-icon.png" alt="Open Collective" />
-            {(!useDashboard || onHomeRoute) && (
-              <Hide xs sm md>
-                <Box mx={2}>
-                  <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
-                </Box>
-              </Hide>
-            )}
-          </Flex>
-        </Link>
-        <Hide xs sm>
-          {onHomeRoute || !useDashboard ? (
+        <Flex alignItems="center" gridGap={3}>
+          {useDashboard && (
+            <StyledMenuButton onClick={() => setShowMenu(true)}>
+              <Menu size={20} absoluteStrokeWidth strokeWidth={1.5} />
+            </StyledMenuButton>
+          )}
+
+          <Box flexShrink={0}>
+            <Link href={useDashboard ? (onHomeRoute ? '/home' : '/dashboard') : '/'}>
+              <Flex alignItems="center">
+                <Image width="36" height="36" src="/static/images/opencollective-icon.png" alt="Open Collective" />
+                {(!useDashboard || onHomeRoute) && (
+                  <Hide xs sm md>
+                    <Box mx={2}>
+                      <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
+                    </Box>
+                  </Hide>
+                )}
+              </Flex>
+            </Link>
+          </Box>
+        </Flex>
+        {onHomeRoute || !useDashboard ? (
+          <Hide xs sm>
             <Flex alignItems="center" justifyContent={['flex-end', 'flex-end', 'center']} flex="1 1 auto">
               <NavList as="ul" p={0} m={0} justifyContent="space-around" css="margin: 0;">
                 {menuItems.solutions && (
@@ -301,27 +377,60 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
                 </NavButton>
               )}
             </Flex>
-          ) : (
-            <Flex flex="1" alignItems="center" gridGap={3}>
+          </Hide>
+        ) : (
+          <Flex
+            flex={1}
+            // minWidth={1}
+            alignItems="center"
+            gridGap={3}
+            overflow={'hidden'}
+            // whiteSpace="nowrap"
+            // style={{ maxWidth: '100%' }}
+          >
+            {onDashboardRoute ? (
               <Link href="/dashboard">
-                <MainNavItem as={Container} isActive={isRouteActive('/dashboard')}>
+                <MainNavItem as={Container}>
                   <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
                 </MainNavItem>
               </Link>
-              <Link href="/search">
-                <MainNavItem as={Container} isActive={isRouteActive('/search')}>
-                  <FormattedMessage defaultMessage="Explore" />
+            ) : account || loadingAccount ? (
+              <Flex alignItems="center" gridGap="0" maxWidth="100%" flexGrow={4}>
+                {account?.parentCollective && (
+                  <Hide flexShrink={1} display="flex" overflow={'hidden'} xs sm>
+                    <DividerIcon />
+                    <MainNavItem
+                      lightWeight
+                      as={Container}
+                      flexShrink={3}
+                      href={getCollectivePageRoute(account.parentCollective)}
+                    >
+                      {/* <Avatar collective={account.parentCollective} radius={32} /> */}
+                      <span>{account.parentCollective.name}</span>
+                    </MainNavItem>
+                  </Hide>
+                )}
+                <DividerIcon />
+                <MainNavItem href={getCollectivePageRoute(account)}>
+                  {/* <Avatar collective={account} radius={32} /> */}
+                  <span>
+                    {account ? account.name : <LoadingPlaceholder height="16px" width="120px" borderRadius="4px" />}
+                  </span>
                 </MainNavItem>
-              </Link>
-            </Flex>
-          )}
-        </Hide>
+              </Flex>
+            ) : (
+              <MainNavItem as={Container}>{title}</MainNavItem>
+            )}
+          </Flex>
+        )}
         <Flex
           alignItems="center"
-          gridGap={3}
-          justifyContent="end"
-          flexShrink={0}
-          flex={useDashboard && !onHomeRoute ? 1 : 0}
+          gridGap={2}
+          //justifyContent="end"
+          flexShrink={4}
+          flexGrow={0}
+          overflow={'hidden'}
+          //flex={useDashboard && !onHomeRoute ? 1 : 0}
         >
           {showProfileAndChangelogMenu && (
             <Fragment>
@@ -334,27 +443,18 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
                     </MainNavItem>
                   </Link>
                 ) : (
-                  <ChangelogTrigger />
+                  <ChangelogTrigger height="36px" width="36px" />
                 )}
               </Hide>
               {useDashboard ? <ProfileMenu /> : <TopBarProfileMenu />}
             </Fragment>
           )}
-          <Hide md lg>
-            <Box px={2} mr="-8px" onClick={toggleMobileMenu}>
-              <Flex as="a">
-                <MenuIcon color="#aaaaaa" size={24} />
-              </Flex>
-            </Box>
-            {showMobileMenu && (
-              <TopBarMobileMenu closeMenu={toggleMobileMenu} useDashboard={useDashboard} onHomeRoute={onHomeRoute} />
-            )}
-          </Hide>
         </Flex>
       </Flex>
       {showSearchModal && (
         <SearchModal onClose={() => setShowSearchModal(false)} showLinkToDiscover={onHomeRoute || !useDashboard} />
       )}
+      <SiteMenu open={showMenu} onClose={() => setShowMenu(false)} />
     </Fragment>
   );
 };

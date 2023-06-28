@@ -110,6 +110,8 @@ const REACT_POPPER_MODIFIERS = [
           case 'top':
           case 'bottom':
             return [0, 3];
+          case 'right':
+            return [0, 8];
           default:
             return [];
         }

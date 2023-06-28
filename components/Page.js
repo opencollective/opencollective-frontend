@@ -25,13 +25,13 @@ const Page = ({
   menuItems,
   showFooter = true,
   showProfileAndChangelogMenu = true,
+  loadingAccount,
 }) => {
   if (data.error) {
     return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
   }
 
   const childProps = { LoggedInUser, loadingLoggedInUser };
-
   return (
     <Fragment>
       <Header
@@ -47,6 +47,7 @@ const Page = ({
         menuItems={menuItems}
         LoggedInUser={LoggedInUser}
         showProfileAndChangelogMenu={showProfileAndChangelogMenu}
+        loadingAccount={loadingAccount}
       />
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       {showFooter && <Footer />}

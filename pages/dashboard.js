@@ -128,7 +128,12 @@ const DashboardPage = () => {
 
   return (
     <DashboardContext.Provider value={{ selectedSection, expandedSection, setExpandedSection, account }}>
-      <Page noRobots collective={account} title={account ? `${account.name} - ${titleBase}` : titleBase}>
+      <Page
+        noRobots
+        collective={account}
+        title={account ? `${account.name} - ${titleBase}` : titleBase}
+        pageTitle={titleBase}
+      >
         {Boolean(notification) && <NotificationBar {...notification} />}
         {blocker ? (
           <Flex flexDirection="column" alignItems="center" my={6}>

@@ -53,7 +53,7 @@ const Home = (props: AdminSectionProps) => {
   const canViewMore = activities.length >= PAGE_SIZE && activities.length % PAGE_SIZE === 0;
 
   return (
-    <Container>
+    <Container maxWidth={'100%'}>
       <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
         <FormattedMessage id="Dashboard.Home.Title" defaultMessage="This is your workspace" />
       </H1>
