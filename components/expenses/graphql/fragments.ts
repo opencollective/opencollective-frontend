@@ -612,6 +612,14 @@ export const expensesListAdminFieldsFragment = gql`
   fragment ExpensesListAdminFieldsFragment on Expense {
     id
     onHold
+    account {
+      id
+      ... on AccountWithHost {
+        hostAgreements {
+          totalCount
+        }
+      }
+    }
     payoutMethod {
       id
       type
