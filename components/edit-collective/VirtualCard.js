@@ -261,6 +261,20 @@ const ActionsButton = props => {
                         </Action>
                       </React.Fragment>
                     )}
+                    {isHostAdmin && (
+                      <React.Fragment>
+                        <StyledHr borderColor="black.300" mt={2} mb={2} />
+                        <a
+                          href={`https://dashboard.stripe.com/issuing/cards/${virtualCard?.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Action>
+                            <FormattedMessage defaultMessage="View on Stripe" />
+                          </Action>
+                        </a>
+                      </React.Fragment>
+                    )}
                     <StyledHr borderColor="black.300" mt={2} mb={2} />
                     <a
                       href={`/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`}
@@ -277,20 +291,6 @@ const ActionsButton = props => {
                         <a href={`mailto:${virtualCard.assignee?.email}`} target="_blank" rel="noopener noreferrer">
                           <Action>
                             <FormattedMessage defaultMessage="Contact assignee" />
-                          </Action>
-                        </a>
-                      </React.Fragment>
-                    )}
-                    {isHostAdmin && (
-                      <React.Fragment>
-                        <StyledHr borderColor="black.300" mt={2} mb={2} />
-                        <a
-                          href={`https://dashboard.stripe.com/issuing/cards/${virtualCard?.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <Action>
-                            <FormattedMessage defaultMessage="View card in Stripe dashboard" />
                           </Action>
                         </a>
                       </React.Fragment>
