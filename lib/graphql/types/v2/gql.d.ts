@@ -94,7 +94,11 @@ export function gql(source: "\n  query CollectiveMembers($slug: String!) {\n    
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query VirtualCardPoliciesQuery($slug: String) {\n    account(slug: $slug) {\n      id\n      policies {\n        MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {\n          ALL_TIME {\n            valueInCents\n          }\n          DAILY {\n            valueInCents\n          }\n          MONTHLY {\n            valueInCents\n          }\n          PER_AUTHORIZATION {\n            valueInCents\n          }\n          WEEKLY {\n            valueInCents\n          }\n          YEARLY {\n            valueInCents\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').VirtualCardPoliciesQueryDocument;
+export function gql(source: "\n  query VirtualCardsAssignedToCollective($hostSlug: String!, $collectiveSlug: String!) {\n    host(slug: $hostSlug) {\n      id\n      allCards: hostedVirtualCards(collectiveAccountIds: [{ slug: $collectiveSlug }], status: [ACTIVE, INACTIVE]) {\n        totalCount\n      }\n      cardsMissingReceipts: hostedVirtualCards(\n        collectiveAccountIds: [{ slug: $collectiveSlug }]\n        status: [ACTIVE, INACTIVE]\n        hasMissingReceipts: true\n      ) {\n        totalCount\n      }\n    }\n  }\n"): typeof import('./graphql').VirtualCardsAssignedToCollectiveDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query VirtualCardPolicies($slug: String) {\n    account(slug: $slug) {\n      id\n      policies {\n        MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {\n          ALL_TIME {\n            valueInCents\n          }\n          DAILY {\n            valueInCents\n          }\n          MONTHLY {\n            valueInCents\n          }\n          PER_AUTHORIZATION {\n            valueInCents\n          }\n          WEEKLY {\n            valueInCents\n          }\n          YEARLY {\n            valueInCents\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').VirtualCardPoliciesDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -158,7 +162,7 @@ export function gql(source: "\n  query DisputedContributionsWarning($hostSlug: S
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query HostAgreements($hostSlug: String!, $limit: Int!, $offset: Int!, $account: [AccountReferenceInput]) {\n    host(slug: $hostSlug) {\n      id\n      legacyId\n      hostedAccountAgreements(limit: $limit, offset: $offset, accounts: $account) {\n        totalCount\n        nodes {\n          id\n          ...AgreementViewFields\n        }\n      }\n    }\n  }\n  \n"): typeof import('./graphql').HostAgreementsDocument;
+export function gql(source: "\n  query HostAgreements($hostSlug: String!, $limit: Int!, $offset: Int!, $account: [AccountReferenceInput]) {\n    host(slug: $hostSlug) {\n      id\n      legacyId\n      slug\n      hostedAccountAgreements(limit: $limit, offset: $offset, accounts: $account) {\n        totalCount\n        nodes {\n          id\n          ...AgreementViewFields\n        }\n      }\n    }\n  }\n  \n"): typeof import('./graphql').HostAgreementsDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
