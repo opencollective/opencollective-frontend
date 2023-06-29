@@ -78,7 +78,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
   const router = useRouter();
   const intl = useIntl();
   const query = router.query;
-  const { LoggedInUser } = useLoggedInUser();
+  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const [agreementDrawerOpen, setAgreementDrawerOpen] = React.useState(false);
   const [agreementInDrawer, setAgreementInDrawer] = React.useState(null);
   const [agreementFilePreview, setAgreementFilePreview] = React.useState<Agreement | null>(null);
@@ -132,6 +132,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
               buttonStyle="primary"
               buttonSize="tiny"
               height="40px"
+              disabled={loading || loadingLoggedInUser}
               onClick={() => {
                 setAgreementInDrawer(null);
                 setAgreementDrawerOpen(true);
