@@ -180,7 +180,7 @@ type FilesViewerModalProps = {
   parentTitle?: string;
   files?: {
     url: string;
-    name: string;
+    name?: string;
     info?: { width: number };
   }[];
   openFileUrl?: string;
@@ -206,7 +206,7 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
   const contentWrapperRef = React.useRef(null);
 
   const renderFile = (
-    { url, info, name }: { url: string; name: string; info?: { width: number } },
+    { url, info, name }: { url: string; name?: string; info?: { width: number } },
     contentWrapperRef,
   ) => {
     let content = null;
@@ -276,7 +276,7 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
                 delayHide={0}
               >
                 <ButtonLink
-                  /* To enable downloading files from S3 directly we're using a /api/download-file endpoint 
+                  /* To enable downloading files from S3 directly we're using a /api/download-file endpoint
                   to stream the file and set the correct headers. */
                   href={`/api/download-file?url=${encodeURIComponent(selectedItem?.url)}`}
                   download
