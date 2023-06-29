@@ -63,7 +63,8 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
   const [showConfirmationModal, setConfirmationModalDisplay] = React.useState(false);
 
   const hasScheduledExpenses = scheduledExpenses.data?.expenses?.totalCount > 0;
-  if (!hasScheduledExpenses) {
+  const amountBatched = scheduledExpenses.data?.host?.transferwise?.amountBatched;
+  if (!hasScheduledExpenses || !amountBatched) {
     return null;
   }
 
@@ -105,8 +106,6 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
       });
     }
   };
-
-  const amountBatched = scheduledExpenses.data.host.transferwise.amountBatched;
 
   return (
     <React.Fragment>
