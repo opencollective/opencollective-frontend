@@ -7,6 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { Agreement } from '../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import AgreementDrawer from '../agreements/AgreementDrawer';
 import AgreementsTable from '../agreements/AgreementsTable';
@@ -25,6 +26,7 @@ const hostDashboardAgreementsQuery = gql`
     host(slug: $hostSlug) {
       id
       legacyId
+      slug
       hostedAccountAgreements(limit: $limit, offset: $offset, accounts: $account) {
         totalCount
         nodes {
@@ -76,6 +78,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
   const router = useRouter();
   const intl = useIntl();
   const query = router.query;
+  const { LoggedInUser } = useLoggedInUser();
   const [agreementDrawerOpen, setAgreementDrawerOpen] = React.useState(false);
   const [agreementInDrawer, setAgreementInDrawer] = React.useState(null);
   const [agreementFilePreview, setAgreementFilePreview] = React.useState<Agreement | null>(null);
@@ -97,6 +100,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
     },
   });
 
+  const canEdit = Boolean(LoggedInUser && !LoggedInUser.isAccountantOnly(data?.host));
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
       <Flex mb={24} justifyContent="space-between" alignItems="center" flexWrap="wrap" gridGap="16px">
@@ -122,21 +126,23 @@ const HostDashboardAgreements = ({ hostSlug }) => {
               router.push({ pathname: router.asPath.split('?')[0], query: newQuery });
             }}
           />
-          <StyledButton
-            data-cy="btn-new-agreement"
-            buttonStyle="primary"
-            buttonSize="tiny"
-            height="40px"
-            onClick={() => {
-              setAgreementInDrawer(null);
-              setAgreementDrawerOpen(true);
-            }}
-          >
-            <Span mr={2}>
-              <FormattedMessage id="HostDashboardAgreements.New" defaultMessage="Add New" />
-            </Span>
-            <PlusIcon size={14} color="#FFFFFF" />
-          </StyledButton>
+          {canEdit && (
+            <StyledButton
+              data-cy="btn-new-agreement"
+              buttonStyle="primary"
+              buttonSize="tiny"
+              height="40px"
+              onClick={() => {
+                setAgreementInDrawer(null);
+                setAgreementDrawerOpen(true);
+              }}
+            >
+              <Span mr={2}>
+                <FormattedMessage id="HostDashboardAgreements.New" defaultMessage="Add New" />
+              </Span>
+              <PlusIcon size={14} color="#FFFFFF" />
+            </StyledButton>
+          )}
         </Flex>
       </Flex>
       <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
@@ -158,6 +164,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
           <AgreementDrawer
             open={agreementDrawerOpen}
             agreement={agreementInDrawer}
+            canEdit={canEdit}
             hostLegacyId={data?.host.legacyId} // legacyId required by CollectivePickerAsync
             onClose={() => setAgreementDrawerOpen(false)}
             onCreate={() => {
