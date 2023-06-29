@@ -60,7 +60,7 @@ const Action = styled.button`
   }
 `;
 
-export const AgreementWithActions = ({ agreement, onEdit, onDelete, openFileViewer = undefined }) => {
+export const AgreementWithActions = ({ agreement, onEdit, onDelete, openFileViewer }) => {
   const drawerActionsContainer = useDrawerActionsContainer();
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
