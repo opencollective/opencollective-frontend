@@ -15,7 +15,7 @@ import {
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective.lib';
+import { isHostAccount, isIndividualAccount, isInternalHost, isSelfHostedAccount } from '../../lib/collective.lib';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 
@@ -58,7 +58,7 @@ const Menu = ({ isAccountantOnly }) => {
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS}
           icon={<FileText size={16} />}
-          if={process.env.OC_ENV !== 'production'}
+          if={isInternalHost(account)}
         />
 
         <MenuLink
