@@ -28,6 +28,7 @@ export const contributionFlowAccountWithTierQuery = gql`
       customFields
       availableQuantity
       singleTicket
+      requireAddress
       maxQuantity
       endsAt
       amount {

@@ -1940,11 +1940,9 @@ export type ContributionStats = {
 };
 
 /**
- *
- *     A person or an entity that contributes financially or by any other mean to the mission
- *     of the collective. While "Member" is dedicated to permissions, this type is meant
- *     to surface all the public contributors.
- *
+ * A person or an entity that contributes financially or by any other mean to the mission
+ * of the collective. While "Member" is dedicated to permissions, this type is meant
+ * to surface all the public contributors.
  */
 export type Contributor = {
   __typename?: 'Contributor';
@@ -1980,11 +1978,9 @@ export type Contributor = {
 
 
 /**
- *
- *     A person or an entity that contributes financially or by any other mean to the mission
- *     of the collective. While "Member" is dedicated to permissions, this type is meant
- *     to surface all the public contributors.
- *
+ * A person or an entity that contributes financially or by any other mean to the mission
+ * of the collective. While "Member" is dedicated to permissions, this type is meant
+ * to surface all the public contributors.
  */
 export type ContributorImageArgs = {
   format?: InputMaybe<ImageFormat>;
@@ -4961,11 +4957,9 @@ export type Individual = Account & {
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
   legalName?: Maybe<Scalars['String']>;
   /**
-   *
-   *           Address. This field is public for hosts, otherwise:
-   *             - Users can see their own address
-   *             - Hosts can see the address of users submitting expenses to their collectives
-   *
+   * Address. This field is public for hosts, otherwise:
+   *   - Users can see their own address
+   *   - Hosts can see the address of users submitting expenses to their collectives
    */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']>;
@@ -6744,11 +6738,9 @@ export type Organization = Account & AccountWithContributions & {
   /** Private, legal name. Used for expense receipts, taxes, etc. Scope: "account". */
   legalName?: Maybe<Scalars['String']>;
   /**
-   *
-   *           Address. This field is public for hosts, otherwise:
-   *             - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.
-   *             - Hosts can see the address of organizations submitting expenses to their collectives.
-   *
+   * Address. This field is public for hosts, otherwise:
+   *   - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.
+   *   - Hosts can see the address of organizations submitting expenses to their collectives.
    */
   location?: Maybe<Location>;
   longDescription?: Maybe<Scalars['String']>;

@@ -379,15 +379,21 @@ const getTotalYearlyAmount = stepDetails => {
 /**
  * Whether this contribution requires us to collect the address of the user
  */
-export const contributionRequiresAddress = stepDetails => {
-  return stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 5000e2;
+export const contributionRequiresAddress = (stepDetails, tier) => {
+  return Boolean(
+    (stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 5000e2) || // Above $5000/year
+      tier?.requireAddress, // Or if enforced by the tier
+  );
 };
 
 /**
  * Whether this contribution requires us to collect the address and legal name of the user
  */
-export const contributionRequiresLegalName = stepDetails => {
-  return stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 500e2;
+export const contributionRequiresLegalName = (stepDetails, tier) => {
+  return Boolean(
+    (stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 250e2) || // Above $250/year
+      tier?.requireAddress, // Or if enforced by the tier, a valid address requires a legal name
+  );
 };
 
 export function getGuestInfoFromStepProfile(stepProfile) {
