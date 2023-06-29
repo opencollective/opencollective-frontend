@@ -219,6 +219,7 @@ const ProfileDrawer = ({ onClose, open }) => {
                   <FormattedMessage id="Settings" defaultMessage="Settings" />
                 </Flex>
               </StyledMenuEntry>
+
               {hasAvailablePreviewFeatures && (
                 <StyledMenuEntry as="button" onClick={() => setShowPreviewFeaturesModal(true)}>
                   <Flex alignItems="center" gridGap={2}>
@@ -239,17 +240,18 @@ const ProfileDrawer = ({ onClose, open }) => {
                   </Span>
                 </StyledMenuEntry>
               )}
+              <StyledMenuEntry as="button" onClick={() => logout()}>
+                <Flex alignItems="center" gridGap={2}>
+                  <LogOut size={14} />
+                  <FormattedMessage id="menu.logout" defaultMessage="Log out" />
+                </Flex>
+              </StyledMenuEntry>
             </Flex>
             <SiteMenuMemberships user={LoggedInUser} onClose={onClose} />
           </Flex>
-          <Footer>
-            <StyledMenuEntry as="button" onClick={() => logout()}>
-              <Flex alignItems="center" gridGap={2}>
-                <LogOut size={14} />
-                <FormattedMessage id="menu.logout" defaultMessage="Log out" />
-              </Flex>
-            </StyledMenuEntry>
-          </Footer>
+          {/* <Footer>
+           
+          </Footer> */}
         </StyledDrawerContainer>
       </StyledMUIDrawer>
 

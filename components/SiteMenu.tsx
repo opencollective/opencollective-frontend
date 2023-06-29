@@ -121,9 +121,10 @@ export default function Menu({
           <CloseDrawerButton type="button" isBorderless onClick={onClose}>
             <X size={20} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
           </CloseDrawerButton>
-          <Box px={3}>
+          <Flex px={3} alignItems="center" gridGap={2}>
             <Image ml={2} width="36" height="36" src="/static/images/opencollective-icon.png" alt="Open Collective" />
-          </Box>
+            <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
+          </Flex>
         </Container>
         <Flex flex={1} flexDirection="column" overflowY="scroll">
           <Flex flexDirection="column" pt={2} pb={3} px={3}>
