@@ -93,10 +93,6 @@ function getBlocker(LoggedInUser, account, section) {
   }
 }
 
-const getIsAccountantOnly = (LoggedInUser, account) => {
-  return LoggedInUser && !LoggedInUser.isAdminOfCollective(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account);
-};
-
 const AdminPanelPage = ({ slug, section, subpath }) => {
   const intl = useIntl();
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
@@ -147,7 +143,7 @@ const AdminPanelPage = ({ slug, section, subpath }) => {
               collective={account}
               selectedSection={selectedSection}
               display={['none', null, 'block']}
-              isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
+              isAccountantOnly={LoggedInUser?.isAccountantOnly(account)}
             />
             {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />

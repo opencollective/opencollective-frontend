@@ -1,21 +1,23 @@
 import React from 'react';
 
-import { Agreement } from '../../lib/graphql/types/v2/graphql';
+import { Agreement as GraphQLAgreement, FileInfo } from '../../lib/graphql/types/v2/graphql';
 
 import Drawer from '../Drawer';
 
+import Agreement from './Agreement';
 import AgreementForm from './AgreementForm';
 import { AgreementWithActions } from './AgreementWithActions';
 
 type AgreementDrawerProps = {
   open: boolean;
+  canEdit: boolean;
   onClose: () => void;
-  onCreate: (Agreement) => void;
-  onEdit: (Agreement) => void;
-  onDelete: (Agreement) => void;
-  agreement?: Agreement;
+  onCreate: (GraphQLAgreement) => void;
+  onEdit: (GraphQLAgreement) => void;
+  onDelete: (GraphQLAgreement) => void;
+  agreement?: GraphQLAgreement;
   hostLegacyId: number;
-  onFilePreview: () => void;
+  onFilePreview: (file: FileInfo) => void;
 };
 
 export default function AgreementDrawer({
@@ -24,6 +26,7 @@ export default function AgreementDrawer({
   onCreate,
   onEdit,
   onDelete,
+  canEdit,
   agreement,
   hostLegacyId,
   onFilePreview,
@@ -48,13 +51,15 @@ export default function AgreementDrawer({
             closeDrawer();
           }}
         />
-      ) : (
+      ) : canEdit ? (
         <AgreementWithActions
           agreement={agreement}
           onEdit={() => setEditing(true)}
           onDelete={onDelete}
           openFileViewer={onFilePreview}
         />
+      ) : (
+        <Agreement agreement={agreement} openFileViewer={() => onFilePreview(agreement.attachment)} />
       )}
     </Drawer>
   );
