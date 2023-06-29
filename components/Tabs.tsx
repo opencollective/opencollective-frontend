@@ -46,7 +46,7 @@ export default function Tabs({
           id="tabs"
           name="tabs"
           className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-          value={selectedTab?.label ?? null}
+          value={selectedTab?.id ?? null}
           onChange={e => onChange(e.target.value)}
         >
           {showEmptyOption ? (
@@ -71,21 +71,21 @@ export default function Tabs({
                 <button
                   key={tab.id}
                   onClick={() => onChange(tab.id)}
-                  className={cx(
-                    isActive
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-700',
-                    'flex whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium',
-                  )}
+                  // className={cx(
+                  //   isActive
+                  //     ? 'border-blue-500 text-blue-600'
+                  //     : 'border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-700',
+                  //   'flex whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium',
+                  // )}
                   aria-current={isActive ? 'page' : undefined}
                 >
                   {tab.label}
                   {tab.showCount && typeof tab.count !== 'undefined' ? (
                     <span
-                      className={cx(
-                        isActive ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-900',
-                        'ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
-                      )}
+                    // className={cx(
+                    //   isActive ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-900',
+                    //   'ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
+                    // )}
                     >
                       {abbreviateNumber(tab.count)}
                     </span>

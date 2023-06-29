@@ -12,6 +12,7 @@ import { useLazyGraphQLPaginatedResults } from '../../lib/hooks/useLazyGraphQLPa
 import useQueryFilter, { BooleanFilter } from '../../lib/hooks/useQueryFilter';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
+import DashboardFilters from '../dashboard/DashboardFilters';
 import DismissibleMessage from '../DismissibleMessage';
 import ExpensesFilters from '../expenses/ExpensesFilters';
 import ExpensesList from '../expenses/ExpensesList';
@@ -136,7 +137,7 @@ const getVariablesFromQuery = query => {
   return {
     offset: parseInt(query.offset) || 0,
     limit: (parseInt(query.limit) || NB_EXPENSES_DISPLAYED) * 2,
-    status: query.status === 'ALL' ? null : isValidStatus(query.status) ? query.status : 'READY_TO_PAY',
+    status: query.status === 'ALL' ? null : isValidStatus(query.status) ? query.status : null,
     type: query.type,
     tags: query.tag ? [query.tag] : undefined,
     minAmount: amountRange[0] && amountRange[0] * 100,
@@ -152,7 +153,7 @@ const getVariablesFromQuery = query => {
 const enforceDefaultParamsOnQuery = query => {
   return {
     ...query,
-    status: query.status || 'READY_TO_PAY',
+    // status: query.status || 'READY_TO_PAY',
   };
 };
 
@@ -201,6 +202,43 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   const getQueryParams = newParams => {
     return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
   };
+
+  const views = [
+    { label: 'All', query: {} },
+    {
+      label: 'Ready to pay',
+      query: { status: 'READY_TO_PAY' },
+      // showCount: true,
+    },
+    {
+      label: 'Scheduled for payment',
+      query: { status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT' },
+      // actions: [
+      //   {
+      //     onClick: () => setConfirmationModalDisplay(true),
+      //     label: <FormattedMessage id="expenses.scheduled.paybatch" defaultMessage="Pay Batch" />,
+      //   },
+      // ],
+      // showCount: true,
+    },
+    {
+      label: 'On hold',
+      query: { status: 'ON_HOLD' },
+      // showCount: true
+    },
+    {
+      label: 'Incomplete',
+      query: { status: 'INCOMPLETE' },
+      // showCount: true,
+    },
+    {
+      label: 'Recently paid',
+      query: { status: 'PAID' },
+      showCount: false,
+    },
+  ].map(view => ({ id: view.label, ...view }));
+
+  const queryWithoutRouteParams = getQueryParams();
 
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
@@ -279,6 +317,17 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
           ) : null
         }
       />
+      <DashboardFilters
+        query={queryWithoutRouteParams}
+        views={views}
+        onChange={query => {
+          router.push({
+            pathname: pageRoute,
+            query,
+          });
+        }}
+      />
+
       <Box mb={34}>
         {data?.host ? (
           <ExpensesFilters
