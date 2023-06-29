@@ -12,7 +12,7 @@ import UploadedFilePreview from '../UploadedFilePreview';
 type AttachedFilesProps = {
   files: Array<File | FileInfo>;
   onRemove?: (idx: number) => void;
-  openFileViewer?: (idx: number) => void;
+  openFileViewer?: (url: string) => void;
   size?: number;
 };
 
