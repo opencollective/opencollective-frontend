@@ -30,6 +30,10 @@ export const msg = defineMessages({
     id: 'Fields.description',
     defaultMessage: 'Description',
   },
+  invoiceDescriptionLabel: {
+    id: 'Fields.InvoiceDescription',
+    defaultMessage: 'Specify item or activity and timeframe, e.g. "Volunteer Training, April 2023"',
+  },
   amountLabel: {
     id: 'Fields.amount',
     defaultMessage: 'Amount',
@@ -125,6 +129,7 @@ const ExpenseItemForm = ({
   hasMultiCurrency,
   availableCurrencies,
   onCurrencyChange,
+  isInvoice,
   isLastItem,
 }) => {
   const intl = useIntl();
@@ -176,7 +181,7 @@ const ExpenseItemForm = ({
             name={getFieldName('description')}
             error={getError('description')}
             htmlFor={`${attachmentKey}-description`}
-            label={formatMessage(msg.descriptionLabel)}
+            label={formatMessage(isInvoice ? msg.invoiceDescriptionLabel : msg.descriptionLabel)}
             labelFontSize="13px"
             required={!isOptional}
           >
@@ -311,6 +316,8 @@ ExpenseItemForm.propTypes = {
   onCurrencyChange: PropTypes.func.isRequired,
   /** For multi-currency expenses */
   availableCurrencies: PropTypes.arrayOf(PropTypes.string),
+  /** Is it an invoice */
+  isInvoice: PropTypes.bool,
   /** the attachment data */
   attachment: PropTypes.shape({
     id: PropTypes.string,
