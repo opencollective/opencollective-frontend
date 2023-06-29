@@ -6,6 +6,8 @@ import styled from 'styled-components';
 import { LifeBuoy, Home, Search, X } from 'lucide-react';
 import { useTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import Image from './Image';
+import { FormattedMessage } from 'react-intl';
+import { ExternalLink, LogOut, Plus } from 'lucide-react';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -30,7 +32,7 @@ const StyledMUIDrawer = styled(MUIDrawer)`
   }
 `;
 
-export const SummaryHeader = styled.span`
+const SummaryHeader = styled.span`
   > a {
     color: inherit;
     text-decoration: underline;
@@ -134,8 +136,18 @@ export default function Menu({
             <MenuItem href="/help">
               <LifeBuoy size={16} /> Help & Support
             </MenuItem>
+            {/* <hr />
+            <MenuItem href="/home" openInNewTab>
+              <FormattedMessage defaultMessage="Open Collective Homepage" /> <ExternalLink size={14} />
+            </MenuItem>
+            <MenuItem href="/help" openInNewTab>
+              <FormattedMessage defaultMessage="Help & Support" /> <ExternalLink size={14} />
+            </MenuItem>
+            <MenuItem href="https://docs.opencollective.com" openInNewTab>
+              <FormattedMessage defaultMessage="Documentation" /> <ExternalLink size={14} />
+            </MenuItem> */}
           </Flex>
-          {LoggedInUser && <SiteMenuMemberships user={LoggedInUser} />}
+          {/* {LoggedInUser && <SiteMenuMemberships user={LoggedInUser} />} */}
         </Flex>
         <Container position="relative" py={'24px'} borderTop={'1px solid #e5e7eb'}>
           <Footer>

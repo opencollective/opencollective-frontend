@@ -1,13 +1,17 @@
 import React from 'react';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
-import { themeGet } from '@styled-system/theme-get';
 import { get } from 'lodash';
 import { ExternalLink, LogOut, Plus } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
+import { useTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+import MUIDrawer from '@mui/material/Drawer';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-
+import StyledRoundButton from './StyledRoundButton';
+import SiteMenuMemberships from './SiteMenuMemberships';
+import { themeGet } from '@styled-system/theme-get';
+import { User, FlaskConical, Settings, Home, X } from 'lucide-react';
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
 import Container from './Container';
@@ -25,25 +29,68 @@ const StyledProfileButton = styled(StyledButton)`
   background-color: white !important;
 `;
 
-const StyledDropdownContent = styled(DropdownContent)`
-  top: 52px;
-  border-radius: 12px;
-  right: 0;
-  width: 260px;
+const StyledDrawerContainer = styled.div<{ maxWidth: string }>`
+  display: flex;
+  height: 100vh;
+  max-width: ${props => props.maxWidth};
+  width: 100vw;
+  flex-direction: column;
 
-  padding: 8px 0;
   hr {
     margin: 8px 0;
     border-color: #f3f4f6;
   }
-  @media screen and (max-width: ${themeGet('breakpoints.0')}) {
-    right: 0;
-    left: 0;
-    width: 100vw;
-    max-width: 100vw;
-    top: 64px;
-    border-radius: 0;
+`;
+
+const StyledMUIDrawer = styled(MUIDrawer)`
+  height: 100vh !important;
+
+  .MuiDrawer-paper {
+    border-radius: 12px 0 0 12px;
   }
+`;
+
+export const SummaryHeader = styled.span`
+  > a {
+    color: inherit;
+    text-decoration: underline;
+    outline: none;
+    :hover {
+      color: ${themeGet('colors.black.600')};
+    }
+  }
+`;
+
+const CloseDrawerButton = styled(StyledRoundButton)`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  color: #4b5563;
+`;
+
+const MenuLink = styled(Link)`
+  display: flex;
+  align-items: center;
+  grid-gap: 8px;
+  &:hover {
+    background: #f7f8fa;
+    color: #1f2328;
+  }
+  padding: 8px;
+  border-radius: 8px;
+  color: #1f2328;
+  svg {
+    color: #4b5563;
+  }
+`;
+
+const Footer = styled.div`
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #f3f4f6;
 `;
 
 const StyledDropdownContainer = styled.div`
@@ -53,7 +100,12 @@ const StyledDropdownContainer = styled.div`
   }
 `;
 const ProfileHeader = styled.div`
-  padding: 4px 16px;
+  padding: 0 16px;
+  padding-bottom: 15px;
+  display: flex;
+  align-items: center;
+  grid-gap: 8px;
+  border-bottom: 1px solid #f3f4f6;
   .name {
     font-size: 14px;
     color: #0f172a;
@@ -76,8 +128,8 @@ const StyledMenuEntry = styled(Link)`
   border: 0;
   background-color: transparent;
   color: #334155;
-  padding: 8px 12px;
-  margin: 0 8px;
+  padding: 8px 8px;
+  margin: 0 16px;
   font-size: 14px;
   border-radius: 6px;
   white-space: nowrap;
@@ -123,10 +175,92 @@ const StyledMenuEntry = styled(Link)`
           },
         })}
 `;
-const ProfileMenuDropdown = () => {
+
+const ProfileDrawer = ({ onClose, open }) => {
   const [showPreviewFeaturesModal, setShowPreviewFeaturesModal] = React.useState(false);
   const { LoggedInUser, logout } = useLoggedInUser();
   const hasAvailablePreviewFeatures = LoggedInUser?.getAvailablePreviewFeatures()?.length > 0;
+  const twoFactorPrompt = useTwoFactorAuthenticationPrompt();
+  const disableEnforceFocus = Boolean(twoFactorPrompt?.isOpen);
+
+  return (
+    <React.Fragment>
+      <StyledMUIDrawer anchor="right" open={open} onClose={onClose} disableEnforceFocus={disableEnforceFocus}>
+        <StyledDrawerContainer maxWidth="280px">
+          <Container position="relative" pt={'16px'}>
+            <ProfileHeader>
+              <Avatar collective={LoggedInUser.collective} radius={36} />
+              <div>
+                <div className="name">{LoggedInUser.collective.name}</div>
+                <div className="email">{LoggedInUser.email}</div>
+              </div>
+            </ProfileHeader>
+            <CloseDrawerButton type="button" isBorderless onClick={onClose}>
+              <X size={20} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
+            </CloseDrawerButton>
+          </Container>
+          <Flex py="12px" flex={1} flexDirection="column" overflowY="scroll">
+            <Flex pb="12px" flexDirection="column">
+              <StyledMenuEntry href={`/${LoggedInUser.collective.slug}`} onClick={onClose}>
+                <Flex alignItems="center" gridGap={2}>
+                  <User size={16} />
+                  <FormattedMessage id="menu.profile" defaultMessage="Profile" />
+                </Flex>
+              </StyledMenuEntry>
+              <StyledMenuEntry href={`/dashboard/${LoggedInUser.collective.slug}`} onClick={onClose}>
+                <Flex alignItems="center" gridGap={2}>
+                  <Home size={16} />
+                  <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+                </Flex>
+              </StyledMenuEntry>
+              <StyledMenuEntry href={`/dashboard/${LoggedInUser.collective.slug}/info`} onClick={onClose}>
+                <Flex alignItems="center" gridGap={2}>
+                  <Settings size={16} />
+                  <FormattedMessage id="Settings" defaultMessage="Settings" />
+                </Flex>
+              </StyledMenuEntry>
+              {hasAvailablePreviewFeatures && (
+                <StyledMenuEntry as="button" onClick={() => setShowPreviewFeaturesModal(true)}>
+                  <Flex alignItems="center" gridGap={2}>
+                    <FlaskConical size={16} />
+                    <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />
+                  </Flex>
+                  <Span
+                    fontSize="12px"
+                    ml={1}
+                    style={{ borderRadius: 20 }}
+                    py="2px"
+                    px="6px"
+                    display="inline-block"
+                    bg="primary.200"
+                    color="black.800"
+                  >
+                    <FormattedMessage defaultMessage="New!" />
+                  </Span>
+                </StyledMenuEntry>
+              )}
+            </Flex>
+            <SiteMenuMemberships user={LoggedInUser} onClose={onClose} />
+          </Flex>
+          <Footer>
+            <StyledMenuEntry as="button" onClick={() => logout()}>
+              <Flex alignItems="center" gridGap={2}>
+                <LogOut size={14} />
+                <FormattedMessage id="menu.logout" defaultMessage="Log out" />
+              </Flex>
+            </StyledMenuEntry>
+          </Footer>
+        </StyledDrawerContainer>
+      </StyledMUIDrawer>
+
+      {showPreviewFeaturesModal && <PreviewFeaturesModal onClose={() => setShowPreviewFeaturesModal(false)} />}
+    </React.Fragment>
+  );
+};
+const ProfileMenuDropdown = () => {
+  const [showProfileMenu, setShowProfileMenu] = React.useState(false);
+
+  const { LoggedInUser } = useLoggedInUser();
 
   if (!LoggedInUser) {
     return <LoginBtn />;
@@ -134,79 +268,12 @@ const ProfileMenuDropdown = () => {
 
   return (
     <React.Fragment>
-      <Dropdown trigger="click">
-        {({ triggerProps, dropdownProps }) => (
-          <StyledDropdownContainer>
-            <StyledProfileButton isBorderless {...triggerProps}>
-              <Flex alignItems="center" data-cy="user-menu-trigger" gridGap={2}>
-                <Avatar collective={get(LoggedInUser, 'collective')} radius={36} />
-              </Flex>
-            </StyledProfileButton>
-            <Hide sm md lg>
-              <Container position="absolute" mx={27} my={-47}>
-                <ChangelogTrigger height="24px" width="24px" backgroundSize="9.49px 13.5px" />
-              </Container>
-            </Hide>
-            <StyledDropdownContent {...dropdownProps}>
-              <Flex flexDirection="column">
-                <ProfileHeader>
-                  <div className="name">{LoggedInUser.collective.name}</div>
-                  <div className="email">{LoggedInUser.email}</div>
-                </ProfileHeader>
-                <hr />
-                <StyledMenuEntry href={`/${LoggedInUser.collective.slug}`}>
-                  <FormattedMessage id="menu.profile" defaultMessage="Profile" />
-                </StyledMenuEntry>
-                <StyledMenuEntry href={`/dashboard/${LoggedInUser.collective.slug}`}>
-                  <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-                </StyledMenuEntry>
-                <StyledMenuEntry href={`/dashboard/${LoggedInUser.collective.slug}/info`}>
-                  <FormattedMessage id="Settings" defaultMessage="Settings" />
-                </StyledMenuEntry>
-                {hasAvailablePreviewFeatures && (
-                  <StyledMenuEntry as="button" onClick={() => setShowPreviewFeaturesModal(true)}>
-                    <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />
-                    <Span
-                      fontSize="12px"
-                      ml={1}
-                      style={{ borderRadius: 20 }}
-                      py="2px"
-                      px="6px"
-                      display="inline-block"
-                      bg="primary.200"
-                      color="black.800"
-                    >
-                      <FormattedMessage defaultMessage="New!" />
-                    </Span>
-                  </StyledMenuEntry>
-                )}
-                <hr />
-                <StyledMenuEntry href="/create">
-                  <FormattedMessage defaultMessage="New Collective" /> <Plus />
-                </StyledMenuEntry>
-                <StyledMenuEntry href="/organizations/new">
-                  <FormattedMessage defaultMessage="New Organization" /> <Plus size={14} />
-                </StyledMenuEntry>
-                <hr />
-                <StyledMenuEntry href="/home" openInNewTab>
-                  <FormattedMessage defaultMessage="Open Collective Homepage" /> <ExternalLink size={14} />
-                </StyledMenuEntry>
-                <StyledMenuEntry href="/help" openInNewTab>
-                  <FormattedMessage defaultMessage="Help & Support" /> <ExternalLink size={14} />
-                </StyledMenuEntry>
-                <StyledMenuEntry href="https://docs.opencollective.com" openInNewTab>
-                  <FormattedMessage defaultMessage="Documentation" /> <ExternalLink size={14} />
-                </StyledMenuEntry>
-                <hr />
-                <StyledMenuEntry as="button" onClick={() => logout()}>
-                  <FormattedMessage id="menu.logout" defaultMessage="Log out" /> <LogOut size={14} />
-                </StyledMenuEntry>
-              </Flex>
-            </StyledDropdownContent>
-          </StyledDropdownContainer>
-        )}
-      </Dropdown>
-      {showPreviewFeaturesModal && <PreviewFeaturesModal onClose={() => setShowPreviewFeaturesModal(false)} />}
+      <StyledProfileButton isBorderless onClick={() => setShowProfileMenu(true)}>
+        <Flex alignItems="center" data-cy="user-menu-trigger" gridGap={2}>
+          <Avatar collective={get(LoggedInUser, 'collective')} radius={36} />
+        </Flex>
+      </StyledProfileButton>
+      <ProfileDrawer open={showProfileMenu} onClose={() => setShowProfileMenu(false)} />
     </React.Fragment>
   );
 };

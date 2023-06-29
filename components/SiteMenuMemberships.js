@@ -40,9 +40,8 @@ import StyledTooltip from './StyledTooltip';
 const AccountList = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 12px 8px;
-  margin: 0 8px;
-  border-top: 1px solid #e5e7eb;
+  padding: 12px 16px;
+  border-top: 1px solid #f3f4f6;
 
   h3 {
     font-size: 12px;
@@ -117,11 +116,11 @@ const CollectiveListItem = styled.div`
   }
 `;
 
-const MembershipLine = ({ user, membership }) => {
+const MembershipLine = ({ user, membership, onClose }) => {
   const intl = useIntl();
   return (
     <CollectiveListItem>
-      <MenuLink href={`/${membership.collective.slug}`} title={membership.collective.name}>
+      <MenuLink href={`/${membership.collective.slug}`} title={membership.collective.name} onClick={onClose}>
         <Avatar collective={membership.collective} radius="16px" />
         <P
           fontSize="inherit"
@@ -139,16 +138,17 @@ const MembershipLine = ({ user, membership }) => {
       </MenuLink>
       {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
         <Pos>
-          <StyledTooltip content="Go to Dashboard" place="right" delayHide={0} noArrow>
-            <DashboardLink
-              className="dashboardLink"
-              href={getDashboardRoute(membership.collective)}
-              color="black.500"
-              title={intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' })}
-            >
-              <Home size="14px" strokeWidth={1.5} />
-            </DashboardLink>
-          </StyledTooltip>
+          {/* <StyledTooltip content="Go to Dashboard" place="left" delayHide={0} noArrow> */}
+          <DashboardLink
+            className="dashboardLink"
+            href={getDashboardRoute(membership.collective)}
+            color="black.500"
+            title={intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' })}
+            onClick={onClose}
+          >
+            <Home size="14px" strokeWidth={1.5} />
+          </DashboardLink>
+          {/* </StyledTooltip> */}
         </Pos>
       )}
     </CollectiveListItem>
@@ -200,11 +200,11 @@ const filterMemberships = memberships => {
   return uniqBy(filteredMemberships, m => m.collective.id);
 };
 
-const MembershipsList = ({ user, memberships }) => {
+const MembershipsList = ({ user, memberships, onClose }) => {
   return (
     <Box as="ul" p={0} my={2}>
       {sortMemberships(memberships).map(member => (
-        <MembershipLine key={member.id} membership={member} user={user} />
+        <MembershipLine key={member.id} membership={member} user={user} onClose={onClose} />
       ))}
     </Box>
   );
@@ -228,7 +228,7 @@ MembershipsList.propTypes = {
  */
 const MENU_SECTIONS = {
   [CollectiveType.COLLECTIVE]: {
-    title: defineMessage({ id: 'collective', defaultMessage: 'Collectives' }),
+    title: defineMessage({ id: 'collective', defaultMessage: 'My Collectives' }),
     emptyMessage: defineMessage({ defaultMessage: 'Create a collective to collect and spend money transparently' }),
     plusButton: {
       text: defineMessage({ id: 'home.create', defaultMessage: 'Create a Collective' }),
@@ -236,17 +236,17 @@ const MENU_SECTIONS = {
     },
   },
   [CollectiveType.EVENT]: {
-    title: defineMessage({ id: 'events', defaultMessage: 'Events' }),
+    title: defineMessage({ id: 'events', defaultMessage: 'My Events' }),
   },
   [CollectiveType.FUND]: {
-    title: defineMessage({ id: 'funds', defaultMessage: 'Funds' }),
+    title: defineMessage({ id: 'funds', defaultMessage: 'My Funds' }),
     plusButton: {
       text: defineMessage({ id: 'createFund.create', defaultMessage: 'Create a Fund' }),
       href: '/fund/create',
     },
   },
   [CollectiveType.ORGANIZATION]: {
-    title: defineMessage({ id: 'organization', defaultMessage: 'Organizations' }),
+    title: defineMessage({ id: 'organization', defaultMessage: 'My Organizations' }),
     emptyMessage: defineMessage({
       defaultMessage: 'A profile representing a company or organization instead of an individual',
     }),
@@ -283,7 +283,7 @@ MenuSectionHeader.propTypes = {
   hidePlusIcon: PropTypes.bool,
 };
 
-const ProfileMenuMemberships = ({ user }) => {
+const ProfileMenuMemberships = ({ user, onClose }) => {
   const intl = useIntl();
   const memberships = filterMemberships(user.memberOf);
   const archivedMemberships = filterArchivedMemberships(user.memberOf);
@@ -316,7 +316,7 @@ const ProfileMenuMemberships = ({ user }) => {
                     {intl.formatMessage(sectionData.emptyMessage)}
                   </P>
                   {Boolean(sectionData.plusButton) && (
-                    <Link href={sectionData.plusButton.href}>
+                    <Link href={sectionData.plusButton.href} onClick={onClose}>
                       <StyledButton mt="12px" mb="16px" borderRadius="8px" width="100%" fontSize="12px">
                         <Flex alignItems="center" justifyContent="center">
                           <Container
@@ -345,7 +345,7 @@ const ProfileMenuMemberships = ({ user }) => {
                   <MembershipsList memberships={memberships} user={user} />
                 </Collapse>
               ) : (
-                <MembershipsList memberships={memberships} user={user} />
+                <MembershipsList memberships={memberships} user={user} onClose={onClose} />
               )}
             </AccountList>
           );
