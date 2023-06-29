@@ -123,7 +123,7 @@ export const virtualCardsAssignedToCollectiveQuery = gql`
 `;
 
 const VirtualCardPoliciesQuery = gql`
-  query VirtualCardPoliciesQuery($slug: String) {
+  query VirtualCardPolicies($slug: String) {
     account(slug: $slug) {
       id
       policies {
