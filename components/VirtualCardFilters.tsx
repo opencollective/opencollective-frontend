@@ -1,5 +1,5 @@
 import React from 'react';
-import { isNil, sortBy } from 'lodash';
+import { debounce, isNil, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -9,9 +9,11 @@ import { VirtualCardStatusI18n } from '../lib/virtual-cards/constants';
 import AmountRangeFilter from './filters/AmountRangeFilter';
 import PeriodFilter from './filters/PeriodFilter';
 import { Flex } from './Grid';
+import StyledInput from './StyledInput';
 import { StyledSelectFilter } from './StyledSelectFilter';
 
 const FilterContainer = styled.div`
+  min-width: 150px;
   margin-bottom: 8px;
   flex: 1 1 120px;
 `;
@@ -32,6 +34,8 @@ type Period = {
 };
 
 type VirtualCardFiltersProps = {
+  loading?: boolean;
+
   collectivesWithVirtualCards: Collective[];
   collectivesFilter: string[];
   onCollectivesFilterChange: (c: string[]) => void;
@@ -48,12 +52,16 @@ type VirtualCardFiltersProps = {
   currency: Currency;
   totalSpent?: { fromAmount: number; toAmount?: number };
   onTotalSpentChange: (amount?: { fromAmount: number; toAmount?: number }) => void;
+
+  searchTerm?: string;
+  onSearchTermChange: (searchTerm: string) => void;
 };
 
 const I18nMessages = defineMessages({
   RECEIPT_MISSING: { defaultMessage: 'Receipt missing' },
   NO_RECEIPT_MISSING: { defaultMessage: 'No receipt missing' },
   ALL: { defaultMessage: 'All' },
+  SEARCH_PLACEHOLDER: { defaultMessage: 'Search by name or last four digits of the card' },
 });
 
 export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
@@ -106,6 +114,10 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
     );
   }, [props.collectivesWithVirtualCards]);
 
+  const onSearchTermChange = React.useMemo(() => {
+    return debounce(e => props.onSearchTermChange(e.target.value), 500);
+  }, [props.onSearchTermChange]);
+
   return (
     <Flex flexWrap={'wrap'} gap="18px">
       <FilterContainer>
@@ -115,15 +127,19 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
         <StyledSelectFilter
           intl={intl}
           inputId="virtual-card.collectives.filter"
+          isLoading={props.loading}
           onChange={newValue => props.onCollectivesFilterChange(newValue.map(v => v.value))}
           isMulti={true}
           isSearchable
-          value={props.collectivesFilter
-            .map(f => props.collectivesWithVirtualCards.find(o => o.slug === f))
-            .map(c => ({
-              value: c.slug,
-              label: c.parentAccount ? `${c.parentAccount.name} - ${c.name}` : c.name,
-            }))}
+          value={
+            !props.loading &&
+            props.collectivesFilter
+              .map(f => props.collectivesWithVirtualCards.find(o => o.slug === f))
+              .map(c => ({
+                value: c.slug,
+                label: c.parentAccount ? `${c.parentAccount.name} - ${c.name}` : c.name,
+              }))
+          }
           options={collectiveOptions}
         />
       </FilterContainer>
@@ -136,6 +152,7 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
           inputId="virtual-card.status.filter"
           onChange={newValue => props.onVirtualCardStatusFilter(newValue.map(v => v.value))}
           isMulti={true}
+          isLoading={props.loading}
           value={props.virtualCardStatusFilter.map(c => ({
             value: c,
             label: intl.formatMessage(VirtualCardStatusI18n[c]),
@@ -174,9 +191,22 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
         <StyledSelectFilter
           intl={intl}
           inputId="virtual-card.missingReceipts.filter"
+          isLoading={props.loading}
           onChange={newValue => props.onMissingReceiptsChange(newValue.value)}
           value={missingReceiptValue}
           options={missingReceiptOptions}
+        />
+      </FilterContainer>
+      <FilterContainer>
+        <FilterLabel htmlFor="virtual-card.searchTerm.filter">
+          <FormattedMessage id="Search" defaultMessage="Search" />
+        </FilterLabel>
+        <StyledInput
+          id="virtual-card.searchTerm.filter"
+          width="100%"
+          placeholder={intl.formatMessage(I18nMessages.SEARCH_PLACEHOLDER)}
+          defaultValue={props.searchTerm}
+          onChange={onSearchTermChange}
         />
       </FilterContainer>
     </Flex>
