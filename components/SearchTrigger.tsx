@@ -16,7 +16,7 @@ export const breakpoints = {
 const SearchButton = styled(StyledButton)`
   color: #6b7280;
   font-weight: 400;
-  height: 36px;
+  height: 32px;
   padding: 0 12px;
   max-width: 280px;
   width: 280px;
@@ -24,8 +24,8 @@ const SearchButton = styled(StyledButton)`
   flex-shrink: 4;
 
   @media screen and (max-width: 52em) {
-    width: 36px;
-    min-width: 36px;
+    width: 32px;
+    min-width: 32px;
     padding: 0;
     display: flex;
     align-items: center;

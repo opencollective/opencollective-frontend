@@ -57,7 +57,7 @@ const MainNavItem = styled(Link)`
   flex-shrink: 1;
   color: #0f172a;
   font-size: 14px;
-  height: 36px;
+  height: 32px;
   padding: 0 8px;
   border-radius: 8px;
   white-space: nowrap;
@@ -72,11 +72,20 @@ const MainNavItem = styled(Link)`
     css`
       @media (hover: hover) {
         :hover {
-          color: #0f172a;
+          color: #0f172a !important;
           background-color: #f1f5f9;
         }
       }
     `}
+  ${props =>
+    props.href &&
+    css`
+      &:hover {
+        color: #0f172a !important;
+        background-color: #f1f5f9;
+      }
+    }
+  `}
   ${props => props.primary && `border: 1px solid #d1d5db;`}
   font-weight: ${props => (props.lightWeight ? `400` : '500')};
 
@@ -100,7 +109,7 @@ const DividerIcon = () => {
       strokeWidth="1"
       viewBox="0 0 24 24"
       width="24"
-      style={{ width: 36, height: 36, color: '#DCDDE0', margin: '0 -8px', flexShrink: 0 }}
+      style={{ width: 32, height: 32, color: '#DCDDE0', margin: '0 -8px', flexShrink: 0 }}
       // style="width: 36px; height: 36px;"
     >
       <path d="M16.88 3.549L7.12 20.451"></path>
@@ -156,7 +165,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
   return (
     <Fragment>
       <Flex
-        px={3}
+        px={[2, 3]}
         alignItems="center"
         flexDirection="row"
         justifyContent="space-between"
@@ -164,13 +173,13 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
         ref={ref}
         gridGap={2}
       >
-        <Flex alignItems="center" gridGap={3}>
+        <Flex alignItems="center" gridGap={[2, 3]}>
           <SiteMenu ocLogoRoute={ocLogoRoute} />
 
           <Box flexShrink={0}>
             <Link href={ocLogoRoute}>
               <Flex alignItems="center" gridGap={2}>
-                <Image width="36" height="36" src="/static/images/opencollective-icon.png" alt="Open Collective" />
+                <Image width="32" height="32" src="/static/images/opencollective-icon.png" alt="Open Collective" />
                 {onHomeRoute && (
                   <Hide xs sm md display="flex" alignItems="center">
                     <Image height={20} width={120} src="/static/images/logotype.svg" alt="Open Collective" />
@@ -348,7 +357,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
             <Fragment>
               <SearchTrigger setShowSearchModal={setShowSearchModal} />
               <Hide xs>
-                <ChangelogTrigger height="36px" width="36px" />
+                <ChangelogTrigger height="32px" width="32px" />
               </Hide>
               <ProfileMenu />
             </Fragment>

@@ -22,10 +22,10 @@ const StyledProfileButton = styled(StyledButton)`
 `;
 
 const ProfileHeader = styled.div`
-  padding: 16px;
-  padding-bottom: 15px;
+  padding: 0 16px;
+  height: 64px;
   display: flex;
-  align-items: start;
+  align-items: center;
   justify-content: space-between;
   grid-gap: 8px;
   border-bottom: 1px solid #f3f4f6;
@@ -58,7 +58,7 @@ const ProfileDrawer = ({ onClose, open }) => {
         <React.Fragment>
           <ProfileHeader>
             <Flex gridGap={2} alignItems="center" overflow="hidden">
-              <Avatar collective={LoggedInUser.collective} radius={36} />
+              <Avatar collective={LoggedInUser.collective} radius={32} />
               <Box overflow="hidden">
                 <div className="name">{LoggedInUser.collective.name}</div>
                 <div className="email">{LoggedInUser.email}</div>
@@ -145,7 +145,7 @@ const ProfileMenu = () => {
     <React.Fragment>
       <StyledProfileButton isBorderless onClick={() => setShowProfileMenu(true)}>
         <Flex alignItems="center" data-cy="user-menu-trigger" gridGap={2}>
-          <Avatar collective={get(LoggedInUser, 'collective')} radius={36} />
+          <Avatar collective={get(LoggedInUser, 'collective')} radius={32} />
         </Flex>
       </StyledProfileButton>
       <ProfileDrawer open={showProfileMenu} onClose={() => setShowProfileMenu(false)} />

@@ -29,8 +29,8 @@ const StyledMUIDrawer = styled(MUIDrawer)`
 `;
 
 const StyledCloseButton = styled(StyledRoundButton)`
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   color: #4b5563;
 `;
 
@@ -78,18 +78,6 @@ const StyledMenuItem = styled(Link)`
   }
   svg {
     color: #94a3b8;
-    height: 14px;
-    width: 14px;
-  }
-
-  @media screen and (max-width: ${themeGet('breakpoints.0')}) {
-    font-size: 16px;
-    padding: 12px;
-
-    svg {
-      height: 16px;
-      width: 16px;
-    }
   }
 
   ${props =>

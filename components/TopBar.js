@@ -111,7 +111,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
       alignItems="center"
       flexDirection="row"
       justifyContent="space-around"
-      css={{ height: theme.sizes.navbarHeight, background: 'white' }}
+      css={{ height: theme.sizes.navbarHeight, background: 'white', borderBottom: '1px solid rgb(232, 233, 235)' }}
       ref={ref}
     >
       <Link href="/">
