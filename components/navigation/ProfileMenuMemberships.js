@@ -1,48 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Plus } from '@styled-icons/boxicons-regular/Plus';
-import { Settings } from '@styled-icons/feather/Settings';
 import { groupBy, isEmpty, uniqBy } from 'lodash';
+import { Home, Plus } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { Home } from 'lucide-react';
-import { CollectiveType } from '../lib/constants/collectives';
-import { isPastEvent } from '../lib/events';
-import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
-import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
 
-import Avatar from './Avatar';
-import Collapse from './Collapse';
-import Container from './Container';
-import { Box, Flex } from './Grid';
-import Link from './Link';
-import ListItem from './ListItem';
-import StyledButton from './StyledButton';
-import StyledHr from './StyledHr';
-import StyledLink from './StyledLink';
-import StyledRoundButton from './StyledRoundButton';
-import { P } from './Text';
-import StyledTooltip from './StyledTooltip';
+import { CollectiveType } from '../../lib/constants/collectives';
+import { isPastEvent } from '../../lib/events';
+import { getDashboardRoute } from '../../lib/url-helpers';
 
-// const CollectiveListItem = styled.div`
-//   @media (hover: hover) {
-//     :hover svg {
-//       opacity: 1;
-//     }
-//   }
-//   @media (hover: none) {
-//     svg {
-//       opacity: 1;
-//     }
-//   }
-// `;
+import Avatar from '../Avatar';
+import Collapse from '../Collapse';
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
+import Link from '../Link';
+import StyledButton from '../StyledButton';
+import StyledRoundButton from '../StyledRoundButton';
+import { P } from '../Text';
 
 const AccountList = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 12px 16px;
+  padding: 4px 16px;
   border-top: 1px solid #f3f4f6;
-
+  padding-top: 12px;
   h3 {
     font-size: 12px;
     font-weight: 600;
@@ -80,26 +61,20 @@ const DashboardLink = styled(Link)`
   border: 1px solid #e5e7eb;
   background: white;
   color: #1f2937;
-  height: 100%;
   opacity: 0;
   display: flex;
   align-items: center;
   padding: 0 6px;
   border-radius: 8px;
-
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  bottom: 4px;
   transition: opacity 0.1s, background-color 0.1s, color 0.1s;
   &:hover {
     background: #030712;
     color: white;
   }
-`;
-const Pos = styled.div`
-  position: absolute;
-  display: flex;
-  align-items: stretch;
-  right: 4px;
-  top: 4px;
-  bottom: 4px;
 `;
 
 const CollectiveListItem = styled.div`
@@ -116,12 +91,12 @@ const CollectiveListItem = styled.div`
   }
 `;
 
-const MembershipLine = ({ user, membership, onClose }) => {
+const MembershipLine = ({ user, membership, closeDrawer }) => {
   const intl = useIntl();
   return (
     <CollectiveListItem>
-      <MenuLink href={`/${membership.collective.slug}`} title={membership.collective.name} onClick={onClose}>
-        <Avatar collective={membership.collective} radius="16px" />
+      <MenuLink href={`/${membership.collective.slug}`} onClick={closeDrawer}>
+        <Avatar collective={membership.collective} radius={16} />
         <P
           fontSize="inherit"
           fontWeight="inherit"
@@ -132,24 +107,17 @@ const MembershipLine = ({ user, membership, onClose }) => {
         >
           {membership.collective.name}
         </P>
-        {/* <P fontSize="12px" lineHeight="18px" truncateOverflow color="black.700">
-            @{membership.collective.slug}
-          </P> */}
       </MenuLink>
       {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
-        <Pos>
-          {/* <StyledTooltip content="Go to Dashboard" place="left" delayHide={0} noArrow> */}
-          <DashboardLink
-            className="dashboardLink"
-            href={getDashboardRoute(membership.collective)}
-            color="black.500"
-            title={intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' })}
-            onClick={onClose}
-          >
-            <Home size="14px" strokeWidth={1.5} />
-          </DashboardLink>
-          {/* </StyledTooltip> */}
-        </Pos>
+        <DashboardLink
+          className="dashboardLink"
+          href={getDashboardRoute(membership.collective)}
+          color="black.500"
+          title={intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' })}
+          onClick={closeDrawer}
+        >
+          <Home size="14px" strokeWidth={1.5} />
+        </DashboardLink>
       )}
     </CollectiveListItem>
   );
@@ -200,11 +168,11 @@ const filterMemberships = memberships => {
   return uniqBy(filteredMemberships, m => m.collective.id);
 };
 
-const MembershipsList = ({ user, memberships, onClose }) => {
+const MembershipsList = ({ user, memberships, closeDrawer }) => {
   return (
     <Box as="ul" p={0} my={2}>
       {sortMemberships(memberships).map(member => (
-        <MembershipLine key={member.id} membership={member} user={user} onClose={onClose} />
+        <MembershipLine key={member.id} membership={member} user={user} closeDrawer={closeDrawer} />
       ))}
     </Box>
   );
@@ -260,7 +228,7 @@ const MENU_SECTIONS = {
   },
 };
 
-const MenuSectionHeader = ({ section, hidePlusIcon }) => {
+const MenuSectionHeader = ({ section, hidePlusIcon, closeDrawer }) => {
   const intl = useIntl();
   const { title, plusButton } = MENU_SECTIONS[section];
   return (
@@ -268,8 +236,15 @@ const MenuSectionHeader = ({ section, hidePlusIcon }) => {
       <h3>{intl.formatMessage(title)}</h3>
 
       {Boolean(!hidePlusIcon && plusButton) && (
-        <Link href={plusButton.href} title={intl.formatMessage(plusButton.text)}>
-          <StyledRoundButton mr={'6px'} size={24} color="#C4C7CC">
+        <Link href={plusButton.href} title={intl.formatMessage(plusButton.text)} onClick={closeDrawer}>
+          <StyledRoundButton
+            mr={'6px'}
+            size={24}
+            color="#C4C7CC"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
             <Plus size={12} color="#76777A" />
           </StyledRoundButton>
         </Link>
@@ -281,9 +256,10 @@ const MenuSectionHeader = ({ section, hidePlusIcon }) => {
 MenuSectionHeader.propTypes = {
   section: PropTypes.oneOf(Object.keys(MENU_SECTIONS)).isRequired,
   hidePlusIcon: PropTypes.bool,
+  closeDrawer: PropTypes.func,
 };
 
-const ProfileMenuMemberships = ({ user, onClose }) => {
+const ProfileMenuMemberships = ({ user, closeDrawer }) => {
   const intl = useIntl();
   const memberships = filterMemberships(user.memberOf);
   const archivedMemberships = filterArchivedMemberships(user.memberOf);
@@ -309,14 +285,16 @@ const ProfileMenuMemberships = ({ user, onClose }) => {
           const sectionData = MENU_SECTIONS[accountType];
           return (
             <AccountList key={accountType}>
-              {accountType !== 'ARCHIVED' && <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} />}
+              {accountType !== 'ARCHIVED' && (
+                <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} closeDrawer={closeDrawer} />
+              )}
               {sectionIsEmpty ? (
                 <Box my={2}>
                   <P fontSize="12px" lineHeight="18px" color="black.700">
                     {intl.formatMessage(sectionData.emptyMessage)}
                   </P>
                   {Boolean(sectionData.plusButton) && (
-                    <Link href={sectionData.plusButton.href} onClick={onClose}>
+                    <Link href={sectionData.plusButton.href} onClick={closeDrawer}>
                       <StyledButton mt="12px" mb="16px" borderRadius="8px" width="100%" fontSize="12px">
                         <Flex alignItems="center" justifyContent="center">
                           <Container
@@ -340,23 +318,18 @@ const ProfileMenuMemberships = ({ user, onClose }) => {
                 <Collapse
                   buttonSize={24}
                   defaultIsOpen={false}
-                  title={<MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} />}
+                  title={
+                    <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} closeDrawer={closeDrawer} />
+                  }
                 >
-                  <MembershipsList memberships={memberships} user={user} />
+                  <MembershipsList memberships={memberships} user={user} closeDrawer={closeDrawer} />
                 </Collapse>
               ) : (
-                <MembershipsList memberships={memberships} user={user} onClose={onClose} />
+                <MembershipsList memberships={memberships} user={user} closeDrawer={closeDrawer} />
               )}
             </AccountList>
           );
         })}
-      {hasNoMemberships && (
-        <P textAlign="center" mb={2}>
-          <StyledLink as={Link} href="/search" color="blue.900">
-            <FormattedMessage defaultMessage="Discover Collectives to Support" />
-          </StyledLink>
-        </P>
-      )}
     </React.Fragment>
   );
 };
@@ -365,6 +338,7 @@ ProfileMenuMemberships.propTypes = {
   user: PropTypes.shape({
     memberOf: PropTypes.arrayOf(PropTypes.object),
   }),
+  closeDrawer: PropTypes.func,
 };
 
 export default React.memo(ProfileMenuMemberships);

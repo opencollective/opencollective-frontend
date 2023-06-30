@@ -126,13 +126,8 @@ const RootActionsPage = () => {
   const selectedMenuEntry = MENU.find(m => m.slug === router.query.section) || MENU[1];
   const showHiddenActions = Boolean(router.query.showHiddenActions);
   return (
-    <AuthenticatedPage disableSignup rootOnly>
-      <Container maxWidth="1000px" m="0 auto" mt={4} borderBottom="1px solid #e5e5e5">
-        <H1 textAlign="left" fontSize="32px" py={2} pl={2}>
-          Root actions
-        </H1>
-      </Container>
-      <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" mb={5}>
+    <AuthenticatedPage disableSignup rootOnly navTitle="Root Actions">
+      <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" my={5}>
         <Container borderRight="1px solid #e5e5e5">
           {MENU.filter(e => showHiddenActions || !e.isHidden).map(menuEntry =>
             menuEntry.type === 'category' ? (

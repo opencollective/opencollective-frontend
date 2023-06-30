@@ -1,5 +1,4 @@
 import React from 'react';
-import { themeGet } from '@styled-system/theme-get';
 import { Search } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';

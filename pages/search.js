@@ -299,7 +299,7 @@ class SearchPage extends React.Component {
     const selectedTypeFilter = this.props.isHost ? 'HOST' : this.props.type.length === 1 ? this.props.type[0] : 'ALL';
 
     return (
-      <Page title="Explore" showSearch={false}>
+      <Page navTitle={intl.formatMessage({ defaultMessage: 'Explore' })} showSearch={false}>
         <Container
           backgroundImage="url(/static/images/home/fiscalhost-blue-bg-lg.png)"
           style={{ transform: 'rotate(180deg)' }}

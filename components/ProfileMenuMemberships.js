@@ -1,3 +1,7 @@
+/**
+ * @deprecated Will be replaced by `components/navigation/ProfileMenuMemberships.tsx` when Workspace moves out of preview features
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Plus } from '@styled-icons/boxicons-regular/Plus';
