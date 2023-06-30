@@ -15,7 +15,7 @@ import StyledInputField from '../StyledInputField';
 
 import FilterButtonContainer from './FilterButtonContainer';
 
-const I18_LABELS = defineMessages({
+const I18N_LABELS = defineMessages({
   ALL: {
     id: 'Amount.AllShort',
     defaultMessage: 'All',
@@ -27,10 +27,6 @@ const I18_LABELS = defineMessages({
   rangeFromTo: {
     id: 'Amount.RangeFromTo',
     defaultMessage: '{minAmount} to {maxAmount}',
-  },
-  rangeExact: {
-    id: 'Amount.RangeExact',
-    defaultMessage: '{amount}',
   },
 });
 
@@ -81,22 +77,20 @@ export default function AmountRangeFilter(props: AmountRangeFilterProps) {
 
   const label = React.useMemo(() => {
     if (!props.value || (isNil(props.value.fromAmount) && isNil(props.value.toAmount))) {
-      return intl.formatMessage(I18_LABELS.ALL);
+      return intl.formatMessage(I18N_LABELS.ALL);
     }
 
     if (isNil(props.value.toAmount)) {
-      return intl.formatMessage(I18_LABELS.rangeFrom, {
+      return intl.formatMessage(I18N_LABELS.rangeFrom, {
         minAmount: formatCurrency(props.value.fromAmount, props.currency, { precision: 0, locale: intl.locale }),
       });
     }
 
     if (props.value?.toAmount === props.value?.fromAmount) {
-      return intl.formatMessage(I18_LABELS.rangeExact, {
-        amount: formatCurrency(props.value?.fromAmount ?? 0, props.currency, { precision: 0, locale: intl.locale }),
-      });
+      return formatCurrency(props.value?.fromAmount ?? 0, props.currency, { precision: 0, locale: intl.locale });
     }
 
-    return intl.formatMessage(I18_LABELS.rangeFromTo, {
+    return intl.formatMessage(I18N_LABELS.rangeFromTo, {
       minAmount: formatCurrency(props.value?.fromAmount ?? 0, props.currency, { precision: 0, locale: intl.locale }),
       maxAmount: formatCurrency(props.value?.toAmount, props.currency, { precision: 0, locale: intl.locale }),
     });

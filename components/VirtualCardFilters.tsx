@@ -60,7 +60,7 @@ type VirtualCardFiltersProps = {
 const I18nMessages = defineMessages({
   RECEIPT_MISSING: { defaultMessage: 'Receipt missing' },
   NO_RECEIPT_MISSING: { defaultMessage: 'No receipt missing' },
-  ALL: { defaultMessage: 'All' },
+  ALL: { id: 'VirtualCard.AllTypes', defaultMessage: 'All' },
   SEARCH_PLACEHOLDER: { defaultMessage: 'Search by name or last four digits of the card' },
 });
 
