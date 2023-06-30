@@ -144,6 +144,21 @@ jobs:
 
       - run: npm run type:check
 
+  build-components:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - run: npm run build:components
+
   e2e:
     if: github.ref_name != 'i18n/crowdin'
     needs: build
