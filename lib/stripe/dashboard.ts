@@ -1,4 +1,4 @@
-export default function getDashboardObjectIdURL(objectId: string, accountId?: string) {
+export function getDashboardObjectIdURL(objectId: string, accountId?: string) {
   const url = new URL(
     process.env.OC_ENV === 'production'
       ? `https://dashboard.stripe.com/id/${objectId}`
