@@ -515,7 +515,11 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 """
 scalar JSON
 
-"\n    A person or an entity that contributes financially or by any other mean to the mission\n    of the collective. While \"Member\" is dedicated to permissions, this type is meant\n    to surface all the public contributors.\n  "
+"""
+A person or an entity that contributes financially or by any other mean to the mission
+of the collective. While "Member" is dedicated to permissions, this type is meant
+to surface all the public contributors.
+"""
 type Contributor {
   """
   A unique identifier for this member
@@ -4316,7 +4320,12 @@ type Query {
     transactionUuid: String!
   ): InvoiceType @deprecated(reason: "2023-05-04: Please fetch transactions with GraphQL v2")
 
-  "\n    Given a collective, returns all its transactions:\n    - Debit transactions made by collective without using a gift card\n    - Debit transactions made using a gift card from collective\n    - Credit transactions made to collective\n    "
+  """
+  Given a collective, returns all its transactions:
+  - Debit transactions made by collective without using a gift card
+  - Debit transactions made using a gift card from collective
+  - Credit transactions made to collective
+  """
   allTransactions(
     CollectiveId: Int
     collectiveSlug: String

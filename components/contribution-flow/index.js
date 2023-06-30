@@ -562,7 +562,7 @@ class ContributionFlow extends React.Component {
     if (!stepProfile) {
       return action === 'prev';
     } else if (stepProfile.isGuest) {
-      return validateGuestProfile(stepProfile, stepDetails);
+      return validateGuestProfile(stepProfile, stepDetails, this.props.tier);
     }
 
     // Check if we're creating a new profile
@@ -752,7 +752,7 @@ class ContributionFlow extends React.Component {
     const minAmount = this.getTierMinAmount(tier, currency);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
     const isStepProfileCompleted = Boolean(
-      (stepProfile && LoggedInUser) || (stepProfile?.isGuest && validateGuestProfile(stepProfile, stepDetails)),
+      (stepProfile && LoggedInUser) || (stepProfile?.isGuest && validateGuestProfile(stepProfile, stepDetails, tier)),
     );
     const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
 

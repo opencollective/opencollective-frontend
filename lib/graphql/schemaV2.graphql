@@ -3044,7 +3044,11 @@ type ContributorCollection implements Collection {
   nodes: [Contributor]
 }
 
-"\n    A person or an entity that contributes financially or by any other mean to the mission\n    of the collective. While \"Member\" is dedicated to permissions, this type is meant\n    to surface all the public contributors.\n  "
+"""
+A person or an entity that contributes financially or by any other mean to the mission
+of the collective. While "Member" is dedicated to permissions, this type is meant
+to surface all the public contributors.
+"""
 type Contributor {
   """
   A unique identifier for this member
@@ -8037,7 +8041,11 @@ type Individual implements Account {
     offset: Int! = 0
   ): OAuthApplicationCollection
 
-  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see their own address\n            - Hosts can see the address of users submitting expenses to their collectives\n        "
+  """
+  Address. This field is public for hosts, otherwise:
+    - Users can see their own address
+    - Hosts can see the address of users submitting expenses to their collectives
+  """
   location: Location
   categories: [String]!
   stats: AccountStats
@@ -8731,7 +8739,11 @@ type Organization implements Account & AccountWithContributions {
     offset: Int! = 0
   ): OAuthApplicationCollection
 
-  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.\n            - Hosts can see the address of organizations submitting expenses to their collectives.\n        "
+  """
+  Address. This field is public for hosts, otherwise:
+    - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.
+    - Hosts can see the address of organizations submitting expenses to their collectives.
+  """
   location: Location
   categories: [String]!
   stats: AccountStats
