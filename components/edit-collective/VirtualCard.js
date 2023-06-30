@@ -14,6 +14,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import getDashboardObjectIdURL from '../../lib/stripe/dashboard';
 
 import Avatar from '../Avatar';
 import ConfirmationModal from '../ConfirmationModal';
@@ -265,7 +266,7 @@ const ActionsButton = props => {
                       <React.Fragment>
                         <StyledHr borderColor="black.300" mt={2} mb={2} />
                         <a
-                          href={`https://dashboard.stripe.com/issuing/cards/${virtualCard?.id}`}
+                          href={getDashboardObjectIdURL(virtualCard.id, props.host?.stripe?.username)}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
