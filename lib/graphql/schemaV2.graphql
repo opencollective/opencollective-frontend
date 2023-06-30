@@ -4789,6 +4789,7 @@ type TimeSeriesAmountWithKindNode {
 Stripe connected account properties
 """
 type StripeConnectedAccount {
+  username: String
   issuingBalance: Amount
 }
 

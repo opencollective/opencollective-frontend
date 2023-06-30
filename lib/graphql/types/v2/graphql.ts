@@ -8253,6 +8253,7 @@ export enum SocialLinkType {
 export type StripeConnectedAccount = {
   __typename?: 'StripeConnectedAccount';
   issuingBalance?: Maybe<Amount>;
+  username?: Maybe<Scalars['String']>;
 };
 
 export type StripeError = {
