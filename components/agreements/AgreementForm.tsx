@@ -119,9 +119,10 @@ type AgreementFormProps = {
   onEdit: (Agreement) => void;
   onCancel: () => void;
   agreement: Agreement;
+  openFileViewer: (fileUrl: string) => void;
 };
 
-const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: AgreementFormProps) => {
+const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel, openFileViewer }: AgreementFormProps) => {
   const intl = useIntl();
   const { addToast } = useToasts();
   const initialValues = cloneDeep(agreement || {});
@@ -222,6 +223,7 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: 
                 isMulti={false}
                 onChange={file => formik.setFieldValue('attachment', file)}
                 defaultValue={formik.values.attachment || undefined}
+                openFileViewer={openFileViewer}
               />
               <StyledInputFormikField
                 name="expiresAt"
