@@ -15,38 +15,22 @@ type LocalFilePreviewProps = {
   size: number;
 };
 
+const SUPPORTED_IMAGE_REGEX = /^image\/(jpeg|jpg|png|gif|webp)$/;
+
 export default function LocalFilePreview(props: LocalFilePreviewProps) {
-  const preview = React.useMemo(() => {
-    if (props.file.type === 'application/pdf') {
-      return <FileText opacity={0.25} />;
-    }
-
-    return <EmbeddedPreview file={props.file} size={props.size} />;
-  }, [props.file.type, props.size]);
-
   return (
     <Box>
       <Box width={props.size} height={props.size}>
-        {preview}
+        {SUPPORTED_IMAGE_REGEX.test(props.file.type) ? (
+          <img height="100%" width="100%" src={URL.createObjectURL(props.file)} alt={props.file.name} />
+        ) : (
+          <FileText opacity={0.25} />
+        )}
       </Box>
 
-      <FileName fontSize="13px" fontWeight="700">
+      <FileName fontSize="13px" fontWeight="700" mt={2}>
         {props.file.name}
       </FileName>
     </Box>
   );
-}
-
-function EmbeddedPreview(props: { file: File; size: number }) {
-  const previewRef = React.useRef<HTMLEmbedElement>(null);
-
-  React.useEffect(() => {
-    const reader = new FileReader();
-    reader.onload = function () {
-      previewRef.current.src = reader.result as string;
-    };
-    reader.readAsDataURL(props.file);
-  }, [props.file, previewRef.current]);
-
-  return <embed height="100%" width="100%" title={props.file.name} ref={previewRef} />;
 }
