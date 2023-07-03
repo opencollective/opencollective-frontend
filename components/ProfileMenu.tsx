@@ -183,6 +183,12 @@ const ProfileMenuDropdown = () => {
                     </Span>
                   </StyledMenuEntry>
                 )}
+                {LoggedInUser.isRoot && (
+                  <StyledMenuEntry href="/opencollective/root-actions">
+                    {/** Not i18n on purpose, this is for platform admins only */}
+                    Root Actions
+                  </StyledMenuEntry>
+                )}
                 <hr />
                 <StyledMenuEntry href="/create">
                   <FormattedMessage defaultMessage="New Collective" /> <Plus />
