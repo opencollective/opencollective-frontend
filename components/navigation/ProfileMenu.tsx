@@ -66,7 +66,7 @@ const ProfileDrawer = ({ onClose, open }) => {
             </Flex>
             <DrawerCloseButton onClick={onClose} />
           </ProfileHeader>
-          <Flex py="12px" flex={1} flexDirection="column" overflowY="scroll">
+          <Flex py="12px" flex={1} flexDirection="column" overflowY="auto">
             <Flex pb="12px" flexDirection="column">
               <DrawerMenuItem href={`/${LoggedInUser.collective.slug}`} onClick={onClose}>
                 <Flex alignItems="center" gridGap={2}>

@@ -106,7 +106,7 @@ export default function SiteMenu({ ocLogoRoute }: { ocLogoRoute: string }) {
             <DrawerCloseButton onClick={onClose} />
           </Flex>
 
-          <Flex flex={1} flexDirection="column" overflowY="scroll">
+          <Flex flex={1} flexDirection="column" overflowY="auto">
             <Flex flexDirection="column" py={2}>
               <DrawerMenuItem href={LoggedInUser ? '/dashboard' : '/'} onClick={onClose}>
                 <Flex alignItems="center" gridGap={2}>
@@ -141,7 +141,7 @@ export default function SiteMenu({ ocLogoRoute }: { ocLogoRoute: string }) {
               </DrawerMenuItem>
             </Flex>
 
-            <hr />
+            {/* <hr /> */}
             <Flex flexDirection="column" py={2}>
               {/* 
               <DrawerMenuItem href="https://slack.opencollective.com/" onClick={onClose} openInNewTab>
@@ -177,7 +177,7 @@ export default function SiteMenu({ ocLogoRoute }: { ocLogoRoute: string }) {
                 </Flex>
                 <ChevronDown size={16} />
               </DrawerMenuItem> */}
-              <DrawerMenuItem href="#">
+              {/* <DrawerMenuItem href="#">
                 <Flex alignItems="center" gridGap={2}>
                   <Lightbulb size={16} />
                   <span>
@@ -215,7 +215,7 @@ export default function SiteMenu({ ocLogoRoute }: { ocLogoRoute: string }) {
                   </span>
                 </Flex>
                 <ChevronDown size={16} />
-              </DrawerMenuItem>
+              </DrawerMenuItem> */}
             </Flex>
             {/* <DrawerMenuItem href="/help" onClick={onClose}>
               <Flex alignItems="center" gridGap={2}>
@@ -224,7 +224,7 @@ export default function SiteMenu({ ocLogoRoute }: { ocLogoRoute: string }) {
               <ExternalLink size={16} className="show-on-hover" />
             </DrawerMenuItem> */}
           </Flex>
-          <Container position="relative" py={'24px'} borderTop={'1px solid #e5e7eb'}>
+          <Container position="relative" py={'24px'} borderTop={'1px solid #f3f4f6'}>
             <Footer>
               <span
                 style={{ fontSize: '12px', margin: '0 0 8px 0', display: 'block', color: '#6e7781', fontWeight: 300 }}
