@@ -25,7 +25,7 @@ class CreateOrganizationPage extends React.Component {
     }
 
     return (
-      <Page>
+      <Page title="Create Organization">
         <CreateOrganization LoggedInUser={LoggedInUser} refetchLoggedInUser={refetchLoggedInUser} />
       </Page>
     );
