@@ -32,9 +32,9 @@ const FilterLabel = styled.label`
 `;
 
 const I18nMessages = defineMessages({
-  ALL: { defaultMessage: 'All' },
-  HAS_RECEIPTS: { defaultMessage: 'Has receipts' },
-  HAS_NO_RECEIPTS: { defaultMessage: 'Has no receipts' },
+  ALL: { id: 'VirtualCard.AllTypes', defaultMessage: 'All' },
+  HAS_RECEIPTS: { id: 'VirtualCard.WithReceiptsFilter', defaultMessage: 'Has receipts' },
+  HAS_NO_RECEIPTS: { id: 'VirtualCard.WithoutReceiptsFilter', defaultMessage: 'Has no receipts' },
 });
 
 const ExpensesFilters = ({

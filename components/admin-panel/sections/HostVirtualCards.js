@@ -33,6 +33,7 @@ const hostVirtualCardsQuery = gql`
     $spentAmountFrom: AmountInput
     $spentAmountTo: AmountInput
     $hasMissingReceipts: Boolean
+    $searchTerm: String
   ) {
     host(slug: $slug) {
       id
@@ -42,6 +43,9 @@ const hostVirtualCardsQuery = gql`
       imageUrl
       currency
       settings
+      stripe {
+        username
+      }
       hostedVirtualCards(
         limit: $limit
         offset: $offset
@@ -52,6 +56,7 @@ const hostVirtualCardsQuery = gql`
         spentAmountFrom: $spentAmountFrom
         spentAmountTo: $spentAmountTo
         hasMissingReceipts: $hasMissingReceipts
+        searchTerm: $searchTerm
       ) {
         totalCount
         limit
@@ -120,6 +125,9 @@ const HostVirtualCards = props => {
   const queryFilter = useQueryFilter({
     ignoreQueryParams: ['slug', 'section'],
     filters: {
+      searchTerm: {
+        queryParam: 'q',
+      },
       collectiveSlugs: {
         isMulti: true,
         queryParam: 'collective',
@@ -157,6 +165,7 @@ const HostVirtualCards = props => {
         ? { valueInCents: queryFilter.values.totalSpent?.toAmount }
         : null,
       hasMissingReceipts: queryFilter.values.missingReceipts,
+      searchTerm: queryFilter.values.searchTerm,
     },
   });
 
@@ -183,10 +192,6 @@ const HostVirtualCards = props => {
     refetch();
   };
 
-  if (loading) {
-    return <Loading />;
-  }
-
   return (
     <Fragment>
       <Box>
@@ -207,6 +212,7 @@ const HostVirtualCards = props => {
         </P>
         <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters
+            loading={loading}
             collectivesFilter={queryFilter.values.collectiveSlugs}
             onCollectivesFilterChange={queryFilter.setCollectiveSlugs}
             collectivesWithVirtualCards={data?.host?.hostedVirtualCardCollectives?.nodes ?? []}
@@ -219,78 +225,88 @@ const HostVirtualCards = props => {
             currency={data?.host?.currency}
             totalSpent={queryFilter.values.totalSpent}
             onTotalSpentChange={queryFilter.setTotalSpent}
+            searchTerm={queryFilter.values.searchTerm}
+            onSearchTermChange={queryFilter.setSearchTerm}
           />
         </Flex>
       </Box>
-      <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
-        <AddCardPlaceholder
-          width="366px"
-          height="248px"
-          justifyContent="center"
-          alignItems="center"
-          flexDirection="column"
-        >
-          <StyledButton
-            my={1}
-            px={14}
-            py={10}
-            buttonStyle="primary"
-            buttonSize="medium"
-            data-cy="confirmation-modal-continue"
-            onClick={() => setCreateVirtualCardModalDisplay(true)}
-          >
-            +
-          </StyledButton>
-          <Box mt="10px">
-            <FormattedMessage defaultMessage="Create virtual card" />
-          </Box>
-        </AddCardPlaceholder>
-        <AddCardPlaceholder
-          width="366px"
-          height="248px"
-          justifyContent="center"
-          alignItems="center"
-          flexDirection="column"
-        >
-          <StyledButton
-            my={1}
-            px={14}
-            py={10}
-            buttonStyle="primary"
-            buttonSize="medium"
-            data-cy="confirmation-modal-continue"
-            onClick={() => setAssignCardModalDisplay(true)}
-          >
-            +
-          </StyledButton>
-          <Box mt="10px">
-            <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />
-          </Box>
-        </AddCardPlaceholder>
-        {data.host.hostedVirtualCards.nodes.map(vc => (
-          <VirtualCard
-            key={vc.id}
-            host={data.host}
-            virtualCard={vc}
-            canEditVirtualCard
-            canPauseOrResumeVirtualCard
-            canDeleteVirtualCard
-            onDeleteRefetchQuery="HostedVirtualCards"
-          />
-        ))}
-      </Grid>
-      <Flex mt={5} alignItems="center" flexDirection="column" justifyContent="center">
-        <Pagination
-          route={`/${data.host.slug}/admin/host-virtual-cards`}
-          total={data.host.hostedVirtualCards.totalCount}
-          limit={VIRTUAL_CARDS_PER_PAGE}
-          offset={offset}
-          ignoredQueryParams={['slug', 'section']}
-        />
-        <P mt={1} fontSize="12px">
-          <FormattedMessage id="TotalItems" defaultMessage="Total Items" />: {data.host.hostedVirtualCards.totalCount}
-        </P>
-      </Flex>
+      {loading ? (
+        <Loading />
+      ) : (
+        <React.Fragment>
+          <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
+            <AddCardPlaceholder
+              width="366px"
+              height="248px"
+              justifyContent="center"
+              alignItems="center"
+              flexDirection="column"
+            >
+              <StyledButton
+                my={1}
+                px={14}
+                py={10}
+                buttonStyle="primary"
+                buttonSize="medium"
+                data-cy="confirmation-modal-continue"
+                onClick={() => setCreateVirtualCardModalDisplay(true)}
+              >
+                +
+              </StyledButton>
+              <Box mt="10px">
+                <FormattedMessage defaultMessage="Create virtual card" />
+              </Box>
+            </AddCardPlaceholder>
+            <AddCardPlaceholder
+              width="366px"
+              height="248px"
+              justifyContent="center"
+              alignItems="center"
+              flexDirection="column"
+            >
+              <StyledButton
+                my={1}
+                px={14}
+                py={10}
+                buttonStyle="primary"
+                buttonSize="medium"
+                data-cy="confirmation-modal-continue"
+                onClick={() => setAssignCardModalDisplay(true)}
+              >
+                +
+              </StyledButton>
+              <Box mt="10px">
+                <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />
+              </Box>
+            </AddCardPlaceholder>
+            {data.host.hostedVirtualCards.nodes.map(vc => (
+              <VirtualCard
+                key={vc.id}
+                host={data.host}
+                virtualCard={vc}
+                canEditVirtualCard
+                canPauseOrResumeVirtualCard
+                canDeleteVirtualCard
+                onDeleteRefetchQuery="HostedVirtualCards"
+              />
+            ))}
+          </Grid>
+          <Flex mt={5} alignItems="center" flexDirection="column" justifyContent="center">
+            <Pagination
+              route={`/${data.host.slug}/admin/host-virtual-cards`}
+              total={data.host.hostedVirtualCards.totalCount}
+              limit={VIRTUAL_CARDS_PER_PAGE}
+              offset={offset}
+              ignoredQueryParams={['slug', 'section']}
+            />
+            <P mt={1} fontSize="12px">
+              <FormattedMessage id="TotalItems" defaultMessage="Total Items" />:{' '}
+              {data.host.hostedVirtualCards.totalCount}
+            </P>
+          </Flex>
+        </React.Fragment>
+      )}
+
       {displayAssignCardModal && (
         <AssignVirtualCardModal
           host={data.host}
@@ -300,6 +316,7 @@ const HostVirtualCards = props => {
           }}
         />
       )}
+
       {displayCreateVirtualCardModal && (
         <EditVirtualCardModal
           host={data.host}

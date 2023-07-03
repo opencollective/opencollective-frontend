@@ -15,7 +15,7 @@ import {
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective.lib';
+import { isHostAccount, isIndividualAccount, isInternalHost, isSelfHostedAccount } from '../../lib/collective.lib';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 
@@ -58,7 +58,7 @@ const Menu = ({ isAccountantOnly }) => {
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS}
           icon={<FileText size={16} />}
-          if={process.env.OC_ENV !== 'production'}
+          if={isInternalHost(account)}
         />
 
         <MenuLink
@@ -106,7 +106,7 @@ const Menu = ({ isAccountantOnly }) => {
         </MenuLink>
       </MenuGroup>
 
-      {/** User/org/collective/event/project dashbord */}
+      {/** User/org/collective/event/project dashboard */}
       <MenuGroup>
         {isHost && (
           <MenuSectionHeader>
@@ -123,7 +123,11 @@ const Menu = ({ isAccountantOnly }) => {
         )}
         <MenuLink section={COLLECTIVE_SECTIONS.HOME} icon={<Home size={16} />} if={isIndividual} />
         <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} icon={<Receipt size={16} />} />
-        <MenuLink section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} icon={<Coins size={16} />} />
+        <MenuLink
+          section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS}
+          icon={<Coins size={16} />}
+          if={!isAccountantOnly}
+        />
         <MenuLink
           section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
           icon={<Coins size={16} />}
@@ -243,7 +247,7 @@ const Menu = ({ isAccountantOnly }) => {
           icon={<Settings size={16} />}
           if={isType(account, ORGANIZATION) && isHost}
           section="ORG_SETTINGS"
-          goToSection={ABOUT_ORG_SECTIONS.INFO}
+          goToSection={isAccountantOnly ? ALL_SECTIONS.PAYMENT_RECEIPTS : ABOUT_ORG_SECTIONS.INFO}
           renderSubMenu={({ parentSection }) => (
             <React.Fragment>
               {!isAccountantOnly && (

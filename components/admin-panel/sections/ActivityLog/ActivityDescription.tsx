@@ -57,7 +57,7 @@ export const getActivityVariables = (
   hasParent: Boolean(activity.account?.parent),
   Individual: () => (
     <Span letterSpacing={0} fontWeight={500}>
-      <LinkCollective collective={activity.individual} />
+      <LinkCollective collective={activity.individual || activity.fromAccount} />
     </Span>
   ),
   FromAccount: () => <CollectiveTag collective={activity.fromAccount} />,

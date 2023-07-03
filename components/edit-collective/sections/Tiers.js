@@ -102,7 +102,7 @@ const Tiers = ({ collective }) => {
     <div>
       <Grid gridTemplateColumns={['1fr', '172px 1fr']} gridGap={62} mt={34}>
         <Box>
-          <Image src="/static/images/tiers-graphic.png" alt="" width={172} height={145} layout="fixed" />
+          <Image src="/static/images/tiers-graphic.png" alt="" width={172} height={145} />
         </Box>
         <Box ml={2}>
           <P>

@@ -800,6 +800,7 @@ type Tier {
   invoiceTemplate: String
   useStandalonePage: Boolean
   singleTicket: Boolean
+  requireAddress: Boolean!
 }
 
 """
@@ -2852,6 +2853,10 @@ type Host implements Account & AccountWithContributions {
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
   ): HostApplicationCollection!
   hostedVirtualCards(
+    """
+    Search term (card name, card last four digits)
+    """
+    searchTerm: String
     limit: Int! = 100
     offset: Int! = 0
     state: String = null @deprecated(reason: "2023-06-12: Please use status.")
@@ -4459,6 +4464,7 @@ enum ActivityType {
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
+  COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY
   COLLECTIVE_VIRTUAL_CARD_DELETED
   VIRTUAL_CARD_REQUESTED
   VIRTUAL_CARD_CHARGE_DECLINED
@@ -4783,6 +4789,7 @@ type TimeSeriesAmountWithKindNode {
 Stripe connected account properties
 """
 type StripeConnectedAccount {
+  username: String
   issuingBalance: Amount
 }
 
@@ -8909,6 +8916,7 @@ type TransferWise {
   Transferwise balances. Returns null if Transferwise account is not connected.
   """
   balances: [Amount]
+  amountBatched: Amount
 }
 
 type TransferWiseRequiredField {
@@ -11710,6 +11718,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
+  COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY
   COLLECTIVE_VIRTUAL_CARD_DELETED
   VIRTUAL_CARD_REQUESTED
   VIRTUAL_CARD_CHARGE_DECLINED

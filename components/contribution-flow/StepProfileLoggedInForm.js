@@ -48,7 +48,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
           onChange={profile => onChange({ stepProfile: profile, stepPayment: null })}
         />
       </Box>
-      {!isContributingFromSameHost && contributionRequiresLegalName(stepDetails) && (
+      {!isContributingFromSameHost && contributionRequiresLegalName(stepDetails, tier) && (
         <React.Fragment>
           {!data?.isIncognito && (
             <StyledInputField
@@ -93,7 +93,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
           </StyledInputField>
         </React.Fragment>
       )}
-      {!isContributingFromSameHost && contributionRequiresAddress(stepDetails) && (
+      {!isContributingFromSameHost && contributionRequiresAddress(stepDetails, tier) && (
         <React.Fragment>
           <Flex alignItems="center" my="14px">
             <P fontSize="24px" lineHeight="32px" fontWeight="500" mr={2}>
