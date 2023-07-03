@@ -79,11 +79,12 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
                 {intl.formatMessage(
                   ActivityTimelineMessageI18n[activity.type] || ActivityDescriptionI18n[activity.type],
                   getActivityVariables(intl, activity, { onClickExpense: openExpense }),
-                )}
+                )}{' '}
+                ·{' '}
+                <Span fontSize="14px" lineHeight="16px" fontWeight={400} color="black.700">
+                  {isLastWeek ? dayjs(activity.createdAt).fromNow() : <DateTime value={activity.createdAt} />}
+                </Span>
               </ItemHeaderWrapper>
-              <Span ml={1} fontSize="14px" lineHeight="16px" fontWeight={400} color="black.700">
-                {isLastWeek ? dayjs(activity.createdAt).fromNow() : <DateTime value={activity.createdAt} />}
-              </Span>
             </React.Fragment>
           )}
         </Flex>
