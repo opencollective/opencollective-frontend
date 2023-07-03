@@ -43,6 +43,9 @@ const hostVirtualCardsQuery = gql`
       imageUrl
       currency
       settings
+      stripe {
+        username
+      }
       hostedVirtualCards(
         limit: $limit
         offset: $offset
