@@ -7,9 +7,8 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { WorkspaceHomeQuery } from '../../../../lib/graphql/types/v2/graphql';
 import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 
-import Container from '../../../Container';
 import ExpenseDrawer from '../../../expenses/ExpenseDrawer';
-import { Flex, Box } from '../../../Grid';
+import { Box, Flex } from '../../../Grid';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
