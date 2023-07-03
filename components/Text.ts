@@ -64,7 +64,7 @@ P.defaultProps = {
   lineHeight: '1.15em',
 };
 
-export const Span = P.withComponent('span');
+export const Span = P.attrs({ as: 'span' });
 
 Span.defaultProps = {
   ...P.defaultProps,
@@ -72,19 +72,19 @@ Span.defaultProps = {
   lineHeight: 'inherit',
 };
 
-export const Label = P.withComponent('label');
+export const Label = P.attrs({ as: 'label' });
 
 Label.defaultProps = {
   fontWeight: 'normal',
 };
 
-export const Strong = P.withComponent('strong');
+export const Strong = P.attrs({ as: 'strong' });
 
 Strong.defaultProps = {
   fontWeight: 'bold',
 };
 
-export const H1 = P.withComponent('h1');
+export const H1 = P.attrs({ as: 'h1' });
 
 H1.defaultProps = {
   ...P.defaultProps,
@@ -95,7 +95,7 @@ H1.defaultProps = {
   textAlign: 'left',
 };
 
-export const H2 = P.withComponent('h2');
+export const H2 = P.attrs({ as: 'h2' });
 
 H2.defaultProps = {
   ...P.defaultProps,
@@ -105,7 +105,7 @@ H2.defaultProps = {
   lineHeight: '44px',
 };
 
-export const H3 = P.withComponent('h3');
+export const H3 = P.attrs({ as: 'h3' });
 
 H3.defaultProps = {
   ...P.defaultProps,
@@ -115,7 +115,7 @@ H3.defaultProps = {
   lineHeight: '36px',
 };
 
-export const H4 = P.withComponent('h4');
+export const H4 = P.attrs({ as: 'h4' });
 
 H4.defaultProps = {
   ...P.defaultProps,
@@ -125,7 +125,7 @@ H4.defaultProps = {
   lineHeight: '32px',
 };
 
-export const H5 = P.withComponent('h5');
+export const H5 = P.attrs({ as: 'h5' });
 
 H5.defaultProps = {
   ...P.defaultProps,
