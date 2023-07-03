@@ -17,7 +17,7 @@ type AgreementDrawerProps = {
   onDelete: (GraphQLAgreement) => void;
   agreement?: GraphQLAgreement;
   hostLegacyId: number;
-  onFilePreview: (file: FileInfo) => void;
+  onFilePreview: (file: FileInfo | string) => void;
 };
 
 export default function AgreementDrawer({
@@ -45,7 +45,8 @@ export default function AgreementDrawer({
           hostLegacyId={hostLegacyId}
           agreement={agreement}
           onCreate={onCreate}
-          onCancel={closeDrawer}
+          onCancel={() => (isEditing ? setEditing(false) : closeDrawer())}
+          openFileViewer={onFilePreview}
           onEdit={agreement => {
             onEdit?.(agreement);
             closeDrawer();
