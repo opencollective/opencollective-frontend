@@ -123,12 +123,11 @@ const Menu = ({ isAccountantOnly }) => {
         )}
         <MenuLink section={COLLECTIVE_SECTIONS.HOME} icon={<Home size={16} />} if={isIndividual} />
         <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} icon={<Receipt size={16} />} />
-        <MenuLink section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} icon={<Coins size={16} />} if={!isAccountantOnly}>
-          Contributing
-        </MenuLink>
-        <MenuLink section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} icon={<Coins size={16} />} if={!isIndividual}>
-          Contributors
-        </MenuLink>
+        <MenuLink
+          section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS}
+          icon={<Coins size={16} />}
+          if={!isAccountantOnly}
+        />
         <MenuLink
           section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
           icon={<Coins size={16} />}
