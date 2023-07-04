@@ -30,9 +30,13 @@ export const msg = defineMessages({
     id: 'Fields.description',
     defaultMessage: 'Description',
   },
-  invoiceDescriptionLabel: {
+  invoiceDescriptionHint: {
     id: 'Fields.InvoiceDescription',
     defaultMessage: 'Specify item or activity and timeframe, e.g. "Volunteer Training, April 2023"',
+  },
+  receiptDescriptionHint: {
+    id: 'Fields.InvoiceDescription',
+    defaultMessage: 'Describe the expense, e.g. "Dinner with the team"',
   },
   amountLabel: {
     id: 'Fields.amount',
@@ -180,8 +184,9 @@ const ExpenseItemForm = ({
           <StyledInputField
             name={getFieldName('description')}
             error={getError('description')}
+            hint={formatMessage(isInvoice ? msg.invoiceDescriptionHint : msg.receiptDescriptionHint)}
             htmlFor={`${attachmentKey}-description`}
-            label={formatMessage(isInvoice ? msg.invoiceDescriptionLabel : msg.descriptionLabel)}
+            label={formatMessage(msg.descriptionLabel)}
             labelFontSize="13px"
             required={!isOptional}
           >
