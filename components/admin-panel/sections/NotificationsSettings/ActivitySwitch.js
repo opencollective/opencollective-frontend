@@ -99,7 +99,9 @@ const ActivitySwitch = ({ account, activityType }) => {
         name={`${activityType}-switch`}
         checked={isSubscribed}
         disabled={isOverridedByAll}
-        onChange={checked => handleToggle({ type: activityType, account: { id: account.id }, active: checked })}
+        onChange={event =>
+          handleToggle({ type: activityType, account: { id: account.id }, active: event.target.checked })
+        }
       />
     </Flex>
   );

@@ -432,7 +432,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
               <InputSwitch
                 name={field.name}
                 checked={field.value}
-                onChange={checked => form.setFieldValue(field.name, checked)}
+                onChange={event => form.setFieldValue(field.name, event.target.checked)}
               />
             )}
           </StyledInputFormikField>
@@ -462,7 +462,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
               <InputSwitch
                 name={field.name}
                 checked={field.value}
-                onChange={checked => form.setFieldValue(field.name, checked)}
+                onChange={event => form.setFieldValue(field.name, event.target.checked)}
               />
             )}
           </StyledInputFormikField>
