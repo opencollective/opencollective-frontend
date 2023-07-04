@@ -286,7 +286,7 @@ const ApplyToHostModal = ({ hostSlug, collective, show, onClose, onSuccess, rout
   }, [useTwoSteps]);
 
   return (
-    <Modal show={show} onClose={onClose} width="xl" hideCloseIcon {...props}>
+    <Modal show={show} onClose={onClose} width="xl" {...props}>
       {loading ? (
         <React.Fragment>
           <div>
