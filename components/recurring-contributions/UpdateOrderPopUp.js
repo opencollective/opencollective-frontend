@@ -64,7 +64,7 @@ const updateOrderMutation = gql`
   }
 `;
 
-const tiersQuery = gql`
+export const tiersQuery = gql`
   query UpdateOrderPopUpTiers($slug: String!) {
     account(slug: $slug) {
       id
@@ -101,7 +101,7 @@ const tiersQuery = gql`
 // TODO: internationalize me
 const OTHER_LABEL = 'Other';
 
-const useUpdateOrder = ({ contribution, onSuccess }) => {
+export const useUpdateOrder = ({ contribution, onSuccess }) => {
   const { addToast } = useToasts();
   const [submitUpdateOrder, { loading }] = useMutation(updateOrderMutation, { context: API_V2_CONTEXT });
   return {
@@ -199,7 +199,7 @@ const geSelectedContributeOption = (contribution, tiersOptions) => {
   }
 };
 
-const useContributeOptions = (order, tiers, tiersLoading, disableCustomContributions) => {
+export const useContributeOptions = (order, tiers, tiersLoading, disableCustomContributions) => {
   const intl = useIntl();
   const [loading, setLoading] = useState(true);
   const [selectedContributeOption, setSelectedContributeOption] = useState(null);
@@ -255,7 +255,7 @@ const useContributeOptions = (order, tiers, tiersLoading, disableCustomContribut
   };
 };
 
-const ContributionInterval = ({ tier, contribution }) => {
+export const ContributionInterval = ({ tier, contribution }) => {
   const isActiveTier = contribution.tier?.id && contribution.tier.id === tier.id;
   let interval = null;
 
