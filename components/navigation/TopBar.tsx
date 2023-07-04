@@ -22,7 +22,6 @@ import SearchModal from '../Search';
 import SearchTrigger from '../SearchTrigger';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
-
 import ProfileMenu from './ProfileMenu';
 import SiteMenu from './SiteMenu';
 
@@ -46,6 +45,26 @@ const NavItem = styled(StyledLink)`
     :hover {
       text-decoration: underline;
     }
+  }
+`;
+
+const NavButton = styled(StyledButton)`
+  color: #323334;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 10px;
+  cursor: pointer;
+  @media (hover: hover) {
+    :hover {
+      background-color: white !important;
+    }
+  }
+  :focus {
+    background-color: white;
+    border-radius: 1px;
+  }
+  :active {
+    color: black;
   }
 `;
 
@@ -177,17 +196,10 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
                     zIndex={2000}
                     closingEvents={['focusin', 'mouseover']}
                     Button={({ onMouseOver, onClick, popupOpen, onFocus }) => (
-                      <MainNavItem
-                        as={StyledButton}
-                        isBorderless
-                        onMouseOver={onMouseOver}
-                        onFocus={onFocus}
-                        onClick={onClick}
-                        my={2}
-                      >
+                      <NavButton isBorderless onMouseOver={onMouseOver} onFocus={onFocus} onClick={onClick} my={2}>
                         <FormattedMessage defaultMessage="Solutions" />
                         {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                      </MainNavItem>
+                      </NavButton>
                     )}
                     placement="bottom"
                     popupMarginTop="-10px"
@@ -217,17 +229,10 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
                     zIndex={2000}
                     closingEvents={['focusin', 'mouseover']}
                     Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
-                      <MainNavItem
-                        as={StyledButton}
-                        isBorderless
-                        onMouseOver={onMouseOver}
-                        onFocus={onFocus}
-                        onClick={onClick}
-                        my={2}
-                      >
+                      <NavButton isBorderless onMouseOver={onMouseOver} onFocus={onFocus} onClick={onClick} my={2}>
                         <FormattedMessage id="ContributionType.Product" defaultMessage="Product" />
                         {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                      </MainNavItem>
+                      </NavButton>
                     )}
                     placement="bottom"
                     popupMarginTop="-10px"
@@ -257,17 +262,10 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
                     zIndex={2000}
                     closingEvents={['focusin', 'mouseover']}
                     Button={({ onClick, onMouseOver, popupOpen, onFocus }) => (
-                      <MainNavItem
-                        as={StyledButton}
-                        isBorderless
-                        onMouseOver={onMouseOver}
-                        onFocus={onFocus}
-                        onClick={onClick}
-                        my={2}
-                      >
+                      <NavButton isBorderless onMouseOver={onMouseOver} onFocus={onFocus} onClick={onClick} my={2}>
                         <FormattedMessage id="company" defaultMessage="Company" />
                         {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                      </MainNavItem>
+                      </NavButton>
                     )}
                     placement="bottom"
                     popupMarginTop="-10px"
