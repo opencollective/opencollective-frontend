@@ -7,12 +7,6 @@ import { Flex } from './Grid';
 import Hide from './Hide';
 import StyledButton from './StyledButton';
 
-export const breakpoints = {
-  xs: '@media screen and (max-width: 40em)',
-  sm: '@media screen and (min-width: 40em) and (max-width: 52em)',
-  md: '@media screen and (min-width: 52em) and (max-width: 64em)',
-  lg: '@media screen and (min-width: 64em)',
-};
 const SearchButton = styled(StyledButton)`
   color: #6b7280;
   font-weight: 400;
