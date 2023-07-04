@@ -20,8 +20,6 @@
     "@formatjs/intl-relativetimeformat": "11.2.4",
     "@graphql-typed-document-node/core": "3.2.0",
     "@hcaptcha/react-hcaptcha": "1.8.1",
-    "@headlessui/react": "1.7.14",
-    "@heroicons/react": "2.0.17",
     "@hyperwatch/hyperwatch": "3.9.4",
     "@mui/material": "5.13.6",
     "@mui/styles": "5.13.2",
