@@ -299,7 +299,10 @@ export type StyledSelectProps = LayoutProps &
     intl: IntlShape;
     /** Alias for isDisabled */
     inputId: string;
+    name?: string;
+    placeholder?: React.ReactNode;
     disabled?: boolean;
+    required?: boolean;
     useSearchIcon?: boolean;
     hideDropdownIndicator?: boolean;
     hideMenu?: boolean;
@@ -336,6 +339,7 @@ StyledSelect['propTypes'] = {
   placeholder: PropTypes.node,
   /** Whether the component is disabled */
   disabled: PropTypes.bool,
+  required: PropTypes.bool,
   /** Alias for `disabled` */
   isDisabled: PropTypes.bool,
   /** Rendered when there's no option to show */
@@ -359,6 +363,7 @@ StyledSelect['propTypes'] = {
   menuPortalTarget: PropTypes.any,
   /** Compact mode for rending multiple selections correctly **/
   useCompactMode: PropTypes.bool,
+  name: PropTypes.string,
 };
 
 StyledSelect['defaultProps'] = {

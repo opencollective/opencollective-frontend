@@ -43,6 +43,7 @@ const nextConfig = {
         CAPTCHA_ENABLED: false,
         CAPTCHA_PROVIDER: 'HCAPTCHA',
         SENTRY_TRACES_SAMPLE_RATE: null,
+        OC_APPLICATION: null,
       }),
     );
 
