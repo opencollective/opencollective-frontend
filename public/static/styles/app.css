@@ -131,52 +131,38 @@ body {
 }
 
 .markdown {
-  @apply text-gray-950;
+  @apply text-gray-950 leading-7;
 }
 .markdown h1 {
   @apply scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl;
 }
-
 .markdown h2 {
   @apply mt-10 scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0;
 }
-
 .markdown h3 {
   @apply mt-8 scroll-m-20 text-xl font-semibold tracking-tight;
 }
-
 .markdown h4 {
   @apply mt-4 scroll-m-20 text-xl font-semibold tracking-tight;
 }
-
 .markdown p {
   @apply leading-7 [&:not(:first-child)]:mt-4;
 }
-
-.markdown blockquote {
-  @apply mt-6 border-l-2 pl-6 italic;
-}
-
-.markdown ul {
-  @apply my-6 ml-6 list-disc [&>li]:mt-2;
-}
-
-.markdown {
-  @apply leading-7;
-}
-
 .markdown p.lead {
   @apply text-lg text-gray-600 sm:text-xl;
 }
-
+.markdown blockquote {
+  @apply mt-6 border-l-2 pl-6 italic;
+}
+.markdown ul {
+  @apply my-6 ml-6 list-disc [&>li]:mt-2;
+}
 .markdown iframe {
   @apply max-w-full;
 }
-
 .markdown code {
   @apply relative rounded bg-gray-100 px-1.5 py-1 font-mono text-sm font-semibold;
 }
-
 .markdown th {
   @apply min-w-[200px] pt-2 text-left align-top;
 }
