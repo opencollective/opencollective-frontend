@@ -31,11 +31,9 @@ export const msg = defineMessages({
     defaultMessage: 'Description',
   },
   invoiceDescriptionHint: {
-    id: 'Fields.InvoiceDescription',
     defaultMessage: 'Specify item or activity and timeframe, e.g. "Volunteer Training, April 2023"',
   },
   receiptDescriptionHint: {
-    id: 'Fields.InvoiceDescription',
     defaultMessage: 'Describe the expense, e.g. "Dinner with the team"',
   },
   amountLabel: {
