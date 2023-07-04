@@ -62,7 +62,7 @@ function Location({ location, showTitle }) {
         </Container>
       </Container>
       {lat && long && (
-        <div className="map">
+        <div className="relative h-80 border">
           <Map lat={lat} long={long} />
         </div>
       )}
