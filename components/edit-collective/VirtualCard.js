@@ -3,6 +3,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { Copy } from '@styled-icons/feather/Copy';
+import { MoreHorizontalIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
@@ -15,6 +16,7 @@ import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getDashboardObjectIdURL } from '../../lib/stripe/dashboard';
+import { getLimitIntervalString } from '../../lib/virtual-cards/spending-limit';
 
 import Avatar from '../Avatar';
 import ConfirmationModal from '../ConfirmationModal';
@@ -23,6 +25,7 @@ import DismissIcon from '../icons/DismissIcon';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
+import StyledRoundButton from '../StyledRoundButton';
 import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
@@ -137,7 +140,7 @@ const resumeCardMutation = gql`
   }
 `;
 
-const ActionsButton = props => {
+export const ActionsButton = props => {
   const wrapperRef = React.useRef();
   const arrowRef = React.useRef();
   const [displayActions, setDisplayActions] = React.useState(false);
@@ -174,6 +177,7 @@ const ActionsButton = props => {
   });
 
   const isActive = virtualCard.data.status === 'active' || virtualCard.data.state === 'OPEN';
+  const isCanceled = virtualCard.data.status === 'canceled';
 
   const handlePauseUnpause = async () => {
     try {
@@ -193,14 +197,20 @@ const ActionsButton = props => {
   const isHostAdmin = LoggedInUser?.isAdminOfCollective(props.host);
 
   return (
-    <div ref={wrapperRef}>
+    <span ref={wrapperRef}>
       <Manager>
         <Reference>
-          {({ ref }) => (
-            <Action ref={ref} onClick={() => setDisplayActions(true)}>
-              <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
-            </Action>
-          )}
+          {({ ref }) =>
+            props.iconOnly ? (
+              <StyledRoundButton ref={ref} onClick={() => setDisplayActions(true)} size={24} color="#C4C7CC">
+                <MoreHorizontalIcon size={12} color="#76777A" />
+              </StyledRoundButton>
+            ) : (
+              <Action ref={ref} onClick={() => setDisplayActions(true)}>
+                <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
+              </Action>
+            )
+          }
         </Reference>
         {displayActions && (
           <Popper
@@ -238,7 +248,7 @@ const ActionsButton = props => {
                         onClick={() =>
                           confirmOnPauseCard && isActive ? setShowConfirmationModal(true) : handlePauseUnpause()
                         }
-                        disabled={isLoading}
+                        disabled={isLoading || isCanceled}
                       >
                         {isActive ? (
                           <FormattedMessage id="VirtualCards.PauseCard" defaultMessage="Pause Card" />
@@ -251,7 +261,7 @@ const ActionsButton = props => {
                     {canDeleteVirtualCard && (
                       <React.Fragment>
                         <StyledHr borderColor="black.300" mt={2} mb={2} />
-                        <Action onClick={() => setIsDeletingVirtualCard(true)}>
+                        <Action onClick={() => setIsDeletingVirtualCard(true)} disabled={isCanceled}>
                           <FormattedMessage defaultMessage="Delete Card" />
                         </Action>
                       </React.Fragment>
@@ -340,7 +350,7 @@ const ActionsButton = props => {
           virtualCard={virtualCard}
         />
       )}
-    </div>
+    </span>
   );
 };
 
@@ -363,37 +373,7 @@ ActionsButton.propTypes = {
   canEditVirtualCard: PropTypes.bool,
   canDeleteVirtualCard: PropTypes.bool,
   onDeleteRefetchQuery: PropTypes.string,
-};
-
-const getLimitIntervalString = spendingLimitInterval => {
-  switch (spendingLimitInterval) {
-    case VirtualCardLimitInterval.DAILY:
-      return (
-        <Fragment>
-          /<FormattedMessage id="Frequency.Day.Short" defaultMessage="day" />
-        </Fragment>
-      );
-    case VirtualCardLimitInterval.WEEKLY:
-      return (
-        <Fragment>
-          /<FormattedMessage id="Frequency.Week.Short" defaultMessage="wk" />
-        </Fragment>
-      );
-    case VirtualCardLimitInterval.MONTHLY:
-      return (
-        <Fragment>
-          /<FormattedMessage id="Frequency.Monthly.Short" defaultMessage="mo" />
-        </Fragment>
-      );
-    case VirtualCardLimitInterval.YEARLY:
-      return (
-        <Fragment>
-          /<FormattedMessage id="Frequency.Yearly.Short" defaultMessage="yr" />
-        </Fragment>
-      );
-    default:
-      return null;
-  }
+  iconOnly: PropTypes.bool,
 };
 
 const getLimitString = ({

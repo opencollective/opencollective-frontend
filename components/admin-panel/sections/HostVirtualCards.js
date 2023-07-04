@@ -10,13 +10,13 @@ import useQueryFilter, { AmountRangeFilter, BooleanFilter, DateRangeFilter } fro
 
 import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal';
 import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';
-import VirtualCard from '../../edit-collective/VirtualCard';
-import { Box, Flex, Grid } from '../../Grid';
+import { Box, Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
 import Pagination from '../../Pagination';
 import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import VirtualCardsTable from '../../virtual-cards/VirtualCardsTable';
 import VirtualCardFilters from '../../VirtualCardFilters';
 
 const hostVirtualCardsQuery = gql`
@@ -229,19 +229,15 @@ const HostVirtualCards = props => {
         <Loading />
       ) : (
         <React.Fragment>
-          <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
-            {data.host.hostedVirtualCards.nodes.map(vc => (
-              <VirtualCard
-                key={vc.id}
-                host={data.host}
-                virtualCard={vc}
-                canEditVirtualCard
-                canPauseOrResumeVirtualCard
-                canDeleteVirtualCard
-                onDeleteRefetchQuery="HostedVirtualCards"
-              />
-            ))}
-          </Grid>
+          <Box mt={4}>
+            <VirtualCardsTable
+              canEditVirtualCard
+              canDeleteVirtualCard
+              onDeleteRefetchQuery="HostedVirtualCards"
+              virtualCards={data.host.hostedVirtualCards.nodes}
+              host={data.host}
+            />
+          </Box>
           <Flex mt={5} alignItems="center" flexDirection="column" justifyContent="center">
             <Pagination
               route={`/${data.host.slug}/admin/host-virtual-cards`}
