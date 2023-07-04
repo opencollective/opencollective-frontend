@@ -54,14 +54,14 @@ const Home = (props: AdminSectionProps) => {
 
   return (
     <Container maxWidth={'100%'}>
-      <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-        <FormattedMessage id="Dashboard.Home.Title" defaultMessage="This is your workspace" />
-      </H1>
-      <Flex flexDirection="column" mt="50px">
+      {/* <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+        <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
+      </H1> */}
+      <Flex flexDirection="column">
         <Flex justifyContent="space-between" alignItems="center" mb="32px">
-          <H2 fontSize="20px" lineHeight="28px" fontWeight="700">
+          <H1 fontSize="32px" mt={0} lineHeight="40px" fontWeight="normal">
             <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
-          </H2>
+          </H1>
           <StyledSelectFilter
             intl={intl}
             inputId="activity-filter"
