@@ -627,9 +627,9 @@ class InputField extends React.Component {
                 )}
                 <Box width={[1, 10 / 12]}>
                   <InputSwitch
-                    name={field.description}
+                    name={field.name}
                     defaultChecked={field.defaultValue}
-                    onChange={checked => this.handleChange(checked)}
+                    onChange={event => this.handleChange(event.target.checked)}
                   />
                   {field.description && <HelpBlock>{field.description}</HelpBlock>}
                 </Box>
@@ -642,7 +642,7 @@ class InputField extends React.Component {
                   <InputSwitch
                     name={field.name}
                     defaultChecked={field.defaultValue}
-                    onChange={checked => this.handleChange(checked)}
+                    onChange={event => this.handleChange(event.target.checked)}
                   />
                   {field.description && <HelpBlock>{field.description}</HelpBlock>}
                 </div>
