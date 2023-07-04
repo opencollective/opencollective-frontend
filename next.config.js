@@ -238,19 +238,14 @@ const nextConfig = {
   },
 };
 
-// Bypasses conflict bug between @sentry/nextjs and depcheck
-const isDepcheck = process.argv[1]?.includes('.bin/depcheck');
+let exportedConfig = withSentryConfig({
+  ...nextConfig,
+  sentry: {
+    disableServerWebpackPlugin: true,
+    disableClientWebpackPlugin: true,
+  },
+});
 
-let exportedConfig = nextConfig;
-if (!isDepcheck) {
-  exportedConfig = withSentryConfig({
-    ...nextConfig,
-    sentry: {
-      disableServerWebpackPlugin: true,
-      disableClientWebpackPlugin: true,
-    },
-  });
-}
 if (process.env.ANALYZE) {
   // eslint-disable-next-line node/no-unpublished-require
   const withBundleAnalyzer = require('@next/bundle-analyzer')({
