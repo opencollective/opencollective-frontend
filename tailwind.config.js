@@ -1,5 +1,3 @@
-const defaultColors = require('./lib/theme/colors.ts');
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./pages/**/*.{js,ts,jsx,tsx,mdx}', './components/**/*.{js,ts,jsx,tsx,mdx}'],
@@ -18,10 +16,6 @@ module.exports = {
           800: 'var(--primary-color-800)',
           900: 'var(--primary-color-900)',
         },
-        green: defaultColors.green,
-        red: defaultColors.red,
-        yellow: defaultColors.yellow,
-        purple: defaultColors.purple,
       },
     },
   },
