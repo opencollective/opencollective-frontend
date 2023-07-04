@@ -1,44 +1,17 @@
-import React, { createContext, useContext, useState } from 'react';
-import MUIDrawer from '@mui/material/Drawer';
-import { XMark } from '@styled-icons/heroicons-outline/XMark';
-import { themeGet } from '@styled-system/theme-get';
-import styled from 'styled-components';
-import {
-  LifeBuoy,
-  Home,
-  Search,
-  Menu,
-  Book,
-  Slack,
-  Github,
-  Pen,
-  Globe,
-  MessageCircle,
-  MessageSquare,
-  Newspaper,
-  ChevronRight,
-  BookOpen,
-  ChevronLeft,
-  ChevronDown,
-  Lightbulb,
-  AppWindow,
-  MessagesSquare,
-  Building2,
-  Box,
-  LampDesk,
-} from 'lucide-react';
-import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
-import Image from '../Image';
+import React, { useState } from 'react';
+import { BookOpen, Home, LifeBuoy, Menu, Search } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
-import { ExternalLink, LogOut, Plus } from 'lucide-react';
+import styled from 'styled-components';
+
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import Container from '../Container';
 import { Flex } from '../Grid';
+import Image from '../Image';
 import Link from '../Link';
-
-import { DrawerMenu, DrawerCloseButton, DrawerMenuItem } from './DrawerMenu';
 import StyledButton from '../StyledButton';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+
+import { DrawerCloseButton, DrawerMenu, DrawerMenuItem } from './DrawerMenu';
 
 const StyledMenuButton = styled(StyledButton)`
   display: flex;
@@ -52,7 +25,6 @@ const StyledMenuButton = styled(StyledButton)`
   height: 32px;
   width: 32px;
   padding: 0;
-  // border-radius: 8px;
   border-radius: 100px;
 
   transition-property: color, background-color;
@@ -60,7 +32,6 @@ const StyledMenuButton = styled(StyledButton)`
   transition-duration: 150ms;
   white-space: nowrap;
   border: 1px solid #d1d5db;
-  // border: 1px solid transparent;
 
   @media (hover: hover) {
     :hover {

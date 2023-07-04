@@ -1,20 +1,20 @@
 import React from 'react';
 import { get } from 'lodash';
+import { FlaskConical, Home, LogOut, PocketKnife, Settings, User } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import ProfileMenuMemberships from './ProfileMenuMemberships';
-import { themeGet } from '@styled-system/theme-get';
-import { User, FlaskConical, Settings, Home, LogOut, PocketKnife } from 'lucide-react';
-import ChangelogTrigger from '../changelog/ChangelogTrigger';
+
 import Avatar from '../Avatar';
-import { Flex, Box } from '../Grid';
+import { Box, Flex } from '../Grid';
 import LoginBtn from '../LoginBtn';
 import PreviewFeaturesModal from '../PreviewFeaturesModal';
 import StyledButton from '../StyledButton';
-import { DrawerMenu, DrawerCloseButton, DrawerMenuItem } from './DrawerMenu';
 import { Span } from '../Text';
+
+import { DrawerCloseButton, DrawerMenu, DrawerMenuItem } from './DrawerMenu';
+import ProfileMenuMemberships from './ProfileMenuMemberships';
 
 const StyledProfileButton = styled(StyledButton)`
   padding: 0;

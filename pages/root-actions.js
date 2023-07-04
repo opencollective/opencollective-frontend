@@ -23,7 +23,7 @@ import RootActivityLog from '../components/root-actions/RootActivityLog';
 import UnhostAccountForm from '../components/root-actions/UnhostAccountForm';
 import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
-import { H1, H2, H3, P, Span } from '../components/Text';
+import { H2, H3, P, Span } from '../components/Text';
 
 const GRID_TEMPLATE_COLUMNS = ['1fr', 'minmax(220px, 1fr) 6fr'];
 

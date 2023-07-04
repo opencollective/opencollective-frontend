@@ -1,12 +1,12 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
-import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import MUIDrawer from '@mui/material/Drawer';
-
-import StyledRoundButton from '../StyledRoundButton';
-import { themeGet } from '@styled-system/theme-get';
 import { X } from 'lucide-react';
+import styled, { css } from 'styled-components';
+
+import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+
 import Link from '../Link';
+import StyledRoundButton from '../StyledRoundButton';
 
 const StyledDrawerContainer = styled.div<{ maxWidth: string }>`
   display: flex;

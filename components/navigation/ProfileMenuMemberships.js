@@ -126,6 +126,7 @@ const MembershipLine = ({ user, membership, closeDrawer }) => {
 MembershipLine.propTypes = {
   user: PropTypes.object,
   membership: PropTypes.object,
+  closeDrawer: PropTypes.func,
 };
 
 const sortMemberships = memberships => {
@@ -181,6 +182,7 @@ const MembershipsList = ({ user, memberships, closeDrawer }) => {
 MembershipsList.propTypes = {
   user: PropTypes.object,
   memberships: PropTypes.array,
+  closeDrawer: PropTypes.func,
 };
 
 /**

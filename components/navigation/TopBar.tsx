@@ -2,29 +2,29 @@ import React, { Fragment, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
-import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
-import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
-import { Menu } from 'lucide-react';
+
 import theme from '../../lib/theme';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import ChangelogTrigger from '../changelog/ChangelogTrigger';
 import Container from '../Container';
+import DividerIcon from '../DividerIcon';
 import { Box, Flex } from '../Grid';
 import Hide from '../Hide';
 import Image from '../Image';
 import Link from '../Link';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import PopupMenu from '../PopupMenu';
-import ProfileMenu from './ProfileMenu';
 import SearchModal from '../Search';
 import SearchTrigger from '../SearchTrigger';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
-import { getCollectivePageRoute } from '../../lib/url-helpers';
+
+import ProfileMenu from './ProfileMenu';
 import SiteMenu from './SiteMenu';
-import LoadingPlaceholder from '../LoadingPlaceholder';
 
 const NavList = styled(Flex)`
   list-style: none;
@@ -96,27 +96,6 @@ const MainNavItem = styled(Link)`
   }
 `;
 
-const DividerIcon = () => {
-  return (
-    <svg
-      className="with-icon_icon__aLCKg"
-      fill="none"
-      height="24"
-      shapeRendering="geometricPrecision"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="1"
-      viewBox="0 0 24 24"
-      width="24"
-      style={{ width: 32, height: 32, color: '#DCDDE0', margin: '0 -8px', flexShrink: 0 }}
-      // style="width: 36px; height: 36px;"
-    >
-      <path d="M16.88 3.549L7.12 20.451"></path>
-    </svg>
-  );
-};
-
 type TopBarProps = {
   showSearch?: boolean;
   showProfileAndChangelogMenu?: boolean;
@@ -138,7 +117,7 @@ type TopBarProps = {
   loading?: boolean;
 };
 
-const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, navTitle, loading }: TopBarProps) => {
+const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loading }: TopBarProps) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
   const router = useRouter();
@@ -174,7 +153,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
         gridGap={2}
       >
         <Flex alignItems="center" gridGap={[2, 3]}>
-          <SiteMenu ocLogoRoute={ocLogoRoute} />
+          <SiteMenu />
 
           <Box flexShrink={0}>
             <Link href={ocLogoRoute}>
@@ -312,13 +291,6 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
                     </NavLinkContainer>
                   </PopupMenu>
                 )}
-                {/* {menuItems.docs && (
-                  <Link href={'/help'}>
-                    <NavButton as={Container} whiteSpace="nowrap">
-                      <FormattedMessage defaultMessage="Help & Support" />
-                    </NavButton>
-                  </Link>
-                )} */}
               </NavList>
             </Flex>
           </Hide>
@@ -332,16 +304,14 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
               <Flex alignItems="center" gridGap="0" maxWidth="100%" flexGrow={4}>
                 {account?.parentCollective && (
                   <Hide flexShrink={1} display="flex" overflow={'hidden'} xs sm>
-                    <DividerIcon />
+                    <DividerIcon size={32} style={{ margin: '0 -8px', flexShrink: 0, color: '#DCDDE0' }} />
                     <MainNavItem lightWeight flexShrink={3} href={getCollectivePageRoute(account.parentCollective)}>
-                      {/* <Avatar collective={account.parentCollective} radius={32} /> */}
                       <span>{account.parentCollective.name}</span>
                     </MainNavItem>
                   </Hide>
                 )}
-                <DividerIcon />
+                <DividerIcon size={32} style={{ margin: '0 -8px', flexShrink: 0, color: '#DCDDE0' }} />
                 <MainNavItem href={getCollectivePageRoute(account)}>
-                  {/* <Avatar collective={account} radius={32} /> */}
                   <span>
                     {account ? account.name : <LoadingPlaceholder height="16px" width="120px" borderRadius="4px" />}
                   </span>

@@ -76,7 +76,7 @@ class UpdatesPage extends React.Component {
 
     const collective = data.account;
     const updates = collective?.updates;
-    console.log({ collective, loading: data.loading });
+
     return (
       <div className="UpdatesPage">
         <Header
