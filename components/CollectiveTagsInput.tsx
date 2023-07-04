@@ -216,7 +216,7 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
                   borderColor: state.isFocused ? colors.primary[500] : colors.primary[300],
                 },
               }),
-              option: baseStyles => ({
+              option: (baseStyles, state) => ({
                 ...baseStyles,
                 fontSize: '14px',
               }),
