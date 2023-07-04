@@ -140,17 +140,17 @@ const ExpenseSummaryAdditionalInformation = ({
             <Flex alignItems="center">
               <Avatar collective={collective} radius={24} />
               <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
-                <Span color="black.800" fontSize="14px" fontWeight="700" truncateOverflow>
+                <Span color="black.800" fontSize="14px" fontWeight="700">
                   {formatAccountName(collective.name, collective.legalName)}
                 </Span>
-                <Span color="black.900" fontSize="13px" truncateOverflow>
+                <Span color="black.900" fontSize="13px">
                   @{collective.slug}
                 </Span>
               </Flex>
             </Flex>
           </LinkCollective>
           {collective.stats.balanceWithBlockedFunds && (
-            <Container mt={3} fontSize="14px" color="black.700">
+            <Container mt={2} fontSize="14px" color="black.700">
               <Container fontWeight="700">
                 <FormattedMessage
                   id="withColon"
@@ -209,14 +209,14 @@ const ExpenseSummaryAdditionalInformation = ({
               <Avatar collective={payee} radius={24} />
             )}
             <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
-              <Span color="black.900" fontWeight="bold" truncateOverflow>
+              <Span color="black.900" fontWeight="bold">
                 {formatAccountName(
                   payee.organization?.name || payee.name,
                   payee.organization?.legalName || payee.legalName,
                 )}
               </Span>
               {payee.type !== CollectiveType.VENDOR && (payee.organization?.slug || payee.slug) && (
-                <Span color="black.900" fontSize="13px" truncateOverflow>
+                <Span color="black.900" fontSize="13px">
                   @{payee.organization?.slug || payee.slug}
                 </Span>
               )}
@@ -226,7 +226,7 @@ const ExpenseSummaryAdditionalInformation = ({
         </LinkCollective>
 
         {payeeLocation && isInvoice && (
-          <Container whiteSpace="pre-wrap" fontSize="14px" lineHeight="16px" mt={2}>
+          <Container whiteSpace="pre-wrap" color="black.700" fontSize="14px" lineHeight="16px" mt={2}>
             <LocationAddress location={payeeLocation} isLoading={isLoadingLoggedInUser} />
           </Container>
         )}
@@ -255,12 +255,12 @@ const ExpenseSummaryAdditionalInformation = ({
               name={expense?.virtualCard?.name && `${expense.virtualCard.name} Card (${expense.virtualCard.last4})`}
             />
           </Box>
-          <div data-cy="expense-summary-payout-method-data">
+          <Container data-cy="expense-summary-payout-method-data" wordBreak="break-word">
             <PayoutMethodData
               payoutMethod={expense.draft?.payoutMethod ?? expense.payoutMethod}
               isLoading={isLoadingLoggedInUser}
             />
-          </div>
+          </Container>
           {expense.invoiceInfo && (
             <Box mt={3} data-cy="expense-summary-invoice-info">
               <Container fontSize="11px" fontWeight="500" mb={2}>
