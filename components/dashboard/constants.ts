@@ -50,6 +50,7 @@ export const FISCAL_HOST_SECTIONS = {
 
 export const COLLECTIVE_SECTIONS = {
   HOME: 'home',
+  CONTRIBUTIONS: 'contributions',
   ADVANCED: 'advanced',
   AUTHORIZED_APPS: 'authorized-apps',
   COLLECTIVE_GOALS: 'goals',
@@ -278,5 +279,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.NOTIFICATIONS]: {
     id: 'NotificationsSettings.Title',
     defaultMessage: 'Notification Settings',
+  },
+  [ALL_SECTIONS.CONTRIBUTIONS]: {
+    id: 'Contributions',
+    defaultMessage: 'Contributions',
   },
 });
