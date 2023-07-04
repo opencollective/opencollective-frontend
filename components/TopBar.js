@@ -11,11 +11,13 @@ import { debounce } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import theme from '../lib/theme';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
+import NewTopBar from './navigation/TopBar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
@@ -29,7 +31,6 @@ import StyledLink from './StyledLink';
 import { Span } from './Text';
 import TopBarMobileMenu from './TopBarMobileMenu';
 import TopBarProfileMenu from './TopBarProfileMenu';
-import NewTopBar from './navigation/TopBar';
 
 const NavList = styled(Flex)`
   list-style: none;
