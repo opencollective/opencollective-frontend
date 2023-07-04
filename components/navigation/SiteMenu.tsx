@@ -71,17 +71,20 @@ const StyledMenuButton = styled(StyledButton)`
 `;
 
 const Footer = styled.div`
-  padding: 0 24px;
-  a {
-    color: rgb(9, 105, 218);
-    font-size: 12px;
-    font-weight: 300;
-    letter-spacing: 0;
-    line-height: 18px;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0;
+  line-height: 18px;
+  padding: 20px;
+
+  span {
+    color: #6e7781;
+    display: block;
+    margin-bottom: 8px;
   }
 `;
 
-export default function SiteMenu({ ocLogoRoute }: { ocLogoRoute: string }) {
+export default function SiteMenu() {
   const { LoggedInUser } = useLoggedInUser();
   const [showMenu, setShowMenu] = useState(false);
   const onClose = () => setShowMenu(false);
@@ -96,7 +99,7 @@ export default function SiteMenu({ ocLogoRoute }: { ocLogoRoute: string }) {
         <React.Fragment>
           <Flex p={3} justifyContent="space-between" gridGap={3}>
             <Flex alignItems="start" gridGap={2}>
-              <Link href={LoggedInUser ? '/dashboard' : '/home'} onClick={onClose}>
+              <Link href={LoggedInUser ? '/dashboard' : '/'} onClick={onClose}>
                 <Image width="32" height="32" src="/static/images/opencollective-icon.png" alt="Open Collective" />
               </Link>
               <Flex height="32px" alignItems="center">
@@ -113,16 +116,6 @@ export default function SiteMenu({ ocLogoRoute }: { ocLogoRoute: string }) {
                   <Home size={16} /> <FormattedMessage defaultMessage="Home" />
                 </Flex>
               </DrawerMenuItem>
-              {/* <DrawerMenuItem href={LoggedInUser ? '/dashboard' : '/'} onClick={onClose}>
-                <Flex alignItems="center" gridGap={2}>
-                  <LampDesk size={16} />{' '}
-                  {LoggedInUser ? (
-                    <FormattedMessage defaultMessage="Workspace" />
-                  ) : (
-                    <FormattedMessage defaultMessage="Home" />
-                  )}
-                </Flex>
-              </DrawerMenuItem> */}
 
               <DrawerMenuItem href="/search" onClick={onClose}>
                 <Flex alignItems="center" gridGap={2}>
@@ -140,100 +133,23 @@ export default function SiteMenu({ ocLogoRoute }: { ocLogoRoute: string }) {
                 </Flex>
               </DrawerMenuItem>
             </Flex>
-
-            {/* <hr /> */}
-            <Flex flexDirection="column" py={2}>
-              {/* 
-              <DrawerMenuItem href="https://slack.opencollective.com/" onClick={onClose} openInNewTab>
-                <Flex alignItems="center" gridGap={2}>
-                  <Slack size={16} /> <FormattedMessage defaultMessage="Join our Slack" />
-                </Flex>
-              </DrawerMenuItem>
-              <DrawerMenuItem href="https://github.com/opencollective/opencollective" openInNewTab onClick={onClose}>
-                <Flex alignItems="center" gridGap={2}>
-                  <Github size={16} /> <FormattedMessage defaultMessage="Open Source" />
-                </Flex>
-              </DrawerMenuItem>
-              <DrawerMenuItem href="https://blog.opencollective.com/" onClick={onClose}>
-                <Flex alignItems="center" gridGap={2}>
-                  <Newspaper size={16} />
-                  <span>
-                    <FormattedMessage defaultMessage="Blog" />
-                  </span>
-                </Flex>
-              </DrawerMenuItem>
-              <hr /> */}
-              {/* <DrawerMenuItem href={LoggedInUser ? '/home' : '/'} onClick={onClose}>
-                <Flex alignItems="center" gridGap={2}>
-                  <Home size={16} /> <FormattedMessage defaultMessage="Home" />
-                </Flex>
-              </DrawerMenuItem> */}
-              {/* <DrawerMenuItem href="#">
-                <Flex alignItems="center" gridGap={2}>
-                  <Lightbulb size={16} />
-                  <span>
-                    <FormattedMessage defaultMessage="Open Collective Homepage" />
-                  </span>
-                </Flex>
-                <ChevronDown size={16} />
-              </DrawerMenuItem> */}
-              {/* <DrawerMenuItem href="#">
-                <Flex alignItems="center" gridGap={2}>
-                  <Lightbulb size={16} />
-                  <span>
-                    <FormattedMessage defaultMessage="Solutions" />
-                  </span>
-                </Flex>
-                <ChevronDown size={16} />
-              </DrawerMenuItem>
-              <DrawerMenuItem href="#">
-                <Flex alignItems="center" gridGap={2}>
-                  <Box size={16} />
-
-                  <span>
-                    <FormattedMessage defaultMessage="Product" />
-                  </span>
-                </Flex>
-                <ChevronDown size={16} />
-              </DrawerMenuItem>
-              <DrawerMenuItem href="#">
-                <Flex alignItems="center" gridGap={2}>
-                  <Building2 size={16} />
-
-                  <span>
-                    <FormattedMessage defaultMessage="Company" />
-                  </span>
-                </Flex>
-                <ChevronDown size={16} />
-              </DrawerMenuItem>
-              <DrawerMenuItem href="#">
-                <Flex alignItems="center" gridGap={2}>
-                  <MessagesSquare size={16} />
-
-                  <span>
-                    <FormattedMessage defaultMessage="Community" />
-                  </span>
-                </Flex>
-                <ChevronDown size={16} />
-              </DrawerMenuItem> */}
-            </Flex>
-            {/* <DrawerMenuItem href="/help" onClick={onClose}>
-              <Flex alignItems="center" gridGap={2}>
-                <Github size={16} /> <FormattedMessage defaultMessage="Open Collective Homepage" />
-              </Flex>
-              <ExternalLink size={16} className="show-on-hover" />
-            </DrawerMenuItem> */}
           </Flex>
-          <Container position="relative" py={'24px'} borderTop={'1px solid #f3f4f6'}>
+          <Container position="relative" borderTop={'1px solid #f3f4f6'}>
             <Footer>
-              <span
-                style={{ fontSize: '12px', margin: '0 0 8px 0', display: 'block', color: '#6e7781', fontWeight: 300 }}
-              >
-                Open Collective
-              </span>
+              <span>Open Collective</span>
               <Flex alignItems="center" justifyContent={'space-between'} width={'100%'}>
-                <Link href="/home">Homepage</Link> <Link href="/contact">Contact</Link>{' '}
-                <Link href="/privacypolicy">Privacy</Link> <Link href="/tos">Terms</Link>{' '}
+                <Link href="/home" onClick={onClose}>
+                  <FormattedMessage id="SiteMenu.OC.Homepage" defaultMessage="Homepage" />
+                </Link>
+                <Link href="/contact" onClick={onClose}>
+                  <FormattedMessage defaultMessage="Contact" />
+                </Link>
+                <Link href="/privacypolicy" onClick={onClose}>
+                  <FormattedMessage defaultMessage="Privacy" />
+                </Link>
+                <Link href="/tos" onClick={onClose}>
+                  <FormattedMessage defaultMessage="Terms" />
+                </Link>
               </Flex>
             </Footer>
           </Container>
