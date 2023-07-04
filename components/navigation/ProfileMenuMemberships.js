@@ -320,6 +320,7 @@ const ProfileMenuMemberships = ({ user, closeDrawer }) => {
                 <Collapse
                   buttonSize={24}
                   defaultIsOpen={false}
+                  mr={'6px'}
                   title={
                     <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} closeDrawer={closeDrawer} />
                   }
