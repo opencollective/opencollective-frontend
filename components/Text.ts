@@ -23,7 +23,7 @@ import {
   WordBreakProps,
 } from '../lib/styled-system-custom-properties';
 
-type TextProps = ColorProps &
+export type TextProps = ColorProps &
   DisplayProps &
   SpaceProps &
   TypographyProps &

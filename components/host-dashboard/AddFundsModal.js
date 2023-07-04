@@ -557,6 +557,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           onBlur={() => form.setFieldTouched(field.name, true)}
                           customOptions={defaultSources}
                           onChange={({ value }) => form.setFieldValue(field.name, value)}
+                          menuPortalTarget={null}
                         />
                       )}
                     </Field>

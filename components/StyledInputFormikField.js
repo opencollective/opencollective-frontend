@@ -30,32 +30,35 @@ const StyledInputFormikField = ({
   const htmlFor = props.htmlFor || `input-${name}`;
   return (
     <FieldComponent name={name} validate={validate}>
-      {({ field, form, meta }) => (
-        <Container flex={flex} width={width} display={display} flexGrow={flexGrow}>
-          <StyledInputField error={Boolean(meta.error)} {...props} htmlFor={htmlFor}>
-            <React.Fragment>
-              {children({
-                form,
-                meta,
-                field: {
-                  ...field,
-                  name: name || htmlFor,
-                  id: htmlFor,
-                  type: props.inputType,
-                  disabled: props.disabled,
-                  required: props.required,
-                  error: Boolean(meta.touched && meta.error),
-                },
-              })}
-              {meta.touched && meta.error && (
-                <P display="block" color="red.500" pt={2} fontSize="10px">
-                  {isOCError(meta.error) ? formatFormErrorMessage(intl, meta.error) : meta.error}
-                </P>
-              )}
-            </React.Fragment>
-          </StyledInputField>
-        </Container>
-      )}
+      {({ field, form, meta }) => {
+        const showError = Boolean(meta.error && (meta.touched || form.submitCount));
+        return (
+          <Container flex={flex} width={width} display={display} flexGrow={flexGrow}>
+            <StyledInputField error={Boolean(meta.error)} {...props} name={name} htmlFor={htmlFor}>
+              <React.Fragment>
+                {children({
+                  form,
+                  meta,
+                  field: {
+                    ...field,
+                    name: name || htmlFor,
+                    id: htmlFor,
+                    type: props.inputType,
+                    disabled: props.disabled,
+                    required: props.required,
+                    error: showError,
+                  },
+                })}
+                {showError && (
+                  <P display="block" color="red.500" pt={2} fontSize="10px">
+                    {isOCError(meta.error) ? formatFormErrorMessage(intl, meta.error) : meta.error}
+                  </P>
+                )}
+              </React.Fragment>
+            </StyledInputField>
+          </Container>
+        );
+      }}
     </FieldComponent>
   );
 };

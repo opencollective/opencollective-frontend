@@ -26,13 +26,9 @@ import StyledInput from '../StyledInput';
 import { H5, P, Span } from '../Text';
 
 import ChangeTierWarningModal from './ChangeTierWarningModal';
+import CustomFields, { buildCustomFieldsConfig } from './CustomFields';
 import PlatformTipInput from './PlatformTipInput';
-import TierCustomFields from './TierCustomFields';
 import { getTotalAmount } from './utils';
-
-const getCustomFields = (collective, tier) => {
-  return [...(tier?.customFields || []), ...(collective.host?.settings?.contributionFlow?.customFields || [])];
-};
 
 const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router, isEmbed }) => {
   const intl = useIntl();
@@ -43,12 +39,17 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
   const [isOtherAmountSelected, setOtherAmountSelected] = React.useState(getDefaultOtherAmountSelected);
   const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
   const { LoggedInUser } = useLoggedInUser();
+  const tierCustomFields = tier?.customFields?.fields;
+  const hostCustomFields = collective.host?.settings?.contributionFlow?.customFields;
+  const selectedInterval = data?.interval;
+  const customFieldsConfig = React.useMemo(
+    () => buildCustomFieldsConfig(tierCustomFields, hostCustomFields),
+    [tierCustomFields, hostCustomFields],
+  );
 
   const minAmount = getTierMinAmount(tier, currency);
   const hasQuantity = (tier?.type === TierTypes.TICKET && !tier.singleTicket) || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
-  const customFields = getCustomFields(collective, tier);
-  const selectedInterval = data?.interval;
   const supportsRecurring = canContributeRecurring(collective, LoggedInUser) && (!tier || tier?.interval);
   const isFixedInterval = tier?.interval && tier.interval !== INTERVALS.flexible;
 
@@ -72,7 +73,11 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
         </Container>
       )}
 
-      {!isFixedInterval && supportsRecurring && (
+      {isFixedInterval ? (
+        <P fontSize="20px" fontWeight="500" color="black.800" mb={3}>
+          {i18nInterval(intl, tier.interval)}
+        </P>
+      ) : supportsRecurring ? (
         <StyledButtonSet
           id="interval"
           justifyContent="center"
@@ -97,7 +102,7 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
             </Span>
           )}
         </StyledButtonSet>
-      )}
+      ) : null}
 
       {!isFixedContribution ? (
         <Box mb="30px">
@@ -250,13 +255,13 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
           />
         </Box>
       )}
-      {!isEmpty(customFields) && (
+      {!isEmpty(customFieldsConfig?.fields) && (
         <Box mt={28}>
           <H5 fontSize="20px" fontWeight="normal" color="black.800">
             <FormattedMessage id="OtherInfo" defaultMessage="Other information" />
           </H5>
-          <TierCustomFields
-            fields={customFields}
+          <CustomFields
+            config={customFieldsConfig}
             data={data?.customData}
             onChange={customData => dispatchChange('customData', customData)}
           />

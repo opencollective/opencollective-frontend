@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { isPastEvent } from '../lib/events';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
 
 import Avatar from './Avatar';
@@ -56,7 +57,7 @@ const MembershipLine = ({ user, membership }) => {
         <StyledLink
           as={Link}
           href={
-            user?.hasEarlyAccess('dashboard')
+            user?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
               ? getDashboardRoute(membership.collective)
               : getSettingsRoute(membership.collective)
           }

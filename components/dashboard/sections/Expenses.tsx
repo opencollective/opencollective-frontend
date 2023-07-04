@@ -10,6 +10,7 @@ import { PayoutMethodType } from '../../../lib/constants/payout-method';
 import { parseDateInterval } from '../../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
+import useQueryFilter, { BooleanFilter } from '../../../lib/hooks/useQueryFilter';
 
 import { expensesPageQuery } from '../../../pages/expenses';
 import { parseAmountRange } from '../../budget/filters/AmountFilter';
@@ -70,8 +71,21 @@ const Expenses = (props: AdminSectionProps) => {
   const variables = getVariables(query, props.account.slug);
   const { LoggedInUser } = useLoggedInUser();
 
+  const queryFilter = useQueryFilter({
+    filters: {
+      virtualCard: {
+        isMulti: true,
+      },
+      chargeHasReceipts: BooleanFilter,
+    },
+  });
+
   const { data, error, loading, refetch } = useQuery(expensesPageQuery, {
-    variables,
+    variables: {
+      ...variables,
+      virtualCards: queryFilter.values.virtualCard?.map(id => ({ id })),
+      chargeHasReceipts: queryFilter.values.chargeHasReceipts,
+    },
     context: API_V2_CONTEXT,
   });
 
@@ -84,7 +98,7 @@ const Expenses = (props: AdminSectionProps) => {
       loading={loading}
       variables={variables}
       LoggedInUser={LoggedInUser}
-      collectiveSlug={variables.collectiveSlug}
+      onlySubmittedExpenses={LoggedInUser?.collective.slug === variables.collectiveSlug}
       isDashboard
     />
   );

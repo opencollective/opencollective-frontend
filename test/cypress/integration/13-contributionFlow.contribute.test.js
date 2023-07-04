@@ -84,8 +84,11 @@ describe('Contribution Flow: Order', () => {
         cy.getByDataCy('contribute-profile-picker').click();
         cy.contains('[data-cy="select-option"]:first', userName);
         cy.getByDataCy('progress-step-profile').contains(userName);
-
         cy.get('body').type('{esc}');
+
+        // Country required since we're contributing > $500
+        cy.getByDataCy('country-select').click();
+        cy.contains('[data-cy="select-option"]', 'Algeria').click();
         cy.get('button[data-cy="cf-next-step"]').click();
 
         // ---- Step 3: Payment ----
@@ -136,7 +139,7 @@ describe('Contribution Flow: Order', () => {
         // Payment
         cy.getByDataCy('cf-next-step').click();
         cy.checkStepsProgress({ enabled: ['profile', 'details', 'payment'] });
-
+        cy.contains('Next charge date: June 1, 2042');
         cy.get('#PaymentMethod').then($paymentMethod => {
           // Checks if the organization already has a payment method configured
           if ($paymentMethod.text().includes('VISA **** 4242')) {

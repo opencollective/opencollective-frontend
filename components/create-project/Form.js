@@ -34,7 +34,7 @@ const placeholders = {
 
 const messages = defineMessages({
   nameLabel: { id: 'createProject.form.nameLabel', defaultMessage: 'Project name' },
-  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
+  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your profile URL' },
   descriptionLabel: {
     id: 'createProject.form.descriptionLabel',
     defaultMessage: "What's the purpose of your Project?",

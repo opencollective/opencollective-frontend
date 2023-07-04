@@ -1,14 +1,14 @@
 import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
 import ExpenseSummary from '../../components/expenses/ExpenseSummary';
 import { expenseReceipt, expenseInvoice } from '../mocks/expenses-v2';
-import { openSourceHost } from '../mocks/collectives';
+import { webpackCollective } from '../mocks/collectives';
 
 <Meta title="Expenses/ExpenseSummary" component={ExpenseSummary} />
 
 <Canvas>
   <Story name="Invoice">
     {() => {
-      return <ExpenseSummary host={openSourceHost} expense={expenseReceipt} />;
+      return <ExpenseSummary collective={webpackCollective} expense={expenseReceipt} />;
     }}
   </Story>
 </Canvas>
@@ -16,7 +16,7 @@ import { openSourceHost } from '../mocks/collectives';
 <Canvas>
   <Story name="Receipt">
     {() => {
-      return <ExpenseSummary host={openSourceHost} expense={expenseInvoice} />;
+      return <ExpenseSummary collective={webpackCollective} expense={expenseInvoice} />;
     }}
   </Story>
 </Canvas>
@@ -24,16 +24,10 @@ import { openSourceHost } from '../mocks/collectives';
 <Canvas>
   <Story name="Loading">
     {() => {
-      const [isLoading, setLoading] = React.useState(true);
       return (
-        <div>
-          <button onClick={() => setLoading(!isLoading)}>Toggle loading</button>
-          <br />
-          <hr />
-          <br />
-          <ExpenseSummary host={openSourceHost} expense={expenseInvoice} isLoading={isLoading} />
-        </div>
+        <ExpenseSummary isLoading={true} />
       );
     }}
+
   </Story>
 </Canvas>

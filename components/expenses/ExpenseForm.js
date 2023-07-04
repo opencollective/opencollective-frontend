@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { Field, FieldArray, Form, Formik } from 'formik';
 import { first, isEmpty, omit, pick } from 'lodash';
+import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -35,13 +36,13 @@ import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } 
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
 import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';
 import { prepareExpenseItemForSubmit, validateExpenseItem } from './ExpenseItemForm';
-import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseRecurringBanner from './ExpenseRecurringBanner';
+import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
 import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
 import ExpenseTypeTag from './ExpenseTypeTag';
 import { validatePayoutMethod } from './PayoutMethodForm';
 
-const msg = defineMessages({
+export const msg = defineMessages({
   descriptionPlaceholder: {
     id: `ExpenseForm.DescriptionPlaceholder`,
     defaultMessage: 'Enter expense title here...',
@@ -264,6 +265,7 @@ const ExpenseFormBody = ({
   shouldLoadValuesFromPersister,
   isDraft,
   defaultStep,
+  drawerActionsContainer,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -467,9 +469,99 @@ const ExpenseFormBody = ({
           formik.setFieldValue('payee', {});
           formik.setFieldValue('payoutMethod', {});
         }}
+        drawerActionsContainer={drawerActionsContainer}
       />
     );
   }
+
+  const actionButtons = (
+    <Flex flex={1} gridGap={[2, 3]} flexWrap="wrap">
+      <StyledButton
+        type="button"
+        width={['100%', 'auto']}
+        whiteSpace="nowrap"
+        data-cy="expense-back"
+        onClick={() => {
+          if (isCreditCardCharge) {
+            onCancel();
+          } else {
+            setStep(EXPENSE_FORM_STEPS.PAYEE);
+          }
+        }}
+      >
+        ←&nbsp;
+        <FormattedMessage id="Back" defaultMessage="Back" />
+      </StyledButton>
+      <StyledButton
+        type="submit"
+        width={['100%', 'auto']}
+        whiteSpace="nowrap"
+        data-cy="expense-summary-btn"
+        buttonStyle="primary"
+        disabled={!stepTwoCompleted || !formik.isValid}
+        loading={formik.isSubmitting}
+        onClick={() => {
+          // When used inside the drawer, the submit button is rendered outside the form (with a portal). The form must be manually submitted.
+          if (drawerActionsContainer && formRef.current) {
+            formRef.current.requestSubmit();
+          }
+        }}
+      >
+        {isInvite && !isDraft ? (
+          <FormattedMessage id="Expense.SendInvite" defaultMessage="Send Invite" />
+        ) : isCreditCardCharge ? (
+          <FormattedMessage id="Expense.SaveReceipt" defaultMessage="Save Receipt" />
+        ) : (
+          <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
+        )}
+        &nbsp;→
+      </StyledButton>
+      {errors.payoutMethod?.data?.currency && touched.items?.some?.(i => i.amount) && (
+        <Box mx={[2, 0]} mt={2} color="red.500" fontSize="12px" letterSpacing={0}>
+          {errors.payoutMethod.data.currency.toString()}
+        </Box>
+      )}
+      {showResetModal ? (
+        <ConfirmationModal
+          onClose={() => setShowResetModal(false)}
+          header={editingExpense ? formatMessage(msg.cancelEditExpense) : formatMessage(msg.clearExpenseForm)}
+          body={
+            editingExpense ? formatMessage(msg.confirmCancelEditExpense) : formatMessage(msg.confirmClearExpenseForm)
+          }
+          continueHandler={() => {
+            if (editingExpense) {
+              onCancel();
+            } else {
+              setStep(EXPENSE_FORM_STEPS.PAYEE);
+              resetForm({ values: getDefaultExpense(collective) });
+              if (formPersister) {
+                formPersister.clearValues();
+                window.scrollTo(0, 0);
+              }
+            }
+            setShowResetModal(false);
+          }}
+          {...(editingExpense && {
+            continueLabel: formatMessage({ defaultMessage: 'Yes, cancel editing' }),
+            cancelLabel: formatMessage({ defaultMessage: 'No, continue editing' }),
+          })}
+        />
+      ) : (
+        <StyledButton
+          type="button"
+          buttonStyle="borderless"
+          width={['100%', 'auto']}
+          color="red.500"
+          marginLeft="auto"
+          whiteSpace="nowrap"
+          onClick={() => setShowResetModal(true)}
+        >
+          <Undo size={11} />
+          <Span mx={1}>{formatMessage(editingExpense ? msg.cancelEditExpense : msg.clearExpenseForm)}</Span>
+        </StyledButton>
+      )}
+    </Flex>
+  );
 
   return (
     <Form ref={formRef}>
@@ -642,100 +734,14 @@ const ExpenseFormBody = ({
                   </Box>
                 )}
 
-                <StyledHr flex="1" mt={4} borderColor="black.300" />
-                <Flex mt={3} flexWrap="wrap" alignItems="center">
-                  <StyledButton
-                    type="button"
-                    width={['100%', 'auto']}
-                    mx={[2, 0]}
-                    mr={[null, 3]}
-                    mt={2}
-                    whiteSpace="nowrap"
-                    data-cy="expense-back"
-                    onClick={() => {
-                      if (isCreditCardCharge) {
-                        onCancel();
-                      } else {
-                        setStep(EXPENSE_FORM_STEPS.PAYEE);
-                      }
-                    }}
-                  >
-                    ←&nbsp;
-                    <FormattedMessage id="Back" defaultMessage="Back" />
-                  </StyledButton>
-                  <StyledButton
-                    type="submit"
-                    width={['100%', 'auto']}
-                    mx={[2, 0]}
-                    mr={[null, 3]}
-                    mt={2}
-                    whiteSpace="nowrap"
-                    data-cy="expense-summary-btn"
-                    buttonStyle="primary"
-                    disabled={!stepTwoCompleted || !formik.isValid}
-                    loading={formik.isSubmitting}
-                  >
-                    {isInvite && !isDraft ? (
-                      <FormattedMessage id="Expense.SendInvite" defaultMessage="Send Invite" />
-                    ) : isCreditCardCharge ? (
-                      <FormattedMessage id="Expense.SaveReceipt" defaultMessage="Save Receipt" />
-                    ) : (
-                      <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
-                    )}
-                    &nbsp;→
-                  </StyledButton>
-                  {errors.payoutMethod?.data?.currency && touched.items?.some?.(i => i.amount) && (
-                    <Box mx={[2, 0]} mt={2} color="red.500" fontSize="12px" letterSpacing={0}>
-                      {errors.payoutMethod.data.currency.toString()}
-                    </Box>
-                  )}
-                  <StyledHr flex="1" borderColor="white.full" mx={2} />
-                  {showResetModal ? (
-                    <ConfirmationModal
-                      onClose={() => setShowResetModal(false)}
-                      header={
-                        editingExpense ? formatMessage(msg.cancelEditExpense) : formatMessage(msg.clearExpenseForm)
-                      }
-                      body={
-                        editingExpense
-                          ? formatMessage(msg.confirmCancelEditExpense)
-                          : formatMessage(msg.confirmClearExpenseForm)
-                      }
-                      continueHandler={() => {
-                        if (editingExpense) {
-                          onCancel();
-                        } else {
-                          setStep(EXPENSE_FORM_STEPS.PAYEE);
-                          resetForm({ values: getDefaultExpense(collective) });
-                          if (formPersister) {
-                            formPersister.clearValues();
-                            window.scrollTo(0, 0);
-                          }
-                        }
-                        setShowResetModal(false);
-                      }}
-                      {...(editingExpense && {
-                        continueLabel: formatMessage({ defaultMessage: 'Yes, cancel editing' }),
-                        cancelLabel: formatMessage({ defaultMessage: 'No, continue editing' }),
-                      })}
-                    />
-                  ) : (
-                    <StyledButton
-                      type="button"
-                      buttonStyle="borderless"
-                      width={['100%', 'auto']}
-                      color="red.500"
-                      mt={1}
-                      mx={[2, 0]}
-                      mr={[null, 3]}
-                      whiteSpace="nowrap"
-                      onClick={() => setShowResetModal(true)}
-                    >
-                      <Undo size={11} />
-                      <Span mx={1}>{formatMessage(editingExpense ? msg.cancelEditExpense : msg.clearExpenseForm)}</Span>
-                    </StyledButton>
-                  )}
-                </Flex>
+                {drawerActionsContainer ? (
+                  createPortal(actionButtons, drawerActionsContainer)
+                ) : (
+                  <Fragment>
+                    <StyledHr flex="1" mt={4} mb={3} borderColor="black.300" />
+                    {actionButtons}
+                  </Fragment>
+                )}
               </HiddenFragment>
             </div>
           ) : null}
@@ -743,7 +749,7 @@ const ExpenseFormBody = ({
       )}
       {step === EXPENSE_FORM_STEPS.EXPENSE && (
         <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
-          <ExpensePayeeDetails expense={formik.values} host={collective.host} borderless collective={collective} />
+          <ExpenseSummaryAdditionalInformation expense={formik.values} host={collective.host} collective={collective} />
         </StyledCard>
       )}
     </Form>
@@ -801,6 +807,7 @@ ExpenseFormBody.propTypes = {
       }),
     ),
   }),
+  drawerActionsContainer: PropTypes.object,
 };
 
 /**
@@ -821,6 +828,7 @@ const ExpenseForm = ({
   expensesTags,
   shouldLoadValuesFromPersister,
   defaultStep,
+  drawerActionsContainer,
 }) => {
   const isDraft = expense?.status === expenseStatus.DRAFT;
   const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
@@ -867,6 +875,7 @@ const ExpenseForm = ({
           shouldLoadValuesFromPersister={shouldLoadValuesFromPersister}
           isDraft={isDraft}
           defaultStep={defaultStep}
+          drawerActionsContainer={drawerActionsContainer}
         />
       )}
     </Formik>
@@ -935,6 +944,7 @@ ExpenseForm.propTypes = {
       location: PropTypes.shape({
         address: PropTypes.string,
         country: PropTypes.string,
+        structured: PropTypes.object,
       }),
       payoutMethods: PropTypes.arrayOf(
         PropTypes.shape({
@@ -946,6 +956,7 @@ ExpenseForm.propTypes = {
       ),
     }),
   ),
+  drawerActionsContainer: PropTypes.object,
 };
 
 ExpenseForm.defaultProps = {

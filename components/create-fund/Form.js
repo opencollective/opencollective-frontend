@@ -34,7 +34,7 @@ const placeholders = {
 
 const messages = defineMessages({
   nameLabel: { id: 'createFund.form.nameLabel', defaultMessage: "What's the name of your fund?" },
-  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
+  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your profile URL' },
   suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
   descriptionLabel: {
     id: 'createFund.form.descriptionLabel',

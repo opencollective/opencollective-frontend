@@ -46,6 +46,7 @@ export const transactionsPageQuery = gql`
     $includeIncognitoTransactions: Boolean
     $includeGiftCardTransactions: Boolean
     $includeChildrenTransactions: Boolean
+    $virtualCard: [VirtualCardReferenceInput]
   ) {
     account(slug: $slug) {
       id
@@ -97,6 +98,7 @@ export const transactionsPageQuery = gql`
       includeGiftCardTransactions: $includeGiftCardTransactions
       includeChildrenTransactions: $includeChildrenTransactions
       includeDebts: true
+      virtualCard: $virtualCard
     ) {
       ...TransactionsQueryCollectionFragment
     }
@@ -145,22 +147,13 @@ class TransactionsPage extends React.Component {
 
   async componentDidMount() {
     const { router, data } = this.props;
-    const Collective = (data && data.account) || this.state.collective;
-    const queryParameters = {
-      ...omit(this.props.query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
-    };
-    this.setState({ Collective });
-    addParentToURLIfMissing(router, Collective, `/transactions`, queryParameters);
+    const collective = data && data.account;
+    const queryParameters = omit(this.props.query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']);
+    addParentToURLIfMissing(router, collective, `/transactions`, queryParameters);
   }
 
   render() {
-    const {
-      LoggedInUser,
-      router,
-      data,
-      // slug,
-      // query,
-    } = this.props;
+    const { LoggedInUser, router, data } = this.props;
     const { account, transactions, refetch, variables, error, loading } = data || {};
 
     if (!account && data.loading) {

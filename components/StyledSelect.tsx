@@ -35,7 +35,6 @@ const Messages = defineMessages({
   },
 });
 
-/* eslint-disable react/prop-types */
 const Option = ({ innerProps, ...props }: OptionProps & { 'data-cy': string }) => (
   <ReactSelectComponents.Option
     {...props}
@@ -294,28 +293,36 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
   ${space}
 `;
 
-type StyledSelectCustomComponent = Select &
-  React.ExoticComponent<
-    LayoutProps &
-      TypographyProps &
-      SpaceProps & {
-        intl: IntlShape;
-        /** Alias for isDisabled */
-        inputId: string;
-        disabled?: boolean;
-        useSearchIcon?: boolean;
-        hideDropdownIndicator?: boolean;
-        hideMenu?: boolean;
-        error?: boolean;
-        style?: Record<string, unknown>;
-        onBlur?: Function;
-        onChange?: Function;
-        isLoading?: boolean;
-        isSearchable?: boolean;
-        options?: any;
-        value?: any;
-      }
-  >;
+export type StyledSelectProps = LayoutProps &
+  TypographyProps &
+  SpaceProps & {
+    intl: IntlShape;
+    /** Alias for isDisabled */
+    inputId: string;
+    name?: string;
+    placeholder?: React.ReactNode;
+    disabled?: boolean;
+    required?: boolean;
+    useSearchIcon?: boolean;
+    hideDropdownIndicator?: boolean;
+    hideMenu?: boolean;
+    error?: boolean;
+    style?: Record<string, unknown>;
+    styles?: Record<string, unknown>;
+    onBlur?: Function;
+    onChange?: Function;
+    isLoading?: boolean;
+    isSearchable?: boolean;
+    isClearable?: boolean;
+    options?: any;
+    value?: any;
+    components?: Record<string, React.ReactNode | React.Component | React.FunctionComponent>;
+    closeMenuOnSelect?: boolean;
+    hideSelectedOptions?: boolean;
+    isMulti?: boolean;
+  };
+
+type StyledSelectCustomComponent = Select & React.ExoticComponent<StyledSelectProps>;
 
 const StyledSelect: StyledSelectCustomComponent = makeStyledSelect(Select);
 
@@ -332,6 +339,7 @@ StyledSelect['propTypes'] = {
   placeholder: PropTypes.node,
   /** Whether the component is disabled */
   disabled: PropTypes.bool,
+  required: PropTypes.bool,
   /** Alias for `disabled` */
   isDisabled: PropTypes.bool,
   /** Rendered when there's no option to show */
@@ -355,6 +363,7 @@ StyledSelect['propTypes'] = {
   menuPortalTarget: PropTypes.any,
   /** Compact mode for rending multiple selections correctly **/
   useCompactMode: PropTypes.bool,
+  name: PropTypes.string,
 };
 
 StyledSelect['defaultProps'] = {

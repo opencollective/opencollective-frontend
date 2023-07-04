@@ -117,7 +117,7 @@ const messages = defineMessages({
   },
   errorSlugHyphen: {
     id: 'createCollective.form.error.slug.hyphen',
-    defaultMessage: 'Collective slug URL cannot start or end with a hyphen',
+    defaultMessage: 'Collective handle cannot start or end with a hyphen',
   },
   name: {
     id: 'OCFHostApplication.name.label',
@@ -129,7 +129,7 @@ const messages = defineMessages({
   },
   slug: {
     id: 'createCollective.form.slugLabel',
-    defaultMessage: 'Set your URL',
+    defaultMessage: 'Set your profile URL',
   },
   repositoryUrl: {
     id: 'HostApplication.form.RepositoryUrlLabel',
@@ -320,7 +320,7 @@ const ApplicationForm = ({
             <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
               <FormattedMessage
                 id="HostApplication.form.subheading"
-                defaultMessage="Introduce your Collective, please incude as much context as possible so we can give you the best service we can! Have doubts? {faqLink}"
+                defaultMessage="Introduce your Collective, please include as much context as possible so we can give you the best service we can! Have doubts? {faqLink}"
                 values={{
                   faqLink: (
                     <StyledLink href="https://docs.oscollective.org/faq/general" openInNewTab color="purple.500">

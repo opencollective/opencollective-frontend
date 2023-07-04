@@ -14,8 +14,7 @@ import { DashboardContext } from '../components/dashboard/DashboardContext';
 import AdminPanelSection from '../components/dashboard/DashboardSection';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
-import AdminPanelTopBar from '../components/dashboard/TopBar';
-import { Box, Flex, Grid } from '../components/Grid';
+import { Box, Flex } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
@@ -44,6 +43,8 @@ const messages = defineMessages({
 const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return ALL_SECTIONS.INFO;
+  } else if (account?.type === 'INDIVIDUAL') {
+    return ALL_SECTIONS.HOME;
   } else if (isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
   } else {
@@ -93,46 +94,37 @@ function getBlocker(LoggedInUser, account, section) {
   }
 }
 
-const getIsAccountantOnly = (LoggedInUser, account) => {
-  return LoggedInUser && !LoggedInUser.isAdminOfCollective(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account);
-};
-
 const DashboardPage = () => {
   const intl = useIntl();
   const router = useRouter();
   const { slug, section, subpath } = router.query;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
+  const activeSlug = slug || LoggedInUser?.getLastDashboardSlug();
 
   // Redirect to the dashboard of the logged in user if no slug is provided
   useEffect(() => {
-    if (!slug && LoggedInUser) {
-      router.push(`/dashboard/${LoggedInUser.collective.slug}`);
+    if (slug) {
+      LoggedInUser?.saveLastDashboardSlug(slug);
     }
   }, [slug, LoggedInUser]);
 
-  const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
+  const { data, loading } = useQuery(adminPanelQuery, {
+    context: API_V2_CONTEXT,
+    variables: { slug: activeSlug },
+    skip: !activeSlug,
+  });
+
   const account = data?.account;
   const notification = getNotification(intl, account);
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
   const [expandedSection, setExpandedSection] = React.useState(null);
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
-  const titleBase = account?.isHost
-    ? intl.formatMessage({ id: 'AdminPanel.button', defaultMessage: 'Admin' })
-    : intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' });
+  const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
 
   return (
     <DashboardContext.Provider value={{ selectedSection, expandedSection, setExpandedSection, account }}>
       <Page noRobots collective={account} title={account ? `${account.name} - ${titleBase}` : titleBase}>
-        {!blocker && (
-          <AdminPanelTopBar
-            isLoading={isLoading}
-            collective={data?.account}
-            collectiveSlug={slug}
-            selectedSection={selectedSection}
-            display={['flex', null, 'none']}
-          />
-        )}
         {Boolean(notification) && <NotificationBar {...notification} />}
         {blocker ? (
           <Flex flexDirection="column" alignItems="center" my={6}>
@@ -142,26 +134,24 @@ const DashboardPage = () => {
             {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
           </Flex>
         ) : (
-          <Grid
-            gridTemplateColumns={['1fr', null, 'repeat(4, minmax(0, 1fr))']}
-            maxWidth={1280}
+          <Flex
+            flexDirection={['column', 'column', 'row']}
+            justifyContent={'space-between'}
             minHeight={600}
             gridGap={16}
-            m="0 auto"
-            pr={3}
             data-cy="admin-panel-container"
           >
             <AdminPanelSideBar
               isLoading={isLoading}
               collective={account}
+              activeSlug={activeSlug}
               selectedSection={selectedSection}
-              display={['none', 'none', 'block']}
-              isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
+              isAccountantOnly={LoggedInUser?.isAccountantOnly(account)}
             />
             {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
             ) : (
-              <Box gridColumn={'span 3 / span 3'} py={'32px'} px={'24px'}>
+              <Box flex="0 1 1000px" py={'32px'} px={[1, '24px']}>
                 <AdminPanelSection
                   section={selectedSection}
                   isLoading={isLoading}
@@ -170,7 +160,8 @@ const DashboardPage = () => {
                 />
               </Box>
             )}
-          </Grid>
+            <Box flex="0 100 300px" />
+          </Flex>
         )}
       </Page>
     </DashboardContext.Provider>

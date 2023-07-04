@@ -38,7 +38,7 @@ class Link extends React.Component {
   }
 
   render() {
-    const { href, children, className, title, onClick, openInNewTab } = this.props;
+    const { href, children, className, openInNewTab } = this.props;
     if (this.isHash) {
       const route = this.constructRoutePath(href);
       const afterAnimate = () => {
@@ -59,17 +59,13 @@ class Link extends React.Component {
       );
     } else {
       return (
-        <NextLink {...pick(this.props, ['href', 'scroll'])}>
-          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
-          <a
-            className={className}
-            title={title}
-            onClick={onClick}
-            data-cy={this.props['data-cy']}
-            {...(openInNewTab || this.state.isIframe ? { target: '_blank', rel: 'noopener noreferrer' } : null)}
-          >
-            {children}
-          </a>
+        <NextLink
+          {...pick(this.props, ['href', 'scroll', 'title', 'onClick'])}
+          className={className}
+          data-cy={this.props['data-cy']}
+          {...(openInNewTab || this.state.isIframe ? { target: '_blank', rel: 'noopener noreferrer' } : null)}
+        >
+          {children}
         </NextLink>
       );
     }

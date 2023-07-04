@@ -7,13 +7,14 @@ import styled from 'styled-components';
 import AccountSettings from '../admin-panel/sections/AccountSettings';
 import FinancialContributions from '../admin-panel/sections/FinancialContributions';
 import HostVirtualCards from '../admin-panel/sections/HostVirtualCards';
-import InvoicesReceipts from '../admin-panel/sections/InvoicesReceipts';
+import InvoicesReceipts from '../admin-panel/sections/invoices-receipts/InvoicesReceipts';
 import NotificationsSettings from '../admin-panel/sections/NotificationsSettings';
 import PendingContributions from '../admin-panel/sections/PendingContributions';
 import TeamSettings from '../admin-panel/sections/Team';
 import Container from '../Container';
 import { Box } from '../Grid';
 import PendingApplications from '../host-dashboard/applications/PendingApplications';
+import HostDashboardAgreements from '../host-dashboard/HostDashboardAgreements';
 import HostDashboardExpenses from '../host-dashboard/HostDashboardExpenses';
 import HostDashboardHostedCollectives from '../host-dashboard/HostDashboardHostedCollectives';
 import HostDashboardReports from '../host-dashboard/HostDashboardReports';
@@ -22,6 +23,7 @@ import NotFound from '../NotFound';
 import { H2 } from '../Text';
 
 import Expenses from './sections/Expenses';
+import Home from './sections/Home';
 import ManageContributions from './sections/ManageContributions';
 import Transactions from './sections/Transactions';
 import {
@@ -37,6 +39,7 @@ const ADMIN_PANEL_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS]: FinancialContributions,
   [HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS]: PendingContributions,
   [HOST_DASHBOARD_SECTIONS.HOST_EXPENSES]: HostDashboardExpenses,
+  [HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
   [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: PendingApplications,
   [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
   [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
@@ -45,6 +48,7 @@ const ADMIN_PANEL_SECTIONS = {
   // NEW
   [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
   [COLLECTIVE_SECTIONS.EXPENSES]: Expenses,
+  [COLLECTIVE_SECTIONS.HOME]: Home,
   [COLLECTIVE_SECTIONS.TRANSACTIONS]: Transactions,
 };
 
@@ -63,10 +67,10 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
 
   if (isLoading) {
     return (
-      <div>
+      <Container width="100%" px={2}>
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
-      </div>
+      </Container>
     );
   }
 
@@ -74,7 +78,7 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
   if (AdminSectionComponent) {
     return (
       <Container width="100%">
-        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} />
+        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} isDashboard={true} />
       </Container>
     );
   }

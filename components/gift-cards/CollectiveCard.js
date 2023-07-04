@@ -36,10 +36,10 @@ const CollectiveCard = ({ collective, children, size, avatarSize, p, ...props })
 CollectiveCard.propTypes = {
   collective: PropTypes.object,
   children: PropTypes.node,
-  size: PropTypes.number,
+  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   fontSize: PropTypes.string,
   p: PropTypes.number,
-  avatarSize: PropTypes.number,
+  avatarSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
 };
 
 CollectiveCard.defaultProps = {

@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { isNil, omit, omitBy, pick } from 'lodash';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
+import { isIndividualAccount } from '../../lib/collective.lib';
 import roles from '../../lib/constants/roles';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { parseDateInterval } from '../../lib/date-utils';
 import { getErrorFromGraphqlException } from '../../lib/errors';
+import { usePrevious } from '../../lib/hooks/usePrevious';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../../lib/url-helpers';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
@@ -34,6 +36,13 @@ const EXPENSES_PER_PAGE = 15;
 export function getVariablesFromQuery(query) {
   const amountRange = parseAmountRange(query.amount);
   const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
+
+  const virtualCardIds = query.virtualCard
+    ? typeof query.virtualCard === 'string'
+      ? [query.virtualCard]
+      : query.virtualCard
+    : null;
+
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || EXPENSES_PER_PAGE,
@@ -52,6 +61,7 @@ export function getVariablesFromQuery(query) {
     includeGiftCardTransactions: !query.ignoreGiftCardsTransactions,
     includeChildrenTransactions: !query.ignoreChildrenTransactions,
     displayPendingContributions: query.displayPendingContributions !== 'false',
+    virtualCard: virtualCardIds ? virtualCardIds.map(id => ({ id })) : null,
   };
 }
 
@@ -74,6 +84,8 @@ const Transactions = ({
   router,
   isDashboard,
 }) => {
+  const intl = useIntl();
+  const prevLoggedInUser = usePrevious(LoggedInUser);
   const [state, setState] = useState({
     hasChildren: null,
     hasGiftCards: null,
@@ -84,6 +96,13 @@ const Transactions = ({
   const transactionsRoute = isDashboard
     ? `/dashboard/${account?.slug}/transactions`
     : `${getCollectivePageCanonicalURL(account)}/transactions`;
+
+  // Refetch data when user logs in or out
+  useEffect(() => {
+    if (LoggedInUser !== prevLoggedInUser) {
+      refetch();
+    }
+  }, [LoggedInUser]);
 
   useEffect(() => {
     const queryParameters = {
@@ -123,7 +142,7 @@ const Transactions = ({
   function checkCanDownloadInvoices() {
     if (!account || !LoggedInUser) {
       return false;
-    } else if (account.type !== 'ORGANIZATION' && account.type !== 'USER') {
+    } else if (account.type !== 'ORGANIZATION' && !isIndividualAccount(account)) {
       return false;
     } else {
       return (
@@ -176,7 +195,7 @@ const Transactions = ({
         </H1>
         <Box flexGrow={[1, 0]}>
           <SearchBar
-            placeholder="Search transactions..." // TODO: fix intl
+            placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…' })}
             defaultValue={router.query.searchTerm}
             height="40px"
             onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}

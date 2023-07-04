@@ -1,3 +1,5 @@
+import { PreviewFeature } from '../preview-features';
+
 export type LoggedInUser = {
   id: number;
   collective: {
@@ -12,11 +14,15 @@ export type LoggedInUser = {
   isAdminOfCollective: (collective: any) => boolean;
   isAdminOfCollectiveOrHost: (collective: any) => boolean;
   isHostAdmin: (collective: any) => boolean;
+  isAccountantOnly: (collective: any) => boolean;
   isSelf: (collective: any) => boolean;
+  isRoot: boolean;
   canEditComment: (comment: any) => boolean;
   canEditEvent: (event: any) => boolean;
   canEditProject: (project: any) => boolean;
   canEditUpdate: (update: any) => boolean;
   canSeeAdminPanel: (collective: any) => boolean;
   email: string;
+  hasPreviewFeatureEnabled: (featureKey: string) => boolean;
+  getAvailablePreviewFeatures: () => PreviewFeature[];
 };

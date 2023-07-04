@@ -44,6 +44,14 @@ const StepCheckout = ({ stepDetails, order }) => {
             />
           )}
         </MessageBox>
+        {!['BTC', 'ETH', 'BCH', 'LTC', 'ZEC', 'DOGE', 'FIL', 'XTZ', 'MIR'].includes(pledgeCurrency) && (
+          <MessageBox type="warning" fontSize="13px" mb={2}>
+            <FormattedMessage
+              defaultMessage="Send only {pledgeCurrency} (Using the Ethereum Mainnet/ERC-20 token) to this address. Sending other unsupported tokens or NFTs to this address may result in the loss of your donation. This address will expire after 180 days if not used."
+              values={{ pledgeCurrency }}
+            />
+          </MessageBox>
+        )}
       </Flex>
     );
   };

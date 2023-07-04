@@ -12,6 +12,8 @@ import { Box, Flex } from '../Grid';
 import StyledCard from '../StyledCard';
 import { P } from '../Text';
 
+import ExpenseDrawer from './ExpenseDrawer';
+
 const ExpenseContainer = styled.div`
   ${props =>
     !props.isFirst &&
@@ -72,13 +74,29 @@ const ExpensesList = ({
   onDelete,
   onProcess,
   expenseFieldForTotalAmount,
+  useDrawer,
+  setOpenExpenseLegacyId,
+  openExpenseLegacyId,
 }) => {
+  // Initial values for expense in drawer
+  const expenseInDrawer = React.useMemo(() => {
+    if (openExpenseLegacyId) {
+      const expense = expenses?.find(e => e.legacyId === openExpenseLegacyId);
+      return expense || null;
+    }
+  }, [openExpenseLegacyId, expenses]);
+
   if (!expenses?.length && !isLoading) {
     return null;
   }
 
   return (
     <StyledCard>
+      <ExpenseDrawer
+        openExpenseLegacyId={openExpenseLegacyId}
+        handleClose={() => setOpenExpenseLegacyId(null)}
+        initialExpenseValues={expenseInDrawer}
+      />
       {isLoading ? (
         [...new Array(nbPlaceholders)].map((_, idx) => (
           // eslint-disable-next-line react/no-array-index-key
@@ -99,6 +117,12 @@ const ExpensesList = ({
                 onDelete={onDelete}
                 onProcess={onProcess}
                 suggestedTags={suggestedTags}
+                selected={openExpenseLegacyId === expense.legacyId}
+                expandExpense={e => {
+                  e.preventDefault();
+                  setOpenExpenseLegacyId(expense.legacyId);
+                }}
+                useDrawer={useDrawer}
               />
             </ExpenseContainer>
           ))}
@@ -166,6 +190,9 @@ ExpensesList.propTypes = {
     }),
   ),
   totalAmount: PropTypes.number,
+  useDrawer: PropTypes.bool,
+  setOpenExpenseLegacyId: PropTypes.func,
+  openExpenseLegacyId: PropTypes.number,
 };
 
 ExpensesList.defaultProps = {

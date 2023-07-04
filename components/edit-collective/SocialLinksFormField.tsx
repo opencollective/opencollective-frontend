@@ -71,7 +71,7 @@ export default function SocialLinksFormField({ value = [], touched, onChange }: 
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <Flex width="100%" flexDirection="column">
+      <Flex width="100%" flexDirection="column" data-cy="social-link-inputs">
         <SortableContext items={items.map(item => item.sortId)} strategy={verticalListSortingStrategy}>
           {items.map(socialLink => {
             return (

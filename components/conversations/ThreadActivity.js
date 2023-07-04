@@ -6,6 +6,8 @@ import { Cogs as CogsIcon } from '@styled-icons/fa-solid/Cogs';
 import { AlertOctagon as ErrorIcon } from '@styled-icons/feather/AlertOctagon';
 import { Edit as EditIcon } from '@styled-icons/feather/Edit';
 import { FileText as InvitedIcon } from '@styled-icons/feather/FileText';
+import { Pause as PauseIcon } from '@styled-icons/feather/Pause';
+import { Play as PlayIcon } from '@styled-icons/feather/Play';
 import { Plus as PlusIcon } from '@styled-icons/feather/Plus';
 import { UserCheck as ApprovedIcon } from '@styled-icons/feather/UserCheck';
 import { UserMinus as UnapprovedIcon } from '@styled-icons/feather/UserMinus';
@@ -78,6 +80,14 @@ const ACTIVITIES_INFO = {
     message: defineMessage({
       id: 'Expense.Activity.Unapproved',
       defaultMessage: 'Expense unapproved',
+    }),
+  },
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED: {
+    type: 'warning',
+    icon: UnapprovedIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.ReApprovalRequested',
+      defaultMessage: 'Re-approval requested',
     }),
   },
   COLLECTIVE_EXPENSE_UPDATED: {
@@ -161,24 +171,41 @@ const ACTIVITIES_INFO = {
       defaultMessage: 'Expense marked as incomplete',
     }),
   },
+  COLLECTIVE_EXPENSE_PUT_ON_HOLD: {
+    type: 'error',
+    icon: PauseIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.PutOnHold',
+      defaultMessage: 'Expense was put on hold',
+    }),
+  },
+  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD: {
+    type: 'info',
+    icon: PlayIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.ReleasedFromHold',
+      defaultMessage: 'Expense was released from hold',
+    }),
+  },
 };
 
-const getActivityColor = (activityType, theme) => {
+const getActivityColors = (activityType, theme) => {
   switch (ACTIVITIES_INFO[activityType]?.type) {
     case 'info':
-      return theme.colors.blue[500];
+      return { text: theme.colors.blue[500], border: theme.colors.blue[500] };
     case 'success':
-      return theme.colors.green[500];
+      return { text: theme.colors.green[500], border: theme.colors.green[500] };
     case 'error':
-      return theme.colors.red[500];
+      return { text: theme.colors.red[500], border: theme.colors.red[500] };
     default:
-      return theme.colors.black[400];
+      return { text: theme.colors.black[700], border: theme.colors.black[400] };
   }
 };
 
 export const getActivityIcon = (activity, theme) => {
   const IconComponent = ACTIVITIES_INFO[activity.type]?.icon || UpdateIcon;
-  return <IconComponent size={18} color={getActivityColor(activity.type, theme)} />;
+  const colors = getActivityColors(activity.type, theme);
+  return <IconComponent size={18} color={colors.border} />;
 };
 
 export const isSupportedActivity = activity => {
@@ -201,7 +228,7 @@ const ActivityMessage = styled.span`
 const ThreadActivity = ({ activity }) => {
   const intl = useIntl();
   const theme = useTheme();
-  const activityColor = getActivityColor(activity.type, theme);
+  const activityColors = getActivityColors(activity.type, theme);
   const message = ACTIVITIES_INFO[activity.type]?.message;
   const details = activity.data?.message || activity.data?.error?.message;
   const DataRenderer = ACTIVITIES_INFO[activity.type]?.DataRenderer;
@@ -230,8 +257,8 @@ const ThreadActivity = ({ activity }) => {
         </Flex>
       )}
       {message && (
-        <ActivityParagraph activityColor={activityColor} mt={1} fontSize="12px" whiteSpace="pre-line">
-          <ActivityMessage color={activityColor}>
+        <ActivityParagraph activityColor={activityColors.border} mt={1} fontSize="12px" whiteSpace="pre-line">
+          <ActivityMessage color={activityColors.text}>
             {intl.formatMessage(message, {
               movedFromCollective: activity.data?.movedFromCollective?.name || 'collective',
             })}

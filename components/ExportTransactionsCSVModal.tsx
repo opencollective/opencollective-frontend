@@ -69,9 +69,13 @@ type CSVField =
   | 'expenseTags'
   | 'payoutMethodType'
   | 'merchantId'
-  | 'orderMemo';
+  | 'orderMemo'
+  | 'taxAmount'
+  | 'taxType'
+  | 'taxRate'
+  | 'taxIdNumber';
 
-const FIELD_GROUPS: Record<string, CSVField[]> = {
+const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
   transaction: [
     'date',
     'datetime',
@@ -117,14 +121,16 @@ const FIELD_GROUPS: Record<string, CSVField[]> = {
     'paymentMethodType',
   ],
   expense: ['expenseId', 'expenseLegacyId', 'expenseType', 'expenseTags', 'payoutMethodType', 'merchantId'],
+  tax: ['taxAmount', 'taxType', 'taxRate', 'taxIdNumber'],
   legacy: ['platformFee', 'hostFee'],
 };
 
-const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, any> = {
+const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, React.ReactNode> = {
   transaction: <FormattedMessage defaultMessage="Transaction" />,
   accounts: <FormattedMessage defaultMessage="Account" />,
   order: <FormattedMessage defaultMessage="Contribution" />,
   expense: <FormattedMessage id="Expense" defaultMessage="Expense" />,
+  tax: <FormattedMessage defaultMessage="Tax" />,
   legacy: <FormattedMessage id="Legacy/Deprecated" defaultMessage="Legacy/Deprecated" />,
 };
 
@@ -160,7 +166,7 @@ const DEFAULT_FIELDS = [
   'orderMemo',
 ];
 
-const FieldLabels = {
+const FieldLabels: Record<CSVField, React.ReactNode> = {
   date: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
   datetime: <FormattedMessage defaultMessage="Date & Time" />,
   id: <FormattedMessage defaultMessage="Transaction ID" />,
@@ -183,15 +189,15 @@ const FieldLabels = {
   netAmount: <FormattedMessage defaultMessage="Net Amount" />,
   balance: <FormattedMessage id="Balance" defaultMessage="Balance" />,
   currency: <FormattedMessage id="Currency" defaultMessage="Currency" />,
-  accountSlug: <FormattedMessage defaultMessage="Account Slug" />,
+  accountSlug: <FormattedMessage defaultMessage="Account Handle" />,
   accountName: <FormattedMessage defaultMessage="Account Name" />,
   accountType: <FormattedMessage defaultMessage="Account Type" />,
   accountEmail: <FormattedMessage defaultMessage="Account Email" />,
-  oppositeAccountSlug: <FormattedMessage defaultMessage="Opposite Account Slug" />,
+  oppositeAccountSlug: <FormattedMessage defaultMessage="Opposite Account Handle" />,
   oppositeAccountName: <FormattedMessage defaultMessage="Opposite Account Name" />,
   oppositeAccountType: <FormattedMessage defaultMessage="Opposite Account Type" />,
   oppositeAccountEmail: <FormattedMessage defaultMessage="Opposite Account Email" />,
-  hostSlug: <FormattedMessage defaultMessage="Host Slug" />,
+  hostSlug: <FormattedMessage defaultMessage="Host Handle" />,
   hostName: <FormattedMessage defaultMessage="Host Name" />,
   hostType: <FormattedMessage defaultMessage="Host Type" />,
   orderId: <FormattedMessage defaultMessage="Contribution ID" />,
@@ -207,6 +213,10 @@ const FieldLabels = {
   expenseTags: <FormattedMessage defaultMessage="Expense Tags" />,
   payoutMethodType: <FormattedMessage defaultMessage="Payout Method Type" />,
   merchantId: <FormattedMessage defaultMessage="Merchant ID" />,
+  taxAmount: <FormattedMessage defaultMessage="Tax Amount" />,
+  taxType: <FormattedMessage defaultMessage="Tax Type" />,
+  taxRate: <FormattedMessage defaultMessage="Tax Rate" />,
+  taxIdNumber: <FormattedMessage defaultMessage="Tax ID Number" />,
 };
 
 enum FIELD_OPTIONS {
@@ -230,6 +240,7 @@ type ExportTransactionsCSVModalProps = {
   collective: Account;
   host?: Account;
   accounts?: Account[];
+  filters?: Record<string, string>;
 };
 
 const ExportTransactionsCSVModal = ({
@@ -238,6 +249,7 @@ const ExportTransactionsCSVModal = ({
   dateInterval,
   host,
   accounts,
+  filters,
   ...props
 }: ExportTransactionsCSVModalProps) => {
   const isHostReport = Boolean(host);
@@ -252,7 +264,7 @@ const ExportTransactionsCSVModal = ({
     () => getSelectedPeriodOptionFromInterval(tmpDateInterval as any),
     [tmpDateInterval],
   );
-  const datePresetPptions = React.useMemo(() => {
+  const datePresetOptions = React.useMemo(() => {
     return Object.keys(PERIOD_FILTER_PRESETS).map(presetKey => ({
       value: presetKey,
       label: PERIOD_FILTER_PRESETS[presetKey].label,
@@ -317,9 +329,22 @@ const ExportTransactionsCSVModal = ({
         url.searchParams.set('account', accounts.map(a => a.slug).join(','));
       }
     } else {
-      url.searchParams.set('includeChildrenTransactions', '1');
-      url.searchParams.set('includeIncognitoTransactions', '1');
-      url.searchParams.set('includeGiftCardTransactions', '1');
+      if (!filters?.ignoreGiftCardsTransactions) {
+        url.searchParams.set('includeGiftCardTransactions', '1');
+      }
+      if (!filters?.ignoreIncognitoTransactions) {
+        url.searchParams.set('includeIncognitoTransactions', '1');
+      }
+      if (!filters?.ignoreChildrenTransactions) {
+        url.searchParams.set('includeChildrenTransactions', '1');
+      }
+      for (const key in omit(filters, [
+        'ignoreGiftCardsTransactions',
+        'ignoreIncognitoTransactions',
+        'ignoreChildrenTransactions',
+      ])) {
+        url.searchParams.set(key, filters[key]);
+      }
     }
     if (from) {
       url.searchParams.set('dateFrom', simpleDateToISOString(from, false, timezoneType));
@@ -351,7 +376,7 @@ const ExportTransactionsCSVModal = ({
   }, [fields, tmpDateInterval]);
 
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
-  const disabled = !isValidDateInterval || isFetchingRows || exportedRows > 100e3;
+  const disabled = !isValidDateInterval || exportedRows > 100e3;
 
   return (
     <StyledModal onClose={onClose} width="100%" maxWidth="576px" {...props}>
@@ -363,10 +388,18 @@ const ExportTransactionsCSVModal = ({
           <MessageBox type="warning" withIcon mt={3}>
             <FormattedMessage
               id="ExportTransactionsCSVModal.FilteredCollectivesWarning"
-              defaultMessage="This report is affected by the collective filtter and will include all transactions from the following accounts: {accounts}"
+              defaultMessage="This report is affected by the collective filter and will include all transactions from the following accounts: {accounts}"
               values={{
                 accounts: accounts.map(a => a.slug).join(', '),
               }}
+            />
+          </MessageBox>
+        )}
+        {!isEmpty(filters) && (
+          <MessageBox type="warning" withIcon mt={3}>
+            <FormattedMessage
+              id="ExportTransactionsCSVModal.FiltersWarning"
+              defaultMessage="This report is affected by the filters set on the transactions page."
             />
           </MessageBox>
         )}
@@ -382,7 +415,7 @@ const ExportTransactionsCSVModal = ({
               {inputProps => (
                 <StyledSelect
                   {...inputProps}
-                  options={datePresetPptions}
+                  options={datePresetOptions}
                   onChange={({ value }) => setTmpDateInterval(PERIOD_FILTER_PRESETS[value].getInterval())}
                   value={datePresetSelectedOption}
                   width="100%"
@@ -492,7 +525,8 @@ const ExportTransactionsCSVModal = ({
           <StyledButton
             buttonSize="small"
             buttonStyle="primary"
-            as={disabled ? undefined : 'a'}
+            as={disabled || isFetchingRows ? undefined : 'a'}
+            loading={isFetchingRows}
             href={disabled ? undefined : downloadUrl}
             disabled={disabled}
           >

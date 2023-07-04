@@ -143,9 +143,9 @@ export const webpackCollective = {
   connectedTo: [],
   tags: ['open source'],
   isApproved: true,
-  image: 'https://cl.ly/221T14472V23/icon-big_x6ot1e.png',
-  imageUrl: 'https://cl.ly/221T14472V23/icon-big_x6ot1e.png',
-  backgroundImage: 'https://cl.ly/2b1k0P030J3o/webpack-background-image.jpg',
+  image: 'https://images-staging.opencollective.com/webpack/logo.png',
+  imageUrl: 'https://images-staging.opencollective.com/webpack/logo.png',
+  backgroundImage: 'https://images-staging.opencollective.com/webpack/ecb7672/background.jpg',
   description: 'webpack is THE build solution for modern web applications.',
   longDescription:
     'The main purpose is to bundle JavaScript files for usage in a browser, yet it is also capable of transforming, bundling, or packaging just about any deployment target running javascript (node, electron, atom, web, web worker).\n\nWebpack bundles both ES6, CommonJS, and AMD modules (even combined). In addition to code-splitting, webpack can create a single bundle or multiple chunks that are asynchronously loaded at runtime (to reduce initial loading time). Dependencies are resolved during compilation reducing the runtime size.\n\nLoaders can preprocess files while compiling, e.g., coffeescript to JavaScript, handlebars strings to compiled functions, images to Base64, etc. webpack makes no assumption about your workflow, framework of choice, or development environment, and because of that, we are in the top 1% most used packages on npm!!!\n\nWebpack has a highly modular and configurable plugin system that lets you do whatever else your application requires.',
@@ -215,6 +215,7 @@ export const webpackCollective = {
     totalAmountReceived: 55220436,
     balanceWithBlockedFunds: {
       valueInCents: 10000,
+      currency: 'USD',
     },
     __typename: 'CollectiveStatsType',
   },

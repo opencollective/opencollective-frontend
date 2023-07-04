@@ -57,6 +57,7 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
   border-radius: 100px;
   letter-spacing: -0.4px;
   font-weight: 500;
+  min-width: max-content;
 
   &:disabled {
     cursor: not-allowed;
@@ -67,6 +68,7 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
   }
 
   /** Align button icons in the middle */
+  span,
   svg {
     vertical-align: middle;
   }

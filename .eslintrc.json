@@ -3,14 +3,7 @@
   "ignorePatterns": ["./lib/graphql/types/*"],
   "env": { "jest": true },
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint/eslint-plugin",
-    "graphql",
-    "react-hooks",
-    "simple-import-sort",
-    "formatjs",
-    "styled-components-a11y"
-  ],
+  "plugins": ["@typescript-eslint/eslint-plugin", "graphql", "react-hooks", "simple-import-sort", "formatjs"],
   "rules": {
     "no-console": "error",
     "require-atomic-updates": "off",
@@ -117,27 +110,22 @@
     "formatjs/no-camel-case": ["off"],
     "formatjs/no-emoji": ["off"],
     "formatjs/no-multiple-plurals": ["off"],
-
     // styled-components-a11y
-
-    // This is deprecated and replaced by jsx-a11y/label-has-associated-control;
-    // https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/master/docs/rules/label-has-for.md
-    "jsx-a11y/label-has-for": ["off"],
-    // The rational behind this is; https://github.com/brendanmorrell/eslint-plugin-styled-components-a11y/issues/18#issuecomment-837229005
-    "jsx-a11y/label-has-associated-control": [
-      "error",
-      {
-        "required": {
-          "some": ["nesting", "id"]
-        }
-      }
-    ]
+    "jsx-a11y/no-autofocus": ["off"],
+    "styled-components-a11y/html-has-lang": ["off"],
+    "styled-components-a11y/iframe-has-title": ["off"]
   },
   "overrides": [
     {
       "files": ["scripts/*.js"],
       "rules": {
         "no-console": "off"
+      }
+    },
+    {
+      "files": ["*.tsx"],
+      "rules": {
+        "react/prop-types": "off"
       }
     }
   ]

@@ -12,16 +12,25 @@ const IGNORED_EXPENSE_STATUS = [expenseStatus.UNVERIFIED];
 
 const getOption = (intl, value) => ({ label: i18nExpenseStatus(intl, value), value });
 
-const getOptions = (intl, ignoredExpenseStatus) => {
-  const filteredStatuses = ignoredExpenseStatus
-    ? Object.values(expenseStatus).filter(s => !ignoredExpenseStatus.includes(s))
-    : Object.values(expenseStatus);
-
-  return ['ALL', ...filteredStatuses, 'READY_TO_PAY'].map(status => getOption(intl, status));
+const getOptions = (intl, ignoredExpenseStatus = []) => {
+  return ['ALL', ...Object.values(expenseStatus), 'READY_TO_PAY', 'ON_HOLD']
+    .filter(s => !ignoredExpenseStatus.includes(s))
+    .map(status => getOption(intl, status));
 };
 
-const ExpenseStatusFilter = ({ value, onChange, ignoredExpenseStatus = IGNORED_EXPENSE_STATUS, ...props }) => {
+const ExpenseStatusFilter = ({
+  value,
+  onChange,
+  ignoredExpenseStatus = IGNORED_EXPENSE_STATUS,
+  displayOnHoldPseudoStatus = false,
+  ...props
+}) => {
   const intl = useIntl();
+  ignoredExpenseStatus = ignoredExpenseStatus || [];
+
+  if (!displayOnHoldPseudoStatus) {
+    ignoredExpenseStatus.push('ON_HOLD');
+  }
   const sortedOptions = React.useMemo(
     () => getOptions(intl, ignoredExpenseStatus).sort(sortSelectOptions),
     [ignoredExpenseStatus],
@@ -41,8 +50,9 @@ const ExpenseStatusFilter = ({ value, onChange, ignoredExpenseStatus = IGNORED_E
 
 ExpenseStatusFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.oneOf([...Object.values(expenseStatus), 'READY_TO_PAY']),
+  value: PropTypes.oneOf([...Object.values(expenseStatus), 'ALL', 'READY_TO_PAY']),
   ignoredExpenseStatus: PropTypes.arrayOf(PropTypes.oneOf(Object.values(expenseStatus))),
+  displayOnHoldPseudoStatus: PropTypes.bool,
 };
 
 export default ExpenseStatusFilter;

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { omit, omitBy } from 'lodash';
-import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -30,10 +29,10 @@ const ORDER_SELECT_STYLE = { control: { background: 'white' } };
 
 const Expenses = props => {
   const router = useRouter();
-  const { query, collectiveSlug, LoggedInUser, data, loading, variables, refetch, isDashboard } = props;
+  const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, onlySubmittedExpenses } = props;
 
   const expensesRoute = isDashboard
-    ? `/dashboard/${data?.account?.slug}/expenses`
+    ? `/dashboard/${variables.collectiveSlug}/expenses`
     : `${getCollectivePageRoute(data?.account)}/expenses`;
 
   useEffect(() => {
@@ -56,9 +55,9 @@ const Expenses = props => {
     setOldLoggedInUser(LoggedInUser);
   }, [oldLoggedInUser, LoggedInUser, data]);
 
-  const hasFilter = memoizeOne(query => {
+  const hasFilters = React.useMemo(() => {
     return Object.entries(query).some(([key, value]) => key !== 'offset' && key !== 'limit' && value);
-  });
+  }, [query]);
 
   function buildFilterLinkParams(params) {
     const queryParameters = {
@@ -87,23 +86,21 @@ const Expenses = props => {
     }
   }
 
-  const suggestedTags = memoizeOne(getSuggestedTags);
+  const suggestedTags = React.useMemo(() => getSuggestedTags(data?.account), [data?.account]);
 
-  const hasFilters = hasFilter(query);
   const isSelfHosted = data?.account?.id === data?.account?.host?.id;
-  const onlyShowSubmittedExpenses = collectiveSlug === LoggedInUser?.collective.slug;
 
   return (
     <Container>
       <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-        {onlyShowSubmittedExpenses ? (
+        {onlySubmittedExpenses ? (
           <FormattedMessage defaultMessage="Submitted Expenses" />
         ) : (
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         )}
       </H1>
       <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}>
-        {!onlyShowSubmittedExpenses && (
+        {!onlySubmittedExpenses && (
           <Box flex="0 1" flexBasis={['100%', null, '380px']}>
             <ExpensesDirection
               value={query.direction || 'RECEIVED'}
@@ -139,7 +136,7 @@ const Expenses = props => {
         )}
       </Box>
       {isSelfHosted && LoggedInUser?.isHostAdmin(data?.account) && data.scheduledExpenses?.totalCount > 0 && (
-        <ScheduledExpensesBanner host={data.account} />
+        <ScheduledExpensesBanner hostSlug={data.account.slug} />
       )}
       <Flex justifyContent="space-between" flexWrap="wrap" gridGap={[0, 3, 5]}>
         <Box flex="1 1 500px" minWidth={300} mb={5} mt={['16px', '46px']}>
@@ -169,9 +166,21 @@ const Expenses = props => {
                 host={data?.account?.isHost ? data?.account : data?.account?.host}
                 expenses={data?.expenses?.nodes}
                 nbPlaceholders={variables.limit}
-                suggestedTags={suggestedTags(data?.account)}
+                suggestedTags={suggestedTags}
                 isInverted={query.direction === 'SUBMITTED'}
                 view={query.direction === 'SUBMITTED' ? 'submitter' : undefined}
+                useDrawer={isDashboard}
+                openExpenseLegacyId={Number(router.query.openExpenseId)}
+                setOpenExpenseLegacyId={legacyId => {
+                  router.push(
+                    {
+                      pathname: expensesRoute,
+                      query: buildFilterLinkParams({ ...query, openExpenseId: legacyId }),
+                    },
+                    undefined,
+                    { shallow: true },
+                  );
+                }}
               />
               <Flex mt={5} justifyContent="center">
                 <Pagination
@@ -227,8 +236,6 @@ const Expenses = props => {
 };
 
 Expenses.propTypes = {
-  collectiveSlug: PropTypes.string,
-  parentCollectiveSlug: PropTypes.string,
   LoggedInUser: PropTypes.object,
   query: PropTypes.shape({
     type: PropTypes.string,
@@ -244,6 +251,7 @@ Expenses.propTypes = {
     offset: PropTypes.number.isRequired,
     limit: PropTypes.number.isRequired,
     account: PropTypes.object,
+    collectiveSlug: PropTypes.string,
   }),
   data: PropTypes.shape({
     account: PropTypes.shape({
@@ -268,6 +276,7 @@ Expenses.propTypes = {
     }),
   }),
   isDashboard: PropTypes.bool,
+  onlySubmittedExpenses: PropTypes.bool,
 };
 
 export default Expenses;

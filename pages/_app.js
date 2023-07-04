@@ -17,6 +17,8 @@ import StripeProviderSSR from '../components/StripeProvider';
 import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
 import UserProvider from '../components/UserProvider';
 
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
@@ -38,12 +40,6 @@ import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
 import GlobalToasts from '../components/GlobalToasts';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
 import ToastProvider from '../components/ToastProvider';
-
-// Use JSDOM on server-side so that react-intl can render rich messages
-// See https://github.com/formatjs/react-intl/blob/c736c2e6c6096b1d5ad1fb6be85fa374891d0a6c/docs/Getting-Started.md#domparser
-if (!process.browser) {
-  global.DOMParser = new (require('jsdom').JSDOM)().window.DOMParser;
-}
 
 // This is optional but highly recommended
 // since it prevents memory leak

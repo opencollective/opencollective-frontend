@@ -101,6 +101,7 @@ class CollectiveCard extends React.Component {
     membership: PropTypes.object,
     memberships: PropTypes.array,
     intl: PropTypes.object.isRequired,
+    hideRoles: PropTypes.bool,
   };
 
   constructor(props) {
@@ -131,7 +132,7 @@ class CollectiveCard extends React.Component {
   }
 
   render() {
-    const { intl, collective, membership } = this.props;
+    const { intl, collective, membership, hideRoles } = this.props;
     let { memberships } = this.props;
     memberships = memberships || (membership ? [membership] : []);
 
@@ -188,7 +189,7 @@ class CollectiveCard extends React.Component {
       route = `/${collective.slug}`;
     }
 
-    const backersCount = get(collective, 'backers.totalCount');
+    const backersCount = get(collective, 'stats.backers.all');
 
     return (
       <Link href={route} target="_top">
@@ -304,7 +305,7 @@ class CollectiveCard extends React.Component {
                 </div>
               </StatsWrapper>
             )}
-            {roles && roles.size > 0 && (
+            {!hideRoles && roles && roles.size > 0 && (
               <MembershipWrapper>
                 <Container
                   minHeight="13px"

@@ -14,7 +14,7 @@ describe('New expense flow', () => {
     let user, collective;
 
     before(() => {
-      cy.createHostedCollective().then(c => {
+      cy.createHostedCollective({ name: 'The Best Collective' }).then(c => {
         collective = c;
         cy.signup({
           user: { name: 'Potatoes Lover' },
@@ -90,7 +90,7 @@ describe('New expense flow', () => {
 
       // Check summary
       cy.getByDataCy('expense-summary-payee').should('contain', 'Potatoes Lover');
-      cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
+      cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
       cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'Bank Account: 007');
       cy.getByDataCy('expense-summary-payout-method-type').should('contain', 'Other');
       cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50');
@@ -139,7 +139,7 @@ describe('New expense flow', () => {
       // Check final expense page
       cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat edited');
       cy.getByDataCy('expense-summary-payee').should('contain', 'Potatoes Lover');
-      cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
+      cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
       cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'Bank Account: 007');
       cy.getByDataCy('expense-summary-payout-method-type').should('contain', 'Other');
       cy.getByDataCy('expense-items-total-amount').should('contain', '$237.50');
@@ -195,7 +195,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-summary-btn').click();
 
       cy.getByDataCy('expense-summary-payee').should('contain', 'Dummy Expense Org');
-      cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
+      cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
       cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
       cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50');
       cy.getByDataCy('expense-summary-items').should('contain', 'Fancy restaurant');
@@ -332,7 +332,7 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
         cy.getByDataCy('expense-author').should('contain', 'Invited by');
         cy.getByDataCy('expense-summary-payee').should('contain', 'Nicolas Cage');
-        cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
+        cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
         cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
       });
 
@@ -409,7 +409,7 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
         cy.getByDataCy('expense-author').should('contain', 'Invited by');
         cy.getByDataCy('expense-summary-payee').should('contain', slug);
-        cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
+        cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
         cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
       });
     });
@@ -558,18 +558,29 @@ describe('New expense flow', () => {
       cy.getByDataCy('approve-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Approved');
       cy.getByDataCy('unapprove-button').click();
+      cy.getByDataCy('confirm-action-text').type('Unapproved once');
+      cy.getByDataCy('confirm-action-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Pending');
+      cy.getByDataCy('comment-body').contains('Unapproved once').should('exist');
       cy.getByDataCy('approve-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Approved');
       cy.getByDataCy('unapprove-button').click();
+      cy.getByDataCy('confirm-action-text').type('Unapproved twice');
+      cy.getByDataCy('confirm-action-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Pending');
+      cy.getByDataCy('comment-body').contains('Unapproved twice').should('exist');
       cy.getByDataCy('reject-button').click();
+      cy.getByDataCy('confirm-action-text').type('Rejected once');
+      cy.getByDataCy('confirm-action-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Rejected');
+      cy.getByDataCy('comment-body').contains('Rejected once').should('exist');
     });
 
     it('Delete expense', () => {
       cy.login({ email: user.email, redirect: expenseUrl });
       cy.getByDataCy('reject-button').click();
+      cy.getByDataCy('confirm-action-text').type('rejected!');
+      cy.getByDataCy('confirm-action-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Rejected');
 
       // Now delete the expense

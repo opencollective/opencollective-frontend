@@ -9,6 +9,9 @@ import Avatar from '../Avatar';
 import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE, FLAG_NEW_COLLECTIVE } from '../CollectivePicker';
 import { Flex } from '../Grid';
 import { Span } from '../Text';
+
+import { canUseIncognitoForContribution } from './utils';
+
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
 const formatAccountName = (intl, account) => {
@@ -17,7 +20,7 @@ const formatAccountName = (intl, account) => {
     : truncate(account.name, { length: 40 });
 };
 
-const getProfileOptions = (intl, profiles) => {
+const getProfileOptions = (intl, profiles, tier) => {
   const getOptionFromAccount = value => ({ [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true, value, label: value.name });
   const sortOptions = options => sortBy(options, 'value.name');
   const profileOptions = profiles.map(getOptionFromAccount);
@@ -27,7 +30,7 @@ const getProfileOptions = (intl, profiles) => {
 
   // Add incognito profile entry if it doesn't exists
   const hasIncognitoProfile = profiles.some(p => p.type === CollectiveType.USER && p.isIncognito);
-  if (!hasIncognitoProfile) {
+  if (!hasIncognitoProfile && canUseIncognitoForContribution(tier)) {
     myself.push(
       getOptionFromAccount({
         id: 'incognito',
@@ -110,9 +113,9 @@ const formatProfileOption = (option, _, intl) => {
   );
 };
 
-const ContributeProfilePicker = ({ profiles, selectedProfile, onChange }) => {
+const ContributeProfilePicker = ({ profiles, tier, selectedProfile, onChange }) => {
   const intl = useIntl();
-  const getOptionsArgs = [intl, profiles];
+  const getOptionsArgs = [intl, profiles, tier];
   const options = React.useMemo(() => getProfileOptions(...getOptionsArgs), getOptionsArgs);
   return (
     <CollectivePicker
@@ -140,6 +143,7 @@ ContributeProfilePicker.propTypes = {
   profiles: PropTypes.array,
   onChange: PropTypes.func,
   selectedProfile: PropTypes.object,
+  tier: PropTypes.object,
 };
 
 export default ContributeProfilePicker;

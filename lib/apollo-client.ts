@@ -4,6 +4,7 @@
 import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
+import { createUploadLink } from 'apollo-upload-client';
 import { pick } from 'lodash';
 
 import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFactorAuthenticationApolloLink';
@@ -147,8 +148,16 @@ function createLink({ twoFactorAuthContext }) {
 
   const linkFetch = process.browser ? fetch : serverSideFetch;
 
-  const apiV1DefaultLink = new HttpLink({ uri: getGraphqlUrl('v1'), fetch: linkFetch });
-  const apiV2DefaultLink = new HttpLink({ uri: getGraphqlUrl('v2'), fetch: linkFetch });
+  const apiV1DefaultLink = createUploadLink({
+    uri: getGraphqlUrl('v1'),
+    fetch: linkFetch,
+    headers: { 'Apollo-Require-Preflight': 'true' },
+  });
+  const apiV2DefaultLink = createUploadLink({
+    uri: getGraphqlUrl('v2'),
+    fetch: linkFetch,
+    headers: { 'Apollo-Require-Preflight': 'true' },
+  });
 
   // Setup internal links handling to be able to split traffic to different API servers
   const apiV1Link =
@@ -195,7 +204,7 @@ function createInMemoryCache() {
       Account: ['Collective', 'Host', 'Individual', 'Fund', 'Project', 'Bot', 'Event', 'Organization', 'Vendor'],
       AccountWithHost: ['Collective', 'Event', 'Fund', 'Project'],
       AccountWithParent: ['Event', 'Project'],
-      AccountWithContributions: ['Collective', 'Event', 'Fund', 'Project', 'Host'],
+      AccountWithContributions: ['Collective', 'Organization', 'Event', 'Fund', 'Project', 'Host'],
     },
     // Documentation:
     // https://www.apollographql.com/docs/react/caching/cache-field-behavior/#merging-non-normalized-objects
