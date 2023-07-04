@@ -58,8 +58,8 @@ const MainNavItem = styled(Link)`
   color: #0f172a;
   font-size: 14px;
   height: 32px;
-  padding: 0 8px;
-  border-radius: 8px;
+  padding: 0 12px;
+  border-radius: 100px;
   white-space: nowrap;
   transition-property: color, background-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);

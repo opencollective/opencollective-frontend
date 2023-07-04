@@ -102,9 +102,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
   if (useDashboard) {
     return <NewTopBar {...{ showSearch, menuItems, showProfileAndChangelogMenu, account, navTitle, loading }} />;
   }
-  if (loadingLoggedInUser) {
-    return null;
-  }
+
   return (
     <Flex
       px={3}
