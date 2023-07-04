@@ -36,6 +36,8 @@ import {
   PointerEventsProps,
   whiteSpace,
   WhiteSpaceProps,
+  wordBreak,
+  WordBreakProps,
 } from '../lib/styled-system-custom-properties';
 
 export type ContainerProps = FlexboxProps &
@@ -54,6 +56,7 @@ export type ContainerProps = FlexboxProps &
   TypographyProps &
   WhiteSpaceProps &
   SizeProps &
+  WordBreakProps &
   React.HTMLProps<HTMLDivElement> & {
     clearfix?: boolean;
   };
@@ -77,6 +80,7 @@ const Container = styled.div<ContainerProps>`
   ${size}
   ${typography}
   ${whiteSpace}
+  ${wordBreak}
   ${props =>
     props.clearfix &&
     `
