@@ -208,9 +208,9 @@ const FooterContainer = styled.footer.attrs({
   justify-content: center;
   background: white;
   border-top: 1px solid #e8e9eb;
-  min-height: 7.5rem;
+  min-height: 4.7rem;
   width: 100%;
-  padding: 1rem;
+  padding: 0.65rem;
 `;
 
 const generateLanguageOptions = () => {

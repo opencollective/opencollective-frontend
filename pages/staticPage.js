@@ -21,37 +21,37 @@ const getContent = (path, pageSlug) => {
 
 const StaticPageContainer = styled.div`
   .content {
-    max-width: 96rem;
+    max-width: 60rem;
   }
   .content .path {
     color: #9399a3;
-    font-size: 1.5rem;
-    margin-bottom: -2rem;
-    margin-left: 0.5rem;
-    margin-top: 1rem;
+    font-size: 0.95rem;
+    margin-bottom: -1.25rem;
+    margin-left: 0.3rem;
+    margin-top: 0.65rem;
     text-transform: uppercase;
   }
   .content h1 {
-    margin: 4rem 0px 6rem;
-    font-size: 4.8rem;
+    margin: 2.5rem 0px 3.75rem;
+    font-size: 3rem;
     color: #121314;
-    line-height: 5.2rem;
+    line-height: 3.25rem;
     font-weight: 300;
     text-align: left;
   }
   .content h2 {
-    font-size: 2.4rem;
+    font-size: 1.5rem;
     color: #6e747a;
     font-weight: 500;
-    line-height: 3.2rem;
-    margin: 5rem 0 1rem;
+    line-height: 2rem;
+    margin: 3.15rem 0 0.65rem;
   }
   .content h3 {
-    margin-top: 2.5rem;
+    margin-top: 1.55rem;
     line-height: 1.3;
   }
   .content h4 {
-    margin-top: 1rem;
+    margin-top: 0.65rem;
     line-height: 1.3;
   }
 
@@ -66,15 +66,15 @@ const StaticPageContainer = styled.div`
     min-width: 200px;
     text-align: left;
     vertical-align: top;
-    padding-top: 1rem;
+    padding-top: 0.65rem;
   }
   .content li {
-    margin: 0.5rem;
+    margin: 0.3rem;
   }
   .content code {
-    padding: 0.5rem !important;
+    padding: 0.3rem !important;
     margin: -7px 0;
-    line-height: 1.5rem;
+    line-height: 0.95rem;
   }
   .content iframe {
     max-width: 100%;

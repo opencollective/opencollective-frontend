@@ -94,7 +94,7 @@ class UpdatesPage extends React.Component {
 
           <div className="content">
             <Flex flexWrap="wrap" alignItems="center" pr={2} justifyContent="space-between">
-              <Container padding="0.8rem 0" my={4}>
+              <Container padding="0.5rem 0" my={4}>
                 <H1 fontSize="40px" fontWeight="normal" textAlign="left" mb={2}>
                   <FormattedMessage id="updates" defaultMessage="Updates" />
                 </H1>

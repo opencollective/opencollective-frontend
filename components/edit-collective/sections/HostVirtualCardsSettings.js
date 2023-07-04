@@ -266,7 +266,7 @@ const HostVirtualCards = props => {
               showCount
               maxLength={VIRTUAL_CARDS_POLICY_MAX_LENGTH}
               version="simplified"
-              editorMinHeight="20rem"
+              editorMinHeight="12.5rem"
               editorMaxHeight={500}
               id={inputProps.id}
               inputName={inputProps.name}

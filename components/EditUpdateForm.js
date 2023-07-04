@@ -109,7 +109,7 @@ class EditUpdateForm extends React.Component {
         <form data-cy="edit-update-form" onSubmit={this.onSubmit}>
           <Container margin="auto 0">
             <Container width={1}>
-              <Container mb={2} mt={2} fontWeight="500" fontSize="1.6rem" lineHeight="1.7">
+              <Container mb={2} mt={2} fontWeight="500" fontSize="1rem" lineHeight="1.7">
                 <Box as="span">Title</Box>
               </Container>
               <StyledInputField htmlFor="title">
@@ -131,7 +131,7 @@ class EditUpdateForm extends React.Component {
             </Container>
           </Container>
           <Container width={1}>
-            <Container fontWeight="500" mb={2} mt={3} fontSize="1.6rem" lineHeight="1.7">
+            <Container fontWeight="500" mb={2} mt={3} fontSize="1rem" lineHeight="1.7">
               <Box as="span">Message</Box>
             </Container>
             <RichTextEditor

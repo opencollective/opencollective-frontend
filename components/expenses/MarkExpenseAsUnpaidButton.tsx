@@ -120,7 +120,7 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
               />
             }
           />
-          <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
+          <P fontSize="14px" lineHeight="18px" color="black.600" ml="1.4rem">
             <FormattedMessage
               id="Expense.markAsUnpaid.details"
               defaultMessage="The amount will be credited back to the Collective balance."
