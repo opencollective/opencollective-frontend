@@ -132,7 +132,7 @@ const RequestVirtualCardModal = props => {
           <StyledInputField
             mt={3}
             labelFontSize="13px"
-            label={<FormattedMessage id="Collective.VirtualCards.RequestCard.Purpose" defaultMessage="Purpose" />}
+            label={<FormattedMessage id="Fields.purpose" defaultMessage="Purpose" />}
             htmlFor="purpose"
             error={formik.touched.purpose && formik.errors.purpose}
             labelFontWeight="500"
