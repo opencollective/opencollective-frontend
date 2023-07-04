@@ -326,8 +326,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
           <Flex flex={1} alignItems="center" gridGap={3} overflow={'hidden'}>
             {onDashboardRoute ? (
               <MainNavItem href="/dashboard">
-                Workspace
-                {/* <FormattedMessage id="Dashboard" defaultMessage="Workspace" /> */}
+                <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
               </MainNavItem>
             ) : account || loading ? (
               <Flex alignItems="center" gridGap="0" maxWidth="100%" flexGrow={4}>

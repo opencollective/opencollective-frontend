@@ -14,7 +14,7 @@ import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
 import { StyledSelectFilter, TruncatedValueContainer } from '../../../StyledSelectFilter';
-import { H1, H2, P } from '../../../Text';
+import { H1, H2 } from '../../../Text';
 import { AdminSectionProps } from '../../types';
 
 import { workspaceHomeQuery } from './query';
@@ -54,21 +54,14 @@ const Home = (props: AdminSectionProps) => {
 
   return (
     <Container maxWidth={'100%'}>
-      <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-        <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Overview" />
-      </H1>
-      <P mb={4} mt={2} color="black.600">
-        {/* Here you'll find important information about your activity on Open Collective. You can switch between profiles
-          using the switcher to your left. ---  */}
-        Here you'll find important information about your activity on Open Collective. Check back for new features as we
-        add them.
-      </P>
+      {/* <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+        <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
+      </H1> */}
       <Flex flexDirection="column">
         <Flex justifyContent="space-between" alignItems="center" mb="32px">
-          <H2 fontSize="24px" mt={0} lineHeight="40px" fontWeight="500">
+          <H1 fontSize="32px" mt={0} lineHeight="40px" fontWeight="normal">
             <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
-          </H2>
-
+          </H1>
           <StyledSelectFilter
             intl={intl}
             inputId="activity-filter"
@@ -88,7 +81,6 @@ const Home = (props: AdminSectionProps) => {
             {...props}
           />
         </Flex>
-
         {error ? (
           <MessageBoxGraphqlError error={error} />
         ) : !activities.length && loading ? (
