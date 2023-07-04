@@ -113,7 +113,7 @@ export default function SiteMenu() {
             <Flex flexDirection="column" py={2}>
               <DrawerMenuItem href={LoggedInUser ? '/dashboard' : '/'} onClick={onClose}>
                 <Flex alignItems="center" gridGap={2}>
-                  <Home size={16} /> <FormattedMessage defaultMessage="Home" />
+                  <Home size={16} /> <FormattedMessage id="home" defaultMessage="Home" />
                 </Flex>
               </DrawerMenuItem>
 
@@ -139,10 +139,10 @@ export default function SiteMenu() {
               <span>Open Collective</span>
               <Flex alignItems="center" justifyContent={'space-between'} width={'100%'}>
                 <Link href="/home" onClick={onClose}>
-                  <FormattedMessage id="SiteMenu.OC.Homepage" defaultMessage="Homepage" />
+                  <FormattedMessage id="Homepage" defaultMessage="Homepage" />
                 </Link>
                 <Link href="/contact" onClick={onClose}>
-                  <FormattedMessage defaultMessage="Contact" />
+                  <FormattedMessage id="Contact" defaultMessage="Contact" />
                 </Link>
                 <Link href="/privacypolicy" onClick={onClose}>
                   <FormattedMessage defaultMessage="Privacy" />
