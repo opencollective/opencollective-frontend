@@ -1080,6 +1080,7 @@
   "error.details": "Feldetaljer",
   "error.email.invalid": "Ogiltig e-postadress",
   "error.existingHost.description": "Detta kollektiv är redan värd hos {hostName}.",
+  "error.existingHostApplication.description": "This collective already has a pending application to {hostName}.",
   "Error.FieldCheckRequired": "Fältet måste markeras",
   "Error.FieldRequired": "Detta fält är obligatoriskt",
   "error.goBack": "Gå tillbaka till föregående sida",

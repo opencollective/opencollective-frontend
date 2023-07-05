@@ -1080,6 +1080,7 @@
   "error.details": "오류 정보",
   "error.email.invalid": "유효하지 않은 이메일 주소",
   "error.existingHost.description": "This collective is already hosted by {hostName}.",
+  "error.existingHostApplication.description": "This collective already has a pending application to {hostName}.",
   "Error.FieldCheckRequired": "This must be checked",
   "Error.FieldRequired": "필수 필드",
   "error.goBack": "Go back to the previous page",

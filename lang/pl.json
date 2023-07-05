@@ -1080,6 +1080,7 @@
   "error.details": "Szczegóły błędu",
   "error.email.invalid": "Nieprawidłowy adres e-mail",
   "error.existingHost.description": "Ta zbiórka jest już obsługiwana przez {hostName}.",
+  "error.existingHostApplication.description": "This collective already has a pending application to {hostName}.",
   "Error.FieldCheckRequired": "To musi być sprawdzone",
   "Error.FieldRequired": "To pole jest wymagane",
   "error.goBack": "Wróć do poprzedniej strony",

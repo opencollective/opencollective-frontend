@@ -1080,6 +1080,7 @@
   "error.details": "Detalle del error",
   "error.email.invalid": "correo electrónico inválido",
   "error.existingHost.description": "Este Colectivo ya está alojado por {hostName}.",
+  "error.existingHostApplication.description": "This collective already has a pending application to {hostName}.",
   "Error.FieldCheckRequired": "Esto debe estar seleccionado",
   "Error.FieldRequired": "Este campo es obligatorio",
   "error.goBack": "Volver a la página anterior",

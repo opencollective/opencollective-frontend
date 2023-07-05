@@ -1080,6 +1080,7 @@
   "error.details": "Podrobnosti chyby",
   "error.email.invalid": "Neplatná e-mailová adresa",
   "error.existingHost.description": "Tento kolektív je už hostený u {hostName}.",
+  "error.existingHostApplication.description": "This collective already has a pending application to {hostName}.",
   "Error.FieldCheckRequired": "Pole musí byť zaškrtnuté",
   "Error.FieldRequired": "Toto pole je povinné",
   "error.goBack": "Späť na predchádzajúcu stránku",

@@ -1080,6 +1080,7 @@
   "error.details": "错误详情",
   "error.email.invalid": "电子邮件地址无效",
   "error.existingHost.description": "This collective is already hosted by {hostName}.",
+  "error.existingHostApplication.description": "This collective already has a pending application to {hostName}.",
   "Error.FieldCheckRequired": "此项必须勾选",
   "Error.FieldRequired": "此字段是必填项",
   "error.goBack": "返回到上一页",

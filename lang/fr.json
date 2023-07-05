@@ -1080,6 +1080,7 @@
   "error.details": "Détails de l’erreur",
   "error.email.invalid": "Adresse email invalide",
   "error.existingHost.description": "Ce collectif est déjà hébergé par {hostName}.",
+  "error.existingHostApplication.description": "This collective already has a pending application to {hostName}.",
   "Error.FieldCheckRequired": "Cette case doit être cochée",
   "Error.FieldRequired": "Ce champ est requis",
   "error.goBack": "Revenir à la page précédente",

@@ -1080,6 +1080,7 @@
   "error.details": "Fehlerdetails",
   "error.email.invalid": "Ungültige E-Mail-Adresse",
   "error.existingHost.description": "This collective is already hosted by {hostName}.",
+  "error.existingHostApplication.description": "This collective already has a pending application to {hostName}.",
   "Error.FieldCheckRequired": "Dieses Feld muss ausgewählt sein",
   "Error.FieldRequired": "Dieses Feld ist erforderlich",
   "error.goBack": "Go back to the previous page",

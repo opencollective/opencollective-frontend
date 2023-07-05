@@ -1080,6 +1080,7 @@
   "error.details": "Detalhes do erro",
   "error.email.invalid": "Endereço de e-mail inválido",
   "error.existingHost.description": "Este coletivo já é administrado por {hostName}.",
+  "error.existingHostApplication.description": "This collective already has a pending application to {hostName}.",
   "Error.FieldCheckRequired": "Isso deve ser verificado",
   "Error.FieldRequired": "Este campo é obrigatório",
   "error.goBack": "Voltar à página anterior",

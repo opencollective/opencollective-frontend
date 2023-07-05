@@ -1080,6 +1080,7 @@
   "error.details": "Дані про помилку",
   "error.email.invalid": "Хибна адреса електронної пошти",
   "error.existingHost.description": "Цей колектив уже співпрацює з {hostName}.",
+  "error.existingHostApplication.description": "This collective already has a pending application to {hostName}.",
   "Error.FieldCheckRequired": "Це необхідно перевірити",
   "Error.FieldRequired": "Це поле обов'язкове",
   "error.goBack": "Повернутися на попередню сторінку",
