@@ -1,6 +1,7 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { CellContext, ColumnDef } from '@tanstack/react-table';
+import { MoreHorizontalIcon } from 'lucide-react';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -21,10 +22,14 @@ import { DataTable } from '../DataTable';
 import DateTime from '../DateTime';
 import VirtualCard, { ActionsButton } from '../edit-collective/VirtualCard';
 import { Box, Flex, Grid } from '../Grid';
+import { I18nBold } from '../I18nFormatters';
 import LinkCollective from '../LinkCollective';
+import StyledRoundButton from '../StyledRoundButton';
 import StyledTag from '../StyledTag';
 import { P, Span } from '../Text';
 import { Toast, TOAST_TYPE, useToasts } from '../ToastProvider';
+
+import VirtualCardDrawer from './VirtualCardDrawer';
 
 const CellButton = styled.button`
   border: 0;
@@ -49,7 +54,6 @@ const CellButton = styled.button`
 `;
 
 type VirtualCardsTableMeta = {
-  openVirtualCardDrawer: (vc: GraphQLVirtualCard) => void;
   intl: IntlShape;
   addToast: (toast: Partial<Toast>) => void;
   host: Host;
@@ -85,7 +89,9 @@ export const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
       const meta = table.options.meta as VirtualCardsTableMeta;
       return (
         <CellButton onClick={() => meta.openVirtualCardDrawer(vc)}>
-          <Span fontSize="14px">{name}</Span>
+          <Box style={{ textOverflow: 'ellipsis' }} overflow="hidden" maxWidth="250px" fontSize="14px">
+            {name}
+          </Box>
         </CellButton>
       );
     },
@@ -96,7 +102,7 @@ export const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
     cell: ({ cell }: CellContext<GraphQLVirtualCard, string>) => {
       const last4 = cell.getValue();
       return (
-        <Box p={3} fontSize="14px">
+        <Box style={{ whiteSpace: 'nowrap' }} p={3} fontSize="14px">
           **** {last4}
         </Box>
       );
@@ -112,18 +118,25 @@ export const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
       return vc.spendingLimitInterval === VirtualCardLimitInterval.PER_AUTHORIZATION ? (
         <FormattedMessage
           id="VirtualCards.LimitedToPerAuthorization.Table"
-          defaultMessage={'{limit} per authorization'}
+          defaultMessage={'{limit} <small>per authorization</small>'}
           values={{
             limit: formatCurrency(vc.spendingLimitAmount, vc.currency, {
               locale: meta.intl.locale,
             }),
+            small(msg) {
+              return (
+                <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
+                  {msg}
+                </Span>
+              );
+            },
           }}
         />
       ) : (
         <React.Fragment>
           <FormattedMessage
             id="VirtualCards.AvailableOfLimit.Table"
-            defaultMessage="{available} / {limit}{interval}"
+            defaultMessage="<bold>{available}</bold> / <small>{limit}{interval}</small>"
             values={{
               available: formatCurrency(vc.remainingLimit, vc.currency, {
                 locale: meta.intl.locale,
@@ -132,6 +145,14 @@ export const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
                 locale: meta.intl.locale,
               }),
               interval: getLimitIntervalString(vc.spendingLimitInterval),
+              small(msg) {
+                return (
+                  <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
+                    {msg}
+                  </Span>
+                );
+              },
+              bold: I18nBold,
             }}
           />
         </React.Fragment>
@@ -142,9 +163,15 @@ export const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
     accessorKey: 'spendingLimitRenewsOn',
     header: () => <FormattedMessage id="VirtualCards.RenewsOn" defaultMessage="Renews On" />,
     cell: ({ cell }: CellContext<GraphQLVirtualCard, string>) => {
+      const spendingLimitRenewsOn = cell.getValue();
+
+      if (!spendingLimitRenewsOn) {
+        return <Box textAlign="center">-</Box>;
+      }
+
       return (
         <Box textAlign="center">
-          <DateTime value={cell.getValue()} />
+          <DateTime dateStyle="medium" value={cell.getValue()} />
         </Box>
       );
     },
@@ -183,7 +210,14 @@ export const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
             canEditVirtualCard={meta.canEditVirtualCard}
             canDeleteVirtualCard={meta.canDeleteVirtualCard}
             onDeleteRefetchQuery={meta.onDeleteRefetchQuery}
-            iconOnly
+            // eslint-disable-next-line react/display-name
+            as={React.forwardRef((props, ref: React.ForwardedRef<HTMLButtonElement>) => {
+              return (
+                <StyledRoundButton size={24} color="#C4C7CC" {...props} ref={ref}>
+                  <MoreHorizontalIcon size={12} color="#76777A" />
+                </StyledRoundButton>
+              );
+            })}
           />
         </Box>
       );
@@ -205,11 +239,16 @@ export default function VirtualCardsTable(props: VirtualCardsTableProps) {
   const intl = useIntl();
   const { addToast } = useToasts();
   const [isTableView, setIsTableView] = React.useState(true);
+  const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
+  const [selectedVirtualCard, setSelectedVirtualCard] = React.useState<GraphQLVirtualCard>(null);
   useWindowResize(() => setIsTableView(window.innerWidth > 1024));
 
   if (isTableView) {
     const virtualCardsTableMeta: VirtualCardsTableMeta = {
-      openVirtualCardDrawer: props.openVirtualCardDrawer,
+      openVirtualCardDrawer: virtualCard => {
+        setIsDrawerOpen(true);
+        setSelectedVirtualCard(virtualCard);
+      },
       canDeleteVirtualCard: props.canDeleteVirtualCard,
       canEditVirtualCard: props.canEditVirtualCard,
       onDeleteRefetchQuery: props.onDeleteRefetchQuery,
@@ -218,24 +257,34 @@ export default function VirtualCardsTable(props: VirtualCardsTableProps) {
       addToast,
     };
     return (
-      <DataTable
-        data-cy="virtual-cards-table"
-        columns={tableColumns}
-        data={props.virtualCards || []}
-        meta={virtualCardsTableMeta}
-        loading={props.loading}
-        emptyMessage={() => (
-          <div>
-            <P fontSize="16px">
-              <FormattedMessage defaultMessage="No agreements" />
-            </P>
-          </div>
-        )}
-      />
+      <React.Fragment>
+        <DataTable
+          data-cy="virtual-cards-table"
+          columns={tableColumns}
+          data={props.virtualCards || []}
+          meta={virtualCardsTableMeta}
+          loading={props.loading}
+          emptyMessage={() => (
+            <div>
+              <P fontSize="16px">
+                <FormattedMessage defaultMessage="No agreements" />
+              </P>
+            </div>
+          )}
+        />
+        <VirtualCardDrawer
+          open={isDrawerOpen}
+          onClose={() => setIsDrawerOpen(false)}
+          virtualCardId={selectedVirtualCard?.id}
+          canEditVirtualCard
+          canDeleteVirtualCard
+          onDeleteRefetchQuery="HostedVirtualCards"
+        />
+      </React.Fragment>
     );
   } else {
     return (
-      <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
+      <Grid justifyContent="center" mt={4} gridTemplateColumns={['100%', '366px']} gridGap="32px 24px">
         {props.virtualCards.map(vc => (
           <VirtualCard
             key={vc.id}

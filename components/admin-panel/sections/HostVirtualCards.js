@@ -64,6 +64,7 @@ const hostVirtualCardsQuery = gql`
           name
           last4
           data
+          status
           privateData
           provider
           spendingLimitAmount
