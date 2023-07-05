@@ -42,12 +42,13 @@ import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 /* TODO: Find alternative strategy for counting items in views since this type of dynamic string interpolation query building 
   is not expected or appreciated by eslint, perhaps some dedicated API resolver that accepts a list of view queries as argument.   */
 const createHostDashboardExpensesQuery = views => {
-  const viewsCountQueries = views
-    .map((view, i) => {
-      if (!view.showCount) {
-        return '';
-      }
-      return `
+  const viewsCountQueries =
+    views
+      ?.map((view, i) => {
+        if (!view.showCount) {
+          return '';
+        }
+        return `
         view${i}: expenses(
             host: { slug: $hostSlug }
             limit: 0
@@ -57,8 +58,8 @@ const createHostDashboardExpensesQuery = views => {
         ) {
           totalCount
         }`;
-    })
-    .join('\n');
+      })
+      .join('\n') ?? '';
 
   return gql`
     query HostDashboardExpenses(
