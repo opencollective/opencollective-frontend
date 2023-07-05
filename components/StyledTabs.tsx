@@ -3,6 +3,18 @@ import styled from 'styled-components';
 
 import { Flex } from './Grid';
 
+const abbreviateNumber = number => {
+  if (number >= 1000000000) {
+    return `${(number / 1000000000).toFixed(1)}B`;
+  } else if (number >= 1000000) {
+    return `${(number / 1000000).toFixed(1)}M`;
+  } else if (number >= 1000) {
+    return `${(number / 1000).toFixed(1)}K`;
+  } else {
+    return number;
+  }
+};
+
 const TabButton = styled.button<{ selected?: boolean }>`
   appearance: none;
   border: none;
@@ -51,7 +63,7 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps & Parameters<t
       <Flex gridGap="24px" mb="-1px" overflowX="auto">
         {tabs.map(tab => (
           <TabButton key={tab.id} onClick={() => onChange?.(tab.id)} selected={tab.id === selectedId}>
-            {tab.label} {typeof tab.count !== 'undefined' && <span>{tab.count}</span>}
+            {tab.label} {typeof tab.count !== 'undefined' && <span>{abbreviateNumber(tab.count)}</span>}
           </TabButton>
         ))}
       </Flex>
