@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
 import { useRouter } from 'next/router';
+import { useIntl } from 'react-intl';
 import slugify from 'slugify';
 import styled, { css } from 'styled-components';
 
@@ -123,10 +124,15 @@ const MenuEntry = styled.div`
 
 const RootActionsPage = () => {
   const router = useRouter();
+  const intl = useIntl();
   const selectedMenuEntry = MENU.find(m => m.slug === router.query.section) || MENU[1];
   const showHiddenActions = Boolean(router.query.showHiddenActions);
   return (
-    <AuthenticatedPage disableSignup rootOnly navTitle="Root Actions">
+    <AuthenticatedPage
+      disableSignup
+      rootOnly
+      navTitle={intl.formatMessage({ id: 'RootActions', defaultMessage: 'Root Actions' })}
+    >
       <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" my={5}>
         <Container borderRight="1px solid #e5e5e5">
           {MENU.filter(e => showHiddenActions || !e.isHidden).map(menuEntry =>

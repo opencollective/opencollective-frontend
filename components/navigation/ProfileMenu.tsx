@@ -111,8 +111,7 @@ const ProfileDrawer = ({ onClose, open }) => {
                 <DrawerMenuItem href="/opencollective/root-actions" onClick={onClose}>
                   <Flex alignItems="center" gridGap={2}>
                     <PocketKnife size={16} />
-                    {/** Not i18n on purpose, this is for platform admins only */}
-                    Root Actions
+                    <FormattedMessage id="RootActions" defaultMessage="Root Actions" />
                   </Flex>
                 </DrawerMenuItem>
               )}

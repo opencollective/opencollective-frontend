@@ -22,6 +22,7 @@ import SearchModal from '../Search';
 import SearchTrigger from '../SearchTrigger';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
+
 import ProfileMenu from './ProfileMenu';
 import SiteMenu from './SiteMenu';
 
