@@ -38,7 +38,28 @@ import { H1 } from '../Text';
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
+/* eslint-disable */
+/* TODO: Find alternative strategy for counting items in views since this type of dynamic string interpolation query building 
+  is not expected or appreciated by eslint, perhaps some dedicated API resolver that accepts a list of view queries as argument.   */
 const createHostDashboardExpensesQuery = views => {
+  const viewsCountQueries = views
+    .map((view, i) => {
+      if (!view.showCount) {
+        return '';
+      }
+      return `
+        view${i}: expenses(
+            host: { slug: $hostSlug }
+            limit: 0
+            offset: 0
+            ${view.query.type ? `type: ${view.query.type}` : ''}
+            ${view.query.status ? `status: ${view.query.status}` : ''}
+        ) {
+          totalCount
+        }`;
+    })
+    .join('\n');
+
   return gql`
     query HostDashboardExpenses(
       $hostSlug: String!
@@ -96,30 +117,16 @@ const createHostDashboardExpensesQuery = views => {
           ...ExpensesListAdminFieldsFragment
         }
       }
-      ${views.map((view, i) => {
-        if (!view.showCount) {
-          return '';
-        }
-
-        return `
-         view${i}: expenses(
-            host: { slug: $hostSlug }
-            limit: 0
-            offset: 0
-            ${view.query.type ? `type: ${view.query.type}` : ''}
-            ${view.query.status ? `status: ${view.query.status}` : ''}
-         ) {
-           totalCount
-         }`;
-      })} 
+      ${viewsCountQueries}
     }
-
     ${expensesListFieldsFragment}
     ${expensesListAdminFieldsFragment}
     ${expenseHostFields}
     ${hostInfoCardFields}
-  `;
+`;
 };
+/* eslint-enable */
+
 /**
  * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
  */
