@@ -13,6 +13,7 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true' || process.env.API_PROXY !== 'true',
   productionBrowserSourceMaps: true,
+  swcMinify: true, // Can't use it for now because we have a custom babel config
   typescript: {
     ignoreBuildErrors: true,
   },
