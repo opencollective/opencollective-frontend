@@ -3,7 +3,6 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { Copy } from '@styled-icons/feather/Copy';
-import { MoreHorizontalIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
@@ -25,7 +24,6 @@ import DismissIcon from '../icons/DismissIcon';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
-import StyledRoundButton from '../StyledRoundButton';
 import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
@@ -33,7 +31,7 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import DeleteVirtualCardModal from './DeleteVirtualCardModal';
 import EditVirtualCardModal from './EditVirtualCardModal';
 
-const CardContainer = styled(Flex)`
+export const CardContainer = styled(Flex)`
   border: 1px solid #dcdee0;
   border-radius: 12px;
   background: #050505;
@@ -109,7 +107,7 @@ const Arrow = styled.div`
   }
 `;
 
-const StateLabel = styled(Box)`
+export const StateLabel = styled(Box)`
   align-self: center;
   padding: 2px 6px;
   border-radius: 4px;
@@ -121,12 +119,16 @@ const StateLabel = styled(Box)`
   letter-spacing: 0.06em;
   text-transform: uppercase;
 `;
+StateLabel.propTypes = {
+  isActive: PropTypes.bool,
+};
 
 const pauseCardMutation = gql`
   mutation PauseVirtualCard($virtualCard: VirtualCardReferenceInput!) {
     pauseVirtualCard(virtualCard: $virtualCard) {
       id
       data
+      status
     }
   }
 `;
@@ -136,6 +138,7 @@ const resumeCardMutation = gql`
     resumeVirtualCard(virtualCard: $virtualCard) {
       id
       data
+      status
     }
   }
 `;
@@ -196,21 +199,17 @@ export const ActionsButton = props => {
 
   const isHostAdmin = LoggedInUser?.isAdminOfCollective(props.host);
 
+  const As = props.as || Action;
+
   return (
     <span ref={wrapperRef}>
       <Manager>
         <Reference>
-          {({ ref }) =>
-            props.iconOnly ? (
-              <StyledRoundButton ref={ref} onClick={() => setDisplayActions(true)} size={24} color="#C4C7CC">
-                <MoreHorizontalIcon size={12} color="#76777A" />
-              </StyledRoundButton>
-            ) : (
-              <Action ref={ref} onClick={() => setDisplayActions(true)}>
-                <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
-              </Action>
-            )
-          }
+          {({ ref }) => (
+            <As ref={ref} onClick={() => setDisplayActions(true)}>
+              <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
+            </As>
+          )}
         </Reference>
         {displayActions && (
           <Popper
@@ -288,16 +287,20 @@ export const ActionsButton = props => {
                         </a>
                       </React.Fragment>
                     )}
-                    <StyledHr borderColor="black.300" mt={2} mb={2} />
-                    <a
-                      href={`/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Action>
-                        <FormattedMessage defaultMessage="View transactions" />
-                      </Action>
-                    </a>
+                    {!props.hideViewTransactions && (
+                      <React.Fragment>
+                        <StyledHr borderColor="black.300" mt={2} mb={2} />
+                        <a
+                          href={`/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Action>
+                            <FormattedMessage defaultMessage="View transactions" />
+                          </Action>
+                        </a>
+                      </React.Fragment>
+                    )}
                     {virtualCard.assignee?.email && (
                       <React.Fragment>
                         <StyledHr borderColor="black.300" mt={2} mb={2} />
@@ -325,7 +328,6 @@ export const ActionsButton = props => {
           onClose={() => setShowConfirmationModal(false)}
           continueHandler={async () => {
             await handlePauseUnpause();
-            setShowConfirmationModal(false);
           }}
         >
           <P>
@@ -373,7 +375,8 @@ ActionsButton.propTypes = {
   canEditVirtualCard: PropTypes.bool,
   canDeleteVirtualCard: PropTypes.bool,
   onDeleteRefetchQuery: PropTypes.string,
-  iconOnly: PropTypes.bool,
+  hideViewTransactions: PropTypes.bool,
+  as: PropTypes.any,
 };
 
 const getLimitString = ({
@@ -436,6 +439,74 @@ const getLimitString = ({
   );
 };
 
+export function CardDetails({ virtualCard }) {
+  const { addToast } = useToasts();
+
+  const handleCopy = value => () => {
+    navigator.clipboard.writeText(value);
+    addToast({
+      type: TOAST_TYPE.SUCCESS,
+      message: <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />,
+    });
+  };
+
+  return (
+    <React.Fragment>
+      <P mt="27px" fontSize="18px" fontWeight="700" lineHeight="26px">
+        {virtualCard.privateData.cardNumber.replace(/\d{4}(?=.)/g, '$& ')}{' '}
+        <Action color="black" ml={2} onClick={handleCopy(virtualCard.privateData.cardNumber)}>
+          <Copy size="18px" />
+        </Action>
+      </P>
+      <P fontSize="12px" fontWeight="500" lineHeight="16px" textTransform="uppercase">
+        <FormattedMessage id="VirtualCards.CardNumber" defaultMessage="Card Number" />{' '}
+      </P>
+      <Flex>
+        <Box mt="19px" mr={4}>
+          <P fontSize="18px" fontWeight="700" lineHeight="26px">
+            {
+              // expireDate should be removed once https://github.com/opencollective/opencollective-api/pull/7307 is deployed to production
+              virtualCard.privateData.expireDate || virtualCard.privateData.expiryDate
+            }
+
+            <Action
+              color="black"
+              ml={2}
+              onClick={
+                // expireDate should be removed once https://github.com/opencollective/opencollective-api/pull/7307 is deployed to production
+                handleCopy(virtualCard.privateData.expireDate || virtualCard.privateData.expiryDate)
+              }
+            >
+              <Copy size="18px" />
+            </Action>
+          </P>
+          <P fontSize="12px" fontWeight="500" lineHeight="16px">
+            <FormattedMessage id="VirtualCards.ExpireDate" defaultMessage="MM/YYYY" />{' '}
+          </P>
+        </Box>
+        <Box mt="19px">
+          <P fontSize="18px" fontWeight="700" lineHeight="26px">
+            {virtualCard.privateData.cvv}
+
+            <Action color="black" ml={2} onClick={handleCopy(virtualCard.privateData.cvv)}>
+              <Box position="relative" display="inline-block">
+                <Copy size="18px" />
+              </Box>
+            </Action>
+          </P>
+          <P fontSize="12px" fontWeight="500" lineHeight="16px">
+            <FormattedMessage id="VirtualCards.CVV" defaultMessage="CVV" />{' '}
+          </P>
+        </Box>
+      </Flex>
+    </React.Fragment>
+  );
+}
+
+CardDetails.propTypes = {
+  virtualCard: PropTypes.object,
+};
+
 const VirtualCard = props => {
   const [displayDetails, setDisplayDetails] = React.useState(false);
   const intl = useIntl();
@@ -446,13 +517,6 @@ const VirtualCard = props => {
 
   const name = virtualCard.name || '';
   const cardNumber = `****  ****  ****  ${virtualCard.last4}`;
-  const handleCopy = value => () => {
-    navigator.clipboard.writeText(value);
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
-      message: <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />,
-    });
-  };
 
   return (
     <CardContainer width="366px" height="248px" flexDirection="column">
@@ -465,55 +529,7 @@ const VirtualCard = props => {
           </StateLabel>
         </Flex>
         {displayDetails ? (
-          <React.Fragment>
-            <P mt="27px" fontSize="18px" fontWeight="700" lineHeight="26px">
-              {virtualCard.privateData.cardNumber.replace(/\d{4}(?=.)/g, '$& ')}{' '}
-              <Action color="black" ml={2} onClick={handleCopy(virtualCard.privateData.cardNumber)}>
-                <Copy size="18px" />
-              </Action>
-            </P>
-            <P fontSize="12px" fontWeight="500" lineHeight="16px" textTransform="uppercase">
-              <FormattedMessage id="VirtualCards.CardNumber" defaultMessage="Card Number" />{' '}
-            </P>
-            <Flex>
-              <Box mt="19px" mr={4}>
-                <P fontSize="18px" fontWeight="700" lineHeight="26px">
-                  {
-                    // expireDate should be removed once https://github.com/opencollective/opencollective-api/pull/7307 is deployed to production
-                    virtualCard.privateData.expireDate || virtualCard.privateData.expiryDate
-                  }
-
-                  <Action
-                    color="black"
-                    ml={2}
-                    onClick={
-                      // expireDate should be removed once https://github.com/opencollective/opencollective-api/pull/7307 is deployed to production
-                      handleCopy(virtualCard.privateData.expireDate || virtualCard.privateData.expiryDate)
-                    }
-                  >
-                    <Copy size="18px" />
-                  </Action>
-                </P>
-                <P fontSize="12px" fontWeight="500" lineHeight="16px">
-                  <FormattedMessage id="VirtualCards.ExpireDate" defaultMessage="MM/YYYY" />{' '}
-                </P>
-              </Box>
-              <Box mt="19px">
-                <P fontSize="18px" fontWeight="700" lineHeight="26px">
-                  {virtualCard.privateData.cvv}
-
-                  <Action color="black" ml={2} onClick={handleCopy(virtualCard.privateData.cvv)}>
-                    <Box position="relative" display="inline-block">
-                      <Copy size="18px" />
-                    </Box>
-                  </Action>
-                </P>
-                <P fontSize="12px" fontWeight="500" lineHeight="16px">
-                  <FormattedMessage id="VirtualCards.CVV" defaultMessage="CVV" />{' '}
-                </P>
-              </Box>
-            </Flex>
-          </React.Fragment>
+          <CardDetails virtualCard={virtualCard} />
         ) : (
           <React.Fragment>
             <P mt="18px" fontSize="18px" fontWeight="700" lineHeight="26px" letterSpacing="0">
