@@ -34,7 +34,7 @@ export type StyledButtonProps = BackgroundProps &
   ColorProps &
   TextTransformProps &
   WhiteSpaceProps &
-  React.HTMLProps<HTMLButtonElement> & {
+  Omit<React.HTMLProps<HTMLButtonElement>, 'as'> & {
     buttonStyle?: ButtonStyle;
     buttonSize?: ButtonSize;
     loading?: boolean;
@@ -42,6 +42,7 @@ export type StyledButtonProps = BackgroundProps &
     isBorderless?: boolean;
     type?: 'button' | 'submit' | 'reset';
     truncateOverflow?: boolean;
+    as?: any;
   };
 
 /**
