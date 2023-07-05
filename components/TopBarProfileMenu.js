@@ -200,6 +200,9 @@ UserAccountLinks.propTypes = {
   setShowPreviewFeaturesModal: PropTypes.func,
 };
 
+/**
+ * @deprecated Will be replaced by `components/navigation/ProfileMenu` when Workspace moves out of preview feature
+ */
 class TopBarProfileMenu extends React.Component {
   static propTypes = {
     LoggedInUser: PropTypes.object,

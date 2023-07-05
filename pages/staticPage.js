@@ -110,7 +110,7 @@ class StaticPage extends React.Component {
 
     return (
       <StaticPageContainer>
-        <Header title={title} LoggedInUser={LoggedInUser} />
+        <Header title={title} navTitle={title} LoggedInUser={LoggedInUser} />
         <Body>
           <div className="content">
             {path && pageSlug && (

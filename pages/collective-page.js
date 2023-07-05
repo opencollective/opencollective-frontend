@@ -173,6 +173,7 @@ class CollectivePage extends React.Component {
         collective={collective}
         canonicalURL={getCollectivePageCanonicalURL(collective)}
         {...getCollectivePageMetadata(collective)}
+        loading={loading}
       >
         <GlobalStyles />
         {loading ? (

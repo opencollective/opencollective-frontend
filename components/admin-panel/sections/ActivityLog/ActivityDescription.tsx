@@ -57,13 +57,13 @@ export const getActivityVariables = (
   hasParent: Boolean(activity.account?.parent),
   Individual: () => (
     <Span fontWeight={600}>
-      <LinkCollective collective={activity.individual || activity.fromAccount} openInNewTab />
+      <LinkCollective collective={activity.individual || activity.fromAccount} />
     </Span>
   ),
-  FromAccount: () => <CollectiveTag collective={activity.fromAccount} openInNewTab />,
-  Account: () => <CollectiveTag collective={activity.account} openInNewTab />,
+  FromAccount: () => <CollectiveTag collective={activity.fromAccount} />,
+  Account: () => <CollectiveTag collective={activity.account} />,
   AccountType: () => formatCollectiveType(intl, activity.account?.type || 'COLLECTIVE'),
-  AccountParent: () => <CollectiveTag collective={activity.account?.parent} openInNewTab />,
+  AccountParent: () => <CollectiveTag collective={activity.account?.parent} />,
   Expense: msg =>
     !activity.expense ? (
       msg
@@ -74,13 +74,12 @@ export const getActivityVariables = (
           expense={activity.expense}
           title={activity.expense.description}
           onClick={options?.onClickExpense}
-          openInNewTab
         >
           {msg || `#${activity.expense.legacyId}`}
         </LinkExpense>
       </ResourceTag>
     ),
-  Host: () => <CollectiveTag collective={activity.host} openInNewTab />,
+  Host: () => <CollectiveTag collective={activity.host} />,
   CommentEntity: () => {
     if (activity.expense) {
       return (
@@ -89,7 +88,6 @@ export const getActivityVariables = (
             collective={activity.expense.account}
             expense={activity.expense}
             title={activity.expense.description}
-            openInNewTab
           >
             <FormattedMessage id="Expense" defaultMessage="Expense" /> #{activity.expense.legacyId}
           </LinkExpense>
@@ -97,7 +95,7 @@ export const getActivityVariables = (
       );
     } else {
       // We're not yet linking conversations & updates to comments in the activity table
-      return <CollectiveTag collective={activity.account} openInNewTab />;
+      return <CollectiveTag collective={activity.account} />;
     }
   },
   Order: msg =>
@@ -108,7 +106,6 @@ export const getActivityVariables = (
         <Link
           href={`${getCollectivePageRoute(activity.order.toAccount)}/contributions/${activity.order.legacyId}`}
           title={activity.order.description}
-          openInNewTab
         >
           {msg} #{activity.order.legacyId}
         </Link>
@@ -122,7 +119,6 @@ export const getActivityVariables = (
         <Link
           href={`${getCollectivePageRoute(activity.account)}/updates/${activity.update.slug}`}
           title={activity.update.title}
-          openInNewTab
         >
           {msg}
         </Link>

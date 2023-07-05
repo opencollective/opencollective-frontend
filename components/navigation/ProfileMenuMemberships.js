@@ -1,76 +1,123 @@
-/**
- * @deprecated Will be replaced by `components/navigation/ProfileMenuMemberships.tsx` when Workspace moves out of preview features
- */
-
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Plus } from '@styled-icons/boxicons-regular/Plus';
-import { Settings } from '@styled-icons/feather/Settings';
 import { groupBy, isEmpty, uniqBy } from 'lodash';
+import { Home, Plus } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { CollectiveType } from '../lib/constants/collectives';
-import { isPastEvent } from '../lib/events';
-import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
-import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
+import { CollectiveType } from '../../lib/constants/collectives';
+import { isPastEvent } from '../../lib/events';
+import { getDashboardRoute } from '../../lib/url-helpers';
 
-import Avatar from './Avatar';
-import Collapse from './Collapse';
-import Container from './Container';
-import { Box, Flex } from './Grid';
-import Link from './Link';
-import ListItem from './ListItem';
-import StyledButton from './StyledButton';
-import StyledHr from './StyledHr';
-import StyledLink from './StyledLink';
-import StyledRoundButton from './StyledRoundButton';
-import { P } from './Text';
+import Avatar from '../Avatar';
+import Collapse from '../Collapse';
+import Container from '../Container';
+import { Box, Flex } from '../Grid';
+import Link from '../Link';
+import StyledButton from '../StyledButton';
+import StyledRoundButton from '../StyledRoundButton';
+import { P } from '../Text';
 
-const CollectiveListItem = styled(ListItem)`
+const AccountList = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 4px 16px;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 12px;
+  h3 {
+    font-size: 12px;
+    font-weight: 600;
+    color: #656d76;
+    letter-spacing: 0;
+    line-height: 20px;
+    margin: 0;
+
+    padding: 0 8px;
+  }
+`;
+
+const MenuLink = styled(Link)`
+  display: flex;
+  align-items: center;
+  grid-gap: 8px;
+  cursor: pointer;
+  &:hover {
+    background: #f7f8fa;
+    color: #1f2328;
+  }
+  positon: relative;
+  padding: 8px;
+  border-radius: 8px;
+  color: #1f2328;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  svg {
+    color: #4b5563;
+  }
+`;
+
+const DashboardLink = styled(Link)`
+  border: 1px solid #e5e7eb;
+  background: white;
+  color: #1f2937;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  border-radius: 8px;
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  bottom: 4px;
+  transition: opacity 0.1s, background-color 0.1s, color 0.1s;
+  &:hover {
+    background: #030712;
+    color: white;
+  }
+`;
+
+const CollectiveListItem = styled.div`
+  position: relative;
   @media (hover: hover) {
-    :hover svg {
+    :hover a.dashboardLink {
       opacity: 1;
     }
   }
   @media (hover: none) {
-    svg {
+    a.dashboardLink {
       opacity: 1;
     }
   }
 `;
 
-const MembershipLine = ({ user, membership }) => {
+const MembershipLine = ({ user, membership, closeDrawer }) => {
   const intl = useIntl();
   return (
-    <CollectiveListItem py={1} display="flex" justifyContent="space-between" alignItems="center">
-      <Link href={`/${membership.collective.slug}`} title={membership.collective.name}>
-        <Flex alignItems="center">
-          <Avatar collective={membership.collective} radius="32px" mr="12px" />
-          <Flex flexDirection="column" maxWidth="150px">
-            <P fontSize="14px" fontWeight="500" lineHeight="20px" color="black.800" truncateOverflow>
-              {membership.collective.name}
-            </P>
-            <P fontSize="12px" lineHeight="18px" truncateOverflow color="black.700">
-              @{membership.collective.slug}
-            </P>
-          </Flex>
-        </Flex>
-      </Link>
-      {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
-        <StyledLink
-          as={Link}
-          href={
-            user?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-              ? getDashboardRoute(membership.collective)
-              : getSettingsRoute(membership.collective)
-          }
-          ml={1}
-          color="black.500"
-          title={intl.formatMessage({ id: 'AdminPanel.button', defaultMessage: 'Admin' })}
+    <CollectiveListItem>
+      <MenuLink href={`/${membership.collective.slug}`} onClick={closeDrawer}>
+        <Avatar collective={membership.collective} radius={16} />
+        <P
+          fontSize="inherit"
+          fontWeight="inherit"
+          lineHeight="inherit"
+          color="inherit"
+          letterSpacing={0}
+          truncateOverflow
         >
-          <Settings opacity="0" size="1.2em" />
-        </StyledLink>
+          {membership.collective.name}
+        </P>
+      </MenuLink>
+      {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
+        <DashboardLink
+          className="dashboardLink"
+          href={getDashboardRoute(membership.collective)}
+          color="black.500"
+          title={intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' })}
+          onClick={closeDrawer}
+        >
+          <Home size="14px" strokeWidth={1.5} />
+        </DashboardLink>
       )}
     </CollectiveListItem>
   );
@@ -79,6 +126,7 @@ const MembershipLine = ({ user, membership }) => {
 MembershipLine.propTypes = {
   user: PropTypes.object,
   membership: PropTypes.object,
+  closeDrawer: PropTypes.func,
 };
 
 const sortMemberships = memberships => {
@@ -121,11 +169,11 @@ const filterMemberships = memberships => {
   return uniqBy(filteredMemberships, m => m.collective.id);
 };
 
-const MembershipsList = ({ user, memberships }) => {
+const MembershipsList = ({ user, memberships, closeDrawer }) => {
   return (
     <Box as="ul" p={0} my={2}>
       {sortMemberships(memberships).map(member => (
-        <MembershipLine key={member.id} membership={member} user={user} />
+        <MembershipLine key={member.id} membership={member} user={user} closeDrawer={closeDrawer} />
       ))}
     </Box>
   );
@@ -134,6 +182,7 @@ const MembershipsList = ({ user, memberships }) => {
 MembershipsList.propTypes = {
   user: PropTypes.object,
   memberships: PropTypes.array,
+  closeDrawer: PropTypes.func,
 };
 
 /**
@@ -181,26 +230,23 @@ const MENU_SECTIONS = {
   },
 };
 
-const MenuSectionHeader = ({ section, hidePlusIcon }) => {
+const MenuSectionHeader = ({ section, hidePlusIcon, closeDrawer }) => {
   const intl = useIntl();
   const { title, plusButton } = MENU_SECTIONS[section];
   return (
-    <Flex alignItems="center">
-      <P
-        color="black.700"
-        fontSize="12px"
-        fontWeight="500"
-        letterSpacing="0.06em"
-        pr={2}
-        textTransform="uppercase"
-        whiteSpace="nowrap"
-      >
-        {intl.formatMessage(title)}
-      </P>
-      <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+    <Flex alignItems="center" justifyContent="space-between">
+      <h3>{intl.formatMessage(title)}</h3>
+
       {Boolean(!hidePlusIcon && plusButton) && (
-        <Link href={plusButton.href} title={intl.formatMessage(plusButton.text)}>
-          <StyledRoundButton ml={2} size={24} color="#C4C7CC">
+        <Link href={plusButton.href} title={intl.formatMessage(plusButton.text)} onClick={closeDrawer}>
+          <StyledRoundButton
+            mr={'6px'}
+            size={24}
+            color="#C4C7CC"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
             <Plus size={12} color="#76777A" />
           </StyledRoundButton>
         </Link>
@@ -212,9 +258,10 @@ const MenuSectionHeader = ({ section, hidePlusIcon }) => {
 MenuSectionHeader.propTypes = {
   section: PropTypes.oneOf(Object.keys(MENU_SECTIONS)).isRequired,
   hidePlusIcon: PropTypes.bool,
+  closeDrawer: PropTypes.func,
 };
 
-const ProfileMenuMemberships = ({ user }) => {
+const ProfileMenuMemberships = ({ user, closeDrawer }) => {
   const intl = useIntl();
   const memberships = filterMemberships(user.memberOf);
   const archivedMemberships = filterArchivedMemberships(user.memberOf);
@@ -239,15 +286,17 @@ const ProfileMenuMemberships = ({ user }) => {
           const sectionIsEmpty = isEmpty(memberships);
           const sectionData = MENU_SECTIONS[accountType];
           return (
-            <Box key={accountType} mb={3}>
-              {accountType !== 'ARCHIVED' && <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} />}
+            <AccountList key={accountType}>
+              {accountType !== 'ARCHIVED' && (
+                <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} closeDrawer={closeDrawer} />
+              )}
               {sectionIsEmpty ? (
                 <Box my={2}>
                   <P fontSize="12px" lineHeight="18px" color="black.700">
                     {intl.formatMessage(sectionData.emptyMessage)}
                   </P>
                   {Boolean(sectionData.plusButton) && (
-                    <Link href={sectionData.plusButton.href}>
+                    <Link href={sectionData.plusButton.href} onClick={closeDrawer}>
                       <StyledButton mt="12px" mb="16px" borderRadius="8px" width="100%" fontSize="12px">
                         <Flex alignItems="center" justifyContent="center">
                           <Container
@@ -269,24 +318,21 @@ const ProfileMenuMemberships = ({ user }) => {
                 </Box>
               ) : accountType === 'ARCHIVED' ? (
                 <Collapse
+                  buttonSize={24}
                   defaultIsOpen={false}
-                  title={<MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} />}
+                  mr={'6px'}
+                  title={
+                    <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} closeDrawer={closeDrawer} />
+                  }
                 >
-                  <MembershipsList memberships={memberships} user={user} />
+                  <MembershipsList memberships={memberships} user={user} closeDrawer={closeDrawer} />
                 </Collapse>
               ) : (
-                <MembershipsList memberships={memberships} user={user} />
+                <MembershipsList memberships={memberships} user={user} closeDrawer={closeDrawer} />
               )}
-            </Box>
+            </AccountList>
           );
         })}
-      {hasNoMemberships && (
-        <P textAlign="center" mb={2}>
-          <StyledLink as={Link} href="/search" color="blue.900">
-            <FormattedMessage defaultMessage="Discover Collectives to Support" />
-          </StyledLink>
-        </P>
-      )}
     </React.Fragment>
   );
 };
@@ -295,6 +341,7 @@ ProfileMenuMemberships.propTypes = {
   user: PropTypes.shape({
     memberOf: PropTypes.arrayOf(PropTypes.object),
   }),
+  closeDrawer: PropTypes.func,
 };
 
 export default React.memo(ProfileMenuMemberships);

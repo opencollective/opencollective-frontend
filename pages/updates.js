@@ -76,10 +76,12 @@ class UpdatesPage extends React.Component {
 
     const collective = data.account;
     const updates = collective?.updates;
+
     return (
       <div className="UpdatesPage">
         <Header
           collective={collective}
+          loading={data.loading}
           LoggedInUser={LoggedInUser}
           canonicalURL={`${getCollectivePageCanonicalURL(collective)}/updates`}
           noRobots={!shouldIndexAccountOnSearchEngines(collective)}
