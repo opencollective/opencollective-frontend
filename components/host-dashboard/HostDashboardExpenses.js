@@ -378,13 +378,12 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
             showChargeHasReceiptFilter
             chargeHasReceiptFilter={queryFilter.values.chargeHasReceipts}
             onChargeHasReceiptFilterChange={queryFilter.setChargeHasReceipts}
-            onChange={queryParams => {
-              console.log('queryParams', queryParams);
+            onChange={queryParams =>
               router.push({
                 pathname: pageRoute,
                 query: getQueryParams({ ...queryParams, offset: null }),
-              });
-            }}
+              })
+            }
           />
         ) : loading ? (
           <LoadingPlaceholder height={70} />
