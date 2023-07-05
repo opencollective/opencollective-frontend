@@ -161,6 +161,7 @@ class ExpenseFormItems extends React.PureComponent {
     const { values, errors, setFieldValue } = this.props.form;
     const requireFile = attachmentRequiresFile(values.type);
     const isGrant = values.type === expenseTypes.GRANT;
+    const isInvoice = values.type === expenseTypes.INVOICE;
     const isCreditCardCharge = values.type === expenseTypes.CHARGE;
     const items = values.items || [];
     const hasItems = items.length > 0;
@@ -213,6 +214,7 @@ class ExpenseFormItems extends React.PureComponent {
             hasMultiCurrency={!index && availableCurrencies?.length > 1} // Only display currency picker for the first item
             availableCurrencies={availableCurrencies}
             onCurrencyChange={async value => await this.onCurrencyChange(value)}
+            isInvoice={isInvoice}
             isLastItem={index === items.length - 1}
           />
         ))}
