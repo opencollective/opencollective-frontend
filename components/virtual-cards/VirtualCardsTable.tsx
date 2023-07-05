@@ -56,6 +56,7 @@ const CellButton = styled.button`
 type VirtualCardsTableMeta = {
   intl: IntlShape;
   addToast: (toast: Partial<Toast>) => void;
+  openVirtualCardDrawer: (vc: GraphQLVirtualCard) => void;
   host: Host;
   canEditVirtualCard?: boolean;
   canDeleteVirtualCard?: boolean;
@@ -229,7 +230,6 @@ type VirtualCardsTableProps = {
   host: Host;
   virtualCards: GraphQLVirtualCard[];
   loading?: boolean;
-  openVirtualCardDrawer: (vc: GraphQLVirtualCard) => void;
   canDeleteVirtualCard?: boolean;
   canEditVirtualCard?: boolean;
   onDeleteRefetchQuery?: string;
