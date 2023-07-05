@@ -9,10 +9,12 @@ import EXPENSE_STATUS from '../../lib/constants/expense-status';
 import { parseDateInterval } from '../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { useLazyGraphQLPaginatedResults } from '../../lib/hooks/useLazyGraphQLPaginatedResults';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import useQueryFilter, { BooleanFilter } from '../../lib/hooks/useQueryFilter';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
-import DashboardFilters from '../dashboard/DashboardFilters';
+import DashboardViews from '../dashboard/DashboardViews';
 import DismissibleMessage from '../DismissibleMessage';
 import ExpensesFilters from '../expenses/ExpensesFilters';
 import ExpensesList from '../expenses/ExpensesList';
@@ -36,71 +38,88 @@ import { H1 } from '../Text';
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
-const hostDashboardExpensesQuery = gql`
-  query HostDashboardExpenses(
-    $hostSlug: String!
-    $limit: Int!
-    $offset: Int!
-    $type: ExpenseType
-    $tags: [String]
-    $status: ExpenseStatusFilter
-    $minAmount: Int
-    $maxAmount: Int
-    $payoutMethodType: PayoutMethodType
-    $dateFrom: DateTime
-    $dateTo: DateTime
-    $searchTerm: String
-    $orderBy: ChronologicalOrderInput
-    $chargeHasReceipts: Boolean
-    $virtualCards: [VirtualCardReferenceInput]
-  ) {
-    host(slug: $hostSlug) {
-      id
-      ...ExpenseHostFields
-      ...HostInfoCardFields
-      transferwise {
+const createHostDashboardExpensesQuery = views => {
+  return gql`
+    query HostDashboardExpenses(
+      $hostSlug: String!
+      $limit: Int!
+      $offset: Int!
+      $type: ExpenseType
+      $tags: [String]
+      $status: ExpenseStatusFilter
+      $minAmount: Int
+      $maxAmount: Int
+      $payoutMethodType: PayoutMethodType
+      $dateFrom: DateTime
+      $dateTo: DateTime
+      $searchTerm: String
+      $orderBy: ChronologicalOrderInput
+      $chargeHasReceipts: Boolean
+      $virtualCards: [VirtualCardReferenceInput]
+    ) {
+      host(slug: $hostSlug) {
         id
-        availableCurrencies
-        amountBatched {
-          valueInCents
-          currency
+        ...ExpenseHostFields
+        ...HostInfoCardFields
+        transferwise {
+          id
+          availableCurrencies
+          amountBatched {
+            valueInCents
+            currency
+          }
         }
       }
-    }
-    expenses(
-      host: { slug: $hostSlug }
-      limit: $limit
-      offset: $offset
-      type: $type
-      tag: $tags
-      status: $status
-      minAmount: $minAmount
-      maxAmount: $maxAmount
-      payoutMethodType: $payoutMethodType
-      dateFrom: $dateFrom
-      dateTo: $dateTo
-      searchTerm: $searchTerm
-      orderBy: $orderBy
-      chargeHasReceipts: $chargeHasReceipts
-      virtualCards: $virtualCards
-    ) {
-      totalCount
-      offset
-      limit
-      nodes {
-        id
-        ...ExpensesListFieldsFragment
-        ...ExpensesListAdminFieldsFragment
+      expenses(
+        host: { slug: $hostSlug }
+        limit: $limit
+        offset: $offset
+        type: $type
+        tag: $tags
+        status: $status
+        minAmount: $minAmount
+        maxAmount: $maxAmount
+        payoutMethodType: $payoutMethodType
+        dateFrom: $dateFrom
+        dateTo: $dateTo
+        searchTerm: $searchTerm
+        orderBy: $orderBy
+        chargeHasReceipts: $chargeHasReceipts
+        virtualCards: $virtualCards
+      ) {
+        totalCount
+        offset
+        limit
+        nodes {
+          id
+          ...ExpensesListFieldsFragment
+          ...ExpensesListAdminFieldsFragment
+        }
       }
+      ${views.map((view, i) => {
+        if (!view.showCount) {
+          return '';
+        }
+
+        return `
+         view${i}: expenses(
+            host: { slug: $hostSlug }
+            limit: 0
+            offset: 0
+            ${view.query.type ? `type: ${view.query.type}` : ''}
+            ${view.query.status ? `status: ${view.query.status}` : ''}
+         ) {
+           totalCount
+         }`;
+      })} 
     }
-  }
 
-  ${expensesListFieldsFragment}
-  ${expensesListAdminFieldsFragment}
-  ${expenseHostFields}
-  ${hostInfoCardFields}
-`;
-
+    ${expensesListFieldsFragment}
+    ${expensesListAdminFieldsFragment}
+    ${expenseHostFields}
+    ${hostInfoCardFields}
+  `;
+};
 /**
  * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
  */
@@ -153,7 +172,7 @@ const getVariablesFromQuery = query => {
 const enforceDefaultParamsOnQuery = query => {
   return {
     ...query,
-    // status: query.status || 'READY_TO_PAY',
+    status: query.status || 'READY_TO_PAY',
   };
 };
 
@@ -165,9 +184,44 @@ const hasParams = query => {
   });
 };
 
+const initViews = [
+  { label: 'All', query: {}, id: 'all' },
+  {
+    label: 'Ready to pay',
+    query: { status: 'READY_TO_PAY', orderBy: 'CREATED_AT,ASC' },
+    showCount: true,
+    id: 'ready-to-pay',
+  },
+  {
+    label: 'Scheduled for payment',
+    query: { status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', orderBy: 'CREATED_AT,ASC' },
+    showCount: true,
+    id: 'scheduled-for-payment',
+  },
+  {
+    label: 'On hold',
+    query: { status: 'ON_HOLD', orderBy: 'CREATED_AT,ASC' },
+    showCount: true,
+    id: 'on-hold',
+  },
+  {
+    label: 'Incomplete',
+    query: { status: 'INCOMPLETE', orderBy: 'CREATED_AT,ASC' },
+    showCount: true,
+    id: 'incomplete',
+  },
+  {
+    label: 'Paid',
+    query: { status: 'PAID' },
+    id: 'recently-paid',
+  },
+];
+
 const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   const router = useRouter() || {};
-  const query = enforceDefaultParamsOnQuery(router.query);
+  const { LoggedInUser } = useLoggedInUser();
+  const expensePipelineFeatureIsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_PIPELINE);
+  const query = expensePipelineFeatureIsEnabled ? router.query : enforceDefaultParamsOnQuery(router.query);
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const hasFilters = React.useMemo(() => hasParams(query), [query]);
   const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-expenses` : `/${hostSlug}/admin/expenses`;
@@ -181,7 +235,9 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
       },
     },
   });
-
+  const hostDashboardExpensesQuery = createHostDashboardExpensesQuery(
+    expensePipelineFeatureIsEnabled ? initViews : null,
+  );
   const expenses = useQuery(hostDashboardExpensesQuery, {
     variables: {
       ...queryVariables,
@@ -199,46 +255,23 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   }, [query.paypalApprovalError]);
 
   const { data, error, loading } = expenses;
+  const [views, setViews] = React.useState(initViews);
+
+  React.useEffect(() => {
+    if (data) {
+      const viewsUpToDate = views.map((view, i) => {
+        return {
+          ...view,
+          count: data[`view${i}`]?.totalCount,
+        };
+      });
+      setViews(viewsUpToDate);
+    }
+  }, [data]);
+
   const getQueryParams = newParams => {
     return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
   };
-
-  const views = [
-    { label: 'All', query: {} },
-    {
-      label: 'Ready to pay',
-      query: { status: 'READY_TO_PAY' },
-      // showCount: true,
-    },
-    {
-      label: 'Scheduled for payment',
-      query: { status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT' },
-      // actions: [
-      //   {
-      //     onClick: () => setConfirmationModalDisplay(true),
-      //     label: <FormattedMessage id="expenses.scheduled.paybatch" defaultMessage="Pay Batch" />,
-      //   },
-      // ],
-      // showCount: true,
-    },
-    {
-      label: 'On hold',
-      query: { status: 'ON_HOLD' },
-      // showCount: true
-    },
-    {
-      label: 'Incomplete',
-      query: { status: 'INCOMPLETE' },
-      // showCount: true,
-    },
-    {
-      label: 'Recently paid',
-      query: { status: 'PAID' },
-      showCount: false,
-    },
-  ].map(view => ({ id: view.label, ...view }));
-
-  const queryWithoutRouteParams = getQueryParams();
 
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
@@ -317,16 +350,23 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
           ) : null
         }
       />
-      <DashboardFilters
-        query={queryWithoutRouteParams}
-        views={views}
-        onChange={query => {
-          router.push({
-            pathname: pageRoute,
-            query,
-          });
-        }}
-      />
+      {expensePipelineFeatureIsEnabled && (
+        <DashboardViews
+          query={query}
+          omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
+          views={views}
+          onChange={query => {
+            router.push(
+              {
+                pathname: pageRoute,
+                query,
+              },
+              undefined,
+              { scroll: false },
+            );
+          }}
+        />
+      )}
 
       <Box mb={34}>
         {data?.host ? (
@@ -338,12 +378,13 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
             showChargeHasReceiptFilter
             chargeHasReceiptFilter={queryFilter.values.chargeHasReceipts}
             onChargeHasReceiptFilterChange={queryFilter.setChargeHasReceipts}
-            onChange={queryParams =>
+            onChange={queryParams => {
+              console.log('queryParams', queryParams);
               router.push({
                 pathname: pageRoute,
                 query: getQueryParams({ ...queryParams, offset: null }),
-              })
-            }
+              });
+            }}
           />
         ) : loading ? (
           <LoadingPlaceholder height={70} />
