@@ -6,7 +6,6 @@ import { StyledSelectFilter } from '../../StyledSelectFilter';
 
 const ExpensesOrder = ({ onChange, value, ...props }) => {
   const intl = useIntl();
-
   const options = [
     {
       label: intl.formatMessage({ id: 'ExpensesOrder.NewestFirst', defaultMessage: 'Newest First' }),
@@ -22,9 +21,8 @@ const ExpensesOrder = ({ onChange, value, ...props }) => {
     <StyledSelectFilter
       inputId="expenses-order"
       onChange={({ value }) => onChange(value)}
-      value={options.find(o => o.value === value)}
+      value={options.find(o => o.value === value) || options[0]}
       options={options}
-      defaultValue={options[0]}
       {...props}
     />
   );
