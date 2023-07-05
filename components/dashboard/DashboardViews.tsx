@@ -17,8 +17,8 @@ export default function DashboardViews({ query, omitMatchingParams, onChange, vi
       const viewQuery = omit(v.query, omitMatchingParams);
       return (
         Object.keys(viewQuery).every(key => {
-          return viewQuery[key] == currentQuery[key];
-        }) && Object.keys(currentQuery).every(key => viewQuery[key] == currentQuery[key])
+          return viewQuery[key] === currentQuery[key];
+        }) && Object.keys(currentQuery).every(key => viewQuery[key] === currentQuery[key])
       );
     });
     setView(matchingView || null);
