@@ -9,7 +9,7 @@ import LinkCollective from './LinkCollective';
 
 type AvatarWithLinkProps = {
   account: Pick<Account, 'name' | 'type' | 'isIncognito' | 'slug' | 'imageUrl'>;
-  secondaryAccount: Partial<Account> | null;
+  secondaryAccount?: Partial<Account> | null;
   /** The size in pixels */
   size: number;
 };

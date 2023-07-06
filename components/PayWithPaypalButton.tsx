@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { truncate } from 'lodash';
@@ -14,7 +13,7 @@ import { getPaypal } from '../lib/paypal';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import StyledButton from './StyledButton';
 
-const PaypalButtonContainer = styled.div`
+const PaypalButtonContainer = styled.div<{ isLoading?: boolean }>`
   ${props =>
     props.isLoading &&
     css`
@@ -24,53 +23,53 @@ const PaypalButtonContainer = styled.div`
     `}
 `;
 
+type PayWithPaypalButtonProps = {
+  /** Total amount to pay in cents */
+  totalAmount: number;
+  /** The currency used for this order */
+  currency: string;
+  interval?: string;
+  isSubmitting?: boolean;
+  /** Called when user authorize the payment with a payment method generated from PayPal data */
+  onSuccess: Function;
+  /** Called when user cancel paypal flow */
+  onCancel?: Function;
+  /** Called when an error is thrown during paypal flow */
+  onError?: Function;
+  /** Called when the button is clicked */
+  onClick?: Function;
+  /** Styles to apply to the button. See https://developer.paypal.com/docs/checkout/how-to/customize-button/#button-styles */
+  style?: {
+    color?: 'gold' | 'blue' | 'silver' | 'white' | 'black';
+    shape?: 'pill' | 'rect';
+    size?: 'small' | 'medium' | 'large' | 'responsive';
+    height?: number;
+    label?: 'checkout' | 'credit' | 'pay' | 'buynow' | 'paypal' | 'installment';
+    tagline?: boolean;
+    layout?: 'horizontal' | 'vertical';
+    funding?: { allowed: Array<any>; disallowed: Array<any> };
+    fundingicons?: boolean;
+  };
+  host: {
+    id: string;
+    legacyId: number;
+    paypalClientId: string;
+  };
+  collective: {
+    id: string;
+    name: string;
+  };
+  tier?: { id: string };
+  data?: any;
+  intl?: any;
+  subscriptionStartDate?: string;
+};
+
 /**
  * Encapsulate Paypal button logic so we don't have to deal with refs in parent
  * components.
  */
-class PayWithPaypalButton extends Component {
-  static propTypes = {
-    /** Total amount to pay in cents */
-    totalAmount: PropTypes.number.isRequired,
-    /** The currency used for this order */
-    currency: PropTypes.string.isRequired,
-    interval: PropTypes.string,
-    isSubmitting: PropTypes.bool,
-    /** Called when user authorize the payment with a payment method generated from PayPal data */
-    onSuccess: PropTypes.func.isRequired,
-    /** Called when user cancel paypal flow */
-    onCancel: PropTypes.func,
-    /** Called when an error is thrown during paypal flow */
-    onError: PropTypes.func,
-    /** Called when the button is clicked */
-    onClick: PropTypes.func,
-    /** Styles to apply to the button. See https://developer.paypal.com/docs/checkout/how-to/customize-button/#button-styles */
-    style: PropTypes.shape({
-      color: PropTypes.oneOf(['gold', 'blue', 'silver', 'white', 'black']),
-      shape: PropTypes.oneOf(['pill', 'rect']),
-      size: PropTypes.oneOf(['small', 'medium', 'large', 'responsive']),
-      height: PropTypes.number,
-      label: PropTypes.oneOf(['checkout', 'credit', 'pay', 'buynow', 'paypal', 'installment']),
-      tagline: PropTypes.bool,
-      layout: PropTypes.oneOf(['horizontal', 'vertical']),
-      funding: PropTypes.shape({ allowed: PropTypes.array, disallowed: PropTypes.array }),
-      fundingicons: PropTypes.bool,
-    }),
-    host: PropTypes.shape({
-      id: PropTypes.string,
-      legacyId: PropTypes.number,
-      paypalClientId: PropTypes.string,
-    }),
-    collective: PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-    }),
-    tier: PropTypes.shape({ id: PropTypes.string }),
-    data: PropTypes.object,
-    intl: PropTypes.object,
-    subscriptionStartDate: PropTypes.string,
-  };
-
+class PayWithPaypalButton extends Component<PayWithPaypalButtonProps, { isLoading: boolean }> {
   constructor(props) {
     super(props);
     this.paypalTarget = React.createRef();
@@ -91,6 +90,7 @@ class PayWithPaypalButton extends Component {
     }
   }
 
+  paypalTarget: any;
   static defaultStyle = {
     color: 'blue',
     tagline: false,
@@ -137,6 +137,10 @@ class PayWithPaypalButton extends Component {
             defaultMessage: 'There was an error while initializing the PayPal checkout',
           }),
         }),
+      intent: null,
+      createSubscription: null,
+      createOrder: null,
+      onApprove: null,
     };
 
     /* eslint-disable camelcase */
@@ -225,7 +229,7 @@ const paypalPlanQuery = gql`
 const addPaypalPlan = graphql(paypalPlanQuery, {
   // We only need a plan if using an interval
   skip: props => !props.interval || props.interval === INTERVALS.oneTime,
-  options: props => ({
+  options: (props: any) => ({
     context: API_V2_CONTEXT,
     variables: {
       account: { id: props.collective.id },

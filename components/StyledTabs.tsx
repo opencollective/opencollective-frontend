@@ -48,7 +48,7 @@ const TabButton = styled.button<{ selected?: boolean }>`
 type TabsProps = {
   tabs: Array<{ id: string | number; label: React.ReactNode | string; count?: number; selected?: boolean }>;
   selectedId: string | number;
-  onChange?: (id: string | number) => void;
+  onChange?: Function;
 };
 
 const TabsBar = styled(Flex)`

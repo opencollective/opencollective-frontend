@@ -37,6 +37,9 @@ const SubListItem = styled(ListItem)`
   padding-bottom: 10px;
 `;
 
+/**
+ * @deprecated Will be replaced by `components/navigation/SiteMenu` when Workspace moves out of preview feature
+ */
 const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
   const [state, setState] = React.useState({
     viewSolutionsMenu: false,

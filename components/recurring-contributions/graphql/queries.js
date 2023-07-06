@@ -33,6 +33,7 @@ export const managedOrderFragment = gql`
     status
     description
     createdAt
+    processedAt
     frequency
     tier {
       id
