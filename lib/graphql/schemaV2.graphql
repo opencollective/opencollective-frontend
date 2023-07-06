@@ -800,6 +800,7 @@ type Tier {
   invoiceTemplate: String
   useStandalonePage: Boolean
   singleTicket: Boolean
+  requireAddress: Boolean!
 }
 
 """
@@ -3043,11 +3044,7 @@ type ContributorCollection implements Collection {
   nodes: [Contributor]
 }
 
-"""
-A person or an entity that contributes financially or by any other mean to the mission
-of the collective. While "Member" is dedicated to permissions, this type is meant
-to surface all the public contributors.
-"""
+"\n    A person or an entity that contributes financially or by any other mean to the mission\n    of the collective. While \"Member\" is dedicated to permissions, this type is meant\n    to surface all the public contributors.\n  "
 type Contributor {
   """
   A unique identifier for this member
@@ -4788,6 +4785,7 @@ type TimeSeriesAmountWithKindNode {
 Stripe connected account properties
 """
 type StripeConnectedAccount {
+  username: String
   issuingBalance: Amount
 }
 
@@ -5352,6 +5350,11 @@ type OrderPermissions {
   Whether the current user can see private activities for this order
   """
   canSeePrivateActivities: Boolean!
+
+  """
+  Whether the current user can set tags on this order
+  """
+  canSetTags: Boolean!
 }
 
 """
@@ -8040,11 +8043,7 @@ type Individual implements Account {
     offset: Int! = 0
   ): OAuthApplicationCollection
 
-  """
-  Address. This field is public for hosts, otherwise:
-    - Users can see their own address
-    - Hosts can see the address of users submitting expenses to their collectives
-  """
+  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see their own address\n            - Hosts can see the address of users submitting expenses to their collectives\n        "
   location: Location
   categories: [String]!
   stats: AccountStats
@@ -8738,11 +8737,7 @@ type Organization implements Account & AccountWithContributions {
     offset: Int! = 0
   ): OAuthApplicationCollection
 
-  """
-  Address. This field is public for hosts, otherwise:
-    - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.
-    - Hosts can see the address of organizations submitting expenses to their collectives.
-  """
+  "\n          Address. This field is public for hosts, otherwise:\n            - Users can see the addresses of the collectives they're admin of; if they are not an admin they can only see the country that the org belong to.\n            - Hosts can see the address of organizations submitting expenses to their collectives.\n        "
   location: Location
   categories: [String]!
   stats: AccountStats
@@ -9566,7 +9561,7 @@ A Virtual Card used to pay expenses
 type VirtualCard {
   id: String
   account: Account
-  host: Account
+  host: Host
   assignee: Individual
   name: String
   last4: String
@@ -10425,6 +10420,17 @@ type Query {
     """
     legacyId: Int
   ): PersonalToken
+  virtualCard(
+    """
+    Identifiers to retrieve the virtual card
+    """
+    virtualCard: VirtualCardReferenceInput!
+
+    """
+    If true, an error will be returned if the virtual card is missing
+    """
+    throwIfMissing: Boolean! = true
+  ): VirtualCard
   loggedInAccount: Individual
   me: Individual
 }

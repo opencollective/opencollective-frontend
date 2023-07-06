@@ -5,6 +5,7 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
+import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
@@ -100,7 +101,8 @@ const InviteMemberModal = props => {
     } catch (error) {
       addToast({
         type: TOAST_TYPE.ERROR,
-        message: <FormattedMessage id="editTeam.member.invite.error" defaultMessage="Failed to invite member." />,
+        title: <FormattedMessage id="editTeam.member.invite.error" defaultMessage="Failed to invite member." />,
+        message: i18nGraphqlException(intl, error),
       });
     }
   };

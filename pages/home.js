@@ -14,6 +14,7 @@ import OpenCollectiveIs from '../components/home/OpenCollectiveIsSection';
 import RaiseMoney from '../components/home/RaiseMoneySection';
 import TheFutureIsCollective from '../components/home/TheFutureIsCollectiveSection';
 import Page from '../components/Page';
+
 const messages = defineMessages({
   defaultTitle: {
     defaultMessage: 'Raise and spend money with full transparency.',

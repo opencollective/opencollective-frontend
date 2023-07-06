@@ -18,7 +18,15 @@ export function gql(source: "\n  mutation ConfirmContribution($order: OrderUpdat
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  mutation CancelRecurringContribution($order: OrderReferenceInput!, $reason: String!, $reasonCode: String!) {\n    cancelOrder(order: $order, reason: $reason, reasonCode: $reasonCode) {\n      id\n      status\n    }\n  }\n"): typeof import('./graphql').CancelRecurringContributionDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query tagStats($host: AccountReferenceInput) {\n    tagStats(host: $host, limit: 5) {\n      nodes {\n        id\n        tag\n      }\n    }\n  }\n"): typeof import('./graphql').TagStatsDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query PaypalPlanQuery(\n    $account: AccountReferenceInput!\n    $tier: TierReferenceInput\n    $amount: AmountInput!\n    $frequency: ContributionFrequency!\n  ) {\n    paypalPlan(account: $account, tier: $tier, amount: $amount, frequency: $frequency) {\n      id\n    }\n  }\n"): typeof import('./graphql').PaypalPlanQueryDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -78,6 +86,10 @@ export function gql(source: "\n  fragment UpdateListFragment on UpdateCollection
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query DashboardRecurringContributions($slug: String!) {\n    account(slug: $slug) {\n      id\n      legacyId\n      slug\n      name\n      type\n      settings\n      imageUrl\n      ... on AccountWithParent {\n        parent {\n          id\n          slug\n        }\n      }\n      recurring: orders(filter: OUTGOING, onlyActiveSubscriptions: true, includeIncognito: true) {\n        totalCount\n        nodes {\n          id\n          ...ManagedOrderFields\n        }\n      }\n      oneTime: orders(\n        filter: OUTGOING\n        frequency: ONETIME\n        status: [PAID, REQUIRE_CLIENT_CONFIRMATION, PROCESSING, IN_REVIEW, DISPUTED, PENDING, REFUNDED, ERROR]\n        includeIncognito: true\n      ) {\n        totalCount\n        nodes {\n          id\n          ...ManagedOrderFields\n        }\n      }\n      canceled: orders(filter: OUTGOING, status: [CANCELLED], includeIncognito: true) {\n        totalCount\n        nodes {\n          id\n          ...ManagedOrderFields\n        }\n      }\n    }\n  }\n  \n"): typeof import('./graphql').DashboardRecurringContributionsDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query WorkspaceHome($slug: String!, $limit: Int, $offset: Int, $type: [ActivityAndClassesType!]) {\n    activities(account: { slug: $slug }, limit: $limit, offset: $offset, type: $type, timeline: true) {\n      limit\n      offset\n      nodes {\n        id\n        createdAt\n        type\n        data\n        isSystem\n        fromAccount {\n          id\n          name\n          slug\n          type\n          isIncognito\n          imageUrl(height: 48)\n        }\n        host {\n          id\n          name\n          slug\n          type\n        }\n        account {\n          id\n          name\n          slug\n          type\n          isIncognito\n          imageUrl(height: 48)\n          ... on AccountWithParent {\n            parent {\n              id\n              slug\n              name\n              type\n            }\n          }\n        }\n        expense {\n          id\n          legacyId\n          description\n          account {\n            id\n            name\n            type\n            slug\n            ... on AccountWithParent {\n              parent {\n                id\n                slug\n              }\n            }\n          }\n        }\n        order {\n          id\n          legacyId\n          description\n          toAccount {\n            id\n            name\n            slug\n            ... on AccountWithParent {\n              parent {\n                id\n                slug\n              }\n            }\n          }\n        }\n        update {\n          id\n          legacyId\n          title\n          summary\n          slug\n        }\n        individual {\n          id\n          slug\n          name\n          type\n          imageUrl(height: 48)\n          isIncognito\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').WorkspaceHomeDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -94,7 +106,11 @@ export function gql(source: "\n  query CollectiveMembers($slug: String!) {\n    
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query VirtualCardPoliciesQuery($slug: String) {\n    account(slug: $slug) {\n      id\n      policies {\n        MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {\n          ALL_TIME {\n            valueInCents\n          }\n          DAILY {\n            valueInCents\n          }\n          MONTHLY {\n            valueInCents\n          }\n          PER_AUTHORIZATION {\n            valueInCents\n          }\n          WEEKLY {\n            valueInCents\n          }\n          YEARLY {\n            valueInCents\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').VirtualCardPoliciesQueryDocument;
+export function gql(source: "\n  query VirtualCardsAssignedToCollective($hostSlug: String!, $collectiveSlug: String!) {\n    host(slug: $hostSlug) {\n      id\n      allCards: hostedVirtualCards(collectiveAccountIds: [{ slug: $collectiveSlug }], status: [ACTIVE, INACTIVE]) {\n        totalCount\n      }\n      cardsMissingReceipts: hostedVirtualCards(\n        collectiveAccountIds: [{ slug: $collectiveSlug }]\n        status: [ACTIVE, INACTIVE]\n        hasMissingReceipts: true\n      ) {\n        totalCount\n      }\n    }\n  }\n"): typeof import('./graphql').VirtualCardsAssignedToCollectiveDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query VirtualCardPolicies($slug: String) {\n    account(slug: $slug) {\n      id\n      policies {\n        MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {\n          ALL_TIME {\n            valueInCents\n          }\n          DAILY {\n            valueInCents\n          }\n          MONTHLY {\n            valueInCents\n          }\n          PER_AUTHORIZATION {\n            valueInCents\n          }\n          WEEKLY {\n            valueInCents\n          }\n          YEARLY {\n            valueInCents\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').VirtualCardPoliciesDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -158,7 +174,7 @@ export function gql(source: "\n  query DisputedContributionsWarning($hostSlug: S
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query HostAgreements($hostSlug: String!, $limit: Int!, $offset: Int!, $account: [AccountReferenceInput]) {\n    host(slug: $hostSlug) {\n      id\n      legacyId\n      hostedAccountAgreements(limit: $limit, offset: $offset, accounts: $account) {\n        totalCount\n        nodes {\n          id\n          ...AgreementViewFields\n        }\n      }\n    }\n  }\n  \n"): typeof import('./graphql').HostAgreementsDocument;
+export function gql(source: "\n  query HostAgreements($hostSlug: String!, $limit: Int!, $offset: Int!, $account: [AccountReferenceInput]) {\n    host(slug: $hostSlug) {\n      id\n      legacyId\n      slug\n      hostedAccountAgreements(limit: $limit, offset: $offset, accounts: $account) {\n        totalCount\n        nodes {\n          id\n          ...AgreementViewFields\n        }\n      }\n    }\n  }\n  \n"): typeof import('./graphql').HostAgreementsDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -167,6 +183,14 @@ export function gql(source: "\n  query SelectedAccountInfo($account: String!) {\
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query ScheduledExpensesBanner($hostSlug: String!, $limit: Int!, $payoutMethodType: PayoutMethodType) {\n    host(slug: $hostSlug) {\n      id\n      currency\n      transferwise {\n        id\n        amountBatched {\n          valueInCents\n          currency\n        }\n      }\n    }\n    expenses(\n      host: { slug: $hostSlug }\n      status: SCHEDULED_FOR_PAYMENT\n      limit: $limit\n      payoutMethodType: $payoutMethodType\n    ) {\n      totalCount\n      offset\n      limit\n      nodes {\n        id\n      }\n    }\n  }\n"): typeof import('./graphql').ScheduledExpensesBannerDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment ManagedOrderFields on Order {\n    id\n    legacyId\n    nextChargeDate\n    paymentMethod {\n      id\n      service\n      name\n      type\n      expiryDate\n      data\n      balance {\n        value\n        valueInCents\n        currency\n      }\n    }\n    amount {\n      value\n      valueInCents\n      currency\n    }\n    totalAmount {\n      value\n      valueInCents\n      currency\n    }\n    status\n    description\n    createdAt\n    processedAt\n    frequency\n    tier {\n      id\n      name\n    }\n    totalDonations {\n      value\n      valueInCents\n      currency\n    }\n    fromAccount {\n      id\n      name\n      slug\n      isIncognito\n      type\n    }\n    toAccount {\n      id\n      slug\n      name\n      type\n      description\n      tags\n      imageUrl(height: 96)\n      backgroundImageUrl(height: 256)\n      settings\n      ... on AccountWithHost {\n        host {\n          id\n          slug\n          paypalClientId\n          supportedPaymentMethods\n        }\n      }\n      ... on Organization {\n        host {\n          id\n          slug\n          paypalClientId\n          supportedPaymentMethods\n        }\n      }\n    }\n    platformTipAmount {\n      value\n      valueInCents\n    }\n  }\n"): typeof import('./graphql').ManagedOrderFieldsFragmentDoc;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query RecurringContributions($slug: String!) {\n    account(slug: $slug) {\n      id\n      legacyId\n      slug\n      name\n      type\n      settings\n      imageUrl\n      features {\n        id\n        ...NavbarFields\n      }\n      ... on AccountWithParent {\n        parent {\n          id\n          slug\n        }\n      }\n      orders(filter: OUTGOING, onlySubscriptions: true, includeIncognito: true) {\n        totalCount\n        nodes {\n          id\n          ...ManagedOrderFields\n        }\n      }\n    }\n  }\n  \n  \n"): typeof import('./graphql').RecurringContributionsDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

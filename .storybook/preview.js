@@ -3,7 +3,7 @@ import { RouterContext } from 'next/dist/shared/lib/router-context';
 import { IntlProvider } from 'react-intl';
 import theme from '../lib/theme';
 import { ApolloProvider } from '@apollo/client';
-import * as nextImage from 'next/legacy/image';
+import * as nextImage from 'next/image';
 
 import UserProvider from '../components/UserProvider';
 import { initClient } from '../lib/apollo-client';

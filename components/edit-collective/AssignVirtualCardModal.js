@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useLazyQuery, useMutation } from '@apollo/client';
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
 import { debounce } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -10,18 +10,22 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
-import { Grid } from '../Grid';
+import { Box, Grid } from '../Grid';
 import CreditCard from '../icons/CreditCard';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledInputMask from '../StyledInputMask';
+import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+
+import { virtualCardsAssignedToCollectiveQuery } from './EditVirtualCardModal';
 
 const initialValues = {
   cardNumber: undefined,
@@ -154,6 +158,18 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
     },
   });
 
+  const { data: virtualCardsAssignedToCollectiveData, loading: isLoadingVirtualCardsAssignedToCollective } = useQuery(
+    virtualCardsAssignedToCollectiveQuery,
+    {
+      context: API_V2_CONTEXT,
+      variables: {
+        collectiveSlug: formik.values?.collective?.slug,
+        hostSlug: host.slug,
+      },
+      skip: !formik.values?.collective?.slug,
+    },
+  );
+
   useEffect(() => {
     if (formik.values.collective?.slug) {
       throttledCall(getCollectiveUsers, { slug: formik.values.collective.slug });
@@ -214,6 +230,34 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
                 />
               )}
             </StyledInputField>
+            {virtualCardsAssignedToCollectiveData &&
+              virtualCardsAssignedToCollectiveData.host.allCards.totalCount > 0 && (
+                <Box gridColumn="1/3">
+                  <MessageBox
+                    type={
+                      virtualCardsAssignedToCollectiveData.host.cardsMissingReceipts.totalCount > 0
+                        ? 'error'
+                        : 'warning'
+                    }
+                  >
+                    <FormattedMessage
+                      defaultMessage="This collective already has {allCardsCount} other cards assigned to it. {missingReceiptsCardsCount, plural, =0 {} other {# of the {allCardsCount} cards have missing receipts.}}"
+                      values={{
+                        allCardsCount: virtualCardsAssignedToCollectiveData.host.allCards.totalCount,
+                        missingReceiptsCardsCount:
+                          virtualCardsAssignedToCollectiveData.host.cardsMissingReceipts.totalCount,
+                      }}
+                    />
+                    <Box mt={3}>
+                      <StyledLink
+                        href={`/${host.slug}/admin/host-virtual-cards?collective=${formik.values?.collective?.slug}`}
+                      >
+                        <FormattedMessage defaultMessage="View Assigned Cards" />
+                      </StyledLink>
+                    </Box>
+                  </MessageBox>
+                </Box>
+              )}
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
@@ -378,6 +422,7 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
               buttonStyle="primary"
               data-cy="confirmation-modal-continue"
               loading={isBusy}
+              disabled={isLoadingVirtualCardsAssignedToCollective}
               type="submit"
               textTransform="capitalize"
             >

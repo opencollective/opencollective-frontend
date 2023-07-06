@@ -117,7 +117,7 @@ export const tableColumns: ColumnDef<Agreement>[] = [
 
   {
     accessorKey: 'expiresAt',
-    header: () => <FormattedMessage id="Attachment.expiresAt" defaultMessage="Expires" />,
+    header: () => <FormattedMessage id="Agreement.expiresAt" defaultMessage="Expires" />,
     cell: ({ cell }) => {
       const expiresAt = cell.getValue() as Agreement['expiresAt'];
       return (

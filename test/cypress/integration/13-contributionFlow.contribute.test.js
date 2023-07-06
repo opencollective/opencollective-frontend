@@ -84,8 +84,11 @@ describe('Contribution Flow: Order', () => {
         cy.getByDataCy('contribute-profile-picker').click();
         cy.contains('[data-cy="select-option"]:first', userName);
         cy.getByDataCy('progress-step-profile').contains(userName);
-
         cy.get('body').type('{esc}');
+
+        // Country required since we're contributing > $500
+        cy.getByDataCy('country-select').click();
+        cy.contains('[data-cy="select-option"]', 'Algeria').click();
         cy.get('button[data-cy="cf-next-step"]').click();
 
         // ---- Step 3: Payment ----

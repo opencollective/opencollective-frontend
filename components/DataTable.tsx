@@ -12,6 +12,7 @@ interface DataTableProps<TData, TValue> {
   loading?: boolean;
   meta?: TableMeta<any>;
   hideHeader?: boolean;
+  highlightRowOnHover?: boolean;
   emptyMessage?: () => React.ReactNode;
   nbPlaceholders?: number;
 }
@@ -24,6 +25,7 @@ export function DataTable<TData, TValue>({
   emptyMessage,
   hideHeader,
   nbPlaceholders = 10,
+  highlightRowOnHover = true,
   ...tableProps
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
@@ -67,7 +69,11 @@ export function DataTable<TData, TValue>({
           ))
         ) : table.getRowModel().rows?.length ? (
           table.getRowModel().rows.map(row => (
-            <TableRow highlightOnHover key={row.id} data-state={row.getIsSelected() && 'selected'}>
+            <TableRow
+              highlightOnHover={highlightRowOnHover}
+              key={row.id}
+              data-state={row.getIsSelected() && 'selected'}
+            >
               {row.getVisibleCells().map(cell => (
                 <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
               ))}
