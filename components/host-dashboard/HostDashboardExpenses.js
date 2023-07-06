@@ -38,95 +38,92 @@ import { H1 } from '../Text';
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
-/* eslint-disable */
-/* TODO: Find alternative strategy for counting items in views since this type of dynamic string interpolation query building 
-  is not expected or appreciated by eslint, perhaps some dedicated API resolver that accepts a list of view queries as argument.   */
-const createHostDashboardExpensesQuery = views => {
-  const viewsCountQueries =
-    views
-      ?.map((view, i) => {
-        if (!view.showCount) {
-          return '';
-        }
-        return `
-        view${i}: expenses(
-            host: { slug: $hostSlug }
-            limit: 0
-            offset: 0
-            ${view.query.type ? `type: ${view.query.type}` : ''}
-            ${view.query.status ? `status: ${view.query.status}` : ''}
-        ) {
-          totalCount
-        }`;
-      })
-      .join('\n') ?? '';
-
-  return gql`
-    query HostDashboardExpenses(
-      $hostSlug: String!
-      $limit: Int!
-      $offset: Int!
-      $type: ExpenseType
-      $tags: [String]
-      $status: ExpenseStatusFilter
-      $minAmount: Int
-      $maxAmount: Int
-      $payoutMethodType: PayoutMethodType
-      $dateFrom: DateTime
-      $dateTo: DateTime
-      $searchTerm: String
-      $orderBy: ChronologicalOrderInput
-      $chargeHasReceipts: Boolean
-      $virtualCards: [VirtualCardReferenceInput]
-    ) {
-      host(slug: $hostSlug) {
+const hostDashboardExpensesQuery = gql`
+  query HostDashboardExpenses(
+    $hostSlug: String!
+    $limit: Int!
+    $offset: Int!
+    $type: ExpenseType
+    $tags: [String]
+    $status: ExpenseStatusFilter
+    $minAmount: Int
+    $maxAmount: Int
+    $payoutMethodType: PayoutMethodType
+    $dateFrom: DateTime
+    $dateTo: DateTime
+    $searchTerm: String
+    $orderBy: ChronologicalOrderInput
+    $chargeHasReceipts: Boolean
+    $virtualCards: [VirtualCardReferenceInput]
+  ) {
+    host(slug: $hostSlug) {
+      id
+      ...ExpenseHostFields
+      ...HostInfoCardFields
+      transferwise {
         id
-        ...ExpenseHostFields
-        ...HostInfoCardFields
-        transferwise {
-          id
-          availableCurrencies
-          amountBatched {
-            valueInCents
-            currency
-          }
+        availableCurrencies
+        amountBatched {
+          valueInCents
+          currency
         }
       }
-      expenses(
-        host: { slug: $hostSlug }
-        limit: $limit
-        offset: $offset
-        type: $type
-        tag: $tags
-        status: $status
-        minAmount: $minAmount
-        maxAmount: $maxAmount
-        payoutMethodType: $payoutMethodType
-        dateFrom: $dateFrom
-        dateTo: $dateTo
-        searchTerm: $searchTerm
-        orderBy: $orderBy
-        chargeHasReceipts: $chargeHasReceipts
-        virtualCards: $virtualCards
-      ) {
-        totalCount
-        offset
-        limit
-        nodes {
-          id
-          ...ExpensesListFieldsFragment
-          ...ExpensesListAdminFieldsFragment
-        }
-      }
-      ${viewsCountQueries}
     }
-    ${expensesListFieldsFragment}
-    ${expensesListAdminFieldsFragment}
-    ${expenseHostFields}
-    ${hostInfoCardFields}
+    expenses(
+      host: { slug: $hostSlug }
+      limit: $limit
+      offset: $offset
+      type: $type
+      tag: $tags
+      status: $status
+      minAmount: $minAmount
+      maxAmount: $maxAmount
+      payoutMethodType: $payoutMethodType
+      dateFrom: $dateFrom
+      dateTo: $dateTo
+      searchTerm: $searchTerm
+      orderBy: $orderBy
+      chargeHasReceipts: $chargeHasReceipts
+      virtualCards: $virtualCards
+    ) {
+      totalCount
+      offset
+      limit
+      nodes {
+        id
+        ...ExpensesListFieldsFragment
+        ...ExpensesListAdminFieldsFragment
+      }
+    }
+  }
+  ${expensesListFieldsFragment}
+  ${expensesListAdminFieldsFragment}
+  ${expenseHostFields}
+  ${hostInfoCardFields}
 `;
-};
-/* eslint-enable */
+
+const viewCountsQuery = gql`
+  query HostDashboardExpensesViewCounts($hostSlug: String!) {
+    ready_to_pay: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: READY_TO_PAY) {
+      totalCount
+    }
+    scheduled_for_payment: expenses(
+      host: { slug: $hostSlug }
+      limit: 0
+      offset: 0
+      status: SCHEDULED_FOR_PAYMENT
+      payoutMethodType: BANK_ACCOUNT
+    ) {
+      totalCount
+    }
+    on_hold: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: ON_HOLD) {
+      totalCount
+    }
+    incomplete: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: INCOMPLETE) {
+      totalCount
+    }
+  }
+`;
 
 /**
  * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
@@ -198,19 +195,19 @@ const initViews = [
     label: 'Ready to pay',
     query: { status: 'READY_TO_PAY', orderBy: 'CREATED_AT,ASC' },
     showCount: true,
-    id: 'ready-to-pay',
+    id: 'ready_to_pay',
   },
   {
     label: 'Scheduled for payment',
     query: { status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', orderBy: 'CREATED_AT,ASC' },
     showCount: true,
-    id: 'scheduled-for-payment',
+    id: 'scheduled_for_payment',
   },
   {
     label: 'On hold',
     query: { status: 'ON_HOLD', orderBy: 'CREATED_AT,ASC' },
     showCount: true,
-    id: 'on-hold',
+    id: 'on_hold',
   },
   {
     label: 'Incomplete',
@@ -221,7 +218,7 @@ const initViews = [
   {
     label: 'Paid',
     query: { status: 'PAID' },
-    id: 'recently-paid',
+    id: 'recently_paid',
   },
 ];
 
@@ -243,9 +240,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
       },
     },
   });
-  const hostDashboardExpensesQuery = createHostDashboardExpensesQuery(
-    expensePipelineFeatureIsEnabled ? initViews : null,
-  );
+
   const expenses = useQuery(hostDashboardExpensesQuery, {
     variables: {
       ...queryVariables,
@@ -254,6 +249,13 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
     },
     context: API_V2_CONTEXT,
   });
+
+  const { data: viewCounts } = useQuery(viewCountsQuery, {
+    variables: { hostSlug },
+    context: API_V2_CONTEXT,
+    skip: !expensePipelineFeatureIsEnabled,
+  });
+
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
   React.useEffect(() => {
     if (query.paypalApprovalError && !paypalPreApprovalError) {
@@ -266,16 +268,16 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   const [views, setViews] = React.useState(initViews);
 
   React.useEffect(() => {
-    if (data) {
-      const viewsUpToDate = views.map((view, i) => {
+    if (viewCounts) {
+      const viewsUpToDate = views.map(view => {
         return {
           ...view,
-          count: data[`view${i}`]?.totalCount,
+          count: viewCounts[view.id]?.totalCount,
         };
       });
       setViews(viewsUpToDate);
     }
-  }, [data]);
+  }, [viewCounts]);
 
   const getQueryParams = newParams => {
     return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
