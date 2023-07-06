@@ -96,6 +96,7 @@ const hostDashboardExpensesQuery = gql`
       }
     }
   }
+
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
   ${expenseHostFields}
