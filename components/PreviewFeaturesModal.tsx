@@ -1,6 +1,8 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
+import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
@@ -11,8 +13,21 @@ import InputSwitch from './InputSwitch';
 import Link from './Link';
 import StyledCard from './StyledCard';
 import StyledModal, { ModalBody, ModalHeader } from './StyledModal';
-import StyledTag from './StyledTag';
 import { H2, H4, P } from './Text';
+
+const Pill = styled.div`
+  font-size: 12px;
+  font-weight: 400;
+  border: 1px solid ${props => props.color};
+  color: ${props => props.color};
+  border-radius: 100px;
+  background: white;
+  display: inline-block;
+  padding: 4px 8px;
+  line-height: 12px;
+  margin-left: 8px;
+  vertical-align: middle;
+`;
 
 const editAccountSettingsMutation = gql`
   mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
@@ -49,22 +64,14 @@ const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
     <StyledCard mt={3} key={feature.title} display="flex" justifyContent="space-between" p={'20px'}>
       <Flex flexDirection="column">
         <H4 fontSize="18px" fontWeight={700} letterSpacing="0" color="black.700" mb={1}>
-          {feature.title}{' '}
-          <StyledTag
-            variant="rounded"
-            type={feature.publicBeta ? 'success' : 'info'}
-            fontWeight={600}
-            fontSize="12px"
-            p="4px 8px"
-            ml={1}
-            verticalAlign="middle"
-          >
+          {feature.title}
+          <Pill color={feature.publicBeta ? themeGet('colors.green.600') : themeGet('colors.primary.600')}>
             {feature.publicBeta ? (
               <FormattedMessage id="PreviewFeatures.publicBeta" defaultMessage="Public Beta" />
             ) : (
               <FormattedMessage id="PreviewFeatures.closedBeta" defaultMessage="Closed Beta" />
             )}
-          </StyledTag>
+          </Pill>
         </H4>
         <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.700" letterSpacing={0}>
           {feature.description}
