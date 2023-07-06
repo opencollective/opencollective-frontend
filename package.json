@@ -302,7 +302,11 @@
       "@shopify/address",
       "jest-styled-components",
       "storybook-addon-designs",
-      "styled-jsx"
+      "styled-jsx",
+      "tailwindcss",
+      "autoprefixer",
+      "postcss",
+      "prettier-plugin-tailwindcss"
     ]
   }
 }
