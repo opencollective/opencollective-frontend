@@ -40,6 +40,7 @@ const MenuLink = styled(Link)`
   display: flex;
   align-items: center;
   grid-gap: 8px;
+  font-size: 14px;
   cursor: pointer;
   &:hover {
     background: #f7f8fa;

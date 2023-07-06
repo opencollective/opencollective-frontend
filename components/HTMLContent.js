@@ -39,6 +39,9 @@ const ReadFullLink = styled.a`
 
 const InlineDisplayBox = styled.div`
   overflow-y: hidden;
+  p {
+    margin: 1em 0;
+  }
   ${props => props.maxHeight && `max-height: ${props.maxHeight + 20}px;`}
 `;
 

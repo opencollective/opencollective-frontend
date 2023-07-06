@@ -135,6 +135,9 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
               setExpanded(!expanded);
             }}
             flexShrink={0}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
           >
             {expanded ? <ChevronUp size="16px" /> : <ChevronDown size="16px" />}
           </StyledRoundButton>
