@@ -18,7 +18,15 @@ export function gql(source: "\n  mutation ConfirmContribution($order: OrderUpdat
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  mutation CancelRecurringContribution($order: OrderReferenceInput!, $reason: String!, $reasonCode: String!) {\n    cancelOrder(order: $order, reason: $reason, reasonCode: $reasonCode) {\n      id\n      status\n    }\n  }\n"): typeof import('./graphql').CancelRecurringContributionDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query tagStats($host: AccountReferenceInput) {\n    tagStats(host: $host, limit: 5) {\n      nodes {\n        id\n        tag\n      }\n    }\n  }\n"): typeof import('./graphql').TagStatsDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query PaypalPlanQuery(\n    $account: AccountReferenceInput!\n    $tier: TierReferenceInput\n    $amount: AmountInput!\n    $frequency: ContributionFrequency!\n  ) {\n    paypalPlan(account: $account, tier: $tier, amount: $amount, frequency: $frequency) {\n      id\n    }\n  }\n"): typeof import('./graphql').PaypalPlanQueryDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -75,6 +83,10 @@ export function gql(source: "\n  query IsUserFollowingConversation($id: String!)
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  fragment UpdateListFragment on UpdateCollection {\n    totalCount\n    offset\n    limit\n    nodes {\n      id\n      slug\n      title\n      summary\n      createdAt\n      publishedAt\n      isPrivate\n      userCanSeeUpdate\n      fromAccount {\n        id\n        type\n        name\n        slug\n        imageUrl\n      }\n    }\n  }\n"): typeof import('./graphql').UpdateListFragmentFragmentDoc;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query DashboardRecurringContributions($slug: String!) {\n    account(slug: $slug) {\n      id\n      legacyId\n      slug\n      name\n      type\n      settings\n      imageUrl\n      ... on AccountWithParent {\n        parent {\n          id\n          slug\n        }\n      }\n      recurring: orders(filter: OUTGOING, onlyActiveSubscriptions: true, includeIncognito: true) {\n        totalCount\n        nodes {\n          id\n          ...ManagedOrderFields\n        }\n      }\n      oneTime: orders(\n        filter: OUTGOING\n        frequency: ONETIME\n        status: [PAID, REQUIRE_CLIENT_CONFIRMATION, PROCESSING, IN_REVIEW, DISPUTED, PENDING, REFUNDED, ERROR]\n        includeIncognito: true\n      ) {\n        totalCount\n        nodes {\n          id\n          ...ManagedOrderFields\n        }\n      }\n      canceled: orders(filter: OUTGOING, status: [CANCELLED], includeIncognito: true) {\n        totalCount\n        nodes {\n          id\n          ...ManagedOrderFields\n        }\n      }\n    }\n  }\n  \n"): typeof import('./graphql').DashboardRecurringContributionsDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -171,6 +183,14 @@ export function gql(source: "\n  query SelectedAccountInfo($account: String!) {\
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query ScheduledExpensesBanner($hostSlug: String!, $limit: Int!, $payoutMethodType: PayoutMethodType) {\n    host(slug: $hostSlug) {\n      id\n      currency\n      transferwise {\n        id\n        amountBatched {\n          valueInCents\n          currency\n        }\n      }\n    }\n    expenses(\n      host: { slug: $hostSlug }\n      status: SCHEDULED_FOR_PAYMENT\n      limit: $limit\n      payoutMethodType: $payoutMethodType\n    ) {\n      totalCount\n      offset\n      limit\n      nodes {\n        id\n      }\n    }\n  }\n"): typeof import('./graphql').ScheduledExpensesBannerDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment ManagedOrderFields on Order {\n    id\n    legacyId\n    nextChargeDate\n    paymentMethod {\n      id\n      service\n      name\n      type\n      expiryDate\n      data\n      balance {\n        value\n        valueInCents\n        currency\n      }\n    }\n    amount {\n      value\n      valueInCents\n      currency\n    }\n    totalAmount {\n      value\n      valueInCents\n      currency\n    }\n    status\n    description\n    createdAt\n    processedAt\n    frequency\n    tier {\n      id\n      name\n    }\n    totalDonations {\n      value\n      valueInCents\n      currency\n    }\n    fromAccount {\n      id\n      name\n      slug\n      isIncognito\n      type\n    }\n    toAccount {\n      id\n      slug\n      name\n      type\n      description\n      tags\n      imageUrl(height: 96)\n      backgroundImageUrl(height: 256)\n      settings\n      ... on AccountWithHost {\n        host {\n          id\n          slug\n          paypalClientId\n          supportedPaymentMethods\n        }\n      }\n      ... on Organization {\n        host {\n          id\n          slug\n          paypalClientId\n          supportedPaymentMethods\n        }\n      }\n    }\n    platformTipAmount {\n      value\n      valueInCents\n    }\n  }\n"): typeof import('./graphql').ManagedOrderFieldsFragmentDoc;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query RecurringContributions($slug: String!) {\n    account(slug: $slug) {\n      id\n      legacyId\n      slug\n      name\n      type\n      settings\n      imageUrl\n      features {\n        id\n        ...NavbarFields\n      }\n      ... on AccountWithParent {\n        parent {\n          id\n          slug\n        }\n      }\n      orders(filter: OUTGOING, onlySubscriptions: true, includeIncognito: true) {\n        totalCount\n        nodes {\n          id\n          ...ManagedOrderFields\n        }\n      }\n    }\n  }\n  \n  \n"): typeof import('./graphql').RecurringContributionsDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
