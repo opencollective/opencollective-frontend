@@ -37,7 +37,7 @@ const AdminPanelSideBar = ({
     <SidebarContainer {...props} flexGrow={0} flexShrink={0} width={['100%', '100%', '280px']}>
       <Sticky p={[2, 3, '20px']} pt={[3, 3, '28px']}>
         <MenuContainer>
-          <AccountSwitcher activeSlug={activeSlug} isLoading={isLoading} />
+          <AccountSwitcher activeSlug={activeSlug} />
 
           <Box py={2}>
             {isLoading ? (

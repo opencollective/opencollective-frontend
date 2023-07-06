@@ -18,8 +18,8 @@ const SearchButton = styled(StyledButton)`
   flex-shrink: 4;
   border-color: #e6e8eb;
   @media screen and (max-width: 52em) {
-    width: 32px;
-    min-width: 32px;
+    width: 36px;
+    min-width: 36px;
     padding: 0;
     display: flex;
     align-items: center;

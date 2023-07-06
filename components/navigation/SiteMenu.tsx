@@ -31,7 +31,7 @@ const StyledMenuButton = styled(StyledButton)`
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
   white-space: nowrap;
-  border: 1px solid #e6e8eb;
+  border: 1px solid transparent;
 
   @media (hover: hover) {
     :hover {
