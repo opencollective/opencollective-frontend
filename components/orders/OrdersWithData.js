@@ -23,7 +23,6 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
-import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
 
 import OrdersFilters from './OrdersFilters';
@@ -185,21 +184,19 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
   }, [LoggedInUser]);
 
   return (
-    <Box maxWidth={1000} width="100%" m="0 auto" px={2}>
-      <Flex mb={24} alignItems="center" flexWrap="wrap">
-        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
+    <Box maxWidth={1000} width="100%" m="0 auto">
+      <Flex mb={16} alignItems="start" flexWrap="wrap">
+        <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
           {title || <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
         </H1>
         <Box mx="auto" />
-        <Box p={2}>
-          <SearchBar
-            defaultValue={router.query.searchTerm}
-            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-            placeholder={intl.formatMessage(messages.searchPlaceholder)}
-          />
-        </Box>
+        <SearchBar
+          defaultValue={router.query.searchTerm}
+          onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
+          placeholder={intl.formatMessage(messages.searchPlaceholder)}
+          height={36}
+        />
       </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
       <Flex mb={34}>
         <Box flexGrow="1" mr="18px">
           {data?.account ? (

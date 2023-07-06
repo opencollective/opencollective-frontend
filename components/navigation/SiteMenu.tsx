@@ -22,8 +22,8 @@ const StyledMenuButton = styled(StyledButton)`
   color: #334155;
   font-weight: 500;
   font-size: 14px;
-  height: 32px;
-  width: 32px;
+  height: 36px;
+  width: 36px;
   padding: 0;
   border-radius: 100px;
 
@@ -31,12 +31,13 @@ const StyledMenuButton = styled(StyledButton)`
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
   white-space: nowrap;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e6e8eb;
 
   @media (hover: hover) {
     :hover {
       color: #0f172a;
       background-color: #f1f5f9;
+      border: 1px solid #e6e8eb;
     }
   }
 `;
@@ -71,9 +72,9 @@ export default function SiteMenu() {
           <Flex p={3} justifyContent="space-between" gridGap={3}>
             <Flex alignItems="start" gridGap={2}>
               <Link href={LoggedInUser ? '/dashboard' : '/'} onClick={onClose}>
-                <Image width="32" height="32" src="/static/images/opencollective-icon.png" alt="Open Collective" />
+                <Image width="36" height="36" src="/static/images/opencollective-icon.png" alt="Open Collective" />
               </Link>
-              <Flex height="32px" alignItems="center">
+              <Flex height="36px" alignItems="center">
                 <Image height={20} width={120} src="/static/images/logotype.svg" alt="Open Collective" />
               </Flex>
             </Flex>

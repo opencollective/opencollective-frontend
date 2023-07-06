@@ -25,14 +25,15 @@ const MenuLinkContainer = styled.li`
     font-weight: 600;
     font-size: 14px;
     line-height: 20px;
-    padding: 8px;
-    border-radius: 6px;
+    padding: 8px 14px;
+    border-radius: 100px;
     -webkit-font-smoothing: antialiased;
     width: 100%;
     cursor: pointer;
 
     svg {
       flex-shrink: 0;
+      color: #9ca3af;
     }
 
     ${props =>
@@ -43,12 +44,18 @@ const MenuLinkContainer = styled.li`
             &:hover {
               color: ${props => props.theme.colors.primary[700]} !important;
             }
+            svg {
+              color: ${props => props.theme.colors.primary[700]} !important;
+            }
           `
         : css`
-            color: ${props => props.theme.colors.black[900]} !important;
+            color: ${props => props.theme.colors.black[800]} !important;
             &:hover {
               color: ${props => props.theme.colors.primary[700]} !important;
               background: ${props => props.theme.colors.black[50]};
+              svg {
+                color: ${props => props.theme.colors.primary[700]} !important;
+              }
             }
           `}
 
@@ -120,7 +127,8 @@ export const MenuLink = ({
   const renderButtonContent = () => (
     <Flex alignItems="center" justifyContent="space-between" flex={1}>
       <Flex alignItems="center" gridGap="8px">
-        {icon}
+        {icon?.component ? <icon.component strokeWidth={1.5} size={20} /> : icon}
+
         <Span truncateOverflow>
           {children}
           {isBeta ? ' (Beta)' : ''}
@@ -186,6 +194,7 @@ export const MenuSectionHeader = styled.div`
   font-size: 12px;
   line-height: 24px;
   margin-bottom: 6px;
+  padding: 0 12px;
 
   color: ${props => props.theme.colors.black[600]};
 `;

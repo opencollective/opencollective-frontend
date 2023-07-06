@@ -18,8 +18,7 @@ const SidebarContainer = styled(Box)`
   }
 `;
 
-const Sticky = styled.div`
-  padding: 16px;
+const Sticky = styled(Box)`
   position: sticky;
   top: 0;
   z-index: 10;
@@ -36,7 +35,7 @@ const AdminPanelSideBar = ({
 }) => {
   return (
     <SidebarContainer {...props} flexGrow={0} flexShrink={0} width={['100%', '100%', '280px']}>
-      <Sticky>
+      <Sticky p={[2, 3, '20px']} pt={[3, 3, '28px']}>
         <MenuContainer>
           <AccountSwitcher activeSlug={activeSlug} isLoading={isLoading} />
 

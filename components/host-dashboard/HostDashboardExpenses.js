@@ -203,25 +203,25 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   };
 
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
-      <Flex mb={24} alignItems="center" flexWrap="wrap">
-        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
+    <Box maxWidth={1000} m="0 auto">
+      <Flex mb={16} alignItems="start" flexWrap="wrap">
+        <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         </H1>
+
         <Box mx="auto" />
-        <Box p={2}>
-          <SearchBar
-            defaultValue={query.searchTerm}
-            onSubmit={searchTerm =>
-              router.push({
-                pathname: pageRoute,
-                query: getQueryParams({ searchTerm, offset: null }),
-              })
-            }
-          />
-        </Box>
+        <SearchBar
+          defaultValue={query.searchTerm}
+          height={36}
+          onSubmit={searchTerm =>
+            router.push({
+              pathname: pageRoute,
+              query: getQueryParams({ searchTerm, offset: null }),
+            })
+          }
+        />
       </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
+      {/* <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" /> */}
       {paypalPreApprovalError && (
         <DismissibleMessage>
           {({ dismiss }) => (

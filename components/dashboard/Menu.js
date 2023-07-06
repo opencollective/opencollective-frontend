@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  ArrowLeftRight as Transfer,
+  ArrowLeftRight,
   BarChart3 as Chart,
   Coins,
   CreditCard,
@@ -46,40 +46,40 @@ const Menu = ({ isAccountantOnly }) => {
         <MenuSectionHeader>
           <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
         </MenuSectionHeader>
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_EXPENSES} icon={<Receipt size={16} />} />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} icon={<Coins size={16} />} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_EXPENSES} icon={{ component: Receipt }} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} icon={{ component: Coins }} />
 
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS}
-          icon={<Coins size={16} />}
+          icon={{ component: Coins }}
           if={!isAccountantOnly}
         />
 
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS}
-          icon={<FileText size={16} />}
+          icon={{ component: FileText }}
           if={isInternalHost(account)}
         />
 
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS}
           if={!isAccountantOnly}
-          icon={<Inbox size={16} />}
+          icon={{ component: Inbox }}
         />
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES}
           if={!isAccountantOnly}
-          icon={<Network size={16} />}
+          icon={{ component: Network }}
         />
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS}
-          icon={<CreditCard size={16} />}
+          icon={{ component: CreditCard }}
           if={!isAccountantOnly && hasFeature(account, FEATURES.VIRTUAL_CARDS)}
         />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} isBeta icon={<Chart size={16} />} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} isBeta icon={{ component: Chart }} />
 
         <MenuLink
-          icon={<Settings size={16} />}
+          icon={{ component: Settings }}
           if={isHost && !isAccountantOnly}
           section="FISCAL_HOST_SETTINGS"
           goToSection={FISCAL_HOST_SECTIONS.FISCAL_HOSTING}
@@ -121,22 +121,22 @@ const Menu = ({ isAccountantOnly }) => {
             )}
           </MenuSectionHeader>
         )}
-        <MenuLink section={COLLECTIVE_SECTIONS.HOME} icon={<Home size={16} />} if={isIndividual} />
-        <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTIONS} icon={<Coins size={16} />} if={isIndividual} />
-        <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} icon={<Receipt size={16} />} />
+        <MenuLink section={COLLECTIVE_SECTIONS.OVERVIEW} icon={{ component: Home }} if={isIndividual} />
+        <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTIONS} icon={{ component: Coins }} if={isIndividual} />
+        <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} icon={{ component: Receipt }} />
         <MenuLink
           section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS}
-          icon={<Coins size={16} />}
+          icon={{ component: Coins }}
           if={!isAccountantOnly && !isIndividual}
         />
         <MenuLink
           section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
-          icon={<Coins size={16} />}
+          icon={{ component: Coins }}
           if={isSelfHostedAccount(account) && !isAccountantOnly && isType(account, COLLECTIVE)}
         />
-        <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} icon={<Transfer size={16} />} />
+        <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} icon={{ component: ArrowLeftRight }} />
         <MenuLink
-          icon={<Settings size={16} />}
+          icon={{ component: Settings }}
           if={!isHost || isUserHost}
           section="SETTINGS"
           goToSection={COLLECTIVE_SECTIONS.INFO}
@@ -245,7 +245,7 @@ const Menu = ({ isAccountantOnly }) => {
         </MenuLink>
         {/* org settings for hosts */}
         <MenuLink
-          icon={<Settings size={16} />}
+          icon={{ component: Settings }}
           if={isType(account, ORGANIZATION) && isHost}
           section="ORG_SETTINGS"
           goToSection={isAccountantOnly ? ALL_SECTIONS.PAYMENT_RECEIPTS : ABOUT_ORG_SECTIONS.INFO}

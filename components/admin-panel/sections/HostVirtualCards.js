@@ -17,7 +17,7 @@ import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
 import Pagination from '../../Pagination';
 import StyledButton from '../../StyledButton';
-import { P } from '../../Text';
+import { P, H1 } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import VirtualCardFilters from '../../VirtualCardFilters';
 
@@ -195,10 +195,10 @@ const HostVirtualCards = props => {
   return (
     <Fragment>
       <Box>
-        <P fontSize="24px" fontWeight="700" lineHeight="32px" mb={3}>
+        <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
           <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
-        </P>
-        <P>
+        </H1>
+        <P mt={1} color="black.600" fontSize="14px" lineHeight="20px">
           <FormattedMessage
             id="Host.VirtualCards.List.Description"
             defaultMessage="Make payments easier by creating virtual cards. One Collective can have multiple virtual cards. <learnMoreLink>Learn more</learnMoreLink>"
@@ -210,7 +210,7 @@ const HostVirtualCards = props => {
             }}
           />
         </P>
-        <Flex mt={3} flexDirection={['row', 'column']}>
+        <Flex mt={4} flexDirection={['row', 'column']}>
           <VirtualCardFilters
             loading={loading}
             collectivesFilter={queryFilter.values.collectiveSlugs}

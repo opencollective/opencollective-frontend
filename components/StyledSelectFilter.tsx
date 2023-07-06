@@ -11,7 +11,7 @@ import { Span } from './Text';
 const TruncatedItemsList = styled(Span).attrs({
   truncateOverflow: true,
   pl: 2,
-  maxWidth: ['calc(100vw - 135px)', '75px', '175px', '200px'],
+  maxWidth: ['75px', '175px', '200px'],
 })`
   display: inline-block;
   max-width: 75px;

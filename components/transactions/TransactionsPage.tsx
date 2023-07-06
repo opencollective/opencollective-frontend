@@ -189,37 +189,25 @@ const Transactions = ({
 
   return (
     <Container>
-      <Flex justifyContent="space-between" alignItems="baseline">
-        <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-          <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
-        </H1>
-        <Box flexGrow={[1, 0]}>
-          <SearchBar
-            placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…' })}
-            defaultValue={router.query.searchTerm}
-            height="40px"
-            onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
-          />
-        </Box>
-      </Flex>
       <Flex
-        mb={['8px', '23px']}
-        mt={4}
-        mx="8px"
+        gridGap={3}
         justifyContent="space-between"
+        alignItems={['stretch', 'start']}
         flexDirection={['column', 'row']}
-        alignItems={['stretch', 'flex-end']}
       >
-        <TransactionsFilters
-          filters={router.query}
-          kinds={transactions?.kinds}
-          paymentMethodTypes={transactions?.paymentMethodTypes}
-          collective={account}
-          onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
-        />
-        <Flex>
-          {canDownloadInvoices && (
-            <Box mr="8px">
+        {isDashboard ? (
+          <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
+            <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
+          </H1>
+        ) : (
+          <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+            <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
+          </H1>
+        )}
+
+        <Flex gridGap={2} flexDirection={['column-reverse', 'row']}>
+          <Flex gridGap={2}>
+            {canDownloadInvoices && (
               <Link href={`/${account.slug}/admin/payment-receipts`}>
                 <StyledButton
                   buttonSize="small"
@@ -235,10 +223,33 @@ const Transactions = ({
                   <IconDownload size="13px" style={{ marginLeft: '8px' }} />
                 </StyledButton>
               </Link>
-            </Box>
-          )}
-          <TransactionsDownloadCSV collective={account} query={router.query} />
+            )}
+            <TransactionsDownloadCSV collective={account} query={router.query} />
+          </Flex>
+          <SearchBar
+            placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…' })}
+            defaultValue={router.query.searchTerm}
+            height="36px"
+            onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
+          />
         </Flex>
+      </Flex>
+
+      <Flex
+        mb={['8px', '23px']}
+        mt={2}
+        mx="8px"
+        justifyContent="space-between"
+        flexDirection={['column', 'row']}
+        alignItems={['stretch', 'flex-end']}
+      >
+        <TransactionsFilters
+          filters={router.query}
+          kinds={transactions?.kinds}
+          paymentMethodTypes={transactions?.paymentMethodTypes}
+          collective={account}
+          onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
+        />
       </Flex>
 
       <Flex

@@ -77,7 +77,7 @@ const MainNavItem = styled(Link)`
   flex-shrink: 1;
   color: #0f172a;
   font-size: 14px;
-  height: 32px;
+  height: 36px;
   padding: 0 12px;
   border-radius: 100px;
   white-space: nowrap;
@@ -164,21 +164,21 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
   return (
     <Fragment>
       <Flex
-        px={[2, 3]}
+        px={[2, 3, '20px']}
         alignItems="center"
         flexDirection="row"
         justifyContent="space-between"
-        css={{ height: theme.sizes.navbarHeight, background: 'white', borderBottom: '1px solid rgb(232, 233, 235)' }}
+        css={{ height: theme.sizes.navbarHeight, background: 'white', borderBottom: '1px solid #e6e8eb' }}
         ref={ref}
-        gridGap={2}
+        gridGap={[2, '12px']}
       >
-        <Flex alignItems="center" gridGap={[2, 3]}>
+        <Flex alignItems="center" gridGap={[2, '12px']}>
           <SiteMenu />
 
           <Box flexShrink={0}>
             <Link href={ocLogoRoute}>
               <Flex alignItems="center" gridGap={2}>
-                <Image width="32" height="32" src="/static/images/opencollective-icon.png" alt="Open Collective" />
+                <Image width="36" height="36" src="/static/images/opencollective-icon.png" alt="Open Collective" />
                 {onHomeRoute && (
                   <Hide xs sm md display="flex" alignItems="center">
                     <Image height={20} width={120} src="/static/images/logotype.svg" alt="Open Collective" />
@@ -326,7 +326,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
             <Fragment>
               <SearchTrigger setShowSearchModal={setShowSearchModal} />
               <Hide xs>
-                <ChangelogTrigger height="32px" width="32px" />
+                <ChangelogTrigger height="36px" width="36px" />
               </Hide>
               <ProfileMenu />
             </Fragment>

@@ -58,7 +58,7 @@ const ProfileDrawer = ({ onClose, open }) => {
         <React.Fragment>
           <ProfileHeader>
             <Flex gridGap={2} alignItems="center" overflow="hidden">
-              <Avatar collective={LoggedInUser.collective} radius={32} />
+              <Avatar collective={LoggedInUser.collective} radius={36} />
               <Box overflow="hidden">
                 <div className="name">{LoggedInUser.collective.name}</div>
                 <div className="email">{LoggedInUser.email}</div>
@@ -144,7 +144,7 @@ const ProfileMenu = () => {
     <React.Fragment>
       <StyledProfileButton isBorderless onClick={() => setShowProfileMenu(true)}>
         <Flex alignItems="center" data-cy="user-menu-trigger" gridGap={2}>
-          <Avatar collective={get(LoggedInUser, 'collective')} radius={32} />
+          <Avatar collective={get(LoggedInUser, 'collective')} radius={36} />
         </Flex>
       </StyledProfileButton>
       <ProfileDrawer open={showProfileMenu} onClose={() => setShowProfileMenu(false)} />

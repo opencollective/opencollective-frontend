@@ -61,7 +61,8 @@ const FISCAL_HOST_SETTINGS_SECTIONS = {
 const Title = styled(H2)`
   font-size: 24px;
   font-weight: 700;
-  line-height: 32px;
+  line-height: 36px;
+  letter-spacing: -0.025em;
 `;
 
 const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {

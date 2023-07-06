@@ -304,7 +304,7 @@ const TableWrapper = styled.div`
   }
 `;
 
-const Home = ({ account }: AdminSectionProps) => {
+const Contributions = ({ account }: AdminSectionProps) => {
   const { data, loading } = useQuery(manageContributionsQuery, {
     variables: { slug: account.slug },
     context: API_V2_CONTEXT,
@@ -327,7 +327,7 @@ const Home = ({ account }: AdminSectionProps) => {
 
   return (
     <Container>
-      <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+      <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
         <FormattedMessage id="Contributions" defaultMessage="Contributions" />
       </H1>
       <StyledTabs tabs={tabs} selectedId={tab} onChange={setTab} mt="24px" />
@@ -352,4 +352,4 @@ const Home = ({ account }: AdminSectionProps) => {
   );
 };
 
-export default Home;
+export default Contributions;

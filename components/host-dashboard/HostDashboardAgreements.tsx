@@ -102,9 +102,9 @@ const HostDashboardAgreements = ({ hostSlug }) => {
 
   const canEdit = Boolean(LoggedInUser && !LoggedInUser.isAccountantOnly(data?.host));
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
-      <Flex mb={24} justifyContent="space-between" alignItems="center" flexWrap="wrap" gridGap="16px">
-        <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+    <Box maxWidth={1000} m="0 auto">
+      <Flex mb={24} justifyContent="space-between" alignItems="start" flexWrap="wrap" gridGap="16px">
+        <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
           <FormattedMessage id="Agreements" defaultMessage="Agreements" />
         </H1>
         <Flex alignItems="center" gridGap="16px" flexWrap="wrap">
@@ -112,7 +112,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
             inputId="agreements-account"
             data-cy="select-agreements-account"
             width="300px"
-            styles={{ control: { borderRadius: '100px', padding: '3px 16px' } }}
+            styles={{ control: { borderRadius: '100px', padding: '0px 16px' } }}
             placeholder={intl.formatMessage({ defaultMessage: 'Filter by account' })}
             hostCollectiveIds={[data?.host?.legacyId]}
             isClearable
@@ -131,7 +131,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
               data-cy="btn-new-agreement"
               buttonStyle="primary"
               buttonSize="tiny"
-              height="40px"
+              height="36px"
               disabled={loading || loadingLoggedInUser}
               onClick={() => {
                 setAgreementInDrawer(null);
@@ -146,7 +146,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
           )}
         </Flex>
       </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
+      {/* <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" /> */}
       {error ? (
         <MessageBoxGraphqlError error={error} my={4} />
       ) : (

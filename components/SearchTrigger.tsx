@@ -10,13 +10,13 @@ import StyledButton from './StyledButton';
 const SearchButton = styled(StyledButton)`
   color: #6b7280;
   font-weight: 400;
-  height: 32px;
+  height: 36px;
   padding: 0 12px;
   max-width: 280px;
   width: 280px;
   min-width: 120px;
   flex-shrink: 4;
-
+  border-color: #e6e8eb;
   @media screen and (max-width: 52em) {
     width: 32px;
     min-width: 32px;
