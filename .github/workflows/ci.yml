@@ -116,7 +116,7 @@ jobs:
       - name: Save .next build (frontend)
         uses: actions/cache/save@v3
         with:
-          path: .next
+          path: dist
           key: ${{ runner.os }}-next-build-${{ github.sha }}
 
   test:
