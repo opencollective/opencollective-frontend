@@ -123,11 +123,11 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Pending Applications',
   },
   [ALL_SECTIONS.OVERVIEW]: {
-    id: 'AdminPanel.Menu.Overview',
+    id: 'Dashboard.Overview.Title',
     defaultMessage: 'Overview',
   },
   [ALL_SECTIONS.BUDGET_MANAGEMENT]: {
-    id: 'AdminPanel.Menu.Overview',
+    id: 'Dashboard.Overview.Title',
     defaultMessage: 'Overview',
   },
   [ALL_SECTIONS.COLLECTIVES]: {

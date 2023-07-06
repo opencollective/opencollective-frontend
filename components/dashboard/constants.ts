@@ -256,7 +256,7 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Hosted Collectives',
   },
   [ALL_SECTIONS.OVERVIEW]: {
-    id: 'overview',
+    id: 'Dashboard.Overview.Title',
     defaultMessage: 'Overview',
   },
   [ALL_SECTIONS.NOTIFICATIONS]: {
