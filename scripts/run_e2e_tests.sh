@@ -25,7 +25,7 @@ if [ -z "$FRONTEND_FOLDER" ]; then
 else
   cd $FRONTEND_FOLDER
 fi
-npm run start:ci &
+npm run start &
 FRONTEND_PID=$!
 cd -
 
