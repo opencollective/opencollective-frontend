@@ -14,7 +14,7 @@ import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
 import { StyledSelectFilter, TruncatedValueContainer } from '../../../StyledSelectFilter';
-import { H1, H2 } from '../../../Text';
+import { H1, H2, P } from '../../../Text';
 import { AdminSectionProps } from '../../types';
 
 import { workspaceHomeQuery } from './query';
@@ -54,17 +54,24 @@ const Home = (props: AdminSectionProps) => {
 
   return (
     <Container maxWidth={'100%'}>
-      <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-        <FormattedMessage id="Dashboard.Home.Title" defaultMessage="This is your workspace" />
+      <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
+        <FormattedMessage id="Dashboard.Overview.Title" defaultMessage="Overview" />
       </H1>
-      <Flex flexDirection="column" mt="50px">
+      <P mt={1} color="black.600" fontSize="14px" lineHeight="20px" letterSpacing={0}>
+        <FormattedMessage
+          id="Dashboard.Overview.Description"
+          defaultMessage="Here you'll find information about your activity on Open Collective. Check back for new features as we add them."
+        />
+      </P>
+      <Flex flexDirection="column" mt="36px">
         <Flex justifyContent="space-between" alignItems="center" mb="32px">
-          <H2 fontSize="20px" lineHeight="28px" fontWeight="700">
-            <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
+          <H2 fontSize="20px" lineHeight="28px" fontWeight="700" color="black.800">
+            <FormattedMessage id="Dashboard.Overview.ActivityHeader" defaultMessage="Recent activity" />
           </H2>
           <StyledSelectFilter
             intl={intl}
             inputId="activity-filter"
+            placeholder="Select"
             isClearable={false}
             onChange={setFilters}
             options={filterOptions}
@@ -73,7 +80,7 @@ const Home = (props: AdminSectionProps) => {
             closeMenuOnSelect={false}
             hideSelectedOptions={false}
             isMulti
-            maxWidth={['100%', 200, 300]}
+            maxWidth={[300]}
             minWidth={150}
             styles={{
               control: { flexWrap: 'nowrap' },

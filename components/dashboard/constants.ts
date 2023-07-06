@@ -5,12 +5,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
 export const HOST_DASHBOARD_SECTIONS = {
-  // New Host Dashboard
-  BUDGET_MANAGEMENT: 'budget',
-  COLLECTIVES: 'collectives',
-  OVERVIEW: 'info',
   REPORTS: 'reports',
-  // Existing Host Dashboard Sections
   HOST_EXPENSES: 'host-expenses',
   HOST_AGREEMENTS: 'host-agreements',
   FINANCIAL_CONTRIBUTIONS: 'orders',
@@ -49,7 +44,7 @@ export const FISCAL_HOST_SECTIONS = {
 };
 
 export const COLLECTIVE_SECTIONS = {
-  HOME: 'home',
+  OVERVIEW: 'overview',
   CONTRIBUTIONS: 'contributions',
   ADVANCED: 'advanced',
   AUTHORIZED_APPS: 'authorized-apps',
@@ -146,18 +141,6 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.PENDING_APPLICATIONS]: {
     id: 'AdminPanel.Menu.PendingApplications',
     defaultMessage: 'Pending Applications',
-  },
-  [ALL_SECTIONS.OVERVIEW]: {
-    id: 'AdminPanel.Menu.Overview',
-    defaultMessage: 'Overview',
-  },
-  [ALL_SECTIONS.BUDGET_MANAGEMENT]: {
-    id: 'AdminPanel.Menu.Overview',
-    defaultMessage: 'Overview',
-  },
-  [ALL_SECTIONS.COLLECTIVES]: {
-    id: 'Collectives',
-    defaultMessage: 'Collectives',
   },
   [ALL_SECTIONS.REPORTS]: {
     id: 'Reports',
@@ -272,9 +255,9 @@ export const SECTION_LABELS = defineMessages({
     id: 'HostedCollectives',
     defaultMessage: 'Hosted Collectives',
   },
-  [ALL_SECTIONS.HOME]: {
-    id: 'home',
-    defaultMessage: 'Home',
+  [ALL_SECTIONS.OVERVIEW]: {
+    id: 'overview',
+    defaultMessage: 'Overview',
   },
   [ALL_SECTIONS.NOTIFICATIONS]: {
     id: 'NotificationsSettings.Title',

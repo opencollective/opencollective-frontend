@@ -24,8 +24,8 @@ import { H2 } from '../Text';
 
 import Contributions from './sections/Contributions';
 import Expenses from './sections/Expenses';
-import Home from './sections/Home';
 import ManageContributions from './sections/ManageContributions';
+import Overview from './sections/Overview';
 import Transactions from './sections/Transactions';
 import {
   COLLECTIVE_SECTIONS,
@@ -49,7 +49,7 @@ const ADMIN_PANEL_SECTIONS = {
   // NEW
   [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
   [COLLECTIVE_SECTIONS.EXPENSES]: Expenses,
-  [COLLECTIVE_SECTIONS.HOME]: Home,
+  [COLLECTIVE_SECTIONS.OVERVIEW]: Overview,
   [COLLECTIVE_SECTIONS.CONTRIBUTIONS]: Contributions,
   [COLLECTIVE_SECTIONS.TRANSACTIONS]: Transactions,
 };
