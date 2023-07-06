@@ -26,7 +26,7 @@ import { H1, Span } from '../../Text';
 import { AdminSectionProps } from '../types';
 
 const manageContributionsQuery = gql`
-  query RecurringContributions($slug: String!) {
+  query DashboardRecurringContributions($slug: String!) {
     account(slug: $slug) {
       id
       legacyId
