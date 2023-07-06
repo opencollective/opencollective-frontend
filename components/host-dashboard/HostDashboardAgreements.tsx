@@ -18,7 +18,6 @@ import { Box, Flex } from '../Grid';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import StyledButton from '../StyledButton';
-import StyledHr from '../StyledHr';
 import { H1, Span } from '../Text';
 
 const hostDashboardAgreementsQuery = gql`

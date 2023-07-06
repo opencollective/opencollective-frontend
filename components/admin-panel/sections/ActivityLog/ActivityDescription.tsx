@@ -14,7 +14,6 @@ import Avatar from '../../../Avatar';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import LinkExpense from '../../../LinkExpense';
-import { Span } from '../../../Text';
 
 const ResourceTag = styled.div`
   display: inline-block;

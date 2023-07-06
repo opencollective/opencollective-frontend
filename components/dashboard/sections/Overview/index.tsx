@@ -57,7 +57,7 @@ const Home = (props: AdminSectionProps) => {
       <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
         <FormattedMessage id="Dashboard.Overview.Title" defaultMessage="Overview" />
       </H1>
-      <P mt={1} color="black.600" fontSize="14px" lineHeight="20px" letterSpacing={0}>
+      <P mt={1} color="black.700" fontSize="14px" lineHeight="20px" letterSpacing={0}>
         <FormattedMessage
           id="Dashboard.Overview.Description"
           defaultMessage="Here you'll find information about your activity on Open Collective. Check back for new features as we add them."

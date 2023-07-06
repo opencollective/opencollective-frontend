@@ -29,7 +29,6 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
-import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
 
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';

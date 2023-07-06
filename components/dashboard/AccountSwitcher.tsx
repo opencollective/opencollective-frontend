@@ -1,7 +1,7 @@
 import React from 'react';
 import { css } from '@styled-system/css';
 import { flatten, groupBy, omit, uniqBy } from 'lodash';
-import { ArrowRight, ArrowRightFromLine, ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';

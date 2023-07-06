@@ -1,4 +1,6 @@
 import React from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -14,9 +16,7 @@ import HTMLContent from '../../../HTMLContent';
 import Link from '../../../Link';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import StyledLink from '../../../StyledLink';
-import { P, Span } from '../../../Text';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
+import { P } from '../../../Text';
 
 dayjs.extend(relativeTime);
 const ItemHeaderWrapper = styled(P)`
