@@ -267,7 +267,7 @@ export default function VirtualCardsTable(props: VirtualCardsTableProps) {
           emptyMessage={() => (
             <div>
               <P fontSize="16px">
-                <FormattedMessage defaultMessage="No agreements" />
+                <FormattedMessage defaultMessage="No virtual cards" />
               </P>
             </div>
           )}
