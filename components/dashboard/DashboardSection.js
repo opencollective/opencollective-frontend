@@ -12,7 +12,7 @@ import NotificationsSettings from '../admin-panel/sections/NotificationsSettings
 import PendingContributions from '../admin-panel/sections/PendingContributions';
 import TeamSettings from '../admin-panel/sections/Team';
 import Container from '../Container';
-import { Box } from '../Grid';
+import { Box, Flex } from '../Grid';
 import PendingApplications from '../host-dashboard/applications/PendingApplications';
 import HostDashboardAgreements from '../host-dashboard/HostDashboardAgreements';
 import HostDashboardExpenses from '../host-dashboard/HostDashboardExpenses';
@@ -20,13 +20,15 @@ import HostDashboardHostedCollectives from '../host-dashboard/HostDashboardHoste
 import HostDashboardReports from '../host-dashboard/HostDashboardReports';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
-import { H2 } from '../Text';
-
+import { H1, H2, P } from '../Text';
+import TopSideBar from './TopSideBar';
 import Contributions from './sections/Contributions';
 import Expenses from './sections/Expenses';
 import ManageContributions from './sections/ManageContributions';
 import Overview from './sections/Overview';
 import Transactions from './sections/Transactions';
+import { FormattedMessage } from 'react-intl';
+import StyledHr from '../StyledHr';
 import {
   COLLECTIVE_SECTIONS,
   FISCAL_HOST_SECTIONS,
@@ -44,8 +46,8 @@ const ADMIN_PANEL_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: PendingApplications,
   [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
   [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
-  [COLLECTIVE_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
-  [COLLECTIVE_SECTIONS.TEAM]: TeamSettings,
+  // [COLLECTIVE_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
+  // [COLLECTIVE_SECTIONS.TEAM]: TeamSettings,
   // NEW
   [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
   [COLLECTIVE_SECTIONS.EXPENSES]: Expenses,
@@ -56,6 +58,8 @@ const ADMIN_PANEL_SECTIONS = {
 
 const FISCAL_HOST_SETTINGS_SECTIONS = {
   [FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
+  [COLLECTIVE_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
+  [COLLECTIVE_SECTIONS.TEAM]: TeamSettings,
 };
 
 const Title = styled(H2)`
@@ -65,48 +69,60 @@ const Title = styled(H2)`
   letter-spacing: -0.025em;
 `;
 
-const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
+const AdminPanelSection = ({ collective, isLoading, section, subpath, useTopBar }) => {
   const { formatMessage } = useIntl();
 
   if (isLoading) {
     return (
-      <Container width="100%" px={2}>
+      <Flex flex={1} flexDirection="column" alignItems="center" width="100%" px={2}>
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
-      </Container>
+      </Flex>
     );
   }
 
   const AdminSectionComponent = ADMIN_PANEL_SECTIONS[section];
   if (AdminSectionComponent) {
     return (
-      <Container width="100%">
+      <Flex flex={1} justifyContent="start">
         <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} isDashboard={true} />
-      </Container>
+      </Flex>
     );
   }
 
   // Fiscal Host Settings
   const FiscalHostSettingsComponent = FISCAL_HOST_SETTINGS_SECTIONS[section];
-  if (FiscalHostSettingsComponent) {
-    return (
-      <Container width="100%">
-        <FiscalHostSettingsComponent collective={collective} />
-      </Container>
-    );
-  }
 
   // Form
-  if (values(LEGACY_COLLECTIVE_SETTINGS_SECTIONS).includes(section)) {
+  if (values(LEGACY_COLLECTIVE_SETTINGS_SECTIONS).includes(section) || FiscalHostSettingsComponent) {
     return (
-      <Container width="100%">
-        {SECTION_LABELS[section] && (
-          <Box mb={3}>
-            <Title>{formatMessage(SECTION_LABELS[section])}</Title>
-          </Box>
-        )}
-        <AccountSettings account={collective} section={section} />
-      </Container>
+      <Flex flex={1} mx="auto" flexDirection="column" alignItems="start" maxWidth={1200}>
+        <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
+          <FormattedMessage defaultMessage="Settings" />
+        </H1>
+        <P mt={1} color="#71717a" fontSize="14px" lineHeight="20px" letterSpacing={0} fontWeight={400}>
+          <FormattedMessage id="Dashboard.Settings.Description" defaultMessage="Manage your account settings" />
+        </P>
+        <StyledHr my={3} width={'100%'} borderColor="#e5e7eb" />
+        <Flex flex={1} flexDirection="row" gridGap={3}>
+          <TopSideBar />
+
+          <Flex flex={1} flexDirection="column">
+            {FiscalHostSettingsComponent ? (
+              <FiscalHostSettingsComponent collective={collective} account={collective} />
+            ) : (
+              <React.Fragment>
+                {SECTION_LABELS[section] && (
+                  <Box mb={3}>
+                    <Title>{formatMessage(SECTION_LABELS[section])}</Title>
+                  </Box>
+                )}
+                <AccountSettings account={collective} section={section} />
+              </React.Fragment>
+            )}
+          </Flex>
+        </Flex>
+      </Flex>
     );
   }
 

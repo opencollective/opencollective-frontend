@@ -20,7 +20,7 @@ import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import Container from '../Container';
-
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import {
   ABOUT_ORG_SECTIONS,
   ALL_SECTIONS,
@@ -31,6 +31,7 @@ import {
 } from './constants';
 import { DashboardContext } from './DashboardContext';
 import { MenuGroup, MenuLink, MenuSectionHeader } from './MenuComponents';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
@@ -39,13 +40,24 @@ const Menu = ({ isAccountantOnly }) => {
   const isHost = isHostAccount(account);
   const isUserHost = account.isHost === true && isType(account, USER); // for legacy compatibility for users who are hosts
   const isIndividual = isIndividualAccount(account);
+  const { LoggedInUser } = useLoggedInUser();
   return (
     <Container>
       {/** Host dashboard */}
+
       <MenuGroup if={isHost} mb={24}>
         <MenuSectionHeader>
           <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
         </MenuSectionHeader>
+        <MenuLink
+          section={COLLECTIVE_SECTIONS.OVERVIEW}
+          icon={{ component: Home }}
+          if={
+            !isIndividual &&
+            LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD_COLLECTIVE_OVERVIEW) &&
+            isHost
+          }
+        />
         <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_EXPENSES} icon={{ component: Receipt }} />
         <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} icon={{ component: Coins }} />
 
@@ -121,7 +133,14 @@ const Menu = ({ isAccountantOnly }) => {
             )}
           </MenuSectionHeader>
         )}
-        <MenuLink section={COLLECTIVE_SECTIONS.OVERVIEW} icon={{ component: Home }} if={isIndividual} />
+        <MenuLink
+          section={COLLECTIVE_SECTIONS.OVERVIEW}
+          icon={{ component: Home }}
+          if={
+            isIndividual ||
+            (LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD_COLLECTIVE_OVERVIEW) && !isHost)
+          }
+        />
         <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTIONS} icon={{ component: Coins }} if={isIndividual} />
         <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} icon={{ component: Receipt }} />
         <MenuLink

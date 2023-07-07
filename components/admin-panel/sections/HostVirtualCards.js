@@ -193,12 +193,12 @@ const HostVirtualCards = props => {
   };
 
   return (
-    <Fragment>
+    <Flex flexDirection={'column'} maxWidth={1024}>
       <Box>
         <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
           <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
         </H1>
-        <P mt={1} color="black.600" fontSize="14px" lineHeight="20px">
+        <P mt={1} color="#71717a" fontSize="14px" lineHeight="20px" letterSpacing={0} fontWeight={400}>
           <FormattedMessage
             id="Host.VirtualCards.List.Description"
             defaultMessage="Make payments easier by creating virtual cards. One Collective can have multiple virtual cards. <learnMoreLink>Learn more</learnMoreLink>"
@@ -326,7 +326,7 @@ const HostVirtualCards = props => {
           }}
         />
       )}
-    </Fragment>
+    </Flex>
   );
 };
 

@@ -3,7 +3,7 @@ import { css } from '@styled-system/css';
 import { flatten, groupBy, omit, uniqBy } from 'lodash';
 import { ArrowRight, ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react';
 import memoizeOne from 'memoize-one';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -11,7 +11,7 @@ import formatCollectiveType from '../../lib/i18n/collective-type';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
-import { Flex } from '../Grid';
+import { Flex, Box } from '../Grid';
 import Link from '../Link';
 import { Dropdown, DropdownContent } from '../StyledDropdown';
 import StyledRoundButton from '../StyledRoundButton';
@@ -62,11 +62,11 @@ const DropdownButton = styled.button`
   transition: all 50ms ease-out;
   cursor: pointer;
   overflow: hidden;
-  padding: 8px 12px;
-  padding-right: 8px;
+  padding-left: 8px;
+  padding-right: 6px;
   flex: 1;
   border-radius: 100px 0 0 100px;
-
+  grid-gap: 8px;
   &:hover,
   :active,
   :focus-visible {
@@ -107,9 +107,10 @@ const AccountSwitcherButtonContainer = styled.div`
   font-size: 14px;
   flex-shrink: 0;
   align-items: stretch;
+  height: 36px;
 `;
 const ProfileLink = styled(Link)`
-  width: 36px;
+  width: 34px;
   padding-right: 4px;
   border-left: 1px solid #f3f4f6;
   display: flex;
@@ -218,40 +219,43 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
   const activeAccount = allAdministratedAccounts.find(a => a.slug === activeSlug) || loggedInUserCollective;
 
   return (
-    <Dropdown trigger="click">
-      {({ triggerProps, dropdownProps }) => (
-        <React.Fragment>
-          <AccountSwitcherButtonContainer>
-            <DropdownButton {...triggerProps}>
-              <Flex alignItems="center" gridGap="8px">
-                <Avatar collective={activeAccount} size={24} />
-                <div>
-                  <P color="#0f172a" lineHeight="20px" letterSpacing="0" fontWeight="500" truncateOverflow>
-                    {activeAccount?.name}
-                  </P>
-                </div>
-              </Flex>
-
-              <ChevronsUpDown size={18} strokeWidth={2} />
-            </DropdownButton>
-            <StyledTooltip
-              content={intl.formatMessage({ id: 'GoToProfilePage', defaultMessage: 'Go to Profile page' })}
-              place="right"
-              noArrow
-              delayHide={0}
-            >
-              {props => (
-                <Flex {...props}>
-                  <ProfileLink href={`/${activeAccount?.slug}`}>
-                    <ArrowRight size={16} strokeWidth={2} />
-                  </ProfileLink>
+    <div style={{ position: 'relative', maxWidth: '100%' }}>
+      <Dropdown trigger="click">
+        {({ triggerProps, dropdownProps }) => (
+          <React.Fragment>
+            <AccountSwitcherButtonContainer>
+              <DropdownButton {...triggerProps}>
+                <Flex alignItems="center" gridGap="8px">
+                  <Avatar collective={activeAccount} size={24} />
+                  <div>
+                    <P color="#0f172a" lineHeight="20px" letterSpacing="0" fontWeight="500" truncateOverflow>
+                      {activeAccount?.name}
+                    </P>
+                  </div>
                 </Flex>
-              )}
-            </StyledTooltip>
-          </AccountSwitcherButtonContainer>
-          <Container maxWidth={'100%'} {...dropdownProps}>
-            <StyledDropdownContent>
-              <Flex p={2} overflowY="auto" flexDirection="column" gridGap={3}>
+
+                <ChevronsUpDown size={18} strokeWidth={2} />
+              </DropdownButton>
+              <StyledTooltip
+                content={intl.formatMessage({ id: 'GoToProfilePage', defaultMessage: 'Go to Profile page' })}
+                place="right"
+                noArrow
+                delayHide={0}
+              >
+                {props => (
+                  <Flex {...props}>
+                    <ProfileLink href={`/${activeAccount?.slug}`}>
+                      <ArrowRight size={16} strokeWidth={2} />
+                    </ProfileLink>
+                  </Flex>
+                )}
+              </StyledTooltip>
+            </AccountSwitcherButtonContainer>
+            <StyledDropdownContent {...dropdownProps}>
+              <Flex p={2} overflowY="auto" flexDirection="column" gridGap={2}>
+                <P mb={0} px={1} color="black.800" fontSize="12px" fontWeight="600">
+                  <FormattedMessage id="Dashboard.SwitchDashboardContext" defaultMessage="Switch dashboard context" />
+                </P>
                 <StyledMenuEntry
                   key={loggedInUserCollective?.id}
                   href={`/dashboard/${loggedInUserCollective?.slug}`}
@@ -281,10 +285,10 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                 })}
               </Flex>
             </StyledDropdownContent>
-          </Container>
-        </React.Fragment>
-      )}
-    </Dropdown>
+          </React.Fragment>
+        )}
+      </Dropdown>
+    </div>
   );
 };
 

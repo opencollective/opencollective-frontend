@@ -91,7 +91,7 @@ const Expenses = props => {
   const isSelfHosted = data?.account?.id === data?.account?.host?.id;
 
   return (
-    <Container>
+    <Container flex={1} maxWidth={1024}>
       {isDashboard ? (
         <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
           {onlySubmittedExpenses ? (

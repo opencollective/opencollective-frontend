@@ -16,6 +16,7 @@ import StyledCard from '../StyledCard';
 import StyledLink from '../StyledLink';
 import StyledTag from '../StyledTag';
 import { P, Span } from '../Text';
+import { Flex } from '../Grid';
 
 const MaskSVG = props => (
   <svg
@@ -190,9 +191,9 @@ const StyledCollectiveCard = ({
                 </StyledLink>
               </P>
             )}
-            <Container>
+            <Flex my={2} alignItems="center">
               {tag === undefined ? (
-                <StyledTag display="inline-block" variant="rounded-right" my={2} backgroundColor="blue.50">
+                <StyledTag display="inline-block" variant="rounded-right" backgroundColor="blue.50">
                   <I18nCollectiveTags tags={getCollectiveMainTag(null, null, collective.type)} />
                 </StyledTag>
               ) : (
@@ -203,7 +204,7 @@ const StyledCollectiveCard = ({
                   {countryString}
                 </Span>
               )}
-            </Container>
+            </Flex>
             <Container>
               {collective.tags &&
                 collective.tags

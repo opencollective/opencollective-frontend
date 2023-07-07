@@ -14,12 +14,14 @@ import { DashboardContext } from '../components/dashboard/DashboardContext';
 import AdminPanelSection from '../components/dashboard/DashboardSection';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
+import TopBar from '../components/dashboard/TopBar';
 import { Box, Flex } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -41,6 +43,7 @@ const messages = defineMessages({
 });
 
 const getDefaultSectionForAccount = (account, loggedInUser) => {
+  return ALL_SECTIONS.OVERVIEW;
   if (!account) {
     return ALL_SECTIONS.INFO;
   } else if (account?.type === 'INDIVIDUAL') {
@@ -121,6 +124,11 @@ const DashboardPage = () => {
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
+  const accountSwitcherInTopBar = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.ACCOUNT_SWITCHER_IN_TOP_BAR,
+  );
+  const useTopBar =
+    accountSwitcherInTopBar && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD_TOP_BAR);
 
   return (
     <DashboardContext.Provider value={{ selectedSection, expandedSection, setExpandedSection, account }}>
@@ -140,30 +148,54 @@ const DashboardPage = () => {
           </Flex>
         ) : (
           <Flex
-            flexDirection={['column', 'column', 'row']}
+            flexDirection={useTopBar ? 'column' : ['column', 'column', 'row']}
             justifyContent={'space-between'}
+            alignItems={useTopBar ? 'stretch' : ''}
             minHeight={600}
             gridGap={0}
             data-cy="admin-panel-container"
           >
-            <AdminPanelSideBar
-              isLoading={isLoading}
-              collective={account}
-              activeSlug={activeSlug}
-              selectedSection={selectedSection}
-              isAccountantOnly={LoggedInUser?.isAccountantOnly(account)}
-            />
+            {useTopBar ? (
+              <TopBar
+                isLoading={isLoading}
+                collective={account}
+                activeSlug={activeSlug}
+                selectedSection={selectedSection}
+                expandedSection={expandedSection}
+                isAccountantOnly={LoggedInUser?.isAccountantOnly(account)}
+              />
+            ) : (
+              <AdminPanelSideBar
+                accountSwitcherInTopBar={accountSwitcherInTopBar}
+                isLoading={isLoading}
+                collective={account}
+                activeSlug={activeSlug}
+                selectedSection={selectedSection}
+                isAccountantOnly={LoggedInUser?.isAccountantOnly(account)}
+              />
+            )}
+
             {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
             ) : (
-              <Box flex="0 1 1000px" py={'32px'} pl={[null, null, '36px']} px={[3, '20px']}>
-                <AdminPanelSection
-                  section={selectedSection}
-                  isLoading={isLoading}
-                  collective={account}
-                  subpath={subpath}
-                />
-              </Box>
+              <Flex justifyContent="center">
+                <Flex
+                  flex={1}
+                  maxWidth={1240}
+                  py={'32px'}
+                  pl={useTopBar ? null : [null, null, '36px']}
+                  px={[3, '24px']}
+                  justifyContent={'start'}
+                >
+                  <AdminPanelSection
+                    useTopBar={useTopBar}
+                    section={selectedSection}
+                    isLoading={isLoading}
+                    collective={account}
+                    subpath={subpath}
+                  />
+                </Flex>
+              </Flex>
             )}
             <Box flex="0 100 280px" />
           </Flex>

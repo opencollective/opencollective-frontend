@@ -326,7 +326,7 @@ const Contributions = ({ account }: AdminSectionProps) => {
   const columns = getColumns({ tab, setEditOrder });
 
   return (
-    <Container>
+    <Container flex={1} maxWidth={1024}>
       <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
         <FormattedMessage id="Contributions" defaultMessage="Contributions" />
       </H1>

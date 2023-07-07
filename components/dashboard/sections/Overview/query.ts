@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 export const workspaceHomeQuery = gql`
   query WorkspaceHome($slug: String!, $limit: Int, $offset: Int, $type: [ActivityAndClassesType!]) {
-    activities(account: { slug: $slug }, limit: $limit, offset: $offset, type: $type, timeline: true) {
+    activities(account: { slug: $slug }, limit: $limit, offset: $offset, type: $type, timeline: false) {
       limit
       offset
       nodes {

@@ -78,10 +78,12 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
             <LoadingPlaceholder height={16} width={300} />
           ) : (
             <ItemHeaderWrapper color="black.700">
-              {intl.formatMessage(
-                ActivityTimelineMessageI18n[activity.type] || ActivityDescriptionI18n[activity.type],
-                getActivityVariables(intl, activity, { onClickExpense: openExpense }),
-              )}{' '}
+              {ActivityTimelineMessageI18n[activity.type] || ActivityDescriptionI18n[activity.type]
+                ? intl.formatMessage(
+                    ActivityTimelineMessageI18n[activity.type] || ActivityDescriptionI18n[activity.type],
+                    getActivityVariables(intl, activity, { onClickExpense: openExpense }),
+                  )
+                : activity.type}{' '}
               · {isLastWeek ? dayjs(activity.createdAt).fromNow() : <DateTime value={activity.createdAt} />}
             </ItemHeaderWrapper>
           )}

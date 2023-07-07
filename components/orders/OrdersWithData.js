@@ -184,7 +184,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
   }, [LoggedInUser]);
 
   return (
-    <Box maxWidth={1000} width="100%" m="0 auto">
+    <Box flex={1} maxWidth={1024} m="0 auto">
       <Flex mb={16} alignItems="start" flexWrap="wrap">
         <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
           {title || <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}

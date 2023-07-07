@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { isPastEvent } from '../../lib/events';
 import { getDashboardRoute } from '../../lib/url-helpers';
-
+import { useQuery, gql } from '@apollo/client';
 import Avatar from '../Avatar';
 import Collapse from '../Collapse';
 import Container from '../Container';
@@ -18,12 +18,13 @@ import StyledButton from '../StyledButton';
 import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 const AccountList = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 4px 16px;
-  border-top: 1px solid #f3f4f6;
+  padding: 4px 8px;
+  border-bottom: 1px solid #f3f4f6;
   padding-top: 12px;
   h3 {
     font-size: 12px;
@@ -96,8 +97,8 @@ const MembershipLine = ({ user, membership, closeDrawer }) => {
   const intl = useIntl();
   return (
     <CollectiveListItem>
-      <MenuLink href={`/${membership.collective.slug}`} onClick={closeDrawer}>
-        <Avatar collective={membership.collective} radius={16} />
+      <MenuLink href={`/${membership.account.slug}`} onClick={closeDrawer}>
+        <Avatar collective={membership.account} radius={16} />
         <P
           fontSize="inherit"
           fontWeight="inherit"
@@ -106,13 +107,13 @@ const MembershipLine = ({ user, membership, closeDrawer }) => {
           letterSpacing={0}
           truncateOverflow
         >
-          {membership.collective.name}
+          {membership.account.name}
         </P>
       </MenuLink>
-      {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
+      {Boolean(user?.canSeeAdminPanel(membership.account)) && (
         <DashboardLink
           className="dashboardLink"
-          href={getDashboardRoute(membership.collective)}
+          href={getDashboardRoute(membership.account)}
           color="black.500"
           title={intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' })}
           onClick={closeDrawer}
@@ -135,39 +136,23 @@ const sortMemberships = memberships => {
     return [];
   } else {
     return memberships.sort((a, b) => {
-      return a.collective.slug.localeCompare(b.collective.slug);
+      return a.account.slug.localeCompare(b.account.slug);
     });
   }
 };
 
-const filterArchivedMemberships = memberships => {
-  const archivedMemberships = memberships.filter(m => {
-    if (
-      m.role !== 'BACKER' &&
-      m.collective.isArchived &&
-      !(m.collective.type === 'EVENT' && isPastEvent(m.collective))
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  });
-
-  return uniqBy(archivedMemberships, m => m.collective.id);
-};
-
 const filterMemberships = memberships => {
   const filteredMemberships = memberships.filter(m => {
-    if (m.role === 'BACKER' || m.collective.isArchived) {
+    if (m.role === 'BACKER' || m.account.isArchived) {
       return false;
-    } else if (m.collective.type === 'EVENT' && isPastEvent(m.collective)) {
+    } else if (m.account.type === 'EVENT' && isPastEvent(m.account)) {
       return false;
     } else {
-      return Boolean(m.collective);
+      return Boolean(m.account);
     }
   });
 
-  return uniqBy(filteredMemberships, m => m.collective.id);
+  return uniqBy(filteredMemberships, m => m.account.id);
 };
 
 const MembershipsList = ({ user, memberships, closeDrawer }) => {
@@ -198,16 +183,17 @@ MembershipsList.propTypes = {
  *  - text: i18n alt string for the button (accessibility)
  */
 const MENU_SECTIONS = {
-  [CollectiveType.COLLECTIVE]: {
-    title: defineMessage({ id: 'collective', defaultMessage: 'My Collectives' }),
-    emptyMessage: defineMessage({ defaultMessage: 'Create a collective to collect and spend money transparently' }),
-    plusButton: {
-      text: defineMessage({ id: 'home.create', defaultMessage: 'Create a Collective' }),
-      href: '/create',
-    },
-  },
   [CollectiveType.EVENT]: {
-    title: defineMessage({ id: 'events', defaultMessage: 'My Events' }),
+    title: defineMessage({ id: 'events', defaultMessage: 'Upcoming Events' }),
+  },
+  [CollectiveType.COLLECTIVE]: {
+    title: defineMessage({ id: 'collective', defaultMessage: 'Collectives you contribute to' }),
+  },
+  // [CollectiveType.COLLECTIVE]: {
+  //   title: defineMessage({ id: 'collective', defaultMessage: 'My Collectives' }),
+  // },
+  [CollectiveType.PROJECT]: {
+    title: defineMessage({ id: 'projects', defaultMessage: 'Projects' }),
   },
   [CollectiveType.FUND]: {
     title: defineMessage({ id: 'funds', defaultMessage: 'My Funds' }),
@@ -217,14 +203,7 @@ const MENU_SECTIONS = {
     },
   },
   [CollectiveType.ORGANIZATION]: {
-    title: defineMessage({ id: 'organization', defaultMessage: 'My Organizations' }),
-    emptyMessage: defineMessage({
-      defaultMessage: 'A profile representing a company or organization instead of an individual',
-    }),
-    plusButton: {
-      text: defineMessage({ id: 'host.organization.create', defaultMessage: 'Create an Organization' }),
-      href: '/organizations/new',
-    },
+    title: defineMessage({ id: 'organization', defaultMessage: 'Organizations you contribute to' }),
   },
   ARCHIVED: {
     title: defineMessage({ id: 'Archived', defaultMessage: 'Archived' }),
@@ -255,6 +234,68 @@ const MenuSectionHeader = ({ section, hidePlusIcon, closeDrawer }) => {
     </Flex>
   );
 };
+export const accountQuery = gql`
+  query AccountQuery($slug: String!) {
+    account(slug: $slug) {
+      slug
+      type
+      isHost
+      memberOf(role: [BACKER, CONTRIBUTOR, ATTENDEE, MEMBER, FOLLOWER, ADMIN]) {
+        totalCount
+        nodes {
+          id
+          role
+          account {
+            id
+            slug
+            type
+            isIncognito
+            name
+            isHost
+            ... on Event {
+              endsAt
+            }
+            imageUrl
+            isArchived
+            ... on AccountWithHost {
+              host {
+                id
+              }
+            }
+
+            childrenAccounts {
+              totalCount
+              nodes {
+                id
+                slug
+                type
+                name
+                isActive
+                isArchived
+                imageUrl
+              }
+            }
+          }
+        }
+      }
+      childrenAccounts {
+        totalCount
+        nodes {
+          id
+          slug
+          type
+          name
+          isActive
+          isArchived
+          imageUrl
+          ... on Event {
+            endsAt
+          }
+        }
+      }
+    }
+  }
+`;
 
 MenuSectionHeader.propTypes = {
   section: PropTypes.oneOf(Object.keys(MENU_SECTIONS)).isRequired,
@@ -262,32 +303,36 @@ MenuSectionHeader.propTypes = {
   closeDrawer: PropTypes.func,
 };
 
-const ProfileMenuMemberships = ({ closeDrawer }) => {
+const ProfileMenuMemberships = ({ slug, closeDrawer = () => {} }) => {
   const { LoggedInUser } = useLoggedInUser();
   const user = LoggedInUser;
   const intl = useIntl();
-  const memberships = filterMemberships(user.memberOf);
-  const archivedMemberships = filterArchivedMemberships(user.memberOf);
-  const groupedMemberships = groupBy(memberships, m => m.collective.type);
-  groupedMemberships.ARCHIVED = archivedMemberships;
+  const { data: { account } = {} } = useQuery(accountQuery, {
+    variables: { slug },
+    context: API_V2_CONTEXT,
+  });
+  if (!account) return null;
+  const isIndividual = account.type === CollectiveType.USER;
+  const memberships = filterMemberships(
+    [...account.memberOf.nodes, ...account.childrenAccounts.nodes.map(a => ({ role: 'ADMIN', account: a, id: a.id }))],
+    isIndividual,
+  );
+  const groupedMemberships = groupBy(memberships, m => m.account.type);
   const hasNoMemberships = isEmpty(memberships);
   const shouldDisplaySection = section => {
     return MENU_SECTIONS[section].emptyMessage || !isEmpty(groupedMemberships[section]);
   };
+  console.log({ account, memberships, groupedMemberships });
 
   return (
     <React.Fragment>
-      {hasNoMemberships && (
-        <P color="blue.900" fontSize="20px" lineHeight="28px" fontWeight="bold" mt="8px" mb="12px">
-          <FormattedMessage id="ProfileMenuMemberships.Empty" defaultMessage="Make the most out of Open Collective" />
-        </P>
-      )}
       {Object.keys(MENU_SECTIONS)
         .filter(shouldDisplaySection)
         .map(accountType => {
           const memberships = groupedMemberships[accountType];
           const sectionIsEmpty = isEmpty(memberships);
           const sectionData = MENU_SECTIONS[accountType];
+
           return (
             <AccountList key={accountType}>
               {accountType !== 'ARCHIVED' && (
@@ -319,17 +364,6 @@ const ProfileMenuMemberships = ({ closeDrawer }) => {
                     </Link>
                   )}
                 </Box>
-              ) : accountType === 'ARCHIVED' ? (
-                <Collapse
-                  buttonSize={24}
-                  defaultIsOpen={false}
-                  mr={'6px'}
-                  title={
-                    <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} closeDrawer={closeDrawer} />
-                  }
-                >
-                  <MembershipsList memberships={memberships} user={user} closeDrawer={closeDrawer} />
-                </Collapse>
               ) : (
                 <MembershipsList memberships={memberships} user={user} closeDrawer={closeDrawer} />
               )}
@@ -341,10 +375,7 @@ const ProfileMenuMemberships = ({ closeDrawer }) => {
 };
 
 ProfileMenuMemberships.propTypes = {
-  user: PropTypes.shape({
-    memberOf: PropTypes.arrayOf(PropTypes.object),
-  }),
-  closeDrawer: PropTypes.func,
+  slug: PropTypes.string,
 };
 
 export default React.memo(ProfileMenuMemberships);

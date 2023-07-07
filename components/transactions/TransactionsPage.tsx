@@ -188,7 +188,7 @@ const Transactions = ({
       : transactions?.nodes || [];
 
   return (
-    <Container>
+    <Container flex={1} maxWidth={1024}>
       <Flex
         gridGap={3}
         justifyContent="space-between"
