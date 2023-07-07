@@ -56,19 +56,6 @@ const hostDashboardExpensesQuery = gql`
     $chargeHasReceipts: Boolean
     $virtualCards: [VirtualCardReferenceInput]
   ) {
-    host(slug: $hostSlug) {
-      id
-      ...ExpenseHostFields
-      ...HostInfoCardFields
-      transferwise {
-        id
-        availableCurrencies
-        amountBatched {
-          valueInCents
-          currency
-        }
-      }
-    }
     expenses(
       host: { slug: $hostSlug }
       limit: $limit
@@ -99,13 +86,25 @@ const hostDashboardExpensesQuery = gql`
 
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
-  ${expenseHostFields}
-  ${hostInfoCardFields}
 `;
+const hostDashboardMetaDataQuery = gql`
+  query HostDashboardMetaData($hostSlug: String!, $getViewCounts: Boolean!) {
+    host(slug: $hostSlug) {
+      id
+      ...ExpenseHostFields
+      ...HostInfoCardFields
+      transferwise {
+        id
+        availableCurrencies
+        amountBatched {
+          valueInCents
+          currency
+        }
+      }
+    }
 
-const viewCountsQuery = gql`
-  query HostDashboardExpensesViewCounts($hostSlug: String!) {
-    ready_to_pay: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: READY_TO_PAY) {
+    ready_to_pay: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: READY_TO_PAY)
+      @include(if: $getViewCounts) {
       totalCount
     }
     scheduled_for_payment: expenses(
@@ -114,37 +113,36 @@ const viewCountsQuery = gql`
       offset: 0
       status: SCHEDULED_FOR_PAYMENT
       payoutMethodType: BANK_ACCOUNT
-    ) {
+    ) @include(if: $getViewCounts) {
       totalCount
     }
-    on_hold: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: ON_HOLD) {
+    on_hold: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: ON_HOLD) @include(if: $getViewCounts) {
       totalCount
     }
-    incomplete: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: INCOMPLETE) {
+    incomplete: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: INCOMPLETE)
+      @include(if: $getViewCounts) {
       totalCount
     }
   }
-`;
 
+  ${expenseHostFields}
+  ${hostInfoCardFields}
+`;
 /**
  * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
  */
-const onExpenseUpdate = (updatedExpense, cache, filteredStatus) => {
-  if (filteredStatus && filteredStatus !== 'ALL' && updatedExpense.status !== filteredStatus) {
-    cache.modify({
-      fields: {
-        expenses(existingExpenses, { readField }) {
-          if (!existingExpenses?.nodes) {
-            return existingExpenses;
-          } else {
-            return {
-              ...existingExpenses,
-              totalCount: existingExpenses.totalCount - 1,
-              nodes: existingExpenses.nodes.filter(expense => updatedExpense.id !== readField('id', expense)),
-            };
-          }
+const onExpenseUpdate = ({ updatedExpense, cache, variables, refetchMetaData }) => {
+  refetchMetaData(); // Refetch the metadata to update the view counts
+  if (variables.status && updatedExpense.status !== variables.status) {
+    cache.updateQuery({ query: hostDashboardExpensesQuery, variables }, data => {
+      return {
+        ...data,
+        expenses: {
+          ...data.expenses,
+          totalCount: data.expenses.totalCount - 1,
+          nodes: data.expenses.nodes?.filter(expense => updatedExpense.id !== expense.id),
         },
-      },
+      };
     });
   }
 };
@@ -241,20 +239,23 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
       },
     },
   });
-
+  const variables = {
+    ...queryVariables,
+    chargeHasReceipts: queryFilter.values.chargeHasReceipts,
+    virtualCards: queryFilter.values.virtualCard?.map(id => ({ id })),
+  };
   const expenses = useQuery(hostDashboardExpensesQuery, {
-    variables: {
-      ...queryVariables,
-      chargeHasReceipts: queryFilter.values.chargeHasReceipts,
-      virtualCards: queryFilter.values.virtualCard?.map(id => ({ id })),
-    },
+    variables,
     context: API_V2_CONTEXT,
   });
 
-  const { data: viewCounts } = useQuery(viewCountsQuery, {
-    variables: { hostSlug },
+  const {
+    data: metaData,
+    loading: loadingMetaData,
+    refetch: refetchMetaData,
+  } = useQuery(hostDashboardMetaDataQuery, {
+    variables: { hostSlug, getViewCounts: Boolean(expensePipelineFeatureIsEnabled) },
     context: API_V2_CONTEXT,
-    skip: !expensePipelineFeatureIsEnabled,
   });
 
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
@@ -266,19 +267,18 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   }, [query.paypalApprovalError]);
 
   const { data, error, loading } = expenses;
-  const [views, setViews] = React.useState(initViews);
 
-  React.useEffect(() => {
-    if (viewCounts) {
-      const viewsUpToDate = views.map(view => {
-        return {
-          ...view,
-          count: viewCounts[view.id]?.totalCount,
-        };
-      });
-      setViews(viewsUpToDate);
+  const views = React.useMemo(() => {
+    if (!metaData) {
+      return initViews;
     }
-  }, [viewCounts]);
+    return initViews.map(view => {
+      return {
+        ...view,
+        count: metaData[view.id]?.totalCount,
+      };
+    });
+  }, [metaData]);
 
   const getQueryParams = newParams => {
     return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
@@ -330,19 +330,19 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
         </DismissibleMessage>
       )}
       <Box mb={4}>
-        {loading ? (
+        {!metaData?.host ? (
           <LoadingPlaceholder height={150} />
         ) : error ? (
           <MessageBoxGraphqlError error={error} />
         ) : (
-          <HostInfoCard host={data.host} />
+          <HostInfoCard host={metaData.host} />
         )}
       </Box>
       <ScheduledExpensesBanner
         hostSlug={hostSlug}
-        expenses={paginatedExpenses.nodes}
         onSubmit={() => {
           expenses.refetch();
+          refetchMetaData();
         }}
         secondButton={
           !(query.status === 'SCHEDULED_FOR_PAYMENT' && query.payout === 'BANK_ACCOUNT') ? (
@@ -380,9 +380,9 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
       )}
 
       <Box mb={34}>
-        {data?.host ? (
+        {metaData?.host ? (
           <ExpensesFilters
-            collective={data.host}
+            collective={metaData.host}
             filters={query}
             explicitAllForStatus
             displayOnHoldPseudoStatus
@@ -423,13 +423,13 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
       ) : (
         <React.Fragment>
           <ExpensesList
-            isLoading={loading}
-            host={data?.host}
+            isLoading={loading || loadingMetaData}
+            host={metaData?.host}
             nbPlaceholders={paginatedExpenses.limit}
             expenses={paginatedExpenses.nodes}
             view="admin"
             onProcess={(expense, cache) => {
-              hasFilters && onExpenseUpdate(expense, cache, query.status);
+              hasFilters && onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData });
             }}
             useDrawer
             openExpenseLegacyId={Number(router.query.openExpenseId)}
