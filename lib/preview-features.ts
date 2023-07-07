@@ -29,7 +29,7 @@ export const previewFeatures: PreviewFeatureType[] = [
     key: PREVIEW_FEATURE_KEYS.DASHBOARD,
     title: 'New navigation & dashboard',
     description: 'Introducing improved navigation and a central admin dashboard for all accounts.',
-    publicBeta: false,
+    publicBeta: true,
     closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
     enabledByDefaultFor: ['opencollective'],
     subFeatures: [
