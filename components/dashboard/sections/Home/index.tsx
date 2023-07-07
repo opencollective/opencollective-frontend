@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import { flatten } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -28,7 +29,7 @@ const REACT_SELECT_COMPONENT_OVERRIDE = {
 };
 
 const getFilterOptions = intl => [
-  { value: 'EXPENSES', label: intl.formatMessage(ActivityClassesI18N['expenses.title']) },
+  { value: 'EXPENSES,VIRTUAL_CARDS', label: intl.formatMessage(ActivityClassesI18N['expenses.title']) },
   { value: 'CONTRIBUTIONS', label: intl.formatMessage(ActivityClassesI18N['contributions.title']) },
   {
     value: 'ACTIVITIES_UPDATES',
@@ -43,14 +44,19 @@ const Home = (props: AdminSectionProps) => {
   const [filters, setFilters] = React.useState(filterOptions);
   const [openExpenseLegacyId, setOpenExpenseLegacyId] = React.useState<number | null>(null);
   const slug = router.query?.as || props.account.slug;
-  const { data, loading, error, fetchMore } = useQuery(workspaceHomeQuery, {
-    variables: { slug, limit: PAGE_SIZE, type: filters.map(f => f.value) },
+  const { data, loading, error, fetchMore, refetch } = useQuery(workspaceHomeQuery, {
+    variables: { slug, limit: PAGE_SIZE, classes: flatten(filters.map(f => f.value.split(','))) },
     context: API_V2_CONTEXT,
     notifyOnNetworkStatusChange: true,
   });
 
-  const activities: WorkspaceHomeQuery['activities']['nodes'] = data?.activities?.nodes || [];
+  const activities: WorkspaceHomeQuery['account']['feed'] = data?.account.feed || [];
   const canViewMore = activities.length >= PAGE_SIZE && activities.length % PAGE_SIZE === 0;
+  React.useEffect(() => {
+    if (error?.graphQLErrors?.[0]?.extensions?.code === 'ContentNotReady') {
+      setTimeout(() => refetch(), 4000);
+    }
+  }, [error]);
 
   return (
     <Container maxWidth={'100%'}>
@@ -108,11 +114,11 @@ const Home = (props: AdminSectionProps) => {
             loading={loading}
             onClick={() =>
               fetchMore({
-                variables: { offset: activities.length },
+                variables: { untilId: activities[activities.length - 1].id },
                 updateQuery: (prevResult, { fetchMoreResult }) => {
-                  const activities = fetchMoreResult?.activities;
-                  activities.nodes = [...prevResult.activities.nodes, ...activities.nodes];
-                  return { activities };
+                  const account = fetchMoreResult?.account;
+                  account.feed = [...prevResult.account.feed, ...account.feed];
+                  return { account };
                 },
               })
             }
