@@ -1,9 +1,9 @@
 import React from 'react';
 import { css } from '@styled-system/css';
-import { flatten, groupBy, uniqBy } from 'lodash';
-import { ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react';
+import { flatten, groupBy, omit, uniqBy } from 'lodash';
+import { ArrowRight, ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react';
 import memoizeOne from 'memoize-one';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -11,11 +11,11 @@ import formatCollectiveType from '../../lib/i18n/collective-type';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
-import { Flex } from '../Grid';
+import { Flex, Box } from '../Grid';
 import Link from '../Link';
 import { Dropdown, DropdownContent } from '../StyledDropdown';
-import StyledHr from '../StyledHr';
 import StyledRoundButton from '../StyledRoundButton';
+import StyledTooltip from '../StyledTooltip';
 import { P, Span } from '../Text';
 
 const StyledMenuEntry = styled(Link)`
@@ -31,10 +31,12 @@ const StyledMenuEntry = styled(Link)`
   font: inherit;
   max-width: 100%;
   text-align: left;
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: 12px;
+  font-size: 14px;
   font-weight: 500;
   grid-gap: 4px;
+  color: ${props => props.theme.colors.black[800]} !important;
+  letter-spacing: 0;
 
   ${props =>
     props.$isActive
@@ -51,31 +53,38 @@ const StyledMenuEntry = styled(Link)`
 const DropdownButton = styled.button`
   display: flex;
   background: white;
-  border: 1px solid #e6e8eb;
-  width: 100%;
-  border-radius: 8px;
+  height: 100%;
+  font-size: 14px;
   flex-shrink: 0;
-  padding: 8px;
+  border: 0;
   align-items: center;
   justify-content: space-between;
   transition: all 50ms ease-out;
   cursor: pointer;
   overflow: hidden;
+  padding-left: 8px;
+  padding-right: 6px;
+  flex: 1;
+  border-radius: 100px 0 0 100px;
+  grid-gap: 8px;
   &:hover,
   :active,
-  :focus {
-    background: #f9f9f9;
+  :focus-visible {
+    background: #f9fafb;
+    svg {
+      flex-shrink: 0;
+      color: #1f2937;
+    }
+  }
+  svg {
+    flex-shrink: 0;
+    color: #9ca3af;
   }
 
   div {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-
-  svg {
-    flex-shrink: 0;
-    color: #4b5563;
   }
 `;
 
@@ -86,7 +95,43 @@ const StyledDropdownContent = styled(DropdownContent)`
   max-width: 100%;
   margin-top: 8px;
   max-height: 70vh;
-  overflow-y: scroll;
+  overflow: hidden;
+`;
+
+const AccountSwitcherButtonContainer = styled.div`
+  display: flex;
+  background: white;
+  border: 1px solid #e6e8eb;
+  width: 100%;
+  border-radius: 100px;
+  font-size: 14px;
+  flex-shrink: 0;
+  align-items: stretch;
+  height: 36px;
+`;
+const ProfileLink = styled(Link)`
+  width: 34px;
+  padding-right: 4px;
+  border-left: 1px solid #f3f4f6;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 100px 100px 0;
+
+  &:hover,
+  :active,
+  :focus-visible {
+    background: #f9fafb;
+    svg {
+      flex-shrink: 0;
+      color: #1f2937;
+    }
+  }
+  svg {
+    flex-shrink: 0;
+    color: #9ca3af;
+  }
 `;
 
 const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
@@ -120,8 +165,8 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
         title={account.name}
         $isActive={activeSlug === account.slug}
       >
-        <Flex overflow="hidden" alignItems="center" gridGap="12px">
-          <Avatar collective={account} size={32} />
+        <Flex overflow="hidden" alignItems="center" gridGap="8px">
+          <Avatar collective={account} size={24} />
           <Span truncateOverflow>{account.name}</Span>
         </Flex>
         {account.children?.length > 0 && (
@@ -143,6 +188,7 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
       {expanded &&
         account?.children
           ?.slice() // Create a copy to that we can sort the otherwise immutable array
+          .filter(child => !child.isArchived)
           .sort((a, b) => a.name.localeCompare(b.name))
           .map(child => (
             <StyledMenuEntry
@@ -151,8 +197,8 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
               title={child.name}
               $isActive={activeSlug === child.slug}
             >
-              <Flex overflow="hidden" alignItems="center" gridGap="12px">
-                <Avatar ml={4} collective={child} size={32} />
+              <Flex overflow="hidden" alignItems="center" gridGap="8px">
+                <Avatar ml={4} collective={child} size={24} />
                 <Span truncateOverflow>{child.name}</Span>
               </Flex>
             </StyledMenuEntry>
@@ -173,26 +219,43 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
   const activeAccount = allAdministratedAccounts.find(a => a.slug === activeSlug) || loggedInUserCollective;
 
   return (
-    <Dropdown trigger="click">
-      {({ triggerProps, dropdownProps }) => (
-        <React.Fragment>
-          <Flex alignItems="center" flex={0}>
-            <DropdownButton {...triggerProps}>
-              <Flex alignItems="center" gridGap="12px">
-                <Avatar collective={activeAccount} size={32} />
-                <div>
-                  <P color="#0f172a" lineHeight="20px" letterSpacing="0" fontWeight="500" truncateOverflow>
-                    {activeAccount?.name}
-                  </P>
-                </div>
-              </Flex>
+    <div style={{ position: 'relative', maxWidth: '100%' }}>
+      <Dropdown trigger="click">
+        {({ triggerProps, dropdownProps }) => (
+          <React.Fragment>
+            <AccountSwitcherButtonContainer>
+              <DropdownButton {...triggerProps}>
+                <Flex alignItems="center" gridGap="8px">
+                  <Avatar collective={activeAccount} size={24} />
+                  <div>
+                    <P color="#0f172a" lineHeight="20px" letterSpacing="0" fontWeight="500" truncateOverflow>
+                      {activeAccount?.name}
+                    </P>
+                  </div>
+                </Flex>
 
-              <ChevronsUpDown size={18} />
-            </DropdownButton>
-          </Flex>
-          <Container maxWidth={'100%'} {...dropdownProps}>
-            <StyledDropdownContent>
-              <Flex p={2} flexDirection="column" gridGap={3}>
+                <ChevronsUpDown size={18} strokeWidth={2} />
+              </DropdownButton>
+              <StyledTooltip
+                content={intl.formatMessage({ id: 'GoToProfilePage', defaultMessage: 'Go to Profile page' })}
+                place="right"
+                noArrow
+                delayHide={0}
+              >
+                {props => (
+                  <Flex {...props}>
+                    <ProfileLink href={`/${activeAccount?.slug}`}>
+                      <ArrowRight size={16} strokeWidth={2} />
+                    </ProfileLink>
+                  </Flex>
+                )}
+              </StyledTooltip>
+            </AccountSwitcherButtonContainer>
+            <StyledDropdownContent {...dropdownProps}>
+              <Flex p={2} overflowY="auto" flexDirection="column" gridGap={2}>
+                <P mb={0} px={1} color="black.800" fontSize="12px" fontWeight="600">
+                  <FormattedMessage id="Dashboard.SwitchDashboardContext" defaultMessage="Switch dashboard context" />
+                </P>
                 <StyledMenuEntry
                   key={loggedInUserCollective?.id}
                   href={`/dashboard/${loggedInUserCollective?.slug}`}
@@ -200,25 +263,17 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                   $isActive={activeSlug === loggedInUserCollective?.slug}
                 >
                   <Flex alignItems="center" gridGap="12px">
-                    <Avatar collective={loggedInUserCollective} size={32} />
+                    <Avatar collective={loggedInUserCollective} size={24} />
                     <Span truncateOverflow>{loggedInUserCollective?.name}</Span>
                   </Flex>
                 </StyledMenuEntry>
-                {Object.entries(groupedAccounts).map(([collectiveType, accounts]) => {
+                {Object.entries(omit(groupedAccounts, 'archived')).map(([collectiveType, accounts]) => {
                   return (
                     <div key={collectiveType}>
                       <Flex alignItems="center" px={1} mb={1}>
-                        <Span
-                          mr={2}
-                          fontWeight="500"
-                          color="black.600"
-                          textTransform="uppercase"
-                          letterSpacing="0"
-                          fontSize="12px"
-                        >
+                        <Span fontWeight="600" color="#656d76" fontSize="12px" lineHeight="20px" letterSpacing="0">
                           {formatCollectiveType(intl, collectiveType, 2)}
                         </Span>
-                        <StyledHr width="100%" borderColor="black.300" />
                       </Flex>
                       {accounts
                         ?.sort((a, b) => a.name.localeCompare(b.name))
@@ -230,10 +285,10 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                 })}
               </Flex>
             </StyledDropdownContent>
-          </Container>
-        </React.Fragment>
-      )}
-    </Dropdown>
+          </React.Fragment>
+        )}
+      </Dropdown>
+    </div>
   );
 };
 

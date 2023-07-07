@@ -54,10 +54,10 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                 </Span>
               </Box>
             </React.Fragment>
-          ) : (
+          ) : collective.stats ? (
             <React.Fragment>
               <P fontSize="12px" lineHeight="18px">
-                {collective.stats?.contributorsCount > 0 && (
+                {collective?.stats?.contributorsCount > 0 && (
                   <Box pb="6px">
                     <Span fontSize="14px" fontWeight={700} color="black.900">
                       {collective.stats.contributorsCount}
@@ -85,34 +85,33 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                     </Span>
                     {` `}
                     <Span fontSize="12px" fontWeight={400} color="black.700">
-                      <FormattedMessage defaultMessage="Money raised" />
+                      <FormattedMessage defaultMessage="Total raised" />
                     </Span>
                   </Box>
                 )}
 
-              {collective.type === CollectiveType.ORGANIZATION &&
-                Math.abs(collective.stats.totalAmountSpent.valueInCents) > 0 && (
-                  <Box pb="6px">
-                    <Span fontSize="14px" fontWeight={700} color="black.900">
-                      <Currency
-                        currency={collective.stats.totalAmountSpent.currency}
-                        formatWithSeparators
-                        value={Math.abs(collective.stats.totalAmountSpent.valueInCents)}
-                      />
-                    </Span>
-                    {` `}
-                    <Span fontSize="12px" fontWeight={400} color="black.700">
-                      <FormattedMessage id="AmountContributed" defaultMessage="Contributed" />
-                    </Span>
-                  </Box>
-                )}
+              {Math.abs(collective.stats.totalAmountSpent.valueInCents) > 0 && (
+                <Box pb="6px">
+                  <Span fontSize="14px" fontWeight={700} color="black.900">
+                    <Currency
+                      currency={collective.stats.totalAmountSpent.currency}
+                      formatWithSeparators
+                      value={Math.abs(collective.stats.totalAmountSpent.valueInCents)}
+                    />
+                  </Span>
+                  {` `}
+                  <Span fontSize="12px" fontWeight={400} color="black.700">
+                    <FormattedMessage id="AmountContributed" defaultMessage="Contributed" />
+                  </Span>
+                </Box>
+              )}
             </React.Fragment>
-          )}
+          ) : null}
           {collective.description && (
             <Container fontSize="12px">
               <Flex alignItems="center" justifyContent="space-between" mt={21.5} mb={4.5}>
                 <Span textTransform="uppercase" color="black.700" fontWeight={500}>
-                  <FormattedMessage defaultMessage="About Us" />
+                  <FormattedMessage defaultMessage="About" />
                 </Span>
                 <StyledHr borderColor="black.300" flex="1" ml={2} />
               </Flex>

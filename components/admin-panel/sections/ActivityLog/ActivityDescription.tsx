@@ -14,19 +14,32 @@ import Avatar from '../../../Avatar';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import LinkExpense from '../../../LinkExpense';
-import { Span } from '../../../Text';
 
 const ResourceTag = styled.div`
   display: inline-block;
   background-color: #fff;
   border-radius: 32px;
-  padding: 2px 8px;
-  font-size: 12px;
-
+  padding: 4px 10px;
+  font-size: 14px;
+  letter-spacing: 0 !important;
+  font-weight: 500;
   a {
     color: ${props => props.theme.colors.black[800]};
-    font-weight: 400;
-    text-decoration: underline;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
+const IndividualTag = styled.span`
+  display: inline-block;
+  letter-spacing: 0;
+  font-weight: 500;
+  a {
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;
 
@@ -56,9 +69,9 @@ export const getActivityVariables = (
   updateTitle: activity.data?.update?.title,
   hasParent: Boolean(activity.account?.parent),
   Individual: () => (
-    <Span fontWeight={600}>
+    <IndividualTag>
       <LinkCollective collective={activity.individual || activity.fromAccount} />
-    </Span>
+    </IndividualTag>
   ),
   FromAccount: () => <CollectiveTag collective={activity.fromAccount} />,
   Account: () => <CollectiveTag collective={activity.account} />,

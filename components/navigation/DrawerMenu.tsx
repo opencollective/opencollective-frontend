@@ -29,8 +29,8 @@ const StyledMUIDrawer = styled(MUIDrawer)`
 `;
 
 const StyledCloseButton = styled(StyledRoundButton)`
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   color: #4b5563;
 `;
 

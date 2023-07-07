@@ -3,25 +3,23 @@ import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
 
-import { Box } from '../Grid';
+import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 
 import AccountSwitcher from './AccountSwitcher';
-import Menu from './Menu';
-import { MenuContainer } from './MenuComponents';
+import Menu from './TopBarMenu';
+import { MenuContainer } from './TopBarMenuComponents';
 
 const SidebarContainer = styled(Box)`
-  border-right: 1px solid #e6e8eb;
-  @media screen and (max-width: ${themeGet('breakpoints.1')}) {
-    border-right: 0;
-    border-bottom: 1px solid #e6e8eb;
-  }
+  border-bottom: 1px solid #e6e8eb;
 `;
 
 const Sticky = styled(Box)`
   position: sticky;
   top: 0;
   z-index: 10;
+  display: flex;
+  justify-content: center;
 `;
 
 const AdminPanelSideBar = ({
@@ -31,15 +29,16 @@ const AdminPanelSideBar = ({
   isLoading,
   selectedSection,
   onRoute,
-  accountSwitcherInTopBar,
+  expandedSection,
   ...props
 }) => {
   return (
-    <SidebarContainer {...props} flexGrow={0} flexShrink={0} width={['100%', '100%', '280px']}>
-      <Sticky p={[2, 3, '20px']} pt={[3, 3, '20px']}>
-        <MenuContainer>
-          {!accountSwitcherInTopBar && <AccountSwitcher activeSlug={activeSlug} />}
-          <Box py={accountSwitcherInTopBar ? 0 : 2}>
+    <SidebarContainer>
+      <Sticky px={[2, 3, '20px']} py={[2]}>
+        <Flex flex={1} maxWidth={1200}>
+          <MenuContainer>
+            {/* <AccountSwitcher activeSlug={activeSlug} /> */}
+
             {isLoading ? (
               <Box>
                 {[...Array(5).keys()].map(i => (
@@ -49,10 +48,10 @@ const AdminPanelSideBar = ({
                 ))}
               </Box>
             ) : (
-              <Menu {...{ collective, selectedSection, onRoute, isAccountantOnly }} />
+              <Menu {...{ collective, selectedSection, onRoute, isAccountantOnly, expandedSection }} />
             )}
-          </Box>
-        </MenuContainer>
+          </MenuContainer>
+        </Flex>
       </Sticky>
     </SidebarContainer>
   );
@@ -70,7 +69,6 @@ AdminPanelSideBar.propTypes = {
   isAccountantOnly: PropTypes.bool,
   onRoute: PropTypes.func,
   activeSlug: PropTypes.string,
-  useTopBar: PropTypes.bool,
 };
 
 export default AdminPanelSideBar;

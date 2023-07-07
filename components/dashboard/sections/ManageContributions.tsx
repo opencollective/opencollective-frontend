@@ -20,7 +20,7 @@ const ManageContributions = ({ account }: AdminSectionProps) => {
 
   return (
     <Container minHeight={[null, 800]}>
-      <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+      <H1 fontSize="24px" lineHeight="32px" fontWeight={700} color="black.900" letterSpacing="-.025em">
         <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
       </H1>
       <Box py={'32px'}>

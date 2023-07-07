@@ -18,6 +18,18 @@ import { SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
 
 const MenuLinkContainer = styled.li`
+  margin-bottom: 0;
+  padding: 0;
+  ${props =>
+    props.isSelected
+      ? css`
+          // border-bottom: 2px solid ${props.theme.colors.primary[600]};
+        `
+      : css`
+          &:hover {
+            // border-bottom: 2px solid ${props.theme.colors.black[100]};
+          }
+        `}
   a,
   ${StyledLink} {
     display: flex;
@@ -25,12 +37,12 @@ const MenuLinkContainer = styled.li`
     font-weight: 600;
     font-size: 14px;
     line-height: 20px;
-    padding: 8px 12px;
+    padding: 4px 10px;
     border-radius: 100px;
     -webkit-font-smoothing: antialiased;
     width: 100%;
     cursor: pointer;
-
+    transition: background-color 100ms ease-in-out, color 100ms ease-in-out;
     svg {
       flex-shrink: 0;
       color: #9ca3af;
@@ -39,22 +51,20 @@ const MenuLinkContainer = styled.li`
     ${props =>
       props.isSelected
         ? css`
-            background: ${props => props.theme.colors.black[50]};
-            color: ${props => props.theme.colors.primary[700]} !important;
-            &:hover {
-              color: ${props => props.theme.colors.primary[700]} !important;
-            }
+            color: ${props.theme.colors.primary[800]} !important;
+            background-color: ${props.theme.colors.primary[100]};
+
             svg {
-              color: ${props => props.theme.colors.primary[700]} !important;
+              color: white !important;
             }
           `
         : css`
-            color: ${props => props.theme.colors.black[800]} !important;
+            color: ${props.theme.colors.black[800]} !important;
+            background-color: transparent;
             &:hover {
-              color: ${props => props.theme.colors.primary[700]} !important;
-              background: ${props => props.theme.colors.black[50]};
+              background-color: ${props.theme.colors.black[100]};
               svg {
-                color: ${props => props.theme.colors.primary[700]} !important;
+                color: white !important;
               }
             }
           `}
@@ -101,7 +111,7 @@ export const MenuLink = ({
   const { selectedSection, expandedSection, setExpandedSection, account } = React.useContext(DashboardContext);
   const expanded = expandedSection === section;
   const { formatMessage } = useIntl();
-  const isSelected = section && selectedSection === section;
+  const isSelected = (section && selectedSection === section) || (section && expandedSection === section);
 
   useEffect(() => {
     if (parentSection && isSelected) {
@@ -127,7 +137,7 @@ export const MenuLink = ({
   const renderButtonContent = () => (
     <Flex alignItems="center" justifyContent="space-between" flex={1}>
       <Flex alignItems="center" gridGap="8px">
-        {icon?.component ? <icon.component strokeWidth={1.5} size={20} /> : icon}
+        {/* {icon?.component ? <icon.component strokeWidth={1.5} size={16} /> : icon} */}
 
         <Span truncateOverflow>
           {children}
@@ -193,7 +203,7 @@ export const MenuSectionHeader = styled.div`
   font-weight: 500;
   font-size: 12px;
   line-height: 24px;
-  margin-bottom: 6px;
+  // margin-bottom: 6px;
   padding: 0 12px;
 
   color: ${props => props.theme.colors.black[600]};
@@ -204,7 +214,8 @@ export const MenuContainer = styled.ul`
   max-width: 100%;
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: center;
   grid-gap: 4px;
   a {
     color: ${props => props.theme.colors.black[900]};
@@ -225,9 +236,9 @@ export const MenuContainer = styled.ul`
 
 export const MenuGroup = ({ if: conditional, children, ...props }) => {
   return conditional === false ? null : (
-    <Box as="ul" {...props}>
+    <Flex gridGap={2} {...props}>
       {children}
-    </Box>
+    </Flex>
   );
 };
 

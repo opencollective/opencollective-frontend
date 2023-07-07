@@ -11,12 +11,13 @@ import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { editCollectiveMutation } from '../../../lib/graphql/mutations';
 import { editCollectivePageQuery } from '../../../lib/graphql/queries';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
-
+import { Flex, Box } from '../../Grid';
 import SettingsForm from '../../edit-collective/Form';
 import Loading from '../../Loading';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import { ALL_SECTIONS } from '../constants';
 import { adminPanelQuery } from '../queries';
+import { Sidebar } from 'lucide-react';
 
 const AccountSettings = ({ account, section }) => {
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
@@ -170,14 +171,16 @@ const AccountSettings = ({ account, section }) => {
   }
 
   return (
-    <SettingsForm
-      collective={collective}
-      host={account?.host}
-      LoggedInUser={LoggedInUser}
-      onSubmit={handleEditCollective}
-      status={state.status}
-      section={section}
-    />
+    <Flex maxWidth={1024} flex={1}>
+      <SettingsForm
+        collective={collective}
+        host={account?.host}
+        LoggedInUser={LoggedInUser}
+        onSubmit={handleEditCollective}
+        status={state.status}
+        section={section}
+      />
+    </Flex>
   );
 };
 

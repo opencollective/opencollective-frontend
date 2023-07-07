@@ -91,14 +91,25 @@ const Expenses = props => {
   const isSelfHosted = data?.account?.id === data?.account?.host?.id;
 
   return (
-    <Container>
-      <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-        {onlySubmittedExpenses ? (
-          <FormattedMessage defaultMessage="Submitted Expenses" />
-        ) : (
-          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-        )}
-      </H1>
+    <Container flex={1} maxWidth={1024}>
+      {isDashboard ? (
+        <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
+          {onlySubmittedExpenses ? (
+            <FormattedMessage defaultMessage="Submitted Expenses" />
+          ) : (
+            <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+          )}
+        </H1>
+      ) : (
+        <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+          {onlySubmittedExpenses ? (
+            <FormattedMessage defaultMessage="Submitted Expenses" />
+          ) : (
+            <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+          )}
+        </H1>
+      )}
+
       <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}>
         {!onlySubmittedExpenses && (
           <Box flex="0 1" flexBasis={['100%', null, '380px']}>
@@ -111,9 +122,7 @@ const Expenses = props => {
             />
           </Box>
         )}
-        <Box flex="12 1 160px">
-          <SearchBar defaultValue={query.searchTerm} onSubmit={searchTerm => handleSearch(searchTerm)} height="40px" />
-        </Box>
+        <SearchBar defaultValue={query.searchTerm} onSubmit={searchTerm => handleSearch(searchTerm)} height="36px" />
         <Box flex="0 1 160px">
           <ExpensesOrder
             value={query.orderBy}

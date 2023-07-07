@@ -6,12 +6,10 @@ import styled from 'styled-components';
 import { Box } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 
-import AccountSwitcher from './AccountSwitcher';
-import Menu from './Menu';
-import { MenuContainer } from './MenuComponents';
+import Menu from './TopSideMenu';
+import { MenuContainer } from './TopSideMenuComponents';
 
 const SidebarContainer = styled(Box)`
-  border-right: 1px solid #e6e8eb;
   @media screen and (max-width: ${themeGet('breakpoints.1')}) {
     border-right: 0;
     border-bottom: 1px solid #e6e8eb;
@@ -31,15 +29,15 @@ const AdminPanelSideBar = ({
   isLoading,
   selectedSection,
   onRoute,
-  accountSwitcherInTopBar,
   ...props
 }) => {
   return (
     <SidebarContainer {...props} flexGrow={0} flexShrink={0} width={['100%', '100%', '280px']}>
-      <Sticky p={[2, 3, '20px']} pt={[3, 3, '20px']}>
+      <Sticky>
         <MenuContainer>
-          {!accountSwitcherInTopBar && <AccountSwitcher activeSlug={activeSlug} />}
-          <Box py={accountSwitcherInTopBar ? 0 : 2}>
+          {/* <AccountSwitcher activeSlug={activeSlug} /> */}
+
+          <Box>
             {isLoading ? (
               <Box>
                 {[...Array(5).keys()].map(i => (
@@ -70,7 +68,6 @@ AdminPanelSideBar.propTypes = {
   isAccountantOnly: PropTypes.bool,
   onRoute: PropTypes.func,
   activeSlug: PropTypes.string,
-  useTopBar: PropTypes.bool,
 };
 
 export default AdminPanelSideBar;

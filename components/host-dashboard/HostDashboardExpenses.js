@@ -10,6 +10,8 @@ import { parseDateInterval } from '../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { useLazyGraphQLPaginatedResults } from '../../lib/hooks/useLazyGraphQLPaginatedResults';
 import useQueryFilter, { BooleanFilter } from '../../lib/hooks/useQueryFilter';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import DismissibleMessage from '../DismissibleMessage';
@@ -29,7 +31,6 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
-import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
 
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
@@ -165,6 +166,7 @@ const hasParams = query => {
 };
 
 const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
+  const { LoggedInUser } = useLoggedInUser();
   const router = useRouter() || {};
   const query = enforceDefaultParamsOnQuery(router.query);
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
@@ -201,27 +203,28 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   const getQueryParams = newParams => {
     return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
   };
+  const useTopBar = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD_TOP_BAR);
 
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
-      <Flex mb={24} alignItems="center" flexWrap="wrap">
-        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
+    <Box flex={1} maxWidth={1024}>
+      <Flex mb={16} alignItems="start" flexWrap="wrap">
+        <H1 fontSize="24px" lineHeight="36px" fontWeight={700} color="black.900" letterSpacing="-.025em">
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         </H1>
+
         <Box mx="auto" />
-        <Box p={2}>
-          <SearchBar
-            defaultValue={query.searchTerm}
-            onSubmit={searchTerm =>
-              router.push({
-                pathname: pageRoute,
-                query: getQueryParams({ searchTerm, offset: null }),
-              })
-            }
-          />
-        </Box>
+        <SearchBar
+          defaultValue={query.searchTerm}
+          height={36}
+          onSubmit={searchTerm =>
+            router.push({
+              pathname: pageRoute,
+              query: getQueryParams({ searchTerm, offset: null }),
+            })
+          }
+        />
       </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
+      {/* <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" /> */}
       {paypalPreApprovalError && (
         <DismissibleMessage>
           {({ dismiss }) => (

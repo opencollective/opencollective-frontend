@@ -231,8 +231,8 @@ class CreateProjectForm extends React.Component {
               <NextIllustration
                 display={['block', 'none']}
                 src="/static/images/create-collective/mobileForm.png"
-                width="320px"
-                height="200px"
+                width={320}
+                height={200}
               />
             </Flex>
           </ContainerWithImage>

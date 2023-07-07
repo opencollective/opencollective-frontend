@@ -26,7 +26,7 @@ const MenuLinkContainer = styled.li`
     font-size: 14px;
     line-height: 20px;
     padding: 8px 12px;
-    border-radius: 100px;
+    border-radius: 8px;
     -webkit-font-smoothing: antialiased;
     width: 100%;
     cursor: pointer;
@@ -58,13 +58,6 @@ const MenuLinkContainer = styled.li`
               }
             }
           `}
-
-    ${props =>
-      props.isSub
-        ? css`
-            padding-left: 32px;
-          `
-        : css``}
   }
 `;
 
@@ -127,8 +120,6 @@ export const MenuLink = ({
   const renderButtonContent = () => (
     <Flex alignItems="center" justifyContent="space-between" flex={1}>
       <Flex alignItems="center" gridGap="8px">
-        {icon?.component ? <icon.component strokeWidth={1.5} size={20} /> : icon}
-
         <Span truncateOverflow>
           {children}
           {isBeta ? ' (Beta)' : ''}
