@@ -1,5 +1,5 @@
 const createOrderPage = '/contribution-flow';
-const contributionFlowSteps = '/details|profile|payment|finalize|summary|success';
+const contributionFlowSteps = '/details|profile|payment|summary|success';
 
 exports.REWRITES = [
   {
@@ -206,7 +206,7 @@ exports.REWRITES = [
   },
   // Embed
   {
-    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:paymentFlow(crypto)?/:step(${contributionFlowSteps})?`,
+    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
     destination: '/embed/contribution-flow',
   },
   {
@@ -246,7 +246,7 @@ exports.REWRITES = [
   },
   // New Routes -> New flow
   {
-    source: `/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:paymentFlow(crypto)?/:step(${contributionFlowSteps})?`,
+    source: `/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
   {

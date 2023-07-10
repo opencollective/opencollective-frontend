@@ -86,10 +86,6 @@ const ContributionFlowUrlParametersConfig = {
   defaultEmail: { type: 'alias', on: 'email' },
   /** @deprecated Use `name` instead */
   defaultName: { type: 'alias', on: 'name' },
-  /** Cryptocurrency type; BTC, ETH etc **/
-  cryptoCurrency: { type: 'string' },
-  /** Cryptocurrency amount **/
-  cryptoAmount: { type: 'float' },
 };
 
 const EmbedContributionFlowUrlParametersConfig = {
@@ -135,26 +131,12 @@ const STATIC_PARAMS_EMBED = Object.keys(EmbedContributionFlowUrlParametersConfig
 /**
  * Returns an un-sanitized version of the URL query parameters
  */
-export const stepsDataToUrlParamsData = (
-  previousUrlParams,
-  stepDetails,
-  stepProfile,
-  stepPayment,
-  isCrypto,
-  isEmbed,
-) => {
+export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepProfile, stepPayment, isEmbed) => {
   // Static params that are not meant to be changed during the flow
   const data = pick(previousUrlParams, isEmbed ? STATIC_PARAMS_EMBED : STATIC_PARAMS);
 
   // Step details
-  assign(data, pick(stepDetails, ['interval', 'quantity', 'customData']));
-
-  if (isCrypto) {
-    data.cryptoAmount = parseFloat(stepDetails.cryptoAmount) || previousUrlParams.cryptoAmount || 0;
-    data.cryptoCurrency = stepDetails.currency?.value ? stepDetails.currency.value : previousUrlParams.cryptoCurrency;
-  } else {
-    data.amount = stepDetails.amount;
-  }
+  assign(data, pick(stepDetails, ['interval', 'quantity', 'customData', 'amount']));
 
   // Step profile
   if (stepProfile?.slug) {

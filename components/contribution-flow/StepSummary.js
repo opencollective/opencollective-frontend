@@ -283,7 +283,7 @@ const StepSummary = ({
   stepDetails,
   collective,
   stepPayment,
-  isCrypto,
+
   applyTaxes,
   taxes,
   data,
@@ -294,7 +294,7 @@ const StepSummary = ({
   const tierType = tier?.type;
   const hostCountry = get(collective.host, 'location.country');
   const collectiveCountry = collective.location?.country || get(collective.parent, 'location.country');
-  const currency = isCrypto ? stepDetails.currency.value : tier?.amount.currency || collective.currency;
+  const currency = tier?.amount.currency || collective.currency;
 
   const [formState, setFormState] = useState({ isEnabled: false, error: false });
   const taxPercentage = getTaxPercentageForProfile(taxes, tierType, hostCountry, collectiveCountry, data);
@@ -343,7 +343,6 @@ const StepSummary = ({
         stepSummary={data}
         stepPayment={stepPayment}
         currency={currency}
-        isCrypto={isCrypto}
         tier={tier}
         renderTax={
           TaxRenderer &&
@@ -432,7 +431,6 @@ StepSummary.propTypes = {
   /** Called with the step info as `{countryCode, taxInfoNumber, isValid}`  */
   onChange: PropTypes.func.isRequired,
   taxes: PropTypes.arrayOf(PropTypes.oneOf(Object.values(TaxType))),
-  isCrypto: PropTypes.bool,
 };
 
 export default StepSummary;
