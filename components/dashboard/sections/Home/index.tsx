@@ -50,6 +50,7 @@ const Home = (props: AdminSectionProps) => {
     notifyOnNetworkStatusChange: true,
   });
 
+  const contentIsBeingGenerated = error?.graphQLErrors?.[0]?.extensions?.code === 'ContentNotReady';
   const activities: WorkspaceHomeQuery['account']['feed'] = data?.account.feed || [];
   const canViewMore = activities.length >= PAGE_SIZE && activities.length % PAGE_SIZE === 0;
   React.useEffect(() => {
@@ -87,10 +88,15 @@ const Home = (props: AdminSectionProps) => {
             {...props}
           />
         </Flex>
-        {error ? (
+        {error && !contentIsBeingGenerated ? (
           <MessageBoxGraphqlError error={error} />
-        ) : !activities.length && loading ? (
+        ) : contentIsBeingGenerated || (!activities.length && loading) ? (
           <React.Fragment>
+            {contentIsBeingGenerated && (
+              <MessageBox type="info" withIcon mb="24px">
+                <FormattedMessage defaultMessage="Generating activity timeline..." />
+              </MessageBox>
+            )}
             <TimelineItem />
             <TimelineItem />
             <TimelineItem />
