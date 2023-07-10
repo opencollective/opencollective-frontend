@@ -38,7 +38,9 @@ const CardContainer = styled(Flex)`
 
   color: #fff;
 
-  transition: box-shadow 400ms ease-in-out, transform 500ms ease;
+  transition:
+    box-shadow 400ms ease-in-out,
+    transform 500ms ease;
   box-shadow: 0px 0px 4px rgba(20, 20, 20, 0);
 
   :hover {

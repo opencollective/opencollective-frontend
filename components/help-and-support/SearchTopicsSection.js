@@ -21,9 +21,13 @@ import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
 const SearchResultPopup = styled(StyledCard)`
   border: 1px solid rgba(50, 51, 52, 0.05);
-  box-shadow: 0px 18px 40px rgba(0, 0, 0, 0.0059351), 0px 7.56604px 12.0812px rgba(0, 0, 0, 0.0111057),
-    0px 4.10431px 6.12521px rgba(0, 0, 0, 0.0160729), 0px 2.27585px 3.41503px rgba(0, 0, 0, 0.0209117),
-    0px 1.1708px 1.84491px rgba(0, 0, 0, 0.0256307), 0px 0.463169px 0.792047px rgba(0, 0, 0, 0.03);
+  box-shadow:
+    0px 18px 40px rgba(0, 0, 0, 0.0059351),
+    0px 7.56604px 12.0812px rgba(0, 0, 0, 0.0111057),
+    0px 4.10431px 6.12521px rgba(0, 0, 0, 0.0160729),
+    0px 2.27585px 3.41503px rgba(0, 0, 0, 0.0209117),
+    0px 1.1708px 1.84491px rgba(0, 0, 0, 0.0256307),
+    0px 0.463169px 0.792047px rgba(0, 0, 0, 0.03);
   border-radius: 16px;
   padding: 20px;
   z-index: 1;
