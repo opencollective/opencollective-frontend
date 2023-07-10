@@ -23,7 +23,7 @@
     "@hyperwatch/hyperwatch": "3.9.4",
     "@mui/material": "5.13.7",
     "@mui/styles": "5.13.7",
-    "@opencollective/taxes": "4.0.2",
+    "@opencollective/taxes": "4.1.0",
     "@popperjs/core": "2.11.8",
     "@sentry/browser": "^7.49.0",
     "@sentry/nextjs": "^7.49.0",
