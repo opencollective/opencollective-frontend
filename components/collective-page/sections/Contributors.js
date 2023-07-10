@@ -17,7 +17,8 @@ import ContributorsGridBackgroundSVG from '../images/ContributorsGridBackground.
 
 /** Main contributors container with the bubbles background */
 const MainContainer = styled(Container)`
-  background: linear-gradient(
+  background:
+    linear-gradient(
       0deg,
       rgba(255, 255, 255, 1) 0,
       rgba(255, 255, 255, 0) 75px,

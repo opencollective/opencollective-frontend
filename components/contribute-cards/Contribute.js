@@ -30,7 +30,10 @@ const StyledContributeCard = styled.div`
   border-radius: ${CONTRIBUTE_CARD_BORDER_RADIUS}px;
   border: 1px solid #dcdee0;
   background: white;
-  transition: border-color 0.2s, box-shadow 0.2s, opacity 0.2s; // Opacity for DragNDrop
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    opacity 0.2s; // Opacity for DragNDrop
 
   &:hover {
     /* Primitives / OC Blue */
