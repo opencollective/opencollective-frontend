@@ -247,7 +247,14 @@ const ContributeCard = ({
         <Box>
           {!disableCTA && !hideCTA && (
             <Link href={route}>
-              <StyledButton buttonStyle={getCTAButtonStyle(type)} width={1} mb={2} mt={3} data-cy="contribute-btn">
+              <StyledButton
+                buttonStyle={getCTAButtonStyle(type)}
+                width={1}
+                mb={2}
+                mt={3}
+                truncateOverflow
+                data-cy="contribute-btn"
+              >
                 {buttonText || getContributeCTA(type)}
               </StyledButton>
             </Link>

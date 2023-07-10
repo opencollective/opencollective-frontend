@@ -376,7 +376,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
           mt="3"
           required={false}
         >
-          {({ field }) => <StyledInput data-cy={field.name} {...field} />}
+          {({ field }) => <StyledInput data-cy={field.name} {...field} maxLength={20} />}
         </StyledInputFormikField>
       )}
       <StyledInputFormikField
