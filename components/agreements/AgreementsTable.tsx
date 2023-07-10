@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Agreement } from '../../lib/graphql/types/v2/graphql';
-import { useWindowResize } from '../../lib/hooks/useWindowResize';
+import { BREAKPOINTS, useWindowResize } from '../../lib/hooks/useWindowResize';
 
 import Avatar from '../Avatar';
 import { DataTable } from '../DataTable';
@@ -180,7 +180,7 @@ export default function AgreementsTable({
   onFilePreview,
 }: AgreementsTableProps) {
   const [isTableView, setIsTableView] = React.useState(true);
-  useWindowResize(() => setIsTableView(window.innerWidth > 1024));
+  useWindowResize(() => setIsTableView(window.innerWidth > BREAKPOINTS.MEDIUM));
   const columns = isTableView ? tableColumns : cardColumns;
   return (
     <DataTable
