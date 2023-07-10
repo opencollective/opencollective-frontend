@@ -5,17 +5,15 @@ import { MoreHorizontalIcon } from 'lucide-react';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import {
   Account,
   Host,
   VirtualCard as GraphQLVirtualCard,
-  VirtualCardLimitInterval,
   VirtualCardStatus,
 } from '../../lib/graphql/types/v2/graphql';
 import { useWindowResize } from '../../lib/hooks/useWindowResize';
-import { getLimitIntervalString } from '../../lib/virtual-cards/spending-limit';
+import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
 import Avatar from '../Avatar';
 import { DataTable } from '../DataTable';
@@ -116,47 +114,26 @@ export const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
       const vc = row.original;
       const meta = table.options.meta as VirtualCardsTableMeta;
 
-      return vc.spendingLimitInterval === VirtualCardLimitInterval.PER_AUTHORIZATION ? (
-        <FormattedMessage
-          id="VirtualCards.LimitedToPerAuthorization.Table"
-          defaultMessage={'{limit} <small>per authorization</small>'}
-          values={{
-            limit: formatCurrency(vc.spendingLimitAmount, vc.currency, {
-              locale: meta.intl.locale,
-            }),
-            small(msg) {
-              return (
-                <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
-                  {msg}
-                </Span>
-              );
-            },
-          }}
-        />
-      ) : (
-        <React.Fragment>
-          <FormattedMessage
-            id="VirtualCards.AvailableOfLimit.Table"
-            defaultMessage="<bold>{available}</bold> / <small>{limit}{interval}</small>"
-            values={{
-              available: formatCurrency(vc.remainingLimit, vc.currency, {
-                locale: meta.intl.locale,
-              }),
-              limit: formatCurrency(vc.spendingLimitAmount, vc.currency, {
-                locale: meta.intl.locale,
-              }),
-              interval: getLimitIntervalString(vc.spendingLimitInterval),
-              small(msg) {
-                return (
-                  <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
-                    {msg}
-                  </Span>
-                );
-              },
-              bold: I18nBold,
-            }}
-          />
-        </React.Fragment>
+      return getAvailableLimitShortString(
+        meta.intl,
+        vc.currency,
+        vc.remainingLimit,
+        vc.spendingLimitAmount,
+        vc.spendingLimitInterval,
+        {
+          AvailableAmount: I18nBold,
+          AmountSeparator: v => <strong>&nbsp;{v}&nbsp;</strong>,
+          LimitAmount: v => (
+            <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
+              {v}
+            </Span>
+          ),
+          LimitInterval: v => (
+            <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
+              {v}
+            </Span>
+          ),
+        },
       );
     },
   },

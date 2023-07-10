@@ -14,8 +14,8 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { getLimitIntervalShortString } from '../../lib/i18n/virtual-card-spending-limit';
 import { getDashboardObjectIdURL } from '../../lib/stripe/dashboard';
-import { getLimitIntervalString } from '../../lib/virtual-cards/spending-limit';
 
 import Avatar from '../Avatar';
 import ConfirmationModal from '../ConfirmationModal';
@@ -385,7 +385,7 @@ const getLimitString = ({
   spendingLimitRenewsOn,
   remainingLimit,
   currency,
-  locale,
+  intl,
 }) => {
   if (!spendingLimitAmount) {
     return <FormattedMessage id="VirtualCards.NoLimit" defaultMessage="No Limit" />;
@@ -398,7 +398,7 @@ const getLimitString = ({
           defaultMessage={'Limited to {limit} per authorization'}
           values={{
             limit: formatCurrency(spendingLimitAmount, currency, {
-              locale,
+              locale: intl.locale,
             }),
           }}
         />
@@ -406,15 +406,16 @@ const getLimitString = ({
         <Fragment>
           <FormattedMessage
             id="VirtualCards.AvailableOfLimit"
-            defaultMessage="Avl. {available} of {limit}{interval}"
+            defaultMessage="Avl. {available} of {limit}/{spendingLimitInterval, select, ALL_TIME {} other {/intervalShort}}"
             values={{
               available: formatCurrency(remainingLimit, currency, {
-                locale,
+                locale: intl.locale,
               }),
               limit: formatCurrency(spendingLimitAmount, currency, {
-                locale,
+                locale: intl.locale,
               }),
-              interval: getLimitIntervalString(spendingLimitInterval),
+              interval: getLimitIntervalShortString(intl, spendingLimitInterval),
+              spendingLimitInterval,
             }}
           />
           {spendingLimitInterval === VirtualCardLimitInterval.ALL_TIME ? (
@@ -550,7 +551,7 @@ const VirtualCard = props => {
             <P mt="16px" fontSize="11px" fontWeight="400" lineHeight="16px" letterSpacing="0">
               {getLimitString({
                 ...virtualCard,
-                locale: intl.locale,
+                intl,
               })}
             </P>
             <P mt="8px" fontSize="11px" fontWeight="400" lineHeight="16px" letterSpacing="0">
