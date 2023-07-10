@@ -50,6 +50,7 @@ export const FISCAL_HOST_SECTIONS = {
 
 export const COLLECTIVE_SECTIONS = {
   HOME: 'home',
+  CONTRIBUTIONS: 'contributions',
   ADVANCED: 'advanced',
   AUTHORIZED_APPS: 'authorized-apps',
   COLLECTIVE_GOALS: 'goals',
@@ -96,6 +97,9 @@ export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.PAYMENT_RECEIPTS,
   ALL_SECTIONS.HOST_EXPENSES,
   ALL_SECTIONS.FINANCIAL_CONTRIBUTIONS,
+  ALL_SECTIONS.TRANSACTIONS,
+  ALL_SECTIONS.EXPENSES,
+  ALL_SECTIONS.HOST_AGREEMENTS,
 ];
 
 export const PAGE_TITLES = defineMessages({
@@ -275,5 +279,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.NOTIFICATIONS]: {
     id: 'NotificationsSettings.Title',
     defaultMessage: 'Notification Settings',
+  },
+  [ALL_SECTIONS.CONTRIBUTIONS]: {
+    id: 'Contributions',
+    defaultMessage: 'Contributions',
   },
 });

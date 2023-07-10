@@ -44,7 +44,7 @@ export const generateTheme = ({ colors = defaultColors, space = defaultSpaces } 
     },
   },
   sizes: {
-    navbarHeight: 68,
+    navbarHeight: 64,
   },
 });
 

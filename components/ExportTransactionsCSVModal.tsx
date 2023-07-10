@@ -69,9 +69,13 @@ type CSVField =
   | 'expenseTags'
   | 'payoutMethodType'
   | 'merchantId'
-  | 'orderMemo';
+  | 'orderMemo'
+  | 'taxAmount'
+  | 'taxType'
+  | 'taxRate'
+  | 'taxIdNumber';
 
-const FIELD_GROUPS: Record<string, CSVField[]> = {
+const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
   transaction: [
     'date',
     'datetime',
@@ -117,14 +121,16 @@ const FIELD_GROUPS: Record<string, CSVField[]> = {
     'paymentMethodType',
   ],
   expense: ['expenseId', 'expenseLegacyId', 'expenseType', 'expenseTags', 'payoutMethodType', 'merchantId'],
+  tax: ['taxAmount', 'taxType', 'taxRate', 'taxIdNumber'],
   legacy: ['platformFee', 'hostFee'],
 };
 
-const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, any> = {
+const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, React.ReactNode> = {
   transaction: <FormattedMessage defaultMessage="Transaction" />,
   accounts: <FormattedMessage defaultMessage="Account" />,
   order: <FormattedMessage defaultMessage="Contribution" />,
   expense: <FormattedMessage id="Expense" defaultMessage="Expense" />,
+  tax: <FormattedMessage defaultMessage="Tax" />,
   legacy: <FormattedMessage id="Legacy/Deprecated" defaultMessage="Legacy/Deprecated" />,
 };
 
@@ -160,7 +166,7 @@ const DEFAULT_FIELDS = [
   'orderMemo',
 ];
 
-const FieldLabels = {
+const FieldLabels: Record<CSVField, React.ReactNode> = {
   date: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
   datetime: <FormattedMessage defaultMessage="Date & Time" />,
   id: <FormattedMessage defaultMessage="Transaction ID" />,
@@ -207,6 +213,10 @@ const FieldLabels = {
   expenseTags: <FormattedMessage defaultMessage="Expense Tags" />,
   payoutMethodType: <FormattedMessage defaultMessage="Payout Method Type" />,
   merchantId: <FormattedMessage defaultMessage="Merchant ID" />,
+  taxAmount: <FormattedMessage defaultMessage="Tax Amount" />,
+  taxType: <FormattedMessage defaultMessage="Tax Type" />,
+  taxRate: <FormattedMessage defaultMessage="Tax Rate" />,
+  taxIdNumber: <FormattedMessage defaultMessage="Tax ID Number" />,
 };
 
 enum FIELD_OPTIONS {

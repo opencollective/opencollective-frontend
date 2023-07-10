@@ -189,22 +189,23 @@ const ACTIVITIES_INFO = {
   },
 };
 
-const getActivityColor = (activityType, theme) => {
+const getActivityColors = (activityType, theme) => {
   switch (ACTIVITIES_INFO[activityType]?.type) {
     case 'info':
-      return theme.colors.blue[500];
+      return { text: theme.colors.blue[500], border: theme.colors.blue[500] };
     case 'success':
-      return theme.colors.green[500];
+      return { text: theme.colors.green[500], border: theme.colors.green[500] };
     case 'error':
-      return theme.colors.red[500];
+      return { text: theme.colors.red[500], border: theme.colors.red[500] };
     default:
-      return theme.colors.black[400];
+      return { text: theme.colors.black[700], border: theme.colors.black[400] };
   }
 };
 
 export const getActivityIcon = (activity, theme) => {
   const IconComponent = ACTIVITIES_INFO[activity.type]?.icon || UpdateIcon;
-  return <IconComponent size={18} color={getActivityColor(activity.type, theme)} />;
+  const colors = getActivityColors(activity.type, theme);
+  return <IconComponent size={18} color={colors.border} />;
 };
 
 export const isSupportedActivity = activity => {
@@ -227,7 +228,7 @@ const ActivityMessage = styled.span`
 const ThreadActivity = ({ activity }) => {
   const intl = useIntl();
   const theme = useTheme();
-  const activityColor = getActivityColor(activity.type, theme);
+  const activityColors = getActivityColors(activity.type, theme);
   const message = ACTIVITIES_INFO[activity.type]?.message;
   const details = activity.data?.message || activity.data?.error?.message;
   const DataRenderer = ACTIVITIES_INFO[activity.type]?.DataRenderer;
@@ -256,8 +257,8 @@ const ThreadActivity = ({ activity }) => {
         </Flex>
       )}
       {message && (
-        <ActivityParagraph activityColor={activityColor} mt={1} fontSize="12px" whiteSpace="pre-line">
-          <ActivityMessage color={activityColor}>
+        <ActivityParagraph activityColor={activityColors.border} mt={1} fontSize="12px" whiteSpace="pre-line">
+          <ActivityMessage color={activityColors.text}>
             {intl.formatMessage(message, {
               movedFromCollective: activity.data?.movedFromCollective?.name || 'collective',
             })}

@@ -24,7 +24,6 @@ const FlameIcon = styled(StyledRoundButton)`
   border-radius: 50%;
   height: ${props => props.height || '40px'};
   width: ${props => props.width || '40px'};
-  margin-left: 2px;
 
   &,
   &:active {
@@ -72,7 +71,7 @@ const ChangelogTrigger = props => {
   return (
     <Flex>
       {hasSeenNewUpdates ? (
-        <StyledTooltip content={TooltipContent}>
+        <StyledTooltip delayHide={100} content={TooltipContent} noArrow>
           <FlameIcon
             height={height}
             width={width}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { ColumnDef, TableMeta } from '@tanstack/react-table';
-import { FormattedDate, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Agreement } from '../../lib/graphql/types/v2/graphql';
@@ -9,6 +9,7 @@ import { useWindowResize } from '../../lib/hooks/useWindowResize';
 
 import Avatar from '../Avatar';
 import { DataTable } from '../DataTable';
+import DateTime from '../DateTime';
 import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import StyledHr from '../StyledHr';
@@ -40,6 +41,7 @@ const CellButton = styled.button`
 
 interface AgreementMeta extends TableMeta<Agreement> {
   openAgreement: (agreement: Agreement) => void;
+  onFilePreview: (agreement: Agreement) => void;
 }
 
 export const cardColumns: ColumnDef<Agreement>[] = [
@@ -50,14 +52,28 @@ export const cardColumns: ColumnDef<Agreement>[] = [
       const meta = table.options.meta as AgreementMeta;
       return (
         <CellButton onClick={() => meta.openAgreement(agreement)}>
-          <span>{agreement.title}</span>
-          <Flex alignItems="center" py={2} gridGap={2}>
-            <Avatar collective={agreement.account} radius={20} />
-            &nbsp;
-            <Span letterSpacing="0" truncateOverflow fontWeight="500">
-              {agreement.account.name}
-            </Span>
+          <Flex alignItems="center" gridGap="16px" mb="16px">
+            <Avatar collective={agreement.account} radius={32} />
+            <Flex flexDirection="column" gridGap="4px">
+              <Span letterSpacing="0" truncateOverflow fontWeight="500">
+                {agreement.account.name}
+              </Span>
+              <Span fontSize="14px" color="black.700" fontWeight="normal">
+                <DateTime value={agreement.createdAt} />
+                {agreement.expiresAt && agreement.attachment && ' • '}
+                {agreement.attachment && (
+                  <FormattedMessage
+                    id="ExepenseAttachments.count"
+                    defaultMessage="{count, plural, one {# attachment} other {# attachments}}"
+                    values={{ count: 1 }}
+                  />
+                )}
+              </Span>
+            </Flex>
           </Flex>
+          <Span fontSize="16px" fontWeight="700" lineHeight="24px" color="black.800">
+            {agreement.title}
+          </Span>
         </CellButton>
       );
     },
@@ -101,14 +117,14 @@ export const tableColumns: ColumnDef<Agreement>[] = [
 
   {
     accessorKey: 'expiresAt',
-    header: () => <FormattedMessage id="Attachment.expiresAt" defaultMessage="Expires" />,
+    header: () => <FormattedMessage id="Agreement.expiresAt" defaultMessage="Expires" />,
     cell: ({ cell }) => {
       const expiresAt = cell.getValue() as Agreement['expiresAt'];
       return (
         <Box p={3} fontSize="14px">
           {expiresAt ? (
             <Span letterSpacing="0" truncateOverflow>
-              <FormattedDate value={expiresAt} month="short" day="numeric" year="numeric" />
+              <DateTime value={expiresAt} />
             </Span>
           ) : (
             <Span fontStyle="italic" color="black.500">
@@ -123,11 +139,14 @@ export const tableColumns: ColumnDef<Agreement>[] = [
     accessorKey: 'attachment',
     header: () => <FormattedMessage id="Expense.Attachment" defaultMessage="Attachment" />,
     meta: { align: 'right' },
-    cell: ({ cell }) => {
-      const attachment = cell.getValue() as Agreement['attachment'];
+    cell: ({ row, table }) => {
+      const agreement = row.original as Agreement;
+      const attachment = agreement.attachment;
       if (!attachment?.url) {
         return <Box size={48} m={3} />;
       }
+
+      const meta = table.options.meta as AgreementMeta;
       return (
         <Flex p={3} justifyContent="flex-end">
           <UploadedFilePreview
@@ -135,6 +154,7 @@ export const tableColumns: ColumnDef<Agreement>[] = [
             size={48}
             borderRadius="8px"
             boxShadow="0px 2px 5px rgba(0, 0, 0, 0.14)"
+            openFileViewer={() => meta?.onFilePreview(agreement)}
           />
         </Flex>
       );
@@ -148,6 +168,7 @@ type AgreementsTableProps = {
   resetFilters?: () => void;
   loading?: boolean;
   nbPlaceholders?: number;
+  onFilePreview?: (agreement: Agreement) => void;
 };
 
 export default function AgreementsTable({
@@ -156,16 +177,18 @@ export default function AgreementsTable({
   loading,
   nbPlaceholders,
   resetFilters,
+  onFilePreview,
 }: AgreementsTableProps) {
   const [isTableView, setIsTableView] = React.useState(true);
   useWindowResize(() => setIsTableView(window.innerWidth > 1024));
   const columns = isTableView ? tableColumns : cardColumns;
   return (
     <DataTable
+      data-cy="agreements-table"
       hideHeader={!isTableView}
       columns={columns}
       data={agreements?.nodes || []}
-      meta={{ openAgreement } as AgreementMeta}
+      meta={{ openAgreement, onFilePreview } as AgreementMeta}
       loading={loading}
       nbPlaceholders={nbPlaceholders}
       emptyMessage={() => (

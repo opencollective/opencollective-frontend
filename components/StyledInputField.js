@@ -65,9 +65,8 @@ const StyledInputField = ({
 
   const containerFlexDirection = flexDirection ?? (isCheckbox ? 'row-reverse' : 'column');
   const containerJustifyContent = justifyContent ?? 'flex-end';
-
   return (
-    <Box {...props}>
+    <Box data-cy={`InputField-${name || htmlFor || 'unknown'}`} {...props}>
       <Flex alignItems={alignItems} flexDirection={containerFlexDirection} justifyContent={containerJustifyContent}>
         {label && (
           <P

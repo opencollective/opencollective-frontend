@@ -22,6 +22,7 @@ type AttachedFilesFormProps = {
   isMulti?: boolean;
   kind: string;
   name: string;
+  openFileViewer?: (fileUrl: string) => void;
 };
 
 const AttachedFilesForm = ({
@@ -33,6 +34,7 @@ const AttachedFilesForm = ({
   isMulti = true,
   kind,
   name,
+  openFileViewer,
 }: AttachedFilesFormProps) => {
   const [files, setFiles] = React.useState(isMulti ? uniqBy(defaultValue, 'url') : defaultValue ? [defaultValue] : []);
   return (
@@ -75,6 +77,7 @@ const AttachedFilesForm = ({
       {files?.length > 0 ? (
         <AttachedFiles
           files={files}
+          openFileViewer={openFileViewer}
           onRemove={idx => {
             let updatedFiles = null;
             if (isMulti) {

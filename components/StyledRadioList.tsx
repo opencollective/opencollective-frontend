@@ -74,6 +74,35 @@ const RadioListContainer = styled(Container)`
 /**
  * Component for controlling a list of radio inputs
  */
+type RadioListProps = {
+  /** Id for the container */
+  id?: string;
+  /** Name for the radio inputs */
+  name: string;
+  /** A function that returns the content of each radio item */
+  children: Function;
+  /** A function that returns the key to use for each item */
+  keyGetter?: string | ((item: any) => string);
+  /** A list of options to use */
+  options: any[];
+  /** Called when the selected item change */
+  onChange: (value: any) => void;
+  /** The default value to use */
+  defaultValue?: any;
+  /** The current value */
+  value?: any;
+  /** If true, all radio buttons will be disabled */
+  disabled?: boolean;
+  /** Container props */
+  containerProps?: any;
+  /** Label props */
+  labelProps?: any;
+  /** Radio size */
+  radioSize?: number;
+  /** Data-cy */
+  'data-cy'?: string;
+};
+
 const StyledRadioList = ({
   children,
   id,
@@ -87,7 +116,7 @@ const StyledRadioList = ({
   radioSize,
   'data-cy': dataCy,
   ...props
-}) => {
+}: RadioListProps) => {
   const [localStateSelected, setSelected] = useState(props.defaultValue);
   const keyExtractor = getKeyExtractor(options, keyGetter);
   const items = getItems(options, keyExtractor);
@@ -140,43 +169,6 @@ const StyledRadioList = ({
       })}
     </RadioListContainer>
   );
-};
-
-StyledRadioList.propTypes = {
-  /**
-   * render function used to display an option
-   * @param {Object} props - Properties use for rendering each radio input
-   * @param {*} props.key - unqiue key for the option derived from `options`
-   * @param {*} props.value - value for the option derived from `options`
-   * @param {boolean} props.checked - true if the radio item is selected
-   * @param {number} props.index - order index of the option
-   * @param {Component} props.radio - radio input component
-   */
-  children: PropTypes.func,
-  defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.shape()]),
-  /** element id for forms */
-  id: PropTypes.string.isRequired,
-  /** element name for radio inputs */
-  name: PropTypes.string.isRequired,
-  /** event handler for when a selection is made */
-  onChange: PropTypes.func,
-  /** for controlled components */
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.object]),
-  /** list or map of options to display */
-  options: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.shape()])),
-    PropTypes.objectOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.shape()])),
-  ]).isRequired,
-  /** A key name of a getter function to extract the unique key from option */
-  keyGetter: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-  /** To pass to the fieldset container */
-  containerProps: PropTypes.object,
-  /** To pass to the label container */
-  labelProps: PropTypes.object,
-  /** If true, user won't be able to interact with the element */
-  disabled: PropTypes.bool,
-  radioSize: PropTypes.number,
-  'data-cy': PropTypes.string,
 };
 
 const defaultChild = ({ value, radio }) => (

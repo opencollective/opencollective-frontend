@@ -29,12 +29,14 @@ const HomePage = () => {
   const { formatMessage } = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const router = useRouter();
+  const shouldRedirectToDashboard =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) && router.asPath === '/';
 
   useEffect(() => {
-    if (router.asPath === '/' && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)) {
-      router.replace(`/dashboard/${LoggedInUser.getLastDashboardSlug()}`);
+    if (shouldRedirectToDashboard) {
+      router.replace('/dashboard');
     }
-  }, [LoggedInUser, router.asPath]);
+  }, [shouldRedirectToDashboard]);
 
   return (
     <Page

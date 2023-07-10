@@ -21,6 +21,7 @@ const oscCollectiveApplicationQuery = gql`
     account(slug: $slug) {
       id
       slug
+      isActive
       description
       name
       type
@@ -63,6 +64,10 @@ const messages = defineMessages({
   'error.unauthorized.description': {
     id: 'error.unauthorized.description',
     defaultMessage: 'You have to be an admin of {name} to apply with this initiative.',
+  },
+  'error.existingHostApplication.description': {
+    id: 'error.existingHostApplication.description',
+    defaultMessage: 'This collective already has a pending application to {hostName}.',
   },
   'error.existingHost.description': {
     id: 'error.existingHost.description',
@@ -136,12 +141,13 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
         type: TOAST_TYPE.ERROR,
         title: intl.formatMessage(messages['error.title']),
         message: hasHost
-          ? intl.formatMessage(messages['error.existingHost.description'], {
-              hostName: collective.host.name,
-            })
-          : intl.formatMessage(messages['error.unauthorized.description'], {
-              name: collective.name,
-            }),
+          ? intl.formatMessage(
+              collective.isActive
+                ? messages['error.existingHost.description']
+                : messages['error.existingHostApplication.description'],
+              { hostName: collective.host.name },
+            )
+          : intl.formatMessage(messages['error.unauthorized.description'], { name: collective.name }),
       });
     }
   }, [collectiveSlug, collective]);

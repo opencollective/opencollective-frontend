@@ -328,6 +328,9 @@ export const expensePageExpenseFieldsFragment = gql`
 
       ... on AccountWithHost {
         isApproved
+        hostAgreements {
+          totalCount
+        }
         host {
           id
           legacyId
@@ -609,6 +612,14 @@ export const expensesListAdminFieldsFragment = gql`
   fragment ExpensesListAdminFieldsFragment on Expense {
     id
     onHold
+    account {
+      id
+      ... on AccountWithHost {
+        hostAgreements {
+          totalCount
+        }
+      }
+    }
     payoutMethod {
       id
       type

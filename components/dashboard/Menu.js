@@ -1,19 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { BarChartAlt2 as Chart } from '@styled-icons/boxicons-regular/BarChartAlt2';
-import { Cog } from '@styled-icons/boxicons-regular/Cog';
-import { Coin } from '@styled-icons/boxicons-regular/Coin';
-import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
-import { File } from '@styled-icons/boxicons-regular/File';
-import { NetworkChart } from '@styled-icons/boxicons-regular/NetworkChart';
-import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
-import { Transfer } from '@styled-icons/boxicons-regular/Transfer';
-import { Home } from '@styled-icons/boxicons-solid/Home';
-import { Inbox } from '@styled-icons/octicons/Inbox';
+import {
+  ArrowLeftRight as Transfer,
+  BarChart3 as Chart,
+  Coins,
+  CreditCard,
+  FileText,
+  Home,
+  Inbox,
+  Network,
+  Receipt,
+  Settings,
+} from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective.lib';
+import { isHostAccount, isIndividualAccount, isInternalHost, isSelfHostedAccount } from '../../lib/collective.lib';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 
@@ -45,18 +47,18 @@ const Menu = ({ isAccountantOnly }) => {
           <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
         </MenuSectionHeader>
         <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_EXPENSES} icon={<Receipt size={16} />} />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} icon={<Coin size={16} />} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} icon={<Coins size={16} />} />
 
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS}
-          icon={<Coin size={16} />}
+          icon={<Coins size={16} />}
           if={!isAccountantOnly}
         />
 
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS}
-          icon={<File size={16} />}
-          if={process.env.OC_ENV !== 'production'}
+          icon={<FileText size={16} />}
+          if={isInternalHost(account)}
         />
 
         <MenuLink
@@ -67,7 +69,7 @@ const Menu = ({ isAccountantOnly }) => {
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES}
           if={!isAccountantOnly}
-          icon={<NetworkChart size={16} />}
+          icon={<Network size={16} />}
         />
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS}
@@ -77,7 +79,7 @@ const Menu = ({ isAccountantOnly }) => {
         <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} isBeta icon={<Chart size={16} />} />
 
         <MenuLink
-          icon={<Cog size={16} />}
+          icon={<Settings size={16} />}
           if={isHost && !isAccountantOnly}
           section="FISCAL_HOST_SETTINGS"
           goToSection={FISCAL_HOST_SECTIONS.FISCAL_HOSTING}
@@ -104,30 +106,37 @@ const Menu = ({ isAccountantOnly }) => {
         </MenuLink>
       </MenuGroup>
 
-      {/** User/org/collective/event/project dashbord */}
+      {/** User/org/collective/event/project dashboard */}
       <MenuGroup>
-        <MenuSectionHeader>
-          {isType(account, ORGANIZATION) ? (
-            <FormattedMessage id="OrganizationDashboard" defaultMessage="Organization Dashboard" />
-          ) : isType(account, USER) ? (
-            <FormattedMessage id="UserDashboard" defaultMessage="User Dashboard" />
-          ) : isType(account, COLLECTIVE) ? (
-            <FormattedMessage id="CollectiveDashboard" defaultMessage="Collective Dashboard" />
-          ) : (
-            <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-          )}
-        </MenuSectionHeader>
+        {isHost && (
+          <MenuSectionHeader>
+            {isType(account, ORGANIZATION) ? (
+              <FormattedMessage id="OrganizationDashboard" defaultMessage="Organization Dashboard" />
+            ) : isType(account, USER) ? (
+              <FormattedMessage id="UserDashboard" defaultMessage="User Dashboard" />
+            ) : isType(account, COLLECTIVE) ? (
+              <FormattedMessage id="CollectiveDashboard" defaultMessage="Collective Dashboard" />
+            ) : (
+              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+            )}
+          </MenuSectionHeader>
+        )}
         <MenuLink section={COLLECTIVE_SECTIONS.HOME} icon={<Home size={16} />} if={isIndividual} />
+        <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTIONS} icon={<Coins size={16} />} if={isIndividual} />
         <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} icon={<Receipt size={16} />} />
-        <MenuLink section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS} icon={<Coin size={16} />} />
+        <MenuLink
+          section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS}
+          icon={<Coins size={16} />}
+          if={!isAccountantOnly && !isIndividual}
+        />
         <MenuLink
           section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
-          icon={<Coin size={16} />}
+          icon={<Coins size={16} />}
           if={isSelfHostedAccount(account) && !isAccountantOnly && isType(account, COLLECTIVE)}
         />
         <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} icon={<Transfer size={16} />} />
         <MenuLink
-          icon={<Cog size={16} />}
+          icon={<Settings size={16} />}
           if={!isHost || isUserHost}
           section="SETTINGS"
           goToSection={COLLECTIVE_SECTIONS.INFO}
@@ -234,14 +243,12 @@ const Menu = ({ isAccountantOnly }) => {
         >
           <FormattedMessage id="Settings" defaultMessage="Settings" />
         </MenuLink>
-
         {/* org settings for hosts */}
-
         <MenuLink
-          icon={<Cog size={16} />}
+          icon={<Settings size={16} />}
           if={isType(account, ORGANIZATION) && isHost}
           section="ORG_SETTINGS"
-          goToSection={ABOUT_ORG_SECTIONS.INFO}
+          goToSection={isAccountantOnly ? ALL_SECTIONS.PAYMENT_RECEIPTS : ABOUT_ORG_SECTIONS.INFO}
           renderSubMenu={({ parentSection }) => (
             <React.Fragment>
               {!isAccountantOnly && (

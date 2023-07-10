@@ -33,6 +33,7 @@ export const managedOrderFragment = gql`
     status
     description
     createdAt
+    processedAt
     frequency
     tier {
       id
@@ -57,7 +58,8 @@ export const managedOrderFragment = gql`
       type
       description
       tags
-      imageUrl
+      imageUrl(height: 96)
+      backgroundImageUrl(height: 256)
       settings
       ... on AccountWithHost {
         host {

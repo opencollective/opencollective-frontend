@@ -43,7 +43,7 @@ const messages = defineMessages({
   },
 });
 
-const paymentMethodFragment = gql`
+export const paymentMethodFragment = gql`
   fragment UpdatePaymentMethodFragment on PaymentMethod {
     id
     name
@@ -61,7 +61,7 @@ const paymentMethodFragment = gql`
   }
 `;
 
-const paymentMethodsQuery = gql`
+export const paymentMethodsQuery = gql`
   query UpdatePaymentMethodPopUpPaymentMethod($accountId: String!, $orderId: String!) {
     account(id: $accountId) {
       id
@@ -81,7 +81,7 @@ const paymentMethodsQuery = gql`
   ${paymentMethodFragment}
 `;
 
-const updatePaymentMethodMutation = gql`
+export const updatePaymentMethodMutation = gql`
   mutation UpdatePaymentMethod(
     $order: OrderReferenceInput!
     $paymentMethod: PaymentMethodReferenceInput
@@ -107,7 +107,7 @@ const updatePaymentMethodMutation = gql`
   }
 `;
 
-const paymentMethodResponseFragment = gql`
+export const paymentMethodResponseFragment = gql`
   fragment paymentMethodResponseFragment on CreditCardWithStripeError {
     paymentMethod {
       id
@@ -143,7 +143,12 @@ export const confirmCreditCardMutation = gql`
 
 const mutationOptions = { context: API_V2_CONTEXT };
 
-const sortAndFilterPaymentMethods = (paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod) => {
+export const sortAndFilterPaymentMethods = (
+  paymentMethods,
+  contribution,
+  addedPaymentMethod,
+  existingPaymentMethod,
+) => {
   if (!paymentMethods) {
     return null;
   }
@@ -198,7 +203,7 @@ const sortAndFilterPaymentMethods = (paymentMethods, contribution, addedPaymentM
   }));
 };
 
-const useUpdatePaymentMethod = contribution => {
+export const useUpdatePaymentMethod = contribution => {
   const { addToast } = useToasts();
   const [submitUpdatePaymentMethod, { loading }] = useMutation(updatePaymentMethodMutation, mutationOptions);
 

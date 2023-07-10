@@ -215,6 +215,7 @@ export const webpackCollective = {
     totalAmountReceived: 55220436,
     balanceWithBlockedFunds: {
       valueInCents: 10000,
+      currency: 'USD',
     },
     __typename: 'CollectiveStatsType',
   },

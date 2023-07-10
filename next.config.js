@@ -43,6 +43,7 @@ const nextConfig = {
         CAPTCHA_ENABLED: false,
         CAPTCHA_PROVIDER: 'HCAPTCHA',
         SENTRY_TRACES_SAMPLE_RATE: null,
+        OC_APPLICATION: null,
       }),
     );
 
@@ -63,18 +64,6 @@ const nextConfig = {
         }),
       );
     }
-
-    // Copying cMaps to get non-latin characters to work in PDFs (https://github.com/wojtekmaj/react-pdf#support-for-non-latin-characters)
-    config.plugins.push(
-      new CopyPlugin({
-        patterns: [
-          {
-            from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'cmaps'),
-            to: path.join(__dirname, 'public/static/cmaps'),
-          },
-        ],
-      }),
-    );
 
     // Copy pdfjs worker to public folder (used by PDFViewer component)
     // (Workaround for working with react-pdf and CommonJS - if moving to ESM this can be removed)

@@ -27,6 +27,23 @@ import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from './fragments';
 
 const FIELD_LABEL_PROPS = { fontSize: 16, fontWeight: 700 };
 
+const AGREEMENT_MUTATION_FIELDS_FRAGMENT = gql`
+  fragment AgreementMutationFields on Agreement {
+    id
+    ...AgreementViewFields
+    account {
+      id
+      ... on AccountWithHost {
+        # Refetch account agreements count to update the cache
+        hostAgreements {
+          totalCount
+        }
+      }
+    }
+  }
+  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
+`;
+
 const ADD_AGREEMENT_MUTATION = gql`
   mutation AddAgreement(
     $host: AccountReferenceInput!
@@ -45,10 +62,10 @@ const ADD_AGREEMENT_MUTATION = gql`
       notes: $notes
     ) {
       id
-      ...AgreementViewFields
+      ...AgreementMutationFields
     }
   }
-  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
+  ${AGREEMENT_MUTATION_FIELDS_FRAGMENT}
 `;
 
 const EDIT_AGREEMENT_MUTATION = gql`
@@ -61,10 +78,10 @@ const EDIT_AGREEMENT_MUTATION = gql`
   ) {
     editAgreement(agreement: $agreement, title: $title, expiresAt: $expiresAt, notes: $notes, attachment: $attachment) {
       id
-      ...AgreementViewFields
+      ...AgreementMutationFields
     }
   }
-  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
+  ${AGREEMENT_MUTATION_FIELDS_FRAGMENT}
 `;
 
 const ActionButtons = ({ formik, onCancel }) => (
@@ -102,9 +119,10 @@ type AgreementFormProps = {
   onEdit: (Agreement) => void;
   onCancel: () => void;
   agreement: Agreement;
+  openFileViewer: (fileUrl: string) => void;
 };
 
-const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: AgreementFormProps) => {
+const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel, openFileViewer }: AgreementFormProps) => {
   const intl = useIntl();
   const { addToast } = useToasts();
   const initialValues = cloneDeep(agreement || {});
@@ -161,7 +179,7 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: 
       >
         {formik => {
           return (
-            <Form>
+            <Form data-cy="agreement-form">
               <StyledInputFormikField
                 name="account"
                 label={intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' })}
@@ -205,6 +223,7 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: 
                 isMulti={false}
                 onChange={file => formik.setFieldValue('attachment', file)}
                 defaultValue={formik.values.attachment || undefined}
+                openFileViewer={openFileViewer}
               />
               <StyledInputFormikField
                 name="expiresAt"

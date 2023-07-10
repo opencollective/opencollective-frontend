@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
-import { themeGet } from '@styled-system/theme-get';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { formatAccountName } from '../../lib/collective.lib';
@@ -10,12 +9,15 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payout-method';
+import formatCollectiveType from '../../lib/i18n/collective-type';
+import { getDashboardRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import LocationAddress from '../LocationAddress';
@@ -40,23 +42,22 @@ CreatedByUserLink.propTypes = {
   account: PropTypes.object,
 };
 
-const PrivateInfoColumn = styled(Box).attrs({ mx: [0, '8px'], flexBasis: [0, '200px'] })`
-  margin-top: 42px;
-  padding-top: 16px;
-  border-top: 1px solid ${themeGet('colors.black.300')};
-  ${({ borderless }) => (borderless ? 'border-top: none; padding-top: 0; margin-top: 0;' : '')}
+const PrivateInfoColumn = styled(Box).attrs({ flexBasis: [0, '185px'] })`
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 16px;
   flex: 1 1;
-  min-width: 200px;
+  min-width: 160px;
 `;
 
 const PrivateInfoColumnHeader = styled(H4).attrs({
-  fontSize: '10px',
-  fontWeight: 'bold',
+  fontSize: '12px',
+  fontWeight: '500',
   textTransform: 'uppercase',
-  color: 'black.500',
-  mb: 2,
-  letterSpacing: 0,
-  lineHeight: '15px',
+  color: 'black.700',
+  mb: 3,
+  letterSpacing: '0.06em',
+  lineHeight: '16px',
 })``;
 
 const PayeeTotalPayoutSumTooltip = ({ stats }) => {
@@ -101,17 +102,24 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
   );
 };
 
-const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLoggedInUser, isDraft, collective }) => {
+const ExpenseSummaryAdditionalInformation = ({
+  expense,
+  host,
+  isLoading,
+  isLoadingLoggedInUser,
+  isDraft,
+  collective,
+}) => {
+  const intl = useIntl();
   const payeeLocation = expense?.payeeLocation || expense?.draft?.payeeLocation;
   const payee = isDraft ? expense?.draft?.payee : expense?.payee;
   const payeeStats = payee && !isDraft ? payee.stats : null; // stats not available for drafts
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === expenseStatus.PAID;
-  const displayedHost = expense?.host ?? host;
 
   if (isLoading) {
-    <LoadingPlaceholder height={150} mt={3} />;
+    return <LoadingPlaceholder height={150} mt={3} />;
   }
 
   if (!payee) {
@@ -123,8 +131,64 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
       flexDirection={['column', 'row']}
       alignItems={['stretch', 'flex-start']}
       flexWrap={['nowrap', 'wrap', null, 'nowrap']}
+      gridGap="12px"
     >
-      <PrivateInfoColumn data-cy="expense-summary-payee" borderless={borderless}>
+      {collective && (
+        <PrivateInfoColumn data-cy="expense-summary-collective">
+          <PrivateInfoColumnHeader>{formatCollectiveType(intl, collective.type)}</PrivateInfoColumnHeader>
+          <LinkCollective collective={collective}>
+            <Flex alignItems="center">
+              <Avatar collective={collective} radius={24} />
+              <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
+                <Span color="black.800" fontSize="14px" fontWeight="700">
+                  {formatAccountName(collective.name, collective.legalName)}
+                </Span>
+                <Span color="black.900" fontSize="13px">
+                  @{collective.slug}
+                </Span>
+              </Flex>
+            </Flex>
+          </LinkCollective>
+          {collective.stats.balanceWithBlockedFunds && (
+            <Container mt={2} fontSize="14px" color="black.700">
+              <Container fontWeight="700">
+                <FormattedMessage
+                  id="withColon"
+                  defaultMessage="{item}:"
+                  values={{ item: <FormattedMessage id="Balance" defaultMessage="Balance" /> }}
+                />
+              </Container>
+              <Box mt={2}>
+                <FormattedMoneyAmount
+                  amount={collective.stats.balanceWithBlockedFunds.valueInCents}
+                  currency={collective.stats.balanceWithBlockedFunds.currency}
+                  amountStyles={null}
+                />
+              </Box>
+            </Container>
+          )}
+          {Boolean(collective?.hostAgreements?.totalCount) && (
+            <Container mt={3}>
+              <StyledLink
+                as={Link}
+                fontWeight="700"
+                color="black.700"
+                textDecoration="underline"
+                href={`${getDashboardRoute(host, 'host-agreements')}?account=${collective.slug}`}
+              >
+                <FormattedMessage
+                  defaultMessage="Host Agreements: <Color>{agreementsCount}</Color>"
+                  values={{
+                    Color: text => <Span color="primary.600">{text}</Span>,
+                    agreementsCount: collective.hostAgreements.totalCount,
+                  }}
+                />
+              </StyledLink>
+            </Container>
+          )}
+        </PrivateInfoColumn>
+      )}
+      <PrivateInfoColumn data-cy="expense-summary-payee">
         <PrivateInfoColumnHeader>
           {isPaid ? (
             <FormattedMessage id="Expense.PaidTo" defaultMessage="Paid to" />
@@ -133,7 +197,7 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
           )}
         </PrivateInfoColumnHeader>
         <LinkCollective collective={payee}>
-          <Flex alignItems="center" fontSize="12px">
+          <Flex alignItems="center" fontSize="14px">
             {!payee.slug ? (
               <Avatar
                 name={payee.organization?.name || payee.name}
@@ -145,14 +209,14 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
               <Avatar collective={payee} radius={24} />
             )}
             <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
-              <Span color="black.900" fontWeight="bold" truncateOverflow>
+              <Span color="black.900" fontWeight="bold">
                 {formatAccountName(
                   payee.organization?.name || payee.name,
                   payee.organization?.legalName || payee.legalName,
                 )}
               </Span>
               {payee.type !== CollectiveType.VENDOR && (payee.organization?.slug || payee.slug) && (
-                <Span color="black.900" fontSize="11px" truncateOverflow>
+                <Span color="black.900" fontSize="13px">
                   @{payee.organization?.slug || payee.slug}
                 </Span>
               )}
@@ -162,23 +226,23 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
         </LinkCollective>
 
         {payeeLocation && isInvoice && (
-          <Container whiteSpace="pre-wrap" fontSize="11px" lineHeight="16px" mt={2}>
+          <Container whiteSpace="pre-wrap" color="black.700" fontSize="14px" lineHeight="16px" mt={2}>
             <LocationAddress location={payeeLocation} isLoading={isLoadingLoggedInUser} />
           </Container>
         )}
         {payee.website && (
-          <P mt={2} fontSize="11px">
+          <P mt={2} fontSize="14px">
             <StyledLink href={payee.website} openInNewTab>
               {payee.website}
             </StyledLink>
           </P>
         )}
       </PrivateInfoColumn>
-      <PrivateInfoColumn mr={0} borderless={borderless}>
+      <PrivateInfoColumn mr={0}>
         <PrivateInfoColumnHeader>
           <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
         </PrivateInfoColumnHeader>
-        <Container fontSize="12px" color="black.600">
+        <Container fontSize="14px" color="black.700">
           <Box mb={3} data-cy="expense-summary-payout-method-type">
             <PayoutMethodTypeWithIcon
               type={
@@ -191,12 +255,12 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
               name={expense?.virtualCard?.name && `${expense.virtualCard.name} Card (${expense.virtualCard.last4})`}
             />
           </Box>
-          <div data-cy="expense-summary-payout-method-data">
+          <Container data-cy="expense-summary-payout-method-data" wordBreak="break-word">
             <PayoutMethodData
               payoutMethod={expense.draft?.payoutMethod ?? expense.payoutMethod}
               isLoading={isLoadingLoggedInUser}
             />
-          </div>
+          </Container>
           {expense.invoiceInfo && (
             <Box mt={3} data-cy="expense-summary-invoice-info">
               <Container fontSize="11px" fontWeight="500" mb={2}>
@@ -211,47 +275,6 @@ const ExpensePayeeDetails = ({ expense, host, isLoading, borderless, isLoadingLo
           )}
         </Container>
       </PrivateInfoColumn>
-      {displayedHost && (
-        <PrivateInfoColumn data-cy="expense-summary-host" borderless={borderless}>
-          <PrivateInfoColumnHeader>
-            {isPaid ? (
-              <FormattedMessage id="expense.PaidFromFiscalhost" defaultMessage="Paid from Fiscal Host" />
-            ) : (
-              <FormattedMessage id="expense.PayFromFiscalhost" defaultMessage="Pay from Fiscal Host" />
-            )}
-          </PrivateInfoColumnHeader>
-          <LinkCollective collective={displayedHost}>
-            <Flex alignItems="center">
-              <Avatar collective={displayedHost} radius={24} />
-              <Span ml={2} color="black.900" fontSize="12px" fontWeight="bold" truncateOverflow>
-                {collective?.isActive ? (
-                  formatAccountName(displayedHost.name, displayedHost.legalName)
-                ) : (
-                  <FormattedMessage
-                    id="Fiscalhost.pending"
-                    defaultMessage="{host} (pending)"
-                    values={{
-                      host: formatAccountName(displayedHost.name, displayedHost.legalName),
-                    }}
-                  />
-                )}
-              </Span>
-            </Flex>
-          </LinkCollective>
-          {displayedHost.location && (
-            <P whiteSpace="pre-wrap" fontSize="11px" mt={2}>
-              {displayedHost.location.address}
-            </P>
-          )}
-          {displayedHost.website && (
-            <P mt={2} fontSize="11px">
-              <StyledLink href={displayedHost.website} openInNewTab>
-                {displayedHost.website}
-              </StyledLink>
-            </P>
-          )}
-        </PrivateInfoColumn>
-      )}
     </Flex>
   );
 };
@@ -273,7 +296,7 @@ PayeeTotalPayoutSumTooltip.propTypes = {
   }),
 };
 
-ExpensePayeeDetails.propTypes = {
+ExpenseSummaryAdditionalInformation.propTypes = {
   /** Set this to true if the expense is not loaded yet */
   isLoading: PropTypes.bool,
   /** Set this to true if this shoud use information from expense.draft property */
@@ -281,16 +304,7 @@ ExpensePayeeDetails.propTypes = {
   /** Set this to true if the logged in user is currenltly loading */
   isLoadingLoggedInUser: PropTypes.bool,
   host: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    legalName: PropTypes.string,
     slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    website: PropTypes.string,
-    location: PropTypes.shape({
-      address: PropTypes.string,
-      country: PropTypes.string,
-    }),
   }),
   /** Must be provided if isLoading is false */
   expense: PropTypes.shape({
@@ -342,18 +356,6 @@ ExpensePayeeDetails.propTypes = {
       slug: PropTypes.string,
       type: PropTypes.string,
     }),
-    host: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      legalName: PropTypes.string,
-      slug: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      website: PropTypes.string,
-      location: PropTypes.shape({
-        address: PropTypes.string,
-        country: PropTypes.string,
-      }),
-    }),
     payoutMethod: PropTypes.shape({
       id: PropTypes.string,
       type: PropTypes.oneOf(Object.values(PayoutMethodType)),
@@ -365,12 +367,20 @@ ExpensePayeeDetails.propTypes = {
       last4: PropTypes.string,
     }),
   }),
-  /** Disable border and paiding in styled card, usefull for modals */
-  borderless: PropTypes.bool,
   collective: PropTypes.shape({
     id: PropTypes.string.isRequired,
     isActive: PropTypes.bool,
+    type: PropTypes.string.isRequired,
+    slug: PropTypes.string.isRequired,
+    name: PropTypes.string,
+    legalName: PropTypes.string,
+    stats: PropTypes.shape({
+      balanceWithBlockedFunds: PropTypes.object,
+    }),
+    hostAgreements: PropTypes.shape({
+      totalCount: PropTypes.number,
+    }),
   }),
 };
 
-export default ExpensePayeeDetails;
+export default ExpenseSummaryAdditionalInformation;

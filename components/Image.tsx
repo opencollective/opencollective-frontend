@@ -1,5 +1,5 @@
 import React from 'react';
-import NextImage from 'next/image';
+import NextImage, { ImageProps } from 'next/image';
 
 // Default to no custom loader, will use Squoosh in dev
 let loader;
@@ -23,8 +23,18 @@ if (process.env.NEXT_IMAGES_URL) {
  * that would be difficult to match with Heroku (at the time of writing, the default loader
  * uses Squoosh, which is a pure-JS solution up to 25x slower than Sharp)
  */
-const Image = ({ ...props }) => {
-  return <NextImage loader={loader} {...props} />;
+const Image = ({ ...props }: ImageProps) => {
+  return (
+    <NextImage
+      loader={loader}
+      {...props}
+      style={{
+        maxWidth: '100%',
+        height: 'auto',
+        ...props.style,
+      }}
+    />
+  );
 };
 
 export default Image;

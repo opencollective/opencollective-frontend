@@ -159,6 +159,8 @@ class ContributionFlow extends React.Component {
       stripeElements: null,
       isSubmitted: false,
       isSubmitting: false,
+      isInitializing: true,
+      isNavigating: false,
       showSignIn: false,
       createdOrder: null,
       forceSummaryStep: this.getCurrentStepName() !== STEPS.DETAILS, // If not starting the flow with the details step, we force the summary step to make sure contributors have an easy way to review their contribution
@@ -182,7 +184,14 @@ class ContributionFlow extends React.Component {
     };
   }
 
-  componentDidUpdate(oldProps) {
+  async componentDidMount() {
+    if (!this.props.loadingLoggedInUser && this.state.isInitializing) {
+      await this.updateRouteFromState();
+      this.setState({ isInitializing: false });
+    }
+  }
+
+  async componentDidUpdate(oldProps) {
     if (oldProps.LoggedInUser && !this.props.LoggedInUser) {
       // User has logged out, reset the state
       this.setState({ stepProfile: null, stepSummary: null, stepPayment: null });
@@ -204,32 +213,43 @@ class ContributionFlow extends React.Component {
     } else if (oldProps.loadingLoggedInUser && !this.props.loadingLoggedInUser) {
       // Login failed, reset the state to make sure we fallback on guest mode
       this.setState({ stepProfile: this.getDefaultStepProfile() });
-    } else if (!this.props.loadingLoggedInUser) {
-      // Reflect state changes in the URL
-      const currentStepName = this.getCurrentStepName();
-      if (currentStepName !== STEPS.SUCCESS) {
-        const { stepDetails, stepProfile, stepPayment } = this.state;
-        const currentUrlState = this.getQueryParams();
-        const expectedUrlState = stepsDataToUrlParamsData(
-          currentUrlState,
-          stepDetails,
-          stepProfile,
-          stepPayment,
-          this.props.paymentFlow === PAYMENT_FLOW.CRYPTO,
-          this.props.isEmbed,
-        );
-        if (!isEqual(currentUrlState, omitBy(expectedUrlState, isNil))) {
-          const route = this.getRoute(currentStepName);
-          const queryHelper = this.getQueryHelper();
-          this.props.router.replace(
+    } else if (!this.props.loadingLoggedInUser && this.state.isInitializing) {
+      await this.updateRouteFromState();
+      this.setState({ isInitializing: false });
+    }
+  }
+
+  updateRouteFromState = async () => {
+    if (this.state.isNavigating) {
+      return;
+    }
+
+    const currentStepName = this.getCurrentStepName();
+    if (currentStepName !== STEPS.SUCCESS) {
+      const { stepDetails, stepProfile, stepPayment } = this.state;
+      const currentUrlState = this.getQueryParams();
+      const expectedUrlState = stepsDataToUrlParamsData(
+        currentUrlState,
+        stepDetails,
+        stepProfile,
+        stepPayment,
+        this.props.paymentFlow === PAYMENT_FLOW.CRYPTO,
+        this.props.isEmbed,
+      );
+      if (!isEqual(currentUrlState, omitBy(expectedUrlState, isNil))) {
+        const route = this.getRoute(currentStepName);
+        const queryHelper = this.getQueryHelper();
+        this.setState({ isNavigating: true }, async () => {
+          await this.props.router.replace(
             { pathname: route, query: omitBy(queryHelper.encode(expectedUrlState), isNil) },
             null,
             { scroll: false, shallow: true },
           );
-        }
+          this.setState({ isNavigating: false });
+        });
       }
     }
-  }
+  };
 
   _getQueryParams = memoizeOne(query => {
     return this.getQueryHelper().decode(query);
@@ -542,7 +562,7 @@ class ContributionFlow extends React.Component {
     if (!stepProfile) {
       return action === 'prev';
     } else if (stepProfile.isGuest) {
-      return validateGuestProfile(stepProfile, stepDetails);
+      return validateGuestProfile(stepProfile, stepDetails, this.props.tier);
     }
 
     // Check if we're creating a new profile
@@ -615,8 +635,8 @@ class ContributionFlow extends React.Component {
       });
     }
 
-    // This checkout step is where the QR code is displayed for crypto
-    if (step.name === 'checkout') {
+    // This finalize step is where the QR code is displayed for crypto
+    if (step.name === 'finalize') {
       await this.submitOrder();
     }
 
@@ -628,9 +648,7 @@ class ContributionFlow extends React.Component {
   /** Navigate to another step, ensuring all route params are preserved */
   pushStepRoute = async (stepName, { query: newQueryParams, replace = false } = {}) => {
     // Reset errors if any
-    if (this.state.error) {
-      this.setState({ error: null });
-    }
+    this.setState({ error: null, isNavigating: true });
 
     // Navigate to the new route
     const { router } = this.props;
@@ -640,6 +658,7 @@ class ContributionFlow extends React.Component {
     const route = this.getRoute(stepName === 'details' ? '' : stepName);
     const navigateFn = replace ? router.replace : router.push;
     await navigateFn({ pathname: route, query: omitBy(encodedQueryParams, value => !value) }, null, { shallow: true });
+    this.setState({ isNavigating: false });
     this.scrollToTop();
 
     // Reinitialize form on success
@@ -733,7 +752,7 @@ class ContributionFlow extends React.Component {
     const minAmount = this.getTierMinAmount(tier, currency);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
     const isStepProfileCompleted = Boolean(
-      (stepProfile && LoggedInUser) || (stepProfile?.isGuest && validateGuestProfile(stepProfile, stepDetails)),
+      (stepProfile && LoggedInUser) || (stepProfile?.isGuest && validateGuestProfile(stepProfile, stepDetails, tier)),
     );
     const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
 
@@ -795,7 +814,7 @@ class ContributionFlow extends React.Component {
     }
 
     // Hide step payment if using a free tier with fixed price
-    // Also hide payment screen if using crypto payment method, we handle crypto flow in the `checkout` step below
+    // Also hide payment screen if using crypto payment method, we handle crypto flow in the `finalize` step below
     if (!noPaymentRequired && !isCrypto) {
       steps.push({
         name: 'payment',
@@ -830,7 +849,7 @@ class ContributionFlow extends React.Component {
 
     if (isCrypto) {
       steps.push({
-        name: 'checkout',
+        name: 'finalize',
         label: intl.formatMessage(STEP_LABELS.payment),
         isCompleted: !stepProfile?.contributorRejectedCategories,
       });
@@ -996,7 +1015,7 @@ class ContributionFlow extends React.Component {
                     collective={collective}
                     tier={tier}
                     mainState={this.state}
-                    onChange={data => this.setState(data)}
+                    onChange={data => this.setState(data, this.updateRouteFromState)}
                     step={currentStep}
                     isCrypto={isCrypto}
                     showPlatformTip={this.canHavePlatformTips()}
@@ -1021,10 +1040,10 @@ class ContributionFlow extends React.Component {
                   <Box mt={40}>
                     <ContributionFlowButtons
                       goNext={goNext}
-                      // for crypto flow the user should not be able to go back after the order is created at checkout step
+                      // for crypto flow the user should not be able to go back after the order is created at finalize step
                       // we also don't want to show the back button when linking directly to the payment step with `hideSteps=true`
                       goBack={
-                        (isCrypto && currentStep.name === STEPS.CHECKOUT) ||
+                        (isCrypto && currentStep.name === STEPS.FINALIZE) ||
                         (queryParams.hideSteps && currentStep.name === STEPS.PAYMENT)
                           ? null
                           : goBack
@@ -1039,6 +1058,7 @@ class ContributionFlow extends React.Component {
                       tier={tier}
                       stepDetails={stepDetails}
                       stepSummary={stepSummary}
+                      disabled={this.state.isInitializing || this.state.isNavigating}
                     />
                   </Box>
                   {!isEmbed && (

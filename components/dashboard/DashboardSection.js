@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import AccountSettings from '../admin-panel/sections/AccountSettings';
 import FinancialContributions from '../admin-panel/sections/FinancialContributions';
 import HostVirtualCards from '../admin-panel/sections/HostVirtualCards';
-import InvoicesReceipts from '../admin-panel/sections/InvoicesReceipts';
+import InvoicesReceipts from '../admin-panel/sections/invoices-receipts/InvoicesReceipts';
 import NotificationsSettings from '../admin-panel/sections/NotificationsSettings';
 import PendingContributions from '../admin-panel/sections/PendingContributions';
 import TeamSettings from '../admin-panel/sections/Team';
@@ -22,6 +22,7 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 import { H2 } from '../Text';
 
+import Contributions from './sections/Contributions';
 import Expenses from './sections/Expenses';
 import Home from './sections/Home';
 import ManageContributions from './sections/ManageContributions';
@@ -49,6 +50,7 @@ const ADMIN_PANEL_SECTIONS = {
   [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
   [COLLECTIVE_SECTIONS.EXPENSES]: Expenses,
   [COLLECTIVE_SECTIONS.HOME]: Home,
+  [COLLECTIVE_SECTIONS.CONTRIBUTIONS]: Contributions,
   [COLLECTIVE_SECTIONS.TRANSACTIONS]: Transactions,
 };
 

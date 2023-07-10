@@ -60,7 +60,7 @@ const Action = styled.button`
   }
 `;
 
-export const AgreementWithActions = ({ agreement, onEdit, onDelete }) => {
+export const AgreementWithActions = ({ agreement, onEdit, onDelete, openFileViewer }) => {
   const drawerActionsContainer = useDrawerActionsContainer();
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
@@ -69,7 +69,7 @@ export const AgreementWithActions = ({ agreement, onEdit, onDelete }) => {
   const intl = useIntl();
   return (
     <React.Fragment>
-      <Agreement agreement={agreement} />
+      <Agreement agreement={agreement} openFileViewer={() => openFileViewer(agreement.attachment)} />
       {drawerActionsContainer &&
         createPortal(
           <Flex justifyContent="space-between" width="100%">
@@ -99,7 +99,7 @@ export const AgreementWithActions = ({ agreement, onEdit, onDelete }) => {
                 </Action>
               </Flex>
             </PopupMenu>
-            <StyledButton buttonStyle="secondary" onClick={onEdit}>
+            <StyledButton buttonStyle="secondary" onClick={onEdit} data-cy="btn-edit-agreement">
               <FormattedMessage defaultMessage="Edit Agreement" />
             </StyledButton>
           </Flex>,

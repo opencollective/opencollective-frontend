@@ -6,11 +6,14 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { Agreement } from '../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import AgreementDrawer from '../agreements/AgreementDrawer';
 import AgreementsTable from '../agreements/AgreementsTable';
 import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from '../agreements/fragments';
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import FilesViewerModal from '../FilesViewerModal';
 import { Box, Flex } from '../Grid';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
@@ -23,6 +26,7 @@ const hostDashboardAgreementsQuery = gql`
     host(slug: $hostSlug) {
       id
       legacyId
+      slug
       hostedAccountAgreements(limit: $limit, offset: $offset, accounts: $account) {
         totalCount
         nodes {
@@ -43,6 +47,12 @@ const selectedAccountInfoQuery = gql`
       name
       slug
       imageUrl
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+        }
+      }
     }
   }
 `;
@@ -68,8 +78,10 @@ const HostDashboardAgreements = ({ hostSlug }) => {
   const router = useRouter();
   const intl = useIntl();
   const query = router.query;
+  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const [agreementDrawerOpen, setAgreementDrawerOpen] = React.useState(false);
   const [agreementInDrawer, setAgreementInDrawer] = React.useState(null);
+  const [agreementFilePreview, setAgreementFilePreview] = React.useState<Agreement | null>(null);
   const queryVariables = { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) };
   const hasSelectedAccount = Boolean(queryVariables.account);
   const [selectedAccount, setSelectedAccount] = React.useState(undefined);
@@ -82,21 +94,23 @@ const HostDashboardAgreements = ({ hostSlug }) => {
     variables: { account: queryVariables.account?.slug },
     context: API_V2_CONTEXT,
     onCompleted: data => {
-      if (selectedAccount === undefined) {
+      if (selectedAccount === undefined && data?.account?.host?.slug === hostSlug) {
         setSelectedAccount(data?.account);
       }
     },
   });
 
+  const canEdit = Boolean(LoggedInUser && !LoggedInUser.isAccountantOnly(data?.host));
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
-      <Flex mb={24} justifyContent="space-between" alignItems="center" flexWrap="wrap">
+      <Flex mb={24} justifyContent="space-between" alignItems="center" flexWrap="wrap" gridGap="16px">
         <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
           <FormattedMessage id="Agreements" defaultMessage="Agreements" />
         </H1>
         <Flex alignItems="center" gridGap="16px" flexWrap="wrap">
           <CollectivePickerAsync
             inputId="agreements-account"
+            data-cy="select-agreements-account"
             width="300px"
             styles={{ control: { borderRadius: '100px', padding: '3px 16px' } }}
             placeholder={intl.formatMessage({ defaultMessage: 'Filter by account' })}
@@ -112,20 +126,24 @@ const HostDashboardAgreements = ({ hostSlug }) => {
               router.push({ pathname: router.asPath.split('?')[0], query: newQuery });
             }}
           />
-          <StyledButton
-            buttonStyle="primary"
-            buttonSize="tiny"
-            height="40px"
-            onClick={() => {
-              setAgreementInDrawer(null);
-              setAgreementDrawerOpen(true);
-            }}
-          >
-            <Span mr={2}>
-              <FormattedMessage id="HostDashboardAgreements.New" defaultMessage="Add New" />
-            </Span>
-            <PlusIcon size={14} color="#FFFFFF" />
-          </StyledButton>
+          {canEdit && (
+            <StyledButton
+              data-cy="btn-new-agreement"
+              buttonStyle="primary"
+              buttonSize="tiny"
+              height="40px"
+              disabled={loading || loadingLoggedInUser}
+              onClick={() => {
+                setAgreementInDrawer(null);
+                setAgreementDrawerOpen(true);
+              }}
+            >
+              <Span mr={2}>
+                <FormattedMessage id="HostDashboardAgreements.New" defaultMessage="Add New" />
+              </Span>
+              <PlusIcon size={14} color="#FFFFFF" />
+            </StyledButton>
+          )}
         </Flex>
       </Flex>
       <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
@@ -138,6 +156,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
             loading={loading}
             nbPlaceholders={NB_AGREEMENTS_DISPLAYED}
             resetFilters={hasSelectedAccount && (() => router.push({ pathname: router.asPath.split('?')[0] }))}
+            onFilePreview={setAgreementFilePreview}
             openAgreement={agreement => {
               setAgreementDrawerOpen(true);
               setAgreementInDrawer(agreement);
@@ -146,6 +165,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
           <AgreementDrawer
             open={agreementDrawerOpen}
             agreement={agreementInDrawer}
+            canEdit={canEdit}
             hostLegacyId={data?.host.legacyId} // legacyId required by CollectivePickerAsync
             onClose={() => setAgreementDrawerOpen(false)}
             onCreate={() => {
@@ -160,6 +180,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
               setAgreementDrawerOpen(false);
               refetch(queryVariables);
             }}
+            onFilePreview={() => setAgreementFilePreview(agreementInDrawer)}
           />
           <Flex my={4} justifyContent="center">
             {hasPagination(data || previousData, queryVariables) && (
@@ -174,6 +195,14 @@ const HostDashboardAgreements = ({ hostSlug }) => {
             )}
           </Flex>
         </React.Fragment>
+      )}
+      {agreementFilePreview && (
+        <FilesViewerModal
+          files={[agreementFilePreview.attachment]}
+          openFileUrl={agreementFilePreview.attachment.url}
+          onClose={() => setAgreementFilePreview(null)}
+          parentTitle={`${agreementFilePreview.account.name} / ${agreementFilePreview.title}`}
+        />
       )}
     </Box>
   );

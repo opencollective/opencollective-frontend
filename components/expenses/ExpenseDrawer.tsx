@@ -31,7 +31,7 @@ export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initia
   }, [openExpenseLegacyId]);
 
   return (
-    <Drawer open={Boolean(openExpenseLegacyId)} onClose={handleClose} showActionsContainer>
+    <Drawer open={Boolean(openExpenseLegacyId)} onClose={handleClose} showActionsContainer data-cy="expense-drawer">
       <Expense
         data={initialExpenseValues ? { ...data, expense: { ...initialExpenseValues, ...data?.expense } } : data}
         // Making sure to initially set loading to true before the query is called

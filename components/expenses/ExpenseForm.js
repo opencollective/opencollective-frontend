@@ -36,8 +36,8 @@ import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } 
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
 import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';
 import { prepareExpenseItemForSubmit, validateExpenseItem } from './ExpenseItemForm';
-import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseRecurringBanner from './ExpenseRecurringBanner';
+import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
 import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
 import ExpenseTypeTag from './ExpenseTypeTag';
 import { validatePayoutMethod } from './PayoutMethodForm';
@@ -749,7 +749,7 @@ const ExpenseFormBody = ({
       )}
       {step === EXPENSE_FORM_STEPS.EXPENSE && (
         <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
-          <ExpensePayeeDetails expense={formik.values} host={collective.host} borderless collective={collective} />
+          <ExpenseSummaryAdditionalInformation expense={formik.values} host={collective.host} collective={collective} />
         </StyledCard>
       )}
     </Form>

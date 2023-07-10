@@ -74,6 +74,13 @@ export const workspaceHomeQuery = gql`
             }
           }
         }
+        update {
+          id
+          legacyId
+          title
+          summary
+          slug
+        }
         individual {
           id
           slug

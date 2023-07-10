@@ -29,8 +29,8 @@ import UploadedFilePreview from '../UploadedFilePreview';
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 import ExpenseMoreActionsButton from './ExpenseMoreActionsButton';
-import ExpensePayeeDetails from './ExpensePayeeDetails';
 import ExpenseStatusTag from './ExpenseStatusTag';
+import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
 import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
 
 export const SummaryHeader = styled(H1)`
@@ -180,7 +180,7 @@ const ExpenseSummary = ({
             <LinkCollective collective={createdByAccount}>
               <Avatar collective={createdByAccount} size={24} />
             </LinkCollective>
-            <P ml={2} fontSize="12px" color="black.600" data-cy="expense-author">
+            <P ml={2} fontSize="14px" color="black.700" data-cy="expense-author">
               {expense.requestedByAccount ? (
                 <FormattedMessage
                   id="Expense.RequestedByOnDate"
@@ -262,7 +262,7 @@ const ExpenseSummary = ({
                     {attachment.description ? (
                       <HTMLContent
                         content={attachment.description}
-                        fontSize="12px"
+                        fontSize="14px"
                         color="black.900"
                         collapsable
                         fontWeight="500"
@@ -270,12 +270,12 @@ const ExpenseSummary = ({
                         collapsePadding={22}
                       />
                     ) : (
-                      <Span color="black.500" fontStyle="italic">
+                      <Span color="black.600" fontStyle="italic">
                         <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
                       </Span>
                     )}
                     {!isGrant && (
-                      <Span mt={1} fontSize="12px" color="black.500">
+                      <Span mt={1} fontSize="12px" color="black.700">
                         <FormattedMessage
                           id="withColon"
                           defaultMessage="{item}:"
@@ -346,7 +346,14 @@ const ExpenseSummary = ({
         </React.Fragment>
       )}
 
-      <ExpensePayeeDetails
+      <Flex mt={4} mb={3} alignItems="center">
+        <Span fontWeight="bold" fontSize="16px">
+          <FormattedMessage defaultMessage="Additional Information" />
+        </Span>
+        <StyledHr flex="1 1" borderColor="black.300" ml={2} />
+      </Flex>
+
+      <ExpenseSummaryAdditionalInformation
         isLoading={isLoading}
         host={host}
         expense={expense}
