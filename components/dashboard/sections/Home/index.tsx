@@ -114,7 +114,7 @@ const Home = (props: AdminSectionProps) => {
             loading={loading}
             onClick={() =>
               fetchMore({
-                variables: { untilId: activities[activities.length - 1].id },
+                variables: { dateTo: activities[activities.length - 1].createdAt },
                 updateQuery: (prevResult, { fetchMoreResult }) => {
                   const account = fetchMoreResult?.account;
                   account.feed = [...prevResult.account.feed, ...account.feed];

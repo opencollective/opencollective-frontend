@@ -1,10 +1,10 @@
 import { gql } from '@apollo/client';
 
 export const workspaceHomeQuery = gql`
-  query WorkspaceHome($slug: String!, $limit: Int, $untilId: String, $classes: [ActivityClassType!]) {
+  query WorkspaceHome($slug: String!, $limit: Int, $dateTo: DateTime, $classes: [ActivityClassType!]) {
     account(slug: $slug) {
       id
-      feed(limit: $limit, untilId: $untilId, classes: $classes) {
+      feed(limit: $limit, dateTo: $dateTo, classes: $classes) {
         id
         createdAt
         type
