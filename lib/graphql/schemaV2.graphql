@@ -10431,6 +10431,33 @@ type Query {
     """
     throwIfMissing: Boolean! = true
   ): VirtualCard
+  virtualCardRequest(
+    """
+    Identifiers to retrieve the virtual card request
+    """
+    virtualCardRequest: VirtualCardRequestReferenceInput!
+
+    """
+    If true, an error will be returned if the virtual card request is missing
+    """
+    throwIfMissing: Boolean! = true
+  ): VirtualCardRequest
+  virtualCardRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Host for the accounts for which to get virtual card requests
+    """
+    host: AccountReferenceInput!
+  ): VirtualCardRequestCollection!
   loggedInAccount: Individual
   me: Individual
 }
@@ -13133,6 +13160,46 @@ type PaypalPlan {
 }
 
 """
+A Virtual Card request
+"""
+type VirtualCardRequest {
+  id: String!
+  legacyId: Int
+  purpose: String
+  notes: String
+  status: VirtualCardRequestStatus
+  currency: Currency
+  spendingLimitAmount: Amount
+  spendingLimitInterval: VirtualCardLimitInterval
+  assignee: Individual
+  host: Host
+  account: Account
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+"""
+The status of a virtual card request
+"""
+enum VirtualCardRequestStatus {
+  PENDING
+}
+
+input VirtualCardRequestReferenceInput {
+  id: String
+}
+
+"""
+A collection of "VirtualCardRequest"
+"""
+type VirtualCardRequestCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [VirtualCardRequest!]
+}
+
+"""
 This is the root mutation
 """
 type Mutation {
@@ -14391,7 +14458,17 @@ type Mutation {
     """
     Monthly budget you want for this Virtual Card
     """
-    budget: Int
+    budget: Int @deprecated(reason: "2023-06-29: Use spendingLimitAmount")
+
+    """
+    Limit you want for this Virtual Card in the given use interval
+    """
+    spendingLimitAmount: AmountInput @deprecated(reason: "2023-06-29: Use spendingLimitAmount")
+
+    """
+    Interval to apply the amount limit on this virtual card
+    """
+    spendingLimitInterval: VirtualCardLimitInterval = MONTHLY
 
     """
     Account where the virtual card will be associated

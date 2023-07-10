@@ -198,6 +198,10 @@ export function gql(source: "\n  mutation ClearCache($account: AccountReferenceI
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query VirtualCardRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {\n    virtualCardRequest(virtualCardRequest: $virtualCardRequest) {\n      id\n      purpose\n      notes\n      status\n      currency\n      spendingLimitAmount {\n        valueInCents\n        currency\n      }\n      spendingLimitInterval\n      createdAt\n      account {\n        id\n        name\n        slug\n        imageUrl\n      }\n      assignee {\n        id\n        name\n        email\n        slug\n        imageUrl\n      }\n    }\n  }\n"): typeof import('./graphql').VirtualCardRequestDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query VirtualCard($virtualCard: VirtualCardReferenceInput!) {\n    virtualCard(virtualCard: $virtualCard) {\n      id\n      name\n      last4\n      data\n      privateData\n      provider\n      spendingLimitAmount\n      spendingLimitInterval\n      spendingLimitRenewsOn\n      remainingLimit\n      currency\n      createdAt\n      status\n      account {\n        id\n        name\n        slug\n        imageUrl\n      }\n      assignee {\n        id\n        name\n        email\n        slug\n        imageUrl\n      }\n      host {\n        id\n        slug\n        stripe {\n          username\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').VirtualCardDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
