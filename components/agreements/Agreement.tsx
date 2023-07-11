@@ -89,7 +89,7 @@ export default function Agreement({ agreement, openFileViewer = undefined }: Agr
       <Flex flexWrap="wrap" gridGap={24} mt={30}>
         <Box>
           <ColumTitle>
-            <FormattedMessage defaultMessage="Created on" />
+            <FormattedMessage id="agreement.createdOn" defaultMessage="Created on" />
           </ColumTitle>
           <Value py="2px">
             <DateTime value={agreement.createdAt} />
