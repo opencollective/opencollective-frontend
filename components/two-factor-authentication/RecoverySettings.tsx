@@ -1,16 +1,16 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
+import { RefreshCcw } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
-import { Flex } from '../Grid';
 import MessageBox from '../MessageBox';
-import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import { H3 } from '../Text';
+import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 const regenerateRecoveryCodesMutation = gql`
@@ -48,27 +48,24 @@ export function RecoverySettings(props: RecoverySettingsProps) {
   return (
     <React.Fragment>
       <StyledCard px={3} py={2}>
-        <Flex alignItems="center">
-          <H3 fontSize="14px" fontWeight="700">
-            <FormattedMessage defaultMessage="Recovery" id="AAB4k2" />
-          </H3>
-        </Flex>
-        <div className="border-b pb-3 text-sm">
+        <H3 fontSize="14px" fontWeight="700" my={3}>
+          <FormattedMessage defaultMessage="Recovery" id="AAB4k2" />
+        </H3>
+        <div className="text-sm">
           <FormattedMessage
             defaultMessage="Recovery codes can be used to access your account in case you lose access to your other two factor methods."
             id="Pw3c53"
           />
         </div>
-        <div className="mt-3 flex gap-2">
-          <StyledButton
-            loading={loading}
-            onClick={() => setIsRegeneratingRecoveryCodes(true)}
-            buttonSize="tiny"
-            buttonStyle="secondary"
-          >
-            <FormattedMessage defaultMessage="Regenerate" id="6PgVSe" />
-          </StyledButton>
-        </div>
+        <Button
+          variant="outline"
+          loading={loading}
+          onClick={() => setIsRegeneratingRecoveryCodes(true)}
+          className="mb-2 mt-3 w-full"
+        >
+          <RefreshCcw className="mr-2 h-4 w-4" />
+          <FormattedMessage defaultMessage="Regenerate codes" id="TWwiPo" />
+        </Button>
       </StyledCard>
       {isRegeneratingRecoveryCodes && (
         <ConfirmationModal

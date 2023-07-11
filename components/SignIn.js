@@ -8,6 +8,7 @@ import { Box, Flex } from './Grid';
 import { WebsiteName } from './I18nFormatters';
 import Image from './Image';
 import Link from './Link';
+import { PasswordInput } from './PasswordInput';
 import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
@@ -236,14 +237,12 @@ export default class SignIn extends React.Component {
                   htmlFor="password"
                   my={2}
                 >
-                  <StyledInput
+                  <PasswordInput
                     key={this.props.passwordRequired ? 'required' : 'initial'}
                     fontSize="14px"
                     id="password"
                     name="password"
                     autoComplete="current-password"
-                    type="password"
-                    width={1}
                     value={password}
                     autoFocus={this.props.passwordRequired ? true : false}
                     required={this.props.passwordRequired ? true : false}
