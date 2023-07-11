@@ -90,3 +90,32 @@ export function getAvailableLimitShortString(
     LimitInterval,
   });
 }
+
+const AvailableLimitI18n = defineMessage({
+  id: 'VirtualCard.AvailableLimit',
+  defaultMessage: `{ spendingLimitInterval, select,
+      ALL_TIME {<AvailableAmount>{ availableLimitAmount }</AvailableAmount><AmountSeparator>/</AmountSeparator><LimitAmount>{ spendingLimitAmount }</LimitAmount>}
+      PER_AUTHORIZATION {Limited to <AvailableAmount>{ spendingLimitAmount }</AvailableAmount><LimitInterval> per use</LimitInterval>}
+      other {Avl. <AvailableAmount>{ availableLimitAmount }</AvailableAmount> <AmountSeparator>of</AmountSeparator> <LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval>/{ spendingLimitIntervalShort }</LimitInterval>}
+    }`,
+});
+
+export function getAvailableLimitString(
+  intl: IntlShape,
+  currency: Currency,
+  availableLimitAmount: Amount | number,
+  spendingLimitAmount: Amount | number,
+  spendingLimitInterval: VirtualCardLimitInterval,
+  { AvailableAmount = v => v, AmountSeparator = v => v, LimitAmount = v => v, LimitInterval = v => v } = {},
+) {
+  return intl.formatMessage(AvailableLimitI18n, {
+    spendingLimitInterval,
+    spendingLimitAmount: formatCurrency(spendingLimitAmount, currency),
+    availableLimitAmount: formatCurrency(availableLimitAmount, currency),
+    spendingLimitIntervalShort: getSpendingLimitIntervalShortString(intl, spendingLimitInterval),
+    AvailableAmount,
+    AmountSeparator,
+    LimitAmount,
+    LimitInterval,
+  });
+}

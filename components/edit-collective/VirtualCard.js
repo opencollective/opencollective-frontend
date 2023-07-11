@@ -14,7 +14,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { getLimitIntervalShortString } from '../../lib/i18n/virtual-card-spending-limit';
+import { getAvailableLimitString } from '../../lib/i18n/virtual-card-spending-limit';
 import { getDashboardObjectIdURL } from '../../lib/stripe/dashboard';
 
 import Avatar from '../Avatar';
@@ -404,20 +404,7 @@ const getLimitString = ({
         />
       ) : (
         <Fragment>
-          <FormattedMessage
-            id="VirtualCards.AvailableOfLimit"
-            defaultMessage="Avl. {available} of {limit}/{spendingLimitInterval, select, ALL_TIME {} other {/intervalShort}}"
-            values={{
-              available: formatCurrency(remainingLimit, currency, {
-                locale: intl.locale,
-              }),
-              limit: formatCurrency(spendingLimitAmount, currency, {
-                locale: intl.locale,
-              }),
-              interval: getLimitIntervalShortString(intl, spendingLimitInterval),
-              spendingLimitInterval,
-            }}
-          />
+          {getAvailableLimitString(intl, currency, remainingLimit, spendingLimitAmount, spendingLimitInterval)}
           {spendingLimitInterval === VirtualCardLimitInterval.ALL_TIME ? (
             <Fragment>
               &nbsp;&bull;&nbsp;
