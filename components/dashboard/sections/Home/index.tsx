@@ -55,7 +55,7 @@ const Home = (props: AdminSectionProps) => {
   const canViewMore = activities.length >= PAGE_SIZE && activities.length % PAGE_SIZE === 0;
   React.useEffect(() => {
     if (error?.graphQLErrors?.[0]?.extensions?.code === 'ContentNotReady') {
-      setTimeout(() => refetch(), 4000);
+      setTimeout(() => refetch(), 5000);
     }
   }, [error]);
 
