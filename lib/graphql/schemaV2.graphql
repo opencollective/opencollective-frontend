@@ -647,6 +647,22 @@ interface Account {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
 }
 
 """
@@ -2698,6 +2714,22 @@ type Host implements Account & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -4396,24 +4428,73 @@ type Permission {
 }
 
 """
-A collection of webhooks
+An activity describing something that happened on the platform
 """
-type WebhookCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Webhook]
-}
-
-"""
-An webhook attached to an account
-"""
-type Webhook {
+type Activity {
+  """
+  Unique identifier for this activity
+  """
   id: String!
-  legacyId: Int!
-  activityType: ActivityType
-  webhookUrl: URL
-  account: Account!
+
+  """
+  The type of the activity
+  """
+  type: ActivityType!
+
+  """
+  The date on which the ConnectedAccount was created
+  """
+  createdAt: DateTime!
+
+  """
+  The account that authored by this activity, if any
+  """
+  fromAccount: Account
+
+  """
+  The account targeted by this activity, if any
+  """
+  account: Account
+
+  """
+  The host under which this activity happened, if any
+  """
+  host: Host
+
+  """
+  The person who triggered the action, if any
+  """
+  individual: Individual
+
+  """
+  The expense related to this activity, if any
+  """
+  expense: Expense
+
+  """
+  The order related to this activity, if any
+  """
+  order: Order
+
+  """
+  The update related to this activity, if any
+  """
+  update: Update
+
+  """
+  The transaction related to this activity, if any
+  """
+  transaction: Transaction
+
+  """
+  Data attached to this activity (if any)
+  """
+  data: JSON!
+
+  """
+  Specifies whether this is a system generated activity
+  """
+  isSystem: Boolean!
 }
 
 enum ActivityType {
@@ -4526,6 +4607,37 @@ enum ActivityType {
   COLLECTIVE_VIRTUAL_CARD_CREATED
   SUBSCRIPTION_CONFIRMED
   COLLECTIVE_COMMENT_CREATED
+}
+
+enum ActivityClassType {
+  COLLECTIVE
+  EXPENSES
+  CONTRIBUTIONS
+  ACTIVITIES_UPDATES
+  VIRTUAL_CARDS
+  FUND_EVENTS
+  REPORTS
+}
+
+"""
+A collection of webhooks
+"""
+type WebhookCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Webhook]
+}
+
+"""
+An webhook attached to an account
+"""
+type Webhook {
+  id: String!
+  legacyId: Int!
+  activityType: ActivityType
+  webhookUrl: URL
+  account: Account!
 }
 
 """
@@ -5111,76 +5223,6 @@ type ExpensePermissions {
   verifyDraftExpense: Permission!
   hold: Permission!
   release: Permission!
-}
-
-"""
-An activity describing something that happened on the platform
-"""
-type Activity {
-  """
-  Unique identifier for this activity
-  """
-  id: String!
-
-  """
-  The type of the activity
-  """
-  type: ActivityType!
-
-  """
-  The date on which the ConnectedAccount was created
-  """
-  createdAt: DateTime!
-
-  """
-  The account that authored by this activity, if any
-  """
-  fromAccount: Account
-
-  """
-  The account targeted by this activity, if any
-  """
-  account: Account
-
-  """
-  The host under which this activity happened, if any
-  """
-  host: Host
-
-  """
-  The person who triggered the action, if any
-  """
-  individual: Individual
-
-  """
-  The expense related to this activity, if any
-  """
-  expense: Expense
-
-  """
-  The order related to this activity, if any
-  """
-  order: Order
-
-  """
-  The update related to this activity, if any
-  """
-  update: Update
-
-  """
-  The transaction related to this activity, if any
-  """
-  transaction: Transaction
-
-  """
-  Data attached to this activity (if any)
-  """
-  data: JSON!
-
-  """
-  Specifies whether this is a system generated activity
-  """
-  isSystem: Boolean!
 }
 
 """
@@ -5973,6 +6015,22 @@ type Bot implements Account {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6492,6 +6550,22 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7380,6 +7454,22 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8117,6 +8207,22 @@ type Individual implements Account {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8811,6 +8917,22 @@ type Organization implements Account & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9453,6 +9575,22 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -12379,6 +12517,22 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -13008,6 +13162,22 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)

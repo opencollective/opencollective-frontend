@@ -31,7 +31,7 @@ const ItemWrapper = styled(Box)`
 `;
 
 type ActivityListItemProps = {
-  activity?: WorkspaceHomeQuery['activities']['nodes'][0];
+  activity?: WorkspaceHomeQuery['account']['feed'][0];
   isLast?: boolean;
   openExpense?: (legacyId: number) => void;
 };
