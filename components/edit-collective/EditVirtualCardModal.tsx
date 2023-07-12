@@ -158,11 +158,11 @@ const throttledCall = debounce((searchFunc, variables) => {
 
 export type EditVirtualCardModalProps = {
   host: Account;
-  collective: Account;
+  collective?: Account;
   virtualCard: VirtualCard;
   onSuccess: (el: React.ReactNode) => void;
   onClose: () => void;
-  modalProps: any;
+  modalProps?: any;
 };
 
 export default function EditVirtualCardModal({
