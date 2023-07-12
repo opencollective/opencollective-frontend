@@ -54,17 +54,21 @@ const getMessage = (from, to) => {
  *
  * If isUTC is true, we also add a `(UTC)` to the end of the date.
  */
-export const DateRange = ({ from, to, isUTC }) => {
+export const DateRange = ({ from, to, timezone }) => {
   const message = getMessage(from, to);
-  if (!isUTC || (!from && !to)) {
+  if (!timezone || (!from && !to)) {
     return message;
-  } else {
-    return <React.Fragment>{message} (UTC)</React.Fragment>;
+  } else if (timezone) {
+    return (
+      <React.Fragment>
+        {message} ({timezone})
+      </React.Fragment>
+    );
   }
 };
 
 DateRange.propTypes = {
   from: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date), PropTypes.instanceOf(dayjs)]),
   to: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date), PropTypes.instanceOf(dayjs)]),
-  isUTC: PropTypes.bool,
+  timezone: PropTypes.string,
 };

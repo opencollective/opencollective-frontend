@@ -12,6 +12,7 @@ class TimezonePicker extends React.Component {
     onChange: PropTypes.func,
     label: PropTypes.string,
     selectedTimezone: PropTypes.string,
+    disabled: PropTypes.bool,
   };
 
   constructor(props) {

@@ -211,7 +211,12 @@ const HostDashboardReports = ({ hostSlug }) => {
             <FilterLabel htmlFor="transactions-period-filter">
               <FormattedMessage id="TransactionsOverviewSection.PeriodFilter" defaultMessage="Filter by Date" />
             </FilterLabel>
-            <PeriodFilter onChange={setDateInterval} value={dateInterval} minDate={host?.createdAt} />
+            <PeriodFilter
+              onChange={setDateInterval}
+              value={dateInterval}
+              minDate={host?.createdAt}
+              allowCustomTimezone
+            />
           </div>
           <div>
             <FilterLabel htmlFor="transactions-collective-filter">

@@ -18,6 +18,7 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledTooltip from '../StyledTooltip';
 import { Span } from '../Text';
+import TimezonePicker from '../TimezonePicker';
 
 import FilterButtonContainer from './FilterButtonContainer';
 
@@ -34,6 +35,11 @@ const getIntervalFromValue = value => {
     const toUTC = date => (date ? dayjs.utc(date) : null);
     intervalFromValue.from = toUTC(intervalFromValue.from);
     intervalFromValue.to = toUTC(intervalFromValue.to);
+  } else if (intervalFromValue.timezoneType && intervalFromValue.timezoneType !== 'local') {
+    const timezone = intervalFromValue.timezoneType === 'custom' ? dayjs.tz.guess() : intervalFromValue.timezoneType;
+    const toTimezone = date => (date ? dayjs(date).tz(timezone) : null);
+    intervalFromValue.from = toTimezone(intervalFromValue.from);
+    intervalFromValue.to = toTimezone(intervalFromValue.to);
   }
 
   return {
@@ -90,6 +96,7 @@ type PeriodFilterFormProps = {
   inputId: string;
   omitPresets?: boolean;
   disabled?: boolean;
+  allowCustomTimezone?: boolean;
 };
 
 export const PeriodFilterForm = ({
@@ -100,6 +107,7 @@ export const PeriodFilterForm = ({
   inputId,
   omitPresets,
   disabled,
+  allowCustomTimezone = false,
 }: PeriodFilterFormProps) => {
   const intervalFromValue = React.useMemo(() => getIntervalFromValue(value), [value]);
   const [isValidDateInterval, setIsValidDateInterval] = React.useState(true);
@@ -136,6 +144,8 @@ export const PeriodFilterForm = ({
     }
   };
 
+  const timezoneTypeOptions = allowCustomTimezone ? ['local', 'UTC', 'custom'] : ['local', 'UTC'];
+  const isCustomTimezone = !['local', 'UTC'].includes(tmpDateInterval.timezoneType);
   return (
     <React.Fragment>
       {!omitPresets && (
@@ -171,9 +181,9 @@ export const PeriodFilterForm = ({
           <StyledButtonSet
             {...inputProps}
             size="tiny"
-            items={['local', 'UTC']}
+            items={timezoneTypeOptions}
             buttonProps={{ p: 1, fontSize: '13px', fontWeight: 400 }}
-            selected={tmpDateInterval.timezoneType}
+            selected={isCustomTimezone ? 'custom' : tmpDateInterval.timezoneType}
             buttonPropsBuilder={({ item }) => ({ title: getTimeZoneTypeName(intl, item) })}
             onChange={timezoneType => {
               setTmpDateInterval(getIntervalFromValue({ ...tmpDateInterval, timezoneType }));
@@ -186,11 +196,25 @@ export const PeriodFilterForm = ({
                   return <FormattedMessage defaultMessage="Local" />;
                 case 'UTC':
                   return <FormattedMessage defaultMessage="UTC" />;
+                case 'custom':
+                  return <FormattedMessage id="Timezone.Custom" defaultMessage="Custom" />;
               }
             }}
           </StyledButtonSet>
         )}
       </StyledInputField>
+      {isCustomTimezone && (
+        <TimezonePicker
+          mt="12px"
+          disabled={disabled}
+          selectedTimezone={tmpDateInterval.timezoneType === 'custom' ? dayjs.tz.guess() : tmpDateInterval.timezoneType}
+          onChange={({ value }) => {
+            if (value !== undefined) {
+              setTmpDateInterval(getIntervalFromValue({ ...tmpDateInterval, timezoneType: value || 'local' }));
+            }
+          }}
+        />
+      )}
       <StyledInputField
         label={<FormattedMessage defaultMessage="Start date" />}
         labelFontWeight="700"
@@ -247,9 +271,12 @@ export const PeriodFilterForm = ({
   );
 };
 
-const PeriodFilter = ({ onChange, value, inputId, minDate = null, ...props }) => {
+const PeriodFilter = ({ onChange, value, inputId, minDate = null, allowCustomTimezone = false, ...props }) => {
   const intervalFromValue = React.useMemo(() => getIntervalFromValue(value), [value]);
   const [tmpDateInterval, setTmpDateInterval] = React.useState(intervalFromValue);
+  const timezone = ['custom', 'local'].includes(intervalFromValue.timezoneType)
+    ? dayjs.tz.guess()
+    : intervalFromValue.timezoneType;
 
   return (
     <PopupMenu
@@ -261,7 +288,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate = null, ...props }) =>
             <DateRange
               from={parseDateForDateRange(intervalFromValue.from, false)}
               to={parseDateForDateRange(intervalFromValue.to, true)}
-              isUTC={intervalFromValue.timezoneType === 'UTC'}
+              timezone={timezone}
             />
             <ChevronDown size={25} color="#cccccc" />
           </Flex>
@@ -270,7 +297,13 @@ const PeriodFilter = ({ onChange, value, inputId, minDate = null, ...props }) =>
     >
       {({ setOpen }) => (
         <Box mx="8px" my="8px" width="190px">
-          <PeriodFilterForm onChange={setTmpDateInterval} value={tmpDateInterval} minDate={minDate} inputId={inputId} />
+          <PeriodFilterForm
+            onChange={setTmpDateInterval}
+            value={tmpDateInterval}
+            minDate={minDate}
+            inputId={inputId}
+            allowCustomTimezone={allowCustomTimezone}
+          />
           <Flex mt={2}>
             <StyledButton
               buttonSize="medium"
@@ -313,7 +346,7 @@ PeriodFilter.propTypes = {
     PropTypes.shape({
       from: PropTypes.string,
       to: PropTypes.string,
-      timezoneType: PropTypes.string,
+      timezoneType: PropTypes.oneOf(['local', 'UTC', 'custom']),
     }),
   ]),
   inputId: PropTypes.string,
