@@ -42,6 +42,7 @@ const Home = (props: AdminSectionProps) => {
   const intl = useIntl();
   const filterOptions = React.useMemo(() => getFilterOptions(intl), [intl]);
   const [filters, setFilters] = React.useState(filterOptions);
+  const [isTimelineBeingGenerated, setIsTimelineBeingGenerated] = React.useState(false);
   const [openExpenseLegacyId, setOpenExpenseLegacyId] = React.useState<number | null>(null);
   const slug = router.query?.as || props.account.slug;
   const { data, loading, error, fetchMore, refetch } = useQuery(workspaceHomeQuery, {
@@ -50,14 +51,16 @@ const Home = (props: AdminSectionProps) => {
     notifyOnNetworkStatusChange: true,
   });
 
-  const contentIsBeingGenerated = error?.graphQLErrors?.[0]?.extensions?.code === 'ContentNotReady';
   const activities: WorkspaceHomeQuery['account']['feed'] = data?.account.feed || [];
   const canViewMore = activities.length >= PAGE_SIZE && activities.length % PAGE_SIZE === 0;
   React.useEffect(() => {
     if (error?.graphQLErrors?.[0]?.extensions?.code === 'ContentNotReady') {
-      setTimeout(() => refetch(), 5000);
+      setIsTimelineBeingGenerated(true);
+      setTimeout(() => refetch(), 1000);
+    } else if (data?.account?.feed) {
+      setIsTimelineBeingGenerated(false);
     }
-  }, [error]);
+  }, [error, data]);
 
   return (
     <Container maxWidth={'100%'}>
@@ -88,11 +91,11 @@ const Home = (props: AdminSectionProps) => {
             {...props}
           />
         </Flex>
-        {error && !contentIsBeingGenerated ? (
+        {error && !isTimelineBeingGenerated ? (
           <MessageBoxGraphqlError error={error} />
-        ) : contentIsBeingGenerated || (!activities.length && loading) ? (
+        ) : isTimelineBeingGenerated || (!activities.length && loading) ? (
           <React.Fragment>
-            {contentIsBeingGenerated && (
+            {isTimelineBeingGenerated && (
               <MessageBox type="info" withIcon mb="24px">
                 <FormattedMessage defaultMessage="Generating activity timeline..." />
               </MessageBox>
