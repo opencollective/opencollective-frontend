@@ -2,6 +2,8 @@ import { assign, pick } from 'lodash';
 
 import UrlQueryHelper from '../../lib/UrlQueryHelper';
 
+import { INCOGNITO_PROFILE_ALIAS, PERSONAL_PROFILE_ALIAS } from './constants';
+
 /**
  * These attributes are documented using JSDoc to automatically generate
  * documentation for the contribution flow. You can re-generate them by running:
@@ -131,7 +133,14 @@ const STATIC_PARAMS_EMBED = Object.keys(EmbedContributionFlowUrlParametersConfig
 /**
  * Returns an un-sanitized version of the URL query parameters
  */
-export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepProfile, stepPayment, isEmbed) => {
+export const stepsDataToUrlParamsData = (
+  loggedInUser,
+  previousUrlParams,
+  stepDetails,
+  stepProfile,
+  stepPayment,
+  isEmbed,
+) => {
   // Static params that are not meant to be changed during the flow
   const data = pick(previousUrlParams, isEmbed ? STATIC_PARAMS_EMBED : STATIC_PARAMS);
 
@@ -139,8 +148,11 @@ export const stepsDataToUrlParamsData = (previousUrlParams, stepDetails, stepPro
   assign(data, pick(stepDetails, ['interval', 'quantity', 'customData', 'amount']));
 
   // Step profile
-  if (stepProfile?.slug) {
-    data.contributeAs = stepProfile.slug;
+  if (stepProfile.isIncognito) {
+    data.contributeAs = INCOGNITO_PROFILE_ALIAS;
+  } else if (stepProfile?.slug) {
+    const isPersonalProfile = stepProfile.slug === loggedInUser?.collective?.slug;
+    data.contributeAs = isPersonalProfile ? PERSONAL_PROFILE_ALIAS : stepProfile.slug;
   } else {
     assign(data, pick(stepProfile, ['name', 'legalName', 'email']));
   }

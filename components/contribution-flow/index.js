@@ -41,7 +41,7 @@ import { withUser } from '../UserProvider';
 
 import { orderResponseFragment } from './graphql/fragments';
 import CollectiveTitleContainer from './CollectiveTitleContainer';
-import { STEPS } from './constants';
+import { INCOGNITO_PROFILE_ALIAS, PERSONAL_PROFILE_ALIAS, STEPS } from './constants';
 import ContributionFlowButtons from './ContributionFlowButtons';
 import ContributionFlowHeader from './ContributionFlowHeader';
 import ContributionFlowStepContainer from './ContributionFlowStepContainer';
@@ -224,6 +224,7 @@ class ContributionFlow extends React.Component {
       const { stepDetails, stepProfile, stepPayment } = this.state;
       const currentUrlState = this.getQueryParams();
       const expectedUrlState = stepsDataToUrlParamsData(
+        this.props.LoggedInUser,
         currentUrlState,
         stepDetails,
         stepProfile,
@@ -430,16 +431,20 @@ class ContributionFlow extends React.Component {
       return { slug: queryParams.contributeAs };
     }
 
-    // If there's a default profile slug, enforce it
-    if (queryParams.contributeAs) {
-      const contributorProfile = profiles.find(({ slug }) => slug === queryParams.contributeAs);
-      if (contributorProfile) {
-        return contributorProfile;
+    // If there's a default profile set in contributeAs, use it
+    let contributorProfile;
+    if (queryParams.contributeAs && queryParams.contributeAs !== PERSONAL_PROFILE_ALIAS) {
+      if (queryParams.contributeAs === INCOGNITO_PROFILE_ALIAS) {
+        contributorProfile = profiles.find(({ isIncognito }) => isIncognito);
+      } else {
+        contributorProfile = profiles.find(({ slug }) => slug === queryParams.contributeAs);
       }
     }
 
-    // Otherwise to the logged-in user personal profile, if any
-    if (profiles[0]) {
+    if (contributorProfile) {
+      return contributorProfile;
+    } else if (profiles[0]) {
+      // Otherwise to the logged-in user personal profile, if any
       return profiles[0];
     }
 
