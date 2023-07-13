@@ -53,8 +53,9 @@ const manageContributionsQuery = gql`
       oneTime: orders(
         filter: OUTGOING
         frequency: ONETIME
-        status: [PAID, REQUIRE_CLIENT_CONFIRMATION, PROCESSING, IN_REVIEW, DISPUTED, PENDING, REFUNDED, ERROR]
+        status: [PAID]
         includeIncognito: true
+        minAmount: 1
       ) {
         totalCount
         nodes {
