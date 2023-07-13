@@ -198,7 +198,7 @@
     "@storybook/nextjs": "7.0.25",
     "@storybook/react": "7.0.25",
     "@types/apollo-upload-client": "17.0.2",
-    "@types/react": "18.2.14",
+    "@types/react": "18.2.15",
     "@types/styled-components": "^5.1.26",
     "@types/styled-system": "^5.1.16",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
