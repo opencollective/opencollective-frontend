@@ -4117,7 +4117,7 @@ type UpdateCollection implements Collection {
   offset: Int
   limit: Int
   totalCount: Int
-  nodes: [Update]
+  nodes: [Update!]
 }
 
 """
@@ -4543,6 +4543,8 @@ enum ActivityType {
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY
   COLLECTIVE_VIRTUAL_CARD_DELETED
+  COLLECTIVE_VIRTUAL_CARD_REQUEST_APPROVED
+  COLLECTIVE_VIRTUAL_CARD_REQUEST_REJECTED
   VIRTUAL_CARD_REQUESTED
   VIRTUAL_CARD_CHARGE_DECLINED
   VIRTUAL_CARD_PURCHASE
@@ -9712,6 +9714,7 @@ type VirtualCard {
   spendingLimitRenewsOn: DateTime
   remainingLimit: Int
   currency: Currency
+  virtualCardRequest: VirtualCardRequest
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -9723,6 +9726,34 @@ enum VirtualCardLimitInterval {
   MONTHLY
   YEARLY
   ALL_TIME
+}
+
+"""
+A Virtual Card request
+"""
+type VirtualCardRequest {
+  id: String!
+  legacyId: Int
+  purpose: String
+  notes: String
+  status: VirtualCardRequestStatus
+  currency: Currency
+  spendingLimitAmount: Amount
+  spendingLimitInterval: VirtualCardLimitInterval
+  assignee: Individual
+  host: Host
+  account: Account
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+"""
+The status of a virtual card request
+"""
+enum VirtualCardRequestStatus {
+  APPROVED
+  REJECTED
+  PENDING
 }
 
 """
@@ -10525,7 +10556,7 @@ type Query {
     Host for the accounts for which to get updates
     """
     host: [AccountReferenceInput]
-  ): UpdatesCollection!
+  ): UpdateCollection!
   paypalPlan(
     """
     The account that serves as a payment target
@@ -10595,6 +10626,8 @@ type Query {
     Host for the accounts for which to get virtual card requests
     """
     host: AccountReferenceInput!
+    status: [VirtualCardRequestStatus]
+    collective: [AccountReferenceInput]
   ): VirtualCardRequestCollection!
   loggedInAccount: Individual
   me: Individual
@@ -11889,6 +11922,8 @@ enum ActivityAndClassesType {
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY
   COLLECTIVE_VIRTUAL_CARD_DELETED
+  COLLECTIVE_VIRTUAL_CARD_REQUEST_APPROVED
+  COLLECTIVE_VIRTUAL_CARD_REQUEST_REJECTED
   VIRTUAL_CARD_REQUESTED
   VIRTUAL_CARD_CHARGE_DECLINED
   VIRTUAL_CARD_PURCHASE
@@ -13313,46 +13348,10 @@ input TierReferenceInput {
 }
 
 """
-A collection of "Updates"
-"""
-type UpdatesCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Update!]
-}
-
-"""
 A PayPal plan to associate with a contribution
 """
 type PaypalPlan {
   id: String!
-}
-
-"""
-A Virtual Card request
-"""
-type VirtualCardRequest {
-  id: String!
-  legacyId: Int
-  purpose: String
-  notes: String
-  status: VirtualCardRequestStatus
-  currency: Currency
-  spendingLimitAmount: Amount
-  spendingLimitInterval: VirtualCardLimitInterval
-  assignee: Individual
-  host: Host
-  account: Account
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-
-"""
-The status of a virtual card request
-"""
-enum VirtualCardRequestStatus {
-  PENDING
 }
 
 input VirtualCardRequestReferenceInput {
@@ -14579,6 +14578,11 @@ type Mutation {
     Individual account responsible for the virtual card
     """
     assignee: AccountReferenceInput!
+
+    """
+    Virtual card request to link to this virtual card
+    """
+    virtualCardRequest: VirtualCardRequestReferenceInput
   ): VirtualCard!
 
   """
@@ -14645,6 +14649,16 @@ type Mutation {
     """
     account: AccountReferenceInput!
   ): Boolean
+
+  """
+  Reject a virtual card request. Scope: "virtualCards"
+  """
+  rejectVirtualCardRequest(
+    """
+    Virtual card request
+    """
+    virtualCardRequest: VirtualCardRequestReferenceInput
+  ): VirtualCardRequest!
 
   """
   Pause active Virtual Card. Scope: "virtualCards".

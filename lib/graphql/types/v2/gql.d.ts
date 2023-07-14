@@ -42,6 +42,10 @@ export function gql(source: "\n  query AdminPanel($slug: String!) {\n    account
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query HostVirtualCardRequests(\n    $hostSlug: String!\n    $collective: [AccountReferenceInput]\n    $selectedCollectiveSlug: String\n    $status: [VirtualCardRequestStatus]\n    $limit: Int!\n    $offset: Int!\n  ) {\n    host(slug: $hostSlug) {\n      id\n      legacyId\n    }\n    account(slug: $selectedCollectiveSlug) {\n      id\n      legacyId\n      slug\n    }\n    virtualCardRequests(\n      host: { slug: $hostSlug }\n      collective: $collective\n      status: $status\n      limit: $limit\n      offset: $offset\n    ) {\n      totalCount\n      limit\n      offset\n      nodes {\n        id\n        purpose\n        notes\n        status\n        currency\n        spendingLimitAmount {\n          valueInCents\n          currency\n        }\n        spendingLimitInterval\n        createdAt\n        account {\n          id\n          name\n          slug\n          imageUrl\n        }\n        host {\n          id\n          name\n          slug\n          imageUrl\n        }\n        assignee {\n          id\n          name\n          email\n          slug\n          imageUrl\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').HostVirtualCardRequestsDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  fragment AgreementMutationFields on Agreement {\n    id\n    ...AgreementViewFields\n    account {\n      id\n      ... on AccountWithHost {\n        # Refetch account agreements count to update the cache\n        hostAgreements {\n          totalCount\n        }\n      }\n    }\n  }\n  \n"): typeof import('./graphql').AgreementMutationFieldsFragmentDoc;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -98,7 +102,7 @@ export function gql(source: "\n  mutation editVirtualCard(\n    $virtualCard: Vi
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation createVirtualCard(\n    $name: String!\n    $limitAmount: AmountInput!\n    $limitInterval: VirtualCardLimitInterval!\n    $account: AccountReferenceInput!\n    $assignee: AccountReferenceInput!\n  ) {\n    createVirtualCard(\n      name: $name\n      limitAmount: $limitAmount\n      limitInterval: $limitInterval\n      account: $account\n      assignee: $assignee\n    ) {\n      id\n      name\n      last4\n      data\n    }\n  }\n"): typeof import('./graphql').CreateVirtualCardDocument;
+export function gql(source: "\n  mutation createVirtualCard(\n    $name: String!\n    $limitAmount: AmountInput!\n    $limitInterval: VirtualCardLimitInterval!\n    $account: AccountReferenceInput!\n    $assignee: AccountReferenceInput!\n    $virtualCardRequest: VirtualCardRequestReferenceInput\n  ) {\n    createVirtualCard(\n      name: $name\n      limitAmount: $limitAmount\n      limitInterval: $limitInterval\n      account: $account\n      assignee: $assignee\n      virtualCardRequest: $virtualCardRequest\n    ) {\n      id\n      name\n      last4\n      data\n      virtualCardRequest {\n        id\n        status\n      }\n    }\n  }\n"): typeof import('./graphql').CreateVirtualCardDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -198,7 +202,11 @@ export function gql(source: "\n  mutation ClearCache($account: AccountReferenceI
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query VirtualCardRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {\n    virtualCardRequest(virtualCardRequest: $virtualCardRequest) {\n      id\n      purpose\n      notes\n      status\n      currency\n      spendingLimitAmount {\n        valueInCents\n        currency\n      }\n      spendingLimitInterval\n      createdAt\n      account {\n        id\n        name\n        slug\n        imageUrl\n      }\n      assignee {\n        id\n        name\n        email\n        slug\n        imageUrl\n      }\n    }\n  }\n"): typeof import('./graphql').VirtualCardRequestDocument;
+export function gql(source: "\n  query VirtualCardRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {\n    virtualCardRequest(virtualCardRequest: $virtualCardRequest) {\n      id\n      purpose\n      notes\n      status\n      currency\n      spendingLimitAmount {\n        valueInCents\n        currency\n      }\n      spendingLimitInterval\n      createdAt\n      account {\n        id\n        name\n        slug\n        imageUrl\n      }\n      assignee {\n        id\n        name\n        email\n        slug\n        imageUrl\n      }\n      host {\n        id\n        name\n        slug\n        imageUrl\n      }\n    }\n  }\n"): typeof import('./graphql').VirtualCardRequestDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation RejectVirtualCardRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {\n    rejectVirtualCardRequest(virtualCardRequest: $virtualCardRequest) {\n      id\n      status\n    }\n  }\n"): typeof import('./graphql').RejectVirtualCardRequestDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
