@@ -359,22 +359,6 @@ export const cardColumns = ({ tab, setEditOrder }) => [
               )}
             </Flex>
           </Flex>
-          {/* <Flex flexDirection="column" gridGap="4px">
-              <Span letterSpacing="0" truncateOverflow fontWeight="500">
-                {agreement.account.name}
-              </Span>
-              <Span fontSize="14px" color="black.700" fontWeight="normal">
-                <DateTime value={agreement.createdAt} />
-                {agreement.expiresAt && agreement.attachment && ' • '}
-                {agreement.attachment && (
-                  <FormattedMessage
-                    id="ExepenseAttachments.count"
-                    defaultMessage="{count, plural, one {# attachment} other {# attachments}}"
-                    values={{ count: 1 }}
-                  />
-                )}
-              </Span>
-            </Flex> */}
         </Flex>
       );
     },
