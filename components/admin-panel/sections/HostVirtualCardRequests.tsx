@@ -48,6 +48,7 @@ const hostVirtualCardRequestsQuery = gql`
       offset
       nodes {
         id
+        legacyId
         purpose
         notes
         status
@@ -110,7 +111,10 @@ export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
         serialize: toLower,
         deserialize: toUpper,
       },
-      virtualCardRequest: {},
+      virtualCardRequest: {
+        deserialize: parseInt,
+        serialize: identity,
+      },
     },
   });
 
@@ -166,7 +170,7 @@ export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
       ) : (
         <React.Fragment>
           <VirtualCardRequestsTable
-            onSelectedVirtualCardRequest={vcr => queryFilter.setVirtualCardRequest(vcr.id)}
+            onSelectedVirtualCardRequest={vcr => queryFilter.setVirtualCardRequest(vcr.legacyId)}
             loading={query.loading}
             virtualCardRequests={query.data.virtualCardRequests.nodes}
           />

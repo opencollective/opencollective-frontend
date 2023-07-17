@@ -13356,6 +13356,7 @@ type PaypalPlan {
 
 input VirtualCardRequestReferenceInput {
   id: String
+  legacyId: Int
 }
 
 """
@@ -14637,7 +14638,7 @@ type Mutation {
     """
     Limit you want for this Virtual Card in the given use interval
     """
-    spendingLimitAmount: AmountInput @deprecated(reason: "2023-06-29: Use spendingLimitAmount")
+    spendingLimitAmount: AmountInput
 
     """
     Interval to apply the amount limit on this virtual card

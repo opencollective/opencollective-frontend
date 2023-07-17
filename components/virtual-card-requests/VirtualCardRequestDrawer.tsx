@@ -152,7 +152,7 @@ function VirtualCardRequestDrawerActions({ virtualCardRequest }: { virtualCardRe
 }
 
 type VirtualCardRequestDrawerProps = {
-  virtualCardRequestId: string;
+  virtualCardRequestId: number;
   open: boolean;
   onClose: () => void;
 };
@@ -164,7 +164,7 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
     context: API_V2_CONTEXT,
     variables: {
       virtualCardRequest: {
-        id: props.virtualCardRequestId,
+        legacyId: props.virtualCardRequestId,
       },
     },
   });
