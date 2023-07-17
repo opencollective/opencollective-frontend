@@ -18,12 +18,15 @@ import DateTime from '../DateTime';
 import EditVirtualCardModal from '../edit-collective/EditVirtualCardModal';
 import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
+import Loading from '../Loading';
 import PopupMenu from '../PopupMenu';
 import StyledHr from '../StyledHr';
 import StyledRoundButton from '../StyledRoundButton';
 import StyledTag from '../StyledTag';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+
+import VirtualCardRequestCard from './VirtualCardRequestCard';
 
 const Action = styled.button`
   padding: 8px;
@@ -310,8 +313,21 @@ export function VirtualCardRequestsTable(props: VirtualCardRequestsTableProps) {
             </div>
           )}
         />
+      ) : props.loading ? (
+        <Loading />
       ) : (
-        <div></div>
+        <Flex flexDirection="column" gap="8px">
+          {props.virtualCardRequests.map(virtualCardRequest => {
+            return (
+              <Box key={virtualCardRequest.id}>
+                <VirtualCardRequestCard
+                  onClick={props.onSelectedVirtualCardRequest}
+                  virtualCardRequest={virtualCardRequest}
+                />
+              </Box>
+            );
+          })}
+        </Flex>
       )}
     </React.Fragment>
   );
