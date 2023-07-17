@@ -3,6 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { Account, Host, VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
+import { VirtualCardRequestStatusI18n } from '../../lib/i18n/virtual-card-request';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
@@ -65,11 +66,11 @@ export default function VirtualCardRequestFilter(props: VirtualCardRequestStatus
             isLoading={props.loading}
             value={props.virtualCardRequestStatusFilter.map(c => ({
               value: c,
-              label: c,
+              label: intl.formatMessage(VirtualCardRequestStatusI18n[c]),
             }))}
             options={Object.values(VirtualCardRequestStatus).map(c => ({
               value: c,
-              label: c,
+              label: intl.formatMessage(VirtualCardRequestStatusI18n[c]),
             }))}
           />
         </FilterContainer>
