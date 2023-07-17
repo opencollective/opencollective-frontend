@@ -3045,7 +3045,7 @@
   "VirtualCard.Paused": "Призупинені",
   "VirtualCard.PendingActivation": "Очікує активацію",
   "VirtualCard.PendingFulfillment": "Очікує заповнення",
-  "VirtualCard.SpendingLimit.Short": "{ spendingLimitInterval, select, ALL_TIME {<LimitAmount>{ spendingLimitAmount }</LimitAmount>} PER_AUTHORIZATION {<AvailableAmount>{ spendingLimitAmount }</AvailableAmount><LimitInterval> per use</LimitInterval>} other {<LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval>/{ spendingLimitIntervalShort }</LimitInterval>} }",
+  "VirtualCard.SpendingLimit.Short": "{ spendingLimitInterval, select, ALL_TIME {<LimitAmount>{ spendingLimitAmount }</LimitAmount>} PER_AUTHORIZATION {<LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval> per use</LimitInterval>} other {<LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval>/{ spendingLimitIntervalShort }</LimitInterval>} }",
   "virtualCard.status.canceled": "Canceled",
   "virtualCard.status.inactive": "Inactive",
   "VirtualCard.WithoutReceiptsFilter": "Has no receipts",
