@@ -3,6 +3,7 @@
  */
 export const PREVIEW_FEATURE_KEYS = {
   DASHBOARD: 'dashboard',
+  EXPENSE_PIPELINE: 'EXPENSE_PIPELINE',
 };
 
 export type PreviewFeature = {
@@ -25,5 +26,12 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe'],
     enabledByDefaultFor: ['opencollective'],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.EXPENSE_PIPELINE,
+    title: 'Host Expense Pipeline',
+    description: 'Introducing tabs in the host expenses dashboard to help you manage paying expenses.',
+    publicBeta: false,
+    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe'],
   },
 ];
