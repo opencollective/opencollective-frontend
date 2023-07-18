@@ -182,7 +182,7 @@ export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
               onPageChange={page => queryFilter.setOffset((page - 1) * query.data.virtualCardRequests.limit)}
             />
             <P mt={1} fontSize="12px">
-              <FormattedMessage id="TotalItems" defaultMessage="Total Items" />:{' '}
+              <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: <FormattedMessage id="TotalItems" defaultMessage="Total Items" /> }} />{' '}
               {query.data.virtualCardRequests.totalCount}
             </P>
           </Flex>
