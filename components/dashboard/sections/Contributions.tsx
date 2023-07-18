@@ -50,13 +50,7 @@ const manageContributionsQuery = gql`
           ...ManagedOrderFields
         }
       }
-      oneTime: orders(
-        filter: OUTGOING
-        frequency: ONETIME
-        status: [PAID]
-        includeIncognito: true
-        minAmount: 1
-      ) {
+      oneTime: orders(filter: OUTGOING, frequency: ONETIME, status: [PAID], includeIncognito: true, minAmount: 1) {
         totalCount
         nodes {
           id
