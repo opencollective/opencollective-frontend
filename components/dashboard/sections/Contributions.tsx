@@ -152,7 +152,7 @@ const getColumns = ({ tab, setEditOrder, intl }) => {
   };
   const status = {
     accessorKey: 'status',
-    header: intl.formatMessage({ id: 'status', defaultMessage: 'Status' }),
+    header: intl.formatMessage({ id: 'order.status', defaultMessage: 'Status' }),
     cell: ({ cell }) => {
       const status = cell.getValue();
       return (
