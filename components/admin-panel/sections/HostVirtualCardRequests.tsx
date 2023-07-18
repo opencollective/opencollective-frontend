@@ -1,9 +1,8 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { identity, toLower, toUpper } from 'lodash';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
-import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { Account, Host, VirtualCardRequestCollection } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
@@ -11,7 +10,7 @@ import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { Box, Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
-import MessageBox from '../../MessageBox';
+import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import Pagination from '../../Pagination';
 import { P } from '../../Text';
 import { VirtualCardRequestDrawer } from '../../virtual-card-requests/VirtualCardRequestDrawer';
@@ -89,8 +88,6 @@ type HostVirtualCardRequestsProps = {
 };
 
 export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
-  const intl = useIntl();
-
   const queryFilter = useQueryFilter({
     ignoreQueryParams: ['slug', 'section'],
     filters: {
@@ -182,7 +179,11 @@ export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
               onPageChange={page => queryFilter.setOffset((page - 1) * query.data.virtualCardRequests.limit)}
             />
             <P mt={1} fontSize="12px">
-              <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: <FormattedMessage id="TotalItems" defaultMessage="Total Items" /> }} />{' '}
+              <FormattedMessage
+                id="withColon"
+                defaultMessage="{item}:"
+                values={{ item: <FormattedMessage id="TotalItems" defaultMessage="Total Items" /> }}
+              />{' '}
               {query.data.virtualCardRequests.totalCount}
             </P>
           </Flex>
