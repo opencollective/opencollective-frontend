@@ -41,7 +41,7 @@ const SpendingLimitShortI18n = defineMessage({
   id: 'VirtualCard.SpendingLimit.Short',
   defaultMessage: `{ spendingLimitInterval, select,
       ALL_TIME {<LimitAmount>{ spendingLimitAmount }</LimitAmount>}
-      PER_AUTHORIZATION {<AvailableAmount>{ spendingLimitAmount }</AvailableAmount><LimitInterval> per use</LimitInterval>}
+      PER_AUTHORIZATION {<LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval> per use</LimitInterval>}
       other {<LimitAmount>{ spendingLimitAmount }</LimitAmount><LimitInterval>/{ spendingLimitIntervalShort }</LimitInterval>}
     }`,
 });

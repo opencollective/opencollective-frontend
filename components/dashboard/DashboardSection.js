@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 import AccountSettings from '../admin-panel/sections/AccountSettings';
 import FinancialContributions from '../admin-panel/sections/FinancialContributions';
+import HostVirtualCardRequests from '../admin-panel/sections/HostVirtualCardRequests';
 import HostVirtualCards from '../admin-panel/sections/HostVirtualCards';
 import InvoicesReceipts from '../admin-panel/sections/invoices-receipts/InvoicesReceipts';
 import NotificationsSettings from '../admin-panel/sections/NotificationsSettings';
@@ -44,6 +45,7 @@ const ADMIN_PANEL_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: PendingApplications,
   [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
   [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
+  [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
   [COLLECTIVE_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
   [COLLECTIVE_SECTIONS.TEAM]: TeamSettings,
   // NEW
