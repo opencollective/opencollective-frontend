@@ -166,7 +166,7 @@ export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
       {loading ? (
         <Loading />
       ) : error ? (
-        <MessageBox type="error">{i18nGraphqlException(intl, error)}</MessageBox>
+        <MessageBoxGraphqlError error={error} />
       ) : (
         <React.Fragment>
           <VirtualCardRequestsTable
