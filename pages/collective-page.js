@@ -8,6 +8,7 @@ import { createGlobalStyle } from 'styled-components';
 import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
+import sentryLib from '../server/sentry';
 
 import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
@@ -57,7 +58,13 @@ const GlobalStyles = createGlobalStyle`
  * to render `components/collective-page` with everything needed.
  */
 class CollectivePage extends React.Component {
-  static async getInitialProps({ client, req, res, query: { slug, status, step, mode, action } }) {
+  static async getInitialProps(ctx) {
+    const {
+      client,
+      req,
+      res,
+      query: { slug, status, step, mode, action },
+    } = ctx;
     if (res && req && (req.language || req.locale === 'en')) {
       res.set('Cache-Control', 'public, s-maxage=300');
     }
@@ -66,8 +73,12 @@ class CollectivePage extends React.Component {
 
     // If on server side
     if (req) {
-      await preloadCollectivePageGraphqlQueries(slug, client);
-      skipDataFromTree = true;
+      try {
+        await preloadCollectivePageGraphqlQueries(slug, client);
+        skipDataFromTree = true;
+      } catch (err) {
+        sentryLib.captureException(err, ctx);
+      }
     }
 
     return { slug, status, step, mode, skipDataFromTree, action };
