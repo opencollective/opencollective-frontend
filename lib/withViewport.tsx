@@ -13,12 +13,15 @@ export const VIEWPORTS = {
   MEDIUM: 'MEDIUM',
   LARGE: 'LARGE',
   UNKNOWN: 'UNKNOWN',
-};
+} as const;
 
 // Please keep the same length for these two arrays
 export const BREAKPOINTS_NAMES = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL, VIEWPORTS.MEDIUM, VIEWPORTS.LARGE];
 export const BREAKPOINTS_WIDTHS = BREAKPOINTS_NAMES.map((_, idx) => emToPx(breakpoints[idx]));
-export const BREAKPOINTS = zipObject(BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS);
+export const BREAKPOINTS = zipObject(BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS) as Record<
+  (typeof BREAKPOINTS_NAMES)[number],
+  number
+>;
 
 /**
  * Helper to check if a viewport is superior or equal to another one.
@@ -96,6 +99,8 @@ const withViewport = (ChildComponent, options) => {
     componentWillUnmount() {
       window.removeEventListener('resize', this.onResize);
     }
+
+    onResize: () => void;
 
     doResize = () => {
       const viewport = getViewportFromWidth(window.innerWidth);
