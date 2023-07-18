@@ -278,15 +278,21 @@ export const cardColumns = ({ tab, setEditOrder }) => [
       return (
         <Flex alignItems="center" gap="16px">
           <Avatar collective={order.toAccount} radius={40} />
-          <Flex flexDirection="column" flexGrow={1}>
-            <Flex justifyContent="space-between" alignItems="baseline">
+          <Flex flexDirection="column" gap="8px" flexGrow={1}>
+            <Flex justifyContent={['flex-start', 'space-between']} gap="8px" alignItems="baseline">
               <P fontSize="13px" fontWeight="400">
                 <FormattedMessage id="order.id" defaultMessage="Order #" />
                 {order.legacyId}
               </P>
-              <Flex alignItems="center" gap="16px">
+              <Flex
+                alignItems={['flex-end', 'center']}
+                flexDirection={['column', 'row']}
+                gap="16px"
+                justifyContent={['space-between', 'flex-end']}
+                flexGrow={1}
+              >
                 {order.frequency && order.processedAt && (
-                  <P fontSize="13px" fontWeight="400">
+                  <P fontSize="13px" fontWeight="400" display={['none', 'block']}>
                     <FormattedMessage defaultMessage="Last charge" />
                     :&nbsp;
                     <DateTime value={order.processedAt} dateStyle="medium" timeStyle={undefined} />
@@ -302,7 +308,7 @@ export const cardColumns = ({ tab, setEditOrder }) => [
                 </P>
               </Flex>
             </Flex>
-            <Flex justifyContent="space-between" alignItems="baseline">
+            <Flex justifyContent="space-between" alignItems="baseline" flexDirection={['column', 'row']} gap="8px">
               <Flex fontSize="13px" fontWeight="400">
                 {order.frequency && order.totalDonations && (
                   <Box mr="16px">
@@ -316,41 +322,50 @@ export const cardColumns = ({ tab, setEditOrder }) => [
                 )}
                 {order.paymentMethod && <PaymentMethodTypeWithIcon iconSize={18} type={order.paymentMethod?.type} />}
               </Flex>
-              {tab === 'recurring' && (
-                <Flex justifyContent="center">
-                  <PopupMenu
-                    placement="bottom-start"
-                    Button={({ onClick }) => (
-                      <StyledButton data-cy="actions" onClick={onClick} buttonSize="tiny">
-                        <FormattedMessage id="Edit" defaultMessage="Edit" />
-                      </StyledButton>
-                    )}
-                  >
-                    {() => (
-                      <Flex flexDirection="column">
-                        <ActionButton onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}>
-                          <FormattedMessage
-                            id="subscription.menu.editPaymentMethod"
-                            defaultMessage="Update payment method"
-                          />
-                        </ActionButton>
-                        <ActionButton onClick={() => setEditOrder({ order, action: 'editAmount' })}>
-                          <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
-                        </ActionButton>
-                        <ActionButton
-                          onClick={() => setEditOrder({ order, action: 'cancel' })}
-                          color={themeGet('colors.red.600')}
-                        >
-                          <FormattedMessage
-                            id="subscription.menu.cancelContribution"
-                            defaultMessage="Cancel contribution"
-                          />
-                        </ActionButton>
-                      </Flex>
-                    )}
-                  </PopupMenu>
-                </Flex>
-              )}
+              <Flex justifyContent={['space-between', 'flex-end']} alignItems="baseline" width={['100%', 'auto']}>
+                {order.frequency && order.processedAt && (
+                  <P fontSize="13px" fontWeight="400" display={['block', 'none']}>
+                    <FormattedMessage defaultMessage="Last charge" />
+                    :&nbsp;
+                    <DateTime value={order.processedAt} dateStyle="medium" timeStyle={undefined} />
+                  </P>
+                )}
+                {tab === 'recurring' && (
+                  <Flex justifyContent="center">
+                    <PopupMenu
+                      placement="bottom-start"
+                      Button={({ onClick }) => (
+                        <StyledButton data-cy="actions" onClick={onClick} buttonSize="tiny">
+                          <FormattedMessage id="Edit" defaultMessage="Edit" />
+                        </StyledButton>
+                      )}
+                    >
+                      {() => (
+                        <Flex flexDirection="column">
+                          <ActionButton onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}>
+                            <FormattedMessage
+                              id="subscription.menu.editPaymentMethod"
+                              defaultMessage="Update payment method"
+                            />
+                          </ActionButton>
+                          <ActionButton onClick={() => setEditOrder({ order, action: 'editAmount' })}>
+                            <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
+                          </ActionButton>
+                          <ActionButton
+                            onClick={() => setEditOrder({ order, action: 'cancel' })}
+                            color={themeGet('colors.red.600')}
+                          >
+                            <FormattedMessage
+                              id="subscription.menu.cancelContribution"
+                              defaultMessage="Cancel contribution"
+                            />
+                          </ActionButton>
+                        </Flex>
+                      )}
+                    </PopupMenu>
+                  </Flex>
+                )}
+              </Flex>
             </Flex>
           </Flex>
         </Flex>
