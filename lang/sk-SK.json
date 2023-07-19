@@ -2727,7 +2727,7 @@
   "subscription.updatePaymentMethod.subheader": "Pick an existing payment method or add a new one.",
   "subscription.updateTier.subheader": "Pick an existing tier or enter a custom amount.",
   "Subscriptions.Active": "Aktívny",
-  "Subscriptions.Cancelled": "Zrušené",
+  "Subscriptions.Cancelled": "Canceled",
   "Subscriptions.ContributedToDate": "Prispel(a) k dátumu",
   "Subscriptions.FeesOnTopTooltip": "Príspevok plus odmena pre platformu",
   "Subscriptions.Status": "{status, select, ACTIVE {Active contribution} CANCELLED {Cancelled contribution} ERROR {Error} REJECTED {Rejected contribution} PROCESSING {Processing} NEW {Processing} other {}}",

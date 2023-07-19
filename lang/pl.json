@@ -2727,7 +2727,7 @@
   "subscription.updatePaymentMethod.subheader": "Pick an existing payment method or add a new one.",
   "subscription.updateTier.subheader": "Pick an existing tier or enter a custom amount.",
   "Subscriptions.Active": "Aktywne",
-  "Subscriptions.Cancelled": "Anulowane",
+  "Subscriptions.Cancelled": "Canceled",
   "Subscriptions.ContributedToDate": "Wsparcie do dziś",
   "Subscriptions.FeesOnTopTooltip": "Składka wraz z napiwkiem dla Platformy",
   "Subscriptions.Status": "{status, select, ACTIVE {Active contribution} CANCELLED {Cancelled contribution} ERROR {Error} REJECTED {Rejected contribution} PROCESSING {Processing} NEW {Processing} other {}}",
