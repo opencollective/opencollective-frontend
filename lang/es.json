@@ -2239,7 +2239,7 @@
   "order.disputed": "Impugnado",
   "order.expired": "Expirado",
   "Order.fromTo": "por {account} de {contributor}",
-  "order.id": "Order #",
+  "order.id": "Contribution #",
   "order.in_review": "En Revisión",
   "order.markAsCompleted": "Marcar como completado",
   "order.markAsExpired": "Marcar como expirado",

@@ -2239,7 +2239,7 @@
   "order.disputed": "Sporny",
   "order.expired": "Wygasłe",
   "Order.fromTo": "dla {account} od {contributor}",
-  "order.id": "Order #",
+  "order.id": "Contribution #",
   "order.in_review": "W trakcie przeglądu",
   "order.markAsCompleted": "Oznacz jako ukończony",
   "order.markAsExpired": "Oznacz jako wygasłe",

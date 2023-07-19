@@ -2239,7 +2239,7 @@
   "order.disputed": "Disputed",
   "order.expired": "已过期",
   "Order.fromTo": "来自 {contributor} 的 {account}",
-  "order.id": "Order #",
+  "order.id": "Contribution #",
   "order.in_review": "正在审查",
   "order.markAsCompleted": "标记为已完成",
   "order.markAsExpired": "标记为已过期",

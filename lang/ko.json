@@ -2239,7 +2239,7 @@
   "order.disputed": "Disputed",
   "order.expired": "만료됨",
   "Order.fromTo": "for {account} from {contributor}",
-  "order.id": "Order #",
+  "order.id": "Contribution #",
   "order.in_review": "In Review",
   "order.markAsCompleted": "완료로 표시",
   "order.markAsExpired": "Mark as expired",
