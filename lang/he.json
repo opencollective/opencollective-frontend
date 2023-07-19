@@ -2239,7 +2239,7 @@
   "order.disputed": "במחלוקת",
   "order.expired": "פג תוקף",
   "Order.fromTo": "עבור {account} מאת {contributor}",
-  "order.id": "Order #",
+  "order.id": "Contribution #",
   "order.in_review": "בבחינה",
   "order.markAsCompleted": "סימון כהושלם",
   "order.markAsExpired": "סימון כפג תוקף",
