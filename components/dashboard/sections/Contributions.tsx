@@ -133,7 +133,7 @@ const getColumns = ({ tab, setEditOrder, intl }) => {
   };
   const orderId = {
     accessorKey: 'legacyId',
-    header: intl.formatMessage({ id: 'order.id', defaultMessage: 'Order #' }),
+    header: intl.formatMessage({ id: 'order.id', defaultMessage: 'Contribution #' }),
   };
   const paymentMethod = {
     accessorKey: 'paymentMethod',
@@ -281,7 +281,7 @@ export const cardColumns = ({ tab, setEditOrder }) => [
           <Flex flexDirection="column" gap="8px" flexGrow={1}>
             <Flex justifyContent={['flex-start', 'space-between']} gap="8px" alignItems="baseline">
               <P fontSize="13px" fontWeight="400">
-                <FormattedMessage id="order.id" defaultMessage="Order #" />
+                <FormattedMessage id="order.id" defaultMessage="Contribution #" />
                 {order.legacyId}
               </P>
               <Flex

@@ -13741,7 +13741,12 @@ type Mutation {
     """
     ID of the Collective where the conversation will be created
     """
-    CollectiveId: String!
+    CollectiveId: String @deprecated(reason: "2023-07-18: Please use `account` instead")
+
+    """
+    Account where the conversation will be created
+    """
+    account: AccountReferenceInput
 
     """
     A list of tags for this conversation

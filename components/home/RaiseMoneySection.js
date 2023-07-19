@@ -74,12 +74,14 @@ const RaiseMoney = () => {
                   width={250}
                   height={168}
                   src="/static/images/new-home/team-picture-4.png"
+                  alt="Climate Sessions"
                 />
                 <NextIllustration
                   display={[null, 'none']}
                   width={373}
                   height={274}
                   src="/static/images/new-home/team-picture-4-xs.png"
+                  alt="Climate Sessions"
                 />
               </Link>
             </Container>
@@ -95,12 +97,14 @@ const RaiseMoney = () => {
                   width={250}
                   height={168}
                   src="/static/images/new-home/team-picture-5.png"
+                  alt="FNB Raleigh"
                 />
                 <NextIllustration
                   display={[null, 'none']}
                   width={384}
                   height={277}
                   src="/static/images/new-home/team-picture-5-xs.png"
+                  alt="FNB Raleigh"
                 />
               </Link>
             </Container>
@@ -117,12 +121,14 @@ const RaiseMoney = () => {
                   width={361}
                   height={304}
                   src="/static/images/new-home/team-picture-6-xs.png"
+                  alt="Tiwai Wakanz"
                 />
                 <NextIllustration
                   display={['none', 'block']}
                   width={250}
                   height={168}
                   src="/static/images/new-home/team-picture-6.png"
+                  alt="Tiwai Wakanz"
                 />
               </Link>
             </Container>
@@ -139,12 +145,14 @@ const RaiseMoney = () => {
                   width={235}
                   height={258}
                   src="/static/images/new-home/team-picture-7-xs.png"
+                  alt="Love Wins"
                 />
                 <NextIllustration
                   display={['none', 'block']}
                   width={250}
                   height={168}
                   src="/static/images/new-home/team-picture-7.png"
+                  alt="Love Wins"
                 />
               </Link>
             </Container>
@@ -155,12 +163,14 @@ const RaiseMoney = () => {
                   width={303}
                   height={262}
                   src="/static/images/new-home/team-picture-8-xs.png"
+                  alt="Reading Red Kitchen"
                 />
                 <NextIllustration
                   display={['none', 'block']}
                   width={250}
                   height={168}
                   src="/static/images/new-home/team-picture-8.png"
+                  alt="Reading Red Kitchen"
                 />
               </Link>
             </Container>
@@ -176,12 +186,14 @@ const RaiseMoney = () => {
                   width={483}
                   height={333}
                   src="/static/images/new-home/team-picture-9-xs.png"
+                  alt="The Light Inside Film"
                 />
                 <NextIllustration
                   display={['none', 'block']}
                   width={250}
                   height={168}
                   src="/static/images/new-home/team-picture-9.png"
+                  alt="The Light Inside Film"
                 />
               </Link>
             </Container>
