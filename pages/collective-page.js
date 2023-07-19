@@ -91,7 +91,7 @@ class CollectivePage extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
-      account: PropTypes.object,
+      previousData: PropTypes.object,
       Collective: PropTypes.shape({
         name: PropTypes.string,
         type: PropTypes.string.isRequired,
@@ -145,23 +145,21 @@ class CollectivePage extends React.Component {
     const { slug, data, LoggedInUser, status, step, mode, action } = this.props;
     const { showOnboardingModal } = this.state;
 
-    const loading = data.loading && !data.Collective;
-
+    const collective = data?.Collective || data?.previousData?.Collective;
+    const loading = data.loading && !collective;
     if (!loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.Collective) {
+      } else if (!collective) {
         return <ErrorPage error={generateNotFoundError(slug)} log={false} />;
-      } else if (data.Collective.isPledged && !data.Collective.isActive) {
-        return <PledgedCollectivePage collective={data.Collective} />;
-      } else if (data.Collective.isIncognito) {
-        return <IncognitoUserCollective collective={data.Collective} />;
-      } else if (data.Collective.isGuest) {
-        return <GuestUserProfile account={data.Collective} />;
+      } else if (collective.isPledged && !collective.isActive) {
+        return <PledgedCollectivePage collective={collective} />;
+      } else if (collective.isIncognito) {
+        return <IncognitoUserCollective collective={collective} />;
+      } else if (collective.isGuest) {
+        return <GuestUserProfile account={collective} />;
       }
     }
-
-    const collective = data && data.Collective;
 
     // Don't allow /collective/apply
     if (action === 'apply' && !collective?.isHost) {
