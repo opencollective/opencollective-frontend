@@ -40,7 +40,7 @@ export const I18nFilters = defineMessages({
   },
   [FILTERS.CANCELLED]: {
     id: 'Subscriptions.Cancelled',
-    defaultMessage: 'Cancelled',
+    defaultMessage: 'Canceled',
   },
 });
 

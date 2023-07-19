@@ -9,9 +9,7 @@ import { H4 } from '../Text';
 import { withUser } from '../UserProvider';
 
 import ShareButton from './ShareButton';
-import StepCheckout from './StepCheckout';
 import StepDetails from './StepDetails';
-import StepDetailsCrypto from './StepDetailsCrypto';
 import StepPayment from './StepPayment';
 import StepProfile from './StepProfile';
 import StepSummary from './StepSummary';
@@ -34,7 +32,6 @@ class ContributionFlowStepContainer extends React.Component {
     step: PropTypes.shape({
       name: PropTypes.string,
     }),
-    isCrypto: PropTypes.bool,
     contributeProfiles: PropTypes.arrayOf(PropTypes.object),
     mainState: PropTypes.shape({
       stepDetails: PropTypes.object,
@@ -44,7 +41,6 @@ class ContributionFlowStepContainer extends React.Component {
       stepSummary: PropTypes.object,
       stepPayment: PropTypes.object,
     }),
-    order: PropTypes.object,
   };
 
   constructor(props) {
@@ -76,11 +72,11 @@ class ContributionFlowStepContainer extends React.Component {
   };
 
   renderStep = step => {
-    const { collective, mainState, tier, isEmbed, isCrypto, order } = this.props;
+    const { collective, mainState, tier, isEmbed } = this.props;
     const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
     switch (step) {
       case 'details':
-        return !isCrypto ? (
+        return (
           <StepDetails
             collective={collective}
             tier={tier}
@@ -89,9 +85,8 @@ class ContributionFlowStepContainer extends React.Component {
             showPlatformTip={this.props.showPlatformTip}
             isEmbed={isEmbed}
           />
-        ) : (
-          <StepDetailsCrypto onChange={this.props.onChange} data={stepDetails} collective={collective} />
         );
+
       case 'profile': {
         return (
           <StepProfile
@@ -118,15 +113,12 @@ class ContributionFlowStepContainer extends React.Component {
             onNewCardFormReady={this.props.onNewCardFormReady}
             isSubmitting={this.props.isSubmitting}
             isEmbed={isEmbed}
-            isCrypto={isCrypto}
             disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
             hideCreditCardPostalCode={
               this.props.hideCreditCardPostalCode || Boolean(collective.settings?.hideCreditCardPostalCode)
             }
           />
         );
-      case 'checkout':
-        return <StepCheckout stepDetails={this.props.mainState.stepDetails} order={order} />;
       case 'summary':
         return (
           <StepSummary
@@ -136,7 +128,6 @@ class ContributionFlowStepContainer extends React.Component {
             stepDetails={stepDetails}
             stepPayment={stepPayment}
             data={stepSummary}
-            isCrypto={isCrypto}
             onChange={this.props.onChange}
             taxes={this.props.taxes}
             applyTaxes

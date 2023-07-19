@@ -15,7 +15,7 @@ import LinkCollective from '../LinkCollective';
 import StyledCard from '../StyledCard';
 import StyledLink from '../StyledLink';
 import StyledTag from '../StyledTag';
-import { P, Span } from '../Text';
+import { P } from '../Text';
 
 const MaskSVG = props => (
   <svg
@@ -199,9 +199,9 @@ const StyledCollectiveCard = ({
                 tag
               )}
               {countryString && (
-                <Span ml={2} fontSize="12px" color="black.700" fontWeight={400}>
+                <Container ml={1} mb={1} fontSize="12px" color="black.700" fontWeight={400}>
                   {countryString}
-                </Span>
+                </Container>
               )}
             </Container>
             <Container>

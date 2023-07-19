@@ -222,9 +222,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                       </Flex>
                       {accounts
                         ?.sort((a, b) => a.name.localeCompare(b.name))
-                        .map(account => (
-                          <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />
-                        ))}
+                        .map(account => <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />)}
                     </div>
                   );
                 })}

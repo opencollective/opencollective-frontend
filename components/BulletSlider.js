@@ -10,7 +10,9 @@ const Bullet = styled.div`
   background-color: ${props => props.theme.colors.black[200]};
   margin-bottom: 8px;
   border-radius: 100%;
-  transition: transform 0.1s, background-color 0.3s;
+  transition:
+    transform 0.1s,
+    background-color 0.3s;
   cursor: pointer;
 
   &:hover {

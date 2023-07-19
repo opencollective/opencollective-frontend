@@ -70,7 +70,10 @@ const DashboardLink = styled(Link)`
   right: 4px;
   top: 4px;
   bottom: 4px;
-  transition: opacity 0.1s, background-color 0.1s, color 0.1s;
+  transition:
+    opacity 0.1s,
+    background-color 0.1s,
+    color 0.1s;
   &:hover {
     background: #030712;
     color: white;

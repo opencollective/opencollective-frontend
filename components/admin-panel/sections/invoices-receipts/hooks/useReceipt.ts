@@ -70,15 +70,21 @@ export const useReceipt = ({ settings, template }: UseReceiptProps): UseReceipt 
   const { formatMessage } = useIntl();
   const templateData = settings.invoice?.templates?.[template] ?? {};
 
-  const initialValues = Object.values(ReceiptField).reduce((acc, field) => {
-    return { ...acc, [field]: templateData[field] };
-  }, {} as { [key in ReceiptField]?: string });
+  const initialValues = Object.values(ReceiptField).reduce(
+    (acc, field) => {
+      return { ...acc, [field]: templateData[field] };
+    },
+    {} as { [key in ReceiptField]?: string },
+  );
 
   const [values, setValues] = useState<{ [key in ReceiptField]?: string }>(initialValues);
 
-  const placeholders = Object.entries(receiptPlaceholders[template]).reduce((acc, [field, message]) => {
-    return { ...acc, [field]: typeof message === 'object' ? formatMessage(message) : message };
-  }, {} as { [key in ReceiptField]: string });
+  const placeholders = Object.entries(receiptPlaceholders[template]).reduce(
+    (acc, [field, message]) => {
+      return { ...acc, [field]: typeof message === 'object' ? formatMessage(message) : message };
+    },
+    {} as { [key in ReceiptField]: string },
+  );
 
   const changeValues = (values: { [key in ReceiptField]?: string }): void => {
     setValues(prev => ({ ...prev, ...values }));

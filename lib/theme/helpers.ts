@@ -6,7 +6,7 @@ export function toPx(value: number) {
 /**
  * Convert a value in `em` to pixels
  */
-export function emToPx(value: 'string') {
+export function emToPx(value: string) {
   return parseFloat(value) * 16;
 }
 

@@ -20,7 +20,6 @@ class ContributionFlowButtons extends React.Component {
     /** If provided, the PayPal button will be displayed in place of the regular submit */
     paypalButtonProps: PropTypes.object,
     currency: PropTypes.string,
-    isCrypto: PropTypes.bool,
     disabled: PropTypes.bool,
     tier: PropTypes.shape({ type: PropTypes.string }),
     stepDetails: PropTypes.object,
@@ -51,9 +50,8 @@ class ContributionFlowButtons extends React.Component {
   }
 
   render() {
-    const { goBack, isValidating, nextStep, paypalButtonProps, currency, tier, isCrypto, stepDetails, disabled } =
-      this.props;
-    const totalAmount = getTotalAmount(stepDetails, this.props.stepSummary, isCrypto);
+    const { goBack, isValidating, nextStep, paypalButtonProps, currency, tier, stepDetails, disabled } = this.props;
+    const totalAmount = getTotalAmount(stepDetails, this.props.stepSummary);
     return (
       <Flex flexWrap="wrap" justifyContent="center">
         <Fragment>
@@ -81,7 +79,7 @@ class ContributionFlowButtons extends React.Component {
               minWidth={!nextStep ? 185 : 145}
               buttonStyle="primary"
               onClick={this.goNext}
-              disabled={disabled || (isCrypto && totalAmount <= 0)}
+              disabled={disabled}
               loading={isValidating || this.state.isLoadingNext}
               data-cy="cf-next-step"
               type="submit"
@@ -93,11 +91,6 @@ class ContributionFlowButtons extends React.Component {
                   )}{' '}
                   &rarr;
                 </React.Fragment>
-              ) : isCrypto ? (
-                <FormattedMessage
-                  defaultMessage="I've sent {CryptoAmount} {CryptoCurrency} to this wallet address"
-                  values={{ CryptoAmount: totalAmount, CryptoCurrency: currency }}
-                />
               ) : tier?.type === 'TICKET' ? (
                 <FormattedMessage
                   id="contribute.ticket"

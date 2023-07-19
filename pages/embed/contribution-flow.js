@@ -13,7 +13,6 @@ import { compose } from '../../lib/utils';
 
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';
 import Container from '../../components/Container';
-import { PAYMENT_FLOW } from '../../components/contribution-flow/constants';
 import ContributionBlocker, { getContributionBlocker } from '../../components/contribution-flow/ContributionBlocker';
 import {
   contributionFlowAccountQuery,
@@ -47,7 +46,6 @@ class EmbedContributionFlowPage extends React.Component {
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
-    paymentFlow: PropTypes.string,
     tierId: PropTypes.number,
     error: PropTypes.string,
     data: PropTypes.shape({
@@ -99,9 +97,8 @@ class EmbedContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, paymentFlow, LoggedInUser } = this.props;
+    const { data = {}, LoggedInUser } = this.props;
     const { account, tier } = data;
-    const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
 
     if (data.loading) {
       return (
@@ -111,13 +108,7 @@ class EmbedContributionFlowPage extends React.Component {
       );
     }
 
-    const contributionBlocker = getContributionBlocker(
-      LoggedInUser,
-      account,
-      tier,
-      Boolean(this.props.tierId),
-      isCrypto,
-    );
+    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
     if (contributionBlocker) {
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else {

@@ -39,9 +39,9 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
   const [isOtherAmountSelected, setOtherAmountSelected] = React.useState(getDefaultOtherAmountSelected);
   const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
   const { LoggedInUser } = useLoggedInUser();
-  const tierCustomFields = tier?.customFields?.fields;
-  const hostCustomFields = collective.host?.settings?.contributionFlow?.customFields;
   const selectedInterval = data?.interval;
+  const tierCustomFields = tier?.customFields;
+  const hostCustomFields = collective.host?.settings?.contributionFlow?.customFields;
   const customFieldsConfig = React.useMemo(
     () => buildCustomFieldsConfig(tierCustomFields, hostCustomFields),
     [tierCustomFields, hostCustomFields],

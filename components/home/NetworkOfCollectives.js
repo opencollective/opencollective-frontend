@@ -511,7 +511,10 @@ const NetworkOfCollectives = () => {
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
+            role="img"
           >
+            <title>Network of Collectives</title>
+
             <g className="visible-sm">
               <path d="M237.767 384.938L387.164 340.547" stroke="white" strokeWidth="4" />
               <path d="M113.404 74.1985L240.997 86.3052" stroke="white" strokeWidth="4" />

@@ -86,6 +86,11 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS}
             if={!isAccountantOnly && hasFeature(collective, FEATURES.VIRTUAL_CARDS)}
           />
+          <MenuLink
+            collective={collective}
+            section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS}
+            if={!isAccountantOnly && hasFeature(collective, FEATURES.VIRTUAL_CARDS)}
+          />
           <MenuLink collective={collective} section={HOST_SECTIONS.REPORTS} isBeta />
         </MenuGroup>
 

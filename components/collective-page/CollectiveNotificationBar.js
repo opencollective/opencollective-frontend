@@ -160,7 +160,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
       type: 'warning',
       inline: true,
     };
-  } else if (!collective.isApproved && collective.host && collective.type === CollectiveType.COLLECTIVE) {
+  } else if (!collective.isApproved && collective.host) {
     return {
       title: intl.formatMessage(messages.approvalPending),
       description: intl.formatMessage(messages.approvalPendingDescription, { host: collective.host.name }),
