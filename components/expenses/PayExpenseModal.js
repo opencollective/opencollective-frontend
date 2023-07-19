@@ -189,6 +189,7 @@ const getInitialValues = (expense, host, payoutMethodType) => {
     ...DEFAULT_VALUES,
     ...getPayoutOptionValue(payoutMethodType, true, host),
     feesPayer: expense.feesPayer || DEFAULT_VALUES.feesPayer,
+    totalAmountPaidInHostCurrency: expense.currency === host.currency ? expense.amount : null,
   };
 };
 
@@ -284,7 +285,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
                 ...formik.values,
                 ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
                 paymentProcessorFeeInHostCurrency: null,
-                totalAmountPaidInHostCurrency: null,
+                totalAmountPaidInHostCurrency: expense.currency === host.currency ? expense.amount : null,
                 feesPayer: !getCanCustomizeFeesPayer(expense, collective, hasManualPayment, null, LoggedInUser.isRoot)
                   ? DEFAULT_VALUES.feesPayer // Reset fees payer if can't customize
                   : formik.values.feesPayer,
@@ -331,7 +332,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
                   data-cy="total-amount-paid"
                   placeholder="0.00"
                   maxWidth="100%"
-                  min={0}
+                  min={1}
                   onChange={value => formik.setFieldValue('totalAmountPaidInHostCurrency', value)}
                 />
               )}
@@ -360,7 +361,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
                   placeholder="0.00"
                   maxWidth="100%"
                   min={0}
-                  max={100000000}
+                  max={formik.values.totalAmountPaidInHostCurrency || 100000000}
                   onChange={value => formik.setFieldValue('paymentProcessorFeeInHostCurrency', value)}
                 />
               )}

@@ -76,6 +76,11 @@ const Menu = ({ isAccountantOnly }) => {
           icon={<CreditCard size={16} />}
           if={!isAccountantOnly && hasFeature(account, FEATURES.VIRTUAL_CARDS)}
         />
+        <MenuLink
+          section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS}
+          icon={<CreditCard size={16} />}
+          if={!isAccountantOnly && hasFeature(account, FEATURES.VIRTUAL_CARDS)}
+        />
         <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} isBeta icon={<Chart size={16} />} />
 
         <MenuLink

@@ -107,7 +107,11 @@ const BackButtonAndAvatar = styled.div`
       opacity: 1;
       visibility: visible;
       margin-right: 8px;
-      transition: opacity 0.1s ease-out, visibility 0.2s ease-out, margin 0.075s, width 0.075s ease-in-out;
+      transition:
+        opacity 0.1s ease-out,
+        visibility 0.2s ease-out,
+        margin 0.075s,
+        width 0.075s ease-in-out;
     }
 
     &[data-hide-on-desktop='true'] {
@@ -115,7 +119,11 @@ const BackButtonAndAvatar = styled.div`
       margin-right: 0px;
       visibility: hidden;
       opacity: 0;
-      transition: opacity 0.1s ease-out, visibility 0.2s ease-out, margin 0.075s, width 0.075s ease-in-out;
+      transition:
+        opacity 0.1s ease-out,
+        visibility 0.2s ease-out,
+        margin 0.075s,
+        width 0.075s ease-in-out;
     }
   }
 `;
@@ -174,7 +182,10 @@ const CategoriesContainer = styled(Container)`
     width: 0;
     visibility: hidden;
     opacity: 0;
-    transition: opacity 0.4s ease-out, visibility 0.4s ease-out, width 0.2s ease-out;
+    transition:
+      opacity 0.4s ease-out,
+      visibility 0.4s ease-out,
+      width 0.2s ease-out;
 
     ${props =>
       props.isExpanded &&

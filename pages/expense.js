@@ -24,7 +24,9 @@ import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
 export const getVariableFromProps = props => {
-  const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1)).utc(true).toISOString();
+  const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1))
+    .utc(true)
+    .toISOString();
   return {
     legacyExpenseId: props.legacyExpenseId,
     draftKey: props.draftKey,

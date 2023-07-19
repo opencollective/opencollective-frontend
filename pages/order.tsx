@@ -64,6 +64,7 @@ const orderPageQuery = gql`
         id
         canMarkAsExpired
         canMarkAsPaid
+        canSetTags
         canEdit
       }
       transactions {
@@ -408,7 +409,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                 >
                   <FormattedMessage defaultMessage="Contribution" /> #{order.legacyId}
                 </StyledTag>
-                <Tags order={order} canEdit />
+                <Tags order={order} canEdit={order.permissions.canSetTags} />
               </Flex>
               <Flex alignItems="center" mt={1}>
                 <P mt="5px" fontSize="12px" color="black.600">
