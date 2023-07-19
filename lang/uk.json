@@ -2239,7 +2239,7 @@
   "order.disputed": "Disputed",
   "order.expired": "Термін дії завершився",
   "Order.fromTo": "для {account} від {contributor}",
-  "order.id": "Order #",
+  "order.id": "Contribution #",
   "order.in_review": "In Review",
   "order.markAsCompleted": "Позначити завершеним",
   "order.markAsExpired": "Позначити протермінованим",

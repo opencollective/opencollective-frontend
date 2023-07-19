@@ -2239,7 +2239,7 @@
   "order.disputed": "Överklagad",
   "order.expired": "Upphört",
   "Order.fromTo": "för {account} från {contributor}",
-  "order.id": "Order #",
+  "order.id": "Contribution #",
   "order.in_review": "Under granskning",
   "order.markAsCompleted": "Markera som klar",
   "order.markAsExpired": "Markera som förfallen",

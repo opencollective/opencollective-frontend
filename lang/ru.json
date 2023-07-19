@@ -2239,7 +2239,7 @@
   "order.disputed": "Disputed",
   "order.expired": "Просрочен",
   "Order.fromTo": "для {account} от {contributor}",
-  "order.id": "Order #",
+  "order.id": "Contribution #",
   "order.in_review": "In Review",
   "order.markAsCompleted": "Отметить как завершенное",
   "order.markAsExpired": "Mark as expired",
