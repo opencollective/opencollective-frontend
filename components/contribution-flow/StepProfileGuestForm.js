@@ -32,6 +32,10 @@ export const validateGuestProfile = (stepProfile, stepDetails, tier) => {
     }
   }
 
+  if (isCaptchaEnabled() && !stepProfile.captcha) {
+    return false;
+  }
+
   if (!stepProfile.email || !isEmail(stepProfile.email)) {
     return false;
   } else {

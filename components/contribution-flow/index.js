@@ -542,6 +542,11 @@ class ContributionFlow extends React.Component {
     if (!stepProfile) {
       return action === 'prev';
     } else if (stepProfile.isGuest) {
+      if (isCaptchaEnabled() && !stepProfile.captcha) {
+        this.setState({ error: this.props.intl.formatMessage({ defaultMessage: 'Captcha is required.' }) });
+        window.scrollTo(0, 0);
+        return false;
+      }
       return validateGuestProfile(stepProfile, stepDetails, this.props.tier);
     }
 
