@@ -41,7 +41,6 @@ class WarnIfUnsavedChanges extends React.Component {
   routeChangeStart = () => {
     const { hasUnsavedChanges, intl } = this.props;
     if (hasUnsavedChanges && !confirm(intl.formatMessage(this.messages.warning))) {
-      Router.router.abortComponentLoad();
       Router.router.events.emit('routeChangeError'); // For NProgress to stop the loading indicator
       throw new IgnorableError('Abort page navigation');
     }
