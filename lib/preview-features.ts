@@ -24,7 +24,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Workspace',
     description: 'Introducing improved navigation and a central admin dashboard for all accounts.',
     publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe'],
+    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
     enabledByDefaultFor: ['opencollective'],
   },
   {
@@ -32,6 +32,6 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Host Expense Pipeline',
     description: 'Introducing tabs in the host expenses dashboard to help you manage paying expenses.',
     publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe'],
+    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
   },
 ];
