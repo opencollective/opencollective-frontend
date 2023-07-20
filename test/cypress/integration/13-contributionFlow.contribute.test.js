@@ -89,6 +89,9 @@ describe('Contribution Flow: Order', () => {
       // Country required since we're contributing > $500
       cy.getByDataCy('country-select').click();
       cy.contains('[data-cy="select-option"]', 'Algeria').click();
+      cy.get('input[data-cy="address-address1"]').type('Street Name, 123');
+      cy.get('input[data-cy="address-postalCode"]').type('123');
+      cy.get('input[data-cy="address-city"]').type('Citycitycity');
       cy.get('button[data-cy="cf-next-step"]').click();
 
       // ---- Step 3: Payment ----
