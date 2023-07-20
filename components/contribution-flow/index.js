@@ -4,7 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { CardElement } from '@stripe/react-stripe-js';
-import { get, intersection, isEmpty, isEqual, isNil, omitBy, pick, set } from 'lodash';
+import { get, intersection, isEmpty, isEqual, isNil, omitBy, pick } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -29,10 +29,10 @@ import { followOrderRedirectUrl, getCollectivePageRoute } from '../../lib/url-he
 import { reportValidityHTML5 } from '../../lib/utils';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
-import Captcha, { isCaptchaEnabled } from '../Captcha';
+import { isCaptchaEnabled } from '../Captcha';
 import Container from '../Container';
 import ContributeFAQ from '../faqs/ContributeFAQ';
-import { Box, Flex, Grid } from '../Grid';
+import { Box, Grid } from '../Grid';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import Steps from '../Steps';
@@ -142,7 +142,6 @@ class ContributionFlow extends React.Component {
     super(props);
     this.mainContainerRef = React.createRef();
     this.formRef = React.createRef();
-    this.captchaRef = React.createRef();
 
     const { collective, tier, LoggedInUser } = props;
     const queryParams = this.getQueryParams();
@@ -365,10 +364,6 @@ class ContributionFlow extends React.Component {
 
   handleError = message => {
     this.setState({ isSubmitting: false, error: message });
-    if (isCaptchaEnabled() && !this.props.LoggedInUser) {
-      this.setState({ stepProfile: set(this.state.stepProfile, 'captcha', null) });
-      this.captchaRef?.current?.resetCaptcha();
-    }
   };
 
   handleStripeError = async (order, stripeError, email, guestToken) => {
@@ -547,6 +542,11 @@ class ContributionFlow extends React.Component {
     if (!stepProfile) {
       return action === 'prev';
     } else if (stepProfile.isGuest) {
+      if (isCaptchaEnabled() && !stepProfile.captcha) {
+        this.setState({ error: this.props.intl.formatMessage({ defaultMessage: 'Captcha is required.' }) });
+        window.scrollTo(0, 0);
+        return false;
+      }
       return validateGuestProfile(stepProfile, stepDetails, this.props.tier);
     }
 
@@ -851,7 +851,6 @@ class ContributionFlow extends React.Component {
     const { error, isSubmitted, isSubmitting, stepDetails, stepSummary, stepProfile, stepPayment } = this.state;
     const isLoading = isSubmitted || isSubmitting;
     const pastEvent = collective.type === CollectiveType.EVENT && isPastEvent(collective);
-    const shouldDisplayCaptcha = isCaptchaEnabled() && !LoggedInUser && stepPayment?.key === NEW_CREDIT_CARD_KEY;
     const queryParams = this.getQueryParams();
     const currency = tier?.amount.currency || collective.currency;
     const currentStepName = this.getCurrentStepName();
@@ -962,14 +961,6 @@ class ContributionFlow extends React.Component {
                     hideCreditCardPostalCode={queryParams.hideCreditCardPostalCode}
                     contributeProfiles={this.getContributeProfiles(LoggedInUser, collective, tier)}
                   />
-                  {!nextStep && shouldDisplayCaptcha && (
-                    <Flex mt={40} justifyContent="center">
-                      <Captcha
-                        ref={this.captchaRef}
-                        onVerify={result => this.setState({ stepProfile: set(stepProfile, 'captcha', result) })}
-                      />
-                    </Flex>
-                  )}
                   <Box mt={40}>
                     <ContributionFlowButtons
                       goNext={goNext}
