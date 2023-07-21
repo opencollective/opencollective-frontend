@@ -1,7 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import { useWindowResize, VIEWPORTS } from '../lib/hooks/useWindowResize';
+
 import { Flex } from './Grid';
+import StyledSelect from './StyledSelect';
 
 const abbreviateNumber = number => {
   if (number >= 1000000000) {
@@ -30,10 +33,12 @@ const TabButton = styled.button<{ selected?: boolean }>`
   color: ${props => (props.selected ? props.theme.colors.primary[700] : props.theme.colors.black[600])};
   transition: color 50ms ease-in-out, border-color 50ms ease-in-out;
   border-bottom: 2px solid ${props => (props.selected ? props.theme.colors.primary[500] : 'transparent')};
-   &:hover {
+
+  &:hover {
     color: ${props => (props.selected ? props.theme.colors.primary[700] : props.theme.colors.black[700])};
     border-color: ${props => (props.selected ? props.theme.colors.primary[500] : props.theme.colors.black[300])};
-   }
+  }
+
   > span {
     padding: 2px 10px;
     align-items: center;
@@ -58,9 +63,24 @@ const TabsBar = styled.div`
 `;
 
 const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps & Parameters<typeof Flex>[0]) => {
+  const { viewport } = useWindowResize();
+
+  if (viewport === VIEWPORTS.XSMALL) {
+    const options = tabs.map(tab => ({ label: tab.count ? `${tab.label} (${tab.count})` : tab.label, value: tab.id }));
+    return (
+      <StyledSelect
+        {...props}
+        inputId="tabs"
+        options={options}
+        onChange={option => onChange?.(option.value)}
+        value={options.find(option => option.value === selectedId)}
+      />
+    );
+  }
+
   return (
     <TabsBar {...props}>
-      <Flex gridGap="24px" mb="-1px" overflowX="auto">
+      <Flex gap="24px" mb="-1px" overflowX="auto">
         {tabs.map(tab => (
           <TabButton key={tab.id} onClick={() => onChange?.(tab.id)} selected={tab.id === selectedId}>
             {tab.label} {typeof tab.count !== 'undefined' && <span>{abbreviateNumber(tab.count)}</span>}
