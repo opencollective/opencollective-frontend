@@ -6,6 +6,7 @@ import { filter, get, isEmpty, size } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
+import { i18nGraphqlException } from '../../../lib/errors';
 import { DEFAULT_SUPPORTED_EXPENSE_TYPES } from '../../../lib/expenses';
 import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import { omitDeep, stripHTML } from '../../../lib/utils';
@@ -65,6 +66,7 @@ const setPoliciesMutation = gql`
           appliesToSingleAdminCollectives
         }
         REQUIRE_2FA_FOR_ADMINS
+        COLLECTIVE_ADMINS_CAN_REFUND
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
           applies
@@ -127,7 +129,8 @@ const messages = defineMessages({
 });
 
 const Policies = ({ collective, showOnlyExpensePolicy }) => {
-  const { formatMessage } = useIntl();
+  const intl = useIntl();
+  const { formatMessage } = intl;
   const [selected, setSelected] = React.useState([]);
   const { addToast } = useToasts();
 
@@ -182,41 +185,48 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
         newSettings.expenseTypes = expenseTypes;
       }
 
-      await updateCollective({
-        variables: {
-          collective: {
-            id: collective.id,
-            contributionPolicy,
-            expensePolicy,
-            settings: newSettings,
-          },
-        },
-      });
-      const selectedRejectCategories = selected.map(option => option.value);
-      await Promise.all([
-        updateCategories({
+      try {
+        await updateCollective({
           variables: {
-            account: {
-              legacyId: collective.id,
+            collective: {
+              id: collective.id,
+              contributionPolicy,
+              expensePolicy,
+              settings: newSettings,
             },
-            key: 'moderation',
-            value: { rejectedCategories: selectedRejectCategories },
           },
-        }),
-        setPolicies({
-          variables: {
-            account: {
-              legacyId: collective.id,
+        });
+        const selectedRejectCategories = selected.map(option => option.value);
+        await Promise.all([
+          updateCategories({
+            variables: {
+              account: {
+                legacyId: collective.id,
+              },
+              key: 'moderation',
+              value: { rejectedCategories: selectedRejectCategories },
             },
-            policies,
-          },
-        }),
-      ]);
+          }),
+          setPolicies({
+            variables: {
+              account: {
+                legacyId: collective.id,
+              },
+              policies,
+            },
+          }),
+        ]);
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
-        message: formatMessage({ defaultMessage: 'Policies updated successfully' }),
-      });
+        addToast({
+          type: TOAST_TYPE.SUCCESS,
+          message: formatMessage({ defaultMessage: 'Policies updated successfully' }),
+        });
+      } catch (e) {
+        addToast({
+          type: TOAST_TYPE.ERROR,
+          message: i18nGraphqlException(intl, e),
+        });
+      }
     },
     validate(values) {
       const errors = {};
@@ -636,6 +646,27 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             isMulti
           />
         </Container>
+        {collective.isHost && (
+          <Container>
+            <SettingsSectionTitle mt={4}>
+              <FormattedMessage defaultMessage="Refunds" />
+            </SettingsSectionTitle>
+
+            <StyledCheckbox
+              name={`checkbox-COLLECTIVE_ADMINS_CAN_REFUND`}
+              label={
+                <FormattedMessage defaultMessage="Allow collective admins to refund contributions for up to 30 days after the transaction date." />
+              }
+              checked={formik.values.policies?.COLLECTIVE_ADMINS_CAN_REFUND}
+              onChange={() =>
+                formik.setFieldValue('policies', {
+                  ...formik.values.policies,
+                  COLLECTIVE_ADMINS_CAN_REFUND: !formik.values.policies?.COLLECTIVE_ADMINS_CAN_REFUND,
+                })
+              }
+            />
+          </Container>
+        )}
         <Flex mt={5} mb={3} alignItems="center" justifyContent="center">
           <StyledButton
             data-cy="submit-policy-btn"

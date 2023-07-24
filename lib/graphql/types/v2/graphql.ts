@@ -7486,6 +7486,7 @@ export type PersonalTokenUpdateInput = {
 
 export type Policies = {
   __typename?: 'Policies';
+  COLLECTIVE_ADMINS_CAN_REFUND?: Maybe<Scalars['Boolean']>;
   COLLECTIVE_MINIMUM_ADMINS?: Maybe<Collective_Minimum_Admins>;
   EXPENSE_AUTHOR_CANNOT_APPROVE?: Maybe<Expense_Author_Cannot_Approve>;
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?: Maybe<Maximum_Virtual_Card_Limit_Amount_For_Interval>;
@@ -8489,6 +8490,9 @@ export type Tier = {
   /** Number of tickets available. Returns null if there is no limit. */
   availableQuantity?: Maybe<Scalars['Int']>;
   button?: Maybe<Scalars['String']>;
+  /** Returns a list of all the contributors for this tier */
+  contributors: ContributorCollection;
+  currency?: Maybe<Scalars['String']>;
   customFields?: Maybe<Scalars['JSON']>;
   description?: Maybe<Scalars['String']>;
   endsAt?: Maybe<Scalars['DateTime']>;
@@ -8499,6 +8503,8 @@ export type Tier = {
   interval?: Maybe<TierInterval>;
   invoiceTemplate?: Maybe<Scalars['String']>;
   legacyId: Scalars['Int'];
+  /** A long, html-formatted description. */
+  longDescription?: Maybe<Scalars['String']>;
   maxQuantity?: Maybe<Scalars['Int']>;
   minimumAmount: Amount;
   name?: Maybe<Scalars['String']>;
@@ -8508,8 +8514,18 @@ export type Tier = {
   requireAddress: Scalars['Boolean'];
   singleTicket?: Maybe<Scalars['Boolean']>;
   slug?: Maybe<Scalars['String']>;
+  stats?: Maybe<TierStats>;
   type: TierType;
   useStandalonePage?: Maybe<Scalars['Boolean']>;
+  /** Link to a video (YouTube, Vimeo). */
+  videoUrl?: Maybe<Scalars['String']>;
+};
+
+
+/** Tier model */
+export type TierContributorsArgs = {
+  limit?: Scalars['Int'];
+  offset?: Scalars['Int'];
 };
 
 
@@ -8571,6 +8587,16 @@ export type TierReferenceInput = {
   isCustom?: InputMaybe<Scalars['Boolean']>;
   /** The DB id assigned to the Tier */
   legacyId?: InputMaybe<Scalars['Int']>;
+};
+
+/** Stats about a tier */
+export type TierStats = {
+  __typename?: 'TierStats';
+  id: Scalars['String'];
+  /** How much money is given for this tier for each tier.interval (monthly/yearly). For flexible tiers, this amount is a monthly average of contributions amount, taking into account both yearly and monthly subscriptions. */
+  recurringAmount: Amount;
+  /** Total amount donated for this tier, in cents. */
+  totalAmountReceived: Amount;
 };
 
 export enum TierType {
