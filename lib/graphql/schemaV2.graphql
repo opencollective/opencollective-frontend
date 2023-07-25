@@ -793,10 +793,21 @@ type Tier {
   description: String
 
   """
+  A long, html-formatted description.
+  """
+  longDescription: String
+
+  """
+  Link to a video (YouTube, Vimeo).
+  """
+  videoUrl: String
+
+  """
   Get all orders
   """
   orders(limit: Int! = 100, offset: Int! = 0, status: [OrderStatus]): OrderCollection!
   amount: Amount!
+  currency: String
   button: String
   goal: Amount!
   type: TierType!
@@ -817,6 +828,22 @@ type Tier {
   useStandalonePage: Boolean
   singleTicket: Boolean
   requireAddress: Boolean!
+
+  """
+  Returns a list of all the contributors for this tier
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): ContributorCollection!
+  stats: TierStats
 }
 
 """
@@ -4327,6 +4354,7 @@ type VirtualCardCollection implements Collection {
 type Policies {
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
+  COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
 }
@@ -5449,6 +5477,23 @@ enum TierFrequency {
 enum TierAmountType {
   FIXED
   FLEXIBLE
+}
+
+"""
+Stats about a tier
+"""
+type TierStats {
+  id: String!
+
+  """
+  Total amount donated for this tier, in cents.
+  """
+  totalAmountReceived: Amount!
+
+  """
+  How much money is given for this tier for each tier.interval (monthly/yearly). For flexible tiers, this amount is a monthly average of contributions amount, taking into account both yearly and monthly subscriptions.
+  """
+  recurringAmount: Amount!
 }
 
 """

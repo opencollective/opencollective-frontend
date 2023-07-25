@@ -220,7 +220,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: screenshots
-          path: test/cypress/screenshots
+          path: opencollective-frontend/test/cypress/screenshots
         if: ${{ failure() }}
 
       - name: Report Coverage

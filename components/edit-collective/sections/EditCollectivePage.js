@@ -54,6 +54,7 @@ export const getSettingsQuery = gql`
           applies
           freeze
         }
+        COLLECTIVE_ADMINS_CAN_REFUND
       }
       ... on AccountWithHost {
         host {

@@ -4,6 +4,7 @@ import { set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
+import Captcha, { isCaptchaEnabled } from '../Captcha';
 import Container from '../Container';
 import { Flex } from '../Grid';
 import I18nFormatters, { getI18nLink } from '../I18nFormatters';
@@ -29,6 +30,10 @@ export const validateGuestProfile = (stepProfile, stepDetails, tier) => {
     if (!stepProfile.name && !stepProfile.legalName) {
       return false;
     }
+  }
+
+  if (isCaptchaEnabled() && !stepProfile.captcha) {
+    return false;
   }
 
   if (!stepProfile.email || !isEmail(stepProfile.email)) {
@@ -129,6 +134,11 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
           />
         )}
       </StyledInputField>
+      {isCaptchaEnabled() && (
+        <Flex mt="18px" justifyContent="center">
+          <Captcha onVerify={result => dispatchChange('captcha', result)} />
+        </Flex>
+      )}
       {contributionRequiresAddress(stepDetails, tier) && (
         <React.Fragment>
           <Flex alignItems="center" my="14px">

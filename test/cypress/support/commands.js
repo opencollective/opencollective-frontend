@@ -1,6 +1,3 @@
-import './third-party-commands';
-
-// import gql from 'fake-tag'; // eslint-disable-line
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { loggedInUserQuery } from '../../../lib/graphql/queries';
 
