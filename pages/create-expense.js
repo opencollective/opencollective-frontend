@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { compose, omit } from 'lodash';
+import { omit } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
@@ -15,7 +15,7 @@ import FormPersister from '../lib/form-persister';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import UrlQueryHelper from '../lib/UrlQueryHelper';
-import { parseToBoolean } from '../lib/utils';
+import { compose, parseToBoolean } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { Dimensions } from '../components/collective-page/_constants';
