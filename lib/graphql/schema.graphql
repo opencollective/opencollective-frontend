@@ -1,22 +1,4 @@
 """
-Input type for Application
-"""
-input ApplicationInput {
-  type: ApplicationType!
-  name: String
-  description: String
-  callbackUrl: String
-}
-
-"""
-All application types
-"""
-enum ApplicationType {
-  API_KEY
-  OAUTH
-}
-
-"""
 Application model
 """
 type Application {
@@ -28,6 +10,14 @@ type Application {
   clientId: String
   clientSecret: String
   callbackUrl: String
+}
+
+"""
+All application types
+"""
+enum ApplicationType {
+  API_KEY
+  OAUTH
 }
 
 """
@@ -269,7 +259,6 @@ type UserDetails {
   id: Int
   CollectiveId: Int
   collective: CollectiveInterface
-  username: String @deprecated(reason: "2022-01-13: Not used anymore. Will be ignored")
   name: String @deprecated(reason: "2022-06-02: Please use collective.name")
   image: String
   email: String
@@ -546,11 +535,6 @@ type Contributor {
   True if the contributor is a financial contributor
   """
   isBacker: Boolean!
-
-  """
-  True if the contributor is a fundraiser
-  """
-  isFundraiser: Boolean @deprecated(reason: "2022-09-12: This role does not exist anymore")
 
   """
   A list of tier ids that this contributors is a member of. A null value indicates that a membership without tier.
@@ -1224,6 +1208,7 @@ type PlanType {
 type Policies {
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
+  COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
 }
@@ -2082,8 +2067,6 @@ type CollectiveStatsType {
   """
   totalNetAmountReceived: Int
   yearlyBudget: Int
-  yearlyBudgetManaged: Int
-    @deprecated(reason: "2023-03-01: This field will be removed soon, please use totalMoneyManaged from GraphQL V2")
   activeRecurringContributions: JSON
 }
 
@@ -3245,7 +3228,6 @@ type Organization implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
-  email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 }
 
 """
@@ -4024,7 +4006,7 @@ type User implements CollectiveInterface {
   categories: [String]!
   policies: Policies!
   email: String
-  applications: [Application]
+  applications: [Application] @deprecated(reason: "2023-07-19: Use GraphQL V2")
 }
 
 """
@@ -4309,12 +4291,6 @@ type Query {
   Tier(id: Int!): Tier @deprecated(reason: "2023-05-04: Please use GraphQL V2")
   LoggedInUser: UserDetails
   allInvoices(fromCollectiveSlug: String!): [InvoiceType]
-  TransactionInvoice(
-    """
-    Slug of the transaction.
-    """
-    transactionUuid: String!
-  ): InvoiceType @deprecated(reason: "2023-05-04: Please fetch transactions with GraphQL v2")
 
   "\n    Given a collective, returns all its transactions:\n    - Debit transactions made by collective without using a gift card\n    - Debit transactions made using a gift card from collective\n    - Credit transactions made to collective\n    "
   allTransactions(
@@ -4331,74 +4307,9 @@ type Query {
     If false, only the transactions not linked to an expense (orders/refunds) will be returned
     """
     includeExpenseTransactions: Boolean
-    fetchDataFromLedger: Boolean
-      @deprecated(
-        reason: "2023-01-11: Removed support for this in 2019 (https://github.com/opencollective/opencollective-api/pull/2384)"
-      )
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction]
-  Application(id: Int): Application @deprecated(reason: "2023-01-03: Please use PersonalToken from GQLV2")
   Transaction(id: Int, uuid: String): Transaction
-  allCollectives(
-    """
-    Fetch collectives with a list of collective slug
-    """
-    slugs: [String]
-
-    """
-    Fetch all collectives that match at least one of the tags
-    """
-    tags: [String]
-
-    """
-    COLLECTIVE, USER, ORGANIZATION, EVENT
-    """
-    type: TypeOfCollective
-
-    """
-    Fetch all collectives hosted by HostCollectiveId
-    """
-    HostCollectiveId: Int
-
-    """
-    Fetch all collectives hosted by hostCollectiveSlug
-    """
-    hostCollectiveSlug: String
-
-    """
-    Only return active collectives
-    """
-    isActive: Boolean
-
-    """
-    Only return pledged or non-pledged collectives
-    """
-    isPledged: Boolean
-
-    """
-    Fetch all collectives that `memberOfCollectiveSlug` is a member of
-    """
-    memberOfCollectiveSlug: String
-
-    """
-    Filter collectives with this minimum number of backers
-    """
-    minBackerCount: Int
-
-    """
-    Only fetch the collectives where `memberOfCollectiveSlug` has the specified role
-    """
-    role: String
-
-    """
-    Fetch all collectives that are a child of `ParentCollectiveId`. Used for "SuperCollectives"
-    """
-    ParentCollectiveId: Int
-    orderBy: CollectiveOrderField = name
-    orderDirection: OrderDirection = ASC
-    limit: Int = 10
-    offset: Int = 0
-  ): CollectiveSearchResults @deprecated(reason: "2023-05-16: Please use \"Accounts\" on GraphQL V2")
 
   """
   Returns all public hosts that are open for applications
@@ -4420,7 +4331,6 @@ type Query {
     onlyOpenHosts: Boolean = true
     minNbCollectivesHosted: Int! = 0
   ): CollectiveSearchResults
-  allCollectiveTags: [String] @deprecated(reason: "2023-05-04: Please use `tagStats` on GraphQL V2 instead")
   allMembers(
     CollectiveId: Int
     collectiveSlug: String
@@ -4439,25 +4349,6 @@ type Query {
     limit: Int
     offset: Int
   ): [Member]
-
-  """
-  [AUTHENTICATED] Returns the pending invitations
-  """
-  memberInvitations(CollectiveId: Int, MemberCollectiveId: Int): [MemberInvitation]
-    @deprecated(reason: "2023-05-04: Please use GraphQL V2")
-  allEvents(
-    """
-    Slug of the parent collective
-    """
-    slug: String
-    limit: Int
-    offset: Int
-
-    """
-    If null, returns all events, if false returns only events that are not archived, if true only returns events that have been archived
-    """
-    isArchived: Boolean
-  ): [CollectiveInterface] @deprecated(reason: "2023-05-04: Please use GraphQL V2")
   PaymentMethod(id: Int, code: String): PaymentMethodType
 
   """
@@ -4550,17 +4441,6 @@ type InvoiceType {
   transactions: [Transaction]
 }
 
-enum TypeOfCollective {
-  COLLECTIVE
-  EVENT
-  ORGANIZATION
-  USER
-  BOT
-  PROJECT
-  FUND
-  VENDOR
-}
-
 """
 Properties by which hosts can be ordered.
 """
@@ -4586,18 +4466,15 @@ enum HostCollectiveOrderFieldType {
   updatedAt
 }
 
-"""
-An invitation to join the members of a collective
-"""
-type MemberInvitation {
-  id: Int
-  createdAt: DateString
-  collective: CollectiveInterface
-  member: CollectiveInterface
-  role: String
-  description: String
-  tier: Tier
-  since: DateString
+enum TypeOfCollective {
+  COLLECTIVE
+  EVENT
+  ORGANIZATION
+  USER
+  BOT
+  PROJECT
+  FUND
+  VENDOR
 }
 
 """
@@ -4693,9 +4570,6 @@ type Mutation {
     @deprecated(reason: "2021-01-27: Please use editPublicMessage from GQLV2")
   createOrder(order: OrderInputType!): OrderType
     @deprecated(reason: "2020-10-13: This mutation has been moved to GQLV2")
-  createApplication(application: ApplicationInput!): Application
-    @deprecated(reason: "2023-01-03: Please use createPersonalToken from GQLV2")
-  deleteApplication(id: Int!): Application @deprecated(reason: "2023-01-03: Please use deletePersonalToken from GQLV2")
 
   """
   Update a payment method
