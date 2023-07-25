@@ -85,7 +85,7 @@ function FieldGroup({ label, help, pre, post, after, button, className, isPrivat
           />
           {button && <StyledButton>{button}</StyledButton>}
         </Box>
-        {help && <HelpBlock>{help}</HelpBlock>}
+        {help && <HelpBlock mt={1}>{help}</HelpBlock>}
       </Flex>
     );
   }
