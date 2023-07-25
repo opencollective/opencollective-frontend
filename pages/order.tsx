@@ -104,12 +104,14 @@ const orderPageQuery = gql`
           slug
           name
           imageUrl
+          isIncognito
         }
         account {
           id
           slug
           name
           imageUrl
+          isIncognito
         }
       }
     }
