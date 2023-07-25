@@ -4,7 +4,7 @@ import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
 import { Form, Formik } from 'formik';
-import { compose, uniqBy } from 'lodash';
+import { uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -13,6 +13,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../lib/constants/payout-method';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { compose } from '../../lib/utils';
 
 import Avatar from '../Avatar';
 import CollectiveNavbar from '../collective-navbar';
