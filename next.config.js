@@ -19,6 +19,11 @@ const nextConfig = {
   images: {
     disableStaticImages: true,
   },
+  experimental: {
+    outputFileTracingExcludes: {
+      '*': ['node_modules/@swc/core-linux-x64-gnu', 'node_modules/@swc/core-linux-x64-musl'],
+    },
+  },
   webpack: (config, { webpack, buildId }) => {
     config.plugins.push(
       // Ignore __tests__
