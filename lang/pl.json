@@ -1302,6 +1302,7 @@
   "ExportTransactionsCSVModal.Title": "Eksportuj transakcje",
   "ExportTransactionsCSVModal.UnselectAll": "Odznacz wszystko",
   "externalRedirect.message": "Twoje żądanie jest obecnie przekierowywane na adres {redirect}. Ze względu na bezpieczeństwo i prywatność twojego konta w Open Collective pamiętaj, aby nigdy nie wprowadzać swoich danych uwierzytelniających, chyba że znajdujesz się na prawdziwej stronie Open Collective.",
+  "F0ZA/r": "Changing the handle from @{previousHandle} to @{newHandle} will break all the links that you previously shared for this profile (i.e., {exampleUrl}). Do you really want to continue?",
   "f1MZ8o": "Available balance",
   "F21ZZ6": "Podgląd Paragonu",
   "f5QMcL": "Wartość musi być pomiędzy {min} a {max}",

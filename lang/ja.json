@@ -1302,6 +1302,7 @@
   "ExportTransactionsCSVModal.Title": "Export Transactions",
   "ExportTransactionsCSVModal.UnselectAll": "Unselect all",
   "externalRedirect.message": "Open Collective のページを離れて {redirect} にリダイレクト（遷移）しようとしています。あなたの Open Collective アカウントの安全とプライバシー保護のために、Open Collective のページ以外では、Open Collective の認証情報（アカウント名やパスワードなど）を決して入力しないようご注意ください。",
+  "F0ZA/r": "Changing the handle from @{previousHandle} to @{newHandle} will break all the links that you previously shared for this profile (i.e., {exampleUrl}). Do you really want to continue?",
   "f1MZ8o": "Available balance",
   "F21ZZ6": "Receipt Preview",
   "f5QMcL": "Value must be between {min} and {max}",
