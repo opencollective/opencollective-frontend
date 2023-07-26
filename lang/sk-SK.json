@@ -1302,6 +1302,7 @@
   "ExportTransactionsCSVModal.Title": "Export Transactions",
   "ExportTransactionsCSVModal.UnselectAll": "Unselect all",
   "externalRedirect.message": "Vaša požiadavka je momentálne presmerovaná na {redirect}. Pre bezpečnosť a súkromie vášho účtu Open Collective pamätajte, že nikdy nezadávajte svoje prihlasovacie údaje, pokiaľ nie ste na skutočnej webovej stránke Open Collective.",
+  "F0ZA/r": "Changing the handle from @{previousHandle} to @{newHandle} will break all the links that you previously shared for this profile (i.e., {exampleUrl}). Do you really want to continue?",
   "f1MZ8o": "Available balance",
   "F21ZZ6": "Náhľad príjmového dokladu",
   "f5QMcL": "Hodnota musí byť v rozmedzí od {min} do {max}",

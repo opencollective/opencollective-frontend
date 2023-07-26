@@ -1302,6 +1302,7 @@
   "ExportTransactionsCSVModal.Title": "Export Transactions",
   "ExportTransactionsCSVModal.UnselectAll": "Unselect all",
   "externalRedirect.message": "Din begäran omdirigeras till {redirect}. Tänk på säkerheten för ditt konto och ange aldrig dessa uppgifter om du inte är på Open Collective's hemsida.",
+  "F0ZA/r": "Changing the handle from @{previousHandle} to @{newHandle} will break all the links that you previously shared for this profile (i.e., {exampleUrl}). Do you really want to continue?",
   "f1MZ8o": "Available balance",
   "F21ZZ6": "Förhandsgranska kvitto",
   "f5QMcL": "Värdet måste vara mellan {min} och {max}",

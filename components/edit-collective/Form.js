@@ -363,6 +363,27 @@ class EditCollectiveForm extends React.Component {
       collective.tiers = [...collective.tiers, ...this.state.tickets];
     }
 
+    // Add a confirm if slug changed
+    if (collective.slug !== this.props.collective.slug) {
+      if (
+        !window.confirm(
+          this.props.intl.formatMessage(
+            {
+              defaultMessage:
+                'Changing the handle from @{previousHandle} to @{newHandle} will break all the links that you previously shared for this profile (i.e., {exampleUrl}). Do you really want to continue?',
+            },
+            {
+              previousHandle: this.props.collective.slug,
+              newHandle: collective.slug,
+              exampleUrl: `https://opencollective.com/${this.props.collective.slug}`,
+            },
+          ),
+        )
+      ) {
+        return;
+      }
+    }
+
     this.props.onSubmit(collective);
 
     this.setState({ modified: false });
@@ -656,7 +677,12 @@ class EditCollectiveForm extends React.Component {
           name: 'slug',
           pre: 'https://opencollective.com/',
           placeholder: '',
+          maxLength: 255,
           when: () => collective.type !== EVENT,
+          description: intl.formatMessage({
+            id: 'createCollective.form.slugLabel',
+            defaultMessage: 'Set your profile URL',
+          }),
         },
         {
           name: 'startsAt',

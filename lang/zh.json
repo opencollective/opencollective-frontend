@@ -1302,6 +1302,7 @@
   "ExportTransactionsCSVModal.Title": "导出交易",
   "ExportTransactionsCSVModal.UnselectAll": "取消全选",
   "externalRedirect.message": "Your request is currently being redirected to {redirect}. For the safety and privacy of your Open Collective account, remember to never enter your credentials unless you're on the real Open Collective website.",
+  "F0ZA/r": "Changing the handle from @{previousHandle} to @{newHandle} will break all the links that you previously shared for this profile (i.e., {exampleUrl}). Do you really want to continue?",
   "f1MZ8o": "Available balance",
   "F21ZZ6": "预览收据",
   "f5QMcL": "值必须介于 {min} 和 {max} 之间",
