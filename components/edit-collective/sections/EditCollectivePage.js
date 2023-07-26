@@ -540,7 +540,7 @@ const EditCollectivePage = ({ collective }) => {
                           ...data.account.settings.collectivePage,
                           sections,
                           showGoals: flatten(sections, item => item.sections || item).some(
-                            ({ section }) => section === Sections.GOALS,
+                            ({ name, isEnabled }) => name === Sections.GOALS && isEnabled,
                           ),
                         },
                       },
