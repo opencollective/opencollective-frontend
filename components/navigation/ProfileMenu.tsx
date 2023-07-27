@@ -1,19 +1,24 @@
 import React from 'react';
+import * as Popover from '@radix-ui/react-popover';
 import { get } from 'lodash';
-import { FlaskConical, Home, LogOut, PocketKnife, Settings, User } from 'lucide-react';
+import { BookOpen, FlaskConical, LifeBuoy, LogOut, PocketKnife, User } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 
 import Avatar from '../Avatar';
 import { Box, Flex } from '../Grid';
+import { HideGlobalScroll } from '../HideGlobalScroll';
+import Image from '../Image';
+import Link from '../Link';
 import LoginBtn from '../LoginBtn';
 import PreviewFeaturesModal from '../PreviewFeaturesModal';
 import StyledButton from '../StyledButton';
-import { Span } from '../Text';
+import { HorziontalSeparator, VerticalSeparator } from '../ui/Separator';
 
-import { DrawerCloseButton, DrawerMenu, DrawerMenuItem } from './DrawerMenu';
+import { DrawerMenu } from './DrawerMenu';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
 
 const StyledProfileButton = styled(StyledButton)`
@@ -21,14 +26,9 @@ const StyledProfileButton = styled(StyledButton)`
   background-color: white !important;
 `;
 
-const ProfileHeader = styled.div`
-  padding: 0 16px;
-  height: 64px;
+const ProfileHeader = styled(Flex)`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  grid-gap: 8px;
-  border-bottom: 1px solid #f3f4f6;
+
   .name {
     font-size: 14px;
     color: #0f172a;
@@ -47,107 +47,171 @@ const ProfileHeader = styled.div`
   }
 `;
 
-const ProfileDrawer = ({ onClose, open }) => {
-  const [showPreviewFeaturesModal, setShowPreviewFeaturesModal] = React.useState(false);
-  const { LoggedInUser, logout } = useLoggedInUser();
-  const hasAvailablePreviewFeatures = LoggedInUser?.getAvailablePreviewFeatures()?.length > 0;
+const PopoverMenuWrapper = styled(Flex)`
+  background-color: white;
+  border-radius: 16px;
+  border: 1px solid ${props => props.theme.colors.black[100]};
+  padding: 36px 24px 16px;
+  margin-top: 5px;
+  z-index: 3000;
+  box-shadow:
+    0px 0.4631686508655548px 0.792047381401062px 0px rgba(0, 0, 0, 0.03),
+    0px 1.1708027124404907px 1.8449060916900635px 0px rgba(0, 0, 0, 0.03),
+    0px 2.275846004486084px 3.4150261878967285px 0px rgba(0, 0, 0, 0.02),
+    0px 4.104311943054199px 6.1252121925354px 0px rgba(0, 0, 0, 0.02),
+    0px 7.566044330596924px 12.08122730255127px 0px rgba(0, 0, 0, 0.01),
+    0px 18px 40px 0px rgba(0, 0, 0, 0.01);
+`;
 
-  return (
-    <React.Fragment>
-      <DrawerMenu anchor="right" open={open} onClose={onClose}>
-        <React.Fragment>
-          <ProfileHeader>
-            <Flex gridGap={2} alignItems="center" overflow="hidden">
-              <Avatar collective={LoggedInUser.collective} radius={32} />
-              <Box overflow="hidden">
-                <div className="name">{LoggedInUser.collective.name}</div>
-                <div className="email">{LoggedInUser.email}</div>
-              </Box>
-            </Flex>
-            <DrawerCloseButton onClick={onClose} />
-          </ProfileHeader>
-          <Flex py="12px" flex={1} flexDirection="column" overflowY="auto">
-            <Flex pb="12px" flexDirection="column">
-              <DrawerMenuItem href={`/${LoggedInUser.collective.slug}`} onClick={onClose}>
-                <Flex alignItems="center" gridGap={2}>
-                  <User size={16} />
-                  <FormattedMessage id="menu.profile" defaultMessage="Profile" />
-                </Flex>
-              </DrawerMenuItem>
-              <DrawerMenuItem href={`/dashboard/${LoggedInUser.collective.slug}`} onClick={onClose}>
-                <Flex alignItems="center" gridGap={2}>
-                  <Home size={16} />
-                  <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-                </Flex>
-              </DrawerMenuItem>
-              <DrawerMenuItem href={`/dashboard/${LoggedInUser.collective.slug}/info`} onClick={onClose}>
-                <Flex alignItems="center" gridGap={2}>
-                  <Settings size={16} />
-                  <FormattedMessage id="Settings" defaultMessage="Settings" />
-                </Flex>
-              </DrawerMenuItem>
+const PopoverMenuItem = styled(Link)`
+  all: unset;
 
-              {hasAvailablePreviewFeatures && (
-                <DrawerMenuItem as="button" onClick={() => setShowPreviewFeaturesModal(true)}>
-                  <Flex alignItems="center" gridGap={2}>
-                    <FlaskConical size={16} />
-                    <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />
-                  </Flex>
-                  <Span
-                    fontSize="12px"
-                    ml={1}
-                    style={{ borderRadius: 20 }}
-                    py="2px"
-                    px="6px"
-                    display="inline-block"
-                    bg="primary.200"
-                    color="black.800"
-                  >
-                    <FormattedMessage defaultMessage="New!" />
-                  </Span>
-                </DrawerMenuItem>
-              )}
-              {LoggedInUser.isRoot && (
-                <DrawerMenuItem href="/opencollective/root-actions" onClick={onClose}>
-                  <Flex alignItems="center" gridGap={2}>
-                    <PocketKnife size={16} />
-                    <FormattedMessage id="RootActions" defaultMessage="Root Actions" />
-                  </Flex>
-                </DrawerMenuItem>
-              )}
-              <DrawerMenuItem as="button" onClick={() => logout()}>
-                <Flex alignItems="center" gridGap={2}>
-                  <LogOut size={14} />
-                  <FormattedMessage id="menu.logout" defaultMessage="Log out" />
-                </Flex>
-              </DrawerMenuItem>
-            </Flex>
-            <ProfileMenuMemberships user={LoggedInUser} closeDrawer={onClose} />
-          </Flex>
-        </React.Fragment>
-      </DrawerMenu>
+  svg:first-child {
+    margin-right: 8px;
+  }
+  padding: 8px 12px;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  cursor: pointer;
+  border-radius: 24px;
+  color: ${props => props.theme.colors.black[700]};
 
-      {showPreviewFeaturesModal && <PreviewFeaturesModal onClose={() => setShowPreviewFeaturesModal(false)} />}
-    </React.Fragment>
-  );
-};
+  &:hover {
+    color: initial;
+    background-color: ${props => props.theme.colors.black[100]};
+  }
+`;
+
+const FooterLinks = styled(Flex)`
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+`;
+
 const ProfileMenu = () => {
-  const [showProfileMenu, setShowProfileMenu] = React.useState(false);
-
-  const { LoggedInUser } = useLoggedInUser();
+  const { LoggedInUser, logout } = useLoggedInUser();
+  const [isMenuOpen, setMenuOpen] = React.useState(false);
+  const [showPreviewFeaturesModal, setShowPreviewFeaturesModal] = React.useState(false);
+  const hasAvailablePreviewFeatures = LoggedInUser?.getAvailablePreviewFeatures()?.length > 0;
+  const { viewport } = useWindowResize();
+  const isMobile = viewport === VIEWPORTS.XSMALL;
 
   if (!LoggedInUser) {
     return <LoginBtn />;
   }
 
+  const content = (
+    <Flex flexDirection="column" maxHeight={['100%', '80dvh']} overflow="hidden">
+      <Flex flexDirection={['column', 'row']} overflow={['auto', 'hidden']}>
+        <Flex flexDirection="column" width="230px">
+          <ProfileHeader alignItems="center" overflow="hidden" pb="24px">
+            <Box overflow="hidden">
+              <div className="name">{LoggedInUser.collective.name}</div>
+              <div className="email">{LoggedInUser.email}</div>
+            </Box>
+          </ProfileHeader>
+          <Flex flexDirection="column" gap="16px">
+            <PopoverMenuItem href={`/help`}>
+              <Flex alignItems="center">
+                <LifeBuoy size={16} />
+                <FormattedMessage id="menu.help" defaultMessage="Help and support" />
+              </Flex>
+            </PopoverMenuItem>
+            <PopoverMenuItem href={`https://docs.opencollective.com/help/`}>
+              <Flex alignItems="center">
+                <BookOpen size={16} />
+                <FormattedMessage id="menu.docs" defaultMessage="Documentation" />
+              </Flex>
+            </PopoverMenuItem>
+            <PopoverMenuItem href={`/dashboard/${LoggedInUser.collective.slug}/info`}>
+              <Flex alignItems="center">
+                <User size={16} />
+                <FormattedMessage id="menu.account.settings" defaultMessage="Account settings" />
+              </Flex>
+            </PopoverMenuItem>
+            {hasAvailablePreviewFeatures && (
+              <PopoverMenuItem as="button" onClick={() => setShowPreviewFeaturesModal(true)}>
+                <Flex alignItems="center">
+                  <FlaskConical size={16} />
+                  <FormattedMessage id="menu.beta.features" defaultMessage="Beta features" />
+                </Flex>
+              </PopoverMenuItem>
+            )}
+            {LoggedInUser.isRoot && (
+              <PopoverMenuItem href="/opencollective/root-actions">
+                <Flex alignItems="center">
+                  <PocketKnife size={16} />
+                  <FormattedMessage id="menu.root" defaultMessage="Root actions" />
+                </Flex>
+              </PopoverMenuItem>
+            )}
+            <PopoverMenuItem as="button" onClick={() => logout()}>
+              <Flex alignItems="center">
+                <LogOut size={14} />
+                <FormattedMessage id="menu.logout" defaultMessage="Log out" />
+              </Flex>
+            </PopoverMenuItem>
+          </Flex>
+        </Flex>
+        <VerticalSeparator style={{ margin: '0 24px' }} />
+        <ProfileMenuMemberships
+          user={LoggedInUser}
+          maxWidth="200px"
+          overflowY={['initial', 'auto']}
+          mt={['32px', '0']}
+          closeDrawer={() => setMenuOpen(false)}
+        />
+      </Flex>
+      <Box>
+        <HorziontalSeparator style={{ margin: '24px 0' }} />
+        <Link href={'/home'}>
+          <Image src="/static/images/opencollectivelogo-footer-n.svg" alt="Open Collective" width="122" height="24" />
+        </Link>
+        <FooterLinks mt="16px" gap="32px">
+          <Link href="/home">
+            <FormattedMessage id="menu.homepage" defaultMessage="Homepage" />
+          </Link>
+          <Link href="/privacypolicy">
+            <FormattedMessage id="menu.privacyPolicy" defaultMessage="Privacy" />
+          </Link>
+          <Link href="/tos">
+            <FormattedMessage id="menu.termsOfAgreement" defaultMessage="Terms" />
+          </Link>
+        </FooterLinks>
+      </Box>
+    </Flex>
+  );
+
   return (
     <React.Fragment>
-      <StyledProfileButton isBorderless onClick={() => setShowProfileMenu(true)}>
-        <Flex alignItems="center" data-cy="user-menu-trigger" gridGap={2}>
-          <Avatar collective={get(LoggedInUser, 'collective')} radius={32} />
-        </Flex>
-      </StyledProfileButton>
-      <ProfileDrawer open={showProfileMenu} onClose={() => setShowProfileMenu(false)} />
+      <Popover.Root onOpenChange={() => setMenuOpen(!isMenuOpen)} open={!isMobile && isMenuOpen}>
+        <Popover.Trigger asChild>
+          <StyledProfileButton isBorderless>
+            <Flex alignItems="center" data-cy="user-menu-trigger" gridGap={2}>
+              <Avatar collective={get(LoggedInUser, 'collective')} radius={40} />
+            </Flex>
+          </StyledProfileButton>
+        </Popover.Trigger>
+        <Popover.Portal>
+          {!isMobile && (
+            <Popover.Content align="end" style={{ zIndex: 3000 }}>
+              <PopoverMenuWrapper>{content}</PopoverMenuWrapper>
+              <HideGlobalScroll />
+            </Popover.Content>
+          )}
+        </Popover.Portal>
+      </Popover.Root>
+      {isMobile && isMenuOpen && (
+        <React.Fragment>
+          <DrawerMenu onClose={() => setMenuOpen(false)} open={true} p="36px 24px 16px">
+            {content}
+          </DrawerMenu>
+          <HideGlobalScroll />
+        </React.Fragment>
+      )}
+      {showPreviewFeaturesModal && <PreviewFeaturesModal onClose={() => setShowPreviewFeaturesModal(false)} />}
     </React.Fragment>
   );
 };

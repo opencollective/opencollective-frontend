@@ -2,6 +2,7 @@ import React from 'react';
 import MUIDrawer from '@mui/material/Drawer';
 import { X } from 'lucide-react';
 import styled, { css } from 'styled-components';
+import { space, SpaceProps } from 'styled-system';
 
 import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 
@@ -18,6 +19,8 @@ const StyledDrawerContainer = styled.div<{ maxWidth: string }>`
     margin: 8px 0;
     border-color: #f3f4f6;
   }
+
+  ${space}
 `;
 
 const StyledMUIDrawer = styled(MUIDrawer)`
@@ -107,18 +110,20 @@ export const DrawerCloseButton = ({ onClick }) => (
 type DrawerMenuProps = {
   onClose: () => void;
   open: boolean;
-  anchor: 'left' | 'right';
+  anchor?: 'left' | 'right';
   children: React.ReactNode;
-};
+} & SpaceProps;
 
-export const DrawerMenu = ({ onClose, open, anchor = 'right', children }: DrawerMenuProps) => {
+export const DrawerMenu = ({ onClose, open, anchor = 'right', children, ...props }: DrawerMenuProps) => {
   const twoFactorPrompt = useTwoFactorAuthenticationPrompt();
   const disableEnforceFocus = Boolean(twoFactorPrompt?.isOpen);
 
   return (
     <React.Fragment>
       <StyledMUIDrawer anchor={anchor} open={open} onClose={onClose} disableEnforceFocus={disableEnforceFocus}>
-        <StyledDrawerContainer maxWidth="280px">{children}</StyledDrawerContainer>
+        <StyledDrawerContainer maxWidth="280px" {...props}>
+          {children}
+        </StyledDrawerContainer>
       </StyledMUIDrawer>
     </React.Fragment>
   );

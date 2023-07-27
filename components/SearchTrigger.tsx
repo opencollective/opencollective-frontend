@@ -10,7 +10,7 @@ import StyledButton from './StyledButton';
 const SearchButton = styled(StyledButton)`
   color: #6b7280;
   font-weight: 400;
-  height: 32px;
+  height: 40px;
   padding: 0 12px;
   max-width: 280px;
   width: 280px;

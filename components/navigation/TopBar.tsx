@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import theme from '../../lib/theme';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import ChangelogTrigger from '../changelog/ChangelogTrigger';
@@ -24,7 +23,6 @@ import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 
 import ProfileMenu from './ProfileMenu';
-import SiteMenu from './SiteMenu';
 
 const NavList = styled(Flex)`
   list-style: none;
@@ -168,13 +166,13 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
         alignItems="center"
         flexDirection="row"
         justifyContent="space-between"
-        css={{ height: theme.sizes.navbarHeight, background: 'white', borderBottom: '1px solid rgb(232, 233, 235)' }}
+        css={{ background: 'white', borderBottom: '1px solid rgb(232, 233, 235)' }}
+        py="16px"
+        height="73px"
         ref={ref}
         gridGap={2}
       >
         <Flex alignItems="center" gridGap={[2, 3]}>
-          <SiteMenu />
-
           <Box flexShrink={0}>
             <Link href={ocLogoRoute}>
               <Flex alignItems="center" gridGap={2}>
@@ -326,7 +324,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
             <Fragment>
               <SearchTrigger setShowSearchModal={setShowSearchModal} />
               <Hide xs>
-                <ChangelogTrigger height="32px" width="32px" />
+                <ChangelogTrigger height="40px" width="40px" />
               </Hide>
               <ProfileMenu />
             </Fragment>
