@@ -141,10 +141,12 @@ const DashboardPage = () => {
         ) : (
           <Flex
             flexDirection={['column', 'column', 'row']}
-            justifyContent={'space-between'}
+            justifyContent={'center'}
             minHeight={600}
-            gridGap={16}
+            gridGap={[16, null, 48]}
             data-cy="admin-panel-container"
+            py={'32px'}
+            px={['16px', '24px']}
           >
             <AdminPanelSideBar
               isLoading={isLoading}
@@ -156,7 +158,7 @@ const DashboardPage = () => {
             {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
             ) : (
-              <Box flex="0 1 1000px" py={'32px'} px={[1, '24px']}>
+              <Box flex="0 1 1000px">
                 <AdminPanelSection
                   section={selectedSection}
                   isLoading={isLoading}
@@ -165,7 +167,6 @@ const DashboardPage = () => {
                 />
               </Box>
             )}
-            <Box flex="0 100 300px" />
           </Flex>
         )}
       </Page>

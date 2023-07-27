@@ -25,8 +25,8 @@ const MenuLinkContainer = styled.li`
     font-weight: 600;
     font-size: 14px;
     line-height: 20px;
-    padding: 8px;
-    border-radius: 6px;
+    padding: 8px 12px;
+    border-radius: 16px;
     -webkit-font-smoothing: antialiased;
     width: 100%;
     cursor: pointer;
@@ -38,7 +38,7 @@ const MenuLinkContainer = styled.li`
     ${props =>
       props.isSelected
         ? css`
-            background: ${props => props.theme.colors.black[50]};
+            background: ${props => props.theme.colors.primary[50]};
             color: ${props => props.theme.colors.primary[700]} !important;
             &:hover {
               color: ${props => props.theme.colors.primary[700]} !important;
@@ -48,7 +48,7 @@ const MenuLinkContainer = styled.li`
             color: ${props => props.theme.colors.black[900]} !important;
             &:hover {
               color: ${props => props.theme.colors.primary[700]} !important;
-              background: ${props => props.theme.colors.black[50]};
+              background: ${props => props.theme.colors.primary[50]};
             }
           `}
 

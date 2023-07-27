@@ -162,12 +162,12 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
   return (
     <Fragment>
       <Flex
-        px={[2, 3]}
         alignItems="center"
         flexDirection="row"
         justifyContent="space-between"
         css={{ background: 'white', borderBottom: '1px solid rgb(232, 233, 235)' }}
         py="16px"
+        px={['16px', '40px']}
         height="73px"
         ref={ref}
         gridGap={2}

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
 
 import { Box } from '../Grid';
@@ -10,16 +9,7 @@ import AccountSwitcher from './AccountSwitcher';
 import Menu from './Menu';
 import { MenuContainer } from './MenuComponents';
 
-const SidebarContainer = styled(Box)`
-  border-right: 1px solid #e6e8eb;
-  @media screen and (max-width: ${themeGet('breakpoints.1')}) {
-    border-right: 0;
-    border-bottom: 1px solid #e6e8eb;
-  }
-`;
-
 const Sticky = styled.div`
-  padding: 16px;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -35,7 +25,7 @@ const AdminPanelSideBar = ({
   ...props
 }) => {
   return (
-    <SidebarContainer {...props} flexGrow={0} flexShrink={0} width={['100%', '100%', '280px']}>
+    <Box {...props} flexGrow={0} flexShrink={0} width={['100%', '100%', '288px']}>
       <Sticky>
         <MenuContainer>
           <AccountSwitcher activeSlug={activeSlug} isLoading={isLoading} />
@@ -55,7 +45,7 @@ const AdminPanelSideBar = ({
           </Box>
         </MenuContainer>
       </Sticky>
-    </SidebarContainer>
+    </Box>
   );
 };
 
