@@ -8,6 +8,19 @@ export type LoggedInUser = {
     name: string;
     type: string;
   };
+  memberOf: Array<{
+    id: number;
+    role: string;
+    collective: {
+      id: number;
+      slug: string;
+      name: string;
+      type: string;
+      imageUrl: string;
+      isArchived: boolean;
+      isIncognito: boolean;
+    };
+  }>;
   hasTwoFactorAuth: boolean;
   hasRole: (roles: string[] | string, collective) => boolean;
   hostsUserisAdminOf: () => any[];
