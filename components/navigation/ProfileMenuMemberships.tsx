@@ -61,7 +61,7 @@ const sortMemberships = (memberships: LoggedInUser['memberOf']) => {
     return [];
   } else {
     return memberships.sort((a, b) => {
-      return a.collective.slug.localeCompare(b.collective.slug);
+      return a.collective.name.localeCompare(b.collective.name);
     });
   }
 };
