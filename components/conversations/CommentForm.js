@@ -20,7 +20,6 @@ import RichTextEditor from '../RichTextEditor';
 import SignInOrJoinFree, { SignInOverlayBackground } from '../SignInOrJoinFree';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
-import StyledTooltip from '../StyledTooltip';
 import { P } from '../Text';
 import { withUser } from '../UserProvider';
 
@@ -182,26 +181,20 @@ const CommentForm = ({
         )}
         {canUsePrivateNote && (
           <Box mt={3} alignItems="center" gap={12}>
-            <StyledTooltip
-              content={
-                <FormattedMessage
-                  id="CommentForm.PrivateNote.Tooltip"
-                  defaultMessage="Private comments are only visible to Fiscal Host admins."
-                />
+            <StyledCheckbox
+              name="privateNote"
+              label={
+                <React.Fragment>
+                  <FormattedMessage
+                    id="CommentForm.PrivateNoteCheckbox"
+                    defaultMessage="Post as a private note for the host admins"
+                  />{' '}
+                  <Lock size="1em" />
+                </React.Fragment>
               }
-            >
-              <StyledCheckbox
-                name="privateNote"
-                label={
-                  <React.Fragment>
-                    <FormattedMessage id="CommentForm.PrivateNoteCheckbox" defaultMessage="Post private comment" />{' '}
-                    <Lock size="1em" />
-                  </React.Fragment>
-                }
-                checked={asPrivateNote}
-                onChange={() => setPrivateNote(!asPrivateNote)}
-              />
-            </StyledTooltip>
+              checked={asPrivateNote}
+              onChange={() => setPrivateNote(!asPrivateNote)}
+            />
           </Box>
         )}
         <Flex mt={3} alignItems="center" gap={12}>
