@@ -465,7 +465,7 @@
   "collective.archive.description": "归档此{type, select, EVENT {事件} PROJECT {项目} FUND {资金} COLLECTIVE {集体} ORGANIZATION {组织} other {账号}}意味着视觉上不再活跃且不再允许新活动",
   "collective.archive.isHost": "当你是托管者时，你不能归档 {type, select, ORGANIZATION {你的组织} other {你的帐户}} ，请先停用托管者身份(在你的财政托管设置中)。",
   "collective.archive.selfHosted": "要存档这个独立的集体，请先到你的 <SettingsLink>财政主机设置</SettingsLink> 然后点击“重置财政主机”。",
-  "collective.archive.subscriptions": "经常性捐款将被自动取消。",
+  "collective.archive.subscriptions": "Recurring financial contributions will be automatically canceled, and all pending expenses will be marked as canceled.",
   "collective.archive.title": "归档{type, select, EVENT {此活动} PROJECT {此项目} FUND {此资金} COLLECTIVE {此集体} ORGANIZATION {此组织} other {此账号}}",
   "collective.backgroundImage.label": "封面图像",
   "collective.balance.description": "转账余额到 {type, select, PROJECT {集体} EVENT {集体} other {财政主机}} {type, select, EVENT {事件} PROJECT {项目} FUND {基金} COLLECTIVE {集体} other {帐户}} 余额必须为零才能存档 {type, select, EVENT {事件} PROJECT {项目} other {或更改主机}} {type, select, EVENT {} PROJECT {} other {或者你可以提交一笔费用或捐赠给另一个集体以零余额}}",

@@ -111,7 +111,7 @@ const ArchiveCollective = ({ collective }) => {
           {collective.type === 'COLLECTIVE' && (
             <FormattedMessage
               id="collective.archive.subscriptions"
-              defaultMessage={'Recurring financial contributions will be automatically canceled.'}
+              defaultMessage="Recurring financial contributions will be automatically canceled, and all pending expenses will be marked as canceled."
             />
           )}
         </P>
