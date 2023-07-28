@@ -68,7 +68,13 @@ const Home = (props: AdminSectionProps) => {
         <FormattedMessage id="Dashboard.Home.Title" defaultMessage="This is your workspace" />
       </H1>
       <Flex flexDirection="column" mt="50px">
-        <Flex justifyContent="space-between" alignItems="center" mb="32px">
+        <Flex
+          justifyContent="space-between"
+          alignItems={[null, 'center']}
+          mb="32px"
+          flexDirection={['column', 'row']}
+          gap="8px"
+        >
           <H2 fontSize="20px" lineHeight="28px" fontWeight="700">
             <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
           </H2>
@@ -83,7 +89,7 @@ const Home = (props: AdminSectionProps) => {
             closeMenuOnSelect={false}
             hideSelectedOptions={false}
             isMulti
-            maxWidth={['100%', 200, 300]}
+            maxWidth={['100%', 300]}
             minWidth={150}
             styles={{
               control: { flexWrap: 'nowrap' },
