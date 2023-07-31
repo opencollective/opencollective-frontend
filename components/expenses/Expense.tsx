@@ -200,7 +200,7 @@ function Expense(props) {
   const isDraft = expense?.status === expenseStatus.DRAFT;
   const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
   const isMissingReceipt =
-    expense?.status === expenseStatus.PAID &&
+    [expenseStatus.PAID, expenseStatus.PROCESSING].includes(expense?.status) &&
     expense?.type === expenseTypes.CHARGE &&
     expense?.permissions?.canEdit &&
     expense?.items?.every(item => !item.url);
