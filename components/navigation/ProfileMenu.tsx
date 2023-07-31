@@ -126,13 +126,13 @@ const ProfileMenu = () => {
             <PopoverMenuItem href="/help">
               <Flex alignItems="center">
                 <LifeBuoy size={16} />
-                <FormattedMessage id="menu.help" defaultMessage="Help and support" />
+                <FormattedMessage id="home.helpAndSupport" defaultMessage="Help and support" />
               </Flex>
             </PopoverMenuItem>
             <PopoverMenuItem href="https://docs.opencollective.com/help/">
               <Flex alignItems="center">
                 <BookOpen size={16} />
-                <FormattedMessage id="menu.docs" defaultMessage="Documentation" />
+                <FormattedMessage id="menu.documentation" defaultMessage="Documentation" />
               </Flex>
             </PopoverMenuItem>
             <PopoverMenuItem href={`/workspace/${LoggedInUser.collective.slug}/info`}>
