@@ -2,6 +2,7 @@ import React from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { get } from 'lodash';
 import { BookOpen, FlaskConical, LifeBuoy, LogOut, PocketKnife, User } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -91,12 +92,21 @@ const FooterLinks = styled(Flex)`
 `;
 
 const ProfileMenu = () => {
+  const router = useRouter();
   const { LoggedInUser, logout } = useLoggedInUser();
   const [isMenuOpen, setMenuOpen] = React.useState(false);
   const [showPreviewFeaturesModal, setShowPreviewFeaturesModal] = React.useState(false);
   const hasAvailablePreviewFeatures = LoggedInUser?.getAvailablePreviewFeatures()?.length > 0;
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
+
+  React.useEffect(() => {
+    const handler = () => setMenuOpen(false);
+    router.events.on('routeChangeStart', handler);
+    return () => {
+      router.events.off('routeChangeStart', handler);
+    };
+  }, [router]);
 
   if (!LoggedInUser) {
     return <LoginBtn />;

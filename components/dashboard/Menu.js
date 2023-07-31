@@ -6,18 +6,22 @@ import {
   Coins,
   CreditCard,
   FileText,
+  Globe2,
   Home,
   Inbox,
   Network,
   Receipt,
   Settings,
 } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isInternalHost, isSelfHostedAccount } from '../../lib/collective.lib';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
+import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import Container from '../Container';
 
@@ -34,13 +38,28 @@ import { MenuGroup, MenuLink, MenuSectionHeader } from './MenuComponents';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
-const Menu = ({ isAccountantOnly }) => {
+const Menu = ({ isAccountantOnly, onRoute }) => {
+  const router = useRouter();
   const { account } = React.useContext(DashboardContext);
+  const { viewport } = useWindowResize();
+  const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
   const isHost = isHostAccount(account);
   const isUserHost = account.isHost === true && isType(account, USER); // for legacy compatibility for users who are hosts
   const isIndividual = isIndividualAccount(account);
+
+  React.useEffect(() => {
+    if (onRoute) {
+      router.events.on('routeChangeStart', onRoute);
+    }
+    return () => {
+      if (onRoute) {
+        router.events.off('routeChangeStart', onRoute);
+      }
+    };
+  }, [router, onRoute]);
+
   return (
-    <Container>
+    <Container gap="8px">
       {/** Host dashboard */}
       <MenuGroup if={isHost} mb={24}>
         <MenuSectionHeader>
@@ -127,6 +146,13 @@ const Menu = ({ isAccountantOnly }) => {
           </MenuSectionHeader>
         )}
         <MenuLink section={COLLECTIVE_SECTIONS.HOME} icon={<Home size={16} />} if={isIndividual} />
+        <MenuLink
+          onClick={() => router.push(getCollectivePageRoute(account))}
+          icon={<Globe2 size={16} />}
+          if={isMobile}
+        >
+          <FormattedMessage id="PublicProfile" defaultMessage="Public profile" />
+        </MenuLink>
         <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTIONS} icon={<Coins size={16} />} if={isIndividual} />
         <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} icon={<Receipt size={16} />} />
         <MenuLink
@@ -292,6 +318,7 @@ const Menu = ({ isAccountantOnly }) => {
 
 Menu.propTypes = {
   isAccountantOnly: PropTypes.bool,
+  onRoute: PropTypes.func,
 };
 
 export default Menu;

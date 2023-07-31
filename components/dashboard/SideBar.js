@@ -1,18 +1,36 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Globe2, Menu as MenuIcon } from 'lucide-react';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { Box } from '../Grid';
+import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
+
+import { Box, Flex } from '../Grid';
+import { HideGlobalScroll } from '../HideGlobalScroll';
+import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import { DrawerMenu } from '../navigation/DrawerMenu';
+import StyledButton from '../StyledButton';
+import StyledRoundButton from '../StyledRoundButton';
 
 import AccountSwitcher from './AccountSwitcher';
 import Menu from './Menu';
-import { MenuContainer } from './MenuComponents';
 
 const Sticky = styled.div`
   position: sticky;
-  top: 0;
+  top: 32px;
   z-index: 10;
+`;
+
+const MenuContainer = styled(Flex)`
+  a {
+    color: ${props => props.theme.colors.black[900]};
+    &:hover {
+      color: ${props => props.theme.colors.black[700]};
+    }
+  }
 `;
 
 const AdminPanelSideBar = ({
@@ -21,28 +39,74 @@ const AdminPanelSideBar = ({
   isAccountantOnly,
   isLoading,
   selectedSection,
-  onRoute,
+  onRoute: _onRoute,
   ...props
 }) => {
+  const [isMenuOpen, setMenuOpen] = React.useState(false);
+  const { viewport } = useWindowResize();
+  const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
+
+  const onRoute = isMobile
+    ? (...args) => {
+        setMenuOpen(false);
+        _onRoute?.(...args);
+      }
+    : _onRoute;
+
+  const content = React.useMemo(
+    () => (
+      <Box mt={[0, null, '32px']}>
+        {isLoading ? (
+          [...Array(5).keys()].map(i => (
+            <Box key={i}>
+              <LoadingPlaceholder height={24} mb={12} borderRadius={8} maxWidth={'70%'} />
+            </Box>
+          ))
+        ) : (
+          <Menu {...{ collective, selectedSection, onRoute, isAccountantOnly }} />
+        )}
+      </Box>
+    ),
+    [collective, isLoading],
+  );
+
   return (
     <Box {...props} flexGrow={0} flexShrink={0} width={['100%', '100%', '288px']}>
       <Sticky>
-        <MenuContainer>
+        <MenuContainer flexDirection={['row-reverse', null, 'column']} m="0" gap="16px">
           <AccountSwitcher activeSlug={activeSlug} isLoading={isLoading} />
+          {isMobile && (
+            <React.Fragment>
+              <StyledRoundButton size={50} onClick={() => setMenuOpen(true)} data-cy="mobile-menu-trigger">
+                <MenuIcon size={24} />
+              </StyledRoundButton>
 
-          <Box py={2}>
-            {isLoading ? (
-              <Box>
-                {[...Array(5).keys()].map(i => (
-                  <li key={i}>
-                    <LoadingPlaceholder height={24} mb={12} borderRadius={8} maxWidth={'70%'} />
-                  </li>
-                ))}
-              </Box>
-            ) : (
-              <Menu {...{ collective, selectedSection, onRoute, isAccountantOnly }} />
-            )}
-          </Box>
+              {isMenuOpen && (
+                <React.Fragment>
+                  <DrawerMenu top="73px" anchor="left" onClose={() => setMenuOpen(false)} open={true} p="16px">
+                    {content}
+                  </DrawerMenu>
+                  <HideGlobalScroll />
+                </React.Fragment>
+              )}
+            </React.Fragment>
+          )}
+          {!isMobile && (
+            <React.Fragment>
+              <StyledButton
+                as={Link}
+                buttonSize="tiny"
+                href={getCollectivePageRoute(collective)}
+                height="24px"
+                textAlign="center"
+              >
+                <Globe2 size={12} />
+                &nbsp;
+                <FormattedMessage id="PublicProfile" defaultMessage="Public profile" />
+              </StyledButton>
+              {content}
+            </React.Fragment>
+          )}
         </MenuContainer>
       </Sticky>
     </Box>

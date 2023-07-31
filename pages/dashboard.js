@@ -143,9 +143,9 @@ const DashboardPage = () => {
             flexDirection={['column', 'column', 'row']}
             justifyContent={'center'}
             minHeight={600}
-            gridGap={[16, null, 48]}
+            gridGap={[24, null, 48]}
             data-cy="admin-panel-container"
-            py={'32px'}
+            py={['24px', null, '32px']}
             px={['16px', '24px']}
           >
             <AdminPanelSideBar
