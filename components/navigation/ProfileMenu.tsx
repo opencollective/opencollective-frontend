@@ -17,7 +17,7 @@ import Link from '../Link';
 import LoginBtn from '../LoginBtn';
 import PreviewFeaturesModal from '../PreviewFeaturesModal';
 import StyledButton from '../StyledButton';
-import { HorziontalSeparator, VerticalSeparator } from '../ui/Separator';
+import { HorziontalSeparator } from '../ui/Separator';
 
 import { DrawerMenu } from './DrawerMenu';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
@@ -165,12 +165,14 @@ const ProfileMenu = () => {
             </PopoverMenuItem>
           </Flex>
         </Flex>
-        <VerticalSeparator style={{ margin: '0 24px' }} />
         <ProfileMenuMemberships
           user={LoggedInUser}
           maxWidth="200px"
           overflowY={['initial', 'auto']}
           mt={['32px', '0']}
+          ml={['0', '24px']}
+          pl={['0', '24px']}
+          borderLeft={['none', '1px solid #EAEAEC']}
           closeDrawer={() => setMenuOpen(false)}
         />
       </Flex>

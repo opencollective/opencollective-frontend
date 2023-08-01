@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { groupBy, isEmpty, uniqBy } from 'lodash';
 import { Plus } from 'lucide-react';
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -157,13 +157,12 @@ const ProfileMenuMemberships = ({ user, closeDrawer, ...props }: ProfileMenuMemb
     return MENU_SECTIONS[section].emptyMessage || !isEmpty(groupedMemberships[section]);
   };
 
+  if (hasNoMemberships && isEmpty(archivedMemberships)) {
+    return null;
+  }
+
   return (
     <React.Fragment>
-      {hasNoMemberships && (
-        <P color="blue.900" fontSize="20px" lineHeight="28px" fontWeight="bold" mt="8px" mb="12px">
-          <FormattedMessage id="ProfileMenuMemberships.Empty" defaultMessage="Make the most out of Open Collective" />
-        </P>
-      )}
       <Flex gap="32px" flexDirection="column" {...props}>
         {Object.keys(MENU_SECTIONS)
           .filter(shouldDisplaySection)
