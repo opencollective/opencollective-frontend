@@ -465,7 +465,7 @@
   "collective.archive.description": "Archiving {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.",
   "collective.archive.isHost": "You can't archive {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings).",
   "collective.archive.selfHosted": "To archive this Independent Collective, first go to your <SettingsLink>Fiscal Host settings</SettingsLink> and click 'Reset Fiscal Host'.",
-  "collective.archive.subscriptions": "Contribuições financeiras recorrentes serão automaticamente canceladas.",
+  "collective.archive.subscriptions": "Recurring financial contributions will be automatically canceled, and all pending expenses will be marked as canceled.",
   "collective.archive.title": "Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}",
   "collective.backgroundImage.label": "Imagem de capa",
   "collective.balance.description": "Transfer remaining balance to {type, select, PROJECT {the Collective} EVENT {the Collective} other {the Fiscal Host}}. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance must be zero to archive {type, select, EVENT {the Event} PROJECT {the Project} other {or change Hosts}}. {type, select, EVENT {} PROJECT {} other {Alternatively, you can submit an expense or donate to another Collective to zero the balance.}}",

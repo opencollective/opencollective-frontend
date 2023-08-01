@@ -465,7 +465,7 @@
   "collective.archive.description": "Archiwizacja {type, select, EVENT {tego Wydarzenia} PROJECT {tego Projektu} FUND {tego Funduszu} COLLECTIVE {tego Kolektywu} ORGANIZATION {tej Organizacji} other {tego Konto}} oznacza, że będzie nieaktywne i żadna nowa aktywność nie będzie dozwolona.",
   "collective.archive.isHost": "Nie możesz zarchiwizować {type, select, ORGANIZATION {swojej Organizacja} other {swojego Konto}} podczas bycia hostem. Proszę najpierw dezaktywować jako hosta (w ustawieniach hostingu podatkowego).",
   "collective.archive.selfHosted": "Aby zarchiwizować ten Niezależny Kolektyw, przejdź najpierw do <SettingsLink>Ustawień hosta podatkowego</SettingsLink> i kliknij przycisk \"Zresetuj hosta podatkowego\".",
-  "collective.archive.subscriptions": "Powtarzające się wkłady finansowe zostaną automatycznie anulowane.",
+  "collective.archive.subscriptions": "Recurring financial contributions will be automatically canceled, and all pending expenses will be marked as canceled.",
   "collective.archive.title": "Archiwizuj {type, select, EVENT {to wydarzenie} PROJECT {ten projekt} FUND {ten fundusz} COLLECTIVE {ten Zbiór} ORGANIZATION {ta organizacja} other {to konto}}",
   "collective.backgroundImage.label": "Obraz okładki",
   "collective.balance.description": "Przenieś pozostałe saldo do {type, select, PROJECT {Zbióru} EVENT {Zbióru} other {Gospodarza podatkowego}}. Saldo {type, select, EVENT {Wydarzeń} PROJECT {Projektu} FUND {Funtuszu} COLLECTIVE {Zbióru} other {konta}} musi wynosić zero, aby zarchiwizować {type, select, EVENT {Wydarzenie} PROJECT {Projekt} other {lub zmień gospodarza}}. {type, select, EVENT {} PROJECT {} other {Alternatywnie, możesz zgłosić wydatek lub przekazać darowiznę innemu zbiorowi by wyzerować saldo.}}",
