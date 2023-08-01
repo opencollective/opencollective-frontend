@@ -44,7 +44,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return ALL_SECTIONS.INFO;
   } else if (account?.type === 'INDIVIDUAL') {
-    return ALL_SECTIONS.HOME;
+    return ALL_SECTIONS.DASHBOARD_OVERVIEW;
   } else if (isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
   } else {

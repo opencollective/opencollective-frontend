@@ -3,6 +3,7 @@ import { useQuery } from '@apollo/client';
 import { flatten } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { WorkspaceHomeQuery } from '../../../../lib/graphql/types/v2/graphql';
@@ -11,11 +12,13 @@ import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 import Container from '../../../Container';
 import ExpenseDrawer from '../../../expenses/ExpenseDrawer';
 import { Flex } from '../../../Grid';
+import Image from '../../../Image';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
-import { StyledSelectFilter, TruncatedValueContainer } from '../../../StyledSelectFilter';
-import { H1, H2 } from '../../../Text';
+import StyledLink from '../../../StyledLink';
+import { makeTruncatedValueAllSelectedLabelContainer, StyledSelectFilter } from '../../../StyledSelectFilter';
+import { H1, H2, P } from '../../../Text';
 import { AdminSectionProps } from '../../types';
 
 import { workspaceHomeQuery } from './query';
@@ -24,9 +27,16 @@ import TimelineItem from './TimelineItem';
 const PAGE_SIZE = 20;
 
 const REACT_SELECT_COMPONENT_OVERRIDE = {
-  ValueContainer: TruncatedValueContainer,
+  ValueContainer: makeTruncatedValueAllSelectedLabelContainer(
+    <FormattedMessage id="Dashboard.AllActivities" defaultMessage="All activities" />,
+  ),
   MultiValue: () => null, // Items will be displayed as a truncated string in `TruncatedValueContainer `
 };
+
+const Banner = styled(Flex)`
+  border-radius: 16px;
+  border: 1px solid ${({ theme }) => theme.colors.black[200]};
+`;
 
 const getFilterOptions = intl => [
   { value: 'EXPENSES,VIRTUAL_CARDS', label: intl.formatMessage(ActivityClassesI18N['expenses.title']) },
@@ -64,20 +74,41 @@ const Home = (props: AdminSectionProps) => {
 
   return (
     <Container maxWidth={'100%'}>
-      <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-        <FormattedMessage id="Dashboard.Home.Title" defaultMessage="This is your workspace" />
+      <H1 fontSize="24px" lineHeight="32px" fontWeight="700">
+        <FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />
       </H1>
-      <Flex flexDirection="column" mt="50px">
-        <Flex
-          justifyContent="space-between"
-          alignItems={[null, 'center']}
-          mb="32px"
-          flexDirection={['column', 'row']}
-          gap="8px"
-        >
+      <P mt={2} fontSize="14px" fontWeight="400" color="black.700">
+        <FormattedMessage
+          id="Dashboard.Home.Subtitle"
+          defaultMessage="A quick look at all that is relevant for you inside Open Collective"
+        />
+      </P>
+      <Banner mt="48px" p="16px 16px 24px 16px" flexDirection="column">
+        <Flex alignItems="center" gap="16px">
+          <Image alt="" width={96} height={96} src="/static/images/dashboard.png" />
+          <H1 fontSize="24px" lineHeight="32px" fontWeight="700">
+            <FormattedMessage id="Dashboard.Banner.Title" defaultMessage="This is your new workspace" />
+          </H1>
+        </Flex>
+        <P mt="24px" fontSize="14px" fontWeight="400" lineHeight="24px" color="black.700">
+          <FormattedMessage
+            id="Dashboard.Banner.Description"
+            defaultMessage="We created this new space for you to keep on top of everything you need to do financially for your community, team account management, and settings in a unified place that will be the new base of the experience using Open Collective. Welcome!"
+          />
+        </P>
+
+        <P mt="24px" fontSize="13px" fontWeight="500">
+          <StyledLink href="https://docs.opencollective.com/help/collectives/collective-workspaces">
+            <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />
+          </StyledLink>
+        </P>
+      </Banner>
+      <Flex flexDirection="column" mt="48px">
+        <Flex justifyContent="space-between" alignItems={[null, 'center']} flexDirection={['column', 'row']} gap="8px">
           <H2 fontSize="20px" lineHeight="28px" fontWeight="700">
             <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
           </H2>
+
           <StyledSelectFilter
             intl={intl}
             inputId="activity-filter"
@@ -97,6 +128,12 @@ const Home = (props: AdminSectionProps) => {
             {...props}
           />
         </Flex>
+        <P mt="16px" mb="48px" fontSize="14px" fontWeight="400" color="black.700">
+          <FormattedMessage
+            id="Dashboard.Home.ActivitySubtitle"
+            defaultMessage="Everything that's relevant to you inside Open Collective as a feed."
+          />
+        </P>
         {error && !isTimelineBeingGenerated ? (
           <MessageBoxGraphqlError error={error} />
         ) : isTimelineBeingGenerated || (!activities.length && loading) ? (

@@ -7,8 +7,8 @@ import {
   CreditCard,
   FileText,
   Globe2,
-  Home,
   Inbox,
+  LayoutDashboard,
   Network,
   Receipt,
   Settings,
@@ -145,7 +145,11 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
             )}
           </MenuSectionHeader>
         )}
-        <MenuLink section={COLLECTIVE_SECTIONS.HOME} icon={<Home size={16} />} if={isIndividual} />
+        <MenuLink
+          section={COLLECTIVE_SECTIONS.DASHBOARD_OVERVIEW}
+          icon={<LayoutDashboard size={16} />}
+          if={isIndividual}
+        />
         <MenuLink
           onClick={() => router.push(getCollectivePageRoute(account))}
           icon={<Globe2 size={16} />}
