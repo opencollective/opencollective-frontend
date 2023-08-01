@@ -12,6 +12,7 @@ import { require2FAForAdmins } from '../lib/policies';
 import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import AdminPanelSection from '../components/dashboard/DashboardSection';
+import Footer from '../components/dashboard/Footer';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
 import { Box, Flex } from '../components/Grid';
@@ -129,6 +130,7 @@ const DashboardPage = () => {
         collective={account}
         title={account ? `${account.name} - ${titleBase}` : titleBase}
         pageTitle={titleBase}
+        showFooter={false}
       >
         {Boolean(notification) && <NotificationBar {...notification} />}
         {blocker ? (
@@ -169,6 +171,7 @@ const DashboardPage = () => {
             )}
           </Flex>
         )}
+        <Footer />
       </Page>
     </DashboardContext.Provider>
   );
