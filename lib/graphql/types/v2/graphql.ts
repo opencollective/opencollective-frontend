@@ -5103,6 +5103,8 @@ export type Individual = Account & {
   transferwise?: Maybe<TransferWise>;
   /** @deprecated 2023-01-16: Please use socialLinks */
   twitterHandle?: Maybe<Scalars['String']>;
+  /** User two factor methods */
+  twoFactorMethods?: Maybe<Array<Maybe<UserTwoFactorMethod>>>;
   type: AccountType;
   updatedAt?: Maybe<Scalars['DateTime']>;
   /** Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates". */
@@ -5588,6 +5590,8 @@ export type Mutation = {
   createUpdate: Update;
   /** Create new Stripe Virtual Card for existing hosted collective. Scope: "virtualCards". */
   createVirtualCard: VirtualCard;
+  /** Create WebAuthn public key registration request options */
+  createWebAuthnRegistrationOptions: Scalars['JSON'];
   /** Create webhook. Scope: "webhooks". */
   createWebhook?: Maybe<Webhook>;
   /** Adds or removes a policy on a given account. Scope: "account". */
@@ -5641,6 +5645,8 @@ export type Mutation = {
   editPublicMessage: Member;
   /** Edit a tier. */
   editTier: Tier;
+  /** Edit 2FA method */
+  editTwoFactorAuthenticationMethod: Individual;
   /** Edit update. Scope: "updates". */
   editUpdate: Update;
   /** Edit existing Virtual Card information. Scope: "virtualCards". */
@@ -5987,6 +5993,12 @@ export type MutationCreateVirtualCardArgs = {
 
 
 /** This is the root mutation */
+export type MutationCreateWebAuthnRegistrationOptionsArgs = {
+  account: AccountReferenceInput;
+};
+
+
+/** This is the root mutation */
 export type MutationCreateWebhookArgs = {
   webhook: WebhookCreateInput;
 };
@@ -6183,6 +6195,13 @@ export type MutationEditTierArgs = {
 
 
 /** This is the root mutation */
+export type MutationEditTwoFactorAuthenticationMethodArgs = {
+  name?: InputMaybe<Scalars['String']>;
+  userTwoFactorMethod: UserTwoFactorMethodReferenceInput;
+};
+
+
+/** This is the root mutation */
 export type MutationEditUpdateArgs = {
   update: UpdateUpdateInput;
 };
@@ -6331,6 +6350,7 @@ export type MutationRemoveTwoFactorAuthTokenFromIndividualArgs = {
   account: AccountReferenceInput;
   code?: InputMaybe<Scalars['String']>;
   type?: InputMaybe<TwoFactorMethod>;
+  userTwoFactorMethod?: InputMaybe<UserTwoFactorMethodReferenceInput>;
 };
 
 
@@ -8968,6 +8988,7 @@ export type TransferWiseRequiredField = {
 /** A two factor authentication method */
 export enum TwoFactorMethod {
   TOTP = 'TOTP',
+  WEBAUTHN = 'WEBAUTHN',
   YUBIKEY_OTP = 'YUBIKEY_OTP'
 }
 
@@ -9122,6 +9143,22 @@ export enum UploadedFileKind {
   TIER_LONG_DESCRIPTION = 'TIER_LONG_DESCRIPTION',
   UPDATE = 'UPDATE'
 }
+
+/** User two factor authentication method */
+export type UserTwoFactorMethod = {
+  __typename?: 'UserTwoFactorMethod';
+  createdAt: Scalars['DateTime'];
+  description?: Maybe<Scalars['String']>;
+  icon?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  method: TwoFactorMethod;
+  name: Scalars['String'];
+};
+
+export type UserTwoFactorMethodReferenceInput = {
+  id?: InputMaybe<Scalars['String']>;
+  legacyId?: InputMaybe<Scalars['Int']>;
+};
 
 /** This represents a Vendor account */
 export type Vendor = Account & AccountWithContributions & AccountWithHost & {
