@@ -116,17 +116,26 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   return groupedAccounts;
 });
 
-const Option = ({ collective, description, ...props }: { collective: any; description?: string | ReactElement }) => {
+const Option = ({
+  collective,
+  description,
+  isChild,
+  ...props
+}: {
+  collective: any;
+  description?: string | ReactElement;
+  isChild?: boolean;
+}) => {
   description = description || (
     <FormattedMessage
       id="AccountSwitcher.Description"
-      defaultMessage="{type, select, USER {My workspace} COLLECTIVE {Collective admin} ORGANIZATION {Organization admin} EVENT {Event admin} FUND {Fund admin} PROJECT {My admin} other {}}"
+      defaultMessage="{type, select, USER {My workspace} COLLECTIVE {Collective admin} ORGANIZATION {Organization admin} EVENT {Event admin} FUND {Fund admin} PROJECT {Project admin} other {}}"
       values={{ type: collective?.type }}
     />
   );
   return (
     <Flex alignItems="center" gridGap="12px" overflow="hidden" {...props}>
-      <Avatar collective={collective} size={32} />
+      <Avatar collective={collective} size={isChild ? 20 : 32} useIcon={isChild} />
       <Flex flexDirection="column" overflow="hidden">
         <P color="black.800" fontSize="14px" letterSpacing="0" fontWeight="500" truncateOverflow>
           {collective?.name}
@@ -179,7 +188,7 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
               $isActive={activeSlug === child.slug}
               ml={3}
             >
-              <Option collective={child} />
+              <Option collective={child} isChild />
             </StyledMenuEntry>
           ))}
     </React.Fragment>
