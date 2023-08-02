@@ -220,7 +220,7 @@ const Footer = () => {
           gridGap={['32px 8px', null, '56px']}
           gridTemplateColumns={[`1fr 1fr`, null, 'repeat(6, 1fr)']}
         >
-          <MenuLink href="/">
+          <MenuLink href="/home">
             <FormattedMessage id="menu.homepage" defaultMessage="Homepage" />
           </MenuLink>
           <MenuLink href="https://docs.opencollective.com/help/about/introduction">

@@ -123,13 +123,13 @@ const ProfileMenu = () => {
             </Box>
           </ProfileHeader>
           <Flex flexDirection="column" gap="16px">
-            <PopoverMenuItem href={`/help`}>
+            <PopoverMenuItem href="/help">
               <Flex alignItems="center">
                 <LifeBuoy size={16} />
                 <FormattedMessage id="menu.help" defaultMessage="Help and support" />
               </Flex>
             </PopoverMenuItem>
-            <PopoverMenuItem href={`https://docs.opencollective.com/help/`}>
+            <PopoverMenuItem href="https://docs.opencollective.com/help/">
               <Flex alignItems="center">
                 <BookOpen size={16} />
                 <FormattedMessage id="menu.docs" defaultMessage="Documentation" />
@@ -178,7 +178,7 @@ const ProfileMenu = () => {
       </Flex>
       <Box>
         <HorziontalSeparator style={{ margin: '24px 0' }} />
-        <Link href={'/home'}>
+        <Link href="/home">
           <Image src="/static/images/opencollectivelogo-footer-n.svg" alt="Open Collective" width="122" height="24" />
         </Link>
         <FooterLinks mt="16px" gap="32px">
