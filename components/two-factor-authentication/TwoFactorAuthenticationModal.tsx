@@ -1,4 +1,5 @@
 import React from 'react';
+import * as simplewebauthn from '@simplewebauthn/browser';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -8,30 +9,65 @@ import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentic
 import { getSettingsRoute } from '../../lib/url-helpers';
 
 import { Box, Flex } from '../Grid';
-import { getI18nLink, I18nSupportLink } from '../I18nFormatters';
+import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
+import StyledLinkButton from '../StyledLinkButton';
 import StyledModal, { ModalFooter, ModalHeader } from '../StyledModal';
-import { Label, P } from '../Text';
+import { P } from '../Text';
+import { TOAST_TYPE, useToasts } from '../ToastProvider';
+
+function initialMethod(supportedMethods: string[]) {
+  if (!supportedMethods) {
+    return null;
+  }
+  if (supportedMethods.length === 1) {
+    return supportedMethods[0];
+  }
+
+  return supportedMethods.find(method => method !== 'recovery_code');
+}
 
 export default function TwoFactorAuthenticationModal() {
+  const { addToast } = useToasts();
   const { LoggedInUser } = useLoggedInUser();
-  const [twoFactorCode, setTwoFactorCode] = React.useState('');
-  const [confirming, setConfirming] = React.useState(false);
-  const [isUsingRecoveryCode, setIsUsingRecoveryCode] = React.useState(false);
 
   const prompt = useTwoFactorAuthenticationPrompt();
   const isOpen = prompt?.isOpen ?? false;
   const supportedMethods = prompt?.supportedMethods ?? [];
-  const hasYubikeyOTP = supportedMethods.includes('yubikey_otp');
-  const hasRecoveryCodeOption = supportedMethods.includes('recovery_code');
-  const has2FAConfigured = supportedMethods.length > 0;
   const cancellable = !supportedMethods.includes('recovery_code');
 
+  const [selectedMethod, setSelectedMethod] = React.useState(initialMethod(supportedMethods));
+  const [twoFactorCode, setTwoFactorCode] = React.useState('');
+  const [confirming, setConfirming] = React.useState(false);
+
   React.useEffect(() => {
-    setIsUsingRecoveryCode(false);
+    if (supportedMethods.length > 0) {
+      setSelectedMethod(initialMethod(supportedMethods));
+    }
   }, [supportedMethods]);
+
+  const useWebAuthn = React.useCallback(async () => {
+    setConfirming(true);
+    setTwoFactorCode('');
+    try {
+      const authenticationResponse = await simplewebauthn.startAuthentication(prompt.authenticationOptions.webauthn);
+      const base64AuthenticationResponse = Buffer.from(JSON.stringify(authenticationResponse), 'utf8').toString(
+        'base64',
+      );
+
+      prompt.resolveAuth({
+        type: 'webauthn',
+        code: base64AuthenticationResponse,
+      });
+    } catch (e) {
+      addToast({ type: TOAST_TYPE.ERROR, message: e.message });
+      return;
+    } finally {
+      setConfirming(false);
+    }
+  }, [prompt]);
 
   const cancel = React.useCallback(() => {
     if (!cancellable) {
@@ -39,6 +75,7 @@ export default function TwoFactorAuthenticationModal() {
     }
     setTwoFactorCode('');
     setConfirming(false);
+    setSelectedMethod(null);
     prompt.rejectAuth(createError(ERROR.TWO_FACTOR_AUTH_CANCELED));
   }, [cancellable]);
 
@@ -46,13 +83,14 @@ export default function TwoFactorAuthenticationModal() {
     const code = twoFactorCode;
     setConfirming(true);
     setTwoFactorCode('');
+    setSelectedMethod(null);
 
     let type = 'totp';
-    if (hasYubikeyOTP && code.length === 44) {
+    if (supportedMethods.includes('yubikey_otp') && code.length === 44) {
       type = 'yubikey_otp';
     }
 
-    if (isUsingRecoveryCode) {
+    if (selectedMethod === 'recovery_code') {
       type = 'recovery_code';
     }
 
@@ -61,7 +99,7 @@ export default function TwoFactorAuthenticationModal() {
       code,
     });
     setConfirming(false);
-  }, [twoFactorCode, hasYubikeyOTP, isUsingRecoveryCode]);
+  }, [twoFactorCode, supportedMethods, selectedMethod]);
 
   const router = useRouter();
 
@@ -69,125 +107,40 @@ export default function TwoFactorAuthenticationModal() {
     const handleRouteChange = () => {
       cancel();
     };
-
     router.events.on('routeChangeStart', handleRouteChange);
-
     return () => router.events.off('routeChangeStart', handleRouteChange);
   }, [cancel]);
 
   React.useEffect(() => {
-    if (hasYubikeyOTP && twoFactorCode.length === 44) {
+    if (supportedMethods.includes('yubikey_otp') && twoFactorCode.length === 44) {
       confirm();
     }
-  }, [confirm, twoFactorCode, hasYubikeyOTP]);
+  }, [confirm, twoFactorCode]);
 
-  const header = has2FAConfigured ? (
-    isUsingRecoveryCode ? (
-      <FormattedMessage defaultMessage="Reset 2FA using a recovery code" />
-    ) : (
-      <FormattedMessage defaultMessage="Verify using the 2FA code" />
-    )
-  ) : (
-    <FormattedMessage defaultMessage="You must configure 2FA to access this feature" />
-  );
-
-  const label = isUsingRecoveryCode ? (
-    <FormattedMessage
-      id="TwoFactorAuth.RecoveryCodes.Form.InputLabel"
-      defaultMessage="Please enter one of your alphanumeric recovery codes."
-    />
-  ) : hasYubikeyOTP ? (
-    <FormattedMessage
-      id="TwoFactorAuth.Setup.Form.InputLabel.YubiKey"
-      defaultMessage="Please enter your 6-digit code without any dashes or select the input below, plug your YubiKey and press it to generate a code."
-    />
-  ) : (
-    <FormattedMessage
-      id="TwoFactorAuth.Setup.Form.InputLabel"
-      defaultMessage="Please enter your 6-digit code without any dashes."
-    />
-  );
-
-  const placeholder = isUsingRecoveryCode ? '' : hasYubikeyOTP ? '123456 or YubiKey: cccc...' : '123456';
-  const pattern = !isUsingRecoveryCode && !hasYubikeyOTP && '[0-9]{6}';
   const verifyBtnEnabled =
-    has2FAConfigured &&
-    ((isUsingRecoveryCode && twoFactorCode?.length > 0) ||
-      (hasYubikeyOTP && twoFactorCode?.length === 44) ||
-      twoFactorCode?.length === 6);
+    (supportedMethods.length > 0 &&
+      ((selectedMethod === 'recovery_code' && twoFactorCode?.length > 0) ||
+        ((selectedMethod === 'yubikey_otp' || selectedMethod === 'totp') && twoFactorCode?.length === 44) ||
+        twoFactorCode?.length === 6)) ||
+    selectedMethod === 'webauthn';
 
-  const buttonLabel = isUsingRecoveryCode ? (
-    <FormattedMessage id="login.twoFactorAuth.reset" defaultMessage="Reset 2FA" />
-  ) : (
-    <FormattedMessage id="actions.verify" defaultMessage="Verify" />
-  );
+  const alternativeMethods = supportedMethods.filter(method => method !== selectedMethod);
 
-  if (isOpen) {
-    return (
-      <StyledModal onClose={cancel} trapFocus maxWidth={495}>
-        <ModalHeader hideCloseIcon>{header}</ModalHeader>
-        {has2FAConfigured ? (
-          <Flex mt={2} flexDirection="column">
-            <Label htmlFor="2fa-code-input" fontWeight="normal" as="label" mb={2}>
-              {label}
-            </Label>
-            <StyledInput
-              id="2fa-code-input"
-              name="2fa-code-input"
-              type="text"
-              minHeight={50}
-              fontSize="20px"
-              placeholder={placeholder}
-              pattern={pattern}
-              inputMode="numeric"
-              value={twoFactorCode}
-              onChange={e => setTwoFactorCode(e.target.value)}
-              disabled={confirming}
-              onKeyDown={event => {
-                if (event.key === 'Enter' && twoFactorCode?.length === 6) {
-                  event.preventDefault();
-                  confirm();
-                }
-              }}
-              autoFocus
-            />
-            {hasRecoveryCodeOption && !isUsingRecoveryCode && (
-              <Box mt={4}>
-                <P fontWeight="bold" fontSize={14} mb={1} textAlign="left" display="block">
-                  <FormattedMessage id="login.twoFactorAuth.havingTrouble" defaultMessage="Having trouble?" />
-                </P>
-                <StyledButton
-                  type="button"
-                  buttonSize="tiny"
-                  isBorderless
-                  buttonStyle="secondary"
-                  mb={3}
-                  onClick={() => setIsUsingRecoveryCode(true)}
-                >
-                  <P>
-                    <FormattedMessage
-                      id="login.twoFactorAuth.useRecoveryCodes"
-                      defaultMessage="Use 2FA recovery codes."
-                    />
-                  </P>
-                </StyledButton>
-              </Box>
-            )}
-            {isUsingRecoveryCode && (
-              <Box mt={4} mb={3}>
-                <P>
-                  <FormattedMessage
-                    id="login.twoFactorAuth.support"
-                    defaultMessage="If you can't login with 2FA or recovery codes, please contact <SupportLink>support</SupportLink>."
-                    values={{
-                      SupportLink: I18nSupportLink,
-                    }}
-                  />
-                </P>
-              </Box>
-            )}
-          </Flex>
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <StyledModal onClose={cancel} width={495}>
+      <ModalHeader hideCloseIcon>
+        {supportedMethods.length === 0 ? (
+          <FormattedMessage defaultMessage="You must configure 2FA to access this feature" />
         ) : (
+          <FormattedMessage defaultMessage="Two Factor Authentication" />
+        )}
+      </ModalHeader>
+      <Box mt={3}>
+        {supportedMethods.length === 0 && (
           <Flex mt={2} flexDirection="column">
             <P fontWeight="normal" as="label" mb={4}>
               <FormattedMessage
@@ -202,28 +155,146 @@ export default function TwoFactorAuthenticationModal() {
             </P>
           </Flex>
         )}
-        <ModalFooter isFullWidth dividerMargin="0.65rem 0">
-          <Flex justifyContent="right" flexWrap="wrap">
-            {cancellable && (
-              <StyledButton disabled={confirming} mr={2} minWidth={120} onClick={cancel}>
-                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </StyledButton>
-            )}
-            <StyledButton
-              ml={2}
-              minWidth={120}
-              buttonStyle="primary"
-              loading={confirming}
-              disabled={!verifyBtnEnabled}
-              onClick={confirm}
-            >
-              {buttonLabel}
-            </StyledButton>
-          </Flex>
-        </ModalFooter>
-      </StyledModal>
-    );
-  }
 
-  return null;
+        {selectedMethod === 'recovery_code' && (
+          <RecoveryCodeOptions value={twoFactorCode} onChange={setTwoFactorCode} disabled={confirming} />
+        )}
+
+        {(selectedMethod === 'yubikey_otp' || selectedMethod === 'totp') && (
+          <AuthenticatorOption
+            value={twoFactorCode}
+            onChange={setTwoFactorCode}
+            supportedMethods={supportedMethods}
+            disabled={confirming}
+          />
+        )}
+
+        {selectedMethod === 'webauthn' && <WebauthnOption />}
+      </Box>
+
+      {supportedMethods.length > 1 && (
+        <Box mt={4}>
+          <FormattedMessage defaultMessage="You can also use alternative methods:" />
+          <ul>
+            {alternativeMethods.includes('totp') && (
+              <li>
+                <StyledLinkButton onClick={() => setSelectedMethod('totp')}>
+                  <FormattedMessage defaultMessage="Authenticator Code" />
+                </StyledLinkButton>
+              </li>
+            )}
+            {alternativeMethods.includes('webauthn') && (
+              <li>
+                <StyledLinkButton onClick={() => setSelectedMethod('webauthn')}>
+                  <FormattedMessage defaultMessage="U2F (Hardware Key, Passkey, Phone, etc)" />
+                </StyledLinkButton>
+              </li>
+            )}
+            {alternativeMethods.includes('recovery_code') && (
+              <li>
+                <StyledLinkButton onClick={() => setSelectedMethod('recovery_code')}>
+                  <FormattedMessage defaultMessage="Recovery code" />
+                </StyledLinkButton>
+              </li>
+            )}
+          </ul>
+        </Box>
+      )}
+
+      <ModalFooter isFullWidth dividerMargin="0.65rem 0">
+        <Flex justifyContent="right" flexWrap="wrap">
+          {cancellable && (
+            <StyledButton disabled={confirming} mr={2} minWidth={120} onClick={cancel}>
+              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+            </StyledButton>
+          )}
+          <StyledButton
+            ml={2}
+            minWidth={120}
+            buttonStyle="primary"
+            loading={confirming}
+            disabled={!verifyBtnEnabled}
+            onClick={selectedMethod === 'webauthn' ? useWebAuthn : confirm}
+          >
+            {selectedMethod === 'recovery_code' ? (
+              <FormattedMessage id="login.twoFactorAuth.reset" defaultMessage="Reset 2FA" />
+            ) : (
+              <FormattedMessage id="actions.verify" defaultMessage="Verify" />
+            )}
+          </StyledButton>
+        </Flex>
+      </ModalFooter>
+    </StyledModal>
+  );
+}
+
+function AuthenticatorOption(props: {
+  value: string;
+  onChange: (string) => void;
+  supportedMethods: string[];
+  disabled: boolean;
+}) {
+  return (
+    <Box>
+      {props.supportedMethods.includes('yubikey_otp') ? (
+        <FormattedMessage
+          id="TwoFactorAuth.Setup.Form.InputLabel.YubiKey"
+          defaultMessage="Please enter your 6-digit code without any dashes or select the input below, plug your YubiKey and press it to generate a code."
+        />
+      ) : (
+        <FormattedMessage
+          id="TwoFactorAuth.Setup.Form.InputLabel"
+          defaultMessage="Please enter your 6-digit code without any dashes."
+        />
+      )}
+
+      <StyledInput
+        id="2fa-code-input"
+        name="2fa-code-input"
+        type="text"
+        mt={3}
+        minHeight={50}
+        fontSize="20px"
+        placeholder={props.supportedMethods.includes('yubikey_otp') ? '123456 or YubiKey: cccc...' : '123456'}
+        pattern={!props.supportedMethods.includes('yubikey_otp') && '[0-9]{6}'}
+        inputMode="numeric"
+        value={props.value}
+        onChange={e => props.onChange(e.target.value)}
+        disabled={props.disabled}
+        autoFocus
+      />
+    </Box>
+  );
+}
+
+function RecoveryCodeOptions(props: { value: string; onChange: (string) => void; disabled: boolean }) {
+  return (
+    <Box>
+      <FormattedMessage
+        id="TwoFactorAuth.RecoveryCodes.Form.InputLabel"
+        defaultMessage="Please enter one of your alphanumeric recovery codes."
+      />
+      <StyledInput
+        id="2fa-code-input"
+        name="2fa-code-input"
+        type="text"
+        mt={3}
+        minHeight={50}
+        fontSize="20px"
+        inputMode="numeric"
+        value={props.value}
+        onChange={e => props.onChange(e.target.value)}
+        disabled={props.disabled}
+        autoFocus
+      />
+    </Box>
+  );
+}
+
+function WebauthnOption() {
+  return (
+    <Box>
+      <FormattedMessage defaultMessage="Use your device for two factor authentication" />
+    </Box>
+  );
 }

@@ -241,7 +241,7 @@ class UserSecurity extends React.Component {
     }
 
     const account = get(data, 'individual', null);
-    const twoFactorMethods = get(account, 'twoFactorMethods', []);
+    const twoFactorMethods = get(account, 'twoFactorMethods', []) || [];
 
     return (
       <Flex flexDirection="column">

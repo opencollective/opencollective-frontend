@@ -257,7 +257,7 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
                 </TokenBox>
               </Flex>
               <form onSubmit={formik.handleSubmit}>
-                <Flex gap="20px" alignItems="center">
+                <Flex gap="20px">
                   <StyledInputField
                     required
                     mt={2}
@@ -285,7 +285,7 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
                       />
                     )}
                   </StyledInputField>
-                  <Box mt={3}>
+                  <Box mt={4}>
                     <StyledButton
                       type="submit"
                       loading={formik.isSubmitting}
