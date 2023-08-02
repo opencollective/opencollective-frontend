@@ -2,6 +2,7 @@ import React, { Fragment, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
+import { Search } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -21,6 +22,8 @@ import SearchModal from '../Search';
 import SearchTrigger from '../SearchTrigger';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
+import { Span } from '../Text';
+import { VerticalSeparator } from '../ui/Separator';
 
 import ProfileMenu from './ProfileMenu';
 
@@ -289,6 +292,17 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
                   </PopupMenu>
                 )}
               </NavList>
+              <VerticalSeparator style={{ margin: '0px 16px', height: '20px' }} />
+              <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
+                <Flex>
+                  <Search size={18} />
+                  <Hide xs sm>
+                    <Span ml="5px">
+                      <FormattedMessage id="Search" defaultMessage="Search" />
+                    </Span>
+                  </Hide>
+                </Flex>
+              </NavButton>
             </Flex>
           </Hide>
         ) : (
@@ -322,7 +336,12 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
         <Flex alignItems="center" gridGap={2} flexShrink={4} flexGrow={0}>
           {showProfileAndChangelogMenu && (
             <Fragment>
-              <SearchTrigger setShowSearchModal={setShowSearchModal} />
+              {onHomeRoute && (
+                <MainNavItem href="/dashboard">
+                  <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+                </MainNavItem>
+              )}
+              {!onHomeRoute && <SearchTrigger setShowSearchModal={setShowSearchModal} />}
               <Hide xs>
                 <ChangelogTrigger height="40px" width="40px" />
               </Hide>
