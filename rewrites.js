@@ -135,6 +135,14 @@ exports.REWRITES = [
     destination: '/dashboard',
   },
   {
+    source: '/workspace',
+    destination: '/dashboard',
+  },
+  {
+    source: '/workspace/:slug/:section?/:subpath*',
+    destination: '/dashboard',
+  },
+  {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',
     destination: '/admin-panel',
   },

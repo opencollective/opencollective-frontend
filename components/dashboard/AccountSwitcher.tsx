@@ -155,7 +155,7 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
     <React.Fragment>
       <StyledMenuEntry
         key={account.id}
-        href={`/dashboard/${account.slug}`}
+        href={`/workspace/${account.slug}`}
         title={account.name}
         $isActive={activeSlug === account.slug}
       >
@@ -183,7 +183,7 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
           .map(child => (
             <StyledMenuEntry
               key={child?.id}
-              href={`/dashboard/${child.slug}`}
+              href={`/workspace/${child.slug}`}
               title={child.name}
               $isActive={activeSlug === child.slug}
               ml={3}
@@ -220,7 +220,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
               <Flex p={2} flexDirection="column" gridGap={3}>
                 <StyledMenuEntry
                   key={loggedInUserCollective?.id}
-                  href={`/dashboard/${loggedInUserCollective?.slug}`}
+                  href={`/workspace/${loggedInUserCollective?.slug}`}
                   title={loggedInUserCollective?.name}
                   $isActive={activeSlug === loggedInUserCollective?.slug}
                 >

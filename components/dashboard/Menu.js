@@ -141,7 +141,7 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
             ) : isType(account, COLLECTIVE) ? (
               <FormattedMessage id="CollectiveDashboard" defaultMessage="Collective Dashboard" />
             ) : (
-              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+              <FormattedMessage id="Workspace" defaultMessage="Workspace" />
             )}
           </MenuSectionHeader>
         )}

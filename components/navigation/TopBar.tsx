@@ -159,8 +159,8 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
     '/e2c',
   ];
   const onHomeRoute = homepageRoutes.some(isRouteActive);
-  const onDashboardRoute = isRouteActive('/dashboard');
-  const ocLogoRoute = onHomeRoute ? '/home' : '/dashboard';
+  const onDashboardRoute = isRouteActive('/workspace');
+  const ocLogoRoute = onHomeRoute ? '/home' : '/workspace';
 
   return (
     <Fragment>
@@ -308,8 +308,8 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
         ) : (
           <Flex flex={1} alignItems="center" gridGap={3} overflow={'hidden'}>
             {onDashboardRoute ? (
-              <MainNavItem href="/dashboard">
-                <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+              <MainNavItem href="/workspace">
+                <FormattedMessage id="Workspace" defaultMessage="Workspace" />
               </MainNavItem>
             ) : account || loading ? (
               <Flex alignItems="center" gridGap="0" maxWidth="100%" flexGrow={4}>
@@ -337,8 +337,8 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
           {showProfileAndChangelogMenu && (
             <Fragment>
               {onHomeRoute && (
-                <MainNavItem href="/dashboard">
-                  <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+                <MainNavItem href="/workspace">
+                  <FormattedMessage id="Workspace" defaultMessage="Workspace" />
                 </MainNavItem>
               )}
               {!onHomeRoute && <SearchTrigger setShowSearchModal={setShowSearchModal} />}
