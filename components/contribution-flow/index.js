@@ -52,6 +52,7 @@ import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import ContributionFlowSuccess from './ContributionFlowSuccess';
 import ContributionSummary from './ContributionSummary';
 import { validateNewOrg } from './CreateOrganizationForm';
+import { PlatformTipOption } from './PlatformTipContainer';
 import { DEFAULT_PLATFORM_TIP_PERCENTAGE } from './PlatformTipInput';
 import {
   ContributionFlowUrlQueryHelper,
@@ -176,6 +177,7 @@ class ContributionFlow extends React.Component {
           : getDefaultInterval(props.tier),
         amount,
         platformTip: this.canHavePlatformTips() ? Math.round(amount * quantity * DEFAULT_PLATFORM_TIP_PERCENTAGE) : 0,
+        platformTipOption: PlatformTipOption.FIFTEEN_PERCENT,
         currency,
       },
     };
