@@ -9,6 +9,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
 import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
+import { updateExpenseItemWithUploadResult } from './lib/ocr';
 
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
@@ -133,6 +134,7 @@ const ExpenseItemForm = ({
   onCurrencyChange,
   isInvoice,
   isLastItem,
+  hasOCRFeature,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -172,6 +174,11 @@ const ExpenseItemForm = ({
                     size={[84, 112]}
                     value={hasValidUrl && field.value}
                     onReject={onUploadError}
+                    useGraphQL={hasOCRFeature}
+                    parseDocument={hasOCRFeature}
+                    onGraphQLSuccess={uploadResults => {
+                      updateExpenseItemWithUploadResult(form, uploadResults[0], name);
+                    }}
                   />
                 </StyledInputField>
               );
@@ -309,6 +316,8 @@ ExpenseItemForm.propTypes = {
   requireDate: PropTypes.bool,
   /** Whether this whole item is optional */
   isOptional: PropTypes.bool,
+  /** Whether the OCR feature is enabled */
+  hasOCRFeature: PropTypes.bool,
   /** Whether this item is the first in the list */
   hasMultiCurrency: PropTypes.bool,
   /** True if description is HTML */

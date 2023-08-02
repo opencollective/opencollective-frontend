@@ -2,6 +2,7 @@ import React from 'react';
 import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
 import { attachmentDropzoneParams } from './lib/attachments';
 
 import { Flex } from '../Grid';
@@ -20,7 +21,7 @@ type AttachedFilesFormProps = {
   title: React.ReactNode;
   description?: React.ReactNode;
   isMulti?: boolean;
-  kind: string;
+  kind: UploadedFileKind | `${UploadedFileKind}`;
   name: string;
   openFileViewer?: (fileUrl: string) => void;
 };

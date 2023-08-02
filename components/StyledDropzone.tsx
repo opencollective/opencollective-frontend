@@ -7,6 +7,8 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
+import { UploadedFileKind, UploadFileResult } from '../lib/graphql/types/v2/graphql';
+import { useGraphQLFileUploader } from '../lib/hooks/useGraphQLFileUploader';
 import { useImageUploader } from '../lib/hooks/useImageUploader';
 
 import Container from './Container';
@@ -101,16 +103,33 @@ const StyledDropzone = ({
   error = undefined,
   value,
   isMulti = true,
+  useGraphQL = false,
+  parseDocument = false,
+  onGraphQLSuccess = undefined,
   kind,
   ...props
 }: StyledDropzoneProps) => {
   const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess, onReject, kind, accept };
   const { uploadFiles, isUploading, uploadProgress } = useImageUploader(imgUploaderParams);
+  const { isUploading: isUploadingWithGraphQL, uploadFile: uploadFileWithGraphQL } = useGraphQLFileUploader({
+    mockImageGenerator,
+    onSuccess: onGraphQLSuccess,
+    onReject,
+  });
+
+  // Sanity checks
+  if (parseDocument && !useGraphQL) {
+    throw new Error('StyledDropzone: parseDocument can only be used with useGraphQL');
+  } else if (parseDocument && collectFilesOnly) {
+    throw new Error('StyledDropzone: parseDocument cannot be used with collectFilesOnly');
+  }
 
   const onDrop = React.useCallback(
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {
       if (collectFilesOnly) {
         onSuccess(acceptedFiles, fileRejections);
+      } else if (useGraphQL) {
+        uploadFileWithGraphQL(acceptedFiles.map(file => ({ file, kind, parseDocument })));
       } else {
         uploadFiles(acceptedFiles, fileRejections);
       }
@@ -132,7 +151,7 @@ const StyledDropzone = ({
       error={error}
     >
       <input name={name} {...getInputProps()} />
-      {isLoading || isUploading ? (
+      {isLoading || isUploading || isUploadingWithGraphQL ? (
         <Container
           position="relative"
           display="flex"
@@ -242,7 +261,7 @@ type StyledDropzoneProps = {
   /** To have square container */
   size?: number;
   /** A function to generate mock images */
-  mockImageGenerator?: () => void;
+  mockImageGenerator?: () => string;
   /** Filetypes to accept */
   accept: Accept;
   /** Min file size */
@@ -254,10 +273,13 @@ type StyledDropzoneProps = {
   /** required field */
   required?: boolean;
   /** A unique identified for the category of uploaded files */
-  kind: string;
+  kind: UploadedFileKind | `${UploadedFileKind}`;
   /** To disabled the input */
   disabled?: boolean;
   value?: any;
+  useGraphQL?: boolean;
+  onGraphQLSuccess?: (result: UploadFileResult[]) => void;
+  parseDocument?: boolean;
 } & (
   | {
       /** Collect File only, do not upload files */

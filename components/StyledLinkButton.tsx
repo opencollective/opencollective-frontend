@@ -2,8 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import { color, ColorProps, typography, TypographyProps, variant } from 'styled-system';
 
+import { textDecoration, TextDecorationProps } from '../lib/styled-system-custom-properties';
+
 type StyledLinkButtonProps = ColorProps &
   TypographyProps &
+  TextDecorationProps &
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
     hoverColor?: string;
     variant?: 'danger';
@@ -21,6 +24,7 @@ const StyledLinkButton = styled.button<StyledLinkButtonProps>`
 
   ${color}
   ${typography}
+  ${textDecoration}
 
   :hover {
     color: ${props => props.hoverColor};
