@@ -176,7 +176,7 @@ describe('edit user collective', () => {
         // typing the wrong code fails
         cy.getByDataCy('add-two-factor-auth-totp-code-field').type('123456');
         cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
-        cy.getByDataCy('add-two-factor-auth-error').should('exist');
+        cy.getByDataCy('InputField-twoFactorAuthenticatorCode').contains('Invalid code');
         // typing the right code passes
         const TOTPCode = speakeasy.totp({
           algorithm: 'SHA1',
@@ -189,7 +189,7 @@ describe('edit user collective', () => {
         cy.getByDataCy('recovery-codes-container').children().should('have.length', 6);
         cy.getByDataCy('add-two-factor-auth-confirm-recovery-codes-button').click();
         cy.getByDataCy('confirmation-modal-continue').click();
-        cy.getByDataCy('add-two-factor-auth-success').should('exist');
+        cy.contains('Two-factor authentication (2FA) is enabled on this account.').should('exist');
       });
   });
 });

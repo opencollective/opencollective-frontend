@@ -291,6 +291,7 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
                       loading={formik.isSubmitting}
                       buttonSize="small"
                       buttonStyle="secondary"
+                      data-cy="add-two-factor-auth-totp-code-button"
                     >
                       <FormattedMessage id="actions.verify" defaultMessage="Verify" />
                     </StyledButton>
