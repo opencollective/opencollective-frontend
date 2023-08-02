@@ -1,11 +1,15 @@
 import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { formatCurrency } from '../../lib/currency-utils';
+import { Currency } from '../../lib/graphql/types/v2/graphql';
 import theme from '../../lib/theme';
 
 import { Box, Flex } from '../Grid';
+import { I18nBold } from '../I18nFormatters';
 import Image from '../Image';
 import StyledButtonSet from '../StyledButtonSet';
+import StyledHr from '../StyledHr';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledLinkButton from '../StyledLinkButton';
 import { P } from '../Text';
@@ -123,9 +127,21 @@ type PlatformTipContainerProps = {
   amount: number;
   currency: string;
   onChange: (selectedOption: PlatformTipOption, value?: number) => void;
+  step: string;
 };
 
 export function PlatformTipContainer(props: PlatformTipContainerProps) {
+  const intl = useIntl();
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
+
+  React.useEffect(() => {
+    if (props.step === 'details') {
+      setIsCollapsed(false);
+    } else {
+      setIsCollapsed(true);
+    }
+  }, [props.step]);
+
   const [isWhyPlatformTipModalOpen, setIsWhyPlatformTipModalOpen] = React.useState(false);
   return (
     <React.Fragment>
@@ -138,36 +154,58 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
       >
         <Flex alignItems="center" gap={10}>
           <Image alt="Platform Tip" src="/static/images/platform-tip-jar.png" height={64} width={64} />
-          <P fontWeight="500" fontSize="20px">
+          <Box flexGrow={1} fontWeight="500" fontSize="20px">
             <FormattedMessage defaultMessage="Keep Open Collective Sustainable" />
-          </P>
-        </Flex>
-        <P mt="12px" fontWeight="400" fontSize="16px">
-          <FormattedMessage defaultMessage="Adding a platform tip helps us to maintain the platform and introduce new features." />
-        </P>
-        <Flex mt="12px">
-          <Box flexGrow={1} fontWeight="700" fontSize="16px">
-            <FormattedMessage defaultMessage="Do you want to add a tip?" />
+            {isCollapsed && <StyledHr my={2} />}
+            {isCollapsed && (
+              <Flex fontSize="14px" gap="20px">
+                <Box>
+                  <FormattedMessage
+                    defaultMessage="Your tip: <bold>{amount}</bold> ({percentage}%)"
+                    values={{
+                      bold: I18nBold,
+                      amount: formatCurrency(props.value, props.currency as Currency, { locale: intl.locale }),
+                      percentage: ((props.value / props.amount) * 100).toFixed(2),
+                    }}
+                  />
+                </Box>
+                <StyledLinkButton onClick={() => setIsCollapsed(false)}>
+                  <FormattedMessage id="Edit" defaultMessage="Edit" />
+                </StyledLinkButton>
+              </Flex>
+            )}
           </Box>
-          <P fontStyle="italic">
-            <StyledLinkButton onClick={() => setIsWhyPlatformTipModalOpen(true)}>
-              <FormattedMessage defaultMessage="Why?" />
-            </StyledLinkButton>
-          </P>
         </Flex>
-        <Box mt="12px">
-          <PlatformTipInput
-            disabled={!props.amount}
-            amount={props.amount}
-            currency={props.currency}
-            selectedOption={props.selectedOption}
-            value={props.value}
-            onChange={props.onChange}
-          />
-        </Box>
-        <P mt="12px" fontWeight="400" fontSize="16px">
-          <FormattedMessage defaultMessage="Thanks for your help." />
-        </P>
+        {!isCollapsed && (
+          <React.Fragment>
+            <P mt="12px" fontWeight="400" fontSize="16px">
+              <FormattedMessage defaultMessage="Adding a platform tip helps us to maintain the platform and introduce new features." />
+            </P>
+            <Flex mt="12px">
+              <Box flexGrow={1} fontWeight="700" fontSize="16px">
+                <FormattedMessage defaultMessage="Do you want to add a tip?" />
+              </Box>
+              <P fontStyle="italic">
+                <StyledLinkButton onClick={() => setIsWhyPlatformTipModalOpen(true)}>
+                  <FormattedMessage defaultMessage="Why?" />
+                </StyledLinkButton>
+              </P>
+            </Flex>
+            <Box mt="12px">
+              <PlatformTipInput
+                disabled={!props.amount}
+                amount={props.amount}
+                currency={props.currency}
+                selectedOption={props.selectedOption}
+                value={props.value}
+                onChange={props.onChange}
+              />
+            </Box>
+            <P mt="12px" fontWeight="400" fontSize="16px">
+              <FormattedMessage defaultMessage="Thanks for your help." />
+            </P>
+          </React.Fragment>
+        )}
       </Box>
       {isWhyPlatformTipModalOpen && <WhyPlatformTipModal onClose={() => setIsWhyPlatformTipModalOpen(false)} />}
     </React.Fragment>
