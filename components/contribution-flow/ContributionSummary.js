@@ -110,11 +110,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
           {Boolean(platformTip) && (
             <AmountLine color="black.700">
               <Label>
-                <FormattedMessage
-                  id="SupportProject"
-                  defaultMessage="Support {projectName}"
-                  values={{ projectName: 'Open Collective' }}
-                />
+                <FormattedMessage defaultMessage="Optional tip to the platform" />
               </Label>
               <Amount data-cy="ContributionSummary-Tip">
                 <FormattedMoneyAmount
