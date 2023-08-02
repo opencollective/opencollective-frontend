@@ -18,9 +18,11 @@ import { WhyPlatformTipModal } from './WhyPlatformTipModal';
 
 const I18nMessages = defineMessages({
   NO_THANKS: {
-    defaultMessage: 'No thanks',
+    id: 'NoThankYou',
+    defaultMessage: 'No thank you',
   },
   OTHER: {
+    id: 'platformFee.Other',
     defaultMessage: 'Other',
   },
 });
@@ -89,9 +91,19 @@ function PlatformTipInput(props: PlatformTipInputProps) {
     [props.onChange],
   );
 
+  React.useEffect(() => {
+    const newTipAmount =
+      props.selectedOption === PlatformTipOption.OTHER
+        ? props.value
+        : options[props.selectedOption].percent * props.amount;
+
+    props.onChange(props.selectedOption, newTipAmount);
+  }, [options, props.amount, props.value, props.selectedOption]);
+
   return (
-    <Box>
+    <Box data-cy="platform-tip-input">
       <StyledButtonSet
+        data-cy="platform-tip-options"
         disabled={props.disabled}
         items={[
           PlatformTipOption.NONE,
@@ -110,6 +122,7 @@ function PlatformTipInput(props: PlatformTipInputProps) {
           <StyledInputAmount
             id="feesOnTop"
             name="platformTip"
+            data-cy="platform-tip-other-amount"
             disabled={props.disabled}
             currency={props.currency}
             onChange={onOtherChange}
@@ -151,6 +164,8 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
         mx={[16, 'none']}
         style={{ borderRadius: '15px' }}
         backgroundColor={theme.colors.black[50]}
+        data-cy="platform-tip-container"
+        display={props.amount === 0 ? 'none' : 'block'}
       >
         <Flex alignItems="center" gap={10}>
           <Image alt="Platform Tip" src="/static/images/platform-tip-jar.png" height={64} width={64} />
@@ -159,7 +174,7 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
             {isCollapsed && <StyledHr my={2} />}
             {isCollapsed && (
               <Flex fontSize="14px" gap="20px">
-                <Box>
+                <Box data-cy="platform-tip-collapsed">
                   <FormattedMessage
                     defaultMessage="Your tip: <bold>{amount}</bold> ({percentage}%)"
                     values={{
