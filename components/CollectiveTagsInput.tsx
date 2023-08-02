@@ -188,7 +188,7 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
             placeholder={intl.formatMessage({ id: 'collective.tags.input.placeholder', defaultMessage: '+ Add tags' })}
             isMulti
             value={selected}
-            menuPortalTarget={document.body}
+            menuPortalTarget={typeof document === 'undefined' ? null : document.body}
             components={{
               MultiValue,
               SelectContainer,

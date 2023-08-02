@@ -23,6 +23,7 @@ export default {
     'ResizeObserver loop limit exceeded',
     'ResizeObserver loop completed with undelivered notifications.',
     'globalThis is not defined', // Happens on old browsers, see https://caniuse.com/?search=globalThis
+    "Can't find variable: globalThis", // Happens on old browsers, see https://caniuse.com/?search=globalThis
   ],
   denyUrls: [
     // Chrome extensions
