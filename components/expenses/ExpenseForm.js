@@ -97,22 +97,27 @@ export const msg = defineMessages({
   },
 });
 
-const getDefaultExpense = collective => ({
-  description: '',
-  longDescription: '',
-  items: [],
-  attachedFiles: [],
-  payee: null,
-  payoutMethod: undefined,
-  privateMessage: '',
-  invoiceInfo: '',
-  currency: collective.currency,
-  taxes: null,
-  payeeLocation: {
-    address: '',
-    country: null,
-  },
-});
+const getDefaultExpense = (collective, supportedExpenseTypes) => {
+  const isSingleSupportedExpenseType = supportedExpenseTypes.length === 1;
+
+  return {
+    description: '',
+    longDescription: '',
+    items: [],
+    attachedFiles: [],
+    payee: null,
+    payoutMethod: undefined,
+    privateMessage: '',
+    invoiceInfo: '',
+    currency: collective.currency,
+    taxes: null,
+    type: isSingleSupportedExpenseType ? supportedExpenseTypes[0] : undefined,
+    payeeLocation: {
+      address: '',
+      country: null,
+    },
+  };
+};
 
 const CREATE_PAYEE_PROFILE_FIELDS = ['name', 'email', 'legalName', 'organization', 'newsletterOptIn'];
 
@@ -462,6 +467,7 @@ const ExpenseFormBody = ({
         editingExpense={editingExpense}
         resetDefaultStep={() => setStep(EXPENSE_FORM_STEPS.PAYEE)}
         formPersister={formPersister}
+        supportedExpenseTypes={supportedExpenseTypes}
         getDefaultExpense={getDefaultExpense}
         onInvite={isInvite => {
           setOnBehalf(isInvite);
@@ -533,7 +539,7 @@ const ExpenseFormBody = ({
               onCancel();
             } else {
               setStep(EXPENSE_FORM_STEPS.PAYEE);
-              resetForm({ values: getDefaultExpense(collective) });
+              resetForm({ values: getDefaultExpense(collective, supportedExpenseTypes) });
               if (formPersister) {
                 formPersister.clearValues();
                 window.scrollTo(0, 0);
@@ -835,12 +841,7 @@ const ExpenseForm = ({
   const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
   const intl = useIntl();
   const supportedExpenseTypes = React.useMemo(() => getSupportedExpenseTypes(collective), [collective]);
-  const isSingleSupportedExpenseType = supportedExpenseTypes.length === 1;
-  const initialValues = {
-    ...getDefaultExpense(collective),
-    type: !isDraft && isSingleSupportedExpenseType ? supportedExpenseTypes[0] : undefined,
-    ...expense,
-  };
+  const initialValues = { ...getDefaultExpense(collective, supportedExpenseTypes), ...expense };
   const validate = expenseData => validateExpense(intl, expenseData);
   if (isDraft) {
     initialValues.items = expense.draft.items?.map(newExpenseItem) || [];

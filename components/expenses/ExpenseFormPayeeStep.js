@@ -226,6 +226,7 @@ const ExpenseFormPayeeStep = ({
   editingExpense,
   resetDefaultStep,
   formPersister,
+  supportedExpenseTypes,
   getDefaultExpense,
   drawerActionsContainer,
 }) => {
@@ -364,7 +365,7 @@ const ExpenseFormPayeeStep = ({
               onCancel();
             } else {
               resetDefaultStep();
-              formik.resetForm({ values: getDefaultExpense(collective) });
+              formik.resetForm({ values: getDefaultExpense(collective, supportedExpenseTypes) });
               if (formPersister) {
                 formPersister.clearValues();
                 window.scrollTo(0, 0);
@@ -563,6 +564,7 @@ ExpenseFormPayeeStep.propTypes = {
   editingExpense: PropTypes.bool,
   resetDefaultStep: PropTypes.func,
   formPersister: PropTypes.object,
+  supportedExpenseTypes: PropTypes.arrayOf(PropTypes.string),
   getDefaultExpense: PropTypes.func,
   payoutProfiles: PropTypes.array,
   onCancel: PropTypes.func,
