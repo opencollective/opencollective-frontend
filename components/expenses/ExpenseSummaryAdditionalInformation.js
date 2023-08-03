@@ -10,7 +10,7 @@ import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payout-method';
 import formatCollectiveType from '../../lib/i18n/collective-type';
-import { getDashboardRoute } from '../../lib/url-helpers';
+import { getWorkspaceRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -174,7 +174,7 @@ const ExpenseSummaryAdditionalInformation = ({
                 fontWeight="700"
                 color="black.700"
                 textDecoration="underline"
-                href={`${getDashboardRoute(host, 'host-agreements')}?account=${collective.slug}`}
+                href={`${getWorkspaceRoute(host, 'host-agreements')}?account=${collective.slug}`}
               >
                 <FormattedMessage
                   defaultMessage="Host Agreements: <Color>{agreementsCount}</Color>"
