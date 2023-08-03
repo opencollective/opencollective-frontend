@@ -7,7 +7,7 @@ import ReactAnimateHeight from 'react-animate-height';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { getDashboardRoute } from '../../lib/url-helpers';
+import { getWorkspaceRoute } from '../../lib/url-helpers';
 
 import { Flex } from '../Grid';
 import Link from '../Link';
@@ -113,7 +113,7 @@ export const MenuLink = ({
     setExpandedSection?.(section);
     onClick?.(e);
     if (goToSection) {
-      router.push({ pathname: getDashboardRoute(account, goToSection) });
+      router.push({ pathname: getWorkspaceRoute(account, goToSection) });
     }
   };
 
@@ -150,7 +150,7 @@ export const MenuLink = ({
         ) : (
           <Link
             onClick={handleClick}
-            href={getDashboardRoute(account, goToSection ? goToSection : section)}
+            href={getWorkspaceRoute(account, goToSection ? goToSection : section)}
             data-cy={`menu-item-${section}`}
           >
             {renderButtonContent()}
