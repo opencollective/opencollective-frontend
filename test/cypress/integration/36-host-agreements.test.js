@@ -1,7 +1,7 @@
 describe('Host agreements', () => {
   it('Use the agreements admin to create and edit agreements', () => {
     // ---- Load the list filter by newly created account ----
-    cy.login({ redirect: `/dashboard/brusselstogetherasbl/host-agreements` });
+    cy.login({ redirect: `/workspace/brusselstogetherasbl/host-agreements` });
     cy.contains('[data-cy="agreements-table"]', 'No agreements'); // Starts with no agreements
 
     // ---- Create an agreement ----
@@ -59,7 +59,7 @@ describe('Host agreements', () => {
     cy.getByDataCy('menu-item-host-expenses').click();
     cy.contains('[data-cy="expense-container-2340"]', 'Vegan Dining Week Client Dinner').as('expense');
     cy.get('@expense')
-      .find('a[href="/dashboard/brusselstogetherasbl/host-agreements?account=veganizerbxl"]')
+      .find('a[href="/workspace/brusselstogetherasbl/host-agreements?account=veganizerbxl"]')
       .contains('1 agreement');
 
     // ---- Agreement count should be displayed on the expense ----
@@ -67,7 +67,7 @@ describe('Host agreements', () => {
     cy.getByDataCy('expense-drawer').should('be.visible'); // Wait for the page to load
     cy.getByDataCy('expense-summary-collective').contains('Host Agreements: 1');
     cy.getByDataCy('expense-summary-collective')
-      .find('a[href="/dashboard/brusselstogetherasbl/host-agreements?account=veganizerbxl"]')
+      .find('a[href="/workspace/brusselstogetherasbl/host-agreements?account=veganizerbxl"]')
       .click();
 
     // ---- Delete the agreements ----
