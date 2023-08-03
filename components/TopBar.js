@@ -93,7 +93,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
     return regex.test(router.asPath);
   };
 
-  const onDashboardRoute = isRouteActive('/dashboard');
+  const onDashboardRoute = isRouteActive('/workspace');
 
   const useDashboard =
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) ||

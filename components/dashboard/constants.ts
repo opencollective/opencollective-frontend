@@ -52,6 +52,7 @@ export const FISCAL_HOST_SECTIONS = {
 
 export const COLLECTIVE_SECTIONS = {
   HOME: 'home',
+  DASHBOARD_OVERVIEW: 'overview',
   CONTRIBUTIONS: 'contributions',
   ADVANCED: 'advanced',
   AUTHORIZED_APPS: 'authorized-apps',
@@ -154,6 +155,10 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Overview',
   },
   [ALL_SECTIONS.BUDGET_MANAGEMENT]: {
+    id: 'AdminPanel.Menu.Overview',
+    defaultMessage: 'Overview',
+  },
+  [ALL_SECTIONS.DASHBOARD_OVERVIEW]: {
     id: 'AdminPanel.Menu.Overview',
     defaultMessage: 'Overview',
   },

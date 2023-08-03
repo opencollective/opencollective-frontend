@@ -335,7 +335,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
               {collective.isHost ? (
                 <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
               ) : LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) ? (
-                <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+                <FormattedMessage id="Workspace" defaultMessage="Workspace" />
               ) : (
                 <FormattedMessage id="Settings" defaultMessage="Settings" />
               )}

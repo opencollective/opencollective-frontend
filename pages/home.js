@@ -34,7 +34,7 @@ const HomePage = () => {
 
   useEffect(() => {
     if (shouldRedirectToDashboard) {
-      router.replace('/dashboard');
+      router.replace('/workspace');
     }
   }, [shouldRedirectToDashboard]);
 

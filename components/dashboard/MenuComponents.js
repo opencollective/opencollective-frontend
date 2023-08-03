@@ -9,7 +9,7 @@ import styled, { css } from 'styled-components';
 
 import { getDashboardRoute } from '../../lib/url-helpers';
 
-import { Box, Flex } from '../Grid';
+import { Flex } from '../Grid';
 import Link from '../Link';
 import StyledLink from '../StyledLink';
 import { Span } from '../Text';
@@ -17,7 +17,7 @@ import { Span } from '../Text';
 import { SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
 
-const MenuLinkContainer = styled.li`
+const MenuLinkContainer = styled.div`
   a,
   ${StyledLink} {
     display: flex;
@@ -25,8 +25,8 @@ const MenuLinkContainer = styled.li`
     font-weight: 600;
     font-size: 14px;
     line-height: 20px;
-    padding: 8px;
-    border-radius: 6px;
+    padding: 8px 12px;
+    border-radius: 16px;
     -webkit-font-smoothing: antialiased;
     width: 100%;
     cursor: pointer;
@@ -38,7 +38,7 @@ const MenuLinkContainer = styled.li`
     ${props =>
       props.isSelected
         ? css`
-            background: ${props => props.theme.colors.black[50]};
+            background: ${props => props.theme.colors.primary[50]};
             color: ${props => props.theme.colors.primary[700]} !important;
             &:hover {
               color: ${props => props.theme.colors.primary[700]} !important;
@@ -48,7 +48,7 @@ const MenuLinkContainer = styled.li`
             color: ${props => props.theme.colors.black[900]} !important;
             &:hover {
               color: ${props => props.theme.colors.primary[700]} !important;
-              background: ${props => props.theme.colors.black[50]};
+              background: ${props => props.theme.colors.primary[50]};
             }
           `}
 
@@ -190,35 +190,11 @@ export const MenuSectionHeader = styled.div`
   color: ${props => props.theme.colors.black[600]};
 `;
 
-export const MenuContainer = styled.ul`
-  margin: 0;
-  max-width: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  grid-gap: 4px;
-  a {
-    color: ${props => props.theme.colors.black[900]};
-    &:hover {
-      color: ${props => props.theme.colors.black[700]};
-    }
-  }
-
-  &,
-  & ul {
-    list-style-type: none;
-    padding: 0;
-    & li {
-      padding: 2px 0;
-    }
-  }
-`;
-
 export const MenuGroup = ({ if: conditional, children, ...props }) => {
   return conditional === false ? null : (
-    <Box as="ul" {...props}>
+    <Flex flexDirection="column" gap="8px" {...props}>
       {children}
-    </Box>
+    </Flex>
   );
 };
 

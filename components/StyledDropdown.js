@@ -119,6 +119,7 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
     </div>
   );
 })`
+  flex-grow: 1;
   ${props =>
     props.trigger === 'hover'
       ? css`
