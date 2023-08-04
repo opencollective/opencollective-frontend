@@ -153,20 +153,23 @@ const UploadedFilePreview = ({
     content = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt || fileName} />;
   }
 
+  const getContainerAttributes = () => {
+    if (isPrivate) {
+      return { as: 'div' };
+    } else if (isText || !openFileViewer) {
+      return { href: url, openInNewTab: true, as: url.startsWith('/') ? Link : StyledLink };
+    } else {
+      return {
+        as: 'div',
+        onClick: () => {
+          openFileViewer(url);
+        },
+      };
+    }
+  };
+
   return (
-    <MainContainer
-      color="black.700"
-      {...props}
-      maxWidth={size}
-      {...(isText || !openFileViewer
-        ? { href: url, openInNewTab: true, as: url.startsWith('/') ? Link : StyledLink }
-        : {
-            onClick: () => {
-              openFileViewer(url);
-            },
-            as: 'div',
-          })}
-    >
+    <MainContainer color="black.700" {...props} maxWidth={size} {...getContainerAttributes()}>
       <CardContainer size={size} maxHeight={maxHeight} title={fileName} border={border}>
         {content}
       </CardContainer>
