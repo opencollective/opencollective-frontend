@@ -1519,7 +1519,6 @@
   "GithubRepositories.faq.cost.title": "Ile to kosztuje?",
   "GithubRepositories.faq.host.content": "Open Source Collective 501(c)(6) jest amerykańskim podmiotem nienastawionym na zysk, który został stworzony w celu pełnienia funkcji hosta fiskalnego (aka sponsora podatkowego) dla projektów typu open source za pomocą Open Collective. Dowiedz się więcej o OSC na https://oscollective.org.",
   "GithubRepositories.faq.host.title": "Kto będzie trzymał pieniądze dla mojej Zbiórki?",
-  "GiveFeedback": "Give feedback",
   "gKqXcg": "Wyświetl kwotę",
   "GLo1nw": "Dołącz wiadomość do administratorów zbiórki (opcjonalnie)",
   "gN829M": "Możesz użyć Webhook, aby zbudować własną integrację z Open Collective. Webhooki Slack i Discord są obsługiwane bezpośrednio. Możesz również zintegrować je z narzędziami takimi jak Zapier, IFTTT lub Huginn. Dowiedz się więcej na ten temat z <DocLink>dokumentacji</DocLink> lub zobacz jak możesz pójść dalej używając naszego <GraphqlAPILink>publicznego API GraphQL</GraphqlAPILink>.",

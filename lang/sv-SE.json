@@ -1519,7 +1519,6 @@
   "GithubRepositories.faq.cost.title": "Vad kostar det?",
   "GithubRepositories.faq.host.content": "Open Source Collective 501(c)(6) är en amerikansk ideell organisation som skapades för att tillhandahålla finansiellt värdskap till projekt med öppen källkod som använder Open Collective. Läs mer om OSC på https://oscollective.org.",
   "GithubRepositories.faq.host.title": "Vem kommer att hantera pengarna för mitt kollektiv?",
-  "GiveFeedback": "Give feedback",
   "gKqXcg": "Display Amount",
   "GLo1nw": "Inkludera ett meddelande till administratörer för kollektivet (valfritt)",
   "gN829M": "Du kan använda Webhooks för att bygga anpassade integrationer med Open Collective. Slack och Discords webhooks stöds redan. Du kan också integrera dem med verktyg som Zapier, IFTTT eller Huginn. Läs mer om detta i <DocLink>dokumentationen</DocLink> eller se hur du kan använda vårt <GraphqlAPILink>publika GraphQL API</GraphqlAPILink>.",

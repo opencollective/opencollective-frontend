@@ -1519,7 +1519,6 @@
   "GithubRepositories.faq.cost.title": "What is the cost?",
   "GithubRepositories.faq.host.content": "Open Source Collective 501(c)(6) is a US non-profit that was created to serve as Fiscal Host (aka fiscal sponsor) to open source projects using Open Collective. Learn more about OSC at https://oscollective.org.",
   "GithubRepositories.faq.host.title": "Who will hold money for my Collective?",
-  "GiveFeedback": "Give feedback",
   "gKqXcg": "Display Amount",
   "GLo1nw": "Include a message to the Collective admins (Optional)",
   "gN829M": "Webhook を使用して Open Collective とのカスタム統合を構築できます。Slack と Discord の Webhook が標準でサポートされています。 それらを Zapier、IFTTT、Huginn などといったツールと統合することもできます。 詳細については、 <DocLink>このドキュメント</DocLink> をご覧いただくか、私たちが公開している <GraphqlAPILink>GraphQL API</GraphqlAPILink> を使用して、どんなことができるのかをご確認ください。",
