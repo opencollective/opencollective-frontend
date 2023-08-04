@@ -24,6 +24,18 @@ const Sticky = styled.div`
   z-index: 10;
 `;
 
+const menuWrapperMobileMixin = `
+  position: sticky;
+  top: 0px;
+  z-index: 1000;
+  background: #FFFE;
+  padding: 10px 0px;
+`;
+
+const MenuWrapper = styled(Box)`
+  ${props => (props.isMobile ? menuWrapperMobileMixin : '')}
+`;
+
 const MenuContainer = styled(Flex)`
   a {
     color: ${props => props.theme.colors.black[900]};
@@ -71,7 +83,7 @@ const AdminPanelSideBar = ({
   );
 
   return (
-    <Box {...props} flexGrow={0} flexShrink={0} width={['100%', '100%', '288px']}>
+    <MenuWrapper {...props} flexGrow={0} flexShrink={0} width={['100%', '100%', '288px']} isMobile={isMobile}>
       <Sticky>
         <MenuContainer flexDirection={['row-reverse', null, 'column']} m="0" gap="16px">
           <AccountSwitcher activeSlug={activeSlug} isLoading={isLoading} />
@@ -109,7 +121,7 @@ const AdminPanelSideBar = ({
           )}
         </MenuContainer>
       </Sticky>
-    </Box>
+    </MenuWrapper>
   );
 };
 
