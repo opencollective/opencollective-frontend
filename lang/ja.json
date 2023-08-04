@@ -1138,6 +1138,7 @@
   "Expense.AttachedReceipts": "添付レシート",
   "Expense.Attachment": "添付ファイル",
   "Expense.Attachments": "添付ファイル",
+  "expense.canceled": "Canceled",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "This will permanently delete the expense and all attachments and comments.",
   "Expense.Direction.Received": "請求を受けた分",
