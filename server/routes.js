@@ -19,6 +19,14 @@ const maxAge = (maxAge = 60) => {
 module.exports = (expressApp, nextApp) => {
   const app = expressApp;
 
+  // Add X-Robots-Tag header to prevent indexing non-production websites
+  if (process.env.OC_ENV !== 'production') {
+    app.use((req, res, next) => {
+      res.set('X-Robots-Tag', 'none');
+      next();
+    });
+  }
+
   app.use((req, res, next) => {
     if (!req.language && req.locale !== 'en') {
       // Prevent server side caching of non english content
@@ -52,8 +60,8 @@ module.exports = (expressApp, nextApp) => {
     return res.sendFile(path.join(__dirname, '../public/static/images/favicon.ico.png'));
   });
 
-  /* Helper to enable downloading files that are on S3 since Chrome and Firefox does 
-   not allow cross-origin downloads when using the download attribute on an anchor tag, 
+  /* Helper to enable downloading files that are on S3 since Chrome and Firefox does
+   not allow cross-origin downloads when using the download attribute on an anchor tag,
    see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-download. */
   app.get('/api/download-file', downloadFileHandler);
 
