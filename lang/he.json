@@ -1138,6 +1138,7 @@
   "Expense.AttachedReceipts": "מצורפות קבלות",
   "Expense.Attachment": "צרופה",
   "Expense.Attachments": "צרופות",
+  "expense.canceled": "Canceled",
   "expense.completed": "בוצע",
   "Expense.DeleteDetails": "פעולה זו תמחק לחלוטין את ההוצאה ואת כל הצרופות וההערות.",
   "Expense.Direction.Received": "Received",
