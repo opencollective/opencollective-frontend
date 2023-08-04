@@ -1138,6 +1138,7 @@
   "Expense.AttachedReceipts": "Bifogade kvitton",
   "Expense.Attachment": "Bilaga",
   "Expense.Attachments": "Bilagor",
+  "expense.canceled": "Canceled",
   "expense.completed": "Slutförd",
   "Expense.DeleteDetails": "Detta kommer att permanent ta bort utgiften, alla bilagor och kommentarer.",
   "Expense.Direction.Received": "Mottagen",
