@@ -7,9 +7,9 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { space } from 'styled-system';
 
-import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { getFilesFromExpense } from '../../lib/expenses';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
@@ -117,9 +117,9 @@ const ExpenseBudgetItem = ({
   const pendingReceipt = isCharge && expense?.items?.every(i => i.url === null);
   const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense]);
   const nbAttachedFiles = !isAdminView ? 0 : files.length;
-  const isExpensePaidOrRejected = [expenseStatus.REJECTED, expenseStatus.PAID].includes(expense?.status);
+  const isExpensePaidOrRejected = [ExpenseStatus.REJECTED, ExpenseStatus.PAID].includes(expense?.status);
   const shouldDisplayStatusTagActions =
-    (isExpensePaidOrRejected || expense?.status === expenseStatus.APPROVED) &&
+    (isExpensePaidOrRejected || expense?.status === ExpenseStatus.APPROVED) &&
     (hasProcessButtons(expense.permissions) || expense.permissions.canMarkAsIncomplete);
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency?.currency !== expense.currency;

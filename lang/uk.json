@@ -1138,6 +1138,7 @@
   "Expense.AttachedReceipts": "Прикріплені квитанції",
   "Expense.Attachment": "Вкладення",
   "Expense.Attachments": "Вкладення",
+  "expense.canceled": "Canceled",
   "expense.completed": "Завершені",
   "Expense.DeleteDetails": "Це остаточно видалить витрати, вкладення та коментарі.",
   "Expense.Direction.Received": "Отримано",

@@ -1138,6 +1138,7 @@
   "Expense.AttachedReceipts": "Priložené platobné doklady",
   "Expense.Attachment": "Príloha",
   "Expense.Attachments": "Prílohy",
+  "expense.canceled": "Canceled",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "Týmto sa natrvalo odstránia výdavky a všetky prílohy a komentáre.",
   "Expense.Direction.Received": "Received",

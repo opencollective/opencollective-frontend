@@ -5,9 +5,9 @@ import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import EXPENSE_STATUS from '../../lib/constants/expense-status';
 import { parseDateInterval } from '../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import { useLazyGraphQLPaginatedResults } from '../../lib/hooks/useLazyGraphQLPaginatedResults';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import useQueryFilter, { BooleanFilter } from '../../lib/hooks/useQueryFilter';
@@ -150,7 +150,7 @@ const onExpenseUpdate = ({ updatedExpense, cache, variables, refetchMetaData }) 
 const NB_EXPENSES_DISPLAYED = 10;
 
 const isValidStatus = status => {
-  return [...Object.values(EXPENSE_STATUS), 'READY_TO_PAY', 'ON_HOLD'].includes(status);
+  return [...Object.values(ExpenseStatus), 'READY_TO_PAY', 'ON_HOLD'].includes(status);
 };
 
 const getVariablesFromQuery = query => {

@@ -1138,6 +1138,7 @@
   "Expense.AttachedReceipts": "Прикрепленные квитанции",
   "Expense.Attachment": "Вложение",
   "Expense.Attachments": "Вложения",
+  "expense.canceled": "Canceled",
   "expense.completed": "Выполнено",
   "Expense.DeleteDetails": "This will permanently delete the expense and all attachments and comments.",
   "Expense.Direction.Received": "Получено",
