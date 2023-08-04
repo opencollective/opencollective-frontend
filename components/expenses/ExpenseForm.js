@@ -97,22 +97,27 @@ export const msg = defineMessages({
   },
 });
 
-const getDefaultExpense = collective => ({
-  description: '',
-  longDescription: '',
-  items: [],
-  attachedFiles: [],
-  payee: null,
-  payoutMethod: undefined,
-  privateMessage: '',
-  invoiceInfo: '',
-  currency: collective.currency,
-  taxes: null,
-  payeeLocation: {
-    address: '',
-    country: null,
-  },
-});
+const getDefaultExpense = (collective, supportedExpenseTypes) => {
+  const isSingleSupportedExpenseType = supportedExpenseTypes.length === 1;
+
+  return {
+    description: '',
+    longDescription: '',
+    items: [],
+    attachedFiles: [],
+    payee: null,
+    payoutMethod: undefined,
+    privateMessage: '',
+    invoiceInfo: '',
+    currency: collective.currency,
+    taxes: null,
+    type: isSingleSupportedExpenseType ? supportedExpenseTypes[0] : undefined,
+    payeeLocation: {
+      address: '',
+      country: null,
+    },
+  };
+};
 
 const CREATE_PAYEE_PROFILE_FIELDS = ['name', 'email', 'legalName', 'organization', 'newsletterOptIn'];
 
@@ -267,6 +272,7 @@ const ExpenseFormBody = ({
   isDraft,
   defaultStep,
   drawerActionsContainer,
+  supportedExpenseTypes,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -278,7 +284,6 @@ const ExpenseFormBody = ({
   const isReceipt = values.type === expenseTypes.RECEIPT;
   const isGrant = values.type === expenseTypes.GRANT;
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
-  const supportedExpenseTypes = React.useMemo(() => getSupportedExpenseTypes(collective), [collective]);
   const isRecurring = expense && expense.recurringExpense !== null;
   const stepOneCompleted =
     values.payoutMethod &&
@@ -463,6 +468,7 @@ const ExpenseFormBody = ({
         editingExpense={editingExpense}
         resetDefaultStep={() => setStep(EXPENSE_FORM_STEPS.PAYEE)}
         formPersister={formPersister}
+        supportedExpenseTypes={supportedExpenseTypes}
         getDefaultExpense={getDefaultExpense}
         onInvite={isInvite => {
           setOnBehalf(isInvite);
@@ -534,7 +540,7 @@ const ExpenseFormBody = ({
               onCancel();
             } else {
               setStep(EXPENSE_FORM_STEPS.PAYEE);
-              resetForm({ values: getDefaultExpense(collective) });
+              resetForm({ values: getDefaultExpense(collective, supportedExpenseTypes) });
               if (formPersister) {
                 formPersister.clearValues();
                 window.scrollTo(0, 0);
@@ -809,6 +815,7 @@ ExpenseFormBody.propTypes = {
     ),
   }),
   drawerActionsContainer: PropTypes.object,
+  supportedExpenseTypes: PropTypes.arrayOf(PropTypes.string),
 };
 
 /**
@@ -834,7 +841,8 @@ const ExpenseForm = ({
   const isDraft = expense?.status === expenseStatus.DRAFT;
   const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
   const intl = useIntl();
-  const initialValues = { ...getDefaultExpense(collective), ...expense };
+  const supportedExpenseTypes = React.useMemo(() => getSupportedExpenseTypes(collective), [collective]);
+  const initialValues = { ...getDefaultExpense(collective, supportedExpenseTypes), ...expense };
   const validate = expenseData => validateExpense(intl, expenseData);
   if (isDraft) {
     initialValues.items = expense.draft.items?.map(newExpenseItem) || [];
@@ -877,6 +885,7 @@ const ExpenseForm = ({
           isDraft={isDraft}
           defaultStep={defaultStep}
           drawerActionsContainer={drawerActionsContainer}
+          supportedExpenseTypes={supportedExpenseTypes}
         />
       )}
     </Formik>
