@@ -95,6 +95,8 @@ const StyledDropzone = ({
   accept,
   minSize,
   maxSize,
+  onSuccess,
+  collectFilesOnly,
   name,
   error = undefined,
   value,
@@ -102,18 +104,18 @@ const StyledDropzone = ({
   kind,
   ...props
 }: StyledDropzoneProps) => {
-  const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess: props.onSuccess, onReject, kind, accept };
+  const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess, onReject, kind, accept };
   const { uploadFiles, isUploading, uploadProgress } = useImageUploader(imgUploaderParams);
 
   const onDrop = React.useCallback(
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-      if (props.collectFilesOnly) {
-        props.onSuccess(acceptedFiles, fileRejections);
+      if (collectFilesOnly) {
+        onSuccess(acceptedFiles, fileRejections);
       } else {
         uploadFiles(acceptedFiles, fileRejections);
       }
     },
-    [props.collectFilesOnly, props.onSuccess, uploadFiles],
+    [collectFilesOnly, onSuccess, uploadFiles],
   );
   const dropzoneParams = { accept, minSize, maxSize, multiple: isMulti, onDrop };
   const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneParams);

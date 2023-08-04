@@ -124,6 +124,7 @@ export const prepareExpenseForSubmit = expenseData => {
   // The collective picker still uses API V1 for when creating a new profile on the fly
   const isInvoice = expenseData.type === expenseTypes.INVOICE;
   const isGrant = expenseData.type === expenseTypes.GRANT;
+  const keepAttachedFiles = isInvoice || isGrant;
 
   // Prepare payee
   let payee;
@@ -166,7 +167,7 @@ export const prepareExpenseForSubmit = expenseData => {
     payee,
     payeeLocation,
     payoutMethod,
-    attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
+    attachedFiles: keepAttachedFiles ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => prepareExpenseItemForSubmit(item, isInvoice, isGrant)),
   };
