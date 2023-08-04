@@ -189,7 +189,7 @@ const Transactions = ({
 
   return (
     <Container>
-      <Flex justifyContent="space-between" alignItems="baseline">
+      <Flex justifyContent="space-between" alignItems="baseline" gap="16px">
         <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
           <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
         </H1>
@@ -206,9 +206,11 @@ const Transactions = ({
         mb={['8px', '23px']}
         mt={4}
         mx="8px"
-        justifyContent="space-between"
         flexDirection={['column', 'row']}
+        flexWrap={['wrap', null, null, null, 'nowrap']}
+        justifyContent="flex-end"
         alignItems={['stretch', 'flex-end']}
+        gap="8px"
       >
         <TransactionsFilters
           filters={router.query}
@@ -217,27 +219,25 @@ const Transactions = ({
           collective={account}
           onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
         />
-        <Flex>
+        <Flex justifyContent="space-evenly">
           {canDownloadInvoices && (
-            <Box mr="8px">
-              <Link href={`/${account.slug}/admin/payment-receipts`}>
-                <StyledButton
-                  buttonSize="small"
-                  minWidth={140}
-                  height={38}
-                  mb="8px"
-                  p="6px 10px"
-                  isBorderless
-                  flexGrow={1}
-                  whiteSpace="nowrap"
-                >
-                  <FormattedMessage id="transactions.downloadinvoicesbutton" defaultMessage="Download Receipts" />
-                  <IconDownload size="13px" style={{ marginLeft: '8px' }} />
-                </StyledButton>
-              </Link>
-            </Box>
+            <Link href={`/${account.slug}/admin/payment-receipts`}>
+              <StyledButton
+                buttonSize="small"
+                minWidth={140}
+                height={38}
+                width="100%"
+                mb="8px"
+                p="6px 10px"
+                isBorderless
+                whiteSpace="nowrap"
+              >
+                <FormattedMessage id="transactions.downloadinvoicesbutton" defaultMessage="Download Receipts" />
+                <IconDownload size="13px" style={{ marginLeft: '8px' }} />
+              </StyledButton>
+            </Link>
           )}
-          <TransactionsDownloadCSV collective={account} query={router.query} />
+          <TransactionsDownloadCSV collective={account} query={router.query} width="100%" />
         </Flex>
       </Flex>
 
