@@ -1138,6 +1138,7 @@
   "Expense.AttachedReceipts": "Επισυναπτόμενες αποδείξεις",
   "Expense.Attachment": "Συνημμένο",
   "Expense.Attachments": "Συνημμένα",
+  "expense.canceled": "Canceled",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "This will permanently delete the expense and all attachments and comments.",
   "Expense.Direction.Received": "Received",
