@@ -16,7 +16,6 @@ import Image from '../../../Image';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
-import StyledLink from '../../../StyledLink';
 import { makeTruncatedValueAllSelectedLabelContainer, StyledSelectFilter } from '../../../StyledSelectFilter';
 import { H1, H2, P } from '../../../Text';
 import { AdminSectionProps } from '../../types';
@@ -97,11 +96,11 @@ const Home = (props: AdminSectionProps) => {
           />
         </P>
 
-        <P mt="24px" fontSize="13px" fontWeight="500">
+        {/* <P mt="24px" fontSize="13px" fontWeight="500">
           <StyledLink href="https://docs.opencollective.com/help/collectives/collective-workspaces">
             <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />
           </StyledLink>
-        </P>
+        </P> */}
       </Banner>
       <Flex flexDirection="column" mt="48px">
         <Flex justifyContent="space-between" alignItems={[null, 'center']} flexDirection={['column', 'row']} gap="8px">
