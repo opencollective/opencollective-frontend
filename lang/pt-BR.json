@@ -1138,6 +1138,7 @@
   "Expense.AttachedReceipts": "Recibos anexados",
   "Expense.Attachment": "Anexo",
   "Expense.Attachments": "Anexos",
+  "expense.canceled": "Canceled",
   "expense.completed": "Concluído",
   "Expense.DeleteDetails": "Isto excluirá permanentemente esta despesa, anexos e comentários.",
   "Expense.Direction.Received": "Recebido",
