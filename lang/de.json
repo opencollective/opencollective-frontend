@@ -1138,6 +1138,7 @@
   "Expense.AttachedReceipts": "Angehängte Belege",
   "Expense.Attachment": "Anhang",
   "Expense.Attachments": "Anhänge",
+  "expense.canceled": "Canceled",
   "expense.completed": "Completed",
   "Expense.DeleteDetails": "This will permanently delete the expense and all attachments and comments.",
   "Expense.Direction.Received": "Received",

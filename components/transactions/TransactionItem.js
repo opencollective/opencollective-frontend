@@ -7,10 +7,10 @@ import { truncate } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import expenseStatus from '../../lib/constants/expense-status';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nTransactionKind, i18nTransactionType } from '../../lib/i18n/transaction';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -137,7 +137,7 @@ const getExpenseStatusTag = (expense, isRefund, isRefunded) => {
   } else if (isRefund) {
     expenseStatusLabel = 'COMPLETED';
   } else {
-    expenseStatusLabel = expense?.status || expenseStatus.PAID;
+    expenseStatusLabel = expense?.status || ExpenseStatus.PAID;
   }
   return (
     <ExpenseStatusTag

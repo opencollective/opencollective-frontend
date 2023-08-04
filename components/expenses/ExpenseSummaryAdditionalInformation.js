@@ -6,9 +6,9 @@ import styled from 'styled-components';
 
 import { formatAccountName } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
-import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payout-method';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 import { getWorkspaceRoute } from '../../lib/url-helpers';
 
@@ -116,7 +116,7 @@ const ExpenseSummaryAdditionalInformation = ({
   const payeeStats = payee && !isDraft ? payee.stats : null; // stats not available for drafts
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
-  const isPaid = expense?.status === expenseStatus.PAID;
+  const isPaid = expense?.status === ExpenseStatus.PAID;
 
   if (isLoading) {
     return <LoadingPlaceholder height={150} mt={3} />;
@@ -315,7 +315,7 @@ ExpenseSummaryAdditionalInformation.propTypes = {
     currency: PropTypes.string,
     invoiceInfo: PropTypes.string,
     createdAt: PropTypes.string,
-    status: PropTypes.oneOf(Object.values(expenseStatus)),
+    status: PropTypes.oneOf(Object.values(ExpenseStatus)),
     type: PropTypes.oneOf(Object.values(expenseTypes)),
     tags: PropTypes.arrayOf(PropTypes.string),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
