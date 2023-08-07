@@ -962,6 +962,22 @@ type Order {
   Whether the order needs confirmation (3DSecure/SCA)
   """
   needsConfirmation: Boolean
+
+  """
+  Returns the list of comments for this order, or `null` if user is not allowed to see them
+  """
+  comments(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
+  ): CommentCollection
 }
 
 """
@@ -4544,6 +4560,7 @@ enum ActivityType {
   UPDATE_COMMENT_CREATED
   EXPENSE_COMMENT_CREATED
   CONVERSATION_COMMENT_CREATED
+  ORDER_COMMENT_CREATED
   COLLECTIVE_EXPENSE_CREATED
   COLLECTIVE_EXPENSE_DELETED
   COLLECTIVE_EXPENSE_UPDATED
@@ -5417,6 +5434,11 @@ type OrderPermissions {
   Whether the current user can edit this pending order
   """
   canEdit: Boolean!
+
+  """
+  Whether the current user can comment on this order
+  """
+  canComment: Boolean!
 
   """
   Whether the current user can see private activities for this order
@@ -11940,6 +11962,7 @@ enum ActivityAndClassesType {
   UPDATE_COMMENT_CREATED
   EXPENSE_COMMENT_CREATED
   CONVERSATION_COMMENT_CREATED
+  ORDER_COMMENT_CREATED
   COLLECTIVE_EXPENSE_CREATED
   COLLECTIVE_EXPENSE_DELETED
   COLLECTIVE_EXPENSE_UPDATED
@@ -14580,6 +14603,12 @@ type Mutation {
   Delete update. Scope: "updates".
   """
   deleteUpdate(id: String!): Update!
+  uploadFile(
+    """
+    The files to upload
+    """
+    files: [UploadFileInput!]!
+  ): [UploadFileResult!]!
 
   """
   Assign Virtual Card information to existing hosted collective. Scope: "virtualCards".
@@ -15100,6 +15129,7 @@ input AccountUpdateInput {
 input PoliciesInput {
   EXPENSE_AUTHOR_CANNOT_APPROVE: PoliciesCollectiveExpenseAuthorCannotApprove
   REQUIRE_2FA_FOR_ADMINS: Boolean
+  COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
 }
 
@@ -15195,6 +15225,11 @@ input CommentCreateInput {
   If your comment is linked to an expense, set it here
   """
   expense: ExpenseReferenceInput
+
+  """
+  If your comment is linked to an order, set it here
+  """
+  order: OrderReferenceInput
   ConversationId: String @deprecated(reason: "2022-08-26: Please use \"conversation\"")
   conversation: ConversationReferenceInput
   update: UpdateReferenceInput
@@ -16428,6 +16463,87 @@ input UpdateUpdateInput {
   fromAccount: AccountReferenceInput
 }
 
+type UploadFileResult {
+  file: FileInfo!
+  parsingResult: ParseUploadedFileResult
+}
+
+type ParseUploadedFileResult {
+  """
+  Whether the parsing was successful
+  """
+  success: Boolean!
+
+  """
+  A message describing the parsing result, usually an error message (if parsing failed) or some warnings
+  """
+  message: String
+
+  """
+  The confidence of the parsing result
+  """
+  confidence: StrictPercentage
+
+  """
+  The parsed expense information
+  """
+  expense: ExpenseParsedFileInfo
+}
+
+"""
+A positive float value between 0 and 100
+"""
+scalar StrictPercentage
+
+type ExpenseParsedFileInfo {
+  description: String
+  amount: Amount
+  incurredAt: Date
+}
+
+"""
+A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar Date
+
+input UploadFileInput {
+  """
+  The file to upload
+  """
+  file: Upload!
+
+  """
+  The kind of file to uploaded
+  """
+  kind: UploadedFileKind!
+
+  """
+  Whether to run OCR on the document. Note that this feature is only available to selected accounts.
+  """
+  parseDocument: Boolean! = false
+}
+
+"""
+The `Upload` scalar type represents a file upload.
+"""
+scalar Upload
+
+"""
+The kind of file that was uploaded
+"""
+enum UploadedFileKind {
+  ACCOUNT_AVATAR
+  ACCOUNT_BANNER
+  EXPENSE_ATTACHED_FILE
+  EXPENSE_ITEM
+  ACCOUNT_LONG_DESCRIPTION
+  UPDATE
+  COMMENT
+  TIER_LONG_DESCRIPTION
+  ACCOUNT_CUSTOM_EMAIL
+  AGREEMENT_ATTACHMENT
+}
+
 input VirtualCardInput {
   id: String
   name: String
@@ -16574,11 +16690,6 @@ type TagResponse {
   order: Order
   expense: Expense
 }
-
-"""
-The `Upload` scalar type represents a file upload.
-"""
-scalar Upload
 
 input AgreementReferenceInput {
   """
