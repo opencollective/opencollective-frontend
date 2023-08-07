@@ -1519,7 +1519,6 @@
   "GithubRepositories.faq.cost.title": "Aké sú náklady?",
   "GithubRepositories.faq.host.content": "Open Source Collective 501(c)(6) je americká nezisková organizácia, ktorá bola vytvorená ako fiškálny hostiteľ (alias fiškálny sponzor) pre projekty s otvoreným zdrojovým kódom využívajúce Open Collective. Viac informácií o OSC nájdete na adrese https://oscollective.org.",
   "GithubRepositories.faq.host.title": "Kto bude držať peniaze pre môj Kolektív?",
-  "GiveFeedback": "Give feedback",
   "gKqXcg": "Display Amount",
   "GLo1nw": "Pridajte správu pre správcov Kolektívu (voliteľné)",
   "gN829M": "Pomocou Webhookov môžete vytvárať vlastné integrácie so službou Open Collective. Webhooky pre Slack a Discord sú natívne podporované. Môžete ich tiež integrovať pomocou nástrojov, ako sú Zapier, IFTTT alebo Huginn. Viac sa o tom dozviete z <DocLink>dokumentácie</DocLink> alebo si pozrite, ako môžete ísť ďalej pomocou nášho <GraphqlAPILink>verejného GraphQL API</GraphqlAPILink>.",

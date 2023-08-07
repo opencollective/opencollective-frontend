@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Globe2, Menu as MenuIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -22,6 +22,19 @@ const Sticky = styled.div`
   position: sticky;
   top: 32px;
   z-index: 10;
+`;
+
+const MenuWrapper = styled(Box)`
+  ${props =>
+    props.isMobile
+      ? css`
+          position: sticky;
+          top: 0px;
+          z-index: 1000;
+          background: #fffe;
+          padding: 10px 0px;
+        `
+      : ''}
 `;
 
 const MenuContainer = styled(Flex)`
@@ -71,7 +84,7 @@ const AdminPanelSideBar = ({
   );
 
   return (
-    <Box {...props} flexGrow={0} flexShrink={0} width={['100%', '100%', '288px']}>
+    <MenuWrapper {...props} flexGrow={0} flexShrink={0} width={['100%', '100%', '288px']} isMobile={isMobile}>
       <Sticky>
         <MenuContainer flexDirection={['row-reverse', null, 'column']} m="0" gap="16px">
           <AccountSwitcher activeSlug={activeSlug} isLoading={isLoading} />
@@ -109,7 +122,7 @@ const AdminPanelSideBar = ({
           )}
         </MenuContainer>
       </Sticky>
-    </Box>
+    </MenuWrapper>
   );
 };
 
