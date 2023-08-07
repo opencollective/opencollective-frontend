@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Globe2, Menu as MenuIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -24,16 +24,17 @@ const Sticky = styled.div`
   z-index: 10;
 `;
 
-const menuWrapperMobileMixin = `
-  position: sticky;
-  top: 0px;
-  z-index: 1000;
-  background: #FFFE;
-  padding: 10px 0px;
-`;
-
 const MenuWrapper = styled(Box)`
-  ${props => (props.isMobile ? menuWrapperMobileMixin : '')}
+  ${props =>
+    props.isMobile
+      ? css`
+          position: sticky;
+          top: 0px;
+          z-index: 1000;
+          background: #fffe;
+          padding: 10px 0px;
+        `
+      : ''}
 `;
 
 const MenuContainer = styled(Flex)`
