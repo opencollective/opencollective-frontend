@@ -1,5 +1,5 @@
 import React from 'react';
-import { debounce, findLastIndex, isEqual, zipObject } from 'lodash';
+import { debounce, findIndex, isEqual, zipObject } from 'lodash';
 
 import breakpoints from './theme/breakpoints';
 import { emToPx } from './theme/helpers';
@@ -43,10 +43,10 @@ export const isDesktopOrAbove = viewport => {
   return BREAKPOINTS_NAMES.indexOf(viewport) >= BREAKPOINTS_NAMES.indexOf(VIEWPORTS.MEDIUM);
 };
 
-/** Returns the name of the viewport (see `BREAKPOINTS_NAMES`) */
+/** Returns the name of the viewport based on max-width media selector (see `BREAKPOINTS_NAMES`) */
 export const getViewportFromWidth = width => {
-  const breakpointIdx = findLastIndex(BREAKPOINTS_WIDTHS, b => width >= b);
-  return breakpointIdx === -1 ? BREAKPOINTS_NAMES[0] : BREAKPOINTS_NAMES[breakpointIdx];
+  const breakpointIdx = findIndex(BREAKPOINTS_WIDTHS, b => width <= b);
+  return breakpointIdx === -1 ? VIEWPORTS.LARGE : BREAKPOINTS_NAMES[breakpointIdx];
 };
 
 /** Function to build component's state */

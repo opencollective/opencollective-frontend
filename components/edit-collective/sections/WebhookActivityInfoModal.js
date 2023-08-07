@@ -92,6 +92,14 @@ export const getFakeMember = () => ({
   role: 'BACKER',
   description: null,
   since: '2022-07-18T10:30:14.985Z',
+  tier: {
+    id: 1212,
+    name: 'backer',
+    amount: 2000,
+    currency: 'USD',
+    description: 'Backers are individuals who support us',
+    maxQuantity: 10,
+  },
   memberCollective: {
     id: 4469,
     type: 'USER',

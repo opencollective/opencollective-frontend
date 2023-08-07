@@ -2,11 +2,11 @@ import React, { Fragment, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
+import { Search } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import theme from '../../lib/theme';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import ChangelogTrigger from '../changelog/ChangelogTrigger';
@@ -22,9 +22,10 @@ import SearchModal from '../Search';
 import SearchTrigger from '../SearchTrigger';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
+import { Span } from '../Text';
+import { VerticalSeparator } from '../ui/Separator';
 
 import ProfileMenu from './ProfileMenu';
-import SiteMenu from './SiteMenu';
 
 const NavList = styled(Flex)`
   list-style: none;
@@ -158,23 +159,23 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
     '/e2c',
   ];
   const onHomeRoute = homepageRoutes.some(isRouteActive);
-  const onDashboardRoute = isRouteActive('/dashboard');
-  const ocLogoRoute = onHomeRoute ? '/home' : '/dashboard';
+  const onDashboardRoute = isRouteActive('/workspace');
+  const ocLogoRoute = onHomeRoute ? '/home' : '/workspace';
 
   return (
     <Fragment>
       <Flex
-        px={[2, 3]}
         alignItems="center"
         flexDirection="row"
         justifyContent="space-between"
-        css={{ height: theme.sizes.navbarHeight, background: 'white', borderBottom: '1px solid rgb(232, 233, 235)' }}
+        css={{ background: 'white', borderBottom: '1px solid rgb(232, 233, 235)' }}
+        py="16px"
+        px={['16px', '40px']}
+        height="73px"
         ref={ref}
         gridGap={2}
       >
         <Flex alignItems="center" gridGap={[2, 3]}>
-          <SiteMenu />
-
           <Box flexShrink={0}>
             <Link href={ocLogoRoute}>
               <Flex alignItems="center" gridGap={2}>
@@ -291,13 +292,24 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
                   </PopupMenu>
                 )}
               </NavList>
+              <VerticalSeparator style={{ margin: '0px 16px', height: '20px' }} />
+              <NavButton isBorderless onClick={() => setShowSearchModal(true)}>
+                <Flex>
+                  <Search size={18} />
+                  <Hide xs sm>
+                    <Span ml="5px">
+                      <FormattedMessage id="Search" defaultMessage="Search" />
+                    </Span>
+                  </Hide>
+                </Flex>
+              </NavButton>
             </Flex>
           </Hide>
         ) : (
           <Flex flex={1} alignItems="center" gridGap={3} overflow={'hidden'}>
             {onDashboardRoute ? (
-              <MainNavItem href="/dashboard">
-                <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+              <MainNavItem href="/workspace">
+                <FormattedMessage id="Workspace" defaultMessage="Workspace" />
               </MainNavItem>
             ) : account || loading ? (
               <Flex alignItems="center" gridGap="0" maxWidth="100%" flexGrow={4}>
@@ -324,9 +336,14 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
         <Flex alignItems="center" gridGap={2} flexShrink={4} flexGrow={0}>
           {showProfileAndChangelogMenu && (
             <Fragment>
-              <SearchTrigger setShowSearchModal={setShowSearchModal} />
+              {onHomeRoute && (
+                <MainNavItem href="/workspace">
+                  <FormattedMessage id="Workspace" defaultMessage="Workspace" />
+                </MainNavItem>
+              )}
+              {!onHomeRoute && <SearchTrigger setShowSearchModal={setShowSearchModal} />}
               <Hide xs>
-                <ChangelogTrigger height="32px" width="32px" />
+                <ChangelogTrigger height="40px" width="40px" />
               </Hide>
               <ProfileMenu />
             </Fragment>

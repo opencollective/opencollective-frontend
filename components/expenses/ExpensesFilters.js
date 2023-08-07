@@ -4,8 +4,8 @@ import { isNil } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import expenseStatus from '../../lib/constants/expense-status';
 import { encodeDateInterval } from '../../lib/date-utils';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 
 import AmountFilter from '../budget/filters/AmountFilter';
 import PeriodFilter from '../filters/PeriodFilter';
@@ -167,7 +167,7 @@ ExpensesFilters.propTypes = {
     createdAt: PropTypes.string,
   }).isRequired,
   wrap: PropTypes.bool,
-  ignoredExpenseStatus: PropTypes.arrayOf(PropTypes.oneOf(Object.values(expenseStatus))),
+  ignoredExpenseStatus: PropTypes.arrayOf(PropTypes.oneOf(Object.values(ExpenseStatus))),
   displayOnHoldPseudoStatus: PropTypes.bool,
   showChargeHasReceiptFilter: PropTypes.bool,
   chargeHasReceiptFilter: PropTypes.bool,

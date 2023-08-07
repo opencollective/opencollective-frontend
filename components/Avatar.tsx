@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
+import { Calendar, TestTube2 } from 'lucide-react';
 import styled from 'styled-components';
 import { border, BorderProps, color, layout, space } from 'styled-system';
 
@@ -10,6 +11,11 @@ import { getAvatarBorderRadius, getCollectiveImage } from '../lib/image-utils';
 import { Flex, FlexProps } from './Grid';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
+
+const COLLECTIVE_TYPE_ICON = {
+  [CollectiveType.EVENT]: Calendar,
+  [CollectiveType.PROJECT]: TestTube2,
+};
 
 type StyledAvatarProps = FlexProps &
   BorderProps & {
@@ -52,8 +58,10 @@ const Avatar = ({
   type = 'USER',
   radius = 42,
   name = undefined,
+  useIcon = false,
   ...styleProps
 }) => {
+  let child = null;
   // Use collective object instead of props
   if (collective) {
     type = collective.type;
@@ -64,13 +72,24 @@ const Avatar = ({
       src = defaultImage.GUEST;
     } else if (type === 'VENDOR') {
       src = defaultImage.ORGANIZATION;
+    } else if (useIcon) {
+      const Icon = COLLECTIVE_TYPE_ICON[type];
+      if (Icon) {
+        child = <Icon size={radius} />;
+      }
     } else {
       src = getCollectiveImage(collective);
+    }
+
+    if (!src && !child) {
+      if ((type === 'USER' || type === 'INDIVIDUAL') && name) {
+        child = <span>{getInitials(name)}</span>;
+      }
     }
   }
   return (
     <StyledAvatar size={radius} type={type} src={src} title={name} {...styleProps}>
-      {!src && (type === 'USER' || type === 'INDIVIDUAL') && name && <span>{getInitials(name)}</span>}
+      {child}
     </StyledAvatar>
   );
 };
@@ -99,6 +118,8 @@ Avatar.propTypes = {
   backgroundSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /* Color of the background */
   backgroundColor: PropTypes.string,
+  /* If true, will display a default icon instead of image */
+  useIcon: PropTypes.bool,
 };
 
 const shouldUseDefaultGuestAvatar = name => {

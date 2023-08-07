@@ -6,6 +6,7 @@
 import propTypes from '@styled-system/prop-types';
 import styled from 'styled-components';
 import {
+  border,
   color,
   ColorProps,
   compose,
@@ -21,7 +22,7 @@ import {
   TypographyProps,
 } from 'styled-system';
 
-export const boxProps = compose(space, color, layout, typography, flexbox, grid);
+export const boxProps = compose(space, color, layout, typography, flexbox, grid, border);
 
 type BoxProps = SpaceProps &
   ColorProps &

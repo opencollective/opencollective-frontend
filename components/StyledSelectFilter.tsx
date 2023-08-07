@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { differenceBy } from 'lodash';
 import { components as ReactSelectComponents } from 'react-select';
 import styled from 'styled-components';
 import { maxWidth } from 'styled-system';
@@ -17,6 +18,29 @@ const TruncatedItemsList = styled(Span).attrs({
   max-width: 75px;
   ${maxWidth}
 `;
+
+export const makeTruncatedValueAllSelectedLabelContainer = (allSelectedNode: React.ReactNode) => {
+  const TruncatedValueAllSelectedLabelContainer = (props: {
+    selectProps: { value?: Array<any>; options?: Array<any> };
+    children: React.ReactNode[];
+  }) => {
+    const { selectProps, children } = props;
+    const itemsList = (selectProps.value || []).map(({ label }) => label);
+    const itemsListStr = itemsList.join(', ');
+    const isAllSelected = differenceBy(selectProps.options, selectProps.value, 'value').length === 0;
+
+    return (
+      <ReactSelectComponents.SelectContainer height="1em" {...(props as any)}>
+        <Flex>
+          <TruncatedItemsList title={itemsListStr}>{isAllSelected ? allSelectedNode : itemsListStr}</TruncatedItemsList>
+          {children}
+        </Flex>
+      </ReactSelectComponents.SelectContainer>
+    );
+  };
+
+  return TruncatedValueAllSelectedLabelContainer;
+};
 
 export const TruncatedValueContainer = props => {
   const { selectProps, children } = props;

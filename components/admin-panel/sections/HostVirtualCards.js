@@ -113,7 +113,7 @@ const hostVirtualCardsQuery = gql`
   }
 `;
 
-const VIRTUAL_CARDS_PER_PAGE = 6;
+const VIRTUAL_CARDS_PER_PAGE = 20;
 
 const HostVirtualCards = props => {
   const queryFilter = useQueryFilter({
@@ -141,12 +141,13 @@ const HostVirtualCards = props => {
   const router = useRouter();
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
+  const limit = parseInt(routerQuery.limit) || VIRTUAL_CARDS_PER_PAGE;
   const { addToast } = useToasts();
   const { loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
     context: API_V2_CONTEXT,
     variables: {
       slug: props.hostSlug,
-      limit: VIRTUAL_CARDS_PER_PAGE,
+      limit,
       offset,
       status: queryFilter.values.virtualCardStatus,
       withExpensesDateFrom: queryFilter.values.usagePeriod?.from,

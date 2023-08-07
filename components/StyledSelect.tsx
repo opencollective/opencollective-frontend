@@ -11,7 +11,16 @@ import Select, {
   ValueContainerProps,
 } from 'react-select';
 import styled from 'styled-components';
-import { layout, LayoutProps, space, SpaceProps, typography, TypographyProps } from 'styled-system';
+import {
+  BorderProps,
+  BorderRadiusProps,
+  layout,
+  LayoutProps,
+  space,
+  SpaceProps,
+  typography,
+  TypographyProps,
+} from 'styled-system';
 
 import Container from './Container';
 import { Flex } from './Grid';
@@ -295,6 +304,8 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
 
 export type StyledSelectProps = LayoutProps &
   TypographyProps &
+  BorderProps &
+  BorderRadiusProps &
   SpaceProps & {
     intl: IntlShape;
     /** Alias for isDisabled */
@@ -311,11 +322,14 @@ export type StyledSelectProps = LayoutProps &
     styles?: Record<string, unknown>;
     onBlur?: Function;
     onChange?: Function;
+    formatOptionLabel?: Function;
     isLoading?: boolean;
     isSearchable?: boolean;
     isClearable?: boolean;
     options?: any;
     value?: any;
+    defaultValue?: any;
+    menuPlacement?: 'auto' | 'bottom' | 'top';
     components?: Record<string, React.ReactNode | React.Component | React.FunctionComponent>;
     closeMenuOnSelect?: boolean;
     hideSelectedOptions?: boolean;

@@ -9,12 +9,12 @@ import { defineMessages, injectIntl } from 'react-intl';
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
 import { getCollectivePageMetadata, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
-import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { ExpenseStatus } from '../lib/graphql/types/v2/graphql';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import { Dimensions } from '../components//collective-page/_constants';
@@ -65,7 +65,7 @@ class ExpensePage extends React.Component {
         offset: parseInt(offset) || undefined,
         limit: parseInt(limit) || undefined,
         type: has(expenseTypes, type) ? type : undefined,
-        status: has(expenseStatus, status) || status === 'READY_TO_PAY' ? status : undefined,
+        status: has(ExpenseStatus, status) || status === 'READY_TO_PAY' ? status : undefined,
         payout: has(PayoutMethodType, payout) ? payout : undefined,
         direction,
         period,

@@ -8,13 +8,16 @@ import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-i
 import styled from 'styled-components';
 
 import { getCollectivePageMetadata, getSuggestedTags, isIndividualAccount } from '../lib/collective.lib';
-import expenseStatus from '../lib/constants/expense-status';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { SubmittedExpensesPageQuery, SubmittedExpensesPageQueryVariables } from '../lib/graphql/types/v2/graphql';
+import {
+  ExpenseStatus,
+  SubmittedExpensesPageQuery,
+  SubmittedExpensesPageQueryVariables,
+} from '../lib/graphql/types/v2/graphql';
 import LoggedInUser from '../lib/LoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
@@ -73,7 +76,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
         offset: parseInt(query.offset) || undefined,
         limit: parseInt(query.limit) || undefined,
         type: has(expenseTypes, query.type) ? query.type : undefined,
-        status: has(expenseStatus, query.status) || query.status === 'READY_TO_PAY' ? query.status : undefined,
+        status: has(ExpenseStatus, query.status) || query.status === 'READY_TO_PAY' ? query.status : undefined,
         payout: has(PayoutMethodType, query.payout) ? query.payout : undefined,
         period: query.period,
         amount: query.amount,

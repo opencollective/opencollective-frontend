@@ -43,6 +43,7 @@ import {
 export type ContainerProps = FlexboxProps &
   BackgroundProps &
   BorderProps &
+  LayoutProps &
   ShadowProps &
   ClearProps &
   ColorProps &
@@ -51,7 +52,6 @@ export type ContainerProps = FlexboxProps &
   OverflowProps &
   PointerEventsProps &
   PositionProps &
-  LayoutProps &
   SpaceProps &
   TypographyProps &
   WhiteSpaceProps &

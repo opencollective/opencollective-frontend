@@ -8,11 +8,11 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getAccountReferenceInput } from '../../lib/collective.lib';
-import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { getSupportedExpenseTypes } from '../../lib/expenses';
 import { requireFields } from '../../lib/form-utils';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep } from '../../lib/utils';
@@ -97,22 +97,27 @@ export const msg = defineMessages({
   },
 });
 
-const getDefaultExpense = collective => ({
-  description: '',
-  longDescription: '',
-  items: [],
-  attachedFiles: [],
-  payee: null,
-  payoutMethod: undefined,
-  privateMessage: '',
-  invoiceInfo: '',
-  currency: collective.currency,
-  taxes: null,
-  payeeLocation: {
-    address: '',
-    country: null,
-  },
-});
+const getDefaultExpense = (collective, supportedExpenseTypes) => {
+  const isSingleSupportedExpenseType = supportedExpenseTypes.length === 1;
+
+  return {
+    description: '',
+    longDescription: '',
+    items: [],
+    attachedFiles: [],
+    payee: null,
+    payoutMethod: undefined,
+    privateMessage: '',
+    invoiceInfo: '',
+    currency: collective.currency,
+    taxes: null,
+    type: isSingleSupportedExpenseType ? supportedExpenseTypes[0] : undefined,
+    payeeLocation: {
+      address: '',
+      country: null,
+    },
+  };
+};
 
 const CREATE_PAYEE_PROFILE_FIELDS = ['name', 'email', 'legalName', 'organization', 'newsletterOptIn'];
 
@@ -124,6 +129,7 @@ export const prepareExpenseForSubmit = expenseData => {
   // The collective picker still uses API V1 for when creating a new profile on the fly
   const isInvoice = expenseData.type === expenseTypes.INVOICE;
   const isGrant = expenseData.type === expenseTypes.GRANT;
+  const keepAttachedFiles = isInvoice || isGrant;
 
   // Prepare payee
   let payee;
@@ -166,7 +172,7 @@ export const prepareExpenseForSubmit = expenseData => {
     payee,
     payeeLocation,
     payoutMethod,
-    attachedFiles: isInvoice ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
+    attachedFiles: keepAttachedFiles ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => prepareExpenseItemForSubmit(item, isInvoice, isGrant)),
   };
@@ -266,6 +272,7 @@ const ExpenseFormBody = ({
   isDraft,
   defaultStep,
   drawerActionsContainer,
+  supportedExpenseTypes,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -277,7 +284,6 @@ const ExpenseFormBody = ({
   const isReceipt = values.type === expenseTypes.RECEIPT;
   const isGrant = values.type === expenseTypes.GRANT;
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
-  const supportedExpenseTypes = React.useMemo(() => getSupportedExpenseTypes(collective), [collective]);
   const isRecurring = expense && expense.recurringExpense !== null;
   const stepOneCompleted =
     values.payoutMethod &&
@@ -462,6 +468,7 @@ const ExpenseFormBody = ({
         editingExpense={editingExpense}
         resetDefaultStep={() => setStep(EXPENSE_FORM_STEPS.PAYEE)}
         formPersister={formPersister}
+        supportedExpenseTypes={supportedExpenseTypes}
         getDefaultExpense={getDefaultExpense}
         onInvite={isInvite => {
           setOnBehalf(isInvite);
@@ -533,7 +540,7 @@ const ExpenseFormBody = ({
               onCancel();
             } else {
               setStep(EXPENSE_FORM_STEPS.PAYEE);
-              resetForm({ values: getDefaultExpense(collective) });
+              resetForm({ values: getDefaultExpense(collective, supportedExpenseTypes) });
               if (formPersister) {
                 formPersister.clearValues();
                 window.scrollTo(0, 0);
@@ -808,6 +815,7 @@ ExpenseFormBody.propTypes = {
     ),
   }),
   drawerActionsContainer: PropTypes.object,
+  supportedExpenseTypes: PropTypes.arrayOf(PropTypes.string),
 };
 
 /**
@@ -830,10 +838,11 @@ const ExpenseForm = ({
   defaultStep,
   drawerActionsContainer,
 }) => {
-  const isDraft = expense?.status === expenseStatus.DRAFT;
+  const isDraft = expense?.status === ExpenseStatus.DRAFT;
   const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
   const intl = useIntl();
-  const initialValues = { ...getDefaultExpense(collective), ...expense };
+  const supportedExpenseTypes = React.useMemo(() => getSupportedExpenseTypes(collective), [collective]);
+  const initialValues = { ...getDefaultExpense(collective, supportedExpenseTypes), ...expense };
   const validate = expenseData => validateExpense(intl, expenseData);
   if (isDraft) {
     initialValues.items = expense.draft.items?.map(newExpenseItem) || [];
@@ -876,6 +885,7 @@ const ExpenseForm = ({
           isDraft={isDraft}
           defaultStep={defaultStep}
           drawerActionsContainer={drawerActionsContainer}
+          supportedExpenseTypes={supportedExpenseTypes}
         />
       )}
     </Formik>

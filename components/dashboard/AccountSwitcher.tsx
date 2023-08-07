@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { css } from '@styled-system/css';
 import { flatten, groupBy, uniqBy } from 'lodash';
-import { ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronsUpDown, ChevronUp, Plus } from 'lucide-react';
 import memoizeOne from 'memoize-one';
-import { useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+import { space } from 'styled-system';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import formatCollectiveType from '../../lib/i18n/collective-type';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -35,6 +35,7 @@ const StyledMenuEntry = styled(Link)`
   font-size: 13px;
   font-weight: 500;
   grid-gap: 4px;
+  ${space}
 
   ${props =>
     props.$isActive
@@ -49,13 +50,13 @@ const StyledMenuEntry = styled(Link)`
 `;
 
 const DropdownButton = styled.button`
+  all: unset;
   display: flex;
   background: white;
   border: 1px solid #e6e8eb;
   width: 100%;
-  border-radius: 8px;
-  flex-shrink: 0;
-  padding: 8px;
+  border-radius: 24px;
+  padding: 8px 16px;
   align-items: center;
   justify-content: space-between;
   transition: all 50ms ease-out;
@@ -89,6 +90,12 @@ const StyledDropdownContent = styled(DropdownContent)`
   overflow-y: scroll;
 `;
 
+const CREATE_NEW_LINKS = {
+  ORGANIZATION: '/organizations/new',
+  FUND: '/fund/create',
+  COLLECTIVE: '/create',
+};
+
 const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   const isAdministratedAccount = m => ['ADMIN', 'ACCOUNTANT'].includes(m.role) && !m.collective.isIncognito;
   let administratedAccounts = loggedInUser?.memberOf.filter(isAdministratedAccount).map(m => m.collective) || [];
@@ -104,10 +111,42 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
 
   const groupedAccounts = groupBy(activeAccounts, a => a.type);
   if (archivedAccounts?.length > 0) {
-    groupedAccounts.archived = archivedAccounts;
+    groupedAccounts.ARCHIVED = archivedAccounts;
   }
   return groupedAccounts;
 });
+
+const Option = ({
+  collective,
+  description,
+  isChild,
+  ...props
+}: {
+  collective: any;
+  description?: string | ReactElement;
+  isChild?: boolean;
+}) => {
+  description = description || (
+    <FormattedMessage
+      id="AccountSwitcher.Description"
+      defaultMessage="{type, select, USER {My workspace} COLLECTIVE {Collective admin} ORGANIZATION {Organization admin} EVENT {Event admin} FUND {Fund admin} PROJECT {Project admin} other {}}"
+      values={{ type: collective?.type }}
+    />
+  );
+  return (
+    <Flex alignItems="center" gridGap="12px" overflow="hidden" {...props}>
+      <Avatar collective={collective} size={isChild ? 20 : 32} useIcon={isChild} />
+      <Flex flexDirection="column" overflow="hidden">
+        <P color="black.800" fontSize="14px" letterSpacing="0" fontWeight="500" truncateOverflow>
+          {collective?.name}
+        </P>
+        <P color="black.700" fontSize="12px" letterSpacing="0" fontWeight="400" truncateOverflow>
+          {description}
+        </P>
+      </Flex>
+    </Flex>
+  );
+};
 
 const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }) => {
   const [expanded, setExpanded] = React.useState(false);
@@ -116,14 +155,11 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
     <React.Fragment>
       <StyledMenuEntry
         key={account.id}
-        href={`/dashboard/${account.slug}`}
+        href={`/workspace/${account.slug}`}
         title={account.name}
         $isActive={activeSlug === account.slug}
       >
-        <Flex overflow="hidden" alignItems="center" gridGap="12px">
-          <Avatar collective={account} size={32} />
-          <Span truncateOverflow>{account.name}</Span>
-        </Flex>
+        <Option collective={account} />
         {account.children?.length > 0 && (
           <StyledRoundButton
             ml={2}
@@ -147,14 +183,12 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
           .map(child => (
             <StyledMenuEntry
               key={child?.id}
-              href={`/dashboard/${child.slug}`}
+              href={`/workspace/${child.slug}`}
               title={child.name}
               $isActive={activeSlug === child.slug}
+              ml={3}
             >
-              <Flex overflow="hidden" alignItems="center" gridGap="12px">
-                <Avatar ml={4} collective={child} size={32} />
-                <Span truncateOverflow>{child.name}</Span>
-              </Flex>
+              <Option collective={child} isChild />
             </StyledMenuEntry>
           ))}
     </React.Fragment>
@@ -163,7 +197,6 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
 
 const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
   const { LoggedInUser } = useLoggedInUser();
-  const intl = useIntl();
 
   const loggedInUserCollective = LoggedInUser?.collective;
 
@@ -173,20 +206,12 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
   const activeAccount = allAdministratedAccounts.find(a => a.slug === activeSlug) || loggedInUserCollective;
 
   return (
-    <Dropdown trigger="click">
+    <Dropdown trigger="click" flexGrow="1">
       {({ triggerProps, dropdownProps }) => (
         <React.Fragment>
           <Flex alignItems="center" flex={0}>
             <DropdownButton {...triggerProps}>
-              <Flex alignItems="center" gridGap="12px">
-                <Avatar collective={activeAccount} size={32} />
-                <div>
-                  <P color="#0f172a" lineHeight="20px" letterSpacing="0" fontWeight="500" truncateOverflow>
-                    {activeAccount?.name}
-                  </P>
-                </div>
-              </Flex>
-
+              <Option collective={activeAccount} />
               <ChevronsUpDown size={18} />
             </DropdownButton>
           </Flex>
@@ -195,30 +220,45 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
               <Flex p={2} flexDirection="column" gridGap={3}>
                 <StyledMenuEntry
                   key={loggedInUserCollective?.id}
-                  href={`/dashboard/${loggedInUserCollective?.slug}`}
+                  href={`/workspace/${loggedInUserCollective?.slug}`}
                   title={loggedInUserCollective?.name}
                   $isActive={activeSlug === loggedInUserCollective?.slug}
                 >
-                  <Flex alignItems="center" gridGap="12px">
-                    <Avatar collective={loggedInUserCollective} size={32} />
-                    <Span truncateOverflow>{loggedInUserCollective?.name}</Span>
-                  </Flex>
+                  <Option collective={loggedInUserCollective} />
                 </StyledMenuEntry>
                 {Object.entries(groupedAccounts).map(([collectiveType, accounts]) => {
                   return (
                     <div key={collectiveType}>
-                      <Flex alignItems="center" px={1} mb={1}>
+                      <Flex alignItems="center" px={1} mb={1} gap="8px">
                         <Span
-                          mr={2}
                           fontWeight="500"
                           color="black.600"
                           textTransform="uppercase"
                           letterSpacing="0"
                           fontSize="12px"
+                          whiteSpace="nowrap"
                         >
-                          {formatCollectiveType(intl, collectiveType, 2)}
+                          <FormattedMessage
+                            id="AccountSwitcher.Category.Titles"
+                            defaultMessage="{type, select, USER {My workspace} COLLECTIVE {My Collectives} ORGANIZATION {My Organizations} EVENT {My Events} FUND {My Funds} PROJECT {My Projects} ARCHIVED {Archived} other {}}"
+                            values={{ type: collectiveType }}
+                          />
                         </Span>
                         <StyledHr width="100%" borderColor="black.300" />
+                        {CREATE_NEW_LINKS[collectiveType] && (
+                          <Link href={CREATE_NEW_LINKS[collectiveType]}>
+                            <StyledRoundButton
+                              minWidth={24}
+                              size={24}
+                              color="#C4C7CC"
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
+                            >
+                              <Plus size={12} color="#76777A" />
+                            </StyledRoundButton>
+                          </Link>
+                        )}
                       </Flex>
                       {accounts
                         ?.sort((a, b) => a.name.localeCompare(b.name))

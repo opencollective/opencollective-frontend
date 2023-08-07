@@ -4,11 +4,11 @@ import { has } from 'lodash';
 import { useRouter } from 'next/router';
 
 import { isIndividualAccount } from '../../../lib/collective.lib';
-import expenseStatus from '../../../lib/constants/expense-status';
 import expenseTypes from '../../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../../lib/constants/payout-method';
 import { parseDateInterval } from '../../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { ExpenseStatus } from '../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import useQueryFilter, { BooleanFilter } from '../../../lib/hooks/useQueryFilter';
 
@@ -26,7 +26,7 @@ const parseQuery = (routerQuery, account) => {
     offset: parseInt(offset) || undefined,
     limit: parseInt(limit) || undefined,
     type: has(expenseTypes, type) ? type : undefined,
-    status: has(expenseStatus, status) || status === 'READY_TO_PAY' ? status : undefined,
+    status: has(ExpenseStatus, status) || status === 'READY_TO_PAY' ? status : undefined,
     payout: has(PayoutMethodType, payout) ? payout : undefined,
     direction: newDirection,
     period,

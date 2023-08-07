@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
+import { flexbox } from 'styled-system';
 
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
 import useKeyBoardShortcut, { ESCAPE_KEY } from '../lib/hooks/useKeyboardKey';
@@ -119,6 +120,7 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
     </div>
   );
 })`
+  ${flexbox}
   ${props =>
     props.trigger === 'hover'
       ? css`

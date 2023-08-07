@@ -503,7 +503,7 @@ class CreateCollectiveForm extends React.Component {
                 }}
               </Formik>
               <Container justifyContent="center" mb={4} display={['flex', 'none']}>
-                <NextIllustration src="/static/images/create-collective/mobileForm.png" width="320px" height="200px" />
+                <NextIllustration src="/static/images/create-collective/mobileForm.png" width={320} height={200} />
               </Container>
             </ContainerWithImage>
           </Flex>
