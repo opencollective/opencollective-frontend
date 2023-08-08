@@ -2,6 +2,7 @@ import React from 'react';
 import * as simplewebauthn from '@simplewebauthn/browser';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
+import { createGlobalStyle } from 'styled-components';
 
 import { createError, ERROR } from '../../lib/errors';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -14,9 +15,17 @@ import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledLinkButton from '../StyledLinkButton';
-import StyledModal, { ModalFooter, ModalHeader } from '../StyledModal';
+import StyledModal, { Modal, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+
+const HideOtherModalsGlobalStyle = createGlobalStyle`
+  ${Modal} {
+    &:not(.twofactor-modal) {
+      opacity: 0;
+    }
+  }
+`;
 
 function initialMethod(supportedMethods: string[]) {
   if (!supportedMethods) {
@@ -36,7 +45,7 @@ export default function TwoFactorAuthenticationModal() {
   const prompt = useTwoFactorAuthenticationPrompt();
   const isOpen = prompt?.isOpen ?? false;
   const supportedMethods = prompt?.supportedMethods ?? [];
-  const cancellable = !supportedMethods.includes('recovery_code');
+  const cancellable = !prompt.isRequired;
 
   const [selectedMethod, setSelectedMethod] = React.useState(initialMethod(supportedMethods));
   const [twoFactorCode, setTwoFactorCode] = React.useState('');
@@ -70,14 +79,11 @@ export default function TwoFactorAuthenticationModal() {
   }, [prompt]);
 
   const cancel = React.useCallback(() => {
-    if (!cancellable) {
-      return;
-    }
     setTwoFactorCode('');
     setConfirming(false);
     setSelectedMethod(null);
     prompt.rejectAuth(createError(ERROR.TWO_FACTOR_AUTH_CANCELED));
-  }, [cancellable]);
+  }, []);
 
   const confirm = React.useCallback(() => {
     const code = twoFactorCode;
@@ -131,7 +137,8 @@ export default function TwoFactorAuthenticationModal() {
   }
 
   return (
-    <StyledModal onClose={cancel} width={495}>
+    <StyledModal trapFocus onClose={cancel} width={495} className="twofactor-modal">
+      <HideOtherModalsGlobalStyle />
       <ModalHeader hideCloseIcon>
         {supportedMethods.length === 0 ? (
           <FormattedMessage defaultMessage="You must configure 2FA to access this feature" />

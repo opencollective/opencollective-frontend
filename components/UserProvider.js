@@ -128,6 +128,7 @@ class UserProvider extends React.Component {
             const result = await twoFactorAuthPrompt.open({
               supportedMethods: decodedToken.supported2FAMethods ?? ['recovery_code'],
               authenticationOptions: decodedToken.authenticationOptions,
+              isRequired: true,
             });
 
             const LoggedInUser = await getLoggedInUser({
