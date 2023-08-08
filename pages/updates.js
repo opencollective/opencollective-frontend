@@ -6,7 +6,9 @@ import { cloneDeep, omitBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
+import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
 import { shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
+import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 
@@ -69,9 +71,14 @@ class UpdatesPage extends React.Component {
 
   render() {
     const { data, LoggedInUser, router } = this.props;
+    const isUpdatesSupported = isFeatureSupported(data.account, FEATURES.UPDATES);
 
     if (!data.account) {
       return <ErrorPage data={data} />;
+    }
+
+    if (!isUpdatesSupported) {
+      return <ErrorPage error={{ type: ERROR.NOT_FOUND }} />;
     }
 
     const collective = data.account;
