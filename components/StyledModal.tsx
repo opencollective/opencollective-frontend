@@ -37,7 +37,7 @@ const Wrapper = styled(Flex)<WrapperProps>`
 
 type ModalProps = SpaceProps & LayoutProps & BackgroundProps;
 
-const Modal = styled(Container).attrs((props: ModalProps) => ({
+export const Modal = styled(Container).attrs((props: ModalProps) => ({
   maxWidth: props.maxWidth || '95%',
   maxHeight: props.maxHeight || '97%',
 }))<ModalProps>`
