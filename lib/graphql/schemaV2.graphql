@@ -16480,14 +16480,17 @@ type ParseUploadedFileResult {
   message: String
 
   """
-  The confidence of the parsing result
-  """
-  confidence: StrictPercentage
-
-  """
   The parsed expense information
   """
   expense: ExpenseParsedFileInfo
+}
+
+type ExpenseParsedFileInfo {
+  confidence: StrictPercentage
+  description: String
+  amount: Amount
+  date: Date
+  items: [ExpenseItemParsedFileInfo!]!
 }
 
 """
@@ -16495,16 +16498,17 @@ A positive float value between 0 and 100
 """
 scalar StrictPercentage
 
-type ExpenseParsedFileInfo {
-  description: String
-  amount: Amount
-  incurredAt: Date
-}
-
 """
 A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
 scalar Date
+
+type ExpenseItemParsedFileInfo {
+  description: String
+  amount: Amount
+  incurredAt: Date
+  url: String
+}
 
 input UploadFileInput {
   """

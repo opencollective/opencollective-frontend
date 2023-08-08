@@ -193,7 +193,7 @@ CollectivePickerAsync.propTypes = {
   /** If true, results won't be cached (Apollo "network-only" mode) */
   noCache: PropTypes.bool,
   /** Query to use for the search. Override to add custom fields */
-  searchQuery: PropTypes.any.isRequired,
+  searchQuery: PropTypes.any,
   /** Custom options that are displayed when the field is empty */
   emptyCustomOptions: PropTypes.any,
   /** Function to filter results returned by the API */

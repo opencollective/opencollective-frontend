@@ -17,6 +17,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep } from '../../lib/utils';
+import { addNewExpenseItem, newExpenseItem } from './lib/items';
 import { checkRequiresAddress, getSupportedCurrencies, validateExpenseTaxes } from './lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -32,7 +33,7 @@ import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
-import ExpenseFormItems, { addNewExpenseItem, newExpenseItem } from './ExpenseFormItems';
+import ExpenseFormItems from './ExpenseFormItems';
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
 import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';

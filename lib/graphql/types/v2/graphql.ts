@@ -3760,11 +3760,21 @@ export type ExpenseItemInput = {
   url?: InputMaybe<Scalars['URL']>;
 };
 
-export type ExpenseParsedFileInfo = {
-  __typename?: 'ExpenseParsedFileInfo';
+export type ExpenseItemParsedFileInfo = {
+  __typename?: 'ExpenseItemParsedFileInfo';
   amount?: Maybe<Amount>;
   description?: Maybe<Scalars['String']>;
   incurredAt?: Maybe<Scalars['Date']>;
+  url?: Maybe<Scalars['String']>;
+};
+
+export type ExpenseParsedFileInfo = {
+  __typename?: 'ExpenseParsedFileInfo';
+  amount?: Maybe<Amount>;
+  confidence?: Maybe<Scalars['StrictPercentage']>;
+  date?: Maybe<Scalars['Date']>;
+  description?: Maybe<Scalars['String']>;
+  items: Array<ExpenseItemParsedFileInfo>;
 };
 
 /** Fields for the user permissions on an expense */
@@ -7164,8 +7174,6 @@ export type OrganizationCreateInput = {
 
 export type ParseUploadedFileResult = {
   __typename?: 'ParseUploadedFileResult';
-  /** The confidence of the parsing result */
-  confidence?: Maybe<Scalars['StrictPercentage']>;
   /** The parsed expense information */
   expense?: Maybe<ExpenseParsedFileInfo>;
   /** A message describing the parsing result, usually an error message (if parsing failed) or some warnings */

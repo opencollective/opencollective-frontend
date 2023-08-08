@@ -3,13 +3,12 @@ import PropTypes from 'prop-types';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { isEmpty } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import { v4 as uuid } from 'uuid';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { toIsoDateStr } from '../../lib/date-utils';
 import { formatErrorMessage } from '../../lib/errors';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
+import { newExpenseItem } from './lib/items';
 import { updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import { Box, Flex } from '../Grid';
@@ -25,24 +24,8 @@ import { withUser } from '../UserProvider';
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseItemForm from './ExpenseItemForm';
 
-/** Init a new expense item with default attributes */
-export const newExpenseItem = attrs => ({
-  id: uuid(), // we generate it here to properly key lists, but it won't be submitted to API
-  incurredAt: toIsoDateStr(new Date()),
-  description: '',
-  amount: null,
-  url: '',
-  __isNew: true,
-  ...attrs,
-});
-
 /** Converts a list of filenames to expense item objects */
 const filesListToItems = files => files.map(({ url }) => newExpenseItem({ url }));
-
-/** Helper to add a new item to the form */
-export const addNewExpenseItem = (formik, defaultValues) => {
-  formik.setFieldValue('items', [...(formik.values.items || []), newExpenseItem(defaultValues)]);
-};
 
 class ExpenseFormItems extends React.PureComponent {
   static propTypes = {
@@ -211,7 +194,7 @@ class ExpenseFormItems extends React.PureComponent {
             key={`item-${attachment.id}`}
             attachment={attachment}
             currency={values.currency}
-            name={`items[${index}]`}
+            itemIdx={index}
             errors={errors}
             onRemove={onRemove}
             requireFile={requireFile}
