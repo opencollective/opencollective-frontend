@@ -8,6 +8,7 @@ import { P } from '../Text';
 
 import { AuthenticatorSettings } from './AuthenticatorSettings';
 import { DevicesSettings } from './DevicesSettings';
+import { RecoverySettings } from './RecoverySettings';
 import { SaveRecoveryCodesModal } from './SaveRecoveryCodesModal';
 
 type TwoFactorAuthenticationSettingsProps = {
@@ -43,6 +44,12 @@ export function TwoFactorAuthenticationSettings(props: TwoFactorAuthenticationSe
             userTwoFactorAuthenticationMethods={props.userTwoFactorAuthenticationMethods}
           />
         </Box>
+
+        {props.userTwoFactorAuthenticationMethods.length > 0 && (
+          <Box mt={3}>
+            <RecoverySettings individual={props.individual} />
+          </Box>
+        )}
       </Box>
       {recoveryCodes && <SaveRecoveryCodesModal recoveryCodes={recoveryCodes} onClose={() => setRecoveryCodes(null)} />}
     </React.Fragment>
