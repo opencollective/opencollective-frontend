@@ -10,6 +10,9 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { AnalyticsEvent } from '../../lib/analytics/events';
+import { track } from '../../lib/analytics/plausible';
+import { AnalyticsProperty } from '../../lib/analytics/properties';
 import { getCollectiveTypeForUrl } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
@@ -183,6 +186,20 @@ class ContributionFlow extends React.Component {
       await this.updateRouteFromState();
       this.setState({ isInitializing: false });
     }
+
+    const step = this.getCurrentStepName();
+    if (step !== 'success' && step !== 'details') {
+      track(AnalyticsEvent.CONTRIBUTION_STARTED, {
+        props: {
+          [AnalyticsProperty.CONTRIBUTION_STEP]: this.getCurrentStepName(),
+        },
+      });
+
+      if (step !== 'details') {
+        // started the contribution flow at advanced step with details picked.
+        track(AnalyticsEvent.CONTRIBUTION_DETAILS_STEP_COMPLETED);
+      }
+    }
   }
 
   async componentDidUpdate(oldProps) {
@@ -266,6 +283,16 @@ class ContributionFlow extends React.Component {
     } else {
       fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
     }
+
+    const props = {
+      [AnalyticsProperty.CONTRIBUTION_HAS_PLATFORM_TIP]: stepDetails.amount && stepDetails.platformTip > 0,
+      [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_PERCENTAGE]:
+        stepDetails.amount && stepDetails.platformTip > 0 ? stepDetails.platformTip / stepDetails.amount : 0,
+    };
+
+    track(AnalyticsEvent.CONTRIBUTION_SUBMITTED, {
+      props,
+    });
 
     try {
       const totalAmount = getTotalAmount(stepDetails, stepSummary);
@@ -363,6 +390,7 @@ class ContributionFlow extends React.Component {
   };
 
   handleError = message => {
+    track(AnalyticsEvent.CONTRIBUTION_ERROR);
     this.setState({ isSubmitting: false, error: message });
   };
 

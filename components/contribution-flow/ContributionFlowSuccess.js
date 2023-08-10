@@ -11,6 +11,8 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { AnalyticsEvent } from '../../lib/analytics/events';
+import { track } from '../../lib/analytics/plausible';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -130,6 +132,10 @@ class ContributionFlowSuccess extends React.Component {
     isEmbed: PropTypes.bool,
     data: PropTypes.object,
   };
+
+  componentDidMount() {
+    track(AnalyticsEvent.CONTRIBUTION_SUCCESS);
+  }
 
   componentDidUpdate() {
     const {
