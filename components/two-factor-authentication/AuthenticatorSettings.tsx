@@ -110,7 +110,7 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
       <Box>
         {userTwoFactorMethods.map(device => {
           return (
-            <Box px={4} key={device.id}>
+            <Box px={4} key={device.id} data-cy="authenticator-2fa-method">
               <UserTwoFactorMethodItem individual={props.individual} userTwoFactorMethod={device} />
             </Box>
           );
@@ -226,7 +226,7 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
           </TokenBox>
         </Flex>
         <form onSubmit={formik.handleSubmit}>
-          <Flex gap="20px">
+          <Box>
             <StyledInputField
               required
               mt={2}
@@ -254,18 +254,20 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
                 />
               )}
             </StyledInputField>
-            <Box mt={4}>
+            <Flex mt={4} gap="20px" justifyContent="flex-end">
+              <StyledButton disabled={formik.isSubmitting} buttonStyle="danger" onClick={props.onClose}>
+                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+              </StyledButton>
               <StyledButton
                 type="submit"
                 loading={formik.isSubmitting}
-                buttonSize="small"
                 buttonStyle="secondary"
                 data-cy="add-two-factor-auth-totp-code-button"
               >
                 <FormattedMessage id="actions.verify" defaultMessage="Verify" />
               </StyledButton>
-            </Box>
-          </Flex>
+            </Flex>
+          </Box>
         </form>
       </Box>
     </StyledModal>
