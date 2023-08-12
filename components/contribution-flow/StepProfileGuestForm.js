@@ -97,10 +97,8 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
         label={<FormattedMessage defaultMessage="Your name" />}
         labelFontSize="16px"
         labelFontWeight="700"
-        required={false}
-        hint={
-          <FormattedMessage defaultMessage="This is your display name or alias. Leave it in blank to appear as guest." />
-        }
+        required
+        hint={<FormattedMessage defaultMessage="This is your display name or alias." />}
       >
         {inputProps => (
           <StyledInput
