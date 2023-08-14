@@ -25,8 +25,7 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.DASHBOARD,
     title: 'Workspace',
     description: 'Introducing improved navigation and a central admin dashboard for all accounts.',
-    publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
+    publicBeta: true,
     enabledByDefaultFor: ['opencollective'],
   },
   {
