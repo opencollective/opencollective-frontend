@@ -10,6 +10,7 @@ import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { stripHTML } from '../lib/utils';
+import sentryLib from '../server/sentry';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
@@ -26,8 +27,28 @@ import StyledUpdate from '../components/StyledUpdate';
 import { withUser } from '../components/UserProvider';
 
 class UpdatePage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, updateSlug } }) {
-    return { collectiveSlug, updateSlug };
+  static async getInitialProps(ctx) {
+    const {
+      req,
+      client,
+      query: { collectiveSlug, updateSlug },
+    } = ctx;
+    let skipDataFromTree = false;
+
+    if (req) {
+      try {
+        await client.query({
+          query: updateQuery,
+          variables: { collectiveSlug, updateSlug },
+          context: API_V2_CONTEXT,
+        });
+        skipDataFromTree = true;
+      } catch (err) {
+        sentryLib.captureException(err, ctx);
+      }
+    }
+
+    return { collectiveSlug, updateSlug, skipDataFromTree };
   }
 
   static propTypes = {
