@@ -1,6 +1,6 @@
 {
-  "++1FQ+": "Rappel envoyé à <Account></Account> à propos de l'expiration d'une carte de crédit",
-  "+5KHJy": "Supprimer le jeton",
+  "++1FQ+": "Sent a reminder about expiring credit card to <Account></Account>",
+  "+5KHJy": "Supprimer le Token",
   "+7ZAeJ": "<Individual></Individual> a payé <Expense>{expenseDescription}</Expense>",
   "+a+2ug": "Membres",
   "+cQ6YM": "Image de couverture mise à jour",
@@ -12,7 +12,7 @@
   "+lM4fw": "Vous n'avez pas trouvé ce que vous cherchez ? Contactez notre <SupportLink>support</SupportLink> ou retrouvez-nous sur <SlackLink>Slack</SlackLink>",
   "+n7iNv": "Mois passé",
   "+o/Xal": "Apps autorisées",
-  "+pCc8I": "Mis en attente",
+  "+pCc8I": "Put-on Hold",
   "+Qi39W": "<strong>Les administrateurs</strong> peuvent modifier les paramètres, approuver les dépenses et recevoir des notifications d'activité (comme lorsqu'une nouvelle dépense est envoyée). Ils sont les gestionnaires actifs d'un Collectif.",
   "+rutWP": "La dépense a été automatiquement préremplie avec les informations du document",
   "+RvjCt": "Carte supprimée avec succès",
