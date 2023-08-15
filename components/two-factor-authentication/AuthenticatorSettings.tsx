@@ -16,7 +16,7 @@ import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
-import StyledModal from '../StyledModal';
+import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { H3, P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
@@ -208,68 +208,77 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
 
   return (
     <StyledModal onClose={props.onClose}>
-      <Box>
-        <Flex gap="20px">
-          <Flex justifyContent="center">
-            <QRCode value={otpAuthUrl} renderAs="svg" size={128} level="L" includeMargin data-cy="qr-code" />
-          </Flex>
-          <TokenBox data-cy="manual-entry-2fa-token">
-            <P>
-              <FormattedMessage
-                id="TwoFactorAuth.Setup.ManualEntry"
-                defaultMessage="Manual entry: {token}"
-                values={{
-                  token: <Code>{base32}</Code>,
-                }}
-              />
-            </P>
-          </TokenBox>
-        </Flex>
-        <form onSubmit={formik.handleSubmit}>
+      <ModalHeader>
+        <FormattedMessage defaultMessage="Add authenticator" />
+      </ModalHeader>
+      <form onSubmit={formik.handleSubmit}>
+        <ModalBody>
           <Box>
-            <StyledInputField
-              required
-              mt={2}
-              mb={3}
-              label={<FormattedMessage defaultMessage="Enter your code without any dashes" />}
-              htmlFor="twoFactorAuthenticatorCode"
-              error={formik.touched.twoFactorAuthenticatorCode && formik.errors.twoFactorAuthenticatorCode}
-              {...formik.getFieldProps('twoFactorAuthenticatorCode')}
-            >
-              {inputProps => (
-                <StyledInput
-                  disabled={formik.isSubmitting}
-                  as={StyledInput}
-                  {...inputProps}
-                  width={240}
-                  minHeight={60}
-                  fontSize="20px"
-                  lineHeight="28px"
-                  placeholder="123456"
-                  pattern="[0-9]{6}"
-                  inputMode="numeric"
-                  minLength={6}
-                  maxLength={6}
-                  data-cy="add-two-factor-auth-totp-code-field"
-                />
-              )}
-            </StyledInputField>
-            <Flex mt={4} gap="20px" justifyContent="flex-end">
-              <StyledButton disabled={formik.isSubmitting} buttonStyle="danger" onClick={props.onClose}>
-                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </StyledButton>
-              <StyledButton
-                type="submit"
-                loading={formik.isSubmitting}
-                buttonStyle="secondary"
-                data-cy="add-two-factor-auth-totp-code-button"
-              >
-                <FormattedMessage id="actions.verify" defaultMessage="Verify" />
-              </StyledButton>
+            <Flex gap="20px">
+              <Flex justifyContent="center">
+                <QRCode value={otpAuthUrl} renderAs="svg" size={128} level="L" includeMargin data-cy="qr-code" />
+              </Flex>
+              <Box>
+                <TokenBox data-cy="manual-entry-2fa-token">
+                  <P>
+                    <FormattedMessage
+                      id="TwoFactorAuth.Setup.ManualEntry"
+                      defaultMessage="Manual entry: {token}"
+                      values={{
+                        token: <Code>{base32}</Code>,
+                      }}
+                    />
+                  </P>
+                </TokenBox>
+                <Box mt={4}>
+                  <StyledInputField
+                    required
+                    mt={2}
+                    mb={3}
+                    label={<FormattedMessage defaultMessage="Enter your code without any dashes" />}
+                    htmlFor="twoFactorAuthenticatorCode"
+                    error={formik.touched.twoFactorAuthenticatorCode && formik.errors.twoFactorAuthenticatorCode}
+                    {...formik.getFieldProps('twoFactorAuthenticatorCode')}
+                  >
+                    {inputProps => (
+                      <StyledInput
+                        disabled={formik.isSubmitting}
+                        as={StyledInput}
+                        {...inputProps}
+                        width={240}
+                        minHeight={60}
+                        fontSize="20px"
+                        lineHeight="28px"
+                        placeholder="123456"
+                        pattern="[0-9]{6}"
+                        inputMode="numeric"
+                        minLength={6}
+                        maxLength={6}
+                        data-cy="add-two-factor-auth-totp-code-field"
+                      />
+                    )}
+                  </StyledInputField>
+                </Box>
+              </Box>
             </Flex>
           </Box>
-        </form>
-      </Box>
+        </ModalBody>
+        <ModalFooter>
+          <Flex justifyContent="space-between">
+            <StyledButton disabled={formik.isSubmitting} buttonStyle="danger" onClick={props.onClose}>
+              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+            </StyledButton>
+            <StyledButton
+              type="submit"
+              loading={formik.isSubmitting}
+              buttonStyle="secondary"
+              data-cy="add-two-factor-auth-totp-code-button"
+            >
+              <FormattedMessage id="actions.verify" defaultMessage="Verify" />
+            </StyledButton>
+          </Flex>
+        </ModalFooter>
+      </form>
     </StyledModal>
   );
 }
