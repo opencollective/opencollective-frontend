@@ -234,9 +234,9 @@ BudgetStats.propTypes = {
 
   /** Stats */
   stats: PropTypes.shape({
-    balance: AmountPropTypeShape.isRequired,
-    consolidatedBalance: AmountPropTypeShape.isRequired,
-    yearlyBudget: AmountPropTypeShape.isRequired,
+    balance: AmountPropTypeShape,
+    consolidatedBalance: AmountPropTypeShape,
+    yearlyBudget: AmountPropTypeShape,
     activeRecurringContributions: PropTypes.object,
     totalAmountReceived: AmountPropTypeShape,
     totalAmountRaised: AmountPropTypeShape,

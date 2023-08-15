@@ -12,7 +12,7 @@ import styled from 'styled-components';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
-import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
+import { getSettingsRoute, getWorkspaceRoute } from '../lib/url-helpers';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
@@ -126,7 +126,7 @@ const UserAccountLinks = ({
       <UserMenuLinkEntry
         isMobileMenuLink={isMobileView}
         href={
-          useDashboard ? getDashboardRoute(LoggedInUser.collective, 'info') : getSettingsRoute(LoggedInUser.collective)
+          useDashboard ? getWorkspaceRoute(LoggedInUser.collective, 'info') : getSettingsRoute(LoggedInUser.collective)
         }
       >
         <FormattedMessage id="Settings" defaultMessage="Settings" />
@@ -135,7 +135,7 @@ const UserAccountLinks = ({
         isMobileMenuLink={isMobileView}
         href={
           useDashboard
-            ? getDashboardRoute(LoggedInUser.collective, 'manage-contributions')
+            ? getWorkspaceRoute(LoggedInUser.collective, 'manage-contributions')
             : `/${LoggedInUser.collective.slug}/manage-contributions`
         }
       >
@@ -145,7 +145,7 @@ const UserAccountLinks = ({
         isMobileMenuLink={isMobileView}
         href={
           useDashboard
-            ? getDashboardRoute(LoggedInUser.collective, 'expenses')
+            ? getWorkspaceRoute(LoggedInUser.collective, 'expenses')
             : `/${LoggedInUser.collective.slug}/submitted-expenses`
         }
       >
@@ -155,7 +155,7 @@ const UserAccountLinks = ({
         isMobileMenuLink={isMobileView}
         href={
           useDashboard
-            ? getDashboardRoute(LoggedInUser.collective, 'transactions')
+            ? getWorkspaceRoute(LoggedInUser.collective, 'transactions')
             : `/${LoggedInUser.collective.slug}/transactions`
         }
       >

@@ -13,7 +13,7 @@ import styled from 'styled-components';
 import { CollectiveType } from '../lib/constants/collectives';
 import { isPastEvent } from '../lib/events';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
-import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
+import { getSettingsRoute, getWorkspaceRoute } from '../lib/url-helpers';
 
 import Avatar from './Avatar';
 import Collapse from './Collapse';
@@ -62,7 +62,7 @@ const MembershipLine = ({ user, membership }) => {
           as={Link}
           href={
             user?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-              ? getDashboardRoute(membership.collective)
+              ? getWorkspaceRoute(membership.collective)
               : getSettingsRoute(membership.collective)
           }
           ml={1}

@@ -30,7 +30,10 @@ const StyledContributeCard = styled.div`
   border-radius: ${CONTRIBUTE_CARD_BORDER_RADIUS}px;
   border: 1px solid #dcdee0;
   background: white;
-  transition: border-color 0.2s, box-shadow 0.2s, opacity 0.2s; // Opacity for DragNDrop
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    opacity 0.2s; // Opacity for DragNDrop
 
   &:hover {
     /* Primitives / OC Blue */
@@ -88,10 +91,6 @@ const I18nContributionType = defineMessages({
   [ContributionTypes.FINANCIAL_CUSTOM]: {
     id: 'ContributionType.Custom',
     defaultMessage: 'Custom contribution',
-  },
-  [ContributionTypes.FINANCIAL_CRYPTO]: {
-    id: 'ContributionType.Crypto',
-    defaultMessage: 'Crypto contribution',
   },
   [ContributionTypes.FINANCIAL_ONE_TIME]: {
     id: 'ContributionType.OneTime',
@@ -247,7 +246,14 @@ const ContributeCard = ({
         <Box>
           {!disableCTA && !hideCTA && (
             <Link href={route}>
-              <StyledButton buttonStyle={getCTAButtonStyle(type)} width={1} mb={2} mt={3} data-cy="contribute-btn">
+              <StyledButton
+                buttonStyle={getCTAButtonStyle(type)}
+                width={1}
+                mb={2}
+                mt={3}
+                truncateOverflow
+                data-cy="contribute-btn"
+              >
                 {buttonText || getContributeCTA(type)}
               </StyledButton>
             </Link>

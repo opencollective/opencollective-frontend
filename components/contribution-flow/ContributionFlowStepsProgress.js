@@ -27,11 +27,9 @@ const StepLabel = styled(Span)`
   margin-bottom: 4px;
 `;
 
-const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, isCrypto }) => {
-  if (stepDetails.amount || stepDetails.cryptoAmount) {
-    const totalAmount = isCrypto
-      ? get(stepDetails, 'cryptoAmount', 0)
-      : get(stepDetails, 'amount', 0) + get(stepDetails, 'platformTip', 0);
+const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
+  if (stepDetails.amount) {
+    const totalAmount = get(stepDetails, 'amount', 0) + get(stepDetails, 'platformTip', 0);
     return (
       <FormattedMoneyAmount
         interval={stepDetails.interval}
@@ -39,7 +37,6 @@ const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier, isCryp
         amount={totalAmount}
         abbreviateInterval
         amountStyles={null}
-        isCrypto={isCrypto}
       />
     );
   } else if (stepDetails.amount === 0 && isFreeTier) {
@@ -54,14 +51,12 @@ PrettyAmountFromStepDetails.propTypes = {
   stepDetails: PropTypes.shape({
     interval: PropTypes.string,
     amount: PropTypes.number,
-    cryptoAmount: PropTypes.number,
     platformTip: PropTypes.number,
   }),
   isFreeTier: PropTypes.bool,
-  isCrypto: PropTypes.bool,
 };
 
-const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, isFreeTier, currency, isCrypto }) => {
+const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, isFreeTier, currency }) => {
   if (step.name === STEPS.PROFILE) {
     if (stepProfile) {
       const mainInfo = (stepProfile.id && stepProfile.name) || (stepProfile.email ?? stepProfile.name);
@@ -76,12 +71,7 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
     if (stepDetails) {
       return (
         <React.Fragment>
-          <PrettyAmountFromStepDetails
-            stepDetails={stepDetails}
-            currency={currency}
-            isFreeTier={isFreeTier}
-            isCrypto={isCrypto}
-          />
+          <PrettyAmountFromStepDetails stepDetails={stepDetails} currency={currency} isFreeTier={isFreeTier} />
           {!isNaN(stepDetails.quantity) && stepDetails.quantity > 1 && ` x ${stepDetails.quantity}`}
         </React.Fragment>
       );
@@ -92,7 +82,7 @@ const StepInfo = ({ step, stepProfile, stepDetails, stepPayment, stepSummary, is
     } else if (stepPayment?.key === NEW_CREDIT_CARD_KEY) {
       return <FormattedMessage id="contribute.newcreditcard" defaultMessage="New credit/debit card" />;
     } else {
-      return (!isCrypto && stepPayment?.paymentMethod && getPaymentMethodName(stepPayment.paymentMethod)) || null;
+      return (stepPayment?.paymentMethod && getPaymentMethodName(stepPayment.paymentMethod)) || null;
     }
   } else if (step.name === STEPS.SUMMARY) {
     return stepSummary?.countryISO || null;
@@ -109,7 +99,6 @@ StepInfo.propTypes = {
   stepSummary: PropTypes.object,
   isFreeTier: PropTypes.bool,
   currency: PropTypes.string,
-  isCrypto: PropTypes.bool,
 };
 
 const ContributionFlowStepsProgress = ({
@@ -125,7 +114,6 @@ const ContributionFlowStepsProgress = ({
   goToStep,
   currency,
   isFreeTier,
-  isCrypto,
 }) => {
   return (
     <StepsProgress
@@ -151,7 +139,6 @@ const ContributionFlowStepsProgress = ({
                 stepSummary={stepSummary}
                 isFreeTier={isFreeTier}
                 currency={currency}
-                isCrypto={isCrypto}
               />
             )}
           </Container>
@@ -174,7 +161,6 @@ ContributionFlowStepsProgress.propTypes = {
   lastVisitedStep: PropTypes.object,
   currency: PropTypes.string,
   isFreeTier: PropTypes.bool,
-  isCrypto: PropTypes.bool,
 };
 
 export default ContributionFlowStepsProgress;

@@ -3,7 +3,6 @@ import { RouterContext } from 'next/dist/shared/lib/router-context';
 import { IntlProvider } from 'react-intl';
 import theme from '../lib/theme';
 import { ApolloProvider } from '@apollo/client';
-import * as nextImage from 'next/image';
 
 import UserProvider from '../components/UserProvider';
 import { initClient } from '../lib/apollo-client';
@@ -15,11 +14,6 @@ import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
 import ToastProvider from '../components/ToastProvider';
-
-Object.defineProperty(nextImage, 'default', {
-  configurable: true,
-  value: props => <img {...props} />,
-});
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },

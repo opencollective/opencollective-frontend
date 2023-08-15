@@ -24,7 +24,6 @@ export const CONTRIBUTION_BLOCKER = {
   TIER_MISSING: 'TIER_MISSING',
   TIER_EXPIRED: 'TIER_EXPIRED',
   NO_CUSTOM_CONTRIBUTION: 'NO_CUSTOM_CONTRIBUTION',
-  NO_CRYPTO_CONTRIBUTION: 'NO_CRYPTO_CONTRIBUTION',
 };
 
 const msg = defineMessages({
@@ -55,10 +54,6 @@ const msg = defineMessages({
     id: 'Tier.disableCustomContribution',
     defaultMessage: 'This collective requires you to select a tier to contribute.',
   },
-  [CONTRIBUTION_BLOCKER.NO_CRYPTO_CONTRIBUTION]: {
-    id: 'Tier.disableCryptoContribution',
-    defaultMessage: 'This collective does not allow crypto contributions. Please select another tier.',
-  },
 });
 
 const tierHasFixedInterval = tier => tier?.interval && tier.interval !== 'flexible';
@@ -66,7 +61,7 @@ const tierHasFixedInterval = tier => tier?.interval && tier.interval !== 'flexib
 /**
  * From received params, see if there's anything preventing the contribution
  */
-export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTier, isCrypto = false) => {
+export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTier) => {
   if (!account.host) {
     return { reason: CONTRIBUTION_BLOCKER.NO_HOST };
   } else if (!account.isActive) {
@@ -80,14 +75,8 @@ export const getContributionBlocker = (loggedInUser, account, tier, shouldHaveTi
     return { reason: CONTRIBUTION_BLOCKER.TIER_MISSING, type: 'warning', showOtherWaysToContribute: true };
   } else if (tier && isTierExpired(tier)) {
     return { reason: CONTRIBUTION_BLOCKER.TIER_EXPIRED, type: 'warning', showOtherWaysToContribute: true };
-  } else if (account.settings.disableCryptoContributions && isCrypto) {
-    return { reason: CONTRIBUTION_BLOCKER.NO_CRYPTO_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
-  } else if (account.settings.disableCustomContributions && !isCrypto && !tier) {
-    return { reason: CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
-  } else if (isCrypto && !account.host.supportedPaymentMethods?.includes('CRYPTO')) {
-    return { reason: CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION, type: 'warning', showOtherWaysToContribute: true };
   } else if (
-    (!isCrypto && !account.host.supportedPaymentMethods?.length) ||
+    !account.host.supportedPaymentMethods?.length ||
     (tierHasFixedInterval(tier) && !canContributeRecurring(account, loggedInUser))
   ) {
     return {

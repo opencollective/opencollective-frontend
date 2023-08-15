@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import expenseStatus from '../../lib/constants/expense-status';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
 
 import { Flex } from '../Grid';
@@ -12,18 +12,18 @@ import StyledTooltip from '../StyledTooltip';
 
 export const getExpenseStatusMsgType = status => {
   switch (status) {
-    case expenseStatus.REJECTED:
-    case expenseStatus.SPAM:
-    case expenseStatus.ERROR:
+    case ExpenseStatus.REJECTED:
+    case ExpenseStatus.SPAM:
+    case ExpenseStatus.ERROR:
       return 'error';
-    case expenseStatus.PENDING:
-    case expenseStatus.UNVERIFIED:
+    case ExpenseStatus.PENDING:
+    case ExpenseStatus.UNVERIFIED:
     case 'ON_HOLD':
       return 'warning';
-    case expenseStatus.SCHEDULED_FOR_PAYMENT:
-    case expenseStatus.APPROVED:
+    case ExpenseStatus.SCHEDULED_FOR_PAYMENT:
+    case ExpenseStatus.APPROVED:
       return 'info';
-    case expenseStatus.PAID:
+    case ExpenseStatus.PAID:
     case 'COMPLETED':
       return 'success';
   }
@@ -58,7 +58,7 @@ const BaseTag = ({ status, ...props }) => {
 };
 
 BaseTag.propTypes = {
-  status: PropTypes.oneOf(Object.values(expenseStatus)),
+  status: PropTypes.oneOf(Object.values(ExpenseStatus)),
 };
 
 /**
@@ -76,10 +76,10 @@ const ExpenseStatusTag = ({ status, showTaxFormTag, showTaxFormMsg, ...props }) 
     ...props,
   };
 
-  if (status === expenseStatus.UNVERIFIED) {
+  if (status === ExpenseStatus.UNVERIFIED) {
     return (
       <Flex alignItems="center">
-        <BaseTag status={expenseStatus.PENDING} {...tagProps} />
+        <BaseTag status={ExpenseStatus.PENDING} {...tagProps} />
         <ExtendedTag {...tagProps}>
           <FormattedMessage id="Unverified" defaultMessage="Unverified" />
         </ExtendedTag>
@@ -119,7 +119,7 @@ const ExpenseStatusTag = ({ status, showTaxFormTag, showTaxFormMsg, ...props }) 
 };
 
 ExpenseStatusTag.propTypes = {
-  status: PropTypes.oneOf(Object.values(expenseStatus)),
+  status: PropTypes.oneOf(Object.values(ExpenseStatus)),
   showTaxFormMsg: PropTypes.bool,
   showTaxFormTag: PropTypes.bool,
 };

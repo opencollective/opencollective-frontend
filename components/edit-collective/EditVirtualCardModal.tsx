@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import roles from '../../lib/constants/roles';
 import { graphqlAmountValueInCents } from '../../lib/currency-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Account, VirtualCard, VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
+import { Account, VirtualCard, VirtualCardLimitInterval, VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import {
   VirtualCardLimitIntervalDescriptionsI18n,
@@ -68,6 +68,7 @@ const createVirtualCardMutation = gql`
     $limitInterval: VirtualCardLimitInterval!
     $account: AccountReferenceInput!
     $assignee: AccountReferenceInput!
+    $virtualCardRequest: VirtualCardRequestReferenceInput
   ) {
     createVirtualCard(
       name: $name
@@ -75,11 +76,16 @@ const createVirtualCardMutation = gql`
       limitInterval: $limitInterval
       account: $account
       assignee: $assignee
+      virtualCardRequest: $virtualCardRequest
     ) {
       id
       name
       last4
       data
+      virtualCardRequest {
+        id
+        status
+      }
     }
   }
 `;
@@ -158,11 +164,12 @@ const throttledCall = debounce((searchFunc, variables) => {
 
 export type EditVirtualCardModalProps = {
   host: Account;
-  collective: Account;
+  collective?: Account;
   virtualCard: VirtualCard;
+  virtualCardRequest?: VirtualCardRequest;
   onSuccess: (el: React.ReactNode) => void;
   onClose: () => void;
-  modalProps: any;
+  modalProps?: any;
 };
 
 export default function EditVirtualCardModal({
@@ -172,6 +179,7 @@ export default function EditVirtualCardModal({
   onSuccess,
   onClose,
   modalProps,
+  virtualCardRequest,
 }: EditVirtualCardModalProps) {
   const { addToast } = useToasts();
 
@@ -224,6 +232,7 @@ export default function EditVirtualCardModal({
           assignee: { id: assignee.id },
           limitAmount: undefined,
           limitInterval: undefined,
+          virtualCardRequest: virtualCardRequest ? { id: virtualCardRequest.id } : undefined,
         };
 
         if (canEditLimit) {

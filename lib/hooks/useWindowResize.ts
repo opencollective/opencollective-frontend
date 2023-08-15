@@ -1,11 +1,24 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { throttle } from 'lodash';
 
-export const useWindowResize = onResizeCallback => {
+import { BREAKPOINTS, getViewportFromWidth, VIEWPORTS } from '../withViewport';
+
+export { BREAKPOINTS, VIEWPORTS };
+
+export const useWindowResize = (onResizeCallback?) => {
+  const [viewport, setViewport] = useState<keyof typeof VIEWPORTS>(VIEWPORTS.UNKNOWN);
+  const callback = (...args) => {
+    const newViewport = getViewportFromWidth(window.innerWidth);
+    setViewport(newViewport);
+    onResizeCallback?.(...args);
+  };
+
   useEffect(() => {
-    const debouncedCallback = throttle(onResizeCallback, 100);
-    debouncedCallback();
-    window.addEventListener('resize', debouncedCallback);
-    return () => window.removeEventListener('resize', debouncedCallback);
+    const throttledCallback = throttle(callback, 34);
+    throttledCallback();
+    window.addEventListener('resize', throttledCallback);
+    return () => window.removeEventListener('resize', throttledCallback);
   }, []);
+
+  return { viewport };
 };

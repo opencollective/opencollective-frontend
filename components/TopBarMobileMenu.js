@@ -73,8 +73,8 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
           {useDashboard && !onHomeRoute ? (
             <Fragment>
               <ListItem>
-                <Link href="/dashboard" onClick={closeMenu}>
-                  <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+                <Link href="/workspace" onClick={closeMenu}>
+                  <FormattedMessage id="Workspace" defaultMessage="Workspace" />
                 </Link>
               </ListItem>
               <hr />
@@ -183,8 +183,8 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                 <Fragment>
                   <hr />
                   <ListItem>
-                    <Link href="/dashboard" onClick={closeMenu}>
-                      <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+                    <Link href="/workspace" onClick={closeMenu}>
+                      <FormattedMessage id="Workspace" defaultMessage="Workspace" />
                     </Link>
                   </ListItem>
                 </Fragment>

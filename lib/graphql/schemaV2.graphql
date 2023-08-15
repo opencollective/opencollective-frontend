@@ -647,6 +647,22 @@ interface Account {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
 }
 
 """
@@ -777,10 +793,21 @@ type Tier {
   description: String
 
   """
+  A long, html-formatted description.
+  """
+  longDescription: String
+
+  """
+  Link to a video (YouTube, Vimeo).
+  """
+  videoUrl: String
+
+  """
   Get all orders
   """
   orders(limit: Int! = 100, offset: Int! = 0, status: [OrderStatus]): OrderCollection!
   amount: Amount!
+  currency: String
   button: String
   goal: Amount!
   type: TierType!
@@ -801,6 +828,22 @@ type Tier {
   useStandalonePage: Boolean
   singleTicket: Boolean
   requireAddress: Boolean!
+
+  """
+  Returns a list of all the contributors for this tier
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): ContributorCollection!
+  stats: TierStats
 }
 
 """
@@ -919,6 +962,22 @@ type Order {
   Whether the order needs confirmation (3DSecure/SCA)
   """
   needsConfirmation: Boolean
+
+  """
+  Returns the list of comments for this order, or `null` if user is not allowed to see them
+  """
+  comments(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
+  ): CommentCollection
 }
 
 """
@@ -2698,6 +2757,22 @@ type Host implements Account & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -4085,7 +4160,7 @@ type UpdateCollection implements Collection {
   offset: Int
   limit: Int
   totalCount: Int
-  nodes: [Update]
+  nodes: [Update!]
 }
 
 """
@@ -4295,6 +4370,7 @@ type VirtualCardCollection implements Collection {
 type Policies {
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
+  COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
 }
@@ -4396,24 +4472,73 @@ type Permission {
 }
 
 """
-A collection of webhooks
+An activity describing something that happened on the platform
 """
-type WebhookCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Webhook]
-}
-
-"""
-An webhook attached to an account
-"""
-type Webhook {
+type Activity {
+  """
+  Unique identifier for this activity
+  """
   id: String!
-  legacyId: Int!
-  activityType: ActivityType
-  webhookUrl: URL
-  account: Account!
+
+  """
+  The type of the activity
+  """
+  type: ActivityType!
+
+  """
+  The date on which the ConnectedAccount was created
+  """
+  createdAt: DateTime!
+
+  """
+  The account that authored by this activity, if any
+  """
+  fromAccount: Account
+
+  """
+  The account targeted by this activity, if any
+  """
+  account: Account
+
+  """
+  The host under which this activity happened, if any
+  """
+  host: Host
+
+  """
+  The person who triggered the action, if any
+  """
+  individual: Individual
+
+  """
+  The expense related to this activity, if any
+  """
+  expense: Expense
+
+  """
+  The order related to this activity, if any
+  """
+  order: Order
+
+  """
+  The update related to this activity, if any
+  """
+  update: Update
+
+  """
+  The transaction related to this activity, if any
+  """
+  transaction: Transaction
+
+  """
+  Data attached to this activity (if any)
+  """
+  data: JSON!
+
+  """
+  Specifies whether this is a system generated activity
+  """
+  isSystem: Boolean!
 }
 
 enum ActivityType {
@@ -4435,6 +4560,7 @@ enum ActivityType {
   UPDATE_COMMENT_CREATED
   EXPENSE_COMMENT_CREATED
   CONVERSATION_COMMENT_CREATED
+  ORDER_COMMENT_CREATED
   COLLECTIVE_EXPENSE_CREATED
   COLLECTIVE_EXPENSE_DELETED
   COLLECTIVE_EXPENSE_UPDATED
@@ -4462,6 +4588,8 @@ enum ActivityType {
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY
   COLLECTIVE_VIRTUAL_CARD_DELETED
+  COLLECTIVE_VIRTUAL_CARD_REQUEST_APPROVED
+  COLLECTIVE_VIRTUAL_CARD_REQUEST_REJECTED
   VIRTUAL_CARD_REQUESTED
   VIRTUAL_CARD_CHARGE_DECLINED
   VIRTUAL_CARD_PURCHASE
@@ -4526,6 +4654,37 @@ enum ActivityType {
   COLLECTIVE_VIRTUAL_CARD_CREATED
   SUBSCRIPTION_CONFIRMED
   COLLECTIVE_COMMENT_CREATED
+}
+
+enum ActivityClassType {
+  COLLECTIVE
+  EXPENSES
+  CONTRIBUTIONS
+  ACTIVITIES_UPDATES
+  VIRTUAL_CARDS
+  FUND_EVENTS
+  REPORTS
+}
+
+"""
+A collection of webhooks
+"""
+type WebhookCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Webhook]
+}
+
+"""
+An webhook attached to an account
+"""
+type Webhook {
+  id: String!
+  legacyId: Int!
+  activityType: ActivityType
+  webhookUrl: URL
+  account: Account!
 }
 
 """
@@ -5114,76 +5273,6 @@ type ExpensePermissions {
 }
 
 """
-An activity describing something that happened on the platform
-"""
-type Activity {
-  """
-  Unique identifier for this activity
-  """
-  id: String!
-
-  """
-  The type of the activity
-  """
-  type: ActivityType!
-
-  """
-  The date on which the ConnectedAccount was created
-  """
-  createdAt: DateTime!
-
-  """
-  The account that authored by this activity, if any
-  """
-  fromAccount: Account
-
-  """
-  The account targeted by this activity, if any
-  """
-  account: Account
-
-  """
-  The host under which this activity happened, if any
-  """
-  host: Host
-
-  """
-  The person who triggered the action, if any
-  """
-  individual: Individual
-
-  """
-  The expense related to this activity, if any
-  """
-  expense: Expense
-
-  """
-  The order related to this activity, if any
-  """
-  order: Order
-
-  """
-  The update related to this activity, if any
-  """
-  update: Update
-
-  """
-  The transaction related to this activity, if any
-  """
-  transaction: Transaction
-
-  """
-  Data attached to this activity (if any)
-  """
-  data: JSON!
-
-  """
-  Specifies whether this is a system generated activity
-  """
-  isSystem: Boolean!
-}
-
-"""
 Type for a required legal document
 """
 enum LegalDocumentType {
@@ -5347,6 +5436,11 @@ type OrderPermissions {
   canEdit: Boolean!
 
   """
+  Whether the current user can comment on this order
+  """
+  canComment: Boolean!
+
+  """
   Whether the current user can see private activities for this order
   """
   canSeePrivateActivities: Boolean!
@@ -5405,6 +5499,23 @@ enum TierFrequency {
 enum TierAmountType {
   FIXED
   FLEXIBLE
+}
+
+"""
+Stats about a tier
+"""
+type TierStats {
+  id: String!
+
+  """
+  Total amount donated for this tier, in cents.
+  """
+  totalAmountReceived: Amount!
+
+  """
+  How much money is given for this tier for each tier.interval (monthly/yearly). For flexible tiers, this amount is a monthly average of contributions amount, taking into account both yearly and monthly subscriptions.
+  """
+  recurringAmount: Amount!
 }
 
 """
@@ -5973,6 +6084,22 @@ type Bot implements Account {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6492,6 +6619,22 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7380,6 +7523,22 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8117,6 +8276,22 @@ type Individual implements Account {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8811,6 +8986,22 @@ type Organization implements Account & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9453,6 +9644,22 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9574,6 +9781,7 @@ type VirtualCard {
   spendingLimitRenewsOn: DateTime
   remainingLimit: Int
   currency: Currency
+  virtualCardRequest: VirtualCardRequest
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -9585,6 +9793,34 @@ enum VirtualCardLimitInterval {
   MONTHLY
   YEARLY
   ALL_TIME
+}
+
+"""
+A Virtual Card request
+"""
+type VirtualCardRequest {
+  id: String!
+  legacyId: Int
+  purpose: String
+  notes: String
+  status: VirtualCardRequestStatus
+  currency: Currency
+  spendingLimitAmount: Amount
+  spendingLimitInterval: VirtualCardLimitInterval
+  assignee: Individual
+  host: Host
+  account: Account
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+"""
+The status of a virtual card request
+"""
+enum VirtualCardRequestStatus {
+  APPROVED
+  REJECTED
+  PENDING
 }
 
 """
@@ -10387,7 +10623,7 @@ type Query {
     Host for the accounts for which to get updates
     """
     host: [AccountReferenceInput]
-  ): UpdatesCollection!
+  ): UpdateCollection!
   paypalPlan(
     """
     The account that serves as a payment target
@@ -10431,6 +10667,35 @@ type Query {
     """
     throwIfMissing: Boolean! = true
   ): VirtualCard
+  virtualCardRequest(
+    """
+    Identifiers to retrieve the virtual card request
+    """
+    virtualCardRequest: VirtualCardRequestReferenceInput!
+
+    """
+    If true, an error will be returned if the virtual card request is missing
+    """
+    throwIfMissing: Boolean! = true
+  ): VirtualCardRequest
+  virtualCardRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Host for the accounts for which to get virtual card requests
+    """
+    host: AccountReferenceInput!
+    status: [VirtualCardRequestStatus]
+    collective: [AccountReferenceInput]
+  ): VirtualCardRequestCollection!
   loggedInAccount: Individual
   me: Individual
 }
@@ -11697,6 +11962,7 @@ enum ActivityAndClassesType {
   UPDATE_COMMENT_CREATED
   EXPENSE_COMMENT_CREATED
   CONVERSATION_COMMENT_CREATED
+  ORDER_COMMENT_CREATED
   COLLECTIVE_EXPENSE_CREATED
   COLLECTIVE_EXPENSE_DELETED
   COLLECTIVE_EXPENSE_UPDATED
@@ -11724,6 +11990,8 @@ enum ActivityAndClassesType {
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY
   COLLECTIVE_VIRTUAL_CARD_DELETED
+  COLLECTIVE_VIRTUAL_CARD_REQUEST_APPROVED
+  COLLECTIVE_VIRTUAL_CARD_REQUEST_REJECTED
   VIRTUAL_CARD_REQUESTED
   VIRTUAL_CARD_CHARGE_DECLINED
   VIRTUAL_CARD_PURCHASE
@@ -12352,6 +12620,22 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -12981,6 +13265,22 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -13116,20 +13416,25 @@ input TierReferenceInput {
 }
 
 """
-A collection of "Updates"
-"""
-type UpdatesCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Update!]
-}
-
-"""
 A PayPal plan to associate with a contribution
 """
 type PaypalPlan {
   id: String!
+}
+
+input VirtualCardRequestReferenceInput {
+  id: String
+  legacyId: Int
+}
+
+"""
+A collection of "VirtualCardRequest"
+"""
+type VirtualCardRequestCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [VirtualCardRequest!]
 }
 
 """
@@ -13504,7 +13809,12 @@ type Mutation {
     """
     ID of the Collective where the conversation will be created
     """
-    CollectiveId: String!
+    CollectiveId: String @deprecated(reason: "2023-07-18: Please use `account` instead")
+
+    """
+    Account where the conversation will be created
+    """
+    account: AccountReferenceInput
 
     """
     A list of tags for this conversation
@@ -14293,6 +14603,12 @@ type Mutation {
   Delete update. Scope: "updates".
   """
   deleteUpdate(id: String!): Update!
+  uploadFile(
+    """
+    The files to upload
+    """
+    files: [UploadFileInput!]!
+  ): [UploadFileResult!]!
 
   """
   Assign Virtual Card information to existing hosted collective. Scope: "virtualCards".
@@ -14342,6 +14658,11 @@ type Mutation {
     Individual account responsible for the virtual card
     """
     assignee: AccountReferenceInput!
+
+    """
+    Virtual card request to link to this virtual card
+    """
+    virtualCardRequest: VirtualCardRequestReferenceInput
   ): VirtualCard!
 
   """
@@ -14391,13 +14712,33 @@ type Mutation {
     """
     Monthly budget you want for this Virtual Card
     """
-    budget: Int
+    budget: Int @deprecated(reason: "2023-06-29: Use spendingLimitAmount")
+
+    """
+    Limit you want for this Virtual Card in the given use interval
+    """
+    spendingLimitAmount: AmountInput
+
+    """
+    Interval to apply the amount limit on this virtual card
+    """
+    spendingLimitInterval: VirtualCardLimitInterval = MONTHLY
 
     """
     Account where the virtual card will be associated
     """
     account: AccountReferenceInput!
   ): Boolean
+
+  """
+  Reject a virtual card request. Scope: "virtualCards"
+  """
+  rejectVirtualCardRequest(
+    """
+    Virtual card request
+    """
+    virtualCardRequest: VirtualCardRequestReferenceInput
+  ): VirtualCardRequest!
 
   """
   Pause active Virtual Card. Scope: "virtualCards".
@@ -14788,6 +15129,7 @@ input AccountUpdateInput {
 input PoliciesInput {
   EXPENSE_AUTHOR_CANNOT_APPROVE: PoliciesCollectiveExpenseAuthorCannotApprove
   REQUIRE_2FA_FOR_ADMINS: Boolean
+  COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
 }
 
@@ -14883,6 +15225,11 @@ input CommentCreateInput {
   If your comment is linked to an expense, set it here
   """
   expense: ExpenseReferenceInput
+
+  """
+  If your comment is linked to an order, set it here
+  """
+  order: OrderReferenceInput
   ConversationId: String @deprecated(reason: "2022-08-26: Please use \"conversation\"")
   conversation: ConversationReferenceInput
   update: UpdateReferenceInput
@@ -16116,6 +16463,87 @@ input UpdateUpdateInput {
   fromAccount: AccountReferenceInput
 }
 
+type UploadFileResult {
+  file: FileInfo!
+  parsingResult: ParseUploadedFileResult
+}
+
+type ParseUploadedFileResult {
+  """
+  Whether the parsing was successful
+  """
+  success: Boolean!
+
+  """
+  A message describing the parsing result, usually an error message (if parsing failed) or some warnings
+  """
+  message: String
+
+  """
+  The confidence of the parsing result
+  """
+  confidence: StrictPercentage
+
+  """
+  The parsed expense information
+  """
+  expense: ExpenseParsedFileInfo
+}
+
+"""
+A positive float value between 0 and 100
+"""
+scalar StrictPercentage
+
+type ExpenseParsedFileInfo {
+  description: String
+  amount: Amount
+  incurredAt: Date
+}
+
+"""
+A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar Date
+
+input UploadFileInput {
+  """
+  The file to upload
+  """
+  file: Upload!
+
+  """
+  The kind of file to uploaded
+  """
+  kind: UploadedFileKind!
+
+  """
+  Whether to run OCR on the document. Note that this feature is only available to selected accounts.
+  """
+  parseDocument: Boolean! = false
+}
+
+"""
+The `Upload` scalar type represents a file upload.
+"""
+scalar Upload
+
+"""
+The kind of file that was uploaded
+"""
+enum UploadedFileKind {
+  ACCOUNT_AVATAR
+  ACCOUNT_BANNER
+  EXPENSE_ATTACHED_FILE
+  EXPENSE_ITEM
+  ACCOUNT_LONG_DESCRIPTION
+  UPDATE
+  COMMENT
+  TIER_LONG_DESCRIPTION
+  ACCOUNT_CUSTOM_EMAIL
+  AGREEMENT_ATTACHMENT
+}
+
 input VirtualCardInput {
   id: String
   name: String
@@ -16262,11 +16690,6 @@ type TagResponse {
   order: Order
   expense: Expense
 }
-
-"""
-The `Upload` scalar type represents a file upload.
-"""
-scalar Upload
 
 input AgreementReferenceInput {
   """

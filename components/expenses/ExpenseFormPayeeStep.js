@@ -24,7 +24,6 @@ import CollectivePicker, {
   FLAG_NEW_COLLECTIVE,
 } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
-import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
@@ -224,9 +223,7 @@ const ExpenseFormPayeeStep = ({
   isOnBehalf,
   loggedInAccount,
   editingExpense,
-  resetDefaultStep,
-  formPersister,
-  getDefaultExpense,
+  handleClearPayeeStep,
   drawerActionsContainer,
 }) => {
   const intl = useIntl();
@@ -239,7 +236,6 @@ const ExpenseFormPayeeStep = ({
     [values.payee, loggedInAccount],
   );
 
-  const [showResetModal, setShowResetModal] = React.useState(false);
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
   const payeeOptions = React.useMemo(() => getPayeeOptions(intl, payoutProfiles), [payoutProfiles]);
@@ -352,45 +348,19 @@ const ExpenseFormPayeeStep = ({
         <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
         &nbsp;→
       </StyledButton>
-      {showResetModal ? (
-        <ConfirmationModal
-          onClose={() => setShowResetModal(false)}
-          header={editingExpense ? formatMessage(msg.cancelEditExpense) : formatMessage(msg.clearExpenseForm)}
-          body={
-            editingExpense ? formatMessage(msg.confirmCancelEditExpense) : formatMessage(msg.confirmClearExpenseForm)
-          }
-          continueHandler={() => {
-            if (editingExpense) {
-              onCancel();
-            } else {
-              resetDefaultStep();
-              formik.resetForm({ values: getDefaultExpense(collective) });
-              if (formPersister) {
-                formPersister.clearValues();
-                window.scrollTo(0, 0);
-              }
-            }
-            setShowResetModal(false);
-          }}
-          {...(editingExpense && {
-            continueLabel: formatMessage({ defaultMessage: 'Yes, cancel editing' }),
-            cancelLabel: formatMessage({ defaultMessage: 'No, continue editing' }),
-          })}
-        />
-      ) : (
-        <StyledButton
-          type="button"
-          buttonStyle="borderless"
-          width={['100%', 'auto']}
-          color="red.500"
-          whiteSpace="nowrap"
-          onClick={() => setShowResetModal(true)}
-          marginLeft={'auto'}
-        >
-          <Undo size={11} />
-          <Span mx={1}>{formatMessage(editingExpense ? msg.cancelEditExpense : msg.clearExpenseForm)}</Span>
-        </StyledButton>
-      )}
+
+      <StyledButton
+        type="button"
+        buttonStyle="borderless"
+        width={['100%', 'auto']}
+        color="red.500"
+        whiteSpace="nowrap"
+        onClick={handleClearPayeeStep}
+        marginLeft={'auto'}
+      >
+        <Undo size={11} />
+        <Span mx={1}>{formatMessage(editingExpense ? msg.cancelEditExpense : msg.clearExpenseForm)}</Span>
+      </StyledButton>
     </Flex>
   );
 
@@ -561,9 +531,6 @@ const ExpenseFormPayeeStep = ({
 ExpenseFormPayeeStep.propTypes = {
   formik: PropTypes.object,
   editingExpense: PropTypes.bool,
-  resetDefaultStep: PropTypes.func,
-  formPersister: PropTypes.object,
-  getDefaultExpense: PropTypes.func,
   payoutProfiles: PropTypes.array,
   onCancel: PropTypes.func,
   handleClearPayeeStep: PropTypes.func,

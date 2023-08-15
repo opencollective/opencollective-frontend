@@ -58,7 +58,7 @@ const getTranslator = (fieldsConfig: FieldsConfig, locale: string) => {
   if (fieldsConfig?.['translations']) {
     return (value: string) => {
       const i18nKey = `${locale}.${value}`;
-      return get(fieldsConfig['translations'], i18nKey);
+      return get(fieldsConfig['translations'], i18nKey, value);
     };
   } else {
     return value => value;

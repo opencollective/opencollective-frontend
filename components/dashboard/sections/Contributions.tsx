@@ -2,10 +2,11 @@ import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { DotsHorizontalRounded } from '@styled-icons/boxicons-regular/DotsHorizontalRounded';
 import { themeGet } from '@styled-system/theme-get';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { BREAKPOINTS, useWindowResize } from '../../../lib/hooks/useWindowResize';
 
 import Avatar from '../../Avatar';
 import Container from '../../Container';
@@ -13,16 +14,17 @@ import { DataTable } from '../../DataTable';
 import DateTime from '../../DateTime';
 import EditOrderModal, { EditOrderActions } from '../../EditOrderModal';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
-import { Flex } from '../../Grid';
+import { Box, Flex } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import OrderStatusTag from '../../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../../PaymentMethodTypeWithIcon';
 import PopupMenu from '../../PopupMenu';
 import { managedOrderFragment } from '../../recurring-contributions/graphql/queries';
+import StyledButton from '../../StyledButton';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledTabs from '../../StyledTabs';
-import { H1, Span } from '../../Text';
+import { H1, P, Span } from '../../Text';
 import { AdminSectionProps } from '../types';
 
 const manageContributionsQuery = gql`
@@ -48,12 +50,7 @@ const manageContributionsQuery = gql`
           ...ManagedOrderFields
         }
       }
-      oneTime: orders(
-        filter: OUTGOING
-        frequency: ONETIME
-        status: [PAID, REQUIRE_CLIENT_CONFIRMATION, PROCESSING, IN_REVIEW, DISPUTED, PENDING, REFUNDED, ERROR]
-        includeIncognito: true
-      ) {
+      oneTime: orders(filter: OUTGOING, frequency: ONETIME, status: [PAID], includeIncognito: true, minAmount: 1) {
         totalCount
         nodes {
           id
@@ -118,10 +115,10 @@ const ActionButton = styled.button`
   }
 `;
 
-const getColumns = ({ tab, setEditOrder }) => {
+const getColumns = ({ tab, setEditOrder, intl }) => {
   const toAccount = {
     accessorKey: 'toAccount',
-    header: 'Collective',
+    header: intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' }),
     cell: ({ cell }) => {
       const toAccount = cell.getValue();
       return (
@@ -136,11 +133,11 @@ const getColumns = ({ tab, setEditOrder }) => {
   };
   const orderId = {
     accessorKey: 'legacyId',
-    header: 'Order #',
+    header: intl.formatMessage({ id: 'order.id', defaultMessage: 'Contribution #' }),
   };
   const paymentMethod = {
     accessorKey: 'paymentMethod',
-    header: 'Payment Method',
+    header: intl.formatMessage({ id: 'paymentmethod.label', defaultMessage: 'Payment Method' }),
     cell: ({ cell }) => {
       const pm = cell.getValue();
       if (pm) {
@@ -150,7 +147,7 @@ const getColumns = ({ tab, setEditOrder }) => {
   };
   const status = {
     accessorKey: 'status',
-    header: 'Status',
+    header: intl.formatMessage({ id: 'order.status', defaultMessage: 'Status' }),
     cell: ({ cell }) => {
       const status = cell.getValue();
       return (
@@ -168,7 +165,7 @@ const getColumns = ({ tab, setEditOrder }) => {
       paymentMethod,
       {
         accessorKey: 'amount',
-        header: 'Amount',
+        header: intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
         cell: ({ cell }) => {
           const amount = cell.getValue();
           return <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />;
@@ -176,7 +173,7 @@ const getColumns = ({ tab, setEditOrder }) => {
       },
       {
         accessorKey: 'createdAt',
-        header: 'Date',
+        header: intl.formatMessage({ id: 'expense.incurredAt', defaultMessage: 'Date' }),
         cell: ({ cell }) => {
           const date = cell.getValue();
           return <DateTime value={date} dateStyle="medium" timeStyle={undefined} />;
@@ -187,7 +184,7 @@ const getColumns = ({ tab, setEditOrder }) => {
   } else if (['recurring', 'canceled'].includes(tab)) {
     const amount = {
       accessorKey: 'amount',
-      header: 'Amount',
+      header: intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
       cell: ({ cell, row }) => {
         const amount = cell.getValue();
         const order = row.original;
@@ -198,7 +195,7 @@ const getColumns = ({ tab, setEditOrder }) => {
     };
     const totalDonations = {
       accessorKey: 'totalDonations',
-      header: 'Total Donated',
+      header: intl.formatMessage({ id: 'TotalDonated', defaultMessage: 'Total Donated' }),
       cell: ({ cell }) => {
         const amount = cell.getValue();
         return <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />;
@@ -206,7 +203,7 @@ const getColumns = ({ tab, setEditOrder }) => {
     };
     const processedAt = {
       accessorKey: 'processedAt',
-      header: 'Last Charge',
+      header: intl.formatMessage({ id: 'LastCharge', defaultMessage: 'Last Charge' }),
       cell: ({ cell }) => {
         const date = cell.getValue();
         if (date) {
@@ -225,7 +222,7 @@ const getColumns = ({ tab, setEditOrder }) => {
         processedAt,
         status,
         {
-          header: 'Actions',
+          header: intl.formatMessage({ id: 'CollectivePage.NavBar.ActionMenu.Actions', defaultMessage: 'Actions' }),
           cell: ({ row }) => {
             const order = row.original;
             return (
@@ -272,6 +269,111 @@ const getColumns = ({ tab, setEditOrder }) => {
   }
 };
 
+export const cardColumns = ({ tab, setEditOrder }) => [
+  {
+    accessorKey: 'summary',
+    header: null,
+    cell: ({ row }) => {
+      const order = row.original;
+      return (
+        <Flex alignItems="center" gap="16px">
+          <Avatar collective={order.toAccount} radius={40} />
+          <Flex flexDirection="column" gap="8px" flexGrow={1}>
+            <Flex justifyContent={['flex-start', 'space-between']} gap="8px" alignItems="baseline">
+              <P fontSize="13px" fontWeight="400">
+                <FormattedMessage id="order.id" defaultMessage="Contribution #" />
+                {order.legacyId}
+              </P>
+              <Flex
+                alignItems={['flex-end', 'center']}
+                flexDirection={['column', 'row']}
+                gap="16px"
+                justifyContent={['space-between', 'flex-end']}
+                flexGrow={1}
+              >
+                {order.frequency && order.processedAt && (
+                  <P fontSize="13px" fontWeight="400" display={['none', 'block']}>
+                    <FormattedMessage defaultMessage="Last charge" />
+                    :&nbsp;
+                    <DateTime value={order.processedAt} dateStyle="medium" timeStyle={undefined} />
+                  </P>
+                )}
+                <OrderStatusTag status={order.status} />
+                <P fontSize="16px">
+                  <FormattedMoneyAmount
+                    amount={order.amount.valueInCents}
+                    currency={order.amount.currency}
+                    frequency={order.frequency}
+                  />
+                </P>
+              </Flex>
+            </Flex>
+            <Flex justifyContent="space-between" alignItems="baseline" flexDirection={['column', 'row']} gap="8px">
+              <Flex fontSize="13px" fontWeight="400">
+                {order.frequency && order.totalDonations && (
+                  <Box mr="16px">
+                    <FormattedMessage defaultMessage="Total contributed" />
+                    :&nbsp;
+                    <FormattedMoneyAmount
+                      amount={order.totalDonations.valueInCents}
+                      currency={order.totalDonations.currency}
+                    />
+                  </Box>
+                )}
+                {order.paymentMethod && <PaymentMethodTypeWithIcon iconSize={18} type={order.paymentMethod?.type} />}
+              </Flex>
+              <Flex justifyContent={['space-between', 'flex-end']} alignItems="baseline" width={['100%', 'auto']}>
+                {order.frequency && order.processedAt && (
+                  <P fontSize="13px" fontWeight="400" display={['block', 'none']}>
+                    <FormattedMessage defaultMessage="Last charge" />
+                    :&nbsp;
+                    <DateTime value={order.processedAt} dateStyle="medium" timeStyle={undefined} />
+                  </P>
+                )}
+                {tab === 'recurring' && (
+                  <Flex justifyContent="center">
+                    <PopupMenu
+                      placement="bottom-start"
+                      Button={({ onClick }) => (
+                        <StyledButton data-cy="actions" onClick={onClick} buttonSize="tiny">
+                          <FormattedMessage id="Edit" defaultMessage="Edit" />
+                        </StyledButton>
+                      )}
+                    >
+                      {() => (
+                        <Flex flexDirection="column">
+                          <ActionButton onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}>
+                            <FormattedMessage
+                              id="subscription.menu.editPaymentMethod"
+                              defaultMessage="Update payment method"
+                            />
+                          </ActionButton>
+                          <ActionButton onClick={() => setEditOrder({ order, action: 'editAmount' })}>
+                            <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
+                          </ActionButton>
+                          <ActionButton
+                            onClick={() => setEditOrder({ order, action: 'cancel' })}
+                            color={themeGet('colors.red.600')}
+                          >
+                            <FormattedMessage
+                              id="subscription.menu.cancelContribution"
+                              defaultMessage="Cancel contribution"
+                            />
+                          </ActionButton>
+                        </Flex>
+                      )}
+                    </PopupMenu>
+                  </Flex>
+                )}
+              </Flex>
+            </Flex>
+          </Flex>
+        </Flex>
+      );
+    },
+  },
+];
+
 const TableWrapper = styled.div`
   > div {
     border-radius: 16px;
@@ -309,7 +411,9 @@ const Home = ({ account }: AdminSectionProps) => {
     variables: { slug: account.slug },
     context: API_V2_CONTEXT,
   });
+  const intl = useIntl();
   const [tab, setTab] = React.useState('recurring');
+  const [view, setView] = React.useState<'table' | 'card'>('table');
   const [editOrder, setEditOrder] = React.useState<{ order?: { id: string }; action: EditOrderActions }>({
     order: null,
     action: null,
@@ -322,8 +426,10 @@ const Home = ({ account }: AdminSectionProps) => {
     { id: 'canceled', label: 'Canceled', count: data?.account?.canceled?.totalCount || undefined },
   ];
 
+  useWindowResize(() => setView(window.innerWidth > BREAKPOINTS.LARGE ? 'table' : 'card'));
+
   const selectedOrders = data?.account?.[tab]?.nodes || [];
-  const columns = getColumns({ tab, setEditOrder });
+  const columns = view === 'table' ? getColumns({ tab, setEditOrder, intl }) : cardColumns({ tab, setEditOrder });
 
   return (
     <Container>
@@ -336,7 +442,12 @@ const Home = ({ account }: AdminSectionProps) => {
         {loading && <LoadingPlaceholder height="250px" width="100%" borderRadius="16px" />}
         {!error && !loading && (
           <TableWrapper>
-            <DataTable columns={columns} data={selectedOrders} highlightRowOnHover={false} />
+            <DataTable
+              columns={columns}
+              data={selectedOrders}
+              highlightRowOnHover={false}
+              hideHeader={view === 'card'}
+            />
           </TableWrapper>
         )}
       </Flex>

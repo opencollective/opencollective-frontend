@@ -2,6 +2,8 @@ import { assign, pick } from 'lodash';
 
 import UrlQueryHelper from '../../lib/UrlQueryHelper';
 
+import { INCOGNITO_PROFILE_ALIAS, PERSONAL_PROFILE_ALIAS } from './constants';
+
 /**
  * These attributes are documented using JSDoc to automatically generate
  * documentation for the contribution flow. You can re-generate them by running:
@@ -86,10 +88,6 @@ const ContributionFlowUrlParametersConfig = {
   defaultEmail: { type: 'alias', on: 'email' },
   /** @deprecated Use `name` instead */
   defaultName: { type: 'alias', on: 'name' },
-  /** Cryptocurrency type; BTC, ETH etc **/
-  cryptoCurrency: { type: 'string' },
-  /** Cryptocurrency amount **/
-  cryptoAmount: { type: 'float' },
 };
 
 const EmbedContributionFlowUrlParametersConfig = {
@@ -136,29 +134,25 @@ const STATIC_PARAMS_EMBED = Object.keys(EmbedContributionFlowUrlParametersConfig
  * Returns an un-sanitized version of the URL query parameters
  */
 export const stepsDataToUrlParamsData = (
+  loggedInUser,
   previousUrlParams,
   stepDetails,
   stepProfile,
   stepPayment,
-  isCrypto,
   isEmbed,
 ) => {
   // Static params that are not meant to be changed during the flow
   const data = pick(previousUrlParams, isEmbed ? STATIC_PARAMS_EMBED : STATIC_PARAMS);
 
   // Step details
-  assign(data, pick(stepDetails, ['interval', 'quantity', 'customData']));
-
-  if (isCrypto) {
-    data.cryptoAmount = parseFloat(stepDetails.cryptoAmount) || previousUrlParams.cryptoAmount || 0;
-    data.cryptoCurrency = stepDetails.currency?.value ? stepDetails.currency.value : previousUrlParams.cryptoCurrency;
-  } else {
-    data.amount = stepDetails.amount;
-  }
+  assign(data, pick(stepDetails, ['interval', 'quantity', 'customData', 'amount']));
 
   // Step profile
-  if (stepProfile?.slug) {
-    data.contributeAs = stepProfile.slug;
+  if (stepProfile.isIncognito) {
+    data.contributeAs = INCOGNITO_PROFILE_ALIAS;
+  } else if (stepProfile?.slug) {
+    const isPersonalProfile = stepProfile.slug === loggedInUser?.collective?.slug;
+    data.contributeAs = isPersonalProfile ? PERSONAL_PROFILE_ALIAS : stepProfile.slug;
   } else {
     assign(data, pick(stepProfile, ['name', 'legalName', 'email']));
   }

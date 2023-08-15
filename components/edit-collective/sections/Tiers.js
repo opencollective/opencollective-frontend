@@ -9,7 +9,6 @@ import styled from 'styled-components';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import AdminContributeCardsContainer from '../../contribute-cards/AdminContributeCardsContainer';
-import ContributeCrypto from '../../contribute-cards/ContributeCrypto';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import { Box, Grid } from '../../Grid';
@@ -28,9 +27,6 @@ import { collectiveSettingsV1Query } from './EditCollectivePage';
 // TODO Make this a common function with the contribute section
 const getFinancialContributions = (collective, sortedTiers) => {
   const hasCustomContribution = !get(collective, 'settings.disableCustomContributions', false);
-  const hasCryptoContribution =
-    !get(collective, 'settings.disableCryptoContributions', true) &&
-    get(collective, 'host.settings.cryptoEnabled', false);
   const waysToContribute = [];
 
   sortedTiers.forEach(tier => {
@@ -42,17 +38,6 @@ const getFinancialContributions = (collective, sortedTiers) => {
           componentProps: {
             collective,
             hideContributors: true,
-            hideCTA: true,
-          },
-        });
-      }
-      if (hasCryptoContribution) {
-        waysToContribute.push({
-          key: 'crypto',
-          Component: ContributeCrypto,
-          componentProps: {
-            collective,
-            hideContributors: true, // for the MVP we shall not display the financial contributors for crypto
             hideCTA: true,
           },
         });
@@ -95,9 +80,6 @@ const Tiers = ({ collective }) => {
   const tiers = sortBy(get(data, 'account.tiers.nodes', []), 'legacyId');
   const filteredTiers = collective.type === 'EVENT' ? tiers.filter(tier => tier.type !== 'TICKET') : tiers; // Events have their tickets displayed in the "Tickets" section
   const intl = useIntl();
-  const cryptoContributionsEnabledByHost = get(collective, 'host.settings.cryptoEnabled', false);
-  const hasCryptoContributionsDisabled = get(collective, 'settings.disableCryptoContributions', true);
-
   return (
     <div>
       <Grid gridTemplateColumns={['1fr', '172px 1fr']} gridGap={62} mt={34}>
@@ -167,45 +149,6 @@ const Tiers = ({ collective }) => {
                 )}
               </Mutation>
             </Box>
-            {cryptoContributionsEnabledByHost && (
-              <Box mb={4}>
-                <StyledHr my={4} borderColor="black.300" />
-                <P fontSize="14px" lineHeight="20x" mb={3}>
-                  <FormattedMessage
-                    id="Tiers.CryptoTierDescription"
-                    defaultMessage="Enabling this will enable support for donations with Cryptocurrencies such as Bitcoin or Ethereum."
-                  />
-                </P>
-                <Mutation
-                  mutation={editAccountSettingsMutation}
-                  refetchQueries={[{ query: collectiveSettingsV1Query, variables: { slug: collective.slug } }]}
-                  awaitRefetchQueries
-                >
-                  {(editSettings, { loading }) => (
-                    <StyledCheckbox
-                      name="crypto-contributions"
-                      label={intl.formatMessage({
-                        id: 'tier.cryptoContributions.label',
-                        defaultMessage: 'Enable Crypto contributions',
-                      })}
-                      defaultChecked={!hasCryptoContributionsDisabled}
-                      width="auto"
-                      isLoading={loading}
-                      onChange={({ target }) => {
-                        editSettings({
-                          variables: {
-                            account: { legacyId: collective.id },
-                            key: 'disableCryptoContributions',
-                            value: !target.value,
-                          },
-                          context: API_V2_CONTEXT,
-                        });
-                      }}
-                    />
-                  )}
-                </Mutation>
-              </Box>
-            )}
             <AdminContributeCardsContainer
               collective={collective}
               cards={getFinancialContributions(collective, filteredTiers)}

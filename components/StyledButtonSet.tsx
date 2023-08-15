@@ -16,7 +16,10 @@ const ButtonItem = styled(StyledButton)<ButtonItemProps>`
   line-height: 1.5;
   flex-grow: 1;
   border-color: ${themeGet('colors.black.300')};
-  transition: color 0.2s, background 0.1s, font-size 30ms;
+  transition:
+    color 0.2s,
+    background 0.1s,
+    font-size 30ms;
 
   &:active p {
     color: white;

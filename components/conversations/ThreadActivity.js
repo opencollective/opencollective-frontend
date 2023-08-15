@@ -23,7 +23,7 @@ import DateTime from '../DateTime';
 import { Box as Container, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import StyledLink from '../StyledLink';
-import { P, Span } from '../Text';
+import { Span } from '../Text';
 
 const ExpenseTransactionRenderer = ({ activity }) => {
   const intl = useIntl();
@@ -212,7 +212,7 @@ export const isSupportedActivity = activity => {
   return Object.prototype.hasOwnProperty.call(ACTIVITIES_INFO, activity.type);
 };
 
-const ActivityParagraph = styled(P)`
+const ActivityParagraph = styled(Container)`
   padding: 10px 12px;
   border-left: 4px solid ${props => props.activityColor};
   border-radius: 0;

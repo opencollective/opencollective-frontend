@@ -12,6 +12,7 @@ import { require2FAForAdmins } from '../lib/policies';
 import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import AdminPanelSection from '../components/dashboard/DashboardSection';
+import Footer from '../components/dashboard/Footer';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
 import { Box, Flex } from '../components/Grid';
@@ -44,7 +45,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return ALL_SECTIONS.INFO;
   } else if (account?.type === 'INDIVIDUAL') {
-    return ALL_SECTIONS.HOME;
+    return ALL_SECTIONS.DASHBOARD_OVERVIEW;
   } else if (isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
   } else {
@@ -129,6 +130,7 @@ const DashboardPage = () => {
         collective={account}
         title={account ? `${account.name} - ${titleBase}` : titleBase}
         pageTitle={titleBase}
+        showFooter={false}
       >
         {Boolean(notification) && <NotificationBar {...notification} />}
         {blocker ? (
@@ -141,10 +143,12 @@ const DashboardPage = () => {
         ) : (
           <Flex
             flexDirection={['column', 'column', 'row']}
-            justifyContent={'space-between'}
+            justifyContent={'center'}
             minHeight={600}
-            gridGap={16}
+            gridGap={[24, null, 48]}
             data-cy="admin-panel-container"
+            py={['24px', null, '32px']}
+            px={['16px', '24px']}
           >
             <AdminPanelSideBar
               isLoading={isLoading}
@@ -156,7 +160,7 @@ const DashboardPage = () => {
             {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
             ) : (
-              <Box flex="0 1 1000px" py={'32px'} px={[1, '24px']}>
+              <Box flex="0 1 1000px">
                 <AdminPanelSection
                   section={selectedSection}
                   isLoading={isLoading}
@@ -165,9 +169,9 @@ const DashboardPage = () => {
                 />
               </Box>
             )}
-            <Box flex="0 100 300px" />
           </Flex>
         )}
+        <Footer />
       </Page>
     </DashboardContext.Provider>
   );

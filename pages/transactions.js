@@ -184,7 +184,7 @@ class TransactionsPage extends React.Component {
             selectedCategory={NAVBAR_CATEGORIES.BUDGET}
             selectedSection={account.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
           />
-          <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} py={[0, 5]} data-cy="transactions-page-content">
+          <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} my={[4, 5]} data-cy="transactions-page-content">
             <Transactions
               transactions={transactions}
               account={account}

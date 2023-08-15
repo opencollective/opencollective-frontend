@@ -6,9 +6,9 @@ import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 
@@ -358,7 +358,7 @@ const ExpenseSummary = ({
         host={host}
         expense={expense}
         collective={collective}
-        isDraft={!isEditing && expense?.status === expenseStatus.DRAFT}
+        isDraft={!isEditing && expense?.status === ExpenseStatus.DRAFT}
       />
       {!isEditing &&
         (drawerActionsContainer ? (
@@ -399,7 +399,7 @@ ExpenseSummary.propTypes = {
     currency: PropTypes.string.isRequired,
     invoiceInfo: PropTypes.string,
     createdAt: PropTypes.string,
-    status: PropTypes.oneOf(Object.values(expenseStatus)),
+    status: PropTypes.oneOf(Object.values(ExpenseStatus)),
     onHold: PropTypes.bool,
     type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
     tags: PropTypes.arrayOf(PropTypes.string),

@@ -102,9 +102,7 @@ const PreviewFeaturesModal = ({ onClose }: { onClose: () => void }) => {
         </Flex>
       </ModalHeader>
       <ModalBody mb={2}>
-        {previewFeatures?.map(feature => (
-          <PreviewFeatureCard key={feature.key} feature={feature} />
-        ))}
+        {previewFeatures?.map(feature => <PreviewFeatureCard key={feature.key} feature={feature} />)}
       </ModalBody>
     </StyledModal>
   );

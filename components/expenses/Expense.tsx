@@ -12,11 +12,11 @@ import styled, { css } from 'styled-components';
 
 import { getCollectiveTypeForUrl, getSuggestedTags } from '../../lib/collective.lib';
 import CommentType from '../../lib/constants/commentTypes';
-import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { getFilesFromExpense, getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 
@@ -52,7 +52,9 @@ import PrivateCommentsMessage from './PrivateCommentsMessage';
 import TaxFormLinkModal from './TaxFormLinkModal';
 
 export const getVariableFromProps = props => {
-  const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1)).utc(true).toISOString();
+  const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1))
+    .utc(true)
+    .toISOString();
   return {
     legacyExpenseId: props.legacyExpenseId,
     draftKey: props.draftKey,
@@ -105,7 +107,7 @@ function Expense(props) {
   const router = useRouter();
   const [state, setState] = useState({
     error: error || null,
-    status: draftKey && data?.expense?.status === expenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
+    status: draftKey && data?.expense?.status === ExpenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
     editedExpense: null,
     isSubmitting: false,
     isPollingEnabled: true,
@@ -123,7 +125,7 @@ function Expense(props) {
   const drawerActionsContainer = useDrawerActionsContainer();
 
   useEffect(() => {
-    const shouldEditDraft = data?.expense?.status === expenseStatus.DRAFT && draftKey;
+    const shouldEditDraft = data?.expense?.status === ExpenseStatus.DRAFT && draftKey;
     if (shouldEditDraft) {
       setState(state => ({
         ...state,
@@ -148,7 +150,7 @@ function Expense(props) {
   useEffect(() => {
     const expense = data?.expense;
     const isMissingReceipt =
-      expense?.status === expenseStatus.PAID &&
+      expense?.status === ExpenseStatus.PAID &&
       expense?.type === expenseTypes.CHARGE &&
       expense?.permissions?.canEdit &&
       expense?.items?.every(item => !item.url);
@@ -161,7 +163,7 @@ function Expense(props) {
 
   // Update status when data or draftKey changes
   useEffect(() => {
-    const status = draftKey && data?.expense?.status === expenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW;
+    const status = draftKey && data?.expense?.status === ExpenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW;
     if (status !== state.status) {
       setState(state => ({ ...state, status }));
     }
@@ -195,10 +197,10 @@ function Expense(props) {
   const loggedInAccount = data?.loggedInAccount;
   const collective = expense?.account;
   const host = collective?.host;
-  const isDraft = expense?.status === expenseStatus.DRAFT;
+  const isDraft = expense?.status === ExpenseStatus.DRAFT;
   const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM');
   const isMissingReceipt =
-    expense?.status === expenseStatus.PAID &&
+    [ExpenseStatus.PAID, ExpenseStatus.PROCESSING].includes(expense?.status) &&
     expense?.type === expenseTypes.CHARGE &&
     expense?.permissions?.canEdit &&
     expense?.items?.every(item => !item.url);
@@ -273,7 +275,7 @@ function Expense(props) {
       await editExpense({
         variables: {
           expense: prepareExpenseForSubmit(editedExpense),
-          draftKey: data?.expense?.status === expenseStatus.DRAFT ? draftKey : null,
+          draftKey: data?.expense?.status === ExpenseStatus.DRAFT ? draftKey : null,
         },
       });
       if (data?.expense?.type === expenseTypes.CHARGE) {
@@ -483,7 +485,7 @@ function Expense(props) {
         </MessageBox>
       )}
       {status === PAGE_STATUS.VIEW &&
-        ((expense?.status === expenseStatus.UNVERIFIED && state.createdUser) || (isDraft && !isRecurring)) && (
+        ((expense?.status === ExpenseStatus.UNVERIFIED && state.createdUser) || (isDraft && !isRecurring)) && (
           <ExpenseInviteNotificationBanner expense={expense} createdUser={state.createdUser} />
         )}
       {isMissingReceipt && (

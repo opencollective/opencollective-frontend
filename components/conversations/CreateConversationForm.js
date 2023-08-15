@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
+import { pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
@@ -20,8 +21,8 @@ import StyledInputTags from '../StyledInputTags';
 import { H4, P } from '../Text';
 
 const createConversationMutation = gql`
-  mutation CreateConversation($title: String!, $html: String!, $CollectiveId: String!, $tags: [String]) {
-    createConversation(title: $title, html: $html, CollectiveId: $CollectiveId, tags: $tags) {
+  mutation CreateConversation($title: String!, $html: String!, $account: AccountReferenceInput!, $tags: [String]) {
+    createConversation(title: $title, html: $html, account: $account, tags: $tags) {
       id
       slug
       title
@@ -71,7 +72,7 @@ const validate = values => {
  */
 const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuccess, disabled, loading }) => {
   const intl = useIntl();
-  const { id: collectiveId, slug: collectiveSlug } = collective;
+  const { slug: collectiveSlug } = collective;
   const { formatMessage } = useIntl();
   const [createConversation, { error: submitError }] = useMutation(createConversationMutation, mutationOptions);
   const [formPersister] = React.useState(new FormPersister());
@@ -85,7 +86,8 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
     },
     validate,
     onSubmit: async values => {
-      const response = await createConversation({ variables: { ...values, CollectiveId: collectiveId } });
+      const account = pick(collective, ['id']);
+      const response = await createConversation({ variables: { ...values, account } });
       formPersister.clearValues();
       return onSuccess(response.data.createConversation);
     },

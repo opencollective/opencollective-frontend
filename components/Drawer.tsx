@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from 'react';
 import MUIDrawer from '@mui/material/Drawer';
 import { XMark } from '@styled-icons/heroicons-outline/XMark';
 import { themeGet } from '@styled-system/theme-get';
+import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 
 import { useTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
@@ -88,4 +89,14 @@ export default function Drawer({
       </MUIDrawer>
     </DrawerActionsContext.Provider>
   );
+}
+
+export function DrawerActions(props: React.PropsWithChildren) {
+  const drawerActionsContainer = useDrawerActionsContainer();
+
+  if (!drawerActionsContainer) {
+    return null;
+  }
+
+  return createPortal(props.children, drawerActionsContainer);
 }

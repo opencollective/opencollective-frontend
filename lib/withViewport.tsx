@@ -1,5 +1,5 @@
 import React from 'react';
-import { debounce, findLastIndex, isEqual, zipObject } from 'lodash';
+import { debounce, findIndex, isEqual, zipObject } from 'lodash';
 
 import breakpoints from './theme/breakpoints';
 import { emToPx } from './theme/helpers';
@@ -13,12 +13,15 @@ export const VIEWPORTS = {
   MEDIUM: 'MEDIUM',
   LARGE: 'LARGE',
   UNKNOWN: 'UNKNOWN',
-};
+} as const;
 
 // Please keep the same length for these two arrays
 export const BREAKPOINTS_NAMES = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL, VIEWPORTS.MEDIUM, VIEWPORTS.LARGE];
 export const BREAKPOINTS_WIDTHS = BREAKPOINTS_NAMES.map((_, idx) => emToPx(breakpoints[idx]));
-export const BREAKPOINTS = zipObject(BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS);
+export const BREAKPOINTS = zipObject(BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS) as Record<
+  (typeof BREAKPOINTS_NAMES)[number],
+  number
+>;
 
 /**
  * Helper to check if a viewport is superior or equal to another one.
@@ -40,10 +43,10 @@ export const isDesktopOrAbove = viewport => {
   return BREAKPOINTS_NAMES.indexOf(viewport) >= BREAKPOINTS_NAMES.indexOf(VIEWPORTS.MEDIUM);
 };
 
-/** Returns the name of the viewport (see `BREAKPOINTS_NAMES`) */
+/** Returns the name of the viewport based on max-width media selector (see `BREAKPOINTS_NAMES`) */
 export const getViewportFromWidth = width => {
-  const breakpointIdx = findLastIndex(BREAKPOINTS_WIDTHS, b => width >= b);
-  return breakpointIdx === -1 ? BREAKPOINTS_NAMES[0] : BREAKPOINTS_NAMES[breakpointIdx];
+  const breakpointIdx = findIndex(BREAKPOINTS_WIDTHS, b => width <= b);
+  return breakpointIdx === -1 ? VIEWPORTS.LARGE : BREAKPOINTS_NAMES[breakpointIdx];
 };
 
 /** Function to build component's state */
@@ -96,6 +99,8 @@ const withViewport = (ChildComponent, options) => {
     componentWillUnmount() {
       window.removeEventListener('resize', this.onResize);
     }
+
+    onResize: () => void;
 
     doResize = () => {
       const viewport = getViewportFromWidth(window.innerWidth);

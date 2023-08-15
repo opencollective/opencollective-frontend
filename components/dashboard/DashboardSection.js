@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 import AccountSettings from '../admin-panel/sections/AccountSettings';
 import FinancialContributions from '../admin-panel/sections/FinancialContributions';
+import HostVirtualCardRequests from '../admin-panel/sections/HostVirtualCardRequests';
 import HostVirtualCards from '../admin-panel/sections/HostVirtualCards';
 import InvoicesReceipts from '../admin-panel/sections/invoices-receipts/InvoicesReceipts';
 import NotificationsSettings from '../admin-panel/sections/NotificationsSettings';
@@ -44,12 +45,13 @@ const ADMIN_PANEL_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: PendingApplications,
   [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
   [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
+  [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
   [COLLECTIVE_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
   [COLLECTIVE_SECTIONS.TEAM]: TeamSettings,
   // NEW
   [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
   [COLLECTIVE_SECTIONS.EXPENSES]: Expenses,
-  [COLLECTIVE_SECTIONS.HOME]: Home,
+  [COLLECTIVE_SECTIONS.DASHBOARD_OVERVIEW]: Home,
   [COLLECTIVE_SECTIONS.CONTRIBUTIONS]: Contributions,
   [COLLECTIVE_SECTIONS.TRANSACTIONS]: Transactions,
 };
@@ -79,9 +81,7 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
   const AdminSectionComponent = ADMIN_PANEL_SECTIONS[section];
   if (AdminSectionComponent) {
     return (
-      <Container width="100%">
-        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} isDashboard={true} />
-      </Container>
+      <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} isDashboard={true} />
     );
   }
 
