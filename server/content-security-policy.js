@@ -73,6 +73,7 @@ const COMMON_DIRECTIVES = {
     'opencollective.com',
     'anchor.fm',
     'podcasters.spotify.com',
+    'player.vimeo.com',
     'js.stripe.com',
     '*.paypal.com',
     '*.openstreetmap.org',

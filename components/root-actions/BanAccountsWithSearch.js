@@ -31,6 +31,7 @@ export const searchQuery = gql`
       limit: 30
       offset: $offset
       skipRecentAccounts: false
+      includeArchived: true
       orderBy: { field: CREATED_AT, direction: DESC }
       type: [COLLECTIVE, EVENT, FUND, INDIVIDUAL, ORGANIZATION, PROJECT]
     ) {
