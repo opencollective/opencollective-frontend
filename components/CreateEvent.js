@@ -110,7 +110,7 @@ class CreateEvent extends React.Component {
         <Body>
           <CollectiveNavbar collective={collective} isAdmin={isAdmin} />
 
-          <div className="content">
+          <div className="p-3 sm:p-8">
             {!isAdmin ? (
               <Container margin="0 auto" textAlign="center">
                 <p>
