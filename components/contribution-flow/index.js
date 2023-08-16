@@ -22,6 +22,7 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { isPastEvent } from '../../lib/events';
+import { Experiment, isExperimentEnabled } from '../../lib/experiments/experiments';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
@@ -178,7 +179,7 @@ class ContributionFlow extends React.Component {
         amount,
         platformTip: this.canHavePlatformTips() ? Math.round(amount * quantity * DEFAULT_PLATFORM_TIP_PERCENTAGE) : 0,
         platformTipOption: PlatformTipOption.FIFTEEN_PERCENT,
-        isNewPlatformTip: Math.random() >= 0.5,
+        isNewPlatformTip: isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, LoggedInUser),
         currency,
       },
     };
