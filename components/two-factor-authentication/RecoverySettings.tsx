@@ -49,7 +49,7 @@ export function RecoverySettings(props: RecoverySettingsProps) {
   const onRemoveConfirmation = React.useCallback(async () => {
     let twoFactorResult: { code: string; type: string };
     try {
-      twoFactorResult = await prompt.open({ supportedMethods: ['recovery_code'] });
+      twoFactorResult = await prompt.open({ supportedMethods: ['recovery_code'], allowRecovery: true });
     } catch (e) {
       return;
     }

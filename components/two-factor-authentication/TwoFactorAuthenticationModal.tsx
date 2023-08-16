@@ -44,7 +44,12 @@ export default function TwoFactorAuthenticationModal() {
 
   const prompt = useTwoFactorAuthenticationPrompt();
   const isOpen = prompt?.isOpen ?? false;
-  const supportedMethods = prompt?.supportedMethods ?? [];
+  const supportedMethods = React.useMemo(() => {
+    return (prompt?.supportedMethods ?? []).filter(method => {
+      return method !== 'recovery_code' || prompt?.allowRecovery;
+    });
+  }, [prompt?.supportedMethods, prompt.allowRecovery]);
+
   const cancellable = !prompt.isRequired;
 
   const [selectedMethod, setSelectedMethod] = React.useState(initialMethod(supportedMethods));
