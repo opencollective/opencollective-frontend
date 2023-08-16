@@ -291,6 +291,7 @@ class ContributionFlow extends React.Component {
       [AnalyticsProperty.CONTRIBUTION_HAS_PLATFORM_TIP]: stepDetails.amount && stepDetails.platformTip > 0,
       [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_PERCENTAGE]:
         stepDetails.amount && stepDetails.platformTip > 0 ? stepDetails.platformTip / stepDetails.amount : 0,
+      [AnalyticsProperty.CONTRIBUTION_IS_NEW_PLATFORM_TIP]: stepDetails.isNewPlatformTip,
     };
 
     track(AnalyticsEvent.CONTRIBUTION_SUBMITTED, {
