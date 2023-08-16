@@ -178,6 +178,7 @@ class ContributionFlow extends React.Component {
         amount,
         platformTip: this.canHavePlatformTips() ? Math.round(amount * quantity * DEFAULT_PLATFORM_TIP_PERCENTAGE) : 0,
         platformTipOption: PlatformTipOption.FIFTEEN_PERCENT,
+        isNewPlatformTip: Math.random() >= 0.5,
         currency,
       },
     };

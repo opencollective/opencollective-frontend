@@ -30,9 +30,10 @@ import { H5, P, Span } from '../Text';
 
 import ChangeTierWarningModal from './ChangeTierWarningModal';
 import CustomFields, { buildCustomFieldsConfig } from './CustomFields';
+import PlatformTipInput from './PlatformTipInput';
 import { getTotalAmount } from './utils';
 
-const StepDetails = ({ onChange, data, collective, tier, router }) => {
+const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router, isEmbed }) => {
   const intl = useIntl();
   const amount = data?.amount;
   const currency = tier?.amount.currency || collective.currency;
@@ -253,6 +254,18 @@ const StepDetails = ({ onChange, data, collective, tier, router }) => {
           <StyledHr borderColor="black.300" mt={16} mb={32} />
         </React.Fragment>
       )}
+      {showPlatformTip && (
+        <Box mt={28}>
+          <PlatformTipInput
+            currency={currency}
+            amount={data?.amount}
+            value={data?.platformTip}
+            quantity={data?.quantity}
+            onChange={value => dispatchChange('platformTip', value)}
+            isEmbed={isEmbed}
+          />
+        </Box>
+      )}
       {!isEmpty(customFieldsConfig?.fields) && (
         <Box mt={28}>
           <H5 fontSize="20px" fontWeight="normal" color="black.800">
@@ -282,6 +295,8 @@ const StepDetails = ({ onChange, data, collective, tier, router }) => {
 
 StepDetails.propTypes = {
   onChange: PropTypes.func,
+  showPlatformTip: PropTypes.bool,
+  isEmbed: PropTypes.bool,
   LoggedInUser: PropTypes.object,
   data: PropTypes.shape({
     amount: PropTypes.number,

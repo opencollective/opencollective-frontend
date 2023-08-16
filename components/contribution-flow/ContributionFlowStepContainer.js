@@ -77,7 +77,16 @@ class ContributionFlowStepContainer extends React.Component {
     const { stepProfile, stepDetails, stepSummary, stepPayment } = mainState;
     switch (step) {
       case 'details':
-        return <StepDetails collective={collective} tier={tier} onChange={this.props.onChange} data={stepDetails} />;
+        return (
+          <StepDetails
+            collective={collective}
+            tier={tier}
+            onChange={this.props.onChange}
+            data={stepDetails}
+            showPlatformTip={this.props.showPlatformTip && !stepDetails.isNewPlatformTip}
+            isEmbed={isEmbed}
+          />
+        );
 
       case 'profile': {
         return (
@@ -162,7 +171,7 @@ class ContributionFlowStepContainer extends React.Component {
             {this.renderStep(step.name)}
           </Flex>
         </StyledCard>
-        {showPlatformTip && (
+        {showPlatformTip && stepDetails.isNewPlatformTip && (
           <PlatformTipContainer
             step={step.name}
             amount={stepDetails.amount}

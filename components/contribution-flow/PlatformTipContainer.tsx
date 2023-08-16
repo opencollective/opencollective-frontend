@@ -104,6 +104,7 @@ function PlatformTipInput(props: PlatformTipInputProps) {
     <Box data-cy="platform-tip-input">
       <StyledButtonSet
         data-cy="platform-tip-options"
+        flexDirection={['column', 'row']}
         disabled={props.disabled}
         items={[
           PlatformTipOption.NONE,
