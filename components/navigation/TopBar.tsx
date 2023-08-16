@@ -206,7 +206,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
   ];
   const onHomeRoute = homepageRoutes.some(isRouteActive);
   const onDashboardRoute = isRouteActive('/workspace');
-  const onRoute = isRouteActive('/search');
+  const onSearchRoute = isRouteActive('/search');
   const ocLogoRoute = onHomeRoute ? '/home' : '/workspace';
 
   return (
@@ -383,7 +383,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
                 </MainNavItem>
               </Flex>
             ) : (
-              !onRoute && navTitle && <MainNavItem as="div">{navTitle}</MainNavItem>
+              !onSearchRoute && navTitle && <MainNavItem as="div">{navTitle}</MainNavItem>
             )}
           </Flex>
         )}
@@ -407,7 +407,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
         </Flex>
       </Flex>
       {showSearchModal && <SearchModal onClose={() => setShowSearchModal(false)} />}
-      {isMobile && !onHomeRoute && (
+      {isMobile && (onDashboardRoute || onSearchRoute) && (
         <MobileFooterBar alignItems="center" justifyContent="center" gap="12px">
           <MobileFooterLink href="/workspace" isActive={onDashboardRoute}>
             <MobileFooterIconContainer className="icon-container">
