@@ -63,7 +63,22 @@ const PrivateUpdateMesgBox = styled(MessageBox)`
   align-items: center;
 `;
 
-class StyledUpdate extends Component {
+type StyledUpdateProps = {
+  collective: any;
+  update: any;
+  compact?: boolean;
+  editable?: boolean;
+  LoggedInUser?: any;
+  isReloadingData?: boolean;
+  editUpdate?: Function;
+  deleteUpdate?: Function;
+  intl: any;
+  router: any;
+  /** Reactions associated with this update **/
+  reactions?: any;
+};
+
+class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified: boolean; update: any }> {
   static propTypes = {
     collective: PropTypes.object.isRequired,
     update: PropTypes.object.isRequired,
@@ -79,7 +94,7 @@ class StyledUpdate extends Component {
     reactions: PropTypes.object,
   };
 
-  constructor(props) {
+  constructor(props: StyledUpdateProps) {
     super(props);
     this.state = {
       modified: false,
@@ -96,6 +111,8 @@ class StyledUpdate extends Component {
       },
     });
   }
+
+  private messages: any;
 
   cancelEdit = () => {
     this.setState({ modified: false, mode: 'details' });
@@ -130,7 +147,7 @@ class StyledUpdate extends Component {
     this.setState({ modified: false, mode: 'details' });
   };
 
-  renderUpdateMeta(update, isAdmin, editable, isEditing) {
+  renderUpdateMeta(update, isAdmin, editable, isEditing?) {
     const { intl } = this.props;
     const { mode } = this.state;
     const fromAccount = update.fromCollective || update.fromAccount;
@@ -311,7 +328,6 @@ class StyledUpdate extends Component {
             id={update.id}
             isHost={Boolean(update.account?.isHost)}
             isChangelog={update.isChangelog}
-            isPrivate={update.isPrivate}
           />
         ) : null}
       </Container>
@@ -410,4 +426,4 @@ const addDeleteUpdateMutation = graphql(deleteUpdateMutation, {
 
 const addGraphql = compose(addEditUpdateMutation, addDeleteUpdateMutation);
 
-export default injectIntl(addGraphql(withRouter(StyledUpdate)));
+export default injectIntl<'intl', Omit<StyledUpdateProps, 'router'>>(addGraphql(withRouter(StyledUpdate)));
