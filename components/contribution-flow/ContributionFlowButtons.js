@@ -2,6 +2,9 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { AnalyticsEvent } from '../../lib/analytics/events';
+import { track } from '../../lib/analytics/plausible';
+
 import Currency from '../Currency';
 import { Box, Flex } from '../Grid';
 import PayWithPaypalButton from '../PayWithPaypalButton';
@@ -14,6 +17,7 @@ class ContributionFlowButtons extends React.Component {
   static propTypes = {
     goNext: PropTypes.func,
     goBack: PropTypes.func,
+    step: PropTypes.shape({ name: PropTypes.string }),
     prevStep: PropTypes.shape({ name: PropTypes.string }),
     nextStep: PropTypes.shape({ name: PropTypes.string }),
     isValidating: PropTypes.bool,
@@ -35,6 +39,10 @@ class ContributionFlowButtons extends React.Component {
         await this.props.goNext();
         this.setState({ isLoadingNext: false });
       });
+    }
+
+    if (this.props.step.name === 'details') {
+      track(AnalyticsEvent.CONTRIBUTION_DETAILS_STEP_COMPLETED);
     }
   };
 

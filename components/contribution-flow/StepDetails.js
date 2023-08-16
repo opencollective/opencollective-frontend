@@ -4,6 +4,9 @@ import { isEmpty, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { AnalyticsEvent } from '../../lib/analytics/events';
+import { track } from '../../lib/analytics/plausible';
+import { AnalyticsProperty } from '../../lib/analytics/properties';
 import { canContributeRecurring, hostIsTaxDeductibleInTheUs } from '../../lib/collective.lib';
 import INTERVALS from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
@@ -64,6 +67,14 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
       dispatchChange('interval', INTERVALS.oneTime);
     }
   }, [selectedInterval, isFixedInterval, supportsRecurring]);
+
+  React.useEffect(() => {
+    track(AnalyticsEvent.CONTRIBUTION_STARTED, {
+      props: {
+        [AnalyticsProperty.CONTRIBUTION_STEP]: 'details',
+      },
+    });
+  }, []);
 
   return (
     <Box width={1}>
