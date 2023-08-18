@@ -16,6 +16,11 @@ const DocumentContainer = styled.div`
   }
 `;
 
+const options = {
+  cMapUrl: `/static/cmaps/`,
+  cMapPacked: true,
+};
+
 const PDFViewer = ({ pdfUrl, contentWrapperRef }) => {
   const [numPages, setNumPages] = useState(null);
   const [wrapperWidth, setWrapperWidth] = useState(0);
@@ -50,6 +55,7 @@ const PDFViewer = ({ pdfUrl, contentWrapperRef }) => {
         onLoadSuccess={({ numPages }) => {
           setNumPages(numPages);
         }}
+        options={options}
         error={
           <Span color="white.full" fontSize={'16px'}>
             <FormattedMessage defaultMessage="Failed to load PDF file." id="PDFViewer.error" />
