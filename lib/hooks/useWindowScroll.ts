@@ -18,7 +18,12 @@ export const useWindowScroll = () => {
 
     const callback = throttle(() => {
       const newYPosition = window?.scrollY;
-      const newDirection = newYPosition > _yPosition ? ScrollDirection.DOWN : ScrollDirection.UP;
+      const newDirection =
+        newYPosition === _yPosition
+          ? _direction
+          : newYPosition > _yPosition
+          ? ScrollDirection.DOWN
+          : ScrollDirection.UP;
       const scrollDifference = Math.abs(newYPosition - _yPosition);
 
       _accPosition = newDirection !== _direction ? scrollDifference : _accPosition + scrollDifference;
