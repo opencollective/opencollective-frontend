@@ -2,12 +2,14 @@ import React, { Fragment, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
+import { max, min } from 'lodash';
 import { Compass, Frame, Search } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
+import { ScrollDirection, useWindowScroll } from '../../lib/hooks/useWindowScroll';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import ChangelogTrigger from '../changelog/ChangelogTrigger';
@@ -159,6 +161,29 @@ const MainNavItem = styled(Link)`
     white-space: nowrap;
   }
 `;
+
+const MobileFooterMenu = ({ onDashboardRoute, onSearchRoute }) => {
+  const { direction, accPosition } = useWindowScroll();
+  const bottom = direction === ScrollDirection.DOWN ? -min([accPosition, 76]) : -max([76 - accPosition, 0]);
+
+  return (
+    <MobileFooterBar alignItems="center" justifyContent="center" gap="12px" style={{ bottom: `${bottom}px` }}>
+      <MobileFooterLink href="/workspace" isActive={onDashboardRoute}>
+        <MobileFooterIconContainer className="icon-container">
+          <Frame size={20} />
+        </MobileFooterIconContainer>
+        <FormattedMessage id="Workspace" defaultMessage="Workspace" />
+      </MobileFooterLink>
+
+      <MobileFooterLink href="/search" isActive={onSearchRoute}>
+        <MobileFooterIconContainer className="icon-container">
+          <Compass size={20} />
+        </MobileFooterIconContainer>
+        <FormattedMessage id="Explore" defaultMessage="Explore" />
+      </MobileFooterLink>
+    </MobileFooterBar>
+  );
+};
 
 type TopBarProps = {
   showSearch?: boolean;
@@ -407,23 +432,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
         </Flex>
       </Flex>
       {showSearchModal && <SearchModal onClose={() => setShowSearchModal(false)} />}
-      {isMobile && (onDashboardRoute || onSearchRoute) && (
-        <MobileFooterBar alignItems="center" justifyContent="center" gap="12px">
-          <MobileFooterLink href="/workspace" isActive={onDashboardRoute}>
-            <MobileFooterIconContainer className="icon-container">
-              <Frame size={20} />
-            </MobileFooterIconContainer>
-            <FormattedMessage id="Workspace" defaultMessage="Workspace" />
-          </MobileFooterLink>
-
-          <MobileFooterLink href="/search" isActive={!onDashboardRoute}>
-            <MobileFooterIconContainer className="icon-container">
-              <Compass size={20} />
-            </MobileFooterIconContainer>
-            <FormattedMessage id="Explore" defaultMessage="Explore" />
-          </MobileFooterLink>
-        </MobileFooterBar>
-      )}
+      {isMobile && (onDashboardRoute || onSearchRoute) && <MobileFooterMenu {...{ onDashboardRoute, onSearchRoute }} />}
     </Fragment>
   );
 };
