@@ -47,7 +47,7 @@ const MobileFooterBar = styled(Flex)`
   padding: 8px 16px;
 `;
 
-const MobileFooterLink = styled(StyledLink)<{ isActive: boolean }>`
+const MobileFooterLink = styled(Link)<{ isActive: boolean }>`
   display: flex;
   align-items: center;
   flex-direction: column;
