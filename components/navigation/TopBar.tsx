@@ -354,7 +354,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
           </Hide>
         ) : (
           <Flex flex={1} alignItems="center" gridGap={3} overflow={'hidden'}>
-            {onDashboardRoute ? (
+            {onDashboardRoute || onSearchRoute ? (
               !isMobile && (
                 <React.Fragment>
                   <MainNavItem href="/workspace">
