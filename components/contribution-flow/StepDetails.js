@@ -65,10 +65,10 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
   // If an interval has been set (either from the tier defaults, or form an URL param) and the
   // collective doesn't support it, we reset the interval
   React.useEffect(() => {
-    if (selectedInterval && !isFixedInterval && !supportsRecurring) {
+    if (selectedInterval && ((!isFixedInterval && !supportsRecurring) || amount === 0)) {
       dispatchChange('interval', INTERVALS.oneTime);
     }
-  }, [selectedInterval, isFixedInterval, supportsRecurring]);
+  }, [selectedInterval, isFixedInterval, supportsRecurring, amount]);
 
   React.useEffect(() => {
     track(AnalyticsEvent.CONTRIBUTION_STARTED, {
@@ -101,6 +101,7 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
           buttonProps={{ px: 2, py: '5px' }}
           role="group"
           aria-label="Amount types"
+          disabled={minAmount === 0 && amount === 0}
           onChange={interval => {
             if (tier && tier.interval !== INTERVALS.flexible) {
               setTemporaryInterval(interval);
