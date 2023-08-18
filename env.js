@@ -34,6 +34,8 @@ const defaults = {
   CAPTCHA_ENABLED: false,
   CAPTCHA_PROVIDER: 'HCAPTCHA',
   CLIENT_ANALYTICS_ENABLED: false,
+  CLIENT_ANALYTICS_DOMAIN: 'localhost',
+  CLIENT_ANALYTICS_EXCLUSIONS: '/**/banner.html, /**/contribute/button, /**/donate/button',
   TW_API_COLLECTIVE_SLUG: 'opencollective-host',
   OC_APPLICATION: 'frontend',
   OC_ENV: process.env.NODE_ENV || 'development',

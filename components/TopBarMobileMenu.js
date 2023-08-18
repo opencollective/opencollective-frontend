@@ -80,7 +80,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
               <hr />
               <ListItem>
                 <Link href="/search" onClick={closeMenu}>
-                  <FormattedMessage defaultMessage="Explore" />
+                  <FormattedMessage id="Explore" defaultMessage="Explore" />
                 </Link>
               </ListItem>
               <hr />

@@ -80,7 +80,7 @@ const AdminPanelSideBar = ({
         )}
       </Box>
     ),
-    [collective, isLoading],
+    [collective, isLoading, viewport],
   );
 
   return (

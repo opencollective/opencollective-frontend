@@ -22,6 +22,12 @@ export default class IntlDocument extends Document {
 
     const clientAnalytics = {
       enabled: parseToBoolean(process.env.CLIENT_ANALYTICS_ENABLED),
+      domain: process.env.CLIENT_ANALYTICS_DOMAIN,
+      scriptSrc:
+        'development' === process.env.OC_ENV
+          ? 'https://plausible.io/js/script.tagged-events.exclusions.local.js'
+          : 'https://plausible.io/js/script.tagged-events.exclusions.js',
+      exclusions: process.env.CLIENT_ANALYTICS_EXCLUSIONS,
     };
 
     // On server-side, add a CSP header
@@ -99,9 +105,10 @@ export default class IntlDocument extends Document {
             <script
               nonce={this.props.cspNonce}
               defer
-              data-domain="opencollective.com"
-              src="https://plausible.io/js/script.js"
-            />
+              data-domain={this.props.clientAnalytics.domain}
+              data-exclude={this.props.clientAnalytics.exclusions}
+              src={this.props.clientAnalytics.scriptSrc}
+            ></script>
           )}
         </body>
       </Html>

@@ -8,6 +8,7 @@ import StyledHr from '../StyledHr';
 import { H4 } from '../Text';
 import { withUser } from '../UserProvider';
 
+import { PlatformTipContainer } from './PlatformTipContainer';
 import ShareButton from './ShareButton';
 import StepDetails from './StepDetails';
 import StepPayment from './StepPayment';
@@ -81,8 +82,9 @@ class ContributionFlowStepContainer extends React.Component {
             collective={collective}
             tier={tier}
             onChange={this.props.onChange}
-            data={stepDetails}
-            showPlatformTip={this.props.showPlatformTip}
+            stepDetails={stepDetails}
+            stepPayment={stepPayment}
+            showPlatformTip={this.props.showPlatformTip && !stepDetails.isNewPlatformTip}
             isEmbed={isEmbed}
           />
         );
@@ -139,31 +141,56 @@ class ContributionFlowStepContainer extends React.Component {
   };
 
   render() {
-    const { LoggedInUser, step, isEmbed } = this.props;
+    const { LoggedInUser, step, isEmbed, showPlatformTip } = this.props;
+
+    const { tier, collective, mainState } = this.props;
+    const { stepDetails } = mainState;
+
+    const currency = tier?.amount.currency || collective.currency;
 
     return (
-      <StyledCard p={[16, 32]} mx={[16, 'none']} borderRadius={15}>
-        <Flex flexDirection="column" alignItems="center">
-          {step.name !== 'checkout' && (
-            <Flex width="100%" mb={3} alignItems="center">
-              <Flex alignItems="center">
-                <H4 fontSize={['20px', '24px']} fontWeight={500} py={2}>
-                  {this.renderHeader(step.name, LoggedInUser)}
-                </H4>
+      <Box>
+        <StyledCard p={[16, 32]} mx={[16, 'none']} borderRadius={15}>
+          <Flex flexDirection="column" alignItems="center">
+            {step.name !== 'checkout' && (
+              <Flex width="100%" mb={3} alignItems="center">
+                <Flex alignItems="center">
+                  <H4 fontSize={['20px', '24px']} fontWeight={500} py={2}>
+                    {this.renderHeader(step.name, LoggedInUser)}
+                  </H4>
+                </Flex>
+                <Flex flexGrow={1} alignItems="center" justifyContent="center">
+                  <StyledHr width="100%" ml={3} borderColor="black.300" />
+                </Flex>
+                {!isEmbed && (
+                  <Box ml={2}>
+                    <ShareButton />
+                  </Box>
+                )}
               </Flex>
-              <Flex flexGrow={1} alignItems="center" justifyContent="center">
-                <StyledHr width="100%" ml={3} borderColor="black.300" />
-              </Flex>
-              {!isEmbed && (
-                <Box ml={2}>
-                  <ShareButton />
-                </Box>
-              )}
-            </Flex>
-          )}
-          {this.renderStep(step.name)}
-        </Flex>
-      </StyledCard>
+            )}
+            {this.renderStep(step.name)}
+          </Flex>
+        </StyledCard>
+        {showPlatformTip && stepDetails.isNewPlatformTip && (
+          <PlatformTipContainer
+            step={step.name}
+            amount={stepDetails.amount}
+            currency={currency}
+            selectedOption={stepDetails.platformTipOption}
+            value={stepDetails.platformTip}
+            onChange={(option, value) => {
+              this.props.onChange({
+                stepDetails: {
+                  ...stepDetails,
+                  platformTip: value,
+                  platformTipOption: option,
+                },
+              });
+            }}
+          />
+        )}
+      </Box>
     );
   }
 }
