@@ -7,8 +7,8 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage } from '../../lib/errors';
 import { i18nTaxType } from '../../lib/i18n/taxes';
-import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
-import { newExpenseItem } from './lib/items';
+import { attachmentDropzoneParams } from './lib/attachments';
+import { expenseItemsMustHaveFiles, newExpenseItem } from './lib/items';
 import { updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import { Box, Flex } from '../Grid';
@@ -19,7 +19,6 @@ import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
 import { TaxesFormikFields } from '../taxes/TaxesFormikFields';
 import { P, Span } from '../Text';
-import { withUser } from '../UserProvider';
 
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseItemForm from './ExpenseItemForm';
@@ -37,7 +36,7 @@ class ExpenseFormItems extends React.PureComponent {
     push: PropTypes.func.isRequired,
     /** Array helper as provided by formik */
     remove: PropTypes.func.isRequired,
-    LoggedInUser: PropTypes.object,
+    hasOCRFeature: PropTypes.bool,
     /** Formik */
     form: PropTypes.shape({
       values: PropTypes.object.isRequired,
@@ -143,15 +142,14 @@ class ExpenseFormItems extends React.PureComponent {
   }
 
   render() {
-    const { availableCurrencies, LoggedInUser } = this.props;
+    const { availableCurrencies, hasOCRFeature } = this.props;
     const { values, errors, setFieldValue } = this.props.form;
-    const requireFile = attachmentRequiresFile(values.type);
+    const requireFile = expenseItemsMustHaveFiles(values.type);
     const isGrant = values.type === expenseTypes.GRANT;
     const isInvoice = values.type === expenseTypes.INVOICE;
     const isCreditCardCharge = values.type === expenseTypes.CHARGE;
     const items = values.items || [];
     const hasItems = items.length > 0;
-    const hasOCRFeature = LoggedInUser?.hasPreviewFeatureEnabled('EXPENSE_OCR');
 
     if (!hasItems && requireFile) {
       return (
@@ -263,4 +261,4 @@ class ExpenseFormItems extends React.PureComponent {
   }
 }
 
-export default injectIntl(withUser(ExpenseFormItems));
+export default injectIntl(ExpenseFormItems);

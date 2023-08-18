@@ -37,6 +37,7 @@ const nextConfig = {
         API_KEY: null,
         API_URL: null,
         PDF_SERVICE_URL: null,
+        DISABLE_MOCK_UPLOADS: false,
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
         NEXT_IMAGES_URL: null,

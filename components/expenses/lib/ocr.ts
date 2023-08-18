@@ -1,12 +1,11 @@
 import { FormikProps } from 'formik';
-import { cloneDeep, get, set, uniq } from 'lodash';
+import { cloneDeep, get, partition, set, uniq } from 'lodash';
 
 import { UploadFileResult } from '../../../lib/graphql/types/v2/graphql';
 
 import type { ExpenseFormValues } from '../types/FormValues';
 
-import { attachmentRequiresFile } from './attachments';
-import { newExpenseItem } from './items';
+import { expenseItemsMustHaveFiles, newExpenseItem } from './items';
 
 /**
  * This function mutates formValues, make sure to clone it first
@@ -23,11 +22,10 @@ const updateExpenseItemWithUploadResult = (
     return false;
   }
 
-  // Small helpers
   const itemValues = get(formValues, itemPath) || newExpenseItem();
 
   if (parsedItem.url) {
-    if (attachmentRequiresFile(formValues.type)) {
+    if (expenseItemsMustHaveFiles(formValues.type)) {
       itemValues.url = parsedItem.url;
     } else if (!formValues.attachedFiles?.find(file => file.url === parsedItem.url)) {
       formValues.attachedFiles = [...formValues.attachedFiles, { url: parsedItem.url }];
@@ -70,29 +68,49 @@ export const updateExpenseFormWithUploadResult = (
   itemIdxToReplace: number = undefined,
 ) => {
   const formValues = cloneDeep(form.values);
-  const allParsedItems = uploadResults.map(uploadResult => uploadResult.parsingResult?.expense?.items).flat();
+  const getItemsFromUploadResult = (uploadResult: UploadFileResult) => get(uploadResult, 'parsingResult.expense.items');
+  const [resultWithItems, resultsWithoutItems] = partition(uploadResults, getItemsFromUploadResult);
+  const allParsedItems = resultWithItems.map(getItemsFromUploadResult).flat();
 
-  // Currency - we only force it if all items have the same currency
-  const allCurrencies = uniq(allParsedItems.map(item => item.amount.currency));
-  if (allCurrencies.length === 1) {
-    formValues.currency = allCurrencies[0];
+  // Update from parsing results
+  if (allParsedItems.length > 0) {
+    // Currency - we only force it if all items have the same currency
+    const allCurrencies = uniq(allParsedItems.map(item => item.amount.currency));
+    if (allCurrencies.length === 1) {
+      formValues.currency = allCurrencies[0];
+    }
+
+    // Feed items (or attached files) with uploaded files
+    allParsedItems.forEach(parsedItem => {
+      // If there's an item to replace, we replace it then append the other lines as new items
+      const itemIdx = itemIdxToReplace ?? formValues.items.length;
+      if (updateExpenseItemWithUploadResult(formValues, parsedItem, `items[${itemIdx}]`)) {
+        itemIdxToReplace = null;
+      }
+    });
+
+    // Update other values
+    // TOOD(OCR): Figure a strategy for multiple files
+    const firstParsingResult = uploadResults[0].parsingResult?.expense;
+    if (firstParsingResult && uploadResults.length === 1) {
+      if (!form.values.description) {
+        formValues.description = firstParsingResult.description;
+      }
+    }
   }
 
-  // Feed items with uploaded files
-  allParsedItems.forEach(parsedItem => {
-    // If there's an item to replace, we replace it then append the other lines as new items
-    const itemIdx = itemIdxToReplace ?? formValues.items.length;
-    if (updateExpenseItemWithUploadResult(formValues, parsedItem, `items[${itemIdx}]`)) {
-      itemIdxToReplace = null;
-    }
-  });
-
-  // Update other values
-  // TOOD(OCR): Figure a strategy for multiple files
-  const firstParsingResult = uploadResults[0].parsingResult?.expense;
-  if (firstParsingResult && uploadResults.length === 1) {
-    if (!form.values.description) {
-      formValues.description = firstParsingResult.description;
+  // We still want to add any unparsed files as items/attachments
+  if (resultsWithoutItems.length > 0) {
+    if (expenseItemsMustHaveFiles(formValues.type)) {
+      formValues.items = [
+        ...formValues.items,
+        ...resultsWithoutItems.map(result => newExpenseItem({ url: result.file.url })),
+      ];
+    } else {
+      formValues.attachedFiles = [
+        ...formValues.attachedFiles,
+        ...resultsWithoutItems.map(result => ({ url: result.file.url })),
+      ];
     }
   }
 

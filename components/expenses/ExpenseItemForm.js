@@ -8,7 +8,8 @@ import { isURL } from 'validator';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
-import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
+import { attachmentDropzoneParams } from './lib/attachments';
+import { expenseItemsMustHaveFiles } from './lib/items';
 import { updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import { Box, Flex } from '../Grid';
@@ -76,7 +77,7 @@ export const validateExpenseItem = (expense, item) => {
   }
 
   // Attachment URL
-  if (attachmentRequiresFile(expense.type)) {
+  if (expenseItemsMustHaveFiles(expense.type)) {
     if (!item.url) {
       errors.url = createError(ERROR.FORM_FIELD_REQUIRED);
     } else if (!isURL(item.url)) {

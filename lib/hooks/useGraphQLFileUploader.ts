@@ -1,9 +1,11 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
+import { v4 as uuid } from 'uuid';
 
 import { TOAST_TYPE, useToasts } from '../../components/ToastProvider';
 
+import { canUseMockImageUpload, mockImageUpload } from '../api';
 import { i18nGraphqlException } from '../errors';
 import { API_V2_CONTEXT } from '../graphql/helpers';
 import { UploadedFileKind, UploadFileResult } from '../graphql/types/v2/graphql';
@@ -53,8 +55,10 @@ type useGraphQLFileUploaderProps = {
 export const useGraphQLFileUploader = ({
   onSuccess = undefined,
   onReject = undefined,
+  mockImageGenerator = undefined,
 }: useGraphQLFileUploaderProps) => {
-  const [callUploadFile, { loading }] = useMutation(uploadFileMutation, { context: API_V2_CONTEXT });
+  const [isUploading, setIsUploading] = React.useState(false);
+  const [callUploadFile] = useMutation(uploadFileMutation, { context: API_V2_CONTEXT });
   const { addToast } = useToasts();
   const intl = useIntl();
 
@@ -71,13 +75,28 @@ export const useGraphQLFileUploader = ({
   );
 
   return {
-    isUploading: loading,
+    isUploading,
     uploadFile: React.useCallback(
       async (input: UploadFileInput | UploadFileInput[]) => {
         const allInputs = Array.isArray(input) ? input : [input];
-
+        setIsUploading(true);
         try {
-          const result = await callUploadFile({ variables: { files: allInputs } });
+          let result;
+          if (mockImageGenerator && canUseMockImageUpload()) {
+            result = {
+              data: {
+                uploadFile: await Promise.all(
+                  allInputs.map(async () => {
+                    const imageUrl = await mockImageUpload(mockImageGenerator);
+                    return { file: { id: uuid(), url: imageUrl, type: 'image/png' }, parsingResult: null };
+                  }),
+                ),
+              },
+            };
+          } else {
+            result = await callUploadFile({ variables: { files: allInputs } });
+          }
+
           if (result.errors) {
             throw result.errors;
           }
@@ -85,9 +104,11 @@ export const useGraphQLFileUploader = ({
           onSuccess?.(result.data.uploadFile);
         } catch (e) {
           reportErrorMessage(i18nGraphqlException(intl, e));
+        } finally {
+          setIsUploading(false);
         }
       },
-      [onSuccess, onReject],
+      [onSuccess, onReject, mockImageGenerator],
     ),
   };
 };
