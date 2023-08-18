@@ -215,6 +215,12 @@ const initViews = [
     id: 'incomplete',
   },
   {
+    label: 'Error',
+    query: { status: 'ERROR', orderBy: 'CREATED_AT,ASC' },
+    showCount: true,
+    id: 'error',
+  },
+  {
     label: 'Paid',
     query: { status: 'PAID' },
     id: 'recently_paid',
