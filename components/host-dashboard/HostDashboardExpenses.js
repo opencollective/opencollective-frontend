@@ -123,6 +123,9 @@ const hostDashboardMetaDataQuery = gql`
       @include(if: $getViewCounts) {
       totalCount
     }
+    error: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: ERROR) @include(if: $getViewCounts) {
+      totalCount
+    }
   }
 
   ${expenseHostFields}
