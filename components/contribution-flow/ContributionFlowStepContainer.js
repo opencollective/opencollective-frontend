@@ -82,7 +82,8 @@ class ContributionFlowStepContainer extends React.Component {
             collective={collective}
             tier={tier}
             onChange={this.props.onChange}
-            data={stepDetails}
+            stepDetails={stepDetails}
+            stepPayment={stepPayment}
             showPlatformTip={this.props.showPlatformTip && !stepDetails.isNewPlatformTip}
             isEmbed={isEmbed}
           />
