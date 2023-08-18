@@ -47,7 +47,7 @@ const MobileFooterBar = styled(Flex)`
   padding: 8px 16px;
 `;
 
-const MobileFooterLink = styled(StyledLink)<{ isActive: boolean }>`
+const MobileFooterLink = styled(Link)<{ isActive: boolean }>`
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -354,7 +354,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
           </Hide>
         ) : (
           <Flex flex={1} alignItems="center" gridGap={3} overflow={'hidden'}>
-            {onDashboardRoute ? (
+            {onDashboardRoute || onSearchRoute ? (
               !isMobile && (
                 <React.Fragment>
                   <MainNavItem href="/workspace">
