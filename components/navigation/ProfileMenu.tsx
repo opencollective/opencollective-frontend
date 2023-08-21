@@ -179,7 +179,7 @@ const ProfileMenu = () => {
       <Box>
         <HorziontalSeparator style={{ margin: '24px 0' }} />
         <Link href="/home">
-          <Image src="/static/images/opencollectivelogo-footer-n.svg" alt="Open Collective" width="122" height="24" />
+          <Image src="/static/images/opencollectivelogo-footer-n.svg" alt="Open Collective" width={122} height={24} />
         </Link>
         <FooterLinks mt="16px" gap="32px">
           <Link href="/home">
