@@ -1,11 +1,10 @@
-/* eslint-disable graphql/template-strings */
 import React, { useEffect } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 
 import { initClient } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective.lib';
@@ -77,7 +76,8 @@ export const getServerSideProps: GetServerSideProps<ExpensePageProps> = async ct
   };
 };
 
-function ExpensePage(props: InferGetServerSidePropsType<typeof getServerSideProps> & { intl: any }) {
+export default function ExpensePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const [fetchData, query] = useLazyQuery(expensePageQuery, {
     variables: getVariableFromProps(props),
@@ -96,7 +96,7 @@ function ExpensePage(props: InferGetServerSidePropsType<typeof getServerSideProp
     addParentToURLIfMissing(router, props.data?.expense?.account, `/expenses/${props.legacyExpenseId}`);
   });
 
-  const { collectiveSlug, edit, draftKey, intl } = props;
+  const { collectiveSlug, edit, draftKey } = props;
   const data = query?.data || props.data;
   const error = query?.error || props.error;
   const { refetch, fetchMore, startPolling, stopPolling } = query;
@@ -155,5 +155,3 @@ function ExpensePage(props: InferGetServerSidePropsType<typeof getServerSideProp
     </Page>
   );
 }
-
-export default injectIntl(ExpensePage);
