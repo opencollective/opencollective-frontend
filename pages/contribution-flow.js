@@ -9,17 +9,13 @@ import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-m
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
-import { compose } from '../lib/utils';
 
 import Container from '../components/Container';
 import ContributionBlocker, {
   CONTRIBUTION_BLOCKER,
   getContributionBlocker,
 } from '../components/contribution-flow/ContributionBlocker';
-import {
-  contributionFlowAccountQuery,
-  contributionFlowAccountWithTierQuery,
-} from '../components/contribution-flow/graphql/queries';
+import { contributionFlowAccountQuery } from '../components/contribution-flow/graphql/queries';
 import ContributionFlowContainer from '../components/contribution-flow/index';
 import { getContributionFlowMetadata } from '../components/contribution-flow/utils';
 import ErrorPage from '../components/ErrorPage';
@@ -133,22 +129,11 @@ class NewContributionFlowPage extends React.Component {
   }
 }
 
-const addAccountData = graphql(contributionFlowAccountQuery, {
-  skip: props => Boolean(props.tierId),
+const addContributionFlowData = graphql(contributionFlowAccountQuery, {
   options: props => ({
-    variables: { collectiveSlug: props.collectiveSlug },
+    variables: { collectiveSlug: props.collectiveSlug, tierId: props.tierId, includeTier: Boolean(props.tierId) },
     context: API_V2_CONTEXT,
   }),
 });
 
-const addAccountWithTierData = graphql(contributionFlowAccountWithTierQuery, {
-  skip: props => !props.tierId,
-  options: props => ({
-    variables: { collectiveSlug: props.collectiveSlug, tier: { legacyId: props.tierId } },
-    context: API_V2_CONTEXT,
-  }),
-});
-
-const addGraphql = compose(addAccountData, addAccountWithTierData);
-
-export default addGraphql(withUser(injectIntl(withStripeLoader(withRouter(NewContributionFlowPage)))));
+export default addContributionFlowData(withUser(injectIntl(withStripeLoader(withRouter(NewContributionFlowPage)))));
