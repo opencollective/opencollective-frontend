@@ -170,7 +170,8 @@ export default function TransactionsPage(props: TransactionsPageProps) {
 
   const error = query?.error || props.error;
   const data = query?.data || props.data;
-  const { account, transactions } = data || {};
+  const account = query?.data?.account || props.data?.account;
+  const transactions = query.called ? query?.data?.transactions : props.data?.transactions;
   const { variables, refetch, loading } = query || {};
 
   if (!account && loading) {
