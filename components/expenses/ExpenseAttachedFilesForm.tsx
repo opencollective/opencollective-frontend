@@ -1,9 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { uniqBy } from 'lodash';
+import { FormikProps } from 'formik';
+import { first, uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { UploadFileResult } from '../../lib/graphql/types/v2/graphql';
 import { attachmentDropzoneParams } from './lib/attachments';
+import { expenseItemIsTouched } from './lib/items';
+import { updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import { Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
@@ -11,18 +14,28 @@ import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
 import { P, Span } from '../Text';
 
+import { ExpenseFormValues } from './types/FormValues';
 import AddNewAttachedFilesButton from './AddNewAttachedFilesButton';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 
 const ExpenseAttachedFilesForm = ({
-  onChange,
+  form,
   disabled,
   defaultValue,
   title,
   description,
-  collectFilesOnly = false,
-}) => {
+  hasOCRFeature = false,
+}: ExpenseAttachedFilesFormProps) => {
   const [files, setFiles] = React.useState(uniqBy(defaultValue, 'url'));
+  const onGraphQLUploadSuccess = (uploadResults: UploadFileResult[]) => {
+    const existingFiles = form.values.attachedFiles || [];
+    setFiles([...existingFiles, ...uploadResults.map(result => result.file)]);
+
+    // Invoices have a default empty item. If it's not touched, we overwrite it with the OCR result
+    const firstItem = first(form.values.items);
+    const itemIdxToReplace = firstItem && !expenseItemIsTouched(firstItem) ? 0 : undefined;
+    updateExpenseFormWithUploadResult(form, uploadResults, itemIdxToReplace);
+  };
 
   return (
     <div>
@@ -46,12 +59,14 @@ const ExpenseAttachedFilesForm = ({
         {files?.length > 0 && (
           <AddNewAttachedFilesButton
             disabled={disabled}
-            collectFilesOnly={collectFilesOnly}
             onSuccess={newFiles => {
               const uploadedFiles = [...files, ...newFiles];
               setFiles(uploadedFiles);
-              onChange(uploadedFiles);
+              form.setFieldValue('attachedFiles', uploadedFiles);
             }}
+            useGraphQL={hasOCRFeature}
+            parseDocument={hasOCRFeature}
+            onGraphQLSuccess={onGraphQLUploadSuccess}
           />
         )}
       </Flex>
@@ -65,38 +80,37 @@ const ExpenseAttachedFilesForm = ({
             const updatedFiles = [...files];
             updatedFiles.splice(idx, 1);
             setFiles(updatedFiles);
-            onChange(updatedFiles);
+            form.setFieldValue('attachedFiles', updatedFiles);
           }}
         />
       ) : (
         <StyledDropzone
           {...attachmentDropzoneParams}
-          collectFilesOnly={collectFilesOnly}
+          isMulti
           name="attachedFiles"
           kind="EXPENSE_ATTACHED_FILE"
           disabled={disabled}
           minHeight={72}
           onSuccess={uploadedFiles => {
             setFiles(uploadedFiles);
-            onChange(uploadedFiles);
+            form.setFieldValue('attachedFiles', uploadedFiles);
           }}
+          useGraphQL={hasOCRFeature}
+          parseDocument={hasOCRFeature}
+          onGraphQLSuccess={onGraphQLUploadSuccess}
         />
       )}
     </div>
   );
 };
 
-ExpenseAttachedFilesForm.propTypes = {
-  defaultValue: PropTypes.arrayOf(
-    PropTypes.shape({
-      url: PropTypes.string.isRequired,
-    }),
-  ),
-  title: PropTypes.element.isRequired,
-  description: PropTypes.element.isRequired,
-  disabled: PropTypes.bool,
-  onChange: PropTypes.func,
-  collectFilesOnly: PropTypes.bool,
+type ExpenseAttachedFilesFormProps = {
+  defaultValue?: Array<{ url: string }>;
+  title: React.ReactNode;
+  description: React.ReactNode;
+  disabled?: boolean;
+  form: FormikProps<ExpenseFormValues>;
+  hasOCRFeature?: boolean;
 };
 
 export default ExpenseAttachedFilesForm;
