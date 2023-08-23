@@ -320,7 +320,7 @@ class ContributionFlow extends React.Component {
             paymentMethod: await this.getPaymentMethod(),
             platformTipAmount: getGQLV2AmountInput(stepDetails.platformTip, undefined),
             tier: this.props.tier && { legacyId: this.props.tier.legacyId },
-            context: { isEmbed: this.props.isEmbed || false },
+            context: { isEmbed: this.props.isEmbed || false, isNewPlatformTipFlow: stepDetails.isNewPlatformTip },
             tags: this.getQueryParams().tags,
             taxes: skipTaxes
               ? null
