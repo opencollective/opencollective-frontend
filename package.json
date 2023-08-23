@@ -74,7 +74,7 @@
     "file-saver": "2.0.5",
     "focus-trap-react": "10.2.1",
     "formik": "2.4.3",
-    "glob": "8.1.0",
+    "glob": "10.3.3",
     "graphql": "16.7.1",
     "helmet": "7.0.0",
     "jsdom": "22.1.0",
