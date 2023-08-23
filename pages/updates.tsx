@@ -1,15 +1,16 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
-import { graphql } from '@apollo/client/react/hoc';
-import { cloneDeep, omitBy } from 'lodash';
-import { withRouter } from 'next/router';
+import React, { useEffect } from 'react';
+import { gql, useLazyQuery } from '@apollo/client';
+import { cloneDeep, isEmpty, omitBy } from 'lodash';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
+import { initClient } from '../lib/apollo-client';
 import { shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 
 import Body from '../components/Body';
@@ -27,133 +28,12 @@ import StyledButton from '../components/StyledButton';
 import { H1, P } from '../components/Text';
 import Updates from '../components/Updates';
 import UpdateFilters from '../components/updates/UpdateFilters';
-import { withUser } from '../components/UserProvider';
 
 const ROUTE_PARAMS = ['collectiveSlug', 'offset'];
+export const UPDATES_PER_PAGE = 10;
 
-class UpdatesPage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, orderBy, searchTerm } }) {
-    return { slug: collectiveSlug, orderBy, searchTerm };
-  }
-
-  static propTypes = {
-    slug: PropTypes.string, // for addCollectiveNavbarData
-    LoggedInUser: PropTypes.object, // from withUser
-    router: PropTypes.object, // from withRouter
-    fetchMore: PropTypes.func, // from withData
-    data: PropTypes.shape({
-      account: PropTypes.object,
-      loading: PropTypes.bool,
-      refetch: PropTypes.func,
-    }).isRequired, // from withData
-  };
-
-  componentDidMount() {
-    const { router, data } = this.props;
-    const account = data?.account;
-    addParentToURLIfMissing(router, account, '/updates');
-  }
-
-  componentDidUpdate(prevProps) {
-    const { data, LoggedInUser } = this.props;
-    const collective = data.account;
-    if (!prevProps.LoggedInUser && LoggedInUser && LoggedInUser.isAdminOfCollective(collective)) {
-      // We refetch the data to get the updates that are not published yet
-      data.refetch({ options: { fetchPolicy: 'network-only' } });
-    }
-  }
-
-  updateQuery = (router, newParams) => {
-    const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
-    const pathname = router.asPath.split('?')[0];
-    return router.push({ pathname, query });
-  };
-
-  render() {
-    const { data, LoggedInUser, router } = this.props;
-    const isUpdatesSupported = isFeatureSupported(data.account, FEATURES.UPDATES);
-
-    if (!data.account) {
-      return <ErrorPage data={data} />;
-    }
-
-    if (!isUpdatesSupported) {
-      return <ErrorPage error={{ type: ERROR.NOT_FOUND }} />;
-    }
-
-    const collective = data.account;
-    const updates = collective?.updates;
-
-    return (
-      <div className="UpdatesPage">
-        <Header
-          collective={collective}
-          loading={data.loading}
-          LoggedInUser={LoggedInUser}
-          canonicalURL={`${getCollectivePageCanonicalURL(collective)}/updates`}
-          noRobots={!shouldIndexAccountOnSearchEngines(collective)}
-        />
-
-        <Body>
-          <CollectiveNavbar
-            collective={collective}
-            isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollective(collective)}
-            selectedCategory={NAVBAR_CATEGORIES.CONNECT}
-          />
-
-          <div className="mx-auto max-w-[1260px] px-2 py-8 sm:px-4 sm:py-16 md:px-8">
-            <Flex flexWrap="wrap" alignItems="center" pr={2} justifyContent="space-between">
-              <Container padding="0.5rem 0" my={4}>
-                <H1 fontSize="40px" fontWeight="normal" textAlign="left" mb={2}>
-                  <FormattedMessage id="updates" defaultMessage="Updates" />
-                </H1>
-                <P color="black.700" css={{ flex: '0 1 70%' }}>
-                  <FormattedMessage
-                    id="section.updates.subtitle"
-                    defaultMessage="Updates on our activities and progress."
-                  />
-                </P>
-              </Container>
-              {LoggedInUser?.isAdminOfCollective(collective) && (
-                <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
-                  <StyledButton buttonStyle="primary" m={2}>
-                    <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />
-                  </StyledButton>
-                </Link>
-              )}
-            </Flex>
-            <UpdateFilters
-              values={router.query}
-              onChange={queryParams =>
-                this.updateQuery(router, {
-                  ...queryParams,
-                  offset: null,
-                })
-              }
-            />
-            <Box mt={4} mb={5}>
-              {data.loading ? (
-                <Loading />
-              ) : (
-                <Updates
-                  collective={collective}
-                  updates={updates}
-                  fetchMore={this.props.fetchMore}
-                  LoggedInUser={LoggedInUser}
-                />
-              )}
-            </Box>
-          </div>
-        </Body>
-
-        <Footer />
-      </div>
-    );
-  }
-}
-
-export const updatesQuery = gql`
-  query Updates(
+export const updatesPageQuery = gql`
+  query UpdatesPage(
     $collectiveSlug: String!
     $limit: Int
     $offset: Int
@@ -211,6 +91,12 @@ export const updatesQuery = gql`
   ${collectiveNavbarFieldsFragment}
 `;
 
+const getPropsFromQuery = (query: Record<string, string>) => ({
+  slug: query?.collectiveSlug,
+  orderBy: query?.orderBy || null,
+  searchTerm: query?.searchTerm || null,
+});
+
 export const getUpdatesVariables = (slug, orderBy = null, searchTerm = null) => {
   return {
     collectiveSlug: slug,
@@ -221,37 +107,170 @@ export const getUpdatesVariables = (slug, orderBy = null, searchTerm = null) => 
   };
 };
 
-export const UPDATES_PER_PAGE = 10;
+type UpdatesPageProps = {
+  slug: string;
+  orderBy?: string;
+  searchTerm?: string;
+  data: Partial<any>;
+  error?: any;
+};
 
-const addUpdatesData = graphql(updatesQuery, {
-  options: props => ({
-    context: API_V2_CONTEXT,
+export const getServerSideProps: GetServerSideProps<UpdatesPageProps> = async ctx => {
+  const props = getPropsFromQuery(ctx.query as any);
+
+  // Fetch data from GraphQL API for SSR
+  const client = initClient();
+  const { data, error } = await client.query({
+    query: updatesPageQuery,
     variables: getUpdatesVariables(props.slug, props.orderBy, props.searchTerm),
-  }),
-  props: ({ data }) => ({
-    data,
-    fetchMore: () => {
-      return data.fetchMore({
+    context: API_V2_CONTEXT,
+    fetchPolicy: 'network-only',
+    errorPolicy: 'ignore',
+  });
+
+  return {
+    props: {
+      ...props,
+      data,
+      error: error || null,
+    },
+  };
+};
+
+export default function UpdatesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
+
+  // render() {
+  const queryProps = getPropsFromQuery(router.query as any);
+  const [fetchData, query] = useLazyQuery(updatesPageQuery, {
+    variables: getUpdatesVariables(queryProps.slug, queryProps.orderBy, queryProps.searchTerm),
+    context: API_V2_CONTEXT,
+  });
+
+  const error = query?.error || props.error;
+  const data = query?.data || props.data;
+
+  useEffect(() => {
+    addParentToURLIfMissing(router, props?.data.account, '/updates');
+  });
+
+  useEffect(() => {
+    if (LoggedInUser?.isAdminOfCollective?.(props.data.account)) {
+      fetchData();
+    }
+  }, [LoggedInUser]);
+
+  const updateQuery = (router, newParams) => {
+    const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
+    const pathname = router.asPath.split('?')[0];
+    return router.push({ pathname, query });
+  };
+
+  const fetchMore = () => {
+    if (!query.called) {
+      return fetchData({
+        variables: {
+          ...query.variables,
+          offset: 0,
+          limit: data.account.updates.nodes.length + UPDATES_PER_PAGE,
+        },
+      });
+    } else {
+      return query.fetchMore({
         variables: {
           offset: data.account.updates.nodes.length,
           limit: UPDATES_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
+          const data = isEmpty(previousResult) ? props.data : previousResult;
           if (!fetchMoreResult) {
-            return previousResult;
+            return data;
           }
-          const previousResultNodes = Object.assign({}, previousResult.account.updates, {
-            // Append the new posts results to the old one
-            nodes: [...previousResult.account.updates.nodes, ...fetchMoreResult.account.updates.nodes],
-          });
 
-          const previousResultClone = cloneDeep(previousResult);
-          previousResultClone.account.updates.nodes = previousResultNodes.nodes;
-          return previousResultClone;
+          const result = cloneDeep(data);
+          const updates = data.account?.updates;
+          result.account.updates = {
+            ...updates,
+            nodes: [...updates.nodes, ...fetchMoreResult.account.updates.nodes],
+          };
+          return result;
         },
       });
-    },
-  }),
-});
+    }
+  };
 
-export default withUser(withRouter(addUpdatesData(UpdatesPage)));
+  const isUpdatesSupported = isFeatureSupported(data.account, FEATURES.UPDATES);
+
+  if (error) {
+    return <ErrorPage error={error} />;
+  } else if (!data.account) {
+    return <ErrorPage data={data} />;
+  } else if (!isUpdatesSupported) {
+    return <ErrorPage error={{ type: ERROR.NOT_FOUND }} />;
+  }
+
+  const collective = data.account;
+  const updates = collective?.updates;
+
+  return (
+    <div className="UpdatesPage">
+      <Header
+        collective={collective}
+        loading={data.loading}
+        LoggedInUser={LoggedInUser}
+        canonicalURL={`${getCollectivePageCanonicalURL(collective)}/updates`}
+        noRobots={!shouldIndexAccountOnSearchEngines(collective)}
+      />
+
+      <Body>
+        <CollectiveNavbar
+          collective={collective}
+          isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollective(collective)}
+          selectedCategory={NAVBAR_CATEGORIES.CONNECT}
+        />
+
+        <div className="mx-auto max-w-[1260px] px-2 py-8 sm:px-4 sm:py-16 md:px-8">
+          <Flex flexWrap="wrap" alignItems="center" pr={2} justifyContent="space-between">
+            <Container padding="0.5rem 0" my={4}>
+              <H1 fontSize="40px" fontWeight="normal" textAlign="left" mb={2}>
+                <FormattedMessage id="updates" defaultMessage="Updates" />
+              </H1>
+              <P color="black.700" css={{ flex: '0 1 70%' }}>
+                <FormattedMessage
+                  id="section.updates.subtitle"
+                  defaultMessage="Updates on our activities and progress."
+                />
+              </P>
+            </Container>
+            {LoggedInUser?.isAdminOfCollective(collective) && (
+              <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
+                <StyledButton buttonStyle="primary" m={2}>
+                  <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />
+                </StyledButton>
+              </Link>
+            )}
+          </Flex>
+          <UpdateFilters
+            values={router.query}
+            onChange={queryParams =>
+              updateQuery(router, {
+                ...queryParams,
+                offset: null,
+              })
+            }
+          />
+          <Box mt={4} mb={5}>
+            {data.loading ? (
+              <Loading />
+            ) : (
+              <Updates collective={collective} updates={updates} fetchMore={fetchMore} LoggedInUser={LoggedInUser} />
+            )}
+          </Box>
+        </div>
+      </Body>
+
+      <Footer />
+    </div>
+  );
+}
