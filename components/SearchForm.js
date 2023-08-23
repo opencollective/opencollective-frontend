@@ -70,7 +70,7 @@ class SearchForm extends React.Component {
       autoComplete = 'on',
       fontStyle = '',
       letterSpacing = '0',
-      fontSize = '1.2rem',
+      fontSize = '0.75rem',
       lineHeight,
       fontWeight,
     } = this.props;

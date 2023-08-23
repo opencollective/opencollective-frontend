@@ -24,7 +24,7 @@ const ClearIcon = styled(Clear)`
 const GeoSuggestItem = styled(Geosuggest)`
   .geosuggest {
     font-size: 18px;
-    font-size: 1rem;
+    font-size: 0.65rem;
     position: relative;
     text-align: left;
   }

@@ -34,7 +34,7 @@ import TopBarProfileMenu from './TopBarProfileMenu';
 
 const NavList = styled(Flex)`
   list-style: none;
-  min-width: 20rem;
+  min-width: 12.5rem;
   text-align: right;
   align-items: center;
 `;

@@ -502,14 +502,14 @@ class TopBarProfileMenu extends React.Component {
     return (
       <div className="LoginTopBarProfileButton">
         {status === 'loading' && (
-          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
+          <P color="#D5DAE0" fontSize="0.85rem" px={3} py={2} display="inline-block">
             <FormattedMessage id="loading" defaultMessage="loading" />
             &hellip;
           </P>
         )}
 
         {status === 'loggingout' && (
-          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
+          <P color="#D5DAE0" fontSize="0.85rem" px={3} py={2} display="inline-block">
             <FormattedMessage id="loggingout" defaultMessage="logging out" />
             &hellip;
           </P>

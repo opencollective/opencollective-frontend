@@ -119,7 +119,7 @@ const InputFieldContainer = styled.div`
 
 const HelpBlock = styled(Box)`
   color: #737373;
-  font-size: 1.2rem;
+  font-size: 0.75rem;
 `;
 
 /**

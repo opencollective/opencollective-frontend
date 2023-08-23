@@ -81,7 +81,7 @@ class UpdateBankDetailsForm extends React.Component {
                 defaultValue={value}
               />
             </Box>
-            <Container fontSize="1.4rem" pl={[0, 3]} width={[1, 0.5]}>
+            <Container fontSize="0.85rem" pl={[0, 3]} width={[1, 0.5]}>
               <P>
                 <FormattedMessage
                   id="bankaccount.instructions.variables"
