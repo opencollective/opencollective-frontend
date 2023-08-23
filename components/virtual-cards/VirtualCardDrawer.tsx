@@ -25,6 +25,8 @@ import StyledLink from '../StyledLink';
 import { H4, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 
+import { StripeVirtualCardComplianceStatement } from './StripeVirtualCardComplianceStatement';
+
 type VirtualCardDrawerProps = {
   open: boolean;
   onClose: () => void;
@@ -144,7 +146,9 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
             <H4 fontSize="20px" fontWeight="700">
               {virtualCard?.name}
             </H4>
-
+            <Box my={3}>
+              <StripeVirtualCardComplianceStatement />
+            </Box>
             <CardContainer mt="24px" width="366px" height="248px" flexDirection="column">
               <div />
               <Box flexGrow={1} m="24px 24px 0 24px">

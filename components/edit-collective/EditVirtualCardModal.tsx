@@ -31,6 +31,7 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal
 import StyledSelect from '../StyledSelect';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const editVirtualCardMutation = gql`
   mutation editVirtualCard(
@@ -529,6 +530,9 @@ export default function EditVirtualCardModal({
               </React.Fragment>
             )}
           </Flex>
+          <Box mt={3}>
+            <StripeVirtualCardComplianceStatement />
+          </Box>
         </ModalBody>
         <ModalFooter isFullWidth>
           <Flex justifyContent="flex-end" flexWrap="wrap">
