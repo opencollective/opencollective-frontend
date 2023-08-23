@@ -73,7 +73,7 @@
     "express-ws": "5.0.2",
     "file-saver": "2.0.5",
     "focus-trap-react": "10.2.1",
-    "formik": "2.4.2",
+    "formik": "2.4.3",
     "glob": "8.1.0",
     "graphql": "16.7.1",
     "helmet": "7.0.0",
