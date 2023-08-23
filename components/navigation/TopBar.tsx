@@ -251,7 +251,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
           <Box flexShrink={0}>
             <Link href={ocLogoRoute}>
               <Flex alignItems="center" gridGap={2}>
-                <Image width="32" height="32" src="/static/images/opencollective-icon.png" alt="Open Collective" />
+                <Image width={32} height={32} src="/static/images/opencollective-icon.png" alt="Open Collective" />
                 {onHomeRoute && (
                   <Hide xs sm md display="flex" alignItems="center">
                     <Image height={20} width={120} src="/static/images/logotype.svg" alt="Open Collective" />
