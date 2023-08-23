@@ -1,20 +1,20 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
-import { graphql } from '@apollo/client/react/hoc';
-import { has } from 'lodash';
-import { withRouter } from 'next/router';
-import { defineMessages, injectIntl } from 'react-intl';
+import React, { useEffect } from 'react';
+import { gql, useLazyQuery } from '@apollo/client';
+import { has, isNil, omitBy } from 'lodash';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { useRouter } from 'next/router';
+import { defineMessages, useIntl } from 'react-intl';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
+import { initClient } from '../lib/apollo-client';
 import { getCollectivePageMetadata, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
-import { CollectiveType } from '../lib/constants/collectives';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { ExpenseStatus } from '../lib/graphql/types/v2/graphql';
+import { ExpensesPageQuery, ExpenseStatus } from '../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
@@ -30,7 +30,6 @@ import { expenseHostFields, expensesListFieldsFragment } from '../components/exp
 import { Box } from '../components/Grid';
 import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
-import { withUser } from '../components/UserProvider';
 
 const messages = defineMessages({
   title: {
@@ -40,145 +39,6 @@ const messages = defineMessages({
 });
 
 const EXPENSES_PER_PAGE = 10;
-
-class ExpensePage extends React.Component {
-  static getInitialProps({ query }) {
-    const {
-      parentCollectiveSlug,
-      collectiveSlug,
-      offset,
-      limit,
-      type,
-      status,
-      tag,
-      amount,
-      payout,
-      period,
-      searchTerm,
-      orderBy,
-      direction,
-    } = query;
-    return {
-      parentCollectiveSlug,
-      collectiveSlug,
-      query: {
-        offset: parseInt(offset) || undefined,
-        limit: parseInt(limit) || undefined,
-        type: has(expenseTypes, type) ? type : undefined,
-        status: has(ExpenseStatus, status) || status === 'READY_TO_PAY' ? status : undefined,
-        payout: has(PayoutMethodType, payout) ? payout : undefined,
-        direction,
-        period,
-        amount,
-        tag,
-        searchTerm,
-        orderBy,
-      },
-    };
-  }
-
-  static propTypes = {
-    collectiveSlug: PropTypes.string,
-    parentCollectiveSlug: PropTypes.string,
-    LoggedInUser: PropTypes.object,
-    query: PropTypes.shape({
-      type: PropTypes.string,
-      tag: PropTypes.string,
-      searchTerm: PropTypes.string,
-      direction: PropTypes.string,
-      orderBy: PropTypes.string,
-    }),
-    /** from injectIntl */
-    intl: PropTypes.object,
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.any,
-      refetch: PropTypes.func,
-      variables: PropTypes.shape({
-        offset: PropTypes.number.isRequired,
-        limit: PropTypes.number.isRequired,
-        account: PropTypes.object,
-      }),
-      account: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        currency: PropTypes.string.isRequired,
-        name: PropTypes.string,
-        isArchived: PropTypes.bool,
-        isHost: PropTypes.bool,
-        host: PropTypes.object,
-        expensesTags: PropTypes.array,
-        type: PropTypes.oneOf(Object.keys(CollectiveType)),
-      }),
-      expenses: PropTypes.shape({
-        nodes: PropTypes.array,
-        totalCount: PropTypes.number,
-        offset: PropTypes.number,
-        limit: PropTypes.number,
-      }),
-      scheduledExpenses: PropTypes.shape({
-        totalCount: PropTypes.number,
-      }),
-    }),
-    router: PropTypes.object,
-  };
-
-  getPageMetaData(collective) {
-    const baseMetadata = getCollectivePageMetadata(collective);
-    if (collective) {
-      return {
-        ...baseMetadata,
-        title: this.props.intl.formatMessage(messages.title, { collectiveName: collective.name }),
-      };
-    } else {
-      return { ...baseMetadata, title: `Expenses` };
-    }
-  }
-
-  render() {
-    const { collectiveSlug, data, query, LoggedInUser } = this.props;
-
-    const { error, loading, refetch, variables } = data;
-
-    if (!loading) {
-      if (error) {
-        return <ErrorPage data={data} />;
-      } else if (!data.account || !data.expenses?.nodes) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
-      } else if (!isFeatureSupported(data.account, FEATURES.RECEIVE_EXPENSES)) {
-        return <PageFeatureNotSupported />;
-      } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, data.account)) {
-        // Hack for funds that want to keep their budget "private"
-        return <PageFeatureNotSupported showContactSupportLink={false} />;
-      }
-    }
-
-    return (
-      <Page
-        collective={data.account}
-        canonicalURL={`${getCollectivePageCanonicalURL(data.account)}/expenses`}
-        {...this.getPageMetaData(data.account)}
-      >
-        <CollectiveNavbar
-          collective={data.account}
-          isLoading={!data.account}
-          selectedCategory={NAVBAR_CATEGORIES.BUDGET}
-        />
-        <Container position="relative" minHeight={[null, 800]}>
-          <Box maxWidth={Dimensions.MAX_SECTION_WIDTH} m="0 auto" px={[2, 3, 4]} py={[0, 5]}>
-            <Expenses
-              data={data}
-              refetch={refetch}
-              query={query}
-              loading={loading}
-              variables={variables}
-              LoggedInUser={LoggedInUser}
-            />
-          </Box>
-        </Container>
-      </Page>
-    );
-  }
-}
 
 export const expensesPageQuery = gql`
   query ExpensesPage(
@@ -317,35 +177,143 @@ export const expensesPageQuery = gql`
   ${expenseHostFields}
 `;
 
-const addExpensesPageData = graphql(expensesPageQuery, {
-  options: props => {
-    const amountRange = parseAmountRange(props.query.amount);
-    const { from: dateFrom, to: dateTo } = parseDateInterval(props.query.period);
-    const orderBy = props.query.orderBy && parseChronologicalOrderInput(props.query.orderBy);
-    const showSubmitted = props.query.direction === 'SUBMITTED';
-    const fromAccount = showSubmitted ? { slug: props.collectiveSlug } : null;
-    const account = !showSubmitted ? { slug: props.collectiveSlug } : null;
-    return {
-      context: API_V2_CONTEXT,
-      variables: {
-        collectiveSlug: props.collectiveSlug,
-        fromAccount,
-        account,
-        offset: props.query.offset || 0,
-        limit: props.query.limit || EXPENSES_PER_PAGE,
-        type: props.query.type,
-        status: props.query.status,
-        tags: props.query.tag ? (props.query.tag === 'untagged' ? null : [props.query.tag]) : undefined,
-        minAmount: amountRange[0] && amountRange[0] * 100,
-        maxAmount: amountRange[1] && amountRange[1] * 100,
-        payoutMethodType: props.query.payout,
-        dateFrom,
-        dateTo,
-        orderBy,
-        searchTerm: props.query.searchTerm,
-      },
-    };
-  },
+const getPropsFromQuery = query => ({
+  parentCollectiveSlug: query.parentCollectiveSlug || null,
+  collectiveSlug: query.collectiveSlug,
+  query: omitBy(
+    {
+      offset: parseInt(query.offset) || undefined,
+      limit: parseInt(query.limit) || undefined,
+      type: has(expenseTypes, query.type) ? query.type : undefined,
+      status: has(ExpenseStatus, query.status) || query.status === 'READY_TO_PAY' ? query.status : undefined,
+      payout: has(PayoutMethodType, query.payout) ? query.payout : undefined,
+      direction: query.direction,
+      period: query.period,
+      amount: query.amount,
+      tag: query.tag,
+      searchTerm: query.searchTerm,
+      orderBy: query.orderBy,
+    },
+    isNil,
+  ),
 });
 
-export default injectIntl(addExpensesPageData(withUser(withRouter(ExpensePage))));
+const getVariablesFromQuery = query => {
+  const props = getPropsFromQuery(query);
+  const amountRange = parseAmountRange(props.query.amount);
+  const { from: dateFrom, to: dateTo } = parseDateInterval(props.query.period);
+  const showSubmitted = props.query.direction === 'SUBMITTED';
+  const fromAccount = showSubmitted ? { slug: props.collectiveSlug } : null;
+  const account = !showSubmitted ? { slug: props.collectiveSlug } : null;
+  return {
+    collectiveSlug: props.collectiveSlug,
+    fromAccount,
+    account,
+    offset: props.query.offset || 0,
+    limit: props.query.limit || EXPENSES_PER_PAGE,
+    type: props.query.type,
+    status: props.query.status,
+    tags: props.query.tag ? (props.query.tag === 'untagged' ? null : [props.query.tag]) : undefined,
+    minAmount: amountRange[0] && amountRange[0] * 100,
+    maxAmount: amountRange[1] && amountRange[1] * 100,
+    payoutMethodType: props.query.payout,
+    dateFrom,
+    dateTo,
+    orderBy: props.query.orderBy && parseChronologicalOrderInput(props.query.orderBy),
+    searchTerm: props.query.searchTerm,
+  };
+};
+
+type ExpensesPageProps = {
+  collectiveSlug: string;
+  parentCollectiveSlug: string;
+  data: Partial<ExpensesPageQuery>;
+  error?: any;
+};
+
+export const getServerSideProps: GetServerSideProps<ExpensesPageProps> = async ctx => {
+  const props = getPropsFromQuery(ctx.query);
+  const variables = getVariablesFromQuery(ctx.query);
+
+  // Fetch data from GraphQL API for SSR
+  const client = initClient();
+  const { data, error } = await client.query({
+    query: expensesPageQuery,
+    variables,
+    context: API_V2_CONTEXT,
+    fetchPolicy: 'network-only',
+    errorPolicy: 'ignore',
+  });
+
+  return {
+    props: {
+      ...props,
+      data,
+      error: error || null,
+    },
+  };
+};
+
+export default function ExpensesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const intl = useIntl();
+  const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
+
+  const [fetchData, query] = useLazyQuery(expensesPageQuery, {
+    variables: getVariablesFromQuery(router.query),
+    context: API_V2_CONTEXT,
+  });
+
+  useEffect(() => {
+    if (LoggedInUser) {
+      fetchData();
+    }
+  }, [LoggedInUser]);
+
+  const error = query?.error || props.error;
+  const data: ExpensesPageQuery = query?.data || props.data;
+
+  const metadata = {
+    ...getCollectivePageMetadata(data.account),
+    title: intl.formatMessage(messages.title, { collectiveName: data.account.name }),
+  };
+
+  if (!query.loading) {
+    if (error) {
+      return <ErrorPage data={data} />;
+    } else if (!data.account || !data.expenses?.nodes) {
+      return <ErrorPage error={generateNotFoundError(props.collectiveSlug)} log={false} />;
+    } else if (!isFeatureSupported(data.account, FEATURES.RECEIVE_EXPENSES)) {
+      return <PageFeatureNotSupported showContactSupportLink />;
+    } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, data.account)) {
+      // Hack for funds that want to keep their budget "private"
+      return <PageFeatureNotSupported showContactSupportLink={false} />;
+    }
+  }
+
+  return (
+    <Page
+      collective={data.account}
+      canonicalURL={`${getCollectivePageCanonicalURL(data.account)}/expenses`}
+      {...metadata}
+    >
+      <CollectiveNavbar
+        collective={data.account}
+        isLoading={!data.account}
+        selectedCategory={NAVBAR_CATEGORIES.BUDGET}
+      />
+      <Container position="relative" minHeight={[null, 800]}>
+        <Box maxWidth={Dimensions.MAX_SECTION_WIDTH} m="0 auto" px={[2, 3, 4]} py={[0, 5]}>
+          <Expenses
+            data={data}
+            refetch={query.refetch}
+            query={router.query}
+            loading={query.loading}
+            variables={query.variables}
+            LoggedInUser={LoggedInUser}
+          />
+        </Box>
+      </Container>
+    </Page>
+  );
+}
