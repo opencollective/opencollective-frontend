@@ -205,7 +205,7 @@
     "@types/styled-system": "^5.1.16",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
-    "autoprefixer": "10.4.14",
+    "autoprefixer": "10.4.15",
     "babel-loader": "^8.2.3",
     "babel-plugin-formatjs": "^10.5.0",
     "babel-plugin-istanbul": "^6.1.1",
