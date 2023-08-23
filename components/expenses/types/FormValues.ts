@@ -1,8 +1,12 @@
-interface ExpenseItemFormValues {
+import { ExpenseAttachedFileInput, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
+
+export interface ExpenseItemFormValues {
   id?: string;
   incurredAt: Date;
   description: string;
   amount: number;
+  url?: string;
+  __isNew?: boolean;
 }
 
 /**
@@ -10,10 +14,11 @@ interface ExpenseItemFormValues {
  * /!\ This object is not complete, we'll progressively add fields as we migrate the expense flow to TypeScript.
  */
 export interface ExpenseFormValues {
+  type: ExpenseType;
   description: string;
   longDescription: string;
   items: ExpenseItemFormValues[];
-  attachedFiles: File[];
+  attachedFiles: ExpenseAttachedFileInput[];
   payee: { id: string; name: string; type: string };
   privateMessage: string;
   invoiceInfo: string;

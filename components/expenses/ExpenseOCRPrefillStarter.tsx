@@ -72,6 +72,7 @@ export const ExpenseOCRPrefillStarter = ({
                     <StyledLinkButton
                       disabled={isUploading}
                       textDecoration="underline"
+                      type="button"
                       onClick={() => {
                         if (inputRef.current) {
                           inputRef.current.click();

@@ -8,8 +8,9 @@ import { isURL } from 'validator';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
-import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
-import { updateExpenseItemWithUploadResult } from './lib/ocr';
+import { attachmentDropzoneParams } from './lib/attachments';
+import { expenseItemsMustHaveFiles } from './lib/items';
+import { updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
@@ -76,7 +77,7 @@ export const validateExpenseItem = (expense, item) => {
   }
 
   // Attachment URL
-  if (attachmentRequiresFile(expense.type)) {
+  if (expenseItemsMustHaveFiles(expense.type)) {
     if (!item.url) {
       errors.url = createError(ERROR.FORM_FIELD_REQUIRED);
     } else if (!isURL(item.url)) {
@@ -126,7 +127,7 @@ const ExpenseItemForm = ({
   requireFile,
   requireDate,
   isRichText,
-  name,
+  itemIdx,
   isOptional,
   editOnlyDescriptiveInfo,
   hasMultiCurrency,
@@ -139,7 +140,7 @@ const ExpenseItemForm = ({
   const intl = useIntl();
   const { formatMessage } = intl;
   const attachmentKey = `attachment-${attachment.id || attachment.url}`;
-  const getFieldName = field => `${name}.${field}`;
+  const getFieldName = field => `items[${itemIdx}].${field}`;
   const getError = field => formatFormErrorMessage(intl, get(errors, getFieldName(field)));
 
   return (
@@ -177,7 +178,7 @@ const ExpenseItemForm = ({
                     useGraphQL={hasOCRFeature}
                     parseDocument={hasOCRFeature}
                     onGraphQLSuccess={uploadResults => {
-                      updateExpenseItemWithUploadResult(form, uploadResults[0], name);
+                      updateExpenseFormWithUploadResult(form, uploadResults, itemIdx);
                     }}
                   />
                 </StyledInputField>
@@ -340,6 +341,7 @@ ExpenseItemForm.propTypes = {
   }).isRequired,
   editOnlyDescriptiveInfo: PropTypes.bool,
   isLastItem: PropTypes.bool,
+  itemIdx: PropTypes.number.isRequired,
 };
 
 ExpenseItemForm.defaultProps = {

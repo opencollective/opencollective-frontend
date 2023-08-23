@@ -123,6 +123,9 @@ const hostDashboardMetaDataQuery = gql`
       @include(if: $getViewCounts) {
       totalCount
     }
+    error: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: ERROR) @include(if: $getViewCounts) {
+      totalCount
+    }
   }
 
   ${expenseHostFields}
@@ -189,7 +192,7 @@ const hasParams = query => {
 };
 
 const initViews = [
-  { label: 'All', query: {}, id: 'all' },
+  { label: <FormattedMessage defaultMessage="All" />, query: {}, id: 'all' },
   {
     label: 'Ready to pay',
     query: { status: 'READY_TO_PAY', orderBy: 'CREATED_AT,ASC' },
@@ -197,25 +200,31 @@ const initViews = [
     id: 'ready_to_pay',
   },
   {
-    label: 'Scheduled for payment',
+    label: <FormattedMessage id="expense.scheduledForPayment" defaultMessage="Scheduled for payment" />,
     query: { status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', orderBy: 'CREATED_AT,ASC' },
     showCount: true,
     id: 'scheduled_for_payment',
   },
   {
-    label: 'On hold',
+    label: <FormattedMessage defaultMessage="On hold" />,
     query: { status: 'ON_HOLD', orderBy: 'CREATED_AT,ASC' },
     showCount: true,
     id: 'on_hold',
   },
   {
-    label: 'Incomplete',
+    label: <FormattedMessage defaultMessage="Incomplete" />,
     query: { status: 'INCOMPLETE', orderBy: 'CREATED_AT,ASC' },
     showCount: true,
     id: 'incomplete',
   },
   {
-    label: 'Paid',
+    label: <FormattedMessage id="Error" defaultMessage="Error" />,
+    query: { status: 'ERROR', orderBy: 'CREATED_AT,ASC' },
+    showCount: true,
+    id: 'error',
+  },
+  {
+    label: <FormattedMessage defaultMessage="Paid" />,
     query: { status: 'PAID' },
     id: 'recently_paid',
   },

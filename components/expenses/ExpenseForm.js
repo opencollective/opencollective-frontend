@@ -17,6 +17,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep } from '../../lib/utils';
+import { addNewExpenseItem, newExpenseItem } from './lib/items';
 import { checkRequiresAddress, getSupportedCurrencies, validateExpenseTaxes } from './lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -32,7 +33,7 @@ import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
-import ExpenseFormItems, { addNewExpenseItem, newExpenseItem } from './ExpenseFormItems';
+import ExpenseFormItems from './ExpenseFormItems';
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
 import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';
@@ -283,6 +284,7 @@ const ExpenseFormBody = ({
   const [hideOCRPrefillStater, setHideOCRPrefillStarter] = React.useState(false);
   const { values, handleChange, errors, setValues, dirty, touched, resetForm, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
+  const hasOCRFeature = LoggedInUser?.hasPreviewFeatureEnabled('EXPENSE_OCR');
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
   const isReceipt = values.type === expenseTypes.RECEIPT;
@@ -556,7 +558,7 @@ const ExpenseFormBody = ({
           supportedExpenseTypes={supportedExpenseTypes}
         />
       )}
-      {!values.type && !hideOCRPrefillStater && LoggedInUser?.hasPreviewFeatureEnabled('EXPENSE_OCR') && (
+      {!values.type && !hideOCRPrefillStater && hasOCRFeature && (
         <ExpenseOCRPrefillStarter form={formik} onSuccess={() => setHideOCRPrefillStarter(true)} />
       )}
       {isRecurring && <ExpenseRecurringBanner expense={expense} />}
@@ -669,8 +671,9 @@ const ExpenseFormBody = ({
                           defaultMessage="If you already have an invoice document, you can upload it here."
                         />
                       }
-                      onChange={files => formik.setFieldValue('attachedFiles', files)}
+                      form={formik}
                       defaultValue={values.attachedFiles}
+                      hasOCRFeature={hasOCRFeature}
                     />
                   </Box>
                 )}
@@ -699,6 +702,7 @@ const ExpenseFormBody = ({
                         {...fieldsArrayProps}
                         collective={collective}
                         availableCurrencies={availableCurrencies}
+                        hasOCRFeature={hasOCRFeature}
                       />
                     )}
                   </FieldArray>
@@ -714,8 +718,9 @@ const ExpenseFormBody = ({
                           defaultMessage="If you want to include any documentation, you can upload it here."
                         />
                       }
-                      onChange={files => formik.setFieldValue('attachedFiles', files)}
+                      form={formik}
                       defaultValue={values.attachedFiles}
+                      hasOCRFeature={hasOCRFeature}
                     />
                   </Box>
                 )}

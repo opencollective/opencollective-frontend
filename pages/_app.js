@@ -62,7 +62,7 @@ class OpenCollectiveFrontendApp extends App {
     // Get the `locale` and `messages` from the request object on the server.
     // In the browser, use the same values that the server serialized.
     const { locale, messages } = ctx?.req || window.__NEXT_DATA__.props;
-    const props = { pageProps: {}, scripts: {}, locale, messages };
+    const props = { pageProps: { skipDataFromTree: true }, scripts: {}, locale, messages };
 
     try {
       if (Component.getInitialProps) {

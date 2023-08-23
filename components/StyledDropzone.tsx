@@ -127,7 +127,7 @@ const StyledDropzone = ({
   const onDrop = React.useCallback(
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {
       if (collectFilesOnly) {
-        onSuccess(acceptedFiles, fileRejections);
+        onSuccess?.(acceptedFiles, fileRejections);
       } else if (useGraphQL) {
         uploadFileWithGraphQL(acceptedFiles.map(file => ({ file, kind, parseDocument })));
       } else {
@@ -278,7 +278,7 @@ type StyledDropzoneProps = {
   disabled?: boolean;
   value?: any;
   useGraphQL?: boolean;
-  onGraphQLSuccess?: (result: UploadFileResult[]) => void;
+  onGraphQLSuccess?: (uploadResults: UploadFileResult[]) => void;
   parseDocument?: boolean;
 } & (
   | {
@@ -297,12 +297,12 @@ type StyledDropzoneProps = {
       | {
           isMulti?: true;
           /** Called back with the uploaded files on success */
-          onSuccess: (fileUrls: string[]) => void;
+          onSuccess?: (fileUrls: string[]) => void;
         }
       | {
           isMulti: false;
           /** Called back with the uploaded files on success */
-          onSuccess: (fileUrls: string) => void;
+          onSuccess?: (fileUrls: string) => void;
           /** if set, the image will be displayed and a "replace" banner will be added */
           value?: string;
         }
