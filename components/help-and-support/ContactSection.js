@@ -246,7 +246,7 @@ const ContactForm = () => {
                 onChange={e => setFieldValue('message', e.target.value)}
                 withBorders
                 version="simplified"
-                editorMinHeight="20rem"
+                editorMinHeight="12.5rem"
               />
               <P mt="6px" fontSize="13px" lineHeight="20px" color="black.700">
                 <FormattedMessage

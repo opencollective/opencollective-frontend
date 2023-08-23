@@ -53,7 +53,7 @@ const StyledTableRow = styled.tr<{ highlightOnHover?: boolean }>`
 `;
 
 const StyledTableHead = styled.th`
-  height: 3rem;
+  height: 1.9rem;
   padding-left: 16px;
   text-align: left;
   vertical-align: middle;

@@ -19,7 +19,7 @@ const FilterLabel = styled.label`
 
 const SearchFormContainer = styled(Box)`
   width: 100%;
-  min-width: 10rem;
+  min-width: 6.25rem;
 `;
 
 const messages = defineMessages({

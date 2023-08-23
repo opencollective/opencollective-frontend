@@ -88,7 +88,7 @@ const I18nFilters = defineMessages({
 const SearchFormContainer = styled(Box)`
   height: 58px;
   width: 608px;
-  min-width: 10rem;
+  min-width: 6.25rem;
 `;
 
 const FilterLabel = styled.label`

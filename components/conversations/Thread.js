@@ -106,7 +106,7 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
       })}
       <hr />
       {hasMore && fetchMore && (
-        <Container margin="1rem">
+        <Container margin="0.65rem">
           <StyledButton onClick={handleLoadMore} loading={loading} textTransform="capitalize">
             <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
           </StyledButton>

@@ -86,7 +86,7 @@ const MemberCard = ({ member, account, index, nbAdmins, refetch }: MemberCardPro
 
   return (
     <MemberContainer position="relative" key={`member-${index}-${memberKey}-${account.id}`} data-cy={`member-${index}`}>
-      <Container position="absolute" top="1rem" right="1rem">
+      <Container position="absolute" top="0.65rem" right="0.65rem">
         {showEditModal && (
           <EditMemberModal
             key={`member-edit-modal-${index}-${memberKey}`}

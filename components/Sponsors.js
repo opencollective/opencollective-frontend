@@ -19,7 +19,7 @@ class Sponsors extends React.Component {
       return <div />;
     }
     return (
-      <Container maxWidth="640px" margin="3rem auto 3rem" textAlign="center" overflow="hidden">
+      <Container maxWidth="640px" margin="1.9rem auto 1.9rem" textAlign="center" overflow="hidden">
         {sponsors.map(sponsor => (
           <EventSponsorCard type="sponsor" key={sponsor.id} sponsor={sponsor} />
         ))}

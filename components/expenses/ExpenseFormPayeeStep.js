@@ -441,6 +441,7 @@ const ExpenseFormPayeeStep = ({
                       name={field.name}
                       label={formatMessage(msg.invoiceInfo)}
                       labelFontSize="13px"
+                      fontSize="14px"
                       required={false}
                       mt={3}
                     >
