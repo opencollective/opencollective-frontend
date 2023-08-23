@@ -17,10 +17,10 @@ import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { ExpenseStatus } from '../lib/graphql/types/v2/graphql';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
-import { Dimensions } from '../components//collective-page/_constants';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
+import { Dimensions } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
