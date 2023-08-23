@@ -264,7 +264,7 @@ const resetPasswordAccountQuery = gql`
       slug
       name
       email
-      imageUrl
+      imageUrl(height: 80)
     }
   }
 `;

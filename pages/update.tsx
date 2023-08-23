@@ -35,7 +35,7 @@ const updatePageQuery = gql`
       type
       description
       settings
-      imageUrl
+      imageUrl(height: 80)
       isFrozen
       twitterHandle
       ... on AccountWithHost {

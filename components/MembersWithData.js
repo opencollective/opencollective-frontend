@@ -178,8 +178,8 @@ const membersQuery = gqlV1/* GraphQL */ `
         description
         slug
         website
-        imageUrl
-        backgroundImage
+        imageUrl(height: 130)
+        backgroundImageUrl(height: 270)
         isIncognito
       }
     }

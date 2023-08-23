@@ -62,20 +62,19 @@ const hostVirtualCardRequestsQuery = gql`
           id
           name
           slug
-          imageUrl
+          imageUrl(height: 40)
         }
         host {
           id
           name
           slug
-          imageUrl
         }
         assignee {
           id
           name
           email
           slug
-          imageUrl
+          imageUrl(height: 40)
         }
       }
     }

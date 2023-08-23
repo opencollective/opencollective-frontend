@@ -241,7 +241,7 @@ const giftCardsQuery = gqlV1/* GraphQL */ `
           collective {
             id
             slug
-            imageUrl
+            imageUrl(height: 48)
             type
             name
           }

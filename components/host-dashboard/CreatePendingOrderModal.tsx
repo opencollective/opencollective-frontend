@@ -125,7 +125,7 @@ const createPendingContributionModalCollectiveQuery = gql`
           slug
           currency
           settings
-          imageUrl
+          imageUrl(height: 40)
           currency
           ... on AccountWithContributions {
             tiers {

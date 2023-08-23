@@ -147,7 +147,6 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
             description
             longDescription
             website
-            imageUrl
             settings
           }
         }

@@ -6,7 +6,7 @@ export const accountActivitySubscriptionsFragment = gql`
     name
     slug
     type
-    imageUrl
+    imageUrl(height: 96)
     activitySubscriptions(channel: email) {
       id
       channel

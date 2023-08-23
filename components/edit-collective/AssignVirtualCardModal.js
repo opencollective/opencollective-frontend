@@ -62,7 +62,7 @@ const collectiveMembersQuery = gql`
           account {
             id
             name
-            imageUrl
+            imageUrl(height: 40)
             slug
           }
         }

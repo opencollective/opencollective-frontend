@@ -138,8 +138,8 @@ const membershipsQuery = gqlV1/* GraphQL */ `
         currency
         description
         slug
-        imageUrl
-        backgroundImage
+        imageUrl(height: 130)
+        backgroundImageUrl(height: 270)
         stats {
           id
           backers {

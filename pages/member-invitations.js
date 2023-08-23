@@ -31,7 +31,7 @@ const memberInvitationsPageQuery = gql`
         slug
         name
         type
-        imageUrl
+        imageUrl(height: 84)
         isHost
         ... on AccountWithHost {
           host {

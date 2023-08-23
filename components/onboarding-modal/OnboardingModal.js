@@ -438,7 +438,7 @@ const addMemberInvitationQuery = graphql(
         memberAccount {
           id
           name
-          imageUrl
+          imageUrl(height: 40)
           slug
         }
       }

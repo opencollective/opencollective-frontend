@@ -202,7 +202,7 @@ export const updatesQuery = gql`
             type
             name
             slug
-            imageUrl
+            imageUrl(height: 80)
           }
         }
       }

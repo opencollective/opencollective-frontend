@@ -55,7 +55,7 @@ const editVirtualCardMutation = gql`
         id
         name
         slug
-        imageUrl
+        imageUrl(height: 40)
       }
     }
   }
@@ -101,7 +101,7 @@ const collectiveMembersQuery = gql`
           account {
             id
             name
-            imageUrl
+            imageUrl(height: 40)
             slug
           }
         }

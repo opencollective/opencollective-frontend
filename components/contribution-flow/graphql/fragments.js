@@ -81,7 +81,7 @@ export const contributionFlowAccountFieldsFragment = gql`
         id
         slug
         settings
-        imageUrl
+        imageUrl(height: 192)
         backgroundImageUrl
         location {
           id

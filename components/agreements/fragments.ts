@@ -12,7 +12,7 @@ export const AGREEMENT_VIEW_FIELDS_FRAGMENT = gql`
       type
       legacyId
       slug
-      imageUrl
+      imageUrl(height: 48)
       name
     }
     createdBy {
@@ -20,7 +20,7 @@ export const AGREEMENT_VIEW_FIELDS_FRAGMENT = gql`
       type
       legacyId
       slug
-      imageUrl
+      imageUrl(height: 48)
       name
     }
     attachment {

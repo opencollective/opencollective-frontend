@@ -70,7 +70,7 @@ const accountFields = gql`
     slug
     name
     type
-    imageUrl
+    imageUrl(height: 128)
     memberInvitations(role: [ADMIN]) {
       id
       role
@@ -79,7 +79,6 @@ const accountFields = gql`
         type
         slug
         name
-        imageUrl
       }
     }
     admins: members(role: ADMIN) {
@@ -91,7 +90,6 @@ const accountFields = gql`
           type
           slug
           name
-          imageUrl
         }
       }
     }

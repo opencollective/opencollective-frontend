@@ -42,7 +42,7 @@ const redeemedPaymentMethodQuery = gqlV1/* GraphQL */ `
         id
         name
         slug
-        imageUrl
+        imageUrl(height: 64)
         settings
       }
     }
@@ -229,7 +229,7 @@ const redeemedPageQuery = gqlV1/* GraphQL */ `
       name
       type
       slug
-      imageUrl
+      imageUrl(height: 64)
       backgroundImageUrl
       description
       settings

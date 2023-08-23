@@ -38,7 +38,7 @@ const hostVirtualCardsQuery = gql`
       legacyId
       slug
       name
-      imageUrl
+      imageUrl(height: 40)
       currency
       settings
       stripe {
@@ -77,14 +77,14 @@ const hostVirtualCardsQuery = gql`
             id
             name
             slug
-            imageUrl
+            imageUrl(height: 64)
           }
           assignee {
             id
             name
             email
             slug
-            imageUrl
+            imageUrl(height: 64)
           }
         }
       }

@@ -20,7 +20,7 @@ export const updatesFieldsFragment = gqlV1/* GraphQL */ `
       type
       name
       slug
-      imageUrl
+      imageUrl(height: 80)
     }
   }
 `;
@@ -240,7 +240,7 @@ export const processingOrderFragment = gql`
       type
       description
       tags
-      imageUrl
+      imageUrl(height: 80)
       settings
       ... on AccountWithHost {
         host {

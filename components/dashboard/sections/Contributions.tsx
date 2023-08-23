@@ -36,7 +36,7 @@ const manageContributionsQuery = gql`
       name
       type
       settings
-      imageUrl
+      imageUrl(height: 48)
       ... on AccountWithParent {
         parent {
           id

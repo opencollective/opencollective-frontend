@@ -45,7 +45,7 @@ export const invoicesQuery = gqlV1/* GraphQL */ `
         id
         slug
         name
-        imageUrl
+        imageUrl(height: 96)
       }
     }
   }

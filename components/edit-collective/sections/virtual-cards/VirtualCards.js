@@ -36,7 +36,6 @@ const virtualCardsQuery = gql`
       slug
       type
       name
-      imageUrl
       ... on AccountWithHost {
         host {
           legacyId
@@ -44,7 +43,6 @@ const virtualCardsQuery = gql`
           id
           type
           name
-          imageUrl
           settings
         }
       }
@@ -76,13 +74,12 @@ const virtualCardsQuery = gql`
             id
             slug
             name
-            imageUrl
+            imageUrl(height: 40)
           }
           assignee {
             id
             name
             slug
-            imageUrl
           }
         }
       }

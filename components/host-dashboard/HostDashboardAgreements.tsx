@@ -46,7 +46,7 @@ const selectedAccountInfoQuery = gql`
       legacyId
       name
       slug
-      imageUrl
+      imageUrl(height: 40)
       ... on AccountWithHost {
         host {
           id

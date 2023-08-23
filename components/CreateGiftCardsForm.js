@@ -677,7 +677,7 @@ export const collectiveSourcePaymentMethodsQuery = gqlV1/* GraphQL */ `
         type
         name
         slug
-        imageUrl
+        imageUrl(height: 40)
       }
     }
   }

@@ -186,7 +186,7 @@ const contributionsSectionStaticQuery = gql`
             isIncognito
             isAdmin
             isHost
-            imageUrl
+            imageUrl(height: 96)
           }
         }
       }
