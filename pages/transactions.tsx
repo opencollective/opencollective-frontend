@@ -16,10 +16,7 @@ import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { Sections } from '../components/collective-page/_constants';
-import {
-  collectiveNavbarFieldsFragment,
-  processingOrderFragment,
-} from '../components/collective-page/graphql/fragments';
+import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import ErrorPage from '../components/ErrorPage';
 import Footer from '../components/Footer';
 import { Box } from '../components/Grid';
@@ -29,6 +26,87 @@ import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import { transactionsQueryCollectionFragment } from '../components/transactions/graphql/fragments';
 import Transactions, { getVariablesFromQuery } from '../components/transactions/TransactionsPage';
+
+const processingOrderFragment = gql`
+  fragment ProcessingOrderFields on Order {
+    id
+    legacyId
+    nextChargeDate
+    paymentMethod {
+      id
+      service
+      name
+      type
+      expiryDate
+      data
+      balance {
+        value
+        valueInCents
+        currency
+      }
+    }
+    amount {
+      value
+      valueInCents
+      currency
+    }
+    totalAmount {
+      value
+      valueInCents
+      currency
+    }
+    status
+    description
+    createdAt
+    frequency
+    tier {
+      id
+      name
+    }
+    totalDonations {
+      value
+      valueInCents
+      currency
+    }
+    fromAccount {
+      id
+      name
+      slug
+      isIncognito
+      type
+    }
+    toAccount {
+      id
+      slug
+      name
+      type
+      description
+      tags
+      imageUrl
+      settings
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+          paypalClientId
+          supportedPaymentMethods
+        }
+      }
+      ... on Organization {
+        host {
+          id
+          slug
+          paypalClientId
+          supportedPaymentMethods
+        }
+      }
+    }
+    platformTipAmount {
+      value
+      valueInCents
+    }
+  }
+`;
 
 export const transactionsPageQuery = gql`
   query TransactionsPage(
