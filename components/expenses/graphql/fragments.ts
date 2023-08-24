@@ -166,6 +166,7 @@ export const expensePageExpenseFieldsFragment = gql`
     }
     createdAt
     invoiceInfo
+    merchantId
     requiredLegalDocuments
     feesPayer
     draft
@@ -277,6 +278,13 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       type
       imageUrl
+    }
+    approvedBy {
+      id
+      type
+      slug
+      name
+      imageUrl(height: 80)
     }
     account {
       id
