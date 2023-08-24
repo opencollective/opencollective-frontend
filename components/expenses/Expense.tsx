@@ -377,7 +377,7 @@ function Expense(props) {
         {isDraft && !loggedInAccount ? (
           <FormattedMessage id="Expense.JoinAndSubmit" defaultMessage="Join and Submit" />
         ) : (
-          <FormattedMessage id="SaveChanges" defaultMessage="Save changes" />
+          <FormattedMessage id="Expense.SaveExpense" defaultMessage="Save Expense" />
         )}
       </StyledButton>
 
