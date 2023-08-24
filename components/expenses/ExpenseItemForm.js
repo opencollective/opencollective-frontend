@@ -95,7 +95,11 @@ export const validateExpenseItem = (expense, item) => {
 
 export const prepareExpenseItemForSubmit = (item, isInvoice, isGrant) => {
   // The frontend currently ignores the time part of the date, we default to midnight UTC
-  const incurredAt = item.incurredAt?.match(/^\d{4}-\d{2}-\d{2}$/) ? `${item.incurredAt}T00:00:00Z` : item.incurredAt;
+  const incurredAtFullDate = item.incurredAt || new Date().toISOString().split('T')[0];
+  const incurredAt = incurredAtFullDate.match(/^\d{4}-\d{2}-\d{2}$/)
+    ? `${incurredAtFullDate}T00:00:00Z`
+    : incurredAtFullDate;
+
   return {
     incurredAt,
     ...pick(item, [
