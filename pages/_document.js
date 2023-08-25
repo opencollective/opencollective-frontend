@@ -15,8 +15,6 @@ const cspHeader = getCSPHeader();
 // data for the user's locale for React Intl to work in the browser.
 export default class IntlDocument extends Document {
   static async getInitialProps(ctx) {
-    const { locale, localeDataScript } = ctx.req;
-
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
 
@@ -47,8 +45,6 @@ export default class IntlDocument extends Document {
 
       return {
         ...initialProps,
-        locale,
-        localeDataScript,
         clientAnalytics,
         cspNonce: requestNonce,
         styles: (

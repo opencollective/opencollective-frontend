@@ -34,6 +34,7 @@ Router.onRouteChangeComplete = () => NProgress.done();
 Router.onRouteChangeError = () => NProgress.done();
 
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
+import { getIntlProps } from '../lib/i18n/request';
 import sentryLib from '../server/sentry';
 
 import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
@@ -61,8 +62,20 @@ class OpenCollectiveFrontendApp extends App {
   static async getInitialProps({ Component, ctx, client }) {
     // Get the `locale` and `messages` from the request object on the server.
     // In the browser, use the same values that the server serialized.
-    const { locale, messages } = ctx?.req || window.__NEXT_DATA__.props;
-    const props = { pageProps: { skipDataFromTree: true }, scripts: {}, locale, messages };
+    const intlProps = getIntlProps(ctx);
+
+    if (ctx.req && ctx.res) {
+      if (intlProps.locale !== 'en') {
+        // Prevent server side caching of non english content
+        ctx.res.setHeader('Cache-Control', 'no-store, no-cache, max-age=0');
+      } else {
+        // When using Cloudflare, there might be a default cache
+        // We're setting that for all requests to reduce the default to 1 minute
+        ctx.res.setHeader('Cache-Control', 'public, max-age=60');
+      }
+    }
+
+    const props = { pageProps: { skipDataFromTree: true }, scripts: {}, ...intlProps };
 
     try {
       if (Component.getInitialProps) {
