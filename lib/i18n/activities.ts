@@ -167,19 +167,17 @@ export const ActivityDescriptionI18n = defineMessages({
   },
   // Members
   COLLECTIVE_MEMBER_CREATED: {
-    defaultMessage: '<FromAccount></FromAccount> joined <Account></Account> as a <MemberRole></MemberRole>',
+    defaultMessage: '<FromAccount></FromAccount> joined <Account></Account> as <MemberRole></MemberRole>',
   },
   COLLECTIVE_MEMBER_INVITED: {
-    defaultMessage:
-      '<FromAccount></FromAccount> was invited to join <Account></Account> as a <MemberRole></MemberRole>',
+    defaultMessage: '<FromAccount></FromAccount> was invited to join <Account></Account> as <MemberRole></MemberRole>',
   },
   COLLECTIVE_CORE_MEMBER_INVITED: {
-    defaultMessage:
-      '<FromAccount></FromAccount> was invited to join <Account></Account> as a <MemberRole></MemberRole>',
+    defaultMessage: '<FromAccount></FromAccount> was invited to join <Account></Account> as <MemberRole></MemberRole>',
   },
   COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED: {
     defaultMessage:
-      '<FromAccount></FromAccount> declined the invitation to join <Account></Account> as a <MemberRole></MemberRole>',
+      '<FromAccount></FromAccount> declined the invitation to join <Account></Account> as <MemberRole></MemberRole>',
   },
   COLLECTIVE_CORE_MEMBER_ADDED: {
     defaultMessage:
