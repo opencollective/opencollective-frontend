@@ -3,7 +3,7 @@ import cookie from 'cookie';
 import { pick } from 'lodash';
 import { NextPageContext } from 'next';
 
-const supportedLanguages = [];
+const supportedLanguages = ['en'];
 
 const languages = require.context('../../lang', false, /\.json$/i);
 
