@@ -128,19 +128,16 @@ exports.REWRITES = [
   },
   {
     source: '/dashboard',
-    destination: '/dashboard',
+    destination: '/workspace',
   },
+  { source: '/workspace', destination: '/workspace' },
   {
     source: '/dashboard/:slug/:section?/:subpath*',
-    destination: '/dashboard',
-  },
-  {
-    source: '/workspace',
-    destination: '/dashboard',
+    destination: '/workspace',
   },
   {
     source: '/workspace/:slug/:section?/:subpath*',
-    destination: '/dashboard',
+    destination: '/workspace',
   },
   {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',
