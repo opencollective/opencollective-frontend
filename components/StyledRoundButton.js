@@ -9,6 +9,9 @@ import StyledButton from './StyledButton';
 const StyledRoundButton = styled(StyledButton).attrs({
   p: 0,
   textAlign: 'center',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 })`
   line-height: 1;
 `;
