@@ -6,6 +6,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isHostAccount } from '../lib/collective.lib';
 import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import useLocalStorage from '../lib/hooks/useLocalStorage';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 
@@ -100,17 +101,35 @@ const DashboardPage = () => {
   const router = useRouter();
   const { slug, section, subpath } = router.query;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
-  const activeSlug = slug;
+  const [lastWorkspaceVisit, setLastWorkspaceVisit] = useLocalStorage('workspaceNavigationState', {
+    slug: LoggedInUser?.slug,
+    section: null,
+  });
+  const activeSlug = slug || lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
 
   const { data, loading } = useQuery(adminPanelQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: activeSlug },
     skip: !activeSlug,
   });
-
   const account = data?.account;
+  const selectedSection = section || lastWorkspaceVisit.section || getDefaultSectionForAccount(account, LoggedInUser);
+
+  // Keep track of last visited workspace account and sections
+  React.useEffect(() => {
+    if (slug && section && (slug !== lastWorkspaceVisit.slug || section !== lastWorkspaceVisit.section)) {
+      setLastWorkspaceVisit({ slug, section, path: router.asPath });
+    }
+  }, [slug, section]);
+
+  // Make sure the URL is updated when restoring last visited workspace
+  React.useEffect(() => {
+    if (router.asPath === '/workspace' && lastWorkspaceVisit.path) {
+      router.replace(lastWorkspaceVisit.path);
+    }
+  }, [router.asPath]);
+
   const notification = getNotification(intl, account);
-  const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
   const [expandedSection, setExpandedSection] = React.useState(null);
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
