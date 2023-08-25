@@ -1,7 +1,10 @@
 import '../env';
 import 'raf/polyfill';
 
+import registerRequireContextHook from 'babel-plugin-require-context-hook/register';
 import jsdom from 'jsdom';
+
+registerRequireContextHook();
 
 const { JSDOM } = jsdom;
 const url = 'http://localhost';

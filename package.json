@@ -218,6 +218,7 @@
     "babel-plugin-istanbul": "^6.1.1",
     "babel-plugin-react-docgen": "^4.2.1",
     "babel-plugin-react-remove-properties": "^0.3.0",
+    "babel-plugin-require-context-hook": "^1.0.0",
     "babel-plugin-styled-components": "^2.1.1",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "cheerio": "1.0.0-rc.12",
@@ -305,6 +306,7 @@
   },
   "depcheck": {
     "ignores": [
+      "@types/webpack-env",
       "@graphql-codegen/gql-tag-operations-preset",
       "cheerio",
       "@storybook/*",
