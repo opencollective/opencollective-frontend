@@ -91,12 +91,6 @@ export default class IntlDocument extends Document {
         <Head nonce={this.props.cspNonce} />
         <body>
           <Main nonce={this.props.cspNonce} />
-          <script
-            nonce={this.props.cspNonce}
-            dangerouslySetInnerHTML={{
-              __html: this.props.localeDataScript,
-            }}
-          />
           <NextScript nonce={this.props.cspNonce} />
           {this.props.clientAnalytics.enabled && (
             <script
