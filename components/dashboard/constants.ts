@@ -147,7 +147,7 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Pending Contributions',
   },
   [ALL_SECTIONS.HOST_APPLICATIONS]: {
-    id: 'AdminPanel.Menu.HostApplications',
+    id: 'HostDashboard.HostApplications',
     defaultMessage: 'Applications',
   },
   [ALL_SECTIONS.OVERVIEW]: {

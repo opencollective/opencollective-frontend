@@ -186,7 +186,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
     <Box maxWidth={1000} m="0 auto" px={2}>
       <Flex alignItems="center" mb={24} flexWrap="wrap">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
-          <FormattedMessage id="host.dashboard.tab.applications" defaultMessage="Applications" />
+          <FormattedMessage id="HostDashboard.HostApplications" defaultMessage="Applications" />
         </H1>
         <Box mx="auto" />
         <Box p={2}>
@@ -233,9 +233,9 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
       {!error && !loading && !hostApplications?.nodes.length ? (
         <MessageBox type="info" withIcon data-cy="zero-collective-message">
           {hasFilters ? (
-            <FormattedMessage id="discover.searchNoResult" defaultMessage="No Collectives match the current search." />
+            <FormattedMessage defaultMessage="No applications match the current filter." />
           ) : (
-            <FormattedMessage id="menu.collective.none" defaultMessage="No Collectives yet" />
+            <FormattedMessage defaultMessage="You have no applications." />
           )}
         </MessageBox>
       ) : (
