@@ -36,6 +36,7 @@ import ApplicationMessageModal from '../ApplicationMessageModal';
 import ValidatedRepositoryInfo from '../ValidatedRepositoryInfo';
 
 import { InfoSectionHeader } from './InfoSectionHeader';
+import { hostApplicationsQuery, processApplicationMutation } from './queries';
 
 const ApplicationBody = styled.div`
   height: 267px;
@@ -63,40 +64,6 @@ const CollectiveCardBody = styled.div`
       border-radius: 8px;
     }
   }
-`;
-
-export const processApplicationAccountFields = gql`
-  fragment ProcessHostApplicationFields on AccountWithHost {
-    isActive
-    approvedAt
-    isApproved
-    host {
-      id
-    }
-  }
-`;
-
-export const processApplicationMutation = gql`
-  mutation ProcessHostApplication(
-    $host: AccountReferenceInput!
-    $account: AccountReferenceInput!
-    $action: ProcessHostApplicationAction!
-    $message: String
-  ) {
-    processHostApplication(host: $host, account: $account, action: $action, message: $message) {
-      account {
-        id
-        ... on AccountWithHost {
-          ...ProcessHostApplicationFields
-        }
-      }
-      conversation {
-        id
-        slug
-      }
-    }
-  }
-  ${processApplicationAccountFields}
 `;
 
 const msg = defineMessages({
@@ -194,13 +161,14 @@ const UserInputContainer = styled(P).attrs({
   fontWeight: '400',
 })``;
 
-const HostApplication = ({ host, application, refetch, ...props }) => {
+const HostApplication = ({ host, application, ...props }) => {
   const intl = useIntl();
   const [showContactModal, setShowContactModal] = React.useState(false);
   const { addToast } = useToasts();
   const collective = application.account;
   const [callProcessApplication, { loading }] = useMutation(processApplicationMutation, {
     context: API_V2_CONTEXT,
+    refetchQueries: [hostApplicationsQuery],
   });
   const hasNothingToShow = !application.message && !application.customData;
 
@@ -217,9 +185,6 @@ const HostApplication = ({ host, application, refetch, ...props }) => {
     try {
       const variables = { host: { id: host.id }, account: { id: collective.id }, action, message };
       const result = await callProcessApplication({ variables });
-
-      // Refetch the host applications page query to update status and move the application to the right view
-      await refetch?.();
 
       addToast(getSuccessToast(intl, action, collective, result));
 
@@ -458,7 +423,6 @@ HostApplication.propTypes = {
       }),
     }).isRequired,
   }),
-  refetch: PropTypes.func,
 };
 
 export default HostApplication;

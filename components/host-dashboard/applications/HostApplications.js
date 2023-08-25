@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -17,86 +17,10 @@ import SearchBar from '../../SearchBar';
 import { H1 } from '../../Text';
 import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from '../HostAdminCollectiveFilters';
 
-import HostApplication, { processApplicationAccountFields } from './HostApplication';
+import HostApplication from './HostApplication';
+import { hostApplicationsQuery } from './queries';
 
 const COLLECTIVES_PER_PAGE = 20;
-
-const hostApplicationsQuery = gql`
-  query HostDashboardPendingApplications(
-    $hostSlug: String!
-    $limit: Int!
-    $offset: Int!
-    $orderBy: ChronologicalOrderInput!
-    $searchTerm: String
-    $status: HostApplicationStatus
-  ) {
-    host(slug: $hostSlug) {
-      id
-      slug
-      name
-      type
-      settings
-      policies {
-        COLLECTIVE_MINIMUM_ADMINS {
-          numberOfAdmins
-        }
-      }
-      hostApplications(limit: $limit, offset: $offset, orderBy: $orderBy, status: $status, searchTerm: $searchTerm) {
-        offset
-        limit
-        totalCount
-        nodes {
-          id
-          message
-          customData
-          status
-          account {
-            id
-            legacyId
-            name
-            slug
-            website
-            description
-            type
-            imageUrl(height: 96)
-            createdAt
-            ... on AccountWithHost {
-              ...ProcessHostApplicationFields
-            }
-            memberInvitations(role: [ADMIN]) {
-              id
-              role
-            }
-            admins: members(role: ADMIN) {
-              totalCount
-              nodes {
-                id
-                account {
-                  id
-                  type
-                  slug
-                  name
-                  imageUrl(height: 48)
-                }
-              }
-            }
-          }
-        }
-      }
-
-      pending: hostApplications(limit: 0, offset: 0, status: PENDING) {
-        totalCount
-      }
-      approved: hostApplications(limit: 0, offset: 0, status: APPROVED) {
-        totalCount
-      }
-      rejected: hostApplications(limit: 0, offset: 0, status: REJECTED) {
-        totalCount
-      }
-    }
-  }
-  ${processApplicationAccountFields}
-`;
 
 const checkIfQueryHasFilters = query =>
   Object.entries(query).some(([key, value]) => {
@@ -159,9 +83,9 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
   const router = useRouter() || {};
   const query = enforceDefaultParamsOnQuery(router.query);
   const hasFilters = React.useMemo(() => checkIfQueryHasFilters(query), [query]);
-  const vars = { hostSlug, ...getVariablesFromQuery(query) };
-  const { data, error, loading, variables, refetch } = useQuery(hostApplicationsQuery, {
-    variables: vars,
+  const { data, error, loading, variables } = useQuery(hostApplicationsQuery, {
+    variables: { hostSlug, ...getVariablesFromQuery(query) },
+    fetchPolicy: 'cache-and-network',
     context: API_V2_CONTEXT,
   });
   const pageRoute = isDashboard ? `/workspace/${hostSlug}/host-applications` : `/${hostSlug}/admin/host-applications`;
@@ -249,7 +173,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
               ))
             : hostApplications?.nodes.map(application => (
                 <Box key={application.id} mb={24} data-cy="host-application">
-                  <HostApplication host={data.host} application={application} refetch={refetch} />
+                  <HostApplication host={data.host} application={application} />
                 </Box>
               ))}
           <Flex mt={5} justifyContent="center">
