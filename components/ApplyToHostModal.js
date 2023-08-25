@@ -614,7 +614,14 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                   }
                                 >
                                   {({ field }) => (
-                                    <StyledTextarea {...field} width="100%" minHeight={76} maxLength={3000} showCount />
+                                    <StyledTextarea
+                                      {...field}
+                                      width="100%"
+                                      minHeight={76}
+                                      maxLength={3000}
+                                      fontSize="14px"
+                                      showCount
+                                    />
                                   )}
                                 </StyledInputFormikField>
                               </React.Fragment>

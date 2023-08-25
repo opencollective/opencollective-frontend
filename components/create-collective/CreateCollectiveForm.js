@@ -425,7 +425,14 @@ class CreateCollectiveForm extends React.Component {
                           }
                         >
                           {({ field }) => (
-                            <StyledTextarea {...field} width="100%" minHeight={76} maxLength={3000} showCount />
+                            <StyledTextarea
+                              {...field}
+                              width="100%"
+                              minHeight={76}
+                              maxLength={3000}
+                              showCount
+                              fontSize="14px"
+                            />
                           )}
                         </StyledInputFormikField>
                       )}
