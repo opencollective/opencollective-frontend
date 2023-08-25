@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { isHostAccount } from '../lib/collective.lib';
@@ -8,6 +9,7 @@ import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 import { AdminPanelContext } from '../components/admin-panel/AdminPanelContext';
 import AdminPanelSection from '../components/admin-panel/AdminPanelSection';
@@ -95,8 +97,16 @@ function getBlocker(LoggedInUser, account, section) {
 
 const AdminPanelPage = ({ slug, section, subpath }) => {
   const intl = useIntl();
+  const router = useRouter();
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
+
+  // Redirect to the new dashboard if the user has the feature flag enabled
+  React.useEffect(() => {
+    if (LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)) {
+      router.push(`/workspace/${slug}`);
+    }
+  }, [LoggedInUser]);
 
   const account = data?.account;
   const notification = getNotification(intl, account);

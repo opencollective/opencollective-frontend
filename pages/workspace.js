@@ -9,6 +9,7 @@ import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLocalStorage from '../lib/hooks/useLocalStorage';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 import { Box, Flex } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
@@ -120,6 +121,13 @@ const DashboardPage = () => {
       setLastWorkspaceVisit({ slug });
     }
   }, [slug]);
+
+  // Redirect to home if user doesn't have access to new dashboard
+  React.useEffect(() => {
+    if (LoggedInUser && !LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)) {
+      router.push(`/`);
+    }
+  }, [LoggedInUser]);
 
   const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
