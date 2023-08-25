@@ -164,7 +164,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
     variables: vars,
     context: API_V2_CONTEXT,
   });
-  const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-applications` : `/${hostSlug}/admin/host-applications`;
+  const pageRoute = isDashboard ? `/workspace/${hostSlug}/host-applications` : `/${hostSlug}/admin/host-applications`;
 
   const hostApplications = data?.host?.hostApplications;
   const [views, setViews] = React.useState(initViews);
