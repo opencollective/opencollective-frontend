@@ -8,6 +8,7 @@ import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
@@ -102,12 +103,19 @@ const DashboardPage = () => {
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const activeSlug = slug || LoggedInUser?.getLastDashboardSlug();
 
-  // Redirect to the dashboard of the logged in user if no slug is provided
+  // Save current slug as last visited dashboard slug
   useEffect(() => {
     if (slug) {
       LoggedInUser?.saveLastDashboardSlug(slug);
     }
   }, [slug, LoggedInUser]);
+
+  // Redirect to home if user doesn't have access to new dashboard
+  useEffect(() => {
+    if (LoggedInUser && !LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)) {
+      router.push(`/`);
+    }
+  }, [LoggedInUser]);
 
   const { data, loading } = useQuery(adminPanelQuery, {
     context: API_V2_CONTEXT,
