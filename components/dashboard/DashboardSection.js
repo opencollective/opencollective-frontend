@@ -14,7 +14,7 @@ import PendingContributions from '../admin-panel/sections/PendingContributions';
 import TeamSettings from '../admin-panel/sections/Team';
 import Container from '../Container';
 import { Box } from '../Grid';
-import PendingApplications from '../host-dashboard/applications/PendingApplications';
+import HostApplications from '../host-dashboard/applications/HostApplications';
 import HostDashboardAgreements from '../host-dashboard/HostDashboardAgreements';
 import HostDashboardExpenses from '../host-dashboard/HostDashboardExpenses';
 import HostDashboardHostedCollectives from '../host-dashboard/HostDashboardHostedCollectives';
@@ -42,7 +42,7 @@ const ADMIN_PANEL_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS]: PendingContributions,
   [HOST_DASHBOARD_SECTIONS.HOST_EXPENSES]: HostDashboardExpenses,
   [HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
-  [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: PendingApplications,
+  [HOST_DASHBOARD_SECTIONS.HOST_APPLICATIONS]: HostApplications,
   [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
   [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
   [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,

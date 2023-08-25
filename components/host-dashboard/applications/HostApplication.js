@@ -148,16 +148,6 @@ StatusTag.propTypes = {
   status: PropTypes.oneOf(['PENDING', 'REJECTED', 'APPROVED']),
 };
 
-const getStatus = (isDone, latestAction) => {
-  if (!isDone) {
-    return 'PENDING';
-  } else if (latestAction === ACTIONS.REJECT) {
-    return 'REJECTED';
-  } else if (latestAction === ACTIONS.APPROVE) {
-    return 'APPROVED';
-  }
-};
-
 const getSuccessToast = (intl, action, collective, result) => {
   if (action === ACTIONS.SEND_PRIVATE_MESSAGE || action === ACTIONS.SEND_PUBLIC_MESSAGE) {
     const conversation = get(result, 'data.processHostApplication.conversation');
@@ -204,10 +194,9 @@ const UserInputContainer = styled(P).attrs({
   fontWeight: '400',
 })``;
 
-const PendingApplication = ({ host, application, ...props }) => {
+const HostApplication = ({ host, application, refetch, ...props }) => {
   const intl = useIntl();
   const [isDone, setIsDone] = React.useState(false);
-  const [latestAction, setLatestAction] = React.useState(null);
   const [showContactModal, setShowContactModal] = React.useState(false);
   const { addToast } = useToasts();
   const collective = application.account;
@@ -227,10 +216,13 @@ const PendingApplication = ({ host, application, ...props }) => {
 
   const processApplication = async (action, message, onSuccess) => {
     setIsDone(false);
-    setLatestAction(action);
     try {
       const variables = { host: { id: host.id }, account: { id: collective.id }, action, message };
       const result = await callProcessApplication({ variables });
+
+      // Refetch the host applications page query to update status and move the application to the right view
+      await refetch?.();
+
       addToast(getSuccessToast(intl, action, collective, result));
       if (action === ACTIONS.APPROVE || action === ACTIONS.REJECT) {
         setIsDone(true);
@@ -261,7 +253,10 @@ const PendingApplication = ({ host, application, ...props }) => {
         showWebsite
         tag={
           <Flex mt={12}>
-            <StatusTag status={getStatus(isDone, latestAction)} />
+            <StatusTag
+              //  status={getStatus(isDone, latestAction)}
+              status={application.status}
+            />
             <StyledTag variant="rounded-right">
               <I18nCollectiveTags
                 tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
@@ -290,7 +285,7 @@ const PendingApplication = ({ host, application, ...props }) => {
                 {collective.admins.nodes.slice(0, 6).map(admin => (
                   <Box key={admin.id} mr={1}>
                     <LinkCollective collective={admin.account}>
-                      <Avatar collective={admin.account} radius="24px" />
+                      <Avatar collective={admin.account} radius={24} />
                     </LinkCollective>
                   </Box>
                 ))}
@@ -411,9 +406,11 @@ const PendingApplication = ({ host, application, ...props }) => {
               disabled={requiresMinimumNumberOfAdmins && !hasEnoughInvitedAdmins}
               disabledMessage={
                 requiresMinimumNumberOfAdmins &&
-                !hasEnoughInvitedAdmins && (
-                  <FormattedMessage defaultMessage="You can not approve this collective as it doesn’t satisfy the minimum admin policy set by you." />
-                )
+                !hasEnoughInvitedAdmins &&
+                intl.formatMessage({
+                  defaultMessage:
+                    'You can not approve this collective as it doesn’t satisfy the minimum admin policy set by you.',
+                })
               }
               onApprove={() => processApplication(ACTIONS.APPROVE)}
               onReject={message => processApplication(ACTIONS.REJECT, message)}
@@ -436,7 +433,7 @@ const PendingApplication = ({ host, application, ...props }) => {
   );
 };
 
-PendingApplication.propTypes = {
+HostApplication.propTypes = {
   host: PropTypes.shape({
     id: PropTypes.string,
     policies: PropTypes.object,
@@ -444,6 +441,7 @@ PendingApplication.propTypes = {
   application: PropTypes.shape({
     message: PropTypes.string,
     customData: PropTypes.object,
+    status: PropTypes.string,
     account: PropTypes.shape({
       id: PropTypes.string.isRequired,
       legacyId: PropTypes.number,
@@ -463,6 +461,7 @@ PendingApplication.propTypes = {
       }),
     }).isRequired,
   }),
+  refetch: PropTypes.func,
 };
 
-export default PendingApplication;
+export default HostApplication;

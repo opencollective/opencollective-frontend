@@ -7,27 +7,28 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
+import DashboardViews from '../../dashboard/DashboardViews';
 import { Box, Flex } from '../../Grid';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import Pagination from '../../Pagination';
 import SearchBar from '../../SearchBar';
-import StyledHr from '../../StyledHr';
 import { H1 } from '../../Text';
 import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from '../HostAdminCollectiveFilters';
 
-import PendingApplication, { processApplicationAccountFields } from './PendingApplication';
+import HostApplication, { processApplicationAccountFields } from './HostApplication';
 
 const COLLECTIVES_PER_PAGE = 20;
 
-const pendingApplicationsQuery = gql`
+const hostApplicationsQuery = gql`
   query HostDashboardPendingApplications(
     $hostSlug: String!
     $limit: Int!
     $offset: Int!
     $orderBy: ChronologicalOrderInput!
     $searchTerm: String
+    $status: HostApplicationStatus
   ) {
     host(slug: $hostSlug) {
       id
@@ -40,7 +41,7 @@ const pendingApplicationsQuery = gql`
           numberOfAdmins
         }
       }
-      pendingApplications(limit: $limit, offset: $offset, orderBy: $orderBy, searchTerm: $searchTerm) {
+      hostApplications(limit: $limit, offset: $offset, orderBy: $orderBy, status: $status, searchTerm: $searchTerm) {
         offset
         limit
         totalCount
@@ -48,6 +49,7 @@ const pendingApplicationsQuery = gql`
           id
           message
           customData
+          status
           account {
             id
             legacyId
@@ -81,6 +83,16 @@ const pendingApplicationsQuery = gql`
           }
         }
       }
+
+      pending: hostApplications(limit: 0, offset: 0, status: PENDING) {
+        totalCount
+      }
+      approved: hostApplications(limit: 0, offset: 0, status: APPROVED) {
+        totalCount
+      }
+      rejected: hostApplications(limit: 0, offset: 0, status: REJECTED) {
+        totalCount
+      }
     }
   }
   ${processApplicationAccountFields}
@@ -97,6 +109,7 @@ const getVariablesFromQuery = query => {
     limit: parseInt(query.limit) || COLLECTIVES_PER_PAGE,
     searchTerm: query.searchTerm,
     hostFeesStructure: query['fees-structure'],
+    status: query.status,
     orderBy: {
       field: 'CREATED_AT',
       direction: query['sort-by'] === 'oldest' ? 'ASC' : 'DESC',
@@ -112,21 +125,68 @@ const updateQuery = (router, newParams) => {
   return router.push({ pathname, query });
 };
 
-const PendingApplications = ({ hostSlug }) => {
+const initViews = [
+  {
+    label: <FormattedMessage defaultMessage="Pending" />,
+    query: {
+      status: 'PENDING',
+    },
+    id: 'pending',
+    showCount: true,
+  },
+  {
+    label: <FormattedMessage defaultMessage="Approved" />,
+    query: { status: 'APPROVED' },
+    showCount: true,
+    id: 'approved',
+  },
+  {
+    label: <FormattedMessage defaultMessage="Rejected" />,
+    query: { status: 'REJECTED' },
+    showCount: true,
+    id: 'rejected',
+  },
+];
+
+const enforceDefaultParamsOnQuery = query => {
+  return {
+    ...query,
+    status: query.status || 'PENDING',
+  };
+};
+
+const HostApplications = ({ hostSlug, isDashboard }) => {
   const router = useRouter() || {};
-  const query = router.query;
+  const query = enforceDefaultParamsOnQuery(router.query);
   const hasFilters = React.useMemo(() => checkIfQueryHasFilters(query), [query]);
-  const { data, error, loading, variables } = useQuery(pendingApplicationsQuery, {
-    variables: { hostSlug, ...getVariablesFromQuery(query) },
+  const vars = { hostSlug, ...getVariablesFromQuery(query) };
+  const { data, error, loading, variables, refetch } = useQuery(hostApplicationsQuery, {
+    variables: vars,
     context: API_V2_CONTEXT,
   });
+  const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-applications` : `/${hostSlug}/admin/host-applications`;
 
-  const hostApplications = data?.host?.pendingApplications;
+  const hostApplications = data?.host?.hostApplications;
+  const [views, setViews] = React.useState(initViews);
+
+  React.useEffect(() => {
+    if (data) {
+      setViews(
+        initViews.map(view => {
+          return {
+            ...view,
+            count: data.host[view.id]?.totalCount,
+          };
+        }),
+      );
+    }
+  }, [data]);
+
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
       <Flex alignItems="center" mb={24} flexWrap="wrap">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
-          <FormattedMessage id="host.dashboard.tab.pendingApplications" defaultMessage="Pending applications" />
+          <FormattedMessage id="host.dashboard.tab.applications" defaultMessage="Applications" />
         </H1>
         <Box mx="auto" />
         <Box p={2}>
@@ -136,7 +196,21 @@ const PendingApplications = ({ hostSlug }) => {
           />
         </Box>
       </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" />
+      <DashboardViews
+        query={query}
+        omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
+        views={views}
+        onChange={query => {
+          router.push(
+            {
+              pathname: pageRoute,
+              query,
+            },
+            undefined,
+            { scroll: false },
+          );
+        }}
+      />
       <Box mb={34}>
         {data?.host ? (
           <HostAdminCollectiveFilters
@@ -175,7 +249,7 @@ const PendingApplications = ({ hostSlug }) => {
               ))
             : hostApplications?.nodes.map(application => (
                 <Box key={application.id} mb={24} data-cy="host-application">
-                  <PendingApplication host={data.host} application={application} />
+                  <HostApplication host={data.host} application={application} refetch={refetch} />
                 </Box>
               ))}
           <Flex mt={5} justifyContent="center">
@@ -192,8 +266,9 @@ const PendingApplications = ({ hostSlug }) => {
   );
 };
 
-PendingApplications.propTypes = {
+HostApplications.propTypes = {
   hostSlug: PropTypes.string.isRequired,
+  isDashboard: PropTypes.bool,
 };
 
-export default PendingApplications;
+export default HostApplications;

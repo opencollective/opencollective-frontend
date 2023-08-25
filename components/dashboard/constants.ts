@@ -18,7 +18,7 @@ export const HOST_DASHBOARD_SECTIONS = {
   HOSTED_COLLECTIVES: 'hosted-collectives',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   HOST_VIRTUAL_CARD_REQUESTS: 'host-virtual-card-requests',
-  PENDING_APPLICATIONS: 'pending-applications',
+  HOST_APPLICATIONS: 'host-applications',
 };
 
 export const ABOUT_ORG_SECTIONS = {
@@ -146,9 +146,9 @@ export const SECTION_LABELS = defineMessages({
     id: 'PendingContributions',
     defaultMessage: 'Pending Contributions',
   },
-  [ALL_SECTIONS.PENDING_APPLICATIONS]: {
-    id: 'AdminPanel.Menu.PendingApplications',
-    defaultMessage: 'Pending Applications',
+  [ALL_SECTIONS.HOST_APPLICATIONS]: {
+    id: 'AdminPanel.Menu.HostApplications',
+    defaultMessage: 'Applications',
   },
   [ALL_SECTIONS.OVERVIEW]: {
     id: 'AdminPanel.Menu.Overview',

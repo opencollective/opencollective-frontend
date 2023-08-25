@@ -81,7 +81,7 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
         />
 
         <MenuLink
-          section={HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS}
+          section={HOST_DASHBOARD_SECTIONS.HOST_APPLICATIONS}
           if={!isAccountantOnly}
           icon={<Inbox size={16} />}
         />
