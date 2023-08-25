@@ -196,7 +196,6 @@ const UserInputContainer = styled(P).attrs({
 
 const HostApplication = ({ host, application, refetch, ...props }) => {
   const intl = useIntl();
-  const [isDone, setIsDone] = React.useState(false);
   const [showContactModal, setShowContactModal] = React.useState(false);
   const { addToast } = useToasts();
   const collective = application.account;
@@ -215,7 +214,6 @@ const HostApplication = ({ host, application, refetch, ...props }) => {
       host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins;
 
   const processApplication = async (action, message, onSuccess) => {
-    setIsDone(false);
     try {
       const variables = { host: { id: host.id }, account: { id: collective.id }, action, message };
       const result = await callProcessApplication({ variables });
@@ -224,9 +222,7 @@ const HostApplication = ({ host, application, refetch, ...props }) => {
       await refetch?.();
 
       addToast(getSuccessToast(intl, action, collective, result));
-      if (action === ACTIONS.APPROVE || action === ACTIONS.REJECT) {
-        setIsDone(true);
-      }
+
       if (onSuccess) {
         onSuccess();
       }
@@ -253,10 +249,7 @@ const HostApplication = ({ host, application, refetch, ...props }) => {
         showWebsite
         tag={
           <Flex mt={12}>
-            <StatusTag
-              //  status={getStatus(isDone, latestAction)}
-              status={application.status}
-            />
+            <StatusTag status={application.status} />
             <StyledTag variant="rounded-right">
               <I18nCollectiveTags
                 tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
@@ -375,20 +368,23 @@ const HostApplication = ({ host, application, refetch, ...props }) => {
               })}
           </ApplicationBody>
         </Container>
-        {!isDone && (
-          <Container
-            display="flex"
-            p={3}
-            justifyContent="space-between"
-            alignItems="center"
-            borderTop="1px solid #DCDEE0"
-            boxShadow="0px -2px 4px 0px rgb(49 50 51 / 6%)"
-          >
-            <Flex alignItems="center" gap="10px">
-              <StyledRoundButton size={32} onClick={() => setShowContactModal(true)}>
-                <Mail size={15} color="#4E5052" />
-              </StyledRoundButton>
-              {requiresMinimumNumberOfAdmins && hasEnoughInvitedAdmins && !hasEnoughAdmins && (
+
+        <Container
+          display="flex"
+          p={3}
+          justifyContent="space-between"
+          alignItems="center"
+          borderTop="1px solid #DCDEE0"
+          boxShadow="0px -2px 4px 0px rgb(49 50 51 / 6%)"
+        >
+          <Flex alignItems="center" gap="10px">
+            <StyledRoundButton size={32} onClick={() => setShowContactModal(true)}>
+              <Mail size={15} color="#4E5052" />
+            </StyledRoundButton>
+            {application.status === 'PENDING' &&
+              requiresMinimumNumberOfAdmins &&
+              hasEnoughInvitedAdmins &&
+              !hasEnoughAdmins && (
                 <StyledTooltip
                   content={
                     <FormattedMessage defaultMessage="This collective doesn’t satisfy the minimum admin requirements as admin invitations are still pending." />
@@ -399,7 +395,8 @@ const HostApplication = ({ host, application, refetch, ...props }) => {
                   </Span>
                 </StyledTooltip>
               )}
-            </Flex>
+          </Flex>
+          {application.status === 'PENDING' && (
             <AcceptRejectButtons
               collective={collective}
               isLoading={loading}
@@ -415,8 +412,8 @@ const HostApplication = ({ host, application, refetch, ...props }) => {
               onApprove={() => processApplication(ACTIONS.APPROVE)}
               onReject={message => processApplication(ACTIONS.REJECT, message)}
             />
-          </Container>
-        )}
+          )}
+        </Container>
       </Container>
       {showContactModal && (
         <ApplicationMessageModal

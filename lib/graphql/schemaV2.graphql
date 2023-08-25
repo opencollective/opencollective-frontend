@@ -2904,6 +2904,36 @@ type Host implements Account & AccountWithContributions {
   stripe: StripeConnectedAccount
 
   """
+  Applications for this host
+  """
+  hostApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Search term for collective tags, id, name, slug and description.
+    """
+    searchTerm: String
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter applications by status
+    """
+    status: HostApplicationStatus
+  ): HostApplicationCollection!
+
+  """
   Pending applications for this host
   """
   pendingApplications(
@@ -2927,6 +2957,7 @@ type Host implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
   ): HostApplicationCollection!
+    @deprecated(reason: "2023-08-25: Deprecated in favour of host.hostApplications(status: PENDING).")
   hostedVirtualCards(
     """
     Search term (card name, card last four digits)
