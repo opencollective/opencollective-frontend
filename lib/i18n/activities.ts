@@ -70,6 +70,9 @@ export const ActivityDescriptionI18n = defineMessages({
   COLLECTIVE_APPROVED: {
     defaultMessage: '<Account></Account> application approved',
   },
+  COLLECTIVE_UNHOSTED: {
+    defaultMessage: '<Account></Account> unhosted',
+  },
   // Freezing collectives
   COLLECTIVE_FROZEN: {
     defaultMessage: '<Account></Account> frozen',
@@ -347,6 +350,9 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
   COLLECTIVE_CREATED: {
     id: 'WebhookEvents.COLLECTIVE_CREATED',
     defaultMessage: 'Collective created',
+  },
+  COLLECTIVE_UNHOSTED: {
+    defaultMessage: 'Collective unhosted',
   },
   ORGANIZATION_COLLECTIVE_CREATED: {
     defaultMessage: 'Organization created',
