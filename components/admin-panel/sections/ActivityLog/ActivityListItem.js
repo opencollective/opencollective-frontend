@@ -18,6 +18,7 @@ import ActivityDescription from './ActivityDescription';
 import ActivityDetails, { DETAILED_ACTIVITY_TYPES } from './ActivityDetails';
 
 const MetadataContainer = styled.div`
+  font-size: 13px;
   display: flex;
   align-items: center;
   grid-gap: 8px;
@@ -49,7 +50,7 @@ const ActivityListItem = ({ activity }) => {
       <P color="black.900" fontWeight="500" fontSize="14px">
         <ActivityDescription activity={activity} />
       </P>
-      <Flex justifyContent="space-between" alignItems="center" mt="10px">
+      <Flex justifyContent="space-between" alignItems="center" mt="8px">
         <MetadataContainer>
           {activity.isSystem ? (
             <Span>

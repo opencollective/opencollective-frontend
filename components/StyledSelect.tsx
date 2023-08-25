@@ -195,6 +195,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     selectTheme,
     noOptionsMessage = () => intl.formatMessage(Messages.noOptions),
     options,
+    fontSize,
   }) => {
     isSearchable = isSearchable ?? options?.length > 8;
     return {
@@ -230,6 +231,10 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
             customStyles.cursor = 'pointer';
           }
 
+          if (fontSize) {
+            customStyles.fontSize = fontSize;
+          }
+
           if (typeof styles?.control === 'function') {
             return styles.control({ ...baseStyles, ...customStyles }, state);
           } else {
@@ -249,6 +254,10 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
             customStyles.backgroundColor = theme.colors.primary[100];
           } else {
             customStyles['&:hover'] = { backgroundColor: theme.colors.primary[100] };
+          }
+
+          if (fontSize) {
+            customStyles.fontSize = fontSize;
           }
 
           return { ...baseStyles, ...customStyles, ...styles?.option };
