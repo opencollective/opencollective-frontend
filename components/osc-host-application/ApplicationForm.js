@@ -503,6 +503,7 @@ const ApplicationForm = ({
                                   width="100%"
                                   maxLength={150}
                                   showCount
+                                  fontSize="14px"
                                   placeholder={intl.formatMessage(messages.descriptionPlaceholder)}
                                 />
                               )}
@@ -656,6 +657,7 @@ const ApplicationForm = ({
                               <StyledTextarea
                                 {...field}
                                 rows={4}
+                                fontSize="14px"
                                 placeholder={intl.formatMessage(messages.extraLicenseInfoHelpText)}
                               />
                             )}
@@ -713,6 +715,7 @@ const ApplicationForm = ({
                               <StyledTextarea
                                 {...field}
                                 rows={4}
+                                fontSize="14px"
                                 placeholder={intl.formatMessage(messages.linksToPreviousEventsPlaceholder)}
                               />
                             )}
@@ -812,6 +815,7 @@ const ApplicationForm = ({
                             <StyledTextarea
                               {...field}
                               rows={6}
+                              fontSize="14px"
                               placeholder={intl.formatMessage(messages.tellUsMorePlaceholder)}
                             />
                           )}
