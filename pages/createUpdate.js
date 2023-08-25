@@ -29,7 +29,7 @@ import StyledButtonSet from '../components/StyledButtonSet';
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-import { getUpdatesVariables, updatesQuery } from './updates';
+import { getUpdatesVariables, updatesPageQuery } from './updates';
 
 const BackButtonWrapper = styled(Container)`
   position: relative;
@@ -106,7 +106,7 @@ class CreateUpdatePage extends React.Component {
         variables: { update },
         refetchQueries: [
           {
-            query: updatesQuery,
+            query: updatesPageQuery,
             context: API_V2_CONTEXT,
             variables: getUpdatesVariables(this.props.slug),
           },
