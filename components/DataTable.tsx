@@ -15,6 +15,7 @@ interface DataTableProps<TData, TValue> {
   highlightRowOnHover?: boolean;
   emptyMessage?: () => React.ReactNode;
   nbPlaceholders?: number;
+  headerProps?: React.ComponentProps<typeof TableHeader>;
 }
 
 export function DataTable<TData, TValue>({
@@ -26,6 +27,7 @@ export function DataTable<TData, TValue>({
   hideHeader,
   nbPlaceholders = 10,
   highlightRowOnHover = true,
+  headerProps,
   ...tableProps
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
@@ -38,13 +40,13 @@ export function DataTable<TData, TValue>({
   return (
     <Table {...tableProps}>
       {!hideHeader && (
-        <TableHeader>
+        <TableHeader {...headerProps}>
           {table.getHeaderGroups().map(headerGroup => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map(header => {
                 const columnMeta = header.column.columnDef.meta || {};
                 return (
-                  <TableHead key={header.id} textAlign={columnMeta['align'] || 'left'}>
+                  <TableHead key={header.id} textAlign="left" {...columnMeta['styles']}>
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 );

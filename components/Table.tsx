@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { textAlign, TextAlignProps } from 'styled-system';
+import { layout, LayoutProps, padding, PaddingProps, textAlign, TextAlignProps } from 'styled-system';
 
 const StyledTable = styled.div`
   width: 100%;
@@ -15,12 +15,14 @@ const StyledTable = styled.div`
   }
 `;
 
-const StyledTableHeader = styled.thead`
+const StyledTableHeader = styled.thead.attrs<React.HTMLAttributes<HTMLTableSectionElement> & PaddingProps>(props => ({
+  padding: props.padding || '16px',
+}))`
   tr {
     border-bottom: 1px solid #e2e8f0;
   }
   th {
-    padding: 16px;
+    ${padding}
   }
 `;
 
@@ -65,6 +67,7 @@ const StyledTableHead = styled.th`
   }
 
   ${textAlign}
+  ${layout}
 `;
 
 const StyledTableCell = styled.td`
@@ -89,7 +92,7 @@ const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableE
 );
 Table.displayName = 'Table';
 
-const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
+const TableHeader = React.forwardRef<HTMLTableSectionElement, React.ComponentProps<typeof StyledTableHeader>>(
   ({ className, ...props }, ref) => <StyledTableHeader ref={ref} className={className} {...props} />,
 );
 TableHeader.displayName = 'TableHeader';
@@ -112,9 +115,10 @@ const TableRow = React.forwardRef<
 ));
 TableRow.displayName = 'TableRow';
 
-const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<HTMLTableCellElement> & TextAlignProps>(
-  ({ className, ...props }, ref) => <StyledTableHead ref={ref} className={className} {...props} />,
-);
+const TableHead = React.forwardRef<
+  HTMLTableCellElement,
+  React.ThHTMLAttributes<HTMLTableCellElement> & TextAlignProps & LayoutProps
+>(({ className, ...props }, ref) => <StyledTableHead ref={ref} className={className} {...props} />);
 TableHead.displayName = 'TableHead';
 
 const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(

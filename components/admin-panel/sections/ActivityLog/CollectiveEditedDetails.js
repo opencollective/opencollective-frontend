@@ -5,6 +5,9 @@ import { has, isEmpty, pickBy, startCase } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { Flex } from '../../../Grid';
+import StyledTag from '../../../StyledTag';
+
 const diffValues = (prevValue, newValue) => {
   if (typeof prevValue === 'string' || typeof newValue === 'string') {
     return { type: 'string', diff: diffChars(prevValue ?? '', newValue ?? '') };
@@ -42,26 +45,67 @@ const deepCompare = (prev, next) => {
 
 const DiffLine = styled.div`
   display: flex;
-  margin: 8px 0;
+  margin: 12px 0;
 `;
 
-const RemovedValue = styled.span`
-  background-color: #8b0000;
+const InlineDiffContainer = styled.div`
+  background: ${props => props.theme.colors.black[100]};
+  padding: 12px;
+  border-radius: 8px;
+`;
+
+const InlineRemovedValue = styled.span`
+  background-color: ${props => props.theme.colors.red[600]};
+  color: white;
   text-decoration: line-through;
-  opacity: 0.45;
 `;
 
-const AddedValue = styled.span`
-  background: #006330;
+const InlineAddedValue = styled.span`
+  background: ${props => props.theme.colors.green[600]};
+  color: white;
+`;
+
+const RemovedValue = styled.div`
+  background-color: ${props => props.theme.colors.red[600]};
+  color: white;
+  text-decoration: line-through;
+  display: block;
+  padding: 12px;
+  border-radius: 8px;
+`;
+
+const AddedValue = styled.div`
+  background: ${props => props.theme.colors.green[600]};
+  color: white;
+  display: block;
+  padding: 12px;
+  border-radius: 8px;
 `;
 
 const DiffedKey = styled.span`
   font-weight: bold;
-  color: orange;
-  min-width: 100px;
+  border-right: 1px solid #e9e9e9;
+  padding-right: 8px;
   margin-right: 8px;
-  display: block;
+  padding-top: 9px;
 `;
+
+const ValueContainer = styled.div`
+  overflow-wrap: anywhere;
+`;
+
+const shouldUseInlineDiff = changes => {
+  const diffLength = changes?.diff?.length ?? 0;
+  if (diffLength === 1 && (changes.diff[0].added || changes.diff[0].removed)) {
+    return false; // When we only add or remove a value, it's clearer to just display old value / new value
+  } else if (diffLength === 2 && changes.diff[0].removed && changes.diff[1].added) {
+    return false; // When we completely replace the value, it's clearer to just display old value / new value
+  } else if (diffLength > 15) {
+    return false; // When there are too many changes, it's clearer to just display old value / new value
+  } else {
+    return true;
+  }
+};
 
 export const CollectiveEditedDetails = ({ activity }) => {
   const { newData, previousData } = activity.data ?? {};
@@ -75,36 +119,52 @@ export const CollectiveEditedDetails = ({ activity }) => {
     );
   }
 
-  return fullDiff.map(({ action, key, changes, newValue, prevValue }, index) => (
-    // eslint-disable-next-line react/no-array-index-key
-    <DiffLine key={index}>
-      <DiffedKey>{startCase(key)}</DiffedKey>
-      {action === 'remove' ? (
-        <RemovedValue>{prevValue}</RemovedValue>
-      ) : action === 'add' ? (
-        <AddedValue>{newValue}</AddedValue>
-      ) : action === 'update' ? (
-        <div>
-          {changes.diff.map((part, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <React.Fragment key={index}>
-              {part.added ? (
-                <AddedValue>{part.value}</AddedValue>
-              ) : part.removed ? (
-                <RemovedValue>{part.value}</RemovedValue>
+  return fullDiff.map(({ action, key, changes, newValue, prevValue }, index) => {
+    const useInlineDiff = shouldUseInlineDiff(changes);
+    return (
+      // eslint-disable-next-line react/no-array-index-key
+      <DiffLine key={index}>
+        <DiffedKey>
+          <StyledTag fontSize="10px">{startCase(key)}</StyledTag>
+        </DiffedKey>
+        <ValueContainer>
+          {action === 'remove' ? (
+            <InlineRemovedValue>{prevValue}</InlineRemovedValue>
+          ) : action === 'add' ? (
+            <InlineAddedValue>{newValue}</InlineAddedValue>
+          ) : action === 'update' ? (
+            <div>
+              {useInlineDiff ? (
+                <InlineDiffContainer>
+                  {changes.diff.map((part, index) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <React.Fragment key={index}>
+                      {part.added ? (
+                        <InlineAddedValue>{part.value}</InlineAddedValue>
+                      ) : part.removed ? (
+                        <InlineRemovedValue>{part.value}</InlineRemovedValue>
+                      ) : (
+                        <span>{part.value}</span>
+                      )}
+                      {/* Separate array values (e.g. for tags) with commas */}
+                      {changes.type === 'array' && index < changes.diff.length - 1 && ', '}
+                      {/* For numbers & unknown types, show as "Previous value → New value" */}
+                      {changes.type === 'default' && index < changes.diff.length - 1 && ' → '}
+                    </React.Fragment>
+                  ))}
+                </InlineDiffContainer>
               ) : (
-                <span>{part.value}</span>
+                <Flex flexDirection="column" gridGap="8px">
+                  {!isEmpty(prevValue) && <RemovedValue p={1}>{JSON.stringify(prevValue, null, 2)}</RemovedValue>}
+                  {!isEmpty(newValue) && <AddedValue p={1}>{JSON.stringify(newValue, null, 2)}</AddedValue>}
+                </Flex>
               )}
-              {/* Separate array values (e.g. for tags) with commas */}
-              {changes.type === 'array' && index < changes.diff.length - 1 && ', '}
-              {/* For numbers & unknown types, show as "Previous value → New value" */}
-              {changes.type === 'default' && index < changes.diff.length - 1 && ' → '}
-            </React.Fragment>
-          ))}
-        </div>
-      ) : null}
-    </DiffLine>
-  ));
+            </div>
+          ) : null}
+        </ValueContainer>
+      </DiffLine>
+    );
+  });
 };
 
 CollectiveEditedDetails.propTypes = {
