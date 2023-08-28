@@ -1366,6 +1366,11 @@ type Expense {
   Custom data for this expense
   """
   customData: JSON
+
+  """
+  The merchant ID for this expense
+  """
+  merchantId: String
 }
 
 """
@@ -16187,11 +16192,6 @@ input OrderContextInput {
   Whether this order was created using the embedded contribution flow
   """
   isEmbed: Boolean
-
-  """
-  Whether this order was created using the new platform tip flow
-  """
-  isNewPlatformTipFlow: Boolean
 }
 
 input OrderUpdateInput {

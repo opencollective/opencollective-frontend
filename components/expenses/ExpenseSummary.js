@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { includes } from 'lodash';
+import { MessageSquare } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -57,6 +58,8 @@ const CreatedByUserLink = ({ account }) => {
 CreatedByUserLink.propTypes = {
   account: PropTypes.object,
 };
+
+const Spacer = () => <Span mx="6px">{'•'}</Span>;
 
 /**
  * Last step of the create expense flow, shows the summary of the expense with
@@ -172,7 +175,7 @@ const ExpenseSummary = ({
         </Flex>
       </Flex>
       <Tags expense={expense} isLoading={isLoading} canEdit={canEditTags} suggestedTags={suggestedTags} />
-      <Flex alignItems="center" mt={3}>
+      <Flex alignItems="center" mt="12px">
         {isLoading && !expense ? (
           <LoadingPlaceholder height={24} width={200} />
         ) : (
@@ -180,20 +183,11 @@ const ExpenseSummary = ({
             <LinkCollective collective={createdByAccount}>
               <Avatar collective={createdByAccount} size={24} />
             </LinkCollective>
-            <P ml={2} fontSize="14px" color="black.700" data-cy="expense-author">
+            <P ml={2} lineHeight="16px" fontSize="14px" color="black.700" data-cy="expense-author">
               {expense.requestedByAccount ? (
                 <FormattedMessage
-                  id="Expense.RequestedByOnDate"
-                  defaultMessage="Invited by {name} on {date, date, long}"
-                  values={{
-                    name: <CreatedByUserLink account={createdByAccount} />,
-                    date: new Date(expense.createdAt),
-                  }}
-                />
-              ) : expense.createdAt ? (
-                <FormattedMessage
-                  id="Expense.SubmittedByOnDate"
-                  defaultMessage="Submitted by {name} on {date, date, long}"
+                  id="Expense.RequestedBy"
+                  defaultMessage="Invited by {name}"
                   values={{
                     name: <CreatedByUserLink account={createdByAccount} />,
                     date: new Date(expense.createdAt),
@@ -206,8 +200,47 @@ const ExpenseSummary = ({
                   values={{ name: <CreatedByUserLink account={createdByAccount} /> }}
                 />
               )}
+              {expense.approvedBy?.length > 0 && (
+                <React.Fragment>
+                  <Spacer />
+                  <FormattedMessage
+                    id="Expense.ApprovedBy"
+                    defaultMessage="Approved by {name}"
+                    values={{
+                      name: <CreatedByUserLink account={expense.approvedBy[0]} />,
+                    }}
+                  />
+                </React.Fragment>
+              )}
             </P>
           </React.Fragment>
+        )}
+      </Flex>
+      <Flex alignItems="center" mt="12px">
+        {isLoading && !expense ? (
+          <LoadingPlaceholder height={24} width={200} />
+        ) : (
+          <P fontSize="14px" color="black.700" data-cy="expense-author">
+            <FormattedDate value={expense.createdAt} dateStyle="medium" />
+            {expense?.comments && (
+              <React.Fragment>
+                <Spacer />
+                <MessageSquare size="16px" style={{ display: 'inline-block' }} />
+                &nbsp;
+                {expense.comments.totalCount}
+              </React.Fragment>
+            )}
+            {expense?.merchantId && (
+              <React.Fragment>
+                <Spacer />
+                <FormattedMessage
+                  id="Expense.MerchantId"
+                  defaultMessage="Merchant ID: {id}"
+                  values={{ id: expense.merchantId }}
+                />
+              </React.Fragment>
+            )}
+          </P>
         )}
       </Flex>
       {isGrant && expense.longDescription && (
@@ -222,7 +255,7 @@ const ExpenseSummary = ({
         </Fragment>
       )}
 
-      <Flex my={4} alignItems="center">
+      <Flex mt={4} mb={2} alignItems="center">
         {!expense && isLoading ? (
           <LoadingPlaceholder height={20} maxWidth={150} />
         ) : (
@@ -398,6 +431,7 @@ ExpenseSummary.propTypes = {
     amount: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
     invoiceInfo: PropTypes.string,
+    merchantId: PropTypes.string,
     createdAt: PropTypes.string,
     status: PropTypes.oneOf(Object.values(ExpenseStatus)),
     onHold: PropTypes.bool,
@@ -442,6 +476,15 @@ ExpenseSummary.propTypes = {
       type: PropTypes.string.isRequired,
       isAdmin: PropTypes.bool,
     }).isRequired,
+    approvedBy: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        slug: PropTypes.string.isRequired,
+        type: PropTypes.string.isRequired,
+        isAdmin: PropTypes.bool,
+      }),
+    ),
     payeeLocation: PropTypes.shape({
       address: PropTypes.string,
       country: PropTypes.string,
@@ -483,6 +526,9 @@ ExpenseSummary.propTypes = {
     permissions: PropTypes.shape({
       canSeeInvoiceInfo: PropTypes.bool,
       canDelete: PropTypes.bool,
+    }),
+    comments: PropTypes.shape({
+      totalCount: PropTypes.number,
     }),
   }),
   /** Whether current user can edit the tags */

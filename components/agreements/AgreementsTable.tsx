@@ -138,7 +138,7 @@ export const tableColumns: ColumnDef<Agreement>[] = [
   {
     accessorKey: 'attachment',
     header: () => <FormattedMessage id="Expense.Attachment" defaultMessage="Attachment" />,
-    meta: { align: 'right' },
+    meta: { styles: { align: 'right' } },
     cell: ({ row, table }) => {
       const agreement = row.original as Agreement;
       const attachment = agreement.attachment;

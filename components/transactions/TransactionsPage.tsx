@@ -23,6 +23,7 @@ import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
+import StyledSpinner from '../StyledSpinner';
 import { H1 } from '../Text';
 
 import { getDefaultKinds, parseTransactionKinds } from './filters/TransactionsKindFilter';
@@ -316,10 +317,13 @@ const Transactions = ({
               <FormattedMessage id="transactions.empty" defaultMessage="No transactions" />
             )}
           </MessageBox>
+        ) : loading ? (
+          <Flex p="16px" justifyContent="center">
+            <StyledSpinner />
+          </Flex>
         ) : (
           <React.Fragment>
             <TransactionsList
-              isLoading={loading}
               collective={account}
               transactions={transactionsAndProcessingOrders}
               displayActions
