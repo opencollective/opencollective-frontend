@@ -27,7 +27,7 @@
     "development": {
       "compact": false
     },
-    "test": {
+    "jest": {
       "plugins": ["require-context-hook"]
     },
     "e2e": {
