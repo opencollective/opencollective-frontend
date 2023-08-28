@@ -10,6 +10,9 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { AnalyticsEvent } from '../../lib/analytics/events';
+import { track } from '../../lib/analytics/plausible';
+import { AnalyticsProperty } from '../../lib/analytics/properties';
 import { getCollectiveTypeForUrl } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
@@ -19,6 +22,7 @@ import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { isPastEvent } from '../../lib/events';
+import { Experiment, isExperimentEnabled } from '../../lib/experiments/experiments';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
@@ -49,6 +53,7 @@ import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import ContributionFlowSuccess from './ContributionFlowSuccess';
 import ContributionSummary from './ContributionSummary';
 import { validateNewOrg } from './CreateOrganizationForm';
+import { PlatformTipOption } from './PlatformTipContainer';
 import { DEFAULT_PLATFORM_TIP_PERCENTAGE } from './PlatformTipInput';
 import {
   ContributionFlowUrlQueryHelper,
@@ -173,6 +178,8 @@ class ContributionFlow extends React.Component {
           : getDefaultInterval(props.tier),
         amount,
         platformTip: this.canHavePlatformTips() ? Math.round(amount * quantity * DEFAULT_PLATFORM_TIP_PERCENTAGE) : 0,
+        platformTipOption: PlatformTipOption.FIFTEEN_PERCENT,
+        isNewPlatformTip: isExperimentEnabled(Experiment.NEW_PLATFORM_TIP_FLOW, LoggedInUser),
         currency,
       },
     };
@@ -182,6 +189,20 @@ class ContributionFlow extends React.Component {
     if (!this.props.loadingLoggedInUser && this.state.isInitializing) {
       await this.updateRouteFromState();
       this.setState({ isInitializing: false });
+    }
+
+    const step = this.getCurrentStepName();
+    if (step !== 'success' && step !== 'details') {
+      track(AnalyticsEvent.CONTRIBUTION_STARTED, {
+        props: {
+          [AnalyticsProperty.CONTRIBUTION_STEP]: this.getCurrentStepName(),
+        },
+      });
+
+      if (step !== 'details') {
+        // started the contribution flow at advanced step with details picked.
+        track(AnalyticsEvent.CONTRIBUTION_DETAILS_STEP_COMPLETED);
+      }
     }
   }
 
@@ -267,6 +288,17 @@ class ContributionFlow extends React.Component {
       fromAccount = typeof stepProfile.id === 'string' ? { id: stepProfile.id } : { legacyId: stepProfile.id };
     }
 
+    const props = {
+      [AnalyticsProperty.CONTRIBUTION_HAS_PLATFORM_TIP]: stepDetails.amount && stepDetails.platformTip > 0,
+      [AnalyticsProperty.CONTRIBUTION_PLATFORM_TIP_PERCENTAGE]:
+        stepDetails.amount && stepDetails.platformTip > 0 ? stepDetails.platformTip / stepDetails.amount : 0,
+      [AnalyticsProperty.CONTRIBUTION_IS_NEW_PLATFORM_TIP]: stepDetails.isNewPlatformTip,
+    };
+
+    track(AnalyticsEvent.CONTRIBUTION_SUBMITTED, {
+      props,
+    });
+
     try {
       const totalAmount = getTotalAmount(stepDetails, stepSummary);
       const skipTaxes = !totalAmount || isEmpty(this.getApplicableTaxes(collective, host, tier?.type));
@@ -288,7 +320,7 @@ class ContributionFlow extends React.Component {
             paymentMethod: await this.getPaymentMethod(),
             platformTipAmount: getGQLV2AmountInput(stepDetails.platformTip, undefined),
             tier: this.props.tier && { legacyId: this.props.tier.legacyId },
-            context: { isEmbed: this.props.isEmbed || false },
+            context: { isEmbed: this.props.isEmbed || false, isNewPlatformTipFlow: stepDetails.isNewPlatformTip },
             tags: this.getQueryParams().tags,
             taxes: skipTaxes
               ? null
@@ -363,6 +395,7 @@ class ContributionFlow extends React.Component {
   };
 
   handleError = message => {
+    track(AnalyticsEvent.CONTRIBUTION_ERROR);
     this.setState({ isSubmitting: false, error: message });
   };
 

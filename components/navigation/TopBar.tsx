@@ -2,11 +2,14 @@ import React, { Fragment, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
-import { Search } from 'lucide-react';
+import { max, min } from 'lodash';
+import { Compass, Frame, Search } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
+import { ScrollDirection, useWindowScroll } from '../../lib/hooks/useWindowScroll';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import ChangelogTrigger from '../changelog/ChangelogTrigger';
@@ -32,6 +35,48 @@ const NavList = styled(Flex)`
   min-width: 20rem;
   text-align: right;
   align-items: center;
+`;
+
+const MobileFooterBar = styled(Flex)`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 76px;
+  border-top: 1px solid ${props => props.theme.colors.black[300]};
+  background: #fff;
+  z-index: 3000;
+  padding: 8px 16px;
+`;
+
+const MobileFooterLink = styled(Link)<{ isActive: boolean }>`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  color: ${props => props.theme.colors.black[700]};
+
+  ${props =>
+    props.isActive &&
+    css`
+      svg {
+        color: ${props => props.theme.colors.primary[500]};
+      }
+      ${MobileFooterIconContainer} {
+        background-color: ${props => props.theme.colors.primary[50]};
+      }
+    `}
+`;
+
+const MobileFooterIconContainer = styled(Box)`
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  border-radius: 24px;
 `;
 
 const NavLinkContainer = styled(Box)`
@@ -117,6 +162,29 @@ const MainNavItem = styled(Link)`
   }
 `;
 
+const MobileFooterMenu = ({ onDashboardRoute, onSearchRoute }) => {
+  const { direction, accPosition } = useWindowScroll();
+  const bottom = direction === ScrollDirection.DOWN ? -min([accPosition, 76]) : -max([76 - accPosition, 0]);
+
+  return (
+    <MobileFooterBar alignItems="center" justifyContent="center" gap="12px" style={{ bottom: `${bottom}px` }}>
+      <MobileFooterLink href="/workspace" isActive={onDashboardRoute}>
+        <MobileFooterIconContainer className="icon-container">
+          <Frame size={20} />
+        </MobileFooterIconContainer>
+        <FormattedMessage id="Workspace" defaultMessage="Workspace" />
+      </MobileFooterLink>
+
+      <MobileFooterLink href="/search" isActive={onSearchRoute}>
+        <MobileFooterIconContainer className="icon-container">
+          <Compass size={20} />
+        </MobileFooterIconContainer>
+        <FormattedMessage id="Explore" defaultMessage="Explore" />
+      </MobileFooterLink>
+    </MobileFooterBar>
+  );
+};
+
 type TopBarProps = {
   showSearch?: boolean;
   showProfileAndChangelogMenu?: boolean;
@@ -143,6 +211,9 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
   const ref = useRef();
   const router = useRouter();
 
+  const { viewport } = useWindowResize();
+  const isMobile = viewport === VIEWPORTS.XSMALL;
+
   const isRouteActive = route => {
     const regex = new RegExp(`^${route}(/.*)?$`);
     return regex.test(router.asPath);
@@ -160,6 +231,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
   ];
   const onHomeRoute = homepageRoutes.some(isRouteActive);
   const onDashboardRoute = isRouteActive('/workspace');
+  const onSearchRoute = isRouteActive('/search');
   const ocLogoRoute = onHomeRoute ? '/home' : '/workspace';
 
   return (
@@ -179,7 +251,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
           <Box flexShrink={0}>
             <Link href={ocLogoRoute}>
               <Flex alignItems="center" gridGap={2}>
-                <Image width="32" height="32" src="/static/images/opencollective-icon.png" alt="Open Collective" />
+                <Image width={32} height={32} src="/static/images/opencollective-icon.png" alt="Open Collective" />
                 {onHomeRoute && (
                   <Hide xs sm md display="flex" alignItems="center">
                     <Image height={20} width={120} src="/static/images/logotype.svg" alt="Open Collective" />
@@ -307,10 +379,17 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
           </Hide>
         ) : (
           <Flex flex={1} alignItems="center" gridGap={3} overflow={'hidden'}>
-            {onDashboardRoute ? (
-              <MainNavItem href="/workspace">
-                <FormattedMessage id="Workspace" defaultMessage="Workspace" />
-              </MainNavItem>
+            {onDashboardRoute || onSearchRoute ? (
+              !isMobile && (
+                <React.Fragment>
+                  <MainNavItem href="/workspace">
+                    <FormattedMessage id="Workspace" defaultMessage="Workspace" />
+                  </MainNavItem>
+                  <MainNavItem href="/search">
+                    <FormattedMessage id="Explore" defaultMessage="Explore" />
+                  </MainNavItem>
+                </React.Fragment>
+              )
             ) : account || loading ? (
               <Flex alignItems="center" gridGap="0" maxWidth="100%" flexGrow={4}>
                 {account?.parentCollective && (
@@ -329,7 +408,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
                 </MainNavItem>
               </Flex>
             ) : (
-              <MainNavItem as="div">{navTitle}</MainNavItem>
+              !onSearchRoute && navTitle && <MainNavItem as="div">{navTitle}</MainNavItem>
             )}
           </Flex>
         )}
@@ -337,9 +416,11 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
           {showProfileAndChangelogMenu && (
             <Fragment>
               {onHomeRoute && (
-                <MainNavItem href="/workspace">
-                  <FormattedMessage id="Workspace" defaultMessage="Workspace" />
-                </MainNavItem>
+                <React.Fragment>
+                  <MainNavItem href="/workspace">
+                    <FormattedMessage id="Workspace" defaultMessage="Workspace" />
+                  </MainNavItem>
+                </React.Fragment>
               )}
               {!onHomeRoute && <SearchTrigger setShowSearchModal={setShowSearchModal} />}
               <Hide xs>
@@ -351,6 +432,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
         </Flex>
       </Flex>
       {showSearchModal && <SearchModal onClose={() => setShowSearchModal(false)} />}
+      {isMobile && (onDashboardRoute || onSearchRoute) && <MobileFooterMenu {...{ onDashboardRoute, onSearchRoute }} />}
     </Fragment>
   );
 };

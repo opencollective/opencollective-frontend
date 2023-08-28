@@ -1,4 +1,4 @@
-import { PreviewFeature } from '../preview-features';
+import { PREVIEW_FEATURE_KEYS, PreviewFeature } from '../preview-features';
 
 export type LoggedInUser = {
   id: number;
@@ -36,6 +36,6 @@ export type LoggedInUser = {
   canEditUpdate: (update: any) => boolean;
   canSeeAdminPanel: (collective: any) => boolean;
   email: string;
-  hasPreviewFeatureEnabled: (featureKey: string) => boolean;
+  hasPreviewFeatureEnabled: (featureKey: PREVIEW_FEATURE_KEYS | `${PREVIEW_FEATURE_KEYS}`) => boolean;
   getAvailablePreviewFeatures: () => PreviewFeature[];
 };

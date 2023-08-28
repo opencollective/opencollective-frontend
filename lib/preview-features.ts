@@ -1,18 +1,20 @@
 /**
  * A map of keys used for preview features.
  */
-export const PREVIEW_FEATURE_KEYS = {
-  DASHBOARD: 'dashboard',
-  EXPENSE_PIPELINE: 'EXPENSE_PIPELINE',
-};
+export enum PREVIEW_FEATURE_KEYS {
+  DASHBOARD = 'dashboard',
+  EXPENSE_PIPELINE = 'EXPENSE_PIPELINE',
+  EXPENSE_OCR = 'EXPENSE_OCR',
+}
 
 export type PreviewFeature = {
-  key: string;
+  key: PREVIEW_FEATURE_KEYS | `${PREVIEW_FEATURE_KEYS}`;
   title: string;
   description: string;
   publicBeta: boolean; // If true, the feature will be available to toggle for all users.
   closedBetaAccessFor?: string[]; // Account slugs. Members and admins of these accounts will see this feature as a Closed Beta preview in the Preview Features modal.
   enabledByDefaultFor?: string[]; // Account slugs. Members and admins of these accounts will have the feature enabled by default.
+  env?: Array<'development' | 'test' | 'e2e' | 'staging' | 'production'>; // If set, the feature will be available only in the specified environments.
 };
 
 /**
@@ -23,8 +25,7 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.DASHBOARD,
     title: 'Workspace',
     description: 'Introducing improved navigation and a central admin dashboard for all accounts.',
-    publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
+    publicBeta: true,
     enabledByDefaultFor: ['opencollective'],
   },
   {
@@ -33,5 +34,13 @@ export const previewFeatures: PreviewFeature[] = [
     description: 'Introducing tabs in the host expenses dashboard to help you manage paying expenses.',
     publicBeta: false,
     closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.EXPENSE_OCR,
+    title: 'Expense AI assistant',
+    description: 'Introducing an AI assistant to help you create expenses.',
+    publicBeta: false,
+    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe'],
+    enabledByDefaultFor: ['opencollective'],
   },
 ];

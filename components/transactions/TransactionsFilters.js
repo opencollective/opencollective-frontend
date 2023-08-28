@@ -7,7 +7,7 @@ import { encodeDateInterval } from '../../lib/date-utils';
 
 import AmountFilter from '../budget/filters/AmountFilter';
 import PeriodFilter from '../filters/PeriodFilter';
-import { Box, Flex } from '../Grid';
+import { Box } from '../Grid';
 
 import TransactionsKindFilter from './filters/TransactionsKindFilter';
 import TransactionsPaymentMethodTypeFilter from './filters/TransactionsPaymentMethodTypeFilter';
@@ -37,40 +37,40 @@ const TransactionsFilters = ({ collective, filters, kinds, paymentMethodTypes, o
   });
 
   return (
-    <Flex flexDirection={['column', 'row']} flexGrow={[1, 0.5]}>
-      <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+    <React.Fragment>
+      <FilterContainer flexGrow={1}>
         <FilterLabel htmlFor="transactions-filter-type">
           <FormattedMessage id="transactions.type" defaultMessage="Type" />
         </FilterLabel>
         <TransactionsTypeFilter {...getFilterProps('type')} />
       </FilterContainer>
-      <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+      <FilterContainer flexGrow={1}>
         <FilterLabel htmlFor="transactions-filter-period">
           <FormattedMessage id="Period" defaultMessage="Period" />
         </FilterLabel>
         <PeriodFilter {...getFilterProps('period', encodeDateInterval)} minDate={collective.createdAt} />
       </FilterContainer>
-      <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+      <FilterContainer flexGrow={1}>
         <FilterLabel htmlFor="transactions-filter-amount">
           <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
         </FilterLabel>
         <AmountFilter currency={collective.currency} {...getFilterProps('amount')} />
       </FilterContainer>
-      <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+      <FilterContainer flexGrow={1}>
         <FilterLabel htmlFor="transactions-filter-kind">
           <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />
         </FilterLabel>
         <TransactionsKindFilter kinds={kinds} {...getFilterProps('kind')} />
       </FilterContainer>
       {paymentMethodTypes?.length > 1 && (
-        <FilterContainer mr={[0, '8px']} mb={['8px', 0]} flexGrow={1}>
+        <FilterContainer flexGrow={1}>
           <FilterLabel htmlFor="transactions-filter-paymentMethod">
             <FormattedMessage id="paymentmethod.label" defaultMessage="Payment Method" />
           </FilterLabel>
           <TransactionsPaymentMethodTypeFilter types={paymentMethodTypes} {...getFilterProps('paymentMethodType')} />
         </FilterContainer>
       )}
-    </Flex>
+    </React.Fragment>
   );
 };
 

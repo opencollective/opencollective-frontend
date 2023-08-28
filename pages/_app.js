@@ -9,8 +9,10 @@ import { ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import theme from '../lib/theme';
+import defaultColors from '../lib/theme/colors';
 import withData from '../lib/withData';
 
+import DefaultPaletteStyle from '../components/DefaultPaletteStyle';
 import StripeProviderSSR from '../components/StripeProvider';
 import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
 import UserProvider from '../components/UserProvider';
@@ -60,7 +62,7 @@ class OpenCollectiveFrontendApp extends App {
     // Get the `locale` and `messages` from the request object on the server.
     // In the browser, use the same values that the server serialized.
     const { locale, messages } = ctx?.req || window.__NEXT_DATA__.props;
-    const props = { pageProps: {}, scripts: {}, locale, messages };
+    const props = { pageProps: { skipDataFromTree: true }, scripts: {}, locale, messages };
 
     try {
       if (Component.getInitialProps) {
@@ -141,6 +143,7 @@ class OpenCollectiveFrontendApp extends App {
             </StripeProviderSSR>
           </ThemeProvider>
         </ApolloProvider>
+        <DefaultPaletteStyle palette={defaultColors.primary} />
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />
         ))}

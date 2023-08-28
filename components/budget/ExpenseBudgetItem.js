@@ -191,7 +191,7 @@ const ExpenseBudgetItem = ({
                         lineHeight="1.5em"
                         textDecoration="none"
                         color="black.900"
-                        fontSize={`${fontSize}px`}
+                        fontSize={fontSize}
                         data-cy="expense-title"
                       >
                         {value}

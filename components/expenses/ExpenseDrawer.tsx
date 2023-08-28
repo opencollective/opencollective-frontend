@@ -26,7 +26,7 @@ export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initia
 
   useEffect(() => {
     if (openExpenseLegacyId) {
-      getExpense({ variables: getVariableFromProps({ legacyExpenseId: openExpenseLegacyId }) });
+      getExpense({ variables: getVariableFromProps({ ExpenseId: openExpenseLegacyId }) });
     }
   }, [openExpenseLegacyId]);
 

@@ -32,6 +32,23 @@ const ContributeFAQ = ({ collective, ...props }) => (
         />
       </Content>
     </Entry>
+    <Entry>
+      <Title>
+        <FormattedMessage id="ContributeFAQ.PlatformTip.Title" defaultMessage="What is a platform tip?" />
+      </Title>
+      <Content>
+        <FormattedMessage
+          id="ContributeFAQ.PlatformTip.Content"
+          defaultMessage="A platform tip is an optional donation from you to help maintain and improve the platform. <Link>Learn more</Link>"
+          values={{
+            Link: getI18nLink({
+              openInNewTab: true,
+              href: 'https://docs.opencollective.com/help/financial-contributors/platform-tips',
+            }),
+          }}
+        />
+      </Content>
+    </Entry>
     {(collective.contributionPolicy || collective.parent?.contributionPolicy) && (
       <Entry>
         <Title>

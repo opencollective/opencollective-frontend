@@ -69,17 +69,20 @@ const ChangelogTrigger = props => {
   }
 
   return (
-    <Flex>
+    <Flex alignItems="center">
       {hasSeenNewUpdates ? (
         <StyledTooltip delayHide={100} content={TooltipContent} noArrow>
-          <FlameIcon
-            height={height}
-            width={width}
-            onClick={handleShowNewUpdates}
-            backgroundColor="black.100"
-            backgroundSize={backgroundSize}
-            url="/static/images/flame-default.svg"
-          />
+          {props => (
+            <FlameIcon
+              height={height}
+              width={width}
+              onClick={handleShowNewUpdates}
+              backgroundColor="black.100"
+              backgroundSize={backgroundSize}
+              url="/static/images/flame-default.svg"
+              {...props}
+            />
+          )}
         </StyledTooltip>
       ) : (
         <Container>

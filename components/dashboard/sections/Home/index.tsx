@@ -98,7 +98,10 @@ const Home = (props: AdminSectionProps) => {
         </P>
 
         <P mt="24px" fontSize="13px" fontWeight="500">
-          <StyledLink href="https://docs.opencollective.com/help/collectives/collective-workspaces">
+          <StyledLink
+            href="https://docs.google.com/forms/d/1-WGUCUF_i5HPS6AsN8kTfqofyt0q0HB-q7na4cQL788/viewform"
+            openInNewTab
+          >
             <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />
           </StyledLink>
         </P>

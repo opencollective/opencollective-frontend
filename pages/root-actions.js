@@ -134,7 +134,7 @@ const RootActionsPage = () => {
       navTitle={intl.formatMessage({ id: 'RootActions', defaultMessage: 'Root Actions' })}
     >
       <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" my={5}>
-        <Container borderRight="1px solid #e5e5e5">
+        <Container borderRight="1px solid #e5e5e5" fontSize="14px">
           {MENU.filter(e => showHiddenActions || !e.isHidden).map(menuEntry =>
             menuEntry.type === 'category' ? (
               <MenuEntry key={menuEntry.id} title={menuEntry.title || menuEntry.id} $type="category">

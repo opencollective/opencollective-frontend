@@ -10,7 +10,7 @@ export enum TOAST_TYPE {
 
 export type Toast = {
   id: string;
-  type: TOAST_TYPE;
+  type: TOAST_TYPE | `${TOAST_TYPE}`;
   variant: 'light' | 'dark';
   message: ReactNode | null;
   title: ReactNode | null;

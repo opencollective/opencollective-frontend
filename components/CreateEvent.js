@@ -110,7 +110,7 @@ class CreateEvent extends React.Component {
         <Body>
           <CollectiveNavbar collective={collective} isAdmin={isAdmin} />
 
-          <div className="content">
+          <div className="p-3 sm:p-8">
             {!isAdmin ? (
               <Container margin="0 auto" textAlign="center">
                 <p>
@@ -147,7 +147,7 @@ class CreateEvent extends React.Component {
                   onChange={this.resetError}
                   loading={this.state.status === 'loading' || this.state.result.success}
                 />
-                <Container textAlign="center" marginBottom="5rem">
+                <Container textAlign="center" marginBottom="3.15rem">
                   <Container style={{ color: 'green' }}>{this.state.result.success}</Container>
                   <Container style={{ color: 'red' }}>{this.state.result.error}</Container>
                 </Container>
