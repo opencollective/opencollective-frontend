@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
 import { ExternalLink } from '@styled-icons/feather/ExternalLink';
 import { Mail } from '@styled-icons/feather/Mail';
