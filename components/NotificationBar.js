@@ -15,8 +15,8 @@ export const NotificationBarLink = styled(Link)`
   font-weight: 700;
   text-decoration-line: underline;
   text-decoration-thickness: 2px;
-  font-size: 1.4rem;
-  line-height: 2rem;
+  font-size: 0.85rem;
+  line-height: 1.25rem;
 `;
 
 export const NotificationBarButton = styled(StyledLinkButton)`
@@ -24,8 +24,8 @@ export const NotificationBarButton = styled(StyledLinkButton)`
   font-weight: 700;
   text-decoration-line: underline;
   text-decoration-thickness: 2px;
-  font-size: 1.4rem;
-  line-height: 2rem;
+  font-size: 0.85rem;
+  line-height: 1.25rem;
 `;
 
 const CloseIcon = styled(Close)`
@@ -73,8 +73,8 @@ const NotificationBar = ({ title, description, type, actions, inline, dismiss })
         <Container maxWidth={inline ? '1200px' : '672px'}>
           {title && (
             <H1
-              fontSize="1.4rem"
-              lineHeight="2rem"
+              fontSize="0.85rem"
+              lineHeight="1.25rem"
               mx="4px"
               textAlign="center"
               letterSpacing="0px"
@@ -86,8 +86,8 @@ const NotificationBar = ({ title, description, type, actions, inline, dismiss })
           )}
           {description && (
             <P
-              fontSize="1.4rem"
-              lineHeight="2rem"
+              fontSize="0.85rem"
+              lineHeight="1.25rem"
               textAlign="center"
               letterSpacing="0px"
               mx="4px"

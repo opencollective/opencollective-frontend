@@ -256,7 +256,7 @@ const FiscalHosting = ({ collective }) => {
             )}
           </ModalHeader>
           <ModalBody>
-            <P mb="1rem">
+            <P mb="0.65rem">
               <FormattedMessage
                 id="collective.hostAccount.modal.description"
                 defaultMessage={

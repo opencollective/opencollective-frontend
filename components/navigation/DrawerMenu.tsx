@@ -35,6 +35,9 @@ const StyledCloseButton = styled(StyledRoundButton)`
   width: 32px;
   height: 32px;
   color: #4b5563;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StyledMenuItem = styled(Link)`

@@ -112,6 +112,9 @@ const AdminPanelSideBar = ({
                 href={getCollectivePageRoute(collective)}
                 height="24px"
                 textAlign="center"
+                display={'flex'}
+                alignItems={'center'}
+                justifyContent={'center'}
               >
                 <Globe2 size={12} />
                 &nbsp;

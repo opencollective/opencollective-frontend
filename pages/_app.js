@@ -9,8 +9,10 @@ import { ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import theme from '../lib/theme';
+import defaultColors from '../lib/theme/colors';
 import withData from '../lib/withData';
 
+import DefaultPaletteStyle from '../components/DefaultPaletteStyle';
 import StripeProviderSSR from '../components/StripeProvider';
 import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
 import UserProvider from '../components/UserProvider';
@@ -141,6 +143,7 @@ class OpenCollectiveFrontendApp extends App {
             </StripeProviderSSR>
           </ThemeProvider>
         </ApolloProvider>
+        <DefaultPaletteStyle palette={defaultColors.primary} />
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />
         ))}

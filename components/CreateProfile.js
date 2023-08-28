@@ -193,7 +193,7 @@ const CreateProfile = ({
 
   return (
     <React.Fragment>
-      <Container textAlign="center">
+      <Flex flexDirection="column" alignItems="center" textAlign="center">
         {isOAuth ? (
           <React.Fragment>
             <Flex justifyContent="center" mb={40}>
@@ -209,9 +209,7 @@ const CreateProfile = ({
             </Flex>
           </React.Fragment>
         ) : (
-          <Box>
-            <Image src="/static/images/oc-logo-watercolor-256.png" height={96} width={96} />
-          </Box>
+          <Image src="/static/images/oc-logo-watercolor-256.png" height={96} width={96} />
         )}
         <Box pt="48px" fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
           {isOAuth ? (
@@ -227,7 +225,7 @@ const CreateProfile = ({
             <FormattedMessage defaultMessage="Set up your personal details to continue" />
           )}
         </Box>
-      </Container>
+      </Flex>
       <Box
         as="form"
         onSubmit={event => {

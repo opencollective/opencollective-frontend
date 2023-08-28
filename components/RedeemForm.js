@@ -10,7 +10,7 @@ import { P } from './Text';
 
 const Description = styled(P)`
   color: #4e5052;
-  font-size: 1.3rem;
+  font-size: 0.8rem;
   line-height: 1.5;
   margin: 12px 0;
 `;

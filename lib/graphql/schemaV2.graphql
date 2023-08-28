@@ -1366,6 +1366,11 @@ type Expense {
   Custom data for this expense
   """
   customData: JSON
+
+  """
+  The merchant ID for this expense
+  """
+  merchantId: String
 }
 
 """

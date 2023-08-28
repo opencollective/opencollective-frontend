@@ -205,7 +205,7 @@ ModalFooter.propTypes = {
 };
 
 ModalFooter.defaultProps = {
-  dividerMargin: '2rem 0',
+  dividerMargin: '1.25rem 0',
   showDivider: true,
 };
 

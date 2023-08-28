@@ -347,7 +347,14 @@ class TiersPage extends React.Component {
 }
 
 const contributePageQuery = gqlV1/* GraphQL */ `
-  query ContributePage($slug: String!, $nbContributorsPerContributeCard: Int) {
+  query ContributePage(
+    $slug: String!
+    $nbContributorsPerContributeCard: Int
+    $includeTiers: Boolean!
+    $includeEvents: Boolean!
+    $includeProjects: Boolean!
+    $includeConnectedCollectives: Boolean!
+  ) {
     Collective(slug: $slug) {
       id
       slug
@@ -402,19 +409,19 @@ const contributePageQuery = gqlV1/* GraphQL */ `
         isIncognito
         tiersIds
       }
-      tiers {
+      tiers @include(if: $includeTiers) {
         id
         ...ContributeCardTierFields
       }
-      events(includePastEvents: true, includeInactive: true) {
+      events(includePastEvents: true, includeInactive: true) @include(if: $includeEvents) {
         id
         ...ContributeCardEventFields
       }
-      projects {
+      projects @include(if: $includeProjects) {
         id
         ...ContributeCardProjectFields
       }
-      connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
+      connectedCollectives: members(role: "CONNECTED_COLLECTIVE") @include(if: $includeConnectedCollectives) {
         id
         collective: member {
           id
@@ -445,13 +452,16 @@ const contributePageQuery = gqlV1/* GraphQL */ `
   ${fragments.contributeCardEventFieldsFragment}
   ${fragments.contributeCardProjectFieldsFragment}
 `;
-/* eslint-enable graphql/template-strings */
 
 const addContributePageData = graphql(contributePageQuery, {
   options: props => ({
     variables: {
       slug: props.slug,
       nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+      includeTiers: ['contribute', 'tiers'].includes(props.verb),
+      includeEvents: ['contribute', 'events'].includes(props.verb),
+      includeProjects: ['contribute', 'projects'].includes(props.verb),
+      includeConnectedCollectives: ['contribute', 'connected-collectives'].includes(props.verb),
     },
   }),
 });

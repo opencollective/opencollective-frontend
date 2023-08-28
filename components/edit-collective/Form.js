@@ -864,7 +864,7 @@ class EditCollectiveForm extends React.Component {
             )}
 
             {fields && fields.length > 0 && (
-              <Container className="actions" margin="5rem auto 1rem" textAlign="center">
+              <Container className="actions" margin="3.15rem auto 0.65rem" textAlign="center">
                 <StyledButton
                   buttonStyle="primary"
                   type="submit"
@@ -881,7 +881,7 @@ class EditCollectiveForm extends React.Component {
                   {submitBtnLabel}
                 </StyledButton>
 
-                <Container className="backToProfile" fontSize="1.3rem" margin="1rem">
+                <Container className="backToProfile" fontSize="0.8rem" margin="0.65rem">
                   <Link
                     data-cy="edit-collective-back-to-profile"
                     href={

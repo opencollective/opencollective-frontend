@@ -40,8 +40,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Expense AI assistant',
     description: 'Introducing an AI assistant to help you create expenses.',
     publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
+    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe'],
     enabledByDefaultFor: ['opencollective'],
-    env: ['development', 'staging'],
   },
 ];

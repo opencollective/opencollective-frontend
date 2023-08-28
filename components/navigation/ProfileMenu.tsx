@@ -115,7 +115,7 @@ const ProfileMenu = () => {
   const content = (
     <Flex flexDirection="column" maxHeight={['100%', '80dvh']} overflow="hidden">
       <Flex flexDirection={['column', 'row']} overflow={['auto', 'hidden']}>
-        <Flex flexDirection="column" width="230px">
+        <Flex flexDirection="column" width="164px">
           <ProfileHeader alignItems="center" overflow="hidden" pb="24px">
             <Box overflow="hidden">
               <div className="name">{LoggedInUser.collective.name}</div>
@@ -167,7 +167,7 @@ const ProfileMenu = () => {
         </Flex>
         <ProfileMenuMemberships
           user={LoggedInUser}
-          maxWidth="200px"
+          maxWidth="270px"
           overflowY={['initial', 'auto']}
           mt={['32px', '0']}
           ml={['0', '24px']}
@@ -179,7 +179,7 @@ const ProfileMenu = () => {
       <Box>
         <HorziontalSeparator style={{ margin: '24px 0' }} />
         <Link href="/home">
-          <Image src="/static/images/opencollectivelogo-footer-n.svg" alt="Open Collective" width="122" height="24" />
+          <Image src="/static/images/opencollectivelogo-footer-n.svg" alt="Open Collective" width={122} height={24} />
         </Link>
         <FooterLinks mt="16px" gap="32px">
           <Link href="/home">

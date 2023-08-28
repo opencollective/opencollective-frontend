@@ -118,7 +118,7 @@ const MenuEntry = styled.div`
       cursor: default;
       background: #f9f9f9;
       border-bottom: 1px solid #eaeaea;
-      box-shadow: 0px -3px 6px #eaeaea;
+      box-shadow: 0px 3px 6px #eaeaea;
     `}
 `;
 
@@ -133,8 +133,8 @@ const RootActionsPage = () => {
       rootOnly
       navTitle={intl.formatMessage({ id: 'RootActions', defaultMessage: 'Root Actions' })}
     >
-      <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" my={5}>
-        <Container borderRight="1px solid #e5e5e5">
+      <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth={1400} m="0 auto">
+        <Container borderRight="1px solid #e5e5e5" fontSize="14px">
           {MENU.filter(e => showHiddenActions || !e.isHidden).map(menuEntry =>
             menuEntry.type === 'category' ? (
               <MenuEntry key={menuEntry.id} title={menuEntry.title || menuEntry.id} $type="category">

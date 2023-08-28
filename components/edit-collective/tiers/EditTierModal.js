@@ -555,7 +555,7 @@ const EditSectionContainer = styled(Flex)`
   overflow-y: scroll;
   flex-grow: 1;
   flex-direction: column;
-  padding-right: 1rem;
+  padding-right: 0.65rem;
   min-width: 250px;
 
   @media (min-width: 700px) {
@@ -621,11 +621,11 @@ const ModalContainer = styled(StyledModal)`
 
 const FieldDescription = styled.div`
   color: #737373;
-  font-size: 1.2rem;
+  font-size: 0.75rem;
 `;
 
 const ContributeCardPreviewContainer = styled.div`
-  padding: 2rem;
+  padding: 1.25rem;
   @media (max-width: 700px) {
     padding: 0;
   }
@@ -936,7 +936,7 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
                   </PreviewSectionContainer>
                 </ModalSectionContainer>
               </ModalBody>
-              <ModalFooter isFullWidth dividerMargin="1rem 0">
+              <ModalFooter isFullWidth dividerMargin="0.65rem 0">
                 <EditModalActionsContainer>
                   {isEditing && (
                     <DeleteModalButton
