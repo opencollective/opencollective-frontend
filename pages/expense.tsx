@@ -76,6 +76,18 @@ export const getServerSideProps: GetServerSideProps<ExpensePageProps> = async ct
   };
 };
 
+const getPageMetadata = (intl, legacyExpenseId, expense) => {
+  const baseMetadata = getCollectivePageMetadata(expense?.account);
+  if (expense?.description) {
+    return {
+      ...baseMetadata,
+      title: intl.formatMessage(messages.title, { id: legacyExpenseId, title: expense.description }),
+    };
+  } else {
+    return baseMetadata;
+  }
+};
+
 export default function ExpensePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
@@ -116,12 +128,7 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
   }
   const collective = expense?.account;
   const host = collective?.host;
-  const baseMetadata = getCollectivePageMetadata(expense?.account);
-  const metadata = {
-    ...baseMetadata,
-    title:
-      intl?.formatMessage(messages.title, { id: expense.legacyId, title: expense.description }) || baseMetadata.title,
-  };
+  const metadata = getPageMetadata(intl, props.legacyExpenseId, expense);
 
   return (
     <Page collective={collective} canonicalURL={`${getCollectivePageCanonicalURL(collective)}/expense`} {...metadata}>
