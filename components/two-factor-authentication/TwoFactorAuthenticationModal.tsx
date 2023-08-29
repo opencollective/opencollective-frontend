@@ -142,7 +142,14 @@ export default function TwoFactorAuthenticationModal() {
   }
 
   return (
-    <StyledModal trapFocus onClose={cancel} width={495} className="twofactor-modal">
+    <StyledModal
+      trapFocus
+      preventClose={!cancellable}
+      onClose={cancel}
+      width={495}
+      className="twofactor-modal"
+      zindex="90000"
+    >
       <HideOtherModalsGlobalStyle />
       <ModalHeader hideCloseIcon>
         {supportedMethods.length === 0 ? (

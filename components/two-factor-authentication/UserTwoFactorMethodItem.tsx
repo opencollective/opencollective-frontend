@@ -110,8 +110,12 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
             buttonStyle="borderless"
             buttonSize="tiny"
             color={theme.colors.blue[500]}
+            display="flex"
+            alignItems="center"
           >
-            <PencilIcon size="18px" /> <FormattedMessage defaultMessage="Rename" />
+            <PencilIcon size="18px" />
+            &nbsp;
+            <FormattedMessage defaultMessage="Rename" />
           </StyledButton>
 
           <StyledButton
@@ -121,8 +125,12 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
             buttonStyle="borderless"
             buttonSize="tiny"
             color={theme.colors.red[500]}
+            display="flex"
+            alignItems="center"
           >
-            <TrashIcon size="18px" /> <FormattedMessage id="actions.delete" defaultMessage="Delete" />
+            <TrashIcon size="18px" />
+            &nbsp;
+            <FormattedMessage id="actions.delete" defaultMessage="Delete" />
           </StyledButton>
         </Flex>
       </Flex>

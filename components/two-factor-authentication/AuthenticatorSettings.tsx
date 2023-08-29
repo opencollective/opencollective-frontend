@@ -117,7 +117,12 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
         })}
       </Box>
       <Box mt={3}>
-        <StyledButton onClick={() => setIsAddingAuthenticator(true)} buttonSize="tiny" buttonStyle="secondary">
+        <StyledButton
+          onClick={() => setIsAddingAuthenticator(true)}
+          buttonSize="tiny"
+          buttonStyle="secondary"
+          display="flex"
+        >
           <FormattedMessage defaultMessage="Add authenticator" /> <PlusIcon size="14px" />
         </StyledButton>
       </Box>

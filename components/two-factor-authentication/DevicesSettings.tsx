@@ -120,7 +120,12 @@ export function DevicesSettings(props: DevicesSettingsProps) {
         })}
       </Box>
       <Box mt={3}>
-        <StyledButton onClick={startWebauthnDeviceRegistration} buttonSize="tiny" buttonStyle="secondary">
+        <StyledButton
+          onClick={startWebauthnDeviceRegistration}
+          buttonSize="tiny"
+          buttonStyle="secondary"
+          display="flex"
+        >
           <FormattedMessage defaultMessage="Add device" /> <PlusIcon size="14px" />
         </StyledButton>
       </Box>
