@@ -174,6 +174,7 @@ const ExpenseSummaryAdditionalInformation = ({
                 fontWeight="700"
                 color="black.700"
                 textDecoration="underline"
+                fontSize="14px"
                 href={`${getWorkspaceRoute(host, 'host-agreements')}?account=${collective.slug}`}
               >
                 <FormattedMessage
