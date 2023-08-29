@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { space } from 'styled-system';
 
+import { CollectiveType } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import Avatar from '../Avatar';
@@ -96,6 +97,19 @@ const CREATE_NEW_LINKS = {
   COLLECTIVE: '/create',
 };
 
+const EMPTY_GROUP_STATE = {
+  [CollectiveType.COLLECTIVE]: {
+    emptyMessage: <FormattedMessage defaultMessage="Create a collective to collect and spend money transparently" />,
+    linkLabel: <FormattedMessage id="home.create" defaultMessage="Create a Collective" />,
+  },
+  [CollectiveType.ORGANIZATION]: {
+    emptyMessage: (
+      <FormattedMessage defaultMessage="A profile representing a company or organization instead of an individual" />
+    ),
+    linkLabel: <FormattedMessage id="host.organization.create" defaultMessage="Create an Organization" />,
+  },
+};
+
 const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   const isAdministratedAccount = m => ['ADMIN', 'ACCOUNTANT'].includes(m.role) && !m.collective.isIncognito;
   let administratedAccounts = loggedInUser?.memberOf.filter(isAdministratedAccount).map(m => m.collective) || [];
@@ -109,7 +123,11 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   const archivedAccounts = administratedAccounts.filter(a => a.isArchived);
   const activeAccounts = administratedAccounts.filter(a => !a.isArchived);
 
-  const groupedAccounts = groupBy(activeAccounts, a => a.type);
+  const groupedAccounts = {
+    [CollectiveType.COLLECTIVE]: [],
+    [CollectiveType.ORGANIZATION]: [],
+    ...groupBy(activeAccounts, a => a.type),
+  };
   if (archivedAccounts?.length > 0) {
     groupedAccounts.ARCHIVED = archivedAccounts;
   }
@@ -248,7 +266,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                           />
                         </Span>
                         <StyledHr width="100%" borderColor="black.300" />
-                        {CREATE_NEW_LINKS[collectiveType] && (
+                        {CREATE_NEW_LINKS[collectiveType] && accounts.length > 0 && (
                           <Link href={CREATE_NEW_LINKS[collectiveType]}>
                             <StyledRoundButton
                               minWidth={24}
@@ -263,6 +281,20 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                           </Link>
                         )}
                       </Flex>
+                      {EMPTY_GROUP_STATE[CollectiveType.COLLECTIVE] && accounts.length === 0 && (
+                        <div className="mx-1 flex flex-col">
+                          <p className="text-xs text-gray-700">{EMPTY_GROUP_STATE[collectiveType].emptyMessage}</p>
+                          <Link
+                            className="focus-visible:ring-ring border-input hover:text-accent-foreground my-3 inline-flex items-center rounded-lg border border bg-transparent px-6 py-4 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
+                            href="/create"
+                          >
+                            <div className="mr-3 rounded-full border bg-white p-2">
+                              <Plus size={12} color="#76777A" />
+                            </div>
+                            {EMPTY_GROUP_STATE[collectiveType].linkLabel}
+                          </Link>
+                        </div>
+                      )}
                       {accounts
                         ?.sort((a, b) => a.name.localeCompare(b.name))
                         .map(account => <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />)}
