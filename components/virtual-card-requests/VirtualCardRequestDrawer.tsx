@@ -21,6 +21,7 @@ import StyledLink from '../StyledLink';
 import StyledTag from '../StyledTag';
 import { H4, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const InfoLabel = styled.p`
   color: var(--dark-700, #4d4f51);
@@ -206,6 +207,9 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
             >
               {virtualCardRequest?.status}
             </StyledTag>
+            <Box my={3}>
+              <StripeVirtualCardComplianceStatement />
+            </Box>
             <Flex gap="32px" flexDirection="column">
               <Box>
                 <InfoLabel>
