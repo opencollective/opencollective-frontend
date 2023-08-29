@@ -257,7 +257,7 @@ const ThreadActivity = ({ activity }) => {
         </Flex>
       )}
       {message && (
-        <ActivityParagraph activityColor={activityColors.border} mt={1} fontSize="12px" whiteSpace="pre-line">
+        <ActivityParagraph activityColor={activityColors.border} my={1} fontSize="12px" whiteSpace="pre-line">
           <ActivityMessage color={activityColors.text}>
             {intl.formatMessage(message, {
               movedFromCollective: activity.data?.movedFromCollective?.name || 'collective',
