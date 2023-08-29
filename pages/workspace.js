@@ -103,7 +103,6 @@ const DashboardPage = () => {
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const [lastWorkspaceVisit, setLastWorkspaceVisit] = useLocalStorage('workspaceNavigationState', {
     slug: LoggedInUser?.slug,
-    section: null,
   });
   const activeSlug = slug || lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
 
@@ -113,14 +112,14 @@ const DashboardPage = () => {
     skip: !activeSlug,
   });
   const account = data?.account;
-  const selectedSection = section || lastWorkspaceVisit.section || getDefaultSectionForAccount(account, LoggedInUser);
+  const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
 
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
-    if (slug && section && (slug !== lastWorkspaceVisit.slug || section !== lastWorkspaceVisit.section)) {
-      setLastWorkspaceVisit({ slug, section, path: router.asPath });
+    if (slug && slug !== lastWorkspaceVisit.slug) {
+      setLastWorkspaceVisit({ slug, path: router.asPath });
     }
-  }, [slug, section]);
+  }, [slug]);
 
   // Make sure the URL is updated when restoring last visited workspace
   React.useEffect(() => {
