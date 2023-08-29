@@ -93,7 +93,7 @@ const Home = (props: AdminSectionProps) => {
         <P mt="24px" fontSize="14px" fontWeight="400" lineHeight="24px" color="black.700">
           <FormattedMessage
             id="Dashboard.Banner.Description"
-            defaultMessage="We created this new space for you to keep on top of everything you need to do financially for your community, team account management, and settings in a unified place that will be the new base of the experience using Open Collective. Welcome!"
+            defaultMessage="We created this new space so you can manage your community’s finances, team accounts, and settings in a unified place that will be the foundation for your Open Collective experience. Welcome!"
           />
         </P>
 
