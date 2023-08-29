@@ -10,16 +10,13 @@ import styled, { css } from 'styled-components';
 
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { ScrollDirection, useWindowScroll } from '../../lib/hooks/useWindowScroll';
-import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import ChangelogTrigger from '../changelog/ChangelogTrigger';
 import Container from '../Container';
-import DividerIcon from '../DividerIcon';
 import { Box, Flex } from '../Grid';
 import Hide from '../Hide';
 import Image from '../Image';
 import Link from '../Link';
-import LoadingPlaceholder from '../LoadingPlaceholder';
 import PopupMenu from '../PopupMenu';
 import SearchModal from '../Search';
 import SearchTrigger from '../SearchTrigger';
@@ -154,6 +151,7 @@ const MainNavItem = styled(Link)`
   `}
   ${props => props.primary && `border: 1px solid #d1d5db;`}
   font-weight: ${props => (props.lightWeight ? `400` : '500')};
+  ${props => props.isActive && `background-color: #f1f5f9;`}
 
   span {
     overflow: hidden;
@@ -206,7 +204,7 @@ type TopBarProps = {
   loading?: boolean;
 };
 
-const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loading }: TopBarProps) => {
+const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle }: TopBarProps) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
   const router = useRouter();
@@ -215,7 +213,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
   const isMobile = viewport === VIEWPORTS.XSMALL;
 
   const isRouteActive = route => {
-    const regex = new RegExp(`^${route}(/.*)?$`);
+    const regex = new RegExp(`^${route}(/?.*)?$`);
     return regex.test(router.asPath);
   };
 
@@ -231,7 +229,8 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
   ];
   const onHomeRoute = homepageRoutes.some(isRouteActive);
   const onDashboardRoute = isRouteActive('/workspace');
-  const onSearchRoute = isRouteActive('/search');
+  const onSearchRoute =
+    isRouteActive('/search') || (account && isRouteActive(`/${account.parentCollective?.slug || account.slug}`));
   const ocLogoRoute = onHomeRoute ? '/home' : '/workspace';
 
   return (
@@ -245,7 +244,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
         px={['16px', '40px']}
         height="73px"
         ref={ref}
-        gridGap={2}
+        gridGap="16px"
       >
         <Flex alignItems="center" gridGap={[2, 3]}>
           <Box flexShrink={0}>
@@ -379,37 +378,18 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle, loa
           </Hide>
         ) : (
           <Flex flex={1} alignItems="center" gridGap={3} overflow={'hidden'}>
-            {onDashboardRoute || onSearchRoute ? (
-              !isMobile && (
-                <React.Fragment>
-                  <MainNavItem href="/workspace">
-                    <FormattedMessage id="Workspace" defaultMessage="Workspace" />
-                  </MainNavItem>
-                  <MainNavItem href="/search">
-                    <FormattedMessage id="Explore" defaultMessage="Explore" />
-                  </MainNavItem>
-                </React.Fragment>
-              )
-            ) : account || loading ? (
-              <Flex alignItems="center" gridGap="0" maxWidth="100%" flexGrow={4}>
-                {account?.parentCollective && (
-                  <Hide flexShrink={1} display="flex" overflow={'hidden'} xs sm>
-                    <DividerIcon size={32} style={{ margin: '0 -8px', flexShrink: 0, color: '#DCDDE0' }} />
-                    <MainNavItem lightWeight flexShrink={3} href={getCollectivePageRoute(account.parentCollective)}>
-                      <span>{account.parentCollective.name}</span>
+            {onDashboardRoute || onSearchRoute
+              ? !isMobile && (
+                  <React.Fragment>
+                    <MainNavItem href="/workspace" isActive={onDashboardRoute}>
+                      <FormattedMessage id="Workspace" defaultMessage="Workspace" />
                     </MainNavItem>
-                  </Hide>
-                )}
-                <DividerIcon size={32} style={{ margin: '0 -8px', flexShrink: 0, color: '#DCDDE0' }} />
-                <MainNavItem href={getCollectivePageRoute(account)}>
-                  <span>
-                    {account ? account.name : <LoadingPlaceholder height="16px" width="120px" borderRadius="4px" />}
-                  </span>
-                </MainNavItem>
-              </Flex>
-            ) : (
-              !onSearchRoute && navTitle && <MainNavItem as="div">{navTitle}</MainNavItem>
-            )}
+                    <MainNavItem href="/search" isActive={onSearchRoute}>
+                      <FormattedMessage id="Explore" defaultMessage="Explore" />
+                    </MainNavItem>
+                  </React.Fragment>
+                )
+              : !onSearchRoute && navTitle && <MainNavItem as="div">{navTitle}</MainNavItem>}
           </Flex>
         )}
         <Flex alignItems="center" gridGap={2} flexShrink={4} flexGrow={0}>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -6,21 +6,22 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isHostAccount } from '../lib/collective.lib';
 import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import useLocalStorage from '../lib/hooks/useLocalStorage';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 
-import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/dashboard/constants';
-import { DashboardContext } from '../components/dashboard/DashboardContext';
-import AdminPanelSection from '../components/dashboard/DashboardSection';
-import Footer from '../components/dashboard/Footer';
-import { adminPanelQuery } from '../components/dashboard/queries';
-import AdminPanelSideBar from '../components/dashboard/SideBar';
 import { Box, Flex } from '../components/Grid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
+import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/workspace/constants';
+import { DashboardContext } from '../components/workspace/DashboardContext';
+import AdminPanelSection from '../components/workspace/DashboardSection';
+import Footer from '../components/workspace/Footer';
+import { adminPanelQuery } from '../components/workspace/queries';
+import AdminPanelSideBar from '../components/workspace/SideBar';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -100,24 +101,34 @@ const DashboardPage = () => {
   const router = useRouter();
   const { slug, section, subpath } = router.query;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
-  const activeSlug = slug || LoggedInUser?.getLastDashboardSlug();
-
-  // Redirect to the dashboard of the logged in user if no slug is provided
-  useEffect(() => {
-    if (slug) {
-      LoggedInUser?.saveLastDashboardSlug(slug);
-    }
-  }, [slug, LoggedInUser]);
+  const [lastWorkspaceVisit, setLastWorkspaceVisit] = useLocalStorage('workspaceNavigationState', {
+    slug: LoggedInUser?.slug,
+  });
+  const activeSlug = slug || lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
 
   const { data, loading } = useQuery(adminPanelQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: activeSlug },
     skip: !activeSlug,
   });
-
   const account = data?.account;
-  const notification = getNotification(intl, account);
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
+
+  // Keep track of last visited workspace account and sections
+  React.useEffect(() => {
+    if (slug && slug !== lastWorkspaceVisit.slug) {
+      setLastWorkspaceVisit({ slug, path: router.asPath });
+    }
+  }, [slug]);
+
+  // Make sure the URL is updated when restoring last visited workspace
+  React.useEffect(() => {
+    if (router.asPath === '/workspace' && lastWorkspaceVisit.path) {
+      router.replace(lastWorkspaceVisit.path);
+    }
+  }, [router.asPath]);
+
+  const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
