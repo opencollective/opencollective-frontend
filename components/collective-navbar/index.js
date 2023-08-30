@@ -25,7 +25,8 @@ import { isSupportedExpenseType } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { getCollectivePageRoute, getDashboardRoute, getSettingsRoute } from '../../lib/url-helpers';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
+import { getCollectivePageRoute, getSettingsRoute, getWorkspaceRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -106,7 +107,11 @@ const BackButtonAndAvatar = styled.div`
       opacity: 1;
       visibility: visible;
       margin-right: 8px;
-      transition: opacity 0.1s ease-out, visibility 0.2s ease-out, margin 0.075s, width 0.075s ease-in-out;
+      transition:
+        opacity 0.1s ease-out,
+        visibility 0.2s ease-out,
+        margin 0.075s,
+        width 0.075s ease-in-out;
     }
 
     &[data-hide-on-desktop='true'] {
@@ -114,7 +119,11 @@ const BackButtonAndAvatar = styled.div`
       margin-right: 0px;
       visibility: hidden;
       opacity: 0;
-      transition: opacity 0.1s ease-out, visibility 0.2s ease-out, margin 0.075s, width 0.075s ease-in-out;
+      transition:
+        opacity 0.1s ease-out,
+        visibility 0.2s ease-out,
+        margin 0.075s,
+        width 0.075s ease-in-out;
     }
   }
 `;
@@ -173,7 +182,10 @@ const CategoriesContainer = styled(Container)`
     width: 0;
     visibility: hidden;
     opacity: 0;
-    transition: opacity 0.4s ease-out, visibility 0.4s ease-out, width 0.2s ease-out;
+    transition:
+      opacity 0.4s ease-out,
+      visibility 0.4s ease-out,
+      width 0.2s ease-out;
 
     ${props =>
       props.isExpanded &&
@@ -310,7 +322,11 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
       type: NAVBAR_ACTION_TYPE.SETTINGS,
       component: (
         <Link
-          href={LoggedInUser.hasEarlyAccess('dashboard') ? getDashboardRoute(collective) : getSettingsRoute(collective)}
+          href={
+            LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
+              ? getWorkspaceRoute(collective)
+              : getSettingsRoute(collective)
+          }
           data-cy="edit-collective-btn"
         >
           <ActionButton tabIndex="-1">
@@ -318,8 +334,8 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
             <Span ml={2}>
               {collective.isHost ? (
                 <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
-              ) : LoggedInUser.hasEarlyAccess('dashboard') ? (
-                <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+              ) : LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) ? (
+                <FormattedMessage id="Workspace" defaultMessage="Workspace" />
               ) : (
                 <FormattedMessage id="Settings" defaultMessage="Settings" />
               )}
@@ -381,8 +397,8 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
       component: (
         <Link
           href={
-            LoggedInUser?.hasEarlyAccess('dashboard')
-              ? getDashboardRoute(collective, 'manage-contributions')
+            LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
+              ? getWorkspaceRoute(collective, 'manage-contributions')
               : `${getCollectivePageRoute(collective)}/manage-contributions`
           }
         >

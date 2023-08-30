@@ -27,7 +27,7 @@ import { withUser } from './UserProvider';
 const orgMessages = defineMessages({
   nameLabel: { id: 'Organization.Name', defaultMessage: 'Organization name' },
   legalNameLabel: { id: 'LegalName', defaultMessage: 'Legal Name' },
-  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
+  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your profile URL' },
   descriptionPlaceholder: {
     id: 'create.collective.placeholder',
     defaultMessage: 'Making the world a better place',
@@ -56,7 +56,7 @@ const orgMessages = defineMessages({
   },
   errorSlugHyphen: {
     id: 'createOrg.form.error.slug.hyphen',
-    defaultMessage: 'Organization URL slug cannot start or end with a hyphen (-)',
+    defaultMessage: 'Organization handle cannot start or end with a hyphen (-)',
   },
   errorWebsite: {
     id: 'createOrg.form.error.website',

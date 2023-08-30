@@ -2,6 +2,9 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { AnalyticsEvent } from '../../lib/analytics/events';
+import { track } from '../../lib/analytics/plausible';
+
 import Currency from '../Currency';
 import { Box, Flex } from '../Grid';
 import PayWithPaypalButton from '../PayWithPaypalButton';
@@ -14,13 +17,14 @@ class ContributionFlowButtons extends React.Component {
   static propTypes = {
     goNext: PropTypes.func,
     goBack: PropTypes.func,
+    step: PropTypes.shape({ name: PropTypes.string }),
     prevStep: PropTypes.shape({ name: PropTypes.string }),
     nextStep: PropTypes.shape({ name: PropTypes.string }),
     isValidating: PropTypes.bool,
     /** If provided, the PayPal button will be displayed in place of the regular submit */
     paypalButtonProps: PropTypes.object,
     currency: PropTypes.string,
-    isCrypto: PropTypes.bool,
+    disabled: PropTypes.bool,
     tier: PropTypes.shape({ type: PropTypes.string }),
     stepDetails: PropTypes.object,
     stepSummary: PropTypes.object,
@@ -36,6 +40,10 @@ class ContributionFlowButtons extends React.Component {
         this.setState({ isLoadingNext: false });
       });
     }
+
+    if (this.props.step.name === 'details') {
+      track(AnalyticsEvent.CONTRIBUTION_DETAILS_STEP_COMPLETED);
+    }
   };
 
   getStepLabel(step) {
@@ -50,8 +58,8 @@ class ContributionFlowButtons extends React.Component {
   }
 
   render() {
-    const { goBack, isValidating, nextStep, paypalButtonProps, currency, tier, isCrypto, stepDetails } = this.props;
-    const totalAmount = getTotalAmount(stepDetails, this.props.stepSummary, isCrypto);
+    const { goBack, isValidating, nextStep, paypalButtonProps, currency, tier, stepDetails, disabled } = this.props;
+    const totalAmount = getTotalAmount(stepDetails, this.props.stepSummary);
     return (
       <Flex flexWrap="wrap" justifyContent="center">
         <Fragment>
@@ -61,7 +69,7 @@ class ContributionFlowButtons extends React.Component {
               minWidth={!nextStep ? 185 : 145}
               onClick={goBack}
               color="black.600"
-              disabled={isValidating}
+              disabled={disabled || isValidating}
               data-cy="cf-prev-step"
               type="button"
               mt={2}
@@ -79,7 +87,7 @@ class ContributionFlowButtons extends React.Component {
               minWidth={!nextStep ? 185 : 145}
               buttonStyle="primary"
               onClick={this.goNext}
-              disabled={isCrypto && totalAmount <= 0}
+              disabled={disabled}
               loading={isValidating || this.state.isLoadingNext}
               data-cy="cf-next-step"
               type="submit"
@@ -91,11 +99,6 @@ class ContributionFlowButtons extends React.Component {
                   )}{' '}
                   &rarr;
                 </React.Fragment>
-              ) : isCrypto ? (
-                <FormattedMessage
-                  defaultMessage="I've sent {CryptoAmount} {CryptoCurrency} to this wallet address"
-                  values={{ CryptoAmount: totalAmount, CryptoCurrency: currency }}
-                />
               ) : tier?.type === 'TICKET' ? (
                 <FormattedMessage
                   id="contribute.ticket"

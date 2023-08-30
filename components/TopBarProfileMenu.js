@@ -12,7 +12,8 @@ import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
-import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
+import { getSettingsRoute, getWorkspaceRoute } from '../lib/url-helpers';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
@@ -24,6 +25,7 @@ import Link from './Link';
 import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
 import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
+import PreviewFeaturesModal from './PreviewFeaturesModal';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
@@ -66,14 +68,44 @@ UserMenuLinkEntry.propTypes = {
   isMobileMenuLink: PropTypes.bool,
 };
 
-const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, logOutHandler }) => {
-  const useDashboard = LoggedInUser.hasEarlyAccess('dashboard');
+const UserAccountLinks = ({
+  setShowNewsAndUpdates,
+  LoggedInUser,
+  isMobileView,
+  logOutHandler,
+  setShowPreviewFeaturesModal,
+}) => {
+  const useDashboard = LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
+  const hasAvailablePreviewFeatures = LoggedInUser?.getAvailablePreviewFeatures()?.length > 0;
 
   return (
     <Box>
       <UserMenuLinkEntry as={Span} isMobileMenuLink={isMobileView} onClick={() => setShowNewsAndUpdates(true)}>
         <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
       </UserMenuLinkEntry>
+      {hasAvailablePreviewFeatures && (
+        <UserMenuLinkEntry
+          as="button"
+          isMobileMenuLink={isMobileView}
+          onClick={() => setShowPreviewFeaturesModal(true)}
+          display="flex"
+          alignItems="center"
+          gridGap={2}
+        >
+          <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />{' '}
+          <Span
+            fontSize="12px"
+            ml={1}
+            style={{ borderRadius: 20 }}
+            display="inline-block"
+            px="6px"
+            bg="primary.200"
+            color="black.800"
+          >
+            <FormattedMessage defaultMessage="New!" />
+          </Span>
+        </UserMenuLinkEntry>
+      )}
       <Query
         query={memberInvitationsCountQuery}
         variables={{ memberAccount: { slug: LoggedInUser.collective.slug } }}
@@ -95,7 +127,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
       <UserMenuLinkEntry
         isMobileMenuLink={isMobileView}
         href={
-          useDashboard ? getDashboardRoute(LoggedInUser.collective, 'info') : getSettingsRoute(LoggedInUser.collective)
+          useDashboard ? getWorkspaceRoute(LoggedInUser.collective, 'info') : getSettingsRoute(LoggedInUser.collective)
         }
       >
         <FormattedMessage id="Settings" defaultMessage="Settings" />
@@ -104,7 +136,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
         isMobileMenuLink={isMobileView}
         href={
           useDashboard
-            ? getDashboardRoute(LoggedInUser.collective, 'manage-contributions')
+            ? getWorkspaceRoute(LoggedInUser.collective, 'manage-contributions')
             : `/${LoggedInUser.collective.slug}/manage-contributions`
         }
       >
@@ -114,7 +146,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
         isMobileMenuLink={isMobileView}
         href={
           useDashboard
-            ? getDashboardRoute(LoggedInUser.collective, 'expenses')
+            ? getWorkspaceRoute(LoggedInUser.collective, 'expenses')
             : `/${LoggedInUser.collective.slug}/submitted-expenses`
         }
       >
@@ -124,7 +156,7 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
         isMobileMenuLink={isMobileView}
         href={
           useDashboard
-            ? getDashboardRoute(LoggedInUser.collective, 'transactions')
+            ? getWorkspaceRoute(LoggedInUser.collective, 'transactions')
             : `/${LoggedInUser.collective.slug}/transactions`
         }
       >
@@ -171,8 +203,12 @@ UserAccountLinks.propTypes = {
   logOutHandler: PropTypes.func,
   profileMenuLink: PropTypes.bool,
   isMobileView: PropTypes.bool,
+  setShowPreviewFeaturesModal: PropTypes.func,
 };
 
+/**
+ * @deprecated Will be replaced by `components/navigation/ProfileMenu` when Workspace moves out of preview feature
+ */
 class TopBarProfileMenu extends React.Component {
   static propTypes = {
     LoggedInUser: PropTypes.object,
@@ -183,7 +219,7 @@ class TopBarProfileMenu extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { showProfileMenu: false, loading: true, showUserAccount: false };
+    this.state = { showProfileMenu: false, showPreviewFeaturesModal: false, loading: true, showUserAccount: false };
   }
 
   componentDidMount() {
@@ -240,7 +276,7 @@ class TopBarProfileMenu extends React.Component {
 
   renderProfileMenu() {
     const { LoggedInUser, setShowNewsAndUpdates } = this.props;
-    const { showUserAccount } = this.state;
+    const { showUserAccount, showPreviewFeaturesModal } = this.state;
 
     return (
       <Container
@@ -327,6 +363,7 @@ class TopBarProfileMenu extends React.Component {
                       LoggedInUser={LoggedInUser}
                       setShowNewsAndUpdates={setShowNewsAndUpdates}
                       logOutHandler={this.logout}
+                      setShowPreviewFeaturesModal={show => this.setState({ showPreviewFeaturesModal: show })}
                     />
                   </Box>
                 </Hide>
@@ -411,11 +448,15 @@ class TopBarProfileMenu extends React.Component {
                   LoggedInUser={LoggedInUser}
                   setShowNewsAndUpdates={setShowNewsAndUpdates}
                   logOutHandler={this.logout}
+                  setShowPreviewFeaturesModal={show => this.setState({ showPreviewFeaturesModal: show })}
                 />
               </Box>
             </Hide>
           )}
         </Flex>
+        {showPreviewFeaturesModal && (
+          <PreviewFeaturesModal onClose={() => this.setState({ showPreviewFeaturesModal: false })} />
+        )}
       </Container>
     );
   }
@@ -467,14 +508,14 @@ class TopBarProfileMenu extends React.Component {
     return (
       <div className="LoginTopBarProfileButton">
         {status === 'loading' && (
-          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
+          <P color="#D5DAE0" fontSize="0.85rem" px={3} py={2} display="inline-block">
             <FormattedMessage id="loading" defaultMessage="loading" />
             &hellip;
           </P>
         )}
 
         {status === 'loggingout' && (
-          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
+          <P color="#D5DAE0" fontSize="0.85rem" px={3} py={2} display="inline-block">
             <FormattedMessage id="loggingout" defaultMessage="logging out" />
             &hellip;
           </P>

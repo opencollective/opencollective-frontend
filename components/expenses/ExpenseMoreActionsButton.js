@@ -6,6 +6,7 @@ import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { Edit as IconEdit } from '@styled-icons/feather/Edit';
 import { Flag as FlagIcon } from '@styled-icons/feather/Flag';
 import { Link as IconLink } from '@styled-icons/feather/Link';
+import { MinusCircle } from '@styled-icons/feather/MinusCircle';
 import { Pause as PauseIcon } from '@styled-icons/feather/Pause';
 import { Play as PlayIcon } from '@styled-icons/feather/Play';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
@@ -17,7 +18,7 @@ import { margin } from 'styled-system';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import useClipboard from '../../lib/hooks/useClipboard';
-import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { getCollectivePageCanonicalURL, getCollectivePageRoute } from '../../lib/url-helpers';
 
 import { Flex } from '../Grid';
 import PopupMenu from '../PopupMenu';
@@ -66,7 +67,6 @@ const Action = styled.button`
  */
 const ExpenseMoreActionsButton = ({
   expense,
-  collective,
   onError,
   onEdit,
   isDisabled,
@@ -125,6 +125,19 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.approve" defaultMessage="Approve" />
               </Action>
             )}
+            {permissions?.canReject && props.isViewingExpenseInHostContext && (
+              <Action
+                loading={processExpense.loading && processExpense.currentAction === 'REJECT'}
+                disabled={processExpense.loading || isDisabled}
+                onClick={async () => {
+                  setProcessModal('REJECT');
+                  setOpen(false);
+                }}
+              >
+                <MinusCircle size={12} />
+                <FormattedMessage id="actions.reject" defaultMessage="Reject" />
+              </Action>
+            )}
             {permissions?.canMarkAsIncomplete && (
               <Action
                 disabled={processExpense.loading || isDisabled}
@@ -177,25 +190,30 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="Edit" defaultMessage="Edit" />
               </Action>
             )}
-            {permissions?.canSeeInvoiceInfo && expense?.type === expenseTypes.INVOICE && (
-              <ExpenseInvoiceDownloadHelper expense={expense} collective={collective} onError={onError}>
-                {({ isLoading, downloadInvoice }) => (
-                  <Action loading={isLoading} onClick={downloadInvoice} disabled={processExpense.loading || isDisabled}>
-                    <IconDownload size="16px" />
-                    {isLoading ? (
-                      <FormattedMessage id="loading" defaultMessage="loading" />
-                    ) : (
-                      <FormattedMessage id="Download" defaultMessage="Download" />
-                    )}
-                  </Action>
-                )}
-              </ExpenseInvoiceDownloadHelper>
-            )}
+            {permissions?.canSeeInvoiceInfo &&
+              [expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense?.type) && (
+                <ExpenseInvoiceDownloadHelper expense={expense} collective={expense.account} onError={onError}>
+                  {({ isLoading, downloadInvoice }) => (
+                    <Action
+                      loading={isLoading}
+                      onClick={downloadInvoice}
+                      disabled={processExpense.loading || isDisabled}
+                    >
+                      <IconDownload size="16px" />
+                      {isLoading ? (
+                        <FormattedMessage id="loading" defaultMessage="loading" />
+                      ) : (
+                        <FormattedMessage id="Download" defaultMessage="Download" />
+                      )}
+                    </Action>
+                  )}
+                </ExpenseInvoiceDownloadHelper>
+              )}
             <Action
               onClick={() =>
                 linkAction === 'link'
-                  ? router.push(`${getCollectivePageRoute(collective)}/expenses/${expense.legacyId}`)
-                  : copy(window.location.href)
+                  ? router.push(`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`)
+                  : copy(`${getCollectivePageCanonicalURL(expense.account)}/expenses/${expense.legacyId}`)
               }
               disabled={processExpense.loading || isDisabled}
             >
@@ -234,12 +252,12 @@ ExpenseMoreActionsButton.propTypes = {
       canSeeInvoiceInfo: PropTypes.bool,
       canMarkAsIncomplete: PropTypes.bool,
     }),
-  }),
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    parent: PropTypes.shape({
+    account: PropTypes.shape({
       slug: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      parent: PropTypes.shape({
+        slug: PropTypes.string.isRequired,
+      }),
     }),
   }),
   /** Called with an error if anything wrong happens */

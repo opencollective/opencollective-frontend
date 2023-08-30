@@ -53,21 +53,12 @@ const Amount = styled(Span)`
   text-align: right;
 `;
 
-const ContributionSummary = ({
-  collective,
-  stepDetails,
-  stepSummary,
-  stepPayment,
-  currency,
-  isCrypto,
-  tier,
-  renderTax,
-}) => {
+const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment, currency, tier, renderTax }) => {
   const intl = useIntl();
-  const amount = isCrypto ? stepDetails.cryptoAmount : stepDetails.amount;
-  const totalAmount = getTotalAmount(stepDetails, stepSummary, isCrypto);
+  const amount = stepDetails.amount;
+  const totalAmount = getTotalAmount(stepDetails, stepSummary);
   const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, currency);
-  const platformTip = !isCrypto ? get(stepDetails, 'platformTip', 0) : 0;
+  const platformTip = get(stepDetails, 'platformTip', 0);
   const showQuantity = stepDetails.quantity > 1 || ['TICKET', 'PRODUCT'].includes(tier?.type);
   const contributionName = tier?.name ? `${collective.name} - "${tier.name}"` : collective.name;
   return (
@@ -95,7 +86,6 @@ const ContributionSummary = ({
                 amount={amount || 0}
                 currency={currency}
                 amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                isCrypto={isCrypto}
               />
             </Amount>
           </AmountLine>
@@ -120,11 +110,15 @@ const ContributionSummary = ({
           {Boolean(platformTip) && (
             <AmountLine color="black.700">
               <Label>
-                <FormattedMessage
-                  id="SupportProject"
-                  defaultMessage="Support {projectName}"
-                  values={{ projectName: 'Open Collective' }}
-                />
+                {stepDetails.isNewPlatformTip ? (
+                  <FormattedMessage defaultMessage="Optional tip to the platform" />
+                ) : (
+                  <FormattedMessage
+                    id="SupportProject"
+                    defaultMessage="Support {projectName}"
+                    values={{ projectName: 'Open Collective' }}
+                  />
+                )}
               </Label>
               <Amount data-cy="ContributionSummary-Tip">
                 <FormattedMoneyAmount
@@ -144,10 +138,10 @@ const ContributionSummary = ({
           <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
         </Label>
         <Amount fontWeight="700" data-cy="ContributionSummary-TodaysCharge">
-          <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} isCrypto={isCrypto} />
+          <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} />
         </Amount>
       </AmountLine>
-      {Boolean(pmFeeInfo.fee) && !isCrypto && (
+      {Boolean(pmFeeInfo.fee) && (
         <React.Fragment>
           <AmountLine color="black.700">
             <Label>
@@ -300,7 +294,6 @@ ContributionSummary.propTypes = {
   stepSummary: PropTypes.object,
   stepPayment: PropTypes.object,
   currency: PropTypes.string,
-  isCrypto: PropTypes.bool,
   renderTax: PropTypes.func,
 };
 

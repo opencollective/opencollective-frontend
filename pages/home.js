@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
+
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 // import Banner from '../components/collectives/Banner';
 import JoinUsSection from '../components/collectives/sections/JoinUs';
@@ -23,6 +27,17 @@ const messages = defineMessages({
 
 const HomePage = () => {
   const { formatMessage } = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
+  const router = useRouter();
+  const shouldRedirectToDashboard =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) && router.asPath === '/';
+
+  useEffect(() => {
+    if (shouldRedirectToDashboard) {
+      router.replace('/workspace');
+    }
+  }, [shouldRedirectToDashboard]);
+
   return (
     <Page
       metaTitle={formatMessage(messages.defaultTitle)}

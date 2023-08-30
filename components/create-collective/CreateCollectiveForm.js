@@ -53,7 +53,7 @@ const placeholders = {
 
 const messages = defineMessages({
   nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: 'Collective name' },
-  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
+  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your profile URL' },
   suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
   descriptionLabel: {
     id: 'createCollective.form.descriptionLabel',
@@ -72,7 +72,7 @@ const messages = defineMessages({
   },
   errorSlugHyphen: {
     id: 'createCollective.form.error.slug.hyphen',
-    defaultMessage: 'Collective slug URL cannot start or end with a hyphen',
+    defaultMessage: 'Collective handle cannot start or end with a hyphen',
   },
 });
 
@@ -425,7 +425,14 @@ class CreateCollectiveForm extends React.Component {
                           }
                         >
                           {({ field }) => (
-                            <StyledTextarea {...field} width="100%" minHeight={76} maxLength={3000} showCount />
+                            <StyledTextarea
+                              {...field}
+                              width="100%"
+                              minHeight={76}
+                              maxLength={3000}
+                              showCount
+                              fontSize="14px"
+                            />
                           )}
                         </StyledInputFormikField>
                       )}
@@ -503,7 +510,7 @@ class CreateCollectiveForm extends React.Component {
                 }}
               </Formik>
               <Container justifyContent="center" mb={4} display={['flex', 'none']}>
-                <NextIllustration src="/static/images/create-collective/mobileForm.png" width="320px" height="200px" />
+                <NextIllustration src="/static/images/create-collective/mobileForm.png" width={320} height={200} />
               </Container>
             </ContainerWithImage>
           </Flex>

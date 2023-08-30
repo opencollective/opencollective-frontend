@@ -68,7 +68,7 @@ const OpenCollectiveIs = () => {
             border="4px solid"
             borderColor="primary.900"
           >
-            <NextIllustration width={128} height={128} src="/static/images/new-home/opencollective-logo.png" />
+            <NextIllustration width={128} height={128} src="/static/images/new-home/opencollective-logo.png" alt="OC" />
           </Container>
           <Box width={['288px', '588px', '760px']} textAlign="center" mt={4}>
             <P

@@ -12,6 +12,7 @@ import styled from 'styled-components';
 
 import languages from '../lib/constants/locales';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 import TranslateIcon from './icons/TranslateIcon';
 import Container from './Container';
@@ -207,9 +208,9 @@ const FooterContainer = styled.footer.attrs({
   justify-content: center;
   background: white;
   border-top: 1px solid #e8e9eb;
-  min-height: 7.5rem;
+  min-height: 4.7rem;
   width: 100%;
-  padding: 1rem;
+  padding: 0.65rem;
 `;
 
 const generateLanguageOptions = () => {
@@ -232,6 +233,8 @@ const Footer = () => {
       {label}
     </Span>
   );
+
+  const useDashboard = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
 
   return (
     <FooterContainer>
@@ -260,12 +263,14 @@ const Footer = () => {
             maxWidth="300px"
           >
             <Flex my="12px">
-              <Image
-                src="/static/images/opencollectivelogo-footer-n.svg"
-                alt="Open Collective"
-                height={28}
-                width={167}
-              />
+              <Link href={useDashboard ? '/home' : '/'}>
+                <Image
+                  src="/static/images/opencollectivelogo-footer-n.svg"
+                  alt="Open Collective"
+                  height={28}
+                  width={167}
+                />
+              </Link>
             </Flex>
             <P
               textAlign={['center', 'left']}

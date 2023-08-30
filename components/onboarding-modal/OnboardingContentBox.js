@@ -140,6 +140,7 @@ class OnboardingContentBox extends React.Component {
                 collective={null}
                 types={['USER']}
                 data-cy="admin-picker"
+                menuPortalTarget={null}
                 onChange={option => {
                   // only assign admins if they are not in the list already
                   const duplicates = admins.filter(admin => admin.member.id === option.value.id);

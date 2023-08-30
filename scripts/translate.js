@@ -13,21 +13,25 @@ const DEFAULT_TRANSLATIONS_FILE = `${LANG_DIR}en.json`;
 const DUPLICATED_IGNORED_MESSAGES = new Set([
   'admin', // Can have different masculine/feminine for some languages based on the context (role or action button)
   'all', // Can have different masculine/feminine for some languages based on the context
-  'approved', // Can have different masculine/feminine for some languages based on the context
-  'completed', // Can have different masculine/feminine for some languages based on the context
   'confirm', // Can have different masculine/feminine for some languages based on the context
-  'expired', // Can have different masculine/feminine for some languages based on the context
   'mark as paid', // Can have different masculine/feminine for some languages based on the context (order or expense)
   'order', // Depends on whether we're talking about ordering (sorting) or an order (contribution)
   'other', // Can have different masculine/feminine for some languages based on the context
   'paid', // Can have different masculine/feminine for some languages based on the context
   'pending', // Can have different masculine/feminine for some languages based on the context
-  'refunded', // Can have different masculine/feminine for some languages based on the context
-  'rejected', // Can have different masculine/feminine for some languages based on the context
   'status', // Can have different masculine/feminine for some languages based on the context
   'type', // Can have different masculine/feminine for some languages based on the context
   'unknown', // Can have different translations if it is "unknown user" or "unknown type"
 ]);
+
+/**
+ * A message will be ignored if part of `DUPLICATED_IGNORED_MESSAGES` or if it ends with "ed" (past tense)
+ * since it's likely to be a verb that will have different feminine/masculine forms in other languages.
+ */
+const shouldIgnoreDuplicateMessage = message => {
+  const lowerCaseMessage = message.toLowerCase();
+  return lowerCaseMessage.endsWith('ed') || DUPLICATED_IGNORED_MESSAGES.has(lowerCaseMessage);
+};
 
 // Aggregates the default messages that were extracted from the app's
 // React components via the React Intl Babel plugin. An error will be thrown if
@@ -109,7 +113,7 @@ const getDuplicateMessages = messages => {
   const groupedMessages = invertBy(messages);
   const duplicates = [];
   Object.entries(groupedMessages).forEach(([message, ids]) => {
-    if (ids.length > 1 && !DUPLICATED_IGNORED_MESSAGES.has(message.toLowerCase())) {
+    if (ids.length > 1 && !shouldIgnoreDuplicateMessage(message)) {
       duplicates.push({ ids: ids, message });
     }
   });

@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import roles from '../../lib/constants/roles';
 import { graphqlAmountValueInCents } from '../../lib/currency-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Account, VirtualCard, VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
+import { Account, VirtualCard, VirtualCardLimitInterval, VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import {
   VirtualCardLimitIntervalDescriptionsI18n,
@@ -20,15 +20,18 @@ import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
+import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const editVirtualCardMutation = gql`
   mutation editVirtualCard(
@@ -66,6 +69,7 @@ const createVirtualCardMutation = gql`
     $limitInterval: VirtualCardLimitInterval!
     $account: AccountReferenceInput!
     $assignee: AccountReferenceInput!
+    $virtualCardRequest: VirtualCardRequestReferenceInput
   ) {
     createVirtualCard(
       name: $name
@@ -73,11 +77,16 @@ const createVirtualCardMutation = gql`
       limitInterval: $limitInterval
       account: $account
       assignee: $assignee
+      virtualCardRequest: $virtualCardRequest
     ) {
       id
       name
       last4
       data
+      virtualCardRequest {
+        id
+        status
+      }
     }
   }
 `;
@@ -102,8 +111,26 @@ const collectiveMembersQuery = gql`
   }
 `;
 
+export const virtualCardsAssignedToCollectiveQuery = gql`
+  query VirtualCardsAssignedToCollective($hostSlug: String!, $collectiveSlug: String!) {
+    host(slug: $hostSlug) {
+      id
+      allCards: hostedVirtualCards(collectiveAccountIds: [{ slug: $collectiveSlug }], status: [ACTIVE, INACTIVE]) {
+        totalCount
+      }
+      cardsMissingReceipts: hostedVirtualCards(
+        collectiveAccountIds: [{ slug: $collectiveSlug }]
+        status: [ACTIVE, INACTIVE]
+        hasMissingReceipts: true
+      ) {
+        totalCount
+      }
+    }
+  }
+`;
+
 const VirtualCardPoliciesQuery = gql`
-  query VirtualCardPoliciesQuery($slug: String) {
+  query VirtualCardPolicies($slug: String) {
     account(slug: $slug) {
       id
       policies {
@@ -138,11 +165,12 @@ const throttledCall = debounce((searchFunc, variables) => {
 
 export type EditVirtualCardModalProps = {
   host: Account;
-  collective: Account;
+  collective?: Account;
   virtualCard: VirtualCard;
+  virtualCardRequest?: VirtualCardRequest;
   onSuccess: (el: React.ReactNode) => void;
   onClose: () => void;
-  modalProps: any;
+  modalProps?: any;
 };
 
 export default function EditVirtualCardModal({
@@ -152,6 +180,7 @@ export default function EditVirtualCardModal({
   onSuccess,
   onClose,
   modalProps,
+  virtualCardRequest,
 }: EditVirtualCardModalProps) {
   const { addToast } = useToasts();
 
@@ -204,6 +233,7 @@ export default function EditVirtualCardModal({
           assignee: { id: assignee.id },
           limitAmount: undefined,
           limitInterval: undefined,
+          virtualCardRequest: virtualCardRequest ? { id: virtualCardRequest.id } : undefined,
         };
 
         if (canEditLimit) {
@@ -262,6 +292,24 @@ export default function EditVirtualCardModal({
     },
   });
 
+  const { data: virtualCardsAssignedToCollectiveData, loading: isLoadingVirtualCardsAssignedToCollective } = useQuery<{
+    host: {
+      allCards: {
+        totalCount: number;
+      };
+      cardsMissingReceipts: {
+        totalCount: number;
+      };
+    };
+  }>(virtualCardsAssignedToCollectiveQuery, {
+    context: API_V2_CONTEXT,
+    variables: {
+      collectiveSlug: formik.values?.collective?.slug,
+      hostSlug: host.slug,
+    },
+    skip: !formik.values?.collective?.slug,
+  });
+
   const cardCollective = isEditing ? virtualCard.account : formik.values.collective;
 
   useEffect(() => {
@@ -304,37 +352,66 @@ export default function EditVirtualCardModal({
           <StyledHr borderColor="black.300" mt={3} />
           <Flex flexDirection="column" mt={3}>
             {!isEditing && (
-              <StyledInputField
-                mb={3}
-                labelFontSize="13px"
-                labelFontWeight="bold"
-                label={<FormattedMessage defaultMessage="Which collective will be assigned to this card?" />}
-                htmlFor="collective"
-                error={formik.touched.collective && formik.errors.collective}
-              >
-                {inputProps => (
-                  <CollectivePickerAsync
-                    {...inputProps}
-                    hostCollectiveIds={[host.legacyId]}
-                    name="collective"
-                    id="collective"
-                    collective={formik.values.collective}
-                    isDisabled={!!collective || isBusy}
-                    customOptions={[
-                      {
-                        value: host,
-                        label: host.name,
-                        [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
-                      },
-                    ]}
-                    onChange={option => {
-                      formik.setFieldValue('collective', option.value);
-                      formik.setFieldValue('assignee', null);
-                    }}
-                    filterResults={collectives => collectives.filter(c => c.isActive)}
-                  />
-                )}
-              </StyledInputField>
+              <React.Fragment>
+                <StyledInputField
+                  mb={3}
+                  labelFontSize="13px"
+                  labelFontWeight="bold"
+                  label={<FormattedMessage defaultMessage="Which collective will be assigned to this card?" />}
+                  htmlFor="collective"
+                  error={formik.touched.collective && formik.errors.collective}
+                >
+                  {inputProps => (
+                    <CollectivePickerAsync
+                      {...inputProps}
+                      hostCollectiveIds={[host.legacyId]}
+                      name="collective"
+                      id="collective"
+                      collective={formik.values.collective}
+                      isDisabled={!!collective || isBusy}
+                      customOptions={[
+                        {
+                          value: host,
+                          label: host.name,
+                          [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
+                        },
+                      ]}
+                      onChange={option => {
+                        formik.setFieldValue('collective', option.value);
+                        formik.setFieldValue('assignee', null);
+                      }}
+                      filterResults={collectives => collectives.filter(c => c.isActive)}
+                    />
+                  )}
+                </StyledInputField>
+                {virtualCardsAssignedToCollectiveData &&
+                  virtualCardsAssignedToCollectiveData.host.allCards.totalCount > 0 && (
+                    <MessageBox
+                      mb={3}
+                      type={
+                        virtualCardsAssignedToCollectiveData.host.cardsMissingReceipts.totalCount > 0
+                          ? 'error'
+                          : 'warning'
+                      }
+                    >
+                      <FormattedMessage
+                        defaultMessage="This collective already has {allCardsCount} other cards assigned to it. {missingReceiptsCardsCount, plural, =0 {} other {# of the {allCardsCount} cards have missing receipts.}}"
+                        values={{
+                          allCardsCount: virtualCardsAssignedToCollectiveData.host.allCards.totalCount,
+                          missingReceiptsCardsCount:
+                            virtualCardsAssignedToCollectiveData.host.cardsMissingReceipts.totalCount,
+                        }}
+                      />
+                      <Box mt={3}>
+                        <StyledLink
+                          href={`/${host.slug}/admin/host-virtual-cards?collective=${formik.values?.collective?.slug}`}
+                        >
+                          <FormattedMessage defaultMessage="View Assigned Cards" />
+                        </StyledLink>
+                      </Box>
+                    </MessageBox>
+                  )}
+              </React.Fragment>
             )}
 
             <StyledInputField
@@ -453,6 +530,9 @@ export default function EditVirtualCardModal({
               </React.Fragment>
             )}
           </Flex>
+          <Box mt={3}>
+            <StripeVirtualCardComplianceStatement />
+          </Box>
         </ModalBody>
         <ModalFooter isFullWidth>
           <Flex justifyContent="flex-end" flexWrap="wrap">
@@ -462,7 +542,7 @@ export default function EditVirtualCardModal({
               buttonStyle="primary"
               data-cy="confirmation-modal-continue"
               loading={isBusy}
-              disabled={isLoadingPolicy}
+              disabled={isLoadingPolicy || isLoadingVirtualCardsAssignedToCollective}
               type="submit"
               textTransform="capitalize"
             >

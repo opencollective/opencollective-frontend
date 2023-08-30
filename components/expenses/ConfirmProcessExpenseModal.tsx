@@ -82,7 +82,7 @@ const messages = defineMessages({
     defaultMessage: 'Release Hold',
   },
   RELEASE_DESCRIPTION: {
-    defaultMessage: 'Expense is can be paid out and is displayed in ready to pay list.',
+    defaultMessage: 'Expense can be paid out and is displayed in ready to pay list.',
   },
   RELEASE_CONFIRM_BUTTON: {
     id: 'actions.release',

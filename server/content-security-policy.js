@@ -73,6 +73,7 @@ const COMMON_DIRECTIVES = {
     'opencollective.com',
     'anchor.fm',
     'podcasters.spotify.com',
+    'player.vimeo.com',
     'js.stripe.com',
     '*.paypal.com',
     '*.openstreetmap.org',
@@ -141,6 +142,10 @@ const getContentSecurityPolicyConfig = () => {
       directives: generateDirectives({
         blockAllMixedContent: false,
         scriptSrc: [UNSAFE_INLINE, UNSAFE_EVAL], // For NextJS scripts
+        imgSrc: [
+          'opencollective-staging.s3.us-west-1.amazonaws.com',
+          'opencollective-staging.s3-us-west-1.amazonaws.com',
+        ],
       }),
     };
   } else if (env === 'staging') {
@@ -148,6 +153,10 @@ const getContentSecurityPolicyConfig = () => {
       reportOnly: false,
       directives: generateDirectives({
         imgSrc: [
+          'opencollective-staging.s3.us-west-1.amazonaws.com',
+          'opencollective-staging.s3-us-west-1.amazonaws.com',
+        ],
+        connectSrc: [
           'opencollective-staging.s3.us-west-1.amazonaws.com',
           'opencollective-staging.s3-us-west-1.amazonaws.com',
         ],
@@ -159,6 +168,10 @@ const getContentSecurityPolicyConfig = () => {
       reportOnly: false,
       directives: generateDirectives({
         imgSrc: [
+          'opencollective-production.s3.us-west-1.amazonaws.com',
+          'opencollective-production.s3-us-west-1.amazonaws.com',
+        ],
+        connectSrc: [
           'opencollective-production.s3.us-west-1.amazonaws.com',
           'opencollective-production.s3-us-west-1.amazonaws.com',
         ],

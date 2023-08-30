@@ -8,6 +8,7 @@ import { createGlobalStyle } from 'styled-components';
 import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
+import sentryLib from '../server/sentry';
 
 import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
@@ -57,7 +58,13 @@ const GlobalStyles = createGlobalStyle`
  * to render `components/collective-page` with everything needed.
  */
 class CollectivePage extends React.Component {
-  static async getInitialProps({ client, req, res, query: { slug, status, step, mode, action } }) {
+  static async getInitialProps(ctx) {
+    const {
+      client,
+      req,
+      res,
+      query: { slug, status, step, mode, action },
+    } = ctx;
     if (res && req && (req.language || req.locale === 'en')) {
       res.set('Cache-Control', 'public, s-maxage=300');
     }
@@ -66,8 +73,12 @@ class CollectivePage extends React.Component {
 
     // If on server side
     if (req) {
-      await preloadCollectivePageGraphqlQueries(slug, client);
-      skipDataFromTree = true;
+      try {
+        await preloadCollectivePageGraphqlQueries(slug, client);
+        skipDataFromTree = true;
+      } catch (err) {
+        sentryLib.captureException(err, ctx);
+      }
     }
 
     return { slug, status, step, mode, skipDataFromTree, action };
@@ -91,7 +102,7 @@ class CollectivePage extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
-      account: PropTypes.object,
+      previousData: PropTypes.object,
       Collective: PropTypes.shape({
         name: PropTypes.string,
         type: PropTypes.string.isRequired,
@@ -145,26 +156,24 @@ class CollectivePage extends React.Component {
     const { slug, data, LoggedInUser, status, step, mode, action } = this.props;
     const { showOnboardingModal } = this.state;
 
-    const loading = data.loading && !data.Collective;
-
+    const collective = data?.Collective || data?.previousData?.Collective;
+    const loading = data.loading && !collective;
     if (!loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.Collective) {
+      } else if (!collective) {
         return <ErrorPage error={generateNotFoundError(slug)} log={false} />;
-      } else if (data.Collective.isPledged && !data.Collective.isActive) {
-        return <PledgedCollectivePage collective={data.Collective} />;
-      } else if (data.Collective.isIncognito) {
-        return <IncognitoUserCollective collective={data.Collective} />;
-      } else if (data.Collective.isGuest) {
-        return <GuestUserProfile account={data.Collective} />;
+      } else if (collective.isPledged && !collective.isActive) {
+        return <PledgedCollectivePage collective={collective} />;
+      } else if (collective.isIncognito) {
+        return <IncognitoUserCollective collective={collective} />;
+      } else if (collective.isGuest) {
+        return <GuestUserProfile account={collective} />;
       }
     }
 
-    const collective = data && data.Collective;
-
     // Don't allow /collective/apply
-    if (action === 'apply' && !collective?.isHost) {
+    if (action === 'apply' && collective && !collective.isHost) {
       return <Custom404 />;
     }
 
@@ -173,6 +182,7 @@ class CollectivePage extends React.Component {
         collective={collective}
         canonicalURL={getCollectivePageCanonicalURL(collective)}
         {...getCollectivePageMetadata(collective)}
+        loading={loading}
       >
         <GlobalStyles />
         {loading ? (

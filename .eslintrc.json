@@ -121,6 +121,12 @@
       "rules": {
         "no-console": "off"
       }
+    },
+    {
+      "files": ["*.tsx"],
+      "rules": {
+        "react/prop-types": "off"
+      }
     }
   ]
 }

@@ -5,10 +5,13 @@ import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import EXPENSE_STATUS from '../../lib/constants/expense-status';
 import { parseDateInterval } from '../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import { useLazyGraphQLPaginatedResults } from '../../lib/hooks/useLazyGraphQLPaginatedResults';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import useQueryFilter, { BooleanFilter } from '../../lib/hooks/useQueryFilter';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import DismissibleMessage from '../DismissibleMessage';
@@ -30,6 +33,7 @@ import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
+import DashboardViews from '../workspace/DashboardViews';
 
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
@@ -49,16 +53,9 @@ const hostDashboardExpensesQuery = gql`
     $dateTo: DateTime
     $searchTerm: String
     $orderBy: ChronologicalOrderInput
+    $chargeHasReceipts: Boolean
+    $virtualCards: [VirtualCardReferenceInput]
   ) {
-    host(slug: $hostSlug) {
-      id
-      ...ExpenseHostFields
-      ...HostInfoCardFields
-      transferwise {
-        id
-        availableCurrencies
-      }
-    }
     expenses(
       host: { slug: $hostSlug }
       limit: $limit
@@ -73,6 +70,8 @@ const hostDashboardExpensesQuery = gql`
       dateTo: $dateTo
       searchTerm: $searchTerm
       orderBy: $orderBy
+      chargeHasReceipts: $chargeHasReceipts
+      virtualCards: $virtualCards
     ) {
       totalCount
       offset
@@ -87,29 +86,66 @@ const hostDashboardExpensesQuery = gql`
 
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
+`;
+const hostDashboardMetaDataQuery = gql`
+  query HostDashboardMetaData($hostSlug: String!, $getViewCounts: Boolean!) {
+    host(slug: $hostSlug) {
+      id
+      ...ExpenseHostFields
+      ...HostInfoCardFields
+      transferwise {
+        id
+        availableCurrencies
+        amountBatched {
+          valueInCents
+          currency
+        }
+      }
+    }
+
+    ready_to_pay: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: READY_TO_PAY)
+      @include(if: $getViewCounts) {
+      totalCount
+    }
+    scheduled_for_payment: expenses(
+      host: { slug: $hostSlug }
+      limit: 0
+      offset: 0
+      status: SCHEDULED_FOR_PAYMENT
+      payoutMethodType: BANK_ACCOUNT
+    ) @include(if: $getViewCounts) {
+      totalCount
+    }
+    on_hold: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: ON_HOLD) @include(if: $getViewCounts) {
+      totalCount
+    }
+    incomplete: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: INCOMPLETE)
+      @include(if: $getViewCounts) {
+      totalCount
+    }
+    error: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: ERROR) @include(if: $getViewCounts) {
+      totalCount
+    }
+  }
+
   ${expenseHostFields}
   ${hostInfoCardFields}
 `;
-
 /**
  * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
  */
-const onExpenseUpdate = (updatedExpense, cache, filteredStatus) => {
-  if (filteredStatus && filteredStatus !== 'ALL' && updatedExpense.status !== filteredStatus) {
-    cache.modify({
-      fields: {
-        expenses(existingExpenses, { readField }) {
-          if (!existingExpenses?.nodes) {
-            return existingExpenses;
-          } else {
-            return {
-              ...existingExpenses,
-              totalCount: existingExpenses.totalCount - 1,
-              nodes: existingExpenses.nodes.filter(expense => updatedExpense.id !== readField('id', expense)),
-            };
-          }
+const onExpenseUpdate = ({ updatedExpense, cache, variables, refetchMetaData }) => {
+  refetchMetaData(); // Refetch the metadata to update the view counts
+  if (variables.status && updatedExpense.status !== variables.status) {
+    cache.updateQuery({ query: hostDashboardExpensesQuery, variables }, data => {
+      return {
+        ...data,
+        expenses: {
+          ...data.expenses,
+          totalCount: data.expenses.totalCount - 1,
+          nodes: data.expenses.nodes?.filter(expense => updatedExpense.id !== expense.id),
         },
-      },
+      };
     });
   }
 };
@@ -117,7 +153,7 @@ const onExpenseUpdate = (updatedExpense, cache, filteredStatus) => {
 const NB_EXPENSES_DISPLAYED = 10;
 
 const isValidStatus = status => {
-  return [...Object.values(EXPENSE_STATUS), 'READY_TO_PAY', 'ON_HOLD'].includes(status);
+  return [...Object.values(ExpenseStatus), 'READY_TO_PAY', 'ON_HOLD'].includes(status);
 };
 
 const getVariablesFromQuery = query => {
@@ -127,7 +163,7 @@ const getVariablesFromQuery = query => {
   return {
     offset: parseInt(query.offset) || 0,
     limit: (parseInt(query.limit) || NB_EXPENSES_DISPLAYED) * 2,
-    status: query.status === 'ALL' ? null : isValidStatus(query.status) ? query.status : 'READY_TO_PAY',
+    status: query.status === 'ALL' ? null : isValidStatus(query.status) ? query.status : null,
     type: query.type,
     tags: query.tag ? [query.tag] : undefined,
     minAmount: amountRange[0] && amountRange[0] * 100,
@@ -155,14 +191,82 @@ const hasParams = query => {
   });
 };
 
+const initViews = [
+  { label: <FormattedMessage defaultMessage="All" />, query: {}, id: 'all' },
+  {
+    label: 'Ready to pay',
+    query: { status: 'READY_TO_PAY', orderBy: 'CREATED_AT,ASC' },
+    showCount: true,
+    id: 'ready_to_pay',
+  },
+  {
+    label: <FormattedMessage id="expense.scheduledForPayment" defaultMessage="Scheduled for payment" />,
+    query: { status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', orderBy: 'CREATED_AT,ASC' },
+    showCount: true,
+    id: 'scheduled_for_payment',
+  },
+  {
+    label: <FormattedMessage defaultMessage="On hold" />,
+    query: { status: 'ON_HOLD', orderBy: 'CREATED_AT,ASC' },
+    showCount: true,
+    id: 'on_hold',
+  },
+  {
+    label: <FormattedMessage defaultMessage="Incomplete" />,
+    query: { status: 'INCOMPLETE', orderBy: 'CREATED_AT,ASC' },
+    showCount: true,
+    id: 'incomplete',
+  },
+  {
+    label: <FormattedMessage id="Error" defaultMessage="Error" />,
+    query: { status: 'ERROR', orderBy: 'CREATED_AT,ASC' },
+    showCount: true,
+    id: 'error',
+  },
+  {
+    label: <FormattedMessage defaultMessage="Paid" />,
+    query: { status: 'PAID' },
+    id: 'recently_paid',
+  },
+];
+
 const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   const router = useRouter() || {};
-  const query = enforceDefaultParamsOnQuery(router.query);
+  const { LoggedInUser } = useLoggedInUser();
+  const expensePipelineFeatureIsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_PIPELINE);
+  const query = expensePipelineFeatureIsEnabled ? router.query : enforceDefaultParamsOnQuery(router.query);
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const hasFilters = React.useMemo(() => hasParams(query), [query]);
   const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-expenses` : `/${hostSlug}/admin/expenses`;
   const queryVariables = { hostSlug, ...getVariablesFromQuery(omitBy(query, isEmpty)) };
-  const expenses = useQuery(hostDashboardExpensesQuery, { variables: queryVariables, context: API_V2_CONTEXT });
+
+  const queryFilter = useQueryFilter({
+    filters: {
+      chargeHasReceipts: BooleanFilter,
+      virtualCard: {
+        isMulti: true,
+      },
+    },
+  });
+  const variables = {
+    ...queryVariables,
+    chargeHasReceipts: queryFilter.values.chargeHasReceipts,
+    virtualCards: queryFilter.values.virtualCard?.map(id => ({ id })),
+  };
+  const expenses = useQuery(hostDashboardExpensesQuery, {
+    variables,
+    context: API_V2_CONTEXT,
+  });
+
+  const {
+    data: metaData,
+    loading: loadingMetaData,
+    refetch: refetchMetaData,
+  } = useQuery(hostDashboardMetaDataQuery, {
+    variables: { hostSlug, getViewCounts: Boolean(expensePipelineFeatureIsEnabled) },
+    context: API_V2_CONTEXT,
+  });
+
   const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
   React.useEffect(() => {
     if (query.paypalApprovalError && !paypalPreApprovalError) {
@@ -172,6 +276,19 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   }, [query.paypalApprovalError]);
 
   const { data, error, loading } = expenses;
+
+  const views = React.useMemo(() => {
+    if (!metaData) {
+      return initViews;
+    }
+    return initViews.map(view => {
+      return {
+        ...view,
+        count: metaData[view.id]?.totalCount,
+      };
+    });
+  }, [metaData]);
+
   const getQueryParams = newParams => {
     return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
   };
@@ -222,26 +339,25 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
         </DismissibleMessage>
       )}
       <Box mb={4}>
-        {loading ? (
+        {!metaData?.host ? (
           <LoadingPlaceholder height={150} />
         ) : error ? (
           <MessageBoxGraphqlError error={error} />
         ) : (
-          <HostInfoCard host={data.host} />
+          <HostInfoCard host={metaData.host} />
         )}
       </Box>
       <ScheduledExpensesBanner
         hostSlug={hostSlug}
-        expenses={paginatedExpenses.nodes}
         onSubmit={() => {
           expenses.refetch();
+          refetchMetaData();
         }}
         secondButton={
           !(query.status === 'SCHEDULED_FOR_PAYMENT' && query.payout === 'BANK_ACCOUNT') ? (
             <StyledButton
               buttonSize="tiny"
               buttonStyle="successSecondary"
-              mr={1}
               onClick={() => {
                 router.push({
                   pathname: pageRoute,
@@ -254,13 +370,34 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
           ) : null
         }
       />
+      {expensePipelineFeatureIsEnabled && (
+        <DashboardViews
+          query={query}
+          omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
+          views={views}
+          onChange={query => {
+            router.push(
+              {
+                pathname: pageRoute,
+                query,
+              },
+              undefined,
+              { scroll: false },
+            );
+          }}
+        />
+      )}
+
       <Box mb={34}>
-        {data?.host ? (
+        {metaData?.host ? (
           <ExpensesFilters
-            collective={data.host}
+            collective={metaData.host}
             filters={query}
             explicitAllForStatus
             displayOnHoldPseudoStatus
+            showChargeHasReceiptFilter
+            chargeHasReceiptFilter={queryFilter.values.chargeHasReceipts}
+            onChargeHasReceiptFilterChange={queryFilter.setChargeHasReceipts}
             onChange={queryParams =>
               router.push({
                 pathname: pageRoute,
@@ -295,13 +432,25 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
       ) : (
         <React.Fragment>
           <ExpensesList
-            isLoading={loading}
-            host={data?.host}
+            isLoading={loading || loadingMetaData}
+            host={metaData?.host}
             nbPlaceholders={paginatedExpenses.limit}
             expenses={paginatedExpenses.nodes}
             view="admin"
             onProcess={(expense, cache) => {
-              hasFilters && onExpenseUpdate(expense, cache, query.status);
+              hasFilters && onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData });
+            }}
+            useDrawer
+            openExpenseLegacyId={Number(router.query.openExpenseId)}
+            setOpenExpenseLegacyId={legacyId => {
+              router.push(
+                {
+                  pathname: pageRoute,
+                  query: getQueryParams({ ...query, openExpenseId: legacyId }),
+                },
+                undefined,
+                { shallow: true },
+              );
             }}
           />
           <Flex mt={5} justifyContent="center">

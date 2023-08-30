@@ -161,15 +161,17 @@ function createLink({ twoFactorAuthContext }) {
 
   const linkFetch = process.browser ? fetch : serverSideFetch;
 
+  const httpHeaders = { 'oc-application': process.env.OC_APPLICATION };
+
   const apiV1DefaultLink = createUploadLink({
     uri: getGraphqlUrl('v1'),
     fetch: linkFetch,
-    headers: { 'Apollo-Require-Preflight': 'true' },
+    headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
   });
   const apiV2DefaultLink = createUploadLink({
     uri: getGraphqlUrl('v2'),
     fetch: linkFetch,
-    headers: { 'Apollo-Require-Preflight': 'true' },
+    headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
   });
 
   // Setup internal links handling to be able to split traffic to different API servers
@@ -178,7 +180,7 @@ function createLink({ twoFactorAuthContext }) {
       ? ApolloLink.split(
           ({ operationName }) =>
             !INTERNAL_API_V1_OPERATION_NAMES || INTERNAL_API_V1_OPERATION_NAMES.split(',').includes(operationName),
-          new HttpLink({ uri: getGraphqlUrl('v1', true), fetch: linkFetch }),
+          new HttpLink({ uri: getGraphqlUrl('v1', true), fetch: linkFetch, headers: httpHeaders }),
           apiV1DefaultLink,
         )
       : apiV1DefaultLink;
@@ -188,7 +190,7 @@ function createLink({ twoFactorAuthContext }) {
       ? ApolloLink.split(
           ({ operationName }) =>
             !INTERNAL_API_V2_OPERATION_NAMES || INTERNAL_API_V2_OPERATION_NAMES.split(',').includes(operationName),
-          new HttpLink({ uri: getGraphqlUrl('v2', true), fetch: linkFetch }),
+          new HttpLink({ uri: getGraphqlUrl('v2', true), fetch: linkFetch, headers: httpHeaders }),
           apiV2DefaultLink,
         )
       : apiV2DefaultLink;

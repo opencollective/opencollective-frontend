@@ -461,7 +461,7 @@ class UserSecurity extends React.Component {
                 borderColor="green.500"
               >
                 <Box flex="0 0 183px">
-                  <Image src="/static/images/lock-green.png" width="183px" height="183px" alt="" />
+                  <Image src="/static/images/lock-green.png" width={183} height={183} alt="" />
                 </Box>
                 <Box flex="1 1 223px" pr="9px">
                   <P fontSize="20px" fontWeight="500">

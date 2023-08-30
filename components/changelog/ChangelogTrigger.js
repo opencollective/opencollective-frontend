@@ -24,7 +24,6 @@ const FlameIcon = styled(StyledRoundButton)`
   border-radius: 50%;
   height: ${props => props.height || '40px'};
   width: ${props => props.width || '40px'};
-  margin-left: 2px;
 
   &,
   &:active {
@@ -70,17 +69,20 @@ const ChangelogTrigger = props => {
   }
 
   return (
-    <Flex>
+    <Flex alignItems="center">
       {hasSeenNewUpdates ? (
-        <StyledTooltip content={TooltipContent}>
-          <FlameIcon
-            height={height}
-            width={width}
-            onClick={handleShowNewUpdates}
-            backgroundColor="black.100"
-            backgroundSize={backgroundSize}
-            url="/static/images/flame-default.svg"
-          />
+        <StyledTooltip delayHide={100} content={TooltipContent} noArrow>
+          {props => (
+            <FlameIcon
+              height={height}
+              width={width}
+              onClick={handleShowNewUpdates}
+              backgroundColor="black.100"
+              backgroundSize={backgroundSize}
+              url="/static/images/flame-default.svg"
+              {...props}
+            />
+          )}
         </StyledTooltip>
       ) : (
         <Container>

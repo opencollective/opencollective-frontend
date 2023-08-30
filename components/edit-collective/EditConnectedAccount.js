@@ -8,11 +8,11 @@ import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage
 import { getWebsiteUrl } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
 
 import EditPayPalAccount from './EditPayPalAccount';
-import EditPrivacyAccount from './EditPrivacyAccount';
 import EditTransferWiseAccount from './EditTransferWiseAccount';
 import EditTwitterAccount from './EditTwitterAccount';
 
@@ -47,6 +47,7 @@ class EditConnectedAccount extends React.Component {
         id: 'collective.connectedAccounts.disconnect.button',
         defaultMessage: 'Disconnect',
       },
+      // Stripe
       'collective.connectedAccounts.stripe.description': {
         id: 'collective.create.connectedAccounts.stripe.description',
         defaultMessage: 'Connect a Stripe account to start accepting financial contributions.',
@@ -55,6 +56,7 @@ class EditConnectedAccount extends React.Component {
         id: 'collective.connectedAccounts.stripe.connected',
         defaultMessage: 'Stripe account connected on {updatedAt, date, short}',
       },
+      // Twitter
       'collective.connectedAccounts.twitter.description': {
         id: 'collective.connectedAccounts.twitter.description',
         defaultMessage: 'Connect a Twitter account to automatically thank new financial contributors',
@@ -63,6 +65,11 @@ class EditConnectedAccount extends React.Component {
         id: 'collective.connectedAccounts.twitter.connected',
         defaultMessage: 'Twitter account @{username} connected on {updatedAt, date, short}',
       },
+      'collective.connectedAccounts.twitter.disableReason': {
+        defaultMessage:
+          'Due to Twitter recent changes, our custom integration is currently offline. We are working on bringing it back.',
+      },
+      // Github
       'collective.connectedAccounts.github.description': {
         id: 'collective.connectedAccounts.github.description',
         defaultMessage: 'Connect a GitHub account to verify your identity and add it to your profile',
@@ -72,7 +79,7 @@ class EditConnectedAccount extends React.Component {
         defaultMessage: 'GitHub account {username} connected on {updatedAt, date, short}',
       },
     });
-    this.services = ['stripe', 'paypal', 'twitter', 'github', 'transferwise', 'privacy'];
+    this.services = ['stripe', 'paypal', 'twitter', 'github', 'transferwise'];
   }
 
   connect(service) {
@@ -149,12 +156,16 @@ class EditConnectedAccount extends React.Component {
           intl={intl}
         />
       );
-    } else if (service === 'privacy') {
-      return <EditPrivacyAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />;
     }
 
+    const disableReason = this.messages[`collective.connectedAccounts.${service}.disableReason`];
     return (
-      <Flex width="100%">
+      <Box width="100%">
+        {Boolean(disableReason) && (
+          <MessageBox type="warning" withIcon mb={3}>
+            {intl.formatMessage(disableReason)}
+          </MessageBox>
+        )}
         {!connectedAccount && (
           <Box>
             <P fontSize="12px" color="black.600" fontWeight="normal" mb={2}>
@@ -164,6 +175,7 @@ class EditConnectedAccount extends React.Component {
               data-cy={`connect-${service}-button`}
               buttonSize="small"
               onClick={() => this.connect(service)}
+              disabled={Boolean(disableReason)}
               mb={2}
             >
               {intl.formatMessage({ defaultMessage: 'Connect {service}' }, { service: capitalize(service) })}
@@ -174,7 +186,7 @@ class EditConnectedAccount extends React.Component {
           <Flex flexDirection="column" width="100%">
             <Box>{intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.connected`], vars)}</Box>
             <Box mt={1}>
-              <StyledButton buttonSize="small" onClick={() => this.connect(service)}>
+              <StyledButton buttonSize="small" onClick={() => this.connect(service)} disabled={Boolean(disableReason)}>
                 {intl.formatMessage(this.messages['collective.connectedAccounts.reconnect.button'])}
               </StyledButton>{' '}
               <StyledButton buttonSize="small" onClick={() => this.disconnect(service)}>
@@ -188,7 +200,7 @@ class EditConnectedAccount extends React.Component {
             )}
           </Flex>
         )}
-      </Flex>
+      </Box>
     );
   }
 }

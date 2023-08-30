@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { omit, omitBy } from 'lodash';
-import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -33,12 +32,12 @@ const Expenses = props => {
   const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, onlySubmittedExpenses } = props;
 
   const expensesRoute = isDashboard
-    ? `/dashboard/${data?.account?.slug}/expenses`
+    ? `/workspace/${variables.collectiveSlug}/expenses`
     : `${getCollectivePageRoute(data?.account)}/expenses`;
 
   useEffect(() => {
     const queryParameters = {
-      ...omit(query, ['offset', 'collec', 'parentCollectiveSlug']),
+      ...omit(query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']),
     };
     if (!isDashboard) {
       addParentToURLIfMissing(router, data?.account, `/expenses`, queryParameters);
@@ -56,9 +55,9 @@ const Expenses = props => {
     setOldLoggedInUser(LoggedInUser);
   }, [oldLoggedInUser, LoggedInUser, data]);
 
-  const hasFilter = memoizeOne(query => {
+  const hasFilters = React.useMemo(() => {
     return Object.entries(query).some(([key, value]) => key !== 'offset' && key !== 'limit' && value);
-  });
+  }, [query]);
 
   function buildFilterLinkParams(params) {
     const queryParameters = {
@@ -87,9 +86,8 @@ const Expenses = props => {
     }
   }
 
-  const suggestedTags = memoizeOne(getSuggestedTags);
+  const suggestedTags = React.useMemo(() => getSuggestedTags(data?.account), [data?.account]);
 
-  const hasFilters = hasFilter(query);
   const isSelfHosted = data?.account?.id === data?.account?.host?.id;
 
   return (
@@ -168,9 +166,21 @@ const Expenses = props => {
                 host={data?.account?.isHost ? data?.account : data?.account?.host}
                 expenses={data?.expenses?.nodes}
                 nbPlaceholders={variables.limit}
-                suggestedTags={suggestedTags(data?.account)}
+                suggestedTags={suggestedTags}
                 isInverted={query.direction === 'SUBMITTED'}
                 view={query.direction === 'SUBMITTED' ? 'submitter' : undefined}
+                useDrawer={isDashboard}
+                openExpenseLegacyId={Number(router.query.openExpenseId)}
+                setOpenExpenseLegacyId={legacyId => {
+                  router.push(
+                    {
+                      pathname: expensesRoute,
+                      query: buildFilterLinkParams({ ...query, openExpenseId: legacyId }),
+                    },
+                    undefined,
+                    { shallow: true },
+                  );
+                }}
               />
               <Flex mt={5} justifyContent="center">
                 <Pagination
@@ -241,6 +251,7 @@ Expenses.propTypes = {
     offset: PropTypes.number.isRequired,
     limit: PropTypes.number.isRequired,
     account: PropTypes.object,
+    collectiveSlug: PropTypes.string,
   }),
   data: PropTypes.shape({
     account: PropTypes.shape({

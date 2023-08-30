@@ -14,7 +14,7 @@ describe('New expense flow', () => {
     let user, collective;
 
     before(() => {
-      cy.createHostedCollective().then(c => {
+      cy.createHostedCollective({ name: 'The Best Collective' }).then(c => {
         collective = c;
         cy.signup({
           user: { name: 'Potatoes Lover' },
@@ -49,8 +49,8 @@ describe('New expense flow', () => {
       cy.get('textarea[name="description"]').type('Brussels January team retreat');
 
       cy.getByDataCy('expense-summary-btn').should('be.disabled');
-      // Upload 2 files to the multi-files dropzone
 
+      // Upload 2 files to the multi-files dropzone
       cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
         {
           contents: 'test/cypress/fixtures/images/receipt.jpg',
@@ -74,23 +74,25 @@ describe('New expense flow', () => {
       cy.get('input[name="items[0].amount"]').type('{selectall}183');
       cy.getByDataCy('currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
-      cy.get('input:invalid').should('have.length', 2); // Missing attachment desctiption+amount
+      cy.get('input:invalid').should('have.length', 4); // Missing attachment description, amount, and dates
       cy.getByDataCy('expense-items-total-amount').should('contain', '--.--'); // amount for second item is missing
 
-      // Try to submit with missing data
-      cy.get('input:invalid').should('have.length', 2); // Previous incomplete fields + payout method email
-      cy.getByDataCy('expense-summary-btn').click(); // Should not submit
+      // Try to submit with missing data (should not submit)
+      cy.getByDataCy('expense-summary-btn').click();
 
       // Fill missing info & submit
       cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
       cy.get('input[name="items[1].amount"]').type('{selectall}92.50');
       cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50');
+      cy.get('input:invalid').should('have.length', 2);
+      cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
+      cy.get('input[name="items[1].incurredAt"]').type('2021-01-01');
       cy.get('input:invalid').should('have.length', 0);
       cy.getByDataCy('expense-summary-btn').click();
 
       // Check summary
       cy.getByDataCy('expense-summary-payee').should('contain', 'Potatoes Lover');
-      cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
+      cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
       cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'Bank Account: 007');
       cy.getByDataCy('expense-summary-payout-method-type').should('contain', 'Other');
       cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50');
@@ -115,6 +117,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-add-item-btn').click();
       cy.get('input[name="items[2].description"]').type('Some more delicious stuff');
       cy.get('input[name="items[2].amount"]').type('{selectall}34');
+      cy.get('input[name="items[2].incurredAt"]').type('2021-01-01');
       cy.getByDataCy('items[2].url-dropzone').selectFile(
         {
           contents: 'test/cypress/fixtures/images/receipt.jpg',
@@ -139,7 +142,7 @@ describe('New expense flow', () => {
       // Check final expense page
       cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat edited');
       cy.getByDataCy('expense-summary-payee').should('contain', 'Potatoes Lover');
-      cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
+      cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
       cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'Bank Account: 007');
       cy.getByDataCy('expense-summary-payout-method-type').should('contain', 'Other');
       cy.getByDataCy('expense-items-total-amount').should('contain', '$237.50');
@@ -188,14 +191,16 @@ describe('New expense flow', () => {
       // Fill info for first attachment
       cy.get('input[name="items[0].description"]').type('Fancy restaurant');
       cy.get('input[name="items[0].amount"]').type('{selectall}183');
+      cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
       cy.getByDataCy('currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
       cy.get('input[name="items[1].amount"]').type('{selectall}92.50');
+      cy.get('input[name="items[1].incurredAt"]').type('2021-01-01');
       cy.getByDataCy('expense-summary-btn').click();
 
       cy.getByDataCy('expense-summary-payee').should('contain', 'Dummy Expense Org');
-      cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
+      cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
       cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
       cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50');
       cy.getByDataCy('expense-summary-items').should('contain', 'Fancy restaurant');
@@ -231,6 +236,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.get('input[name="items[0].amount"]').type('{selectall}4200');
+      cy.get('input[name="items[0].incurredAt"]').type('2021-03-01');
 
       // Switch to receipt and acknowledge error
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
@@ -251,6 +257,7 @@ describe('New expense flow', () => {
 
         cy.get('textarea[name="description"]').type('Service Invoice');
         cy.get('input[name="items[0].amount"]').type('{selectall}4200');
+        cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
 
         cy.getByDataCy('expense-summary-btn').click();
         cy.wait(500);
@@ -275,6 +282,7 @@ describe('New expense flow', () => {
 
         cy.get('textarea[name="description"]').type('Service Invoice');
         cy.get('input[name="items[0].amount"]').type('{selectall}4200');
+        cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
 
         cy.getByDataCy('expense-summary-btn').click();
         cy.wait(500);
@@ -332,7 +340,7 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
         cy.getByDataCy('expense-author').should('contain', 'Invited by');
         cy.getByDataCy('expense-summary-payee').should('contain', 'Nicolas Cage');
-        cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
+        cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
         cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
       });
 
@@ -353,6 +361,7 @@ describe('New expense flow', () => {
 
         cy.get('textarea[name="description"]').type('Service Invoice');
         cy.get('input[name="items[0].amount"]').type('{selectall}4200');
+        cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
 
         cy.getByDataCy('expense-summary-btn').click();
         cy.wait(500);
@@ -409,7 +418,7 @@ describe('New expense flow', () => {
         cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
         cy.getByDataCy('expense-author').should('contain', 'Invited by');
         cy.getByDataCy('expense-summary-payee').should('contain', slug);
-        cy.getByDataCy('expense-summary-host').should('contain', 'Open Source Collective org');
+        cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
         cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
       });
     });
@@ -449,11 +458,13 @@ describe('New expense flow', () => {
       cy.get('textarea[name="description"]').type('Brussels January team retreat');
       cy.get('input[name="items[0].description"]').type('TShirts');
       cy.get('input[name="items[0].amount"]').type('{selectall}112');
+      cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
       cy.getByDataCy('currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.getByDataCy('expense-add-item-btn').click();
       cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
       cy.get('input[name="items[1].amount"]').type('{selectall}75.5');
+      cy.get('input[name="items[1].incurredAt"]').type('2021-01-01');
 
       // Need to fill in the tax rate before we can go next
       cy.get('input[name="taxes.0.idNumber"]').should('not.have.attr', 'required'); // Not required if the rate is not set or 0
@@ -496,6 +507,7 @@ describe('New expense flow', () => {
       cy.getByDataCy('expense-add-item-btn').click();
       cy.get('input[name="items[2].description"]').type('Some more delicious stuff');
       cy.get('input[name="items[2].amount"]').type('{selectall}34');
+      cy.get('input[name="items[2].incurredAt"]').type('2021-01-01');
       cy.getByDataCy('expense-invoiced-amount').should('contain', '$221.50');
       cy.getByDataCy('tax-VAT-expense-amount-line').should('contain', '$12.18');
       cy.getByDataCy('expense-items-total-amount').should('contain', '$233.68');

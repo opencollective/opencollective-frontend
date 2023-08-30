@@ -74,9 +74,17 @@ const ExpensesList = ({
   onDelete,
   onProcess,
   expenseFieldForTotalAmount,
+  useDrawer,
+  setOpenExpenseLegacyId,
+  openExpenseLegacyId,
 }) => {
-  const [expenseInDrawer, setExpenseInDrawer] = React.useState(null);
-  const [selectedId, setSelectedId] = React.useState(null);
+  // Initial values for expense in drawer
+  const expenseInDrawer = React.useMemo(() => {
+    if (openExpenseLegacyId) {
+      const expense = expenses?.find(e => e.legacyId === openExpenseLegacyId);
+      return expense || null;
+    }
+  }, [openExpenseLegacyId, expenses]);
 
   if (!expenses?.length && !isLoading) {
     return null;
@@ -84,7 +92,11 @@ const ExpensesList = ({
 
   return (
     <StyledCard>
-      <ExpenseDrawer open={Boolean(selectedId)} handleClose={() => setSelectedId(null)} expense={expenseInDrawer} />
+      <ExpenseDrawer
+        openExpenseLegacyId={openExpenseLegacyId}
+        handleClose={() => setOpenExpenseLegacyId(null)}
+        initialExpenseValues={expenseInDrawer}
+      />
       {isLoading ? (
         [...new Array(nbPlaceholders)].map((_, idx) => (
           // eslint-disable-next-line react/no-array-index-key
@@ -105,12 +117,12 @@ const ExpensesList = ({
                 onDelete={onDelete}
                 onProcess={onProcess}
                 suggestedTags={suggestedTags}
-                selected={selectedId === expense.id}
+                selected={openExpenseLegacyId === expense.legacyId}
                 expandExpense={e => {
                   e.preventDefault();
-                  setExpenseInDrawer(expense);
-                  setSelectedId(expense.id);
+                  setOpenExpenseLegacyId(expense.legacyId);
                 }}
+                useDrawer={useDrawer}
               />
             </ExpenseContainer>
           ))}
@@ -178,6 +190,9 @@ ExpensesList.propTypes = {
     }),
   ),
   totalAmount: PropTypes.number,
+  useDrawer: PropTypes.bool,
+  setOpenExpenseLegacyId: PropTypes.func,
+  openExpenseLegacyId: PropTypes.number,
 };
 
 ExpensesList.defaultProps = {

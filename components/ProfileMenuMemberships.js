@@ -1,3 +1,7 @@
+/**
+ * @deprecated Will be replaced by `components/navigation/ProfileMenuMemberships.tsx` when Workspace moves out of preview features
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Plus } from '@styled-icons/boxicons-regular/Plus';
@@ -8,7 +12,8 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { isPastEvent } from '../lib/events';
-import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
+import { getSettingsRoute, getWorkspaceRoute } from '../lib/url-helpers';
 
 import Avatar from './Avatar';
 import Collapse from './Collapse';
@@ -56,8 +61,8 @@ const MembershipLine = ({ user, membership }) => {
         <StyledLink
           as={Link}
           href={
-            user?.hasEarlyAccess('dashboard')
-              ? getDashboardRoute(membership.collective)
+            user?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
+              ? getWorkspaceRoute(membership.collective)
               : getSettingsRoute(membership.collective)
           }
           ml={1}

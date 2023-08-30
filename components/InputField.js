@@ -85,7 +85,7 @@ function FieldGroup({ label, help, pre, post, after, button, className, isPrivat
           />
           {button && <StyledButton>{button}</StyledButton>}
         </Box>
-        {help && <HelpBlock>{help}</HelpBlock>}
+        {help && <HelpBlock mt={1}>{help}</HelpBlock>}
       </Flex>
     );
   }
@@ -119,7 +119,7 @@ const InputFieldContainer = styled.div`
 
 const HelpBlock = styled(Box)`
   color: #737373;
-  font-size: 1.2rem;
+  font-size: 0.75rem;
 `;
 
 /**

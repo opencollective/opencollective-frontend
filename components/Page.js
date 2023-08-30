@@ -16,6 +16,7 @@ const Page = ({
   loadingLoggedInUser,
   LoggedInUser,
   title,
+  navTitle,
   metaTitle,
   noRobots,
   twitterHandle,
@@ -25,18 +26,19 @@ const Page = ({
   menuItems,
   showFooter = true,
   showProfileAndChangelogMenu = true,
+  loading,
 }) => {
   if (data.error) {
     return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
   }
 
   const childProps = { LoggedInUser, loadingLoggedInUser };
-
   return (
     <Fragment>
       <Header
         showSearch={showSearch}
         title={title}
+        navTitle={navTitle}
         noRobots={noRobots}
         twitterHandle={twitterHandle}
         description={description}
@@ -47,6 +49,7 @@ const Page = ({
         menuItems={menuItems}
         LoggedInUser={LoggedInUser}
         showProfileAndChangelogMenu={showProfileAndChangelogMenu}
+        loading={loading}
       />
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       {showFooter && <Footer />}
@@ -69,12 +72,14 @@ Page.propTypes = {
   showSearch: PropTypes.bool,
   noRobots: PropTypes.bool,
   title: PropTypes.string,
+  navTitle: PropTypes.string,
   metaTitle: PropTypes.string,
   twitterHandle: PropTypes.string,
   collective: PropTypes.object,
   menuItems: PropTypes.object,
   showFooter: PropTypes.bool,
   showProfileAndChangelogMenu: PropTypes.bool,
+  loading: PropTypes.bool,
 };
 
 Page.defaultProps = {

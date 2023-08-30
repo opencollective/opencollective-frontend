@@ -264,7 +264,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                   )}
                 </Flex>
               )}
-              <Flex alignItems="center" flexWrap="wrap">
+              <Flex alignItems="center" flexWrap="wrap" fontSize="14px">
                 <Flex mb={2} mt={-2} flexWrap="wrap">
                   {collective.canContact && (
                     <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>

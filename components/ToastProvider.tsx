@@ -8,9 +8,9 @@ export enum TOAST_TYPE {
   INFO = 'INFO',
 }
 
-type Toast = {
+export type Toast = {
   id: string;
-  type: TOAST_TYPE;
+  type: TOAST_TYPE | `${TOAST_TYPE}`;
   variant: 'light' | 'dark';
   message: ReactNode | null;
   title: ReactNode | null;

@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
 
 import { gqlV1 } from '../../../lib/graphql/helpers';
 
+import { Sections } from '../../collective-page/_constants';
 import Container from '../../Container';
 import GoalsCover from '../../GoalsCover';
 import { Box, Flex } from '../../Grid';
@@ -61,7 +62,7 @@ class CollectiveGoals extends React.Component {
       balance: { id: 'Balance', defaultMessage: 'Balance' },
       monthlyBudget: { id: 'MonthlyBudget', defaultMessage: 'Monthly budget' },
       yearlyBudget: { id: 'YearlyBudget', defaultMessage: 'Yearly budget' },
-      title: { id: 'goal.title.label', defaultMessage: 'Title' },
+      title: { id: 'Title', defaultMessage: 'Title' },
       description: { id: 'Fields.description', defaultMessage: 'Description' },
       amount: { id: 'Fields.amount', defaultMessage: 'Amount' },
       showToggle: { id: 'goal.show', defaultMessage: 'Show goals on my Profile page' },
@@ -119,8 +120,24 @@ class CollectiveGoals extends React.Component {
   toggleGoalsOnCollectivePage = ({ checked }) => {
     this.setState(state => ({
       isTouched: true,
-      collectivePage: { ...state.collectivePage, showGoals: checked },
+      collectivePage: {
+        ...state.collectivePage,
+        showGoals: checked,
+        sections: this.getCollectivePageSections(state.collectivePage?.sections, checked),
+      },
     }));
+  };
+
+  getCollectivePageSections = (baseSections, checked) => {
+    const sections = [...(baseSections || [])];
+    const goalsSection = sections.find(({ name }) => name === Sections.GOALS);
+    if (goalsSection) {
+      goalsSection.isEnabled = checked;
+    } else {
+      sections.push({ type: 'SECTION', name: Sections.GOALS, isEnabled: checked });
+    }
+
+    return sections;
   };
 
   addGoal = () => {

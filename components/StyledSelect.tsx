@@ -11,7 +11,16 @@ import Select, {
   ValueContainerProps,
 } from 'react-select';
 import styled from 'styled-components';
-import { layout, LayoutProps, space, SpaceProps, typography, TypographyProps } from 'styled-system';
+import {
+  BorderProps,
+  BorderRadiusProps,
+  layout,
+  LayoutProps,
+  space,
+  SpaceProps,
+  typography,
+  TypographyProps,
+} from 'styled-system';
 
 import Container from './Container';
 import { Flex } from './Grid';
@@ -35,7 +44,6 @@ const Messages = defineMessages({
   },
 });
 
-/* eslint-disable react/prop-types */
 const Option = ({ innerProps, ...props }: OptionProps & { 'data-cy': string }) => (
   <ReactSelectComponents.Option
     {...props}
@@ -187,6 +195,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     selectTheme,
     noOptionsMessage = () => intl.formatMessage(Messages.noOptions),
     options,
+    fontSize,
   }) => {
     isSearchable = isSearchable ?? options?.length > 8;
     return {
@@ -222,6 +231,10 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
             customStyles.cursor = 'pointer';
           }
 
+          if (fontSize) {
+            customStyles.fontSize = fontSize;
+          }
+
           if (typeof styles?.control === 'function') {
             return styles.control({ ...baseStyles, ...customStyles }, state);
           } else {
@@ -241,6 +254,10 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
             customStyles.backgroundColor = theme.colors.primary[100];
           } else {
             customStyles['&:hover'] = { backgroundColor: theme.colors.primary[100] };
+          }
+
+          if (fontSize) {
+            customStyles.fontSize = fontSize;
           }
 
           return { ...baseStyles, ...customStyles, ...styles?.option };
@@ -294,28 +311,41 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
   ${space}
 `;
 
-type StyledSelectCustomComponent = Select &
-  React.ExoticComponent<
-    LayoutProps &
-      TypographyProps &
-      SpaceProps & {
-        intl: IntlShape;
-        /** Alias for isDisabled */
-        inputId: string;
-        disabled?: boolean;
-        useSearchIcon?: boolean;
-        hideDropdownIndicator?: boolean;
-        hideMenu?: boolean;
-        error?: boolean;
-        style?: Record<string, unknown>;
-        onBlur?: Function;
-        onChange?: Function;
-        isLoading?: boolean;
-        isSearchable?: boolean;
-        options?: any;
-        value?: any;
-      }
-  >;
+export type StyledSelectProps = LayoutProps &
+  TypographyProps &
+  BorderProps &
+  BorderRadiusProps &
+  SpaceProps & {
+    intl: IntlShape;
+    /** Alias for isDisabled */
+    inputId: string;
+    name?: string;
+    placeholder?: React.ReactNode;
+    disabled?: boolean;
+    required?: boolean;
+    useSearchIcon?: boolean;
+    hideDropdownIndicator?: boolean;
+    hideMenu?: boolean;
+    error?: boolean;
+    style?: Record<string, unknown>;
+    styles?: Record<string, unknown>;
+    onBlur?: Function;
+    onChange?: Function;
+    formatOptionLabel?: Function;
+    isLoading?: boolean;
+    isSearchable?: boolean;
+    isClearable?: boolean;
+    options?: any;
+    value?: any;
+    defaultValue?: any;
+    menuPlacement?: 'auto' | 'bottom' | 'top';
+    components?: Record<string, React.ReactNode | React.Component | React.FunctionComponent>;
+    closeMenuOnSelect?: boolean;
+    hideSelectedOptions?: boolean;
+    isMulti?: boolean;
+  };
+
+type StyledSelectCustomComponent = Select & React.ExoticComponent<StyledSelectProps>;
 
 const StyledSelect: StyledSelectCustomComponent = makeStyledSelect(Select);
 
@@ -332,6 +362,7 @@ StyledSelect['propTypes'] = {
   placeholder: PropTypes.node,
   /** Whether the component is disabled */
   disabled: PropTypes.bool,
+  required: PropTypes.bool,
   /** Alias for `disabled` */
   isDisabled: PropTypes.bool,
   /** Rendered when there's no option to show */
@@ -355,6 +386,7 @@ StyledSelect['propTypes'] = {
   menuPortalTarget: PropTypes.any,
   /** Compact mode for rending multiple selections correctly **/
   useCompactMode: PropTypes.bool,
+  name: PropTypes.string,
 };
 
 StyledSelect['defaultProps'] = {

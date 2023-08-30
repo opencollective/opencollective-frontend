@@ -83,6 +83,7 @@ class Webhooks extends React.Component {
         'collective.expense.paid',
         'collective.monthly',
         'collective.transaction.paid',
+        'virtualcard.purchase',
       );
     }
     if (collectiveType !== CollectiveType.ORGANIZATION) {

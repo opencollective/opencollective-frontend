@@ -5,6 +5,7 @@ const express = require('express');
 const proxy = require('express-http-proxy');
 const { template, trim } = require('lodash');
 
+const downloadFileHandler = require('./download-file');
 const intl = require('./intl');
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
@@ -17,6 +18,14 @@ const maxAge = (maxAge = 60) => {
 
 module.exports = (expressApp, nextApp) => {
   const app = expressApp;
+
+  // Add X-Robots-Tag header to prevent indexing non-production websites
+  if (process.env.OC_ENV !== 'production') {
+    app.use((req, res, next) => {
+      res.set('X-Robots-Tag', 'none');
+      next();
+    });
+  }
 
   app.use((req, res, next) => {
     if (!req.language && req.locale !== 'en') {
@@ -50,6 +59,11 @@ module.exports = (expressApp, nextApp) => {
   app.get('/favicon.*', maxAge(300000), (req, res) => {
     return res.sendFile(path.join(__dirname, '../public/static/images/favicon.ico.png'));
   });
+
+  /* Helper to enable downloading files that are on S3 since Chrome and Firefox does
+   not allow cross-origin downloads when using the download attribute on an anchor tag,
+   see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-download. */
+  app.get('/api/download-file', downloadFileHandler);
 
   // NOTE: in production and staging environment, this is currently not used
   // we use Cloudflare workers to route the request directly to the API

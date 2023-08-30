@@ -5,6 +5,7 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
+import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
@@ -100,7 +101,8 @@ const InviteMemberModal = props => {
     } catch (error) {
       addToast({
         type: TOAST_TYPE.ERROR,
-        message: <FormattedMessage id="editTeam.member.invite.error" defaultMessage="Failed to invite member." />,
+        title: <FormattedMessage id="editTeam.member.invite.error" defaultMessage="Failed to invite member." />,
+        message: i18nGraphqlException(intl, error),
       });
     }
   };
@@ -113,7 +115,7 @@ const InviteMemberModal = props => {
 
   return (
     <Container>
-      <StyledModal width={688} onClose={cancelHandler}>
+      <StyledModal width={688} onClose={cancelHandler} trapFocus>
         <ModalHeader mb={4}>
           <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
         </ModalHeader>
@@ -139,6 +141,7 @@ const InviteMemberModal = props => {
               types={[CollectiveType.USER]}
               filterResults={collectives => collectives.filter(c => !membersIds.includes(c.id))}
               data-cy="member-collective-picker"
+              menuPortalTarget={null}
             />
           </Flex>
           <MemberForm

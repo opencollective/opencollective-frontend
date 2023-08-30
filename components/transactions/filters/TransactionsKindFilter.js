@@ -2,16 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { intersection, size } from 'lodash';
 import { useIntl } from 'react-intl';
-import { components as ReactSelectComponents } from 'react-select';
-import styled from 'styled-components';
-import { maxWidth } from 'styled-system';
 
 import { TransactionKind } from '../../../lib/constants/transactions';
 import { i18nTransactionKind } from '../../../lib/i18n/transaction';
 
-import { Flex } from '../../Grid';
-import { StyledSelectFilter } from '../../StyledSelectFilter';
-import { Span } from '../../Text';
+import { StyledSelectFilter, TruncatedValueContainer } from '../../StyledSelectFilter';
 
 // (!) Remember that any changes made here should be applied to the cache in API > `getCacheKeyForBudgetOrTransactionsSections`
 export const getDefaultKinds = () => {
@@ -43,36 +38,6 @@ export const parseTransactionKinds = str => {
   } else {
     return result?.length ? result : null;
   }
-};
-
-const TruncatedItemsList = styled(Span).attrs({
-  truncateOverflow: true,
-  pl: 2,
-  maxWidth: ['calc(100vw - 135px)', '75px', '175px', '200px'],
-})`
-  display: inline-block;
-  max-width: 75px;
-  ${maxWidth}
-`;
-
-const TruncatedValueContainer = props => {
-  const { selectProps, children } = props;
-  const itemsList = (selectProps.value || []).map(({ label }) => label);
-  const itemsListStr = itemsList.join(', ');
-
-  return (
-    <ReactSelectComponents.SelectContainer height="1em" {...props}>
-      <Flex>
-        <TruncatedItemsList title={itemsListStr}>{itemsListStr}</TruncatedItemsList>
-        {children}
-      </Flex>
-    </ReactSelectComponents.SelectContainer>
-  );
-};
-
-TruncatedValueContainer.propTypes = {
-  selectProps: PropTypes.object,
-  children: PropTypes.node,
 };
 
 const REACT_SELECT_COMPONENT_OVERRIDE = {

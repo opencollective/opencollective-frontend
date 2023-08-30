@@ -24,7 +24,7 @@ const ClearIcon = styled(Clear)`
 const GeoSuggestItem = styled(Geosuggest)`
   .geosuggest {
     font-size: 18px;
-    font-size: 1rem;
+    font-size: 0.65rem;
     position: relative;
     text-align: left;
   }
@@ -84,8 +84,12 @@ const GeoSuggestItem = styled(Geosuggest)`
     list-style: none;
     margin-top: 1px;
     z-index: 5;
-    -webkit-transition: max-height 0.2s, border 0.2s;
-    transition: max-height 0.2s, border 0.2s;
+    -webkit-transition:
+      max-height 0.2s,
+      border 0.2s;
+    transition:
+      max-height 0.2s,
+      border 0.2s;
   }
   .geosuggest__suggests--hidden {
     max-height: 0;

@@ -17,6 +17,9 @@ import StyledButton from '../components/StyledButton';
 import StyledLink from '../components/StyledLink';
 
 const messages = defineMessages({
+  pageTitle: {
+    defaultMessage: 'Help & Support',
+  },
   defaultTitle: {
     id: 'OC.helpAndSupport',
     defaultMessage: 'How can we help?',
@@ -72,7 +75,7 @@ const HelpAndSupport = ({ action, formConfirmation }) => {
   const { formatMessage } = useIntl();
 
   return (
-    <Page description={formatMessage(messages.defaultTitle)}>
+    <Page navTitle={formatMessage(messages.pageTitle)} description={formatMessage(messages.defaultTitle)}>
       {action === 'contact' ? (
         renderFormContent(formConfirmation)
       ) : (

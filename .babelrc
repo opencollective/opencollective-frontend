@@ -15,7 +15,6 @@
   "plugins": [
     "babel-plugin-react-docgen",
     "babel-plugin-styled-components",
-    "lodash",
     [
       "babel-plugin-formatjs",
       {

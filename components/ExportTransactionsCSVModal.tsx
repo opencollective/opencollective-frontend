@@ -69,9 +69,13 @@ type CSVField =
   | 'expenseTags'
   | 'payoutMethodType'
   | 'merchantId'
-  | 'orderMemo';
+  | 'orderMemo'
+  | 'taxAmount'
+  | 'taxType'
+  | 'taxRate'
+  | 'taxIdNumber';
 
-const FIELD_GROUPS: Record<string, CSVField[]> = {
+const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
   transaction: [
     'date',
     'datetime',
@@ -117,14 +121,16 @@ const FIELD_GROUPS: Record<string, CSVField[]> = {
     'paymentMethodType',
   ],
   expense: ['expenseId', 'expenseLegacyId', 'expenseType', 'expenseTags', 'payoutMethodType', 'merchantId'],
+  tax: ['taxAmount', 'taxType', 'taxRate', 'taxIdNumber'],
   legacy: ['platformFee', 'hostFee'],
 };
 
-const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, any> = {
+const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, React.ReactNode> = {
   transaction: <FormattedMessage defaultMessage="Transaction" />,
   accounts: <FormattedMessage defaultMessage="Account" />,
   order: <FormattedMessage defaultMessage="Contribution" />,
   expense: <FormattedMessage id="Expense" defaultMessage="Expense" />,
+  tax: <FormattedMessage defaultMessage="Tax" />,
   legacy: <FormattedMessage id="Legacy/Deprecated" defaultMessage="Legacy/Deprecated" />,
 };
 
@@ -160,7 +166,7 @@ const DEFAULT_FIELDS = [
   'orderMemo',
 ];
 
-const FieldLabels = {
+const FieldLabels: Record<CSVField, React.ReactNode> = {
   date: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
   datetime: <FormattedMessage defaultMessage="Date & Time" />,
   id: <FormattedMessage defaultMessage="Transaction ID" />,
@@ -183,15 +189,15 @@ const FieldLabels = {
   netAmount: <FormattedMessage defaultMessage="Net Amount" />,
   balance: <FormattedMessage id="Balance" defaultMessage="Balance" />,
   currency: <FormattedMessage id="Currency" defaultMessage="Currency" />,
-  accountSlug: <FormattedMessage defaultMessage="Account Slug" />,
+  accountSlug: <FormattedMessage defaultMessage="Account Handle" />,
   accountName: <FormattedMessage defaultMessage="Account Name" />,
   accountType: <FormattedMessage defaultMessage="Account Type" />,
   accountEmail: <FormattedMessage defaultMessage="Account Email" />,
-  oppositeAccountSlug: <FormattedMessage defaultMessage="Opposite Account Slug" />,
+  oppositeAccountSlug: <FormattedMessage defaultMessage="Opposite Account Handle" />,
   oppositeAccountName: <FormattedMessage defaultMessage="Opposite Account Name" />,
   oppositeAccountType: <FormattedMessage defaultMessage="Opposite Account Type" />,
   oppositeAccountEmail: <FormattedMessage defaultMessage="Opposite Account Email" />,
-  hostSlug: <FormattedMessage defaultMessage="Host Slug" />,
+  hostSlug: <FormattedMessage defaultMessage="Host Handle" />,
   hostName: <FormattedMessage defaultMessage="Host Name" />,
   hostType: <FormattedMessage defaultMessage="Host Type" />,
   orderId: <FormattedMessage defaultMessage="Contribution ID" />,
@@ -207,6 +213,10 @@ const FieldLabels = {
   expenseTags: <FormattedMessage defaultMessage="Expense Tags" />,
   payoutMethodType: <FormattedMessage defaultMessage="Payout Method Type" />,
   merchantId: <FormattedMessage defaultMessage="Merchant ID" />,
+  taxAmount: <FormattedMessage defaultMessage="Tax Amount" />,
+  taxType: <FormattedMessage defaultMessage="Tax Type" />,
+  taxRate: <FormattedMessage defaultMessage="Tax Rate" />,
+  taxIdNumber: <FormattedMessage defaultMessage="Tax ID Number" />,
 };
 
 enum FIELD_OPTIONS {
@@ -389,7 +399,7 @@ const ExportTransactionsCSVModal = ({
           <MessageBox type="warning" withIcon mt={3}>
             <FormattedMessage
               id="ExportTransactionsCSVModal.FiltersWarning"
-              defaultMessage="This report is affected by the filters set in the transactions page."
+              defaultMessage="This report is affected by the filters set on the transactions page."
             />
           </MessageBox>
         )}

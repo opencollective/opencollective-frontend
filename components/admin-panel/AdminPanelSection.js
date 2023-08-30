@@ -16,8 +16,9 @@ import { H2 } from '../Text';
 
 import AccountSettings from './sections/AccountSettings';
 import FinancialContributions from './sections/FinancialContributions';
+import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
 import HostVirtualCards from './sections/HostVirtualCards';
-import InvoicesReceipts from './sections/InvoicesReceipts';
+import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
 import NotificationsSettings from './sections/NotificationsSettings';
 import PendingContributions from './sections/PendingContributions';
 import TeamSettings from './sections/Team';
@@ -37,6 +38,7 @@ const ADMIN_PANEL_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: PendingApplications,
   [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
   [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
+  [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
   [COLLECTIVE_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
   [COLLECTIVE_SECTIONS.TEAM]: TeamSettings,
 };

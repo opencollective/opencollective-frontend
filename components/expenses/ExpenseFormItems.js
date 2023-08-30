@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { isEmpty } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import { v4 as uuid } from 'uuid';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { toIsoDateStr } from '../../lib/date-utils';
 import { formatErrorMessage } from '../../lib/errors';
 import { i18nTaxType } from '../../lib/i18n/taxes';
-import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
+import { attachmentDropzoneParams } from './lib/attachments';
+import { expenseItemsMustHaveFiles, newExpenseItem } from './lib/items';
+import { updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
@@ -23,24 +23,8 @@ import { P, Span } from '../Text';
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseItemForm from './ExpenseItemForm';
 
-/** Init a new expense item with default attributes */
-export const newExpenseItem = attrs => ({
-  id: uuid(), // we generate it here to properly key lists, but it won't be submitted to API
-  incurredAt: toIsoDateStr(new Date()),
-  description: '',
-  amount: null,
-  url: '',
-  __isNew: true,
-  ...attrs,
-});
-
 /** Converts a list of filenames to expense item objects */
 const filesListToItems = files => files.map(({ url }) => newExpenseItem({ url }));
-
-/** Helper to add a new item to the form */
-export const addNewExpenseItem = (formik, defaultValues) => {
-  formik.setFieldValue('items', [...(formik.values.items || []), newExpenseItem(defaultValues)]);
-};
 
 class ExpenseFormItems extends React.PureComponent {
   static propTypes = {
@@ -52,6 +36,7 @@ class ExpenseFormItems extends React.PureComponent {
     push: PropTypes.func.isRequired,
     /** Array helper as provided by formik */
     remove: PropTypes.func.isRequired,
+    hasOCRFeature: PropTypes.bool,
     /** Formik */
     form: PropTypes.shape({
       values: PropTypes.object.isRequired,
@@ -157,10 +142,11 @@ class ExpenseFormItems extends React.PureComponent {
   }
 
   render() {
-    const { availableCurrencies } = this.props;
+    const { availableCurrencies, hasOCRFeature } = this.props;
     const { values, errors, setFieldValue } = this.props.form;
-    const requireFile = attachmentRequiresFile(values.type);
+    const requireFile = expenseItemsMustHaveFiles(values.type);
     const isGrant = values.type === expenseTypes.GRANT;
+    const isInvoice = values.type === expenseTypes.INVOICE;
     const isCreditCardCharge = values.type === expenseTypes.CHARGE;
     const items = values.items || [];
     const hasItems = items.length > 0;
@@ -177,6 +163,11 @@ class ExpenseFormItems extends React.PureComponent {
             onReject={uploadErrors => this.setState({ uploadErrors })}
             mockImageGenerator={index => `https://loremflickr.com/120/120/invoice?lock=${index}`}
             mb={3}
+            useGraphQL={hasOCRFeature}
+            parseDocument={hasOCRFeature}
+            onGraphQLSuccess={uploadResults => {
+              updateExpenseFormWithUploadResult(this.props.form, uploadResults);
+            }}
           >
             <P color="black.700" mt={1} px={2}>
               <FormattedMessage
@@ -201,7 +192,7 @@ class ExpenseFormItems extends React.PureComponent {
             key={`item-${attachment.id}`}
             attachment={attachment}
             currency={values.currency}
-            name={`items[${index}]`}
+            itemIdx={index}
             errors={errors}
             onRemove={onRemove}
             requireFile={requireFile}
@@ -213,7 +204,9 @@ class ExpenseFormItems extends React.PureComponent {
             hasMultiCurrency={!index && availableCurrencies?.length > 1} // Only display currency picker for the first item
             availableCurrencies={availableCurrencies}
             onCurrencyChange={async value => await this.onCurrencyChange(value)}
+            isInvoice={isInvoice}
             isLastItem={index === items.length - 1}
+            hasOCRFeature={hasOCRFeature}
           />
         ))}
         {taxType && (

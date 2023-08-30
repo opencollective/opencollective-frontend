@@ -81,6 +81,7 @@ class UserProvider extends React.Component {
 
   logout = async () => {
     removeFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+    removeFromLocalStorage(LOCAL_STORAGE_KEYS.LAST_DASHBOARD_SLUG);
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
     await this.props.client.resetStore();
   };

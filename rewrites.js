@@ -1,5 +1,5 @@
 const createOrderPage = '/contribution-flow';
-const contributionFlowSteps = '/details|profile|payment|checkout|summary|success';
+const contributionFlowSteps = '/details|profile|payment|summary|success';
 
 exports.REWRITES = [
   {
@@ -128,11 +128,16 @@ exports.REWRITES = [
   },
   {
     source: '/dashboard',
-    destination: '/dashboard',
+    destination: '/workspace',
   },
+  { source: '/workspace', destination: '/workspace' },
   {
     source: '/dashboard/:slug/:section?/:subpath*',
-    destination: '/dashboard',
+    destination: '/workspace',
+  },
+  {
+    source: '/workspace/:slug/:section?/:subpath*',
+    destination: '/workspace',
   },
   {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',
@@ -172,7 +177,7 @@ exports.REWRITES = [
     destination: '/order',
   },
   {
-    source: '/:collectiveSlug?/orders/:id([0-9]+)/confirm',
+    source: '/:collectiveSlug?/(orders|contributions)/:id([0-9]+)/confirm',
     destination: '/confirmOrder',
   },
   {
@@ -206,11 +211,11 @@ exports.REWRITES = [
   },
   // Embed
   {
-    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:paymentFlow(crypto)?/:step(${contributionFlowSteps})?`,
+    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
     destination: '/embed/contribution-flow',
   },
   {
-    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:step(${contributionFlowSteps})?`,
+    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:action(checkout)?/:step(${contributionFlowSteps})?`,
     destination: '/embed/contribution-flow',
   },
   // Tier page
@@ -246,7 +251,7 @@ exports.REWRITES = [
   },
   // New Routes -> New flow
   {
-    source: `/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:paymentFlow(crypto)?/:step(${contributionFlowSteps})?`,
+    source: `/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
   {
@@ -309,6 +314,10 @@ exports.REWRITES = [
   // set `useFileSystemPublicRoutes` to true (default) in `next.config.js`
   {
     source: '/',
+    destination: '/home',
+  },
+  {
+    source: '/home',
     destination: '/home',
   },
   {

@@ -34,13 +34,15 @@ export type StyledButtonProps = BackgroundProps &
   ColorProps &
   TextTransformProps &
   WhiteSpaceProps &
-  React.HTMLProps<HTMLButtonElement> & {
+  Omit<React.HTMLProps<HTMLButtonElement>, 'as'> & {
     buttonStyle?: ButtonStyle;
     buttonSize?: ButtonSize;
     loading?: boolean;
     asLink?: boolean;
     isBorderless?: boolean;
     type?: 'button' | 'submit' | 'reset';
+    truncateOverflow?: boolean;
+    as?: any;
   };
 
 /**
@@ -68,6 +70,7 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
   }
 
   /** Align button icons in the middle */
+  span,
   svg {
     vertical-align: middle;
   }
@@ -110,6 +113,15 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
       `;
     }
   }}
+
+  ${props =>
+    props.truncateOverflow &&
+    css`
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      min-width: 0;
+    `}
 `;
 
 const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forwardRef<
@@ -163,6 +175,7 @@ StyledButton.propTypes = {
    * If true, will display a link instead of a button
    */
   isBorderless: PropTypes.bool,
+  truncateOverflow: PropTypes.bool,
   children: PropTypes.node,
 };
 

@@ -8,7 +8,9 @@ import { isURL } from 'validator';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
-import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
+import { attachmentDropzoneParams } from './lib/attachments';
+import { expenseItemsMustHaveFiles } from './lib/items';
+import { updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
@@ -29,6 +31,12 @@ export const msg = defineMessages({
   descriptionLabel: {
     id: 'Fields.description',
     defaultMessage: 'Description',
+  },
+  invoiceDescriptionHint: {
+    defaultMessage: 'Specify item or activity and timeframe, e.g. "Volunteer Training, April 2023"',
+  },
+  receiptDescriptionHint: {
+    defaultMessage: 'Describe the expense, e.g. "Dinner with the team"',
   },
   amountLabel: {
     id: 'Fields.amount',
@@ -69,7 +77,7 @@ export const validateExpenseItem = (expense, item) => {
   }
 
   // Attachment URL
-  if (attachmentRequiresFile(expense.type)) {
+  if (expenseItemsMustHaveFiles(expense.type)) {
     if (!item.url) {
       errors.url = createError(ERROR.FORM_FIELD_REQUIRED);
     } else if (!isURL(item.url)) {
@@ -87,7 +95,11 @@ export const validateExpenseItem = (expense, item) => {
 
 export const prepareExpenseItemForSubmit = (item, isInvoice, isGrant) => {
   // The frontend currently ignores the time part of the date, we default to midnight UTC
-  const incurredAt = item.incurredAt?.match(/^\d{4}-\d{2}-\d{2}$/) ? `${item.incurredAt}T00:00:00Z` : item.incurredAt;
+  const incurredAtFullDate = item.incurredAt || new Date().toISOString().split('T')[0];
+  const incurredAt = incurredAtFullDate.match(/^\d{4}-\d{2}-\d{2}$/)
+    ? `${incurredAtFullDate}T00:00:00Z`
+    : incurredAtFullDate;
+
   return {
     incurredAt,
     ...pick(item, [
@@ -119,18 +131,20 @@ const ExpenseItemForm = ({
   requireFile,
   requireDate,
   isRichText,
-  name,
+  itemIdx,
   isOptional,
   editOnlyDescriptiveInfo,
   hasMultiCurrency,
   availableCurrencies,
   onCurrencyChange,
+  isInvoice,
   isLastItem,
+  hasOCRFeature,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const attachmentKey = `attachment-${attachment.id || attachment.url}`;
-  const getFieldName = field => `${name}.${field}`;
+  const getFieldName = field => `items[${itemIdx}].${field}`;
   const getError = field => formatFormErrorMessage(intl, get(errors, getFieldName(field)));
 
   return (
@@ -165,6 +179,11 @@ const ExpenseItemForm = ({
                     size={[84, 112]}
                     value={hasValidUrl && field.value}
                     onReject={onUploadError}
+                    useGraphQL={hasOCRFeature}
+                    parseDocument={hasOCRFeature}
+                    onGraphQLSuccess={uploadResults => {
+                      updateExpenseFormWithUploadResult(form, uploadResults, itemIdx);
+                    }}
                   />
                 </StyledInputField>
               );
@@ -175,6 +194,7 @@ const ExpenseItemForm = ({
           <StyledInputField
             name={getFieldName('description')}
             error={getError('description')}
+            hint={formatMessage(isInvoice ? msg.invoiceDescriptionHint : msg.receiptDescriptionHint)}
             htmlFor={`${attachmentKey}-description`}
             label={formatMessage(msg.descriptionLabel)}
             labelFontSize="13px"
@@ -301,6 +321,8 @@ ExpenseItemForm.propTypes = {
   requireDate: PropTypes.bool,
   /** Whether this whole item is optional */
   isOptional: PropTypes.bool,
+  /** Whether the OCR feature is enabled */
+  hasOCRFeature: PropTypes.bool,
   /** Whether this item is the first in the list */
   hasMultiCurrency: PropTypes.bool,
   /** True if description is HTML */
@@ -311,6 +333,8 @@ ExpenseItemForm.propTypes = {
   onCurrencyChange: PropTypes.func.isRequired,
   /** For multi-currency expenses */
   availableCurrencies: PropTypes.arrayOf(PropTypes.string),
+  /** Is it an invoice */
+  isInvoice: PropTypes.bool,
   /** the attachment data */
   attachment: PropTypes.shape({
     id: PropTypes.string,
@@ -321,6 +345,7 @@ ExpenseItemForm.propTypes = {
   }).isRequired,
   editOnlyDescriptiveInfo: PropTypes.bool,
   isLastItem: PropTypes.bool,
+  itemIdx: PropTypes.number.isRequired,
 };
 
 ExpenseItemForm.defaultProps = {

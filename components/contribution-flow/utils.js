@@ -293,11 +293,11 @@ export const generatePaymentMethodOptions = (
   return uniquePMs;
 };
 
-export const getTotalAmount = (stepDetails, stepSummary = null, isCrypto = false) => {
+export const getTotalAmount = (stepDetails, stepSummary = null) => {
   const quantity = get(stepDetails, 'quantity', 1);
-  const amount = isCrypto ? get(stepDetails, 'cryptoAmount', 0) : get(stepDetails, 'amount', 0);
+  const amount = get(stepDetails, 'amount', 0);
   const taxAmount = get(stepSummary, 'amount', 0);
-  const platformFeeAmount = !isCrypto ? get(stepDetails, 'platformTip', 0) : 0;
+  const platformFeeAmount = get(stepDetails, 'platformTip', 0);
   return quantity * amount + platformFeeAmount + taxAmount;
 };
 
@@ -379,15 +379,21 @@ const getTotalYearlyAmount = stepDetails => {
 /**
  * Whether this contribution requires us to collect the address of the user
  */
-export const contributionRequiresAddress = stepDetails => {
-  return stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 5000e2;
+export const contributionRequiresAddress = (stepDetails, tier) => {
+  return Boolean(
+    (stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 5000e2) || // Above $5000/year
+      tier?.requireAddress, // Or if enforced by the tier
+  );
 };
 
 /**
  * Whether this contribution requires us to collect the address and legal name of the user
  */
-export const contributionRequiresLegalName = stepDetails => {
-  return stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 500e2;
+export const contributionRequiresLegalName = (stepDetails, tier) => {
+  return Boolean(
+    (stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 250e2) || // Above $250/year
+      tier?.requireAddress, // Or if enforced by the tier, a valid address requires a legal name
+  );
 };
 
 export function getGuestInfoFromStepProfile(stepProfile) {

@@ -166,6 +166,7 @@ export const expensePageExpenseFieldsFragment = gql`
     }
     createdAt
     invoiceInfo
+    merchantId
     requiredLegalDocuments
     feesPayer
     draft
@@ -175,6 +176,12 @@ export const expensePageExpenseFieldsFragment = gql`
       description
       amount
       url
+      file {
+        id
+        ... on ImageFileInfo {
+          width
+        }
+      }
     }
     taxes {
       id
@@ -190,6 +197,9 @@ export const expensePageExpenseFieldsFragment = gql`
         id
         name
         size
+        ... on ImageFileInfo {
+          width
+        }
       }
     }
     payee {
@@ -199,6 +209,7 @@ export const expensePageExpenseFieldsFragment = gql`
       legalName
       type
       isAdmin
+      isActive
       location {
         id
         address
@@ -268,6 +279,13 @@ export const expensePageExpenseFieldsFragment = gql`
       type
       imageUrl
     }
+    approvedBy {
+      id
+      type
+      slug
+      name
+      imageUrl(height: 80)
+    }
     account {
       id
       legacyId
@@ -318,6 +336,9 @@ export const expensePageExpenseFieldsFragment = gql`
 
       ... on AccountWithHost {
         isApproved
+        hostAgreements {
+          totalCount
+        }
         host {
           id
           legacyId
@@ -523,6 +544,12 @@ export const expensesListFieldsFragment = gql`
           currency
         }
       }
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+        }
+      }
       ... on AccountWithParent {
         parent {
           id
@@ -593,6 +620,14 @@ export const expensesListAdminFieldsFragment = gql`
   fragment ExpensesListAdminFieldsFragment on Expense {
     id
     onHold
+    account {
+      id
+      ... on AccountWithHost {
+        hostAgreements {
+          totalCount
+        }
+      }
+    }
     payoutMethod {
       id
       type
@@ -604,6 +639,12 @@ export const expensesListAdminFieldsFragment = gql`
       incurredAt
       url
       amount
+      file {
+        id
+        ... on ImageFileInfo {
+          width
+        }
+      }
     }
     taxes {
       id
@@ -614,6 +655,12 @@ export const expensesListAdminFieldsFragment = gql`
       id
       url
       name
+      info {
+        id
+        ... on ImageFileInfo {
+          width
+        }
+      }
     }
     securityChecks {
       level

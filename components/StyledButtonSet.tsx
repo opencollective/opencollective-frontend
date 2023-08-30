@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { ButtonSize } from '../lib/theme/variants/button';
 
-import Container from './Container';
+import Container, { ContainerProps } from './Container';
 import StyledButton, { StyledButtonProps } from './StyledButton';
 
 type ButtonItemProps = {
@@ -16,7 +16,10 @@ const ButtonItem = styled(StyledButton)<ButtonItemProps>`
   line-height: 1.5;
   flex-grow: 1;
   border-color: ${themeGet('colors.black.300')};
-  transition: color 0.2s, background 0.1s, font-size 30ms;
+  transition:
+    color 0.2s,
+    background 0.1s,
+    font-size 30ms;
 
   &:active p {
     color: white;
@@ -44,7 +47,7 @@ const ButtonItem = styled(StyledButton)<ButtonItemProps>`
 type StyledButtonItemProps<T> = {
   index: number;
   item: T;
-  children: ({ item, isSelected }: { item: T; isSelected: boolean }) => ReactNode;
+  children: ReactNode;
   size: ButtonSize;
   selected?: T;
   onChange?: (item: T) => void;
@@ -85,7 +88,6 @@ const StyledButtonItem = ({
 
   return (
     <ButtonItem
-      as={undefined as any}
       color={isSelected ? 'white' : 'black.400'}
       buttonSize={size}
       buttonStyle={isSelected ? 'primary' : undefined}
@@ -99,14 +101,15 @@ const StyledButtonItem = ({
       {...buttonProps}
       {...(buttonPropsBuilder ? buttonPropsBuilder({ item, index, isSelected }) : {})}
       {...(isAlwaysShown ? { display: 'inline-block' } : {})}
+      as={undefined}
     >
-      {children({ item, isSelected })}
+      {children}
     </ButtonItem>
   );
 };
 
-type StyledButtonSetProps<T> = {
-  /** A list of elements to build buttons uppon */
+type StyledButtonSetProps<T> = Omit<ContainerProps, 'onChange' | 'size' | 'selected' | 'children'> & {
+  /** A list of elements to build buttons upon */
   items: Array<T>;
   /** Button child content renderer. Get passed an object like { item, isSelected } */
   children: ({ item, isSelected }: { item: T; isSelected: boolean }) => ReactNode;
@@ -145,7 +148,7 @@ const StyledButtonSet = ({
   customBorderRadius = '4px',
   ...props
 }: StyledButtonSetProps<string | number>) => (
-  <Container display="flex" {...props}>
+  <Container display="flex" {...props} as={undefined}>
     {items.map((item, index) => (
       <StyledButtonItem
         key={item}
@@ -159,7 +162,8 @@ const StyledButtonSet = ({
         disabled={disabled}
         customBorderRadius={customBorderRadius}
       >
-        {children}
+        {' '}
+        {children({ item, isSelected: item === selected })}
       </StyledButtonItem>
     ))}
   </Container>

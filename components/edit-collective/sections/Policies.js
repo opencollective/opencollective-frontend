@@ -6,6 +6,7 @@ import { filter, get, isEmpty, size } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
+import { i18nGraphqlException } from '../../../lib/errors';
 import { DEFAULT_SUPPORTED_EXPENSE_TYPES } from '../../../lib/expenses';
 import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import { omitDeep, stripHTML } from '../../../lib/utils';
@@ -65,6 +66,7 @@ const setPoliciesMutation = gql`
           appliesToSingleAdminCollectives
         }
         REQUIRE_2FA_FOR_ADMINS
+        COLLECTIVE_ADMINS_CAN_REFUND
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
           applies
@@ -127,7 +129,8 @@ const messages = defineMessages({
 });
 
 const Policies = ({ collective, showOnlyExpensePolicy }) => {
-  const { formatMessage } = useIntl();
+  const intl = useIntl();
+  const { formatMessage } = intl;
   const [selected, setSelected] = React.useState([]);
   const { addToast } = useToasts();
 
@@ -182,41 +185,48 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
         newSettings.expenseTypes = expenseTypes;
       }
 
-      await updateCollective({
-        variables: {
-          collective: {
-            id: collective.id,
-            contributionPolicy,
-            expensePolicy,
-            settings: newSettings,
-          },
-        },
-      });
-      const selectedRejectCategories = selected.map(option => option.value);
-      await Promise.all([
-        updateCategories({
+      try {
+        await updateCollective({
           variables: {
-            account: {
-              legacyId: collective.id,
+            collective: {
+              id: collective.id,
+              contributionPolicy,
+              expensePolicy,
+              settings: newSettings,
             },
-            key: 'moderation',
-            value: { rejectedCategories: selectedRejectCategories },
           },
-        }),
-        setPolicies({
-          variables: {
-            account: {
-              legacyId: collective.id,
+        });
+        const selectedRejectCategories = selected.map(option => option.value);
+        await Promise.all([
+          updateCategories({
+            variables: {
+              account: {
+                legacyId: collective.id,
+              },
+              key: 'moderation',
+              value: { rejectedCategories: selectedRejectCategories },
             },
-            policies,
-          },
-        }),
-      ]);
+          }),
+          setPolicies({
+            variables: {
+              account: {
+                legacyId: collective.id,
+              },
+              policies,
+            },
+          }),
+        ]);
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
-        message: formatMessage({ defaultMessage: 'Policies updated successfully' }),
-      });
+        addToast({
+          type: TOAST_TYPE.SUCCESS,
+          message: formatMessage({ defaultMessage: 'Policies updated successfully' }),
+        });
+      } catch (e) {
+        addToast({
+          type: TOAST_TYPE.ERROR,
+          message: i18nGraphqlException(intl, e),
+        });
+      }
     },
     validate(values) {
       const errors = {};
@@ -287,7 +297,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                     maxLength={CONTRIBUTION_POLICY_MAX_LENGTH}
                     error={formik.errors.contributionPolicy}
                     version="simplified"
-                    editorMinHeight="20rem"
+                    editorMinHeight="12.5rem"
                     editorMaxHeight={500}
                     id={inputProps.id}
                     inputName={inputProps.name}
@@ -323,7 +333,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                 maxLength={EXPENSE_POLICY_MAX_LENGTH}
                 error={formik.errors.expensePolicy}
                 version="simplified"
-                editorMinHeight="20rem"
+                editorMinHeight="12.5rem"
                 editorMaxHeight={500}
                 id={inputProps.id}
                 inputName={inputProps.name}
@@ -414,7 +424,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               }}
               checked={Boolean(formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze)}
             />
-            <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
+            <P fontSize="14px" lineHeight="18px" color="black.600" ml="1.4rem">
               <FormattedMessage defaultMessage="Freezing the collective will prevent them from accepting and distributing contributions till they meet the requirements. This is a security measure to make sure the admins are within their rights. Read More." />
             </P>
             {formik.values.policies?.COLLECTIVE_MINIMUM_ADMINS?.applies === 'ALL_COLLECTIVES' &&
@@ -460,12 +470,12 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             }
           />
           <Flex
-            ml="2.2rem"
-            mt="1rem"
+            ml="1.4rem"
+            mt="0.65rem"
             alignItems="center"
             color={!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled ? 'black.600' : undefined}
           >
-            <P mr="2rem">
+            <P mr="1.25rem">
               <FormattedMessage defaultMessage="Enforce for expenses above:" />
             </P>
             <StyledInputAmount
@@ -497,8 +507,8 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
           {collective?.isHost && (
             <React.Fragment>
               <P
-                ml="2.2rem"
-                mt="1rem"
+                ml="1.4rem"
+                mt="0.65rem"
                 color={!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled ? 'black.600' : undefined}
               >
                 <StyledCheckbox
@@ -525,8 +535,8 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                 />
               </P>
               <P
-                ml="2.2rem"
-                mt="1rem"
+                ml="1.4rem"
+                mt="0.65rem"
                 color={
                   !formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.appliesToHostedCollectives
                     ? 'black.600'
@@ -561,7 +571,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             </React.Fragment>
           )}
           {numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled) && (
-            <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
+            <P fontSize="14px" lineHeight="18px" color="black.600" ml="1.4rem">
               <FormattedMessage
                 id="editCollective.expenseApprovalsPolicy.authorCannotApprove.minAdminRequired"
                 defaultMessage="You need to have at least two admins to enable this policy."
@@ -636,6 +646,27 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             isMulti
           />
         </Container>
+        {collective.isHost && (
+          <Container>
+            <SettingsSectionTitle mt={4}>
+              <FormattedMessage defaultMessage="Refunds" />
+            </SettingsSectionTitle>
+
+            <StyledCheckbox
+              name={`checkbox-COLLECTIVE_ADMINS_CAN_REFUND`}
+              label={
+                <FormattedMessage defaultMessage="Allow collective admins to refund contributions for up to 30 days after the transaction date." />
+              }
+              checked={formik.values.policies?.COLLECTIVE_ADMINS_CAN_REFUND}
+              onChange={() =>
+                formik.setFieldValue('policies', {
+                  ...formik.values.policies,
+                  COLLECTIVE_ADMINS_CAN_REFUND: !formik.values.policies?.COLLECTIVE_ADMINS_CAN_REFUND,
+                })
+              }
+            />
+          </Container>
+        )}
         <Flex mt={5} mb={3} alignItems="center" justifyContent="center">
           <StyledButton
             data-cy="submit-policy-btn"

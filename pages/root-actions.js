@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
 import { useRouter } from 'next/router';
+import { useIntl } from 'react-intl';
 import slugify from 'slugify';
 import styled, { css } from 'styled-components';
 
@@ -23,7 +24,7 @@ import RootActivityLog from '../components/root-actions/RootActivityLog';
 import UnhostAccountForm from '../components/root-actions/UnhostAccountForm';
 import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
-import { H1, H2, H3, P, Span } from '../components/Text';
+import { H2, H3, P, Span } from '../components/Text';
 
 const GRID_TEMPLATE_COLUMNS = ['1fr', 'minmax(220px, 1fr) 6fr'];
 
@@ -117,23 +118,23 @@ const MenuEntry = styled.div`
       cursor: default;
       background: #f9f9f9;
       border-bottom: 1px solid #eaeaea;
-      box-shadow: 0px -3px 6px #eaeaea;
+      box-shadow: 0px 3px 6px #eaeaea;
     `}
 `;
 
 const RootActionsPage = () => {
   const router = useRouter();
+  const intl = useIntl();
   const selectedMenuEntry = MENU.find(m => m.slug === router.query.section) || MENU[1];
   const showHiddenActions = Boolean(router.query.showHiddenActions);
   return (
-    <AuthenticatedPage disableSignup rootOnly>
-      <Container maxWidth="1000px" m="0 auto" mt={4} borderBottom="1px solid #e5e5e5">
-        <H1 textAlign="left" fontSize="32px" py={2} pl={2}>
-          Root actions
-        </H1>
-      </Container>
-      <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" mb={5}>
-        <Container borderRight="1px solid #e5e5e5">
+    <AuthenticatedPage
+      disableSignup
+      rootOnly
+      navTitle={intl.formatMessage({ id: 'RootActions', defaultMessage: 'Root Actions' })}
+    >
+      <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth={1400} m="0 auto">
+        <Container borderRight="1px solid #e5e5e5" fontSize="14px">
           {MENU.filter(e => showHiddenActions || !e.isHidden).map(menuEntry =>
             menuEntry.type === 'category' ? (
               <MenuEntry key={menuEntry.id} title={menuEntry.title || menuEntry.id} $type="category">

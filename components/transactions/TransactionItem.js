@@ -7,10 +7,10 @@ import { truncate } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import expenseStatus from '../../lib/constants/expense-status';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nTransactionKind, i18nTransactionType } from '../../lib/i18n/transaction';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -46,7 +46,7 @@ export const getDisplayedAmount = (transaction, collective) => {
   const hasOrder = transaction.order !== null;
   const isExpense = transaction.kind === TransactionKind.EXPENSE;
 
-  const isSelf = transaction.fromAccount.slug === collective.slug;
+  const isSelf = transaction.fromAccount?.slug === collective.slug;
   const isProcessingOrPending =
     hasOrder && [ORDER_STATUS.PROCESSING, ORDER_STATUS.PENDING].includes(transaction.order?.status);
 
@@ -93,7 +93,7 @@ const ItemTitleWrapper = ({ expense, order, children }) => {
         <StyledLink
           as={Link}
           underlineOnHover
-          href={`${getCollectivePageRoute(order.toAccount)}/orders/${order.legacyId}`}
+          href={`${getCollectivePageRoute(order.toAccount)}/contributions/${order.legacyId}`}
         >
           {children}
         </StyledLink>
@@ -137,7 +137,7 @@ const getExpenseStatusTag = (expense, isRefund, isRefunded) => {
   } else if (isRefund) {
     expenseStatusLabel = 'COMPLETED';
   } else {
-    expenseStatusLabel = expense?.status || expenseStatus.PAID;
+    expenseStatusLabel = expense?.status || ExpenseStatus.PAID;
   }
   return (
     <ExpenseStatusTag
