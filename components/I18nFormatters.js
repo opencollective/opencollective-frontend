@@ -19,20 +19,23 @@ export const I18nSupportLink = chunks => (
   </StyledLink>
 );
 export const I18nSignInLink = chunks => (
-  <Link href={{ pathname: '/signin', query: { next: typeof window !== 'undefined' ? window.location.pathname : '' } }}>
+  <StyledLink
+    as={Link}
+    href={{ pathname: '/signin', query: { next: typeof window !== 'undefined' ? window.location.pathname : '' } }}
+  >
     {chunks}
-  </Link>
+  </StyledLink>
 );
 
 export const I18nTOSLink = msg => (
-  <Link href="/tos">
+  <StyledLink as={Link} href="/tos">
     <span>{msg}</span>
-  </Link>
+  </StyledLink>
 );
 export const I18nPrivacyLink = msg => (
-  <Link href="/privacypolicy">
+  <StyledLink as={Link} href="/privacypolicy">
     <span>{msg}</span>
-  </Link>
+  </StyledLink>
 );
 
 export const WebsiteName = 'Open Collective';

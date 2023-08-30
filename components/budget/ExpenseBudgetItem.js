@@ -203,13 +203,17 @@ const ExpenseBudgetItem = ({
 
               <P mt="5px" fontSize="12px" color="black.700">
                 {isAdminView ? (
-                  <LinkCollective collective={expense.account} />
+                  <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.account} />
                 ) : (
                   <FormattedMessage
                     defaultMessage="from {payee} to {account}"
                     values={{
-                      payee: <LinkCollective collective={expense.payee} />,
-                      account: <LinkCollective collective={expense.account} />,
+                      payee: (
+                        <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.payee} />
+                      ),
+                      account: (
+                        <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.account} />
+                      ),
                     }}
                   />
                 )}
