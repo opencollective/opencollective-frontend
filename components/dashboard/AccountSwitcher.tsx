@@ -147,7 +147,7 @@ const Option = ({
   description = description || (
     <FormattedMessage
       id="AccountSwitcher.Description"
-      defaultMessage="{type, select, USER {My workspace} COLLECTIVE {Collective admin} ORGANIZATION {Organization admin} EVENT {Event admin} FUND {Fund admin} PROJECT {Project admin} other {}}"
+      defaultMessage="{type, select, USER {My Dashboard} COLLECTIVE {Collective admin} ORGANIZATION {Organization admin} EVENT {Event admin} FUND {Fund admin} PROJECT {Project admin} other {}}"
       values={{ type: collective?.type }}
     />
   );
@@ -173,7 +173,7 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
     <React.Fragment>
       <StyledMenuEntry
         key={account.id}
-        href={`/workspace/${account.slug}`}
+        href={`/dashboard/${account.slug}`}
         title={account.name}
         $isActive={activeSlug === account.slug}
       >
@@ -204,7 +204,7 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
           .map(child => (
             <StyledMenuEntry
               key={child?.id}
-              href={`/workspace/${child.slug}`}
+              href={`/dashboard/${child.slug}`}
               title={child.name}
               $isActive={activeSlug === child.slug}
               ml={3}
@@ -241,7 +241,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
               <Flex p={2} flexDirection="column" gridGap={3}>
                 <StyledMenuEntry
                   key={loggedInUserCollective?.id}
-                  href={`/workspace/${loggedInUserCollective?.slug}`}
+                  href={`/dashboard/${loggedInUserCollective?.slug}`}
                   title={loggedInUserCollective?.name}
                   $isActive={activeSlug === loggedInUserCollective?.slug}
                 >

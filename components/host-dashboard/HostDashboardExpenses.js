@@ -14,6 +14,7 @@ import useQueryFilter, { BooleanFilter } from '../../lib/hooks/useQueryFilter';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
+import DashboardViews from '../dashboard/DashboardViews';
 import DismissibleMessage from '../DismissibleMessage';
 import ExpensesFilters from '../expenses/ExpensesFilters';
 import ExpensesList from '../expenses/ExpensesList';
@@ -33,7 +34,6 @@ import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { H1 } from '../Text';
-import DashboardViews from '../workspace/DashboardViews';
 
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';

@@ -104,7 +104,7 @@ const AdminPanelPage = ({ slug, section, subpath }) => {
   // Redirect to the new dashboard if the user has the feature flag enabled
   React.useEffect(() => {
     if (LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)) {
-      router.push(`/workspace/${slug}`);
+      router.push(`/dashboard/${slug}`);
     }
   }, [LoggedInUser]);
 

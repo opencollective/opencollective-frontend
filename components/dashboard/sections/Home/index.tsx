@@ -87,7 +87,7 @@ const Home = (props: AdminSectionProps) => {
         <Flex alignItems="center" gap="16px">
           <Image alt="" width={96} height={96} src="/static/images/dashboard.png" />
           <H1 fontSize="24px" lineHeight="32px" fontWeight="700">
-            <FormattedMessage id="Dashboard.Banner.Title" defaultMessage="This is your new workspace" />
+            <FormattedMessage id="Dashboard.Banner.Title" defaultMessage="This is your new dashboard" />
           </H1>
         </Flex>
         <P mt="24px" fontSize="14px" fontWeight="400" lineHeight="24px" color="black.700">

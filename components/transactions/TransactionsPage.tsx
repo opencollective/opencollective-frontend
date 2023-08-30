@@ -95,7 +95,7 @@ const Transactions = ({
   });
 
   const transactionsRoute = isDashboard
-    ? `/workspace/${account?.slug}/transactions`
+    ? `/dashboard/${account?.slug}/transactions`
     : `${getCollectivePageCanonicalURL(account)}/transactions`;
 
   // Refetch data when user logs in or out
