@@ -7,7 +7,8 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('../fonts/inter/Inter-Regular.woff2') format('woff2'),
+  src:
+    url('../fonts/inter/Inter-Regular.woff2') format('woff2'),
     url('../fonts/inter/Inter-Regular.woff') format('woff');
 }
 @font-face {
@@ -15,7 +16,9 @@
   font-style: italic;
   font-weight: 400;
   font-display: swap;
-  src: url('../fonts/inter/Inter-Italic.woff2') format('woff2'), url('../fonts/inter/Inter-Italic.woff') format('woff');
+  src:
+    url('../fonts/inter/Inter-Italic.woff2') format('woff2'),
+    url('../fonts/inter/Inter-Italic.woff') format('woff');
 }
 
 @font-face {
@@ -23,14 +26,17 @@
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url('../fonts/inter/Inter-Medium.woff2') format('woff2'), url('../fonts/inter/Inter-Medium.woff') format('woff');
+  src:
+    url('../fonts/inter/Inter-Medium.woff2') format('woff2'),
+    url('../fonts/inter/Inter-Medium.woff') format('woff');
 }
 @font-face {
   font-family: 'Inter';
   font-style: italic;
   font-weight: 500;
   font-display: swap;
-  src: url('../fonts/inter/Inter-MediumItalic.woff2') format('woff2'),
+  src:
+    url('../fonts/inter/Inter-MediumItalic.woff2') format('woff2'),
     url('../fonts/inter/Inter-MediumItalic.woff') format('woff');
 }
 
@@ -39,7 +45,8 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url('../fonts/inter/Inter-SemiBold.woff2') format('woff2'),
+  src:
+    url('../fonts/inter/Inter-SemiBold.woff2') format('woff2'),
     url('../fonts/inter/Inter-SemiBold.woff') format('woff');
 }
 @font-face {
@@ -47,7 +54,8 @@
   font-style: italic;
   font-weight: 600;
   font-display: swap;
-  src: url('../fonts/inter/Inter-SemiBoldItalic.woff2') format('woff2'),
+  src:
+    url('../fonts/inter/Inter-SemiBoldItalic.woff2') format('woff2'),
     url('../fonts/inter/Inter-SemiBoldItalic.woff') format('woff');
 }
 
@@ -56,14 +64,17 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('../fonts/inter/Inter-Bold.woff2') format('woff2'), url('../fonts/inter/Inter-Bold.woff') format('woff');
+  src:
+    url('../fonts/inter/Inter-Bold.woff2') format('woff2'),
+    url('../fonts/inter/Inter-Bold.woff') format('woff');
 }
 @font-face {
   font-family: 'Inter';
   font-style: italic;
   font-weight: 700;
   font-display: swap;
-  src: url('../fonts/inter/Inter-BoldItalic.woff2') format('woff2'),
+  src:
+    url('../fonts/inter/Inter-BoldItalic.woff2') format('woff2'),
     url('../fonts/inter/Inter-BoldItalic.woff') format('woff');
 }
 
@@ -72,7 +83,8 @@
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url('../fonts/inter/Inter-ExtraBold.woff2') format('woff2'),
+  src:
+    url('../fonts/inter/Inter-ExtraBold.woff2') format('woff2'),
     url('../fonts/inter/Inter-ExtraBold.woff') format('woff');
 }
 @font-face {
@@ -80,7 +92,8 @@
   font-style: italic;
   font-weight: 800;
   font-display: swap;
-  src: url('../fonts/inter/Inter-ExtraBoldItalic.woff2') format('woff2'),
+  src:
+    url('../fonts/inter/Inter-ExtraBoldItalic.woff2') format('woff2'),
     url('../fonts/inter/Inter-ExtraBoldItalic.woff') format('woff');
 }
 
@@ -89,14 +102,17 @@
   font-style: normal;
   font-weight: 900;
   font-display: swap;
-  src: url('../fonts/inter/Inter-Black.woff2') format('woff2'), url('../fonts/inter/Inter-Black.woff') format('woff');
+  src:
+    url('../fonts/inter/Inter-Black.woff2') format('woff2'),
+    url('../fonts/inter/Inter-Black.woff') format('woff');
 }
 @font-face {
   font-family: 'Inter';
   font-style: italic;
   font-weight: 900;
   font-display: swap;
-  src: url('../fonts/inter/Inter-BlackItalic.woff2') format('woff2'),
+  src:
+    url('../fonts/inter/Inter-BlackItalic.woff2') format('woff2'),
     url('../fonts/inter/Inter-BlackItalic.woff') format('woff');
 }
 
@@ -115,10 +131,8 @@ html {
 }
 
 body {
+  @apply m-0 h-full p-0 text-slate-900;
   font-family: 'Inter', sans-serif;
-  height: 100%;
-  margin: 0;
-  padding: 0;
 }
 
 #nprogress {
@@ -131,7 +145,7 @@ body {
 }
 
 .markdown {
-  @apply text-gray-950 leading-7;
+  @apply leading-7 text-gray-950;
 }
 .markdown h1 {
   @apply scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl;
@@ -172,14 +186,6 @@ label {
   font-size: 14px;
   display: inline-block;
   font-weight: 700;
-}
-
-a {
-  color: #3385ff;
-}
-
-a:hover {
-  color: #797d80;
 }
 
 summary {

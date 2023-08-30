@@ -104,7 +104,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
       <Flex mb={24} justifyContent="space-between" alignItems="center" flexWrap="wrap" gridGap="16px">
-        <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           <FormattedMessage id="Agreements" defaultMessage="Agreements" />
         </H1>
         <Flex alignItems="center" gridGap="16px" flexWrap="wrap">
@@ -146,7 +146,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
           )}
         </Flex>
       </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
+      <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" className="min-w-[64px]" />
       {error ? (
         <MessageBoxGraphqlError error={error} my={4} />
       ) : (
