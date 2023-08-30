@@ -117,16 +117,9 @@ const DashboardPage = () => {
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
     if (slug && slug !== lastWorkspaceVisit.slug) {
-      setLastWorkspaceVisit({ slug, path: router.asPath });
+      setLastWorkspaceVisit({ slug });
     }
   }, [slug]);
-
-  // Make sure the URL is updated when restoring last visited workspace
-  React.useEffect(() => {
-    if (router.asPath === '/workspace' && lastWorkspaceVisit.path) {
-      router.replace(lastWorkspaceVisit.path);
-    }
-  }, [router.asPath]);
 
   const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
