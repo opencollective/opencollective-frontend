@@ -37,6 +37,7 @@ export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initia
       onClose={handleClose}
       showActionsContainer
       data-cy="expense-drawer"
+      className="max-w-3xl"
     >
       <Expense
         data={initialExpenseValues ? { ...data, expense: { ...initialExpenseValues, ...data?.expense } } : data}
