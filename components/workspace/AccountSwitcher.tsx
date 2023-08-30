@@ -281,7 +281,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                           </Link>
                         )}
                       </Flex>
-                      {EMPTY_GROUP_STATE[CollectiveType.COLLECTIVE] && accounts.length === 0 && (
+                      {EMPTY_GROUP_STATE[collectiveType] && accounts.length === 0 && (
                         <div className="mx-1 flex flex-col">
                           <p className="text-xs text-gray-700">{EMPTY_GROUP_STATE[collectiveType].emptyMessage}</p>
                           <Link
