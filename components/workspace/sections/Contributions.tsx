@@ -542,7 +542,7 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
           )}
         </H1>
         <SearchBar
-          placeholder={intl.formatMessage({ defaultMessage: 'Search...' })}
+          placeholder={intl.formatMessage({ defaultMessage: 'Search...', id: 'search.placeholder' })}
           defaultValue={router.query.searchTerm}
           height="40px"
           onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
