@@ -40,6 +40,7 @@ export const hostApplicationsQuery = gql`
           message
           customData
           status
+          createdAt
           account {
             id
             legacyId

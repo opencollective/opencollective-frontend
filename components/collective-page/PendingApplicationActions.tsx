@@ -8,7 +8,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import AcceptRejectButtons from '../host-dashboard/AcceptRejectButtons';
-import { processApplicationMutation } from '../host-dashboard/applications/HostApplication';
+import { processApplicationMutation } from '../host-dashboard/applications/HostApplicationDrawer';
 import { NotificationBarButton } from '../NotificationBar';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 

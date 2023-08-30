@@ -3,29 +3,23 @@ import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import DashboardViews from '../../dashboard/DashboardViews';
 import { Box, Flex } from '../../Grid';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
-import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import Pagination from '../../Pagination';
 import SearchBar from '../../SearchBar';
 import { H1 } from '../../Text';
 import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from '../HostAdminCollectiveFilters';
 
-import HostApplication from './HostApplication';
+import HostApplicationDrawer from './HostApplicationDrawer';
+import HostApplicationsTable from './HostApplicationsTable';
 import { hostApplicationsQuery } from './queries';
 
 const COLLECTIVES_PER_PAGE = 20;
-
-const checkIfQueryHasFilters = query =>
-  Object.entries(query).some(([key, value]) => {
-    return !['view', 'offset', 'limit', 'hostCollectiveSlug', 'sort-by'].includes(key) && value;
-  });
 
 const getVariablesFromQuery = query => {
   return {
@@ -49,29 +43,6 @@ const updateQuery = (router, newParams) => {
   return router.push({ pathname, query });
 };
 
-const initViews = [
-  {
-    label: <FormattedMessage defaultMessage="Pending" />,
-    query: {
-      status: 'PENDING',
-    },
-    id: 'pending',
-    showCount: true,
-  },
-  {
-    label: <FormattedMessage defaultMessage="Approved" />,
-    query: { status: 'APPROVED' },
-    showCount: true,
-    id: 'approved',
-  },
-  {
-    label: <FormattedMessage defaultMessage="Rejected" />,
-    query: { status: 'REJECTED' },
-    showCount: true,
-    id: 'rejected',
-  },
-];
-
 const enforceDefaultParamsOnQuery = query => {
   return {
     ...query,
@@ -81,16 +52,42 @@ const enforceDefaultParamsOnQuery = query => {
 
 const HostApplications = ({ hostSlug, isDashboard }) => {
   const router = useRouter() || {};
+  const intl = useIntl();
   const query = enforceDefaultParamsOnQuery(router.query);
-  const hasFilters = React.useMemo(() => checkIfQueryHasFilters(query), [query]);
   const { data, error, loading, variables } = useQuery(hostApplicationsQuery, {
     variables: { hostSlug, ...getVariablesFromQuery(query) },
     fetchPolicy: 'cache-and-network',
     context: API_V2_CONTEXT,
   });
+
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [applicationInDrawer, setApplicationInDrawer] = React.useState(null);
+
   const pageRoute = isDashboard ? `/workspace/${hostSlug}/host-applications` : `/${hostSlug}/admin/host-applications`;
 
   const hostApplications = data?.host?.hostApplications;
+  const initViews = [
+    {
+      label: intl.formatMessage({ defaultMessage: 'Pending' }),
+      query: {
+        status: 'PENDING',
+      },
+      id: 'pending',
+      showCount: true,
+    },
+    {
+      label: intl.formatMessage({ defaultMessage: 'Approved' }),
+      query: { status: 'APPROVED' },
+      showCount: true,
+      id: 'approved',
+    },
+    {
+      label: intl.formatMessage({ defaultMessage: 'Rejected' }),
+      query: { status: 'REJECTED' },
+      showCount: true,
+      id: 'rejected',
+    },
+  ];
   const [views, setViews] = React.useState(initViews);
 
   React.useEffect(() => {
@@ -120,6 +117,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
           />
         </Box>
       </Flex>
+
       <DashboardViews
         query={query}
         omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
@@ -135,57 +133,46 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
           );
         }}
       />
-      <Box mb={34}>
-        {data?.host ? (
-          <HostAdminCollectiveFilters
-            filters={[COLLECTIVE_FILTER.SORT_BY]}
-            values={query}
-            onChange={queryParams =>
-              updateQuery(router, {
-                ...queryParams,
-                offset: null,
-              })
-            }
-          />
-        ) : loading ? (
-          <LoadingPlaceholder height={70} />
-        ) : null}
-      </Box>
+      <div className="mb-6">
+        <HostAdminCollectiveFilters
+          filters={[COLLECTIVE_FILTER.SORT_BY]}
+          values={query}
+          onChange={queryParams =>
+            updateQuery(router, {
+              ...queryParams,
+              offset: null,
+            })
+          }
+        />
+      </div>
 
       {error && <MessageBoxGraphqlError error={error} mb={2} />}
 
-      {!error && !loading && !hostApplications?.nodes.length ? (
-        <MessageBox type="info" withIcon data-cy="zero-collective-message">
-          {hasFilters ? (
-            <FormattedMessage defaultMessage="No applications match the current filter." />
-          ) : (
-            <FormattedMessage defaultMessage="You have no applications." />
-          )}
-        </MessageBox>
-      ) : (
-        <React.Fragment>
-          {loading
-            ? Array.from(new Array(COLLECTIVES_PER_PAGE)).map((_, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <Box key={index} mb={24}>
-                  <LoadingPlaceholder height={362} borderRadius="8px" />
-                </Box>
-              ))
-            : hostApplications?.nodes.map(application => (
-                <Box key={application.id} mb={24} data-cy="host-application">
-                  <HostApplication host={data.host} application={application} />
-                </Box>
-              ))}
-          <Flex mt={5} justifyContent="center">
-            <Pagination
-              total={hostApplications?.totalCount}
-              limit={variables.limit}
-              offset={variables.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-          </Flex>
-        </React.Fragment>
-      )}
+      <HostApplicationsTable
+        hostApplications={hostApplications}
+        nbPlaceholders={COLLECTIVES_PER_PAGE}
+        loading={loading}
+        openApplication={application => {
+          setDrawerOpen(true);
+          setApplicationInDrawer(application);
+        }}
+      />
+
+      <div className="mt-16 flex justify-center">
+        <Pagination
+          total={hostApplications?.totalCount}
+          limit={variables.limit}
+          offset={variables.offset}
+          ignoredQueryParams={ROUTE_PARAMS}
+        />
+      </div>
+
+      <HostApplicationDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        host={data?.host}
+        application={applicationInDrawer}
+      />
     </Box>
   );
 };
