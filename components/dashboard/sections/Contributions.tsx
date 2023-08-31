@@ -17,6 +17,7 @@ import DateTime from '../../DateTime';
 import EditOrderModal, { EditOrderActions } from '../../EditOrderModal';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import { Box, Flex } from '../../Grid';
+import LinkCollective from '../../LinkCollective';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import OrderStatusTag from '../../orders/OrderStatusTag';
@@ -157,12 +158,14 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
     cell: ({ cell }) => {
       const toAccount = cell.getValue();
       return (
-        <Flex alignItems="center" maxWidth="200px">
-          <Avatar size={24} collective={toAccount} mr={2} />
-          <Span as="span" truncateOverflow>
-            {toAccount.name}
-          </Span>
-        </Flex>
+        <LinkCollective collective={toAccount}>
+          <div className="flex max-w-[200px] items-center">
+            <Avatar size={24} collective={toAccount} mr={2} />
+            <Span as="span" truncateOverflow>
+              {toAccount.name}
+            </Span>
+          </div>
+        </LinkCollective>
       );
     },
   };
@@ -172,12 +175,14 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
     cell: ({ cell }) => {
       const fromAccount = cell.getValue();
       return (
-        <Flex alignItems="center" maxWidth="200px">
-          <Avatar size={24} collective={fromAccount} mr={2} />
-          <Span as="span" truncateOverflow>
-            {fromAccount.name}
-          </Span>
-        </Flex>
+        <LinkCollective collective={fromAccount}>
+          <div className="flex max-w-[200px] items-center">
+            <Avatar size={24} collective={fromAccount} mr={2} />
+            <Span as="span" truncateOverflow>
+              {fromAccount.name}
+            </Span>
+          </div>
+        </LinkCollective>
       );
     },
   };
@@ -334,9 +339,12 @@ export const cardColumns = ({ tab, setEditOrder, isIncoming }) => [
     header: null,
     cell: ({ row }) => {
       const order = row.original;
+      const account = isIncoming ? order.fromAccount : order.toAccount;
       return (
         <Flex alignItems="center" gap="16px">
-          <Avatar collective={isIncoming ? order.fromAccount : order.toAccount} radius={40} />
+          <LinkCollective collective={account}>
+            <Avatar collective={account} radius={40} />
+          </LinkCollective>
           <Flex flexDirection="column" gap="8px" flexGrow={1}>
             <Flex justifyContent={['flex-start', 'space-between']} gap="8px" alignItems="baseline">
               <P fontSize="13px" fontWeight="400">

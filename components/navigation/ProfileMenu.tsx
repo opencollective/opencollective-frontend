@@ -164,7 +164,7 @@ const ProfileMenu = () => {
                 </Flex>
               </PopoverMenuItem>
             )}
-            <PopoverMenuItem href={`/workspace/${LoggedInUser.collective.slug}/info`}>
+            <PopoverMenuItem href={`/dashboard/${LoggedInUser.collective.slug}/info`}>
               <Flex alignItems="center">
                 <User size={16} />
                 <FormattedMessage id="menu.account.settings" defaultMessage="Account settings" />
