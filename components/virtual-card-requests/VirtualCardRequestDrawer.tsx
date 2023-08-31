@@ -18,7 +18,7 @@ import StyledButton from '../StyledButton';
 import StyledTag from '../StyledTag';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
-import { DescriptionList, DescriptionListItem } from '../ui/DescriptionList';
+import { InfoList, InfoListItem } from '../ui/InfoList';
 
 const virtualCardRequestQuery = gql`
   query VirtualCardRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {
@@ -187,8 +187,8 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
               onClose={props.onClose}
             />
 
-            <DescriptionList columns={2}>
-              <DescriptionListItem
+            <InfoList className="sm:grid-cols-2">
+              <InfoListItem
                 title={<FormattedMessage defaultMessage="Account" />}
                 value={
                   <LinkCollective
@@ -199,7 +199,7 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
                   </LinkCollective>
                 }
               />
-              <DescriptionListItem
+              <InfoListItem
                 title={<FormattedMessage defaultMessage="Assigned to" />}
                 value={
                   <LinkCollective
@@ -210,7 +210,7 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
                   </LinkCollective>
                 }
               />
-              <DescriptionListItem
+              <InfoListItem
                 title={<FormattedMessage id="VirtualCards.SpendingLimit" defaultMessage="Spending Limit" />}
                 value={getSpendingLimitShortString(
                   intl,
@@ -224,17 +224,17 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
                 )}
               />
 
-              <DescriptionListItem
+              <InfoListItem
                 title={<FormattedMessage id="agreement.createdOn" defaultMessage="Created on" />}
                 value={<DateTime dateStyle="medium" value={virtualCardRequest.createdAt} />}
               />
-              <DescriptionListItem
-                colSpan={2}
+              <InfoListItem
+                className="sm:col-span-2"
                 title={<FormattedMessage id="expense.notes" defaultMessage="Notes" />}
                 value={<p className="whitespace-pre-line">{virtualCardRequest.notes}</p>}
               />
-              <DescriptionListItem colSpan={2} value={<StripeVirtualCardComplianceStatement />} />
-            </DescriptionList>
+              <InfoListItem className="sm:col-span-2" value={<StripeVirtualCardComplianceStatement />} />
+            </InfoList>
 
             <VirtualCardRequestDrawerActions virtualCardRequest={virtualCardRequest} />
           </React.Fragment>

@@ -20,7 +20,7 @@ import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
-import { DescriptionList, DescriptionListItem } from '../ui/DescriptionList';
+import { InfoList, InfoListItem } from '../ui/InfoList';
 
 import { StripeVirtualCardComplianceStatement } from './StripeVirtualCardComplianceStatement';
 
@@ -135,9 +135,9 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
               </Box>
             </CardContainer>
 
-            <DescriptionList className="mt-8" columns={2}>
-              <DescriptionListItem
-                colSpan={2}
+            <InfoList className="mt-8 sm:grid-cols-2">
+              <InfoListItem
+                className="sm:col-span-2"
                 title={<FormattedMessage defaultMessage="Account" />}
                 value={
                   <LinkCollective
@@ -149,7 +149,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
                 }
               />
 
-              <DescriptionListItem
+              <InfoListItem
                 title={<FormattedMessage defaultMessage="Assigned to" />}
                 value={
                   <LinkCollective
@@ -161,11 +161,11 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
                 }
               />
 
-              <DescriptionListItem
+              <InfoListItem
                 title={<FormattedMessage id="agreement.createdOn" defaultMessage="Created on" />}
                 value={<DateTime dateStyle="medium" value={virtualCard.createdAt} />}
               />
-              <DescriptionListItem
+              <InfoListItem
                 title={<FormattedMessage defaultMessage="Available balance" />}
                 value={getAvailableLimitShortString(
                   intl,
@@ -183,13 +183,13 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
               />
 
               {virtualCard.spendingLimitRenewsOn && (
-                <DescriptionListItem
+                <InfoListItem
                   title={<FormattedMessage defaultMessage="Renews on" />}
                   value={<DateTime dateStyle="medium" value={virtualCard.spendingLimitRenewsOn} />}
                 />
               )}
-              <DescriptionListItem colSpan={2} value={<StripeVirtualCardComplianceStatement />} />
-            </DescriptionList>
+              <InfoListItem className="sm:col-span-2" value={<StripeVirtualCardComplianceStatement />} />
+            </InfoList>
           </React.Fragment>
         )
       )}

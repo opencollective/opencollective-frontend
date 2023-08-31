@@ -7,7 +7,7 @@ import AttachedFiles from '../attached-files/AttachedFiles';
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';
 import LinkCollective from '../LinkCollective';
-import { DescriptionList, DescriptionListItem } from '../ui/DescriptionList';
+import { InfoList, InfoListItem } from '../ui/InfoList';
 
 type AgreementProps = {
   agreement: GraphQLAgreement;
@@ -18,16 +18,16 @@ export default function Agreement({ agreement, openFileViewer = undefined }: Agr
   return (
     <div>
       <h4 className="mb-4 text-lg font-medium text-slate-900">{agreement.title}</h4>
-      <DescriptionList columns={2}>
+      <InfoList className="sm:grid-cols-2">
         {agreement.attachment && (
-          <DescriptionListItem
+          <InfoListItem
             title={<FormattedMessage defaultMessage="Agreement file" />}
             value={<AttachedFiles files={[agreement.attachment]} size={128} openFileViewer={openFileViewer} />}
-            colSpan={2}
+            className="sm:col-span-2"
           />
         )}
 
-        <DescriptionListItem
+        <InfoListItem
           title={<FormattedMessage defaultMessage="Account" />}
           value={
             <LinkCollective
@@ -40,7 +40,7 @@ export default function Agreement({ agreement, openFileViewer = undefined }: Agr
           }
         />
 
-        <DescriptionListItem
+        <InfoListItem
           title={<FormattedMessage id="Agreement.createdBy" defaultMessage="Created by" />}
           value={
             <LinkCollective
@@ -52,11 +52,11 @@ export default function Agreement({ agreement, openFileViewer = undefined }: Agr
             </LinkCollective>
           }
         />
-        <DescriptionListItem
+        <InfoListItem
           title={<FormattedMessage id="agreement.createdOn" defaultMessage="Created on" />}
           value={<DateTime value={agreement.createdAt} />}
         />
-        <DescriptionListItem
+        <InfoListItem
           title={<FormattedMessage id="agreement.expiresOn" defaultMessage="Expires on" />}
           value={
             agreement.expiresAt ? (
@@ -69,13 +69,13 @@ export default function Agreement({ agreement, openFileViewer = undefined }: Agr
           }
         />
         {agreement.notes && (
-          <DescriptionListItem
-            colSpan={2}
+          <InfoListItem
+            className="sm:col-span-2"
             title={<FormattedMessage id="expense.notes" defaultMessage="Notes" />}
             value={<p className="whitespace-pre-line">{agreement.notes}</p>}
           />
         )}
-      </DescriptionList>
+      </InfoList>
     </div>
   );
 }

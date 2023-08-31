@@ -28,7 +28,7 @@ import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
-import { DescriptionList, DescriptionListItem } from '../../ui/DescriptionList';
+import { InfoList, InfoListItem } from '../../ui/InfoList';
 import AcceptRejectButtons from '../AcceptRejectButtons';
 import ApplicationMessageModal from '../ApplicationMessageModal';
 import ValidatedRepositoryInfo from '../ValidatedRepositoryInfo';
@@ -219,125 +219,123 @@ export function HostApplication({
           statusTag={<StatusTag status={status} />}
         />
 
-        <div>
-          <DescriptionList columns={2}>
-            <DescriptionListItem
-              title={<FormattedMessage defaultMessage="Account" />}
-              value={
-                <LinkCollective
-                  collective={application.account}
-                  className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
-                >
-                  <Avatar collective={application.account} radius={24} />
-                  {application.account.name}
-                </LinkCollective>
-              }
-            />
-            <DescriptionListItem
-              title={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
-              value={application.account.description}
-            />
-            <DescriptionListItem
-              colSpan={2}
-              title={
-                <div className="flex items-center gap-2">
-                  <FormattedMessage id="Admins" defaultMessage="Admins" />
-                  {status === HostApplicationStatus.PENDING &&
-                    requiresMinimumNumberOfAdmins &&
-                    hasEnoughInvitedAdmins &&
-                    !hasEnoughAdmins && (
-                      <StyledTooltip
-                        noArrow
-                        content={
-                          <FormattedMessage defaultMessage="This collective doesn’t satisfy the minimum admin requirements as admin invitations are still pending." />
-                        }
-                      >
-                        <div>
-                          <AlertTriangle size={12} className="text-red-600" />
-                        </div>
-                      </StyledTooltip>
-                    )}
-                </div>
-              }
-              value={
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  {account.admins.nodes.slice(0, 10).map((admin, i, a) => (
-                    <div className="flex items-center whitespace-nowrap" key={admin.id}>
-                      <LinkCollective
-                        collective={admin.account}
-                        className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
-                      >
-                        <Avatar collective={admin.account} radius={24} /> {admin.account.name}
-                      </LinkCollective>
-                      {i !== a.length - 1 && <span className="text-slate-500">,</span>}
-                    </div>
-                  ))}
-                  {account.admins.totalCount > 10 && (
-                    <span className="text-slate-600">+ {account.admins.totalCount - 10}</span>
+        <InfoList className="sm:grid-cols-2">
+          <InfoListItem
+            title={<FormattedMessage defaultMessage="Account" />}
+            value={
+              <LinkCollective
+                collective={application.account}
+                className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
+              >
+                <Avatar collective={application.account} radius={24} />
+                {application.account.name}
+              </LinkCollective>
+            }
+          />
+          <InfoListItem
+            title={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
+            value={application.account.description}
+          />
+          <InfoListItem
+            className="sm:col-span-2"
+            title={
+              <div className="flex items-center gap-2">
+                <FormattedMessage id="Admins" defaultMessage="Admins" />
+                {status === HostApplicationStatus.PENDING &&
+                  requiresMinimumNumberOfAdmins &&
+                  hasEnoughInvitedAdmins &&
+                  !hasEnoughAdmins && (
+                    <StyledTooltip
+                      noArrow
+                      content={
+                        <FormattedMessage defaultMessage="This collective doesn’t satisfy the minimum admin requirements as admin invitations are still pending." />
+                      }
+                    >
+                      <div>
+                        <AlertTriangle size={12} className="text-red-600" />
+                      </div>
+                    </StyledTooltip>
                   )}
+              </div>
+            }
+            value={
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                {account.admins.nodes.slice(0, 10).map((admin, i, a) => (
+                  <div className="flex items-center whitespace-nowrap" key={admin.id}>
+                    <LinkCollective
+                      collective={admin.account}
+                      className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
+                    >
+                      <Avatar collective={admin.account} radius={24} /> {admin.account.name}
+                    </LinkCollective>
+                    {i !== a.length - 1 && <span className="text-slate-500">,</span>}
+                  </div>
+                ))}
+                {account.admins.totalCount > 10 && (
+                  <span className="text-slate-600">+ {account.admins.totalCount - 10}</span>
+                )}
+              </div>
+            }
+          />
+
+          {application.customData?.validatedRepositoryInfo && (
+            <InfoListItem
+              title={
+                <div className="flex items-center gap-1.5">
+                  <ShieldCheck size={16} className="text-slate-700" />
+                  <FormattedMessage
+                    id="PendingApplication.RepoInfo.Header"
+                    defaultMessage="Validated repository information"
+                  />
                 </div>
               }
+              value={<ValidatedRepositoryInfo customData={application.customData} />}
             />
+          )}
 
-            {application.customData?.validatedRepositoryInfo && (
-              <DescriptionListItem
-                title={
-                  <div className="flex items-center gap-1.5">
-                    <ShieldCheck size={16} className="text-slate-700" />
-                    <FormattedMessage
-                      id="PendingApplication.RepoInfo.Header"
-                      defaultMessage="Validated repository information"
-                    />
-                  </div>
-                }
-                value={<ValidatedRepositoryInfo customData={application.customData} />}
-              />
-            )}
+          {application.customData &&
+            Object.keys(application.customData).map(key => {
+              // Don't show repository info twice as it is displayed on top in a special component
+              if (
+                key === 'validatedRepositoryInfo' ||
+                (key === 'licenseSpdxId' && application.customData.validatedRepositoryInfo) ||
+                (key === 'useGithubValidation' && application.customData.validatedRepositoryInfo) ||
+                (key === 'typeOfProject' && application.customData.validatedRepositoryInfo)
+              ) {
+                return null;
+              }
 
-            {application.customData &&
-              Object.keys(application.customData).map(key => {
-                // Don't show repository info twice as it is displayed on top in a special component
-                if (
-                  key === 'validatedRepositoryInfo' ||
-                  (key === 'licenseSpdxId' && application.customData.validatedRepositoryInfo) ||
-                  (key === 'useGithubValidation' && application.customData.validatedRepositoryInfo) ||
-                  (key === 'typeOfProject' && application.customData.validatedRepositoryInfo)
-                ) {
-                  return null;
-                }
+              // Don't show empty fields
+              if (isEmpty(application.customData[key])) {
+                return null;
+              }
 
-                // Don't show empty fields
-                if (isEmpty(application.customData[key])) {
-                  return null;
-                }
+              return (
+                <InfoListItem
+                  key={key}
+                  title={i18nCustomApplicationFormLabel(intl, key)}
+                  value={renderCustomDataContent(key)}
+                />
+              );
+            })}
 
-                return (
-                  <DescriptionListItem
-                    key={key}
-                    title={i18nCustomApplicationFormLabel(intl, key)}
-                    value={renderCustomDataContent(key)}
-                  />
-                );
-              })}
-
-            {(application.message || hasNothingToShow) && (
-              <DescriptionListItem
-                colSpan={2}
-                title={
-                  <div className="flex items-center gap-1.5">
-                    <MessageSquare size={16} className="text-slate-700" />
-                    <FormattedMessage id="PendingApplication.Message" defaultMessage="Message to Fiscal Host" />
-                  </div>
-                }
-                value={
-                  <p className="whitespace-pre-line">
-                    {application.message ?? <FormattedMessage id="NoMessage" defaultMessage="No message provided" />}
-                  </p>
-                }
-              />
-            )}
-          </DescriptionList>
-        </div>
+          {(application.message || hasNothingToShow) && (
+            <InfoListItem
+              className="sm:col-span-2"
+              title={
+                <div className="flex items-center gap-1.5">
+                  <MessageSquare size={16} className="text-slate-700" />
+                  <FormattedMessage id="PendingApplication.Message" defaultMessage="Message to Fiscal Host" />
+                </div>
+              }
+              value={
+                <p className="whitespace-pre-line">
+                  {application.message ?? <FormattedMessage id="NoMessage" defaultMessage="No message provided" />}
+                </p>
+              }
+            />
+          )}
+        </InfoList>
       </div>
       <DrawerActions>
         <div className="flex w-full justify-between">

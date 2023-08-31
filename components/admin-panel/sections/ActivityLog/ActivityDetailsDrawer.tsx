@@ -8,7 +8,7 @@ import DateTime from '../../../DateTime';
 import { Drawer, DrawerHeader } from '../../../Drawer';
 import LinkCollective from '../../../LinkCollective';
 import StyledTag from '../../../StyledTag';
-import { DescriptionList, DescriptionListItem, DescriptionListItemTitle } from '../../../ui/DescriptionList';
+import { InfoList, InfoListItem, InfoListItemTitle } from '../../../ui/InfoList';
 
 import ActivityDescription from './ActivityDescription';
 import ActivityDetails, { activityHasDetails } from './ActivityDetails';
@@ -58,20 +58,20 @@ export default function ActivityDetailsDrawer({ activity, onClose }: ActivityDra
             onClose={onClose}
           />
 
-          <DescriptionList columns={2}>
-            <DescriptionListItem
+          <InfoList className="sm:grid-cols-2">
+            <InfoListItem
               title={<FormattedMessage id="Tags.USER" defaultMessage="User" />}
               value={<ActivityUser activity={activity} />}
             />
 
-            <DescriptionListItem
-              colSpan={2}
+            <InfoListItem
+              className="sm:col-span-2"
               title={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
               value={<ActivityDescription activity={activity} />}
             />
 
-            <DescriptionListItem
-              colSpan={2}
+            <InfoListItem
+              className="sm:col-span-2"
               title={<FormattedMessage id="expense.incurredAt" defaultMessage="Date" />}
               value={<DateTime value={activity.createdAt} timeStyle="long" />}
             />
@@ -83,7 +83,7 @@ export default function ActivityDetailsDrawer({ activity, onClose }: ActivityDra
               }
 
               return (
-                <DescriptionListItem
+                <InfoListItem
                   key={accountKey}
                   title={intl.formatMessage(AccountKeysI18n[accountKey])}
                   value={
@@ -98,12 +98,12 @@ export default function ActivityDetailsDrawer({ activity, onClose }: ActivityDra
               );
             })}
             {activityHasDetails(activity) && (
-              <DescriptionListItem
-                colSpan={2}
-                value={<ActivityDetails activity={activity} TitleContainer={DescriptionListItemTitle} />}
+              <InfoListItem
+                className="sm:col-span-2"
+                value={<ActivityDetails activity={activity} TitleContainer={InfoListItemTitle} />}
               />
             )}
-          </DescriptionList>
+          </InfoList>
         </div>
       )}
     </Drawer>
