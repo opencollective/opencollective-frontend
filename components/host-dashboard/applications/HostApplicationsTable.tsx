@@ -164,16 +164,14 @@ export default function HostApplicationsTable({
   return (
     <DataTable
       data-cy="host-applications-table"
+      innerClassName="table-fixed"
       columns={columns}
       data={hostApplications?.nodes || []}
       meta={{ openApplication } as ApplicationMeta}
       loading={loading}
       nbPlaceholders={nbPlaceholders}
-      onClickRow={row => {
-        const application = row.original as HostApplication;
-        openApplication(application);
-      }}
-      className="-mx-6 rounded-none border-b border-l-0 border-r-0 border-t sm:mx-0 sm:rounded-xl sm:border"
+      onClickRow={row => openApplication(row.original)}
+      mobileTableView
       emptyMessage={() => (
         <div>
           <p className="text-base">

@@ -3,13 +3,22 @@ import { MoreHorizontal } from 'lucide-react';
 
 import { cn } from '../../lib/utils';
 
-const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
-  ({ className, ...props }, ref) => (
-    <div className="w-full overflow-auto">
-      <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
-    </div>
-  ),
-);
+const Table = React.forwardRef<
+  HTMLTableElement,
+  React.HTMLAttributes<HTMLTableElement> & { mobileTableView?: boolean; innerClassName?: string }
+>(({ className, innerClassName, mobileTableView, ...props }, ref) => (
+  <div
+    className={cn(
+      'overflow-auto',
+      mobileTableView
+        ? '-mx-6 border-b border-t sm:mx-0 sm:w-full sm:rounded-xl sm:border'
+        : 'w-full rounded-xl border',
+      className,
+    )}
+  >
+    <table ref={ref} className={cn('w-full caption-bottom text-sm', innerClassName)} {...props} />
+  </div>
+));
 Table.displayName = 'Table';
 
 const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
@@ -67,7 +76,10 @@ const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<
   ({ className, ...props }, ref) => (
     <td
       ref={ref}
-      className={cn('px-2 py-3 align-middle first:pl-4 last:pr-4 [&:has([role=checkbox])]:pr-0', className)}
+      className={cn(
+        'h-[56px] min-h-[56px] px-2 py-3 align-middle first:pl-4 last:pr-4 [&:has([role=checkbox])]:pr-0',
+        className,
+      )}
       {...props}
     />
   ),
