@@ -2,8 +2,6 @@ import React from 'react';
 import { ColumnDef, flexRender, getCoreRowModel, Row, TableMeta, useReactTable } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
-import { cn } from '../lib/utils';
-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/Table';
 import LoadingPlaceholder from './LoadingPlaceholder';
 interface DataTableProps<TData, TValue> {
