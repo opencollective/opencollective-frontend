@@ -38,18 +38,25 @@ const parseQuery = (routerQuery, account) => {
 };
 const EXPENSES_PER_PAGE = 10;
 
-const getVariables = (query, slug) => {
+const Expenses = (props: AdminSectionProps) => {
+  const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
+
+  const query = parseQuery(router.query, props.account);
+
   const amountRange = parseAmountRange(query.amount);
   const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
   const orderBy = query.orderBy && parseChronologicalOrderInput(query.orderBy);
-
   const showSubmitted = query.direction === 'SUBMITTED';
-  const fromAccount = showSubmitted ? { slug } : null;
-  const account = !showSubmitted ? { slug } : null;
-  return {
+  const slug = props.account.slug;
+  const createdByAccount = slug === LoggedInUser?.collective.slug ? { slug } : null;
+  const fromAccount = !createdByAccount && showSubmitted ? { slug } : null;
+  const account = !createdByAccount && !showSubmitted ? { slug } : null;
+  const variables = {
     collectiveSlug: slug,
     fromAccount,
     account,
+    createdByAccount,
     offset: query.offset || 0,
     limit: query.limit || EXPENSES_PER_PAGE,
     type: query.type,
@@ -63,13 +70,6 @@ const getVariables = (query, slug) => {
     orderBy,
     searchTerm: query.searchTerm,
   };
-};
-
-const Expenses = (props: AdminSectionProps) => {
-  const router = useRouter();
-  const query = parseQuery(router.query, props.account);
-  const variables = getVariables(query, props.account.slug);
-  const { LoggedInUser } = useLoggedInUser();
 
   const queryFilter = useQueryFilter({
     filters: {
