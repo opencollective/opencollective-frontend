@@ -278,17 +278,13 @@ const ContributeCard = ({
                 </Flex>
               </React.Fragment>
               {totalContributors === 0 ? (
-                <React.Fragment>
-                  <Container pt="0.7em" color="black.600">
-                    {getFooterMessage(type)}
-                  </Container>
-                </React.Fragment>
+                <div className="pt-2 text-sm text-slate-600">{getFooterMessage(type)}</div>
               ) : (
-                <Flex>
+                <div className="flex items-center gap-2">
                   {contributors &&
                     contributors.length > 0 &&
                     contributors.slice(0, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD).map(contributor => (
-                      <Box key={contributor.id} mx={1}>
+                      <Box key={contributor.id}>
                         {contributor.collectiveSlug ? (
                           <Link href={`/${contributor.collectiveSlug}`} title={contributor.name}>
                             <ContributorAvatar contributor={contributor} radius={32} />
@@ -299,11 +295,11 @@ const ContributeCard = ({
                       </Box>
                     ))}
                   {totalContributors > MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD && (
-                    <Container ml={2} pt="0.7em" fontSize="11px" fontWeight="bold" color="black.600">
+                    <div className="text-xs text-slate-600">
                       + {totalContributors - MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD}
-                    </Container>
+                    </div>
                   )}
-                </Flex>
+                </div>
               )}
             </Box>
           )}
