@@ -115,7 +115,7 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
     cell: ({ cell }) => {
       const toAccount = cell.getValue();
       return (
-        <LinkCollective collective={toAccount}>
+        <LinkCollective collective={toAccount} className="hover:underline">
           <div className="flex max-w-[200px] items-center">
             <Avatar size={24} collective={toAccount} mr={2} />
             <Span as="span" truncateOverflow>
@@ -132,7 +132,7 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
     cell: ({ cell }) => {
       const fromAccount = cell.getValue();
       return (
-        <LinkCollective collective={fromAccount}>
+        <LinkCollective collective={fromAccount} className="hover:underline">
           <div className="flex max-w-[200px] items-center">
             <Avatar size={24} collective={fromAccount} mr={2} />
             <Span as="span" truncateOverflow>
@@ -472,7 +472,6 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
         {loading && <LoadingPlaceholder height="250px" width="100%" borderRadius="16px" />}
         {!error && !loading && (
           <DataTable
-            fixedLayout={false}
             columns={columns}
             data={selectedOrders}
             hideHeader={view === 'card'}

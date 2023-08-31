@@ -258,6 +258,7 @@ export function VirtualCardRequestsTable(props: VirtualCardRequestsTableProps) {
       {isTableView ? (
         <DataTable
           data-cy="virtual-card-requests-table"
+          innerClassName="table-fixed"
           columns={tableColumns}
           meta={virtualCardRequestsTableMeta}
           data={props.virtualCardRequests || []}

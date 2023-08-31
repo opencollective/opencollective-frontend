@@ -190,6 +190,7 @@ export default function VirtualCardsTable(props: VirtualCardsTableProps) {
       <React.Fragment>
         <DataTable
           data-cy="virtual-cards-table"
+          innerClassName="table-fixed"
           columns={tableColumns}
           data={props.virtualCards || []}
           meta={virtualCardsTableMeta}

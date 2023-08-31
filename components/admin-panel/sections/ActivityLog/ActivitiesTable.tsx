@@ -47,12 +47,14 @@ export const tableColumns: ColumnDef<Activity>[] = [
   {
     accessorKey: 'individual',
     header: () => <FormattedMessage id="Tags.USER" defaultMessage="User" />,
-    meta: { className: 'w-48' },
+    meta: { className: 'w-40 xl:w-56' },
     cell: ({ cell }) => {
       const activity = cell.row.original;
       return (
         <div className="truncate text-slate-700">
-          <ActivityUser activity={activity} showBy={false} avatarSize={20} />
+          <span className="truncate">
+            <ActivityUser activity={activity} showBy={false} avatarSize={20} />
+          </span>
         </div>
       );
     },
@@ -62,7 +64,11 @@ export const tableColumns: ColumnDef<Activity>[] = [
     header: () => <FormattedMessage id="Fields.description" defaultMessage="Description" />,
     cell: ({ cell }) => {
       const activity = cell.row.original;
-      return <ActivityDescription activity={activity} />;
+      return (
+        <div className="truncate">
+          <ActivityDescription activity={activity} />
+        </div>
+      );
     },
   },
   {
@@ -114,6 +120,7 @@ export default function ActivitiesTable({
   return (
     <DataTable
       data-cy="activities-table"
+      innerClassName="table-fixed"
       hideHeader={!isTableView}
       columns={columns}
       data={activities?.nodes || []}

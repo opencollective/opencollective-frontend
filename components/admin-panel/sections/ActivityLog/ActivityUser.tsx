@@ -7,13 +7,13 @@ import Avatar from '../../../Avatar';
 
 const Username = ({ individual, avatarSize }) => {
   return !individual ? (
-    <span>
+    <span className="truncate">
       <FormattedMessage id="user.Unknown" defaultMessage="Unknown" />
     </span>
   ) : (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 truncate">
       <Avatar radius={avatarSize} collective={individual} />
-      {individual.name}
+      <span className="truncate"> {individual.name}</span>
     </div>
   );
 };

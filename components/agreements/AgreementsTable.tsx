@@ -200,6 +200,7 @@ export default function AgreementsTable({
   return (
     <DataTable
       data-cy="agreements-table"
+      innerClassName="table-fixed"
       hideHeader={!isTableView}
       columns={columns}
       data={agreements?.nodes || []}
