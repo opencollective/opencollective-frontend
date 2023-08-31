@@ -147,7 +147,7 @@ const Option = ({
   description = description || (
     <FormattedMessage
       id="AccountSwitcher.Description"
-      defaultMessage="{type, select, USER {My Dashboard} COLLECTIVE {Collective admin} ORGANIZATION {Organization admin} EVENT {Event admin} FUND {Fund admin} PROJECT {Project admin} other {}}"
+      defaultMessage="{type, select, USER {Personal profile} COLLECTIVE {Collective admin} ORGANIZATION {Organization admin} EVENT {Event admin} FUND {Fund admin} PROJECT {Project admin} other {}}"
       values={{ type: collective?.type }}
     />
   );
