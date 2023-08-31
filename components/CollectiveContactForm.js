@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
-import Container from './Container';
 import { Box } from './Grid';
 import MessageBox from './MessageBox';
 import MessageBoxGraphqlError from './MessageBoxGraphqlError';
