@@ -207,6 +207,11 @@ class EditConnectedAccount extends React.Component {
             )}
             {connectedAccount ? (
               <Flex flexDirection="column" width="100%">
+                {Boolean(connectedAccount.settings?.needsReconnect) && (
+                  <MessageBox type="warning" withIcon mb={3}>
+                    <FormattedMessage defaultMessage="This account is currently inactive. Please reconnect it to continue using it." />
+                  </MessageBox>
+                )}
                 <P mb={2}>
                   <FormattedMessage
                     defaultMessage="{service} account {username} connected on {date}"

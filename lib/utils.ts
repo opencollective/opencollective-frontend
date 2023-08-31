@@ -1,14 +1,14 @@
-import { clsx } from 'clsx';
+import { type ClassValue, clsx } from 'clsx';
 import loadScript from 'load-script';
 import { isObject, omit } from 'lodash';
 import sanitizeHtml from 'sanitize-html';
 import { twMerge } from 'tailwind-merge';
 
 /**
- * A helper to make it easier to conditionally add Tailwind CSS classes
- * and merge conflicting classes with twMerge.
+ * Helper to make it easier to conditionally add and deduplicate Tailwind CSS classes and deduplicate
  */
-export function cn(...inputs) {
+
+export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
@@ -100,7 +100,10 @@ export function getQueryParams() {
   return urlParams;
 }
 
-export function formatDate(date, options = { month: 'long', year: 'numeric' }) {
+export function formatDate(
+  date,
+  options: Intl.DateTimeFormatOptions & { locale?: Intl.LocalesArgument } = { month: 'long', year: 'numeric' },
+) {
   const d = new Date(date);
   const locale = typeof window !== 'undefined' ? window.navigator.language : options.locale || 'en-US';
   try {
