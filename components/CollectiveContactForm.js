@@ -104,7 +104,6 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange 
             onChange={e => setMessage(e.target.value)}
             minLength={10}
             maxLength={4000}
-            fontSize="14px"
             value={message}
             showCount
             data-cy="message"
