@@ -24,6 +24,7 @@ import NotFound from '../NotFound';
 import { H2 } from '../Text';
 
 import Contributions from './sections/Contributions';
+import Contributors from './sections/Contributors';
 import Expenses from './sections/Expenses';
 import Home from './sections/Home';
 import ManageContributions from './sections/ManageContributions';
@@ -52,6 +53,7 @@ const ADMIN_PANEL_SECTIONS = {
   [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
   [COLLECTIVE_SECTIONS.EXPENSES]: Expenses,
   [COLLECTIVE_SECTIONS.DASHBOARD_OVERVIEW]: Home,
+  [COLLECTIVE_SECTIONS.CONTRIBUTORS]: Contributors,
   [COLLECTIVE_SECTIONS.CONTRIBUTIONS]: Contributions,
   [COLLECTIVE_SECTIONS.TRANSACTIONS]: Transactions,
 };

@@ -28,7 +28,10 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps & Parameters<t
   const { viewport } = useWindowResize();
 
   if (viewport === VIEWPORTS.XSMALL) {
-    const options = tabs.map(tab => ({ label: tab.count ? `${tab.label} (${tab.count})` : tab.label, value: tab.id }));
+    const options = tabs.map(tab => ({
+      label: tab.count !== undefined ? `${tab.label} (${tab.count})` : tab.label,
+      value: tab.id,
+    }));
     return (
       <StyledSelect
         {...props}

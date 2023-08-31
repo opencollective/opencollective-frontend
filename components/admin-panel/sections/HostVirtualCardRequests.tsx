@@ -16,6 +16,7 @@ import { P } from '../../Text';
 import { VirtualCardRequestDrawer } from '../../virtual-card-requests/VirtualCardRequestDrawer';
 import VirtualCardRequestFilter from '../../virtual-card-requests/VirtualCardRequestFilter';
 import { VirtualCardRequestsTable } from '../../virtual-card-requests/VirtualCardRequestsTable';
+import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const hostVirtualCardRequestsQuery = gql`
   query HostVirtualCardRequests(
@@ -152,6 +153,9 @@ export default function HostVirtualCardRequests(props: HostVirtualCardRequestsPr
           }}
         />
       </P>
+      <Box mb={3}>
+        <StripeVirtualCardComplianceStatement />
+      </Box>
       <VirtualCardRequestFilter
         virtualCardRequestStatusFilter={queryFilter.values.virtualCardRequestStatus}
         onVirtualCardRequestStatusFilter={queryFilter.setVirtualCardRequestStatus}

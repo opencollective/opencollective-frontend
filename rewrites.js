@@ -130,12 +130,9 @@ exports.REWRITES = [
     source: '/dashboard',
     destination: '/dashboard',
   },
+  { source: '/workspace', destination: '/dashboard' },
   {
     source: '/dashboard/:slug/:section?/:subpath*',
-    destination: '/dashboard',
-  },
-  {
-    source: '/workspace',
     destination: '/dashboard',
   },
   {

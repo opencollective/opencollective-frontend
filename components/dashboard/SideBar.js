@@ -118,7 +118,7 @@ const AdminPanelSideBar = ({
               >
                 <Globe2 size={12} />
                 &nbsp;
-                <FormattedMessage id="PublicProfile" defaultMessage="Public profile" />
+                <FormattedMessage id="home.public.profile" defaultMessage="Go to public profile" />
               </StyledButton>
               {content}
             </React.Fragment>

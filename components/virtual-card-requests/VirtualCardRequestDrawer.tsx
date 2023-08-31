@@ -17,6 +17,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledTag from '../StyledTag';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 import { DescriptionList, DescriptionListItem } from '../ui/DescriptionList';
 
 const virtualCardRequestQuery = gql`
@@ -232,6 +233,7 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
                 title={<FormattedMessage id="expense.notes" defaultMessage="Notes" />}
                 value={<p className="whitespace-pre-line">{virtualCardRequest.notes}</p>}
               />
+              <DescriptionListItem colSpan={2} value={<StripeVirtualCardComplianceStatement />} />
             </DescriptionList>
 
             <VirtualCardRequestDrawerActions virtualCardRequest={virtualCardRequest} />

@@ -1,11 +1,13 @@
 import React from 'react';
+import { gql, useQuery } from '@apollo/client';
 import * as Popover from '@radix-ui/react-popover';
 import { get } from 'lodash';
-import { BookOpen, FlaskConical, LifeBuoy, LogOut, PocketKnife, User } from 'lucide-react';
+import { Badge, BookOpen, FlaskConical, LifeBuoy, LogOut, PocketKnife, User } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 
@@ -21,6 +23,14 @@ import { HorziontalSeparator } from '../ui/Separator';
 
 import { DrawerMenu } from './DrawerMenu';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
+
+const memberInvitationsCountQuery = gql`
+  query MemberInvitationsCount($memberAccount: AccountReferenceInput!) {
+    memberInvitations(memberAccount: $memberAccount) {
+      id
+    }
+  }
+`;
 
 const StyledProfileButton = styled(StyledButton)`
   padding: 0;
@@ -99,6 +109,11 @@ const ProfileMenu = () => {
   const hasAvailablePreviewFeatures = LoggedInUser?.getAvailablePreviewFeatures()?.length > 0;
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
+  const { data } = useQuery(memberInvitationsCountQuery, {
+    variables: { memberAccount: { slug: LoggedInUser?.collective?.slug } },
+    skip: !LoggedInUser,
+    context: API_V2_CONTEXT,
+  });
 
   React.useEffect(() => {
     const handler = () => setMenuOpen(false);
@@ -111,6 +126,8 @@ const ProfileMenu = () => {
   if (!LoggedInUser) {
     return <LoginBtn />;
   }
+
+  const pendingInvitations = data?.memberInvitations?.length > 0 ? data?.memberInvitations?.length : null;
 
   const content = (
     <Flex flexDirection="column" maxHeight={['100%', '80dvh']} overflow="hidden">
@@ -135,7 +152,19 @@ const ProfileMenu = () => {
                 <FormattedMessage id="menu.documentation" defaultMessage="Documentation" />
               </Flex>
             </PopoverMenuItem>
-            <PopoverMenuItem href={`/workspace/${LoggedInUser.collective.slug}/info`}>
+            {pendingInvitations && (
+              <PopoverMenuItem href="/member-invitations">
+                <Flex alignItems="center">
+                  <Badge size={16} />
+                  <FormattedMessage
+                    id="menu.invitations"
+                    defaultMessage="Invitations ({numberOfInvitations})"
+                    values={{ numberOfInvitations: pendingInvitations }}
+                  />
+                </Flex>
+              </PopoverMenuItem>
+            )}
+            <PopoverMenuItem href={`/dashboard/${LoggedInUser.collective.slug}/info`}>
               <Flex alignItems="center">
                 <User size={16} />
                 <FormattedMessage id="menu.account.settings" defaultMessage="Account settings" />
@@ -145,7 +174,7 @@ const ProfileMenu = () => {
               <PopoverMenuItem as="button" onClick={() => setShowPreviewFeaturesModal(true)}>
                 <Flex alignItems="center">
                   <FlaskConical size={16} />
-                  <FormattedMessage id="menu.beta.features" defaultMessage="Beta features" />
+                  <FormattedMessage id="menu.preview.features" defaultMessage="Preview features" />
                 </Flex>
               </PopoverMenuItem>
             )}

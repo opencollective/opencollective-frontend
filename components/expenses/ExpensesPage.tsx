@@ -32,7 +32,7 @@ const Expenses = props => {
   const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, onlySubmittedExpenses } = props;
 
   const expensesRoute = isDashboard
-    ? `/workspace/${variables.collectiveSlug}/expenses`
+    ? `/dashboard/${variables.collectiveSlug}/expenses`
     : `${getCollectivePageRoute(data?.account)}/expenses`;
 
   useEffect(() => {

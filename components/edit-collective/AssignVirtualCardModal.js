@@ -24,6 +24,7 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal
 import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 import { virtualCardsAssignedToCollectiveQuery } from './EditVirtualCardModal';
 
@@ -413,6 +414,9 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
               )}
             </StyledInputField>
           </Grid>
+          <Box mt={3}>
+            <StripeVirtualCardComplianceStatement />
+          </Box>
         </ModalBody>
         <ModalFooter isFullWidth>
           <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">

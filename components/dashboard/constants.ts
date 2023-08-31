@@ -53,6 +53,7 @@ export const FISCAL_HOST_SECTIONS = {
 export const COLLECTIVE_SECTIONS = {
   HOME: 'home',
   DASHBOARD_OVERVIEW: 'overview',
+  CONTRIBUTORS: 'contributors',
   CONTRIBUTIONS: 'contributions',
   ADVANCED: 'advanced',
   AUTHORIZED_APPS: 'authorized-apps',
@@ -294,5 +295,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.CONTRIBUTIONS]: {
     id: 'Contributions',
     defaultMessage: 'Contributions',
+  },
+  [ALL_SECTIONS.CONTRIBUTORS]: {
+    id: 'Contributors',
+    defaultMessage: 'Contributors',
   },
 });

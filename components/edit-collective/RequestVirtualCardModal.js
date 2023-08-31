@@ -29,6 +29,7 @@ import StyledSelect from '../StyledSelect';
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const initialValues = {
   agreement: false,
@@ -271,6 +272,9 @@ const RequestVirtualCardModal = props => {
               onChange={({ checked }) => formik.setFieldValue('agreement', checked)}
               error={formik.touched.agreement && formik.errors.agreement}
             />
+          </Box>
+          <Box mt={3}>
+            <StripeVirtualCardComplianceStatement />
           </Box>
           {createError && (
             <Box mt={3}>

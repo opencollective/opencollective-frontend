@@ -22,6 +22,8 @@ import StyledButton from '../StyledButton';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { DescriptionList, DescriptionListItem } from '../ui/DescriptionList';
 
+import { StripeVirtualCardComplianceStatement } from './StripeVirtualCardComplianceStatement';
+
 type VirtualCardDrawerProps = {
   open: boolean;
   onClose: () => void;
@@ -119,7 +121,6 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
         virtualCard && (
           <React.Fragment>
             <DrawerHeader title={virtualCard?.name} onClose={props.onClose} />
-
             <CardContainer mt="24px" width="366px" height="248px" flexDirection="column">
               <div />
               <Box flexGrow={1} m="24px 24px 0 24px">
@@ -187,6 +188,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
                   value={<DateTime dateStyle="medium" value={virtualCard.spendingLimitRenewsOn} />}
                 />
               )}
+              <DescriptionListItem colSpan={2} value={<StripeVirtualCardComplianceStatement />} />
             </DescriptionList>
           </React.Fragment>
         )

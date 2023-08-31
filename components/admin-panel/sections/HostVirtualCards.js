@@ -16,6 +16,7 @@ import Loading from '../../Loading';
 import Pagination from '../../Pagination';
 import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
 import VirtualCardsTable from '../../virtual-cards/VirtualCardsTable';
 import VirtualCardFilters from '../../VirtualCardFilters';
 
@@ -205,6 +206,9 @@ const HostVirtualCards = props => {
             }}
           />
         </P>
+        <Box mt={3}>
+          <StripeVirtualCardComplianceStatement />
+        </Box>
         <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters
             loading={loading}
