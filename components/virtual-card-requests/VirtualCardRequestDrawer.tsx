@@ -17,8 +17,8 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledTag from '../StyledTag';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
-import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 import { InfoList, InfoListItem } from '../ui/InfoList';
+import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const virtualCardRequestQuery = gql`
   query VirtualCardRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {
