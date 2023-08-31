@@ -1,14 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { truncate } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import Container from '../Container';
 import Currency from '../Currency';
-import { Box, Flex } from '../Grid';
-import StyledHr from '../StyledHr';
+import { Box } from '../Grid';
 import { P, Span } from '../Text';
 
 import StyledCollectiveCard from './StyledCollectiveCard';
