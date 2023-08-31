@@ -40,7 +40,6 @@ export default function AgreementDrawer({
 
   return (
     <Drawer
-      maxWidth="512px"
       open={open}
       onClose={closeDrawer}
       showCloseButton
