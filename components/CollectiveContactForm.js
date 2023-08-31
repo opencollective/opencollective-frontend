@@ -104,6 +104,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange 
             onChange={e => setMessage(e.target.value)}
             minLength={10}
             maxLength={4000}
+            fontSize="14px"
             value={message}
             showCount
             data-cy="message"
@@ -111,10 +112,10 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange 
         )}
       </StyledInputField>
       {error && <MessageBoxGraphqlError error={error} mt={3} />}
-      <Container mt={2}>
+      <p className="mt-2 text-sm">
         <FormattedMessage defaultMessage="Message needs to be at least 10 characters long" />
-      </Container>
-      {isModal && <hr />}
+      </p>
+      {isModal && <hr className="my-6" />}
       <Box textAlign={isModal ? 'right' : ''}>
         <StyledButton
           mt={isModal ? 0 : 4}
