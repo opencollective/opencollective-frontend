@@ -115,7 +115,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange 
       <p className="mt-2 text-sm">
         <FormattedMessage defaultMessage="Message needs to be at least 10 characters long" />
       </p>
-      {isModal && <hr className="my-6" />}
+      {isModal && <hr className="my-5" />}
       <Box textAlign={isModal ? 'right' : ''}>
         <StyledButton
           mt={isModal ? 0 : 4}

@@ -126,7 +126,7 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
           )}
         </P>
       </Flex>
-      <hr className="my-6" />
+      <hr className="my-5" />
       <div className="rounded bg-slate-100 p-3 text-center">{formatMemberRole(intl, invitation.role)}</div>
       {hasRoleDescription(invitation.role) && (
         <p className="my-4 px-2 text-sm text-slate-700">
