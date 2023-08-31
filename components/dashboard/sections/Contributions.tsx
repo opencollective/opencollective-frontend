@@ -1,9 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { DotsHorizontalRounded } from '@styled-icons/boxicons-regular/DotsHorizontalRounded';
-import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { BREAKPOINTS, useWindowResize } from '../../../lib/hooks/useWindowResize';
@@ -19,12 +16,18 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import OrderStatusTag from '../../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../../PaymentMethodTypeWithIcon';
-import PopupMenu from '../../PopupMenu';
 import { managedOrderFragment } from '../../recurring-contributions/graphql/queries';
 import StyledButton from '../../StyledButton';
-import StyledRoundButton from '../../StyledRoundButton';
 import StyledTabs from '../../StyledTabs';
 import { H1, P, Span } from '../../Text';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../../ui/Dropdown';
+import { TableActionsButton } from '../../ui/Table';
 import { AdminSectionProps } from '../types';
 
 const manageContributionsQuery = gql`
@@ -67,52 +70,6 @@ const manageContributionsQuery = gql`
     }
   }
   ${managedOrderFragment}
-`;
-
-const ActionButton = styled.button`
-  appearance: none;
-  border: none;
-  cursor: pointer;
-  outline: 0;
-  min-width: max-content;
-  background: transparent;
-  background-color: transparent;
-  border: 0;
-  padding: 8px 12px;
-  margin: 0 8px;
-  font-size: 13px;
-  border-radius: 6px;
-  white-space: nowrap;
-  vertical-align: middle;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: ${props => props.color || props.theme.colors.black[800]};
-  gap: 8px;
-  cursor: pointer;
-  &:hover {
-    background-color: #f4f5f7;
-    text-decoration: none;
-    svg {
-      color: #334155;
-    }
-  }
-
-  svg {
-    color: #94a3b8;
-    height: 14px;
-    width: 14px;
-  }
-
-  @media screen and (max-width: ${themeGet('breakpoints.0')}) {
-    font-size: 16px;
-    padding: 12px;
-
-    svg {
-      height: 16px;
-      width: 16px;
-    }
-  }
 `;
 
 const getColumns = ({ tab, setEditOrder, intl }) => {
@@ -222,43 +179,29 @@ const getColumns = ({ tab, setEditOrder, intl }) => {
         processedAt,
         status,
         {
-          header: intl.formatMessage({ id: 'CollectivePage.NavBar.ActionMenu.Actions', defaultMessage: 'Actions' }),
+          accessorKey: 'actions',
+          meta: { className: 'flex justify-end' },
+          header: null,
           cell: ({ row }) => {
             const order = row.original;
             return (
-              <Flex justifyContent="center">
-                <PopupMenu
-                  placement="bottom-start"
-                  Button={({ onClick }) => (
-                    <StyledRoundButton data-cy="actions" size={32} onClick={onClick} buttonSize="small">
-                      <DotsHorizontalRounded size="24px" color={themeGet('colors.black.600')} />
-                    </StyledRoundButton>
-                  )}
-                >
-                  {() => (
-                    <Flex flexDirection="column">
-                      <ActionButton onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}>
-                        <FormattedMessage
-                          id="subscription.menu.editPaymentMethod"
-                          defaultMessage="Update payment method"
-                        />
-                      </ActionButton>
-                      <ActionButton onClick={() => setEditOrder({ order, action: 'editAmount' })}>
-                        <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
-                      </ActionButton>
-                      <ActionButton
-                        onClick={() => setEditOrder({ order, action: 'cancel' })}
-                        color={themeGet('colors.red.600')}
-                      >
-                        <FormattedMessage
-                          id="subscription.menu.cancelContribution"
-                          defaultMessage="Cancel contribution"
-                        />
-                      </ActionButton>
-                    </Flex>
-                  )}
-                </PopupMenu>
-              </Flex>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <TableActionsButton />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}>
+                    <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setEditOrder({ order, action: 'editAmount' })}>
+                    <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-red-600" onClick={() => setEditOrder({ order, action: 'cancel' })}>
+                    <FormattedMessage id="subscription.menu.cancelContribution" defaultMessage="Cancel contribution" />
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             );
           },
         },
@@ -332,37 +275,34 @@ export const cardColumns = ({ tab, setEditOrder }) => [
                 )}
                 {tab === 'recurring' && (
                   <Flex justifyContent="center">
-                    <PopupMenu
-                      placement="bottom-start"
-                      Button={({ onClick }) => (
-                        <StyledButton data-cy="actions" onClick={onClick} buttonSize="tiny">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <StyledButton data-cy="actions" buttonSize="tiny">
                           <FormattedMessage id="Edit" defaultMessage="Edit" />
                         </StyledButton>
-                      )}
-                    >
-                      {() => (
-                        <Flex flexDirection="column">
-                          <ActionButton onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}>
-                            <FormattedMessage
-                              id="subscription.menu.editPaymentMethod"
-                              defaultMessage="Update payment method"
-                            />
-                          </ActionButton>
-                          <ActionButton onClick={() => setEditOrder({ order, action: 'editAmount' })}>
-                            <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
-                          </ActionButton>
-                          <ActionButton
-                            onClick={() => setEditOrder({ order, action: 'cancel' })}
-                            color={themeGet('colors.red.600')}
-                          >
-                            <FormattedMessage
-                              id="subscription.menu.cancelContribution"
-                              defaultMessage="Cancel contribution"
-                            />
-                          </ActionButton>
-                        </Flex>
-                      )}
-                    </PopupMenu>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}>
+                          <FormattedMessage
+                            id="subscription.menu.editPaymentMethod"
+                            defaultMessage="Update payment method"
+                          />
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setEditOrder({ order, action: 'editAmount' })}>
+                          <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={() => setEditOrder({ order, action: 'cancel' })}
+                        >
+                          <FormattedMessage
+                            id="subscription.menu.cancelContribution"
+                            defaultMessage="Cancel contribution"
+                          />
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </Flex>
                 )}
               </Flex>
@@ -373,38 +313,6 @@ export const cardColumns = ({ tab, setEditOrder }) => [
     },
   },
 ];
-
-const TableWrapper = styled.div`
-  > div {
-    border-radius: 16px;
-  }
-
-  thead th {
-    padding: 16px 0px;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 18px;
-    color: ${props => props.theme.colors.black[700]};
-    :first-child {
-      padding-left: 20px;
-    }
-    :last-child {
-      padding-right: 20px;
-    }
-  }
-
-  tbody tr td {
-    font-size: 13px;
-    padding: 16px 0px;
-    color: ${props => props.theme.colors.black[800]};
-    :first-child {
-      padding-left: 20px;
-    }
-    :last-child {
-      padding-right: 20px;
-    }
-  }
-`;
 
 const Home = ({ account }: AdminSectionProps) => {
   const { data, loading } = useQuery(manageContributionsQuery, {
@@ -441,14 +349,7 @@ const Home = ({ account }: AdminSectionProps) => {
         {error && <MessageBoxGraphqlError error={error} />}
         {loading && <LoadingPlaceholder height="250px" width="100%" borderRadius="16px" />}
         {!error && !loading && (
-          <TableWrapper>
-            <DataTable
-              columns={columns}
-              data={selectedOrders}
-              highlightRowOnHover={false}
-              hideHeader={view === 'card'}
-            />
-          </TableWrapper>
+          <DataTable fixedLayout={false} columns={columns} data={selectedOrders} hideHeader={view === 'card'} />
         )}
       </Flex>
       {editOrder.order && (
