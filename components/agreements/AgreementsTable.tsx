@@ -143,7 +143,7 @@ export const tableColumns: ColumnDef<Agreement>[] = [
             size={32}
             borderRadius="8px"
             openFileViewer={() => meta?.onFilePreview(agreement)}
-            className="shadow-sm hover:shadow"
+            className="hover:shadow"
           />
         </div>
       );
