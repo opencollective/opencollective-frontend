@@ -93,7 +93,7 @@ export const validateExpenseItem = (expense, item) => {
   return errors;
 };
 
-export const prepareExpenseItemForSubmit = (item, isInvoice, isGrant) => {
+export const prepareExpenseItemForSubmit = (expenseData, item) => {
   // The frontend currently ignores the time part of the date, we default to midnight UTC
   const incurredAtFullDate = item.incurredAt || new Date().toISOString().split('T')[0];
   const incurredAt = incurredAtFullDate.match(/^\d{4}-\d{2}-\d{2}$/)
@@ -104,7 +104,7 @@ export const prepareExpenseItemForSubmit = (item, isInvoice, isGrant) => {
     incurredAt,
     ...pick(item, [
       ...(item.__isNew ? [] : ['id']), // Omit item's ids that were created for keying purposes
-      ...(isInvoice || isGrant ? [] : ['url']), // never submit URLs for invoices or requests
+      ...(expenseItemsMustHaveFiles(expenseData.type) ? ['url'] : []), // never submit URLs for invoices or requests
       'description',
       'amount',
     ]),

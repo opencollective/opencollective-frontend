@@ -17,6 +17,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep } from '../../lib/utils';
+import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { addNewExpenseItem, newExpenseItem } from './lib/items';
 import { checkRequiresAddress, getSupportedCurrencies, validateExpenseTaxes } from './lib/utils';
 
@@ -129,10 +130,7 @@ const CREATE_PAYEE_PROFILE_FIELDS = ['name', 'email', 'legalName', 'organization
  * like URLs for items when the expense is an invoice.
  */
 export const prepareExpenseForSubmit = expenseData => {
-  // The collective picker still uses API V1 for when creating a new profile on the fly
-  const isInvoice = expenseData.type === expenseTypes.INVOICE;
-  const isGrant = expenseData.type === expenseTypes.GRANT;
-  const keepAttachedFiles = isInvoice || isGrant;
+  const keepAttachedFiles = expenseTypeSupportsAttachments(expenseData.type);
 
   // Prepare payee
   let payee;
@@ -141,6 +139,7 @@ export const prepareExpenseForSubmit = expenseData => {
     // See https://github.com/opencollective/opencollective-api/blob/88e9864a716e4a2ad5237a81cee177b781829f42/server/graphql/v2/input/ExpenseInviteDraftInput.ts#L29
     if (expenseData.payee.isInvite) {
       payee = pick(expenseData.payee, ['id', 'legacyId', ...CREATE_PAYEE_PROFILE_FIELDS]);
+      // The collective picker still uses API V1 for when creating a new profile on the fly
       if (payee.legacyId) {
         payee.id = payee.legacyId;
         delete payee.legacyId;
@@ -177,7 +176,7 @@ export const prepareExpenseForSubmit = expenseData => {
     payoutMethod,
     attachedFiles: keepAttachedFiles ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
-    items: expenseData.items.map(item => prepareExpenseItemForSubmit(item, isInvoice, isGrant)),
+    items: expenseData.items.map(item => prepareExpenseItemForSubmit(expenseData, item)),
   };
 };
 
