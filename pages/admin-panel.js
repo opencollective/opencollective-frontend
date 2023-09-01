@@ -18,7 +18,9 @@ import { adminPanelQuery } from '../components/admin-panel/queries';
 import AdminPanelSideBar from '../components/admin-panel/SideBar';
 import AdminPanelTopBar from '../components/admin-panel/TopBar';
 import AuthenticatedPage from '../components/AuthenticatedPage';
+import Container from '../components/Container';
 import { Flex, Grid } from '../components/Grid';
+import LoadingGrid from '../components/LoadingGrid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
@@ -100,11 +102,14 @@ const AdminPanelPage = ({ slug, section, subpath }) => {
   const router = useRouter();
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
+  const needsRedirectToWorkspace =
+    LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
 
   // Redirect to the new dashboard if the user has the feature flag enabled
   React.useEffect(() => {
-    if (LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)) {
-      router.push(`/dashboard/${slug}`);
+    if (needsRedirectToWorkspace) {
+      const url = section ? `/dashboard/${slug}/${section}` : `/dashboard/${slug}`;
+      router.replace(!window.location.search ? url : `${url}${window.location.search}`);
     }
   }, [LoggedInUser]);
 
@@ -137,6 +142,10 @@ const AdminPanelPage = ({ slug, section, subpath }) => {
             </MessageBox>
             {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
           </Flex>
+        ) : needsRedirectToWorkspace ? (
+          <Container display="flex" justifyContent="center" py={[5, null, 6]} px={2}>
+            <LoadingGrid />
+          </Container>
         ) : (
           <Grid
             gridTemplateColumns={['1fr', null, '208px 1fr']}

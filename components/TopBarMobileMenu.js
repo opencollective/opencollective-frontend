@@ -77,13 +77,13 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
                 </Link>
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Link href="/search" onClick={closeMenu}>
                   <FormattedMessage id="Explore" defaultMessage="Explore" />
                 </Link>
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Link href="/help" onClick={closeMenu}>
                   <FormattedMessage defaultMessage="Help & Support" />
@@ -120,7 +120,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   </Box>
                 )}
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Flex
                   justifyContent="space-between"
@@ -149,7 +149,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   </Box>
                 )}
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Flex
                   justifyContent="space-between"
@@ -173,7 +173,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   </Box>
                 )}
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Link href={'/help'} onClick={closeMenu}>
                   <FormattedMessage defaultMessage="Help & Support" />
@@ -181,7 +181,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
               </ListItem>
               {useDashboard && (
                 <Fragment>
-                  <hr />
+                  <hr className="my-5" />
                   <ListItem>
                     <Link href="/dashboard" onClick={closeMenu}>
                       <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
