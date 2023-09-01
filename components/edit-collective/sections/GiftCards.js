@@ -182,7 +182,7 @@ class GiftCards extends React.Component {
             {paymentMethods.map(v => (
               <div key={v.id}>
                 <GiftCardDetails giftCard={v} collectiveSlug={this.props.collectiveSlug} />
-                {v !== lastGiftCard && <hr />}
+                {v !== lastGiftCard && <hr className="my-5" />}
               </div>
             ))}
             {total > limit && (

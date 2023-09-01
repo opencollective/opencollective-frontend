@@ -42,7 +42,7 @@ const MobileFooterBar = styled(Flex)`
   height: 76px;
   border-top: 1px solid ${props => props.theme.colors.black[300]};
   background: #fff;
-  z-index: 3000;
+  z-index: 1199;
   padding: 8px 16px;
 `;
 
@@ -166,11 +166,11 @@ const MobileFooterMenu = ({ onDashboardRoute, onSearchRoute }) => {
 
   return (
     <MobileFooterBar alignItems="center" justifyContent="center" gap="12px" style={{ bottom: `${bottom}px` }}>
-      <MobileFooterLink href="/workspace" isActive={onDashboardRoute}>
+      <MobileFooterLink href="/dashboard" isActive={onDashboardRoute}>
         <MobileFooterIconContainer className="icon-container">
           <Frame size={20} />
         </MobileFooterIconContainer>
-        <FormattedMessage id="Workspace" defaultMessage="Workspace" />
+        <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
       </MobileFooterLink>
 
       <MobileFooterLink href="/search" isActive={onSearchRoute}>
@@ -228,10 +228,10 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle }: T
     '/e2c',
   ];
   const onHomeRoute = homepageRoutes.some(isRouteActive);
-  const onDashboardRoute = isRouteActive('/workspace');
+  const onDashboardRoute = isRouteActive('/dashboard');
   const onSearchRoute =
     isRouteActive('/search') || (account && isRouteActive(`/${account.parentCollective?.slug || account.slug}`));
-  const ocLogoRoute = onHomeRoute ? '/home' : '/workspace';
+  const ocLogoRoute = onHomeRoute ? '/home' : '/dashboard';
 
   return (
     <Fragment>
@@ -381,8 +381,8 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle }: T
             {onDashboardRoute || onSearchRoute
               ? !isMobile && (
                   <React.Fragment>
-                    <MainNavItem href="/workspace" isActive={onDashboardRoute}>
-                      <FormattedMessage id="Workspace" defaultMessage="Workspace" />
+                    <MainNavItem href="/dashboard" isActive={onDashboardRoute}>
+                      <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
                     </MainNavItem>
                     <MainNavItem href="/search" isActive={onSearchRoute}>
                       <FormattedMessage id="Explore" defaultMessage="Explore" />
@@ -397,8 +397,8 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle }: T
             <Fragment>
               {onHomeRoute && (
                 <React.Fragment>
-                  <MainNavItem href="/workspace">
-                    <FormattedMessage id="Workspace" defaultMessage="Workspace" />
+                  <MainNavItem href="/dashboard">
+                    <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
                   </MainNavItem>
                 </React.Fragment>
               )}

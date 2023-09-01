@@ -130,8 +130,8 @@ const ProfileMenu = () => {
   const pendingInvitations = data?.memberInvitations?.length > 0 ? data?.memberInvitations?.length : null;
 
   const content = (
-    <Flex flexDirection="column" maxHeight={['100%', '80dvh']} overflow="hidden">
-      <Flex flexDirection={['column', 'row']} overflow={['auto', 'hidden']}>
+    <Flex flexDirection="column" maxHeight={['100%', '80dvh']} height={['100%', 'auto']} overflow="hidden">
+      <Flex flexDirection={['column', 'row']} overflow={['auto', 'hidden']} flexGrow={1}>
         <Flex flexDirection="column" width="164px">
           <ProfileHeader alignItems="center" overflow="hidden" pb="24px">
             <Box overflow="hidden">
@@ -164,7 +164,7 @@ const ProfileMenu = () => {
                 </Flex>
               </PopoverMenuItem>
             )}
-            <PopoverMenuItem href={`/workspace/${LoggedInUser.collective.slug}/info`}>
+            <PopoverMenuItem href={`/dashboard/${LoggedInUser.collective.slug}/info`}>
               <Flex alignItems="center">
                 <User size={16} />
                 <FormattedMessage id="menu.account.settings" defaultMessage="Account settings" />

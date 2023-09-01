@@ -12,6 +12,7 @@ import {
   Network,
   Receipt,
   Settings,
+  Users,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -157,13 +158,9 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
         >
           <FormattedMessage id="PublicProfile" defaultMessage="Public profile" />
         </MenuLink>
-        <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTIONS} icon={<Coins size={16} />} if={isIndividual} />
+        <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTORS} icon={<Users size={16} />} if={!isIndividual} />
+        <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTIONS} icon={<Coins size={16} />} />
         <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} icon={<Receipt size={16} />} />
-        <MenuLink
-          section={COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS}
-          icon={<Coins size={16} />}
-          if={!isAccountantOnly && !isIndividual}
-        />
         <MenuLink
           section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
           icon={<Coins size={16} />}

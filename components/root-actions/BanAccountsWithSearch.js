@@ -191,7 +191,8 @@ const BanAccountsWithSearch = () => {
                   title={truncate(stripHTML(account.longDescription), { length: 256 })}
                 >
                   <div>
-                    <hr />
+                    <hr className="my-5" />
+
                     <Box>
                       <strong>Received</strong>:{' '}
                       {formatCurrency(account.stats.totalAmountReceived.valueInCents, account.currency)}
