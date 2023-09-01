@@ -141,19 +141,17 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
   const hostedMemberships = data?.host?.memberOf;
   return (
     <Box maxWidth={1000} m="0 auto" px={2}>
-      <Flex alignItems="center" mb={24} flexWrap="wrap">
-        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
+      <div className="flex flex-wrap justify-between gap-4">
+        <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />
-        </H1>
-        <Box mx="auto" />
-        <Box p={2}>
-          <SearchBar
-            defaultValue={query.searchTerm}
-            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-          />
-        </Box>
-      </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" />
+        </h1>
+        <SearchBar
+          height={40}
+          defaultValue={query.searchTerm}
+          onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
+        />
+      </div>
+      <hr className="my-5" />
       <Box mb={34}>
         {data?.host ? (
           <HostAdminCollectiveFilters

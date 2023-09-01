@@ -1,50 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Globe2, Menu as MenuIcon } from 'lucide-react';
-import { FormattedMessage } from 'react-intl';
-import styled, { css } from 'styled-components';
+import { MenuIcon } from 'lucide-react';
 
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
-import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { cn } from '../../lib/utils';
 
-import { Box, Flex } from '../Grid';
+import { Box } from '../Grid';
 import { HideGlobalScroll } from '../HideGlobalScroll';
-import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import { DrawerMenu } from '../navigation/DrawerMenu';
-import StyledButton from '../StyledButton';
 import StyledRoundButton from '../StyledRoundButton';
 
 import AccountSwitcher from './AccountSwitcher';
 import Menu from './Menu';
-
-const Sticky = styled.div`
-  position: sticky;
-  top: 32px;
-  z-index: 10;
-`;
-
-const MenuWrapper = styled(Box)`
-  ${props =>
-    props.isMobile
-      ? css`
-          position: sticky;
-          top: 0px;
-          z-index: 1000;
-          background: #fffe;
-          padding: 10px 0px;
-        `
-      : ''}
-`;
-
-const MenuContainer = styled(Flex)`
-  a {
-    color: ${props => props.theme.colors.black[900]};
-    &:hover {
-      color: ${props => props.theme.colors.black[700]};
-    }
-  }
-`;
 
 const AdminPanelSideBar = ({
   collective,
@@ -68,7 +36,7 @@ const AdminPanelSideBar = ({
 
   const content = React.useMemo(
     () => (
-      <Box mt={[0, null, '32px']}>
+      <div>
         {isLoading ? (
           [...Array(5).keys()].map(i => (
             <Box key={i}>
@@ -78,15 +46,18 @@ const AdminPanelSideBar = ({
         ) : (
           <Menu {...{ collective, selectedSection, onRoute, isAccountantOnly }} />
         )}
-      </Box>
+      </div>
     ),
     [collective, isLoading, viewport],
   );
 
   return (
-    <MenuWrapper {...props} flexGrow={0} flexShrink={0} width={['100%', '100%', '288px']} isMobile={isMobile}>
-      <Sticky>
-        <MenuContainer flexDirection={['row-reverse', null, 'column']} m="0" gap="16px">
+    <div
+      className={cn(' w-full flex-shrink-0 flex-grow-0 md:w-64', isMobile && 'sticky top-0 z-[1000] bg-white py-2.5')}
+      {...props}
+    >
+      <div className="sticky top-8 z-10">
+        <div className="flex flex-row-reverse gap-4 sm:flex-auto md:flex-col">
           <AccountSwitcher activeSlug={activeSlug} isLoading={isLoading} />
           {isMobile && (
             <React.Fragment>
@@ -94,38 +65,18 @@ const AdminPanelSideBar = ({
                 <MenuIcon size={24} />
               </StyledRoundButton>
 
-              {isMenuOpen && (
-                <React.Fragment>
-                  <DrawerMenu top="73px" anchor="left" onClose={() => setMenuOpen(false)} open={true} p="16px">
-                    {content}
-                  </DrawerMenu>
-                  <HideGlobalScroll />
-                </React.Fragment>
-              )}
+              <React.Fragment>
+                <DrawerMenu anchor="left" open={isMenuOpen} onClose={() => setMenuOpen(false)} p="16px">
+                  {content}
+                </DrawerMenu>
+                <HideGlobalScroll />
+              </React.Fragment>
             </React.Fragment>
           )}
-          {!isMobile && (
-            <React.Fragment>
-              <StyledButton
-                as={Link}
-                buttonSize="tiny"
-                href={getCollectivePageRoute(collective)}
-                height="24px"
-                textAlign="center"
-                display={'flex'}
-                alignItems={'center'}
-                justifyContent={'center'}
-              >
-                <Globe2 size={12} />
-                &nbsp;
-                <FormattedMessage id="home.public.profile" defaultMessage="Go to public profile" />
-              </StyledButton>
-              {content}
-            </React.Fragment>
-          )}
-        </MenuContainer>
-      </Sticky>
-    </MenuWrapper>
+          {!isMobile && <React.Fragment>{content}</React.Fragment>}
+        </div>
+      </div>
+    </div>
   );
 };
 

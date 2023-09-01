@@ -92,13 +92,16 @@ const Expenses = props => {
 
   return (
     <Container>
-      <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+      <h1 className="text-2xl font-bold leading-10 tracking-tight">
         {onlySubmittedExpenses ? (
           <FormattedMessage defaultMessage="Submitted Expenses" />
         ) : (
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         )}
-      </H1>
+      </h1>
+      {/* <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+       
+      </H1> */}
       <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}>
         {!onlySubmittedExpenses && (
           <Box flex="0 1" flexBasis={['100%', null, '380px']}>

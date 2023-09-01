@@ -11,6 +11,12 @@ import Container from './Container';
 import { Box, Flex } from './Grid';
 import StyledRoundButton from './StyledRoundButton';
 
+const StyledMUIDrawer = styled(MUIDrawer)`
+  .MuiBackdrop-root {
+    background-color: rgba(0, 0, 0, 0.25);
+  }
+`;
+
 const StyledDrawerContainer = styled.div<{ maxWidth: string }>`
   display: flex;
   height: 100%;
@@ -64,7 +70,7 @@ export default function Drawer({
   const disableEnforceFocus = Boolean(twoFactorPrompt?.isOpen);
   return (
     <DrawerActionsContext.Provider value={drawerActionsContainer}>
-      <MUIDrawer anchor="right" open={open} onClose={onClose} disableEnforceFocus={disableEnforceFocus}>
+      <StyledMUIDrawer anchor="right" open={open} onClose={onClose} disableEnforceFocus={disableEnforceFocus}>
         <StyledDrawerContainer maxWidth={maxWidth} data-cy={dataCy}>
           <Flex flex={1} flexDirection="column" overflowY="scroll">
             <Container position="relative" py={'24px'}>
@@ -86,7 +92,7 @@ export default function Drawer({
             />
           )}
         </StyledDrawerContainer>
-      </MUIDrawer>
+      </StyledMUIDrawer>
     </DrawerActionsContext.Provider>
   );
 }

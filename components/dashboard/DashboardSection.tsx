@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+
+import { cn } from '../../lib/utils';
 
 import AccountSettings from '../admin-panel/sections/AccountSettings';
 import FinancialContributions from '../admin-panel/sections/FinancialContributions';
@@ -21,7 +22,6 @@ import HostDashboardHostedCollectives from '../host-dashboard/HostDashboardHoste
 import HostDashboardReports from '../host-dashboard/HostDashboardReports';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
-import { H2 } from '../Text';
 
 import Contributions from './sections/Contributions';
 import Contributors from './sections/Contributors';
@@ -62,11 +62,11 @@ const FISCAL_HOST_SETTINGS_SECTIONS = {
   [FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
 };
 
-const Title = styled(H2)`
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 32px;
-`;
+const Title = ({ className, children, ...props }: { className?: string; children: React.ReactNode }) => (
+  <h1 className={cn('text-2xl font-bold leading-10 tracking-tight', className)} {...props}>
+    {children}
+  </h1>
+);
 
 const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
   const { formatMessage } = useIntl();
@@ -83,7 +83,9 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
   const AdminSectionComponent = ADMIN_PANEL_SECTIONS[section];
   if (AdminSectionComponent) {
     return (
-      <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} isDashboard={true} />
+      <Container width="100%">
+        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} isDashboard={true} />
+      </Container>
     );
   }
 

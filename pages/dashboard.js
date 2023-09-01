@@ -170,14 +170,14 @@ const DashboardPage = () => {
             {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
             ) : (
-              <Box flex="0 1 1000px">
+              <div className="max-w-[1000px] flex-1 overflow-clip">
                 <AdminPanelSection
                   section={selectedSection}
                   isLoading={isLoading}
                   collective={account}
                   subpath={subpath}
                 />
-              </Box>
+              </div>
             )}
           </Flex>
         )}

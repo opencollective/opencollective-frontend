@@ -190,13 +190,10 @@ const HostDashboardReports = ({ hostSlug }) => {
   }
 
   return (
-    <Box m="0 auto" px={2}>
-      <Flex alignItems="center" mb={24} flexWrap="wrap">
-        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
-          <FormattedMessage id="Reports" defaultMessage="Reports" />
-        </H1>
-        <Box mx="auto" />
-      </Flex>
+    <Box m="0 auto">
+      <h1 className="text-2xl font-bold leading-10 tracking-tight">
+        <FormattedMessage id="Reports" defaultMessage="Reports" />
+      </h1>
       <Container
         position={['relative', 'sticky']}
         top="0"
