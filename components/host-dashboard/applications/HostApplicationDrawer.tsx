@@ -196,9 +196,10 @@ export function HostApplication({
 
   return (
     <React.Fragment>
-      <div id={`application-${account.legacyId}`}>
+      <div>
         <DrawerHeader
           onClose={onClose}
+          data-Cy={`host-application-header-${account.slug}`}
           title={
             <FormattedMessage
               defaultMessage="Application <ApplicationId></ApplicationId> to <HostCollectiveName></HostCollectiveName>"

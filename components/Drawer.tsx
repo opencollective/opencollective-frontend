@@ -80,13 +80,14 @@ export function DrawerHeader({
   title,
   statusTag,
   onClose,
+  ...props
 }: {
   title: React.ReactNode;
   statusTag?: React.ReactNode;
   onClose: () => void;
 }) {
   return (
-    <div className="mb-4 flex items-start justify-between gap-4">
+    <div className="mb-4 flex items-start justify-between gap-4" {...props}>
       <h3 className="mt-1 text-lg font-medium text-slate-900">{title}</h3>
       <div className="flex flex-col-reverse items-end gap-1 sm:flex-row sm:items-center sm:gap-4">
         {statusTag}

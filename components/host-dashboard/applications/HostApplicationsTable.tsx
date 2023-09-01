@@ -128,7 +128,7 @@ export const columns: ColumnDef<HostApplication>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <TableActionsButton />
+            <TableActionsButton data-Cy={`${application.account.slug}-table-actions`} />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
@@ -136,6 +136,7 @@ export const columns: ColumnDef<HostApplication>[] = [
                 e.stopPropagation();
                 openApplication(application);
               }}
+              data-Cy={`${application.account.slug}-view-details`}
             >
               <FormattedMessage defaultMessage="View details" />
             </DropdownMenuItem>
