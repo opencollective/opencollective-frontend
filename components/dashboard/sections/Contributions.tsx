@@ -151,7 +151,11 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
     cell: ({ cell }) => {
       const pm = cell.getValue();
       if (pm) {
-        return <PaymentMethodTypeWithIcon iconSize={18} type={pm.type} />;
+        return (
+          <div className="flex items-center gap-2 truncate">
+            <PaymentMethodTypeWithIcon iconSize={18} type={pm.type} />
+          </div>
+        );
       }
     },
   };
@@ -161,9 +165,9 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
     cell: ({ cell }) => {
       const status = cell.getValue();
       return (
-        <Flex>
+        <div>
           <OrderStatusTag status={status} />
-        </Flex>
+        </div>
       );
     },
   };
@@ -178,7 +182,11 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
         header: intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
         cell: ({ cell }) => {
           const amount = cell.getValue();
-          return <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />;
+          return (
+            <div className="flex items-center gap-2 truncate">
+              <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />
+            </div>
+          );
         },
       },
       {
@@ -186,7 +194,11 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
         header: intl.formatMessage({ id: 'expense.incurredAt', defaultMessage: 'Date' }),
         cell: ({ cell }) => {
           const date = cell.getValue();
-          return <DateTime value={date} dateStyle="medium" timeStyle={undefined} />;
+          return (
+            <div className="flex items-center gap-2 truncate">
+              <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
+            </div>
+          );
         },
       },
       status,
@@ -199,7 +211,9 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
         const amount = cell.getValue();
         const order = row.original;
         return (
-          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} frequency={order.frequency} />
+          <div className="flex items-center gap-2 truncate">
+            <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} frequency={order.frequency} />
+          </div>
         );
       },
     };
@@ -208,7 +222,11 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
       header: intl.formatMessage({ id: 'TotalDonated', defaultMessage: 'Total Donated' }),
       cell: ({ cell }) => {
         const amount = cell.getValue();
-        return <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />;
+        return (
+          <div className="flex items-center gap-2 truncate">
+            <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />
+          </div>
+        );
       },
     };
     const processedAt = {
@@ -217,7 +235,11 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
       cell: ({ cell }) => {
         const date = cell.getValue();
         if (date) {
-          return <DateTime value={date} dateStyle="medium" timeStyle={undefined} />;
+          return (
+            <div className="flex items-center gap-2 truncate">
+              <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
+            </div>
+          );
         }
       },
     };
