@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from './utils';
 
 /**
  * Merge react refs.
@@ -25,12 +26,18 @@ export function elementFromClass<T>(type: T, className: string): T;
 // eslint-disable-next-line no-redeclare
 export function elementFromClass(type, className) {
   const render = (
-    { children, ...props }: Parameters<typeof React.createElement>[1] & { children: React.ReactNode },
+    {
+      children,
+      ...props
+    }: Parameters<typeof React.createElement>[1] & { children: React.ReactNode; className?: string },
     ref,
   ) => {
     children = Array.isArray(children) ? children : [children];
-    // TODO: Merge classNames using Gustav's helper function
-    return React.createElement(type, { ...props, className, ref } as any, ...(children as any));
+    return React.createElement(
+      type,
+      { ...props, className: cn(className, props.className || ''), ref } as any,
+      ...(children as any),
+    );
   };
   render.displayName = typeof type === 'string' ? type : type.name;
   return React.forwardRef(render);

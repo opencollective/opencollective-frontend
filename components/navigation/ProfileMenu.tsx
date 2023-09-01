@@ -19,7 +19,7 @@ import Link from '../Link';
 import LoginBtn from '../LoginBtn';
 import PreviewFeaturesModal from '../PreviewFeaturesModal';
 import StyledButton from '../StyledButton';
-import { HorziontalSeparator } from '../ui/Separator';
+import { Separator } from '../ui/Separator';
 
 import { DrawerMenu } from './DrawerMenu';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
@@ -206,7 +206,7 @@ const ProfileMenu = () => {
         />
       </Flex>
       <Box>
-        <HorziontalSeparator style={{ margin: '24px 0' }} />
+        <Separator style={{ margin: '24px 0' }} />
         <Link href="/home">
           <Image src="/static/images/opencollectivelogo-footer-n.svg" alt="Open Collective" width={122} height={24} />
         </Link>

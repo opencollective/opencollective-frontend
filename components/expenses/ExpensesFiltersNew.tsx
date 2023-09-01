@@ -14,7 +14,7 @@ import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 import { sortSelectOptions } from '../../lib/utils';
 
 import AmountFilter from '../budget/filters/AmountFilter';
-import { FilterOptions, FilterType } from '../filters/FilterComboNew';
+import { FilterOptions, FilterType, OptionType } from '../filters/FilterCombo';
 import PeriodFilter from '../filters/PeriodFilter';
 import { Flex } from '../Grid';
 import { StyledSelectFilter } from '../StyledSelectFilter';
@@ -137,6 +137,7 @@ const ExpensesFilters = ({
       },
       {
         key: 'type',
+        static: true,
         filterType: FilterType.SELECT,
         label: intl.formatMessage({ id: 'expense.type', defaultMessage: 'Type' }),
         options: Object.keys(expenseTypes)
@@ -156,8 +157,20 @@ const ExpensesFilters = ({
         key: 'period',
         filterType: FilterType.DATE,
         label: intl.formatMessage({ id: 'Period', defaultMessage: 'Period' }),
-        options: [{}],
+        options: [
+          {
+            label: 'Today',
+            value: 'TODAY',
+          },
+          {
+            label: 'Yesterday',
+            value: 'YESTERDAY',
+            type: OptionType.PERIOD,
+          },
+          { label: 'Date range', value: 'DATE_RANGE', type: OptionType.CUSTOM_DATE_RANGE },
+        ],
       },
+
       {
         key: 'status',
         static: false,
