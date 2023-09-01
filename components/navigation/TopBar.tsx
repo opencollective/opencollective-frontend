@@ -42,7 +42,7 @@ const MobileFooterBar = styled(Flex)`
   height: 76px;
   border-top: 1px solid ${props => props.theme.colors.black[300]};
   background: #fff;
-  z-index: 3000;
+  z-index: 1199;
   padding: 8px 16px;
 `;
 

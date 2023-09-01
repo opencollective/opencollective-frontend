@@ -8,6 +8,7 @@ import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLocalStorage from '../lib/hooks/useLocalStorage';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { require2FAForAdmins } from '../lib/policies';
 
 import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/dashboard/constants';
@@ -101,25 +102,30 @@ const DashboardPage = () => {
   const router = useRouter();
   const { slug, section, subpath } = router.query;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
-  const [lastWorkspaceVisit, setLastWorkspaceVisit] = useLocalStorage('DashboardNavigationState', {
+  const [lastWorkspaceVisit, setLastWorkspaceVisit] = useLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE, {
     slug: LoggedInUser?.slug,
   });
-  const activeSlug = slug || lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
+  const activeSlug = LoggedInUser?.isAdminOfCollective({ slug: slug || lastWorkspaceVisit.slug })
+    ? slug || lastWorkspaceVisit.slug
+    : LoggedInUser?.collective.slug;
 
   const { data, loading } = useQuery(adminPanelQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: activeSlug },
-    skip: !activeSlug,
+    skip: !activeSlug || !LoggedInUser,
   });
   const account = data?.account;
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
 
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
-    if (slug && slug !== lastWorkspaceVisit.slug) {
-      setLastWorkspaceVisit({ slug });
+    if (activeSlug && activeSlug !== lastWorkspaceVisit.slug) {
+      setLastWorkspaceVisit({ slug: activeSlug });
     }
-  }, [slug]);
+    if (router.query.slug !== activeSlug) {
+      router.replace(`/dashboard/${activeSlug || ''}`);
+    }
+  }, [activeSlug]);
 
   const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
@@ -161,7 +167,7 @@ const DashboardPage = () => {
               selectedSection={selectedSection}
               isAccountantOnly={LoggedInUser?.isAccountantOnly(account)}
             />
-            {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
+            {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
             ) : (
               <Box flex="0 1 1000px">

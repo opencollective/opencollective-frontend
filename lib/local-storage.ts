@@ -6,6 +6,7 @@ export const LOCAL_STORAGE_KEYS = {
   GUEST_TOKENS: 'guestTokens',
   HOST_DASHBOARD_FILTER_PREFERENCES: 'hostDashBoardFilterPreferences',
   LAST_DASHBOARD_SLUG: 'lastDashboardSlug',
+  DASHBOARD_NAVIGATION_STATE: 'DashboardNavigationState',
 };
 
 // The below helpers use a try-catch to gracefully fallback in these scenarios:
