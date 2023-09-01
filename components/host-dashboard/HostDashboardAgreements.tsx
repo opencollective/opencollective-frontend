@@ -102,7 +102,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
 
   const canEdit = Boolean(LoggedInUser && !LoggedInUser.isAccountantOnly(data?.host));
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
+    <Box maxWidth={1000} m="0 auto">
       <Flex mb={24} justifyContent="space-between" alignItems="center" flexWrap="wrap" gridGap="16px">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           <FormattedMessage id="Agreements" defaultMessage="Agreements" />

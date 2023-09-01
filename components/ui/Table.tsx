@@ -11,7 +11,7 @@ const Table = React.forwardRef<
     className={cn(
       'overflow-auto',
       mobileTableView
-        ? '-mx-6 border-b border-t sm:mx-0 sm:w-full sm:rounded-xl sm:border'
+        ? '-mx-4 border-b border-t sm:mx-0 sm:w-full sm:rounded-xl sm:border'
         : 'w-full rounded-xl border',
       className,
     )}

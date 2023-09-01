@@ -1,91 +1,30 @@
 import React from 'react';
-import { themeGet } from '@styled-system/theme-get';
 import { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 import { Agreement } from '../../lib/graphql/types/v2/graphql';
-import { BREAKPOINTS, useWindowResize } from '../../lib/hooks/useWindowResize';
 
 import Avatar from '../Avatar';
 import { DataTable } from '../DataTable';
 import DateTime from '../DateTime';
-import { Box, Flex } from '../Grid';
+import { Box } from '../Grid';
 import StyledHr from '../StyledHr';
 import StyledLinkButton from '../StyledLinkButton';
-import { P, Span } from '../Text';
+import { P } from '../Text';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/Dropdown';
 import { TableActionsButton } from '../ui/Table';
 import UploadedFilePreview from '../UploadedFilePreview';
-
-const CellButton = styled.button`
-  border: 0;
-  width: 100%;
-  outline: none;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding: 16px;
-  font-weight: 500;
-  color: ${themeGet('colors.black.900')};
-
-  &:hover,
-  :focus-visible {
-    .title {
-      text-decoration: underline;
-    }
-  }
-`;
 
 interface AgreementMeta extends TableMeta<Agreement> {
   openAgreement: (agreement: Agreement) => void;
   onFilePreview: (agreement: Agreement) => void;
 }
 
-export const cardColumns: ColumnDef<Agreement>[] = [
-  {
-    accessorKey: 'summary',
-    cell: ({ row, table }) => {
-      const agreement = row.original;
-      const meta = table.options.meta as AgreementMeta;
-      return (
-        <CellButton onClick={() => meta.openAgreement(agreement)}>
-          <Flex alignItems="center" gridGap="16px" mb="16px">
-            <Avatar collective={agreement.account} radius={32} />
-            <Flex flexDirection="column" gridGap="4px">
-              <Span letterSpacing="0" truncateOverflow fontWeight="500">
-                {agreement.account.name}
-              </Span>
-              <Span fontSize="14px" color="black.700" fontWeight="normal">
-                <DateTime value={agreement.createdAt} />
-                {agreement.expiresAt && agreement.attachment && ' • '}
-                {agreement.attachment && (
-                  <FormattedMessage
-                    id="ExepenseAttachments.count"
-                    defaultMessage="{count, plural, one {# attachment} other {# attachments}}"
-                    values={{ count: 1 }}
-                  />
-                )}
-              </Span>
-            </Flex>
-          </Flex>
-          <Span fontSize="16px" fontWeight="700" lineHeight="24px" color="black.800">
-            {agreement.title}
-          </Span>
-        </CellButton>
-      );
-    },
-  },
-];
-
-export const tableColumns: ColumnDef<Agreement>[] = [
+export const columns: ColumnDef<Agreement>[] = [
   {
     accessorKey: 'account',
     header: () => <FormattedMessage defaultMessage="Account" />,
-    meta: { className: 'w-56' },
+    meta: { className: 'w-40 sm:w-56' },
 
     cell: ({ cell }) => {
       const account = cell.getValue() as Agreement['account'];
@@ -99,6 +38,7 @@ export const tableColumns: ColumnDef<Agreement>[] = [
   },
   {
     accessorKey: 'title',
+    meta: { className: 'w-32 sm:w-auto' },
     header: () => <FormattedMessage id="Title" defaultMessage="Title" />,
     cell: ({ cell }) => {
       const title = cell.getValue() as Agreement['title'];
@@ -194,14 +134,11 @@ export default function AgreementsTable({
   resetFilters,
   onFilePreview,
 }: AgreementsTableProps) {
-  const [isTableView, setIsTableView] = React.useState(true);
-  useWindowResize(() => setIsTableView(window.innerWidth > BREAKPOINTS.MEDIUM));
-  const columns = isTableView ? tableColumns : cardColumns;
   return (
     <DataTable
       data-cy="agreements-table"
       innerClassName="table-fixed"
-      hideHeader={!isTableView}
+      mobileTableView
       columns={columns}
       data={agreements?.nodes || []}
       meta={{ openAgreement, onFilePreview } as AgreementMeta}

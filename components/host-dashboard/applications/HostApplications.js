@@ -104,7 +104,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
   }, [data]);
 
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
+    <Box maxWidth={1000} m="0 auto">
       <Flex alignItems="center" mb={24} flexWrap="wrap">
         <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
           <FormattedMessage id="HostDashboard.HostApplications" defaultMessage="Applications" />

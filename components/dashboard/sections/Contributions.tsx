@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { BREAKPOINTS, useWindowResize } from '../../../lib/hooks/useWindowResize';
 
 import Avatar from '../../Avatar';
 import Container from '../../Container';
@@ -21,9 +20,8 @@ import OrderStatusTag from '../../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../../PaymentMethodTypeWithIcon';
 import { managedOrderFragment } from '../../recurring-contributions/graphql/queries';
 import SearchBar from '../../SearchBar';
-import StyledButton from '../../StyledButton';
 import StyledTabs from '../../StyledTabs';
-import { H1, P, Span } from '../../Text';
+import { H1, Span } from '../../Text';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -276,111 +274,6 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
   }
 };
 
-export const cardColumns = ({ tab, setEditOrder, isIncoming }) => [
-  {
-    accessorKey: 'summary',
-    header: null,
-    cell: ({ row }) => {
-      const order = row.original;
-      const account = isIncoming ? order.fromAccount : order.toAccount;
-      return (
-        <Flex alignItems="center" gap="16px">
-          <LinkCollective collective={account}>
-            <Avatar collective={account} radius={40} />
-          </LinkCollective>
-          <Flex flexDirection="column" gap="8px" flexGrow={1}>
-            <Flex justifyContent={['flex-start', 'space-between']} gap="8px" alignItems="baseline">
-              <P fontSize="13px" fontWeight="400">
-                <FormattedMessage id="order.id" defaultMessage="Contribution #" />
-                {order.legacyId}
-              </P>
-              <Flex
-                alignItems={['flex-end', 'center']}
-                flexDirection={['column', 'row']}
-                gap="16px"
-                justifyContent={['space-between', 'flex-end']}
-                flexGrow={1}
-              >
-                {order.frequency && order.processedAt && (
-                  <P fontSize="13px" fontWeight="400" display={['none', 'block']}>
-                    <FormattedMessage defaultMessage="Last charge" />
-                    :&nbsp;
-                    <DateTime value={order.processedAt} dateStyle="medium" timeStyle={undefined} />
-                  </P>
-                )}
-                <OrderStatusTag status={order.status} />
-                <P fontSize="16px">
-                  <FormattedMoneyAmount
-                    amount={order.amount.valueInCents}
-                    currency={order.amount.currency}
-                    frequency={order.frequency}
-                  />
-                </P>
-              </Flex>
-            </Flex>
-            <Flex justifyContent="space-between" alignItems="baseline" flexDirection={['column', 'row']} gap="8px">
-              <Flex fontSize="13px" fontWeight="400">
-                {order.frequency && order.totalDonations && (
-                  <Box mr="16px">
-                    <FormattedMessage defaultMessage="Total contributed" />
-                    :&nbsp;
-                    <FormattedMoneyAmount
-                      amount={order.totalDonations.valueInCents}
-                      currency={order.totalDonations.currency}
-                    />
-                  </Box>
-                )}
-                {order.paymentMethod && <PaymentMethodTypeWithIcon iconSize={18} type={order.paymentMethod?.type} />}
-              </Flex>
-              <Flex justifyContent={['space-between', 'flex-end']} alignItems="baseline" width={['100%', 'auto']}>
-                {order.frequency && order.processedAt && (
-                  <P fontSize="13px" fontWeight="400" display={['block', 'none']}>
-                    <FormattedMessage defaultMessage="Last charge" />
-                    :&nbsp;
-                    <DateTime value={order.processedAt} dateStyle="medium" timeStyle={undefined} />
-                  </P>
-                )}
-                {tab === ContributionsTab.RECURRING && !isIncoming && (
-                  <Flex justifyContent="center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <StyledButton data-cy="actions" buttonSize="tiny">
-                          <FormattedMessage id="Edit" defaultMessage="Edit" />
-                        </StyledButton>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}>
-                          <FormattedMessage
-                            id="subscription.menu.editPaymentMethod"
-                            defaultMessage="Update payment method"
-                          />
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setEditOrder({ order, action: 'editAmount' })}>
-                          <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-red-600"
-                          onClick={() => setEditOrder({ order, action: 'cancel' })}
-                        >
-                          <FormattedMessage
-                            id="subscription.menu.cancelContribution"
-                            defaultMessage="Cancel contribution"
-                          />
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </Flex>
-                )}
-              </Flex>
-            </Flex>
-          </Flex>
-        </Flex>
-      );
-    },
-  },
-];
-
 const PAGE_SIZE = 20;
 const QUERY_FILTERS = ['searchTerm', 'offset'];
 const QUERY_FORMATERS = {
@@ -418,12 +311,10 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
       setCounters({ ...counters, [tab]: data.account.orders.totalCount });
     },
   });
-  const [view, setView] = React.useState<'table' | 'card'>('table');
   const [editOrder, setEditOrder] = React.useState<{ order?: { id: string }; action: EditOrderActions }>({
     order: null,
     action: null,
   });
-  useWindowResize(() => setView(window.innerWidth > BREAKPOINTS.LARGE ? 'table' : 'card'));
 
   const tabs = [
     { id: ContributionsTab.RECURRING, label: 'Recurring', count: counters[ContributionsTab.RECURRING] },
@@ -442,14 +333,11 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
     setTab(tab);
     updateFilters({ offset: null });
   };
-  const columns =
-    view === 'table'
-      ? getColumns({ tab, setEditOrder, intl, isIncoming })
-      : cardColumns({ tab, setEditOrder, isIncoming });
+  const columns = getColumns({ tab, setEditOrder, intl, isIncoming });
 
   return (
     <Container>
-      <Flex justifyContent="space-between" alignItems="baseline">
+      <Flex justifyContent="space-between" alignItems="baseline" gridGap={2}>
         <H1 fontSize="24px" lineHeight="32px" fontWeight="700">
           {isIncoming ? (
             <FormattedMessage id="Contributors" defaultMessage="Contributors" />
@@ -474,7 +362,7 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
           <DataTable
             columns={columns}
             data={selectedOrders}
-            hideHeader={view === 'card'}
+            mobileTableView
             emptyMessage={() => <FormattedMessage id="NoContributions" defaultMessage="No contributions" />}
           />
         )}
