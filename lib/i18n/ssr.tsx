@@ -5,6 +5,7 @@ import { SSRIntlProvider } from '../../components/intl/SSRIntlProvider';
 
 const cache = createIntlCache();
 
+// ServerIntl is a helper to do SSR while collecting the messages used.
 export class ServerIntl {
   usedMessages: Record<symbol | string, string>;
   messagesProxy: Record<symbol | string, string>;

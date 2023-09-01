@@ -18,6 +18,7 @@ import Container from '../Container';
 import { Flex, Grid } from '../Grid';
 import TranslateIcon from '../icons/TranslateIcon';
 import Image from '../Image';
+import { useLocaleContext } from '../intl/IntlProvider';
 import Link from '../Link';
 import StyledLink from '../StyledLink';
 import StyledSelect from '../StyledSelect';
@@ -50,12 +51,6 @@ const MenuLink = styled(Link)`
   padding: 0;
 `;
 
-const switchLanguage = key => {
-  document.cookie = `language=${key};path=/`;
-  window.location.reload();
-  window.scrollTo(0, 0);
-};
-
 const FooterContainer = styled.footer.attrs({
   id: 'footer',
 })<SpaceProps>`
@@ -79,6 +74,7 @@ const generateLanguageOptions = () => {
 };
 
 const Footer = () => {
+  const localeContext = useLocaleContext();
   const intl = useIntl();
   const languageOptions = React.useMemo(generateLanguageOptions, []);
   const defaultLanguage = languageOptions.find(language => language.value === intl.locale);
@@ -202,7 +198,7 @@ const Footer = () => {
               <StyledSelect
                 inputId="language-options"
                 options={languageOptions}
-                onChange={({ value }) => switchLanguage(value)}
+                onChange={({ value }) => localeContext.setLocale(value)}
                 defaultValue={defaultLanguage}
                 borderRadius="10px"
                 menuPlacement="auto"

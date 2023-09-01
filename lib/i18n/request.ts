@@ -1,4 +1,4 @@
-import Sentry from '@sentry/nextjs';
+import * as Sentry from '@sentry/nextjs';
 import accepts from 'accepts';
 import cookie from 'cookie';
 import { pick } from 'lodash';

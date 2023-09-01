@@ -15,6 +15,7 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 import TranslateIcon from './icons/TranslateIcon';
+import { useLocaleContext } from './intl/IntlProvider';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Image from './Image';
@@ -195,12 +196,6 @@ const navigation = {
   },
 };
 
-const switchLanguage = key => {
-  document.cookie = `language=${key};path=/`;
-  window.location.reload();
-  window.scrollTo(0, 0);
-};
-
 const FooterContainer = styled.footer.attrs({
   id: 'footer',
 })`
@@ -224,6 +219,7 @@ const generateLanguageOptions = () => {
 };
 
 const Footer = () => {
+  const localeContext = useLocaleContext();
   const intl = useIntl();
   const languageOptions = React.useMemo(generateLanguageOptions);
   const defaultLanguage = languageOptions.find(language => language.value === intl.locale);
@@ -325,7 +321,7 @@ const Footer = () => {
               <StyledSelect
                 inputId="language-options"
                 options={languageOptions}
-                onChange={({ value }) => switchLanguage(value)}
+                onChange={({ value }) => localeContext.setLocale(value)}
                 defaultValue={defaultLanguage}
                 borderRadius="10px"
                 menuPlacement="auto"
@@ -460,7 +456,7 @@ const Footer = () => {
               inputId="language-switcher"
               data-cy="language-switcher"
               options={languageOptions}
-              onChange={({ value }) => switchLanguage(value)}
+              onChange={({ value }) => localeContext.setLocale(value)}
               defaultValue={defaultLanguage}
               menuPlacement="auto"
               formatOptionLabel={formatLanguageOptionLabel}

@@ -68,6 +68,7 @@ export default class IntlDocument extends Document {
         cspNonce: requestNonce,
         intl: {
           ...intlProps,
+          // contains only the messages used on this SSR pass to be properly hydrated on the client side.
           messages: ssrIntl.getMessages(),
         },
         styles: (
