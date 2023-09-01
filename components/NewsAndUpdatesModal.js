@@ -153,7 +153,7 @@ const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
           </Flex>
         </Flex>
       </ModalHeaderWrapper>
-      <hr />
+      <hr className="my-5" />
       <ModalBody>
         <Query query={newsAndUpdatesQuery} variables={{ limit: 5 }} context={API_V2_CONTEXT}>
           {({ data, loading, error }) => renderStyledCarousel(data, loading, error, onClose)}
