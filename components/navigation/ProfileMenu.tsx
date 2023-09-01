@@ -130,8 +130,8 @@ const ProfileMenu = () => {
   const pendingInvitations = data?.memberInvitations?.length > 0 ? data?.memberInvitations?.length : null;
 
   const content = (
-    <Flex flexDirection="column" maxHeight={['100%', '80dvh']} overflow="hidden">
-      <Flex flexDirection={['column', 'row']} overflow={['auto', 'hidden']}>
+    <Flex flexDirection="column" maxHeight={['100%', '80dvh']} height={['100%', 'auto']} overflow="hidden">
+      <Flex flexDirection={['column', 'row']} overflow={['auto', 'hidden']} flexGrow={1}>
         <Flex flexDirection="column" width="164px">
           <ProfileHeader alignItems="center" overflow="hidden" pb="24px">
             <Box overflow="hidden">
