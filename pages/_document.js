@@ -6,6 +6,8 @@ import Document, { Head, Html, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
+import { getIntlProps, getLocaleMessages } from '../lib/i18n/request';
+import { ServerIntl } from '../lib/i18n/ssr';
 import { parseToBoolean } from '../lib/utils';
 import { getCSPHeader } from '../server/content-security-policy';
 
@@ -15,6 +17,23 @@ const cspHeader = getCSPHeader();
 // data for the user's locale for React Intl to work in the browser.
 export default class IntlDocument extends Document {
   static async getInitialProps(ctx) {
+    // Get the `locale` and `messages` from the request object on the server.
+    // In the browser, use the same values that the server serialized.
+    const intlProps = getIntlProps(ctx);
+    const messages = await getLocaleMessages(intlProps.locale);
+    const ssrIntl = new ServerIntl(intlProps.locale, messages);
+
+    if (ctx.req && ctx.res) {
+      if (intlProps.locale !== 'en') {
+        // Prevent server side caching of non english content
+        ctx.res.setHeader('Cache-Control', 'no-store, no-cache, max-age=0');
+      } else {
+        // When using Cloudflare, there might be a default cache
+        // We're setting that for all requests to reduce the default to 1 minute
+        ctx.res.setHeader('Cache-Control', 'public, max-age=60');
+      }
+    }
+
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
 
@@ -38,7 +57,7 @@ export default class IntlDocument extends Document {
     try {
       ctx.renderPage = () =>
         originalRenderPage({
-          enhanceApp: App => props => sheet.collectStyles(<App {...props} />),
+          enhanceApp: App => props => ssrIntl.collectMessages(sheet.collectStyles(<App {...props} {...intlProps} />)),
         });
 
       const initialProps = await Document.getInitialProps(ctx);
@@ -47,6 +66,10 @@ export default class IntlDocument extends Document {
         ...initialProps,
         clientAnalytics,
         cspNonce: requestNonce,
+        intl: {
+          ...intlProps,
+          messages: ssrIntl.getMessages(),
+        },
         styles: (
           <React.Fragment>
             {initialProps.styles}
@@ -64,6 +87,14 @@ export default class IntlDocument extends Document {
     if (props.cspNonce) {
       props.__NEXT_DATA__.cspNonce = props.cspNonce;
     }
+
+    if (props.intl) {
+      props.__NEXT_DATA__.props = {
+        ...props.__NEXT_DATA__.props,
+        ...props.intl,
+      };
+    }
+
     // We pick the environment variables that we want to access from the client
     // They can later be read with getEnvVar()
     // Please, NEVER SECRETS!
@@ -88,7 +119,12 @@ export default class IntlDocument extends Document {
   render() {
     return (
       <Html>
-        <Head nonce={this.props.cspNonce} />
+        <Head nonce={this.props.cspNonce}>
+          {/* Preload locale message chunks to prevent flashing missing messages after hydration and state update on the client. */}
+          {this?.props?.intl?.locale && (
+            <script defer src={`_next/static/chunks/lang_${this.props.intl.locale}_json.js`} />
+          )}
+        </Head>
         <body>
           <Main nonce={this.props.cspNonce} />
           <NextScript nonce={this.props.cspNonce} />

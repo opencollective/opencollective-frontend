@@ -4,10 +4,10 @@ import { ApolloProvider } from '@apollo/client';
 import App from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
-import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
+import { getIntlProps } from '../lib/i18n/request';
 import theme from '../lib/theme';
 import defaultColors from '../lib/theme/colors';
 import withData from '../lib/withData';
@@ -34,17 +34,13 @@ Router.onRouteChangeComplete = () => NProgress.done();
 Router.onRouteChangeError = () => NProgress.done();
 
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
-import { getIntlProps } from '../lib/i18n/request';
 import sentryLib from '../server/sentry';
 
 import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
 import GlobalToasts from '../components/GlobalToasts';
+import IntlProvider from '../components/intl/IntlProvider';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
 import ToastProvider from '../components/ToastProvider';
-
-// This is optional but highly recommended
-// since it prevents memory leak
-const cache = createIntlCache();
 
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
@@ -60,22 +56,7 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   static async getInitialProps({ Component, ctx, client }) {
-    // Get the `locale` and `messages` from the request object on the server.
-    // In the browser, use the same values that the server serialized.
-    const intlProps = getIntlProps(ctx);
-
-    if (ctx.req && ctx.res) {
-      if (intlProps.locale !== 'en') {
-        // Prevent server side caching of non english content
-        ctx.res.setHeader('Cache-Control', 'no-store, no-cache, max-age=0');
-      } else {
-        // When using Cloudflare, there might be a default cache
-        // We're setting that for all requests to reduce the default to 1 minute
-        ctx.res.setHeader('Cache-Control', 'public, max-age=60');
-      }
-    }
-
-    const props = { pageProps: { skipDataFromTree: true }, scripts: {}, ...intlProps };
+    const props = { pageProps: { skipDataFromTree: true }, scripts: {}, ...getIntlProps(ctx) };
 
     try {
       if (Component.getInitialProps) {
@@ -132,16 +113,14 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   render() {
-    const { client, Component, pageProps, scripts, locale, messages } = this.props;
-
-    const intl = createIntl({ locale: locale || 'en', defaultLocale: 'en', messages }, cache);
+    const { client, Component, pageProps, scripts, locale } = this.props;
 
     return (
       <Fragment>
         <ApolloProvider client={client}>
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
-              <RawIntlProvider value={intl}>
+              <IntlProvider locale={locale}>
                 <ToastProvider>
                   <UserProvider>
                     <NewsAndUpdatesProvider>
@@ -152,7 +131,7 @@ class OpenCollectiveFrontendApp extends App {
                     </NewsAndUpdatesProvider>
                   </UserProvider>
                 </ToastProvider>
-              </RawIntlProvider>
+              </IntlProvider>
             </StripeProviderSSR>
           </ThemeProvider>
         </ApolloProvider>
