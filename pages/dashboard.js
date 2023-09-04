@@ -106,9 +106,7 @@ const DashboardPage = () => {
   const [lastWorkspaceVisit, setLastWorkspaceVisit] = useLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE, {
     slug: LoggedInUser?.slug,
   });
-  const activeSlug = LoggedInUser?.isAdminOfCollective({ slug: slug || lastWorkspaceVisit.slug })
-    ? slug || lastWorkspaceVisit.slug
-    : LoggedInUser?.collective.slug;
+  const activeSlug = slug || lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
 
   const { data, loading } = useQuery(adminPanelQuery, {
     context: API_V2_CONTEXT,
@@ -120,9 +118,15 @@ const DashboardPage = () => {
 
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
-    if (activeSlug && activeSlug !== lastWorkspaceVisit.slug) {
+    // Redirect unlogged users
+    if (!LoggedInUser && !loadingLoggedInUser) {
+      router.replace('/');
+    }
+    // Update last visited workspace
+    else if (activeSlug && activeSlug !== lastWorkspaceVisit.slug) {
       setLastWorkspaceVisit({ slug: activeSlug });
     }
+    // Fix URL if needed
     if (
       LoggedInUser &&
       router.query.slug !== activeSlug &&
@@ -130,7 +134,7 @@ const DashboardPage = () => {
     ) {
       router.replace(`/dashboard/${activeSlug || ''}`);
     }
-  }, [activeSlug]);
+  }, [activeSlug, LoggedInUser]);
 
   const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
