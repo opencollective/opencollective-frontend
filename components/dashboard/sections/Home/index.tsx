@@ -163,7 +163,7 @@ const Home = (props: AdminSectionProps) => {
       <div className="xl:w-64">
         <DismissibleMessage messageId={HELP_MESSAGE.WELCOME_TO_DASHBOARD}>
           {({ dismiss }) => (
-            <Alert className="fade-in relative flex items-start gap-4">
+            <Alert className="relative flex items-start gap-4 fade-in">
               <Image
                 className="block xl:hidden"
                 alt="Illustration of plant"
@@ -198,7 +198,7 @@ const Home = (props: AdminSectionProps) => {
                       className=" group font-medium hover:underline"
                     >
                       <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />{' '}
-                      <ArrowRight className="group-hover:animate-arrow-right inline-block" size={16} />
+                      <ArrowRight className="inline-block group-hover:animate-arrow-right" size={16} />
                     </a>
                   </div>
                 </AlertDescription>
