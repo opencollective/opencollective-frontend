@@ -28,7 +28,7 @@ import SearchBar from '../../SearchBar';
 import StyledButton from '../../StyledButton';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledTabs from '../../StyledTabs';
-import { H1, P, Span } from '../../Text';
+import { P, Span } from '../../Text';
 import { Pagination } from '../../ui/Pagination';
 import { AdminSectionProps } from '../types';
 
@@ -541,21 +541,21 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
 
   return (
     <Container>
-      <Flex justifyContent="space-between" alignItems="baseline">
-        <H1 fontSize="24px" lineHeight="32px" fontWeight="700">
+      <div className="flex justify-between gap-4">
+        <h1 className="text-2xl font-bold leading-10 tracking-tight">
           {isIncoming ? (
             <FormattedMessage id="Contributors" defaultMessage="Contributors" />
           ) : (
             <FormattedMessage id="Contributions" defaultMessage="Contributions" />
           )}
-        </H1>
+        </h1>
         <SearchBar
           placeholder={intl.formatMessage({ defaultMessage: 'Search...', id: 'search.placeholder' })}
           defaultValue={router.query.searchTerm}
           height="40px"
           onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
         />
-      </Flex>
+      </div>
       <Box my="24px">
         <StyledTabs tabs={tabs} selectedId={tab} onChange={handleTabUpdate} />
       </Box>

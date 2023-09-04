@@ -64,7 +64,13 @@ export default function Drawer({
   const disableEnforceFocus = Boolean(twoFactorPrompt?.isOpen);
   return (
     <DrawerActionsContext.Provider value={drawerActionsContainer}>
-      <MUIDrawer anchor="right" open={open} onClose={onClose} disableEnforceFocus={disableEnforceFocus}>
+      <MUIDrawer
+        className="[&_.MuiBackdrop-root]:bg-black/25"
+        anchor="right"
+        open={open}
+        onClose={onClose}
+        disableEnforceFocus={disableEnforceFocus}
+      >
         <StyledDrawerContainer maxWidth={maxWidth} data-cy={dataCy}>
           <Flex flex={1} flexDirection="column" overflowY="scroll">
             <Container position="relative" py={'24px'}>

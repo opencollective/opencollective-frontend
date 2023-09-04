@@ -231,7 +231,7 @@ const ProfileMenu = () => {
         <Popover.Trigger asChild>
           <StyledProfileButton isBorderless>
             <Flex alignItems="center" data-cy="user-menu-trigger" gridGap={2}>
-              <Avatar collective={get(LoggedInUser, 'collective')} radius={40} />
+              <Avatar collective={get(LoggedInUser, 'collective')} radius={36} />
             </Flex>
           </StyledProfileButton>
         </Popover.Trigger>
