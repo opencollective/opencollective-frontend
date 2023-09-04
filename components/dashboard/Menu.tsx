@@ -238,7 +238,7 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
                 if={isOneOfTypes(account, [COLLECTIVE, FUND, ORGANIZATION])}
               />
               <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.ADVANCED} />
-              <MenuGroup if={isSelfHostedAccount(account) && !isAccountantOnly} mt={24}>
+              <MenuGroup if={isSelfHostedAccount(account) && !isAccountantOnly} className="mt-6">
                 <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS} />
                 <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.RECEIVING_MONEY} />
                 <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />

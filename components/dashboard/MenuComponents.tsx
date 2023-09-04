@@ -136,9 +136,18 @@ export const MenuLink = ({
 export const MenuSectionHeader = ({ children, className }: { children: React.ReactNode; className?: string }) => (
   <div className={cn('px-4 text-xs font-medium leading-6 text-slate-600', className)}>{children}</div>
 );
-export const MenuGroup = ({ if: conditional, children, ...props }: { if?: boolean; children: React.ReactNode }) => {
+export const MenuGroup = ({
+  if: conditional,
+  className,
+  children,
+  ...props
+}: {
+  if?: boolean;
+  className?: string;
+  children: React.ReactNode;
+}) => {
   return conditional === false ? null : (
-    <div className="space-y-2" {...props}>
+    <div className={cn('space-y-2', className)} {...props}>
       {children}
     </div>
   );
