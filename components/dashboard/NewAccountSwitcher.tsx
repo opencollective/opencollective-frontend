@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { cx } from 'class-variance-authority';
 import { useCommandState } from 'cmdk';
-import { flatten, groupBy, set, uniqBy } from 'lodash';
-import { Check, ChevronsUpDown, Plus, PlusCircle, PlusIcon } from 'lucide-react';
+import { flatten, groupBy, uniqBy } from 'lodash';
+import { Check, ChevronsUpDown, PlusCircle } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { CollectiveType } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 import { cn } from '../../lib/utils';
@@ -15,28 +16,168 @@ import Avatar from '../Avatar';
 import { Button } from '../ui/Button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
-import { CollectiveType } from '../../lib/constants/collectives';
-
-const CREATE_NEW_LINKS = {
-  ORGANIZATION: '/organizations/new',
-  FUND: '/fund/create',
-  COLLECTIVE: '/create',
-};
 
 const CREATE_NEW_BUTTONS = {
   [CollectiveType.COLLECTIVE]: {
     linkLabel: <FormattedMessage id="home.create" defaultMessage="Create Collective" />,
+    getRoute: () => '/create',
   },
   [CollectiveType.ORGANIZATION]: {
     linkLabel: <FormattedMessage id="host.organization.create" defaultMessage="Create Organization" />,
+    getRoute: () => '/organizations/new',
   },
   [CollectiveType.EVENT]: {
     linkLabel: <FormattedMessage defaultMessage="Create Event" />,
+    getRoute: slug => `/${slug}/events/create`,
   },
   [CollectiveType.PROJECT]: {
     linkLabel: <FormattedMessage defaultMessage="Create Project" />,
+    getRoute: slug => `/${slug}/projects/create`,
   },
 };
+
+const AccountsCommand = ({
+  active,
+  isChild,
+  setActive,
+  selectedValue,
+  setSelectedValue,
+  hasInitialized,
+  setHasInitialized,
+  inputPlaceholder,
+  groupedAccounts,
+  setOpen,
+  activeAccount,
+  loggedInUserCollective,
+  archivedAccounts,
+  selectedParentSlug,
+}) => {
+  const intl = useIntl();
+  const router = useRouter();
+
+  const HiddenGroup = ({ accounts }) => {
+    const search = useCommandState(state => state.search);
+    // or if not search matches "archived"
+    if (!search && !activeAccount.isArchived) {
+      return null;
+    }
+    return (
+      <CommandGroup key={'archived'} heading={'Archived'} value="Archived">
+        {accounts.map(account => (
+          <CommandItem
+            key={`${account.slug} archived`}
+            onSelect={() => {
+              router.push(`/dashboard/${account.slug}`);
+              setOpen(false);
+            }}
+            value={`${account.slug} archived`}
+            className={cn(
+              'flex items-center justify-between rounded-lg',
+              activeAccount?.slug === account?.slug && 'bg-slate-200 aria-selected:bg-slate-200',
+            )}
+          >
+            <div className="flex items-center gap-2 truncate">
+              <Avatar collective={account} radius={16} />
+              <span className="truncate">{account.name}</span>
+            </div>
+            {activeAccount?.slug === account.slug && <Check className={cn('mr-2 h-4 w-4')} />}
+          </CommandItem>
+        ))}
+      </CommandGroup>
+    );
+  };
+
+  return (
+    <Command
+      className={cn('w-64', isChild && 'border-l', active ? 'bg-white' : 'bg-slate-50')}
+      onMouseOver={() => setActive(true)}
+      onFocus={e => {
+        if (e.relatedTarget instanceof HTMLInputElement) {
+          setActive(true);
+        }
+      }}
+      value={active ? selectedValue : ''}
+      onValueChange={v => {
+        if (hasInitialized) {
+          setSelectedValue(v);
+        } else {
+          setHasInitialized(true);
+        }
+      }}
+    >
+      <CommandInput placeholder={inputPlaceholder} autoFocus={active} />
+      <CommandEmpty>
+        <FormattedMessage defaultMessage="No account found." />
+      </CommandEmpty>
+      {/* TODO: include in Grouped Accounts */}
+      {!isChild && (
+        <CommandGroup heading={intl.formatMessage({ defaultMessage: 'Personal Account' })} hidden>
+          <CommandItem
+            key={loggedInUserCollective.slug}
+            onSelect={() => {
+              router.push(`/dashboard/${loggedInUserCollective.slug}`);
+              setOpen(false);
+            }}
+            value={loggedInUserCollective.slug}
+            className={cn(
+              'flex cursor-pointer items-center justify-between',
+              active ? 'aria-selected:bg-slate-100' : 'aria-selected:bg-transparent',
+            )}
+          >
+            <div className="flex items-center gap-2 truncate">
+              <Avatar collective={loggedInUserCollective} radius={16} />
+              <span className="truncate">{loggedInUserCollective?.name}</span>
+            </div>
+            {activeAccount?.slug === loggedInUserCollective?.slug && <Check className={cn('mr-2 h-4 w-4')} />}
+          </CommandItem>
+        </CommandGroup>
+      )}
+      {Object.entries(groupedAccounts).map(([collectiveType, accounts]) => {
+        return (
+          <CommandGroup key={collectiveType} heading={formatCollectiveType(intl, collectiveType, 2)}>
+            {accounts.map(account => (
+              <CommandItem
+                key={account.slug}
+                onSelect={() => {
+                  router.push(`/dashboard/${account.slug}`);
+                  setOpen(false);
+                }}
+                value={account.slug}
+                className={cn(
+                  'flex items-center justify-between',
+                  selectedValue === account.slug && !active && !isChild && 'bg-slate-200',
+                  active ? 'aria-selected:bg-slate-100' : 'aria-selected:bg-transparent',
+                )}
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <Avatar collective={account} radius={16} />
+                  <span className="truncate">{account.name}</span>
+                </div>
+                {activeAccount?.slug === account.slug && <Check className={cn('mr-2 h-4 w-4')} />}
+              </CommandItem>
+            ))}
+            <CommandItem
+              value={`${collectiveType}-create`}
+              onSelect={() => {
+                const route = CREATE_NEW_BUTTONS[collectiveType].getRoute(selectedParentSlug);
+                router.push(route);
+              }}
+              className={cn(
+                'flex items-center gap-2',
+                active ? 'aria-selected:bg-slate-100' : 'aria-selected:bg-transparent',
+              )}
+            >
+              <PlusCircle strokeWidth={1} absoluteStrokeWidth size={16} className="text-slate-500" />{' '}
+              <span className="truncate">{CREATE_NEW_BUTTONS[collectiveType].linkLabel}</span>
+            </CommandItem>
+          </CommandGroup>
+        );
+      })}
+      {archivedAccounts.length > 0 && <HiddenGroup accounts={archivedAccounts} />}
+    </Command>
+  );
+};
+
 const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   let administratedAccounts =
     loggedInUser?.memberOf.filter(m => m.role === 'ADMIN' && !m.collective.isIncognito).map(m => m.collective) || [];
@@ -61,7 +202,7 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   return { groupedAccounts, archivedAccounts };
 });
 
-const getGroupChildAccounts = memoizeOne(accounts => {
+const getGroupedChildAccounts = memoizeOne(accounts => {
   // Filter out Archived accounts and group it separately
   const archivedAccounts = accounts.filter(a => a.isArchived);
   const activeAccounts = accounts.filter(a => !a.isArchived);
@@ -80,9 +221,6 @@ const getGroupChildAccounts = memoizeOne(accounts => {
 export default function AccountSwitcher({ activeSlug }) {
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
-  const router = useRouter();
-  const childInput = React.useRef();
-  const rootInput = React.useRef();
   const [hasInitialized, setHasInitialized] = React.useState(false);
   const [hasInitializedChild, setHasInitializedChild] = React.useState(false);
 
@@ -120,41 +258,8 @@ export default function AccountSwitcher({ activeSlug }) {
   const childAccounts = selectedAccount?.children || [];
 
   const { groupedAccounts: childGroupedAccounts, archivedAccounts: childArchivedAccounts } =
-    getGroupChildAccounts(childAccounts);
-  const showEventAndProjects = ['ORGANIZATION', 'COLLECTIVE'].includes(selectedAccount?.type);
-  console.log({ childGroupedAccounts });
-
-  const HiddenGroup = ({ accounts }) => {
-    const search = useCommandState(state => state.search);
-    // or if not search matches "archived"
-    if (!search && !activeAccount.isArchived) {
-      return null;
-    }
-    return (
-      <CommandGroup key={'archived'} heading={'Archived'} value="Archived">
-        {accounts.map(account => (
-          <CommandItem
-            key={`${account.slug} archived`}
-            onSelect={() => {
-              router.push(`/dashboard/${account.slug}`);
-              setOpen(false);
-            }}
-            value={`${account.slug} archived`}
-            className={cn(
-              'flex items-center justify-between rounded-lg',
-              activeAccount?.slug === account?.slug && 'bg-slate-200 aria-selected:bg-slate-200',
-            )}
-          >
-            <div className="flex items-center gap-2 truncate">
-              <Avatar collective={account} radius={16} />
-              <span className="truncate">{account.name}</span>
-            </div>
-            {activeAccount?.slug === account.slug && <Check className={cn('mr-2 h-4 w-4')} />}
-          </CommandItem>
-        ))}
-      </CommandGroup>
-    );
-  };
+    getGroupedChildAccounts(childAccounts);
+  const showChildAccounts = ['ORGANIZATION', 'COLLECTIVE'].includes(selectedAccount?.type);
 
   return (
     <Popover
@@ -184,139 +289,41 @@ export default function AccountSwitcher({ activeSlug }) {
 
       <PopoverContent
         align="start"
-        className={cx('grid overflow-hidden rounded-xl p-0', showEventAndProjects ? 'grid-cols-2' : 'grid-cols-1')}
+        className={cx('grid overflow-hidden rounded-xl p-0', showChildAccounts ? 'grid-cols-2' : 'grid-cols-1')}
       >
-        <Command
-          className={cn('w-64', rootActive ? 'bg-white' : 'bg-slate-50')}
-          onMouseOver={() => setRootActive(true)}
-          onFocus={e => {
-            if (e.relatedTarget instanceof HTMLInputElement) {
-              setRootActive(true);
-            }
-          }}
-          value={rootActive ? selectedValue : ''}
-          onValueChange={v => {
-            if (hasInitialized) {
-              setSelectedValue(v);
-            } else {
-              setHasInitialized(true);
-            }
-          }}
-        >
-          <CommandInput placeholder="Search account..." autoFocus={rootActive} />
-          <CommandEmpty>No account found.</CommandEmpty>
-          <CommandGroup heading="Personal Account" hidden>
-            <CommandItem
-              key={loggedInUserCollective.slug}
-              onSelect={() => {
-                router.push(`/dashboard/${loggedInUserCollective.slug}`);
-                setOpen(false);
-              }}
-              value={loggedInUserCollective.slug}
-              className={cn(
-                'flex cursor-pointer items-center justify-between rounded-lg aria-selected:bg-slate-100',
-                // activeAccount?.slug === loggedInUserCollective?.slug && 'bg-slate-200 aria-selected:bg-slate-200',
-              )}
-            >
-              <div className="flex items-center gap-2 truncate">
-                <Avatar collective={loggedInUserCollective} radius={16} />
-                <span className="truncate">{loggedInUserCollective?.name}</span>
-              </div>
-              {activeAccount?.slug === loggedInUserCollective?.slug && <Check className={cn('mr-2 h-4 w-4')} />}
-            </CommandItem>
-          </CommandGroup>
-          {Object.entries(groupedAccounts).map(([collectiveType, accounts]) => {
-            return (
-              <CommandGroup key={collectiveType} heading={formatCollectiveType(intl, collectiveType, 2)}>
-                {accounts.map(account => (
-                  <CommandItem
-                    key={account.id}
-                    onSelect={() => {
-                      router.push(`/dashboard/${account.slug}`);
-                      setOpen(false);
-                    }}
-                    value={account.slug}
-                    className={cn(
-                      'flex items-center justify-between aria-selected:bg-slate-100',
-                      // selectedValue === account.slug && 'bg-slate-100',
-                      selectedValue === account.slug && !rootActive && 'bg-slate-200',
+        <AccountsCommand
+          active={rootActive}
+          isChild={false}
+          setActive={setRootActive}
+          selectedValue={selectedValue}
+          setSelectedValue={setSelectedValue}
+          hasInitialized={hasInitialized}
+          setHasInitialized={setHasInitialized}
+          inputPlaceholder={intl.formatMessage({ defaultMessage: 'Search accounts...' })}
+          groupedAccounts={groupedAccounts}
+          setOpen={setOpen}
+          activeAccount={activeAccount}
+          loggedInUserCollective={loggedInUserCollective}
+          archivedAccounts={archivedAccounts}
+        />
 
-                      // activeAccount?.slug === account?.slug && 'bg-slate-200 aria-selected:bg-slate-200',
-                    )}
-                  >
-                    <div className="flex items-center gap-2 truncate">
-                      <Avatar collective={account} radius={16} />
-                      <span className="truncate">{account.name}</span>
-                    </div>
-                    {activeAccount?.slug === account.slug && <Check className={cn('mr-2 h-4 w-4')} />}
-                  </CommandItem>
-                ))}
-                <CommandItem value={`${collectiveType}-create`}>
-                  <PlusCircle strokeWidth={1} absoluteStrokeWidth size={16} className="mr-2 text-slate-500" />{' '}
-                  <span className="truncate">{CREATE_NEW_BUTTONS[collectiveType].linkLabel}</span>
-                </CommandItem>
-              </CommandGroup>
-            );
-          })}
-
-          {archivedAccounts.length > 0 && <HiddenGroup accounts={archivedAccounts} />}
-        </Command>
-
-        {showEventAndProjects && (
-          <Command
-            className={cn('w-64 border-l', rootActive ? 'bg-slate-50' : 'bg-white')}
-            onMouseOver={() => setRootActive(false)}
-            onFocus={() => setRootActive(false)}
-            value={rootActive ? '' : selectedValueChild}
-            onValueChange={v => {
-              if (hasInitializedChild) {
-                setSelectedValueChild(v);
-              } else {
-                setHasInitializedChild(true);
-              }
-            }}
-          >
-            <CommandInput placeholder="Search event or project..." autoFocus={!rootActive} />
-
-            {Object.entries(childGroupedAccounts).map(([collectiveType, accounts]) => {
-              return (
-                <CommandGroup key={collectiveType} heading={formatCollectiveType(intl, collectiveType, 2)}>
-                  {accounts.map(account => (
-                    <CommandItem
-                      key={account.id}
-                      onSelect={() => {
-                        router.push(`/dashboard/${account.slug}`);
-                        setOpen(false);
-                      }}
-                      value={account.id}
-                      className={cn(
-                        'flex items-center justify-between',
-                        // activeAccount?.slug === account?.slug && 'aria-selected:bg-slate-50',
-                        !rootActive ? 'aria-selected:bg-slate-100' : 'aria-selected:bg-transparent',
-                      )}
-                    >
-                      <div className="flex items-center gap-2 truncate">
-                        <Avatar collective={account} radius={16} />
-                        <span className="truncate">{account.name}</span>
-                      </div>
-                      {activeAccount?.slug === account.slug && <Check className={cn('mr-2 h-4 w-4')} />}
-                    </CommandItem>
-                  ))}
-                  <CommandItem
-                    value={`${collectiveType}-create`}
-                    className={cn(
-                      // activeAccount?.slug === account?.slug && 'aria-selected:bg-slate-50',
-                      !rootActive ? 'aria-selected:bg-slate-100' : 'aria-selected:bg-transparent',
-                    )}
-                  >
-                    <PlusCircle strokeWidth={1} absoluteStrokeWidth size={16} className="mr-2 text-slate-500" />
-                    <span className="truncate">{CREATE_NEW_BUTTONS[collectiveType].linkLabel}</span>
-                  </CommandItem>
-                </CommandGroup>
-              );
-            })}
-            <HiddenGroup accounts={childArchivedAccounts} />
-          </Command>
+        {showChildAccounts && (
+          <AccountsCommand
+            active={!rootActive}
+            isChild={true}
+            selectedParentSlug={selectedValue}
+            setActive={active => setRootActive(!active)}
+            selectedValue={selectedValueChild}
+            setSelectedValue={setSelectedValueChild}
+            hasInitialized={hasInitializedChild}
+            setHasInitialized={setHasInitializedChild}
+            inputPlaceholder={intl.formatMessage({ defaultMessage: 'Search projects and events...' })}
+            groupedAccounts={childGroupedAccounts}
+            setOpen={setOpen}
+            activeAccount={activeAccount}
+            loggedInUserCollective={loggedInUserCollective}
+            archivedAccounts={childArchivedAccounts}
+          />
         )}
       </PopoverContent>
     </Popover>
