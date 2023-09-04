@@ -20,7 +20,7 @@ type MenuLinkProps = {
   children?: React.ReactNode;
   isBeta?: boolean;
   isStrong?: boolean;
-  onClick?: () => void;
+  onClick?: (e: Event) => void;
   href?: string;
   afterClick?: () => void;
   Icon?: LucideIcon;

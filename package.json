@@ -10,6 +10,7 @@
     "node": "18.x",
     "npm": "9.x"
   },
+  "files": [],
   "dependencies": {
     "@apollo/client": "3.7.17",
     "@dnd-kit/core": "6.0.8",

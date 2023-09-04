@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { capitalize } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import type { Account } from '../../../../lib/graphql/types/v2/graphql';
 import { ActivityDescriptionI18n } from '../../../../lib/i18n/activities';

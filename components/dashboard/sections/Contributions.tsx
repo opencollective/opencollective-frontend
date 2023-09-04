@@ -28,7 +28,7 @@ import SearchBar from '../../SearchBar';
 import StyledButton from '../../StyledButton';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledTabs from '../../StyledTabs';
-import { H1, P, Span } from '../../Text';
+import { P, Span } from '../../Text';
 import { Pagination } from '../../ui/Pagination';
 import { AdminSectionProps } from '../types';
 

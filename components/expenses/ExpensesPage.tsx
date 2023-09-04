@@ -17,7 +17,7 @@ import MessageBox from '../MessageBox';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import Tags from '../Tags';
-import { H1, H5 } from '../Text';
+import { H5 } from '../Text';
 
 import { ExpensesDirection } from './filters/ExpensesDirection';
 import ExpensesOrder from './filters/ExpensesOrder';
@@ -99,9 +99,7 @@ const Expenses = props => {
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         )}
       </h1>
-      {/* <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-       
-      </H1> */}
+
       <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}>
         {!onlySubmittedExpenses && (
           <Box flex="0 1" flexBasis={['100%', null, '380px']}>

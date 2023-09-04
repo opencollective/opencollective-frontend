@@ -44,6 +44,7 @@ const AdminPanelSideBar = ({
       <div>
         {isLoading ? (
           [...Array(6)].map((_, i) => (
+            // eslint-disable-next-line react/no-array-index-key
             <div key={i} className={cn('py-1.5', i === 0 ? 'mb-4' : 'mb-2')}>
               <LoadingPlaceholder height={24} borderRadius={100} maxWidth={'70%'} />
             </div>

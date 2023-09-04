@@ -21,7 +21,7 @@ import { PERIOD_FILTER_PRESETS } from '../PeriodFilterPresetsSelect';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
-import { H1, H2 } from '../Text';
+import { H2 } from '../Text';
 
 import HostCSVDownloadButton from './reports-section/HostCSVDownloadButton';
 import HostFeesSection from './reports-section/HostFeesSection';

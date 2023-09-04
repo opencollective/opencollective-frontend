@@ -13,8 +13,6 @@ import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import Pagination from '../../Pagination';
 import SearchBar from '../../SearchBar';
-import StyledHr from '../../StyledHr';
-import { H1 } from '../../Text';
 import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from '../HostAdminCollectiveFilters';
 
 import PendingApplication, { processApplicationAccountFields } from './PendingApplication';

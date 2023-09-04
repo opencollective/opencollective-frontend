@@ -14,12 +14,11 @@ import AgreementsTable from '../agreements/AgreementsTable';
 import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from '../agreements/fragments';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import FilesViewerModal from '../FilesViewerModal';
-import { Box, Flex } from '../Grid';
+import { Flex } from '../Grid';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import StyledButton from '../StyledButton';
-import StyledHr from '../StyledHr';
-import { H1, Span } from '../Text';
+import { Span } from '../Text';
 
 const hostDashboardAgreementsQuery = gql`
   query HostAgreements($hostSlug: String!, $limit: Int!, $offset: Int!, $account: [AccountReferenceInput]) {
