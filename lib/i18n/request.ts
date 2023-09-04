@@ -6,8 +6,7 @@ import { NextPageContext } from 'next';
 
 const supportedLanguages = ['en'];
 
-const languages = require.context('../../lang', false, /\.json$/i, 'lazy');
-
+const languages = require.context('../../lang', false, /\.json$/i, 'weak');
 languages.keys().forEach(element => {
   const match = element.match(/\.?\/?([^.]+)\.json$/);
   if (match) {
@@ -68,6 +67,32 @@ export function getRequestIntl(req: NextPageContext['req']): IntlProps {
   }
 }
 
-export function getLocaleMessages(locale: string) {
-  return languages(`./${locale}.json`);
+/** Fetches the i18n messages for the given locale, async */
+export function getLocaleMessages(locale: string): Promise<Record<string, string>> {
+  return import(
+    /* webpackInclude: /\.json$/i */
+    /* webpackChunkName: "i18n-messages-[request]" */
+    /* webpackMode: "lazy" */
+    `../../lang/${locale}.json`
+  );
+  // return languages(`./${locale}.json`);
+}
+
+/** Client only. If the given locale i18n messages were already loaded, returning it sync from the webpack module cache.
+ * This is used as the initial state of the IntlProvider messages in the first pass of the react hydration after SSR.
+ */
+export function getPreloadedLocaleMessages(locale: string) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  // checks if the module is loaded using a weak require (does not include the dependency in this bundle)
+  const moduleId = require.resolveWeak(`../../lang/${locale}.json`);
+  // eslint-disable-next-line no-undef, camelcase
+  if (moduleId && __webpack_modules__[moduleId]) {
+    // if the module is loaded, require it using the webpack raw require to avoid adding it to this bundle as a dependency.
+    // eslint-disable-next-line no-undef
+    return __webpack_require__(moduleId);
+  }
+
+  return;
 }
