@@ -8,11 +8,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import DashboardViews from '../../dashboard/DashboardViews';
-import { Box, Flex } from '../../Grid';
+import { Box } from '../../Grid';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import Pagination from '../../Pagination';
 import SearchBar from '../../SearchBar';
-import { H1 } from '../../Text';
 import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from '../HostAdminCollectiveFilters';
 
 import HostApplicationDrawer from './HostApplicationDrawer';
