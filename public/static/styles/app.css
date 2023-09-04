@@ -204,6 +204,10 @@
   display: none;
 }
 
+#nprogress .bar {
+  @apply bg-blue-500;
+}
+
 .markdown {
   @apply leading-7 text-gray-950;
 }
