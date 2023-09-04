@@ -25,7 +25,6 @@ import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 import { VerticalSeparator } from '../ui/Separator';
 
-import OldProfileMenu from './OldProfileMenu';
 import ProfileMenu from './ProfileMenu';
 
 const NavList = styled(Flex)`
@@ -236,8 +235,8 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle }: T
 
   return (
     <Fragment>
-      <div className="border-b bg-white px-4 md:px-8">
-        <div className="flex  h-16 items-center justify-between gap-4 py-4">
+      <div className="border-b bg-white px-4 md:px-8" ref={ref}>
+        <div className="flex h-16 items-center justify-between gap-4 py-4">
           <Flex alignItems="center" gridGap={[2, 3]}>
             <Box flexShrink={0}>
               <Link href={ocLogoRoute}>
@@ -398,8 +397,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle }: T
                 <Hide xs>
                   <ChangelogTrigger height="36px" width="36px" />
                 </Hide>
-                {/* <ProfileMenu /> */}
-                <OldProfileMenu />
+                <ProfileMenu />
               </Fragment>
             )}
           </Flex>

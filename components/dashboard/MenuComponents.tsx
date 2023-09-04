@@ -1,20 +1,35 @@
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { ChevronUp, ChevronDown, ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, LucideIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import ReactAnimateHeight from 'react-animate-height';
 import { useIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
 
 import { getWorkspaceRoute } from '../../lib/url-helpers';
+import { cn } from '../../lib/utils';
 
 import { Flex } from '../Grid';
 import Link from '../Link';
-import StyledLink from '../StyledLink';
-import { Span } from '../Text';
-import { cn } from '../../lib/utils';
+
 import { SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
+
+type MenuLinkProps = {
+  if?: boolean;
+  section?: string;
+  selectedSection?: string;
+  children?: React.ReactNode;
+  isBeta?: boolean;
+  isStrong?: boolean;
+  onClick?: () => void;
+  href?: string;
+  afterClick?: () => void;
+  Icon?: LucideIcon;
+  renderSubMenu?: (props: { parentSection: string }) => React.ReactNode;
+  parentSection?: string;
+  goToSection?: string;
+  className?: string;
+  external?: boolean;
+};
 
 export const MenuLink = ({
   section,
@@ -29,7 +44,7 @@ export const MenuLink = ({
   goToSection,
   className,
   external,
-}) => {
+}: MenuLinkProps) => {
   const router = useRouter();
   const { selectedSection, expandedSection, setExpandedSection, account } = React.useContext(DashboardContext);
   const expanded = expandedSection === section;
@@ -118,42 +133,13 @@ export const MenuLink = ({
   );
 };
 
-MenuLink.propTypes = {
-  if: PropTypes.bool,
-  section: PropTypes.string,
-  selectedSection: PropTypes.string,
-  children: PropTypes.node,
-  isBeta: PropTypes.bool,
-  isStrong: PropTypes.bool,
-  onClick: PropTypes.func,
-  afterClick: PropTypes.func,
-  Icon: PropTypes.func,
-  renderSubMenu: PropTypes.func,
-  parentSection: PropTypes.string,
-  goToSection: PropTypes.string,
-};
-
-// export const MenuSectionHeader = styled.div`
-//   font-weight: 500;
-//   font-size: 12px;
-//   line-height: 24px;
-//   margin-bottom: 6px;
-
-//   color: ${props => props.theme.colors.black[600]};
-// `;
-
-export const MenuSectionHeader = ({ children, className }) => (
+export const MenuSectionHeader = ({ children, className }: { children: React.ReactNode; className?: string }) => (
   <div className={cn('px-4 text-xs font-medium leading-6 text-slate-600', className)}>{children}</div>
 );
-export const MenuGroup = ({ if: conditional, children, ...props }) => {
+export const MenuGroup = ({ if: conditional, children, ...props }: { if?: boolean; children: React.ReactNode }) => {
   return conditional === false ? null : (
     <div className="space-y-2" {...props}>
       {children}
     </div>
   );
-};
-
-MenuGroup.propTypes = {
-  if: PropTypes.bool,
-  children: PropTypes.node,
 };

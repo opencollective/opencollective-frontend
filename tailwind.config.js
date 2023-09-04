@@ -13,20 +13,6 @@ module.exports = {
       },
     },
     extend: {
-      // colors: {
-      //   primary: {
-      //     50: 'var(--primary-color-50)',
-      //     100: 'var(--primary-color-100)',
-      //     200: 'var(--primary-color-200)',
-      //     300: 'var(--primary-color-300)',
-      //     400: 'var(--primary-color-400)',
-      //     500: 'var(--primary-color-500)',
-      //     600: 'var(--primary-color-600)',
-      //     700: 'var(--primary-color-700)',
-      //     800: 'var(--primary-color-800)',
-      //     900: 'var(--primary-color-900)',
-      //   },
-      // },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -87,7 +73,7 @@ module.exports = {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'arrow-right': 'arrow-right 0.2s ease-out forwards', // added 'forwards' value
+        'arrow-right': 'arrow-right 0.2s ease-out forwards',
       },
     },
   },

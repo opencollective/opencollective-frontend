@@ -4,12 +4,13 @@ import { flatten } from 'lodash';
 import { ArrowRight, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
+import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { WorkspaceHomeQuery } from '../../../../lib/graphql/types/v2/graphql';
 import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 
+import DismissibleMessage from '../../../DismissibleMessage';
 import ExpenseDrawer from '../../../expenses/ExpenseDrawer';
 import { Flex } from '../../../Grid';
 import Image from '../../../Image';
@@ -110,12 +111,6 @@ const Home = (props: AdminSectionProps) => {
               {...props}
             />
           </Flex>
-          {/* <p className="mb-4 mt-2 text-sm text-muted-foreground">
-            <FormattedMessage
-              id="Dashboard.Home.ActivitySubtitle"
-              defaultMessage="Everything that's relevant to you inside Open Collective as a feed."
-            />
-          </p> */}
           <div className="mt-4 space-y-4">
             {error && !isTimelineBeingGenerated ? (
               <MessageBoxGraphqlError error={error} />
@@ -166,51 +161,58 @@ const Home = (props: AdminSectionProps) => {
         </Flex>
       </div>
       <div className="xl:w-64">
-        <Alert className="relative flex items-start gap-4">
-          <Image
-            className="block xl:hidden"
-            alt="Illustration of plant"
-            width={48}
-            height={48}
-            src="/static/images/dashboard.png"
-          />
-          <div>
-            <div className="mb-2 flex items-start gap-3">
+        <DismissibleMessage messageId={HELP_MESSAGE.WELCOME_TO_DASHBOARD}>
+          {({ dismiss }) => (
+            <Alert className="fade-in relative flex items-start gap-4">
               <Image
-                className="hidden xl:block"
+                className="block xl:hidden"
                 alt="Illustration of plant"
                 width={48}
                 height={48}
                 src="/static/images/dashboard.png"
               />
-              <AlertTitle className="text-lg leading-tight">
-                <FormattedMessage id="Dashboard.Banner.Title" defaultMessage="Welcome to your new dashboard" />
-              </AlertTitle>
-            </div>
+              <div>
+                <div className="mb-2 flex items-start gap-3">
+                  <Image
+                    className="hidden xl:block"
+                    alt="Illustration of plant"
+                    width={48}
+                    height={48}
+                    src="/static/images/dashboard.png"
+                  />
+                  <AlertTitle className="text-lg leading-tight">
+                    <FormattedMessage id="Dashboard.Banner.Title" defaultMessage="Welcome to your new dashboard" />
+                  </AlertTitle>
+                </div>
 
-            <AlertDescription className="mt-1 max-w-prose">
-              <FormattedMessage
-                id="Dashboard.Banner.Description"
-                defaultMessage="We’ve created this space for you to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations."
-              />
-              <div className="mt-3 flex justify-between space-x-2">
-                <a
-                  href="https://docs.google.com/forms/d/1-WGUCUF_i5HPS6AsN8kTfqofyt0q0HB-q7na4cQL788/viewform"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className=" group font-medium hover:underline"
-                >
-                  <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />{' '}
-                  <ArrowRight className="group-hover:animate-arrow-right inline-block" size={16} />
-                </a>
+                <AlertDescription className="mt-1 max-w-prose">
+                  <FormattedMessage
+                    id="Dashboard.Banner.Description"
+                    defaultMessage="We’ve created this space for you to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations."
+                  />
+                  <div className="mt-3 flex justify-between space-x-2">
+                    <a
+                      href="https://docs.google.com/forms/d/1-WGUCUF_i5HPS6AsN8kTfqofyt0q0HB-q7na4cQL788/viewform"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className=" group font-medium hover:underline"
+                    >
+                      <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />{' '}
+                      <ArrowRight className="group-hover:animate-arrow-right inline-block" size={16} />
+                    </a>
+                  </div>
+                </AlertDescription>
               </div>
-            </AlertDescription>
-          </div>
 
-          <button className="absolute right-1 top-1 rounded-full p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-900">
-            <X size={16} />
-          </button>
-        </Alert>
+              <button
+                className="absolute right-1 top-1 rounded-full p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                onClick={dismiss}
+              >
+                <X size={16} />
+              </button>
+            </Alert>
+          )}
+        </DismissibleMessage>
       </div>
     </div>
   );

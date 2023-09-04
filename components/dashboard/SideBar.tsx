@@ -1,11 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { MenuIcon } from 'lucide-react';
 
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn } from '../../lib/utils';
 
-import { Box } from '../Grid';
 import { HideGlobalScroll } from '../HideGlobalScroll';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import { DrawerMenu } from '../navigation/DrawerMenu';
@@ -14,15 +12,22 @@ import StyledRoundButton from '../StyledRoundButton';
 import AccountSwitcher from './AccountSwitcher';
 import Menu from './Menu';
 
+interface AdminPanelSideBarProps {
+  isLoading?: boolean;
+  selectedSection?: string;
+  isAccountantOnly?: boolean;
+  onRoute?: (...args: any[]) => void;
+  activeSlug?: string;
+}
+
 const AdminPanelSideBar = ({
-  collective,
   activeSlug,
   isAccountantOnly,
   isLoading,
   selectedSection,
   onRoute: _onRoute,
   ...props
-}) => {
+}: AdminPanelSideBarProps) => {
   const [isMenuOpen, setMenuOpen] = React.useState(false);
   const { viewport } = useWindowResize();
   const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
@@ -38,17 +43,17 @@ const AdminPanelSideBar = ({
     () => (
       <div>
         {isLoading ? (
-          [...Array(5).keys()].map(i => (
-            <Box key={i}>
-              <LoadingPlaceholder height={24} mb={12} borderRadius={8} maxWidth={'70%'} />
-            </Box>
+          [...Array(6)].map((_, i) => (
+            <div key={i} className={cn('py-1.5', i === 0 ? 'mb-4' : 'mb-2')}>
+              <LoadingPlaceholder height={24} borderRadius={100} maxWidth={'70%'} />
+            </div>
           ))
         ) : (
-          <Menu {...{ collective, selectedSection, onRoute, isAccountantOnly }} />
+          <Menu {...{ selectedSection, onRoute, isAccountantOnly }} />
         )}
       </div>
     ),
-    [collective, isLoading, viewport],
+    [isLoading, viewport],
   );
 
   return (
@@ -58,7 +63,7 @@ const AdminPanelSideBar = ({
     >
       <div className="sticky top-8 z-10">
         <div className="flex flex-row-reverse gap-4 sm:flex-auto md:flex-col">
-          <AccountSwitcher activeSlug={activeSlug} isLoading={isLoading} />
+          <AccountSwitcher activeSlug={activeSlug} />
           {isMobile && (
             <React.Fragment>
               <StyledRoundButton size={50} onClick={() => setMenuOpen(true)} data-cy="mobile-menu-trigger">
@@ -78,20 +83,6 @@ const AdminPanelSideBar = ({
       </div>
     </div>
   );
-};
-
-AdminPanelSideBar.propTypes = {
-  isLoading: PropTypes.bool,
-  selectedSection: PropTypes.string,
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    name: PropTypes.string,
-    type: PropTypes.string,
-    isHost: PropTypes.bool,
-  }),
-  isAccountantOnly: PropTypes.bool,
-  onRoute: PropTypes.func,
-  activeSlug: PropTypes.string,
 };
 
 export default AdminPanelSideBar;

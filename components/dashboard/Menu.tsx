@@ -131,9 +131,9 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
           </MenuSectionHeader>
         )}
         <MenuLink section={COLLECTIVE_SECTIONS.DASHBOARD_OVERVIEW} Icon={LayoutDashboard} if={isIndividual} />
+        <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} Icon={Receipt} />
         <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTORS} Icon={Users} if={!isIndividual} />
         <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTIONS} Icon={Coins} />
-        <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} Icon={Receipt} />
         <MenuLink
           section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
           Icon={Coins}
