@@ -41,7 +41,7 @@ const SocialLink = styled.a`
   }
 `;
 
-const MenuLink = styled(StyledLink)`
+const MenuLink = styled(Link)`
   color: ${props => props.theme.colors.black[700]};
   font-size: 13px;
   line-height: 16px;

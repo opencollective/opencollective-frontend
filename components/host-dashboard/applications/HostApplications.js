@@ -105,18 +105,16 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
 
   return (
     <Box maxWidth={1000} m="0 auto">
-      <Flex alignItems="center" mb={24} flexWrap="wrap">
-        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
-          <FormattedMessage id="HostDashboard.HostApplications" defaultMessage="Applications" />
-        </H1>
-        <Box mx="auto" />
-        <Box p={2}>
-          <SearchBar
-            defaultValue={query.searchTerm}
-            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-          />
-        </Box>
-      </Flex>
+      <div className="flex flex-wrap justify-between gap-4">
+        <h1 className="text-2xl font-bold leading-10 tracking-tight">
+          <FormattedMessage id="host.dashboard.tab.pendingApplications" defaultMessage="Pending applications" />
+        </h1>
+        <SearchBar
+          height={40}
+          defaultValue={query.searchTerm}
+          onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
+        />
+      </div>
 
       <DashboardViews
         query={query}

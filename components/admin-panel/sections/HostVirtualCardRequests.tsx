@@ -138,10 +138,10 @@ export default function HostVirtualCardRequests(props: HostVirtualCardRequestsPr
 
   return (
     <Box>
-      <P fontSize="24px" fontWeight="700" lineHeight="32px" mb={3}>
+      <h1 className="text-2xl font-bold leading-10 tracking-tight">
         <FormattedMessage id="VirtualCardRequests.Title" defaultMessage="Virtual Card Requests" />
-      </P>
-      <P mb={3}>
+      </h1>
+      <p className="mb-4 text-muted-foreground">
         <FormattedMessage
           id="Host.VirtualCardRequests.List.Description"
           defaultMessage="Manage virtual card requests made by your hosted collectives. <learnMoreLink>Learn more</learnMoreLink>"
@@ -152,7 +152,7 @@ export default function HostVirtualCardRequests(props: HostVirtualCardRequestsPr
             }),
           }}
         />
-      </P>
+      </p>
       <Box mb={3}>
         <StripeVirtualCardComplianceStatement />
       </Box>

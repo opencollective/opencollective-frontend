@@ -6,17 +6,17 @@ import styled from 'styled-components';
 import { Flex } from './Grid';
 import Hide from './Hide';
 import StyledButton from './StyledButton';
-import { Span } from './Text';
 
 const SearchButton = styled(StyledButton)`
-  color: #6b7280;
+  color: #64748b;
   font-weight: 400;
-  height: 40px;
+  height: 36px;
   padding: 0 12px;
   max-width: 280px;
   width: 280px;
   min-width: 120px;
   flex-shrink: 4;
+  letter-spacing: 0;
 
   @media screen and (max-width: 52em) {
     width: 32px;
@@ -62,12 +62,12 @@ const SearchTrigger = ({ setShowSearchModal }) => {
       <Flex alignItems="center" gridGap="6px">
         <Search size={16} />
         <Hide xs sm>
-          <Span fontSize="12px" fontWeight={400} lineHeight="16px">
+          <span className="text-xs">
             <FormattedMessage
               defaultMessage="Search for Profiles and Collectives {slash}"
               values={{ slash: <span className="slash">/</span> }}
             />
-          </Span>
+          </span>
         </Hide>
       </Flex>
     </SearchButton>
