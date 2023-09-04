@@ -2,10 +2,10 @@ import * as React from 'react';
 import { cx } from 'class-variance-authority';
 import { useCommandState } from 'cmdk';
 import { flatten, groupBy, set, uniqBy } from 'lodash';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, Plus, PlusCircle, PlusIcon } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../lib/i18n/collective-type';
@@ -13,9 +13,30 @@ import { cn } from '../../lib/utils';
 
 import Avatar from '../Avatar';
 import { Button } from '../ui/Button';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../ui/Command';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
+import { CollectiveType } from '../../lib/constants/collectives';
 
+const CREATE_NEW_LINKS = {
+  ORGANIZATION: '/organizations/new',
+  FUND: '/fund/create',
+  COLLECTIVE: '/create',
+};
+
+const CREATE_NEW_BUTTONS = {
+  [CollectiveType.COLLECTIVE]: {
+    linkLabel: <FormattedMessage id="home.create" defaultMessage="Create Collective" />,
+  },
+  [CollectiveType.ORGANIZATION]: {
+    linkLabel: <FormattedMessage id="host.organization.create" defaultMessage="Create Organization" />,
+  },
+  [CollectiveType.EVENT]: {
+    linkLabel: <FormattedMessage defaultMessage="Create Event" />,
+  },
+  [CollectiveType.PROJECT]: {
+    linkLabel: <FormattedMessage defaultMessage="Create Project" />,
+  },
+};
 const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   let administratedAccounts =
     loggedInUser?.memberOf.filter(m => m.role === 'ADMIN' && !m.collective.isIncognito).map(m => m.collective) || [];
@@ -29,7 +50,11 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   const archivedAccounts = administratedAccounts.filter(a => a.isArchived);
   const activeAccounts = administratedAccounts.filter(a => !a.isArchived);
 
-  const groupedAccounts = groupBy(activeAccounts, a => a.type);
+  const groupedAccounts = {
+    [CollectiveType.COLLECTIVE]: [],
+    [CollectiveType.ORGANIZATION]: [],
+    ...groupBy(activeAccounts, a => a.type),
+  };
   // if (archivedAccounts?.length > 0) {
   //   groupedAccounts.archived = archivedAccounts;
   // }
@@ -41,17 +66,23 @@ const getGroupChildAccounts = memoizeOne(accounts => {
   const archivedAccounts = accounts.filter(a => a.isArchived);
   const activeAccounts = accounts.filter(a => !a.isArchived);
 
-  const groupedAccounts = groupBy(activeAccounts, a => a.type);
+  const groupedAccounts = {
+    [CollectiveType.PROJECT]: [],
+    [CollectiveType.EVENT]: [],
+    ...groupBy(activeAccounts, a => a.type),
+  };
   // if (archivedAccounts?.length > 0) {
   //   groupedAccounts.archived = archivedAccounts;
   // }
   return { groupedAccounts, archivedAccounts };
 });
 
-export default function ComboboxDemo({ activeSlug }) {
+export default function AccountSwitcher({ activeSlug }) {
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
+  const childInput = React.useRef();
+  const rootInput = React.useRef();
   const [hasInitialized, setHasInitialized] = React.useState(false);
   const [hasInitializedChild, setHasInitializedChild] = React.useState(false);
 
@@ -85,10 +116,14 @@ export default function ComboboxDemo({ activeSlug }) {
     return null;
   }
 
-  const childAccounts = rootAccounts.find(a => a.slug === selectedValue)?.children || [];
+  const selectedAccount = rootAccounts.find(a => a.slug === selectedValue);
+  const childAccounts = selectedAccount?.children || [];
+
   const { groupedAccounts: childGroupedAccounts, archivedAccounts: childArchivedAccounts } =
     getGroupChildAccounts(childAccounts);
-  const showEventAndProjects = childAccounts.filter(a => !a.isArchived).length > 0;
+  const showEventAndProjects = ['ORGANIZATION', 'COLLECTIVE'].includes(selectedAccount?.type);
+  console.log({ childGroupedAccounts });
+
   const HiddenGroup = ({ accounts }) => {
     const search = useCommandState(state => state.search);
     // or if not search matches "archived"
@@ -152,8 +187,13 @@ export default function ComboboxDemo({ activeSlug }) {
         className={cx('grid overflow-hidden rounded-xl p-0', showEventAndProjects ? 'grid-cols-2' : 'grid-cols-1')}
       >
         <Command
-          className={cn('w-64', rootActive ? 'bg-white' : 'bg-gray-50')}
+          className={cn('w-64', rootActive ? 'bg-white' : 'bg-slate-50')}
           onMouseOver={() => setRootActive(true)}
+          onFocus={e => {
+            if (e.relatedTarget instanceof HTMLInputElement) {
+              setRootActive(true);
+            }
+          }}
           value={rootActive ? selectedValue : ''}
           onValueChange={v => {
             if (hasInitialized) {
@@ -163,7 +203,7 @@ export default function ComboboxDemo({ activeSlug }) {
             }
           }}
         >
-          <CommandInput placeholder="Search account..." />
+          <CommandInput placeholder="Search account..." autoFocus={rootActive} />
           <CommandEmpty>No account found.</CommandEmpty>
           <CommandGroup heading="Personal Account" hidden>
             <CommandItem
@@ -174,8 +214,8 @@ export default function ComboboxDemo({ activeSlug }) {
               }}
               value={loggedInUserCollective.slug}
               className={cn(
-                'flex cursor-pointer items-center justify-between rounded-lg',
-                activeAccount?.slug === loggedInUserCollective?.slug && 'bg-slate-200 aria-selected:bg-slate-200',
+                'flex cursor-pointer items-center justify-between rounded-lg aria-selected:bg-slate-100',
+                // activeAccount?.slug === loggedInUserCollective?.slug && 'bg-slate-200 aria-selected:bg-slate-200',
               )}
             >
               <div className="flex items-center gap-2 truncate">
@@ -197,8 +237,11 @@ export default function ComboboxDemo({ activeSlug }) {
                     }}
                     value={account.slug}
                     className={cn(
-                      'flex items-center justify-between rounded-lg',
-                      activeAccount?.slug === account?.slug && 'bg-slate-200 aria-selected:bg-slate-200',
+                      'flex items-center justify-between aria-selected:bg-slate-100',
+                      // selectedValue === account.slug && 'bg-slate-100',
+                      selectedValue === account.slug && !rootActive && 'bg-slate-200',
+
+                      // activeAccount?.slug === account?.slug && 'bg-slate-200 aria-selected:bg-slate-200',
                     )}
                   >
                     <div className="flex items-center gap-2 truncate">
@@ -208,16 +251,22 @@ export default function ComboboxDemo({ activeSlug }) {
                     {activeAccount?.slug === account.slug && <Check className={cn('mr-2 h-4 w-4')} />}
                   </CommandItem>
                 ))}
+                <CommandItem value={`${collectiveType}-create`}>
+                  <PlusCircle strokeWidth={1} absoluteStrokeWidth size={16} className="mr-2 text-slate-500" />{' '}
+                  <span className="truncate">{CREATE_NEW_BUTTONS[collectiveType].linkLabel}</span>
+                </CommandItem>
               </CommandGroup>
             );
           })}
 
           {archivedAccounts.length > 0 && <HiddenGroup accounts={archivedAccounts} />}
         </Command>
+
         {showEventAndProjects && (
           <Command
-            className={cn('w-64 border-l', rootActive ? 'bg-gray-50' : 'bg-white')}
+            className={cn('w-64 border-l', rootActive ? 'bg-slate-50' : 'bg-white')}
             onMouseOver={() => setRootActive(false)}
+            onFocus={() => setRootActive(false)}
             value={rootActive ? '' : selectedValueChild}
             onValueChange={v => {
               if (hasInitializedChild) {
@@ -227,7 +276,7 @@ export default function ComboboxDemo({ activeSlug }) {
               }
             }}
           >
-            <CommandInput placeholder="Search event or project..." />
+            <CommandInput placeholder="Search event or project..." autoFocus={!rootActive} />
 
             {Object.entries(childGroupedAccounts).map(([collectiveType, accounts]) => {
               return (
@@ -241,8 +290,9 @@ export default function ComboboxDemo({ activeSlug }) {
                       }}
                       value={account.id}
                       className={cn(
-                        'flex items-center justify-between rounded-lg',
-                        activeAccount?.slug === account?.slug && 'bg-slate-200 aria-selected:bg-slate-200',
+                        'flex items-center justify-between',
+                        // activeAccount?.slug === account?.slug && 'aria-selected:bg-slate-50',
+                        !rootActive ? 'aria-selected:bg-slate-100' : 'aria-selected:bg-transparent',
                       )}
                     >
                       <div className="flex items-center gap-2 truncate">
@@ -252,6 +302,16 @@ export default function ComboboxDemo({ activeSlug }) {
                       {activeAccount?.slug === account.slug && <Check className={cn('mr-2 h-4 w-4')} />}
                     </CommandItem>
                   ))}
+                  <CommandItem
+                    value={`${collectiveType}-create`}
+                    className={cn(
+                      // activeAccount?.slug === account?.slug && 'aria-selected:bg-slate-50',
+                      !rootActive ? 'aria-selected:bg-slate-100' : 'aria-selected:bg-transparent',
+                    )}
+                  >
+                    <PlusCircle strokeWidth={1} absoluteStrokeWidth size={16} className="mr-2 text-slate-500" />
+                    <span className="truncate">{CREATE_NEW_BUTTONS[collectiveType].linkLabel}</span>
+                  </CommandItem>
                 </CommandGroup>
               );
             })}
