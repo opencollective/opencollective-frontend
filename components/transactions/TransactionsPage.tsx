@@ -24,7 +24,6 @@ import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledSpinner from '../StyledSpinner';
-import { H1 } from '../Text';
 
 import { getDefaultKinds, parseTransactionKinds } from './filters/TransactionsKindFilter';
 import { parseTransactionPaymentMethodTypes } from './filters/TransactionsPaymentMethodTypeFilter';
@@ -190,19 +189,19 @@ const Transactions = ({
 
   return (
     <Container>
-      <Flex justifyContent="space-between" alignItems="baseline" gap="16px">
-        <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+      <div className="flex flex-wrap justify-between gap-4">
+        <h1 className={isDashboard ? 'text-2xl font-bold leading-10 tracking-tight' : 'text-[32px] leading-10'}>
           <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
-        </H1>
-        <Box flexGrow={[1, 0]}>
+        </h1>
+        <div className="flex-grow sm:flex-grow-0">
           <SearchBar
             placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…' })}
             defaultValue={router.query.searchTerm}
             height="40px"
             onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
           />
-        </Box>
-      </Flex>
+        </div>
+      </div>
       <Flex
         mb={['8px', '23px']}
         mt={4}

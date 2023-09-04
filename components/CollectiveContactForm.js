@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
-import Container from './Container';
 import { Box } from './Grid';
 import MessageBox from './MessageBox';
 import MessageBoxGraphqlError from './MessageBoxGraphqlError';
@@ -111,10 +110,10 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange 
         )}
       </StyledInputField>
       {error && <MessageBoxGraphqlError error={error} mt={3} />}
-      <Container mt={2}>
+      <p className="mt-2 text-sm">
         <FormattedMessage defaultMessage="Message needs to be at least 10 characters long" />
-      </Container>
-      {isModal && <hr />}
+      </p>
+      {isModal && <hr className="my-5" />}
       <Box textAlign={isModal ? 'right' : ''}>
         <StyledButton
           mt={isModal ? 0 : 4}
