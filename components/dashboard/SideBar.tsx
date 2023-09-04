@@ -4,7 +4,6 @@ import { MenuIcon } from 'lucide-react';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn } from '../../lib/utils';
 
-import { HideGlobalScroll } from '../HideGlobalScroll';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import { DrawerMenu } from '../navigation/DrawerMenu';
 import StyledRoundButton from '../StyledRoundButton';
@@ -75,7 +74,6 @@ const AdminPanelSideBar = ({
                 <DrawerMenu anchor="left" open={isMenuOpen} onClose={() => setMenuOpen(false)} p="16px">
                   {content}
                 </DrawerMenu>
-                <HideGlobalScroll />
               </React.Fragment>
             </React.Fragment>
           )}
