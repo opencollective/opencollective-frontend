@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import { startsWith } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -122,7 +123,11 @@ const DashboardPage = () => {
     if (activeSlug && activeSlug !== lastWorkspaceVisit.slug) {
       setLastWorkspaceVisit({ slug: activeSlug });
     }
-    if (router.query.slug !== activeSlug) {
+    if (
+      LoggedInUser &&
+      router.query.slug !== activeSlug &&
+      !startsWith(router.query.asPath, `/dashboard/${activeSlug}`)
+    ) {
       router.replace(`/dashboard/${activeSlug || ''}`);
     }
   }, [activeSlug]);
