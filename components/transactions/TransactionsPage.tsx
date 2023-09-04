@@ -31,6 +31,7 @@ import { parseTransactionPaymentMethodTypes } from './filters/TransactionsPaymen
 import TransactionsDownloadCSV from './TransactionsDownloadCSV';
 import TransactionsFilters from './TransactionsFilters';
 import TransactionsList from './TransactionsList';
+import { cn } from '../../lib/utils';
 
 const EXPENSES_PER_PAGE = 15;
 
@@ -191,7 +192,7 @@ const Transactions = ({
   return (
     <Container>
       <div className="flex flex-wrap justify-between gap-4">
-        <h1 className="text-2xl font-bold leading-10 tracking-tight">
+        <h1 className={isDashboard ? 'text-2xl font-bold leading-10 tracking-tight' : 'text-[32px] leading-10'}>
           <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
         </h1>
         <div className="flex-grow sm:flex-grow-0">

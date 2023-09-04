@@ -92,7 +92,7 @@ const Expenses = props => {
 
   return (
     <Container>
-      <h1 className="text-2xl font-bold leading-10 tracking-tight">
+      <h1 className={isDashboard ? 'text-2xl font-bold leading-10 tracking-tight' : 'text-[32px] leading-10'}>
         {onlySubmittedExpenses ? (
           <FormattedMessage defaultMessage="Submitted Expenses" />
         ) : (

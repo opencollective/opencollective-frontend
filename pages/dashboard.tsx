@@ -1,7 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { startsWith } from 'lodash';
-
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -20,13 +19,13 @@ import Footer from '../components/dashboard/Footer';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
 import { Flex } from '../components/Grid';
+import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
-import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 import StyledLink from '../components/StyledLink';
-import Link from '../components/Link';
+import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 
 const messages = defineMessages({
   collectiveIsArchived: {
