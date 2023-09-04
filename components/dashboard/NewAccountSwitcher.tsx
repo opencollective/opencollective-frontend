@@ -48,7 +48,7 @@ const getGroupChildAccounts = memoizeOne(accounts => {
   return { groupedAccounts, archivedAccounts };
 });
 
-export default function ComboboxDemo({ activeSlug, divider }) {
+export default function ComboboxDemo({ activeSlug }) {
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();

@@ -19,11 +19,12 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
 import { makeTruncatedValueAllSelectedLabelContainer, StyledSelectFilter } from '../../../StyledSelectFilter';
 import { H2 } from '../../../Text';
-import { Alert, AlertDescription, AlertTitle } from '../../../ui/Alert';
 import { AdminSectionProps } from '../../types';
-
+import { Alert, AlertTitle, AlertDescription } from '../../../ui/Alert';
 import { workspaceHomeQuery } from './query';
 import TimelineItem from './TimelineItem';
+import { Button } from '../../../ui/Button';
+import { ArrowRight, X } from 'lucide-react';
 const PAGE_SIZE = 20;
 
 const REACT_SELECT_COMPONENT_OVERRIDE = {
@@ -77,7 +78,7 @@ const Home = (props: AdminSectionProps) => {
         <p className="text-muted-foreground">
           <FormattedMessage
             id="Dashboard.Home.Subtitle"
-            defaultMessage="The latest news and updates you need to know in Open Collective."
+            defaultMessage="A quick look at all that is relevant for you inside Open Collective."
           />
         </p>
 
