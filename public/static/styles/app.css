@@ -189,10 +189,24 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground overflow-y-auto;
+    @apply bg-background text-foreground overflow-y-scroll h-full;
     font-family: 'Inter', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+html {
+  --charcoal-grey-two: #373a3d;
+  --charcoal-grey-three: #45484c;
+  --main-custom-color: #8f47b3;
+  --silver-four: #e1e4e6;
+  --cool-grey: #9ea2a6;
+  --attention: #e69900;
+  --gunmetal: #505559;
+  --fade-blue: #97b7f3;
+
+  height: 100%;
+  width: 100%;
 }
 
 #nprogress {
