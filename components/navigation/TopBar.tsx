@@ -235,7 +235,7 @@ const TopBar = ({ menuItems, showProfileAndChangelogMenu, account, navTitle }: T
 
   return (
     <Fragment>
-      <div className="border-b bg-white px-4 md:px-8" ref={ref}>
+      <div className="border-b bg-white px-4 md:px-7" ref={ref}>
         <div className="flex h-16 items-center justify-between gap-4 py-4">
           <Flex alignItems="center" gridGap={[2, 3]}>
             <Box flexShrink={0}>

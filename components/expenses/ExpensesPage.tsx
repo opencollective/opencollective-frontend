@@ -99,7 +99,6 @@ const Expenses = props => {
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         )}
       </h1>
-
       <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}>
         {!onlySubmittedExpenses && (
           <Box flex="0 1" flexBasis={['100%', null, '380px']}>
