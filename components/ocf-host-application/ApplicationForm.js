@@ -16,7 +16,7 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyChecked, verifyEmailPattern, verifyFieldLength } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { i18nOCFApplicationFormLabel } from '../../lib/i18n/ocf-form';
+import { i18nOCFApplicationFormLabel } from '../../lib/i18n/custom-application-form';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';

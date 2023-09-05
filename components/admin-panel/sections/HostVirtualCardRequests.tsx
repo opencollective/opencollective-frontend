@@ -88,7 +88,7 @@ type HostVirtualCardRequestsProps = {
   hostSlug: string;
 };
 
-export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
+export default function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
   const queryFilter = useQueryFilter({
     ignoreQueryParams: ['slug', 'section'],
     filters: {
@@ -202,5 +202,3 @@ export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
     </Box>
   );
 }
-
-export default HostVirtualCardRequests;

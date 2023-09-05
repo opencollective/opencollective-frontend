@@ -161,7 +161,8 @@ const UploadedFilePreview = ({
     } else {
       return {
         as: 'div',
-        onClick: () => {
+        onClick: e => {
+          e.stopPropagation();
           openFileViewer(url);
         },
       };

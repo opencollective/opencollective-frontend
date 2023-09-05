@@ -73,8 +73,8 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
         <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} Icon={Coins} />
         <MenuLink section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS} Icon={Coins} if={!isAccountantOnly} />
         <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS} Icon={FileText} if={isInternalHost(account)} />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS} if={!isAccountantOnly} Icon={Inbox} />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES} if={!isAccountantOnly} Icon={Network} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_APPLICATIONS} Icon={Inbox} if={!isAccountantOnly} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES} Icon={Network} if={!isAccountantOnly} />
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS}
           Icon={CreditCard}
@@ -85,7 +85,7 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
           Icon={CreditCard}
           if={!isAccountantOnly && hasFeature(account, FEATURES.VIRTUAL_CARDS)}
         />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} isBeta Icon={Chart} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} Icon={Chart} isBeta />
 
         <MenuLink
           Icon={Settings}

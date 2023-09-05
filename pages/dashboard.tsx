@@ -18,7 +18,6 @@ import AdminPanelSection from '../components/dashboard/DashboardSection';
 import Footer from '../components/dashboard/Footer';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
-import { Flex } from '../components/Grid';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
@@ -168,7 +167,7 @@ const DashboardPage = () => {
       >
         {Boolean(notification) && <NotificationBar {...notification} />}
         {blocker ? (
-          <Flex flexDirection="column" alignItems="center" my={6}>
+          <div className="my-32 flex flex-col items-center">
             <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
               <p>{blocker}</p>
               {LoggedInUser && (
@@ -178,16 +177,11 @@ const DashboardPage = () => {
               )}
             </MessageBox>
             {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
-          </Flex>
+          </div>
         ) : (
-          <Flex
-            flexDirection={['column', 'column', 'row']}
-            justifyContent={'center'}
-            minHeight={600}
-            gridGap={[24, null, 48]}
+          <div
+            className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row md:px-6 lg:gap-12 lg:py-8"
             data-cy="admin-panel-container"
-            py={['24px', null, '32px']}
-            px={['16px', '24px']}
           >
             <AdminPanelSideBar
               isLoading={isLoading}
@@ -198,7 +192,7 @@ const DashboardPage = () => {
             {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage className="lg:mt-16" />
             ) : (
-              <div className="max-w-[1000px] flex-1 overflow-clip">
+              <div className="max-w-[1000px] flex-1 sm:overflow-x-clip">
                 <AdminPanelSection
                   section={selectedSection}
                   isLoading={isLoading}
@@ -207,7 +201,7 @@ const DashboardPage = () => {
                 />
               </div>
             )}
-          </Flex>
+          </div>
         )}
         <Footer />
       </Page>

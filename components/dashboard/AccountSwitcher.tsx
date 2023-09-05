@@ -284,13 +284,15 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                       </Flex>
                       {EMPTY_GROUP_STATE[collectiveType] && accounts.length === 0 && (
                         <div className="mx-1 flex flex-col">
-                          <p className="text-xs text-gray-700">{EMPTY_GROUP_STATE[collectiveType].emptyMessage}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {EMPTY_GROUP_STATE[collectiveType].emptyMessage}
+                          </p>
                           <Link
-                            className="my-3 inline-flex items-center rounded-lg border border border-input bg-transparent px-6 py-4 shadow-sm transition-colors hover:bg-gray-50 hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+                            className="my-3 inline-flex items-center rounded-lg border border-input px-6 py-4 text-accent-foreground shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
                             href="/create"
                           >
-                            <div className="mr-3 rounded-full border bg-white p-2">
-                              <Plus size={12} color="#76777A" />
+                            <div className="mr-3 rounded-full border bg-white p-2 text-muted-foreground">
+                              <Plus size={12} />
                             </div>
                             {EMPTY_GROUP_STATE[collectiveType].linkLabel}
                           </Link>
