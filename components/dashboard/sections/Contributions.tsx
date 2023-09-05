@@ -38,7 +38,7 @@ enum ContributionsTab {
   CANCELED = 'CANCELED',
 }
 
-const DEFAULT_VARIABLES = {
+const VIEWS = {
   RECURRING: {
     onlyActiveSubscriptions: true,
     includeIncognito: true,
@@ -56,19 +56,8 @@ const DEFAULT_VARIABLES = {
   },
 };
 
-const manageContributionsQuery = gql`
-  query DashboardRecurringContributions(
-    $slug: String!
-    $searchTerm: String
-    $offset: Int
-    $limit: Int
-    $filter: AccountOrdersFilter!
-    $frequency: ContributionFrequency
-    $status: [OrderStatus!]
-    $onlyActiveSubscriptions: Boolean
-    $includeIncognito: Boolean
-    $minAmount: Int
-  ) {
+const dashboardContributionsMetadataQuery = gql`
+  query DashboardRecurringContributions($slug: String!, $filter: AccountOrdersFilter!) {
     account(slug: $slug) {
       id
       legacyId
@@ -83,6 +72,34 @@ const manageContributionsQuery = gql`
           slug
         }
       }
+      RECURRING: orders(filter: $filter, onlyActiveSubscriptions: true, includeIncognito: true) {
+        totalCount
+      }
+      ONETIME: orders(filter: $filter, frequency: ONETIME, status: [PAID], includeIncognito: true, minAmount: 1) {
+        totalCount
+      }
+      CANCELED: orders(filter: $filter, status: [CANCELLED], includeIncognito: true) {
+        totalCount
+      }
+    }
+  }
+`;
+
+const dashboardContributionsQuery = gql`
+  query DashboardRecurringContributions(
+    $slug: String!
+    $searchTerm: String
+    $offset: Int
+    $limit: Int
+    $filter: AccountOrdersFilter!
+    $frequency: ContributionFrequency
+    $status: [OrderStatus!]
+    $onlyActiveSubscriptions: Boolean
+    $includeIncognito: Boolean
+    $minAmount: Int
+  ) {
+    account(slug: $slug) {
+      id
       orders(
         filter: $filter
         frequency: $frequency
@@ -491,24 +508,32 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
   const router = useRouter();
   const intl = useIntl();
   const [tab, setTab] = React.useState<ContributionsTab>(ContributionsTab.RECURRING);
-  const [counters, setCounters] = React.useState<Record<ContributionsTab, number>>({
-    [ContributionsTab.RECURRING]: undefined,
-    [ContributionsTab.ONETIME]: undefined,
-    [ContributionsTab.CANCELED]: undefined,
-  });
   const queryValues = pickQueryFilters(router.query);
-  const { data, loading, error } = useQuery(manageContributionsQuery, {
+  const {
+    data: metadata,
+    loading: metadataLoading,
+    error: metadataError,
+  } = useQuery(dashboardContributionsMetadataQuery, {
+    variables: {
+      slug: account.slug,
+      filter: direction || 'OUTGOING',
+    },
+    context: API_V2_CONTEXT,
+  });
+  const {
+    data,
+    previousData,
+    loading: queryLoading,
+    error: queryError,
+  } = useQuery(dashboardContributionsQuery, {
     variables: {
       slug: account.slug,
       filter: direction || 'OUTGOING',
       limit: PAGE_SIZE,
-      ...DEFAULT_VARIABLES[tab],
+      ...VIEWS[tab],
       ...queryValues,
     },
     context: API_V2_CONTEXT,
-    onCompleted: data => {
-      setCounters({ ...counters, [tab]: data.account.orders.totalCount });
-    },
   });
   const [view, setView] = React.useState<'table' | 'card'>('table');
   const [editOrder, setEditOrder] = React.useState<{ order?: { id: string }; action: EditOrderActions }>({
@@ -518,15 +543,29 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
   useWindowResize(() => setView(window.innerWidth > BREAKPOINTS.LARGE ? 'table' : 'card'));
 
   const tabs = [
-    { id: ContributionsTab.RECURRING, label: 'Recurring', count: counters[ContributionsTab.RECURRING] },
-    { id: ContributionsTab.ONETIME, label: 'One-Time', count: counters[ContributionsTab.ONETIME] },
-    { id: ContributionsTab.CANCELED, label: 'Canceled', count: counters[ContributionsTab.CANCELED] },
+    {
+      id: ContributionsTab.RECURRING,
+      label: 'Recurring',
+      count: metadata?.account?.[ContributionsTab.RECURRING].totalCount,
+    },
+    {
+      id: ContributionsTab.ONETIME,
+      label: 'One-Time',
+      count: metadata?.account?.[ContributionsTab.ONETIME].totalCount,
+    },
+    {
+      id: ContributionsTab.CANCELED,
+      label: 'Canceled',
+      count: metadata?.account?.[ContributionsTab.CANCELED].totalCount,
+    },
   ];
 
-  const pages = Math.ceil((counters[tab] || 1) / PAGE_SIZE);
+  const selectedOrders = data?.account?.orders.nodes || [];
+  const pages = Math.ceil(((data || previousData)?.account?.orders.totalCount || 1) / PAGE_SIZE);
   const currentPage = toNumber((queryValues.offset || 0) + PAGE_SIZE) / PAGE_SIZE;
   const isIncoming = direction === 'INCOMING';
-  const selectedOrders = data?.account?.orders.nodes || [];
+  const loading = metadataLoading || queryLoading;
+  const error = metadataError || queryError;
 
   const updateFilters = props =>
     router.replace({ pathname: router.asPath.split('?')[0], query: pickQueryFilters({ ...router.query, ...props }) });
