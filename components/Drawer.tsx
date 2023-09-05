@@ -52,6 +52,7 @@ export function Drawer({
                   type="button"
                   isBorderless
                   onClick={onClose}
+                  data-cy="close-drawer"
                 >
                   <X size={20} aria-hidden="true" />
                 </StyledRoundButton>
@@ -97,7 +98,7 @@ export function DrawerHeader({
       <h3 className="mt-1 text-lg font-medium text-slate-900">{title}</h3>
       <div className="flex flex-col-reverse items-end gap-1 sm:flex-row sm:items-center sm:gap-4">
         {statusTag}
-        <StyledRoundButton size={36} type="button" isBorderless onClick={onClose}>
+        <StyledRoundButton size={36} type="button" isBorderless onClick={onClose} data-cy="close-drawer">
           <X size={20} aria-hidden="true" />
         </StyledRoundButton>
       </div>

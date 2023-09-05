@@ -53,7 +53,7 @@ export const columns: ColumnDef<HostApplication>[] = [
       const account = cell.getValue() as HostApplication['account'];
 
       return (
-        <div className="flex items-center gap-2 truncate">
+        <div className="flex items-center gap-2 truncate" id={`application-${account.legacyId}`}>
           <Avatar collective={account} radius={24} />
           <span className="truncate">{account.name}</span>
         </div>
