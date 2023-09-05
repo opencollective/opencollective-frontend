@@ -106,7 +106,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
     <Box maxWidth={1000} m="0 auto">
       <div className="flex flex-wrap justify-between gap-4">
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
-          <FormattedMessage id="host.dashboard.tab.pendingApplications" defaultMessage="Pending applications" />
+          <FormattedMessage id="Menu.HostApplications" defaultMessage="Host Applications" />
         </h1>
         <SearchBar
           height={40}

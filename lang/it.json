@@ -2028,6 +2028,7 @@
   "menu.documentation": "Documentation",
   "menu.help": "Aiuto",
   "menu.homepage": "Homepage",
+  "Menu.HostApplications": "Host Applications",
   "menu.howItWorks": "Come funziona",
   "menu.invitations": "Invitations ({numberOfInvitations})",
   "menu.logout": "Esci",

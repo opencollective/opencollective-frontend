@@ -2028,6 +2028,7 @@
   "menu.documentation": "Documentation",
   "menu.help": "帮助",
   "menu.homepage": "Homepage",
+  "Menu.HostApplications": "Host Applications",
   "menu.howItWorks": "运行模式",
   "menu.invitations": "Invitations ({numberOfInvitations})",
   "menu.logout": "登出",

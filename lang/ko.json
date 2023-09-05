@@ -2028,6 +2028,7 @@
   "menu.documentation": "Documentation",
   "menu.help": "도움말",
   "menu.homepage": "Homepage",
+  "Menu.HostApplications": "Host Applications",
   "menu.howItWorks": "작동 원리",
   "menu.invitations": "Invitations ({numberOfInvitations})",
   "menu.logout": "로그아웃",
