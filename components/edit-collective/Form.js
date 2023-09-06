@@ -498,6 +498,7 @@ class EditCollectiveForm extends React.Component {
         return (
           <Box>
             {collective.type === USER && <EditUserEmailForm />}
+            {collective.type === ORGANIZATION && <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />}
             {[COLLECTIVE, FUND, PROJECT, EVENT].includes(collective.type) && (
               <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
             )}
@@ -509,7 +510,7 @@ class EditCollectiveForm extends React.Component {
       // Fiscal Hosts
 
       case ALL_SECTIONS.FISCAL_HOSTING:
-        return <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />;
+        return null;
 
       case ALL_SECTIONS.RECEIVING_MONEY:
         return <ReceivingMoney collective={collective} />;
