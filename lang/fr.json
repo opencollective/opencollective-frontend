@@ -1769,7 +1769,6 @@
   "HostApplication.form.mainInfo": "Infos principales",
   "HostApplication.form.publicInformation": "Ce champ est public. N'ajoutez pas d'informations personnelles telles que des noms ou des adresses dans ce champ.",
   "HostApplication.form.readFaqs": "Lisez notre FAQ",
-  "HostApplication.form.RepositoryUrlLabel": "Votre dépôt ou votre organisation",
   "HostApplication.form.subheading": "Présentez votre Collectif, veuillez inclure autant de contexte que possible afin que nous puissions vous offrir le meilleur service qui soit ! Vous avez des doutes ? {faqLink}",
   "HostApplication.form.team": "Votre équipe",
   "HostApplication.form.tellUsMoreHelpText": "Nous voulons en savoir plus sur vous et sur la façon dont nous pouvons vous aider.",
