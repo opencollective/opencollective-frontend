@@ -1769,7 +1769,6 @@
   "HostApplication.form.mainInfo": "מידע ראשי",
   "HostApplication.form.publicInformation": "המידע הזה פומבי. נא לא לכתוב מידע אישי כמו שמות או כתובות.",
   "HostApplication.form.readFaqs": "לקריאת תשובות לשאלות נפוצות",
-  "HostApplication.form.RepositoryUrlLabel": "מאגר הקוד או הארגון שלך",
   "HostApplication.form.subheading": "Introduce your Collective, please include as much context as possible so we can give you the best service we can! Have doubts? {faqLink}",
   "HostApplication.form.team": "אודות הצוות",
   "HostApplication.form.tellUsMoreHelpText": "אנחנו רוצים לדעת עוד עליך ואיך אפשר לעזור.",
