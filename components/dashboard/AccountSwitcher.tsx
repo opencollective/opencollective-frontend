@@ -228,7 +228,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
   const activeAccount = allAdministratedAccounts.find(a => a.slug === activeSlug) || loggedInUserCollective;
 
   return (
-    <Dropdown trigger="click" flexGrow="1">
+    <Dropdown trigger="click" className="flex-grow">
       {({ triggerProps, dropdownProps }) => (
         <React.Fragment>
           <Flex alignItems="center" flex={0}>

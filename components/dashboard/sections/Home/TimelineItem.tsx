@@ -46,12 +46,12 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
           <LoadingPlaceholder height={16} width={300} />
         ) : (
           <div className="flex flex-1 items-center justify-between">
-            <p className="text-foreground">
+            <div className="text-foreground">
               {intl.formatMessage(
                 ActivityTimelineMessageI18n[activity.type] || ActivityDescriptionI18n[activity.type],
                 getActivityVariables(intl, activity, { onClickExpense: openExpense }),
               )}
-            </p>
+            </div>
 
             <div className="text-muted-foreground">
               {isLastWeek ? (
