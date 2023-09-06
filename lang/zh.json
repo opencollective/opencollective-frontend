@@ -1769,7 +1769,6 @@
   "HostApplication.form.mainInfo": "主要信息",
   "HostApplication.form.publicInformation": "此信息是公开的。请不要添加任何个人信息，如此字段中的姓名或地址。",
   "HostApplication.form.readFaqs": "阅读我们的常见问题",
-  "HostApplication.form.RepositoryUrlLabel": "你的仓库或组织",
   "HostApplication.form.subheading": "Introduce your Collective, please include as much context as possible so we can give you the best service we can! Have doubts? {faqLink}",
   "HostApplication.form.team": "你的团队",
   "HostApplication.form.tellUsMoreHelpText": "We want to know more about you and how we can help you.",
