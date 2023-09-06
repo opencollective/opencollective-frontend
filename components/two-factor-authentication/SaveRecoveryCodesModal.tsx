@@ -56,6 +56,7 @@ export function SaveRecoveryCodesModal(props: SaveRecoveryCodesModalProps) {
                 <FormattedMessage id="TwoFactorAuth.Setup.Form.FinishSetup" defaultMessage="Finish setup" />
               </StyledButton>
               <StyledButton
+                display="flex"
                 onClick={() =>
                   saveAs(
                     new Blob([props.recoveryCodes.join('\n')], { type: 'text/plain;charset=utf-8' }),

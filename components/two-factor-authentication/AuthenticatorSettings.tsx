@@ -107,25 +107,30 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
           <FormattedMessage defaultMessage="Authenticator App" />
         </H3>
       </Flex>
+      <div className="mb-3 text-sm">
+        <FormattedMessage defaultMessage="An application that supports TOTP (time-based one-time password). For example, Google Authenticator and 1Password." />
+      </div>
       <Box>
         {userTwoFactorMethods.map(device => {
           return (
-            <Box px={4} key={device.id} data-cy="authenticator-2fa-method">
+            <Box className="border-b last:border-b-0" mx={4} key={device.id} data-cy="authenticator-2fa-method">
               <UserTwoFactorMethodItem individual={props.individual} userTwoFactorMethod={device} />
             </Box>
           );
         })}
       </Box>
-      <Box mt={3}>
-        <StyledButton
-          onClick={() => setIsAddingAuthenticator(true)}
-          buttonSize="tiny"
-          buttonStyle="secondary"
-          display="flex"
-        >
-          <FormattedMessage defaultMessage="Add authenticator" /> <PlusIcon size="14px" />
-        </StyledButton>
-      </Box>
+      {userTwoFactorMethods.length === 0 && (
+        <Box mt={3}>
+          <StyledButton
+            onClick={() => setIsAddingAuthenticator(true)}
+            buttonSize="tiny"
+            buttonStyle="secondary"
+            display="flex"
+          >
+            <FormattedMessage defaultMessage="Add authenticator" /> <PlusIcon size="14px" />
+          </StyledButton>
+        </Box>
+      )}
       {isAddingAuthenticator && (
         <AddAuthenticatorModal
           onClose={() => setIsAddingAuthenticator(false)}

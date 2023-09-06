@@ -13845,6 +13845,11 @@ type Mutation {
     message: NonEmptyString!
     subject: String
   ): SendMessageResult
+
+  """
+  Regenerate two factor authentication recovery codes
+  """
+  regenerateRecoveryCodes: [String!]
   createApplication(application: ApplicationCreateInput!): Application
   updateApplication(application: ApplicationUpdateInput!): Application
   deleteApplication(application: ApplicationReferenceInput!): Application
@@ -14630,22 +14635,6 @@ type Mutation {
     """
     year: Int!
   ): SetTaxFormResult
-
-  """
-  Add platform tips to a transaction. Scope: "transactions".
-  """
-  addPlatformTipToTransaction(
-    """
-    Reference to the transaction in the platform tip
-    """
-    transaction: TransactionReferenceInput!
-
-    """
-    Amount of the platform tip
-    """
-    amount: AmountInput!
-  ): Transaction!
-    @deprecated(reason: "2022-07-06: This feature will not be supported in the future. Please don't rely on it.")
 
   """
   Refunds a transaction. Scope: "transactions".

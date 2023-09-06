@@ -89,13 +89,7 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
 
   return (
     <React.Fragment>
-      <Flex
-        alignItems="center"
-        py={2}
-        style={{
-          borderBottom: '1px solid #DCDDE0',
-        }}
-      >
+      <Flex alignItems="center" py={2}>
         <Box>
           <CheckCircle2Icon color="#0EA755" />
         </Box>

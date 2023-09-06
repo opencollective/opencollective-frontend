@@ -110,10 +110,13 @@ export function DevicesSettings(props: DevicesSettingsProps) {
           <FormattedMessage defaultMessage="U2F (Universal 2nd Factor)" />
         </H3>
       </Flex>
+      <div className="mb-3 text-sm">
+        <FormattedMessage defaultMessage="A device or platform authenticator that supports the U2F specification. This can be a hardware key (like a YubiKey) or other methods supported by your browser." />
+      </div>
       <Box>
         {twoFactorMethods.map(device => {
           return (
-            <Box px={4} key={device.id}>
+            <Box className="border-b last:border-b-0" mx={4} key={device.id}>
               <UserTwoFactorMethodItem individual={props.individual} userTwoFactorMethod={device} />
             </Box>
           );

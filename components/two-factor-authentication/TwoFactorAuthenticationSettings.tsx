@@ -9,6 +9,7 @@ import { P } from '../Text';
 import { AuthenticatorSettings } from './AuthenticatorSettings';
 import { DevicesSettings } from './DevicesSettings';
 import { RecoverySettings } from './RecoverySettings';
+import { ResetTwoFactorButton } from './ResetTwoFactorButton';
 import { SaveRecoveryCodesModal } from './SaveRecoveryCodesModal';
 
 type TwoFactorAuthenticationSettingsProps = {
@@ -47,7 +48,13 @@ export function TwoFactorAuthenticationSettings(props: TwoFactorAuthenticationSe
 
         {props.userTwoFactorAuthenticationMethods.length > 0 && (
           <Box mt={3}>
-            <RecoverySettings individual={props.individual} />
+            <RecoverySettings onRecoveryCodes={codes => setRecoveryCodes(codes)} />
+          </Box>
+        )}
+
+        {props.userTwoFactorAuthenticationMethods.length > 0 && (
+          <Box mt={3}>
+            <ResetTwoFactorButton individual={props.individual} />
           </Box>
         )}
       </Box>
