@@ -1769,7 +1769,6 @@
   "HostApplication.form.mainInfo": "Main info",
   "HostApplication.form.publicInformation": "この情報は公開されます。氏名、住所など個人情報は記入しないでください。",
   "HostApplication.form.readFaqs": "Read our FAQs",
-  "HostApplication.form.RepositoryUrlLabel": "リポジトリまたは組織",
   "HostApplication.form.subheading": "Introduce your Collective, please include as much context as possible so we can give you the best service we can! Have doubts? {faqLink}",
   "HostApplication.form.team": "Your team",
   "HostApplication.form.tellUsMoreHelpText": "We want to know more about you and how we can help you.",
