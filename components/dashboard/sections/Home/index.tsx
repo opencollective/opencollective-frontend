@@ -68,7 +68,7 @@ const Home = (props: AdminSectionProps) => {
   }, [error, data]);
 
   return (
-    <div className="flex flex-col-reverse gap-8 xl:flex-row">
+    <div className="flex flex-col-reverse xl:flex-row">
       <div className="flex-1">
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />
@@ -160,12 +160,12 @@ const Home = (props: AdminSectionProps) => {
           <ExpenseDrawer openExpenseLegacyId={openExpenseLegacyId} handleClose={() => setOpenExpenseLegacyId(null)} />
         </Flex>
       </div>
-      <div className="xl:w-64">
+      <div className="xl:ml-8 xl:w-64">
         <DismissibleMessage messageId={HELP_MESSAGE.WELCOME_TO_DASHBOARD}>
           {({ dismiss }) => (
-            <Alert className="relative flex items-start gap-4 fade-in">
+            <Alert className="relative mb-8 flex items-start gap-4 fade-in">
               <Image
-                className="block xl:hidden"
+                className="block h-12 w-12 xl:hidden"
                 alt="Illustration of plant"
                 width={48}
                 height={48}
@@ -174,7 +174,7 @@ const Home = (props: AdminSectionProps) => {
               <div>
                 <div className="mb-2 flex items-start gap-3">
                   <Image
-                    className="hidden xl:block"
+                    className="hidden h-12 w-12 xl:block"
                     alt="Illustration of plant"
                     width={48}
                     height={48}
