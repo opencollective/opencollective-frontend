@@ -74,7 +74,7 @@ class SigninPage extends React.Component {
       // Avoid redirect loop: replace '/signin' redirects by '/'
       const { next } = this.props;
       const redirect = next && (next.match(/^\/?signin[?/]?/) || next.match(/^\/?reset-password[?/]?/)) ? null : next;
-      await this.props.router.replace(redirect || '/');
+      await this.props.router.replace(redirect && redirect !== '/' ? redirect : '/dashboard');
       window.scroll(0, 0);
     } else if (this.props.token && oldProps.token !== this.props.token) {
       // --- There's a new token in town 🤠 ---
