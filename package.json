@@ -18,7 +18,6 @@
     "@dnd-kit/utilities": "3.2.1",
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
-    "@formatjs/intl-relativetimeformat": "11.2.4",
     "@graphql-typed-document-node/core": "3.2.0",
     "@hcaptcha/react-hcaptcha": "1.8.1",
     "@hyperwatch/hyperwatch": "3.9.4",
@@ -59,6 +58,7 @@
     "classnames": "2.3.2",
     "cloudflare-ip": "0.0.7",
     "clsx": "2.0.0",
+    "cookie": "0.5.0",
     "cookie-parser": "1.4.6",
     "copy-to-clipboard": "3.3.3",
     "copy-webpack-plugin": "11.0.0",
@@ -178,10 +178,10 @@
     "test:e2e:1": "cross-env TZ=UTC cypress run --spec \"test/cypress/integration/1*.js\"",
     "test:e2e:2": "cross-env TZ=UTC cypress run --spec \"test/cypress/integration/2*.js\"",
     "test:e2e:3": "cross-env TZ=UTC cypress run --spec \"test/cypress/integration/3*.js\"",
-    "test:jest": "cross-env NODE_ENV=test TZ=UTC jest components lib pages",
+    "test:jest": "cross-env NODE_ENV=test BABEL_ENV=jest TZ=UTC jest components lib pages",
     "test:update": "npm run test:jest -- --updateSnapshot",
     "type:check": "tsc",
-    "jest": "cross-env NODE_ENV=test TZ=UTC jest"
+    "jest": "cross-env NODE_ENV=test BABEL_ENV=jest TZ=UTC jest"
   },
   "devDependencies": {
     "@babel/core": "^7.18.0",
@@ -205,9 +205,11 @@
     "@storybook/nextjs": "7.4.0",
     "@storybook/react": "7.4.0",
     "@types/apollo-upload-client": "17.0.2",
+    "@types/cookie": "^0.5.1",
     "@types/react": "18.2.21",
     "@types/styled-components": "^5.1.26",
     "@types/styled-system": "^5.1.16",
+    "@types/webpack-env": "^1.18.1",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "autoprefixer": "10.4.15",
@@ -216,6 +218,7 @@
     "babel-plugin-istanbul": "^6.1.1",
     "babel-plugin-react-docgen": "^4.2.1",
     "babel-plugin-react-remove-properties": "^0.3.0",
+    "babel-plugin-require-context-hook": "^1.0.0",
     "babel-plugin-styled-components": "^2.1.1",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "cheerio": "1.0.0-rc.12",
@@ -269,7 +272,8 @@
     "tailwindcss-animate": "1.0.7",
     "typescript": "^5.0.0",
     "url-loader": "^4.1.1",
-    "webpack": "^5.80.0"
+    "webpack": "^5.80.0",
+    "webpack-manifest-plugin": "^5.0.0"
   },
   "jest": {
     "moduleNameMapper": {
@@ -303,7 +307,7 @@
   },
   "depcheck": {
     "ignores": [
-      "@formatjs/intl-relativetimeformat",
+      "@types/webpack-env",
       "@graphql-codegen/gql-tag-operations-preset",
       "cheerio",
       "@storybook/*",

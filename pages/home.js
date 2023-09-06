@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { getRequestIntl } from '../lib/i18n/request';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 // import Banner from '../components/collectives/Banner';
@@ -59,8 +60,11 @@ const HomePage = () => {
 };
 
 HomePage.getInitialProps = ({ req, res }) => {
-  if (res && req && (req.language || req.locale === 'en')) {
-    res.set('Cache-Control', 'public, s-maxage=3600');
+  if (res && req) {
+    const { locale } = getRequestIntl(req);
+    if (locale === 'en') {
+      res.setHeader('Cache-Control', 'public, s-maxage=3600');
+    }
   }
 
   let skipDataFromTree = false;

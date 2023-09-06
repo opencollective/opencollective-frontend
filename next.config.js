@@ -4,7 +4,9 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 const { withSentryConfig } = require('@sentry/nextjs');
 const CopyPlugin = require('copy-webpack-plugin');
-
+// webpack-manifest-plugin is published
+// eslint-disable-next-line node/no-unpublished-require
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const path = require('path');
 require('./env');
 const { REWRITES } = require('./rewrites');
@@ -22,6 +24,9 @@ const nextConfig = {
   experimental: {
     outputFileTracingExcludes: {
       '*': ['node_modules/@swc/core-linux-x64-gnu', 'node_modules/@swc/core-linux-x64-musl'],
+    },
+    outputFileTracingIncludes: {
+      '/_document': ['./.next/language-manifest.json'],
     },
   },
   webpack: (config, { webpack, buildId }) => {
@@ -94,6 +99,25 @@ const nextConfig = {
             to: path.join(__dirname, 'public/static/scripts'),
           },
         ],
+      }),
+    );
+
+    // generates a manifest of languages and the respective webpack chunk url
+    config.plugins.push(
+      new WebpackManifestPlugin({
+        fileName: 'language-manifest.json',
+        generate(seed, files) {
+          return files.reduce((manifest, file) => {
+            const match = file.name.match(/i18n-messages-(.*)-json.js$/);
+            if (match) {
+              manifest[match[1]] = file.path;
+            }
+            return manifest;
+          }, seed);
+        },
+        filter(file) {
+          return file.isChunk && file.name.match(/^i18n-messages-.*/);
+        },
       }),
     );
 
