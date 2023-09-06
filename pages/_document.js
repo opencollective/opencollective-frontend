@@ -17,6 +17,7 @@ import { getCSPHeader } from '../server/content-security-policy';
 
 import { SSRIntlProvider } from '../components/intl/SSRIntlProvider';
 
+// map of language key to module chunk url
 let languageManifest = {};
 try {
   const languageManifestPath = path.join(process.cwd(), '.next', 'language-manifest.json');

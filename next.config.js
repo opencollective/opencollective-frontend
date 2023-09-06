@@ -102,6 +102,7 @@ const nextConfig = {
       }),
     );
 
+    // generates a manifest of languages and the respective webpack chunk url
     config.plugins.push(
       new WebpackManifestPlugin({
         fileName: 'language-manifest.json',
