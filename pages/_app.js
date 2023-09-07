@@ -40,6 +40,7 @@ import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
 import GlobalToasts from '../components/GlobalToasts';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
 import ToastProvider from '../components/ToastProvider';
+import { TooltipProvider } from '../components/ui/Tooltip';
 
 // This is optional but highly recommended
 // since it prevents memory leak
@@ -129,16 +130,18 @@ class OpenCollectiveFrontendApp extends App {
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
               <RawIntlProvider value={intl}>
-                <ToastProvider>
-                  <UserProvider>
-                    <NewsAndUpdatesProvider>
-                      <Component {...pageProps} />
-                      <GlobalToasts />
-                      <GlobalNewsAndUpdates />
-                      <TwoFactorAuthenticationModal />
-                    </NewsAndUpdatesProvider>
-                  </UserProvider>
-                </ToastProvider>
+                <TooltipProvider delayDuration={300} skipDelayDuration={100}>
+                  <ToastProvider>
+                    <UserProvider>
+                      <NewsAndUpdatesProvider>
+                        <Component {...pageProps} />
+                        <GlobalToasts />
+                        <GlobalNewsAndUpdates />
+                        <TwoFactorAuthenticationModal />
+                      </NewsAndUpdatesProvider>
+                    </UserProvider>
+                  </ToastProvider>
+                </TooltipProvider>
               </RawIntlProvider>
             </StripeProviderSSR>
           </ThemeProvider>

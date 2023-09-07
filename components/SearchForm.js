@@ -85,7 +85,7 @@ class SearchForm extends React.Component {
           p={this.props.py || 1}
         >
           <SearchButton as="button" ml={2} p={1}>
-            <Search size={18} color="#aaaaaa">
+            <Search size={18} className="text-slate-500">
               <title>Search</title>
             </Search>
           </SearchButton>

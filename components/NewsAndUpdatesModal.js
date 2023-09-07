@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/Dialog';
 import Container from './Container';
 import { Flex } from './Grid';
 import HTMLContent from './HTMLContent';
@@ -60,9 +61,9 @@ const newsAndUpdatesQuery = gql`
 const renderStyledCarousel = (data, loading, error, onClose) => {
   if (loading === false && data) {
     return (
-      <StyledCarousel contentPosition="left">
+      <StyledCarousel contentPosition="left" className="-mx-6">
         {data.account.updates.nodes.map(update => (
-          <Container key={update.id}>
+          <Container key={update.id} className="px-3">
             <Container fontSize="13px" lineHeight="20px" color="black.700">
               <FormattedDate value={update.publishedAt} day="numeric" month="long" year="numeric" />
             </Container>
@@ -84,7 +85,7 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
                 onClick={onClose}
                 as={Link}
                 href={`/opencollective/updates/${update.slug}`}
-                color="blue.700"
+                className="text-blue-800"
                 fontSize="14px"
                 display="flex"
               >
@@ -97,7 +98,6 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
                   collapsable
                   maxHeight={430}
                   maxCollapsedHeight={430}
-                  color="black.800"
                   mt={1}
                   fontSize="16px"
                   content={update.html}
@@ -112,6 +112,7 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
                 href={`/opencollective/updates/${update.slug}`}
                 fontSize="14px"
                 display="flex"
+                className="text-blue-800"
               >
                 <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
               </StyledLink>
@@ -133,56 +134,49 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
   }
 };
 
-const NewsAndUpdatesModal = ({ onClose, ...modalProps }) => {
+const NewsAndUpdatesModal = ({ open, setOpen, ...modalProps }) => {
+  const onClose = () => setOpen(false);
   return (
-    <ModalWrapper onClose={onClose} width="576px" {...modalProps}>
-      <ModalHeaderWrapper onClose={onClose}>
-        <Flex width="100%">
-          <Flex>
-            <Span>
-              <Image
-                width={72}
-                height={72}
-                src="/static/images/updates-and-news-modal-icon.svg"
-                alt="Updates and News Icon"
-              />
-            </Span>
-            <P fontSize={['25px', '28px']} fontWeight="500" lineHeight="36px" color="black.900" ml={16} mt="18px">
+    <Dialog open={open} onOpenChange={open => setOpen(open)}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-3">
+            <Image
+              width={48}
+              height={48}
+              src="/static/images/updates-and-news-modal-icon.svg"
+              alt="Updates and News Icon"
+              aria-hidden={true}
+              className="-my-2 h-12 w-12"
+            />
+            <h2 className="text-xl">
               <FormattedMessage id="NewsAndUpdates.link.whatsNew" defaultMessage="What's new" />
-            </P>
-          </Flex>
-        </Flex>
-      </ModalHeaderWrapper>
-      <hr className="my-5" />
-      <ModalBody>
+            </h2>
+          </DialogTitle>
+        </DialogHeader>
+        <hr className="-mx-6 my-1" />
         <Query query={newsAndUpdatesQuery} variables={{ limit: 5 }} context={API_V2_CONTEXT}>
           {({ data, loading, error }) => renderStyledCarousel(data, loading, error, onClose)}
         </Query>
-      </ModalBody>
-      <ModalFooterWrapper isFullWidth>
-        <Container display="flex">
-          <Flex width={1 / 2}>
-            <StyledLink href="https://twitter.com/opencollect" openInNewTab color="black.500" display="flex" mt={1}>
-              <Span pr={2}>
-                <FormattedMessage id="NewsAndUpdates.link.twitterFollow" defaultMessage="Follow us" />
-              </Span>
-              <Span>
-                <Twitter size={17} color="#1153D6" />
-              </Span>
-            </StyledLink>
-          </Flex>
-          <Flex width={1 / 2} justifyContent="right" mb="16px">
-            <Link onClick={onClose} href="/opencollective/updates">
-              <StyledButton buttonSize="tiny">
-                <Span fontSize={['11px', '14px']}>
-                  <FormattedMessage id="NewsAndUpdates.button.seeAllUpdates" defaultMessage="See all new updates" />
-                </Span>
-              </StyledButton>
-            </Link>
-          </Flex>
-        </Container>
-      </ModalFooterWrapper>
-    </ModalWrapper>
+        <hr className="-mx-6 my-1" />
+        <div className="flex items-center justify-between">
+          <StyledLink
+            className="flex items-center gap-1.5 text-slate-600"
+            href="https://twitter.com/opencollect"
+            openInNewTab
+            color="black.500"
+          >
+            <FormattedMessage id="NewsAndUpdates.link.twitterFollow" defaultMessage="Follow us" />
+            <Twitter className="inline-block" size={16} color="#1153D6" />
+          </StyledLink>
+          <Link onClick={onClose} href="/opencollective/updates">
+            <StyledButton fontSize="14px" buttonSize="tiny">
+              <FormattedMessage id="NewsAndUpdates.button.seeAllUpdates" defaultMessage="See all new updates" />
+            </StyledButton>
+          </Link>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

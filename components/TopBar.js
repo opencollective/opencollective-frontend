@@ -270,11 +270,9 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
 
       {showProfileAndChangelogMenu && (
         <React.Fragment>
-          <Container mr={3}>
-            <Hide xs>
-              <ChangelogTrigger />
-            </Hide>
-          </Container>
+          <div className="mr-2 hidden sm:block">
+            <ChangelogTrigger />
+          </div>
           <TopBarProfileMenu />
         </React.Fragment>
       )}
