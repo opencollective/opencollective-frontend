@@ -2929,7 +2929,7 @@
   "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "Use the filters to define the transactions you would like to download.",
   "transactions.downloadcsvbutton": "Baixar em CSV",
-  "transactions.downloadinvoicesbutton": "Baixar recibos",
+  "transactions.downloadinvoicesbutton": "Transferir recibo",
   "transactions.empty": "Sem transações",
   "transactions.excludeChildren": "Exclude transactions from Projects and Events",
   "transactions.excludeGiftCards": "Exclude Gift Card transactions",
