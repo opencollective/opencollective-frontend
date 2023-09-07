@@ -1,6 +1,5 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { startsWith } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -138,10 +137,10 @@ const DashboardPage = () => {
     if (activeSlug && activeSlug !== lastWorkspaceVisit.slug) {
       setLastWorkspaceVisit({ slug: activeSlug });
     }
-    if (LoggedInUser && slug !== activeSlug && !startsWith(router.asPath, `/dashboard/${activeSlug}`)) {
-      router.replace(`/dashboard/${activeSlug || ''}`);
+    if (!slug && activeSlug && activeSlug !== LoggedInUser?.collective.slug) {
+      router.replace(`/dashboard/${activeSlug}`);
     }
-  }, [activeSlug]);
+  }, [activeSlug, LoggedInUser]);
 
   // Clear last visited workspace account if not admin
   React.useEffect(() => {
