@@ -137,7 +137,11 @@ const DashboardPage = () => {
     if (activeSlug && activeSlug !== lastWorkspaceVisit.slug) {
       setLastWorkspaceVisit({ slug: activeSlug });
     }
-    if (!slug && activeSlug && activeSlug !== LoggedInUser?.collective.slug) {
+    // If there is no slug set (that means /dashboard)
+    // And if there is an activeSlug (this means lastWorkspaceVisit OR LoggedInUser)
+    // And a LoggedInUser
+    // And if activeSlug is different than LoggedInUser slug
+    if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
       router.replace(`/dashboard/${activeSlug}`);
     }
   }, [activeSlug, LoggedInUser]);
