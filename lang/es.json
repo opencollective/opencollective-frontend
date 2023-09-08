@@ -2960,7 +2960,6 @@
   "TwoFactorAuth.Setup.FiscalHost.Info": "La autenticación de dos factores (2FA) añade más seguridad al iniciar la sesión. Para los Hosts Fiscales o los Colectivos que gestionan sus propios fondos, la 2FA ayuda a garantizar la seguridad de los pagos.",
   "TwoFactorAuth.Setup.Form.FinishSetup": "Finalizar configuración",
   "TwoFactorAuth.Setup.Form.InputLabel": "Por favor, introduce tu código de 6 dígitos sin guiones.",
-  "TwoFactorAuth.Setup.Form.InputLabel.YubiKey": "Introduce tu código de 6 dígitos sin guiones, o selecciona la entrada de abajo, conecta tu YubiKey y púlsala para generar un código.",
   "TwoFactorAuth.Setup.Info": "La autenticación de dos factores añade una capa extra de seguridad para su cuenta al iniciar sesión o realizar acciones de administración.",
   "TwoFactorAuth.Setup.ManualEntry": "Entrada manual: {token}",
   "TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Body": "Cuando hagas clic en \"Confirmar\" ya no tendrás acceso a tus códigos de recuperación.",

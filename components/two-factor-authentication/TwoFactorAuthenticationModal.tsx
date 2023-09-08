@@ -102,23 +102,15 @@ export default function TwoFactorAuthenticationModal() {
     setTwoFactorCode('');
     setSelectedMethod(null);
 
-    let type = 'totp';
-    if (supportedMethods.includes('yubikey_otp') && code.length === 44) {
-      type = 'yubikey_otp';
-    }
-
-    if (selectedMethod === 'recovery_code') {
-      type = 'recovery_code';
-    }
-
-    if (type !== 'recovery_code') {
-      setPreferredTwoFactorMethod(type);
+    if (selectedMethod !== 'recovery_code') {
+      setPreferredTwoFactorMethod(selectedMethod);
     }
 
     prompt.resolveAuth({
-      type,
+      type: selectedMethod,
       code,
     });
+
     setConfirming(false);
   }, [twoFactorCode, supportedMethods, selectedMethod]);
 
@@ -265,19 +257,10 @@ function AuthenticatorOption(props: {
 }) {
   return (
     <Box>
-      <div>
-        {props.supportedMethods.includes('yubikey_otp') ? (
-          <FormattedMessage
-            id="TwoFactorAuth.Setup.Form.InputLabel.YubiKey"
-            defaultMessage="Please enter your 6-digit code without any dashes or select the input below, plug your YubiKey and press it to generate a code."
-          />
-        ) : (
-          <FormattedMessage
-            id="TwoFactorAuth.Setup.Form.InputLabel"
-            defaultMessage="Please enter your 6-digit code without any dashes."
-          />
-        )}
-      </div>
+      <FormattedMessage
+        id="TwoFactorAuth.Setup.Form.InputLabel"
+        defaultMessage="Please enter your 6-digit code without any dashes."
+      />
 
       <StyledInput
         id="2fa-code-input"
@@ -286,8 +269,8 @@ function AuthenticatorOption(props: {
         mt={3}
         minHeight={50}
         fontSize="20px"
-        placeholder={props.supportedMethods.includes('yubikey_otp') ? '123456 or YubiKey: cccc...' : '123456'}
-        pattern={!props.supportedMethods.includes('yubikey_otp') && '[0-9]{6}'}
+        placeholder={'123456'}
+        pattern={'[0-9]{6}'}
         inputMode="numeric"
         value={props.value}
         onChange={e => props.onChange(e.target.value)}
