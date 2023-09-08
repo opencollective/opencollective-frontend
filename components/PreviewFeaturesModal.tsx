@@ -49,7 +49,7 @@ const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
           <label className="text-base font-medium" htmlFor={feature.key}>
             {feature.title}
           </label>
-          <Badge variant={feature.publicBeta ? 'success' : 'warning'}>
+          <Badge type={feature.publicBeta ? 'success' : 'warning'}>
             {feature.publicBeta ? (
               <FormattedMessage id="PreviewFeatures.publicBeta" defaultMessage="Public beta" />
             ) : (

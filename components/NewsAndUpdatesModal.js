@@ -134,7 +134,7 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
   }
 };
 
-const NewsAndUpdatesModal = ({ open, setOpen, ...modalProps }) => {
+const NewsAndUpdatesModal = ({ open, setOpen }) => {
   const onClose = () => setOpen(false);
   return (
     <Dialog open={open} onOpenChange={open => setOpen(open)}>
@@ -181,8 +181,8 @@ const NewsAndUpdatesModal = ({ open, setOpen, ...modalProps }) => {
 };
 
 NewsAndUpdatesModal.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  router: PropTypes.object,
+  setOpen: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
 };
 
 export default NewsAndUpdatesModal;

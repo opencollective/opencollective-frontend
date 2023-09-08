@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { groupBy, isEmpty, uniqBy } from 'lodash';
-import { Plus } from 'lucide-react';
-import { defineMessage, useIntl } from 'react-intl';
+import { Frame, LayoutDashboard, Plus } from 'lucide-react';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
-import { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
 import { isPastEvent } from '../../lib/events';
+import { getDashboardRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
 import Collapse from '../Collapse';
@@ -15,58 +15,117 @@ import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
+import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
+import { Separator } from '../ui/Separator';
 
-const MenuLink = styled(Link)`
-  all: unset;
+const AccountList = styled.div`
   display: flex;
-  align-items: center;
-  grid-gap: 8px;
-  padding: 0px 8px;
-
-  positon: relative;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 20px;
-  cursor: pointer;
-  color: ${props => props.theme.colors.black[700]};
-
-  &:hover {
-    color: ${props => props.theme.colors.black[600]};
+  flex-direction: column;
+  padding: 4px 8px;
+  padding-top: 12px;
+  h3 {
+    font-size: 12px;
+    font-weight: 600;
+    color: #656d76;
+    letter-spacing: 0;
+    line-height: 20px;
+    margin: 0;
+    padding: 0 8px;
   }
 `;
 
-const MembershipLine = ({ membership, closeDrawer }) => (
-  <MenuLink href={`/${membership.collective.slug}`} onClick={closeDrawer}>
-    <Avatar collective={membership.collective} radius={24} />
-    <P fontSize="14px" fontWeight="500" lineHeight="20px" color="inherit" truncateOverflow>
-      {membership.collective.name}
-    </P>
-  </MenuLink>
-);
+const MenuLink = styled(Link)`
+  display: flex;
+  align-items: center;
+  grid-gap: 8px;
+  cursor: pointer;
+  &:hover {
+    background: #f8fafc;
+  }
+  positon: relative;
+  padding: 8px;
+  border-radius: 8px;
+  color: #0f172a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  svg {
+    color: #4b5563;
+  }
+`;
+
+const CollectiveListItem = styled.div`
+  position: relative;
+  @media (hover: hover) {
+    :hover a.dashboardLink {
+      opacity: 1;
+    }
+  }
+  @media (hover: none) {
+    a.dashboardLink {
+      opacity: 1;
+    }
+  }
+`;
+
+const MembershipLine = ({ user, membership, onClose }) => {
+  return (
+    <CollectiveListItem className="group h-9">
+      <MenuLink href={`/${membership.collective.slug}`} onClick={onClose}>
+        <Avatar collective={membership.collective} radius={16} />
+        <P
+          fontSize="inherit"
+          fontWeight="inherit"
+          lineHeight="inherit"
+          color="inherit"
+          letterSpacing={0}
+          truncateOverflow
+        >
+          {membership.collective.name}
+        </P>
+      </MenuLink>
+
+      {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
+        <div className="absolute bottom-1 right-1 top-1">
+          <Tooltip>
+            <TooltipTrigger>
+              <Link
+                className="flex h-7 w-7 items-center justify-center rounded-md border bg-white text-slate-950 opacity-0 transition-all hover:border-white hover:bg-slate-900 hover:text-white group-hover:opacity-100"
+                href={getDashboardRoute(membership.collective)}
+                onClick={onClose}
+              >
+                <LayoutDashboard size="14px" strokeWidth={1.5} />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              <FormattedMessage defaultMessage="Go to Dashboard" />
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      )}
+    </CollectiveListItem>
+  );
+};
 
 MembershipLine.propTypes = {
   user: PropTypes.object,
   membership: PropTypes.object,
-  closeDrawer: PropTypes.func,
+  onClose: PropTypes.func,
 };
 
-const sortMemberships = (memberships: LoggedInUser['memberOf']) => {
+const sortMemberships = memberships => {
   if (!memberships?.length) {
     return [];
   } else {
     return memberships.sort((a, b) => {
-      return a.collective.name.localeCompare(b.collective.name);
+      return a.collective.slug.localeCompare(b.collective.slug);
     });
   }
 };
 
-const filterArchivedMemberships = (memberships: LoggedInUser['memberOf']) => {
+const filterArchivedMemberships = memberships => {
   const archivedMemberships = memberships.filter(m => {
     if (
       m.role !== 'BACKER' &&
@@ -82,7 +141,7 @@ const filterArchivedMemberships = (memberships: LoggedInUser['memberOf']) => {
   return uniqBy(archivedMemberships, m => m.collective.id);
 };
 
-const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
+const filterMemberships = memberships => {
   const filteredMemberships = memberships.filter(m => {
     if (m.role === 'BACKER' || m.collective.isArchived) {
       return false;
@@ -94,6 +153,22 @@ const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
   });
 
   return uniqBy(filteredMemberships, m => m.collective.id);
+};
+
+const MembershipsList = ({ user, memberships, onClose }) => {
+  return (
+    <Box as="ul" p={0} my={2}>
+      {sortMemberships(memberships).map(member => (
+        <MembershipLine key={member.id} membership={member} user={user} onClose={onClose} />
+      ))}
+    </Box>
+  );
+};
+
+MembershipsList.propTypes = {
+  user: PropTypes.object,
+  memberships: PropTypes.array,
+  onClose: PropTypes.func,
 };
 
 /**
@@ -141,12 +216,40 @@ const MENU_SECTIONS = {
   },
 };
 
-type ProfileMenuMembershipsProps = {
-  user: LoggedInUser;
-  closeDrawer: () => void;
-} & Parameters<typeof Flex>[0];
+const MenuSectionHeader = ({ section, hidePlusIcon, onClose }) => {
+  const intl = useIntl();
+  const { title, plusButton } = MENU_SECTIONS[section];
+  return (
+    <Flex alignItems="center" justifyContent="space-between">
+      <p className="px-2 text-xs font-medium text-slate-600">{intl.formatMessage(title)}</p>
 
-const ProfileMenuMemberships = ({ user, closeDrawer, ...props }: ProfileMenuMembershipsProps) => {
+      {Boolean(!hidePlusIcon && plusButton) && (
+        <Tooltip>
+          <TooltipTrigger>
+            <Link
+              href={plusButton.href}
+              aria-label={intl.formatMessage(plusButton.text)}
+              onClick={onClose}
+              tabIndex="-1"
+              className="mr-1.5 flex h-6 w-6 items-center justify-center rounded-full border"
+            >
+              <Plus size={12} color="#76777A" />
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="left">{intl.formatMessage(plusButton.text)}</TooltipContent>
+        </Tooltip>
+      )}
+    </Flex>
+  );
+};
+
+MenuSectionHeader.propTypes = {
+  section: PropTypes.oneOf(Object.keys(MENU_SECTIONS)).isRequired,
+  hidePlusIcon: PropTypes.bool,
+  onClose: PropTypes.func,
+};
+
+const ProfileMenuMemberships = ({ user, onClose }) => {
   const intl = useIntl();
   const memberships = filterMemberships(user.memberOf);
   const archivedMemberships = filterArchivedMemberships(user.memberOf);
@@ -157,25 +260,25 @@ const ProfileMenuMemberships = ({ user, closeDrawer, ...props }: ProfileMenuMemb
     return MENU_SECTIONS[section].emptyMessage || !isEmpty(groupedMemberships[section]);
   };
 
-  if (hasNoMemberships && isEmpty(archivedMemberships)) {
-    return null;
-  }
-
   return (
     <React.Fragment>
-      <Flex gap="32px" flexDirection="column" {...props}>
-        {Object.keys(MENU_SECTIONS)
-          .filter(shouldDisplaySection)
-          .map(accountType => {
-            const memberships = groupedMemberships[accountType];
-            const sectionIsEmpty = isEmpty(memberships);
-            const sectionData = MENU_SECTIONS[accountType];
-            return (
-              <Flex flexDirection="column" key={accountType}>
+      {hasNoMemberships && (
+        <P color="blue.900" fontSize="20px" lineHeight="28px" fontWeight="bold" mt="8px" mb="12px">
+          <FormattedMessage id="ProfileMenuMemberships.Empty" defaultMessage="Make the most out of Open Collective" />
+        </P>
+      )}
+      {Object.keys(MENU_SECTIONS)
+        .filter(shouldDisplaySection)
+        .map((accountType, i) => {
+          const memberships = groupedMemberships[accountType];
+          const sectionIsEmpty = isEmpty(memberships);
+          const sectionData = MENU_SECTIONS[accountType];
+          return (
+            <React.Fragment key={accountType}>
+              {i !== 0 && <Separator />}
+              <AccountList>
                 {accountType !== 'ARCHIVED' && (
-                  <P color="black.800" fontSize="14px" lineHeight="20px" fontWeight="700" mb="26px">
-                    {intl.formatMessage(sectionData.title)}
-                  </P>
+                  <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} onClose={onClose} />
                 )}
                 {sectionIsEmpty ? (
                   <Box my={2}>
@@ -183,7 +286,7 @@ const ProfileMenuMemberships = ({ user, closeDrawer, ...props }: ProfileMenuMemb
                       {intl.formatMessage(sectionData.emptyMessage)}
                     </P>
                     {Boolean(sectionData.plusButton) && (
-                      <Link href={sectionData.plusButton.href} onClick={closeDrawer}>
+                      <Link href={sectionData.plusButton.href} onClick={onClose}>
                         <StyledButton mt="12px" mb="16px" borderRadius="8px" width="100%" fontSize="12px">
                           <Flex alignItems="center" justifyContent="center">
                             <Container
@@ -193,6 +296,7 @@ const ProfileMenuMemberships = ({ user, closeDrawer, ...props }: ProfileMenuMemb
                               borderRadius="100%"
                               border="1px solid #C4C7CC"
                               mr="16px"
+                              size="24px"
                             >
                               <Plus size={12} />
                             </Container>
@@ -207,31 +311,26 @@ const ProfileMenuMemberships = ({ user, closeDrawer, ...props }: ProfileMenuMemb
                     buttonSize={24}
                     defaultIsOpen={false}
                     mr={'6px'}
-                    title={
-                      <P color="black.800" fontSize="14px" lineHeight="20px" fontWeight="700">
-                        {intl.formatMessage(sectionData.title)}
-                      </P>
-                    }
+                    title={<MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} onClose={onClose} />}
                   >
-                    <Flex as="ul" p={0} my={0} mt="26px" gap="24px" flexDirection="column">
-                      {sortMemberships(memberships).map(member => (
-                        <MembershipLine key={member.id} membership={member} user={user} closeDrawer={closeDrawer} />
-                      ))}
-                    </Flex>
+                    <MembershipsList memberships={memberships} user={user} onClose={onClose} />
                   </Collapse>
                 ) : (
-                  <Flex as="ul" p={0} my={0} gap="24px" flexDirection="column">
-                    {sortMemberships(memberships).map(member => (
-                      <MembershipLine key={member.id} membership={member} user={user} closeDrawer={closeDrawer} />
-                    ))}
-                  </Flex>
+                  <MembershipsList memberships={memberships} user={user} onClose={onClose} />
                 )}
-              </Flex>
-            );
-          })}
-      </Flex>
+              </AccountList>
+            </React.Fragment>
+          );
+        })}
     </React.Fragment>
   );
+};
+
+ProfileMenuMemberships.propTypes = {
+  user: PropTypes.shape({
+    memberOf: PropTypes.arrayOf(PropTypes.object),
+  }),
+  onClose: PropTypes.func,
 };
 
 export default React.memo(ProfileMenuMemberships);
