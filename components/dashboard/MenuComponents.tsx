@@ -76,7 +76,10 @@ export const MenuLink = ({
     <Flex alignItems="center" justifyContent="space-between" flex={1}>
       <Flex alignItems="center" gridGap="8px">
         {Icon && (
-          <Icon size={18} className={cn(' group-hover:text-inherit', isSelected ? 'text-inherit' : 'text-slate-400')} />
+          <Icon
+            size={18}
+            className={cn('group-hover:text-inherit', isSelected ? 'text-inherit' : 'text-muted-foreground')}
+          />
         )}
         <span className="truncate">
           {children}

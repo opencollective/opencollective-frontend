@@ -6,24 +6,11 @@ import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { PreviewFeature } from '../lib/preview-features';
 
-import { Flex } from './Grid';
-import InputSwitch from './InputSwitch';
-import Link from './Link';
-import StyledCard from './StyledCard';
-import StyledModal, { ModalBody, ModalHeader } from './StyledModal';
-import StyledTag from './StyledTag';
-import { H2, H4, P } from './Text';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from './ui/Dialog';
-import { Switch } from './ui/Switch';
 import { Badge } from './ui/Badge';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/Dialog';
+import { Switch } from './ui/Switch';
+import Link from './Link';
+
 const editAccountSettingsMutation = gql`
   mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
@@ -62,11 +49,11 @@ const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
           <label className="text-base font-medium" htmlFor={feature.key}>
             {feature.title}
           </label>
-          <Badge rounded={false} color={feature.publicBeta ? 'green' : 'yellow'}>
+          <Badge variant={feature.publicBeta ? 'success' : 'warning'}>
             {feature.publicBeta ? (
               <FormattedMessage id="PreviewFeatures.publicBeta" defaultMessage="Public beta" />
             ) : (
-              <FormattedMessage id="PreviewFeatures.LimitedAccess" defaultMessage="Limited access" />
+              <FormattedMessage id="PreviewFeatures.LimitedAccess" defaultMessage="Limited preview" />
             )}
           </Badge>
         </div>
@@ -83,7 +70,7 @@ const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
   );
 };
 
-const PreviewFeaturesModal = ({ open, setOpen }: { onClose: () => void }) => {
+const PreviewFeaturesModal = ({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) => {
   const { LoggedInUser } = useLoggedInUser();
   const previewFeatures = LoggedInUser?.getAvailablePreviewFeatures() || [];
   return (
