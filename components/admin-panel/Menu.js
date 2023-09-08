@@ -43,7 +43,6 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
           <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SECURITY} />
           <MenuLink collective={collective} section={ALL_SECTIONS.ADVANCED} />
-          {!isHostAccount(collective) && <MenuLink collective={collective} section={ALL_SECTIONS.FISCAL_HOSTING} />}
         </React.Fragment>
       )}
     </React.Fragment>

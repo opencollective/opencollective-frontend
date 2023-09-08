@@ -40,7 +40,6 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
   const router = useRouter();
   const { account } = React.useContext(DashboardContext);
   const isHost = isHostAccount(account);
-  const isUserHost = account.isHost === true && isType(account, USER); // for legacy compatibility for users who are hosts
   const isIndividual = isIndividualAccount(account);
 
   React.useEffect(() => {
@@ -126,7 +125,7 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
             ) : isType(account, COLLECTIVE) ? (
               <FormattedMessage id="CollectiveDashboard" defaultMessage="Collective Dashboard" />
             ) : (
-              <FormattedMessage id="Workspace" defaultMessage="Workspace" />
+              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
             )}
           </MenuSectionHeader>
         )}
@@ -142,7 +141,7 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
         <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} Icon={Transfer} />
         <MenuLink
           Icon={Settings}
-          if={!isHost || isUserHost}
+          if={!isType(account, ORGANIZATION)}
           section="SETTINGS"
           goToSection={COLLECTIVE_SECTIONS.INFO}
           renderSubMenu={({ parentSection }) => (
@@ -248,10 +247,11 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
         >
           <FormattedMessage id="Settings" defaultMessage="Settings" />
         </MenuLink>
-        {/* org settings for hosts */}
+
+        {/* org settings */}
         <MenuLink
           Icon={Settings}
-          if={isType(account, ORGANIZATION) && isHost}
+          if={isType(account, ORGANIZATION)}
           section="ORG_SETTINGS"
           goToSection={isAccountantOnly ? ALL_SECTIONS.PAYMENT_RECEIPTS : ABOUT_ORG_SECTIONS.INFO}
           renderSubMenu={({ parentSection }) => (
@@ -275,15 +275,16 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
                   <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
                   <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.SECURITY} />
                   <MenuLink parentSection={parentSection} section={ALL_SECTIONS.ADVANCED} />
-                  {!isHostAccount(account) && (
-                    <MenuLink parentSection={parentSection} section={ALL_SECTIONS.FISCAL_HOSTING} />
-                  )}
                 </React.Fragment>
               )}
             </React.Fragment>
           )}
         >
-          <FormattedMessage id="AdminPanel.OrganizationSettings" defaultMessage="Organization Settings" />
+          {isHost ? (
+            <FormattedMessage id="AdminPanel.OrganizationSettings" defaultMessage="Organization Settings" />
+          ) : (
+            <FormattedMessage id="Settings" defaultMessage="Settings" />
+          )}
         </MenuLink>
       </MenuGroup>
     </div>
