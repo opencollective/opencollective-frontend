@@ -43,7 +43,6 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
           <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SECURITY} />
           <MenuLink collective={collective} section={ALL_SECTIONS.ADVANCED} />
-          {!isHostAccount(collective) && <MenuLink collective={collective} section={ALL_SECTIONS.FISCAL_HOSTING} />}
         </React.Fragment>
       )}
     </React.Fragment>
@@ -79,7 +78,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS}
             if={!isAccountantOnly}
           />
-          <MenuLink collective={collective} section={HOST_SECTIONS.PENDING_APPLICATIONS} if={!isAccountantOnly} />
+          <MenuLink collective={collective} section={HOST_SECTIONS.HOST_APPLICATIONS} if={!isAccountantOnly} />
           <MenuLink collective={collective} section={HOST_SECTIONS.HOSTED_COLLECTIVES} if={!isAccountantOnly} />
           <MenuLink
             collective={collective}

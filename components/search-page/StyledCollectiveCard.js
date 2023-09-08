@@ -177,7 +177,7 @@ const StyledCollectiveCard = ({
           </Container>
         </Container>
         <Container display="flex" flexDirection="column" justifyContent="space-between" height={bodyHeight}>
-          <Container p={3} pb={0}>
+          <div className="flex flex-col space-y-3 p-4 pb-0">
             <CollectiveContainer useLink={useLink} collective={collective}>
               <P mt={3} fontSize="16px" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
                 {collective.name}
@@ -190,32 +190,32 @@ const StyledCollectiveCard = ({
                 </StyledLink>
               </P>
             )}
-            <Container>
+            <div className="flex flex-wrap items-center gap-2">
               {tag === undefined ? (
-                <StyledTag display="inline-block" variant="rounded-right" my={2} backgroundColor="blue.50">
+                <StyledTag variant="rounded-right" backgroundColor="blue.50">
                   <I18nCollectiveTags tags={getCollectiveMainTag(null, null, collective.type)} />
                 </StyledTag>
               ) : (
                 tag
               )}
               {countryString && (
-                <Container ml={1} mb={1} fontSize="12px" color="black.700" fontWeight={400}>
+                <Container fontSize="12px" color="black.700" fontWeight={400}>
                   {countryString}
                 </Container>
               )}
-            </Container>
-            <Container>
+            </div>
+            <div className="flex flex-wrap gap-2">
               {collective.tags &&
                 collective.tags
                   .filter(tag => !IGNORED_TAGS.includes(tag))
                   .slice(0, 4)
                   .map(tag => (
-                    <StyledTag key={tag} display="inline-block" variant="rounded-right" m={1}>
+                    <StyledTag key={tag} variant="rounded-right">
                       {tag}
                     </StyledTag>
                   ))}
-            </Container>
-          </Container>
+            </div>
+          </div>
           {children}
         </Container>
       </Container>

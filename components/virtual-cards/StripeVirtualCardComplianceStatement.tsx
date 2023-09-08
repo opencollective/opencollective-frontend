@@ -1,17 +1,15 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { P } from '../Text';
-
 export function StripeVirtualCardComplianceStatement() {
   return (
-    <P fontStyle="italic" fontSize="14px">
+    <p className="text-sm italic text-muted-foreground">
       <FormattedMessage
         defaultMessage="{virtualCardProgramName} Visa® Commercial Credit cards are issued by Celtic Bank."
         values={{
           virtualCardProgramName: 'Virtual Card',
         }}
       />
-    </P>
+    </p>
   );
 }

@@ -238,7 +238,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                                           <I18nCollectiveTags tags={tag} />
                                         </HiddenTagItem>
                                       </Link>
-                                      <hr />
+                                      <hr className="my-5" />
                                     </Fragment>
                                   ))}
                                   <Link href={`/search?tag=${hiddenTags[numberOfHiddenTags - 1]}`}>

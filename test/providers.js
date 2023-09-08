@@ -5,8 +5,8 @@ import { IntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
 
 import { initClient } from '../lib/apollo-client';
+import { getLocaleMessages } from '../lib/i18n/request';
 import theme from '../lib/theme';
-import * as Intl from '../server/intl';
 
 const apolloClient = initClient();
 
@@ -21,7 +21,7 @@ const apolloClient = initClient();
 export const withRequiredProviders = (component, providersParams = {}) => {
   const locale = get(providersParams, 'IntlProvider.locale', 'en');
   return (
-    <IntlProvider locale={locale} messages={locale === 'en' ? undefined : Intl.getMessages(locale)}>
+    <IntlProvider locale={locale} messages={locale === 'en' ? undefined : getLocaleMessages(locale)}>
       <ApolloProvider client={get(providersParams, 'ApolloProvider.client', apolloClient)}>
         <ThemeProvider theme={get(providersParams, 'ThemeProvider.theme', theme)}>{component}</ThemeProvider>
       </ApolloProvider>

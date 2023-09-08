@@ -59,6 +59,7 @@ export const expensesPageQuery = gql`
     $orderBy: ChronologicalOrderInput
     $chargeHasReceipts: Boolean
     $virtualCards: [VirtualCardReferenceInput]
+    $createdByAccount: AccountReferenceInput
   ) {
     account(slug: $collectiveSlug) {
       id
@@ -151,6 +152,7 @@ export const expensesPageQuery = gql`
       orderBy: $orderBy
       chargeHasReceipts: $chargeHasReceipts
       virtualCards: $virtualCards
+      createdByAccount: $createdByAccount
     ) {
       totalCount
       offset

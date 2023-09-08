@@ -5,6 +5,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isValidRelativeUrl } from '../lib/utils';
 
@@ -74,7 +75,10 @@ class SigninPage extends React.Component {
       // Avoid redirect loop: replace '/signin' redirects by '/'
       const { next } = this.props;
       const redirect = next && (next.match(/^\/?signin[?/]?/) || next.match(/^\/?reset-password[?/]?/)) ? null : next;
-      await this.props.router.replace(redirect || '/');
+      const defaultRedirect = this.props.LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
+        ? '/dashboard'
+        : '/';
+      await this.props.router.replace(redirect && redirect !== '/' ? redirect : defaultRedirect);
       window.scroll(0, 0);
     } else if (this.props.token && oldProps.token !== this.props.token) {
       // --- There's a new token in town 🤠 ---

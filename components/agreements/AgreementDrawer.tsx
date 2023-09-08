@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Agreement as GraphQLAgreement, FileInfo } from '../../lib/graphql/types/v2/graphql';
 
-import Drawer from '../Drawer';
+import { Drawer } from '../Drawer';
 
 import Agreement from './Agreement';
 import AgreementForm from './AgreementForm';
@@ -39,7 +39,14 @@ export default function AgreementDrawer({
   }, [onClose]);
 
   return (
-    <Drawer maxWidth="512px" open={open} onClose={closeDrawer} showActionsContainer data-cy="agreement-drawer">
+    <Drawer
+      open={open}
+      onClose={closeDrawer}
+      showCloseButton
+      showActionsContainer={canEdit || isEditing || !agreement}
+      data-cy="agreement-drawer"
+    >
+      {/* <DrawerHeader /> */}
       {isEditing || !agreement ? (
         <AgreementForm
           hostLegacyId={hostLegacyId}

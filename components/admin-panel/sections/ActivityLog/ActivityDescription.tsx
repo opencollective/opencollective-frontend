@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { capitalize } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import type { Account } from '../../../../lib/graphql/types/v2/graphql';
 import { ActivityDescriptionI18n } from '../../../../lib/i18n/activities';
@@ -14,21 +13,10 @@ import Avatar from '../../../Avatar';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import LinkExpense from '../../../LinkExpense';
-import { Span } from '../../../Text';
 
-const ResourceTag = styled.div`
-  display: inline-block;
-  background-color: #fff;
-  border-radius: 32px;
-  padding: 2px 8px;
-  font-size: 12px;
-
-  a {
-    color: ${props => props.theme.colors.black[800]};
-    font-weight: 400;
-    text-decoration: underline;
-  }
-`;
+const ResourceTag = ({ children }) => (
+  <div className="inline-block rounded-full bg-slate-100 px-2 py-0.5 text-sm hover:underline">{children}</div>
+);
 
 const CollectiveTag = ({
   collective,
@@ -56,9 +44,9 @@ export const getActivityVariables = (
   updateTitle: activity.data?.update?.title,
   hasParent: Boolean(activity.account?.parent),
   Individual: () => (
-    <Span fontWeight={600}>
-      <LinkCollective collective={activity.individual || activity.fromAccount} />
-    </Span>
+    <span className="font-medium">
+      <LinkCollective collective={activity.individual || activity.fromAccount} className="hover:underline" />
+    </span>
   ),
   FromAccount: () => <CollectiveTag collective={activity.fromAccount} />,
   Account: () => <CollectiveTag collective={activity.account} />,
@@ -88,6 +76,7 @@ export const getActivityVariables = (
             collective={activity.expense.account}
             expense={activity.expense}
             title={activity.expense.description}
+            className="text-slate-800"
           >
             <FormattedMessage id="Expense" defaultMessage="Expense" /> #{activity.expense.legacyId}
           </LinkExpense>
