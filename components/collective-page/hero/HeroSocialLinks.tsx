@@ -12,6 +12,7 @@ import { Globe } from '@styled-icons/feather/Globe';
 import { Instagram } from '@styled-icons/feather/Instagram';
 import { Linkedin } from '@styled-icons/feather/Linkedin';
 import { Slack } from '@styled-icons/feather/Slack';
+import { Twitch } from '@styled-icons/feather/Twitch';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import { Youtube } from '@styled-icons/feather/Youtube';
 import { Pixelfed } from '@styled-icons/remix-line/Pixelfed';
@@ -42,6 +43,7 @@ const SocialLinkIcon = {
   [SocialLinkType.GHOST]: Globe,
   [SocialLinkType.PEERTUBE]: Globe,
   [SocialLinkType.TIKTOK]: Tiktok,
+  [SocialLinkType.TWITCH]: Twitch,
 };
 
 function iconForSocialLinkType(type: SocialLinkType) {

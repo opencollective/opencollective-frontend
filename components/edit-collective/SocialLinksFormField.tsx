@@ -191,6 +191,10 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
       value: SocialLinkType.TIKTOK.toString(),
       label: 'TikTok',
     },
+    {
+      value: SocialLinkType.TWITCH.toString(),
+      label: 'Twitch',
+    },
   ];
 
   return (
@@ -314,6 +318,7 @@ const knownSocialLinkDomains = [
   { type: SocialLinkType.SLACK, regexp: /^(https:\/\/)?[^.]+.?slack.com/ },
   { type: SocialLinkType.TIKTOK, regexp: /^(https:\/\/)?(www\.)?tiktok.com/ },
   { type: SocialLinkType.TUMBLR, regexp: /^(https:\/\/)?[^.]+\.?tumblr.com/ },
+  { type: SocialLinkType.TWITCH, regexp: /^(https:\/\/)?(www\.)?twitch.tv/ },
   { type: SocialLinkType.TWITTER, regexp: /^(https:\/\/)?twitter.com/ },
   { type: SocialLinkType.YOUTUBE, regexp: /^(https:\/\/)?(www\.)?youtube.com/ },
 ];

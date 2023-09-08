@@ -8468,6 +8468,7 @@ export enum SocialLinkType {
   SLACK = 'SLACK',
   TIKTOK = 'TIKTOK',
   TUMBLR = 'TUMBLR',
+  TWITCH = 'TWITCH',
   TWITTER = 'TWITTER',
   WEBSITE = 'WEBSITE',
   YOUTUBE = 'YOUTUBE'
