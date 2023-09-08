@@ -4,6 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import languages from '../lib/constants/locales';
 
+import { useLocaleContext } from './intl/IntlProvider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/Tooltip';
 
@@ -20,20 +21,15 @@ const generateLanguageOptions = () => {
   });
 };
 
-const switchLanguage = key => {
-  document.cookie = `language=${key};path=/`;
-  window.location.reload();
-  window.scrollTo(0, 0);
-};
-
 export function LanguageSwitcher() {
+  const localeContext = useLocaleContext();
   const intl = useIntl();
   const languageOptions = React.useMemo(generateLanguageOptions, []);
   const defaultLanguage = languageOptions.find(language => language.value === intl.locale);
   return (
     <div className="relative">
       <Tooltip>
-        <Select onValueChange={value => switchLanguage(value)} defaultValue={defaultLanguage.value}>
+        <Select onValueChange={value => localeContext.setLocale(value)} defaultValue={defaultLanguage.value}>
           <label className="sr-only" htmlFor="language-options">
             <FormattedMessage id="footer.changeLanguage" defaultMessage="Change language" />
           </label>
