@@ -6,7 +6,7 @@ import { createGlobalStyle } from 'styled-components';
 
 import { createError, ERROR } from '../../lib/errors';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { getPreferredTwoFactorMethod, setPreferredTwoFactorMethod } from '../../lib/two-factor-authentication';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS, setLocalStorage } from '../../lib/local-storage';
 import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import { getSettingsRoute } from '../../lib/url-helpers';
 
@@ -36,7 +36,7 @@ function initialMethod(supportedMethods: string[]) {
     return supportedMethods[0];
   }
 
-  const preferredMethod = getPreferredTwoFactorMethod();
+  const preferredMethod = getFromLocalStorage(LOCAL_STORAGE_KEYS.PREFERRED_TWO_FACTOR_METHOD);
   return (
     supportedMethods.find(method => method === preferredMethod) ||
     supportedMethods.find(method => method !== 'recovery_code')
@@ -68,7 +68,7 @@ export default function TwoFactorAuthenticationModal() {
   }, [supportedMethods]);
 
   const useWebAuthn = React.useCallback(async () => {
-    setPreferredTwoFactorMethod('webauthn');
+    setLocalStorage(LOCAL_STORAGE_KEYS.PREFERRED_TWO_FACTOR_METHOD, 'webauthn');
     setConfirming(true);
     setTwoFactorCode('');
     try {
@@ -103,7 +103,7 @@ export default function TwoFactorAuthenticationModal() {
     setSelectedMethod(null);
 
     if (selectedMethod !== 'recovery_code') {
-      setPreferredTwoFactorMethod(selectedMethod);
+      setLocalStorage(LOCAL_STORAGE_KEYS.PREFERRED_TWO_FACTOR_METHOD, selectedMethod);
     }
 
     prompt.resolveAuth({
