@@ -59,7 +59,7 @@ const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
     <div className="flex flex-row items-center justify-between gap-3 rounded-lg border p-4" key={feature.title}>
       <div className="space-y-0.5">
         <div className="flex items-center gap-1.5">
-          <label className="font-medium" htmlFor={feature.key}>
+          <label className="text-base font-medium" htmlFor={feature.key}>
             {feature.title}
           </label>
           <Badge rounded={false} color={feature.publicBeta ? 'green' : 'yellow'}>
