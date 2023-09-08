@@ -23,7 +23,6 @@
     "@hcaptcha/react-hcaptcha": "1.8.1",
     "@hyperwatch/hyperwatch": "3.9.4",
     "@mui/material": "5.14.8",
-    "@mui/styles": "5.14.7",
     "@opencollective/taxes": "4.1.0",
     "@popperjs/core": "2.11.8",
     "@radix-ui/react-dialog": "1.0.4",

@@ -21,7 +21,7 @@ import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import { Box, Flex } from '../../Grid';
 import InputFieldPresets from '../../InputFieldPresets';
-import InputSwitch from '../../InputSwitch';
+import { Switch } from '../../ui/Switch';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
@@ -429,10 +429,10 @@ function FormFields({ collective, values, hideTypeSelect }) {
             alignItems={'center'}
           >
             {({ field, form }) => (
-              <InputSwitch
+              <Switch
                 name={field.name}
                 checked={field.value}
-                onChange={event => form.setFieldValue(field.name, event.target.checked)}
+                onCheckedChange={checked => form.setFieldValue(field.name, checked)}
               />
             )}
           </StyledInputFormikField>
@@ -459,10 +459,10 @@ function FormFields({ collective, values, hideTypeSelect }) {
             alignItems={'center'}
           >
             {({ field, form }) => (
-              <InputSwitch
+              <Switch
                 name={field.name}
                 checked={field.value}
-                onChange={event => form.setFieldValue(field.name, event.target.checked)}
+                onCheckedChange={checked => form.setFieldValue(field.name, checked)}
               />
             )}
           </StyledInputFormikField>

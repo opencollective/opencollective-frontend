@@ -5,11 +5,11 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Flex } from '../../Grid';
-import InputSwitch from '../../InputSwitch';
 import StyledButton from '../../StyledButton';
 import StyledHr from '../../StyledHr';
 import StyledModal, { ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
+import { Switch } from '../../ui/Switch';
 
 const CancelDeleteModalButton = styled(StyledButton)`
   @media (max-width: 700px) {
@@ -56,9 +56,9 @@ export default function ConfirmTierDeleteModal({ isDeleting, onClose, onConfirmD
             <FormattedMessage defaultMessage="If yes, you will still receive existing recurring contributions for this deleted tier." />
           </P>
         </Flex>
-        <InputSwitch
+        <Switch
           checked={keepRecurringContributions}
-          onChange={event => setKeepRecurringContributions(event.target.checked)}
+          onCheckedChange={checked => setKeepRecurringContributions(checked)}
         />
       </Flex>
       <ModalFooter isFullWidth dividerMargin="1.2em 0">
