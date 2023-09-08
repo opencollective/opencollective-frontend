@@ -124,18 +124,11 @@ export default function TwoFactorAuthenticationModal() {
     return () => router.events.off('routeChangeStart', handleRouteChange);
   }, [cancel]);
 
-  React.useEffect(() => {
-    if (supportedMethods.includes('yubikey_otp') && twoFactorCode.length === 44) {
-      confirm();
-    }
-  }, [confirm, twoFactorCode]);
-
   const verifyBtnEnabled =
-    (supportedMethods.length > 0 &&
-      ((selectedMethod === 'recovery_code' && twoFactorCode?.length > 0) ||
-        ((selectedMethod === 'yubikey_otp' || selectedMethod === 'totp') && twoFactorCode?.length === 44) ||
-        twoFactorCode?.length === 6)) ||
-    selectedMethod === 'webauthn';
+    supportedMethods.length > 0 &&
+    ((selectedMethod === 'recovery_code' && twoFactorCode?.length > 0) ||
+      (selectedMethod === 'totp' && twoFactorCode?.length === 6) ||
+      selectedMethod === 'webauthn');
 
   const alternativeMethods = supportedMethods.filter(method => method !== selectedMethod);
 
@@ -181,7 +174,7 @@ export default function TwoFactorAuthenticationModal() {
           <RecoveryCodeOptions value={twoFactorCode} onChange={setTwoFactorCode} disabled={confirming} />
         )}
 
-        {(selectedMethod === 'yubikey_otp' || selectedMethod === 'totp') && (
+        {selectedMethod === 'totp' && (
           <AuthenticatorOption
             value={twoFactorCode}
             onChange={setTwoFactorCode}
