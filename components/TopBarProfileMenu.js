@@ -14,7 +14,6 @@ import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { getSettingsRoute, getWorkspaceRoute } from '../lib/url-helpers';
 
-import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -448,9 +447,11 @@ class TopBarProfileMenu extends React.Component {
             </Hide>
           )}
         </Flex>
-        {showPreviewFeaturesModal && (
-          <PreviewFeaturesModal onClose={() => this.setState({ showPreviewFeaturesModal: false })} />
-        )}
+
+        <PreviewFeaturesModal
+          open={showPreviewFeaturesModal}
+          setOpen={open => this.setState({ showPreviewFeaturesModal: open })}
+        />
       </Container>
     );
   }
@@ -469,11 +470,7 @@ class TopBarProfileMenu extends React.Component {
             </Hide>
           </Flex>
         </StyledProfileButton>
-        <Hide sm md lg>
-          <Container position="absolute" mx={27} my={-47}>
-            <ChangelogTrigger height="24px" width="24px" backgroundSize="9.49px 13.5px" />
-          </Container>
-        </Hide>
+
         {showProfileMenu && (
           <React.Fragment>
             <HideGlobalScroll />

@@ -36,7 +36,7 @@ export function Drawer({
   return (
     <DrawerActionsContext.Provider value={drawerActionsContainer}>
       <MUIDrawer
-        className="[&_.MuiBackdrop-root]:bg-black/25"
+        className="[&_.MuiBackdrop-root]:bg-slate-950/25"
         anchor="right"
         open={open}
         onClose={onClose}

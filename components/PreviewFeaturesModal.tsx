@@ -13,7 +13,17 @@ import StyledCard from './StyledCard';
 import StyledModal, { ModalBody, ModalHeader } from './StyledModal';
 import StyledTag from './StyledTag';
 import { H2, H4, P } from './Text';
-
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './ui/Dialog';
+import { Switch } from './ui/Switch';
+import { Badge } from './ui/Badge';
 const editAccountSettingsMutation = gql`
   mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
@@ -46,65 +56,60 @@ const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
   };
 
   return (
-    <StyledCard mt={3} key={feature.title} display="flex" justifyContent="space-between" p={'20px'}>
-      <Flex flexDirection="column">
-        <H4 fontSize="18px" fontWeight={700} letterSpacing="0" color="black.700" mb={1}>
-          {feature.title}{' '}
-          <StyledTag
-            variant="rounded"
-            type={feature.publicBeta ? 'success' : 'info'}
-            fontWeight={600}
-            fontSize="12px"
-            p="4px 8px"
-            ml={1}
-            verticalAlign="middle"
-          >
+    <div className="flex flex-row items-center justify-between gap-3 rounded-lg border p-4" key={feature.title}>
+      <div className="space-y-0.5">
+        <div className="flex items-center gap-1.5">
+          <label className="font-medium" htmlFor={feature.key}>
+            {feature.title}
+          </label>
+          <Badge rounded={false} color={feature.publicBeta ? 'green' : 'yellow'}>
             {feature.publicBeta ? (
-              <FormattedMessage id="PreviewFeatures.publicBeta" defaultMessage="Public Beta" />
+              <FormattedMessage id="PreviewFeatures.publicBeta" defaultMessage="Public beta" />
             ) : (
-              <FormattedMessage id="PreviewFeatures.closedBeta" defaultMessage="Closed Beta" />
+              <FormattedMessage id="PreviewFeatures.LimitedAccess" defaultMessage="Limited access" />
             )}
-          </StyledTag>
-        </H4>
-        <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.700" letterSpacing={0}>
-          {feature.description}
-        </P>
-      </Flex>
-      <InputSwitch
+          </Badge>
+        </div>
+
+        <p className="text-sm text-muted-foreground">{feature.description}</p>
+      </div>
+      <Switch
+        id={feature.key}
         checked={isChecked}
         disabled={loading}
-        onChange={e => togglePreviewFeature(feature.key, e.target.checked)}
+        onCheckedChange={checked => togglePreviewFeature(feature.key, checked)}
       />
-    </StyledCard>
+    </div>
   );
 };
 
-const PreviewFeaturesModal = ({ onClose }: { onClose: () => void }) => {
+const PreviewFeaturesModal = ({ open, setOpen }: { onClose: () => void }) => {
   const { LoggedInUser } = useLoggedInUser();
   const previewFeatures = LoggedInUser?.getAvailablePreviewFeatures() || [];
-
   return (
-    <StyledModal onClose={onClose} width="576px">
-      <ModalHeader onClose={onClose}>
-        <Flex width="100%" flexDirection="column">
-          <H2 fontSize={'20px'} fontWeight="700" lineHeight="36px" color="black.800" mb={2}>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
             <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />
-          </H2>
-          <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.700" letterSpacing={0}>
+          </DialogTitle>
+          <DialogDescription>
             <FormattedMessage
               id="PreviewFeatures.description"
               defaultMessage="Get early access to features that are in development. Please <ContactLink>let us know</ContactLink> how we can make them better."
               values={{
-                ContactLink: msg => <Link href="/contact">{msg}</Link>,
+                ContactLink: msg => (
+                  <Link className="text-blue-700 underline" href="/contact">
+                    {msg}
+                  </Link>
+                ),
               }}
             />
-          </P>
-        </Flex>
-      </ModalHeader>
-      <ModalBody mb={2}>
+          </DialogDescription>
+        </DialogHeader>
         {previewFeatures?.map(feature => <PreviewFeatureCard key={feature.key} feature={feature} />)}
-      </ModalBody>
-    </StyledModal>
+      </DialogContent>
+    </Dialog>
   );
 };
 
