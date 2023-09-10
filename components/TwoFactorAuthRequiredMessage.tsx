@@ -15,6 +15,7 @@ import { P, Strong } from './Text';
 type TwoFactorAuthRequiredMessageProps = {
   borderWidth?: string | number;
   noTitle?: boolean;
+  className?: string;
 };
 
 export const TwoFactorAuthRequiredMessage = ({

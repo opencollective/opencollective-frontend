@@ -1,7 +1,7 @@
 describe('Host agreements', () => {
   it('Use the agreements admin to create and edit agreements', () => {
     // ---- Load the list filter by newly created account ----
-    cy.login({ redirect: `/workspace/brusselstogetherasbl/host-agreements` });
+    cy.login({ redirect: `/dashboard/brusselstogetherasbl/host-agreements` });
     cy.contains('[data-cy="agreements-table"]', 'No agreements'); // Starts with no agreements
 
     // ---- Create an agreement ----
@@ -28,7 +28,7 @@ describe('Host agreements', () => {
     cy.get('[data-cy="agreements-table"] tbody tr').first().as('firstRow');
     cy.get('@firstRow').contains('Veganizer BXL');
     cy.get('@firstRow').contains('Unlimited potatoes');
-    cy.get('@firstRow').contains('November 6, 2062');
+    cy.get('@firstRow').contains('Nov 6, 2062');
 
     // ---- Open drawer, make sure the info is there ----
     cy.get('@firstRow').find('td:nth-child(2)').click();
@@ -46,7 +46,7 @@ describe('Host agreements', () => {
     cy.checkToast({ type: 'SUCCESS', message: 'Agreement updated' });
     cy.getByDataCy('agreement-drawer').should('not.exist'); // It closes the drawer
     cy.get('@firstRow').contains('Unlimited potatoes (updated)');
-    cy.get('@firstRow').contains('November 7, 2062');
+    cy.get('@firstRow').contains('Nov 7, 2062');
 
     // ---- Filters the agreements ----
     cy.getByDataCy('select-agreements-account').type('brussels');
@@ -59,7 +59,7 @@ describe('Host agreements', () => {
     cy.getByDataCy('menu-item-host-expenses').click();
     cy.contains('[data-cy="expense-container-2340"]', 'Vegan Dining Week Client Dinner').as('expense');
     cy.get('@expense')
-      .find('a[href="/workspace/brusselstogetherasbl/host-agreements?account=veganizerbxl"]')
+      .find('a[href="/dashboard/brusselstogetherasbl/host-agreements?account=veganizerbxl"]')
       .contains('1 agreement');
 
     // ---- Agreement count should be displayed on the expense ----
@@ -67,7 +67,7 @@ describe('Host agreements', () => {
     cy.getByDataCy('expense-drawer').should('be.visible'); // Wait for the page to load
     cy.getByDataCy('expense-summary-collective').contains('Host Agreements: 1');
     cy.getByDataCy('expense-summary-collective')
-      .find('a[href="/workspace/brusselstogetherasbl/host-agreements?account=veganizerbxl"]')
+      .find('a[href="/dashboard/brusselstogetherasbl/host-agreements?account=veganizerbxl"]')
       .click();
 
     // ---- Delete the agreements ----

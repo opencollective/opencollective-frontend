@@ -9,7 +9,6 @@ const cookieParser = require('cookie-parser');
 const cloudflareIps = require('cloudflare-ip/ips.json');
 const throng = require('throng');
 
-const intl = require('./intl');
 const logger = require('./logger');
 const loggerMiddleware = require('./logger-middleware');
 const routes = require('./routes');
@@ -66,8 +65,6 @@ const start = id =>
     );
 
     app.use(cookieParser());
-
-    app.use(intl.middleware());
 
     if (parseToBooleanDefaultFalse(process.env.DUPLICATE_HANDLER)) {
       app.use(

@@ -30,9 +30,11 @@ describe('host dashboard', () => {
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
       cy.login({ redirect: '/brusselstogetherasbl/admin' });
-      cy.get('[data-cy="menu-item-pending-applications"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
+      cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
-      cy.contains(`[data-cy="host-application"]`, 'Approved');
+      cy.contains(`[data-cy="host-application-header-${collectiveSlug}"]`, 'Approved');
     });
   });
 
@@ -51,9 +53,12 @@ describe('host dashboard', () => {
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
       cy.login({ redirect: '/brusselstogetherasbl/admin' });
-      cy.get('[data-cy="menu-item-pending-applications"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
+      cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
-      cy.contains(`[data-cy="host-application"]`, 'Approved');
+      cy.contains(`[data-cy="host-application-header-${collectiveSlug}"]`, 'Approved');
+      cy.get(`[data-cy="close-drawer"]`).click();
       cy.getByDataCy('menu-item-hosted-collectives').click();
       cy.getByDataCy(`${collectiveSlug}-collective-card`).within(() => {
         cy.get('button[title="More options"]').click();
@@ -78,9 +83,12 @@ describe('host dashboard', () => {
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
       cy.login({ redirect: '/brusselstogetherasbl/admin' });
-      cy.get('[data-cy="menu-item-pending-applications"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
+      cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
-      cy.contains(`[data-cy="host-application"]`, 'Approved');
+      cy.contains(`[data-cy="host-application-header-${collectiveSlug}"]`, 'Approved');
+      cy.get('[data-cy="close-drawer"]').click();
       cy.getByDataCy('menu-item-hosted-collectives').click();
       cy.getByDataCy(`${collectiveSlug}-collective-card`).within(() => {
         cy.get('[data-cy="hosted-collective-add-funds-btn"]').click();

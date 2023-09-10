@@ -1,7 +1,7 @@
 import React from 'react';
-import styled from 'styled-components';
 
 import { useWindowResize, VIEWPORTS } from '../lib/hooks/useWindowResize';
+import { cn } from '../lib/utils';
 
 import { Flex } from './Grid';
 import StyledSelect from './StyledSelect';
@@ -18,55 +18,20 @@ const abbreviateNumber = number => {
   }
 };
 
-const TabButton = styled.button<{ selected?: boolean }>`
-  appearance: none;
-  border: none;
-  cursor: pointer;
-  outline: 0;
-  min-width: max-content;
-  background: transparent;
-  padding: 16px 4px;
-  line-height: 20px;
-  font-size: 14px;
-  font-weight: 500;
-
-  color: ${props => (props.selected ? props.theme.colors.primary[700] : props.theme.colors.black[600])};
-  transition: color 50ms ease-in-out, border-color 50ms ease-in-out;
-  border-bottom: 2px solid ${props => (props.selected ? props.theme.colors.primary[500] : 'transparent')};
-
-  &:hover {
-    color: ${props => (props.selected ? props.theme.colors.primary[700] : props.theme.colors.black[700])};
-    border-color: ${props => (props.selected ? props.theme.colors.primary[500] : props.theme.colors.black[300])};
-  }
-
-  > span {
-    padding: 2px 10px;
-    align-items: center;
-    margin-left: 12px;
-    border-radius: 100px;
-    background: ${props => (props.selected ? props.theme.colors.primary[100] : props.theme.colors.black[100])};
-    color: ${props => (props.selected ? props.theme.colors.primary[700] : props.theme.colors.black[700])};
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 16px;
-    
-`;
-
 type TabsProps = {
   tabs: Array<{ id: string | number; label: React.ReactNode | string; count?: number; selected?: boolean }>;
   selectedId: string | number;
   onChange?: Function;
 };
 
-const TabsBar = styled.div`
-  border-bottom: 1px solid ${props => props.theme.colors.black[300]};
-`;
-
 const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps & Parameters<typeof Flex>[0]) => {
   const { viewport } = useWindowResize();
 
   if (viewport === VIEWPORTS.XSMALL) {
-    const options = tabs.map(tab => ({ label: tab.count ? `${tab.label} (${tab.count})` : tab.label, value: tab.id }));
+    const options = tabs.map(tab => ({
+      label: tab.count !== undefined ? `${tab.label} (${tab.count})` : tab.label,
+      value: tab.id,
+    }));
     return (
       <StyledSelect
         {...props}
@@ -79,15 +44,37 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps & Parameters<t
   }
 
   return (
-    <TabsBar {...props}>
-      <Flex gap="24px" mb="-1px" overflowX="auto">
-        {tabs.map(tab => (
-          <TabButton key={tab.id} onClick={() => onChange?.(tab.id)} selected={tab.id === selectedId}>
-            {tab.label} {typeof tab.count !== 'undefined' && <span>{abbreviateNumber(tab.count)}</span>}
-          </TabButton>
-        ))}
-      </Flex>
-    </TabsBar>
+    <div className="border-b" {...props}>
+      <div className="-mb-px flex space-x-6 overflow-x-auto">
+        {tabs.map(tab => {
+          const selected = tab.id === selectedId;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => onChange?.(tab.id)}
+              className={cn(
+                'flex whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ring-inset	ring-black focus:outline-none focus-visible:ring-2',
+                selected
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-slate-500 hover:border-slate-200 hover:text-slate-700',
+              )}
+            >
+              {tab.label}{' '}
+              {typeof tab.count !== 'undefined' && (
+                <span
+                  className={cn(
+                    'ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
+                    selected ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-900',
+                  )}
+                >
+                  {abbreviateNumber(tab.count)}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 };
 

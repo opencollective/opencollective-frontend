@@ -1,14 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { truncate } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 
 import Container from '../Container';
 import Currency from '../Currency';
-import { Box, Flex } from '../Grid';
-import StyledHr from '../StyledHr';
+import { Box } from '../Grid';
 import { P, Span } from '../Text';
 
 import StyledCollectiveCard from './StyledCollectiveCard';
@@ -109,17 +107,15 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
             </React.Fragment>
           )}
           {collective.description && (
-            <Container fontSize="12px">
-              <Flex alignItems="center" justifyContent="space-between" mt={21.5} mb={4.5}>
-                <Span textTransform="uppercase" color="black.700" fontWeight={500}>
+            <div className="text-xs">
+              <div className="mb-1 mt-2 flex items-center justify-between gap-2">
+                <span className="font-medium uppercase text-slate-700">
                   <FormattedMessage defaultMessage="About Us" />
-                </Span>
-                <StyledHr borderColor="black.300" flex="1" ml={2} />
-              </Flex>
-              <Span fontWeight={400} color="black.800">
-                {truncate(collective.description, { length: 85 })}
-              </Span>
-            </Container>
+                </span>
+                <hr className="flex-1" />
+              </div>
+              <span className="line-clamp-2 text-slate-800">{collective.description}</span>
+            </div>
           )}
         </Box>
       </Container>

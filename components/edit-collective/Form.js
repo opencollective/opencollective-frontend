@@ -4,7 +4,7 @@ import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import dayjs from 'dayjs';
-import { cloneDeep, find, get, set } from 'lodash';
+import { cloneDeep, find, get, isNil, set } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -498,6 +498,7 @@ class EditCollectiveForm extends React.Component {
         return (
           <Box>
             {collective.type === USER && <EditUserEmailForm />}
+            {collective.type === ORGANIZATION && <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />}
             {[COLLECTIVE, FUND, PROJECT, EVENT].includes(collective.type) && (
               <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
             )}
@@ -509,7 +510,7 @@ class EditCollectiveForm extends React.Component {
       // Fiscal Hosts
 
       case ALL_SECTIONS.FISCAL_HOSTING:
-        return <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />;
+        return null;
 
       case ALL_SECTIONS.RECEIVING_MONEY:
         return <ReceivingMoney collective={collective} />;
@@ -565,6 +566,9 @@ class EditCollectiveForm extends React.Component {
     const taxes = getApplicableTaxesForCountry(country);
 
     if (taxes.includes(TaxType.VAT)) {
+      const vatType = get(collective, 'settings.VAT.type');
+      const vatNumber = get(collective, 'settings.VAT.number');
+
       const getVATOptions = () => {
         const options = [
           {
@@ -592,7 +596,7 @@ class EditCollectiveForm extends React.Component {
         {
           name: 'VAT',
           type: 'select',
-          defaultValue: get(collective, 'settings.VAT.type') || VAT_OPTIONS.HOST,
+          defaultValue: isNil(vatType) ? VAT_OPTIONS.HOST : vatType,
           when: () => {
             return collective.isHost || AccountTypesWithHost.includes(collective.type);
           },
@@ -602,12 +606,12 @@ class EditCollectiveForm extends React.Component {
           name: 'VAT-number',
           type: 'string',
           placeholder: 'FRXX999999999',
-          defaultValue: get(collective, 'settings.VAT.number'),
+          defaultValue: vatNumber,
           when: () => {
             const { collective } = this.state;
             if (collective.type === COLLECTIVE || collective.type === EVENT) {
               // Collectives can set a VAT number if configured
-              return get(collective, 'settings.VAT.type') === VAT_OPTIONS.OWN;
+              return vatType === VAT_OPTIONS.OWN;
             } else {
               return true;
             }

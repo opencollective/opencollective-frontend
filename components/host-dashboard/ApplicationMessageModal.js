@@ -19,7 +19,7 @@ const ApplicationMessageModal = ({ collective, onClose, onConfirm, ...modalProps
   const [isPrivate, setIsPrivate] = useState(false);
 
   return (
-    <StyledModal onClose={onClose} width="576px" {...modalProps}>
+    <StyledModal onClose={onClose} width="576px" {...modalProps} trapFocus>
       <ModalHeader hideCloseIcon>
         <Flex justifyContent="space-between" flexDirection={['column', 'row']} width="100%">
           <Flex>

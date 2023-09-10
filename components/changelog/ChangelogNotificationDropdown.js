@@ -61,7 +61,15 @@ const ChangelogNotificationDropdown = ({ onClose }) => {
               id="ChangelogNotification.secondLine"
               defaultMessage="Click on the {image} to take a look"
               values={{
-                image: <Image src="/static/images/flame-red.svg" width={10.55} height={15} alt="Flame Image" />,
+                image: (
+                  <Image
+                    className="inline-block"
+                    src="/static/images/flame-red.svg"
+                    width={10.55}
+                    height={15}
+                    alt="Flame Image"
+                  />
+                ),
               }}
             />
           </P>
