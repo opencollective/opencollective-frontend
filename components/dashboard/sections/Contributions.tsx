@@ -28,7 +28,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../../ui/Dropdown';
+} from '../../ui/DropdownMenu';
 import { Pagination } from '../../ui/Pagination';
 import { TableActionsButton } from '../../ui/Table';
 import { AdminSectionProps } from '../types';
