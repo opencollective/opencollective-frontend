@@ -213,7 +213,7 @@ const ProfileMenu = () => {
   );
   return (
     <React.Fragment>
-      <Popover onOpenChange={open => setMenuOpen(open)}>
+      <Popover open={isMenuOpen} onOpenChange={open => setMenuOpen(open)}>
         <PopoverTrigger asChild>
           <button
             className="rounded-full ring-black ring-offset-1 focus:outline-none focus:ring-2"
