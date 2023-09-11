@@ -43,7 +43,7 @@ const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
         )}
         onClick={handleShowNewUpdates}
       >
-        <Megaphone size={legacySize ? 20 : 18} />
+        <Megaphone size={18} />
         {!hasSeenNewUpdates && <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-primary" />}
       </TooltipTrigger>
       <TooltipContent>
