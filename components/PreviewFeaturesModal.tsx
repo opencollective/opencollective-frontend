@@ -45,10 +45,8 @@ const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
   return (
     <div className="flex flex-row items-center justify-between gap-3 rounded-lg border p-4" key={feature.title}>
       <div className="space-y-0.5">
-        <div className="flex items-center gap-2">
-          <label className="text-base font-medium" htmlFor={feature.key}>
-            {feature.title}
-          </label>
+        <label className="flex flex-wrap items-center gap-x-2 text-base font-medium" htmlFor={feature.key}>
+          <span>{feature.title}</span>
           <Badge size="sm" type={feature.publicBeta ? 'success' : 'warning'}>
             {feature.publicBeta ? (
               <FormattedMessage id="PreviewFeatures.publicBeta" defaultMessage="Public beta" />
@@ -56,7 +54,7 @@ const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
               <FormattedMessage id="PreviewFeatures.LimitedAccess" defaultMessage="Limited preview" />
             )}
           </Badge>
-        </div>
+        </label>
 
         <p className="text-sm text-muted-foreground">{feature.description}</p>
       </div>
