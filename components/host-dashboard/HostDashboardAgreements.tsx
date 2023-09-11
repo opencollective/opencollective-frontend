@@ -163,6 +163,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
           />
           <AgreementDrawer
             open={agreementDrawerOpen}
+            setOpen={setAgreementDrawerOpen}
             agreement={agreementInDrawer}
             canEdit={canEdit}
             hostLegacyId={data?.host.legacyId} // legacyId required by CollectivePickerAsync

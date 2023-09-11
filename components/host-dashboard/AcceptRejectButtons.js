@@ -7,7 +7,7 @@ import { Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 import { Span } from '../Text';
-
+import { Button } from '../ui/Button';
 import ApplicationRejectionReasonModal from './ApplicationRejectionReasonModal';
 
 const AcceptRejectButtons = ({
@@ -22,7 +22,7 @@ const AcceptRejectButtons = ({
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [action, setAction] = useState(null);
   return (
-    <Flex alignItems="baseline" gap="10px">
+    <Flex alignItems="baseline" gap="8px">
       {disabledMessage && (
         <StyledTooltip content={disabledMessage}>
           <Span color="black.600">
@@ -30,6 +30,7 @@ const AcceptRejectButtons = ({
           </Span>
         </StyledTooltip>
       )}
+
       {customButton ? (
         customButton({
           onClick: () => {
@@ -41,9 +42,9 @@ const AcceptRejectButtons = ({
           children: <FormattedMessage id="actions.approve" defaultMessage="Approve" />,
         })
       ) : (
-        <StyledButton
-          minWidth={100}
-          buttonStyle="successSecondary"
+        <Button
+          variant={'default'}
+          size="sm"
           disabled={disabled || isLoading}
           loading={isLoading && action === 'APPROVE'}
           data-cy={`${collective.slug}-approve`}
@@ -54,7 +55,7 @@ const AcceptRejectButtons = ({
         >
           <Check size={14} className="inline-block" />
           &nbsp; <FormattedMessage id="actions.approve" defaultMessage="Approve" />
-        </StyledButton>
+        </Button>
       )}
 
       {customButton ? (
@@ -65,9 +66,9 @@ const AcceptRejectButtons = ({
           children: <FormattedMessage id="actions.reject" defaultMessage="Reject" />,
         })
       ) : (
-        <StyledButton
-          minWidth={100}
-          buttonStyle="dangerSecondary"
+        <Button
+          variant={'outline'}
+          size="sm"
           onClick={() => setShowRejectModal(true)}
           disabled={isLoading}
           loading={isLoading && action === 'REJECT'}
@@ -75,8 +76,9 @@ const AcceptRejectButtons = ({
         >
           <Ban size={14} className="inline-block" />
           &nbsp; <FormattedMessage id="actions.reject" defaultMessage="Reject" />
-        </StyledButton>
+        </Button>
       )}
+
       {showRejectModal && (
         <ApplicationRejectionReasonModal
           collective={collective}

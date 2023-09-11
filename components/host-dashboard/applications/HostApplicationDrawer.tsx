@@ -2,9 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { get, isEmpty } from 'lodash';
-import { AlertTriangle, ExternalLink, LinkIcon, Mail, MessageSquare, ShieldCheck } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  ChevronDown,
+  ExternalLink,
+  LinkIcon,
+  Mail,
+  MessageSquare,
+  MoreHorizontal,
+  PanelRightClose,
+  ShieldCheck,
+  X,
+} from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-
+import DateTime from '../../DateTime';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import {
@@ -15,6 +28,7 @@ import {
   MemberCollection,
   ProcessHostApplicationAction,
 } from '../../../lib/graphql/types/v2/graphql';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/Tooltip';
 import { i18nCustomApplicationFormLabel } from '../../../lib/i18n/custom-application-form';
 
 import Avatar from '../../Avatar';
@@ -35,6 +49,23 @@ import ValidatedRepositoryInfo from '../ValidatedRepositoryInfo';
 
 import { hostApplicationsQuery, processApplicationMutation } from './queries';
 
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetBody,
+  SheetTrigger,
+} from '../../ui/Sheet';
+
+import { StatusTag } from './HostApplicationsTable';
+import { Separator } from '../../ui/Separator';
+import { Button } from '../../ui/Button';
+import { Badge } from '../../ui/Badge';
+
 const msg = defineMessages({
   approved: {
     id: 'HostApplication.Approved',
@@ -47,42 +78,6 @@ const msg = defineMessages({
 });
 
 const ACTIONS = ProcessHostApplicationAction;
-
-const StatusTag = ({ status }) => {
-  const tagProps = {
-    display: 'block',
-    textTransform: 'uppercase',
-    fontWeight: 700,
-    fontSize: '12px',
-  };
-
-  switch (status) {
-    case 'PENDING':
-      return (
-        <StyledTag {...tagProps} type="warning">
-          <FormattedMessage id="Pending" defaultMessage="Pending" />
-        </StyledTag>
-      );
-    case 'APPROVED':
-      return (
-        <StyledTag {...tagProps} type="success">
-          <FormattedMessage id="PendingApplication.Approved" defaultMessage="Approved" />
-        </StyledTag>
-      );
-    case 'REJECTED':
-      return (
-        <StyledTag {...tagProps} type="error">
-          <FormattedMessage id="PendingApplication.Rejected" defaultMessage="Rejected" />
-        </StyledTag>
-      );
-    default:
-      return null;
-  }
-};
-
-StatusTag.propTypes = {
-  status: PropTypes.oneOf(['PENDING', 'REJECTED', 'APPROVED']),
-};
 
 const getSuccessToast = (intl, action, collective, result) => {
   if (action === ACTIONS.SEND_PRIVATE_MESSAGE || action === ACTIONS.SEND_PUBLIC_MESSAGE) {
@@ -194,34 +189,177 @@ export function HostApplication({
     }
   };
 
+  console.log({ application });
+
   return (
     <React.Fragment>
-      <div>
-        <DrawerHeader
-          onClose={onClose}
-          data-Cy={`host-application-header-${account.slug}`}
-          title={
-            <FormattedMessage
-              defaultMessage="Application <ApplicationId></ApplicationId> to <HostCollectiveName></HostCollectiveName>"
-              values={{
-                ApplicationId: () => (
-                  <StyledTag display="inline-block" verticalAlign="middle" mx={1} fontSize="12px">
-                    #{application.id.split('-')[0]}
-                  </StyledTag>
-                ),
-                HostCollectiveName: () => (
-                  <LinkCollective className="text-inherit hover:underline" collective={host}>
-                    {host.name}
-                  </LinkCollective>
-                ),
-              }}
-            />
-          }
-          statusTag={<StatusTag status={status} />}
-        />
+      <SheetHeader>
+        <div className="flex w-full items-center justify-between">
+          <div className="flex items-center gap-1">
+            {/* <Button variant="outline" className="" size={'sm-icon'} onClick={onClose}>
+              <X size={16} />
+            </Button> */}
 
+            <p className="text-sm font-medium text-muted-foreground">
+              Host Applications / <span className="font-normal">#4874</span>
+            </p>
+          </div>
+
+          <div className="flex items-center gap-1">
+            {/* {status === HostApplicationStatus.PENDING && (
+              <AcceptRejectButtons
+                collective={account}
+                isLoading={loading}
+                disabled={requiresMinimumNumberOfAdmins && !hasEnoughInvitedAdmins}
+                disabledMessage={
+                  requiresMinimumNumberOfAdmins &&
+                  !hasEnoughInvitedAdmins &&
+                  intl.formatMessage({
+                    defaultMessage:
+                      'You can not approve this collective as it doesn’t satisfy the minimum admin policy set by you.',
+                  })
+                }
+                onApprove={() => processApplication(ACTIONS.APPROVE)}
+                onReject={message => processApplication(ACTIONS.REJECT, message)}
+              />
+            )}
+            <Button
+              variant="outline"
+              // rounded
+              // className="rounded-full"
+              size={'sm-icon'}
+              onClick={() => setShowContactModal(true)}
+            >
+              <MoreHorizontal size={16} />
+            </Button> */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size={'sm-icon'} onClick={onClose}>
+                  <ArrowLeft size={16} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <FormattedMessage
+                  defaultMessage="Previous {k}"
+                  values={{
+                    k: <span className="ml-1 rounded bg-slate-700 px-1 py-0.5 font-mono text-xs font-normal">k</span>,
+                  }}
+                />
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size={'sm-icon'} onClick={onClose}>
+                  <ArrowRight size={16} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <FormattedMessage
+                  defaultMessage="Next {j}"
+                  values={{
+                    j: <span className="ml-1 rounded bg-slate-700 px-1 py-0.5 font-mono text-xs font-normal">j</span>,
+                  }}
+                />
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" className="" size={'sm-icon'} onClick={onClose}>
+                  <X size={16} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <FormattedMessage
+                  defaultMessage="Close {esc}"
+                  values={{
+                    esc: (
+                      <span className="ml-1 rounded bg-slate-700 px-1 py-0.5 font-mono text-xs font-normal">Esc</span>
+                    ),
+                  }}
+                />
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
+        <div>
+          <p className="font-medium text-muted-foreground">
+            <LinkCollective className="text-foreground hover:underline" collective={application.account}>
+              {application.account.name}
+            </LinkCollective>
+            {/* <StatusTag status={status} size={'lg'} /> */}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between gap-1 pt-1">
+          <div className="flex items-center gap-2">
+            <StatusTag status={status} />{' '}
+            <p className="text-sm text-muted-foreground">
+              <span className="cursor-pointer text-foreground hover:underline">
+                {account.admins.nodes[0].account.name}
+              </span>{' '}
+              submitted on{' '}
+              <span className="">
+                <DateTime formatProps={{ month: 'short', day: '2-digit' }} value={application.createdAt} />
+              </span>
+            </p>
+          </div>
+          <div className="flex items-center justify-end gap-1">
+            {status === HostApplicationStatus.PENDING && (
+              <AcceptRejectButtons
+                collective={account}
+                isLoading={loading}
+                disabled={requiresMinimumNumberOfAdmins && !hasEnoughInvitedAdmins}
+                disabledMessage={
+                  requiresMinimumNumberOfAdmins &&
+                  !hasEnoughInvitedAdmins &&
+                  intl.formatMessage({
+                    defaultMessage:
+                      'You can not approve this collective as it doesn’t satisfy the minimum admin policy set by you.',
+                  })
+                }
+                onApprove={() => processApplication(ACTIONS.APPROVE)}
+                onReject={message => processApplication(ACTIONS.REJECT, message)}
+              />
+            )}
+            {/* <Button variant="outline" className="" size={'sm'} onClick={onClose}>
+              More <ChevronDown size={16} />
+            </Button> */}
+            {/* {status === HostApplicationStatus.PENDING && (
+              <AcceptRejectButtons
+                collective={account}
+                isLoading={loading}
+                disabled={requiresMinimumNumberOfAdmins && !hasEnoughInvitedAdmins}
+                disabledMessage={
+                  requiresMinimumNumberOfAdmins &&
+                  !hasEnoughInvitedAdmins &&
+                  intl.formatMessage({
+                    defaultMessage:
+                      'You can not approve this collective as it doesn’t satisfy the minimum admin policy set by you.',
+                  })
+                }
+                onApprove={() => processApplication(ACTIONS.APPROVE)}
+                onReject={message => processApplication(ACTIONS.REJECT, message)}
+              />
+            )} */}
+            <Button
+              variant="outline"
+              // rounded
+              // className="rounded-full"
+              size={'sm-icon'}
+              onClick={() => setShowContactModal(true)}
+            >
+              <MoreHorizontal size={16} />
+            </Button>
+          </div>
+        </div>
+      </SheetHeader>
+
+      <SheetBody>
         <InfoList className="sm:grid-cols-2">
-          <InfoListItem
+          {/* <InfoListItem title={<FormattedMessage defaultMessage="Status" />} value={<StatusTag status={status} />} /> */}
+
+          {/* <InfoListItem
+            className="border-t-0"
             title={<FormattedMessage defaultMessage="Account" />}
             value={
               <LinkCollective
@@ -232,13 +370,18 @@ export function HostApplication({
                 {application.account.name}
               </LinkCollective>
             }
-          />
+          /> */}
+          {/* <InfoListItem
+            title={<FormattedMessage defaultMessage="Date" />}
+            value={<DateTime dateStyle="medium" value={application.createdAt} />}
+          /> */}
           <InfoListItem
+            className="border-t-0"
             title={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
             value={application.account.description}
           />
           <InfoListItem
-            className="sm:col-span-2"
+            className="border-t-0"
             title={
               <div className="flex items-center gap-2">
                 <FormattedMessage id="Admins" defaultMessage="Admins" />
@@ -278,6 +421,23 @@ export function HostApplication({
               </div>
             }
           />
+
+          {(application.message || hasNothingToShow) && (
+            <InfoListItem
+              className="sm:col-span-2"
+              title={
+                <div className="flex items-center gap-1.5">
+                  <MessageSquare size={16} className="text-slate-700" />
+                  <FormattedMessage id="PendingApplication.Message" defaultMessage="Message to Fiscal Host" />
+                </div>
+              }
+              value={
+                <p className="whitespace-pre-line">
+                  {application.message ?? <FormattedMessage id="NoMessage" defaultMessage="No message provided" />}
+                </p>
+              }
+            />
+          )}
 
           {application.customData?.validatedRepositoryInfo && (
             <InfoListItem
@@ -319,51 +479,8 @@ export function HostApplication({
                 />
               );
             })}
-
-          {(application.message || hasNothingToShow) && (
-            <InfoListItem
-              className="sm:col-span-2"
-              title={
-                <div className="flex items-center gap-1.5">
-                  <MessageSquare size={16} className="text-slate-700" />
-                  <FormattedMessage id="PendingApplication.Message" defaultMessage="Message to Fiscal Host" />
-                </div>
-              }
-              value={
-                <p className="whitespace-pre-line">
-                  {application.message ?? <FormattedMessage id="NoMessage" defaultMessage="No message provided" />}
-                </p>
-              }
-            />
-          )}
         </InfoList>
-      </div>
-      <DrawerActions>
-        <div className="flex w-full justify-between">
-          <Flex alignItems="center" gap="10px">
-            <StyledRoundButton onClick={() => setShowContactModal(true)}>
-              <Mail size={16} color="#4E5052" />
-            </StyledRoundButton>
-          </Flex>
-          {status === HostApplicationStatus.PENDING && (
-            <AcceptRejectButtons
-              collective={account}
-              isLoading={loading}
-              disabled={requiresMinimumNumberOfAdmins && !hasEnoughInvitedAdmins}
-              disabledMessage={
-                requiresMinimumNumberOfAdmins &&
-                !hasEnoughInvitedAdmins &&
-                intl.formatMessage({
-                  defaultMessage:
-                    'You can not approve this collective as it doesn’t satisfy the minimum admin policy set by you.',
-                })
-              }
-              onApprove={() => processApplication(ACTIONS.APPROVE)}
-              onReject={message => processApplication(ACTIONS.REJECT, message)}
-            />
-          )}
-        </div>
-      </DrawerActions>
+      </SheetBody>
 
       {showContactModal && (
         <ApplicationMessageModal
@@ -382,18 +499,20 @@ export function HostApplication({
 
 export default function HostApplicationDrawer({
   open,
-  onClose,
+  setOpen,
   application,
   host,
 }: {
   open: boolean;
-  onClose: () => void;
+  setOpen: (open: boolean) => void;
   application: GraphQLHostApplication;
   host: Host;
 }) {
   return (
-    <Drawer open={open} onClose={onClose} showActionsContainer className="max-w-2xl" data-cy="host-application-drawer">
-      <HostApplication onClose={onClose} application={application} host={host} />
-    </Drawer>
+    <Sheet open={open} onOpenChange={setOpen} data-cy="host-application-drawer">
+      <SheetContent size="2xl">
+        <HostApplication onClose={() => setOpen(false)} application={application} host={host} />
+      </SheetContent>
+    </Sheet>
   );
 }
