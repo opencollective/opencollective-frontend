@@ -13,7 +13,7 @@ import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
-import { getCollectivePageRoute, getWorkspaceRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
@@ -373,7 +373,7 @@ const ExpenseBudgetItem = ({
                     <StyledLink
                       as={Link}
                       color="black.700"
-                      href={`${getWorkspaceRoute(host, 'host-agreements')}?account=${expense.account.slug}`}
+                      href={`${getDashboardRoute(host, 'host-agreements')}?account=${expense.account.slug}`}
                     >
                       <FormattedMessage
                         defaultMessage="{count, plural, one {# agreement} other {# agreements}}"
