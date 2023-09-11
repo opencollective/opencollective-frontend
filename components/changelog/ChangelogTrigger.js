@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
-import { clsx } from 'clsx';
 import { cloneDeep } from 'lodash';
 import { Megaphone } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
@@ -16,7 +15,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
   const { data } = useQuery(loggedInUserQuery, { fetchPolicy: 'cache-only' });
   const LoggedInUser = data?.LoggedInUser;
-  const hasSeenNewUpdates = LoggedInUser?.hasSeenLatestChangelogEntry;
+  const hasSeenNewUpdates = false;
+  LoggedInUser?.hasSeenLatestChangelogEntry;
 
   const handleShowNewUpdates = () => {
     setShowNewsAndUpdates(true);
@@ -37,14 +37,11 @@ const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
   return (
     <Tooltip>
       <TooltipTrigger
-        className={clsx(
-          'relative flex h-8 w-8 items-center justify-center  rounded-full border ring-black ring-offset-2 hover:bg-slate-50 focus:outline-none focus-visible:ring-2',
-          hasSeenNewUpdates ? 'text-slate-500' : 'bg-blue-50 text-primary',
-        )}
+        className="relative flex h-8 w-8 items-center justify-center  rounded-full border text-slate-500 ring-black ring-offset-2 hover:bg-slate-50 focus:outline-none focus-visible:ring-2"
         onClick={handleShowNewUpdates}
       >
         <Megaphone size={18} />
-        {!hasSeenNewUpdates && <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-primary" />}
+        {!hasSeenNewUpdates && <div className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-primary" />}
       </TooltipTrigger>
       <TooltipContent>
         <FormattedMessage
