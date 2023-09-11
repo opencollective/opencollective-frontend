@@ -462,9 +462,9 @@ class TopBarProfileMenu extends React.Component {
 
     return (
       <React.Fragment>
-        <StyledProfileButton height={36} isBorderless onClick={this.toggleProfileMenu}>
+        <StyledProfileButton height={32} isBorderless onClick={this.toggleProfileMenu}>
           <Flex alignItems="center" data-cy="user-menu-trigger">
-            <Avatar collective={get(LoggedInUser, 'collective')} radius={36} mr={2} />
+            <Avatar collective={get(LoggedInUser, 'collective')} radius={32} mr={2} />
             <Hide xs>
               <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
             </Hide>
@@ -497,7 +497,7 @@ class TopBarProfileMenu extends React.Component {
     }
 
     return (
-      <div className="h-9">
+      <div className="h-8">
         {status === 'loading' && (
           <P color="#D5DAE0" fontSize="0.85rem" px={3} py={2} display="inline-block">
             <FormattedMessage id="loading" defaultMessage="loading" />

@@ -204,11 +204,7 @@ const TopBar = ({ account }: TopBarProps) => {
           </Flex>
         </div>
       </div>
-      <SearchModal
-        open={showSearchModal}
-        setOpen={open => setShowSearchModal(open)}
-        onClose={() => setShowSearchModal(false)}
-      />
+      <SearchModal open={showSearchModal} setOpen={open => setShowSearchModal(open)} />
       {isMobile && (onDashboardRoute || onSearchRoute) && <MobileFooterMenu {...{ onDashboardRoute, onSearchRoute }} />}
     </Fragment>
   );
