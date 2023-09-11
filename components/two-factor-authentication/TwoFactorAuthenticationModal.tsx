@@ -6,6 +6,7 @@ import { createGlobalStyle } from 'styled-components';
 
 import { createError, ERROR } from '../../lib/errors';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS, setLocalStorage } from '../../lib/local-storage';
 import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import { getSettingsRoute } from '../../lib/url-helpers';
 
@@ -35,7 +36,11 @@ function initialMethod(supportedMethods: string[]) {
     return supportedMethods[0];
   }
 
-  return supportedMethods.find(method => method !== 'recovery_code');
+  const preferredMethod = getFromLocalStorage(LOCAL_STORAGE_KEYS.PREFERRED_TWO_FACTOR_METHOD);
+  return (
+    supportedMethods.find(method => method === preferredMethod) ||
+    supportedMethods.find(method => method !== 'recovery_code')
+  );
 }
 
 export default function TwoFactorAuthenticationModal() {
@@ -63,6 +68,7 @@ export default function TwoFactorAuthenticationModal() {
   }, [supportedMethods]);
 
   const useWebAuthn = React.useCallback(async () => {
+    setLocalStorage(LOCAL_STORAGE_KEYS.PREFERRED_TWO_FACTOR_METHOD, 'webauthn');
     setConfirming(true);
     setTwoFactorCode('');
     try {
@@ -96,19 +102,15 @@ export default function TwoFactorAuthenticationModal() {
     setTwoFactorCode('');
     setSelectedMethod(null);
 
-    let type = 'totp';
-    if (supportedMethods.includes('yubikey_otp') && code.length === 44) {
-      type = 'yubikey_otp';
-    }
-
-    if (selectedMethod === 'recovery_code') {
-      type = 'recovery_code';
+    if (selectedMethod !== 'recovery_code') {
+      setLocalStorage(LOCAL_STORAGE_KEYS.PREFERRED_TWO_FACTOR_METHOD, selectedMethod);
     }
 
     prompt.resolveAuth({
-      type,
+      type: selectedMethod,
       code,
     });
+
     setConfirming(false);
   }, [twoFactorCode, supportedMethods, selectedMethod]);
 
@@ -122,18 +124,11 @@ export default function TwoFactorAuthenticationModal() {
     return () => router.events.off('routeChangeStart', handleRouteChange);
   }, [cancel]);
 
-  React.useEffect(() => {
-    if (supportedMethods.includes('yubikey_otp') && twoFactorCode.length === 44) {
-      confirm();
-    }
-  }, [confirm, twoFactorCode]);
-
   const verifyBtnEnabled =
-    (supportedMethods.length > 0 &&
-      ((selectedMethod === 'recovery_code' && twoFactorCode?.length > 0) ||
-        ((selectedMethod === 'yubikey_otp' || selectedMethod === 'totp') && twoFactorCode?.length === 44) ||
-        twoFactorCode?.length === 6)) ||
-    selectedMethod === 'webauthn';
+    supportedMethods.length > 0 &&
+    ((selectedMethod === 'recovery_code' && twoFactorCode?.length > 0) ||
+      (selectedMethod === 'totp' && twoFactorCode?.length === 6) ||
+      selectedMethod === 'webauthn');
 
   const alternativeMethods = supportedMethods.filter(method => method !== selectedMethod);
 
@@ -179,7 +174,7 @@ export default function TwoFactorAuthenticationModal() {
           <RecoveryCodeOptions value={twoFactorCode} onChange={setTwoFactorCode} disabled={confirming} />
         )}
 
-        {(selectedMethod === 'yubikey_otp' || selectedMethod === 'totp') && (
+        {selectedMethod === 'totp' && (
           <AuthenticatorOption
             value={twoFactorCode}
             onChange={setTwoFactorCode}
@@ -194,7 +189,7 @@ export default function TwoFactorAuthenticationModal() {
       {supportedMethods.length > 1 && (
         <Box mt={4}>
           <FormattedMessage defaultMessage="You can also use alternative methods:" />
-          <ul>
+          <ul className="list-inside list-disc">
             {alternativeMethods.includes('totp') && (
               <li>
                 <StyledLinkButton onClick={() => setSelectedMethod('totp')}>
@@ -255,17 +250,10 @@ function AuthenticatorOption(props: {
 }) {
   return (
     <Box>
-      {props.supportedMethods.includes('yubikey_otp') ? (
-        <FormattedMessage
-          id="TwoFactorAuth.Setup.Form.InputLabel.YubiKey"
-          defaultMessage="Please enter your 6-digit code without any dashes or select the input below, plug your YubiKey and press it to generate a code."
-        />
-      ) : (
-        <FormattedMessage
-          id="TwoFactorAuth.Setup.Form.InputLabel"
-          defaultMessage="Please enter your 6-digit code without any dashes."
-        />
-      )}
+      <FormattedMessage
+        id="TwoFactorAuth.Setup.Form.InputLabel"
+        defaultMessage="Please enter your 6-digit code without any dashes."
+      />
 
       <StyledInput
         id="2fa-code-input"
@@ -274,8 +262,8 @@ function AuthenticatorOption(props: {
         mt={3}
         minHeight={50}
         fontSize="20px"
-        placeholder={props.supportedMethods.includes('yubikey_otp') ? '123456 or YubiKey: cccc...' : '123456'}
-        pattern={!props.supportedMethods.includes('yubikey_otp') && '[0-9]{6}'}
+        placeholder={'123456'}
+        pattern={'[0-9]{6}'}
         inputMode="numeric"
         value={props.value}
         onChange={e => props.onChange(e.target.value)}

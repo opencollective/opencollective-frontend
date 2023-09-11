@@ -2957,7 +2957,6 @@
   "TwoFactorAuth.Setup.FiscalHost.Info": "L'authentification à deux facteurs (2FA) ajoute un niveau de sécurité supplémentaire lors de la connexion. Pour les Hôtes fiscaux ou les Collectifs qui gèrent leurs propres fonds, le 2FA aide à s'assurer que les paiements sont sécurisés.",
   "TwoFactorAuth.Setup.Form.FinishSetup": "Terminer la configuration",
   "TwoFactorAuth.Setup.Form.InputLabel": "Veuillez entrer votre code à 6 chiffres sans tirets.",
-  "TwoFactorAuth.Setup.Form.InputLabel.YubiKey": "Veuillez entrer votre code à 6 chiffres sans tirets ou sélectionnez la saisie ci-dessous, branchez votre YubiKey et appuyez dessus pour générer un code.",
   "TwoFactorAuth.Setup.Info": "L'authentification à deux facteurs permet à votre compte d'atteindre un niveau de sécurité supérieur.",
   "TwoFactorAuth.Setup.ManualEntry": "Saisie manuelle : {token}",
   "TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Body": "Après avoir cliqué sur \"Confirmer\", vous n'aurez plus accès à vos codes de récupération.",

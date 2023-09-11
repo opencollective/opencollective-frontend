@@ -2957,7 +2957,6 @@
   "TwoFactorAuth.Setup.FiscalHost.Info": "Dwuskładnikowe uwierzytelnianie (2FA) dodaje dodatkową warstwę bezpieczeństwa podczas logowania. Dla gospodarzy podatkowych czy zbiórek, które zarządzają własnymi funduszami, 2FA pomaga zapewnić bezpieczeństwo wypłat.",
   "TwoFactorAuth.Setup.Form.FinishSetup": "Konfiguracja końcowa",
   "TwoFactorAuth.Setup.Form.InputLabel": "Wprowadź swój 6-cyfrowy kod bez kresek.",
-  "TwoFactorAuth.Setup.Form.InputLabel.YubiKey": "Wprowadź swój 6-cyfrowy kod bez myślników lub wybierz poniższy wpis, podłącz YubiKey i naciśnij go, aby wygenerować kod.",
   "TwoFactorAuth.Setup.Info": "Dwuskładnikowe uwierzytelnianie dodaje dodatkową warstwę bezpieczeństwa dla Twojego konta podczas logowania lub wykonywania czynności administracyjnych.",
   "TwoFactorAuth.Setup.ManualEntry": "Wpisz ręcznie: {token}",
   "TwoFactorAuth.Setup.RecoveryCodes.ConfirmationModal.Body": "Po kliknięciu \"Potwierdź\", nie będziesz miał już dostępu do swoich kodów odzyskiwania.",
