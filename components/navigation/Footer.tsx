@@ -19,7 +19,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { dashboardFooterItems, regularFooterItems } from './menu-items';
 
 const SocialLink = ({ href, children, ...props }) => (
-  <a
+  <Link
     href={href}
     className={
       'flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground'
@@ -27,7 +27,7 @@ const SocialLink = ({ href, children, ...props }) => (
     {...props}
   >
     {children}
-  </a>
+  </Link>
 );
 
 const SocialLinks = ({ className }: { className?: string }) => {
@@ -49,7 +49,7 @@ const SocialLinks = ({ className }: { className?: string }) => {
       <SocialLink href="https://slack.opencollective.com" aria-label="Open Collective Slack link">
         <Slack size={16} />
       </SocialLink>
-      <SocialLink as={Link} href="/contact" aria-label="Contact Open Collective">
+      <SocialLink href="/contact" aria-label="Contact Open Collective">
         <Mail size={16} />
       </SocialLink>
     </div>
@@ -65,7 +65,7 @@ const Footer = () => {
         <div className="flex max-w-screen-xl flex-1 grid-cols-2 items-start gap-6 md:flex-col">
           <div className="flex w-full flex-1 flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div className="flex flex-col items-start gap-4 md:flex-row md:items-center">
-              <Link href={'/home'}>
+              <Link href="/home">
                 <Image
                   src="/static/images/opencollectivelogo-footer-n.svg"
                   alt="Open Collective"

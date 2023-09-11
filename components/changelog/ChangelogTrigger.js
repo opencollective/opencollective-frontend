@@ -13,7 +13,7 @@ import { WebsiteName } from '../I18nFormatters';
 import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
-const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
+const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate, legacySize }) => {
   const { data } = useQuery(loggedInUserQuery, { fetchPolicy: 'cache-only' });
   const LoggedInUser = data?.LoggedInUser;
   const hasSeenNewUpdates = LoggedInUser?.hasSeenLatestChangelogEntry;
@@ -38,13 +38,14 @@ const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
     <Tooltip>
       <TooltipTrigger
         className={clsx(
-          'relative flex h-8 w-8 items-center justify-center  rounded-full border ring-black ring-offset-2 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 ',
-          hasSeenNewUpdates ? 'text-slate-500' : 'bg-blue-50 text-blue-600',
+          'relative flex items-center justify-center  rounded-full border ring-black ring-offset-2 hover:bg-slate-50 focus:outline-none focus-visible:ring-2',
+          legacySize ? 'h-9 w-9' : 'h-8 w-8',
+          hasSeenNewUpdates ? 'text-slate-500' : 'bg-blue-50 text-primary',
         )}
         onClick={handleShowNewUpdates}
       >
-        <Megaphone size={16} />
-        {!hasSeenNewUpdates && <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-blue-600" />}
+        <Megaphone size={legacySize ? 20 : 18} />
+        {!hasSeenNewUpdates && <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-primary" />}
       </TooltipTrigger>
       <TooltipContent>
         <FormattedMessage
@@ -65,6 +66,7 @@ ChangelogTrigger.propTypes = {
   setChangelogViewDate: PropTypes.func,
   client: PropTypes.object.isRequired,
   showDropdown: PropTypes.bool,
+  legacySize: PropTypes.bool,
 };
 
 const setChangelogViewDateMutation = gql`

@@ -30,8 +30,8 @@ const SearchModal = ({ open, setOpen }) => {
 };
 
 SearchModal.propTypes = {
-  onClose: PropTypes.func,
-  showLinkToDiscover: PropTypes.bool,
+  setOpen: PropTypes.func,
+  open: PropTypes.bool,
 };
 
 export default SearchModal;

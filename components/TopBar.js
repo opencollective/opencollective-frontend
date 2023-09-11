@@ -271,7 +271,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
       {showProfileAndChangelogMenu && (
         <React.Fragment>
           <div className="mr-2 hidden sm:block">
-            <ChangelogTrigger />
+            <ChangelogTrigger legacySize />
           </div>
           <TopBarProfileMenu />
         </React.Fragment>

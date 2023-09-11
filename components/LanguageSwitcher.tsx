@@ -28,8 +28,8 @@ export function LanguageSwitcher() {
   const defaultLanguage = languageOptions.find(language => language.value === intl.locale);
   return (
     <div className="relative">
-      <Tooltip>
-        <Select onValueChange={value => localeContext.setLocale(value)} defaultValue={defaultLanguage.value}>
+      <Select onValueChange={value => localeContext.setLocale(value)} defaultValue={defaultLanguage.value}>
+        <Tooltip>
           <label className="sr-only" htmlFor="language-options">
             <FormattedMessage id="footer.changeLanguage" defaultMessage="Change language" />
           </label>
@@ -57,26 +57,26 @@ export function LanguageSwitcher() {
               </SelectItem>
             ))}
           </SelectContent>
-        </Select>
-        <TooltipContent side="left" sideOffset={8}>
-          <FormattedMessage
-            id="Footer.Languages.ContributeTranslations"
-            defaultMessage="Contribute to translations on {crowdinLink}"
-            values={{
-              crowdinLink: (
-                <a
-                  className="underline"
-                  href="https://crowdin.com/project/opencollective"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Crowdin <ExternalLink className="inline-block" size={12} />
-                </a>
-              ),
-            }}
-          />
-        </TooltipContent>
-      </Tooltip>
+          <TooltipContent side="left" sideOffset={8}>
+            <FormattedMessage
+              id="Footer.Languages.ContributeTranslations"
+              defaultMessage="Contribute to translations on {crowdinLink}"
+              values={{
+                crowdinLink: (
+                  <a
+                    className="underline"
+                    href="https://crowdin.com/project/opencollective"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Crowdin <ExternalLink className="inline-block" size={12} />
+                  </a>
+                ),
+              }}
+            />
+          </TooltipContent>
+        </Tooltip>
+      </Select>
     </div>
   );
 }

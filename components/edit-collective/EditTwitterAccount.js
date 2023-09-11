@@ -7,11 +7,11 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { gqlV1 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
-import { Switch } from '../ui/Switch';
 import StyledButton from '../StyledButton';
 import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
 import { TOAST_TYPE, withToasts } from '../ToastProvider';
+import { Switch } from '../ui/Switch';
 
 const DEFAULT_TWEETS = {
   newBacker: '{backerTwitterHandle} thank you for your contribution of {amount} 🙏 - it makes a difference!',

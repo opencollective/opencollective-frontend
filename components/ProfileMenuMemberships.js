@@ -13,7 +13,7 @@ import styled from 'styled-components';
 import { CollectiveType } from '../lib/constants/collectives';
 import { isPastEvent } from '../lib/events';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
-import { getSettingsRoute, getDashboardRoute } from '../lib/url-helpers';
+import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
 
 import Avatar from './Avatar';
 import Collapse from './Collapse';

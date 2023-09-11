@@ -21,7 +21,6 @@ import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import { Box, Flex } from '../../Grid';
 import InputFieldPresets from '../../InputFieldPresets';
-import { Switch } from '../../ui/Switch';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
@@ -34,6 +33,7 @@ import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
 import { Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { Switch } from '../../ui/Switch';
 
 import ConfirmTierDeleteModal from './ConfirmTierDeleteModal';
 

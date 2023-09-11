@@ -2,38 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
-import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { FormattedDate, FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/Dialog';
-import Container from './Container';
-import { Flex } from './Grid';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/Dialog';
 import HTMLContent from './HTMLContent';
 import Image from './Image';
 import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
-import StyledButton from './StyledButton';
 import StyledCarousel from './StyledCarousel';
 import StyledLink from './StyledLink';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import { P, Span } from './Text';
-
-const ModalHeaderWrapper = styled(ModalHeader)`
-  height: 58px;
-`;
-
-const ModalWrapper = styled(StyledModal)`
-  padding-top: 8px;
-  padding-bottom: 0px;
-`;
-
-const ModalFooterWrapper = styled(ModalFooter)`
-  height: 65px;
-`;
 
 const newsAndUpdatesQuery = gql`
   query ChangelogUpdates($limit: Int) {
@@ -63,11 +44,11 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
     return (
       <StyledCarousel contentPosition="left" className="-mx-6">
         {data.account.updates.nodes.map(update => (
-          <Container key={update.id} className="px-3">
-            <Container fontSize="13px" lineHeight="20px" color="black.700">
+          <div key={update.id} className="px-3">
+            <span className="text-sm text-muted-foreground">
               <FormattedDate value={update.publishedAt} day="numeric" month="long" year="numeric" />
-            </Container>
-            <Flex>
+            </span>
+            <div className="flex">
               <Span paddingTop="10px">
                 <Image
                   width={12}
@@ -79,8 +60,8 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
               <P fontSize="20px" margin="0px 12px" fontWeight="500" lineHeight="36px" color="black.900">
                 {update.title}
               </P>
-            </Flex>
-            <Flex pt={2} pb={3}>
+            </div>
+            <div className="flex pb-4 pt-2">
               <StyledLink
                 onClick={onClose}
                 as={Link}
@@ -91,9 +72,9 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
               >
                 <FormattedMessage id="NewsAndUpdates.link.giveFeedback" defaultMessage="Read more & give Feedback" />
               </StyledLink>
-            </Flex>
-            <Flex pb={1}>
-              <Container width="100%">
+            </div>
+            <div className="flex pb-1">
+              <div className="w-full">
                 <HTMLContent
                   collapsable
                   maxHeight={430}
@@ -103,9 +84,9 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
                   content={update.html}
                   hideViewMoreLink
                 />
-              </Container>
-            </Flex>
-            <Flex pt={1} pb={3}>
+              </div>
+            </div>
+            <div className="flex pb-4 pt-1">
               <StyledLink
                 onClick={onClose}
                 as={Link}
@@ -116,18 +97,18 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
               >
                 <FormattedMessage id="ContributeCard.ReadMore" defaultMessage="Read more" />
               </StyledLink>
-            </Flex>
-          </Container>
+            </div>
+          </div>
         ))}
       </StyledCarousel>
     );
   } else if (error) {
     return (
-      <Flex flexDirection="column" alignItems="center" px={2} py={6}>
+      <div className="flex flex-col items-center px-2 py-32">
         <MessageBox type="error" withIcon mb={5}>
           {error.message}
         </MessageBox>
-      </Flex>
+      </div>
     );
   } else {
     return <Loading />;
@@ -138,43 +119,31 @@ const NewsAndUpdatesModal = ({ open, setOpen }) => {
   const onClose = () => setOpen(false);
   return (
     <Dialog open={open} onOpenChange={open => setOpen(open)}>
-      <DialogContent>
+      <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <DialogTitle className="mb-1.5">
+                <FormattedMessage id="NewsAndUpdates.link.whatsNew" defaultMessage="What's new" />
+              </DialogTitle>
+              <DialogDescription>
+                <FormattedMessage defaultMessage="Keep track of the latest updates from Open Collective." />
+              </DialogDescription>
+            </div>
             <Image
-              width={48}
-              height={48}
+              width={64}
+              height={64}
               src="/static/images/updates-and-news-modal-icon.svg"
               alt="Updates and News Icon"
               aria-hidden={true}
-              className="-my-2 h-12 w-12"
+              className="-my-2 mr-2 h-16 w-16"
             />
-            <h2 className="text-xl">
-              <FormattedMessage id="NewsAndUpdates.link.whatsNew" defaultMessage="What's new" />
-            </h2>
-          </DialogTitle>
+          </div>
         </DialogHeader>
         <hr className="-mx-6 my-1" />
         <Query query={newsAndUpdatesQuery} variables={{ limit: 5 }} context={API_V2_CONTEXT}>
           {({ data, loading, error }) => renderStyledCarousel(data, loading, error, onClose)}
         </Query>
-        <hr className="-mx-6 my-1" />
-        <div className="flex items-center justify-between">
-          <StyledLink
-            className="flex items-center gap-1.5 text-slate-600"
-            href="https://twitter.com/opencollect"
-            openInNewTab
-            color="black.500"
-          >
-            <FormattedMessage id="NewsAndUpdates.link.twitterFollow" defaultMessage="Follow us" />
-            <Twitter className="inline-block" size={16} color="#1153D6" />
-          </StyledLink>
-          <Link onClick={onClose} href="/opencollective/updates">
-            <StyledButton fontSize="14px" buttonSize="tiny">
-              <FormattedMessage id="NewsAndUpdates.button.seeAllUpdates" defaultMessage="See all new updates" />
-            </StyledButton>
-          </Link>
-        </div>
       </DialogContent>
     </Dialog>
   );

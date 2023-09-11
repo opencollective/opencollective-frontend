@@ -45,11 +45,11 @@ const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
   return (
     <div className="flex flex-row items-center justify-between gap-3 rounded-lg border p-4" key={feature.title}>
       <div className="space-y-0.5">
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <label className="text-base font-medium" htmlFor={feature.key}>
             {feature.title}
           </label>
-          <Badge type={feature.publicBeta ? 'success' : 'warning'}>
+          <Badge size="sm" type={feature.publicBeta ? 'success' : 'warning'}>
             {feature.publicBeta ? (
               <FormattedMessage id="PreviewFeatures.publicBeta" defaultMessage="Public beta" />
             ) : (
@@ -86,7 +86,7 @@ const PreviewFeaturesModal = ({ open, setOpen }: { open: boolean; setOpen: (open
               defaultMessage="Get early access to features that are in development. Please <ContactLink>let us know</ContactLink> how we can make them better."
               values={{
                 ContactLink: msg => (
-                  <Link className="text-blue-700 underline" href="/contact">
+                  <Link className="text-blue-700 hover:underline" href="/contact">
                     {msg}
                   </Link>
                 ),

@@ -149,12 +149,12 @@ const ProfileMenu = () => {
                 Icon={Mailbox}
                 href="/member-invitations"
                 appending={
-                  <Badge type="info" rounded>
+                  <Badge type="info" round size="sm">
                     {pendingInvitations}
                   </Badge>
                 }
               >
-                <FormattedMessage defaultMessage="Pending Invitations" />
+                <FormattedMessage defaultMessage="Member Invitations" />
               </MenuItem>
             )}
 
@@ -163,7 +163,7 @@ const ProfileMenu = () => {
                 Icon={FlaskConical}
                 onClick={() => setShowPreviewFeaturesModal(true)}
                 appending={
-                  <Badge type="info" rounded>
+                  <Badge type="info" round size="sm">
                     <FormattedMessage defaultMessage="New!" />
                   </Badge>
                 }
@@ -204,7 +204,7 @@ const ProfileMenu = () => {
         <Separator className="sm:hidden" />
         <div className="flex flex-col sm:w-[256px]">
           <div className="flex-grow border-l text-sm sm:basis-0 sm:overflow-y-auto">
-            <ProfileMenuMemberships user={LoggedInUser} />
+            <ProfileMenuMemberships user={LoggedInUser} closeDrawer={() => setMenuOpen(false)} />
           </div>
         </div>
       </div>

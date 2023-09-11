@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { groupBy, isEmpty, uniqBy } from 'lodash';
-import { Frame, LayoutDashboard, Plus } from 'lucide-react';
+import { LayoutDashboard, Plus } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
+import { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
 import { isPastEvent } from '../../lib/events';
 import { getDashboardRoute } from '../../lib/url-helpers';
 
@@ -15,10 +16,9 @@ import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
-import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 import { Separator } from '../ui/Separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const AccountList = styled.div`
   display: flex;
@@ -70,10 +70,10 @@ const CollectiveListItem = styled.div`
   }
 `;
 
-const MembershipLine = ({ user, membership, onClose }) => {
+const MembershipLine = ({ user, membership, closeDrawer }) => {
   return (
     <CollectiveListItem className="group h-9">
-      <MenuLink href={`/${membership.collective.slug}`} onClick={onClose}>
+      <MenuLink href={`/${membership.collective.slug}`} onClick={closeDrawer}>
         <Avatar collective={membership.collective} radius={16} />
         <P
           fontSize="inherit"
@@ -94,7 +94,7 @@ const MembershipLine = ({ user, membership, onClose }) => {
               <Link
                 className="flex h-7 w-7 items-center justify-center rounded-md border bg-white text-slate-950 opacity-0 transition-all hover:border-white hover:bg-slate-900 hover:text-white group-hover:opacity-100"
                 href={getDashboardRoute(membership.collective)}
-                onClick={onClose}
+                onClick={closeDrawer}
               >
                 <LayoutDashboard size="14px" strokeWidth={1.5} />
               </Link>
@@ -112,10 +112,10 @@ const MembershipLine = ({ user, membership, onClose }) => {
 MembershipLine.propTypes = {
   user: PropTypes.object,
   membership: PropTypes.object,
-  onClose: PropTypes.func,
+  closeDrawer: PropTypes.func,
 };
 
-const sortMemberships = memberships => {
+const sortMemberships = (memberships: LoggedInUser['memberOf']) => {
   if (!memberships?.length) {
     return [];
   } else {
@@ -125,7 +125,7 @@ const sortMemberships = memberships => {
   }
 };
 
-const filterArchivedMemberships = memberships => {
+const filterArchivedMemberships = (memberships: LoggedInUser['memberOf']) => {
   const archivedMemberships = memberships.filter(m => {
     if (
       m.role !== 'BACKER' &&
@@ -141,7 +141,7 @@ const filterArchivedMemberships = memberships => {
   return uniqBy(archivedMemberships, m => m.collective.id);
 };
 
-const filterMemberships = memberships => {
+const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
   const filteredMemberships = memberships.filter(m => {
     if (m.role === 'BACKER' || m.collective.isArchived) {
       return false;
@@ -155,11 +155,11 @@ const filterMemberships = memberships => {
   return uniqBy(filteredMemberships, m => m.collective.id);
 };
 
-const MembershipsList = ({ user, memberships, onClose }) => {
+const MembershipsList = ({ user, memberships, closeDrawer }) => {
   return (
     <Box as="ul" p={0} my={2}>
       {sortMemberships(memberships).map(member => (
-        <MembershipLine key={member.id} membership={member} user={user} onClose={onClose} />
+        <MembershipLine key={member.id} membership={member} user={user} closeDrawer={closeDrawer} />
       ))}
     </Box>
   );
@@ -168,7 +168,7 @@ const MembershipsList = ({ user, memberships, onClose }) => {
 MembershipsList.propTypes = {
   user: PropTypes.object,
   memberships: PropTypes.array,
-  onClose: PropTypes.func,
+  closeDrawer: PropTypes.func,
 };
 
 /**
@@ -216,7 +216,7 @@ const MENU_SECTIONS = {
   },
 };
 
-const MenuSectionHeader = ({ section, hidePlusIcon, onClose }) => {
+const MenuSectionHeader = ({ section, hidePlusIcon, closeDrawer }) => {
   const intl = useIntl();
   const { title, plusButton } = MENU_SECTIONS[section];
   return (
@@ -229,7 +229,7 @@ const MenuSectionHeader = ({ section, hidePlusIcon, onClose }) => {
             <Link
               href={plusButton.href}
               aria-label={intl.formatMessage(plusButton.text)}
-              onClick={onClose}
+              onClick={closeDrawer}
               tabIndex="-1"
               className="mr-1.5 flex h-6 w-6 items-center justify-center rounded-full border"
             >
@@ -243,13 +243,12 @@ const MenuSectionHeader = ({ section, hidePlusIcon, onClose }) => {
   );
 };
 
-MenuSectionHeader.propTypes = {
-  section: PropTypes.oneOf(Object.keys(MENU_SECTIONS)).isRequired,
-  hidePlusIcon: PropTypes.bool,
-  onClose: PropTypes.func,
+type ProfileMenuMembershipsProps = {
+  user: LoggedInUser;
+  closeDrawer: () => void;
 };
 
-const ProfileMenuMemberships = ({ user, onClose }) => {
+const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsProps) => {
   const intl = useIntl();
   const memberships = filterMemberships(user.memberOf);
   const archivedMemberships = filterArchivedMemberships(user.memberOf);
@@ -278,7 +277,7 @@ const ProfileMenuMemberships = ({ user, onClose }) => {
               {i !== 0 && <Separator />}
               <AccountList>
                 {accountType !== 'ARCHIVED' && (
-                  <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} onClose={onClose} />
+                  <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} closeDrawer={closeDrawer} />
                 )}
                 {sectionIsEmpty ? (
                   <Box my={2}>
@@ -286,7 +285,7 @@ const ProfileMenuMemberships = ({ user, onClose }) => {
                       {intl.formatMessage(sectionData.emptyMessage)}
                     </P>
                     {Boolean(sectionData.plusButton) && (
-                      <Link href={sectionData.plusButton.href} onClick={onClose}>
+                      <Link href={sectionData.plusButton.href} onClick={closeDrawer}>
                         <StyledButton mt="12px" mb="16px" borderRadius="8px" width="100%" fontSize="12px">
                           <Flex alignItems="center" justifyContent="center">
                             <Container
@@ -296,7 +295,8 @@ const ProfileMenuMemberships = ({ user, onClose }) => {
                               borderRadius="100%"
                               border="1px solid #C4C7CC"
                               mr="16px"
-                              size="24px"
+                              width="24px"
+                              height="24px"
                             >
                               <Plus size={12} />
                             </Container>
@@ -311,12 +311,18 @@ const ProfileMenuMemberships = ({ user, onClose }) => {
                     buttonSize={24}
                     defaultIsOpen={false}
                     mr={'6px'}
-                    title={<MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} onClose={onClose} />}
+                    title={
+                      <MenuSectionHeader
+                        section={accountType}
+                        hidePlusIcon={sectionIsEmpty}
+                        closeDrawer={closeDrawer}
+                      />
+                    }
                   >
-                    <MembershipsList memberships={memberships} user={user} onClose={onClose} />
+                    <MembershipsList memberships={memberships} user={user} closeDrawer={closeDrawer} />
                   </Collapse>
                 ) : (
-                  <MembershipsList memberships={memberships} user={user} onClose={onClose} />
+                  <MembershipsList memberships={memberships} user={user} closeDrawer={closeDrawer} />
                 )}
               </AccountList>
             </React.Fragment>
@@ -330,7 +336,7 @@ ProfileMenuMemberships.propTypes = {
   user: PropTypes.shape({
     memberOf: PropTypes.arrayOf(PropTypes.object),
   }),
-  onClose: PropTypes.func,
+  closeDrawer: PropTypes.func,
 };
 
 export default React.memo(ProfileMenuMemberships);

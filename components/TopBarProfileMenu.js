@@ -12,7 +12,7 @@ import styled from 'styled-components';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
-import { getSettingsRoute, getDashboardRoute } from '../lib/url-helpers';
+import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
 
 import Avatar from './Avatar';
 import Container from './Container';

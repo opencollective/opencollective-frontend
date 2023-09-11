@@ -122,7 +122,7 @@ class OpenCollectiveFrontendApp extends App {
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
               <IntlProvider locale={locale}>
-                <TooltipProvider delayDuration={300} skipDelayDuration={100}>
+                <TooltipProvider delayDuration={500} skipDelayDuration={100}>
                   <ToastProvider>
                     <UserProvider>
                       <NewsAndUpdatesProvider>
