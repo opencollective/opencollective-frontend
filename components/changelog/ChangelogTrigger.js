@@ -15,8 +15,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
   const { data } = useQuery(loggedInUserQuery, { fetchPolicy: 'cache-only' });
   const LoggedInUser = data?.LoggedInUser;
-  const hasSeenNewUpdates = false;
-  LoggedInUser?.hasSeenLatestChangelogEntry;
+  const hasSeenNewUpdates = LoggedInUser?.hasSeenLatestChangelogEntry;
 
   const handleShowNewUpdates = () => {
     setShowNewsAndUpdates(true);
