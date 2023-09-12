@@ -30,6 +30,9 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
 
   const isLoading = !activity;
   const isLastWeek = dayjs(activity?.createdAt).isAfter(dayjs().subtract(1, 'week'));
+  const shouldDisplay =
+    activity && Boolean(ActivityTimelineMessageI18n[activity.type] || ActivityDescriptionI18n[activity.type]);
+  if (!shouldDisplay) return null;
   return (
     <div className="rounded-2xl border p-4 text-sm">
       <div className="flex flex-1 gap-3">

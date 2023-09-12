@@ -68,6 +68,7 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
         <MenuSectionHeader>
           <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
         </MenuSectionHeader>
+        <MenuLink section={ALL_SECTIONS.DASHBOARD_OVERVIEW} Icon={LayoutDashboard} />
         <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_EXPENSES} Icon={Receipt} />
         <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} Icon={Coins} />
         <MenuLink section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS} Icon={Coins} if={!isAccountantOnly} />
@@ -129,7 +130,7 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
             )}
           </MenuSectionHeader>
         )}
-        <MenuLink section={COLLECTIVE_SECTIONS.DASHBOARD_OVERVIEW} Icon={LayoutDashboard} if={isIndividual} />
+        <MenuLink section={COLLECTIVE_SECTIONS.DASHBOARD_OVERVIEW} Icon={LayoutDashboard} />
         <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} Icon={Receipt} />
         <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTORS} Icon={Users} if={!isIndividual} />
         <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTIONS} Icon={Coins} />

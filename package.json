@@ -121,6 +121,7 @@
     "react-swipeable": "7.0.1",
     "react-text-mask": "5.5.0",
     "react-window": "1.8.9",
+    "recharts": "^2.8.0",
     "redis": "4.6.7",
     "sanitize-html": "2.11.0",
     "slugify": "1.6.6",
