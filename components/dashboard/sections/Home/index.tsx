@@ -24,6 +24,8 @@ import { AdminSectionProps } from '../../types';
 
 import { workspaceHomeQuery } from './query';
 import TimelineItem from './TimelineItem';
+import Stats from './Stats';
+
 const PAGE_SIZE = 20;
 
 const REACT_SELECT_COMPONENT_OVERRIDE = {
@@ -68,18 +70,19 @@ const Home = (props: AdminSectionProps) => {
   }, [error, data]);
 
   return (
-    <div className="flex flex-col-reverse xl:flex-row">
+    <div className="">
       <div className="flex-1">
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />
         </h1>
 
-        <p className="text-muted-foreground">
+        {/* <p className="text-muted-foreground">
           <FormattedMessage
             id="Dashboard.Home.Subtitle"
             defaultMessage="The latest news and updates you need to know in Open Collective."
           />
-        </p>
+        </p> */}
+        <Stats />
 
         <Flex flexDirection="column" mt="48px">
           <Flex
