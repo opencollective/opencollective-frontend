@@ -105,7 +105,7 @@ export const MenuLink = ({
   );
 
   const classNames = cn(
-    'group w-full flex gap-x-3 rounded-full py-1.5 px-4 text-sm leading-6 font-medium transition-colors',
+    'group w-full flex gap-x-3 rounded-full py-1.5 px-3 text-sm leading-6 font-medium transition-colors',
     isSelected ? 'bg-blue-50/50 text-blue-700' : 'text-slate-700 hover:text-blue-700 hover:bg-blue-50/50',
     !!parentSection && 'pl-11',
     className,

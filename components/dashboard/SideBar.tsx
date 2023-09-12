@@ -8,8 +8,8 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import { DrawerMenu } from '../navigation/DrawerMenu';
 import StyledRoundButton from '../StyledRoundButton';
 
-import AccountSwitcher from './AccountSwitcher';
 import Menu from './Menu';
+import AccountSwitcher from './NewAccountSwitcher';
 
 interface AdminPanelSideBarProps {
   isLoading?: boolean;

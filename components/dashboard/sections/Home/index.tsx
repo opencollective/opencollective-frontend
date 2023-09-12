@@ -24,6 +24,7 @@ import { AdminSectionProps } from '../../types';
 
 import { workspaceHomeQuery } from './query';
 import TimelineItem from './TimelineItem';
+
 const PAGE_SIZE = 20;
 
 const REACT_SELECT_COMPONENT_OVERRIDE = {
@@ -77,7 +78,7 @@ const Home = (props: AdminSectionProps) => {
         <p className="text-muted-foreground">
           <FormattedMessage
             id="Dashboard.Home.Subtitle"
-            defaultMessage="The latest news and updates you need to know in Open Collective."
+            defaultMessage="A quick look at all that is relevant for you inside Open Collective."
           />
         </p>
 
