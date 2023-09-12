@@ -93,7 +93,7 @@ export const MenuLink = ({
 
   const classNames = cn(
     'group w-full flex gap-x-1.5 antialiased items-center rounded-full py-0.5 px-2.5 text-sm leading-6 font-medium transition-colors',
-    isSelected ? 'bg-blue-50 text-primary' : 'text-slate-950 hover:text-blue-700 hover:bg-slate-50',
+    isSelected ? 'bg-blue-50 text-blue-700' : 'text-slate-950 hover:text-blue-700 hover:bg-slate-50',
     !!parentSection && 'pl-11',
     className,
   );

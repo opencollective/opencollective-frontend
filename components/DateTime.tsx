@@ -27,7 +27,7 @@ type DateTimeProps = {
  * A wrapper around `FormattedDate` + HTML `<time>` with sensible defaults.
  * Displays the full date and time in the user's locale and in UTC in the title.
  */
-const DateTime = ({ value, dateStyle, timeStyle, ...props }: DateTimeProps) => {
+const DateTime = ({ value, dateStyle, timeStyle, formatProps, ...props }: DateTimeProps) => {
   const intl = useIntl();
   const [title, setTitle] = React.useState();
   const date = React.useMemo(() => getDateFromValue(value), [value]);
@@ -38,7 +38,7 @@ const DateTime = ({ value, dateStyle, timeStyle, ...props }: DateTimeProps) => {
       dateTime={date.toISOString()}
       onMouseEnter={() => setTitle(generateDateTitle(intl, date))}
     >
-      <FormattedDate dateStyle={dateStyle || 'long'} timeStyle={timeStyle} value={date} />
+      <FormattedDate value={date} {...formatProps} />
     </time>
   );
 };

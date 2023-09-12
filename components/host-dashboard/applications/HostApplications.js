@@ -166,7 +166,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
 
       <HostApplicationDrawer
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        setOpen={setDrawerOpen}
         host={data?.host}
         application={applicationInDrawer}
       />

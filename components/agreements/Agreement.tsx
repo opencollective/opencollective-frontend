@@ -17,7 +17,7 @@ type AgreementProps = {
 export default function Agreement({ agreement, openFileViewer = undefined }: AgreementProps) {
   return (
     <div>
-      <h4 className="mb-4 text-lg font-medium text-slate-900">{agreement.title}</h4>
+      {/* <h4 className="mb-4 text-lg font-medium text-slate-900">{agreement.title}</h4> */}
       <InfoList className="sm:grid-cols-2">
         {agreement.attachment && (
           <InfoListItem

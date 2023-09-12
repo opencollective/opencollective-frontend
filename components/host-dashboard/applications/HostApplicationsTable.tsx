@@ -9,35 +9,32 @@ import { DataTable } from '../../DataTable';
 import DateTime from '../../DateTime';
 import StyledHr from '../../StyledHr';
 import StyledLinkButton from '../../StyledLinkButton';
-import StyledTag from '../../StyledTag';
+import { Badge } from '../../ui/Badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/DropdownMenu';
 import { TableActionsButton } from '../../ui/Table';
-
 interface ApplicationMeta extends TableMeta<HostApplication> {
   openApplication: (agreement: HostApplication) => void;
 }
 
-const StatusTag = ({ status }: { status: HostApplicationStatus }) => {
-  const tagProps = { textTransform: 'uppercase', fontWeight: 700, fontSize: '12px' };
-
+export const StatusTag = ({ status, size }: { status: HostApplicationStatus }) => {
   switch (status) {
     case 'PENDING':
       return (
-        <StyledTag {...tagProps} type="warning">
+        <Badge type="warning" size={size}>
           <FormattedMessage id="Pending" defaultMessage="Pending" />
-        </StyledTag>
+        </Badge>
       );
     case 'APPROVED':
       return (
-        <StyledTag {...tagProps} type="success">
+        <Badge type="success" size={size}>
           <FormattedMessage id="PendingApplication.Approved" defaultMessage="Approved" />
-        </StyledTag>
+        </Badge>
       );
     case 'REJECTED':
       return (
-        <StyledTag {...tagProps} type="error">
+        <Badge type="error" size={size}>
           <FormattedMessage id="PendingApplication.Rejected" defaultMessage="Rejected" />
-        </StyledTag>
+        </Badge>
       );
     default:
       return null;
