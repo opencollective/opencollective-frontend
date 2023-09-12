@@ -265,7 +265,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
             </Flex>
           </NavButton>
         )}
-        {showSearchModal && <SearchModal onClose={() => setShowSearchModal(false)} />}
+        <SearchModal open={showSearchModal} setOpen={setShowSearchModal} />
       </Flex>
 
       {showProfileAndChangelogMenu && (
