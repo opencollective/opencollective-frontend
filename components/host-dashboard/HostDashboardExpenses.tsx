@@ -16,7 +16,7 @@ import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import DashboardViews from '../dashboard/DashboardViews';
 import DismissibleMessage from '../DismissibleMessage';
-import ExpensesFilters from '../expenses/ExpensesFilters';
+import ExpensesFilters from '../expenses/ExpensesFiltersNew';
 import ExpensesList from '../expenses/ExpensesList';
 import { parseChronologicalOrderInput } from '../expenses/filters/ExpensesOrder';
 import {
@@ -24,6 +24,7 @@ import {
   expensesListAdminFieldsFragment,
   expensesListFieldsFragment,
 } from '../expenses/graphql/fragments';
+import Filterbar from '../filters';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -229,7 +230,7 @@ const initViews = [
 ];
 
 const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
-  const router = useRouter() || {};
+  const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
   const expensePipelineFeatureIsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_PIPELINE);
   const query = expensePipelineFeatureIsEnabled ? router.query : enforceDefaultParamsOnQuery(router.query);
@@ -297,7 +298,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         </h1>
-        <SearchBar
+        {/* <SearchBar
           height="40px"
           defaultValue={query.searchTerm}
           onSubmit={searchTerm =>
@@ -306,7 +307,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
               query: getQueryParams({ searchTerm, offset: null }),
             })
           }
-        />
+        /> */}
       </div>
       {paypalPreApprovalError && (
         <DismissibleMessage>
@@ -365,6 +366,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
           ) : null
         }
       />
+
       {expensePipelineFeatureIsEnabled && (
         <DashboardViews
           query={query}
@@ -393,6 +395,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
             showChargeHasReceiptFilter
             chargeHasReceiptFilter={queryFilter.values.chargeHasReceipts}
             onChargeHasReceiptFilterChange={queryFilter.setChargeHasReceipts}
+            pageRoute={pageRoute}
             onChange={queryParams =>
               router.push({
                 pathname: pageRoute,

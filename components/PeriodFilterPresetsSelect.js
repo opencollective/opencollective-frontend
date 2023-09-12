@@ -46,6 +46,39 @@ export const PERIOD_FILTER_PRESETS = {
   },
 };
 
+export const NEW_PERIOD_FILTER_PRESETS = {
+  TODAY: {
+    label: <FormattedMessage defaultMessage="Today" />,
+    value: 'TODAY',
+    getInterval: () => ({ from: dayjs().startOf('day'), to: dayjs().endOf('day') }),
+  },
+  THIS_MONTH: {
+    label: <FormattedMessage defaultMessage="This Month" />,
+    value: 'THIS_MONTH',
+    getInterval: () => ({ from: dayjs().startOf('month'), to: dayjs().endOf('day') }),
+  },
+  THIS_YEAR: {
+    label: <FormattedMessage defaultMessage="This Year" />,
+    value: 'THIS_YEAR',
+    getInterval: () => ({ from: dayjs().startOf('year'), to: dayjs().endOf('day') }),
+  },
+  PAST_WEEK: {
+    label: <FormattedMessage defaultMessage="Past Week" />,
+    value: 'PAST_WEEK',
+    getInterval: () => getPastDateInterval('week'),
+  },
+  PAST_MONTH: {
+    label: <FormattedMessage defaultMessage="Past Month" />,
+    value: 'PAST_MONTH',
+    getInterval: () => getPastDateInterval('month'),
+  },
+  PAST_YEAR: {
+    label: <FormattedMessage defaultMessage="Past Year" />,
+    value: 'PAST_YEAR',
+    getInterval: () => getPastDateInterval('year'),
+  },
+};
+
 const PERIOD_FILTER_SELECT_STYLES = {
   dropdownIndicator: { paddingTop: 0, paddingBottom: 0 },
   option: { fontSize: '12px' },

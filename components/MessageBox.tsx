@@ -44,6 +44,7 @@ type MessageBoxProps = MessageProps & {
   isLoading?: boolean;
   withIcon?: boolean;
   children: React.ReactNode;
+  onClose?: () => void;
 };
 
 const Message = styled.div<MessageProps>`
