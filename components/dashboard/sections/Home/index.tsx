@@ -139,7 +139,7 @@ const Home = (props: AdminSectionProps) => {
           </div>
           {canViewMore && (
             <StyledButton
-              mt={2}
+              mt={4}
               width="100%"
               buttonSize="small"
               loading={loading}
