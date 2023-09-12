@@ -5,11 +5,16 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import useLocalStorage from '../../lib/hooks/useLocalStorage';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { ScrollDirection, useWindowScroll } from '../../lib/hooks/useWindowScroll';
+import { LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
 import ChangelogTrigger from '../changelog/ChangelogTrigger';
+import AccountSwitcher from '../dashboard/NewAccountSwitcher';
+import DividerIcon from '../DividerIcon';
 import { Box, Flex } from '../Grid';
 import Image from '../Image';
 import Link from '../Link';
@@ -17,6 +22,7 @@ import SearchModal from '../Search';
 import SearchTrigger from '../SearchTrigger';
 
 import ProfileMenu from './ProfileMenu';
+import SiteMenu from './SiteMenu';
 
 const MobileFooterBar = styled(Flex)`
   position: fixed;
@@ -152,11 +158,16 @@ type TopBarProps = {
   loading?: boolean;
 };
 
-const TopBar = ({ account }: TopBarProps) => {
+const TopBar = ({ account, navTitle = 'Page' }: TopBarProps) => {
   const { LoggedInUser } = useLoggedInUser();
   const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
   const router = useRouter();
+  const [lastWorkspaceVisit] = useLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE, {
+    slug: LoggedInUser?.collective.slug,
+  });
+
+  const activeSlug = router.query.slug || lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
 
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
@@ -170,12 +181,14 @@ const TopBar = ({ account }: TopBarProps) => {
   const onSearchRoute =
     isRouteActive('/search') || (account && isRouteActive(`/${account.parentCollective?.slug || account.slug}`));
   const ocLogoRoute = LoggedInUser ? '/dashboard' : '/home';
+  const hasBreadCrumbNav = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.BREADCRUMB_NAV);
 
   return (
     <Fragment>
-      <div className="border-b bg-white px-4 md:px-7" ref={ref}>
+      <div className="border-b bg-white px-4 md:px-6" ref={ref}>
         <div className="flex h-16 items-center justify-between gap-4 py-4">
-          <Flex alignItems="center" gridGap={[2, 3]}>
+          <div className="flex items-center gap-3">
+            {hasBreadCrumbNav && <SiteMenu />}
             <Box flexShrink={0}>
               <Link href={ocLogoRoute}>
                 <Flex alignItems="center" gridGap={2}>
@@ -183,16 +196,34 @@ const TopBar = ({ account }: TopBarProps) => {
                 </Flex>
               </Link>
             </Box>
-          </Flex>
+          </div>
 
-          <Flex flex={1} alignItems="center" gridGap={3} overflow={'hidden'}>
-            <MainNavItem href="/dashboard" isActive={onDashboardRoute}>
-              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-            </MainNavItem>
-            <MainNavItem href="/search" isActive={onSearchRoute}>
-              <FormattedMessage id="Explore" defaultMessage="Explore" />
-            </MainNavItem>
-          </Flex>
+          {hasBreadCrumbNav ? (
+            <div className="-ml-3 -mr-1 flex flex-1 items-center gap-3">
+              {onDashboardRoute ? (
+                <React.Fragment>
+                  <MainNavItem href="/dashboard">
+                    <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+                  </MainNavItem>
+                  <DividerIcon size={32} className="-mx-4 text-slate-300" />
+                  <div>
+                    <AccountSwitcher activeSlug={activeSlug} />
+                  </div>
+                </React.Fragment>
+              ) : (
+                <React.Fragment>{navTitle}</React.Fragment>
+              )}
+            </div>
+          ) : (
+            <Flex flex={1} alignItems="center" gridGap={3} overflow={'hidden'}>
+              <MainNavItem href="/dashboard" isActive={onDashboardRoute}>
+                <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+              </MainNavItem>
+              <MainNavItem href="/search" isActive={onSearchRoute}>
+                <FormattedMessage id="Explore" defaultMessage="Explore" />
+              </MainNavItem>
+            </Flex>
+          )}
 
           <Flex alignItems="center" gridGap={2} flexShrink={4} flexGrow={0}>
             <SearchTrigger setShowSearchModal={setShowSearchModal} />

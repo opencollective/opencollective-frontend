@@ -9,7 +9,9 @@ import { DrawerMenu } from '../navigation/DrawerMenu';
 import StyledRoundButton from '../StyledRoundButton';
 
 import Menu from './Menu';
-import AccountSwitcher from './NewAccountSwitcher';
+import AccountSwitcher from './AccountSwitcher';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 interface AdminPanelSideBarProps {
   isLoading?: boolean;
@@ -27,6 +29,7 @@ const AdminPanelSideBar = ({
   onRoute: _onRoute,
   ...props
 }: AdminPanelSideBarProps) => {
+  const { LoggedInUser } = useLoggedInUser();
   const [isMenuOpen, setMenuOpen] = React.useState(false);
   const { viewport } = useWindowResize();
   const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
@@ -63,7 +66,10 @@ const AdminPanelSideBar = ({
     >
       <div className="sticky top-8 z-10">
         <div className="flex flex-row-reverse gap-4 sm:flex-auto md:flex-col">
-          <AccountSwitcher activeSlug={activeSlug} />
+          {!LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.BREADCRUMB_NAV) && (
+            <AccountSwitcher activeSlug={activeSlug} />
+          )}
+
           {isMobile && (
             <React.Fragment>
               <StyledRoundButton size={50} onClick={() => setMenuOpen(true)} data-cy="mobile-menu-trigger">

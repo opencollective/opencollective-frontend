@@ -5,6 +5,7 @@ export enum PREVIEW_FEATURE_KEYS {
   DASHBOARD = 'dashboard',
   EXPENSE_PIPELINE = 'EXPENSE_PIPELINE',
   EXPENSE_OCR = 'EXPENSE_OCR',
+  BREADCRUMB_NAV = 'BREADCRUMB_NAV',
 }
 
 export type PreviewFeature = {
@@ -15,6 +16,7 @@ export type PreviewFeature = {
   closedBetaAccessFor?: string[]; // Account slugs. Members and admins of these accounts will see this feature as a Closed Beta preview in the Preview Features modal.
   enabledByDefaultFor?: string[]; // Account slugs. Members and admins of these accounts will have the feature enabled by default.
   env?: Array<'development' | 'test' | 'e2e' | 'staging' | 'production'>; // If set, the feature will be available only in the specified environments.
+  dependsOn?: PREVIEW_FEATURE_KEYS;
 };
 
 /**
@@ -28,6 +30,15 @@ export const previewFeatures: PreviewFeature[] = [
       'A central space to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations.',
     publicBeta: true,
     enabledByDefaultFor: ['opencollective'],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.BREADCRUMB_NAV,
+    title: 'New navigation',
+    description:
+      'A new navigation bar that helps you find your way around Open Collective and understand where you are.',
+    publicBeta: false,
+    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
+    dependsOn: PREVIEW_FEATURE_KEYS.DASHBOARD,
   },
   {
     key: PREVIEW_FEATURE_KEYS.EXPENSE_PIPELINE,

@@ -133,9 +133,7 @@ const Home = (props: AdminSectionProps) => {
                 <FormattedMessage defaultMessage="No activity yet" />
               </MessageBox>
             ) : (
-              activities.map(activity => (
-                <TimelineItem key={activity.id} activity={activity} openExpense={id => setOpenExpenseLegacyId(id)} />
-              ))
+              activities.map(activity => <TimelineItem key={activity.id} />)
             )}
           </div>
           {canViewMore && (

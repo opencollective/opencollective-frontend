@@ -62,7 +62,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [applicationInDrawer, setApplicationInDrawer] = React.useState(null);
 
-  const pageRoute = isDashboard ? `/workspace/${hostSlug}/host-applications` : `/${hostSlug}/admin/host-applications`;
+  const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-applications` : `/${hostSlug}/admin/host-applications`;
 
   const hostApplications = data?.host?.hostApplications;
   const initViews = [
@@ -106,7 +106,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
     <Box maxWidth={1000} m="0 auto">
       <div className="flex flex-wrap justify-between gap-4">
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
-          <FormattedMessage id="Menu.HostApplications" defaultMessage="Host Applications" />
+          <FormattedMessage defaultMessage="Applications" />
         </h1>
         <SearchBar
           height={40}
