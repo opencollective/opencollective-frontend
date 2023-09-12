@@ -21,10 +21,7 @@ import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isInternalHost, isSelfHostedAccount } from '../../lib/collective.lib';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
-import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
-
-import Container from '../Container';
 
 import {
   ABOUT_ORG_SECTIONS,
@@ -42,10 +39,7 @@ const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 const Menu = ({ isAccountantOnly, onRoute }) => {
   const router = useRouter();
   const { account } = React.useContext(DashboardContext);
-  const { viewport } = useWindowResize();
-  const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
   const isHost = isHostAccount(account);
-  const isUserHost = account.isHost === true && isType(account, USER); // for legacy compatibility for users who are hosts
   const isIndividual = isIndividualAccount(account);
 
   React.useEffect(() => {
@@ -60,51 +54,40 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
   }, [router, onRoute]);
 
   return (
-    <Container gap="8px">
-      {/** Host dashboard */}
-      <MenuGroup if={isHost} mb={24}>
+    <div className="space-y-4">
+      <MenuLink
+        href={getCollectivePageRoute(account)}
+        Icon={Globe2}
+        className="hover:bg-slate-50 hover:text-slate-700"
+        external
+      >
+        <FormattedMessage id="PublicProfile" defaultMessage="Public profile" />
+      </MenuLink>
+
+      <MenuGroup if={isHost}>
         <MenuSectionHeader>
           <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
         </MenuSectionHeader>
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_EXPENSES} icon={<Receipt size={16} />} />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} icon={<Coins size={16} />} />
-
-        <MenuLink
-          section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS}
-          icon={<Coins size={16} />}
-          if={!isAccountantOnly}
-        />
-
-        <MenuLink
-          section={HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS}
-          icon={<FileText size={16} />}
-          if={isInternalHost(account)}
-        />
-
-        <MenuLink
-          section={HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS}
-          if={!isAccountantOnly}
-          icon={<Inbox size={16} />}
-        />
-        <MenuLink
-          section={HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES}
-          if={!isAccountantOnly}
-          icon={<Network size={16} />}
-        />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_EXPENSES} Icon={Receipt} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} Icon={Coins} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS} Icon={Coins} if={!isAccountantOnly} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS} Icon={FileText} if={isInternalHost(account)} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_APPLICATIONS} Icon={Inbox} if={!isAccountantOnly} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES} Icon={Network} if={!isAccountantOnly} />
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS}
-          icon={<CreditCard size={16} />}
+          Icon={CreditCard}
           if={!isAccountantOnly && hasFeature(account, FEATURES.VIRTUAL_CARDS)}
         />
         <MenuLink
           section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS}
-          icon={<CreditCard size={16} />}
+          Icon={CreditCard}
           if={!isAccountantOnly && hasFeature(account, FEATURES.VIRTUAL_CARDS)}
         />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} isBeta icon={<Chart size={16} />} />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} Icon={Chart} isBeta />
 
         <MenuLink
-          icon={<Settings size={16} />}
+          Icon={Settings}
           if={isHost && !isAccountantOnly}
           section="FISCAL_HOST_SETTINGS"
           goToSection={FISCAL_HOST_SECTIONS.FISCAL_HOSTING}
@@ -142,34 +125,23 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
             ) : isType(account, COLLECTIVE) ? (
               <FormattedMessage id="CollectiveDashboard" defaultMessage="Collective Dashboard" />
             ) : (
-              <FormattedMessage id="Workspace" defaultMessage="Workspace" />
+              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
             )}
           </MenuSectionHeader>
         )}
-        <MenuLink
-          section={COLLECTIVE_SECTIONS.DASHBOARD_OVERVIEW}
-          icon={<LayoutDashboard size={16} />}
-          if={isIndividual}
-        />
-        <MenuLink
-          onClick={() => router.push(getCollectivePageRoute(account))}
-          icon={<Globe2 size={16} />}
-          if={isMobile}
-        >
-          <FormattedMessage id="PublicProfile" defaultMessage="Public profile" />
-        </MenuLink>
-        <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTORS} icon={<Users size={16} />} if={!isIndividual} />
-        <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTIONS} icon={<Coins size={16} />} />
-        <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} icon={<Receipt size={16} />} />
+        <MenuLink section={COLLECTIVE_SECTIONS.DASHBOARD_OVERVIEW} Icon={LayoutDashboard} if={isIndividual} />
+        <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} Icon={Receipt} />
+        <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTORS} Icon={Users} if={!isIndividual} />
+        <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTIONS} Icon={Coins} />
         <MenuLink
           section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
-          icon={<Coins size={16} />}
+          Icon={Coins}
           if={isSelfHostedAccount(account) && !isAccountantOnly && isType(account, COLLECTIVE)}
         />
-        <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} icon={<Transfer size={16} />} />
+        <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} Icon={Transfer} />
         <MenuLink
-          icon={<Settings size={16} />}
-          if={!isHost || isUserHost}
+          Icon={Settings}
+          if={!isType(account, ORGANIZATION)}
           section="SETTINGS"
           goToSection={COLLECTIVE_SECTIONS.INFO}
           renderSubMenu={({ parentSection }) => (
@@ -265,7 +237,7 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
                 if={isOneOfTypes(account, [COLLECTIVE, FUND, ORGANIZATION])}
               />
               <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.ADVANCED} />
-              <MenuGroup if={isSelfHostedAccount(account) && !isAccountantOnly} mt={24}>
+              <MenuGroup if={isSelfHostedAccount(account) && !isAccountantOnly} className="mt-6">
                 <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS} />
                 <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.RECEIVING_MONEY} />
                 <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />
@@ -275,10 +247,11 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
         >
           <FormattedMessage id="Settings" defaultMessage="Settings" />
         </MenuLink>
-        {/* org settings for hosts */}
+
+        {/* org settings */}
         <MenuLink
-          icon={<Settings size={16} />}
-          if={isType(account, ORGANIZATION) && isHost}
+          Icon={Settings}
+          if={isType(account, ORGANIZATION)}
           section="ORG_SETTINGS"
           goToSection={isAccountantOnly ? ALL_SECTIONS.PAYMENT_RECEIPTS : ABOUT_ORG_SECTIONS.INFO}
           renderSubMenu={({ parentSection }) => (
@@ -302,18 +275,19 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
                   <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
                   <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.SECURITY} />
                   <MenuLink parentSection={parentSection} section={ALL_SECTIONS.ADVANCED} />
-                  {!isHostAccount(account) && (
-                    <MenuLink parentSection={parentSection} section={ALL_SECTIONS.FISCAL_HOSTING} />
-                  )}
                 </React.Fragment>
               )}
             </React.Fragment>
           )}
         >
-          <FormattedMessage id="AdminPanel.OrganizationSettings" defaultMessage="Organization Settings" />
+          {isHost ? (
+            <FormattedMessage id="AdminPanel.OrganizationSettings" defaultMessage="Organization Settings" />
+          ) : (
+            <FormattedMessage id="Settings" defaultMessage="Settings" />
+          )}
         </MenuLink>
       </MenuGroup>
-    </Container>
+    </div>
   );
 };
 

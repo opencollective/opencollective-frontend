@@ -6,8 +6,8 @@ import languages from '../lib/constants/locales';
 import { loadScriptAsync } from '../lib/utils';
 
 import Body from '../components/Body';
-import Footer from '../components/Footer';
 import Header from '../components/Header';
+import Footer from '../components/navigation/Footer';
 import { withUser } from '../components/UserProvider';
 
 import giftCardPageStyle from '!css-loader!../public/gift-cards-page/stylesheets/style.css'; // eslint-disable-line

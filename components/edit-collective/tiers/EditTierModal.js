@@ -21,7 +21,6 @@ import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import { Box, Flex } from '../../Grid';
 import InputFieldPresets from '../../InputFieldPresets';
-import InputSwitch from '../../InputSwitch';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
@@ -34,6 +33,7 @@ import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
 import { Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { Switch } from '../../ui/Switch';
 
 import ConfirmTierDeleteModal from './ConfirmTierDeleteModal';
 
@@ -429,10 +429,10 @@ function FormFields({ collective, values, hideTypeSelect }) {
             alignItems={'center'}
           >
             {({ field, form }) => (
-              <InputSwitch
+              <Switch
                 name={field.name}
                 checked={field.value}
-                onChange={event => form.setFieldValue(field.name, event.target.checked)}
+                onCheckedChange={checked => form.setFieldValue(field.name, checked)}
               />
             )}
           </StyledInputFormikField>
@@ -459,10 +459,10 @@ function FormFields({ collective, values, hideTypeSelect }) {
             alignItems={'center'}
           >
             {({ field, form }) => (
-              <InputSwitch
+              <Switch
                 name={field.name}
                 checked={field.value}
-                onChange={event => form.setFieldValue(field.name, event.target.checked)}
+                onCheckedChange={checked => form.setFieldValue(field.name, checked)}
               />
             )}
           </StyledInputFormikField>

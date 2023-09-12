@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { isHostAccount } from '../lib/collective.lib';
+import { isHostAccount, isIndividualAccount } from '../lib/collective.lib';
 import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLocalStorage from '../lib/hooks/useLocalStorage';
@@ -14,11 +14,11 @@ import { require2FAForAdmins } from '../lib/policies';
 import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import AdminPanelSection from '../components/dashboard/DashboardSection';
-import Footer from '../components/dashboard/Footer';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
-import { Box, Flex } from '../components/Grid';
+import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
+import Footer from '../components/navigation/Footer';
 import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
@@ -45,8 +45,8 @@ const messages = defineMessages({
 
 const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
-    return ALL_SECTIONS.INFO;
-  } else if (account?.type === 'INDIVIDUAL') {
+    return null;
+  } else if (isIndividualAccount(account)) {
     return ALL_SECTIONS.DASHBOARD_OVERVIEW;
   } else if (isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
@@ -97,17 +97,32 @@ function getBlocker(LoggedInUser, account, section) {
   }
 }
 
+function getSingleParam(queryParam: string | string[]): string {
+  return Array.isArray(queryParam) ? queryParam[0] : queryParam;
+}
+
+function getAsArray(queryParam: string | string[]): string[] {
+  return Array.isArray(queryParam) ? queryParam : [queryParam];
+}
+
+const parseQuery = query => {
+  return {
+    slug: getSingleParam(query.slug),
+    section: getSingleParam(query.section),
+    subpath: getAsArray(query.subpath),
+  };
+};
+
 const DashboardPage = () => {
   const intl = useIntl();
   const router = useRouter();
-  const { slug, section, subpath } = router.query;
+  const { slug, section, subpath } = parseQuery(router.query);
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const [lastWorkspaceVisit, setLastWorkspaceVisit] = useLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE, {
-    slug: LoggedInUser?.slug,
+    slug: LoggedInUser?.collective.slug,
   });
-  const activeSlug = LoggedInUser?.isAdminOfCollective({ slug: slug || lastWorkspaceVisit.slug })
-    ? slug || lastWorkspaceVisit.slug
-    : LoggedInUser?.collective.slug;
+
+  const activeSlug = slug || lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
 
   const { data, loading } = useQuery(adminPanelQuery, {
     context: API_V2_CONTEXT,
@@ -122,10 +137,21 @@ const DashboardPage = () => {
     if (activeSlug && activeSlug !== lastWorkspaceVisit.slug) {
       setLastWorkspaceVisit({ slug: activeSlug });
     }
-    if (router.query.slug !== activeSlug) {
-      router.replace(`/dashboard/${activeSlug || ''}`);
+    // If there is no slug set (that means /dashboard)
+    // And if there is an activeSlug (this means lastWorkspaceVisit OR LoggedInUser)
+    // And a LoggedInUser
+    // And if activeSlug is different than LoggedInUser slug
+    if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
+      router.replace(`/dashboard/${activeSlug}`);
     }
-  }, [activeSlug]);
+  }, [activeSlug, LoggedInUser]);
+
+  // Clear last visited workspace account if not admin
+  React.useEffect(() => {
+    if (account && !LoggedInUser.isAdminOfCollective(account)) {
+      setLastWorkspaceVisit({ slug: null });
+    }
+  }, [account]);
 
   const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
@@ -144,42 +170,41 @@ const DashboardPage = () => {
       >
         {Boolean(notification) && <NotificationBar {...notification} />}
         {blocker ? (
-          <Flex flexDirection="column" alignItems="center" my={6}>
+          <div className="my-32 flex flex-col items-center">
             <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
-              {blocker}
+              <p>{blocker}</p>
+              {LoggedInUser && (
+                <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
+                  <FormattedMessage defaultMessage="Go to your Dashboard" />
+                </Link>
+              )}
             </MessageBox>
             {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
-          </Flex>
+          </div>
         ) : (
-          <Flex
-            flexDirection={['column', 'column', 'row']}
-            justifyContent={'center'}
-            minHeight={600}
-            gridGap={[24, null, 48]}
+          <div
+            className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row md:px-6 lg:gap-12 lg:py-8"
             data-cy="admin-panel-container"
-            py={['24px', null, '32px']}
-            px={['16px', '24px']}
           >
             <AdminPanelSideBar
               isLoading={isLoading}
-              collective={account}
               activeSlug={activeSlug}
               selectedSection={selectedSection}
               isAccountantOnly={LoggedInUser?.isAccountantOnly(account)}
             />
             {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
-              <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
+              <TwoFactorAuthRequiredMessage className="lg:mt-16" />
             ) : (
-              <Box flex="0 1 1000px">
+              <div className="max-w-[1000px] flex-1 sm:overflow-x-clip">
                 <AdminPanelSection
                   section={selectedSection}
                   isLoading={isLoading}
                   collective={account}
                   subpath={subpath}
                 />
-              </Box>
+              </div>
             )}
-          </Flex>
+          </div>
         )}
         <Footer />
       </Page>

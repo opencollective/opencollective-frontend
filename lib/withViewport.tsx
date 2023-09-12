@@ -7,13 +7,13 @@ import { emToPx } from './theme/helpers';
 /**
  * Defines all the breakpoints names as passed by `withViewport`
  */
-export const VIEWPORTS = {
-  XSMALL: 'XSMALL',
-  SMALL: 'SMALL',
-  MEDIUM: 'MEDIUM',
-  LARGE: 'LARGE',
-  UNKNOWN: 'UNKNOWN',
-} as const;
+export enum VIEWPORTS {
+  XSMALL = 'XSMALL',
+  SMALL = 'SMALL',
+  MEDIUM = 'MEDIUM',
+  LARGE = 'LARGE',
+  UNKNOWN = 'UNKNOWN',
+}
 
 // Please keep the same length for these two arrays
 export const BREAKPOINTS_NAMES = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL, VIEWPORTS.MEDIUM, VIEWPORTS.LARGE];

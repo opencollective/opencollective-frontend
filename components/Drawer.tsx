@@ -1,55 +1,24 @@
 import React, { createContext, useContext, useState } from 'react';
 import MUIDrawer from '@mui/material/Drawer';
-import { XMark } from '@styled-icons/heroicons-outline/XMark';
-import { themeGet } from '@styled-system/theme-get';
+import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import styled from 'styled-components';
 
 import { useTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+import { cn } from '../lib/utils';
 
-import Container from './Container';
-import { Box, Flex } from './Grid';
 import StyledRoundButton from './StyledRoundButton';
-
-const StyledDrawerContainer = styled.div<{ maxWidth: string }>`
-  display: flex;
-  height: 100%;
-  max-width: ${props => props.maxWidth};
-  width: 100vw;
-  flex-direction: column;
-`;
-
-const StyledDrawerActionsContainer = styled(Flex)`
-  border-top: 1px solid ${themeGet('colors.black.200')};
-`;
-
-export const SummaryHeader = styled.span`
-  > a {
-    color: inherit;
-    text-decoration: underline;
-    outline: none;
-    :hover {
-      color: ${themeGet('colors.black.600')};
-    }
-  }
-`;
-
-const CloseDrawerButton = styled(StyledRoundButton)`
-  position: absolute;
-  top: 16px;
-  right: 16px;
-`;
 
 export const DrawerActionsContext = createContext(null);
 
 export const useDrawerActionsContainer = () => useContext(DrawerActionsContext);
 
-export default function Drawer({
+export function Drawer({
   open,
   onClose,
   children,
-  maxWidth = '768px',
+  className,
   showActionsContainer,
+  showCloseButton = false,
   'data-cy': dataCy,
 }: {
   open: boolean;
@@ -57,35 +26,48 @@ export default function Drawer({
   children: React.ReactNode;
   maxWidth?: string;
   showActionsContainer?: boolean;
+  showCloseButton?: boolean;
   'data-cy'?: string;
+  className?: string;
 }) {
   const [drawerActionsContainer, setDrawerActionsContainer] = useState(null);
   const twoFactorPrompt = useTwoFactorAuthenticationPrompt();
   const disableEnforceFocus = Boolean(twoFactorPrompt?.isOpen);
   return (
     <DrawerActionsContext.Provider value={drawerActionsContainer}>
-      <MUIDrawer anchor="right" open={open} onClose={onClose} disableEnforceFocus={disableEnforceFocus}>
-        <StyledDrawerContainer maxWidth={maxWidth} data-cy={dataCy}>
-          <Flex flex={1} flexDirection="column" overflowY="scroll">
-            <Container position="relative" py={'24px'}>
-              <CloseDrawerButton type="button" isBorderless onClick={onClose}>
-                <XMark size="24" aria-hidden="true" />
-              </CloseDrawerButton>
+      <MUIDrawer
+        className="[&_.MuiBackdrop-root]:bg-slate-950/25"
+        anchor="right"
+        open={open}
+        onClose={onClose}
+        disableEnforceFocus={disableEnforceFocus}
+      >
+        <div className={cn('flex h-full w-screen max-w-lg flex-col', className)} data-cy={dataCy}>
+          <div className="flex flex-1 flex-col overflow-y-scroll">
+            <div className="relative py-6">
+              {showCloseButton && (
+                <StyledRoundButton
+                  className="absolute right-5 top-5"
+                  size={36}
+                  type="button"
+                  isBorderless
+                  onClick={onClose}
+                  data-cy="close-drawer"
+                >
+                  <X size={20} aria-hidden="true" />
+                </StyledRoundButton>
+              )}
 
-              <Box px={[3, '24px']}>{children}</Box>
-            </Container>
-          </Flex>
+              <div className="px-4 sm:px-6">{children}</div>
+            </div>
+          </div>
           {showActionsContainer && (
-            <StyledDrawerActionsContainer
-              flexWrap="wrap"
-              gridGap={2}
-              flexShrink="0"
-              justifyContent="space-between"
-              p={3}
+            <div
+              className="flex flex-shrink-0 flex-wrap justify-between gap-2 border-t p-4"
               ref={ref => setDrawerActionsContainer(ref)}
             />
           )}
-        </StyledDrawerContainer>
+        </div>
       </MUIDrawer>
     </DrawerActionsContext.Provider>
   );
@@ -99,4 +81,27 @@ export function DrawerActions(props: React.PropsWithChildren) {
   }
 
   return createPortal(props.children, drawerActionsContainer);
+}
+
+export function DrawerHeader({
+  title,
+  statusTag,
+  onClose,
+  ...props
+}: {
+  title: React.ReactNode;
+  statusTag?: React.ReactNode;
+  onClose: () => void;
+}) {
+  return (
+    <div className="mb-4 flex items-start justify-between gap-4" {...props}>
+      <h3 className="mt-1 text-lg font-medium text-slate-900">{title}</h3>
+      <div className="flex flex-col-reverse items-end gap-1 sm:flex-row sm:items-center sm:gap-4">
+        {statusTag}
+        <StyledRoundButton size={36} type="button" isBorderless onClick={onClose} data-cy="close-drawer">
+          <X size={20} aria-hidden="true" />
+        </StyledRoundButton>
+      </div>
+    </div>
+  );
 }

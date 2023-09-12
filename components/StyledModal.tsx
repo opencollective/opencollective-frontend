@@ -37,7 +37,7 @@ const Wrapper = styled(Flex)<WrapperProps>`
 
 type ModalProps = SpaceProps & LayoutProps & BackgroundProps;
 
-const Modal = styled(Container).attrs((props: ModalProps) => ({
+export const Modal = styled(Container).attrs((props: ModalProps) => ({
   maxWidth: props.maxWidth || '95%',
   maxHeight: props.maxHeight || '97%',
 }))<ModalProps>`
@@ -224,12 +224,16 @@ const StyledModal = ({
   hasUnsavedChanges = undefined,
   trapFocus = false,
   ignoreEscapeKey = false,
+  preventClose = false,
   ...props
 }) => {
   const intl = useIntl();
   const modalRef = React.useRef(null);
   const TrapContainer = trapFocus ? DefaultTrapContainer : React.Fragment;
   const closeHandler = React.useCallback(() => {
+    if (preventClose) {
+      return;
+    }
     if (
       hasUnsavedChanges &&
       !confirm(intl.formatMessage({ defaultMessage: 'You have unsaved changes. Are you sure you want to close this?' }))
@@ -238,7 +242,7 @@ const StyledModal = ({
     }
 
     onClose();
-  }, [hasUnsavedChanges, onClose]);
+  }, [hasUnsavedChanges, onClose, preventClose]);
 
   const onEscape = React.useCallback(() => {
     if (!ignoreEscapeKey) {

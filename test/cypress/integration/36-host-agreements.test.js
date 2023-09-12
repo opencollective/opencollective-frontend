@@ -28,7 +28,7 @@ describe('Host agreements', () => {
     cy.get('[data-cy="agreements-table"] tbody tr').first().as('firstRow');
     cy.get('@firstRow').contains('Veganizer BXL');
     cy.get('@firstRow').contains('Unlimited potatoes');
-    cy.get('@firstRow').contains('November 6, 2062');
+    cy.get('@firstRow').contains('Nov 6, 2062');
 
     // ---- Open drawer, make sure the info is there ----
     cy.get('@firstRow').find('td:nth-child(2)').click();
@@ -46,7 +46,7 @@ describe('Host agreements', () => {
     cy.checkToast({ type: 'SUCCESS', message: 'Agreement updated' });
     cy.getByDataCy('agreement-drawer').should('not.exist'); // It closes the drawer
     cy.get('@firstRow').contains('Unlimited potatoes (updated)');
-    cy.get('@firstRow').contains('November 7, 2062');
+    cy.get('@firstRow').contains('Nov 7, 2062');
 
     // ---- Filters the agreements ----
     cy.getByDataCy('select-agreements-account').type('brussels');

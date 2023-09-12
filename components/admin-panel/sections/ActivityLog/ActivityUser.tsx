@@ -4,23 +4,17 @@ import { FormattedMessage } from 'react-intl';
 import { Activity } from '../../../../lib/graphql/types/v2/graphql';
 
 import Avatar from '../../../Avatar';
-import { Flex } from '../../../Grid';
-import LinkCollective from '../../../LinkCollective';
-import StyledLink from '../../../StyledLink';
-import { Span } from '../../../Text';
 
 const Username = ({ individual, avatarSize }) => {
   return !individual ? (
-    <Span>
+    <span className="truncate">
       <FormattedMessage id="user.Unknown" defaultMessage="Unknown" />
-    </Span>
+    </span>
   ) : (
-    <StyledLink as={LinkCollective} color="black.700" collective={individual}>
-      <Flex alignItems="center" gridGap="8px">
-        <Avatar radius={avatarSize} collective={individual} />
-        {individual.name}
-      </Flex>
-    </StyledLink>
+    <div className="flex items-center gap-2 truncate">
+      <Avatar radius={avatarSize} collective={individual} />
+      <span className="truncate"> {individual.name}</span>
+    </div>
   );
 };
 
@@ -34,9 +28,9 @@ export const ActivityUser = ({
   avatarSize?: number;
 }) => {
   return activity.isSystem ? (
-    <Span>
+    <span>
       <FormattedMessage defaultMessage="System Activity" />
-    </Span>
+    </span>
   ) : showBy ? (
     <FormattedMessage
       id="ByUser"

@@ -1,18 +1,14 @@
 import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { Activity } from '../../../../lib/graphql/types/v2/graphql';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
-import Drawer from '../../../Drawer';
-import { Box, Flex } from '../../../Grid';
+import { Drawer, DrawerHeader } from '../../../Drawer';
 import LinkCollective from '../../../LinkCollective';
-import StyledHr from '../../../StyledHr';
-import StyledLink from '../../../StyledLink';
 import StyledTag from '../../../StyledTag';
-import { H4, P } from '../../../Text';
+import { InfoList, InfoListItem, InfoListItemTitle } from '../../../ui/InfoList';
 
 import ActivityDescription from './ActivityDescription';
 import ActivityDetails, { activityHasDetails } from './ActivityDetails';
@@ -23,25 +19,6 @@ type ActivityDrawerProps = {
   activity?: Activity | null;
   onClose: () => void;
 };
-
-const ColumTitle = styled.p`
-  font-style: normal;
-  font-weight: 500;
-  font-size: 12px;
-  line-height: 16px;
-  text-transform: uppercase;
-  color: #4d4f51;
-  margin: 0;
-  margin-bottom: 6px;
-`;
-
-const Value = styled(P)`
-  font-style: normal;
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 20px;
-  color: ${props => props.theme.colors.black[700]};
-`;
 
 const ACCOUNT_KEYS = ['fromAccount', 'account', 'host'] as const;
 
@@ -62,51 +39,43 @@ const AccountKeysI18n = defineMessages({
 export default function ActivityDetailsDrawer({ activity, onClose }: ActivityDrawerProps) {
   const intl = useIntl();
   return (
-    <Drawer maxWidth="512px" open={Boolean(activity)} onClose={onClose} showActionsContainer data-cy="activity-drawer">
+    <Drawer open={Boolean(activity)} onClose={onClose} data-cy="activity-drawer">
       {Boolean(activity) && (
-        <Box fontSize="14px">
-          <H4 fontSize="20px" fontWeight="700">
-            <FormattedMessage
-              defaultMessage="Activity <ActivityId></ActivityId>"
-              values={{
-                ActivityId: () => (
-                  <StyledTag display="inline-block" verticalAlign="middle" ml={2} fontSize="12px">
-                    #{activity.id.split('-')[0]}
-                  </StyledTag>
-                ),
-              }}
-            />
-          </H4>
-          <Box mt={30}>
-            <ColumTitle>
-              <FormattedMessage id="Tags.USER" defaultMessage="User" />
-            </ColumTitle>
-            <Value>
-              <ActivityUser activity={activity} />
-            </Value>
-          </Box>
-          <Flex flexWrap="wrap" gridGap={24} mt={30}>
-            <Box>
-              <ColumTitle>
-                <FormattedMessage id="Fields.description" defaultMessage="Description" />
-              </ColumTitle>
-              <Value py="2px">
-                <ActivityDescription activity={activity} />
-              </Value>
-            </Box>
-          </Flex>
-          <Flex flexWrap="wrap" gridGap={24} mt={30}>
-            <Box>
-              <ColumTitle>
-                <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
-              </ColumTitle>
-              <Value py="2px">
-                <DateTime value={activity.createdAt} timeStyle="long" />
-              </Value>
-            </Box>
-          </Flex>
+        <div>
+          <DrawerHeader
+            title={
+              <FormattedMessage
+                defaultMessage="Activity <ActivityId></ActivityId>"
+                values={{
+                  ActivityId: () => (
+                    <StyledTag display="inline-block" verticalAlign="middle" ml={2} fontSize="12px">
+                      #{activity.id.split('-')[0]}
+                    </StyledTag>
+                  ),
+                }}
+              />
+            }
+            onClose={onClose}
+          />
 
-          <Flex flexWrap="wrap" gridGap={24} mt={30}>
+          <InfoList className="sm:grid-cols-2">
+            <InfoListItem
+              title={<FormattedMessage id="Tags.USER" defaultMessage="User" />}
+              value={<ActivityUser activity={activity} />}
+            />
+
+            <InfoListItem
+              className="sm:col-span-2"
+              title={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
+              value={<ActivityDescription activity={activity} />}
+            />
+
+            <InfoListItem
+              className="sm:col-span-2"
+              title={<FormattedMessage id="expense.incurredAt" defaultMessage="Date" />}
+              value={<DateTime value={activity.createdAt} timeStyle="long" />}
+            />
+
             {ACCOUNT_KEYS.map(accountKey => {
               const account = activity[accountKey];
               if (!account) {
@@ -114,34 +83,28 @@ export default function ActivityDetailsDrawer({ activity, onClose }: ActivityDra
               }
 
               return (
-                <Box key={accountKey}>
-                  <ColumTitle>{intl.formatMessage(AccountKeysI18n[accountKey])}</ColumTitle>
-                  <Value>
-                    <Flex alignItems="center" gridGap={2}>
-                      <Avatar collective={account} radius={24} />
-                      <StyledLink
-                        as={LinkCollective}
-                        collective={account}
-                        color="black.700"
-                        truncateOverflow
-                        textDecoration="underline"
-                      />
-                    </Flex>
-                  </Value>
-                </Box>
+                <InfoListItem
+                  key={accountKey}
+                  title={intl.formatMessage(AccountKeysI18n[accountKey])}
+                  value={
+                    <LinkCollective
+                      collective={account}
+                      className="flex items-center gap-2 font-medium hover:underline"
+                    >
+                      <Avatar collective={account} radius={24} /> {account.name}
+                    </LinkCollective>
+                  }
+                />
               );
             })}
-          </Flex>
-
-          {activityHasDetails(activity) && (
-            <React.Fragment>
-              <StyledHr mt="32px" mb="16px" borderColor="black.300" />
-              <Box fontSize="13px">
-                <ActivityDetails activity={activity} TitleContainer={ColumTitle} />
-              </Box>
-            </React.Fragment>
-          )}
-        </Box>
+            {activityHasDetails(activity) && (
+              <InfoListItem
+                className="sm:col-span-2"
+                value={<ActivityDetails activity={activity} TitleContainer={InfoListItemTitle} />}
+              />
+            )}
+          </InfoList>
+        </div>
       )}
     </Drawer>
   );
