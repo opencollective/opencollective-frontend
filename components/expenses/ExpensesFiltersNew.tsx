@@ -137,7 +137,6 @@ const ExpensesFilters = ({
       },
       {
         key: 'type',
-        static: true,
         filterType: FilterType.SELECT,
         label: intl.formatMessage({ id: 'expense.type', defaultMessage: 'Type' }),
         options: Object.keys(expenseTypes)
@@ -173,7 +172,7 @@ const ExpensesFilters = ({
 
       {
         key: 'status',
-        static: false,
+        static: true,
         filterType: FilterType.SELECT,
         label: intl.formatMessage({ id: 'expense.status', defaultMessage: 'Status' }),
         options: Object.values(ExpenseStatusFilter)

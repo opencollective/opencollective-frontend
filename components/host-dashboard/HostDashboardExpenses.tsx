@@ -298,7 +298,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         </h1>
-        <SearchBar
+        {/* <SearchBar
           height="40px"
           defaultValue={query.searchTerm}
           onSubmit={searchTerm =>
@@ -307,7 +307,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
               query: getQueryParams({ searchTerm, offset: null }),
             })
           }
-        />
+        /> */}
       </div>
       {paypalPreApprovalError && (
         <DismissibleMessage>

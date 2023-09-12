@@ -34,6 +34,9 @@ export default function Filters({
     setDisplayedFilters(filtersToUpdate.map(f => ({ ...f, value: query?.[f.key] })));
   }, [JSON.stringify(query)]);
 
+  const generalOnChange = (newQuery: Record<string, string>) => {
+    onChange({ ...query, ...newQuery });
+  };
   const getFilterProps = (name, valueModifier) => ({
     inputId: `expenses-filter-${name}`,
     value: query?.[name],
@@ -46,11 +49,11 @@ export default function Filters({
   return (
     <div className="">
       <div className="flex justify-between">
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {displayedFilters.map(filter => (
-            <FilterCombo key={filter.key} filter={filter} filterOptions={filterOptions} />
+            <FilterCombo key={filter.key} filter={filter} filterOptions={filterOptions} onChange={generalOnChange} />
           ))}
-          <FilterCombo filterOptions={remainingOptions} />
+          <FilterCombo filterOptions={remainingOptions} onChange={generalOnChange} />
         </div>
         <OrderFilter options={orderByOptions} {...getFilterProps(orderByKey)} />
       </div>

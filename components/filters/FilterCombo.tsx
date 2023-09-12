@@ -1,6 +1,7 @@
 import React from 'react';
 import { Input } from '../ui/Input';
 import { FilterDropdown } from './FilterDropdown';
+import { Search } from 'lucide-react';
 
 export enum FilterType {
   TEXT_INPUT = 'TEXT_INPUT',
@@ -30,10 +31,17 @@ export type FilterOptions = Filter[];
 
 // look up how to do conditional types in typescript
 
-export default function FilterCombo({ filter, filterOptions }: { filter?: Filter; filterOptions?: FilterOptions }) {
+export default function FilterCombo({
+  filter,
+  filterOptions,
+  onChange,
+}: {
+  filter?: Filter;
+  filterOptions?: FilterOptions;
+}) {
   if (filter) {
     if (filter.static && filter.filterType === FilterType.TEXT_INPUT) {
-      return <Input className="h-8 w-[150px] lg:w-[250px]" placeholder={filter.label} value={filter.value} />;
+      return <Input className="w-[150px] lg:w-[250px]" Icon={Search} placeholder={filter.label} value={filter.value} />;
     }
     console.log({ filter });
     return (
@@ -41,11 +49,11 @@ export default function FilterCombo({ filter, filterOptions }: { filter?: Filter
         title={filter.label}
         // options={filter.options}
         value={filter.value}
-        onChange={e => console.log(e)}
+        onChange={onChange}
         filterOptions={filterOptions}
         filterKey={filter.key}
       />
     );
   }
-  return <FilterDropdown title={'Add Filter'} filterOptions={filterOptions} onChange={e => console.log(e)} />;
+  return <FilterDropdown title={'Add Filter'} filterOptions={filterOptions} onChange={onChange} />;
 }

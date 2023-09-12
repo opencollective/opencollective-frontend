@@ -22,7 +22,7 @@ import { isNil } from 'lodash';
 interface DataTableFacetedFilter {
   title?: string;
   value?: string | string[];
-  onChange: (value: string | string[]) => void;
+  // onChange: (value: string | string[]) => void;
   options?: {
     label: string;
     value: string;
@@ -43,26 +43,26 @@ export function FilterDropdown({ title, value, onChange, filterKey, filterOption
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className={cn('h-8 border-dashed', !value && 'text-slate-500')}>
+        <Button variant="outline" size="sm" className={cn('h-9', value ? '' : ' text-slate-500')}>
           {!value && <PlusCircle className="mr-2 h-4 w-4" />}
 
           {title}
           {selectedValues.size > 0 && (
             <React.Fragment>
               <Separator orientation="vertical" className="mx-2 h-4" />
-              <Badge variant="secondary" className="rounded-sm px-1 font-normal lg:hidden">
+              <Badge size="xs" className="rounded-sm px-1 font-normal lg:hidden">
                 {selectedValues.size}
               </Badge>
               <div className="hidden space-x-1 lg:flex">
                 {selectedValues.size > 2 ? (
-                  <Badge variant="secondary" className="rounded-sm px-1 font-normal">
+                  <Badge size="xs" className="rounded-sm px-1 font-normal">
                     {selectedValues.size} selected
                   </Badge>
                 ) : (
                   options
                     .filter(option => selectedValues.has(option.value))
                     .map(option => (
-                      <Badge variant="secondary" key={option.value} className="rounded-sm px-1 font-normal">
+                      <Badge size="xs" key={option.value} className="rounded-sm px-1 font-normal">
                         {option.label}
                       </Badge>
                     ))
@@ -90,18 +90,23 @@ export function FilterDropdown({ title, value, onChange, filterKey, filterOption
                         selectedValues.add(option.value);
                       }
                       const filterValues = Array.from(selectedValues);
-                      onChange(filterValues.length ? filterValues : undefined);
+                      const [firstValue] = filterValues;
+                      // onChange(filterValues.length ? filterValues : undefined);
+                      onChange({ [filterKey]: firstValue });
                     }}
                   >
-                    <div
-                      className={cn(
-                        'border-primary mr-2 flex h-4 w-4 items-center justify-center rounded-sm border',
-                        isSelected ? 'bg-primary text-primary-foreground' : 'opacity-50 [&_svg]:invisible',
-                      )}
-                    >
-                      <CheckIcon className={cn('h-4 w-4')} />
-                    </div>
-                    {option.icon && <option.icon className="text-muted-foreground mr-2 h-4 w-4" />}
+                    {filterKeyState && (
+                      <div
+                        className={cn(
+                          'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+                          isSelected ? 'bg-primary text-primary-foreground' : 'opacity-50 [&_svg]:invisible',
+                        )}
+                      >
+                        <CheckIcon className={cn('h-4 w-4')} />
+                      </div>
+                    )}
+
+                    {option.icon && <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />}
                     <span>{option.label}</span>
                     {/* {facets?.get(option.value) && (
                       <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">

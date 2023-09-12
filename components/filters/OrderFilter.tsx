@@ -18,18 +18,19 @@ const OrderFilter = ({ onChange, options, value, ...props }) => {
     },
   ];
   const option = options.find(o => o.value === value) || options[0];
+  console.log({ option, options });
   return (
     <SelectFilter
       inputId="expenses-order"
-      onChange={({ value }) => onChange(value)}
-      value={option}
+      onChange={value => onChange(value)}
+      value={option.value}
       options={options}
       trigger={
-        <React.Fragment>
+        <div className="flex items-center gap-2 font-medium">
           <ArrowDownNarrowWide className="-ml-0.5 h-5 w-5 text-gray-400" aria-hidden="true" />
 
           <span className="block truncate">{option.label}</span>
-        </React.Fragment>
+        </div>
       }
     />
   );

@@ -4,6 +4,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { cx } from 'class-variance-authority';
 import { Button } from '../ui/Button';
 import { cn } from '../../lib/utils';
+
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/Select';
+
 export default function Example({
   onChange,
   value,
@@ -16,9 +19,16 @@ export default function Example({
 }) {
   value = value || defaultValue;
   return (
-    <Button variant="outline" size="sm" className={'h-8'}>
-      {trigger}
-    </Button>
+    <Select onValueChange={value => onChange(value)} value={value}>
+      <SelectTrigger className="max-w-[160px]">{trigger}</SelectTrigger>
+      <SelectContent>
+        {options.map(option => (
+          <SelectItem value={option.value} key={option.value}>
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
   return <div>Select filter</div>;
   //   return (

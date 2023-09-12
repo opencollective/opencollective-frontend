@@ -195,7 +195,7 @@ const DashboardPage = () => {
             {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage className="lg:mt-16" />
             ) : (
-              <div className="max-w-[1000px] flex-1 sm:overflow-x-clip">
+              <div className="max-w-[1000px] flex-1 ">
                 <AdminPanelSection
                   section={selectedSection}
                   isLoading={isLoading}
