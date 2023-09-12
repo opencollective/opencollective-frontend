@@ -332,7 +332,7 @@ export default function EditVirtualCardModal({
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
   return (
-    <StyledModal width="382px" onClose={handleClose} trapFocus {...modalProps}>
+    <StyledModal width="420px" onClose={handleClose} trapFocus {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose} hideCloseIcon={false}>
           {isEditing ? (
