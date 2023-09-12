@@ -455,7 +455,7 @@ const DashboardPage = () => {
             ) : (
               <div
                 className={clsx(
-                  'flex  flex-1 justify-center gap-4 sm:overflow-x-clip',
+                  'mx-auto  flex  flex-1 justify-center gap-4 sm:overflow-x-clip',
                   useHorizontalNav ? ' px-4 md:px-8' : '',
                 )}
               >
@@ -484,7 +484,7 @@ const DashboardPage = () => {
                     </div>
                   </div>
                 )}
-                <div className="max-w-[1000px] flex-1">
+                <div className="flex-1">
                   <AdminPanelSection
                     section={selectedSection}
                     isLoading={isLoading}
@@ -492,7 +492,7 @@ const DashboardPage = () => {
                     subpath={subpath}
                   />
                 </div>
-                {useHorizontalNav && subMenu?.length && <div className="hidden w-48 xl:block" />}
+                {/* {useHorizontalNav && subMenu?.length && <div className="hidden w-48 xl:block" />} */}
               </div>
             )}
           </div>
