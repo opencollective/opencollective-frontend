@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 export default async function handler(req, res) {
-  const hostname = req.get('original-hostname') || req.hostname;
+  const hostname = req.headers['original-hostname'] || req.hostname;
   if (hostname !== 'opencollective.com') {
     res.setHeader('Content-Type', 'text/plain');
     res.send('User-agent: *\nDisallow: /');
