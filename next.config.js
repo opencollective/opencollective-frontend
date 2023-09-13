@@ -177,7 +177,8 @@ const nextConfig = {
     return REWRITES;
   },
   async headers() {
-    return process.env.IS_VERCEL === 'true'
+    // NOTE: we'll have to tweak this in case we move to Vercel in production
+    return process.env.IS_VERCEL === 'true' || process.env.OC_ENV !== 'production'
       ? [
           // Prevent indexing of our Vercel deployments
           {
