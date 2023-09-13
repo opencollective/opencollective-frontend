@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
-import jwt from 'jsonwebtoken';
+import jwtDecode from 'jwt-decode';
 import { get, isEqual } from 'lodash';
 import Router, { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
@@ -141,7 +141,7 @@ class UserProvider extends React.Component {
         while (true) {
           try {
             const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-            const decodedToken = jwt.decode(token);
+            const decodedToken = jwtDecode(token);
 
             const result = await twoFactorAuthPrompt.open({
               supportedMethods: decodedToken.supported2FAMethods,
