@@ -13,6 +13,7 @@
     ]
   ],
   "plugins": [
+    "babel-plugin-lodash",
     "babel-plugin-react-docgen",
     "babel-plugin-styled-components",
     [
