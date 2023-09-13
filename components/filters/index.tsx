@@ -48,14 +48,16 @@ export default function Filters({
 
   return (
     <div className="">
-      <div className="flex justify-between">
+      <div className="flex flex-wrap justify-between gap-2">
         <div className="flex flex-wrap gap-2">
           {displayedFilters.map(filter => (
             <FilterCombo key={filter.key} filter={filter} filterOptions={filterOptions} onChange={generalOnChange} />
           ))}
           <FilterCombo filterOptions={remainingOptions} onChange={generalOnChange} />
         </div>
-        <OrderFilter options={orderByOptions} {...getFilterProps(orderByKey)} />
+        <div className="flex flex-1 justify-end">
+          <OrderFilter className="ml-auto" options={orderByOptions} {...getFilterProps(orderByKey)} />
+        </div>
       </div>
     </div>
   );

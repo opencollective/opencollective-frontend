@@ -41,7 +41,14 @@ export default function FilterCombo({
 }) {
   if (filter) {
     if (filter.static && filter.filterType === FilterType.TEXT_INPUT) {
-      return <Input className="w-[150px] lg:w-[250px]" Icon={Search} placeholder={filter.label} value={filter.value} />;
+      return (
+        <Input
+          className="w-[150px] rounded-full lg:w-[200px]"
+          Icon={Search}
+          placeholder={filter.label}
+          value={filter.value}
+        />
+      );
     }
     console.log({ filter });
     return (

@@ -455,7 +455,7 @@ const DashboardPage = () => {
             ) : (
               <div
                 className={clsx(
-                  'mx-auto  flex  flex-1 justify-center gap-4 sm:overflow-x-clip',
+                  'flex  flex-1 justify-center gap-4 sm:overflow-x-clip',
                   useHorizontalNav ? ' px-4 md:px-8' : '',
                 )}
               >
@@ -484,7 +484,7 @@ const DashboardPage = () => {
                     </div>
                   </div>
                 )}
-                <div className="flex-1">
+                <div className="relative w-full flex-1">
                   <AdminPanelSection
                     section={selectedSection}
                     isLoading={isLoading}

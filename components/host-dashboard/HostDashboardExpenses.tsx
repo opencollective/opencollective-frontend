@@ -33,7 +33,7 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
-
+import ExpenseStats from '../dashboard/sections/Home/ExpenseStats';
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
@@ -293,12 +293,13 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   };
 
   return (
-    <React.Fragment>
-      <div className="mb-5 flex flex-wrap justify-between gap-4">
-        <h1 className="text-2xl font-bold leading-10 tracking-tight">
-          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-        </h1>
-        {/* <SearchBar
+    <div className="grid grid-cols-5 gap-6">
+      <div className="col-span-3">
+        <div className="mb-5 flex flex-wrap justify-between gap-4">
+          <h1 className="text-2xl font-bold leading-10 tracking-tight">
+            <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+          </h1>
+          {/* <SearchBar
           height="40px"
           defaultValue={query.searchTerm}
           onSubmit={searchTerm =>
@@ -308,42 +309,42 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
             })
           }
         /> */}
-      </div>
-      {paypalPreApprovalError && (
-        <DismissibleMessage>
-          {({ dismiss }) => (
-            <MessageBox type="warning" mb={3} withIcon onClose={dismiss}>
-              {paypalPreApprovalError === 'PRE_APPROVAL_EMAIL_CHANGED' ? (
-                <FormattedMessage
-                  id="paypal.preApproval.emailWarning"
-                  defaultMessage="Warning: the associated PayPal email was changed from {oldEmail} to {newEmail}. If this was not intentional, click {refillBalance} and use the correct account."
-                  values={{
-                    oldEmail: <strong>{query.oldPaypalEmail}</strong>,
-                    newEmail: <strong>{query.newPaypalEmail}</strong>,
-                    refillBalance: (
-                      <q>
-                        <FormattedMessage id="ConnectPaypal.refill" defaultMessage="Refill balance" />
-                      </q>
-                    ),
-                  }}
-                />
-              ) : (
-                paypalPreApprovalError
-              )}
-            </MessageBox>
-          )}
-        </DismissibleMessage>
-      )}
-      <Box mb={4}>
-        {!metaData?.host ? (
-          <LoadingPlaceholder height={150} />
-        ) : error ? (
-          <MessageBoxGraphqlError error={error} />
-        ) : (
-          <HostInfoCard host={metaData.host} />
+        </div>
+        {paypalPreApprovalError && (
+          <DismissibleMessage>
+            {({ dismiss }) => (
+              <MessageBox type="warning" mb={3} withIcon onClose={dismiss}>
+                {paypalPreApprovalError === 'PRE_APPROVAL_EMAIL_CHANGED' ? (
+                  <FormattedMessage
+                    id="paypal.preApproval.emailWarning"
+                    defaultMessage="Warning: the associated PayPal email was changed from {oldEmail} to {newEmail}. If this was not intentional, click {refillBalance} and use the correct account."
+                    values={{
+                      oldEmail: <strong>{query.oldPaypalEmail}</strong>,
+                      newEmail: <strong>{query.newPaypalEmail}</strong>,
+                      refillBalance: (
+                        <q>
+                          <FormattedMessage id="ConnectPaypal.refill" defaultMessage="Refill balance" />
+                        </q>
+                      ),
+                    }}
+                  />
+                ) : (
+                  paypalPreApprovalError
+                )}
+              </MessageBox>
+            )}
+          </DismissibleMessage>
         )}
-      </Box>
-      <ScheduledExpensesBanner
+        <Box mb={4}>
+          {!metaData?.host ? (
+            <LoadingPlaceholder height={150} />
+          ) : error ? (
+            <MessageBoxGraphqlError error={error} />
+          ) : (
+            <ExpenseStats host={metaData.host} />
+          )}
+        </Box>
+        {/* <ScheduledExpensesBanner
         hostSlug={hostSlug}
         onSubmit={() => {
           expenses.refetch();
@@ -365,104 +366,108 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
             </StyledButton>
           ) : null
         }
-      />
+      /> */}
 
-      {expensePipelineFeatureIsEnabled && (
-        <DashboardViews
-          query={query}
-          omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
-          views={views}
-          onChange={query => {
-            router.push(
-              {
-                pathname: pageRoute,
-                query,
-              },
-              undefined,
-              { scroll: false },
-            );
-          }}
-        />
-      )}
-
-      <Box mb={34}>
-        {metaData?.host ? (
-          <ExpensesFilters
-            collective={metaData.host}
-            filters={query}
-            explicitAllForStatus
-            displayOnHoldPseudoStatus
-            showChargeHasReceiptFilter
-            chargeHasReceiptFilter={queryFilter.values.chargeHasReceipts}
-            onChargeHasReceiptFilterChange={queryFilter.setChargeHasReceipts}
-            pageRoute={pageRoute}
-            onChange={queryParams =>
-              router.push({
-                pathname: pageRoute,
-                query: getQueryParams({ ...queryParams, offset: null }),
-              })
-            }
-          />
-        ) : loading ? (
-          <LoadingPlaceholder height={70} />
-        ) : null}
-      </Box>
-      {error ? null : !loading && !data.expenses?.nodes.length ? (
-        <MessageBox type="info" withIcon data-cy="zero-expense-message">
-          {hasFilters ? (
-            <FormattedMessage
-              id="ExpensesList.Empty"
-              defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
-              values={{
-                ResetLink(text) {
-                  return (
-                    <Link data-cy="reset-expenses-filters" href={{ pathname: pageRoute }}>
-                      {text}
-                    </Link>
-                  );
-                },
-              }}
-            />
-          ) : (
-            <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
-          )}
-        </MessageBox>
-      ) : (
-        <React.Fragment>
-          <ExpensesList
-            isLoading={loading || loadingMetaData}
-            host={metaData?.host}
-            nbPlaceholders={paginatedExpenses.limit}
-            expenses={paginatedExpenses.nodes}
-            view="admin"
-            onProcess={(expense, cache) => {
-              hasFilters && onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData });
-            }}
-            useDrawer
-            openExpenseLegacyId={Number(router.query.openExpenseId)}
-            setOpenExpenseLegacyId={legacyId => {
+        {expensePipelineFeatureIsEnabled && (
+          <DashboardViews
+            query={query}
+            omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
+            views={views}
+            onChange={query => {
               router.push(
                 {
                   pathname: pageRoute,
-                  query: getQueryParams({ ...query, openExpenseId: legacyId }),
+                  query,
                 },
                 undefined,
-                { shallow: true },
+                { scroll: false },
               );
             }}
           />
-          <Flex mt={5} justifyContent="center">
-            <Pagination
-              route={pageRoute}
-              total={paginatedExpenses.totalCount}
-              limit={paginatedExpenses.limit}
-              offset={paginatedExpenses.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
+        )}
+
+        <Box mb={34}>
+          {metaData?.host ? (
+            <ExpensesFilters
+              collective={metaData.host}
+              filters={query}
+              explicitAllForStatus
+              displayOnHoldPseudoStatus
+              showChargeHasReceiptFilter
+              chargeHasReceiptFilter={queryFilter.values.chargeHasReceipts}
+              onChargeHasReceiptFilterChange={queryFilter.setChargeHasReceipts}
+              pageRoute={pageRoute}
+              onChange={queryParams =>
+                router.push({
+                  pathname: pageRoute,
+                  query: getQueryParams({ ...queryParams, offset: null }),
+                })
+              }
             />
-          </Flex>
-        </React.Fragment>
-      )}
-    </React.Fragment>
+          ) : loading ? (
+            <LoadingPlaceholder height={70} />
+          ) : null}
+        </Box>
+        {error ? null : !loading && !data.expenses?.nodes.length ? (
+          <MessageBox type="info" withIcon data-cy="zero-expense-message">
+            {hasFilters ? (
+              <FormattedMessage
+                id="ExpensesList.Empty"
+                defaultMessage="No expense matches the given filters, <ResetLink>reset them</ResetLink> to see all expenses."
+                values={{
+                  ResetLink(text) {
+                    return (
+                      <Link data-cy="reset-expenses-filters" href={{ pathname: pageRoute }}>
+                        {text}
+                      </Link>
+                    );
+                  },
+                }}
+              />
+            ) : (
+              <FormattedMessage id="expenses.empty" defaultMessage="No expenses" />
+            )}
+          </MessageBox>
+        ) : (
+          <React.Fragment>
+            <ExpensesList
+              isLoading={loading || loadingMetaData}
+              host={metaData?.host}
+              nbPlaceholders={paginatedExpenses.limit}
+              expenses={paginatedExpenses.nodes}
+              view="admin"
+              onProcess={(expense, cache) => {
+                hasFilters && onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData });
+              }}
+              useDrawer
+              openExpenseLegacyId={Number(router.query.openExpenseId)}
+              setOpenExpenseLegacyId={legacyId => {
+                router.push(
+                  {
+                    pathname: pageRoute,
+                    query: getQueryParams({ ...query, openExpenseId: legacyId }),
+                  },
+                  undefined,
+                  { shallow: true },
+                );
+              }}
+            />
+            <Flex mt={5} justifyContent="center">
+              <Pagination
+                route={pageRoute}
+                total={paginatedExpenses.totalCount}
+                limit={paginatedExpenses.limit}
+                offset={paginatedExpenses.offset}
+                ignoredQueryParams={ROUTE_PARAMS}
+              />
+            </Flex>
+          </React.Fragment>
+        )}
+      </div>
+      <div className="col-span-2 -my-6 -mr-8 flex-1 border-l bg-slate-50/50 p-6 text-muted-foreground">
+        <p>No expense selected</p>
+      </div>
+    </div>
   );
 };
 

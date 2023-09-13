@@ -20,7 +20,7 @@ export default function Example({
   value = value || defaultValue;
   return (
     <Select onValueChange={value => onChange(value)} value={value}>
-      <SelectTrigger className="max-w-[160px]">{trigger}</SelectTrigger>
+      <SelectTrigger className="h-8 max-w-[160px] rounded-full">{trigger}</SelectTrigger>
       <SelectContent>
         {options.map(option => (
           <SelectItem value={option.value} key={option.value}>
