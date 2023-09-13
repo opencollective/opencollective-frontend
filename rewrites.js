@@ -360,6 +360,11 @@ exports.REWRITES = [
     source: '/applications',
     destination: '/applications',
   },
+  // Robots.txt
+  {
+    source: '/robots.txt',
+    destination: '/api/robots',
+  },
   // Collective
   // ----------
   // Collective page
@@ -380,10 +385,5 @@ exports.REWRITES = [
   {
     source: '/:hostCollectiveSlug/terms',
     destination: '/terms-of-fiscal-sponsorship',
-  },
-  // Robots.txt
-  {
-    source: '/robots.txt',
-    destination: '/api/robots',
   },
 ];
