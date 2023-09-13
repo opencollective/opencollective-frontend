@@ -101,7 +101,7 @@ class Header extends React.Component {
   render() {
     const { css, canonicalURL, withTopBar } = this.props;
     return (
-      <header>
+      <header className="sticky top-0 z-20">
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
           {/** Disable IE compatibility mode. See https://developer.paypal.com/docs/checkout/integrate/#2-add-the-paypal-javascript-sdk-to-your-web-page */}

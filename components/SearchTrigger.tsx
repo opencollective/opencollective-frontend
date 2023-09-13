@@ -16,11 +16,11 @@ const SearchTrigger = ({ setShowSearchModal }) => {
 
   return (
     <button
-      className="relative flex h-8 w-8 items-center justify-center gap-1.5 rounded-full border text-slate-500 ring-black ring-offset-2 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 md:w-auto md:justify-start md:px-2 md:pr-4"
+      className="relative flex h-8 w-8 items-center justify-center gap-1.5 rounded-full border text-slate-500 ring-black ring-offset-2 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 xl:w-auto xl:justify-start xl:px-2 xl:pr-4"
       onClick={() => setShowSearchModal(true)}
     >
       <Search size={16} />
-      <span className="hidden text-xs md:block">
+      <span className="hidden text-xs xl:block">
         <FormattedMessage
           defaultMessage="Type {slash} to search for Collectives..."
           values={{ slash: <span className="rounded-sm border bg-slate-100 px-1">/</span> }}

@@ -1,6 +1,6 @@
 import React, { Fragment, useRef, useState } from 'react';
-import { max, min } from 'lodash';
-import { Compass, Frame } from 'lucide-react';
+import { get, max, min } from 'lodash';
+import { ArrowRight, Compass, Frame, Globe, Globe2 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -21,8 +21,11 @@ import Link from '../Link';
 import SearchModal from '../Search';
 import SearchTrigger from '../SearchTrigger';
 
+import { cn } from '../../lib/utils';
+
 import ProfileMenu from './ProfileMenu';
 import SiteMenu from './SiteMenu';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 const MobileFooterBar = styled(Flex)`
   position: fixed;
@@ -158,7 +161,7 @@ type TopBarProps = {
   loading?: boolean;
 };
 
-const TopBar = ({ account, navTitle = 'Page' }: TopBarProps) => {
+const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
   const { LoggedInUser } = useLoggedInUser();
   const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
@@ -186,7 +189,7 @@ const TopBar = ({ account, navTitle = 'Page' }: TopBarProps) => {
   return (
     <Fragment>
       <div className="border-b bg-white px-4 md:px-6" ref={ref}>
-        <div className="flex h-16 items-center justify-between gap-4 py-4">
+        <div className="flex h-16 items-center justify-between gap-2 py-4">
           <div className="flex items-center gap-3">
             {hasBreadCrumbNav && <SiteMenu />}
             <Box flexShrink={0}>
@@ -199,19 +202,46 @@ const TopBar = ({ account, navTitle = 'Page' }: TopBarProps) => {
           </div>
 
           {hasBreadCrumbNav ? (
-            <div className="-ml-3 -mr-1 flex flex-1 items-center gap-3">
+            <div className="flex flex-1 items-center gap-2">
               {onDashboardRoute ? (
                 <React.Fragment>
                   <MainNavItem href="/dashboard">
                     <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
                   </MainNavItem>
-                  <DividerIcon size={32} className="-mx-4 text-slate-300" />
-                  <div>
-                    <AccountSwitcher activeSlug={activeSlug} />
-                  </div>
+                  <DividerIcon size={32} className="-ml-4 -mr-3 text-slate-300" />
+                  <AccountSwitcher activeSlug={activeSlug} />
+                  <Link
+                    href={getCollectivePageRoute(account)}
+                    className={cn(
+                      'group flex items-center justify-center rounded-full border px-0 text-sm font-medium leading-6 antialiased transition-colors hover:border-border lg:border-transparent lg:px-2.5',
+                      'text-foreground hover:bg-slate-50 hover:text-foreground',
+                      'h-8 w-8 lg:w-auto',
+                    )}
+                  >
+                    <Globe2 className="block text-muted-foreground group-hover:text-foreground lg:hidden" size={16} />
+                    <span className="hidden items-center gap-x-1.5 lg:flex">
+                      Public profile
+                      <ArrowRight size={16} className="group-hover:animate-arrow-right" />
+                    </span>
+                  </Link>
+                </React.Fragment>
+              ) : account ? (
+                <React.Fragment>
+                  {account.parentCollective && (
+                    <React.Fragment>
+                      <DividerIcon size={32} className="-mx-3 text-slate-300" />
+
+                      <MainNavItem href={getCollectivePageRoute(account.parentCollective)} className="!font-normal">
+                        {account.parentCollective.name}
+                      </MainNavItem>
+                    </React.Fragment>
+                  )}
+                  <DividerIcon size={32} className="-mx-2 text-slate-300" />
+
+                  <MainNavItem href={getCollectivePageRoute(account)}>{account.name}</MainNavItem>
                 </React.Fragment>
               ) : (
-                <React.Fragment>{navTitle}</React.Fragment>
+                <MainNavItem href={'#'}>{navTitle}</MainNavItem>
               )}
             </div>
           ) : (

@@ -64,7 +64,7 @@ export default function SiteMenu() {
   return (
     <React.Fragment>
       <button
-        className="flex h-8 w-8 items-center justify-center rounded-full border text-muted-foreground hover:bg-slate-50"
+        className="flex h-8 w-8 items-center justify-center rounded-md border text-muted-foreground hover:bg-slate-50"
         onClick={() => setShowMenu(true)}
       >
         <Menu size={18} absoluteStrokeWidth strokeWidth={1.5} />

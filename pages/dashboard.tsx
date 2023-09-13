@@ -17,7 +17,7 @@ import { DashboardContext } from '../components/dashboard/DashboardContext';
 import AdminPanelSection from '../components/dashboard/DashboardSection';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
-import TopBar from '../components/dashboard/TopBar';
+import TopBar from '../components/dashboard/DashboardTopBar';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import Footer from '../components/navigation/Footer';
@@ -131,76 +131,6 @@ const parseQuery = query => {
   };
 };
 
-const arrayWithChildren = [
-  {
-    section: 'EXPENSES',
-    children: [
-      {
-        section: 'HOSTED',
-      },
-      {
-        section: 'PENDING',
-      },
-    ],
-  },
-  {
-    section: 'CONTRUBUTIONS',
-    children: [
-      {
-        section: 'INCOMING',
-      },
-      {
-        section: 'PAID',
-      },
-    ],
-  },
-];
-
-const result = [
-  {
-    section: 'EXPENSES',
-    children: [
-      {
-        section: 'HOSTED',
-      },
-      {
-        section: 'PENDING',
-      },
-    ],
-  },
-  {
-    section: 'HOSTED',
-    parent: 'EXPENSES',
-  },
-  {
-    section: 'PENDING',
-    parent: 'EXPENSES',
-  },
-  {
-    section: 'CONTRUBUTIONS',
-    children: [
-      {
-        section: 'INCOMING',
-      },
-      {
-        section: 'PAID',
-      },
-    ],
-  },
-  {
-    section: 'INCOMING',
-    parent: 'CONTRUBUTIONS',
-  },
-  {
-    section: 'PAID',
-    parent: 'CONTRUBUTIONS',
-  },
-];
-
-const isRouteActive = (route, router) => {
-  const regex = new RegExp(`^${route}(/?.*)?$`);
-  return regex.test(router.asPath);
-};
 const getMenuItems = (intl, account) => {
   const isHost = isHostAccount(account);
   // const isUserHost = account.isHost === true && isType(account, USER); // for legacy compatibility for users who are hosts

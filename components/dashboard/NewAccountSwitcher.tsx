@@ -16,6 +16,8 @@ import Avatar from '../Avatar';
 import { Button } from '../ui/Button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
+import DividerIcon from '../DividerIcon';
+import clsx from 'clsx';
 
 const CREATE_NEW_BUTTONS = {
   [CollectiveType.COLLECTIVE]: {
@@ -89,7 +91,7 @@ const AccountsCommand = ({
 
   return (
     <Command
-      className={cn('w-64', isChild && 'border-l', active ? 'bg-white' : 'bg-slate-50')}
+      className={cn('w-60', isChild && 'border-l', active ? 'bg-white' : 'bg-slate-50')}
       onMouseOver={() => setActive(true)}
       onFocus={e => {
         if (e.relatedTarget instanceof HTMLInputElement) {
@@ -163,7 +165,7 @@ const AccountsCommand = ({
                 router.push(route);
               }}
               className={cn(
-                'flex items-center gap-2',
+                'flex items-center gap-2 text-muted-foreground hover:text-foreground',
                 active ? 'aria-selected:bg-slate-100' : 'aria-selected:bg-transparent',
               )}
             >
@@ -253,7 +255,10 @@ export default function AccountSwitcher({ activeSlug }) {
   if (!loggedInUserCollective) {
     return null;
   }
-
+  let parentAccount;
+  if (parentExistsAndIsAdministrated) {
+    parentAccount = allAdministratedAccounts.find(a => a.slug === activeAccount?.parentCollective?.slug);
+  }
   const selectedAccount = rootAccounts.find(a => a.slug === selectedValue);
   const childAccounts = selectedAccount?.children || [];
 
@@ -272,19 +277,42 @@ export default function AccountSwitcher({ activeSlug }) {
         setRootActive(parentExistsAndIsAdministrated ? false : true);
       }}
     >
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="group h-8 w-full justify-between gap-2 whitespace-nowrap rounded-full px-2 "
-        >
-          <div className="flex items-center gap-2 truncate">
-            <Avatar collective={activeAccount} radius={20} />
-            <div className="truncate">{activeAccount?.name}</div>
-          </div>
-          <ChevronsUpDown size={16} className="shrink-0 text-slate-500 group-hover:text-slate-900" />
-        </Button>
+      <PopoverTrigger>
+        <div className="flex items-center gap-2.5">
+          {parentAccount && (
+            <React.Fragment>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className={clsx(
+                  'group h-8 w-[14rem] justify-between gap-1.5 whitespace-nowrap rounded-full px-2',
+                  parentExistsAndIsAdministrated ? 'w-[14rem]' : 'w-auto',
+                )}
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <Avatar collective={parentAccount} radius={20} />
+                  <div className="truncate">{parentAccount.name}</div>
+                </div>
+                <ChevronsUpDown size={16} className="shrink-0 text-slate-500 group-hover:text-slate-900" />
+              </Button>
+              <DividerIcon size={32} className="-mx-4 text-slate-300" />
+            </React.Fragment>
+          )}
+
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={clsx('group h-8 max-w-[14rem] justify-between gap-1.5 whitespace-nowrap rounded-full px-2')}
+          >
+            <div className="flex items-center gap-2 truncate">
+              <Avatar collective={activeAccount} radius={20} />
+              <div className="truncate">{activeAccount?.name}</div>
+            </div>
+            <ChevronsUpDown size={16} className="shrink-0 text-slate-500 group-hover:text-slate-900" />
+          </Button>
+        </div>
       </PopoverTrigger>
 
       <PopoverContent
