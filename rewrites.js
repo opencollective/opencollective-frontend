@@ -381,4 +381,9 @@ exports.REWRITES = [
     source: '/:hostCollectiveSlug/terms',
     destination: '/terms-of-fiscal-sponsorship',
   },
+  // Robots.txt
+  {
+    source: '/robots.txt',
+    destination: '/api/robots',
+  },
 ];
