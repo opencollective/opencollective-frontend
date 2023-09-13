@@ -133,6 +133,7 @@ function Expense(props) {
         editedExpense: data?.expense,
         isPollingEnabled: false,
       }));
+      return;
     }
 
     handlePolling();
@@ -278,7 +279,7 @@ function Expense(props) {
           draftKey: data?.expense?.status === ExpenseStatus.DRAFT ? draftKey : null,
         },
       });
-      if (data?.expense?.type === expenseTypes.CHARGE) {
+      if (data?.expense?.type === expenseTypes.CHARGE || data?.expense?.status === ExpenseStatus.DRAFT) {
         await refetch();
       }
       const createdUser = editedExpense?.payee;

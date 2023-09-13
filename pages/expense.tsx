@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, omit } from 'lodash';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
@@ -67,7 +67,7 @@ export const getServerSideProps: GetServerSideProps<ExpensePageProps> = async ct
 
   return {
     props: {
-      ...query,
+      ...omit(query, 'key'),
       legacyExpenseId: parseInt(query.ExpenseId as string),
       draftKey: query.key || null,
       data,
