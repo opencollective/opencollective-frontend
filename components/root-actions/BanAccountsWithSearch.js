@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { stripHTML } from '../../lib/utils';
+import { stripHTML } from '../../lib/html';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';

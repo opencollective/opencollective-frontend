@@ -1,7 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import loadScript from 'load-script';
 import { isObject, omit } from 'lodash';
-import sanitizeHtml from 'sanitize-html';
 import { twMerge } from 'tailwind-merge';
 
 /**
@@ -254,8 +253,6 @@ export const flattenObjectDeep = obj =>
     (acc, k) => (typeof obj[k] === 'object' ? { ...acc, ...flattenObjectDeep(obj[k]) } : { ...acc, [k]: obj[k] }),
     {},
   );
-
-export const stripHTML = htmlContent => sanitizeHtml(htmlContent, { allowedTags: [], allowedAttributes: {} });
 
 export const omitDeep = (obj, keys) =>
   Object.keys(omit(obj, keys)).reduce(
