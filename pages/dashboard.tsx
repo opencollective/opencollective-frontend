@@ -33,6 +33,7 @@ import {
   Building,
   Coins,
   CreditCard,
+  CreditCardIcon,
   FileText,
   Hotel,
   LayoutDashboard,
@@ -62,9 +63,10 @@ const messages = defineMessages({
 });
 
 const getDefaultSectionForAccount = (account, loggedInUser) => {
+  const hasEnabledOverViewForCollectives = true;
   if (!account) {
     return null;
-  } else if (isIndividualAccount(account)) {
+  } else if (isIndividualAccount(account) || hasEnabledOverViewForCollectives) {
     return ALL_SECTIONS.DASHBOARD_OVERVIEW;
   } else if (isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
@@ -139,39 +141,67 @@ const getMenuItems = (intl, account) => {
     {
       label: 'Overview',
       section: ALL_SECTIONS.DASHBOARD_OVERVIEW,
-      href: getDashboardRoute(account, 'overview'),
       Icon: LayoutDashboard,
     },
     {
       label: 'Expenses',
       section: isHost ? ALL_SECTIONS.HOST_EXPENSES : ALL_SECTIONS.EXPENSES,
-      href: getDashboardRoute(account, isHost ? 'host-expenses' : 'expenses'),
       Icon: Receipt,
+    },
+    {
+      label: 'Contributions',
+      sections: [ALL_SECTIONS.CONTRIBUTORS, ALL_SECTIONS.CONTRIBUTIONS],
+      Icon: Coins,
+      if: !isIndividual && !isHost,
+      subMenu: [
+        {
+          label: 'Incoming',
+          section: ALL_SECTIONS.CONTRIBUTORS,
+        },
+        {
+          label: 'Outgoing',
+          section: ALL_SECTIONS.CONTRIBUTIONS,
+        },
+      ],
+    },
+    {
+      label: 'Tiers',
+      section: ALL_SECTIONS.TIERS,
+      Icon: Users,
+      if: !isIndividual && !isHost,
+    },
+    // {
+    //   label: 'Projects & Events',
+    //   sections: ['projects', 'events'],
+    //   Icon: Users,
+    //   if: !isIndividual && !isHost,
+    // },
+    {
+      label: 'Virtual Cards',
+      section: ALL_SECTIONS.VIRTUAL_CARDS,
+      Icon: CreditCardIcon,
+      if: !isIndividual && !isHost,
     },
     // host tools
     {
       label: 'Contributions',
       section: ALL_SECTIONS.FINANCIAL_CONTRIBUTIONS,
-      href: getDashboardRoute(account, 'orders'),
       Icon: Coins,
       if: isHost,
     },
     {
       label: 'Collectives',
       sections: [ALL_SECTIONS.HOSTED_COLLECTIVES, ALL_SECTIONS.HOST_APPLICATIONS],
-      href: getDashboardRoute(account, 'hosted-collectives'),
       Icon: Building,
       if: isHost,
       subMenu: [
         {
           label: 'Hosted Collectives',
           section: ALL_SECTIONS.HOSTED_COLLECTIVES,
-          href: getDashboardRoute(account, 'hosted-collectives'),
         },
         {
           label: 'Applications',
           section: ALL_SECTIONS.HOST_APPLICATIONS,
-          href: getDashboardRoute(account, 'host-applications'),
           badge: 15,
         },
       ],
@@ -179,26 +209,22 @@ const getMenuItems = (intl, account) => {
     {
       label: 'Virtual Cards',
       sections: [ALL_SECTIONS.HOST_VIRTUAL_CARDS, ALL_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS],
-      href: getDashboardRoute(account, 'host-virtual-cards'),
       Icon: CreditCard,
       if: isHost,
       subMenu: [
         {
           label: 'Virtual Cards',
           section: ALL_SECTIONS.HOST_VIRTUAL_CARDS,
-          href: getDashboardRoute(account, 'host-virtual-cards'),
         },
         {
           label: 'Requests',
           section: ALL_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS,
-          href: getDashboardRoute(account, 'host-virtual-card-requests'),
         },
       ],
     },
     {
       label: 'Reports',
       section: ALL_SECTIONS.REPORTS,
-      href: getDashboardRoute(account, 'reports'),
       Icon: BarChart2,
       if: isHost,
     },
@@ -210,41 +236,35 @@ const getMenuItems = (intl, account) => {
       if: isHost,
     },
 
-    {
-      label: 'Contributors',
-      section: ALL_SECTIONS.CONTRIBUTORS,
-      href: getDashboardRoute(account, 'contributors'),
-      Icon: Users,
-      if: !isIndividual && !isHost,
-    },
+    // {
+    //   label: 'Contributors',
+    //   section: ALL_SECTIONS.CONTRIBUTORS,
+    //   Icon: Users,
+    //   if: !isIndividual && !isHost,
+    // },
     {
       label: 'Contributions',
       section: ALL_SECTIONS.CONTRIBUTIONS,
-      href: getDashboardRoute(account, 'contributions'),
       Icon: Coins,
-      if: !isHost,
+      if: isIndividual,
     },
     {
       label: 'Transactions',
       section: ALL_SECTIONS.TRANSACTIONS,
-      href: getDashboardRoute(account, 'transactions'),
       Icon: ArrowRightLeft,
     },
     {
       label: 'Settings',
       sections: [ALL_SECTIONS.INFO, ALL_SECTIONS.COLLECTIVE_PAGE],
-      href: getDashboardRoute(account, 'info'),
       Icon: Settings,
       subMenu: [
         {
           label: 'Info',
           section: ALL_SECTIONS.INFO,
-          href: getDashboardRoute(account, 'info'),
         },
         {
           label: 'Profile page',
           section: ALL_SECTIONS.COLLECTIVE_PAGE,
-          href: getDashboardRoute(account, ALL_SECTIONS.COLLECTIVE_PAGE),
         },
       ],
     },
@@ -270,6 +290,7 @@ const getMenuItems = (intl, account) => {
   //   };
   // }
   return {
+    menu: { slug: account.slug, items: filteredItems },
     menuItems: filteredItems,
     allItems: flatArray,
   };
@@ -289,6 +310,7 @@ const DashboardPage = () => {
 
   const activeSlug = slug || lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
 
+  console.log({ activeSlugInPage: activeSlug, lastWorkspaceVisit });
   const { data, loading } = useQuery(adminPanelQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: activeSlug },
@@ -299,7 +321,9 @@ const DashboardPage = () => {
 
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
+    console.log('useEffect', activeSlug);
     if (activeSlug && activeSlug !== lastWorkspaceVisit.slug) {
+      console.log('setting last workspace visit', activeSlug);
       setLastWorkspaceVisit({ slug: activeSlug });
     }
     // If there is no slug set (that means /dashboard)
@@ -324,12 +348,12 @@ const DashboardPage = () => {
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
   const useHorizontalNav = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.BREADCRUMB_NAV);
-  const { menuItems, allItems } = account ? getMenuItems(intl, account) : { menuItems: [], allItems: [] };
+  const { menu, allItems } = account ? getMenuItems(intl, account) : { menu: { items: [] }, allItems: [] };
 
   const subMenu = allItems.find(item => item.sections?.includes(selectedSection))?.subMenu;
 
   return (
-    <DashboardContext.Provider value={{ selectedSection, expandedSection, setExpandedSection, account }}>
+    <DashboardContext.Provider value={{ selectedSection, expandedSection, setExpandedSection, account, activeSlug }}>
       <Page
         noRobots
         collective={account}
@@ -363,12 +387,9 @@ const DashboardPage = () => {
             {useHorizontalNav ? (
               <TopBar
                 isLoading={isLoading}
-                collective={account}
-                activeSlug={activeSlug}
-                selectedSection={selectedSection}
-                expandedSection={expandedSection}
+                account={account}
                 isAccountantOnly={LoggedInUser?.isAccountantOnly(account)}
-                menuItems={menuItems}
+                menu={menu}
               />
             ) : (
               <AdminPanelSideBar
@@ -395,7 +416,7 @@ const DashboardPage = () => {
                       {subMenu.map(item => (
                         <Link
                           key={item.label}
-                          href={item.href}
+                          href={getDashboardRoute(account, item.section)}
                           className={clsx(
                             '-ml-px flex items-center justify-start gap-2 px-4 py-0.5 font-medium transition-colors',
                             selectedSection === item.section

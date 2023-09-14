@@ -26,6 +26,7 @@ import { cn } from '../../lib/utils';
 import ProfileMenu from './ProfileMenu';
 import SiteMenu from './SiteMenu';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { DashboardContext } from '../dashboard/DashboardContext';
 
 const MobileFooterBar = styled(Flex)`
   position: fixed;
@@ -69,53 +70,64 @@ const MobileFooterIconContainer = styled(Box)`
   border-radius: 24px;
 `;
 
-const MainNavItem = styled(Link)`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 340px;
-  flex-shrink: 1;
-  color: #0f172a;
-  font-size: 14px;
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 100px;
-  white-space: nowrap;
-  transition-property: color, background-color;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-  text-overflow: ellipsis;
-  overflow: hidden;
+// const MainNavItem = styled(Link)`
+//   display: flex;
+//   align-items: center;
+//   gap: 8px;
+//   max-width: 340px;
+//   flex-shrink: 1;
+//   color: #0f172a;
+//   font-size: 14px;
+//   height: 32px;
+//   padding: 0 12px;
+//   border-radius: 100px;
+//   white-space: nowrap;
+//   transition-property: color, background-color;
+//   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+//   transition-duration: 150ms;
+//   text-overflow: ellipsis;
+//   overflow: hidden;
 
-  ${props =>
-    props.href &&
-    css`
-      @media (hover: hover) {
-        :hover {
-          color: #0f172a !important;
-          background-color: #f1f5f9;
-        }
-      }
-    `}
-  ${props =>
-    props.href &&
-    css`
-      &:hover {
-        color: #0f172a !important;
-        background-color: #f1f5f9;
-      }
-    }
-  `}
-  ${props => props.primary && `border: 1px solid #d1d5db;`}
-  font-weight: ${props => (props.lightWeight ? `400` : '500')};
-  ${props => props.isActive && `background-color: #f1f5f9;`}
+//   ${props =>
+//     props.href &&
+//     css`
+//       @media (hover: hover) {
+//         :hover {
+//           color: #0f172a !important;
+//           background-color: #f1f5f9;
+//         }
+//       }
+//     `}
+//   ${props =>
+//     props.href &&
+//     css`
+//       &:hover {
+//         color: #0f172a !important;
+//         background-color: #f1f5f9;
+//       }
+//     }
+//   `}
+//   ${props => props.primary && `border: 1px solid #d1d5db;`}
+//   font-weight: ${props => (props.lightWeight ? `400` : '500')};
+//   ${props => props.isActive && `background-color: #f1f5f9;`}
 
-  span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-`;
+//   span {
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+//     white-space: nowrap;
+//   }
+// `;
+
+const MainNavItem = props => {
+  return (
+    <Link
+      {...props}
+      className="flex h-8 shrink items-center gap-2 truncate whitespace-nowrap rounded-full px-1 text-sm font-medium text-foreground transition-colors hover:bg-slate-50 md:px-3"
+    >
+      {props.children}
+    </Link>
+  );
+};
 
 const MobileFooterMenu = ({ onDashboardRoute, onSearchRoute }) => {
   const { direction, accPosition } = useWindowScroll();
@@ -166,11 +178,7 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
   const router = useRouter();
-  const [lastWorkspaceVisit] = useLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE, {
-    slug: LoggedInUser?.collective.slug,
-  });
-
-  const activeSlug = router.query.slug || lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
+  const { activeSlug } = React.useContext(DashboardContext);
 
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
@@ -188,9 +196,9 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
 
   return (
     <Fragment>
-      <div className="border-b bg-white px-4 md:px-6" ref={ref}>
-        <div className="flex h-16 items-center justify-between gap-2 py-4">
-          <div className="flex items-center gap-3">
+      <div className="border-b bg-white px-3 md:px-6" ref={ref}>
+        <div className="flex h-16 max-w-full items-center justify-between gap-1 py-4 md:gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 md:gap-3">
             {hasBreadCrumbNav && <SiteMenu />}
             <Box flexShrink={0}>
               <Link href={ocLogoRoute}>
@@ -202,20 +210,23 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
           </div>
 
           {hasBreadCrumbNav ? (
-            <div className="flex flex-1 items-center gap-2">
+            <div className="flex shrink grow basis-0 items-center justify-start gap-1 overflow-hidden md:gap-2">
               {onDashboardRoute ? (
                 <React.Fragment>
                   <MainNavItem href="/dashboard">
-                    <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+                    <span className="truncate">
+                      <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+                    </span>
                   </MainNavItem>
-                  <DividerIcon size={32} className="-ml-4 -mr-3 text-slate-300" />
+                  {/* */}
+                  <DividerIcon size={32} className="-ml-4 -mr-3 shrink-0 text-slate-300" />
                   <AccountSwitcher activeSlug={activeSlug} />
                   <Link
                     href={getCollectivePageRoute(account)}
                     className={cn(
-                      'group flex items-center justify-center rounded-full border px-0 text-sm font-medium leading-6 antialiased transition-colors hover:border-border lg:border-transparent lg:px-2.5',
+                      'group shrink-0 items-center justify-center rounded-full border px-0 text-sm font-medium leading-6 antialiased transition-colors hover:border-border lg:border-transparent lg:px-2.5',
                       'text-foreground hover:bg-slate-50 hover:text-foreground',
-                      'h-8 w-8 lg:w-auto',
+                      'hidden h-8 w-8 sm:flex lg:w-auto',
                     )}
                   >
                     <Globe2 className="block text-muted-foreground group-hover:text-foreground lg:hidden" size={16} />
@@ -245,24 +256,23 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
               )}
             </div>
           ) : (
-            <Flex flex={1} alignItems="center" gridGap={3} overflow={'hidden'}>
+            <div className="flex flex-1 items-center gap-4">
               <MainNavItem href="/dashboard" isActive={onDashboardRoute}>
                 <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
               </MainNavItem>
               <MainNavItem href="/search" isActive={onSearchRoute}>
                 <FormattedMessage id="Explore" defaultMessage="Explore" />
               </MainNavItem>
-            </Flex>
+            </div>
           )}
-
-          <Flex alignItems="center" gridGap={2} flexShrink={4} flexGrow={0}>
+          <div className="flex grow-0 items-center gap-1 md:gap-2">
             <SearchTrigger setShowSearchModal={setShowSearchModal} />
 
             <div className="hidden sm:block">
               <ChangelogTrigger />
             </div>
             <ProfileMenu />
-          </Flex>
+          </div>
         </div>
       </div>
       <SearchModal open={showSearchModal} setOpen={open => setShowSearchModal(open)} />

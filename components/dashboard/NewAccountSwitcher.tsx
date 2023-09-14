@@ -252,9 +252,10 @@ export default function AccountSwitcher({ activeSlug }) {
 
   const [rootActive, setRootActive] = React.useState(true);
 
-  if (!loggedInUserCollective) {
+  if (!loggedInUserCollective || !activeSlug) {
     return null;
   }
+
   let parentAccount;
   if (parentExistsAndIsAdministrated) {
     parentAccount = allAdministratedAccounts.find(a => a.slug === activeAccount?.parentCollective?.slug);
@@ -277,7 +278,7 @@ export default function AccountSwitcher({ activeSlug }) {
         setRootActive(parentExistsAndIsAdministrated ? false : true);
       }}
     >
-      <PopoverTrigger>
+      <PopoverTrigger asChild>
         <div className="flex items-center gap-2.5">
           {parentAccount && (
             <React.Fragment>
@@ -304,7 +305,9 @@ export default function AccountSwitcher({ activeSlug }) {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className={clsx('group h-8 max-w-[14rem] justify-between gap-1.5 whitespace-nowrap rounded-full px-2')}
+            className={clsx(
+              'group h-8 max-w-[8rem] justify-between gap-1.5 whitespace-nowrap rounded-full px-2 md:max-w-[14rem]',
+            )}
           >
             <div className="flex items-center gap-2 truncate">
               <Avatar collective={activeAccount} radius={20} />

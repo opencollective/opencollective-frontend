@@ -7,6 +7,7 @@ type DashboardContextType = {
   expandedSection: string | null;
   setExpandedSection: (section: string | null) => void;
   account: any;
+  activeSlug: string | null;
 };
 
 export const DashboardContext = React.createContext<DashboardContextType>({
@@ -14,4 +15,5 @@ export const DashboardContext = React.createContext<DashboardContextType>({
   expandedSection: null,
   setExpandedSection: () => {},
   account: null,
+  activeSlug: null,
 });

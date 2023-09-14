@@ -66,9 +66,7 @@ const AdminPanelSideBar = ({
     >
       <div className="sticky top-8 z-10">
         <div className="flex flex-row-reverse gap-4 sm:flex-auto md:flex-col">
-          {!LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.BREADCRUMB_NAV) && (
-            <AccountSwitcher activeSlug={activeSlug} />
-          )}
+          <AccountSwitcher activeSlug={activeSlug} />
 
           {isMobile && (
             <React.Fragment>
