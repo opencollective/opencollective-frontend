@@ -12,11 +12,18 @@ export enum VIEWPORTS {
   SMALL = 'SMALL',
   MEDIUM = 'MEDIUM',
   LARGE = 'LARGE',
+  XLARGE = 'XLARGE',
   UNKNOWN = 'UNKNOWN',
 }
 
 // Please keep the same length for these two arrays
-export const BREAKPOINTS_NAMES = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL, VIEWPORTS.MEDIUM, VIEWPORTS.LARGE];
+export const BREAKPOINTS_NAMES = [
+  VIEWPORTS.XSMALL,
+  VIEWPORTS.SMALL,
+  VIEWPORTS.MEDIUM,
+  VIEWPORTS.LARGE,
+  VIEWPORTS.XLARGE,
+];
 export const BREAKPOINTS_WIDTHS = BREAKPOINTS_NAMES.map((_, idx) => emToPx(breakpoints[idx]));
 export const BREAKPOINTS = zipObject(BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS) as Record<
   (typeof BREAKPOINTS_NAMES)[number],
@@ -46,7 +53,7 @@ export const isDesktopOrAbove = viewport => {
 /** Returns the name of the viewport based on max-width media selector (see `BREAKPOINTS_NAMES`) */
 export const getViewportFromWidth = width => {
   const breakpointIdx = findIndex(BREAKPOINTS_WIDTHS, b => width <= b);
-  return breakpointIdx === -1 ? VIEWPORTS.LARGE : BREAKPOINTS_NAMES[breakpointIdx];
+  return breakpointIdx === -1 ? VIEWPORTS.XLARGE : BREAKPOINTS_NAMES[breakpointIdx];
 };
 
 /** Function to build component's state */

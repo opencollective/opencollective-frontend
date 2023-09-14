@@ -241,12 +241,14 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
                   <Link
                     href={getCollectivePageRoute(account)}
                     className={cn(
-                      'group shrink-0 items-center justify-center rounded-full border border-transparent px-3 text-sm font-medium leading-6 antialiased transition-colors hover:border-border',
+                      'group shrink-0 items-center justify-center rounded-full border border-border text-sm font-medium leading-6 antialiased transition-colors hover:border-border sm:border-transparent',
                       'text-muted-foreground hover:bg-slate-50 hover:text-foreground',
-                      'flex h-8 ',
+                      'flex h-8 w-8 px-0 sm:w-auto sm:px-3',
                     )}
                   >
-                    <span className=" flex items-center gap-x-1.5 ">
+                    <Globe2 className="block text-muted-foreground group-hover:text-foreground sm:hidden" size={16} />
+
+                    <span className="  hidden items-center gap-x-1.5 sm:flex">
                       Public profile
                       <ArrowRight
                         size={16}

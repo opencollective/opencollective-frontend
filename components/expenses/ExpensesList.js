@@ -79,12 +79,6 @@ const ExpensesList = ({
   openExpenseLegacyId,
 }) => {
   // Initial values for expense in drawer
-  const expenseInDrawer = React.useMemo(() => {
-    if (openExpenseLegacyId) {
-      const expense = expenses?.find(e => e.legacyId === openExpenseLegacyId);
-      return expense || null;
-    }
-  }, [openExpenseLegacyId, expenses]);
 
   if (!expenses?.length && !isLoading) {
     return null;
@@ -92,11 +86,6 @@ const ExpensesList = ({
 
   return (
     <StyledCard>
-      <ExpenseDrawer
-        openExpenseLegacyId={openExpenseLegacyId}
-        handleClose={() => setOpenExpenseLegacyId(null)}
-        initialExpenseValues={expenseInDrawer}
-      />
       {isLoading ? (
         [...new Array(nbPlaceholders)].map((_, idx) => (
           // eslint-disable-next-line react/no-array-index-key

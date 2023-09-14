@@ -36,6 +36,7 @@ import StyledButton from '../StyledButton';
 import ExpenseStats from '../dashboard/sections/Home/ExpenseStats';
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
+import ExpenseDrawer from '../expenses/ExpenseDrawer';
 
 const hostDashboardExpensesQuery = gql`
   query HostDashboardExpenses(
@@ -273,8 +274,24 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
       router.replace(pageRoute, omit(query, 'paypalApprovalError'), { shallow: true });
     }
   }, [query.paypalApprovalError]);
-
+  const openExpenseLegacyId = Number(router.query.openExpenseId);
+  const setOpenExpenseLegacyId = legacyId => {
+    router.push(
+      {
+        pathname: pageRoute,
+        query: getQueryParams({ ...query, openExpenseId: legacyId }),
+      },
+      undefined,
+      { shallow: true },
+    );
+  };
   const { data, error, loading } = expenses;
+  const expenseInDrawer = React.useMemo(() => {
+    if (openExpenseLegacyId) {
+      const expense = paginatedExpenses?.nodes?.find(e => e.legacyId === openExpenseLegacyId);
+      return expense || null;
+    }
+  }, [openExpenseLegacyId, expenses]);
 
   const views = React.useMemo(() => {
     if (!metaData) {
@@ -293,8 +310,8 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   };
 
   return (
-    <div className="grid grid-cols-5 gap-6">
-      <div className="col-span-3">
+    <div className="flex gap-6">
+      <div className="flex-1">
         <div className="mb-5 flex flex-wrap justify-between gap-4">
           <h1 className="text-2xl font-bold leading-10 tracking-tight">
             <FormattedMessage id="Expenses" defaultMessage="Expenses" />
@@ -335,7 +352,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
             )}
           </DismissibleMessage>
         )}
-        <Box mb={4}>
+        {/* <Box mb={4}>
           {!metaData?.host ? (
             <LoadingPlaceholder height={150} />
           ) : error ? (
@@ -343,7 +360,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
           ) : (
             <ExpenseStats host={metaData.host} />
           )}
-        </Box>
+        </Box> */}
         {/* <ScheduledExpensesBanner
         hostSlug={hostSlug}
         onSubmit={() => {
@@ -439,18 +456,9 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
               onProcess={(expense, cache) => {
                 hasFilters && onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData });
               }}
+              setOpenExpenseLegacyId={setOpenExpenseLegacyId}
+              openExpenseLegacyId={openExpenseLegacyId}
               useDrawer
-              openExpenseLegacyId={Number(router.query.openExpenseId)}
-              setOpenExpenseLegacyId={legacyId => {
-                router.push(
-                  {
-                    pathname: pageRoute,
-                    query: getQueryParams({ ...query, openExpenseId: legacyId }),
-                  },
-                  undefined,
-                  { shallow: true },
-                );
-              }}
             />
             <Flex mt={5} justifyContent="center">
               <Pagination
@@ -464,9 +472,12 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
           </React.Fragment>
         )}
       </div>
-      <div className="col-span-2 -my-6 -mr-8 flex-1 border-l bg-slate-50/50 p-6 text-muted-foreground">
-        <p>No expense selected</p>
-      </div>
+
+      <ExpenseDrawer
+        openExpenseLegacyId={openExpenseLegacyId}
+        handleClose={() => setOpenExpenseLegacyId(null)}
+        initialExpenseValues={expenseInDrawer}
+      />
     </div>
   );
 };

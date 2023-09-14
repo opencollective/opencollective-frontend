@@ -188,16 +188,21 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           {title || <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
         </h1>
-        <SearchBar
+        {/* <SearchBar
           height="40px"
           defaultValue={router.query.searchTerm}
           onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
           placeholder={intl.formatMessage(messages.searchPlaceholder)}
-        />
+        /> */}
       </div>
       <hr className="my-5" />
-      <Flex mb={34}>
-        <Box flexGrow="1" mr="18px">
+      <div className="mb-12 w-full">
+        <OrdersFilters
+          filters={router.query}
+          onChange={queryParams => updateQuery(router, { ...queryParams, offset: null })}
+          hasStatus={!status}
+        />
+        {/* <Box flexGrow="1" mr="18px">
           {data?.account ? (
             <OrdersFilters
               currency={data.account.currency}
@@ -207,8 +212,8 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
             />
           ) : loading ? (
             <LoadingPlaceholder height={70} />
-          ) : null}
-        </Box>
+          ) : null} */}
+        {/* </Box> */}
         {isHostAdmin && canCreatePendingOrder && (
           <React.Fragment>
             <StyledButton
@@ -232,8 +237,8 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
             )}
           </React.Fragment>
         )}
-      </Flex>
-      {Boolean(data?.account?.isHost && isHostAdmin) && <DisputedContributionsWarning hostSlug={accountSlug} />}
+      </div>
+      {/* {Boolean(data?.account?.isHost && isHostAdmin) && <DisputedContributionsWarning hostSlug={accountSlug} />} */}
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : !loading && !data.orders?.nodes.length ? (

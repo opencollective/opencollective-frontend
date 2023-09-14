@@ -6,6 +6,8 @@ import { Stripe } from '@styled-icons/fa-brands/Stripe';
 import { CreditCardIcon, InboxIcon, Receipt, X } from 'lucide-react';
 import { Badge } from '../../../ui/Badge';
 import React from 'react';
+import { isHostAccount, isIndividualAccount } from '../../../../lib/collective.lib';
+
 const chartData = [
   {
     revenue: 10400,
@@ -40,12 +42,51 @@ const chartData = [
     subscription: 189,
   },
 ];
-export default function Stats() {
-  const isHost = true;
+
+const individualDchartData = [
+  {
+    revenue: 500,
+    subscription: 240,
+  },
+  {
+    revenue: 1204,
+    subscription: 300,
+  },
+  {
+    revenue: 2105,
+    subscription: 200,
+  },
+  {
+    revenue: 2421,
+    subscription: 278,
+  },
+  {
+    revenue: 2323,
+    subscription: 189,
+  },
+  {
+    revenue: 2385,
+    subscription: 239,
+  },
+  {
+    revenue: 2504,
+    subscription: 278,
+  },
+  {
+    revenue: 2484,
+    subscription: 189,
+  },
+];
+
+export default function Stats({ account }) {
+  const isHost = isHostAccount(account);
+  const isIndividual = isIndividualAccount(account);
+  const isCollective = !isHost && !isIndividual;
+
   if (isHost) {
     return (
       <div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Paypal balance</CardTitle>
@@ -178,8 +219,97 @@ export default function Stats() {
       </div>
     );
   }
+  if (isCollective) {
+    return (
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-base font-normal">Raised</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">$7,421.89</div>
+            {/* <div className="h-[80px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={chartData}
+                  margin={{
+                    top: 5,
+                    right: 10,
+                    left: 10,
+                    bottom: 0,
+                  }}
+                >
+                  <Line
+                    type="monotone"
+                    strokeWidth={2}
+                    dataKey="revenue"
+                    activeDot={{
+                      r: 6,
+                      style: { fill: 'var(--theme-primary)', opacity: 0.25 },
+                    }}
+                    style={
+                      {
+                        stroke: 'var(--theme-primary)',
+                        '--theme-primary': `hsl(221.2 83.2% 53.3%)`,
+                      } as React.CSSProperties
+                    }
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div> */}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-base font-normal">Disbursed</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">$5,323.32</div>
+            {/* <div className="h-[80px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={chartData}
+                  margin={{
+                    top: 5,
+                    right: 10,
+                    left: 10,
+                    bottom: 0,
+                  }}
+                >
+                  <Line
+                    type="monotone"
+                    strokeWidth={2}
+                    dataKey="revenue"
+                    activeDot={{
+                      r: 6,
+                      style: { fill: 'var(--theme-primary)', opacity: 0.25 },
+                    }}
+                    style={
+                      {
+                        stroke: 'var(--theme-primary)',
+                        '--theme-primary': `hsl(221.2 83.2% 53.3%)`,
+                      } as React.CSSProperties
+                    }
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div> */}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Collective balance</CardTitle>
+            {/* <PayPal size={16} /> */}
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">$12,521.34</div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
   return (
-    <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-2">
+    <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-base font-normal">Received</CardTitle>
@@ -190,7 +320,7 @@ export default function Stats() {
           <div className="h-[80px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
-                data={chartData}
+                data={individualDchartData}
                 margin={{
                   top: 5,
                   right: 10,
