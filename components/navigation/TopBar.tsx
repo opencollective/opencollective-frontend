@@ -27,6 +27,7 @@ import ProfileMenu from './ProfileMenu';
 import SiteMenu from './SiteMenu';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { DashboardContext } from '../dashboard/DashboardContext';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const MobileFooterBar = styled(Flex)`
   position: fixed;
@@ -178,7 +179,7 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
   const router = useRouter();
-  const { activeSlug } = React.useContext(DashboardContext);
+  const { activeSlug, defaultSlug, setDefaultSlug } = React.useContext(DashboardContext);
 
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
@@ -220,19 +221,37 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
                   </MainNavItem>
                   {/* */}
                   <DividerIcon size={32} className="-ml-4 -mr-3 shrink-0 text-slate-300" />
-                  <AccountSwitcher activeSlug={activeSlug} />
+                  <AccountSwitcher activeSlug={activeSlug} defaultSlug={defaultSlug} setDefaultSlug={setDefaultSlug} />
+                  {/* <Tooltip>
+                    <TooltipTrigger>
+                      <Link
+                        href={getCollectivePageRoute(account)}
+                        className={cn(
+                          'group shrink-0 items-center justify-center rounded-full border border-transparent px-0 text-sm font-medium leading-6 antialiased transition-colors hover:border-border',
+                          'text-foreground hover:bg-slate-50',
+                          'flex h-8 w-8',
+                        )}
+                      >
+                        <Globe2 className="block text-muted-foreground group-hover:text-foreground" size={16} />
+                      
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Go to public profile</TooltipContent>
+                  </Tooltip> */}
                   <Link
                     href={getCollectivePageRoute(account)}
                     className={cn(
-                      'group shrink-0 items-center justify-center rounded-full border px-0 text-sm font-medium leading-6 antialiased transition-colors hover:border-border lg:border-transparent lg:px-2.5',
-                      'text-foreground hover:bg-slate-50 hover:text-foreground',
-                      'hidden h-8 w-8 sm:flex lg:w-auto',
+                      'group shrink-0 items-center justify-center rounded-full border border-transparent px-3 text-sm font-medium leading-6 antialiased transition-colors hover:border-border',
+                      'text-muted-foreground hover:bg-slate-50 hover:text-foreground',
+                      'flex h-8 ',
                     )}
                   >
-                    <Globe2 className="block text-muted-foreground group-hover:text-foreground lg:hidden" size={16} />
-                    <span className="hidden items-center gap-x-1.5 lg:flex">
+                    <span className=" flex items-center gap-x-1.5 ">
                       Public profile
-                      <ArrowRight size={16} className="group-hover:animate-arrow-right" />
+                      <ArrowRight
+                        size={16}
+                        className="text-muted-foreground group-hover:animate-arrow-right group-hover:text-inherit"
+                      />
                     </span>
                   </Link>
                 </React.Fragment>

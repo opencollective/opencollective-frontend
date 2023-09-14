@@ -307,9 +307,9 @@ const DashboardPage = () => {
   const [lastWorkspaceVisit, setLastWorkspaceVisit] = useLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE, {
     slug: LoggedInUser?.collective.slug,
   });
+  const defaultSlug = lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
 
-  const activeSlug = slug || lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
-
+  const activeSlug = slug || defaultSlug;
   console.log({ activeSlugInPage: activeSlug, lastWorkspaceVisit });
   const { data, loading } = useQuery(adminPanelQuery, {
     context: API_V2_CONTEXT,
@@ -318,13 +318,16 @@ const DashboardPage = () => {
   });
   const account = data?.account;
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
+  const useHorizontalNav = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.BREADCRUMB_NAV);
 
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
     console.log('useEffect', activeSlug);
     if (activeSlug && activeSlug !== lastWorkspaceVisit.slug) {
       console.log('setting last workspace visit', activeSlug);
-      setLastWorkspaceVisit({ slug: activeSlug });
+      if (!useHorizontalNav) {
+        setLastWorkspaceVisit({ slug: activeSlug });
+      }
     }
     // If there is no slug set (that means /dashboard)
     // And if there is an activeSlug (this means lastWorkspaceVisit OR LoggedInUser)
@@ -347,13 +350,22 @@ const DashboardPage = () => {
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
-  const useHorizontalNav = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.BREADCRUMB_NAV);
   const { menu, allItems } = account ? getMenuItems(intl, account) : { menu: { items: [] }, allItems: [] };
 
   const subMenu = allItems.find(item => item.sections?.includes(selectedSection))?.subMenu;
 
   return (
-    <DashboardContext.Provider value={{ selectedSection, expandedSection, setExpandedSection, account, activeSlug }}>
+    <DashboardContext.Provider
+      value={{
+        selectedSection,
+        expandedSection,
+        setExpandedSection,
+        account,
+        activeSlug,
+        defaultSlug,
+        setDefaultSlug: slug => setLastWorkspaceVisit({ slug }),
+      }}
+    >
       <Page
         noRobots
         collective={account}
@@ -407,7 +419,7 @@ const DashboardPage = () => {
               <div
                 className={clsx(
                   'flex  flex-1 justify-center gap-4 sm:overflow-x-clip',
-                  useHorizontalNav ? ' px-4 md:px-8' : '',
+                  useHorizontalNav ? ' px-3 md:px-6' : '',
                 )}
               >
                 {useHorizontalNav && subMenu?.length && (

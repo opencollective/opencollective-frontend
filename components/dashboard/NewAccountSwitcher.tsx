@@ -2,7 +2,7 @@ import * as React from 'react';
 import { cx } from 'class-variance-authority';
 import { useCommandState } from 'cmdk';
 import { flatten, groupBy, uniqBy } from 'lodash';
-import { Check, ChevronsUpDown, PlusCircle } from 'lucide-react';
+import { Bookmark, Check, ChevronsUpDown, PlusCircle, Star } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -18,6 +18,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import DividerIcon from '../DividerIcon';
 import clsx from 'clsx';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const CREATE_NEW_BUTTONS = {
   [CollectiveType.COLLECTIVE]: {
@@ -38,6 +39,54 @@ const CREATE_NEW_BUTTONS = {
   },
 };
 
+const AccountItem = ({ account, active, isChild, setOpen, activeAccount, defaultSlug, setDefaultSlug, selected }) => {
+  const router = useRouter();
+  return (
+    <CommandItem
+      key={account.slug}
+      onSelect={() => {
+        router.push(`/dashboard/${account.slug}`);
+        setOpen(false);
+      }}
+      value={account.slug}
+      className={cn(
+        'group flex items-center justify-between',
+        selected && !active && !isChild && 'bg-slate-200',
+        active ? 'aria-selected:bg-slate-100' : 'aria-selected:bg-transparent',
+      )}
+    >
+      <div className="flex items-center gap-2 truncate">
+        <Avatar collective={account} radius={16} />
+        <span className="truncate">{account.name}</span>
+      </div>
+      <div className="flex items-center gap-1">
+        {!isChild && (
+          <Tooltip>
+            <TooltipTrigger>
+              <Star
+                onClick={e => {
+                  const isDefault = defaultSlug === account.slug;
+                  if (!isDefault) {
+                    e.stopPropagation();
+                    setDefaultSlug(account.slug);
+                  }
+                }}
+                size={16}
+                className={clsx(
+                  'text-muted-foreground transition-colors hover:text-foreground',
+                  defaultSlug !== account.slug && 'hidden text-slate-400 group-hover:block',
+                )}
+              />
+            </TooltipTrigger>
+            {defaultSlug !== account.slug && <TooltipContent side="right">Set as default</TooltipContent>}
+          </Tooltip>
+        )}
+        {activeAccount?.slug === account.slug && <Check className={'h-4 w-4'} />}
+      </div>
+    </CommandItem>
+  );
+};
+
 const AccountsCommand = ({
   active,
   isChild,
@@ -53,6 +102,8 @@ const AccountsCommand = ({
   loggedInUserCollective,
   archivedAccounts,
   selectedParentSlug,
+  setDefaultSlug,
+  defaultSlug,
 }) => {
   const intl = useIntl();
   const router = useRouter();
@@ -114,50 +165,36 @@ const AccountsCommand = ({
       {/* TODO: include in Grouped Accounts */}
       {!isChild && (
         <CommandGroup heading={intl.formatMessage({ defaultMessage: 'Personal Account' })} hidden>
-          <CommandItem
-            key={loggedInUserCollective.slug}
-            onSelect={() => {
-              router.push(`/dashboard/${loggedInUserCollective.slug}`);
-              setOpen(false);
-            }}
-            value={loggedInUserCollective.slug}
-            className={cn(
-              'flex cursor-pointer items-center justify-between',
-              active ? 'aria-selected:bg-slate-100' : 'aria-selected:bg-transparent',
-            )}
-          >
-            <div className="flex items-center gap-2 truncate">
-              <Avatar collective={loggedInUserCollective} radius={16} />
-              <span className="truncate">{loggedInUserCollective?.name}</span>
-            </div>
-            {activeAccount?.slug === loggedInUserCollective?.slug && <Check className={cn('mr-2 h-4 w-4')} />}
-          </CommandItem>
+          <AccountItem
+            account={loggedInUserCollective}
+            activeAccount={activeAccount}
+            setOpen={setOpen}
+            active={active}
+            selected={selectedValue === loggedInUserCollective.slug}
+            isChild={isChild}
+            defaultSlug={defaultSlug}
+            setDefaultSlug={setDefaultSlug}
+          />
         </CommandGroup>
       )}
       {Object.entries(groupedAccounts).map(([collectiveType, accounts]) => {
         return (
           <CommandGroup key={collectiveType} heading={formatCollectiveType(intl, collectiveType, 2)}>
-            {accounts.map(account => (
-              <CommandItem
-                key={account.slug}
-                onSelect={() => {
-                  router.push(`/dashboard/${account.slug}`);
-                  setOpen(false);
-                }}
-                value={account.slug}
-                className={cn(
-                  'flex items-center justify-between',
-                  selectedValue === account.slug && !active && !isChild && 'bg-slate-200',
-                  active ? 'aria-selected:bg-slate-100' : 'aria-selected:bg-transparent',
-                )}
-              >
-                <div className="flex items-center gap-2 truncate">
-                  <Avatar collective={account} radius={16} />
-                  <span className="truncate">{account.name}</span>
-                </div>
-                {activeAccount?.slug === account.slug && <Check className={cn('mr-2 h-4 w-4')} />}
-              </CommandItem>
-            ))}
+            {accounts.map(account => {
+              return (
+                <AccountItem
+                  key={account.slug}
+                  account={account}
+                  activeAccount={activeAccount}
+                  setOpen={setOpen}
+                  active={active}
+                  selected={selectedValue === account.slug}
+                  isChild={isChild}
+                  defaultSlug={defaultSlug}
+                  setDefaultSlug={setDefaultSlug}
+                />
+              );
+            })}
             <CommandItem
               value={`${collectiveType}-create`}
               onSelect={() => {
@@ -220,7 +257,7 @@ const getGroupedChildAccounts = memoizeOne(accounts => {
   return { groupedAccounts, archivedAccounts };
 });
 
-export default function AccountSwitcher({ activeSlug }) {
+export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlug }) {
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const [hasInitialized, setHasInitialized] = React.useState(false);
@@ -281,14 +318,14 @@ export default function AccountSwitcher({ activeSlug }) {
       <PopoverTrigger asChild>
         <div className="flex items-center gap-2.5">
           {parentAccount && (
-            <React.Fragment>
+            <div className="hidden items-center gap-2.5 md:flex">
               <Button
                 variant="outline"
                 role="combobox"
                 aria-expanded={open}
                 className={clsx(
-                  'group h-8 w-[14rem] justify-between gap-1.5 whitespace-nowrap rounded-full px-2',
-                  parentExistsAndIsAdministrated ? 'w-[14rem]' : 'w-auto',
+                  'group h-8 justify-between gap-1.5 whitespace-nowrap rounded-full border-transparent px-2 hover:border-border',
+                  parentExistsAndIsAdministrated ? 'max-w-[14rem]' : 'w-auto',
                 )}
               >
                 <div className="flex items-center gap-2 truncate">
@@ -298,7 +335,7 @@ export default function AccountSwitcher({ activeSlug }) {
                 <ChevronsUpDown size={16} className="shrink-0 text-slate-500 group-hover:text-slate-900" />
               </Button>
               <DividerIcon size={32} className="-mx-4 text-slate-300" />
-            </React.Fragment>
+            </div>
           )}
 
           <Button
@@ -306,7 +343,7 @@ export default function AccountSwitcher({ activeSlug }) {
             role="combobox"
             aria-expanded={open}
             className={clsx(
-              'group h-8 max-w-[8rem] justify-between gap-1.5 whitespace-nowrap rounded-full px-2 md:max-w-[14rem]',
+              'group h-8 max-w-[10rem] justify-between gap-1.5 whitespace-nowrap rounded-full px-2 sm:max-w-[14rem]',
             )}
           >
             <div className="flex items-center gap-2 truncate">
@@ -336,6 +373,8 @@ export default function AccountSwitcher({ activeSlug }) {
           activeAccount={activeAccount}
           loggedInUserCollective={loggedInUserCollective}
           archivedAccounts={archivedAccounts}
+          defaultSlug={defaultSlug}
+          setDefaultSlug={setDefaultSlug}
         />
 
         {showChildAccounts && (
