@@ -7,6 +7,7 @@ import { createGlobalStyle } from 'styled-components';
 
 import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
+import { getRequestIntl } from '../lib/i18n/request';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import sentryLib from '../server/sentry';
 
@@ -15,7 +16,6 @@ import CollectiveNotificationBar from '../components/collective-page/CollectiveN
 import { preloadCollectivePageGraphqlQueries } from '../components/collective-page/graphql/preload';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../components/collective-page/graphql/queries';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
-import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
@@ -65,8 +65,11 @@ class CollectivePage extends React.Component {
       res,
       query: { slug, status, step, mode, action },
     } = ctx;
-    if (res && req && (req.language || req.locale === 'en')) {
-      res.set('Cache-Control', 'public, s-maxage=300');
+    if (res && req) {
+      const { locale } = getRequestIntl(req);
+      if (locale === 'en') {
+        res.setHeader('Cache-Control', 'public, s-maxage=300');
+      }
     }
 
     let skipDataFromTree = false;
@@ -186,9 +189,9 @@ class CollectivePage extends React.Component {
       >
         <GlobalStyles />
         {loading ? (
-          <Container py={[5, 6]}>
+          <div className="py-16 sm:py-32">
             <Loading />
-          </Container>
+          </div>
         ) : (
           <React.Fragment>
             <CollectiveNotificationBar

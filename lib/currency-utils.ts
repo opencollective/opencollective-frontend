@@ -4,7 +4,7 @@ import { isNil, round } from 'lodash';
 import { CurrencyPrecision } from './constants/currency-precision';
 import { Amount, Currency } from './graphql/types/v2/graphql';
 
-type Options = {
+export type Options = {
   locale?: string;
   minimumFractionDigits?: number;
   precision?: number;

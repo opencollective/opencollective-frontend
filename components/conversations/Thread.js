@@ -104,7 +104,7 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
             return null;
         }
       })}
-      <hr />
+      <hr className="my-5" />
       {hasMore && fetchMore && (
         <Container margin="0.65rem">
           <StyledButton onClick={handleLoadMore} loading={loading} textTransform="capitalize">

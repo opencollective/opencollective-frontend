@@ -128,16 +128,16 @@ exports.REWRITES = [
   },
   {
     source: '/dashboard',
-    destination: '/workspace',
+    destination: '/dashboard',
   },
-  { source: '/workspace', destination: '/workspace' },
+  { source: '/workspace', destination: '/dashboard' },
   {
     source: '/dashboard/:slug/:section?/:subpath*',
-    destination: '/workspace',
+    destination: '/dashboard',
   },
   {
     source: '/workspace/:slug/:section?/:subpath*',
-    destination: '/workspace',
+    destination: '/dashboard',
   },
   {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',
@@ -359,6 +359,11 @@ exports.REWRITES = [
   {
     source: '/applications',
     destination: '/applications',
+  },
+  // Robots.txt
+  {
+    source: '/robots.txt',
+    destination: '/api/robots',
   },
   // Collective
   // ----------

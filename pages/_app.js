@@ -5,10 +5,10 @@ import App from 'next/app';
 import Router from 'next/router';
 import { SessionProvider } from 'next-auth/react';
 import NProgress from 'nprogress';
-import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
+import { getIntlProps } from '../lib/i18n/request';
 import theme from '../lib/theme';
 import defaultColors from '../lib/theme/colors';
 import withData from '../lib/withData';
@@ -39,12 +39,10 @@ import sentryLib from '../server/sentry';
 
 import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
 import GlobalToasts from '../components/GlobalToasts';
+import IntlProvider from '../components/intl/IntlProvider';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
 import ToastProvider from '../components/ToastProvider';
-
-// This is optional but highly recommended
-// since it prevents memory leak
-const cache = createIntlCache();
+import { TooltipProvider } from '../components/ui/Tooltip';
 
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
@@ -60,10 +58,7 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   static async getInitialProps({ Component, ctx, client }) {
-    // Get the `locale` and `messages` from the request object on the server.
-    // In the browser, use the same values that the server serialized.
-    const { locale, messages } = ctx?.req || window.__NEXT_DATA__.props;
-    const props = { pageProps: { skipDataFromTree: true }, scripts: {}, locale, messages };
+    const props = { pageProps: { skipDataFromTree: true }, scripts: {}, ...getIntlProps(ctx) };
 
     try {
       if (Component.getInitialProps) {
@@ -120,9 +115,7 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   render() {
-    const { client, Component, pageProps, scripts, locale, messages } = this.props;
-
-    const intl = createIntl({ locale: locale || 'en', defaultLocale: 'en', messages }, cache);
+    const { client, Component, pageProps, scripts, locale } = this.props;
 
     return (
       <Fragment>
@@ -130,18 +123,20 @@ class OpenCollectiveFrontendApp extends App {
           <ApolloProvider client={client}>
             <ThemeProvider theme={theme}>
               <StripeProviderSSR>
-                <RawIntlProvider value={intl}>
-                  <ToastProvider>
-                    <UserProvider>
-                      <NewsAndUpdatesProvider>
-                        <Component {...pageProps} />
-                        <GlobalToasts />
-                        <GlobalNewsAndUpdates />
-                        <TwoFactorAuthenticationModal />
-                      </NewsAndUpdatesProvider>
-                    </UserProvider>
-                  </ToastProvider>
-                </RawIntlProvider>
+                <IntlProvider locale={locale}>
+                  <TooltipProvider delayDuration={500} skipDelayDuration={100}>
+                    <ToastProvider>
+                      <UserProvider>
+                        <NewsAndUpdatesProvider>
+                          <Component {...pageProps} />
+                          <GlobalToasts />
+                          <GlobalNewsAndUpdates />
+                          <TwoFactorAuthenticationModal />
+                        </NewsAndUpdatesProvider>
+                      </UserProvider>
+                    </ToastProvider>
+                  </TooltipProvider>
+                </IntlProvider>
               </StripeProviderSSR>
             </ThemeProvider>
           </ApolloProvider>

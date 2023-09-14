@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { isHostAccount } from '../lib/collective.lib';
@@ -8,6 +9,7 @@ import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 import { AdminPanelContext } from '../components/admin-panel/AdminPanelContext';
 import AdminPanelSection from '../components/admin-panel/AdminPanelSection';
@@ -16,7 +18,9 @@ import { adminPanelQuery } from '../components/admin-panel/queries';
 import AdminPanelSideBar from '../components/admin-panel/SideBar';
 import AdminPanelTopBar from '../components/admin-panel/TopBar';
 import AuthenticatedPage from '../components/AuthenticatedPage';
+import Container from '../components/Container';
 import { Flex, Grid } from '../components/Grid';
+import LoadingGrid from '../components/LoadingGrid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
@@ -95,8 +99,22 @@ function getBlocker(LoggedInUser, account, section) {
 
 const AdminPanelPage = ({ slug, section, subpath }) => {
   const intl = useIntl();
+  const router = useRouter();
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
+  const needsRedirectToWorkspace =
+    LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
+
+  // Redirect to the new dashboard if the user has the feature flag enabled
+  React.useEffect(() => {
+    if (needsRedirectToWorkspace) {
+      let url = section ? `/dashboard/${slug}/${section}` : `/dashboard/${slug}`;
+      if (subpath) {
+        url += `/${subpath.join('/')}`;
+      }
+      router.replace(!window.location.search ? url : `${url}${window.location.search}`);
+    }
+  }, [LoggedInUser]);
 
   const account = data?.account;
   const notification = getNotification(intl, account);
@@ -127,6 +145,10 @@ const AdminPanelPage = ({ slug, section, subpath }) => {
             </MessageBox>
             {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
           </Flex>
+        ) : needsRedirectToWorkspace ? (
+          <Container display="flex" justifyContent="center" py={[5, null, 6]} px={2}>
+            <LoadingGrid />
+          </Container>
         ) : (
           <Grid
             gridTemplateColumns={['1fr', null, '208px 1fr']}

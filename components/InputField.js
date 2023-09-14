@@ -8,9 +8,9 @@ import { capitalize } from '../lib/utils';
 
 import SocialLinksFormField from './edit-collective/SocialLinksFormField';
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
+import { Switch } from './ui/Switch';
 import CollectiveTagsInput from './CollectiveTagsInput';
 import { Box, Flex } from './Grid';
-import InputSwitch from './InputSwitch';
 import InputTypeLocation from './InputTypeLocation';
 import StyledButton from './StyledButton';
 import StyledCheckbox from './StyledCheckbox';
@@ -22,7 +22,7 @@ import StyledTextarea from './StyledTextarea';
 import TimezonePicker from './TimezonePicker';
 
 const Label = ({ label, isPrivate }) => (
-  <label>
+  <label className="text-sm font-bold">
     {label}&nbsp;{isPrivate && <PrivateInfoIcon tooltipProps={{ containerVerticalAlign: 'text-bottom' }} />}
   </label>
 );
@@ -626,10 +626,10 @@ class InputField extends React.Component {
                   </Box>
                 )}
                 <Box width={[1, 10 / 12]}>
-                  <InputSwitch
+                  <Switch
                     name={field.name}
                     defaultChecked={field.defaultValue}
-                    onChange={event => this.handleChange(event.target.checked)}
+                    onCheckedChange={checked => this.handleChange(checked)}
                   />
                   {field.description && <HelpBlock>{field.description}</HelpBlock>}
                 </Box>
@@ -639,10 +639,10 @@ class InputField extends React.Component {
               <React.Fragment>
                 {field.label && <label>{capitalize(field.label)}</label>}
                 <div className="switch">
-                  <InputSwitch
+                  <Switch
                     name={field.name}
                     defaultChecked={field.defaultValue}
-                    onChange={event => this.handleChange(event.target.checked)}
+                    onCheckedChange={checked => this.handleChange(checked)}
                   />
                   {field.description && <HelpBlock>{field.description}</HelpBlock>}
                 </div>

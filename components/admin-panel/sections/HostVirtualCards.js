@@ -191,10 +191,10 @@ const HostVirtualCards = props => {
   return (
     <Fragment>
       <Box>
-        <P fontSize="24px" fontWeight="700" lineHeight="32px" mb={3}>
+        <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
-        </P>
-        <P>
+        </h1>
+        <p className="mb-4 text-muted-foreground">
           <FormattedMessage
             id="Host.VirtualCards.List.Description"
             defaultMessage="Make payments easier by creating virtual cards. One Collective can have multiple virtual cards. <learnMoreLink>Learn more</learnMoreLink>"
@@ -205,10 +205,8 @@ const HostVirtualCards = props => {
               }),
             }}
           />
-        </P>
-        <Box mt={3}>
-          <StripeVirtualCardComplianceStatement />
-        </Box>
+        </p>
+        <StripeVirtualCardComplianceStatement />
         <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters
             loading={loading}

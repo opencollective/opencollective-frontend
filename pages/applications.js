@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
-import { getWorkspaceRoute } from '../lib/url-helpers';
+import { getDashboardRoute } from '../lib/url-helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import { Flex } from '../components/Grid';
@@ -28,7 +28,7 @@ class Apps extends React.Component {
             <StyledLink
               href={
                 LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-                  ? getWorkspaceRoute(LoggedInUser.collective, 'for-developers')
+                  ? getDashboardRoute(LoggedInUser.collective, 'for-developers')
                   : `/${LoggedInUser.collective.slug}/admin/for-developers`
               }
             >
