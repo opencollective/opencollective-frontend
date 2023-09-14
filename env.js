@@ -43,9 +43,9 @@ const defaults = {
   OC_SECRET: crypto.randomBytes(16).toString('hex'),
   WISE_ENVIRONMENT: process.env.OC_ENV === 'production' ? 'production' : 'sandbox',
   API_PROXY: 'true',
+  SENTRY_TRACES_SAMPLE_RATE: null,
   OPENCOLLECTIVE_OAUTH_URL: 'https://opencollective.com',
   OPENCOLLECTIVE_OAUTH_SCOPES: 'email',
-  SENTRY_TRACES_SAMPLE_RATE: null,
 };
 
 if (['production', 'staging'].includes(process.env.OC_ENV)) {
