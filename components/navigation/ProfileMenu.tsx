@@ -15,13 +15,14 @@ import {
   Settings,
   User,
 } from 'lucide-react';
+import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
-import { cn } from '../../lib/utils';
+import { cn, parseToBoolean } from '../../lib/utils';
 
 import Avatar from '../Avatar';
 import Link from '../Link';
@@ -196,7 +197,7 @@ const ProfileMenu = () => {
 
             <Separator className="my-1" />
 
-            <MenuItem Icon={LogOut} onClick={() => logout()}>
+            <MenuItem Icon={LogOut} onClick={parseToBoolean(process.env.OAUTH_MODE) ? signOut : () => logout()}>
               <FormattedMessage id="menu.logout" defaultMessage="Log out" />
             </MenuItem>
           </div>
