@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/nextjs';
-import cookie from 'cookie';
 import { pick } from 'lodash';
 import { NextPageContext } from 'next';
 
@@ -39,7 +38,8 @@ export function getRequestIntl(req: NextPageContext['req']): IntlProps {
 
     if (queryLanguage && supportedLanguages.includes(queryLanguage)) {
       language = queryLanguage;
-    } else {
+    } else if (typeof window === 'undefined') {
+      const cookie = require('cookie');
       const cookies = cookie.parse(req?.headers?.['cookie'] ?? '');
       const cookieLanguage = cookies?.['language'];
 

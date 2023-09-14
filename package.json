@@ -94,7 +94,6 @@
     "next": "13.4.10",
     "node-fetch": "2.7.0",
     "nprogress": "0.2.0",
-    "payment": "2.4.6",
     "pdfjs-dist": "3.6.172",
     "polished": "4.2.2",
     "prop-types": "15.8.1",
