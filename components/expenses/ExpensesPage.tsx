@@ -91,7 +91,7 @@ const Expenses = props => {
   const isSelfHosted = data?.account?.id === data?.account?.host?.id;
 
   return (
-    <Container>
+    <div className="mx-auto max-w-screen-lg">
       <h1 className={isDashboard ? 'text-2xl font-bold leading-10 tracking-tight' : 'text-[32px] leading-10'}>
         {onlySubmittedExpenses ? (
           <FormattedMessage defaultMessage="Submitted Expenses" />
@@ -231,7 +231,7 @@ const Expenses = props => {
           </Box>
         )}
       </Flex>
-    </Container>
+    </div>
   );
 };
 

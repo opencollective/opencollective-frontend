@@ -7,14 +7,14 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { space } from 'styled-system';
 
+import { ExpenseStatus as expenseStatus } from '../../lib/graphql/types/v2/graphql';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { getFilesFromExpense } from '../../lib/expenses';
-import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
-
+import { MessageSquare, Paperclip, MoreHorizontal } from 'lucide-react';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
 import { AvatarWithLink } from '../AvatarWithLink';
@@ -30,7 +30,7 @@ import ProcessExpenseButtons, {
 } from '../expenses/ProcessExpenseButtons';
 import FilesViewerModal from '../FilesViewerModal';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import { Box, Flex } from '../Grid';
+import { Box, Flex, Grid } from '../Grid';
 import CommentIcon from '../icons/CommentIcon';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
@@ -41,6 +41,7 @@ import StyledTooltip from '../StyledTooltip';
 import Tags from '../Tags';
 import { H3, P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
+import StyledRoundButton from '../StyledRoundButton';
 
 const DetailColumnHeader = styled.div`
   font-style: normal;
@@ -93,6 +94,37 @@ const ExpenseContainer = styled.div`
   }
 `;
 
+const StyledP = styled(P)`
+  margin-top: 4px;
+  color: #4b5563;
+  a {
+    font-weight: 500;
+    //color: #2563eb;
+    color: #1f2937;
+
+    &:hover {
+      color: black;
+      text-decoration: underline;
+    }
+  }
+`;
+
+const BubbleThing = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  grid-gap: 4px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4b5563;
+  padding: 8px 8px;
+  cursor: pointer;
+  &:hover {
+    background: #f8fafc;
+  }
+`;
+
 const ExpenseBudgetItem = ({
   isLoading,
   host,
@@ -110,16 +142,16 @@ const ExpenseBudgetItem = ({
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const [showFilesViewerModal, setShowFilesViewerModal] = React.useState(false);
-  const featuredProfile = isInverted ? expense?.account : expense?.payee;
+  const featuredProfile = expense?.account;
   const isAdminView = view === 'admin';
   const isSubmitterView = view === 'submitter';
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const pendingReceipt = isCharge && expense?.items?.every(i => i.url === null);
   const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense]);
   const nbAttachedFiles = !isAdminView ? 0 : files.length;
-  const isExpensePaidOrRejected = [ExpenseStatus.REJECTED, ExpenseStatus.PAID].includes(expense?.status);
+  const isExpensePaidOrRejected = [expenseStatus.REJECTED, expenseStatus.PAID].includes(expense?.status);
   const shouldDisplayStatusTagActions =
-    (isExpensePaidOrRejected || expense?.status === ExpenseStatus.APPROVED) &&
+    (isExpensePaidOrRejected || expense?.status === expenseStatus.APPROVED) &&
     (hasProcessButtons(expense.permissions) || expense.permissions.canMarkAsIncomplete);
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency?.currency !== expense.currency;
@@ -130,96 +162,86 @@ const ExpenseBudgetItem = ({
 
   return (
     <ExpenseContainer
-      px={[3, '24px']}
+      px={[3, '16px']}
       py={3}
       data-cy={`expense-container-${expense?.legacyId}`}
       selected={selected}
       useDrawer={useDrawer}
     >
-      <Flex justifyContent="space-between" flexWrap="wrap">
-        <Flex flex="1" minWidth="max(50%, 200px)" maxWidth={[null, '70%']} mr="24px">
-          <Box mr={3}>
+      <Flex alignItems="center" gridGap={2}>
+        <Grid flex={1} gridTemplateColumns={'repeat(12, minmax(0, 1fr))'}>
+          <Flex style={{ gridColumn: 'span 8 / span 8' }} flex="1" minWidth="max(50%, 200px)">
+            <Box mr={3}>
+              {isLoading ? (
+                <LoadingPlaceholder width={40} height={40} />
+              ) : (
+                <AvatarWithLink
+                  size={40}
+                  account={featuredProfile}
+                  secondaryAccount={
+                    featuredProfile.id === expense.createdByAccount.id ? null : expense.createdByAccount
+                  }
+                />
+              )}
+            </Box>
             {isLoading ? (
-              <LoadingPlaceholder width={40} height={40} />
+              <LoadingPlaceholder height={60} />
             ) : (
-              <AvatarWithLink
-                size={40}
-                account={featuredProfile}
-                secondaryAccount={featuredProfile.id === expense.createdByAccount.id ? null : expense.createdByAccount}
-              />
-            )}
-          </Box>
-          {isLoading ? (
-            <LoadingPlaceholder height={60} />
-          ) : (
-            <Box>
-              <StyledTooltip
-                content={
-                  useDrawer ? (
-                    <FormattedMessage id="Expense.SeeDetails" defaultMessage="See expense details" />
-                  ) : (
-                    <FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />
-                  )
-                }
-                delayHide={0}
-              >
-                <StyledLink
-                  underlineOnHover
-                  {...(useDrawer
-                    ? {
-                        as: Link,
-                        href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
-                        onClick: expandExpense,
-                      }
-                    : {
-                        as: Link,
-                        href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
-                      })}
-                >
-                  <AutosizeText
-                    value={expense.description}
-                    maxLength={255}
-                    minFontSizeInPx={12}
-                    maxFontSizeInPx={16}
-                    lengthThreshold={72}
-                    mobileRatio={0.875}
-                    valueFormatter={toPx}
+              <Box>
+                <Flex alignItems="center" gridGap={2}>
+                  <StyledLink
+                    underlineOnHover
+                    {...(useDrawer
+                      ? {
+                          as: Link,
+                          href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
+                          onClick: expandExpense,
+                        }
+                      : {
+                          as: Link,
+                          href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
+                        })}
                   >
-                    {({ value, fontSize }) => (
-                      <H3
-                        fontWeight="500"
-                        lineHeight="1.5em"
-                        textDecoration="none"
-                        color="black.900"
-                        fontSize={fontSize}
-                        data-cy="expense-title"
-                      >
-                        {value}
-                      </H3>
-                    )}
-                  </AutosizeText>
-                </StyledLink>
-              </StyledTooltip>
+                    <AutosizeText
+                      value={expense.description}
+                      maxLength={255}
+                      minFontSizeInPx={12}
+                      maxFontSizeInPx={16}
+                      lengthThreshold={72}
+                      mobileRatio={0.875}
+                      valueFormatter={toPx}
+                    >
+                      {({ value, fontSize }) => (
+                        <H3
+                          fontWeight="500"
+                          lineHeight="1.5em"
+                          textDecoration="none"
+                          color="black.900"
+                          fontSize={`${fontSize}px`}
+                          data-cy="expense-title"
+                        >
+                          {value} <span style={{ color: '#9ca3af' }}>#{expense.legacyId}</span>
+                        </H3>
+                      )}
+                    </AutosizeText>
+                  </StyledLink>
+                </Flex>
 
-              <P mt="5px" fontSize="12px" color="black.700">
-                {isAdminView ? (
-                  <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.account} />
-                ) : (
-                  <FormattedMessage
-                    defaultMessage="from {payee} to {account}"
-                    values={{
-                      payee: (
-                        <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.payee} />
-                      ),
-                      account: (
-                        <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.account} />
-                      ),
-                    }}
-                  />
-                )}
-                {' • '}
-                <DateTime value={expense.createdAt} />
-                {isAdminView && (
+                <StyledP mt="5px" fontSize="12px">
+                  {false ? (
+                    <LinkCollective collective={expense.account} />
+                  ) : (
+                    <FormattedMessage
+                      defaultMessage="from {payee} to {account} on {date}"
+                      values={{
+                        payee: <LinkCollective collective={expense.payee} />,
+                        account: <LinkCollective collective={expense.account} />,
+                        date: <DateTime value={expense.createdAt} />,
+                      }}
+                    />
+                  )}
+
+                  {/* {isAdminView && (
                   <React.Fragment>
                     {' • '}
                     <FormattedMessage
@@ -248,30 +270,47 @@ const ExpenseBudgetItem = ({
                       </React.Fragment>
                     )}
                   </React.Fragment>
-                )}
-              </P>
-            </Box>
-          )}
-        </Flex>
-        <Flex flexDirection={['row', 'column']} mt={[3, 0]} flexWrap="wrap" alignItems={['center', 'flex-end']}>
+                )} */}
+                </StyledP>
+              </Box>
+            )}
+          </Flex>
+          <Flex alignItems="center" justifyContent={'center'}>
+            {expense?.comments.totalCount > 0 && (
+              <BubbleThing>
+                <MessageSquare size={16} />
+                {expense?.comments.totalCount}
+              </BubbleThing>
+            )}
+          </Flex>
+          <Flex alignItems="center" justifyContent={'center'}>
+            {nbAttachedFiles > 0 && (
+              <BubbleThing>
+                <Paperclip size={16} /> {nbAttachedFiles}{' '}
+              </BubbleThing>
+            )}
+          </Flex>
           <Flex
-            my={2}
-            mr={[3, 0]}
-            flexDirection="column"
-            minWidth={100}
-            alignItems="flex-end"
+            // my={1}
+            mr={1}
+            alignItems="center"
+            justifyContent={'end'}
+            // minWidth={100}
+            // alignItems="flex-end"
             data-cy="transaction-amount"
+            whiteSpace="nowrap"
+            style={{ gridColumn: 'span 2 / span 2' }}
           >
             {isLoading ? (
               <LoadingPlaceholder height={19} width={120} />
             ) : (
               <React.Fragment>
-                <div>
+                <Flex alignItems="center" whiteSpace="nowrap" flexWrap={'nowrap'}>
                   {showAmountSign && <TransactionSign isCredit={isInverted} />}
-                  <Span color="black.700" fontSize="16px">
+                  <Span color="black.700" fontSize="16px" whiteSpace="nowrap">
                     <FormattedMoneyAmount amount={expense.amount} currency={expense.currency} precision={2} />
                   </Span>
-                </div>
+                </Flex>
                 {isMultiCurrency && (
                   <Container color="black.600" fontSize="13px" my={1}>
                     <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency} />
@@ -280,43 +319,113 @@ const ExpenseBudgetItem = ({
               </React.Fragment>
             )}
           </Flex>
-          {isLoading ? (
-            <LoadingPlaceholder height={20} width={140} />
-          ) : (
-            <Flex>
-              {(isAdminView || isSubmitterView) && pendingReceipt && (
-                <Box mr="1px">
-                  <StyledTooltip
-                    content={
-                      <FormattedMessage id="Expense.MissingReceipt" defaultMessage="Expense is missing its Receipt" />
-                    }
-                  >
-                    <AlertTriangle size={18} />
-                  </StyledTooltip>
-                </Box>
-              )}
-              {(isAdminView || isSubmitterView) && (
-                <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} mb={0} py={0} mr="2px" fontSize="9px" />
-              )}
-              {shouldDisplayStatusTagActions ? (
-                <AdminExpenseStatusTag host={host} collective={expense.account} expense={expense} p="3px 8px" />
+
+          {/* <Flex
+            style={{ gridColumn: 'span 2 / span 2' }}
+            flexDirection={['row', 'column']}
+            mt={[3, 0]}
+            flexWrap="wrap"
+            alignItems={['center', 'flex-end']}
+          >
+            <Flex
+              my={1}
+              mr={[3, 0]}
+              flexDirection="column"
+              minWidth={100}
+              alignItems="flex-end"
+              data-cy="transaction-amount"
+            >
+              {isLoading ? (
+                <LoadingPlaceholder height={19} width={120} />
               ) : (
-                <ExpenseStatusTag
-                  status={expense.status}
-                  fontSize="12px"
-                  fontWeight="bold"
-                  letterSpacing="0.06em"
-                  lineHeight="16px"
-                  p="3px 8px"
-                  showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
-                  showTaxFormMsg={expense.payee.isAdmin}
-                />
+                <React.Fragment>
+                  <div>
+                    {showAmountSign && <TransactionSign isCredit={isInverted} />}
+                    <Span color="black.700" fontSize="16px">
+                      <FormattedMoneyAmount amount={expense.amount} currency={expense.currency} precision={2} />
+                    </Span>
+                  </div>
+                  {isMultiCurrency && (
+                    <Container color="black.600" fontSize="13px" my={1}>
+                      <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency} />
+                    </Container>
+                  )}
+                </React.Fragment>
               )}
             </Flex>
+            {isLoading ? (
+              <LoadingPlaceholder height={20} width={140} />
+            ) : (
+              <Flex>
+                {(isAdminView || isSubmitterView) && pendingReceipt && (
+                  <Box mr="1px">
+                    <StyledTooltip
+                      content={
+                        <FormattedMessage id="Expense.MissingReceipt" defaultMessage="Expense is missing its Receipt" />
+                      }
+                    >
+                      <AlertTriangle size={18} />
+                    </StyledTooltip>
+                  </Box>
+                )}
+                {(isAdminView || isSubmitterView) && (
+                <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} mb={0} py={0} mr="2px" fontSize="9px" />
+              )}
+                {shouldDisplayStatusTagActions && false ? (
+                  <AdminExpenseStatusTag host={host} collective={expense.account} expense={expense} p="3px 8px" />
+                ) : (
+                  <ExpenseStatusTag
+                    status={expense.status}
+                    fontSize="12px"
+                    fontWeight="bold"
+                    letterSpacing="0.06em"
+                    lineHeight="16px"
+                    p="3px 8px"
+                    showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
+                    showTaxFormMsg={expense.payee.isAdmin}
+                  />
+                )}
+              </Flex>
+            )}
+          </Flex> */}
+        </Grid>
+        <Flex alignItems="center">
+          {(isAdminView || isSubmitterView) && pendingReceipt && (
+            <Box mr="1px">
+              <StyledTooltip
+                content={
+                  <FormattedMessage id="Expense.MissingReceipt" defaultMessage="Expense is missing its Receipt" />
+                }
+              >
+                <AlertTriangle size={18} />
+              </StyledTooltip>
+            </Box>
+          )}
+          {/* {(isAdminView || isSubmitterView) && (
+                <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} mb={0} py={0} mr="2px" fontSize="9px" />
+              )} */}
+          {isLoading ? (
+            <div />
+          ) : (
+            <ExpenseStatusTag
+              status={expense.status}
+              fontSize="12px"
+              fontWeight="bold"
+              letterSpacing="0.06em"
+              lineHeight="16px"
+              p="3px 8px"
+              truncateOverflow
+              showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
+              showTaxFormMsg={expense.payee.isAdmin}
+            />
           )}
         </Flex>
+        <StyledRoundButton size={32}>
+          <MoreHorizontal size={20} />
+        </StyledRoundButton>
       </Flex>
-      <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}>
+
+      {/* <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}>
         <Box mt={2}>
           {isAdminView || isSubmitterView ? (
             <Flex>
@@ -405,7 +514,7 @@ const ExpenseBudgetItem = ({
             />
           </ButtonsContainer>
         )}
-      </Flex>
+      </Flex> */}
       {showFilesViewerModal && (
         <FilesViewerModal
           files={files}

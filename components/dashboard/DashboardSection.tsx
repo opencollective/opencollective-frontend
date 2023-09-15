@@ -27,39 +27,35 @@ import Contributions from './sections/Contributions';
 import Contributors from './sections/Contributors';
 import Expenses from './sections/Expenses';
 import Home from './sections/Home';
-import ManageContributions from './sections/ManageContributions';
 import Transactions from './sections/Transactions';
-import {
-  COLLECTIVE_SECTIONS,
-  FISCAL_HOST_SECTIONS,
-  HOST_DASHBOARD_SECTIONS,
-  LEGACY_COLLECTIVE_SETTINGS_SECTIONS,
-  SECTION_LABELS,
-} from './constants';
+import VirtualCards from './sections/virtual-cards/VirtualCards';
+import { DASHBOARD_SECTIONS, DASHBOARD_SETTINGS_SECTIONS, LEGACY_SECTIONS, SECTION_LABELS } from './constants';
 
-const ADMIN_PANEL_SECTIONS = {
-  [HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
-  [HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS]: FinancialContributions,
-  [HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS]: PendingContributions,
-  [HOST_DASHBOARD_SECTIONS.HOST_EXPENSES]: HostDashboardExpenses,
-  [HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
-  [HOST_DASHBOARD_SECTIONS.HOST_APPLICATIONS]: HostApplications,
-  [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
-  [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
-  [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
-  [COLLECTIVE_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
-  [COLLECTIVE_SECTIONS.TEAM]: TeamSettings,
+const DASHBOARD_COMPONENTS = {
+  [DASHBOARD_SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
+  [DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS]: FinancialContributions,
+  [DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS]: PendingContributions,
+  [DASHBOARD_SECTIONS.HOST_EXPENSES]: HostDashboardExpenses,
+  [DASHBOARD_SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
+  [DASHBOARD_SECTIONS.HOST_APPLICATIONS]: HostApplications,
+  [DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
+  [DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
+  [DASHBOARD_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
+
   // NEW
-  [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
-  [COLLECTIVE_SECTIONS.EXPENSES]: Expenses,
-  [COLLECTIVE_SECTIONS.DASHBOARD_OVERVIEW]: Home,
-  [COLLECTIVE_SECTIONS.CONTRIBUTORS]: Contributors,
-  [COLLECTIVE_SECTIONS.CONTRIBUTIONS]: Contributions,
-  [COLLECTIVE_SECTIONS.TRANSACTIONS]: Transactions,
+  // [COLLECTIVE_SECTIONS.MANAGE_CONTRIBUTIONS]: ManageContributions,
+  [DASHBOARD_SECTIONS.EXPENSES]: Expenses,
+  [DASHBOARD_SECTIONS.OVERVIEW]: Home,
+  [DASHBOARD_SECTIONS.CONTRIBUTORS]: Contributors,
+  [DASHBOARD_SECTIONS.CONTRIBUTIONS]: Contributions,
+  [DASHBOARD_SECTIONS.TRANSACTIONS]: Transactions,
+  [DASHBOARD_SECTIONS.VIRTUAL_CARDS]: VirtualCards,
 };
 
-const FISCAL_HOST_SETTINGS_SECTIONS = {
-  [FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
+const SETTINGS_COMPONENTS = {
+  [DASHBOARD_SETTINGS_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
+  [DASHBOARD_SETTINGS_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
+  [DASHBOARD_SETTINGS_SECTIONS.TEAM]: TeamSettings,
 };
 
 const Title = ({ className, children, ...props }: { className?: string; children: React.ReactNode }) => (
@@ -73,44 +69,43 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
 
   if (isLoading) {
     return (
-      <Container width="100%" px={2}>
+      <div className="w-full">
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
-      </Container>
+      </div>
     );
   }
 
-  const AdminSectionComponent = ADMIN_PANEL_SECTIONS[section];
-  if (AdminSectionComponent) {
+  const DashboardComponent = DASHBOARD_COMPONENTS[section];
+  if (DashboardComponent) {
     return (
-      <Container width="100%">
+      <div className="w-full">
         {/* @ts-ignore-next-line */}
-        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} isDashboard={true} />
-      </Container>
+        <DashboardComponent account={collective} hostSlug={collective.slug} subpath={subpath} isDashboard={true} />
+      </div>
     );
   }
 
-  // Fiscal Host Settings
-  const FiscalHostSettingsComponent = FISCAL_HOST_SETTINGS_SECTIONS[section];
-  if (FiscalHostSettingsComponent) {
+  // Settings component
+  const SettingsComponent = SETTINGS_COMPONENTS[section];
+  if (SettingsComponent) {
     return (
-      <Container width="100%">
-        <FiscalHostSettingsComponent collective={collective} />
-      </Container>
+      <div className="max-w-screen-md">
+        <SettingsComponent account={collective} hostSlug={collective.slug} subpath={subpath} />
+      </div>
     );
   }
-
   // Form
-  if (values(LEGACY_COLLECTIVE_SETTINGS_SECTIONS).includes(section)) {
+  if (values(LEGACY_SECTIONS).includes(section)) {
     return (
-      <Container width="100%">
+      <div className="max-w-screen-md">
         {SECTION_LABELS[section] && (
           <Box mb={3}>
             <Title>{formatMessage(SECTION_LABELS[section])}</Title>
           </Box>
         )}
         <AccountSettings account={collective} section={section} />
-      </Container>
+      </div>
     );
   }
 

@@ -12,10 +12,13 @@ import { useLazyGraphQLPaginatedResults } from '../../lib/hooks/useLazyGraphQLPa
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import useQueryFilter, { BooleanFilter } from '../../lib/hooks/useQueryFilter';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-
+import { useIntl } from 'react-intl';
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import DashboardViews from '../dashboard/DashboardViews';
+import ExpenseStats from '../dashboard/sections/Home/ExpenseStats';
 import DismissibleMessage from '../DismissibleMessage';
+import ExpenseDrawer from '../expenses/ExpenseDrawer';
+import { getExpensesFilterOptions } from '../expenses/expensesFilterOptions';
 import ExpensesFilters from '../expenses/ExpensesFiltersNew';
 import ExpensesList from '../expenses/ExpensesList';
 import { parseChronologicalOrderInput } from '../expenses/filters/ExpensesOrder';
@@ -33,10 +36,9 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
-import ExpenseStats from '../dashboard/sections/Home/ExpenseStats';
+
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
-import ExpenseDrawer from '../expenses/ExpenseDrawer';
 
 const hostDashboardExpensesQuery = gql`
   query HostDashboardExpenses(
@@ -103,6 +105,9 @@ const hostDashboardMetaDataQuery = gql`
       }
     }
 
+    all: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0) @include(if: $getViewCounts) {
+      totalCount
+    }
     ready_to_pay: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: READY_TO_PAY)
       @include(if: $getViewCounts) {
       totalCount
@@ -124,6 +129,9 @@ const hostDashboardMetaDataQuery = gql`
       totalCount
     }
     error: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: ERROR) @include(if: $getViewCounts) {
+      totalCount
+    }
+    paid: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: PAID) @include(if: $getViewCounts) {
       totalCount
     }
   }
@@ -226,12 +234,13 @@ const initViews = [
   {
     label: <FormattedMessage defaultMessage="Paid" />,
     query: { status: 'PAID' },
-    id: 'recently_paid',
+    id: 'paid',
   },
 ];
 
 const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   const router = useRouter();
+  const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const expensePipelineFeatureIsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_PIPELINE);
   const query = expensePipelineFeatureIsEnabled ? router.query : enforceDefaultParamsOnQuery(router.query);
@@ -308,11 +317,15 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   const getQueryParams = newParams => {
     return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
   };
+  const filterOptions = React.useMemo(
+    () => getExpensesFilterOptions({ intl, collective: metaData?.host }),
+    [intl, metaData?.host],
+  );
 
   return (
-    <div className="flex gap-6">
+    <React.Fragment>
       <div className="flex-1">
-        <div className="mb-5 flex flex-wrap justify-between gap-4">
+        <div className="flex flex-wrap justify-between gap-4">
           <h1 className="text-2xl font-bold leading-10 tracking-tight">
             <FormattedMessage id="Expenses" defaultMessage="Expenses" />
           </h1>
@@ -352,7 +365,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
             )}
           </DismissibleMessage>
         )}
-        {/* <Box mb={4}>
+        <div className="mb-6">
           {!metaData?.host ? (
             <LoadingPlaceholder height={150} />
           ) : error ? (
@@ -360,7 +373,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
           ) : (
             <ExpenseStats host={metaData.host} />
           )}
-        </Box> */}
+        </div>
         {/* <ScheduledExpensesBanner
         hostSlug={hostSlug}
         onSubmit={() => {
@@ -385,10 +398,10 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
         }
       /> */}
 
-        {expensePipelineFeatureIsEnabled && (
+        {/* {expensePipelineFeatureIsEnabled && (
           <DashboardViews
             query={query}
-            omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
+            omitMatchingParams={}
             views={views}
             onChange={query => {
               router.push(
@@ -401,25 +414,25 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
               );
             }}
           />
-        )}
+        )} */}
 
         <Box mb={34}>
           {metaData?.host ? (
-            <ExpensesFilters
-              collective={metaData.host}
-              filters={query}
-              explicitAllForStatus
-              displayOnHoldPseudoStatus
-              showChargeHasReceiptFilter
-              chargeHasReceiptFilter={queryFilter.values.chargeHasReceipts}
-              onChargeHasReceiptFilterChange={queryFilter.setChargeHasReceipts}
-              pageRoute={pageRoute}
-              onChange={queryParams =>
-                router.push({
-                  pathname: pageRoute,
-                  query: getQueryParams({ ...queryParams, offset: null }),
-                })
-              }
+            <Filterbar
+              query={query}
+              filterOptions={filterOptions}
+              views={views}
+              omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
+              onChange={query => {
+                router.push(
+                  {
+                    pathname: pageRoute,
+                    query,
+                  },
+                  undefined,
+                  { scroll: false },
+                );
+              }}
             />
           ) : loading ? (
             <LoadingPlaceholder height={70} />
@@ -478,7 +491,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
         handleClose={() => setOpenExpenseLegacyId(null)}
         initialExpenseValues={expenseInDrawer}
       />
-    </div>
+    </React.Fragment>
   );
 };
 

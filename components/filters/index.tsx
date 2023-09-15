@@ -5,6 +5,8 @@ import { ArrowUpDown, Filter, LayoutList, MessageSquare, MoreHorizontal, Papercl
 import OrderFilter from './OrderFilter';
 import SelectFilter from './SelectFilter';
 import FilterCombo, { FilterOptions } from './FilterCombo';
+import DashboardViews from '../dashboard/DashboardViews';
+import { Separator } from '../ui/Separator';
 
 export default function Filters({
   query,
@@ -12,6 +14,8 @@ export default function Filters({
   orderByKey = 'orderBy',
   orderByOptions,
   onChange,
+  omitMatchingParams,
+  views,
 }: {
   filterOptions: FilterOptions;
 }) {
@@ -48,6 +52,11 @@ export default function Filters({
 
   return (
     <div className="">
+      {views ? (
+        <DashboardViews query={query} omitMatchingParams={omitMatchingParams} views={views} onChange={onChange} />
+      ) : (
+        <Separator className="my-4" />
+      )}
       <div className="flex flex-wrap justify-between gap-2">
         <div className="flex flex-wrap gap-2">
           {displayedFilters.map(filter => (

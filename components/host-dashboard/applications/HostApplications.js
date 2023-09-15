@@ -103,78 +103,73 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
   }, [data]);
 
   return (
-    <div className="grid flex-1 grid-cols-6 gap-6">
-      <div className="col-span-4 ">
-        <div className="flex flex-wrap justify-between gap-4">
-          <h1 className="text-2xl font-bold leading-10 tracking-tight">
-            <FormattedMessage defaultMessage="Applications" />
-          </h1>
-          <SearchBar
-            height={40}
-            defaultValue={query.searchTerm}
-            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-          />
-        </div>
-
-        <DashboardViews
-          query={query}
-          omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
-          views={views}
-          onChange={query => {
-            router.push(
-              {
-                pathname: pageRoute,
-                query,
-              },
-              undefined,
-              { scroll: false },
-            );
-          }}
-        />
-        <div className="mb-6">
-          <HostAdminCollectiveFilters
-            filters={[COLLECTIVE_FILTER.SORT_BY]}
-            values={query}
-            onChange={queryParams =>
-              updateQuery(router, {
-                ...queryParams,
-                offset: null,
-              })
-            }
-          />
-        </div>
-
-        {error && <MessageBoxGraphqlError error={error} mb={2} />}
-
-        <HostApplicationsTable
-          hostApplications={hostApplications}
-          nbPlaceholders={COLLECTIVES_PER_PAGE}
-          loading={loading}
-          openApplication={application => {
-            setDrawerOpen(true);
-            setApplicationInDrawer(application);
-          }}
-        />
-
-        <div className="mt-16 flex justify-center">
-          <Pagination
-            total={hostApplications?.totalCount}
-            limit={variables.limit}
-            offset={variables.offset}
-            ignoredQueryParams={ROUTE_PARAMS}
-          />
-        </div>
-
-        <HostApplicationDrawer
-          open={drawerOpen}
-          setOpen={setDrawerOpen}
-          host={data?.host}
-          application={applicationInDrawer}
+    <div className="">
+      <div className="flex flex-wrap justify-between gap-4">
+        <h1 className="text-2xl font-bold leading-10 tracking-tight">
+          <FormattedMessage defaultMessage="Applications" />
+        </h1>
+        <SearchBar
+          height={40}
+          defaultValue={query.searchTerm}
+          onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
         />
       </div>
-      <div className="col-span-2  flex-1 rounded bg-slate-50 p-6">
-        <p>No application selected</p>
+
+      <DashboardViews
+        query={query}
+        omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
+        views={views}
+        onChange={query => {
+          router.push(
+            {
+              pathname: pageRoute,
+              query,
+            },
+            undefined,
+            { scroll: false },
+          );
+        }}
+      />
+      <div className="mb-6">
+        <HostAdminCollectiveFilters
+          filters={[COLLECTIVE_FILTER.SORT_BY]}
+          values={query}
+          onChange={queryParams =>
+            updateQuery(router, {
+              ...queryParams,
+              offset: null,
+            })
+          }
+        />
       </div>
+
+      {error && <MessageBoxGraphqlError error={error} mb={2} />}
+
+      <HostApplicationsTable
+        hostApplications={hostApplications}
+        nbPlaceholders={COLLECTIVES_PER_PAGE}
+        loading={loading}
+        openApplication={application => {
+          setDrawerOpen(true);
+          setApplicationInDrawer(application);
+        }}
+      />
+
+      <div className="mt-16 flex justify-center">
+        <Pagination
+          total={hostApplications?.totalCount}
+          limit={variables.limit}
+          offset={variables.offset}
+          ignoredQueryParams={ROUTE_PARAMS}
+        />
+      </div>
+
+      <HostApplicationDrawer
+        open={drawerOpen}
+        setOpen={setDrawerOpen}
+        host={data?.host}
+        application={applicationInDrawer}
+      />
     </div>
   );
 };

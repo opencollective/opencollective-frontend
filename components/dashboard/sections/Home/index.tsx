@@ -73,7 +73,7 @@ const Home = (props: AdminSectionProps) => {
   const isIndividual = isIndividualAccount(props.account);
   const isCollective = !isHost && !isIndividual;
   return (
-    <div className="flex flex-col-reverse lg:flex-row">
+    <div className="mx-auto flex max-w-screen-lg flex-col-reverse lg:flex-row">
       <div className="flex flex-1 flex-col">
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />

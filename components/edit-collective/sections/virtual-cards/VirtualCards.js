@@ -138,7 +138,7 @@ const VirtualCards = props => {
   };
 
   return (
-    <Box width={['366px', '764px']}>
+    <div>
       <Box>
         <P>
           <FormattedMessage
@@ -203,7 +203,7 @@ const VirtualCards = props => {
           ignoredQueryParams={['slug', 'section']}
         />
       </Flex>
-    </Box>
+    </div>
   );
 };
 

@@ -397,7 +397,7 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
   const columns = getColumns({ tab, setEditOrder, intl, isIncoming });
 
   return (
-    <Container>
+    <div className="mx-auto max-w-screen-lg">
       <div className="flex justify-between gap-4">
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           {isIncoming ? (
@@ -441,7 +441,7 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
           onClose={() => setEditOrder({ order: null, action: null })}
         />
       )}
-    </Container>
+    </div>
   );
 };
 

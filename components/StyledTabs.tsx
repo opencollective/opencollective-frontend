@@ -44,35 +44,37 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps & Parameters<t
   }
 
   return (
-    <div className="border-b" {...props}>
-      <div className="-mb-px flex space-x-6 overflow-x-auto">
-        {tabs.map(tab => {
-          const selected = tab.id === selectedId;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => onChange?.(tab.id)}
-              className={cn(
-                'flex whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ring-inset	ring-black focus:outline-none focus-visible:ring-2',
-                selected
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-slate-500 hover:border-slate-200 hover:text-slate-700',
-              )}
-            >
-              {tab.label}{' '}
-              {typeof tab.count !== 'undefined' && (
-                <span
-                  className={cn(
-                    'ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
-                    selected ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-900',
-                  )}
-                >
-                  {abbreviateNumber(tab.count)}
-                </span>
-              )}
-            </button>
-          );
-        })}
+    <div className="relative">
+      <div className="w-full max-w-full border-b " {...props}>
+        <div className="-mb-px flex  gap-6 overflow-x-auto">
+          {tabs.map(tab => {
+            const selected = tab.id === selectedId;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => onChange?.(tab.id)}
+                className={cn(
+                  'flex whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ring-inset	ring-black focus:outline-none focus-visible:ring-2',
+                  selected
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-slate-500 hover:border-slate-200 hover:text-slate-700',
+                )}
+              >
+                {tab.label}{' '}
+                {typeof tab.count !== 'undefined' && (
+                  <span
+                    className={cn(
+                      'ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
+                      selected ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-900',
+                    )}
+                  >
+                    {abbreviateNumber(tab.count)}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

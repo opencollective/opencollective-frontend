@@ -10,6 +10,7 @@ import { parseDateInterval } from '../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
+import i18nOrderStatus from '../../lib/i18n/order-status';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import { confirmContributionFieldsFragment } from '../ContributionConfirmationModal';
@@ -26,6 +27,8 @@ import StyledButton from '../StyledButton';
 
 import OrdersFilters from './OrdersFilters';
 import OrdersList from './OrdersList';
+import Filterbar from '../filters';
+import { FilterType, FilterOptions, OptionType } from '../filters/FilterCombo';
 
 const accountOrdersQuery = gql`
   query Orders(
@@ -174,6 +177,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
   const { LoggedInUser } = useLoggedInUser();
   const prevLoggedInUser = usePrevious(LoggedInUser);
   const isHostAdmin = LoggedInUser?.isAdminOfCollective(data?.account);
+  const pageRoute = `/dashboard/${accountSlug}/orders`;
 
   // Refetch data when user logs in
   React.useEffect(() => {
@@ -182,11 +186,64 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
     }
   }, [LoggedInUser]);
 
+  const filterOptions = React.useMemo(
+    () => [
+      {
+        key: 'searchTerm',
+        static: true,
+        filterType: FilterType.TEXT_INPUT,
+        label: intl.formatMessage({ id: 'Search', defaultMessage: 'Search...' }),
+      },
+
+      {
+        key: 'period',
+        filterType: FilterType.DATE,
+        label: intl.formatMessage({ id: 'Period', defaultMessage: 'Period' }),
+        options: [
+          {
+            label: 'Today',
+            value: 'TODAY',
+          },
+          {
+            label: 'Yesterday',
+            value: 'YESTERDAY',
+            type: OptionType.PERIOD,
+          },
+          { label: 'Date range', value: 'DATE_RANGE', type: OptionType.CUSTOM_DATE_RANGE },
+        ],
+      },
+
+      {
+        key: 'status',
+        static: true,
+        filterType: FilterType.SELECT,
+        label: intl.formatMessage({ defaultMessage: 'Status' }),
+        options: Object.values(ORDER_STATUS).map(value => ({ label: i18nOrderStatus(intl, value), value })),
+      },
+      // {
+      //   key: 'amount',
+      //   filterType: FilterType.SELECT,
+      //   label: intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
+      //   options: [0, 50, 500, 5000].map((step, i, steps) => {
+      //     const maxAmount = steps[i + 1];
+      //     const minAmount = step;
+      //     return {
+      //       value: maxAmount ? `${minAmount}-${maxAmount}` : `${minAmount}+`,
+      //       label: intl.formatMessage(OPTION_LABELS[maxAmount ? 'rangeFromTo' : 'rangeFrom'], {
+      //         minAmount: formatCurrency(minAmount * 100, collective.currency, { precision: 0, locale: intl.locale }),
+      //         maxAmount: formatCurrency(maxAmount * 100, collective.currency, { precision: 0, locale: intl.locale }),
+      //       }),
+      //     };
+      //   }),
+      // },
+    ],
+    [intl],
+  );
   return (
-    <Box maxWidth={1000} width="100%" m="0 auto">
+    <div className="mx-auto max-w-screen-xl">
       <div className="flex flex-wrap justify-between gap-4">
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
-          {title || <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
+          {title || <FormattedMessage defaultMessage="Contributions" />}
         </h1>
         {/* <SearchBar
           height="40px"
@@ -195,13 +252,44 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
           placeholder={intl.formatMessage(messages.searchPlaceholder)}
         /> */}
       </div>
-      <hr className="my-5" />
       <div className="mb-12 w-full">
-        <OrdersFilters
-          filters={router.query}
-          onChange={queryParams => updateQuery(router, { ...queryParams, offset: null })}
-          hasStatus={!status}
+        <Filterbar
+          query={router.query}
+          omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
+          filterOptions={filterOptions}
+          views={[
+            { label: <FormattedMessage defaultMessage="All" />, query: {}, id: 'all' },
+            {
+              label: 'Pending',
+              query: { status: 'PENDING', orderBy: 'CREATED_AT,ASC' },
+              showCount: true,
+              id: 'pending',
+            },
+            {
+              label: 'Disputed',
+              query: { status: 'DISPUTED', orderBy: 'CREATED_AT,ASC' },
+              showCount: true,
+              id: 'disputed',
+            },
+            {
+              label: 'In Review',
+              query: { status: 'IN_REVIEW', orderBy: 'CREATED_AT,ASC' },
+              showCount: true,
+              id: 'in_review',
+            },
+          ]}
+          onChange={query => {
+            router.push(
+              {
+                pathname: pageRoute,
+                query,
+              },
+              undefined,
+              { scroll: false },
+            );
+          }}
         />
+
         {/* <Box flexGrow="1" mr="18px">
           {data?.account ? (
             <OrdersFilters
@@ -279,7 +367,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
           </Flex>
         </React.Fragment>
       )}
-    </Box>
+    </div>
   );
 };
 

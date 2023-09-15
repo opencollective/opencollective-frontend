@@ -17,6 +17,7 @@ import { VirtualCardRequestDrawer } from '../../virtual-card-requests/VirtualCar
 import VirtualCardRequestFilter from '../../virtual-card-requests/VirtualCardRequestFilter';
 import { VirtualCardRequestsTable } from '../../virtual-card-requests/VirtualCardRequestsTable';
 import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
+import DashboardHeader from '../../dashboard/DashboardHeader';
 
 const hostVirtualCardRequestsQuery = gql`
   query HostVirtualCardRequests(
@@ -138,21 +139,22 @@ export default function HostVirtualCardRequests(props: HostVirtualCardRequestsPr
 
   return (
     <Box>
-      <h1 className="text-2xl font-bold leading-10 tracking-tight">
-        <FormattedMessage id="VirtualCardRequests.Title" defaultMessage="Virtual Card Requests" />
-      </h1>
-      <p className="mb-4 text-muted-foreground">
-        <FormattedMessage
-          id="Host.VirtualCardRequests.List.Description"
-          defaultMessage="Manage virtual card requests made by your hosted collectives. <learnMoreLink>Learn more</learnMoreLink>"
-          values={{
-            learnMoreLink: getI18nLink({
-              href: 'https://docs.opencollective.com/help/fiscal-hosts/virtual-cards',
-              openInNewTabNoFollow: true,
-            }),
-          }}
-        />
-      </p>
+      <DashboardHeader
+        title={<FormattedMessage id="VirtualCardRequests.Title" defaultMessage="Virtual Card Requests" />}
+        description={
+          <FormattedMessage
+            id="Host.VirtualCardRequests.List.Description"
+            defaultMessage="Manage virtual card requests made by your hosted collectives. <learnMoreLink>Learn more</learnMoreLink>"
+            values={{
+              learnMoreLink: getI18nLink({
+                href: 'https://docs.opencollective.com/help/fiscal-hosts/virtual-cards',
+                openInNewTabNoFollow: true,
+              }),
+            }}
+          />
+        }
+      />
+
       <Box mb={3}>
         <StripeVirtualCardComplianceStatement />
       </Box>

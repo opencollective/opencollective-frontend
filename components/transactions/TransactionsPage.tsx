@@ -188,7 +188,7 @@ const Transactions = ({
       : transactions?.nodes || [];
 
   return (
-    <Container>
+    <div className="mx-auto max-w-screen-lg">
       <div className="flex flex-wrap justify-between gap-4">
         <h1 className={isDashboard ? 'text-2xl font-bold leading-10 tracking-tight' : 'text-[32px] leading-10'}>
           <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
@@ -340,7 +340,7 @@ const Transactions = ({
           </React.Fragment>
         )}
       </Box>
-    </Container>
+    </div>
   );
 };
 

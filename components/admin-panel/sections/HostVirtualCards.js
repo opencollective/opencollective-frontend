@@ -19,6 +19,14 @@ import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
 import VirtualCardsTable from '../../virtual-cards/VirtualCardsTable';
 import VirtualCardFilters from '../../VirtualCardFilters';
+import Filterbar from '../../filters';
+import { useIntl } from 'react-intl';
+import { FilterType, FilterOptions, OptionType } from '../../filters/FilterCombo';
+import { Button } from '../../ui/Button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem } from '../../ui/DropdownMenu';
+import { MoreHorizontal, BookOpen } from 'lucide-react';
+import Link from 'next/link';
+import DashboardHeader from '../../dashboard/DashboardHeader';
 
 const hostVirtualCardsQuery = gql`
   query HostedVirtualCards(
@@ -117,6 +125,7 @@ const hostVirtualCardsQuery = gql`
 const VIRTUAL_CARDS_PER_PAGE = 20;
 
 const HostVirtualCards = props => {
+  const intl = useIntl();
   const queryFilter = useQueryFilter({
     ignoreQueryParams: ['slug', 'section'],
     filters: {
@@ -187,27 +196,77 @@ const HostVirtualCards = props => {
     setCreateVirtualCardModalDisplay(false);
     refetch();
   };
+  const filterOptions = React.useMemo(
+    () => [
+      {
+        key: 'searchTerm',
+        static: true,
+        filterType: FilterType.TEXT_INPUT,
+        label: intl.formatMessage({ id: 'Search', defaultMessage: 'Search...' }),
+      },
 
+      // {
+      //   key: 'amount',
+      //   filterType: FilterType.SELECT,
+      //   label: intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
+      //   options: [0, 50, 500, 5000].map((step, i, steps) => {
+      //     const maxAmount = steps[i + 1];
+      //     const minAmount = step;
+      //     return {
+      //       value: maxAmount ? `${minAmount}-${maxAmount}` : `${minAmount}+`,
+      //       label: intl.formatMessage(OPTION_LABELS[maxAmount ? 'rangeFromTo' : 'rangeFrom'], {
+      //         minAmount: formatCurrency(minAmount * 100, collective.currency, { precision: 0, locale: intl.locale }),
+      //         maxAmount: formatCurrency(maxAmount * 100, collective.currency, { precision: 0, locale: intl.locale }),
+      //       }),
+      //     };
+      //   }),
+      // },
+    ],
+    [intl],
+  );
   return (
     <Fragment>
       <Box>
-        <h1 className="text-2xl font-bold leading-10 tracking-tight">
-          <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
-        </h1>
-        <p className="mb-4 text-muted-foreground">
-          <FormattedMessage
-            id="Host.VirtualCards.List.Description"
-            defaultMessage="Make payments easier by creating virtual cards. One Collective can have multiple virtual cards. <learnMoreLink>Learn more</learnMoreLink>"
-            values={{
-              learnMoreLink: getI18nLink({
-                href: 'https://docs.opencollective.com/help/fiscal-hosts/virtual-cards',
-                openInNewTabNoFollow: true,
-              }),
-            }}
-          />
-        </p>
+        <DashboardHeader
+          title={<FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />}
+          primaryAction={{
+            disabled: loading,
+            label: <FormattedMessage defaultMessage="New Card" />,
+            onClick: () => setCreateVirtualCardModalDisplay(true),
+          }}
+          secondaryActions={[
+            {
+              label: <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />,
+              onClick: () => setAssignCardModalDisplay(true),
+              disabled: loading,
+            },
+          ]}
+          description={
+            <FormattedMessage
+              // id="Host.VirtualCards.List.Description"
+              defaultMessage="Make payments easier by creating virtual cards. One Collective can have multiple virtual cards. <docsLink>Docs</docsLink>"
+              values={{
+                learnMoreLink: getI18nLink({
+                  href: 'https://docs.opencollective.com/help/fiscal-hosts/virtual-cards',
+                  openInNewTabNoFollow: true,
+                }),
+                docsLink: chunks => (
+                  <Link
+                    href="https://docs.opencollective.com/help/fiscal-hosts/virtual-cards"
+                    className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 align-middle text-xs text-foreground hover:bg-slate-200"
+                    {...props}
+                  >
+                    <BookOpen size={16} />
+                    {chunks}
+                  </Link>
+                ),
+              }}
+            />
+          }
+        />
+
         <StripeVirtualCardComplianceStatement />
-        <Flex mt={3} flexDirection={['row', 'column']}>
+        {/* <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters
             loading={loading}
             collectivesFilter={queryFilter.values.collectiveSlugs}
@@ -227,7 +286,8 @@ const HostVirtualCards = props => {
             onCreateCardClick={() => setCreateVirtualCardModalDisplay(true)}
             onAssignCardClick={() => setAssignCardModalDisplay(true)}
           />
-        </Flex>
+        </Flex> */}
+        <Filterbar query={router.query} filterOptions={filterOptions} />
       </Box>
       {loading ? (
         <Loading />

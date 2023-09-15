@@ -202,6 +202,7 @@ export function HostApplication({
 
             <p className="text-sm font-medium text-muted-foreground">
               Host Applications / <span className="font-normal">#4874</span>
+              <button />
             </p>
           </div>
 

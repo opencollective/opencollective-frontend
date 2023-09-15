@@ -67,7 +67,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return null;
   } else if (isIndividualAccount(account) || hasEnabledOverViewForCollectives) {
-    return ALL_SECTIONS.DASHBOARD_OVERVIEW;
+    return ALL_SECTIONS.OVERVIEW;
   } else if (isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
   } else {
@@ -140,7 +140,7 @@ const getMenuItems = (intl, account) => {
   const menuItems = [
     {
       label: 'Overview',
-      section: ALL_SECTIONS.DASHBOARD_OVERVIEW,
+      section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
     },
     {
@@ -255,7 +255,7 @@ const getMenuItems = (intl, account) => {
     },
     {
       label: 'Settings',
-      sections: [ALL_SECTIONS.INFO, ALL_SECTIONS.COLLECTIVE_PAGE],
+      sections: [ALL_SECTIONS.INFO, ALL_SECTIONS.COLLECTIVE_PAGE, ALL_SECTIONS.SECURITY, ALL_SECTIONS.ADVANCED],
       Icon: Settings,
       subMenu: [
         {
@@ -265,6 +265,14 @@ const getMenuItems = (intl, account) => {
         {
           label: 'Profile page',
           section: ALL_SECTIONS.COLLECTIVE_PAGE,
+        },
+        {
+          label: 'Security',
+          section: ALL_SECTIONS.SECURITY,
+        },
+        {
+          label: 'Advanced',
+          section: ALL_SECTIONS.ADVANCED,
         },
       ],
     },
@@ -416,12 +424,7 @@ const DashboardPage = () => {
             {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage className="lg:mt-16" />
             ) : (
-              <div
-                className={clsx(
-                  'flex  flex-1 justify-center gap-4 sm:overflow-x-clip',
-                  useHorizontalNav ? ' px-3 md:px-6' : '',
-                )}
-              >
+              <div className={clsx('flex flex-1 justify-center gap-4', useHorizontalNav ? 'px-3 md:px-6' : '')}>
                 {useHorizontalNav && subMenu?.length && (
                   <div className="hidden w-48 pt-2 lg:block">
                     <div className="space-y-2 border-l text-sm ">
@@ -447,7 +450,7 @@ const DashboardPage = () => {
                     </div>
                   </div>
                 )}
-                <div className="relative w-full flex-1">
+                <div className="relative w-full max-w-screen-lg">
                   <AdminPanelSection
                     section={selectedSection}
                     isLoading={isLoading}
@@ -455,7 +458,7 @@ const DashboardPage = () => {
                     subpath={subpath}
                   />
                 </div>
-                {/* {useHorizontalNav && subMenu?.length && <div className="hidden w-48 xl:block" />} */}
+                {useHorizontalNav && subMenu?.length && <div className="w-48 shrink-[10]" />}
               </div>
             )}
           </div>

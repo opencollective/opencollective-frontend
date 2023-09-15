@@ -23,14 +23,7 @@ import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
-import {
-  ABOUT_ORG_SECTIONS,
-  ALL_SECTIONS,
-  COLLECTIVE_SECTIONS,
-  FISCAL_HOST_SECTIONS,
-  HOST_DASHBOARD_SECTIONS,
-  ORG_BUDGET_SECTIONS,
-} from './constants';
+import { ALL_SECTIONS } from './constants';
 import { DashboardContext } from './DashboardContext';
 import { MenuGroup, MenuLink, MenuSectionHeader } from './MenuComponents';
 
@@ -68,44 +61,44 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
         <MenuSectionHeader>
           <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
         </MenuSectionHeader>
-        <MenuLink section={ALL_SECTIONS.DASHBOARD_OVERVIEW} Icon={LayoutDashboard} />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_EXPENSES} Icon={Receipt} />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS} Icon={Coins} />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS} Icon={Coins} if={!isAccountantOnly} />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_AGREEMENTS} Icon={FileText} if={isInternalHost(account)} />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOST_APPLICATIONS} Icon={Inbox} if={!isAccountantOnly} />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.HOSTED_COLLECTIVES} Icon={Network} if={!isAccountantOnly} />
+        <MenuLink section={ALL_SECTIONS.OVERVIEW} Icon={LayoutDashboard} />
+        <MenuLink section={ALL_SECTIONS.HOST_EXPENSES} Icon={Receipt} />
+        <MenuLink section={ALL_SECTIONS.FINANCIAL_CONTRIBUTIONS} Icon={Coins} />
+        <MenuLink section={ALL_SECTIONS.PENDING_CONTRIBUTIONS} Icon={Coins} if={!isAccountantOnly} />
+        <MenuLink section={ALL_SECTIONS.HOST_AGREEMENTS} Icon={FileText} if={isInternalHost(account)} />
+        <MenuLink section={ALL_SECTIONS.HOST_APPLICATIONS} Icon={Inbox} if={!isAccountantOnly} />
+        <MenuLink section={ALL_SECTIONS.HOSTED_COLLECTIVES} Icon={Network} if={!isAccountantOnly} />
         <MenuLink
-          section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS}
+          section={ALL_SECTIONS.HOST_VIRTUAL_CARDS}
           Icon={CreditCard}
           if={!isAccountantOnly && hasFeature(account, FEATURES.VIRTUAL_CARDS)}
         />
         <MenuLink
-          section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS}
+          section={ALL_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS}
           Icon={CreditCard}
           if={!isAccountantOnly && hasFeature(account, FEATURES.VIRTUAL_CARDS)}
         />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} Icon={Chart} isBeta />
+        <MenuLink section={ALL_SECTIONS.REPORTS} Icon={Chart} isBeta />
 
         <MenuLink
           Icon={Settings}
           if={isHost && !isAccountantOnly}
           section="FISCAL_HOST_SETTINGS"
-          goToSection={FISCAL_HOST_SECTIONS.FISCAL_HOSTING}
+          goToSection={ALL_SECTIONS.FISCAL_HOSTING}
           renderSubMenu={({ parentSection }) => (
             <React.Fragment>
-              <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.FISCAL_HOSTING} />
-              <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS} />
-              <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.RECEIVING_MONEY} />
-              <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.FISCAL_HOSTING} />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.INVOICES_RECEIPTS} />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.RECEIVING_MONEY} />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.SENDING_MONEY} />
               <MenuLink
                 parentSection={parentSection}
-                section={FISCAL_HOST_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS}
+                section={ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS}
                 if={hasFeature(account, FEATURES.VIRTUAL_CARDS)}
               />
               <MenuLink
                 parentSection={parentSection}
-                section={FISCAL_HOST_SECTIONS.POLICIES}
+                section={ALL_SECTIONS.POLICIES}
                 if={isOneOfTypes(account, [USER, ORGANIZATION])}
               />
             </React.Fragment>
@@ -130,118 +123,110 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
             )}
           </MenuSectionHeader>
         )}
-        <MenuLink section={COLLECTIVE_SECTIONS.DASHBOARD_OVERVIEW} Icon={LayoutDashboard} />
-        <MenuLink section={COLLECTIVE_SECTIONS.EXPENSES} Icon={Receipt} />
-        <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTORS} Icon={Users} if={!isIndividual} />
-        <MenuLink section={COLLECTIVE_SECTIONS.CONTRIBUTIONS} Icon={Coins} />
+        <MenuLink section={ALL_SECTIONS.OVERVIEW} Icon={LayoutDashboard} />
+        <MenuLink section={ALL_SECTIONS.EXPENSES} Icon={Receipt} />
+        <MenuLink section={ALL_SECTIONS.CONTRIBUTORS} Icon={Users} if={!isIndividual} />
+        <MenuLink section={ALL_SECTIONS.CONTRIBUTIONS} Icon={Coins} />
         <MenuLink
-          section={ORG_BUDGET_SECTIONS.FINANCIAL_CONTRIBUTIONS}
+          section={ALL_SECTIONS.FINANCIAL_CONTRIBUTIONS}
           Icon={Coins}
           if={isSelfHostedAccount(account) && !isAccountantOnly && isType(account, COLLECTIVE)}
         />
-        <MenuLink section={COLLECTIVE_SECTIONS.TRANSACTIONS} Icon={Transfer} />
+        <MenuLink section={ALL_SECTIONS.TRANSACTIONS} Icon={Transfer} />
         <MenuLink
           Icon={Settings}
           if={!isType(account, ORGANIZATION)}
           section="SETTINGS"
-          goToSection={COLLECTIVE_SECTIONS.INFO}
+          goToSection={ALL_SECTIONS.INFO}
           renderSubMenu={({ parentSection }) => (
             <React.Fragment>
-              <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.INFO} />
-              <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.COLLECTIVE_PAGE} />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.INFO} />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.COLLECTIVE_PAGE} />
               <MenuLink
                 parentSection={parentSection}
-                section={COLLECTIVE_SECTIONS.COLLECTIVE_GOALS}
+                section={ALL_SECTIONS.COLLECTIVE_GOALS}
                 if={isOneOfTypes(account, [COLLECTIVE, PROJECT])}
               />
               <MenuLink
                 parentSection={parentSection}
-                section={COLLECTIVE_SECTIONS.CONNECTED_ACCOUNTS}
+                section={ALL_SECTIONS.CONNECTED_ACCOUNTS}
                 if={isType(account, COLLECTIVE)}
               />
               <MenuLink
                 parentSection={parentSection}
-                section={COLLECTIVE_SECTIONS.POLICIES}
+                section={ALL_SECTIONS.POLICIES}
                 if={isOneOfTypes(account, [COLLECTIVE, FUND])}
               />
               <MenuLink
                 parentSection={parentSection}
-                section={COLLECTIVE_SECTIONS.CUSTOM_EMAIL}
+                section={ALL_SECTIONS.CUSTOM_EMAIL}
                 if={isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT])}
               />
               <MenuLink
                 parentSection={parentSection}
-                section={COLLECTIVE_SECTIONS.EXPORT}
+                section={ALL_SECTIONS.EXPORT}
                 if={isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT])}
               />
               <MenuLink
                 parentSection={parentSection}
-                section={COLLECTIVE_SECTIONS.HOST}
+                section={ALL_SECTIONS.HOST}
                 if={isOneOfTypes(account, [COLLECTIVE, FUND])}
               />
               <MenuLink
                 parentSection={parentSection}
-                section={COLLECTIVE_SECTIONS.TEAM}
+                section={ALL_SECTIONS.TEAM}
                 if={isOneOfTypes(account, [COLLECTIVE, FUND, ORGANIZATION, EVENT, PROJECT])}
               />
               <MenuLink
                 parentSection={parentSection}
-                section={COLLECTIVE_SECTIONS.PAYMENT_METHODS}
+                section={ALL_SECTIONS.PAYMENT_METHODS}
                 if={['ACTIVE', 'AVAILABLE'].includes(account.features.USE_PAYMENT_METHODS)}
               />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.PAYMENT_RECEIPTS} if={isIndividual} />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.NOTIFICATIONS} if={isIndividual} />
               <MenuLink
                 parentSection={parentSection}
-                section={COLLECTIVE_SECTIONS.PAYMENT_RECEIPTS}
-                if={isIndividual}
-              />
-              <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.NOTIFICATIONS} if={isIndividual} />
-              <MenuLink
-                parentSection={parentSection}
-                section={ORG_BUDGET_SECTIONS.GIFT_CARDS}
+                section={ALL_SECTIONS.GIFT_CARDS}
                 if={['ACTIVE', 'AVAILABLE'].includes(account.features.EMIT_GIFT_CARDS)}
               />
               <MenuLink
                 parentSection={parentSection}
-                section={COLLECTIVE_SECTIONS.VIRTUAL_CARDS}
+                section={ALL_SECTIONS.VIRTUAL_CARDS}
                 if={
                   isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT]) &&
                   hasFeature(account.host, FEATURES.VIRTUAL_CARDS) &&
                   account.isApproved
                 }
               />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.TICKETS} if={isType(account, EVENT)} />
               <MenuLink
                 parentSection={parentSection}
-                section={COLLECTIVE_SECTIONS.TICKETS}
-                if={isType(account, EVENT)}
-              />
-              <MenuLink
-                parentSection={parentSection}
-                section={COLLECTIVE_SECTIONS.TIERS}
+                section={ALL_SECTIONS.TIERS}
                 if={isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT])}
               />
-              <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.WEBHOOKS} />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.WEBHOOKS} />
               <MenuLink
                 parentSection={parentSection}
-                section={COLLECTIVE_SECTIONS.AUTHORIZED_APPS}
+                section={ALL_SECTIONS.AUTHORIZED_APPS}
                 if={isType(account, USER)}
               />
-              <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.USER_SECURITY} if={isIndividual} />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.USER_SECURITY} if={isIndividual} />
               <MenuLink
                 parentSection={parentSection}
-                section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS}
+                section={ALL_SECTIONS.FOR_DEVELOPERS}
                 if={isOneOfTypes(account, [COLLECTIVE, USER])}
               />
-              <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.ACTIVITY_LOG} />
               <MenuLink
                 parentSection={parentSection}
-                section={FISCAL_HOST_SECTIONS.SECURITY}
+                section={ALL_SECTIONS.SECURITY}
                 if={isOneOfTypes(account, [COLLECTIVE, FUND, ORGANIZATION])}
               />
-              <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.ADVANCED} />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.ADVANCED} />
               <MenuGroup if={isSelfHostedAccount(account) && !isAccountantOnly} className="mt-6">
-                <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS} />
-                <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.RECEIVING_MONEY} />
-                <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />
+                <MenuLink parentSection={parentSection} section={ALL_SECTIONS.INVOICES_RECEIPTS} />
+                <MenuLink parentSection={parentSection} section={ALL_SECTIONS.RECEIVING_MONEY} />
+                <MenuLink parentSection={parentSection} section={ALL_SECTIONS.SENDING_MONEY} />
               </MenuGroup>
             </React.Fragment>
           )}
@@ -254,27 +239,27 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
           Icon={Settings}
           if={isType(account, ORGANIZATION)}
           section="ORG_SETTINGS"
-          goToSection={isAccountantOnly ? ALL_SECTIONS.PAYMENT_RECEIPTS : ABOUT_ORG_SECTIONS.INFO}
+          goToSection={isAccountantOnly ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.INFO}
           renderSubMenu={({ parentSection }) => (
             <React.Fragment>
               {!isAccountantOnly && (
                 <React.Fragment>
-                  <MenuLink parentSection={parentSection} section={ABOUT_ORG_SECTIONS.INFO} />
-                  <MenuLink parentSection={parentSection} section={ABOUT_ORG_SECTIONS.COLLECTIVE_PAGE} />
-                  <MenuLink parentSection={parentSection} section={ABOUT_ORG_SECTIONS.CONNECTED_ACCOUNTS} />
-                  <MenuLink parentSection={parentSection} section={ABOUT_ORG_SECTIONS.TEAM} />
-                  <MenuLink parentSection={parentSection} section={ORG_BUDGET_SECTIONS.PAYMENT_METHODS} />
+                  <MenuLink parentSection={parentSection} section={ALL_SECTIONS.INFO} />
+                  <MenuLink parentSection={parentSection} section={ALL_SECTIONS.COLLECTIVE_PAGE} />
+                  <MenuLink parentSection={parentSection} section={ALL_SECTIONS.CONNECTED_ACCOUNTS} />
+                  <MenuLink parentSection={parentSection} section={ALL_SECTIONS.TEAM} />
+                  <MenuLink parentSection={parentSection} section={ALL_SECTIONS.PAYMENT_METHODS} />
                 </React.Fragment>
               )}
-              <MenuLink parentSection={parentSection} section={ORG_BUDGET_SECTIONS.PAYMENT_RECEIPTS} />
-              <MenuLink parentSection={parentSection} section={ORG_BUDGET_SECTIONS.TIERS} if={!isAccountantOnly} />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.PAYMENT_RECEIPTS} />
+              <MenuLink parentSection={parentSection} section={ALL_SECTIONS.TIERS} if={!isAccountantOnly} />
               {!isAccountantOnly && (
                 <React.Fragment>
-                  <MenuLink parentSection={parentSection} section={ORG_BUDGET_SECTIONS.GIFT_CARDS} />
+                  <MenuLink parentSection={parentSection} section={ALL_SECTIONS.GIFT_CARDS} />
                   <MenuLink parentSection={parentSection} section={ALL_SECTIONS.WEBHOOKS} />
-                  <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.FOR_DEVELOPERS} />
-                  <MenuLink parentSection={parentSection} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
-                  <MenuLink parentSection={parentSection} section={FISCAL_HOST_SECTIONS.SECURITY} />
+                  <MenuLink parentSection={parentSection} section={ALL_SECTIONS.FOR_DEVELOPERS} />
+                  <MenuLink parentSection={parentSection} section={ALL_SECTIONS.ACTIVITY_LOG} />
+                  <MenuLink parentSection={parentSection} section={ALL_SECTIONS.SECURITY} />
                   <MenuLink parentSection={parentSection} section={ALL_SECTIONS.ADVANCED} />
                 </React.Fragment>
               )}

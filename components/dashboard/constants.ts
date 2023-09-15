@@ -4,13 +4,9 @@ import { CollectiveType } from '../../lib/constants/collectives';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
 
-export const HOST_DASHBOARD_SECTIONS = {
-  // New Host Dashboard
-  BUDGET_MANAGEMENT: 'budget',
-  COLLECTIVES: 'collectives',
-  OVERVIEW: 'info',
+export const DASHBOARD_SECTIONS = {
+  OVERVIEW: 'overview',
   REPORTS: 'reports',
-  // Existing Host Dashboard Sections
   HOST_EXPENSES: 'host-expenses',
   HOST_AGREEMENTS: 'host-agreements',
   FINANCIAL_CONTRIBUTIONS: 'orders',
@@ -19,81 +15,53 @@ export const HOST_DASHBOARD_SECTIONS = {
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   HOST_VIRTUAL_CARD_REQUESTS: 'host-virtual-card-requests',
   HOST_APPLICATIONS: 'host-applications',
+  CONTRIBUTORS: 'contributors',
+  CONTRIBUTIONS: 'contributions',
+  EXPENSES: 'expenses',
+  TRANSACTIONS: 'transactions',
+  VIRTUAL_CARDS: 'virtual-cards',
 };
 
-export const ABOUT_ORG_SECTIONS = {
-  COLLECTIVE_PAGE: 'collective-page',
-  CONNECTED_ACCOUNTS: 'connected-accounts',
-  INFO: 'info',
+export const DASHBOARD_SETTINGS_SECTIONS = {
   TEAM: 'team',
+  NOTIFICATIONS: 'notifications',
+  INVOICES_RECEIPTS: 'invoices-receipts',
 };
 
-export const ORG_BUDGET_SECTIONS = {
+export const LEGACY_SECTIONS = {
+  HOST: 'host',
+  INFO: 'info',
   GIFT_CARDS: 'gift-cards',
   CREATE_GIFT_CARDS: 'gift-cards-create',
   PAYMENT_METHODS: 'payment-methods',
   PAYMENT_RECEIPTS: 'payment-receipts',
   FINANCIAL_CONTRIBUTIONS: 'orders',
   TIERS: 'tiers',
-  // Manage Contributions
-};
-
-export const FISCAL_HOST_SECTIONS = {
   FISCAL_HOSTING: 'fiscal-hosting',
   SECURITY: 'security',
-  HOST_VIRTUAL_CARDS: 'host-virtual-cards',
-  HOST_VIRTUAL_CARD_REQUESTS: 'host-virtual-card-requests',
   HOST_VIRTUAL_CARDS_SETTINGS: 'host-virtual-cards-settings',
-  INVOICES_RECEIPTS: 'invoices-receipts',
   POLICIES: 'policies',
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
-};
-
-export const COLLECTIVE_SECTIONS = {
-  HOME: 'home',
-  DASHBOARD_OVERVIEW: 'overview',
-  CONTRIBUTORS: 'contributors',
-  CONTRIBUTIONS: 'contributions',
+  VIRTUAL_CARDS: 'virtual-cards',
+  TICKETS: 'tickets',
+  WEBHOOKS: 'webhooks',
   ADVANCED: 'advanced',
   AUTHORIZED_APPS: 'authorized-apps',
   COLLECTIVE_GOALS: 'goals',
-  COLLECTIVE_PAGE: 'collective-page',
   CONNECTED_ACCOUNTS: 'connected-accounts',
   EXPORT: 'export',
   FOR_DEVELOPERS: 'for-developers',
-  HOST: 'host',
-  INFO: 'info',
-  EXPENSES: 'expenses',
-  MANAGE_CONTRIBUTIONS: 'manage-contributions',
-  TRANSACTIONS: 'transactions',
-  PAYMENT_METHODS: 'payment-methods',
-  PAYMENT_RECEIPTS: 'payment-receipts',
-  NOTIFICATIONS: 'notifications',
-  POLICIES: 'policies',
-  CUSTOM_EMAIL: 'custom-email',
-  TEAM: 'team',
-  TICKETS: 'tickets',
-  TIERS: 'tiers',
   USER_SECURITY: 'user-security',
-  VIRTUAL_CARDS: 'virtual-cards',
-  WEBHOOKS: 'webhooks',
+  CUSTOM_EMAIL: 'custom-email',
   ACTIVITY_LOG: 'activity-log',
-} as const;
-
-export const LEGACY_COLLECTIVE_SETTINGS_SECTIONS = {
-  ...COLLECTIVE_SECTIONS,
-  ...ABOUT_ORG_SECTIONS,
-  ...ORG_BUDGET_SECTIONS,
-  ...FISCAL_HOST_SECTIONS,
-} as const;
+  COLLECTIVE_PAGE: 'collective-page',
+};
 
 export const ALL_SECTIONS = {
-  ...COLLECTIVE_SECTIONS,
-  ...ABOUT_ORG_SECTIONS,
-  ...ORG_BUDGET_SECTIONS,
-  ...FISCAL_HOST_SECTIONS,
-  ...HOST_DASHBOARD_SECTIONS,
+  ...DASHBOARD_SECTIONS,
+  ...LEGACY_SECTIONS,
+  ...DASHBOARD_SETTINGS_SECTIONS,
 } as const;
 
 export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
@@ -119,10 +87,6 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.EXPENSES]: {
     id: 'Expenses',
     defaultMessage: 'Expenses',
-  },
-  [ALL_SECTIONS.MANAGE_CONTRIBUTIONS]: {
-    id: 'menu.subscriptions',
-    defaultMessage: 'Manage Contributions',
   },
   [ALL_SECTIONS.TRANSACTIONS]: {
     id: 'menu.transactions',
@@ -155,18 +119,15 @@ export const SECTION_LABELS = defineMessages({
     id: 'AdminPanel.Menu.Overview',
     defaultMessage: 'Overview',
   },
-  [ALL_SECTIONS.BUDGET_MANAGEMENT]: {
+
+  [ALL_SECTIONS.OVERVIEW]: {
     id: 'AdminPanel.Menu.Overview',
     defaultMessage: 'Overview',
   },
-  [ALL_SECTIONS.DASHBOARD_OVERVIEW]: {
-    id: 'AdminPanel.Menu.Overview',
-    defaultMessage: 'Overview',
-  },
-  [ALL_SECTIONS.COLLECTIVES]: {
-    id: 'Collectives',
-    defaultMessage: 'Collectives',
-  },
+  // [ALL_SECTIONS.COLLECTIVES]: {
+  //   id: 'Collectives',
+  //   defaultMessage: 'Collectives',
+  // },
   [ALL_SECTIONS.REPORTS]: {
     id: 'Reports',
     defaultMessage: 'Reports',
@@ -283,10 +244,6 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.HOSTED_COLLECTIVES]: {
     id: 'HostedCollectives',
     defaultMessage: 'Hosted Collectives',
-  },
-  [ALL_SECTIONS.HOME]: {
-    id: 'home',
-    defaultMessage: 'Home',
   },
   [ALL_SECTIONS.NOTIFICATIONS]: {
     id: 'NotificationsSettings.Title',
