@@ -36,8 +36,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'New navigation',
     description:
       'A new navigation bar that helps you find your way around Open Collective and understand where you are.',
-    publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
+    publicBeta: true,
     dependsOn: PREVIEW_FEATURE_KEYS.DASHBOARD,
   },
   {
