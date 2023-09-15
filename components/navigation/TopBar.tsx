@@ -297,7 +297,9 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
         </div>
       </div>
       <SearchModal open={showSearchModal} setOpen={open => setShowSearchModal(open)} />
-      {isMobile && (onDashboardRoute || onSearchRoute) && <MobileFooterMenu {...{ onDashboardRoute, onSearchRoute }} />}
+      {isMobile && (onDashboardRoute || onSearchRoute) && !hasBreadCrumbNav && (
+        <MobileFooterMenu {...{ onDashboardRoute, onSearchRoute }} />
+      )}
     </Fragment>
   );
 };

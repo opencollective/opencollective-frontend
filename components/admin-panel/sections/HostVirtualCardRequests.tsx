@@ -7,6 +7,7 @@ import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { Account, Host, VirtualCardRequestCollection } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
+import DashboardHeader from '../../dashboard/DashboardHeader';
 import { Box, Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
@@ -17,7 +18,6 @@ import { VirtualCardRequestDrawer } from '../../virtual-card-requests/VirtualCar
 import VirtualCardRequestFilter from '../../virtual-card-requests/VirtualCardRequestFilter';
 import { VirtualCardRequestsTable } from '../../virtual-card-requests/VirtualCardRequestsTable';
 import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
-import DashboardHeader from '../../dashboard/DashboardHeader';
 
 const hostVirtualCardRequestsQuery = gql`
   query HostVirtualCardRequests(

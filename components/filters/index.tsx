@@ -1,12 +1,10 @@
 import React from 'react';
-import { cx } from 'class-variance-authority';
-import { ArrowUpDown, Filter, LayoutList, MessageSquare, MoreHorizontal, Paperclip, Table2, X } from 'lucide-react';
 
-import OrderFilter from './OrderFilter';
-import SelectFilter from './SelectFilter';
-import FilterCombo, { FilterOptions } from './FilterCombo';
 import DashboardViews from '../dashboard/DashboardViews';
 import { Separator } from '../ui/Separator';
+
+import FilterCombo, { FilterOptions } from './FilterCombo';
+import OrderFilter from './OrderFilter';
 
 export default function Filters({
   query,
