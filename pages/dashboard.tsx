@@ -1,5 +1,19 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import clsx from 'clsx';
+import {
+  ArrowRightLeft,
+  BarChart2,
+  Building,
+  Coins,
+  CreditCard,
+  CreditCardIcon,
+  FileText,
+  LayoutDashboard,
+  Receipt,
+  Settings,
+  Users,
+} from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -11,13 +25,14 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { require2FAForAdmins } from '../lib/policies';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
+import { getDashboardRoute } from '../lib/url-helpers';
 
 import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import AdminPanelSection from '../components/dashboard/DashboardSection';
+import TopBar from '../components/dashboard/DashboardTopBar';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
-import TopBar from '../components/dashboard/DashboardTopBar';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import Footer from '../components/navigation/Footer';
@@ -25,23 +40,6 @@ import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
-import clsx from 'clsx';
-import { getDashboardRoute } from '../lib/url-helpers';
-import {
-  ArrowRightLeft,
-  BarChart2,
-  Building,
-  Coins,
-  CreditCard,
-  CreditCardIcon,
-  FileText,
-  Hotel,
-  LayoutDashboard,
-  Network,
-  Receipt,
-  Settings,
-  Users,
-} from 'lucide-react';
 import { Badge } from '../components/ui/Badge';
 const messages = defineMessages({
   collectiveIsArchived: {
