@@ -8,7 +8,6 @@ import { getSuggestedTags } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
 
-import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import ScheduledExpensesBanner from '../host-dashboard/ScheduledExpensesBanner';
 import Link from '../Link';
@@ -29,7 +28,7 @@ const ORDER_SELECT_STYLE = { control: { background: 'white' } };
 
 const Expenses = props => {
   const router = useRouter();
-  const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, onlySubmittedExpenses } = props;
+  const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, isSubmitted } = props;
 
   const expensesRoute = isDashboard
     ? `/dashboard/${variables.collectiveSlug}/expenses`
@@ -68,18 +67,6 @@ const Expenses = props => {
     return omitBy(queryParameters, value => !value);
   }
 
-  function updateFilters(queryParams) {
-    return router.push({
-      pathname: expensesRoute,
-      query: buildFilterLinkParams({ ...queryParams, offset: null }),
-    });
-  }
-
-  function handleSearch(searchTerm) {
-    const params = buildFilterLinkParams({ searchTerm, offset: null });
-    router.push({ pathname: expensesRoute, query: params });
-  }
-
   function getTagProps(tag) {
     if (tag === query.tag) {
       return { type: 'info', closeButtonProps: true };
@@ -88,56 +75,12 @@ const Expenses = props => {
 
   const suggestedTags = React.useMemo(() => getSuggestedTags(data?.account), [data?.account]);
 
-  const isSelfHosted = data?.account?.id === data?.account?.host?.id;
-
   return (
     <div className="mx-auto max-w-screen-lg">
-      <h1 className={isDashboard ? 'text-2xl font-bold leading-10 tracking-tight' : 'text-[32px] leading-10'}>
-        {onlySubmittedExpenses ? (
-          <FormattedMessage defaultMessage="Submitted Expenses" />
-        ) : (
-          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-        )}
-      </h1>
-      <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}>
-        {!onlySubmittedExpenses && (
-          <Box flex="0 1" flexBasis={['100%', null, '380px']}>
-            <ExpensesDirection
-              value={query.direction || 'RECEIVED'}
-              onChange={direction => {
-                const newFilters = { ...query, direction };
-                updateFilters(newFilters);
-              }}
-            />
-          </Box>
-        )}
-        <Box flex="12 1 160px">
-          <SearchBar defaultValue={query.searchTerm} onSubmit={searchTerm => handleSearch(searchTerm)} height="40px" />
-        </Box>
-        <Box flex="0 1 160px">
-          <ExpensesOrder
-            value={query.orderBy}
-            onChange={orderBy => updateFilters({ ...query, orderBy })}
-            styles={ORDER_SELECT_STYLE}
-          />
-        </Box>
-      </Flex>
-      <Box mx="8px">
-        {data?.account ? (
-          <ExpensesFilters
-            collective={data.account}
-            filters={query}
-            onChange={queryParams => updateFilters(queryParams)}
-            wrap={false}
-            showOrderFilter={false} // On this page, the order filter is displayed at the top
-          />
-        ) : (
-          <LoadingPlaceholder height={70} />
-        )}
-      </Box>
-      {isSelfHosted && LoggedInUser?.isHostAdmin(data?.account) && data.scheduledExpenses?.totalCount > 0 && (
+      {/* TODO: include this as a view, similar strategy as host dashboard */}
+      {/* {isSelfHosted && LoggedInUser?.isHostAdmin(data?.account) && data.scheduledExpenses?.totalCount > 0 && (
         <ScheduledExpensesBanner hostSlug={data.account.slug} />
-      )}
+      )} */}
       <Flex justifyContent="space-between" flexWrap="wrap" gridGap={[0, 3, 5]}>
         <Box flex="1 1 500px" minWidth={300} mb={5} mt={['16px', '46px']}>
           {!loading && !data.expenses?.nodes.length ? (
@@ -167,8 +110,8 @@ const Expenses = props => {
                 expenses={data?.expenses?.nodes}
                 nbPlaceholders={variables.limit}
                 suggestedTags={suggestedTags}
-                isInverted={query.direction === 'SUBMITTED'}
-                view={query.direction === 'SUBMITTED' ? 'submitter' : undefined}
+                isInverted={isSubmitted}
+                view={isSubmitted ? 'submitter' : undefined}
                 useDrawer={isDashboard}
                 openExpenseLegacyId={Number(router.query.openExpenseId)}
                 setOpenExpenseLegacyId={legacyId => {
@@ -194,6 +137,7 @@ const Expenses = props => {
             </React.Fragment>
           )}
         </Box>
+        {/* TODO: move this to the page itself */}
         {!isDashboard && (
           <Box minWidth={270} width={['100%', null, null, 275]} mt={[0, 48]}>
             <ExpenseInfoSidebar isLoading={loading} collective={data?.account} host={data?.account?.host}>

@@ -30,7 +30,10 @@ import { parseTransactionPaymentMethodTypes } from './filters/TransactionsPaymen
 import TransactionsDownloadCSV from './TransactionsDownloadCSV';
 import TransactionsFilters from './TransactionsFilters';
 import TransactionsList from './TransactionsList';
-
+import DashboardHeader from '../dashboard/DashboardHeader';
+import ExportTransactionsCSVModal from '../ExportTransactionsCSVModal';
+import Filterbar from '../filters/FilterArea';
+import { FilterType } from '../filters/types';
 const EXPENSES_PER_PAGE = 15;
 
 export function getVariablesFromQuery(query) {
@@ -86,6 +89,7 @@ const Transactions = ({
 }) => {
   const intl = useIntl();
   const prevLoggedInUser = usePrevious(LoggedInUser);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [state, setState] = useState({
     hasChildren: null,
     hasGiftCards: null,
@@ -173,9 +177,7 @@ const Transactions = ({
   });
   const canDownloadInvoices = checkCanDownloadInvoices();
 
-  if (!account && loading) {
-    return <Loading />;
-  } else if (!account) {
+  if (!account && !loading) {
     return <ErrorPage error={error} loading={loading} />;
   }
 
@@ -189,10 +191,18 @@ const Transactions = ({
 
   return (
     <div className="mx-auto max-w-screen-lg">
-      <div className="flex flex-wrap justify-between gap-4">
-        <h1 className={isDashboard ? 'text-2xl font-bold leading-10 tracking-tight' : 'text-[32px] leading-10'}>
-          <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
-        </h1>
+      <DashboardHeader
+        title={<FormattedMessage id="menu.transactions" defaultMessage="Transactions" />}
+        staticActions={[
+          {
+            primary: false,
+            label: <FormattedMessage defaultMessage="Export CSV" />,
+            onClick: () => setShowExportModal(true),
+          },
+        ]}
+      />
+      {/* <div className="flex flex-wrap justify-between gap-4">
+        <h1 className={isDashboard ? 'text-2xl font-bold leading-10 tracking-tight' : 'text-[32px] leading-10'}></h1>
         <div className="flex-grow sm:flex-grow-0">
           <SearchBar
             placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…' })}
@@ -201,8 +211,8 @@ const Transactions = ({
             onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
           />
         </div>
-      </div>
-      <Flex
+      </div> */}
+      {/* <Flex
         mb={['8px', '23px']}
         mt={4}
         mx="8px"
@@ -239,8 +249,18 @@ const Transactions = ({
           )}
           <TransactionsDownloadCSV collective={account} query={router.query} width="100%" />
         </Flex>
-      </Flex>
-
+      </Flex> */}
+      <Filterbar
+        query={router.query}
+        filterOptions={[
+          {
+            key: 'searchTerm',
+            static: true,
+            filterType: FilterType.TEXT_INPUT,
+            label: intl.formatMessage({ id: 'Search', defaultMessage: 'Search...' }),
+          },
+        ]}
+      />
       <Flex
         mx="8px"
         justifyContent="space-between"
@@ -340,6 +360,14 @@ const Transactions = ({
           </React.Fragment>
         )}
       </Box>
+      {showExportModal && (
+        <ExportTransactionsCSVModal
+          dateInterval={router.query.period && parseDateInterval(router.query.period)}
+          filters={omit(router.query, ['period', 'collectiveSlug'])}
+          collective={account}
+          onClose={() => setShowExportModal(false)}
+        />
+      )}
     </div>
   );
 };

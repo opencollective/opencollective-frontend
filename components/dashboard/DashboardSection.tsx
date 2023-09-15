@@ -26,6 +26,7 @@ import NotFound from '../NotFound';
 import Contributions from './sections/Contributions';
 import Contributors from './sections/Contributors';
 import Expenses from './sections/Expenses';
+import SubmittedExpenses from './sections/SubmittedExpenses';
 import Home from './sections/Home';
 import Transactions from './sections/Transactions';
 import VirtualCards from './sections/virtual-cards/VirtualCards';
@@ -50,6 +51,7 @@ const DASHBOARD_COMPONENTS = {
   [DASHBOARD_SECTIONS.CONTRIBUTIONS]: Contributions,
   [DASHBOARD_SECTIONS.TRANSACTIONS]: Transactions,
   [DASHBOARD_SECTIONS.VIRTUAL_CARDS]: VirtualCards,
+  [DASHBOARD_SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
 };
 
 const SETTINGS_COMPONENTS = {

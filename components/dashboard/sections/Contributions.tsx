@@ -32,6 +32,8 @@ import {
 import { Pagination } from '../../ui/Pagination';
 import { TableActionsButton } from '../../ui/Table';
 import { AdminSectionProps } from '../types';
+import FilterArea from '../../filters/FilterArea';
+import DashboardHeader from '../DashboardHeader';
 
 enum ContributionsTab {
   RECURRING = 'RECURRING',
@@ -398,25 +400,18 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
 
   return (
     <div className="mx-auto max-w-screen-lg">
-      <div className="flex justify-between gap-4">
-        <h1 className="text-2xl font-bold leading-10 tracking-tight">
-          {isIncoming ? (
-            <FormattedMessage id="Contributors" defaultMessage="Contributors" />
-          ) : (
+      <DashboardHeader
+        title={
+          isIncoming ? (
             <FormattedMessage id="Contributions" defaultMessage="Contributions" />
-          )}
-        </h1>
-        <SearchBar
-          placeholder={intl.formatMessage({ defaultMessage: 'Search...', id: 'search.placeholder' })}
-          defaultValue={router.query.searchTerm}
-          height="40px"
-          onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
-        />
-      </div>
-      <Box my="24px">
-        <StyledTabs tabs={tabs} selectedId={tab} onChange={handleTabUpdate} />
-      </Box>
-      <div className="flex flex-col gap-4">
+          ) : (
+            <FormattedMessage id="OutgoingContributions" defaultMessage="Outgoing Contributions" />
+          )
+        }
+      />
+
+      <FilterArea query={queryValues} views={tabs} onChange={updateFilters} />
+      <div className="mt-6 flex flex-col gap-4">
         {error && <MessageBoxGraphqlError error={error} />}
         {loading && <LoadingPlaceholder height="250px" width="100%" borderRadius="16px" />}
         {!error && !loading && (

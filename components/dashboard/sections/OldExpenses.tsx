@@ -17,10 +17,6 @@ import { parseAmountRange } from '../../budget/filters/AmountFilter';
 import ExpensesPage from '../../expenses/ExpensesPage';
 import { parseChronologicalOrderInput } from '../../expenses/filters/ExpensesOrder';
 import { AdminSectionProps } from '../types';
-import { FormattedMessage, useIntl } from 'react-intl';
-import DashboardHeader from '../DashboardHeader';
-import FilterArea from '../../filters/FilterArea';
-import { FilterType } from '../../filters/types';
 
 const parseQuery = (routerQuery, account) => {
   const { offset, limit, type, status, tag, amount, payout, period, searchTerm, orderBy, direction } = routerQuery;
@@ -44,7 +40,6 @@ const EXPENSES_PER_PAGE = 10;
 
 const Expenses = (props: AdminSectionProps) => {
   const router = useRouter();
-  const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
 
   const query = parseQuery(router.query, props.account);
@@ -52,11 +47,16 @@ const Expenses = (props: AdminSectionProps) => {
   const amountRange = parseAmountRange(query.amount);
   const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
   const orderBy = query.orderBy && parseChronologicalOrderInput(query.orderBy);
+  const showSubmitted = query.direction === 'SUBMITTED';
   const slug = props.account.slug;
-
+  const createdByAccount = slug === LoggedInUser?.collective.slug ? { slug } : null;
+  const fromAccount = !createdByAccount && showSubmitted ? { slug } : null;
+  const account = !createdByAccount && !showSubmitted ? { slug } : null;
   const variables = {
     collectiveSlug: slug,
-    account: { slug },
+    fromAccount,
+    account,
+    createdByAccount,
     offset: query.offset || 0,
     limit: query.limit || EXPENSES_PER_PAGE,
     type: query.type,
@@ -90,30 +90,17 @@ const Expenses = (props: AdminSectionProps) => {
   });
 
   return (
-    <div>
-      <DashboardHeader title={<FormattedMessage defaultMessage="Expenses" />} />
-      <FilterArea
-        query={query}
-        filterOptions={[
-          {
-            key: 'searchTerm',
-            static: true,
-            filterType: FilterType.TEXT_INPUT,
-            label: intl.formatMessage({ id: 'Search', defaultMessage: 'Search...' }),
-          },
-        ]}
-      />
-      <ExpensesPage
-        data={data}
-        refetch={refetch}
-        query={query}
-        error={error}
-        loading={loading}
-        variables={variables}
-        LoggedInUser={LoggedInUser}
-        isDashboard
-      />
-    </div>
+    <ExpensesPage
+      data={data}
+      refetch={refetch}
+      query={query}
+      error={error}
+      loading={loading}
+      variables={variables}
+      LoggedInUser={LoggedInUser}
+      onlySubmittedExpenses={LoggedInUser?.collective.slug === variables.collectiveSlug}
+      isDashboard
+    />
   );
 };
 

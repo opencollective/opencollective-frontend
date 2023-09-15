@@ -18,6 +18,7 @@ export const DASHBOARD_SECTIONS = {
   CONTRIBUTORS: 'contributors',
   CONTRIBUTIONS: 'contributions',
   EXPENSES: 'expenses',
+  SUBMITTED_EXPENSES: 'submitted-expenses',
   TRANSACTIONS: 'transactions',
   VIRTUAL_CARDS: 'virtual-cards',
 };

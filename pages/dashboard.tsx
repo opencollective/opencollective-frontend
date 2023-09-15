@@ -135,6 +135,7 @@ const getMenuItems = (intl, account) => {
   const isHost = isHostAccount(account);
   // const isUserHost = account.isHost === true && isType(account, USER); // for legacy compatibility for users who are hosts
   const isIndividual = isIndividualAccount(account);
+  const isCollective = !isHost && !isIndividual;
   const menuItems = [
     {
       label: 'Overview',
@@ -143,8 +144,31 @@ const getMenuItems = (intl, account) => {
     },
     {
       label: 'Expenses',
-      section: isHost ? ALL_SECTIONS.HOST_EXPENSES : ALL_SECTIONS.EXPENSES,
+      section: ALL_SECTIONS.HOST_EXPENSES,
       Icon: Receipt,
+      if: isHost,
+    },
+    {
+      label: 'Expenses',
+      sections: [ALL_SECTIONS.EXPENSES, ALL_SECTIONS.SUBMITTED_EXPENSES],
+      subMenu: [
+        {
+          label: 'Received',
+          section: ALL_SECTIONS.EXPENSES,
+        },
+        {
+          label: 'Submitted',
+          section: ALL_SECTIONS.SUBMITTED_EXPENSES,
+        },
+      ],
+      Icon: Receipt,
+      if: isCollective,
+    },
+    {
+      label: 'Expenses',
+      section: ALL_SECTIONS.SUBMITTED_EXPENSES,
+      Icon: Receipt,
+      if: isIndividual,
     },
     {
       label: 'Contributions',
@@ -162,12 +186,12 @@ const getMenuItems = (intl, account) => {
         },
       ],
     },
-    {
-      label: 'Tiers',
-      section: ALL_SECTIONS.TIERS,
-      Icon: Users,
-      if: !isIndividual && !isHost,
-    },
+    // {
+    //   label: 'Tiers',
+    //   section: ALL_SECTIONS.TIERS,
+    //   Icon: Users,
+    //   if: !isIndividual && !isHost,
+    // },
     // {
     //   label: 'Projects & Events',
     //   sections: ['projects', 'events'],

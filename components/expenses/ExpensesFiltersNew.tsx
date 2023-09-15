@@ -23,7 +23,7 @@ import ExpensesOrder from './filters/ExpensesOrder';
 import ExpensesPayoutTypeFilter from './filters/ExpensesPayoutTypeFilter';
 import ExpensesStatusFilter from './filters/ExpensesStatusFilter';
 import ExpensesTypeFilter from './filters/ExpensesTypeFilter';
-import Filterbar from '../filters';
+import Filterbar from '../filters/FilterArea';
 import { useRouter } from 'next/router';
 const FilterContainer = styled.div`
   margin-bottom: 8px;

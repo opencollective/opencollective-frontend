@@ -8,9 +8,7 @@ import { i18nExpenseStatus, i18nExpenseType } from '../../lib/i18n/expense';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 import { sortSelectOptions } from '../../lib/utils';
 
-import { FilterOptions, FilterType, OptionType } from '../filters/FilterCombo';
-
-import memoizeOne from 'memoize-one';
+import { FilterOptions, FilterType, OptionType } from '../filters/types';
 
 const OPTION_LABELS = defineMessages({
   ALL: {

@@ -27,8 +27,8 @@ import StyledButton from '../StyledButton';
 
 import OrdersFilters from './OrdersFilters';
 import OrdersList from './OrdersList';
-import Filterbar from '../filters';
-import { FilterType, FilterOptions, OptionType } from '../filters/FilterCombo';
+import Filterbar from '../filters/FilterArea';
+import { FilterType, FilterOptions, OptionType } from '../filters/types';
 
 const accountOrdersQuery = gql`
   query Orders(

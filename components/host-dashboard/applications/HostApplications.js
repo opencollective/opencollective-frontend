@@ -13,11 +13,12 @@ import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import Pagination from '../../Pagination';
 import SearchBar from '../../SearchBar';
 import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from '../HostAdminCollectiveFilters';
-
+import DashboardHeader from '../../dashboard/DashboardHeader';
+import FilterArea from '../../filters/FilterArea';
 import HostApplicationDrawer from './HostApplicationDrawer';
 import HostApplicationsTable from './HostApplicationsTable';
 import { hostApplicationsQuery } from './queries';
-
+import { FilterType } from '../../filters/types';
 const COLLECTIVES_PER_PAGE = 20;
 
 const getVariablesFromQuery = query => {
@@ -104,33 +105,44 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
 
   return (
     <div className="">
-      <div className="flex flex-wrap justify-between gap-4">
-        <h1 className="text-2xl font-bold leading-10 tracking-tight">
-          <FormattedMessage defaultMessage="Applications" />
-        </h1>
-        <SearchBar
-          height={40}
-          defaultValue={query.searchTerm}
-          onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
+      <div className="mb-6">
+        <DashboardHeader title={<FormattedMessage defaultMessage="Applications" />} />
+        <FilterArea
+          query={router.query}
+          omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
+          views={views}
+          filterOptions={[
+            {
+              key: 'searchTerm',
+              static: true,
+              filterType: FilterType.TEXT_INPUT,
+              label: 'Search...',
+            },
+            {
+              key: 'status',
+              filterType: FilterType.SELECT,
+              label: 'Status',
+              options: [
+                { value: 'PENDING', label: 'Pending' },
+                { value: 'APPROVED', label: 'Approved' },
+                { value: 'REJECTED', label: 'Rejected' },
+              ],
+            },
+          ]}
+          onChange={query => {
+            router.push(
+              {
+                pathname: pageRoute,
+                query,
+              },
+              undefined,
+              { scroll: false },
+            );
+          }}
         />
       </div>
 
-      <DashboardViews
-        query={query}
-        omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
-        views={views}
-        onChange={query => {
-          router.push(
-            {
-              pathname: pageRoute,
-              query,
-            },
-            undefined,
-            { scroll: false },
-          );
-        }}
-      />
-      <div className="mb-6">
+      {/* <div className="mb-6">
         <HostAdminCollectiveFilters
           filters={[COLLECTIVE_FILTER.SORT_BY]}
           values={query}
@@ -141,7 +153,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
             })
           }
         />
-      </div>
+      </div> */}
 
       {error && <MessageBoxGraphqlError error={error} mb={2} />}
 

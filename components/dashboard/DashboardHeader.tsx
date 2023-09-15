@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 export default function DashboardHeader({
   title,
+  staticActions,
   primaryAction,
   secondaryActions,
   description,
@@ -25,6 +26,12 @@ export default function DashboardHeader({
               {primaryAction.label}
             </Button>
           )}
+          {staticActions?.length > 0 &&
+            staticActions.map(({ label, onClick, disabled }) => (
+              <Button key={label} disabled={disabled} size="sm" onClick={onClick} variant="outline">
+                {label}
+              </Button>
+            ))}
           {secondaryActions?.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

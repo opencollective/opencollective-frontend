@@ -27,7 +27,7 @@ import {
   expensesListAdminFieldsFragment,
   expensesListFieldsFragment,
 } from '../expenses/graphql/fragments';
-import Filterbar from '../filters';
+import Filterbar from '../filters/FilterArea';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';

@@ -17,6 +17,8 @@ import Pagination from '../../../Pagination';
 import { AdminSectionProps } from '../../types';
 
 import VirtualCardFilters from './VirtualCardFilters';
+import DashboardHeader from '../../DashboardHeader';
+import FilterArea from '../../../filters/FilterArea';
 
 const virtualCardsQuery = gql`
   query AccountVirtualCards(
@@ -135,12 +137,43 @@ const VitualCards = ({ account }: AdminSectionProps) => {
   };
   return (
     <div>
-      <h1 className="text-2xl font-bold leading-10 tracking-tight">
-        <FormattedMessage id="VirtualCards" defaultMessage="Virtual Cards" />
-      </h1>
+      <DashboardHeader
+        title={<FormattedMessage id="VirtualCards" defaultMessage="Virtual Cards" />}
+        staticActions={[{ label: 'Request Virtual Card', onClick: () => console.log('click') }]}
+        description={
+          <FormattedMessage
+            id="VirtualCards.Description"
+            defaultMessage="Use a virtual card to spend from your collective's budget. You can request multiple cards (review the host's policy to see how many). Your fiscal host will create the card for you and assign it a limit and a merchant. You will be notified by email once the card is assigned. <learnMoreLink>Learn more</learnMoreLink>"
+            values={{
+              learnMoreLink: getI18nLink({
+                href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
+                openInNewTabNoFollow: true,
+              }),
+            }}
+          />
+        }
+      />
+      {account.host?.settings?.virtualcards?.policy && (
+        <p className="mt-3">
+          <Collapse
+            title={
+              <FormattedMessage
+                id="VirtualCards.Policy.Reminder"
+                defaultMessage="{hostName} Virtual Card use Policy"
+                values={{
+                  hostName: account.host.name,
+                }}
+              />
+            }
+          >
+            <HTMLContent content={account.host?.settings?.virtualcards?.policy} />
+          </Collapse>
+        </p>
+      )}
+      <FilterArea />
       <div>
-        <div>
-          <p className="mb-4 max-w-prose text-muted-foreground">
+        {/* <div> */}
+        {/* <p className="mb-4 max-w-prose text-muted-foreground">
             <FormattedMessage
               id="VirtualCards.Description"
               defaultMessage="Use a virtual card to spend from your collective's budget. You can request multiple cards (review the host's policy to see how many). Your fiscal host will create the card for you and assign it a limit and a merchant. You will be notified by email once the card is assigned. <learnMoreLink>Learn more</learnMoreLink>"
@@ -151,25 +184,9 @@ const VitualCards = ({ account }: AdminSectionProps) => {
                 }),
               }}
             />
-          </p>
-          {account.host?.settings?.virtualcards?.policy && (
-            <p className="mt-3">
-              <Collapse
-                title={
-                  <FormattedMessage
-                    id="VirtualCards.Policy.Reminder"
-                    defaultMessage="{hostName} Virtual Card use Policy"
-                    values={{
-                      hostName: account.host.name,
-                    }}
-                  />
-                }
-              >
-                <HTMLContent content={account.host?.settings?.virtualcards?.policy} />
-              </Collapse>
-            </p>
-          )}
-          <Flex mt={3} flexDirection={['row', 'column']}>
+          </p> */}
+
+        {/* <Flex mt={3} flexDirection={['row', 'column']}>
             <VirtualCardFilters
               filters={routerQuery}
               collective={account}
@@ -178,8 +195,8 @@ const VitualCards = ({ account }: AdminSectionProps) => {
               onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
               displayPeriodFilter
             />
-          </Flex>
-        </div>
+          </Flex> */}
+        {/* </div> */}
         <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
           {data.account.virtualCards.nodes.map(virtualCard => (
             <VirtualCard
@@ -204,6 +221,7 @@ const VitualCards = ({ account }: AdminSectionProps) => {
           />
         </Flex>
       </div>
+      {/* {showRequestCardModal && <RequestVirtualCardModal host={host} collective={collective} onClose={() => setShowModal(false)} />} */}
     </div>
   );
 };

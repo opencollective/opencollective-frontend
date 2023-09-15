@@ -16,7 +16,8 @@ import SearchBar from '../SearchBar';
 
 import HostAdminCollectiveCard from './HostAdminCollectiveCard';
 import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from './HostAdminCollectiveFilters';
-
+import DashboardHeader from '../dashboard/DashboardHeader';
+import FilterArea from '../filters/FilterArea';
 const COLLECTIVES_PER_PAGE = 20;
 
 // TODO: This query is using `legacyId` for host and member.account to interface with the
@@ -139,18 +140,12 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
   const hostedMemberships = data?.host?.memberOf;
   return (
     <div className="mx-auto max-w-screen-lg">
-      <div className="flex flex-wrap justify-between gap-4">
-        <h1 className="text-2xl font-bold leading-10 tracking-tight">
-          <FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />
-        </h1>
-        <SearchBar
-          height={40}
-          defaultValue={query.searchTerm}
-          onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-        />
+      <div className="mb-6">
+        <DashboardHeader title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />} />
+        <FilterArea query={router.query} />
       </div>
-      <hr className="my-5" />
-      <Box mb={34}>
+
+      {/* <Box mb={34}>
         {data?.host ? (
           <HostAdminCollectiveFilters
             values={query}
@@ -160,7 +155,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
         ) : loading ? (
           <LoadingPlaceholder height={70} />
         ) : null}
-      </Box>
+      </Box> */}
 
       {error && <MessageBoxGraphqlError error={error} mb={2} />}
 

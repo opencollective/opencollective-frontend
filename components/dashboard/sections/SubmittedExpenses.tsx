@@ -21,7 +21,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import DashboardHeader from '../DashboardHeader';
 import FilterArea from '../../filters/FilterArea';
 import { FilterType } from '../../filters/types';
-
 const parseQuery = (routerQuery, account) => {
   const { offset, limit, type, status, tag, amount, payout, period, searchTerm, orderBy, direction } = routerQuery;
   const newDirection = direction ? direction : isIndividualAccount(account) ? 'SUBMITTED' : 'RECEIVED';
@@ -53,10 +52,13 @@ const Expenses = (props: AdminSectionProps) => {
   const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
   const orderBy = query.orderBy && parseChronologicalOrderInput(query.orderBy);
   const slug = props.account.slug;
+  const createdByAccount = slug === LoggedInUser?.collective.slug ? { slug } : null;
+  const fromAccount = !createdByAccount ? { slug } : null;
 
   const variables = {
     collectiveSlug: slug,
-    account: { slug },
+    createdByAccount,
+    fromAccount,
     offset: query.offset || 0,
     limit: query.limit || EXPENSES_PER_PAGE,
     type: query.type,
@@ -91,7 +93,7 @@ const Expenses = (props: AdminSectionProps) => {
 
   return (
     <div>
-      <DashboardHeader title={<FormattedMessage defaultMessage="Expenses" />} />
+      <DashboardHeader title={<FormattedMessage defaultMessage="Submitted Expenses" />} />
       <FilterArea
         query={query}
         filterOptions={[
@@ -112,6 +114,7 @@ const Expenses = (props: AdminSectionProps) => {
         variables={variables}
         LoggedInUser={LoggedInUser}
         isDashboard
+        isSubmitted
       />
     </div>
   );

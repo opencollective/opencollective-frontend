@@ -3,12 +3,20 @@ import React from 'react';
 import DashboardViews from '../dashboard/DashboardViews';
 import { Separator } from '../ui/Separator';
 
-import FilterCombo, { FilterOptions } from './FilterCombo';
+import FilterCombo from './FilterCombo';
 import OrderFilter from './OrderFilter';
+import { FilterOptions, FilterType } from './types';
 
-export default function Filters({
+export default function FilterArea({
   query,
-  filterOptions,
+  filterOptions = [
+    {
+      key: 'searchTerm',
+      static: true,
+      filterType: FilterType.TEXT_INPUT,
+      label: 'Search...',
+    },
+  ],
   orderByKey = 'orderBy',
   orderByOptions,
   onChange,
