@@ -2165,7 +2165,7 @@
   "NotificationsSettings.NecessaryNotifications.Receipts": "捐款收据",
   "NotificationsSettings.NecessaryNotifications.Title": "必要通知",
   "NotificationsSettings.NecessaryNotifications.ToSUpdates": "我们服务条款的更新",
-  "NotificationsSettings.Title": "同志设置",
+  "NotificationsSettings.Title": "通知设置",
   "NotificationsSettings.ToggleError": "更新活动 {activity} 时出错：{error}",
   "NotificationsSettings.ToggleResetSettings": "切换此设置，此前设置的选项也会重置：{activities}",
   "NotificationsSettings.Updates.CollectivesSupported": "你支持的集体",
