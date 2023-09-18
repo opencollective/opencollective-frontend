@@ -1,5 +1,5 @@
 import React from 'react';
-import { MoreHorizontal } from 'lucide-react';
+import { LucideIcon, MoreHorizontal } from 'lucide-react';
 
 import { Button } from '../ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/DropdownMenu';
@@ -14,6 +14,7 @@ export default function DashboardHeader({
   title: React.ReactNode;
   primaryAction?: { label: string; onClick: () => void; disabled?: boolean };
   secondaryActions?: { label: string; onClick: () => void; disabled?: boolean }[];
+  staticActions?: { label: string; Icon?: LucideIcon; primary?: boolean; onClick: () => void; disabled?: boolean }[];
   description?: React.ReactNode;
 }) {
   return (
@@ -22,20 +23,27 @@ export default function DashboardHeader({
         <h1 className="text-2xl font-bold leading-10 tracking-tight">{title}</h1>
         <div className="flex items-center gap-2">
           {primaryAction && (
-            <Button disabled={primaryAction.disabled} size="sm" type="primary" onClick={primaryAction.onClick}>
+            <Button disabled={primaryAction.disabled} size="lg" rounded onClick={primaryAction.onClick}>
               {primaryAction.label}
             </Button>
           )}
           {staticActions?.length > 0 &&
-            staticActions.map(({ label, onClick, disabled }) => (
-              <Button key={label} disabled={disabled} size="sm" onClick={onClick} variant="outline">
-                {label}
+            staticActions.map(({ label, Icon, onClick, disabled, primary }) => (
+              <Button
+                key={label}
+                size="lg"
+                disabled={disabled}
+                rounded
+                onClick={onClick}
+                variant={primary ? 'default' : 'outline'}
+              >
+                {Icon && <Icon size={16} />} {label}
               </Button>
             ))}
           {secondaryActions?.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm-icon">
+                <Button size="lg-icon" variant="outline" rounded>
                   <MoreHorizontal size={16} />
                 </Button>
               </DropdownMenuTrigger>

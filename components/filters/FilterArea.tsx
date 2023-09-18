@@ -22,6 +22,8 @@ export default function FilterArea({
   onChange,
   omitMatchingParams,
   views,
+  className,
+  disableOrderBy,
 }: {
   filterOptions: FilterOptions;
 }) {
@@ -57,7 +59,7 @@ export default function FilterArea({
   });
 
   return (
-    <div className="">
+    <div className={className}>
       {views ? (
         <DashboardViews query={query} omitMatchingParams={omitMatchingParams} views={views} onChange={onChange} />
       ) : (
@@ -70,9 +72,11 @@ export default function FilterArea({
           ))}
           <FilterCombo filterOptions={remainingOptions} onChange={generalOnChange} />
         </div>
-        <div className="flex flex-1 justify-end">
-          <OrderFilter className="ml-auto" options={orderByOptions} {...getFilterProps(orderByKey)} />
-        </div>
+        {!disableOrderBy && (
+          <div className="flex flex-1 justify-end">
+            <OrderFilter className="ml-auto" options={orderByOptions} {...getFilterProps(orderByKey)} />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -32,7 +32,7 @@ interface DataTableFacetedFilter {
   filterOptions: FilterOptions;
 }
 
-export function FilterDropdown({ title, value, onChange, filterKey, filterOptions }: DataTableFacetedFilter) {
+export function FilterDropdown({ title, value, onChange, filterKey, filterOptions, Icon }: DataTableFacetedFilter) {
   const arrayValue = isNil(value) ? null : Array.isArray(value) ? value : [value];
   const [filterKeyState, setFilterKeyState] = React.useState(filterKey);
   const rootFilterOptions = filterOptions.map(option => ({ label: option.label, value: option.key }));
@@ -44,7 +44,7 @@ export function FilterDropdown({ title, value, onChange, filterKey, filterOption
     <Popover>
       <PopoverTrigger asChild>
         <Button rounded variant="outline" size="sm" className={cn(value ? '' : ' text-slate-500')}>
-          {!value && <PlusCircle className="mr-2 h-4 w-4" />}
+          {!value ? <PlusCircle className="mr-2 h-4 w-4" /> : Icon && <Icon size={16} />}
 
           {title}
           {selectedValues.size > 0 && (

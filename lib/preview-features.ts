@@ -6,6 +6,7 @@ export enum PREVIEW_FEATURE_KEYS {
   EXPENSE_PIPELINE = 'EXPENSE_PIPELINE',
   EXPENSE_OCR = 'EXPENSE_OCR',
   BREADCRUMB_NAV = 'BREADCRUMB_NAV',
+  DASHBOARD_OVERVIEW = 'DASHBOARD_OVERVIEW',
 }
 
 export type PreviewFeature = {
@@ -36,6 +37,13 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'New navigation',
     description:
       'A new navigation bar that helps you find your way around Open Collective and understand where you are.',
+    publicBeta: true,
+    dependsOn: PREVIEW_FEATURE_KEYS.DASHBOARD,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.DASHBOARD_OVERVIEW,
+    title: 'Overview pages for all accounts',
+    description: 'Overview pages for Collectives, Hosts and Events.',
     publicBeta: true,
     dependsOn: PREVIEW_FEATURE_KEYS.DASHBOARD,
   },

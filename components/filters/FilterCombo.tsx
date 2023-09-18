@@ -24,6 +24,7 @@ export default function FilterCombo({
         />
       );
     }
+
     console.log({ filter });
     return (
       <FilterDropdown
@@ -33,6 +34,7 @@ export default function FilterCombo({
         onChange={onChange}
         filterOptions={filterOptions}
         filterKey={filter.key}
+        Icon={filter.Icon}
       />
     );
   }

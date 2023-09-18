@@ -5,7 +5,7 @@ import { Question } from '@styled-icons/remix-line/Question';
 import dayjs from 'dayjs';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-
+import { Calendar } from 'lucide-react';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { simpleDateToISOString } from '../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -22,13 +22,15 @@ import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
 import { H2 } from '../Text';
-
+import DashboardHeader from '../dashboard/DashboardHeader';
+import FilterArea from '../filters/FilterArea';
+import { FilterType } from '../filters/types';
 import HostCSVDownloadButton from './reports-section/HostCSVDownloadButton';
 import HostFeesSection from './reports-section/HostFeesSection';
 import PlatformTipsCollected from './reports-section/PlatformTipsCollected';
 import TotalMoneyManagedSection from './reports-section/TotalMoneyManagedSection';
 import TransactionsOverviewSection from './reports-section/TransactionsOverviewSection';
-
+import { useRouter } from 'next/router';
 const hostReportPageQuery = gql`
   query HostReportsPage(
     $hostSlug: String!
@@ -163,6 +165,7 @@ const getDefaultDateInterval = () => {
 };
 
 const HostDashboardReports = ({ hostSlug }) => {
+  const router = useRouter();
   const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
   const [collectives, setCollectives] = React.useState(null);
   const dateFrom = simpleDateToISOString(dateInterval?.from, false, dateInterval?.timezoneType);
@@ -191,10 +194,37 @@ const HostDashboardReports = ({ hostSlug }) => {
 
   return (
     <Box m="0 auto">
-      <h1 className="text-2xl font-bold leading-10 tracking-tight">
+      <DashboardHeader
+        title={<FormattedMessage id="Reports" defaultMessage="Reports" />}
+        staticActions={[{ label: 'Export CSV', onClick: () => console.log('click') }]}
+      />
+      <FilterArea
+        query={{ period: PERIOD_FILTER_PRESETS.thisMonth }}
+        disableOrderBy={true}
+        filterOptions={[
+          {
+            key: 'period',
+            static: true,
+            filterType: FilterType.PERIOD,
+            Icon: Calendar,
+            label: 'Period',
+            value: PERIOD_FILTER_PRESETS.thisMonth,
+            options: [
+              { label: 'Today', value: PERIOD_FILTER_PRESETS.today },
+              { label: 'This Month', value: PERIOD_FILTER_PRESETS.thisMonth },
+              { label: 'This Year', value: PERIOD_FILTER_PRESETS.thisYear },
+              { label: 'Past Week', value: PERIOD_FILTER_PRESETS.pastWeek },
+              { label: 'Past Month', value: PERIOD_FILTER_PRESETS.pastMonth },
+              { label: 'Past Year', value: PERIOD_FILTER_PRESETS.pastYear },
+            ],
+          },
+        ]}
+        className="mb-6"
+      />
+      {/* <h1 className="text-2xl font-bold leading-10 tracking-tight">
         <FormattedMessage id="Reports" defaultMessage="Reports" />
-      </h1>
-      <Container
+      </h1> */}
+      {/* <Container
         position={['relative', 'sticky']}
         top="0"
         background="white"
@@ -234,7 +264,7 @@ const HostDashboardReports = ({ hostSlug }) => {
             <HostCSVDownloadButton host={host} collectives={collectives} dateInterval={dateInterval} />
           </Flex>
         </Grid>
-      </Container>
+      </Container> */}
       <StyledCard mb={5} borderRadius="12px" padding="32px 24px" borderColor="black.400">
         <Container mb={38}>
           <SectionTitle

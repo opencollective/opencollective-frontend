@@ -19,6 +19,9 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import StyledButton from '../StyledButton';
 import { Span } from '../Text';
+import DashboardHeader from '../dashboard/DashboardHeader';
+import FilterArea from '../filters/FilterArea';
+import { Plus } from 'lucide-react';
 
 const hostDashboardAgreementsQuery = gql`
   query HostAgreements($hostSlug: String!, $limit: Int!, $offset: Int!, $account: [AccountReferenceInput]) {
@@ -102,7 +105,12 @@ const HostDashboardAgreements = ({ hostSlug }) => {
   const canEdit = Boolean(LoggedInUser && !LoggedInUser.isAccountantOnly(data?.host));
   return (
     <React.Fragment>
-      <div className="flex flex-wrap justify-between gap-4">
+      <DashboardHeader
+        title={<FormattedMessage id="Agreements" defaultMessage="Agreements" />}
+        staticActions={[{ Icon: Plus, label: 'Add new', onClick: () => console.log('click'), primary: true }]}
+      />
+      <FilterArea className="mb-6" />
+      {/* <div className="flex flex-wrap justify-between gap-4">
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="Agreements" defaultMessage="Agreements" />
         </h1>
@@ -144,8 +152,8 @@ const HostDashboardAgreements = ({ hostSlug }) => {
             </StyledButton>
           )}
         </Flex>
-      </div>
-      <hr className="my-5" />
+      </div> */}
+      {/* <hr className="my-5" /> */}
       {error ? (
         <MessageBoxGraphqlError error={error} my={4} />
       ) : (

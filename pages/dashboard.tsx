@@ -61,7 +61,9 @@ const messages = defineMessages({
 });
 
 const getDefaultSectionForAccount = (account, loggedInUser) => {
-  const hasEnabledOverViewForCollectives = true;
+  const hasEnabledOverViewForCollectives = loggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.DASHBOARD_OVERVIEW,
+  );
   if (!account) {
     return null;
   } else if (isIndividualAccount(account) || hasEnabledOverViewForCollectives) {
@@ -131,16 +133,19 @@ const parseQuery = query => {
   };
 };
 
-const getMenuItems = (intl, account) => {
+const getMenuItems = (intl, account, loggedInUser) => {
   const isHost = isHostAccount(account);
   // const isUserHost = account.isHost === true && isType(account, USER); // for legacy compatibility for users who are hosts
   const isIndividual = isIndividualAccount(account);
   const isCollective = !isHost && !isIndividual;
+  const hasEnabledOverviewPages = loggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD_OVERVIEW);
+  console.log({ hasEnabledOverviewPages, loggedInUser, account, isIndividual });
   const menuItems = [
     {
       label: 'Overview',
       section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
+      if: isIndividual || !!loggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD_OVERVIEW),
     },
     {
       label: 'Expenses',
@@ -380,7 +385,9 @@ const DashboardPage = () => {
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
-  const { menu, allItems } = account ? getMenuItems(intl, account) : { menu: { items: [] }, allItems: [] };
+  const { menu, allItems } = account
+    ? getMenuItems(intl, account, LoggedInUser)
+    : { menu: { items: [] }, allItems: [] };
 
   const subMenu = allItems.find(item => item.sections?.includes(selectedSection))?.subMenu;
 
