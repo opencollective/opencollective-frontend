@@ -88,6 +88,10 @@ const StyledInput = styled.input`
   &[type='date'] {
     font-family: inherit;
   }
+
+  &:user-invalid {
+    border-color: ${themeGet('colors.red.500')} !important;
+  }
 `;
 
 StyledInput.propTypes = {
