@@ -104,6 +104,7 @@ const CommentForm = ({
   isDisabled,
   canUsePrivateNote,
   defaultType = commentTypes.COMMENT,
+  replyingToComment,
 }) => {
   const [createComment, { loading, error }] = useMutation(createCommentMutation, mutationOptions);
   const intl = useIntl();
@@ -133,6 +134,14 @@ const CommentForm = ({
     }
   };
 
+  const getDefaultValueWhenReplying = () => {
+    let value = `<blockquote><div>${replyingToComment.html}</div></blockquote>`;
+    if (html) {
+      value = `${value} ${html}`;
+    }
+    return value;
+  };
+
   return (
     <Container id={id} position="relative">
       {!loadingLoggedInUser && !LoggedInUser && (
@@ -152,22 +161,26 @@ const CommentForm = ({
         {loadingLoggedInUser ? (
           <LoadingPlaceholder height={232} />
         ) : (
-          <RichTextEditor
-            kind="COMMENT"
-            withBorders
-            inputName="html"
-            editorMinHeight={150}
-            placeholder={formatMessage(messages.placeholder)}
-            autoFocus={isAutoFocused(id)}
-            disabled={isDisabled || !LoggedInUser || loading}
-            reset={resetValue}
-            fontSize="13px"
-            onChange={e => {
-              setHtml(e.target.value);
-              setValidationError(null);
-            }}
-            setUploading={setUploading}
-          />
+          //  When Key is updated the text editor default value will be updated too
+          <div key={replyingToComment?.id}>
+            <RichTextEditor
+              defaultValue={replyingToComment?.id && getDefaultValueWhenReplying()}
+              kind="COMMENT"
+              withBorders
+              inputName="html"
+              editorMinHeight={250}
+              placeholder={formatMessage(messages.placeholder)}
+              autoFocus={isAutoFocused(id)}
+              disabled={isDisabled || !LoggedInUser || loading}
+              reset={resetValue}
+              fontSize="13px"
+              onChange={e => {
+                setHtml(e.target.value);
+                setValidationError(null);
+              }}
+              setUploading={setUploading}
+            />
+          </div>
         )}
         {validationError && (
           <P color="red.500" mt={3}>
@@ -236,8 +249,11 @@ CommentForm.propTypes = {
   loadingLoggedInUser: PropTypes.bool,
   /** @ignore from withUser */
   LoggedInUser: PropTypes.object,
+  replyingToComment: PropTypes.object,
   /** @ignore from withRouter */
   router: PropTypes.object,
+  /** Called when comment gets selected*/
+  getClickedComment: PropTypes.func,
 };
 
 export default withUser(withRouter(CommentForm));

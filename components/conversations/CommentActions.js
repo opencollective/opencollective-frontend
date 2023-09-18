@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
+import { Reply as ReplyIcon } from '@styled-icons/bootstrap/Reply';
 import { DotsHorizontalRounded } from '@styled-icons/boxicons-regular/DotsHorizontalRounded';
 import { Share2 as ShareIcon } from '@styled-icons/feather/Share2';
 import { X } from '@styled-icons/feather/X';
@@ -106,6 +107,21 @@ const AdminActionButtons = ({
   );
 };
 
+const ReplyButton = ({ onReplyClick }) => {
+  return (
+    <React.Fragment>
+      <CommentBtn data-cy="reply-comment-btn" onClick={onReplyClick}>
+        <ReplyIcon size="1em" mr={2} />
+        <FormattedMessage tagName="span" id="Reply" defaultMessage="Reply" />
+      </CommentBtn>
+    </React.Fragment>
+  );
+};
+
+ReplyButton.propTypes = {
+  onReplyClick: PropTypes.func,
+};
+
 AdminActionButtons.propTypes = {
   comment: PropTypes.object.isRequired,
   openDeleteConfirmation: PropTypes.func,
@@ -136,7 +152,17 @@ const REACT_POPPER_MODIFIERS = [
 
 const mutationOptions = { context: API_V2_CONTEXT };
 
-const CommentActions = ({ comment, anchorHash, isConversationRoot, canEdit, canDelete, onDelete, onEditClick }) => {
+const CommentActions = ({
+  comment,
+  anchorHash,
+  isConversationRoot,
+  canEdit,
+  canDelete,
+  onDelete,
+  onEditClick,
+  canReply,
+  onReplyClick,
+}) => {
   const intl = useIntl();
   const { copy } = useClipboard();
   const [isDeleting, setDeleting] = React.useState(null);
@@ -190,6 +216,11 @@ const CommentActions = ({ comment, anchorHash, isConversationRoot, canEdit, canD
             </P>
             <StyledHr flex="1" borderStyle="solid" borderColor="black.300" />
           </Flex>
+          {canReply && (
+            <Flex flexDirection="column" alignItems="flex-start">
+              <ReplyButton onReplyClick={onReplyClick} />
+            </Flex>
+          )}
           <Flex flexDirection="column" alignItems="flex-start">
             <AdminActionButtons
               comment={comment}
@@ -262,12 +293,16 @@ CommentActions.propTypes = {
   canEdit: PropTypes.bool,
   /** Can current user delete this comment? */
   canDelete: PropTypes.bool,
+  /** Can current user reply this comment? */
+  canReply: PropTypes.bool,
   /** Set this to true if the comment is the root comment of a conversation */
   isConversationRoot: PropTypes.bool,
   /** Called when comment gets deleted */
   onDelete: PropTypes.func,
   /** Called when comment gets deleted */
   onEditClick: PropTypes.func,
+  /** Called when comment is getting a reply */
+  onReplyClick: PropTypes.func,
 };
 
 export default CommentActions;
