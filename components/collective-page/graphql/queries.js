@@ -114,6 +114,7 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
           VIRTUAL_CARDS
         }
         policies {
+          id
           COLLECTIVE_MINIMUM_ADMINS {
             freeze
             numberOfAdmins

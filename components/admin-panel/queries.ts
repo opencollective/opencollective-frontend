@@ -23,6 +23,7 @@ export const adminPanelQuery = gql`
         EMIT_GIFT_CARDS
       }
       policies {
+        id
         REQUIRE_2FA_FOR_ADMINS
       }
       ... on AccountWithParent {
@@ -30,6 +31,7 @@ export const adminPanelQuery = gql`
           id
           slug
           policies {
+            id
             REQUIRE_2FA_FOR_ADMINS
           }
         }
@@ -42,6 +44,7 @@ export const adminPanelQuery = gql`
           name
           settings
           policies {
+            id
             EXPENSE_AUTHOR_CANNOT_APPROVE {
               enabled
               amountInCents
