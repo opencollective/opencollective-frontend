@@ -134,13 +134,11 @@ class UserProvider extends React.Component {
         return null;
       }
 
-      // Store the error
-      this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
       if (error.message.includes('Two-factor authentication is enabled')) {
         // eslint-disable-next-line no-constant-condition
         while (true) {
           try {
-            const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+            const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
             const decodedToken = decodeJwt(token);
 
             const result = await twoFactorAuthPrompt.open({
@@ -151,7 +149,7 @@ class UserProvider extends React.Component {
             });
 
             const LoggedInUser = await getLoggedInUser({
-              token: getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN),
+              token: getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN),
               twoFactorAuthenticatorCode: result.code,
               twoFactorAuthenticationType: result.type,
             });
@@ -167,6 +165,7 @@ class UserProvider extends React.Component {
                 LoggedInUser,
               });
             }
+            removeFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
 
             return LoggedInUser;
           } catch (e) {
@@ -186,6 +185,9 @@ class UserProvider extends React.Component {
           }
         }
       }
+
+      // Store the error
+      this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
     }
   };
 

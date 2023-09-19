@@ -219,7 +219,10 @@ class TopBarProfileMenu extends React.Component {
     const main = document.querySelector('main');
     main.addEventListener('keydown', this.handleKeyPress);
     main.addEventListener('click', this.onClickOutside);
-    if (!getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN)) {
+    if (
+      !getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN) ||
+      !getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN)
+    ) {
       this.setState({ loading: false });
     }
   }
