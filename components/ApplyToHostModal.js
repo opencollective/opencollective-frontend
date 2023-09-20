@@ -57,6 +57,7 @@ const hostFields = gql`
     hostFeePercent
     settings
     policies {
+      id
       COLLECTIVE_MINIMUM_ADMINS {
         numberOfAdmins
       }

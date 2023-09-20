@@ -43,6 +43,7 @@ export const getSettingsQuery = gql`
       isHost
       settings
       policies {
+        id
         EXPENSE_AUTHOR_CANNOT_APPROVE {
           enabled
           amountInCents
@@ -60,6 +61,7 @@ export const getSettingsQuery = gql`
         host {
           id
           policies {
+            id
             EXPENSE_AUTHOR_CANNOT_APPROVE {
               enabled
               amountInCents

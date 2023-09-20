@@ -23,6 +23,7 @@ const createCollectiveHostQuery = gql`
       isOpenToApplications
       termsUrl
       policies {
+        id
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
         }

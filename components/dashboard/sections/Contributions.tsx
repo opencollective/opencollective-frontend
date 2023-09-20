@@ -58,7 +58,7 @@ const VIEWS = {
 };
 
 const dashboardContributionsMetadataQuery = gql`
-  query DashboardRecurringContributions($slug: String!, $filter: AccountOrdersFilter!) {
+  query DashboardRecurringMetadataContributions($slug: String!, $filter: AccountOrdersFilter!) {
     account(slug: $slug) {
       id
       legacyId
