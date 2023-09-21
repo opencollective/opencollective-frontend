@@ -7,6 +7,7 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/Dialog';
+import { Separator } from './ui/Separator';
 import HTMLContent from './HTMLContent';
 import Image from './Image';
 import Link from './Link';
@@ -42,7 +43,7 @@ const newsAndUpdatesQuery = gql`
 const renderStyledCarousel = (data, loading, error, onClose) => {
   if (loading === false && data) {
     return (
-      <StyledCarousel contentPosition="left" className="-mx-6">
+      <StyledCarousel contentPosition="left">
         {data.account.updates.nodes.map(update => (
           <div key={update.id} className="px-3">
             <span className="text-sm text-muted-foreground">
@@ -119,8 +120,8 @@ const NewsAndUpdatesModal = ({ open, setOpen }) => {
   const onClose = () => setOpen(false);
   return (
     <Dialog open={open} onOpenChange={open => setOpen(open)}>
-      <DialogContent className="max-w-xl">
-        <DialogHeader>
+      <DialogContent className="p-0">
+        <DialogHeader className="px-6 pt-6">
           <div className="flex items-start justify-between gap-2">
             <div>
               <DialogTitle className="mb-1.5">
@@ -140,10 +141,12 @@ const NewsAndUpdatesModal = ({ open, setOpen }) => {
             />
           </div>
         </DialogHeader>
-        <hr className="-mx-6 my-1" />
-        <Query query={newsAndUpdatesQuery} variables={{ limit: 5 }} context={API_V2_CONTEXT}>
-          {({ data, loading, error }) => renderStyledCarousel(data, loading, error, onClose)}
-        </Query>
+        <Separator className="my-3" />
+        <div className="px-0 pb-6">
+          <Query query={newsAndUpdatesQuery} variables={{ limit: 5 }} context={API_V2_CONTEXT}>
+            {({ data, loading, error }) => renderStyledCarousel(data, loading, error, onClose)}
+          </Query>
+        </div>
       </DialogContent>
     </Dialog>
   );

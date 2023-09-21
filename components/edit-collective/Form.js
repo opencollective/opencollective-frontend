@@ -571,32 +571,27 @@ class EditCollectiveForm extends React.Component {
 
       const getVATOptions = () => {
         const options = [
-          {
-            value: '',
-            label: intl.formatMessage(this.messages['VAT.None']),
-          },
-          {
-            value: VAT_OPTIONS.HOST,
-            label: intl.formatMessage(this.messages['VAT.Host']),
-          },
+          { value: '', label: intl.formatMessage(this.messages['VAT.None']) },
+          { value: VAT_OPTIONS.OWN, label: intl.formatMessage(this.messages['VAT.Own']) },
         ];
 
-        return collective.isHost
-          ? options
-          : [
-              ...options,
-              {
-                value: VAT_OPTIONS.OWN,
-                label: intl.formatMessage(this.messages['VAT.Own']),
-              },
-            ];
+        // Show a "Host" VAT option (default) when not a fiscal host, nor self-hosted, or when it's already set
+        if (!collective.isHost || vatType === VAT_OPTIONS.HOST) {
+          options.push({
+            value: VAT_OPTIONS.HOST,
+            label: intl.formatMessage(this.messages['VAT.Host']),
+          });
+        }
+
+        return options;
       };
 
       fields.push(
         {
           name: 'VAT',
           type: 'select',
-          defaultValue: isNil(vatType) ? VAT_OPTIONS.HOST : vatType,
+          // For hosted accounts, we default to `HOST` for VAT type
+          defaultValue: !isNil(vatType) ? vatType : !collective.isHost ? VAT_OPTIONS.HOST : '',
           when: () => {
             return collective.isHost || AccountTypesWithHost.includes(collective.type);
           },
@@ -608,13 +603,7 @@ class EditCollectiveForm extends React.Component {
           placeholder: 'FRXX999999999',
           defaultValue: vatNumber,
           when: () => {
-            const { collective } = this.state;
-            if (collective.type === COLLECTIVE || collective.type === EVENT) {
-              // Collectives can set a VAT number if configured
-              return vatType === VAT_OPTIONS.OWN;
-            } else {
-              return true;
-            }
+            return Boolean(vatType) && (collective.isHost || vatType === VAT_OPTIONS.OWN);
           },
         },
       );

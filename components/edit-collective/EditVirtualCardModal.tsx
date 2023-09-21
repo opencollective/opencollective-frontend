@@ -134,6 +134,7 @@ const VirtualCardPoliciesQuery = gql`
     account(slug: $slug) {
       id
       policies {
+        id
         MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
           ALL_TIME {
             valueInCents

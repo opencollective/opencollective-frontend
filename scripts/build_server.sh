@@ -18,4 +18,4 @@ cp -R $SRC/public/static/icons $DIST/public/static
 cp -R $SRC/public/static/images $DIST/public/static
 cp -R $SRC/public/static/styles $DIST/public/static
 cp -R $SRC/public/static/scripts $DIST/public/static
-cp -R $SRC/public/robots.txt $DIST/public
+cp -R $SRC/public/robots-production.txt $DIST/public

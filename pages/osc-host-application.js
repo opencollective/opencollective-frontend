@@ -42,6 +42,7 @@ const oscHostApplicationPageQuery = gql`
       id
       slug
       policies {
+        id
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
         }

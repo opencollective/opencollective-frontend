@@ -101,6 +101,7 @@ const createPendingContributionModalQuery = gql`
         hostFees
       }
       policies {
+        id
         REQUIRE_2FA_FOR_ADMINS
       }
       hostFeePercent

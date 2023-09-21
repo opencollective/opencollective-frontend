@@ -360,6 +360,11 @@ exports.REWRITES = [
     source: '/applications',
     destination: '/applications',
   },
+  // Robots.txt
+  {
+    source: '/robots.txt',
+    destination: '/api/robots',
+  },
   // Collective
   // ----------
   // Collective page

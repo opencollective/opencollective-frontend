@@ -86,9 +86,11 @@ export const updateExpenseFormWithUploadResult = (
     }
 
     // Currency - we only force it if all items have the same currency
-    const allCurrencies = uniq(allParsedItems.map(item => item.amount.currency));
-    if (allCurrencies.length === 1) {
-      formValues.currency = allCurrencies[0];
+    if (form.values.type !== 'CHARGE') {
+      const allCurrencies = uniq(allParsedItems.map(item => item.amount.currency));
+      if (allCurrencies.length === 1) {
+        formValues.currency = allCurrencies[0];
+      }
     }
   }
 

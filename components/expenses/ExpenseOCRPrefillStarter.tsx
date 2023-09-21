@@ -65,7 +65,7 @@ export const ExpenseOCRPrefillStarter = ({
           </StyledTag>
           <P fontSize="14px">
             <FormattedMessage
-              defaultMessage="<UploadClick>Upload a document</UploadClick>, then let our AI assistant prefills the expense for you"
+              defaultMessage="<UploadClick>Upload a document</UploadClick>, then let our AI assistant prefill the expense for you"
               values={{
                 UploadClick(msg) {
                   return (
