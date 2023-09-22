@@ -108,7 +108,10 @@ const AdminPanelPage = ({ slug, section, subpath }) => {
   // Redirect to the new dashboard if the user has the feature flag enabled
   React.useEffect(() => {
     if (needsRedirectToWorkspace) {
-      const url = section ? `/dashboard/${slug}/${section}` : `/dashboard/${slug}`;
+      let url = section ? `/dashboard/${slug}/${section}` : `/dashboard/${slug}`;
+      if (subpath) {
+        url += `/${subpath.join('/')}`;
+      }
       router.replace(!window.location.search ? url : `${url}${window.location.search}`);
     }
   }, [LoggedInUser]);

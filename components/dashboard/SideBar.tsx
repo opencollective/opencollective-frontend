@@ -58,7 +58,7 @@ const AdminPanelSideBar = ({
 
   return (
     <div
-      className={cn(' w-full flex-shrink-0 flex-grow-0 md:w-64', isMobile && 'sticky top-0 z-[1000] bg-white py-2.5')}
+      className={cn(' w-full flex-shrink-0 flex-grow-0 md:w-64', isMobile && 'sticky top-0 bg-white py-2.5')}
       {...props}
     >
       <div className="sticky top-8 z-10">

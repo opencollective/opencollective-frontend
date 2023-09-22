@@ -29,7 +29,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/Dropdown';
+} from '../ui/DropdownMenu';
 
 import DeleteVirtualCardModal from './DeleteVirtualCardModal';
 import EditVirtualCardModal from './EditVirtualCardModal';

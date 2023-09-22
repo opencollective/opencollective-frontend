@@ -4405,6 +4405,7 @@ type VirtualCardCollection implements Collection {
 }
 
 type Policies {
+  id: String
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
@@ -14256,6 +14257,26 @@ type Mutation {
   ): Boolean!
 
   """
+  Follows a given Collective. Scope: "account"
+  """
+  followAccount(
+    """
+    user will follow this account
+    """
+    account: AccountReferenceInput!
+  ): FollowAccountResult!
+
+  """
+  Unfollows a given Collective. Scope: "account"
+  """
+  unfollowAccount(
+    """
+    account to unfollow
+    """
+    account: AccountReferenceInput!
+  ): UnfollowAccountResult!
+
+  """
   Edit the public message for the given Member of a Collective. Scope: "account".
   """
   editPublicMessage(
@@ -15960,6 +15981,16 @@ input MemberInvitationReferenceInput {
   The internal id of the invitation (ie: 580)
   """
   legacyId: Int
+}
+
+type FollowAccountResult {
+  individual: Individual!
+  member: Member!
+}
+
+type UnfollowAccountResult {
+  individual: Individual!
+  member: Member
 }
 
 input OAuthAuthorizationReferenceInput {

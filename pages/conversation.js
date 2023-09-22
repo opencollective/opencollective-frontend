@@ -184,6 +184,11 @@ class ConversationPage extends React.Component {
     router: PropTypes.object,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = { replyingToComment: null };
+  }
+
   static MAX_NB_FOLLOWERS_AVATARS = 4;
 
   getPageMetaData(collective, conversation) {
@@ -278,6 +283,10 @@ class ConversationPage extends React.Component {
     } else {
       setValue(options.map(i => i.value));
     }
+  };
+
+  handleSetClickedComment = value => {
+    this.setState({ replyingToComment: value });
   };
 
   fetchMore = async () => {
@@ -385,6 +394,7 @@ class ConversationPage extends React.Component {
                             onDelete={this.onConversationDeleted}
                             canReply={Boolean(LoggedInUser)}
                             isConversationRoot
+                            onReplyClick={this.handleSetClickedComment}
                           />
                         </Container>
                         {comments.length > 0 && (
@@ -395,6 +405,7 @@ class ConversationPage extends React.Component {
                               hasMore={totalCommentsCount > comments.length}
                               fetchMore={this.fetchMore}
                               onCommentDeleted={this.onCommentDeleted}
+                              getClickedComment={this.handleSetClickedComment}
                             />
                           </Box>
                         )}
@@ -407,6 +418,7 @@ class ConversationPage extends React.Component {
                               id="new-comment"
                               ConversationId={conversation.id}
                               onSuccess={this.onCommentAdded}
+                              replyingToComment={this.state.replyingToComment}
                             />
                           </Box>
                         </Flex>

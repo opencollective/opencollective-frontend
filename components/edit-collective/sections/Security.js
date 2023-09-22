@@ -35,6 +35,7 @@ const accountQuery = gql`
       settings
       currency
       policies {
+        id
         REQUIRE_2FA_FOR_ADMINS
       }
     }
@@ -54,6 +55,7 @@ const updateSecuritySettingsMutation = gql`
     setPolicies(account: $account, policies: { REQUIRE_2FA_FOR_ADMINS: $require2FAForAdmins }) {
       id
       policies {
+        id
         REQUIRE_2FA_FOR_ADMINS
       }
     }

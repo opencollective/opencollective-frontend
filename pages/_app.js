@@ -41,6 +41,7 @@ import GlobalToasts from '../components/GlobalToasts';
 import IntlProvider from '../components/intl/IntlProvider';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
 import ToastProvider from '../components/ToastProvider';
+import { TooltipProvider } from '../components/ui/Tooltip';
 
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
@@ -121,16 +122,18 @@ class OpenCollectiveFrontendApp extends App {
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
               <IntlProvider locale={locale}>
-                <ToastProvider>
-                  <UserProvider>
-                    <NewsAndUpdatesProvider>
-                      <Component {...pageProps} />
-                      <GlobalToasts />
-                      <GlobalNewsAndUpdates />
-                      <TwoFactorAuthenticationModal />
-                    </NewsAndUpdatesProvider>
-                  </UserProvider>
-                </ToastProvider>
+                <TooltipProvider delayDuration={500} skipDelayDuration={100}>
+                  <ToastProvider>
+                    <UserProvider>
+                      <NewsAndUpdatesProvider>
+                        <Component {...pageProps} />
+                        <GlobalToasts />
+                        <GlobalNewsAndUpdates />
+                        <TwoFactorAuthenticationModal />
+                      </NewsAndUpdatesProvider>
+                    </UserProvider>
+                  </ToastProvider>
+                </TooltipProvider>
               </IntlProvider>
             </StripeProviderSSR>
           </ThemeProvider>

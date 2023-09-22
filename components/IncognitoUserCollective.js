@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { defineMessages, injectIntl } from 'react-intl';
 
+import Footer from './navigation/Footer';
 import { IncognitoAvatar } from './Avatar';
 import Body from './Body';
-import Footer from './Footer';
 import { Flex } from './Grid';
 import Header from './Header';
 import { H1 } from './Text';

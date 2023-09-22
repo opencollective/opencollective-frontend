@@ -11,7 +11,7 @@ import { Box } from '../Grid';
 import StyledHr from '../StyledHr';
 import StyledLinkButton from '../StyledLinkButton';
 import { P } from '../Text';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/Dropdown';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/DropdownMenu';
 import { TableActionsButton } from '../ui/Table';
 import UploadedFilePreview from '../UploadedFilePreview';
 

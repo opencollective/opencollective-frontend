@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import ReactAnimateHeight from 'react-animate-height';
 import { useIntl } from 'react-intl';
 
-import { getWorkspaceRoute } from '../../lib/url-helpers';
+import { getDashboardRoute } from '../../lib/url-helpers';
 import { cn } from '../../lib/utils';
 
 import { Flex } from '../Grid';
@@ -68,7 +68,7 @@ export const MenuLink = ({
     setExpandedSection?.(section);
     onClick?.(e);
     if (goToSection) {
-      router.push({ pathname: getWorkspaceRoute(account, goToSection) });
+      router.push({ pathname: getDashboardRoute(account, goToSection) });
     }
   };
 
@@ -76,7 +76,10 @@ export const MenuLink = ({
     <Flex alignItems="center" justifyContent="space-between" flex={1}>
       <Flex alignItems="center" gridGap="8px">
         {Icon && (
-          <Icon size={18} className={cn(' group-hover:text-inherit', isSelected ? 'text-inherit' : 'text-slate-400')} />
+          <Icon
+            size={18}
+            className={cn('group-hover:text-inherit', isSelected ? 'text-inherit' : 'text-muted-foreground')}
+          />
         )}
         <span className="truncate">
           {children}
@@ -116,7 +119,7 @@ export const MenuLink = ({
       ) : (
         <Link
           onClick={handleClick}
-          href={getWorkspaceRoute(account, goToSection ? goToSection : section)}
+          href={getDashboardRoute(account, goToSection ? goToSection : section)}
           {...(href && { href, onClick: undefined })}
           data-cy={`menu-item-${section}`}
           className={classNames}

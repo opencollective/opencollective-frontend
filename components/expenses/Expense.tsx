@@ -118,6 +118,7 @@ function Expense(props) {
     showFilesViewerModal: false,
   });
   const [openUrl, setOpenUrl] = useState(null);
+  const [replyingToComment, setReplyingToComment] = useState(null);
   const pollingInterval = 60;
   let pollingTimeout = null;
   let pollingStarted = false;
@@ -644,6 +645,7 @@ function Expense(props) {
                 fetchMore={fetchMoreComments}
                 onCommentDeleted={onCommentDeleted}
                 loading={loading}
+                getClickedComment={setReplyingToComment}
               />
             ) : null}
           </Box>
@@ -655,6 +657,7 @@ function Expense(props) {
               </Box>
               <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
                 <CommentForm
+                  replyingToComment={replyingToComment}
                   id="new-comment-on-expense"
                   ExpenseId={expense && expense.id}
                   disabled={!expense}

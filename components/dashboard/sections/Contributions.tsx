@@ -28,7 +28,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../../ui/Dropdown';
+} from '../../ui/DropdownMenu';
 import { Pagination } from '../../ui/Pagination';
 import { TableActionsButton } from '../../ui/Table';
 import { AdminSectionProps } from '../types';
@@ -58,7 +58,7 @@ const VIEWS = {
 };
 
 const dashboardContributionsMetadataQuery = gql`
-  query DashboardRecurringContributions($slug: String!, $filter: AccountOrdersFilter!) {
+  query DashboardRecurringMetadataContributions($slug: String!, $filter: AccountOrdersFilter!) {
     account(slug: $slug) {
       id
       legacyId

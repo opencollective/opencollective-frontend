@@ -68,21 +68,6 @@ module.exports = (expressApp, nextApp) => {
     );
   }
 
-  /**
-   * Prevent indexation from search engines
-   * (out of 'production' environment)
-   */
-  app.get('/robots.txt', (req, res, next) => {
-    const hostname = req.get('original-hostname') || req.hostname;
-    if (hostname !== 'opencollective.com') {
-      res.setHeader('Content-Type', 'text/plain');
-      res.send('User-agent: *\nDisallow: /');
-    } else {
-      // Will send public/robots.txt
-      next();
-    }
-  });
-
   // This is used by Cypress to collect server side coverage
   if (process.env.OC_ENV === 'e2e' || process.env.E2E_TEST) {
     app.get('/__coverage__', (req, res) => {

@@ -134,6 +134,7 @@ const VirtualCardPoliciesQuery = gql`
     account(slug: $slug) {
       id
       policies {
+        id
         MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
           ALL_TIME {
             valueInCents
@@ -332,7 +333,7 @@ export default function EditVirtualCardModal({
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
   return (
-    <StyledModal width="382px" onClose={handleClose} trapFocus {...modalProps}>
+    <StyledModal width="420px" onClose={handleClose} trapFocus {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose} hideCloseIcon={false}>
           {isEditing ? (

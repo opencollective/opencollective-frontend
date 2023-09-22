@@ -16,7 +16,6 @@ import CollectiveNotificationBar from '../components/collective-page/CollectiveN
 import { preloadCollectivePageGraphqlQueries } from '../components/collective-page/graphql/preload';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../components/collective-page/graphql/queries';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
-import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
@@ -190,9 +189,9 @@ class CollectivePage extends React.Component {
       >
         <GlobalStyles />
         {loading ? (
-          <Container py={[5, 6]}>
+          <div className="py-16 sm:py-32">
             <Loading />
-          </Container>
+          </div>
         ) : (
           <React.Fragment>
             <CollectiveNotificationBar

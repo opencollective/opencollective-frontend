@@ -16,7 +16,7 @@ export const PasswordStrengthBar = (
   return (
     <ReactPasswordStrengthBar
       {...props}
-      style={{ visibility: props.password ? 'visible' : 'hidden' }}
+      style={{ display: props.password ? 'block' : 'none' }}
       shortScoreWord={intl.formatMessage({ id: 'FormError.minLength', defaultMessage: 'The value is too short' })}
       scoreWords={[
         intl.formatMessage({ id: 'Password.weak', defaultMessage: 'Weak' }),

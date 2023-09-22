@@ -23,7 +23,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/Dropdown';
+} from '../ui/DropdownMenu';
 import { TableActionsButton } from '../ui/Table';
 
 import VirtualCardRequestCard from './VirtualCardRequestCard';

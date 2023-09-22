@@ -10,7 +10,7 @@ import DateTime from '../../DateTime';
 import StyledHr from '../../StyledHr';
 import StyledLinkButton from '../../StyledLinkButton';
 import StyledTag from '../../StyledTag';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/Dropdown';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/DropdownMenu';
 import { TableActionsButton } from '../../ui/Table';
 
 interface ApplicationMeta extends TableMeta<HostApplication> {
