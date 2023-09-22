@@ -80,6 +80,7 @@ export const preloadCollectivePageGraphqlQueries = async (slug, client) => {
         client.query({
           query: updatesSectionQuery,
           variables: getUpdatesSectionQueryVariables(slug),
+          context: API_V2_CONTEXT,
         }),
       );
     }

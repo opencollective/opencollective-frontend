@@ -168,10 +168,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
           }
         }
       }
-      updates(limit: 3, onlyPublishedUpdates: true) {
-        id
-        ...UpdatesFields
-      }
       plan {
         id
         hostedCollectives
@@ -220,7 +216,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
     }
   }
 
-  ${fragments.updatesFieldsFragment}
   ${fragments.contributorsFieldsFragment}
   ${fragments.collectiveNavbarFieldsFragment}
   ${fragments.contributeCardTierFieldsFragment}
