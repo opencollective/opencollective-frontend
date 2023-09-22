@@ -1,11 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
-import { FormattedMessage } from 'react-intl';
+import { gql, useQuery } from '@apollo/client';
+import { useRouter } from 'next/router';
+import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
 import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { Account } from '../lib/graphql/types/v2/graphql';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -17,121 +18,91 @@ import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
-import { withUser } from '../components/UserProvider';
+
+const getPageMetaData = (intl: IntlShape, collective: Account) => {
+  const baseMetadata = getCollectivePageMetadata(collective);
+  if (collective) {
+    return {
+      ...baseMetadata,
+      title: intl.formatMessage(
+        { id: 'ContactCollective', defaultMessage: 'Contact {collective}' },
+        { collective: collective.name },
+      ),
+      noRobots: false,
+    };
+  } else {
+    return {
+      ...baseMetadata,
+      title: 'Contact collective',
+      noRobots: false,
+    };
+  }
+};
 
 /**
- * The main page to display collectives. Wrap route parameters and GraphQL query
- * to render `components/collective-page` with everything needed.
+ * A page to contact accounts.
  */
-class CollectiveContact extends React.Component {
-  static getInitialProps({ query: { collectiveSlug } }) {
-    return { collectiveSlug };
-  }
+const CollectiveContact = () => {
+  const intl = useIntl();
+  const router = useRouter();
+  const collectiveSlug = router.query?.collectiveSlug as string;
 
-  static propTypes = {
-    /** @ignore from getInitialProps */
-    collectiveSlug: PropTypes.string.isRequired,
-    /** @ignore from withUser */
-    LoggedInUser: PropTypes.object,
-    /** @ignore from apollo */
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.any,
-      Collective: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        description: PropTypes.string,
-        type: PropTypes.string.isRequired,
-        twitterHandle: PropTypes.string,
-        imageUrl: PropTypes.string,
-        canContact: PropTypes.bool,
-      }),
-    }).isRequired, // from withData
-  };
+  // We query here rather than SSR cause the query is authenticated
+  const { loading, data, error } = useQuery(collectiveContactPageQuery, {
+    variables: { collectiveSlug },
+    context: API_V2_CONTEXT,
+  });
 
-  getPageMetaData(collective) {
-    const baseMetadata = getCollectivePageMetadata(collective);
-    if (collective) {
-      return {
-        ...baseMetadata,
-        title: `Contact ${collective.name}`,
-        noRobots: false,
-      };
-    } else {
-      return {
-        ...baseMetadata,
-        title: 'Contact collective',
-        noRobots: false,
-      };
+  if (!loading) {
+    if (error) {
+      return <ErrorPage data={error} />;
+    } else if (!data?.account) {
+      return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
     }
   }
 
-  setSubject = e => {
-    this.setState({ subject: e.target.value });
-  };
-
-  setMessage = e => {
-    this.setState({ message: e.target.value });
-  };
-
-  renderContent() {
-    const { data } = this.props;
-
-    if (!data.Collective.canContact) {
-      return (
-        <MessageBox type="warning" withIcon maxWidth={600} m="0 auto">
-          <FormattedMessage
-            id="CollectiveContact.NotAllowed"
-            defaultMessage="This Collective can't be contacted via Open Collective."
-          />
-        </MessageBox>
-      );
-    } else {
-      return <CollectiveContactForm collective={data.Collective} />;
-    }
-  }
-
-  render() {
-    const { collectiveSlug, data } = this.props;
-
-    if (!data.loading) {
-      if (!data || data.error) {
-        return <ErrorPage data={data} />;
-      } else if (!data.Collective) {
-        return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
-      }
-    }
-
-    const collective = data && data.Collective;
-    return (
-      <AuthenticatedPage {...this.getPageMetaData(collective)}>
-        {() =>
-          data.loading ? (
-            <Loading />
-          ) : (
-            <CollectiveThemeProvider collective={data.Collective}>
-              <Container>
-                <CollectiveNavbar collective={data.Collective} selectedCategory={NAVBAR_CATEGORIES.CONNECT} />
-                <Container py={[4, 5]} px={[2, 3, 4]}>
-                  {this.renderContent()}
-                </Container>
+  return (
+    <AuthenticatedPage {...getPageMetaData(intl, data?.account)}>
+      {() =>
+        !data?.account ? (
+          <Loading />
+        ) : (
+          <CollectiveThemeProvider collective={data.account}>
+            <Container>
+              <CollectiveNavbar collective={data.account} selectedCategory={NAVBAR_CATEGORIES.CONNECT} />
+              <Container py={[4, 5]} px={[2, 3, 4]}>
+                {!data.account.permissions.contact.allowed ? (
+                  <MessageBox type="warning" withIcon maxWidth={600} m="0 auto">
+                    <FormattedMessage
+                      id="CollectiveContact.NotAllowed"
+                      defaultMessage="This Collective can't be contacted via Open Collective."
+                    />
+                  </MessageBox>
+                ) : (
+                  <CollectiveContactForm collective={data.account} />
+                )}
               </Container>
-            </CollectiveThemeProvider>
-          )
-        }
-      </AuthenticatedPage>
-    );
-  }
-}
+            </Container>
+          </CollectiveThemeProvider>
+        )
+      }
+    </AuthenticatedPage>
+  );
+};
 
-const collectiveContactPageQuery = gqlV1/* GraphQL */ `
+const collectiveContactPageQuery = gql`
   query CollectiveContactPage($collectiveSlug: String!) {
-    Collective(slug: $collectiveSlug, throwIfMissing: false) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
       id
       slug
-      path
       name
       type
-      canContact
+      permissions {
+        id
+        contact {
+          allowed
+        }
+      }
       description
       settings
       imageUrl
@@ -145,6 +116,4 @@ const collectiveContactPageQuery = gqlV1/* GraphQL */ `
   ${collectiveNavbarFieldsFragment}
 `;
 
-const addCollectiveContactPageData = graphql(collectiveContactPageQuery);
-
-export default withUser(addCollectiveContactPageData(CollectiveContact));
+export default CollectiveContact;

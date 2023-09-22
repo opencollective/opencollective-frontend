@@ -4500,6 +4500,11 @@ type AccountPermissions {
   Whether the current user can mark this order as expired
   """
   addFunds: Permission!
+
+  """
+  Whether the current user can mark this order as expired
+  """
+  contact: Permission!
 }
 
 type Permission {
