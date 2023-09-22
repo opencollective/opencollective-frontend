@@ -12,6 +12,7 @@ export const tierPageQuery = gqlV1/* GraphQL */ `
       longDescription
       videoUrl
       goal
+      type
       currency
       interval
       endsAt
