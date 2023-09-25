@@ -57,7 +57,7 @@ const AdminPanelSideBar = ({
         )}
       </div>
     ),
-    [isLoading, viewport],
+    [isLoading, viewport, menuItems],
   );
 
   return (
