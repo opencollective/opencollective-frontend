@@ -110,7 +110,11 @@ class CreateUpdatePage extends React.Component {
             context: API_V2_CONTEXT,
             variables: getUpdatesVariables(this.props.slug),
           },
-          { query: updatesSectionQuery, variables: getUpdatesSectionQueryVariables(this.props.slug, true) },
+          {
+            query: updatesSectionQuery,
+            context: API_V2_CONTEXT,
+            variables: getUpdatesSectionQueryVariables(this.props.slug, true),
+          },
         ],
       });
       this.setState({ isModified: false });

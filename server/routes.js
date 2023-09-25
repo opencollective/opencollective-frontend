@@ -18,14 +18,6 @@ const maxAge = (maxAge = 60) => {
 module.exports = (expressApp, nextApp) => {
   const app = expressApp;
 
-  // Add X-Robots-Tag header to prevent indexing non-production websites
-  if (process.env.OC_ENV !== 'production') {
-    app.use((req, res, next) => {
-      res.set('X-Robots-Tag', 'none');
-      next();
-    });
-  }
-
   // Support older assets from website
   app.use('/public/images', express.static(path.join(__dirname, '../public/static/images')));
 

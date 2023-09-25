@@ -1,29 +1,6 @@
 import { gqlV1 } from '../../../lib/graphql/helpers';
 
 /**
- * Fields fetched for updates
- */
-export const updatesFieldsFragment = gqlV1/* GraphQL */ `
-  fragment UpdatesFields on UpdateType {
-    id
-    slug
-    title
-    summary
-    createdAt
-    publishedAt
-    isPrivate
-    userCanSeeUpdate
-    fromCollective {
-      id
-      type
-      name
-      slug
-      imageUrl
-    }
-  }
-`;
-
-/**
  * Fields fetched for contributors
  */
 export const contributorsFieldsFragment = gqlV1/* GraphQL */ `
