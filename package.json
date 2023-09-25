@@ -217,7 +217,7 @@
     "@types/webpack-env": "^1.18.1",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
-    "autoprefixer": "10.4.15",
+    "autoprefixer": "10.4.16",
     "babel-loader": "^8.2.3",
     "babel-plugin-formatjs": "^10.5.0",
     "babel-plugin-istanbul": "^6.1.1",
