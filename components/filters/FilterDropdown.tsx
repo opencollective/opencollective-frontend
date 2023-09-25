@@ -44,7 +44,7 @@ export function FilterDropdown({ title, value, onChange, filterKey, filterOption
     <Popover>
       <PopoverTrigger asChild>
         <Button rounded variant="outline" size="sm" className={cn(value ? '' : ' text-slate-500')}>
-          {!value ? <PlusCircle className="mr-2 h-4 w-4" /> : Icon && <Icon size={16} />}
+          {!value ? <PlusCircle size={16} className="mr-1" /> : Icon && <Icon size={16} className="mr-0.5" />}
 
           {title}
           {selectedValues.size > 0 && (

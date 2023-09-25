@@ -5,7 +5,7 @@ import { Question } from '@styled-icons/remix-line/Question';
 import dayjs from 'dayjs';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { Calendar } from 'lucide-react';
+import { Calendar, CalendarDays } from 'lucide-react';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { simpleDateToISOString } from '../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -206,7 +206,7 @@ const HostDashboardReports = ({ hostSlug }) => {
             key: 'period',
             static: true,
             filterType: FilterType.PERIOD,
-            Icon: Calendar,
+            Icon: CalendarDays,
             label: 'Period',
             value: PERIOD_FILTER_PRESETS.thisMonth,
             options: [
