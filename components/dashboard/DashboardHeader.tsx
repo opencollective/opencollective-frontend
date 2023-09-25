@@ -23,7 +23,12 @@ export default function DashboardHeader({
         <h1 className="text-2xl font-bold leading-10 tracking-tight">{title}</h1>
         <div className="flex items-center gap-2">
           {primaryAction && (
-            <Button disabled={primaryAction.disabled} size="lg" rounded onClick={primaryAction.onClick}>
+            <Button
+              disabled={primaryAction.disabled}
+              // size="lg"
+              // rounded
+              onClick={primaryAction.onClick}
+            >
               {primaryAction.label}
             </Button>
           )}
@@ -31,9 +36,9 @@ export default function DashboardHeader({
             staticActions.map(({ label, Icon, onClick, disabled, primary }) => (
               <Button
                 key={label}
-                size="lg"
+                // size="lg"
                 disabled={disabled}
-                rounded
+                // rounded
                 onClick={onClick}
                 variant={primary ? 'default' : 'outline'}
               >
@@ -43,7 +48,11 @@ export default function DashboardHeader({
           {secondaryActions?.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="lg-icon" variant="outline" rounded>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  // rounded
+                >
                   <MoreHorizontal size={16} />
                 </Button>
               </DropdownMenuTrigger>

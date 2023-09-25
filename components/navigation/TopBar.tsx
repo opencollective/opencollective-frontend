@@ -1,4 +1,5 @@
 import React, { Fragment, useRef, useState } from 'react';
+import clsx from 'clsx';
 import { get, max, min } from 'lodash';
 import { ArrowRight, Compass, Frame, Globe, Globe2 } from 'lucide-react';
 import { useRouter } from 'next/router';
@@ -11,8 +12,11 @@ import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { ScrollDirection, useWindowScroll } from '../../lib/hooks/useWindowScroll';
 import { LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { cn } from '../../lib/utils';
 
 import ChangelogTrigger from '../changelog/ChangelogTrigger';
+import { DashboardContext } from '../dashboard/DashboardContext';
 import AccountSwitcher from '../dashboard/NewAccountSwitcher';
 import DividerIcon from '../DividerIcon';
 import { Box, Flex } from '../Grid';
@@ -20,14 +24,10 @@ import Image from '../Image';
 import Link from '../Link';
 import SearchModal from '../Search';
 import SearchTrigger from '../SearchTrigger';
-
-import { cn } from '../../lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 import ProfileMenu from './ProfileMenu';
 import SiteMenu from './SiteMenu';
-import { getCollectivePageRoute } from '../../lib/url-helpers';
-import { DashboardContext } from '../dashboard/DashboardContext';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const MobileFooterBar = styled(Flex)`
   position: fixed;
@@ -123,7 +123,10 @@ const MainNavItem = props => {
   return (
     <Link
       {...props}
-      className="flex h-8 shrink items-center gap-2 truncate whitespace-nowrap rounded-full px-1 text-sm font-medium text-foreground transition-colors hover:bg-slate-50 md:px-3"
+      className={clsx(
+        'flex h-8 shrink items-center gap-2 truncate whitespace-nowrap rounded-full px-1 text-sm font-medium text-foreground transition-colors hover:bg-slate-50 md:px-3',
+        props.isActive && 'bg-slate-100',
+      )}
     >
       {props.children}
     </Link>

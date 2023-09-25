@@ -27,6 +27,7 @@ const AdminPanelSideBar = ({
   isLoading,
   selectedSection,
   onRoute: _onRoute,
+  menuItems,
   ...props
 }: AdminPanelSideBarProps) => {
   const { LoggedInUser } = useLoggedInUser();
@@ -52,7 +53,7 @@ const AdminPanelSideBar = ({
             </div>
           ))
         ) : (
-          <Menu {...{ selectedSection, onRoute, isAccountantOnly }} />
+          <Menu {...{ selectedSection, onRoute, isAccountantOnly, menuItems }} />
         )}
       </div>
     ),

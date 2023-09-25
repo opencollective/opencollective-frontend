@@ -447,6 +447,7 @@ const DashboardPage = () => {
                 activeSlug={activeSlug}
                 selectedSection={selectedSection}
                 isAccountantOnly={LoggedInUser?.isAccountantOnly(account)}
+                menuItems={menu.items}
               />
             )}
 

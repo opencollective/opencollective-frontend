@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import clsx from 'clsx';
 import { ArrowRight, ChevronDown, ChevronUp, LucideIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import ReactAnimateHeight from 'react-animate-height';
@@ -41,21 +42,20 @@ export const MenuLink = ({
   Icon,
   renderSubMenu,
   parentSection = null,
+  sections,
   goToSection,
   className,
   external,
 }: MenuLinkProps) => {
   const router = useRouter();
-  const { selectedSection, expandedSection, setExpandedSection, account } = React.useContext(DashboardContext);
-  const expanded = expandedSection === section;
+  const { selectedSection, account } = React.useContext(DashboardContext);
+  const [selfExpanded, setSelfExpanded] = React.useState(false);
+  const sectionExpanded = sections?.includes(selectedSection);
+  const expanded = sectionExpanded || selfExpanded;
+
+  // const expanded = expandedSection === section;
   const { formatMessage } = useIntl();
   const isSelected = section && selectedSection === section;
-
-  useEffect(() => {
-    if (parentSection && isSelected) {
-      setExpandedSection?.(parentSection);
-    }
-  }, [isSelected]);
 
   if (conditional === false) {
     return null;
@@ -65,7 +65,6 @@ export const MenuLink = ({
     children = formatMessage(SECTION_LABELS[section]);
   }
   const handleClick = e => {
-    setExpandedSection?.(section);
     onClick?.(e);
     if (goToSection) {
       router.push({ pathname: getDashboardRoute(account, goToSection) });
@@ -88,12 +87,15 @@ export const MenuLink = ({
       </Flex>
       {renderSubMenu ? (
         <button
-          className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded transition-colors hover:bg-blue-100"
+          className={clsx(
+            'flex h-6 w-6 flex-shrink-0 items-center justify-center rounded transition-colors',
+            !sectionExpanded && 'hover:bg-blue-100',
+          )}
+          disabled={sectionExpanded}
           onClick={e => {
             e.preventDefault();
             e.stopPropagation();
-
-            setExpandedSection(expanded ? null : section);
+            setSelfExpanded(!selfExpanded);
           }}
         >
           {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -107,11 +109,10 @@ export const MenuLink = ({
   const classNames = cn(
     'group w-full flex gap-x-3 rounded-full py-1.5 px-3 text-sm leading-6 font-medium transition-colors',
     isSelected ? 'bg-blue-50/50 text-blue-700' : 'text-slate-700 hover:text-blue-700 hover:bg-blue-50/50',
-    !!parentSection && 'pl-11',
     className,
   );
   return (
-    <React.Fragment>
+    <div>
       {onClick ? (
         <button className={classNames} onClick={handleClick} data-cy={`menu-item-${section}`}>
           {renderButtonContent({ isSelected })}
@@ -129,10 +130,12 @@ export const MenuLink = ({
       )}
       {renderSubMenu && (
         <ReactAnimateHeight duration={150} height={expanded ? 'auto' : 0}>
-          {renderSubMenu({ parentSection: section })}
+          <div className="ml-5 mt-2 flex flex-col space-y-1 border-l pl-4">
+            {renderSubMenu({ parentSection: section })}
+          </div>
         </ReactAnimateHeight>
       )}
-    </React.Fragment>
+    </div>
   );
 };
 
