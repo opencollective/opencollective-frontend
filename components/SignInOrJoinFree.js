@@ -81,6 +81,8 @@ class SignInOrJoinFree extends React.Component {
     }),
     /* From UserProvider / withUser */
     login: PropTypes.func,
+    /** whether the input needs to be auto-focused */
+    autoFocus: PropTypes.bool,
   };
 
   constructor(props) {
@@ -255,6 +257,7 @@ class SignInOrJoinFree extends React.Component {
               isOAuth={this.props.isOAuth}
               oAuthAppName={this.props.oAuthApplication?.name}
               oAuthAppImage={this.props.oAuthApplication?.account?.imageUrl}
+              autoFocus={this.props.autoFocus}
             />
           ) : (
             <Flex flexDirection="column" width={1} alignItems="center">
