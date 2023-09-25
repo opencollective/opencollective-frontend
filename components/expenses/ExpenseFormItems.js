@@ -142,7 +142,7 @@ class ExpenseFormItems extends React.PureComponent {
   }
 
   render() {
-    const { availableCurrencies, hasOCRFeature } = this.props;
+    const { availableCurrencies, hasOCRFeature, collective, form } = this.props;
     const { values, errors, setFieldValue } = this.props.form;
     const requireFile = expenseItemsMustHaveFiles(values.type);
     const isGrant = values.type === expenseTypes.GRANT;
@@ -166,7 +166,7 @@ class ExpenseFormItems extends React.PureComponent {
             useGraphQL={hasOCRFeature}
             parseDocument={hasOCRFeature}
             onGraphQLSuccess={uploadResults => {
-              updateExpenseFormWithUploadResult(this.props.form, uploadResults);
+              updateExpenseFormWithUploadResult(collective, form, uploadResults);
             }}
           >
             <P color="black.700" mt={1} px={2}>
@@ -207,6 +207,7 @@ class ExpenseFormItems extends React.PureComponent {
             isInvoice={isInvoice}
             isLastItem={index === items.length - 1}
             hasOCRFeature={hasOCRFeature}
+            collective={collective}
           />
         ))}
         {taxType && (
