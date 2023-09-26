@@ -5,7 +5,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { omit } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
-
+import { toast } from '../components/ui/useToast';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { expenseSubmissionAllowed, getCollectivePageMetadata, getCollectiveTypeForUrl } from '../lib/collective.lib';
 import expenseTypes from '../lib/constants/expenseTypes';
@@ -16,7 +16,7 @@ import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import UrlQueryHelper from '../lib/UrlQueryHelper';
 import { compose, parseToBoolean } from '../lib/utils';
-
+import Survey from '../components/Survey';
 import CollectiveNavbar from '../components/collective-navbar';
 import { Dimensions } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
@@ -267,13 +267,18 @@ class CreateExpensePage extends React.Component {
       await this.props.router.push(
         `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
       );
-      this.props.addToast({
+      toast({
         type: TOAST_TYPE.SUCCESS,
-        title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
-        message: (
-          <FormattedMessage id="Expense.SuccessPage" defaultMessage="You can edit or review updates on this page." />
-        ),
+        title: 'Expense submitted',
+        description: <Survey question="How was your experience using the automatic OCR feature?" />,
       });
+      // this.props.addToast({
+      //   type: TOAST_TYPE.SUCCESS,
+      //   title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
+      //   message: (
+      //     <FormattedMessage id="Expense.SuccessPage" defaultMessage="You can edit or review updates on this page." />
+      //   ),
+      // });
       window.scrollTo(0, 0);
     } catch (e) {
       this.props.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(this.props.intl, e) });

@@ -10,6 +10,10 @@ import { Badge } from './ui/Badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/Dialog';
 import { Switch } from './ui/Switch';
 import Link from './Link';
+import { toast } from './ui/useToast';
+import Survey from './Survey';
+import { FlaskConical } from 'lucide-react';
+import { Button } from './ui/Button';
 
 const editAccountSettingsMutation = gql`
   mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
@@ -62,7 +66,22 @@ const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
         id={feature.key}
         checked={isChecked}
         disabled={loading}
-        onCheckedChange={checked => togglePreviewFeature(feature.key, checked)}
+        onCheckedChange={checked => {
+          togglePreviewFeature(feature.key, checked);
+          if (!checked) {
+            toast({
+              type: 'SUCCESS',
+              title: <div className="flex items-center gap-1">{`Disabled "${feature.title}" preview feature`}</div>,
+              description: (
+                <Survey
+                  action="Turning off preview feature"
+                  question="How was your experience?"
+                  id="dashboard-turn-off"
+                />
+              ),
+            });
+          }
+        }}
       />
     </div>
   );

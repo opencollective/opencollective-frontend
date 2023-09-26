@@ -16,7 +16,7 @@ import DefaultPaletteStyle from '../components/DefaultPaletteStyle';
 import StripeProviderSSR from '../components/StripeProvider';
 import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
 import UserProvider from '../components/UserProvider';
-
+import { Toaster } from '../components/ui/Toaster';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'nprogress/nprogress.css';
@@ -128,6 +128,8 @@ class OpenCollectiveFrontendApp extends App {
                       <NewsAndUpdatesProvider>
                         <Component {...pageProps} />
                         <GlobalToasts />
+                        <Toaster />
+
                         <GlobalNewsAndUpdates />
                         <TwoFactorAuthenticationModal />
                       </NewsAndUpdatesProvider>
