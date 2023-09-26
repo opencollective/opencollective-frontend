@@ -52,11 +52,14 @@ export default class SignIn extends React.Component {
     showSubHeading: PropTypes.bool,
     /** Show/hide Open Collective Logo **/
     showOCLogo: PropTypes.bool,
+    /** whether the input needs to be auto-focused */
+    autoFocus: PropTypes.bool,
   };
 
   static defaultProps = {
     showSubHeading: true,
     showOCLogo: true,
+    autoFocus: true,
   };
 
   constructor(props) {
@@ -214,7 +217,7 @@ export default class SignIn extends React.Component {
                       this.setState({ error: event.target.validationMessage });
                     }}
                     placeholder="e.g., yourname@yourhost.com"
-                    autoFocus
+                    autoFocus={this.props.autoFocus}
                     required
                     value={email}
                     type="email"
