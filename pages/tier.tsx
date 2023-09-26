@@ -2,7 +2,7 @@ import React from 'react';
 import { get } from 'lodash';
 import { useRouter } from 'next/router';
 
-import { initClient } from '../lib/apollo-client';
+import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
@@ -11,6 +11,7 @@ import { getWebsiteUrl } from '../lib/utils';
 
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import ErrorPage from '../components/ErrorPage';
+import Loading from '../components/Loading';
 import Page from '../components/Page';
 import TierPageContent from '../components/tier-page';
 import { tierPageQuery } from '../components/tier-page/graphql/queries';
@@ -22,8 +23,6 @@ type TierPageProps = {
   parentCollectiveSlug: string | null;
   collectiveType: string | null;
   redirect: string | null;
-  data: any;
-  error: any;
 };
 
 const getPageMetaData = (pageProps: TierPageProps, data) => {
@@ -52,6 +51,23 @@ const getPageMetaData = (pageProps: TierPageProps, data) => {
   return { ...baseMetadata, title: 'Tier', canonicalURL };
 };
 
+const tierPageQueryHelpers = getSSRQueryHelpers({
+  query: tierPageQuery,
+  getVariablesFromContext: ({ query: { tierId } }) => ({ tierId: Number(tierId) }),
+  getPropsFromContext: ({
+    query: { parentCollectiveSlug, collectiveSlug, tierId, tierSlug, redirect, collectiveType },
+  }) => ({
+    // Required
+    collectiveSlug,
+    tierId: Number(tierId),
+    tierSlug,
+    // Optional must default to `null` (rather than undefined) for serialization
+    parentCollectiveSlug: parentCollectiveSlug || null,
+    collectiveType: collectiveType || null,
+    redirect: redirect || null,
+  }),
+});
+
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query
  * to render `components/collective-page` with everything needed.
@@ -59,7 +75,8 @@ const getPageMetaData = (pageProps: TierPageProps, data) => {
 const TierPage = pageProps => {
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
-  const { tierId, tierSlug, data, redirect, error } = pageProps;
+  const { tierId, tierSlug, redirect } = pageProps;
+  const { data, error, loading } = tierPageQueryHelpers.useQuery(pageProps);
   const collective = data?.Tier?.collective;
 
   React.useEffect(() => {
@@ -72,43 +89,26 @@ const TierPage = pageProps => {
     <ErrorPage data={error || data} />
   ) : (
     <Page {...getPageMetaData(pageProps, data)}>
-      <CollectiveThemeProvider collective={data.Tier.collective}>
-        <TierPageContent
-          LoggedInUser={LoggedInUser}
-          collective={data.Tier.collective}
-          tier={data.Tier}
-          contributors={data.Tier.contributors}
-          contributorsStats={data.Tier.stats.contributors}
-          redirect={redirect}
-        />
-      </CollectiveThemeProvider>
+      {loading ? (
+        <div className="py-16 sm:py-32">
+          <Loading />
+        </div>
+      ) : (
+        <CollectiveThemeProvider collective={data.Tier.collective}>
+          <TierPageContent
+            LoggedInUser={LoggedInUser}
+            collective={data.Tier.collective}
+            tier={data.Tier}
+            contributors={data.Tier.contributors}
+            contributorsStats={data.Tier.stats.contributors}
+            redirect={redirect}
+          />
+        </CollectiveThemeProvider>
+      )}
     </Page>
   );
 };
 
-export const getServerSideProps = async ({
-  query: { parentCollectiveSlug, collectiveSlug, tierId, tierSlug, redirect, collectiveType },
-}): Promise<{ props: TierPageProps }> => {
-  const client = initClient();
-  const { data, error } = await client.query({
-    query: tierPageQuery,
-    variables: { tierId: Number(tierId) },
-  });
-
-  return {
-    props: {
-      // Required
-      collectiveSlug,
-      tierId: Number(tierId),
-      tierSlug,
-      // Optional must default to `null` (rather than undefined) for serialization
-      parentCollectiveSlug: parentCollectiveSlug || null,
-      collectiveType: collectiveType || null,
-      data: data || null,
-      error: error || null,
-      redirect: redirect || null,
-    },
-  };
-};
+export const getServerSideProps = tierPageQueryHelpers.getServerSideProps;
 
 export default TierPage;

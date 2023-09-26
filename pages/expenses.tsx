@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import { gql, useLazyQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { has, isNil, omitBy } from 'lodash';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
-import { initClient } from '../lib/apollo-client';
+import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
@@ -233,42 +233,25 @@ type ExpensesPageProps = {
   error?: any;
 };
 
-export const getServerSideProps: GetServerSideProps<ExpensesPageProps> = async ctx => {
-  const props = getPropsFromQuery(ctx.query);
-  const variables = getVariablesFromQuery(ctx.query);
+const expensePageQueryHelpers = getSSRQueryHelpers({
+  query: expensesPageQuery,
+  context: API_V2_CONTEXT,
+  getVariablesFromContext: ctx => getVariablesFromQuery(ctx.query),
+  getPropsFromContext: ctx => getPropsFromQuery(ctx.query),
+});
 
-  // Fetch data from GraphQL API for SSR
-  const client = initClient();
-  const { data, error } = await client.query({
-    query: expensesPageQuery,
-    variables,
-    context: API_V2_CONTEXT,
-    fetchPolicy: 'network-only',
-    errorPolicy: 'ignore',
-  });
-
-  return {
-    props: {
-      ...props,
-      data,
-      error: error || null,
-    },
-  };
-};
+export const getServerSideProps: GetServerSideProps<ExpensesPageProps> = expensePageQueryHelpers.getServerSideProps;
 
 export default function ExpensesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
+  const query = expensePageQueryHelpers.useQuery(props);
 
-  const [fetchData, query] = useLazyQuery(expensesPageQuery, {
-    variables: getVariablesFromQuery(router.query),
-    context: API_V2_CONTEXT,
-  });
-
+  // Refetch data when logging in/out
   useEffect(() => {
     if (LoggedInUser) {
-      fetchData();
+      query.refetch();
     }
   }, [LoggedInUser]);
 

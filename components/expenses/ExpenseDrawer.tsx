@@ -3,7 +3,7 @@ import { useApolloClient, useLazyQuery } from '@apollo/client';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
-import { getVariableFromProps } from '../../pages/expense';
+import { getVariableFromQuery } from '../../pages/expense';
 import { Drawer } from '../Drawer';
 
 import { expensePageQuery } from './graphql/queries';
@@ -26,7 +26,7 @@ export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initia
 
   useEffect(() => {
     if (openExpenseLegacyId) {
-      getExpense({ variables: getVariableFromProps({ ExpenseId: openExpenseLegacyId }) });
+      getExpense({ variables: getVariableFromQuery({ ExpenseId: openExpenseLegacyId }) });
     }
   }, [openExpenseLegacyId]);
 

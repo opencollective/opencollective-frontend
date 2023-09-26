@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
-import { gql, useLazyQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { cloneDeep, isEmpty, omitBy } from 'lodash';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
-import { initClient } from '../lib/apollo-client';
+import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
@@ -107,57 +106,27 @@ export const getUpdatesVariables = (slug, orderBy = null, searchTerm = null) => 
   };
 };
 
-type UpdatesPageProps = {
-  slug: string;
-  orderBy?: string;
-  searchTerm?: string;
-  data: Partial<any>;
-  error?: any;
-};
+const updatesPageQueryHelper = getSSRQueryHelpers({
+  query: updatesPageQuery,
+  context: API_V2_CONTEXT,
+  getPropsFromContext: ctx => getPropsFromQuery(ctx.query),
+  getVariablesFromContext: (ctx, props) => getUpdatesVariables(props.slug, props.orderBy, props.searchTerm),
+});
 
-export const getServerSideProps: GetServerSideProps<UpdatesPageProps> = async ctx => {
-  const props = getPropsFromQuery(ctx.query as any);
+export const getServerSideProps = updatesPageQueryHelper.getServerSideProps;
 
-  // Fetch data from GraphQL API for SSR
-  const client = initClient();
-  const { data, error } = await client.query({
-    query: updatesPageQuery,
-    variables: getUpdatesVariables(props.slug, props.orderBy, props.searchTerm),
-    context: API_V2_CONTEXT,
-    fetchPolicy: 'network-only',
-    errorPolicy: 'ignore',
-  });
-
-  return {
-    props: {
-      ...props,
-      data,
-      error: error || null,
-    },
-  };
-};
-
-export default function UpdatesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function UpdatesPage(props: ReturnType<typeof getPropsFromQuery>) {
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
-
-  // render() {
-  const queryProps = getPropsFromQuery(router.query as any);
-  const [fetchData, query] = useLazyQuery(updatesPageQuery, {
-    variables: getUpdatesVariables(queryProps.slug, queryProps.orderBy, queryProps.searchTerm),
-    context: API_V2_CONTEXT,
-  });
-
-  const error = query?.error || props.error;
-  const data = query?.data || props.data;
+  const queryResult = updatesPageQueryHelper.useQuery(props);
 
   useEffect(() => {
-    addParentToURLIfMissing(router, props?.data.account, '/updates');
+    addParentToURLIfMissing(router, queryResult.data.account, '/updates');
   });
 
   useEffect(() => {
-    if (LoggedInUser?.isAdminOfCollective?.(props.data.account)) {
-      fetchData();
+    if (LoggedInUser?.isAdminOfCollective?.(queryResult.data.account)) {
+      queryResult.refetch();
     }
   }, [LoggedInUser]);
 
@@ -168,22 +137,22 @@ export default function UpdatesPage(props: InferGetServerSidePropsType<typeof ge
   };
 
   const fetchMore = () => {
-    if (!query.called) {
-      return fetchData({
+    if (!queryResult.called) {
+      return queryResult.refetch({
         variables: {
-          ...query.variables,
+          ...queryResult.variables,
           offset: 0,
-          limit: data.account.updates.nodes.length + UPDATES_PER_PAGE,
+          limit: queryResult.data.account.updates.nodes.length + UPDATES_PER_PAGE,
         },
       });
     } else {
-      return query.fetchMore({
+      return queryResult.fetchMore({
         variables: {
-          offset: data.account.updates.nodes.length,
+          offset: queryResult.data.account.updates.nodes.length,
           limit: UPDATES_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          const data = isEmpty(previousResult) ? props.data : previousResult;
+          const data = isEmpty(previousResult) ? queryResult.data : previousResult;
           if (!fetchMoreResult) {
             return data;
           }
@@ -200,24 +169,24 @@ export default function UpdatesPage(props: InferGetServerSidePropsType<typeof ge
     }
   };
 
-  const isUpdatesSupported = isFeatureSupported(data.account, FEATURES.UPDATES);
+  const isUpdatesSupported = isFeatureSupported(queryResult.data.account, FEATURES.UPDATES);
 
-  if (error) {
-    return <ErrorPage error={error} />;
-  } else if (!data.account) {
-    return <ErrorPage data={data} />;
+  if (queryResult.error) {
+    return <ErrorPage error={queryResult.error} />;
+  } else if (!queryResult.data.account) {
+    return <ErrorPage data={queryResult.data} />;
   } else if (!isUpdatesSupported) {
     return <ErrorPage error={{ type: ERROR.NOT_FOUND }} />;
   }
 
-  const collective = data.account;
+  const collective = queryResult.data.account;
   const updates = collective?.updates;
 
   return (
     <div className="UpdatesPage">
       <Header
         collective={collective}
-        loading={data.loading}
+        loading={queryResult.loading}
         LoggedInUser={LoggedInUser}
         canonicalURL={`${getCollectivePageCanonicalURL(collective)}/updates`}
         noRobots={!shouldIndexAccountOnSearchEngines(collective)}
@@ -261,7 +230,7 @@ export default function UpdatesPage(props: InferGetServerSidePropsType<typeof ge
             }
           />
           <Box mt={4} mb={5}>
-            {data.loading ? (
+            {queryResult.loading ? (
               <Loading />
             ) : (
               <Updates collective={collective} updates={updates} fetchMore={fetchMore} LoggedInUser={LoggedInUser} />
