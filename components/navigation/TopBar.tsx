@@ -1,7 +1,7 @@
 import React, { Fragment, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { get, max, min } from 'lodash';
-import { ArrowRight, Compass, Frame, Globe, Globe2 } from 'lucide-react';
+import { ArrowRight, Compass, Frame, Globe, Globe2, CircleIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -25,7 +25,16 @@ import Link from '../Link';
 import SearchModal from '../Search';
 import SearchTrigger from '../SearchTrigger';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
-
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuIndicator,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+} from '../ui/NavigationMenu';
 import ProfileMenu from './ProfileMenu';
 import SiteMenu from './SiteMenu';
 
@@ -193,10 +202,11 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
   };
 
   const onDashboardRoute = isRouteActive('/dashboard');
+  const onHomeRoute = isRouteActive('/home');
   const onSearchRoute =
     isRouteActive('/search') || (account && isRouteActive(`/${account.parentCollective?.slug || account.slug}`));
   const ocLogoRoute = LoggedInUser ? '/dashboard' : '/home';
-  const hasBreadCrumbNav = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.BREADCRUMB_NAV);
+  const hasBreadCrumbNav = true; // LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.BREADCRUMB_NAV);
 
   return (
     <Fragment>
@@ -214,7 +224,7 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
           </div>
 
           {hasBreadCrumbNav ? (
-            <div className="flex shrink grow basis-0 items-center justify-start gap-1 overflow-hidden md:gap-2">
+            <div className="flex shrink grow basis-0 items-center justify-start gap-1 md:gap-2">
               {onDashboardRoute ? (
                 <React.Fragment>
                   <MainNavItem href="/dashboard">
@@ -275,6 +285,126 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
 
                   <MainNavItem href={getCollectivePageRoute(account)}>{account.name}</MainNavItem>
                 </React.Fragment>
+              ) : onHomeRoute ? (
+                <div className="flex flex-1 items-center gap-2">
+                  <Image height={20} width={120} src="/static/images/logotype.svg" alt="Open Collective" />
+                  <div className="flex flex-1 justify-center">
+                    <NavigationMenu>
+                      <NavigationMenuList>
+                        <NavigationMenuItem>
+                          <NavigationMenuTrigger>Solutions</NavigationMenuTrigger>
+                          <NavigationMenuContent>
+                            <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[1fr_.75fr]">
+                              <ListItem href="/docs" title="For Collectives">
+                                Make your community sustainable
+                              </ListItem>
+                              <li className="row-span-3">
+                                <Image
+                                  src={'/static/images/how-it-works/builtWithResilient-illustration.png'}
+                                  width="200"
+                                  height="200"
+                                />
+                                {/* <NavigationMenuLink asChild>
+                                  <a
+                                    className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                    href="/"
+                                  >
+                                    <CircleIcon className="h-6 w-6" />
+                                    <div className="mb-2 mt-4 text-lg font-medium">shadcn/ui</div>
+                                    <p className="text-sm leading-tight text-muted-foreground">
+                                      Beautifully designed components built with Radix UI and Tailwind CSS.
+                                    </p>
+                                  </a>
+                                </NavigationMenuLink> */}
+                              </li>
+                              <ListItem href="/docs/installation" title="For Sponsors">
+                                Support projects & communities
+                              </ListItem>
+
+                              <ListItem href="/docs/primitives/typography" title="For Fiscal Hosts">
+                                Fiscal sponsorship has never been easier
+                              </ListItem>
+                            </ul>
+                          </NavigationMenuContent>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
+                          <NavigationMenuTrigger>Product</NavigationMenuTrigger>
+                          <NavigationMenuContent>
+                            <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[1fr_.75fr]">
+                              <ListItem href="/docs" title="Pricing">
+                                Our Pricing Structure
+                              </ListItem>
+                              <li className="row-span-3">
+                                <Image
+                                  src={'/static/images/how-it-works/openIsBetter-illustration.png'}
+                                  width="200"
+                                  height="200"
+                                />
+                                {/* <NavigationMenuLink asChild>
+                                  <a
+                                    className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                    href="/"
+                                  >
+                                    <CircleIcon className="h-6 w-6" />
+                                    <div className="mb-2 mt-4 text-lg font-medium">shadcn/ui</div>
+                                    <p className="text-sm leading-tight text-muted-foreground">
+                                      Beautifully designed components built with Radix UI and Tailwind CSS.
+                                    </p>
+                                  </a>
+                                </NavigationMenuLink> */}
+                              </li>
+                              <ListItem href="/docs/installation" title="How Open Collective works">
+                                Open Collective enables all kinds of groups to raise, manage, and spend money
+                                transparently. Our open source software platform engages contributors and supporters,
+                                automates admin, and helps you tell your story.
+                              </ListItem>
+                              <ListItem href="/docs/primitives/typography" title="Fiscal Hosting">
+                                Think of your community, project, or initiative as a plant, and a fiscal host as a
+                                lovingly tended garden.
+                              </ListItem>
+                            </ul>
+                          </NavigationMenuContent>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
+                          <NavigationMenuTrigger>Company</NavigationMenuTrigger>
+                          <NavigationMenuContent>
+                            <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[1fr_.75fr]">
+                              <ListItem href="/docs" title="Blog">
+                                Stay up to date with what is happening with Open Collective
+                              </ListItem>
+                              <li className="row-span-3">
+                                <Image
+                                  src={'/static/images/how-it-works/transparentByDesign-illustration.png'}
+                                  width="200"
+                                  height="200"
+                                />
+                                {/* <NavigationMenuLink asChild>
+                                  <a
+                                    className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                    href="/"
+                                  >
+                                    <CircleIcon className="h-6 w-6" />
+                                    <div className="mb-2 mt-4 text-lg font-medium">shadcn/ui</div>
+                                    <p className="text-sm leading-tight text-muted-foreground">
+                                      Beautifully designed components built with Radix UI and Tailwind CSS.
+                                    </p>
+                                  </a>
+                                </NavigationMenuLink> */}
+                              </li>
+                              <ListItem href="/docs/installation" title="Exit to Community">
+                                Join us as we transition from a privately owned company to a structure that allows us to
+                                share power and revenue with you.
+                              </ListItem>
+                              <ListItem href="/docs/primitives/typography" title="About">
+                                Introduction to Open Collective in the docs.
+                              </ListItem>
+                            </ul>
+                          </NavigationMenuContent>
+                        </NavigationMenuItem>
+                      </NavigationMenuList>
+                    </NavigationMenu>
+                  </div>
+                </div>
               ) : (
                 <MainNavItem href={'#'}>{navTitle}</MainNavItem>
               )}
@@ -306,5 +436,26 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
     </Fragment>
   );
 };
-
+const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWithoutRef<'a'>>(
+  ({ className, title, children, ...props }, ref) => {
+    return (
+      <li>
+        <NavigationMenuLink asChild>
+          <a
+            ref={ref}
+            className={cn(
+              'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+              className,
+            )}
+            {...props}
+          >
+            <div className="text-sm font-medium leading-none">{title}</div>
+            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">{children}</p>
+          </a>
+        </NavigationMenuLink>
+      </li>
+    );
+  },
+);
+ListItem.displayName = 'ListItem';
 export default TopBar;
