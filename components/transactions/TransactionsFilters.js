@@ -4,18 +4,16 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { encodeDateInterval } from '../../lib/date-utils';
+import { elementFromClass } from '../../lib/react-utils';
 
 import AmountFilter from '../budget/filters/AmountFilter';
 import PeriodFilter from '../filters/PeriodFilter';
-import { Box } from '../Grid';
 
 import TransactionsKindFilter from './filters/TransactionsKindFilter';
 import TransactionsPaymentMethodTypeFilter from './filters/TransactionsPaymentMethodTypeFilter';
 import TransactionsTypeFilter from './filters/TransactionsTypeFilter';
 
-const FilterContainer = styled(Box)`
-  margin-bottom: 8px;
-`;
+const FilterContainer = elementFromClass('div', 'min-w-fit');
 
 const FilterLabel = styled.label`
   font-weight: 600;
