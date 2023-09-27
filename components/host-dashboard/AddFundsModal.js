@@ -186,6 +186,7 @@ const addFundsAccountQuery = gql`
           hostFees
         }
         policies {
+          id
           REQUIRE_2FA_FOR_ADMINS
         }
         isTrustedHost
@@ -202,6 +203,7 @@ const addFundsAccountQuery = gql`
             hostFees
           }
           policies {
+            id
             REQUIRE_2FA_FOR_ADMINS
           }
           isTrustedHost

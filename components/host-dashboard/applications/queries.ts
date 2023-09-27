@@ -27,6 +27,7 @@ export const hostApplicationsQuery = gql`
       type
       settings
       policies {
+        id
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
         }

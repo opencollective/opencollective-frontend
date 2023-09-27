@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { gql, useLazyQuery } from '@apollo/client';
 import { get } from 'lodash';
 import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -142,6 +142,7 @@ export default function UpdatePage(props: InferGetServerSidePropsType<typeof get
   const { account, update } = query?.data || props;
   const comments = get(update, 'comments.nodes', []);
   const totalCommentsCount = get(update, 'comments.totalCount', 0);
+  const [replyingToComment, setReplyingToComment] = useState(null);
 
   React.useEffect(() => {
     if (LoggedInUser) {
@@ -218,6 +219,7 @@ export default function UpdatePage(props: InferGetServerSidePropsType<typeof get
                   fetchMore={fetchMore}
                   items={comments}
                   onCommentDeleted={() => query.refetch()}
+                  getClickedComment={setReplyingToComment}
                 />
               </Container>
             )}
@@ -227,7 +229,12 @@ export default function UpdatePage(props: InferGetServerSidePropsType<typeof get
                   <CommentIcon size={24} color="lightgrey" />
                 </Box>
                 <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
-                  <CommentForm id="new-update" UpdateId={update.id} onSuccess={() => query.refetch()} />
+                  <CommentForm
+                    id="new-update"
+                    replyingToComment={replyingToComment}
+                    UpdateId={update.id}
+                    onSuccess={() => query.refetch()}
+                  />
                 </Box>
               </Flex>
             )}
