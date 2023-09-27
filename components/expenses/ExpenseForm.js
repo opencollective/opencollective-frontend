@@ -321,17 +321,25 @@ const ExpenseFormBody = ({
 
   // When user logs in we set its account as the default payout profile if not yet defined
   React.useEffect(() => {
+    const payeePayoutProfile = values?.payee && payoutProfiles?.find(p => p.slug === values.payee.slug);
     if (values?.draft?.payee && !loggedInAccount && !isRecurring) {
       formik.setFieldValue('payee', {
         ...values.draft.payee,
         isInvite: false,
         isNewUser: true,
       });
+    } else if (!payeePayoutProfile && loggedInAccount && isDraft) {
+      setOnBehalf(true);
     }
     // If creating a new expense or completing an expense submitted on your behalf, automatically select your default profile.
-    else if (!isOnBehalf && (isDraft || !values.payee) && loggedInAccount && !isEmpty(payoutProfiles)) {
-      const defaultProfile =
-        (values.payee && payoutProfiles.find(p => p.slug === values.payee.slug)) || first(payoutProfiles);
+    else if (
+      !isOnBehalf &&
+      (isDraft || !values.payee) &&
+      loggedInAccount &&
+      !isEmpty(payoutProfiles) &&
+      payeePayoutProfile
+    ) {
+      const defaultProfile = payeePayoutProfile || first(payoutProfiles);
       formik.setFieldValue('payee', defaultProfile);
     }
     // Update the form state with private fields that were refeched after the user was authenticated
@@ -471,6 +479,7 @@ const ExpenseFormBody = ({
         handleClearPayeeStep={() => setShowResetModal(true)}
         payoutProfiles={payoutProfiles}
         loggedInAccount={loggedInAccount}
+        disablePayee={isDraft && isOnBehalf}
         onChange={payee => {
           setOnBehalf(payee.isInvite);
         }}
