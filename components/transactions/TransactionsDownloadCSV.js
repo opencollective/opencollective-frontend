@@ -30,7 +30,6 @@ const TransactionsDownloadCSV = ({ collective, query, ...props }) => {
           buttonSize="small"
           minWidth={140}
           height={38}
-          mb="8px"
           p="6px 10px"
           isBorderless
           flexGrow={1}

@@ -46,7 +46,7 @@ const nextConfig = {
         NEXT_IMAGES_URL: null,
         REST_URL: null,
         SENTRY_DSN: null,
-        TW_API_COLLECTIVE_SLUG: null,
+        WISE_PLATFORM_COLLECTIVE_SLUG: null,
         WISE_ENVIRONMENT: 'sandbox',
         HCAPTCHA_SITEKEY: false,
         CAPTCHA_ENABLED: false,
