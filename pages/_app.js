@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { ApolloProvider } from '@apollo/client';
 import App from 'next/app';
 import Router from 'next/router';
+import { SessionProvider } from 'next-auth/react';
 import NProgress from 'nprogress';
 import { ThemeProvider } from 'styled-components';
 
@@ -118,26 +119,28 @@ class OpenCollectiveFrontendApp extends App {
 
     return (
       <Fragment>
-        <ApolloProvider client={client}>
-          <ThemeProvider theme={theme}>
-            <StripeProviderSSR>
-              <IntlProvider locale={locale}>
-                <TooltipProvider delayDuration={500} skipDelayDuration={100}>
-                  <ToastProvider>
-                    <UserProvider>
-                      <NewsAndUpdatesProvider>
-                        <Component {...pageProps} />
-                        <GlobalToasts />
-                        <GlobalNewsAndUpdates />
-                        <TwoFactorAuthenticationModal />
-                      </NewsAndUpdatesProvider>
-                    </UserProvider>
-                  </ToastProvider>
-                </TooltipProvider>
-              </IntlProvider>
-            </StripeProviderSSR>
-          </ThemeProvider>
-        </ApolloProvider>
+        <SessionProvider>
+          <ApolloProvider client={client}>
+            <ThemeProvider theme={theme}>
+              <StripeProviderSSR>
+                <IntlProvider locale={locale}>
+                  <TooltipProvider delayDuration={500} skipDelayDuration={100}>
+                    <ToastProvider>
+                      <UserProvider>
+                        <NewsAndUpdatesProvider>
+                          <Component {...pageProps} />
+                          <GlobalToasts />
+                          <GlobalNewsAndUpdates />
+                          <TwoFactorAuthenticationModal />
+                        </NewsAndUpdatesProvider>
+                      </UserProvider>
+                    </ToastProvider>
+                  </TooltipProvider>
+                </IntlProvider>
+              </StripeProviderSSR>
+            </ThemeProvider>
+          </ApolloProvider>
+        </SessionProvider>
         <DefaultPaletteStyle palette={defaultColors.primary} />
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />

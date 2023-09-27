@@ -6,6 +6,7 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronRight } from '@styled-icons/boxicons-regular/ChevronRight';
 import { Exit } from '@styled-icons/boxicons-regular/Exit';
 import { get } from 'lodash';
+import { signOut } from 'next-auth/react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -173,7 +174,12 @@ const UserAccountLinks = ({
         </UserMenuLinkEntry>
       )}
       {isMobileView ? (
-        <UserMenuLinkEntry profileMenuLink as="a" data-cy="logout" onClick={logOutHandler}>
+        <UserMenuLinkEntry
+          profileMenuLink
+          as="a"
+          data-cy="logout"
+          onClick={process.env.OAUTH_MODE ? signOut : logOutHandler}
+        >
           <Flex alignItems="center">
             <P color="#7A0F2B" fontWeight="500" pr={2} whiteSpace="nowrap">
               <FormattedMessage id="menu.logout" defaultMessage="Log out" />
@@ -182,7 +188,7 @@ const UserAccountLinks = ({
           </Flex>
         </UserMenuLinkEntry>
       ) : (
-        <UserMenuLinkEntry as="a" data-cy="logout" onClick={logOutHandler}>
+        <UserMenuLinkEntry as="a" data-cy="logout" onClick={process.env.OAUTH_MODE ? signOut : logOutHandler}>
           <FormattedMessage id="menu.logout" defaultMessage="Log out" /> →
         </UserMenuLinkEntry>
       )}

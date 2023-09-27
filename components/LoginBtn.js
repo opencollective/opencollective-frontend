@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { signIn } from 'next-auth/react';
 import { FormattedMessage } from 'react-intl';
 
 import { cn } from '../lib/utils';
@@ -7,6 +8,7 @@ import { cn } from '../lib/utils';
 import Link from './Link';
 import StyledSpinner from './StyledSpinner';
 import { withUser } from './UserProvider';
+
 /**
  * A user login button with proper redirect function.
  * If user is currently loggin in, button will be disabled and will show a spinner.
@@ -39,6 +41,12 @@ class LoginBtn extends React.Component {
   render() {
     return (
       <Link
+        onClick={e => {
+          if (process.env.OAUTH_MODE) {
+            e.preventDefault();
+            signIn('opencollective', { callbackUrl: this.redirectAfterSignin });
+          }
+        }}
         href={{ pathname: '/signin', query: { next: this.redirectAfterSignin } }}
         className={cn(
           'text-primary hover:text-primary/80',

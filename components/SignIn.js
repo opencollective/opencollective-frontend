@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
+import { signIn } from 'next-auth/react';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
@@ -120,6 +121,18 @@ export default class SignIn extends React.Component {
   render() {
     const { onSubmit, loading, email, password, onEmailChange, onPasswordChange, label } = this.props;
     const { error, showError } = this.state;
+    if (process.env.OAUTH_MODE) {
+      return (
+        <StyledButton
+          onClick={e => {
+            e.preventDefault();
+            signIn('opencollective', { callbackUrl: this.redirectAfterSignin });
+          }}
+        >
+          <FormattedMessage defaultMessage="Sign in with Open Collective" />
+        </StyledButton>
+      );
+    }
     return (
       <React.Fragment>
         <Head>

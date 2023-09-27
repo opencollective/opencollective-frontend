@@ -44,6 +44,8 @@ const defaults = {
   WISE_ENVIRONMENT: 'sandbox',
   API_PROXY: true,
   SENTRY_TRACES_SAMPLE_RATE: null,
+  OPENCOLLECTIVE_OAUTH_URL: 'https://opencollective.com',
+  OPENCOLLECTIVE_OAUTH_SCOPES: 'email',
 };
 
 if ((process.env.OC_ENV || process.env.NODE_ENV || 'production') === 'production') {

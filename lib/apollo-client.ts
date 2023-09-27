@@ -6,6 +6,7 @@ import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { createUploadLink } from 'apollo-upload-client';
 import { pick } from 'lodash';
+import { getSession } from 'next-auth/react';
 
 import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFactorAuthenticationApolloLink';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from './local-storage';
@@ -113,8 +114,20 @@ const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?
 };
 
 function createLink({ twoFactorAuthContext }) {
-  const authLink = setContext((_, { headers }) => {
-    const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+  const authLink = setContext(async (_, { headers }) => {
+    let token;
+
+    // From OAuth session
+    const session = (await getSession()) as any;
+    if (session?.accessToken) {
+      token = session.accessToken;
+    }
+
+    // From local storage
+    if (!token) {
+      token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+    }
+
     if (token) {
       return {
         headers: {

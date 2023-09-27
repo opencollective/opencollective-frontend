@@ -67,6 +67,7 @@ const withData = ComposedComponent => {
     static propTypes = {
       serverState: PropTypes.object.isRequired,
       options: PropTypes.object,
+      // session: PropTypes.object,
       twoFactorAuthContext: PropTypes.object,
     };
 

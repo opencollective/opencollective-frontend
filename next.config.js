@@ -51,6 +51,7 @@ const nextConfig = {
         HCAPTCHA_SITEKEY: false,
         CAPTCHA_ENABLED: false,
         CAPTCHA_PROVIDER: 'HCAPTCHA',
+        OAUTH_MODE: null,
         SENTRY_TRACES_SAMPLE_RATE: null,
         OC_APPLICATION: null,
       }),
