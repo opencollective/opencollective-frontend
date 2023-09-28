@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FastField, Field } from 'formik';
+import { FastField, Field, useFormikContext } from 'formik';
 import { escape, get, isEmpty, pick, unescape } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isURL } from 'validator';
@@ -10,7 +10,7 @@ import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
 import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemsMustHaveFiles } from './lib/items';
-import { updateExpenseFormWithUploadResult } from './lib/ocr';
+import { itemCanBeSplit, updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
@@ -22,6 +22,8 @@ import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import { Span } from '../Text';
+
+import { SplitExpenseItemsModal } from './SplitExpenseItemsModal';
 
 export const msg = defineMessages({
   previewImgAlt: {
@@ -123,6 +125,7 @@ const AttachmentLabel = () => (
  * Form for a single attachment. Must be used with Formik.
  */
 const ExpenseItemForm = ({
+  collective,
   attachment,
   errors,
   onRemove,
@@ -142,6 +145,8 @@ const ExpenseItemForm = ({
   hasOCRFeature,
 }) => {
   const intl = useIntl();
+  const [showSplitConfirm, setShowSplitConfirm] = React.useState(false);
+  const form = useFormikContext();
   const { formatMessage } = intl;
   const attachmentKey = `attachment-${attachment.id || attachment.url}`;
   const getFieldName = field => `items[${itemIdx}].${field}`;
@@ -182,7 +187,7 @@ const ExpenseItemForm = ({
                     useGraphQL={hasOCRFeature}
                     parseDocument={hasOCRFeature}
                     onGraphQLSuccess={uploadResults => {
-                      updateExpenseFormWithUploadResult(form, uploadResults, itemIdx);
+                      updateExpenseFormWithUploadResult(collective, form, uploadResults, itemIdx);
                     }}
                   />
                 </StyledInputField>
@@ -300,6 +305,23 @@ const ExpenseItemForm = ({
             {formatMessage(requireFile ? msg.removeReceipt : msg.removeItem)}
           </StyledButton>
         )}
+        {itemCanBeSplit(attachment) && (
+          <React.Fragment>
+            <StyledButton
+              type="button"
+              buttonStyle="secondary"
+              buttonSize="tiny"
+              isBorderless
+              mr={2}
+              onClick={() => setShowSplitConfirm(true)}
+            >
+              <FormattedMessage defaultMessage="Split items" />
+            </StyledButton>
+            {showSplitConfirm && (
+              <SplitExpenseItemsModal form={form} itemIdx={itemIdx} onClose={() => setShowSplitConfirm(false)} />
+            )}
+          </React.Fragment>
+        )}
         {!isLastItem && <StyledHr flex="1" borderStyle="dashed" borderColor="black.200" />}
       </Flex>
     </Box>
@@ -307,6 +329,7 @@ const ExpenseItemForm = ({
 };
 
 ExpenseItemForm.propTypes = {
+  collective: PropTypes.object,
   /** The currency of the collective */
   currency: PropTypes.string,
   /** ReactHookForm key */
@@ -335,13 +358,14 @@ ExpenseItemForm.propTypes = {
   availableCurrencies: PropTypes.arrayOf(PropTypes.string),
   /** Is it an invoice */
   isInvoice: PropTypes.bool,
-  /** the attachment data */
+  /** the item data. TODO: Rename to "item" */
   attachment: PropTypes.shape({
     id: PropTypes.string,
     url: PropTypes.string,
     description: PropTypes.string,
     incurredAt: PropTypes.string,
     amount: PropTypes.number,
+    __parsingResult: PropTypes.object,
   }).isRequired,
   editOnlyDescriptiveInfo: PropTypes.bool,
   isLastItem: PropTypes.bool,

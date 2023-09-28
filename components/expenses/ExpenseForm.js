@@ -558,7 +558,11 @@ const ExpenseFormBody = ({
         />
       )}
       {!values.type && !hideOCRPrefillStater && hasOCRFeature && (
-        <ExpenseOCRPrefillStarter form={formik} onSuccess={() => setHideOCRPrefillStarter(true)} />
+        <ExpenseOCRPrefillStarter
+          collective={collective}
+          form={formik}
+          onSuccess={() => setHideOCRPrefillStarter(true)}
+        />
       )}
       {isRecurring && <ExpenseRecurringBanner expense={expense} />}
       {values.type && (
@@ -663,6 +667,7 @@ const ExpenseFormBody = ({
                 {values.type === expenseTypes.INVOICE && (
                   <Box my={40}>
                     <ExpenseAttachedFilesForm
+                      collective={collective}
                       title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
                       description={
                         <FormattedMessage
@@ -710,6 +715,7 @@ const ExpenseFormBody = ({
                 {values.type === expenseTypes.GRANT && (
                   <Box my={40}>
                     <ExpenseAttachedFilesForm
+                      collective={collective}
                       title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}
                       description={
                         <FormattedMessage
