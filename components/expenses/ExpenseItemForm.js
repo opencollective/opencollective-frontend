@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field, useFormikContext } from 'formik';
 import { escape, get, isEmpty, pick, unescape } from 'lodash';
+import Lottie from 'lottie-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isURL } from 'validator';
 
@@ -12,6 +13,7 @@ import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemsMustHaveFiles } from './lib/items';
 import { itemCanBeSplit, updateExpenseFormWithUploadResult } from './lib/ocr';
 
+import * as ScanningAnimationJSON from '../../public/static/animations/scanning.json';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import RichTextEditor from '../RichTextEditor';
@@ -189,6 +191,7 @@ const ExpenseItemForm = ({
                     onGraphQLSuccess={uploadResults => {
                       updateExpenseFormWithUploadResult(collective, form, uploadResults, itemIdx);
                     }}
+                    UploadingComponent={() => <Lottie animationData={ScanningAnimationJSON} loop autoPlay />}
                   />
                 </StyledInputField>
               );

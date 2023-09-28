@@ -13,6 +13,7 @@ export interface ExpenseItemFormValues {
   url?: string;
   __isNew?: boolean;
   __parsingResult?: UploadFileResult['parsingResult']['expense'];
+  __isUploading?: boolean;
 }
 
 /**

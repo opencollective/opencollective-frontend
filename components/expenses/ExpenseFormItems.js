@@ -160,12 +160,19 @@ class ExpenseFormItems extends React.PureComponent {
             kind="EXPENSE_ITEM"
             data-cy="expense-multi-attachments-dropzone"
             onSuccess={files => filesListToItems(files).map(this.props.push)}
-            onReject={uploadErrors => this.setState({ uploadErrors })}
+            onReject={uploadErrors => {
+              this.setState({ uploadErrors });
+              this.props.remove(0); // Remove the dummy item
+            }}
             mockImageGenerator={index => `https://loremflickr.com/120/120/invoice?lock=${index}`}
             mb={3}
             useGraphQL={hasOCRFeature}
             parseDocument={hasOCRFeature}
+            onDrop={() => {
+              this.props.push(newExpenseItem({ __isUploading: true })); // Insert a dummy item to display the loading state
+            }}
             onGraphQLSuccess={uploadResults => {
+              this.props.remove(0); // Remove the dummy item
               updateExpenseFormWithUploadResult(collective, form, uploadResults);
             }}
           >
