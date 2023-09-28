@@ -332,13 +332,7 @@ const ExpenseFormBody = ({
       setOnBehalf(true);
     }
     // If creating a new expense or completing an expense submitted on your behalf, automatically select your default profile.
-    else if (
-      !isOnBehalf &&
-      (isDraft || !values.payee) &&
-      loggedInAccount &&
-      !isEmpty(payoutProfiles) &&
-      payeePayoutProfile
-    ) {
+    else if (!isOnBehalf && (isDraft || !values.payee) && loggedInAccount && !isEmpty(payoutProfiles)) {
       const defaultProfile = payeePayoutProfile || first(payoutProfiles);
       formik.setFieldValue('payee', defaultProfile);
     }
