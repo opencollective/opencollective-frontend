@@ -1,6 +1,8 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import clsx from 'clsx';
+import { parseCookies } from 'nookies';
+
 import {
   ArrowRightLeft,
   BarChart2,
@@ -27,7 +29,7 @@ import { require2FAForAdmins } from '../lib/policies';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { getDashboardRoute } from '../lib/url-helpers';
 
-import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/dashboard/constants';
+import { ALL_SECTIONS, SECTION_LABELS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import AdminPanelSection from '../components/dashboard/DashboardSection';
 import TopBar from '../components/dashboard/DashboardTopBar';
@@ -142,13 +144,11 @@ const getMenuItems = (intl, account, loggedInUser) => {
   console.log({ hasEnabledOverviewPages, loggedInUser, account, isIndividual });
   const menuItems = [
     {
-      label: 'Overview',
       section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
       if: isIndividual || !!loggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD_OVERVIEW),
     },
     {
-      label: 'Expenses',
       section: ALL_SECTIONS.HOST_EXPENSES,
       Icon: Receipt,
       if: isHost,
@@ -204,7 +204,7 @@ const getMenuItems = (intl, account, loggedInUser) => {
     //   if: !isIndividual && !isHost,
     // },
     {
-      label: 'Virtual Cards',
+      // label: 'Virtual Cards',
       section: ALL_SECTIONS.VIRTUAL_CARDS,
       Icon: CreditCardIcon,
       if: !isIndividual && !isHost,
@@ -305,7 +305,9 @@ const getMenuItems = (intl, account, loggedInUser) => {
     },
   ];
 
-  const filteredItems = menuItems.filter(route => route.if !== false);
+  const filteredItems = menuItems
+    .filter(route => route.if !== false)
+    .map(route => ({ ...route, label: route.label || intl.formatMessage(SECTION_LABELS[route.section]) }));
 
   const flatArray = filteredItems.flatMap(item => {
     // Create an array for the parent and its transformed children
@@ -499,10 +501,10 @@ const DashboardPage = () => {
   );
 };
 
-DashboardPage.getInitialProps = () => {
-  return {
-    scripts: { googleMaps: true }, // TODO: This should be enabled only for events
-  };
-};
+// DashboardPage.getInitialProps = () => {
+//   return {
+//     scripts: { googleMaps: true }, // TODO: This should be enabled only for events
+//   };
+// };
 
 export default DashboardPage;

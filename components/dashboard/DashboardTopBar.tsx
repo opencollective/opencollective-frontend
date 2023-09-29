@@ -9,6 +9,8 @@ import { getDashboardRoute } from '../../lib/url-helpers';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/DropdownMenu';
 
 import { DashboardContext } from './DashboardContext';
+import { useIntl } from 'react-intl';
+import { SECTION_LABELS } from './constants';
 
 export const MenuLink = ({ section, label, href, Icon, isActive, onChangeVisiblity, visibility }) => {
   const { ref, inView, entry } = useInView({

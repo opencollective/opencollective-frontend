@@ -38,13 +38,6 @@ export default function SiteMenu() {
 
           <Flex flex={1} flexDirection="column" overflowY="auto">
             <Flex flexDirection="column" py={2}>
-              {LoggedInUser && (
-                <DrawerMenuItem href={'/home'} onClick={onClose}>
-                  <Flex alignItems="center" gridGap={2}>
-                    <Home size={16} /> <FormattedMessage defaultMessage="Homepage" />
-                  </Flex>
-                </DrawerMenuItem>
-              )}
               {LoggedInUser ? (
                 <DrawerMenuItem href={LoggedInUser ? '/dashboard' : '/'} onClick={onClose}>
                   <Flex alignItems="center" gridGap={2}>
@@ -52,7 +45,7 @@ export default function SiteMenu() {
                   </Flex>
                 </DrawerMenuItem>
               ) : (
-                <DrawerMenuItem href={LoggedInUser ? '/dashboard' : '/'} onClick={onClose}>
+                <DrawerMenuItem href={'/'} onClick={onClose}>
                   <Flex alignItems="center" gridGap={2}>
                     <Home size={16} /> <FormattedMessage id="home" defaultMessage="Home" />
                   </Flex>
@@ -71,9 +64,16 @@ export default function SiteMenu() {
               </DrawerMenuItem>
               <DrawerMenuItem href="https://docs.opencollective.com" onClick={onClose} openInNewTab>
                 <Flex alignItems="center" gridGap={2}>
-                  <BookOpen size={16} /> <FormattedMessage defaultMessage="Docs" />
+                  <BookOpen size={16} /> <FormattedMessage defaultMessage="Documentation" />
                 </Flex>
               </DrawerMenuItem>
+              {LoggedInUser && (
+                <DrawerMenuItem href={'/home'} onClick={onClose}>
+                  <Flex alignItems="center" gridGap={2}>
+                    <Home size={16} /> <FormattedMessage defaultMessage="Open Collective Home" />
+                  </Flex>
+                </DrawerMenuItem>
+              )}
             </Flex>
           </Flex>
         </React.Fragment>

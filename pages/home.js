@@ -1,6 +1,6 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
-
+import { parseCookies } from 'nookies';
 import { getRequestIntl } from '../lib/i18n/request';
 
 // import Banner from '../components/collectives/Banner';
@@ -46,22 +46,63 @@ const HomePage = () => {
   );
 };
 
-HomePage.getInitialProps = ({ req, res }) => {
-  if (res && req) {
-    const { locale } = getRequestIntl(req);
-    if (locale === 'en') {
-      res.setHeader('Cache-Control', 'public, s-maxage=3600');
-    }
+// HomePage.getInitialProps = ({ req, res }) => {
+//   if (res && req) {
+//     const { locale } = getRequestIntl(req);
+//     if (locale === 'en') {
+//       res.setHeader('Cache-Control', 'public, s-maxage=3600');
+//     }
+//   }
+
+//   let skipDataFromTree = false;
+
+//   // If on server side
+//   if (req) {
+//     skipDataFromTree = true;
+//   }
+
+//   return { skipDataFromTree };
+// };
+
+export const getServerSideProps = async ctx => {
+  const cookies = parseCookies(ctx);
+  const rootPath = cookies.rootPath;
+  console.log({ query: ctx.query, ctx });
+  // const props = getPropsFromQuery(ctx.query);
+  // const variables = getVariablesFromQuery(ctx.query);
+
+  // // Fetch data from GraphQL API for SSR
+  // const client = initClient();
+  // const { data, error } = await client.query({
+  //   query: expensesPageQuery,
+  //   variables,
+  //   context: API_V2_CONTEXT,
+  //   fetchPolicy: 'network-only',
+  //   errorPolicy: 'ignore',
+  // });
+
+  // return {
+  //   props: {
+  //     ...props,
+  //     data,
+  //     error: error || null,
+  //   },
+  // };
+  if (ctx.req.url === '/' && rootPath === 'dashboard') {
+    console.log('redirecting');
+    // Redirect to another page if the cookie has a certain value
+    return {
+      redirect: {
+        destination: '/dashboard',
+        permanent: false,
+      },
+    };
   }
 
-  let skipDataFromTree = false;
-
-  // If on server side
-  if (req) {
-    skipDataFromTree = true;
-  }
-
-  return { skipDataFromTree };
+  // Otherwise, return the usual props
+  return {
+    props: {},
+  };
 };
 
 export default HomePage;

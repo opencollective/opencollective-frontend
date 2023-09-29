@@ -206,7 +206,7 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
   const onSearchRoute =
     isRouteActive('/search') || (account && isRouteActive(`/${account.parentCollective?.slug || account.slug}`));
   const ocLogoRoute = LoggedInUser ? '/dashboard' : '/home';
-  const hasBreadCrumbNav = true; // LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.BREADCRUMB_NAV);
+  const hasBreadCrumbNav = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.BREADCRUMB_NAV);
 
   return (
     <Fragment>

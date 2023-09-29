@@ -120,11 +120,6 @@ export const SECTION_LABELS = defineMessages({
     id: 'AdminPanel.Menu.Overview',
     defaultMessage: 'Overview',
   },
-
-  [ALL_SECTIONS.OVERVIEW]: {
-    id: 'AdminPanel.Menu.Overview',
-    defaultMessage: 'Overview',
-  },
   // [ALL_SECTIONS.COLLECTIVES]: {
   //   id: 'Collectives',
   //   defaultMessage: 'Collectives',
