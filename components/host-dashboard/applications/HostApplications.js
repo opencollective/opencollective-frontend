@@ -58,12 +58,20 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
     fetchPolicy: 'cache-and-network',
     context: API_V2_CONTEXT,
   });
-
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const accountSlug = router.query.accountSlug;
   const [applicationInDrawer, setApplicationInDrawer] = React.useState(null);
+  const drawerOpen = accountSlug && applicationInDrawer;
+
+  React.useEffect(() => {
+    if (accountSlug) {
+      const application = data?.host?.hostApplications?.nodes?.find(a => a.account.slug === accountSlug);
+      if (application) {
+        setApplicationInDrawer(application);
+      }
+    }
+  }, [accountSlug, data?.host?.hostApplications]);
 
   const pageRoute = isDashboard ? `/workspace/${hostSlug}/host-applications` : `/${hostSlug}/admin/host-applications`;
-
   const hostApplications = data?.host?.hostApplications;
   const initViews = [
     {
@@ -117,7 +125,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
 
       <DashboardViews
         query={query}
-        omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
+        omitMatchingParams={[...ROUTE_PARAMS, 'orderBy', 'accountSlug']}
         views={views}
         onChange={query => {
           router.push(
@@ -149,10 +157,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
         hostApplications={hostApplications}
         nbPlaceholders={COLLECTIVES_PER_PAGE}
         loading={loading}
-        openApplication={application => {
-          setDrawerOpen(true);
-          setApplicationInDrawer(application);
-        }}
+        openApplication={application => updateQuery(router, { accountSlug: application.account.slug })}
       />
 
       <div className="mt-16 flex justify-center">
@@ -166,7 +171,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
 
       <HostApplicationDrawer
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={() => updateQuery(router, { accountSlug: null })}
         host={data?.host}
         application={applicationInDrawer}
       />
