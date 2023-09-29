@@ -11,7 +11,7 @@ import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
 import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemsMustHaveFiles } from './lib/items';
-import { itemCanBeSplit, updateExpenseFormWithUploadResult } from './lib/ocr';
+import { updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import * as ScanningAnimationJSON from '../../public/static/animations/scanning.json';
 import { Box, Flex } from '../Grid';
@@ -25,6 +25,7 @@ import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import { Span } from '../Text';
 
+import { ExpenseItemDescriptionHint } from './ItemDescriptionHint';
 import { SplitExpenseItemsModal } from './SplitExpenseItemsModal';
 
 export const msg = defineMessages({
@@ -35,12 +36,6 @@ export const msg = defineMessages({
   descriptionLabel: {
     id: 'Fields.description',
     defaultMessage: 'Description',
-  },
-  invoiceDescriptionHint: {
-    defaultMessage: 'Specify item or activity and timeframe, e.g. "Volunteer Training, April 2023"',
-  },
-  receiptDescriptionHint: {
-    defaultMessage: 'Describe the expense, e.g. "Dinner with the team"',
   },
   amountLabel: {
     id: 'Fields.amount',
@@ -143,7 +138,6 @@ const ExpenseItemForm = ({
   availableCurrencies,
   onCurrencyChange,
   isInvoice,
-  isLastItem,
   hasOCRFeature,
 }) => {
   const intl = useIntl();
@@ -189,8 +183,9 @@ const ExpenseItemForm = ({
                     useGraphQL={hasOCRFeature}
                     parseDocument={hasOCRFeature}
                     onGraphQLSuccess={uploadResults => {
-                      updateExpenseFormWithUploadResult(collective, form, uploadResults, itemIdx);
+                      updateExpenseFormWithUploadResult(collective, form, uploadResults, [itemIdx]);
                     }}
+                    isLoading={attachment.__isUploadingFromMultiDropzone}
                     UploadingComponent={() => <Lottie animationData={ScanningAnimationJSON} loop autoPlay />}
                   />
                 </StyledInputField>
@@ -199,37 +194,32 @@ const ExpenseItemForm = ({
           </FastField>
         )}
         <Box flex="1 1" minWidth={170} mt={2}>
-          <StyledInputField
-            name={getFieldName('description')}
-            error={getError('description')}
-            hint={formatMessage(isInvoice ? msg.invoiceDescriptionHint : msg.receiptDescriptionHint)}
-            htmlFor={`${attachmentKey}-description`}
-            label={formatMessage(msg.descriptionLabel)}
-            labelFontSize="13px"
-            required={!isOptional}
-          >
-            {inputProps =>
-              isRichText ? (
-                <Field
-                  as={RichTextEditor}
-                  {...inputProps}
-                  inputName={inputProps.name}
-                  withBorders
-                  version="simplified"
-                />
-              ) : (
-                <Field name={inputProps.name}>
-                  {({ field, form: { setFieldValue } }) => (
+          <Field name={getFieldName('description')}>
+            {({ field, form }) => (
+              <StyledInputField
+                name={field.name}
+                error={getError('description')}
+                hint={<ExpenseItemDescriptionHint item={attachment} isInvoice={isInvoice} form={form} field={field} />}
+                htmlFor={`${attachmentKey}-description`}
+                label={formatMessage(msg.descriptionLabel)}
+                labelFontSize="13px"
+                required={!isOptional}
+              >
+                {inputProps =>
+                  isRichText ? (
+                    <RichTextEditor {...inputProps} inputName={inputProps.name} withBorders version="simplified" />
+                  ) : (
                     <StyledInput
                       {...inputProps}
                       value={unescape(field.value)}
-                      onChange={e => setFieldValue(inputProps.name, escape(e.target.value))}
+                      onChange={e => form.setFieldValue(field.name, escape(e.target.value))}
+                      placeholder={get(attachment, '__file.name') || get(attachment, '__file.path')}
                     />
-                  )}
-                </Field>
-              )
-            }
-          </StyledInputField>
+                  )
+                }
+              </StyledInputField>
+            )}
+          </Field>
           <Flex justifyContent="flex-end" flexDirection={['column', 'row']}>
             {requireDate && (
               <StyledInputField
@@ -251,6 +241,8 @@ const ExpenseItemForm = ({
                       <StyledInput
                         {...inputProps}
                         {...field}
+                        width="100%"
+                        warning="Hello World"
                         value={typeof field.value === 'string' ? field.value.split('T')[0] : field.value}
                       />
                     )}
@@ -308,7 +300,7 @@ const ExpenseItemForm = ({
             {formatMessage(requireFile ? msg.removeReceipt : msg.removeItem)}
           </StyledButton>
         )}
-        {itemCanBeSplit(attachment) && (
+        {attachment.__canBeSplit && (
           <React.Fragment>
             <StyledButton
               type="button"
@@ -325,7 +317,7 @@ const ExpenseItemForm = ({
             )}
           </React.Fragment>
         )}
-        {!isLastItem && <StyledHr flex="1" borderStyle="dashed" borderColor="black.200" />}
+        <StyledHr flex="1" borderStyle="dashed" borderColor="black.200" />
       </Flex>
     </Box>
   );
@@ -369,9 +361,10 @@ ExpenseItemForm.propTypes = {
     incurredAt: PropTypes.string,
     amount: PropTypes.number,
     __parsingResult: PropTypes.object,
+    __canBeSplit: PropTypes.boolean,
+    __isUploadingFromMultiDropzone: PropTypes.boolean,
   }).isRequired,
   editOnlyDescriptiveInfo: PropTypes.bool,
-  isLastItem: PropTypes.bool,
   itemIdx: PropTypes.number.isRequired,
 };
 

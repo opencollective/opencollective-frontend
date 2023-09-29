@@ -35,7 +35,7 @@ const ExpenseAttachedFilesForm = ({
     // Invoices have a default empty item. If it's not touched, we overwrite it with the OCR result
     const firstItem = first(form.values.items);
     const itemIdxToReplace = firstItem && !expenseItemIsTouched(firstItem) ? 0 : undefined;
-    updateExpenseFormWithUploadResult(collective, form, uploadResults, itemIdxToReplace);
+    updateExpenseFormWithUploadResult(collective, form, uploadResults, [itemIdxToReplace]);
   };
 
   return (

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
-import { isEmpty } from 'lodash';
+import { filter, isEmpty, range } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -141,8 +141,13 @@ class ExpenseFormItems extends React.PureComponent {
     }
   }
 
+  getUploadingItemsIndexes() {
+    const { items } = this.props.form.values;
+    return filter(range(items.length), index => items[index].__isUploadingFromMultiDropzone);
+  }
+
   render() {
-    const { availableCurrencies, hasOCRFeature, collective, form } = this.props;
+    const { availableCurrencies, hasOCRFeature, collective } = this.props;
     const { values, errors, setFieldValue } = this.props.form;
     const requireFile = expenseItemsMustHaveFiles(values.type);
     const isGrant = values.type === expenseTypes.GRANT;
@@ -162,18 +167,26 @@ class ExpenseFormItems extends React.PureComponent {
             onSuccess={files => filesListToItems(files).map(this.props.push)}
             onReject={uploadErrors => {
               this.setState({ uploadErrors });
-              this.props.remove(0); // Remove the dummy item
+              // Remove the dummy items added by this component
+              const otherItems = this.props.form.values.items.filter(item => !item.__isUploadingFromMultiDropzone);
+              this.props.form.setFieldValue('items', otherItems);
             }}
             mockImageGenerator={index => `https://loremflickr.com/120/120/invoice?lock=${index}`}
             mb={3}
             useGraphQL={hasOCRFeature}
             parseDocument={hasOCRFeature}
-            onDrop={() => {
-              this.props.push(newExpenseItem({ __isUploading: true })); // Insert a dummy item to display the loading state
+            onDrop={files => {
+              // Insert dummy items to display the loading states when uploading through GraphQL
+              if (hasOCRFeature) {
+                this.props.form.setFieldValue(
+                  'items',
+                  files.map(file => newExpenseItem({ __isUploadingFromMultiDropzone: true, __file: file })),
+                );
+              }
             }}
             onGraphQLSuccess={uploadResults => {
-              this.props.remove(0); // Remove the dummy item
-              updateExpenseFormWithUploadResult(collective, form, uploadResults);
+              const indexesToUpdate = this.getUploadingItemsIndexes();
+              updateExpenseFormWithUploadResult(collective, this.props.form, uploadResults, indexesToUpdate);
             }}
           >
             <P color="black.700" mt={1} px={2}>
@@ -212,7 +225,6 @@ class ExpenseFormItems extends React.PureComponent {
             availableCurrencies={availableCurrencies}
             onCurrencyChange={async value => await this.onCurrencyChange(value)}
             isInvoice={isInvoice}
-            isLastItem={index === items.length - 1}
             hasOCRFeature={hasOCRFeature}
             collective={collective}
           />
