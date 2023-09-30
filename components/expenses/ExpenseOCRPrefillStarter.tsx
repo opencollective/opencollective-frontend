@@ -2,6 +2,7 @@ import React from 'react';
 import { FormikProps } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
+import { Account } from '../../lib/graphql/types/v2/graphql';
 import { useGraphQLFileUploader } from '../../lib/hooks/useGraphQLFileUploader';
 import { updateExpenseFormWithUploadResult } from './lib/ocr';
 
@@ -18,16 +19,18 @@ import type { ExpenseFormValues } from './types/FormValues';
 
 export const ExpenseOCRPrefillStarter = ({
   form,
+  collective,
   onSuccess,
 }: {
   form: FormikProps<ExpenseFormValues>;
   onSuccess: () => void;
+  collective: Account;
 }) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const { addToast } = useToasts();
   const { isUploading, uploadFile } = useGraphQLFileUploader({
     onSuccess: uploadResult => {
-      updateExpenseFormWithUploadResult(form, uploadResult);
+      updateExpenseFormWithUploadResult(collective, form, uploadResult);
       addToast({
         type: 'SUCCESS',
         message: (
