@@ -1,5 +1,6 @@
 import React from 'react';
 import { get } from 'lodash';
+import { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
@@ -22,7 +23,7 @@ type TierPageProps = {
   tierSlug: string;
   parentCollectiveSlug: string | null;
   collectiveType: string | null;
-  redirect: string | null;
+  redirect: string | string[] | null;
 };
 
 const getPageMetaData = (pageProps: TierPageProps, data) => {
@@ -51,28 +52,30 @@ const getPageMetaData = (pageProps: TierPageProps, data) => {
   return { ...baseMetadata, title: 'Tier', canonicalURL };
 };
 
-const tierPageQueryHelpers = getSSRQueryHelpers({
+const tierPageQueryHelpers = getSSRQueryHelpers<{ tierId: number }, TierPageProps>({
   query: tierPageQuery,
   getVariablesFromContext: ({ query: { tierId } }) => ({ tierId: Number(tierId) }),
   getPropsFromContext: ({
     query: { parentCollectiveSlug, collectiveSlug, tierId, tierSlug, redirect, collectiveType },
   }) => ({
     // Required
-    collectiveSlug,
+    collectiveSlug: collectiveSlug as string,
     tierId: Number(tierId),
-    tierSlug,
+    tierSlug: tierSlug as string,
     // Optional must default to `null` (rather than undefined) for serialization
-    parentCollectiveSlug: parentCollectiveSlug || null,
-    collectiveType: collectiveType || null,
+    parentCollectiveSlug: (parentCollectiveSlug as string) || null,
+    collectiveType: (collectiveType as string) || null,
     redirect: redirect || null,
   }),
 });
+
+export const getServerSideProps = tierPageQueryHelpers.getServerSideProps;
 
 /**
  * The main page to display collectives. Wrap route parameters and GraphQL query
  * to render `components/collective-page` with everything needed.
  */
-const TierPage = pageProps => {
+const TierPage = (pageProps: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
   const { tierId, tierSlug, redirect } = pageProps;
@@ -101,14 +104,12 @@ const TierPage = pageProps => {
             tier={data.Tier}
             contributors={data.Tier.contributors}
             contributorsStats={data.Tier.stats.contributors}
-            redirect={redirect}
+            redirect={Array.isArray(redirect) ? redirect[0] : redirect}
           />
         </CollectiveThemeProvider>
       )}
     </Page>
   );
 };
-
-export const getServerSideProps = tierPageQueryHelpers.getServerSideProps;
 
 export default TierPage;

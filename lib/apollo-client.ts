@@ -1,12 +1,21 @@
 // This file is mostly adapted from:
 // https://github.com/zeit/next.js/blob/3949c82bdfe268f841178979800aa8e71bbf412c/examples/with-apollo/lib/initApollo.js
 
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, useQuery } from '@apollo/client';
+import {
+  ApolloClient,
+  ApolloLink,
+  HttpLink,
+  InMemoryCache,
+  NormalizedCacheObject,
+  QueryOptions,
+  useQuery,
+} from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { mergeDeep } from '@apollo/client/utilities';
 import { createUploadLink } from 'apollo-upload-client';
 import { isUndefined, omitBy, pick } from 'lodash';
+import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFactorAuthenticationApolloLink';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from './local-storage';
@@ -18,8 +27,8 @@ const INTERNAL_API_V1_URL = process.env.INTERNAL_API_V1_URL;
 const INTERNAL_API_V2_URL = process.env.INTERNAL_API_V2_URL;
 const INTERNAL_API_V1_OPERATION_NAMES = process.env.INTERNAL_API_V1_OPERATION_NAMES;
 const INTERNAL_API_V2_OPERATION_NAMES = process.env.INTERNAL_API_V2_OPERATION_NAMES;
-export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__';
-export const APOLLO_VARIABLES_PROP_NAME = '__APOLLO_VARIABLES__';
+export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__' as const;
+export const APOLLO_VARIABLES_PROP_NAME = '__APOLLO_VARIABLES__' as const;
 
 const getBaseApiUrl = (apiVersion, internal = false) => {
   if (process.browser) {
@@ -168,21 +177,21 @@ function createLink({ twoFactorAuthContext }) {
   const apiV1Link =
     INTERNAL_API_V1_URL && !process.browser
       ? ApolloLink.split(
-        ({ operationName }) =>
-          !INTERNAL_API_V1_OPERATION_NAMES || INTERNAL_API_V1_OPERATION_NAMES.split(',').includes(operationName),
-        new HttpLink({ uri: getGraphqlUrl('v1', true), fetch: linkFetch, headers: httpHeaders }),
-        apiV1DefaultLink,
-      )
+          ({ operationName }) =>
+            !INTERNAL_API_V1_OPERATION_NAMES || INTERNAL_API_V1_OPERATION_NAMES.split(',').includes(operationName),
+          new HttpLink({ uri: getGraphqlUrl('v1', true), fetch: linkFetch, headers: httpHeaders }),
+          apiV1DefaultLink,
+        )
       : apiV1DefaultLink;
 
   const apiV2Link =
     INTERNAL_API_V2_URL && !process.browser
       ? ApolloLink.split(
-        ({ operationName }) =>
-          !INTERNAL_API_V2_OPERATION_NAMES || INTERNAL_API_V2_OPERATION_NAMES.split(',').includes(operationName),
-        new HttpLink({ uri: getGraphqlUrl('v2', true), fetch: linkFetch, headers: httpHeaders }),
-        apiV2DefaultLink,
-      )
+          ({ operationName }) =>
+            !INTERNAL_API_V2_OPERATION_NAMES || INTERNAL_API_V2_OPERATION_NAMES.split(',').includes(operationName),
+          new HttpLink({ uri: getGraphqlUrl('v2', true), fetch: linkFetch, headers: httpHeaders }),
+          apiV2DefaultLink,
+        )
       : apiV2DefaultLink;
 
   /** Depending on the value of the context.apiVersion we choose to use the link for the api
@@ -274,36 +283,46 @@ export function initClient({ initialState, twoFactorAuthContext }: any = {}): Re
   return apolloClient;
 }
 
+type SSRQueryHelperProps<TVariables> = {
+  [APOLLO_STATE_PROP_NAME]: NormalizedCacheObject;
+  [APOLLO_VARIABLES_PROP_NAME]: Partial<TVariables>;
+};
+
 /**
  * A helper to easily plug Apollo on functional components that use `getServerSideProps` thats make sure that
  * the server-side query and the client-side query/variables are the same; to properly rehydrate the cache.
  */
-export function getSSRQueryHelpers({
+export function getSSRQueryHelpers<TVariables, TProps = {}>({
   query,
-  getVariablesFromContext,
+  getVariablesFromContext = undefined,
   getPropsFromContext = undefined,
   ...queryOptions
+}: QueryOptions<TVariables> & {
+  getPropsFromContext?: (context: GetServerSidePropsContext) => TProps;
+  getVariablesFromContext?: (context: GetServerSidePropsContext, props: Partial<TProps>) => TVariables;
 }) {
+  type ServerSideProps = TProps & SSRQueryHelperProps<TVariables>;
   return {
-    getServerSideProps: async context => {
+    getServerSideProps: async (
+      context: GetServerSidePropsContext,
+    ): Promise<GetServerSidePropsResult<ServerSideProps>> => {
       const props = (getPropsFromContext && getPropsFromContext(context)) || {};
-      const variables = !getVariablesFromContext ? {} : omitBy(getVariablesFromContext(context, props), isUndefined);
+      const variables = (getVariablesFromContext && getVariablesFromContext(context, props)) || {};
       const client = initClient();
       await client.query({ query, variables, ...queryOptions }); // No handling the result here, we just want to make sure the query is in the cache
       return {
         props: {
-          ...props,
+          ...omitBy<TProps>(props, isUndefined),
           [APOLLO_STATE_PROP_NAME]: client.cache.extract(),
-          [APOLLO_VARIABLES_PROP_NAME]: variables,
-        },
+          [APOLLO_VARIABLES_PROP_NAME]: omitBy<TVariables>(variables, isUndefined) as Partial<TVariables>,
+        } as ServerSideProps,
       };
     },
-    useQuery: pageProps => {
-      const variables = pageProps[APOLLO_VARIABLES_PROP_NAME];
-      const result = useQuery(query, { variables, ...queryOptions });
-      return result;
+    useQuery: (pageProps: ServerSideProps) => {
+      const variables = pageProps[APOLLO_VARIABLES_PROP_NAME] as TVariables;
+      return useQuery(query, { variables, ...queryOptions });
     },
-    getVariablesFromPageProps: pageProps => {
+    getVariablesFromPageProps: (pageProps: ServerSideProps): Partial<TVariables> => {
       return pageProps[APOLLO_VARIABLES_PROP_NAME];
     },
   };

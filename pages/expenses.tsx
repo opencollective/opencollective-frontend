@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { gql } from '@apollo/client';
 import { has, isNil, omitBy } from 'lodash';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
@@ -200,8 +200,7 @@ const getPropsFromQuery = query => ({
   ),
 });
 
-const getVariablesFromQuery = query => {
-  const props = getPropsFromQuery(query);
+const getVariablesFromProps = (props: Partial<ReturnType<typeof getPropsFromQuery>>) => {
   const amountRange = parseAmountRange(props.query.amount);
   const { from: dateFrom, to: dateTo } = parseDateInterval(props.query.period);
   const showSubmitted = props.query.direction === 'SUBMITTED';
@@ -229,18 +228,29 @@ const getVariablesFromQuery = query => {
 type ExpensesPageProps = {
   collectiveSlug: string;
   parentCollectiveSlug: string;
-  data: Partial<ExpensesPageQuery>;
-  error?: any;
+  query: Partial<{
+    offset: number;
+    limit: number;
+    type: string;
+    status: string;
+    payout: string;
+    direction: string;
+    period: string;
+    amount: string;
+    tag: string;
+    searchTerm: string;
+    orderBy: string;
+  }>;
 };
 
-const expensePageQueryHelpers = getSSRQueryHelpers({
+const expensePageQueryHelpers = getSSRQueryHelpers<ReturnType<typeof getVariablesFromProps>, ExpensesPageProps>({
   query: expensesPageQuery,
   context: API_V2_CONTEXT,
-  getVariablesFromContext: ctx => getVariablesFromQuery(ctx.query),
   getPropsFromContext: ctx => getPropsFromQuery(ctx.query),
+  getVariablesFromContext: (ctx, props) => getVariablesFromProps(props),
 });
 
-export const getServerSideProps: GetServerSideProps<ExpensesPageProps> = expensePageQueryHelpers.getServerSideProps;
+export const getServerSideProps = expensePageQueryHelpers.getServerSideProps;
 
 export default function ExpensesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
@@ -255,8 +265,8 @@ export default function ExpensesPage(props: InferGetServerSidePropsType<typeof g
     }
   }, [LoggedInUser]);
 
-  const error = query?.error || props.error;
-  const data: ExpensesPageQuery = query?.data || props.data;
+  const error = query?.error;
+  const data: ExpensesPageQuery = query?.data;
 
   const metadata = {
     ...getCollectivePageMetadata(data.account),

@@ -184,10 +184,13 @@ const orderPageQuery = gql`
   ${confirmContributionFieldsFragment}
 `;
 
-const contributionPageQueryHelper = getSSRQueryHelpers({
+const contributionPageQueryHelper = getSSRQueryHelpers<{ legacyId: number; collectiveSlug: string }>({
   query: orderPageQuery,
   context: API_V2_CONTEXT,
-  getVariablesFromContext: ({ query }) => ({ legacyId: toNumber(query.OrderId), collectiveSlug: query.collectiveSlug }),
+  getVariablesFromContext: ({ query }) => ({
+    legacyId: toNumber(query.OrderId),
+    collectiveSlug: query.collectiveSlug as string,
+  }),
 });
 
 export const getServerSideProps: GetServerSideProps = contributionPageQueryHelper.getServerSideProps;

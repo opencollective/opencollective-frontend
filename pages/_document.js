@@ -40,7 +40,6 @@ export default class IntlDocument extends Document {
     const intlProps = getIntlProps(ctx);
     const messages = await getLocaleMessages(intlProps.locale);
     const intl = createIntl({ locale: intlProps.locale, defaultLocale: 'en', messages }, cache);
-    const apolloClient = initClient();
 
     if (ctx.req && ctx.res) {
       if (intlProps.locale !== 'en') {
@@ -85,7 +84,6 @@ export default class IntlDocument extends Document {
         });
 
       const initialProps = await Document.getInitialProps(ctx);
-
       return {
         ...initialProps,
         clientAnalytics,
@@ -97,7 +95,7 @@ export default class IntlDocument extends Document {
             {sheet.getStyleElement()}
           </React.Fragment>
         ),
-        [APOLLO_STATE_PROP_NAME]: apolloClient.cache.extract(),
+        [APOLLO_STATE_PROP_NAME]: initClient().cache.extract(),
       };
     } finally {
       sheet.seal();

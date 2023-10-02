@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useApolloClient } from '@apollo/client';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
+import { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
@@ -22,7 +23,7 @@ import MobileCollectiveInfoStickyBar from '../components/expenses/MobileCollecti
 import { Box, Flex } from '../components/Grid';
 import Page from '../components/Page';
 
-export const getVariableFromQuery = query => {
+export const getVariablesFromQuery = query => {
   const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1))
     .utc(true)
     .toISOString();
@@ -34,14 +35,11 @@ export const getVariableFromQuery = query => {
 };
 
 export const getPropsFromQuery = query => {
-  const {
-    query: { collectiveSlug, ExpenseId, edit, key },
-  } = query;
   return {
-    legacyExpenseId: parseInt(ExpenseId),
-    draftKey: key,
-    collectiveSlug,
-    edit,
+    legacyExpenseId: parseInt(query.ExpenseId),
+    draftKey: query.key,
+    collectiveSlug: query.collectiveSlug,
+    edit: query.edit,
   };
 };
 
@@ -54,10 +52,13 @@ const messages = defineMessages({
 
 const SIDE_MARGIN_WIDTH = 'calc((100% - 1200px) / 2)';
 
-const expensePageQueryHelper = getSSRQueryHelpers({
+const expensePageQueryHelper = getSSRQueryHelpers<
+  ReturnType<typeof getVariablesFromQuery>,
+  ReturnType<typeof getPropsFromQuery>
+>({
   query: expensePageQuery,
   context: API_V2_CONTEXT,
-  getVariablesFromContext: context => getVariableFromQuery(context.query),
+  getVariablesFromContext: context => getVariablesFromQuery(context.query),
   getPropsFromContext: context => getPropsFromQuery(context.query),
 });
 
@@ -75,7 +76,7 @@ const getPageMetadata = (intl, legacyExpenseId, expense) => {
   }
 };
 
-export default function ExpensePage(props: ReturnType<typeof getPropsFromQuery>) {
+export default function ExpensePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const queryResult = expensePageQueryHelper.useQuery(props);

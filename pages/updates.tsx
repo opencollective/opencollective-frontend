@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { gql } from '@apollo/client';
 import { cloneDeep, isEmpty, omitBy } from 'lodash';
+import { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -11,6 +12,7 @@ import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -90,10 +92,10 @@ export const updatesPageQuery = gql`
   ${collectiveNavbarFieldsFragment}
 `;
 
-const getPropsFromQuery = (query: Record<string, string>) => ({
-  slug: query?.collectiveSlug,
-  orderBy: query?.orderBy || null,
-  searchTerm: query?.searchTerm || null,
+const getPropsFromQuery = (query: NextParsedUrlQuery) => ({
+  slug: query?.collectiveSlug as string,
+  orderBy: (Array.isArray(query?.orderBy) ? query?.orderBy[0] : query?.orderBy) || null,
+  searchTerm: (Array.isArray(query?.searchTerm) ? query?.searchTerm[0] : query?.searchTerm) || null,
 });
 
 export const getUpdatesVariables = (slug, orderBy = null, searchTerm = null) => {
@@ -106,7 +108,10 @@ export const getUpdatesVariables = (slug, orderBy = null, searchTerm = null) => 
   };
 };
 
-const updatesPageQueryHelper = getSSRQueryHelpers({
+const updatesPageQueryHelper = getSSRQueryHelpers<
+  ReturnType<typeof getUpdatesVariables>,
+  ReturnType<typeof getPropsFromQuery>
+>({
   query: updatesPageQuery,
   context: API_V2_CONTEXT,
   getPropsFromContext: ctx => getPropsFromQuery(ctx.query),
@@ -115,7 +120,7 @@ const updatesPageQueryHelper = getSSRQueryHelpers({
 
 export const getServerSideProps = updatesPageQueryHelper.getServerSideProps;
 
-export default function UpdatesPage(props: ReturnType<typeof getPropsFromQuery>) {
+export default function UpdatesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
   const queryResult = updatesPageQueryHelper.useQuery(props);
@@ -137,36 +142,26 @@ export default function UpdatesPage(props: ReturnType<typeof getPropsFromQuery>)
   };
 
   const fetchMore = () => {
-    if (!queryResult.called) {
-      return queryResult.refetch({
-        variables: {
-          ...queryResult.variables,
-          offset: 0,
-          limit: queryResult.data.account.updates.nodes.length + UPDATES_PER_PAGE,
-        },
-      });
-    } else {
-      return queryResult.fetchMore({
-        variables: {
-          offset: queryResult.data.account.updates.nodes.length,
-          limit: UPDATES_PER_PAGE,
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          const data = isEmpty(previousResult) ? queryResult.data : previousResult;
-          if (!fetchMoreResult) {
-            return data;
-          }
+    return queryResult.fetchMore({
+      variables: {
+        offset: queryResult.data.account.updates.nodes.length,
+        limit: UPDATES_PER_PAGE,
+      },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        const data = isEmpty(previousResult) ? queryResult.data : previousResult;
+        if (!fetchMoreResult) {
+          return data;
+        }
 
-          const result = cloneDeep(data);
-          const updates = data.account?.updates;
-          result.account.updates = {
-            ...updates,
-            nodes: [...updates.nodes, ...fetchMoreResult.account.updates.nodes],
-          };
-          return result;
-        },
-      });
-    }
+        const result = cloneDeep(data);
+        const updates = data.account?.updates;
+        result.account.updates = {
+          ...updates,
+          nodes: [...updates.nodes, ...fetchMoreResult.account.updates.nodes],
+        };
+        return result;
+      },
+    });
   };
 
   const isUpdatesSupported = isFeatureSupported(queryResult.data.account, FEATURES.UPDATES);
