@@ -73,7 +73,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
     }
   }, [accountId, data?.host?.hostApplications]);
 
-  const pageRoute = isDashboard ? `/workspace/${hostSlug}/host-applications` : `/${hostSlug}/admin/host-applications`;
+  const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-applications` : `/${hostSlug}/admin/host-applications`;
   const hostApplications = data?.host?.hostApplications;
   const initViews = [
     {
