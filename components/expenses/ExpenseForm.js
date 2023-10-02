@@ -557,7 +557,7 @@ const ExpenseFormBody = ({
           supportedExpenseTypes={supportedExpenseTypes}
         />
       )}
-      {!values.type && !hideOCRPrefillStater && hasOCRFeature && (
+      {Boolean(!values.type && !hideOCRPrefillStater && LoggedInUser?.isRoot) && (
         <ExpenseOCRPrefillStarter
           collective={collective}
           form={formik}
