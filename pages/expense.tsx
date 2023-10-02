@@ -82,9 +82,11 @@ export default function ExpensePage(props: ReturnType<typeof getPropsFromQuery>)
   const router = useRouter();
   const client = useApolloClient();
 
-  // Refetch data when logging in/out
+  // Refetch data when logging in
   useEffect(() => {
-    queryResult.refetch();
+    if (LoggedInUser) {
+      queryResult.refetch();
+    }
   }, [LoggedInUser]);
 
   useEffect(() => {

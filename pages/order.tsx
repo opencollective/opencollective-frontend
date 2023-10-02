@@ -187,7 +187,6 @@ const orderPageQuery = gql`
 const contributionPageQueryHelper = getSSRQueryHelpers({
   query: orderPageQuery,
   context: API_V2_CONTEXT,
-  getPropsFromContext: ({ query }) => ({ query }),
   getVariablesFromContext: ({ query }) => ({ legacyId: toNumber(query.OrderId), collectiveSlug: query.collectiveSlug }),
 });
 
@@ -310,11 +309,11 @@ const getTransactionsToDisplay = (account, transactions) => {
   return [...accountTransactions, ...tipTransactionsToDisplay];
 };
 
-export default function OrderPage(props: { legacyId: number; collectiveSlug: string }) {
+export default function OrderPage(props) {
   const { LoggedInUser } = useLoggedInUser();
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
   const queryResult = contributionPageQueryHelper.useQuery(props);
-
+  const variables = contributionPageQueryHelper.getVariablesFromPageProps(props);
   const baseMetadata = getCollectivePageMetadata(queryResult.data?.account);
 
   const data = queryResult?.data;
@@ -329,12 +328,14 @@ export default function OrderPage(props: { legacyId: number; collectiveSlug: str
     dayjs().isAfter(dayjs(order?.pendingContributionData.expectedAt));
   const intl = useIntl();
 
-  // Refetch when users logs in/out
+  // Refetch when users logs in
   React.useEffect(() => {
-    queryResult.refetch();
+    if (LoggedInUser) {
+      queryResult.refetch();
+    }
   }, [LoggedInUser]);
 
-  if (!order || order.toAccount?.slug !== props.query.collectiveSlug) {
+  if (!order || order.toAccount?.slug !== variables.collectiveSlug) {
     return <Custom404 />;
   }
 
