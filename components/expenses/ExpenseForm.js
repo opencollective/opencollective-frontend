@@ -19,6 +19,7 @@ import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep } from '../../lib/utils';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { addNewExpenseItem, newExpenseItem } from './lib/items';
+import { updateExpenseFormWithUploadResult } from './lib/ocr';
 import { checkRequiresAddress, getSupportedCurrencies, validateExpenseTaxes } from './lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -32,6 +33,7 @@ import StyledHr from '../StyledHr';
 import StyledInputTags from '../StyledInputTags';
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
+import { useToasts } from '../ToastProvider';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseFormItems from './ExpenseFormItems';
@@ -277,6 +279,7 @@ const ExpenseFormBody = ({
   supportedExpenseTypes,
 }) => {
   const intl = useIntl();
+  const { addToast } = useToasts();
   const { formatMessage } = intl;
   const formRef = React.useRef();
   const { LoggedInUser } = useLoggedInUser();
@@ -299,6 +302,7 @@ const ExpenseFormBody = ({
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
   const availableCurrencies = getSupportedCurrencies(collective, values.payoutMethod);
   const [step, setStep] = React.useState(() => getDefaultStep(defaultStep, stepOneCompleted, isCreditCardCharge));
+  const [initWithOCR, setInitWithOCR] = React.useState(null);
 
   // Only true when logged in and drafting the expense
   const [isOnBehalf, setOnBehalf] = React.useState(false);
@@ -339,6 +343,14 @@ const ExpenseFormBody = ({
       }
     }
   }, [payoutProfiles, loggedInAccount]);
+
+  // Pre-fill with OCR data when the expense type is set
+  React.useEffect(() => {
+    if (initWithOCR && values.type) {
+      updateExpenseFormWithUploadResult(collective, formik, initWithOCR);
+      setInitWithOCR(null);
+    }
+  }, [initWithOCR, values.type]);
 
   // Pre-fill address based on the payout profile
   React.useEffect(() => {
@@ -559,9 +571,22 @@ const ExpenseFormBody = ({
       )}
       {!values.type && !hideOCRPrefillStater && hasOCRFeature && (
         <ExpenseOCRPrefillStarter
-          collective={collective}
-          form={formik}
-          onSuccess={() => setHideOCRPrefillStarter(true)}
+          onUpload={() => setHideOCRPrefillStarter(true)}
+          onSuccess={uploadResult => {
+            // We want to make sure that the expense type is set before prefilling the form
+            if (values.type) {
+              updateExpenseFormWithUploadResult(collective, formik, uploadResult);
+            } else {
+              setInitWithOCR(uploadResult);
+            }
+
+            addToast({
+              type: 'SUCCESS',
+              message: (
+                <FormattedMessage defaultMessage="The expense has been automatically prefilled with the information from the document" />
+              ),
+            });
+          }}
         />
       )}
       {isRecurring && <ExpenseRecurringBanner expense={expense} />}

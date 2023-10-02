@@ -52,21 +52,21 @@ describe('New expense flow', () => {
 
       // Upload 2 files to the multi-files dropzone
       cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
-        {
-          contents: 'test/cypress/fixtures/images/receipt.jpg',
-          fileName: 'receipt0.jpg',
-          mimeType: 'image/jpeg',
-        },
+        [
+          {
+            contents: 'test/cypress/fixtures/images/receipt.jpg',
+            fileName: 'receipt0.jpg',
+            mimeType: 'image/jpeg',
+          },
+          {
+            contents: 'test/cypress/fixtures/images/receipt.jpg',
+            fileName: 'receipt1.jpg',
+            mimeType: 'image/jpeg',
+          },
+        ],
         { action: 'drag-drop' },
       );
-      cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
-        {
-          contents: 'test/cypress/fixtures/images/receipt.jpg',
-          fileName: 'receipt1.jpg',
-          mimeType: 'image/jpeg',
-        },
-        { action: 'drag-drop' },
-      );
+
       cy.getByDataCy('expense-attachment-form').should('have.length', 2);
 
       // Fill info for first attachment
