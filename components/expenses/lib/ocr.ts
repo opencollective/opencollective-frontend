@@ -1,9 +1,9 @@
 import { FormikProps } from 'formik';
 import { cloneDeep, get, set } from 'lodash';
 
-import { Account, UploadFileResult } from '../../../lib/graphql/types/v2/graphql';
+import { Account, ExpenseType, UploadFileResult } from '../../../lib/graphql/types/v2/graphql';
 
-import type { ExpenseFormValues } from '../types/FormValues';
+import type { ExpenseFormValues, ExpenseItemFormValues } from '../types/FormValues';
 
 import { expenseItemsMustHaveFiles, newExpenseItem } from './items';
 import { getSupportedCurrencies } from './utils';
@@ -191,4 +191,18 @@ export const splitExpenseItem = (form: FormikProps<ExpenseFormValues>, itemIdx: 
   form.setValues(newFormValues);
 
   return true;
+};
+
+export const checkExpenseSupportsOCR = (expenseType: ExpenseType, loggedInUser): boolean => {
+  if (['RECEIPT', 'CHARGE'].includes(expenseType)) {
+    return true;
+  } else if (expenseType === 'INVOICE') {
+    return Boolean(loggedInUser?.isRoot);
+  } else {
+    return false;
+  }
+};
+
+export const checkExpenseItemCanBeSplit = (item: ExpenseItemFormValues, expenseType: ExpenseType): boolean => {
+  return Boolean(item.__canBeSplit && [ExpenseType.RECEIPT, ExpenseType.INVOICE].includes(expenseType));
 };

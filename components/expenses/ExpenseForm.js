@@ -19,7 +19,7 @@ import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep } from '../../lib/utils';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { addNewExpenseItem, newExpenseItem } from './lib/items';
-import { updateExpenseFormWithUploadResult } from './lib/ocr';
+import { checkExpenseSupportsOCR, updateExpenseFormWithUploadResult } from './lib/ocr';
 import { checkRequiresAddress, getSupportedCurrencies, validateExpenseTaxes } from './lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -286,7 +286,8 @@ const ExpenseFormBody = ({
   const [hideOCRPrefillStater, setHideOCRPrefillStarter] = React.useState(false);
   const { values, handleChange, errors, setValues, dirty, touched, resetForm, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
-  const hasOCRFeature = LoggedInUser?.hasPreviewFeatureEnabled('EXPENSE_OCR');
+  const hasOCRPreviewEnabled = LoggedInUser?.hasPreviewFeatureEnabled('EXPENSE_OCR');
+  const hasOCRFeature = hasOCRPreviewEnabled && checkExpenseSupportsOCR(values.type, LoggedInUser);
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
   const isReceipt = values.type === expenseTypes.RECEIPT;
@@ -569,7 +570,7 @@ const ExpenseFormBody = ({
           supportedExpenseTypes={supportedExpenseTypes}
         />
       )}
-      {!values.type && !hideOCRPrefillStater && hasOCRFeature && (
+      {Boolean(!values.type && !hideOCRPrefillStater && hasOCRPreviewEnabled && LoggedInUser.isRoot) && (
         <ExpenseOCRPrefillStarter
           onUpload={() => setHideOCRPrefillStarter(true)}
           onSuccess={uploadResult => {

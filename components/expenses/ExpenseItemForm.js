@@ -11,7 +11,7 @@ import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
 import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemsMustHaveFiles } from './lib/items';
-import { updateExpenseFormWithUploadResult } from './lib/ocr';
+import { checkExpenseItemCanBeSplit, updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import * as ScanningAnimationJSON from '../../public/static/animations/scanning.json';
 import { Box, Flex } from '../Grid';
@@ -300,7 +300,7 @@ const ExpenseItemForm = ({
             {formatMessage(requireFile ? msg.removeReceipt : msg.removeItem)}
           </StyledButton>
         )}
-        {attachment.__canBeSplit && (
+        {checkExpenseItemCanBeSplit(attachment, form.values.type) && (
           <React.Fragment>
             <StyledButton
               type="button"
