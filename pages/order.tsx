@@ -334,7 +334,7 @@ export default function OrderPage(props: { legacyId: number; collectiveSlug: str
     queryResult.refetch();
   }, [LoggedInUser]);
 
-  if (!order || order.toAccount?.slug !== props.collectiveSlug) {
+  if (!order || order.toAccount?.slug !== props.query.collectiveSlug) {
     return <Custom404 />;
   }
 
