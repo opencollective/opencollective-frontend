@@ -8,7 +8,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const deletePersonalTokenMutation = gql`
   mutation DeletePersonalToken($id: String!) {
@@ -22,7 +22,7 @@ const deletePersonalTokenMutation = gql`
 `;
 
 const DeletePersonalTokenModal = ({ personalToken, onDelete, ...props }) => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const [deleteToken] = useMutation(deletePersonalTokenMutation, {
     context: API_V2_CONTEXT,
@@ -46,8 +46,8 @@ const DeletePersonalTokenModal = ({ personalToken, onDelete, ...props }) => {
         try {
           await deleteToken({ variables: { id: personalToken.id } });
           await onDelete(personalToken);
-          addToast({
-            type: TOAST_TYPE.SUCCESS,
+          toast({
+            variant: 'success',
             message: intl.formatMessage(
               { defaultMessage: 'Personal token "{name}" deleted' },
               { name: personalToken.name || '' },
@@ -55,7 +55,7 @@ const DeletePersonalTokenModal = ({ personalToken, onDelete, ...props }) => {
           });
           return CONFIRMATION_MODAL_TERMINATE;
         } catch (e) {
-          addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
         }
       }}
     >

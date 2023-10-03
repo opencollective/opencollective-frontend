@@ -17,7 +17,7 @@ import SearchForm from '../SearchForm';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const SearchResultPopup = styled(StyledCard)`
   border: 1px solid rgba(50, 51, 52, 0.05);
@@ -81,7 +81,7 @@ const SearchTopics = () => {
   const [searchResults, setSearchResults] = React.useState([]);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const { styles, attributes } = usePopper(refElement, popperElement, {
     placement: 'bottom',
     modifiers: REACT_POPPER_MODIFIERS,
@@ -105,8 +105,8 @@ const SearchTopics = () => {
       const results = await searchDocs(query);
       setSearchResults(results.items);
     } catch (error) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         title: intl.formatMessage({ defaultMessage: 'Error in fetching results' }),
         message: (
           <p>

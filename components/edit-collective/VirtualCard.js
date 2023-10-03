@@ -22,7 +22,6 @@ import DismissIcon from '../icons/DismissIcon';
 import StyledLink from '../StyledLink';
 import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +29,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/DropdownMenu';
+import { useToast } from '../ui/useToast';
 
 import DeleteVirtualCardModal from './DeleteVirtualCardModal';
 import EditVirtualCardModal from './EditVirtualCardModal';
@@ -128,7 +128,7 @@ export const ActionsButton = props => {
   const [showConfirmationModal, setShowConfirmationModal] = React.useState(false);
   const [isEditingVirtualCard, setIsEditingVirtualCard] = React.useState(false);
   const [isDeletingVirtualCard, setIsDeletingVirtualCard] = React.useState(false);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const { LoggedInUser } = useLoggedInUser();
   const { virtualCard, host, canEditVirtualCard, canDeleteVirtualCard, confirmOnPauseCard } = props;
 
@@ -136,12 +136,12 @@ export const ActionsButton = props => {
     message => {
       setIsEditingVirtualCard(false);
       setIsDeletingVirtualCard(false);
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: message,
       });
     },
-    [addToast],
+    [toast],
   );
 
   const [pauseCard, { loading: pauseLoading }] = useMutation(pauseCardMutation, {
@@ -370,12 +370,12 @@ const getLimitString = ({
 };
 
 export function CardDetails({ virtualCard }) {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const handleCopy = value => () => {
     navigator.clipboard.writeText(value);
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
+    toast({
+      variant: 'success',
       message: <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />,
     });
   };
@@ -440,7 +440,7 @@ CardDetails.propTypes = {
 const VirtualCard = props => {
   const [displayDetails, setDisplayDetails] = React.useState(false);
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const { virtualCard } = props;
 
   const isActive = virtualCard.data.state === 'OPEN' || virtualCard.data.status === 'active';
@@ -522,7 +522,7 @@ const VirtualCard = props => {
           <ActionsButton
             virtualCard={virtualCard}
             host={props.host}
-            onError={error => addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, error) })}
+            onError={error => toast({ variant: 'error', message: i18nGraphqlException(intl, error) })}
             onDeleteRefetchQuery={props.onDeleteRefetchQuery}
             confirmOnPauseCard={props.confirmOnPauseCard}
             canEditVirtualCard={props.canEditVirtualCard}

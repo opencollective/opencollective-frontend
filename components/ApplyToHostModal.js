@@ -15,6 +15,7 @@ import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import ApplicationDescription from './ocf-host-application/ApplicationDescription';
 import OCFPrimaryButton from './ocf-host-application/OCFPrimaryButton';
 import OnboardingProfileCard from './onboarding-modal/OnboardingProfileCard';
+import { useToast } from './ui/useToast';
 import Avatar from './Avatar';
 import CollectivePicker from './CollectivePicker';
 import CollectivePickerAsync from './CollectivePickerAsync';
@@ -32,7 +33,6 @@ import StyledInputFormikField from './StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import StyledTextarea from './StyledTextarea';
 import { H1, P, Span } from './Text';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const messages = defineMessages({
   SUCCESS: {
@@ -273,7 +273,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   });
   const [applyToHost, { loading: submitting }] = useMutation(applyToHostMutation, GQL_CONTEXT);
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [step, setStep] = React.useState(STEPS.INFORMATION);
   const contentRef = React.useRef();
   const canApply = Boolean(data?.host?.isOpenToApplications);
@@ -349,8 +349,8 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
               if (onSuccess) {
                 await onSuccess(result);
               } else {
-                addToast({
-                  type: TOAST_TYPE.SUCCESS,
+                toast({
+                  variant: 'success',
                   message: intl.formatMessage(messages.SUCCESS, {
                     hostName: host.name,
                     collectiveName: values.collective.name,
@@ -360,7 +360,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                 onClose();
               }
             } catch (e) {
-              addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+              toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
             }
           }}
         >

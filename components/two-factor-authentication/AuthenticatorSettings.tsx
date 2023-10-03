@@ -18,7 +18,7 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { H3, P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import { UserTwoFactorMethodItem } from './UserTwoFactorMethodItem';
 
@@ -149,7 +149,7 @@ type AddAuthenticatorModalProps = {
 };
 
 function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
 
   const { otpAuthUrl, base32 } = React.useMemo(() => {
@@ -178,8 +178,8 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
     async onSubmit() {
       try {
         const result = await addAuthenticatorAppMutation();
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
+        toast({
+          variant: 'success',
           message: <FormattedMessage defaultMessage="Authenticator added" />,
         });
 
@@ -187,8 +187,8 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
           props.onRecoveryCodes(result.data.addTwoFactorAuthTokenToIndividual.recoveryCodes);
         }
       } catch (e) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: i18nGraphqlException(intl, e),
         });
       } finally {

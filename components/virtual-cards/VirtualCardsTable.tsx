@@ -19,14 +19,13 @@ import VirtualCard, { ActionsButton } from '../edit-collective/VirtualCard';
 import { Grid } from '../Grid';
 import StyledTag from '../StyledTag';
 import { P } from '../Text';
-import { Toast, TOAST_TYPE, useToasts } from '../ToastProvider';
 import { TableActionsButton } from '../ui/Table';
+import { toast } from '../ui/useToast';
 
 import VirtualCardDrawer from './VirtualCardDrawer';
 
 type VirtualCardsTableMeta = {
   intl: IntlShape;
-  addToast: (toast: Partial<Toast>) => void;
   openVirtualCardDrawer: (vc: GraphQLVirtualCard) => void;
   host: Host;
   canEditVirtualCard?: boolean;
@@ -141,9 +140,7 @@ export const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
           <ActionsButton
             virtualCard={row.original}
             host={meta.host}
-            onError={error =>
-              meta.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(meta.intl, error) })
-            }
+            onError={error => toast({ variant: 'error', message: i18nGraphqlException(meta.intl, error) })}
             openVirtualCardDrawer={meta.openVirtualCardDrawer}
             canEditVirtualCard={meta.canEditVirtualCard}
             canDeleteVirtualCard={meta.canDeleteVirtualCard}
@@ -167,7 +164,6 @@ type VirtualCardsTableProps = {
 
 export default function VirtualCardsTable(props: VirtualCardsTableProps) {
   const intl = useIntl();
-  const { addToast } = useToasts();
   const [isTableView, setIsTableView] = React.useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
   const [selectedVirtualCard, setSelectedVirtualCard] = React.useState<GraphQLVirtualCard>(null);
@@ -184,7 +180,6 @@ export default function VirtualCardsTable(props: VirtualCardsTableProps) {
       onDeleteRefetchQuery: props.onDeleteRefetchQuery,
       host: props.host,
       intl,
-      addToast,
     };
     return (
       <React.Fragment>

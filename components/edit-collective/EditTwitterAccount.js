@@ -10,8 +10,8 @@ import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
-import { TOAST_TYPE, withToasts } from '../ToastProvider';
 import { Switch } from '../ui/Switch';
+import { toast } from '../ui/useToast';
 
 const DEFAULT_TWEETS = {
   newBacker: '{backerTwitterHandle} thank you for your contribution of {amount} 🙏 - it makes a difference!',
@@ -31,7 +31,6 @@ class EditTwitterAccount extends React.Component {
     collective: PropTypes.object,
     intl: PropTypes.object.isRequired,
     editConnectedAccount: PropTypes.func.isRequired,
-    addToast: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -119,7 +118,7 @@ class EditTwitterAccount extends React.Component {
       const connectedAccount = pick(this.state.connectedAccount, ['id', 'settings']);
       await this.props.editConnectedAccount({ variables: { connectedAccount } });
       this.setState({ isModified: false });
-      this.props.addToast({ type: TOAST_TYPE.SUCCESS, message: 'Twitter settings updated' });
+      toast({ variant: 'success', message: 'Twitter settings updated' });
     } finally {
       this.setState({ isSaving: false });
     }
@@ -227,4 +226,4 @@ const addEditConnectedAccountMutation = graphql(editConnectedAccountMutation, {
   name: 'editConnectedAccount',
 });
 
-export default injectIntl(addEditConnectedAccountMutation(withToasts(EditTwitterAccount)));
+export default injectIntl(addEditConnectedAccountMutation(EditTwitterAccount));

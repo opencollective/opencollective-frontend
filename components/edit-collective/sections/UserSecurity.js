@@ -18,8 +18,8 @@ import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 import { H3, P } from '../../Text';
-import { TOAST_TYPE, withToasts } from '../../ToastProvider';
 import { TwoFactorAuthenticationSettings } from '../../two-factor-authentication/TwoFactorAuthenticationSettings';
+import { toast } from '../../ui/useToast';
 import { withUser } from '../../UserProvider';
 
 class UserSecurity extends React.Component {
@@ -41,8 +41,6 @@ class UserSecurity extends React.Component {
       individual: PropTypes.object,
       loading: PropTypes.bool,
     }),
-    /** From withToasts */
-    addToast: PropTypes.func.isRequired,
     /** From parent component */
     slug: PropTypes.string,
   };
@@ -98,8 +96,8 @@ class UserSecurity extends React.Component {
         passwordLoading: false,
         passwordKey: Number(passwordKey) + 1,
       });
-      this.props.addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: hadPassword ? (
           <FormattedMessage defaultMessage="Password successfully updated" />
         ) : (
@@ -304,4 +302,4 @@ const addGraphql = compose(
   }),
 );
 
-export default injectIntl(withToasts(withUser(addGraphql(UserSecurity))));
+export default injectIntl(withUser(addGraphql(UserSecurity)));

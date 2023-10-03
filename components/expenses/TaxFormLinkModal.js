@@ -16,7 +16,7 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledSelect from '../StyledSelect';
 import { H2, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import StyledModal, { ModalBody, ModalHeader } from './../StyledModal';
 
@@ -37,7 +37,7 @@ const TaxFormLinkModal = ({ account, year, onClose, refetchExpense }) => {
   const taxYearOptions = arrayOfYears().map(year => ({ key: year, value: year, label: year }));
   const defaultTaxYearOption = taxYearOptions.filter(option => option.value === year)[0];
   const [taxFormYear, setTaxFormYear] = React.useState(defaultTaxYearOption.value);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [error, setError] = React.useState(null);
   const [submit, { loading }] = useMutation(setTaxFormMutation, { context: API_V2_CONTEXT });
   return (
@@ -111,14 +111,14 @@ const TaxFormLinkModal = ({ account, year, onClose, refetchExpense }) => {
                   },
                 });
                 if (get(result, 'data.setTaxForm.success')) {
-                  addToast({
-                    type: TOAST_TYPE.SUCCESS,
+                  toast({
+                    variant: 'success',
                     message: <FormattedMessage defaultMessage="Tax form submitted" />,
                   });
                   await refetchExpense();
                 } else {
-                  addToast({
-                    type: TOAST_TYPE.ERROR,
+                  toast({
+                    variant: 'error',
                     message: <FormattedMessage defaultMessage="Failed to submit the tax form" />,
                   });
                 }

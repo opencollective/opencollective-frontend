@@ -13,7 +13,7 @@ import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const CACHE_TYPES = Object.values(AccountCacheType);
 
@@ -33,7 +33,7 @@ const ClearCacheForAccountForm = () => {
   const [clearCache, { loading }] = useMutation<ClearCacheMutation, ClearCacheMutationVariables>(clearCacheMutation, {
     context: API_V2_CONTEXT,
   });
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const isValid = account && cacheTypes.length > 0;
   const intl = useIntl();
   return (
@@ -87,13 +87,13 @@ const ClearCacheForAccountForm = () => {
           try {
             const result = await clearCache({ variables: { account: { legacyId: account.id }, cacheTypes } });
             const resultAccount = result.data.clearCacheForAccount;
-            addToast({
-              type: TOAST_TYPE.SUCCESS,
+            toast({
+              variant: 'success',
               message: `Cache cleared for ${resultAccount.name} (@${resultAccount.slug})`,
             });
           } catch (e) {
-            addToast({
-              type: TOAST_TYPE.ERROR,
+            toast({
+              variant: 'error',
               message: i18nGraphqlException(intl, e),
             });
           }

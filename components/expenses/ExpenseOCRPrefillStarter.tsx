@@ -12,7 +12,7 @@ import StyledInput from '../StyledInput';
 import StyledLinkButton from '../StyledLinkButton';
 import StyledTag from '../StyledTag';
 import { P } from '../Text';
-import { useToasts } from '../ToastProvider';
+import { toast } from '../ui/useToast';
 
 import type { ExpenseFormValues } from './types/FormValues';
 
@@ -24,12 +24,11 @@ export const ExpenseOCRPrefillStarter = ({
   onSuccess: () => void;
 }) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const { addToast } = useToasts();
   const { isUploading, uploadFile } = useGraphQLFileUploader({
     onSuccess: uploadResult => {
       updateExpenseFormWithUploadResult(form, uploadResult);
-      addToast({
-        type: 'SUCCESS',
+      toast({
+        variant: 'success',
         message: (
           <FormattedMessage defaultMessage="The expense has been automatically prefilled with the information from the document" />
         ),

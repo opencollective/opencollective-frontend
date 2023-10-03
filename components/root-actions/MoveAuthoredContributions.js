@@ -23,7 +23,7 @@ import StyledLink from '../StyledLink';
 import StyledSelect from '../StyledSelect';
 import StyledTag from '../StyledTag';
 import { Label, P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const moveOrdersFieldsFragment = gql`
   fragment MoveOrdersFields on Order {
@@ -147,7 +147,7 @@ const getOrdersQueryOptions = selectedProfile => {
 const MoveAuthoredContributions = () => {
   // Local state and hooks
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [fromAccount, setFromAccount] = React.useState(null);
   const [newFromAccount, setNewFromAccount] = React.useState(null);
   const [hasConfirmationModal, setHasConfirmationModal] = React.useState(false);
@@ -177,7 +177,7 @@ const MoveAuthoredContributions = () => {
 
       // Submit
       await submitMoveContributions({ variables: mutationVariables });
-      addToast({ type: TOAST_TYPE.SUCCESS, title: 'Contributions moved successfully', message: callToAction });
+      toast({ variant: 'success', title: 'Contributions moved successfully', message: callToAction });
 
       // Reset form and purge cache
       setHasConfirmationModal(false);
@@ -185,7 +185,7 @@ const MoveAuthoredContributions = () => {
       setNewFromAccount(null);
       setSelectedOrderOptions([]);
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   };
 

@@ -19,7 +19,7 @@ import StyledInputField from '../StyledInputField';
 import StyledLink from '../StyledLink';
 import StyledTag from '../StyledTag';
 import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const moveExpensesMutation = gql`
   mutation MoveExpensesMutation($destinationAccount: AccountReferenceInput!, $expenses: [ExpenseReferenceInput!]!) {
@@ -31,7 +31,7 @@ const moveExpensesMutation = gql`
 
 export default function MoveExpenses() {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [submitMoveExpenses] = useMutation(moveExpensesMutation, { context: API_V2_CONTEXT });
 
   const [sourceAccount, setSourceAccount] = React.useState(null);
@@ -55,14 +55,14 @@ export default function MoveExpenses() {
       };
 
       await submitMoveExpenses({ variables: mutationVariables });
-      addToast({ type: TOAST_TYPE.SUCCESS, title: 'Expenses moved successfully', message: callToAction });
+      toast({ variant: 'success', title: 'Expenses moved successfully', message: callToAction });
       // Reset form and purge cache
       setIsConfirmationModelOpen(false);
       setSourceAccount(null);
       setDestinationAccount(null);
       setSelectedExpenses([]);
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   }, [selectedExpenses, destinationAccount, callToAction]);
 

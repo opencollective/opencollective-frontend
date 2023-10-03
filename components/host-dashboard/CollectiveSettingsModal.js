@@ -21,7 +21,7 @@ import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../S
 import StyledRadioList from '../StyledRadioList';
 import StyledSelect from '../StyledSelect';
 import { Label, P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const OPTION_LABELS = defineMessages({
   [HOST_FEE_STRUCTURE.DEFAULT]: {
@@ -88,7 +88,7 @@ const EXPENSE_TYPE_SELECT_STYLES = {
 
 const CollectiveSettingsModal = ({ host, collective, ...props }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [hostFeePercent, setHostFeePercent] = useState(getDefaultFee(collective, host));
   const [selectedOption, setSelectedOption] = useState(
     hostFeePercent === host.hostFeePercent ? HOST_FEE_STRUCTURE.DEFAULT : HOST_FEE_STRUCTURE.CUSTOM_FEE,
@@ -220,7 +220,7 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
 
                 props?.onClose();
               } catch (e) {
-                addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+                toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }
             }}
           >

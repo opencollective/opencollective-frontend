@@ -26,7 +26,7 @@ import StyledInputAmount from '../StyledInputAmount';
 import StyledRadioList from '../StyledRadioList';
 import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import { getSubscriptionStartDate } from './AddPaymentMethod';
 
@@ -102,7 +102,7 @@ export const tiersQuery = gql`
 const OTHER_LABEL = 'Other';
 
 export const useUpdateOrder = ({ contribution, onSuccess }) => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [submitUpdateOrder, { loading }] = useMutation(updateOrderMutation, { context: API_V2_CONTEXT });
   return {
     isSubmittingOrder: loading,
@@ -121,8 +121,8 @@ export const useUpdateOrder = ({ contribution, onSuccess }) => {
             },
           },
         });
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
+        toast({
+          variant: 'success',
           message: (
             <FormattedMessage
               id="subscription.createSuccessUpdated"
@@ -134,7 +134,7 @@ export const useUpdateOrder = ({ contribution, onSuccess }) => {
         onSuccess();
       } catch (error) {
         const errorMsg = getErrorFromGraphqlException(error).message;
-        addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
+        toast({ variant: 'error', message: errorMsg });
         return false;
       }
     },
@@ -306,7 +306,7 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
 
   // state management
   const { locale } = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const { isSubmittingOrder, updateOrder } = useUpdateOrder({ contribution, onSuccess: onCloseEdit });
   const tiers = get(data, 'account.tiers.nodes', null);
   const disableCustomContributions = get(data, 'account.settings.disableCustomContributions', false);
@@ -457,7 +457,7 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
             tier={selectedTier}
             style={{ height: 25, size: 'small' }}
             subscriptionStartDate={getSubscriptionStartDate(contribution)}
-            onError={e => addToast({ type: TOAST_TYPE.ERROR, title: e.message })}
+            onError={e => toast({ variant: 'error', title: e.message })}
             onSuccess={({ subscriptionId }) =>
               updateOrder(selectedTier, selectedAmountOption, inputAmountValue, subscriptionId)
             }

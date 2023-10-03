@@ -10,7 +10,7 @@ import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { toast } from '../ui/useToast';
 
 const messages = defineMessages({
   reasonPlaceholder: {
@@ -148,7 +148,6 @@ export type ConfirmProcessExpenseModalProps = {
 
 export default function ConfirmProcessExpenseModal({ type, onClose, expense }: ConfirmProcessExpenseModalProps) {
   const intl = useIntl();
-  const { addToast } = useToasts();
 
   const [message, setMessage] = React.useState<string>();
   const [uploading, setUploading] = React.useState(false);
@@ -205,7 +204,7 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
       }
       onClose();
     } catch (error) {
-      addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, error) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
     }
   }, [type, message, intl, processExpense]);
 

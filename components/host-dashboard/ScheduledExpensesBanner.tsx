@@ -15,7 +15,7 @@ import { I18nSupportLink } from '../I18nFormatters';
 import TransferwiseIcon from '../icons/TransferwiseIcon';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 export const scheduledExpensesQuery = gql`
   query ScheduledExpensesBanner($hostSlug: String!, $limit: Int!, $payoutMethodType: PayoutMethodType) {
@@ -58,7 +58,7 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
     context: API_V2_CONTEXT,
   });
 
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const [showConfirmationModal, setConfirmationModalDisplay] = React.useState(false);
 
@@ -78,8 +78,8 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
         headers: addAuthTokenToHeader(),
       });
       setConfirmationModalDisplay(false);
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: (
           <FormattedMessage
             id="expenses.scheduled.paybatch.success"
@@ -99,8 +99,8 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
             { SupportLink: I18nSupportLink },
           );
 
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         title: intl.formatMessage({ defaultMessage: 'Batch payment failed' }),
         message,
       });

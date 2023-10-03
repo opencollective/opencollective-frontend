@@ -16,7 +16,7 @@ import { Flex } from '../Grid';
 import NewCreditCardForm from '../NewCreditCardForm';
 import PayWithPaypalButton from '../PayWithPaypalButton';
 import StyledButton from '../StyledButton';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 /** Return the next charge date, or `undefined` if subscription is past due */
 export const getSubscriptionStartDate = order => {
@@ -33,7 +33,7 @@ const AddPaymentMethod = ({ onStripeReady, onPaypalSuccess, setNewPaymentMethodI
   const hasPaypal = host.supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYPAL);
   const defaultProvider = hasStripe && !hasPaypal ? STRIPE : null;
   const [selectedProvider, setSelectedProvider] = React.useState(defaultProvider);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   if (!selectedProvider) {
     return (
@@ -61,7 +61,7 @@ const AddPaymentMethod = ({ onStripeReady, onPaypalSuccess, setNewPaymentMethodI
             style={{ height: 45, size: 'small' }}
             subscriptionStartDate={getSubscriptionStartDate(order)}
             isSubmitting={isSubmitting}
-            onError={e => addToast({ type: TOAST_TYPE.ERROR, title: e.message })}
+            onError={e => toast({ variant: 'error', title: e.message })}
             onSuccess={({ subscriptionId }) => {
               onPaypalSuccess({
                 service: PAYMENT_METHOD_SERVICE.PAYPAL,

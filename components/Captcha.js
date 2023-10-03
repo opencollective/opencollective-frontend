@@ -9,9 +9,9 @@ import { getEnvVar } from '../lib/env-utils';
 import useRecaptcha from '../lib/hooks/useRecaptcha';
 import { parseToBoolean } from '../lib/utils';
 
+import { useToast } from './ui/useToast';
 import { Box } from './Grid';
 import StyledCheckbox from './StyledCheckbox';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 export const PROVIDERS = {
   HCAPTCHA: 'HCAPTCHA',
@@ -28,7 +28,7 @@ const ReCaptcha = ({ onVerify, onError, ...props }) => {
   const { verify } = useRecaptcha();
   const [loading, setLoading] = React.useState(false);
   const [verified, setVerified] = React.useState(false);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const handleClick = async () => {
     setLoading(true);
     try {
@@ -38,7 +38,7 @@ const ReCaptcha = ({ onVerify, onError, ...props }) => {
         setVerified(true);
       }
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: e.message });
+      toast({ variant: 'error', message: e.message });
       onError?.(e);
     }
     setLoading(false);

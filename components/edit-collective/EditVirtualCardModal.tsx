@@ -30,7 +30,7 @@ import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const editVirtualCardMutation = gql`
@@ -183,7 +183,7 @@ export default function EditVirtualCardModal({
   modalProps,
   virtualCardRequest,
 }: EditVirtualCardModalProps) {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const { data: policyData, loading: isLoadingPolicy } = useQuery(VirtualCardPoliciesQuery, {
     context: API_V2_CONTEXT,
@@ -249,8 +249,8 @@ export default function EditVirtualCardModal({
 
         await submitForm({ variables });
       } catch (e) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: (
             <FormattedMessage
               defaultMessage="Error submiting form: {error}"

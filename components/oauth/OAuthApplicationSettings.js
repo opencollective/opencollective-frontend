@@ -22,7 +22,7 @@ import StyledInputFormikField from '../StyledInputFormikField';
 import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { H3, H4, P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 import WarnIfUnsavedChanges from '../WarnIfUnsavedChanges';
 
 import DeleteOAuthApplicationModal from './DeleteOAuthApplicationModal';
@@ -86,7 +86,7 @@ const LABEL_STYLES = { fontWeight: 700, fontSize: '16px', lineHeight: '24px' };
 const OAuthApplicationSettings = ({ backPath, id }) => {
   const intl = useIntl();
   const router = useRouter();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const { data, loading, error } = useQuery(applicationQuery, { variables: { id }, context: API_V2_CONTEXT });
   const [updateApplication] = useMutation(updateApplicationMutation, { context: API_V2_CONTEXT });
@@ -138,8 +138,8 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
                 const filteredValues = pick(values, ['name', 'description', 'redirectUri']);
                 const applicationInput = { id: data.application.id, ...filteredValues };
                 const result = await updateApplication({ variables: { application: applicationInput } });
-                addToast({
-                  type: TOAST_TYPE.SUCCESS,
+                toast({
+                  variant: 'success',
                   message: intl.formatMessage(
                     { defaultMessage: 'Application "{name}" updated' },
                     { name: result.data.updateApplication.name },
@@ -147,7 +147,7 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
                 });
                 resetForm({ values: result.data.updateApplication });
               } catch (e) {
-                addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+                toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }
             }}
           >

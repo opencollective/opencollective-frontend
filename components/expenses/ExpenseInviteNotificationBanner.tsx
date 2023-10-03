@@ -16,7 +16,7 @@ import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledLink from '../StyledLink';
 import { H4, P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import pidgeon from '../../public/static/images/pidgeon.png';
 
@@ -34,7 +34,7 @@ const PidgeonIllustration = styled.img.attrs({ src: pidgeon })`
 `;
 
 const ResendDraftInviteButton = ({ expense }) => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const [resendDraftInvite, { loading, error, data }] = useMutation(resendDraftExpenseInviteMutation, {
     context: API_V2_CONTEXT,
@@ -51,13 +51,13 @@ const ResendDraftInviteButton = ({ expense }) => {
       onClick={async () => {
         try {
           await resendDraftInvite({ variables: { expense: pick(expense, ['id', 'legacyId']) } });
-          addToast({
-            type: TOAST_TYPE.SUCCESS,
+          toast({
+            variant: 'success',
             message: <FormattedMessage id="ResendInviteSuccessful" defaultMessage="Invite sent" />,
           });
         } catch (e) {
-          addToast({
-            type: TOAST_TYPE.ERROR,
+          toast({
+            variant: 'error',
             message: i18nGraphqlException(intl, e),
           });
         }

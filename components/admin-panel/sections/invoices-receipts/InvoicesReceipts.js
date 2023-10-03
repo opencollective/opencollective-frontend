@@ -18,7 +18,7 @@ import StyledHr from '../../../StyledHr';
 import StyledInputField from '../../../StyledInputField';
 import StyledSelect from '../../../StyledSelect';
 import { H2, P, Span } from '../../../Text';
-import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
+import { useToast } from '../../../ui/useToast';
 
 import { useReceipt } from './hooks/useReceipt';
 import ReceiptTemplateForm from './ReceiptTemplateForm';
@@ -38,7 +38,7 @@ const BILL_TO_OPTIONS = [
 
 const InvoicesReceipts = ({ collective }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const defaultReceipt = useReceipt({ template: 'default', settings: collective.settings });
   const alternativeReceipt = useReceipt({ template: 'alternative', settings: collective.settings });
   const [setSettings, { loading, error, data }] = useMutation(editCollectiveSettingsMutation);
@@ -214,8 +214,8 @@ const InvoicesReceipts = ({ collective }) => {
               },
             });
             setIsFieldChanged(false);
-            addToast({
-              type: TOAST_TYPE.SUCCESS,
+            toast({
+              variant: 'success',
               message: <FormattedMessage defaultMessage="Invoices updated successfully" />,
             });
           }}

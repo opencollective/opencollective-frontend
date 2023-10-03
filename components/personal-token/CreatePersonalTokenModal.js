@@ -15,7 +15,7 @@ import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import { getScopesOptions, validatePersonalTokenValues } from './lib';
 
@@ -38,7 +38,7 @@ const INITIAL_VALUES = {
 
 const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [createPersonalToken] = useMutation(createPersonalTokenMutation, {
     context: API_V2_CONTEXT,
     update: cache => {
@@ -64,8 +64,8 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
               expiresAt: values.expiresAt ? values.expiresAt : null,
             };
             const result = await createPersonalToken({ variables: { personalToken: tokenInput } });
-            addToast({
-              type: TOAST_TYPE.SUCCESS,
+            toast({
+              variant: 'success',
               message: intl.formatMessage(
                 { defaultMessage: 'Personal token "{name}" created' },
                 { name: result.data.createPersonalToken.name },
@@ -73,7 +73,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
             });
             onSuccess(result.data.createPersonalToken, account);
           } catch (e) {
-            addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+            toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
           }
         }}
       >

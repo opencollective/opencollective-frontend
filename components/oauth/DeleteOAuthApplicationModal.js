@@ -8,7 +8,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const deleteApplicationMutation = gql`
   mutation DeleteOAuthApplication($id: String!) {
@@ -22,7 +22,7 @@ const deleteApplicationMutation = gql`
 `;
 
 const DeleteOAuthApplicationModal = ({ application, onDelete, ...props }) => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const [deleteApplication] = useMutation(deleteApplicationMutation, {
     context: API_V2_CONTEXT,
@@ -47,13 +47,13 @@ const DeleteOAuthApplicationModal = ({ application, onDelete, ...props }) => {
         try {
           await deleteApplication({ variables: { id: application.id } });
           await onDelete(application);
-          addToast({
-            type: TOAST_TYPE.SUCCESS,
+          toast({
+            variant: 'success',
             message: intl.formatMessage({ defaultMessage: 'Application {name} deleted' }, { name: application.name }),
           });
           return CONFIRMATION_MODAL_TERMINATE;
         } catch (e) {
-          addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
         }
       }}
     >

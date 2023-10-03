@@ -16,7 +16,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
-import { TOAST_TYPE, withToasts } from '../ToastProvider';
+import { toast } from '../ui/useToast';
 
 import EditPayPalAccount from './EditPayPalAccount';
 import EditTransferWiseAccount from './EditTransferWiseAccount';
@@ -32,7 +32,6 @@ class EditConnectedAccount extends React.Component {
     connectedAccount: PropTypes.object,
     variation: PropTypes.bool,
     router: PropTypes.object,
-    addToast: PropTypes.func.isRequired,
     client: PropTypes.object.isRequired,
   };
 
@@ -83,8 +82,8 @@ class EditConnectedAccount extends React.Component {
       }
 
       // Success!
-      this.props.addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: intl.formatMessage({ defaultMessage: 'Successfully connected {service} account' }, { service }),
       });
 
@@ -94,8 +93,8 @@ class EditConnectedAccount extends React.Component {
       Sentry.captureException(e);
 
       // Not showing the exact error message to users as raw fetch messages are not user friendly
-      this.props.addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: intl.formatMessage({ defaultMessage: 'Error while connecting {service} account' }, { service }),
       });
     } finally {
@@ -146,8 +145,8 @@ class EditConnectedAccount extends React.Component {
       }
     } catch (e) {
       Sentry.captureException(e);
-      this.props.addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: this.props.intl.formatMessage(
           { defaultMessage: 'Error while disconnecting {service} account' },
           { service },
@@ -269,4 +268,4 @@ class EditConnectedAccount extends React.Component {
   }
 }
 
-export default injectIntl(withRouter(withToasts(withApollo(EditConnectedAccount))));
+export default injectIntl(withRouter(withApollo(EditConnectedAccount)));

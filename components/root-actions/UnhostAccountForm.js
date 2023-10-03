@@ -8,7 +8,7 @@ import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
   query UnhostAccountSearchQuery($term: String!, $types: [TypeOfCollective], $limit: Int, $hostCollectiveIds: [Int]) {
@@ -49,7 +49,7 @@ const unhostAccountMutation = gql`
 const UnhostAccountForm = () => {
   const [account, setAccount] = React.useState(null);
   const [unhostAccount, { loading }] = useMutation(unhostAccountMutation, { context: API_V2_CONTEXT });
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   return (
     <div>
@@ -74,7 +74,7 @@ const UnhostAccountForm = () => {
         loading={loading}
         onClick={async () => {
           if (!account.host) {
-            addToast({ type: TOAST_TYPE.ERROR, message: 'This account has no host' });
+            toast({ variant: 'error', message: 'This account has no host' });
             return;
           } else if (
             !confirm(
@@ -87,14 +87,14 @@ const UnhostAccountForm = () => {
           try {
             const result = await unhostAccount({ variables: { account: { legacyId: account.id } } });
             const resultAccount = result.data.removeHost;
-            addToast({
-              type: TOAST_TYPE.SUCCESS,
+            toast({
+              variant: 'success',
               message: `${resultAccount.name} (@${resultAccount.slug}) has been unhosted`,
             });
             setAccount(null);
           } catch (e) {
-            addToast({
-              type: TOAST_TYPE.ERROR,
+            toast({
+              variant: 'error',
               message: i18nGraphqlException(intl, e),
             });
           }

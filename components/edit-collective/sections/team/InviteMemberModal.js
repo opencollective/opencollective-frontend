@@ -15,7 +15,7 @@ import MessageBox from '../../../MessageBox';
 import StyledButton from '../../../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
 import { P } from '../../../Text';
-import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
+import { useToast } from '../../../ui/useToast';
 
 import MemberForm from './MemberForm';
 import { teamSectionQuery } from './queries';
@@ -46,7 +46,7 @@ export const inviteMemberMutation = gql`
 const InviteMemberModal = props => {
   const { intl, collective, membersIds, cancelHandler } = props;
 
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [member, setMember] = React.useState(null);
   const mutationOptions = {
@@ -92,15 +92,15 @@ const InviteMemberModal = props => {
         },
       });
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: <FormattedMessage id="editTeam.member.invite.success" defaultMessage="Member invited successfully." />,
       });
 
       cancelHandler();
     } catch (error) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         title: <FormattedMessage id="editTeam.member.invite.error" defaultMessage="Failed to invite member." />,
         message: i18nGraphqlException(intl, error),
       });

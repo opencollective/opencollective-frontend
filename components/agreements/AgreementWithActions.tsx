@@ -18,7 +18,7 @@ import { Flex } from '../Grid';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import Agreement from './Agreement';
 
@@ -65,7 +65,7 @@ export const AgreementWithActions = ({ agreement, onEdit, onDelete, openFileView
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
   const [deleteAgreement] = useMutation(DELETE_AGREEMENT_MUTATION, { context: API_V2_CONTEXT });
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   return (
     <React.Fragment>
@@ -114,16 +114,16 @@ export const AgreementWithActions = ({ agreement, onEdit, onDelete, openFileView
           continueHandler={async () => {
             try {
               await deleteAgreement({ variables: { id: agreement.id } });
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 message: <FormattedMessage defaultMessage="Agreement deleted successfully" />,
               });
               setDeleteConfirm(false);
               onDelete(agreement);
               return CONFIRMATION_MODAL_TERMINATE;
             } catch (e) {
-              addToast({
-                type: TOAST_TYPE.ERROR,
+              toast({
+                variant: 'error',
                 message: i18nGraphqlException(intl, e),
               });
             }

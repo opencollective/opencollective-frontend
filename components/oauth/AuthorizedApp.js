@@ -16,7 +16,7 @@ import LinkCollective from '../LinkCollective';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const revokeAuthorizationMutation = gql`
   mutation RevokeAuthorization($id: String!) {
@@ -28,7 +28,7 @@ const revokeAuthorizationMutation = gql`
 
 export const AuthorizedApp = ({ authorization, onRevoke }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [revokeAuthorization, { loading }] = useMutation(revokeAuthorizationMutation, {
     context: API_V2_CONTEXT,
     onCompleted: onRevoke,
@@ -106,15 +106,15 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
           onClick={async () => {
             try {
               await revokeAuthorization({ variables: { id: authorization.id } });
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 message: intl.formatMessage(
                   { defaultMessage: `Authorization for {appName} revoked` },
                   { appName: authorization.application.name },
                 ),
               });
             } catch (e) {
-              addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+              toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
             }
           }}
         >

@@ -12,7 +12,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import ConfirmationModal from '../ConfirmationModal';
 import ContributionConfirmationModal from '../ContributionConfirmationModal';
 import StyledButton from '../StyledButton';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const processPendingOrderMutation = gql`
   mutation ProcessPendingOrder($id: String!, $action: ProcessOrderAction!) {
@@ -47,7 +47,7 @@ export const hasProcessButtons = permissions => {
  */
 const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [selectedAction, setSelectedAction] = React.useState(null);
   const mutationOptions = { context: API_V2_CONTEXT };
   const [processOrder, { loading }] = useMutation(processPendingOrderMutation, mutationOptions);
@@ -66,7 +66,7 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
       await processOrder({ variables: { id: order.id, action } });
       onSuccess?.();
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   };
 

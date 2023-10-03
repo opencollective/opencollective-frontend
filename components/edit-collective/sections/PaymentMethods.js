@@ -29,7 +29,7 @@ import {
 import { withStripeLoader } from '../../StripeProvider';
 import StyledButton from '../../StyledButton';
 import { P, Span } from '../../Text';
-import { TOAST_TYPE, withToasts } from '../../ToastProvider';
+import { toast } from '../../ui/useToast';
 import EditPaymentMethod from '../EditPaymentMethod';
 
 class EditPaymentMethods extends React.Component {
@@ -50,7 +50,7 @@ class EditPaymentMethods extends React.Component {
     /** From stripeLoader */
     loadStripe: PropTypes.func.isRequired,
     /** from withToast */
-    addToast: PropTypes.func.isRequired,
+    toast: PropTypes.func.isRequired,
     /** from withRouter */
     router: PropTypes.object.isRequired,
   };
@@ -132,7 +132,7 @@ class EditPaymentMethods extends React.Component {
         ],
       });
     } catch (error) {
-      this.props.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(this.props.intl, error) });
+      toast({ variant: 'error', message: i18nGraphqlException(this.props.intl, error) });
     } finally {
       this.setState({ savingId: null });
     }
@@ -161,7 +161,7 @@ class EditPaymentMethods extends React.Component {
         this.handleSuccess('payment');
       }
     } catch (error) {
-      this.props.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(this.props.intl, error) });
+      toast({ variant: 'error', message: i18nGraphqlException(this.props.intl, error) });
     } finally {
       this.setState({ savingId: null });
     }
@@ -211,7 +211,7 @@ class EditPaymentMethods extends React.Component {
     }
 
     if (newError) {
-      this.props.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(this.props.intl, newError) });
+      toast({ variant: 'error', message: i18nGraphqlException(this.props.intl, newError) });
     } else {
       this.handleSuccess(response.setupIntent ? 'setup' : response.paymentIntent ? 'payment' : null);
     }
@@ -526,4 +526,4 @@ const addGraphql = compose(
   addConfirmOrderMutation,
 );
 
-export default injectIntl(withStripeLoader(addGraphql(withToasts(withRouter(EditPaymentMethods)))));
+export default injectIntl(withStripeLoader(addGraphql(withRouter(EditPaymentMethods))));

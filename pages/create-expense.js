@@ -5,9 +5,10 @@ import { graphql } from '@apollo/client/react/hoc';
 import { omit } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import { toast } from '../components/ui/useToast';
+
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { expenseSubmissionAllowed, getCollectivePageMetadata, getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { ActivityTypes } from '../lib/constants/activities';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
@@ -16,7 +17,7 @@ import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import UrlQueryHelper from '../lib/UrlQueryHelper';
 import { compose, parseToBoolean } from '../lib/utils';
-import Survey from '../components/Survey';
+
 import CollectiveNavbar from '../components/collective-navbar';
 import { Dimensions } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
@@ -43,7 +44,8 @@ import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree, { SignInOverlayBackground } from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import StyledCard from '../components/StyledCard';
-import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
+import Survey from '../components/Survey';
+import { toast } from '../components/ui/useToast';
 import { withUser } from '../components/UserProvider';
 
 const STEPS = { ...EXPENSE_FORM_STEPS, SUMMARY: 'summary' };
@@ -76,8 +78,6 @@ class CreateExpensePage extends React.Component {
     createExpense: PropTypes.func.isRequired,
     /** from apollo */
     draftExpenseAndInviteUser: PropTypes.func.isRequired,
-    /** from withToast */
-    addToast: PropTypes.func.isRequired,
     /** from apollo */
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -237,7 +237,10 @@ class CreateExpensePage extends React.Component {
         this.setState({ expense, step: STEPS.SUMMARY, isInitialForm: false });
       }
     } catch (e) {
-      this.props.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(this.props.intl, e) });
+      toast({
+        variant: 'error',
+        description: i18nGraphqlException(this.props.intl, e),
+      });
     }
   };
 
@@ -268,20 +271,22 @@ class CreateExpensePage extends React.Component {
         `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
       );
       toast({
-        type: TOAST_TYPE.SUCCESS,
-        title: 'Expense submitted',
-        description: <Survey question="How was your experience using the automatic OCR feature?" />,
+        title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
+        description: this.props.LoggedInUser ? (
+          <Survey
+            activity={ActivityTypes.COLLECTIVE_EXPENSE_CREATED}
+            question={<FormattedMessage defaultMessage="How was you experience?" />}
+          />
+        ) : (
+          <FormattedMessage id="Expense.SuccessPage" defaultMessage="You can edit or review updates on this page." />
+        ),
       });
-      // this.props.addToast({
-      //   type: TOAST_TYPE.SUCCESS,
-      //   title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
-      //   message: (
-      //     <FormattedMessage id="Expense.SuccessPage" defaultMessage="You can edit or review updates on this page." />
-      //   ),
-      // });
       window.scrollTo(0, 0);
     } catch (e) {
-      this.props.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(this.props.intl, e) });
+      toast({
+        variant: 'error',
+        description: i18nGraphqlException(this.props.intl, e),
+      });
       this.setState({ isSubmitting: false });
     }
   };
@@ -623,7 +628,6 @@ const addHoc = compose(
   addCreateExpensePageData,
   addCreateExpenseMutation,
   addDraftExpenseAndInviteUserMutation,
-  withToasts,
   injectIntl,
 );
 

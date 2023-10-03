@@ -23,7 +23,7 @@ import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 import { virtualCardsAssignedToCollectiveQuery } from './EditVirtualCardModal';
@@ -77,7 +77,7 @@ const throttledCall = debounce((searchFunc, variables) => {
 }, 750);
 
 const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modalProps }) => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [assignNewVirtualCard, { loading: isBusy }] = useMutation(assignNewVirtualCardMutation, {
     context: API_V2_CONTEXT,
   });
@@ -113,8 +113,8 @@ const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modal
           },
         });
       } catch (e) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: (
             <FormattedMessage
               id="Host.VirtualCards.AssignCard.Error"

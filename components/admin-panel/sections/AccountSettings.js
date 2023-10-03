@@ -14,7 +14,7 @@ import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import SettingsForm from '../../edit-collective/Form';
 import Loading from '../../Loading';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { useToast } from '../../ui/useToast';
 import { ALL_SECTIONS } from '../constants';
 import { adminPanelQuery } from '../queries';
 
@@ -22,7 +22,7 @@ const AccountSettings = ({ account, section }) => {
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const router = useRouter();
   const [state, setState] = React.useState({ status: undefined, result: undefined });
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const { data, loading } = useQuery(editCollectivePageQuery, {
     variables: { slug: account.slug },
@@ -147,16 +147,16 @@ const AccountSettings = ({ account, section }) => {
           setState({ ...state, status: null });
         }, 3000);
       }
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: <FormattedMessage id="Settings.Updated" defaultMessage="Settings updated." />,
       });
     } catch (err) {
       const errorMsg = getErrorFromGraphqlException(err)?.message || (
         <FormattedMessage id="Settings.Updated.Fail" defaultMessage="Update failed." />
       );
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: errorMsg,
       });
       setState({ ...state, status: null, result: { error: errorMsg } });

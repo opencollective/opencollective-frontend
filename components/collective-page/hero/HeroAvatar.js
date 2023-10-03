@@ -21,7 +21,7 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import { DROPZONE_ACCEPT_IMAGES } from '../../StyledDropzone';
 import { P, Span } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { useToast } from '../../ui/useToast';
 import { editCollectiveAvatarMutation } from '../graphql/mutations';
 
 const AVATAR_SIZE = 128;
@@ -89,7 +89,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
   const [uploadedImage, setUploadedImage] = React.useState(null);
   const borderRadius = getAvatarBorderRadius(collective.type);
   const [editImage] = useMutation(editCollectiveAvatarMutation);
-  const { addToast, removeToasts } = useToasts();
+  const { toast, removeToasts } = useToast();
 
   const onDropImage = async ([image]) => {
     if (image) {
@@ -111,8 +111,8 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
           !inRange(img.height, ...AVATAR_HEIGHT_RANGE) ||
           image.size >= 5000000
         ) {
-          addToast({
-            type: TOAST_TYPE.ERROR,
+          toast({
+            variant: 'error',
             __isAvatarUploadError: true, // Flag to allow for easy removal of toast when a valid image is uploaded
             message: intl.formatMessage(
               {
