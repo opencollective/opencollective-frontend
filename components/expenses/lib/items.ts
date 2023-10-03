@@ -15,6 +15,7 @@ export const newExpenseItem = (attrs = {}): ExpenseItemFormValues => ({
   amount: null,
   url: '',
   __isNew: true,
+  __isUploading: false,
   ...attrs,
 });
 
