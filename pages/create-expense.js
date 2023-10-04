@@ -8,7 +8,6 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { expenseSubmissionAllowed, getCollectivePageMetadata, getCollectiveTypeForUrl } from '../lib/collective.lib';
-import { ActivityTypes } from '../lib/constants/activities';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
@@ -44,7 +43,7 @@ import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree, { SignInOverlayBackground } from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import StyledCard from '../components/StyledCard';
-import Survey from '../components/Survey';
+import { Survey, SURVEY_KEY } from '../components/Survey';
 import { toast } from '../components/ui/useToast';
 import { withUser } from '../components/UserProvider';
 
@@ -273,13 +272,11 @@ class CreateExpensePage extends React.Component {
       toast({
         title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
         description: this.props.LoggedInUser ? (
-          <Survey
-            activity={ActivityTypes.COLLECTIVE_EXPENSE_CREATED}
-            question={<FormattedMessage defaultMessage="How was you experience?" />}
-          />
+          <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED} />
         ) : (
           <FormattedMessage id="Expense.SuccessPage" defaultMessage="You can edit or review updates on this page." />
         ),
+        duration: 20000,
       });
       window.scrollTo(0, 0);
     } catch (e) {

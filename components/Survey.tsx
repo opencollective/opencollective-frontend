@@ -10,7 +10,22 @@ import { Button } from './ui/Button';
 import { Checkbox } from './ui/Checkbox';
 import { Textarea } from './ui/Textarea';
 
-export default function Survey({ question, activity }) {
+export enum SURVEY_KEY {
+  EXPENSE_SUBMITTED = 'EXPENSE_SUBMITTED',
+  CONTRIBUTION_COMPLETED = 'CONTRIBUTION_COMPLETED',
+}
+
+export function Survey({
+  surveyKey,
+  question = <FormattedMessage defaultMessage="How was your experience?" />,
+  followUpQuestion = <FormattedMessage defaultMessage="Thanks! How could it be improved?" />,
+  hasParentTitle = false,
+}: {
+  surveyKey: SURVEY_KEY;
+  question?: string | React.ReactNode;
+  followUpQuestion?: string | React.ReactNode;
+  hasParentTitle?: boolean;
+}) {
   const { LoggedInUser } = useLoggedInUser();
   const [score, setScore] = React.useState(null);
   const [text, setText] = React.useState('');
@@ -22,10 +37,10 @@ export default function Survey({ question, activity }) {
   const responseId = React.useMemo(() => self.crypto.randomUUID(), []);
   const showForm = score !== null;
 
-  const sendResponse = async ({ responseId, score, text, question, activity, okToContact }) => {
+  const sendResponse = async ({ surveyKey, responseId, score, text, okToContact }) => {
     setLoading(true);
     try {
-      await sendInAppSurveyResponse({ responseId, score, text, question, activity, okToContact });
+      await sendInAppSurveyResponse({ surveyKey, responseId, score, text, okToContact });
     } catch (error) {
       setError(error.message);
     }
@@ -35,7 +50,7 @@ export default function Survey({ question, activity }) {
   const submit = async e => {
     e.preventDefault();
     try {
-      await sendResponse({ responseId, score, text, question, activity, okToContact });
+      await sendResponse({ surveyKey, responseId, score, text, okToContact });
       setCompleted(true);
     } catch (error) {
       setError(error.message);
@@ -56,7 +71,7 @@ export default function Survey({ question, activity }) {
     <React.Fragment>
       <ReactAnimateHeight duration={150} height={completed ? 0 : 'auto'}>
         <div className="flex flex-col gap-4">
-          <p>{question}</p>
+          <p className={hasParentTitle ? 'font-normal' : 'font-bold'}>{question}</p>
           <div className="flex flex-col gap-1">
             <div className="flex gap-2">
               {['😫', '😕', '😐', '🙂', '😀'].map((emoji, i) => (
@@ -67,7 +82,7 @@ export default function Survey({ question, activity }) {
                   onClick={async e => {
                     e.preventDefault();
                     setScore(i);
-                    await sendResponse({ responseId, score: i, text, question, activity, okToContact });
+                    await sendResponse({ surveyKey, responseId, score: i, text, okToContact });
                   }}
                   className="text-xl"
                 >
@@ -79,9 +94,7 @@ export default function Survey({ question, activity }) {
 
           <ReactAnimateHeight duration={150} height={showForm ? 'auto' : 0}>
             <form className="flex w-full flex-1 flex-col gap-4" onSubmit={submit}>
-              <p className="text-muted-foreground">
-                <FormattedMessage defaultMessage="Thanks! How could it be improved?" />
-              </p>
+              <p className="text-muted-foreground">{followUpQuestion}</p>
 
               <Textarea ref={textarea} value={text} onChange={e => setText(e.target.value)} />
               <div className="flex items-center space-x-2">
