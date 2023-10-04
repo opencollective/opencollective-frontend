@@ -1,8 +1,8 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Calendar } from '@styled-icons/feather/Calendar';
-import { Expand } from '@styled-icons/ionicons-solid/Expand';
 import { ShowChart } from '@styled-icons/material/ShowChart';
+import { Expand } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { border } from 'styled-system';
@@ -25,6 +25,8 @@ const StatTitle = styled(Container)`
   font-weight: 500;
   text-transform: uppercase;
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
 `;
 
 StatTitle.defaultProps = {
@@ -68,6 +70,10 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
   const isFund = collective.type === CollectiveType.FUND;
   const isIndividual = !collective.isHost && isIndividualAccount(collective);
   const borderTop = ['1px solid #dcdee0', 'none', horizontal ? null : '1px solid #dcdee0'];
+
+  if (!stats) {
+    return null;
+  }
 
   return (
     <StyledCard

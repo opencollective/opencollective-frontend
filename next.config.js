@@ -46,7 +46,7 @@ const nextConfig = {
         NEXT_IMAGES_URL: null,
         REST_URL: null,
         SENTRY_DSN: null,
-        TW_API_COLLECTIVE_SLUG: null,
+        WISE_PLATFORM_COLLECTIVE_SLUG: null,
         WISE_ENVIRONMENT: 'sandbox',
         HCAPTCHA_SITEKEY: false,
         CAPTCHA_ENABLED: false,
@@ -177,30 +177,47 @@ const nextConfig = {
     return REWRITES;
   },
   async headers() {
-    return process.env.IS_VERCEL === 'true'
-      ? [
-          // Prevent indexing of our Vercel deployments
+    return [
+      // Prevent indexing of non-production deployments
+      {
+        source: '/(.*?)',
+        headers: [
           {
-            source: '/(.*?)',
-            headers: [
-              {
-                key: 'x-robots-tag',
-                value: 'none',
-              },
-            ],
+            key: 'x-robots-tag',
+            value: 'none',
           },
-          // Exception for "Next images", if on the configured domain
+        ],
+        missing: [
           {
-            source: '/_next/image(.*?)',
-            headers: [
-              {
-                key: 'x-robots-tag',
-                value: 'all',
-              },
-            ],
+            type: 'header',
+            key: 'host',
+            value: 'opencollective.com',
           },
-        ]
-      : [];
+          {
+            type: 'header',
+            key: 'original-hostname',
+            value: 'opencollective.com',
+          },
+        ],
+      },
+      // Exception for "Next images", if on the configured domain
+      {
+        source: '/_next/image(.*?)',
+        headers: [
+          {
+            key: 'x-robots-tag',
+            value: 'all',
+          },
+        ],
+        has: [
+          {
+            type: 'header',
+            key: 'host',
+            value: 'next-images.opencollective.com',
+          },
+        ],
+      },
+    ];
   },
   async redirects() {
     return [

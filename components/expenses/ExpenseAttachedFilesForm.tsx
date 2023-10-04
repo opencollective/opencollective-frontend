@@ -3,7 +3,7 @@ import { FormikProps } from 'formik';
 import { first, uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { UploadFileResult } from '../../lib/graphql/types/v2/graphql';
+import { Account, UploadFileResult } from '../../lib/graphql/types/v2/graphql';
 import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemIsTouched } from './lib/items';
 import { updateExpenseFormWithUploadResult } from './lib/ocr';
@@ -19,6 +19,7 @@ import AddNewAttachedFilesButton from './AddNewAttachedFilesButton';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 
 const ExpenseAttachedFilesForm = ({
+  collective,
   form,
   disabled,
   defaultValue,
@@ -34,7 +35,7 @@ const ExpenseAttachedFilesForm = ({
     // Invoices have a default empty item. If it's not touched, we overwrite it with the OCR result
     const firstItem = first(form.values.items);
     const itemIdxToReplace = firstItem && !expenseItemIsTouched(firstItem) ? 0 : undefined;
-    updateExpenseFormWithUploadResult(form, uploadResults, itemIdxToReplace);
+    updateExpenseFormWithUploadResult(collective, form, uploadResults, [itemIdxToReplace]);
   };
 
   return (
@@ -111,6 +112,7 @@ type ExpenseAttachedFilesFormProps = {
   disabled?: boolean;
   form: FormikProps<ExpenseFormValues>;
   hasOCRFeature?: boolean;
+  collective: Account;
 };
 
 export default ExpenseAttachedFilesForm;

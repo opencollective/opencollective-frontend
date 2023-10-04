@@ -85,7 +85,7 @@ const TransactionsPaymentMethodTypeFilter = ({ onChange, value, types, ...props 
       closeMenuOnSelect={false}
       hideSelectedOptions={false}
       isMulti
-      maxWidth={['100%', 200, 300]}
+      maxWidth={['100%']}
       minWidth={150}
       {...props}
     />

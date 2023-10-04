@@ -202,16 +202,7 @@ const Transactions = ({
           />
         </div>
       </div>
-      <Flex
-        mb={['8px', '23px']}
-        mt={4}
-        mx="8px"
-        flexDirection={['column', 'row']}
-        flexWrap={['wrap', null, null, null, 'nowrap']}
-        justifyContent="flex-end"
-        alignItems={['stretch', 'flex-end']}
-        gap="8px"
-      >
+      <div className="mx-2 my-2 flex flex-col items-stretch gap-2 md:flex-row md:flex-wrap md:items-end">
         <TransactionsFilters
           filters={router.query}
           kinds={transactions?.kinds}
@@ -219,7 +210,7 @@ const Transactions = ({
           collective={account}
           onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
         />
-        <Flex justifyContent="space-evenly">
+        <div className="flex justify-evenly">
           {canDownloadInvoices && (
             <Link href={`/${account.slug}/admin/payment-receipts`}>
               <StyledButton
@@ -227,7 +218,6 @@ const Transactions = ({
                 minWidth={140}
                 height={38}
                 width="100%"
-                mb="8px"
                 p="6px 10px"
                 isBorderless
                 whiteSpace="nowrap"
@@ -238,8 +228,8 @@ const Transactions = ({
             </Link>
           )}
           <TransactionsDownloadCSV collective={account} query={router.query} width="100%" />
-        </Flex>
-      </Flex>
+        </div>
+      </div>
 
       <Flex
         mx="8px"

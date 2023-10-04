@@ -39,6 +39,10 @@ class MembershipsWithData extends React.Component {
     this.onChange();
   }
 
+  componentDidUpdate() {
+    this.onChange();
+  }
+
   onChange() {
     const { onChange } = this.props;
     onChange && this.node && onChange({ height: this.node.offsetHeight });

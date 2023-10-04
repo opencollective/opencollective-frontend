@@ -114,6 +114,7 @@ const CommentForm = ({
   const [validationError, setValidationError] = useState();
   const [uploading, setUploading] = useState(false);
   const { formatMessage } = intl;
+  const isRichTextDisabled = isDisabled || !LoggedInUser || loading;
 
   const postComment = async event => {
     event.preventDefault();
@@ -153,6 +154,7 @@ const CommentForm = ({
               hideFooter
               showSubHeading={false}
               showOCLogo={false}
+              autoFocus={false}
             />
           </SignInOverlayBackground>
         </ContainerOverlay>
@@ -170,8 +172,8 @@ const CommentForm = ({
               inputName="html"
               editorMinHeight={250}
               placeholder={formatMessage(messages.placeholder)}
-              autoFocus={isAutoFocused(id)}
-              disabled={isDisabled || !LoggedInUser || loading}
+              autoFocus={Boolean(!isRichTextDisabled && isAutoFocused(id))}
+              disabled={isRichTextDisabled}
               reset={resetValue}
               fontSize="13px"
               onChange={e => {
