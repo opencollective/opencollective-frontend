@@ -139,7 +139,7 @@ class ContributionFlowSuccess extends React.Component {
     track(AnalyticsEvent.CONTRIBUTION_SUCCESS);
     if (this.props.LoggedInUser) {
       toast({
-        message: <Survey survey={SURVEY_KEY.CONTRIBUTION_COMPLETED} />,
+        message: <Survey surveyKey={SURVEY_KEY.CONTRIBUTION_COMPLETED} />,
         duration: 20000,
       });
     }
