@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { ActivityTypes } from '../../lib/constants/activities';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { ScrollDirection, useWindowScroll } from '../../lib/hooks/useWindowScroll';
@@ -16,9 +15,6 @@ import Image from '../Image';
 import Link from '../Link';
 import SearchModal from '../Search';
 import SearchTrigger from '../SearchTrigger';
-import Survey from '../Survey';
-import { Button } from '../ui/Button';
-import { toast , useToast } from '../ui/useToast';
 
 import ProfileMenu from './ProfileMenu';
 
@@ -161,7 +157,6 @@ const TopBar = ({ account }: TopBarProps) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
   const router = useRouter();
-  const { toast } = useToast();
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
 
@@ -200,22 +195,6 @@ const TopBar = ({ account }: TopBarProps) => {
 
           <Flex alignItems="center" gridGap={2} flexShrink={4} flexGrow={0}>
             <SearchTrigger setShowSearchModal={setShowSearchModal} />
-            <Button
-              onClick={() => {
-                toast({
-                  variant: 'success',
-                  title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
-                  message: (
-                    <Survey
-                      activity={ActivityTypes.COLLECTIVE_EXPENSE_CREATED}
-                      question={<FormattedMessage defaultMessage="How was you experience?" />}
-                    />
-                  ),
-                });
-              }}
-            >
-              Test toast
-            </Button>
             <div className="hidden sm:block">
               <ChangelogTrigger />
             </div>
