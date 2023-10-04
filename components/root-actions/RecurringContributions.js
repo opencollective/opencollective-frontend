@@ -5,6 +5,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box } from '../Grid';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import { manageContributionsQuery } from '../recurring-contributions/graphql/queries';
 import RecurringContributionsContainer from '../recurring-contributions/RecurringContributionsContainer';
 import StyledInputField from '../StyledInputField';
@@ -23,7 +24,9 @@ const RecurringContributions = () => {
           <CollectivePickerAsync inputId={id} onChange={({ value }) => setAccount(value)} collective={account} />
         )}
       </StyledInputField>
-      {!loading && (
+      {loading ? (
+        <LoadingPlaceholder height={400} />
+      ) : (
         <Box my={4}>
           <RecurringContributionsContainer
             recurringContributions={data?.account?.orders}
