@@ -38,7 +38,7 @@ const ROUTE_PARAMS = ['hostCollectiveSlug', 'slug', 'section', 'view'];
 
 const updateQuery = (router, newParams) => {
   const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
-  const pathname = router.asPath.split('?')[0];
+  const pathname = router.asPath.split('?')[0].split('#')[0];
   return router.push({ pathname, query });
 };
 
