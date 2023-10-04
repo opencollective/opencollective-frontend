@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { Question } from '@styled-icons/octicons/Question';
+import { HelpCircle } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { PAYMENT_METHOD_SERVICE, PAYMENT_METHOD_TYPE } from '../../lib/constants/payment-methods';
@@ -109,7 +109,7 @@ export function PayWithStripeForm({
               </Span>
             )}
           >
-            <Question size="1.1em" />
+            <HelpCircle size="1.1em" />
           </StyledTooltip>
         </Flex>
       )}
