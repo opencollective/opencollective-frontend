@@ -4,12 +4,14 @@ import ReactAnimateHeight from 'react-animate-height';
 import { FormattedMessage } from 'react-intl';
 
 import { sendInAppSurveyResponse } from '../lib/api';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
 import { Button } from './ui/Button';
 import { Checkbox } from './ui/Checkbox';
 import { Textarea } from './ui/Textarea';
 
 export default function Survey({ question, activity }) {
+  const { LoggedInUser } = useLoggedInUser();
   const [score, setScore] = React.useState(null);
   const [text, setText] = React.useState('');
   const [completed, setCompleted] = React.useState(false);
@@ -46,9 +48,10 @@ export default function Survey({ question, activity }) {
     }
   }, [showForm]);
 
-  if (error) {
-    return <div>{error}</div>;
+  if (!LoggedInUser) {
+    return null;
   }
+
   return (
     <React.Fragment>
       <ReactAnimateHeight duration={150} height={completed ? 0 : 'auto'}>
@@ -104,6 +107,7 @@ export default function Survey({ question, activity }) {
                   </Button>
                 </ToastPrimitives.Close>
               </div>
+              {error && <p className="text-red-600">{error}</p>}
             </form>
           </ReactAnimateHeight>
         </div>
