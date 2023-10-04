@@ -255,7 +255,6 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
                   });
                   onCloseEdit();
                   toast({
-                    type: TOAST_TYPE.INFO,
                     message: (
                       <FormattedMessage
                         id="subscription.createSuccessCancel"
