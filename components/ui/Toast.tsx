@@ -14,7 +14,7 @@ const ToastViewport = React.forwardRef<
   <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      'fixed top-0 z-[5000] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]',
+      'fixed top-0 z-[5000] flex max-h-screen w-full flex-col-reverse gap-4 p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]',
       className,
     )}
     {...props}
@@ -38,7 +38,13 @@ const toastVariants = cva(
   },
 );
 
-const Icon = ({ variant, ...props }) => {
+const ToastIcon = ({
+  variant,
+  ...props
+}: {
+  variant?: VariantProps<typeof toastVariants>['variant'];
+  size?: number;
+}) => {
   switch (variant) {
     case 'success':
       return <CheckCircle className="text-green-700" {...props} />;
@@ -53,7 +59,7 @@ const Toast = React.forwardRef<
 >(({ className, variant, children, ...props }, ref) => {
   return (
     <ToastPrimitives.Root ref={ref} className={cn(toastVariants({ variant }), className)} {...props}>
-      <Icon variant={variant} size={20} />
+      <ToastIcon variant={variant} size={20} />
       <div className="flex w-full items-center justify-between space-x-4">{children}</div>
     </ToastPrimitives.Root>
   );

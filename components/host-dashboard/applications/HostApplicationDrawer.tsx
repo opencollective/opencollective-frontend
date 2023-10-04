@@ -28,7 +28,7 @@ import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
 import { InfoList, InfoListItem } from '../../ui/InfoList';
-import { useToast } from '../../ui/useToast';
+import { type Toast, useToast } from '../../ui/useToast';
 import AcceptRejectButtons from '../AcceptRejectButtons';
 import ApplicationMessageModal from '../ApplicationMessageModal';
 import ValidatedRepositoryInfo from '../ValidatedRepositoryInfo';
@@ -84,7 +84,7 @@ StatusTag.propTypes = {
   status: PropTypes.oneOf(['PENDING', 'REJECTED', 'APPROVED']),
 };
 
-const getSuccessToast = (intl, action, collective, result) => {
+const getSuccessToast = (intl, action, collective, result): Toast => {
   if (action === ACTIONS.SEND_PRIVATE_MESSAGE || action === ACTIONS.SEND_PUBLIC_MESSAGE) {
     const conversation = get(result, 'data.processHostApplication.conversation');
     return {
