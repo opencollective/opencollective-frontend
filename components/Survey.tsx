@@ -112,11 +112,11 @@ export function Survey({
               </div>
               <div className="flex gap-3">
                 <Button type="submit" disabled={loading}>
-                  <FormattedMessage defaultMessage="Submit" />
+                  <FormattedMessage id="submit" defaultMessage="Submit" />
                 </Button>
                 <ToastPrimitives.Close asChild>
                   <Button variant="ghost">
-                    <FormattedMessage defaultMessage="Close" />
+                    <FormattedMessage id="Close" defaultMessage="Close" />
                   </Button>
                 </ToastPrimitives.Close>
               </div>
