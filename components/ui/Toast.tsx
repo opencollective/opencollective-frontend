@@ -58,7 +58,12 @@ const Toast = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> & VariantProps<typeof toastVariants>
 >(({ className, variant, children, ...props }, ref) => {
   return (
-    <ToastPrimitives.Root ref={ref} className={cn(toastVariants({ variant }), className)} {...props}>
+    <ToastPrimitives.Root
+      ref={ref}
+      className={cn(toastVariants({ variant }), className)}
+      data-cy="toast-notification"
+      {...props}
+    >
       <ToastIcon variant={variant} size={20} />
       <div className="flex w-full items-center justify-between space-x-4 [&_a]:underline">{children}</div>
     </ToastPrimitives.Root>
