@@ -1048,7 +1048,7 @@
   "EditCollectivePageFAQ.Data": "אם אני מסיר חלק מהתצוגה, כל התוכן יימחק?",
   "EditCollectivePageFAQ.DataDetails": "לא, המידע נשמר גם כשמסירים אותו מהתצוגה. בכל עת אפשר להחזיר את התוכן לתצוגה.",
   "EditCollectivePageFAQ.EditHidden": "אני יכול לערוך איזור שאינו בתצוגה?",
-  "EditCollectivePageFAQ.EditHiddenDetails": "לא. כדי לערוך צריך להפוך את הקטע לפומבי ולכלול בתצוגה.",
+  "EditCollectivePageFAQ.EditHiddenDetails": "No. To edit a section, you need to make it visible.",
   "EditCollectivePageFAQ.HideBudget": "למה אינני יכול להסתיר את תצוגת התקציב?",
   "EditCollectivePageFAQ.HideBudgetDetails": "כל הקטע של Open Collective זה שקיפות, ותצוגת התקציב זה חלק גדול מזה.",
   "EditCollectivePageFAQ.Publish": "מתי השינויים יפורסמו?",
