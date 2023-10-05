@@ -60,7 +60,7 @@ const Toast = React.forwardRef<
   return (
     <ToastPrimitives.Root ref={ref} className={cn(toastVariants({ variant }), className)} {...props}>
       <ToastIcon variant={variant} size={20} />
-      <div className="flex w-full items-center justify-between space-x-4">{children}</div>
+      <div className="flex w-full items-center justify-between space-x-4 [&_a]:underline">{children}</div>
     </ToastPrimitives.Root>
   );
 });
