@@ -20,6 +20,7 @@ import MergeAccountsForm from '../components/root-actions/MergeAccountsForm';
 import MoveAuthoredContributions from '../components/root-actions/MoveAuthoredContributions';
 import MoveExpenses from '../components/root-actions/MoveExpenses';
 import MoveReceivedContributions from '../components/root-actions/MoveReceivedContributions';
+import RecurringContributions from '../components/root-actions/RecurringContributions';
 import RootActivityLog from '../components/root-actions/RootActivityLog';
 import UnhostAccountForm from '../components/root-actions/UnhostAccountForm';
 import StyledCard from '../components/StyledCard';
@@ -47,6 +48,12 @@ const MENU = [
     id: 'Account Type',
     Component: AccountType,
     description: `This tool is meant to convert a User account to an Organization type. The organization account will have the fields copied from the initial user account. Please notify the user to go through and update the organization account details after this is done. The location data for the user (if exists) will become public for the organization.`,
+  },
+  {
+    id: 'Recurring Contributions',
+    Component: RecurringContributions,
+    description: `This tool is designed to help root admins to update recurring contributions of users`,
+    useCard: false,
   },
   { id: 'Activity Log', Component: RootActivityLog, useCard: false },
   {

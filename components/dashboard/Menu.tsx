@@ -84,7 +84,7 @@ const Menu = ({ isAccountantOnly, onRoute }) => {
           Icon={CreditCard}
           if={!isAccountantOnly && hasFeature(account, FEATURES.VIRTUAL_CARDS)}
         />
-        <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} Icon={Chart} isBeta />
+        <MenuLink section={HOST_DASHBOARD_SECTIONS.REPORTS} Icon={Chart} />
 
         <MenuLink
           Icon={Settings}

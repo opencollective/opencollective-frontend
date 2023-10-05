@@ -82,7 +82,7 @@ const cancelRecurringContributionMutation = gql`
   }
 `;
 
-const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, account }) => {
+const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, account, LoggedInUser }) => {
   const { toast } = useToast();
   const [menuState, setMenuState] = useState('mainMenu');
   const intl = useIntl();
@@ -115,7 +115,8 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
             </Flex>
             <GrayXCircle size={26} onClick={onCloseEdit} />
           </Flex>
-          {account.type !== 'COLLECTIVE' && (
+          {/** This popup is also used by root users, and we don't want them to touch the payment methods */}
+          {account.type !== 'COLLECTIVE' && Boolean(LoggedInUser?.isAdminOfCollective(account)) && (
             <MenuItem
               flexGrow={1 / 4}
               width={1}
