@@ -115,6 +115,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
             </Flex>
             <GrayXCircle size={26} onClick={onCloseEdit} />
           </Flex>
+          {/** This popup is also used by root users, and we don't want them to touch the payment methods */}
           {account.type !== 'COLLECTIVE' && Boolean(LoggedInUser?.isAdminOfCollective(account)) && (
             <MenuItem
               flexGrow={1 / 4}
