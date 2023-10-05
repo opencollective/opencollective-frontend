@@ -23,10 +23,9 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       />
     );
 
-    if (!showCount) {
-      return input;
-    }
-    return (
+    return !showCount ? (
+      input
+    ) : (
       <div className="relative">
         {input}
         <div className="absolute bottom-1.5 right-1.5">
