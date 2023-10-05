@@ -46,7 +46,7 @@ describe('passwords', () => {
 
     // Submit new password
     cy.contains('button', 'Set Password').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Password successfully set' });
+    cy.checkToast({ variant: 'success', message: 'Password successfully set' });
   });
 
   it('can then be edited', () => {
@@ -78,7 +78,7 @@ describe('passwords', () => {
     // Submit new password
     cy.get('input[name="current-password"]').type('{selectall}{backspace}qwerty123456!@#amazing!');
     cy.contains('button', 'Update Password').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Password successfully updated' });
+    cy.checkToast({ variant: 'success', message: 'Password successfully updated' });
   });
 
   it('can be used to login', () => {
@@ -88,7 +88,7 @@ describe('passwords', () => {
       cy.getByDataCy('signin-btn').click();
       cy.get('input[name="password"]:visible').type('WRONG'); // waiting for it to be visible since we add the field with "display: none" for password managers to prefill
       cy.getByDataCy('signin-btn').click();
-      cy.checkToast({ type: 'ERROR', message: 'Invalid password' });
+      cy.checkToast({ variant: 'error', message: 'Invalid password' });
       cy.get('input[name="password"]:visible').type('{selectall}{backspace}qwerty123456!@#amazing!"edited\'😊');
       cy.getByDataCy('signin-btn').click();
       cy.assertLoggedIn(user);

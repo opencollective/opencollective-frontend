@@ -62,6 +62,7 @@ const Toast = React.forwardRef<
       ref={ref}
       className={cn(toastVariants({ variant }), className)}
       data-cy="toast-notification"
+      data-variant={variant}
       {...props}
     >
       <ToastIcon variant={variant} size={20} />

@@ -101,7 +101,7 @@ describe('edit collective', () => {
     cy.get('input[data-cy=maxQuantity]').type('100');
     cy.get('input[data-cy=button]').type('Buy it!');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Tier created.' });
+    cy.checkToast({ variant: 'success', message: 'Tier created.' });
     cy.getByDataCy('contribute-card-tier').should('have.length', 3);
 
     // TODO: Also do the check below on the profile page (need https://github.com/opencollective/opencollective/issues/6331)
@@ -122,7 +122,7 @@ describe('edit collective', () => {
     cy.get('.currency1.inputField input').type('{selectall}25');
     cy.get('.currency2.inputField input').type('{selectall}50');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Tier updated.' });
+    cy.checkToast({ variant: 'success', message: 'Tier updated.' });
     cy.getByDataCy('contribute-card-tier')
       .last()
       .should('contain', 'Potatoes')
@@ -136,7 +136,7 @@ describe('edit collective', () => {
     cy.getByDataCy('contribute-card-tier').last().find('button').click();
     cy.getByDataCy('delete-btn').click();
     cy.getByDataCy('confirm-delete-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Tier deleted.' });
+    cy.checkToast({ variant: 'success', message: 'Tier deleted.' });
 
     // TODO: Check profile page (need https://github.com/opencollective/opencollective/issues/6331)
   });
