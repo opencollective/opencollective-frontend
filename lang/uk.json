@@ -1048,7 +1048,7 @@
   "EditCollectivePageFAQ.Data": "Якщо вимкнути розділ, його вміст буде видалено?",
   "EditCollectivePageFAQ.DataDetails": "Ні, ваші дані зберігаються, коли ви вимикаєте розділ. Його можна повторно увімкнути в будь-який час.",
   "EditCollectivePageFAQ.EditHidden": "Чи можу я змінити вимкнений розділ?",
-  "EditCollectivePageFAQ.EditHiddenDetails": "Ні. Щоб змінити розділ, зробіть його видимим.",
+  "EditCollectivePageFAQ.EditHiddenDetails": "No. To edit a section, you need to make it visible.",
   "EditCollectivePageFAQ.HideBudget": "Чому я не можу сховати свій розділ бюджету?",
   "EditCollectivePageFAQ.HideBudgetDetails": "Open Collective — це прозорість, і видимість розділу бюджету є ключовою частиною цього.",
   "EditCollectivePageFAQ.Publish": "Коли буде опубліковано зміни?",

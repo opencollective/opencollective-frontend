@@ -1048,7 +1048,7 @@
   "EditCollectivePageFAQ.Data": "非表示にした項目の内容は削除されますか？",
   "EditCollectivePageFAQ.DataDetails": "いいえ、非表示の項目のデータも保存されています。表示するように切り替えることはいつでも可能です。",
   "EditCollectivePageFAQ.EditHidden": "非表示の項目を編集できますか？",
-  "EditCollectivePageFAQ.EditHiddenDetails": "いいえ、項目を編集するには、まず、その項目を表示する必要があります。",
+  "EditCollectivePageFAQ.EditHiddenDetails": "No. To edit a section, you need to make it visible.",
   "EditCollectivePageFAQ.HideBudget": "運営費の項目を非表示にできないのはなぜですか？",
   "EditCollectivePageFAQ.HideBudgetDetails": "Open Collective は透明性を重視しており、収支の項目の可視化はその重要な一環です。",
   "EditCollectivePageFAQ.Publish": "変更はいつ公開されますか？",

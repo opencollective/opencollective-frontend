@@ -1048,7 +1048,7 @@
   "EditCollectivePageFAQ.Data": "Czy jeśli wyłączę sekcję, jej zawartość zostanie usunięta?",
   "EditCollectivePageFAQ.DataDetails": "Nie, Twoje dane są zachowane, gdy wyłączysz sekcję. Możesz ją ponownie włączyć w dowolnym momencie.",
   "EditCollectivePageFAQ.EditHidden": "Czy mogę edytować wyłączoną sekcję?",
-  "EditCollectivePageFAQ.EditHiddenDetails": "Nie, aby edytować sekcję, musisz ją pokazać.",
+  "EditCollectivePageFAQ.EditHiddenDetails": "No. To edit a section, you need to make it visible.",
   "EditCollectivePageFAQ.HideBudget": "Dlaczego nie mogę ukryć mojej sekcji budżetu?",
   "EditCollectivePageFAQ.HideBudgetDetails": "W Open Collective chodzi o przejrzystość, a widoczność sekcji budżetowej jest tego kluczowym elementem.",
   "EditCollectivePageFAQ.Publish": "Kiedy zmiany zostaną opublikowane?",

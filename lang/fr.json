@@ -1048,7 +1048,7 @@
   "EditCollectivePageFAQ.Data": "Si je désactive une section, son contenu sera-t-il supprimé ?",
   "EditCollectivePageFAQ.DataDetails": "Non, vos données sont conservées lorsque vous désactivez une section. Vous pouvez les réactiver à tout moment.",
   "EditCollectivePageFAQ.EditHidden": "Puis-je modifier une section désactivée ?",
-  "EditCollectivePageFAQ.EditHiddenDetails": "Non. Pour éditer une section, vous devez la rendre visible.",
+  "EditCollectivePageFAQ.EditHiddenDetails": "No. To edit a section, you need to make it visible.",
   "EditCollectivePageFAQ.HideBudget": "Pourquoi ne puis-je pas cacher ma section budget ?",
   "EditCollectivePageFAQ.HideBudgetDetails": "Open Collective accorde beaucoup d'importance à la transparence, et la visibilité du budget en est un élément clé.",
   "EditCollectivePageFAQ.Publish": "Quand les modifications seront-elles publiées ?",

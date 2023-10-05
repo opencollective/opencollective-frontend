@@ -1048,7 +1048,7 @@
   "EditCollectivePageFAQ.Data": "Se eu desativar uma seção seu conteúdo será excluído?",
   "EditCollectivePageFAQ.DataDetails": "Não, seus dados são preservados quando você desativa uma seção. Você pode reativá-la a qualquer momento.",
   "EditCollectivePageFAQ.EditHidden": "Posso editar uma seção desativada?",
-  "EditCollectivePageFAQ.EditHiddenDetails": "Não. Para editar uma seção você precisa torná-la visível.",
+  "EditCollectivePageFAQ.EditHiddenDetails": "No. To edit a section, you need to make it visible.",
   "EditCollectivePageFAQ.HideBudget": "Por que eu não posso ocultar minha seção de orçamento?",
   "EditCollectivePageFAQ.HideBudgetDetails": "A Open Collective tem tudo a ver com transparência, e a visibilidade da seção de orçamento é uma peça fundamental dessa transparência.",
   "EditCollectivePageFAQ.Publish": "Quando as alterações serão publicadas?",

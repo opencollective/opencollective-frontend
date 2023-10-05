@@ -1048,7 +1048,7 @@
   "EditCollectivePageFAQ.Data": "If I disable a section will its content be deleted?",
   "EditCollectivePageFAQ.DataDetails": "No, your data is preserved when you disable a section. You can re-enable it any time.",
   "EditCollectivePageFAQ.EditHidden": "我可以编辑禁用部分吗？",
-  "EditCollectivePageFAQ.EditHiddenDetails": "No. To edit a section, you need to make it to visible.",
+  "EditCollectivePageFAQ.EditHiddenDetails": "No. To edit a section, you need to make it visible.",
   "EditCollectivePageFAQ.HideBudget": "为什么我不能隐藏我的预算部分？",
   "EditCollectivePageFAQ.HideBudgetDetails": "Open Collective 的核心就是透明公开，因此预算部分的可见度不可或缺。",
   "EditCollectivePageFAQ.Publish": "更改将在何时发布？",

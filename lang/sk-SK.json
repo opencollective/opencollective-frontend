@@ -1048,7 +1048,7 @@
   "EditCollectivePageFAQ.Data": "Ak zakážem sekciu, odstráni sa jej obsah?",
   "EditCollectivePageFAQ.DataDetails": "Nie, vaše údaje sa pri vypnutí sekcie zachovajú. Môžete ju kedykoľvek znova povoliť.",
   "EditCollectivePageFAQ.EditHidden": "Môžem upravovať vypnutú sekciu?",
-  "EditCollectivePageFAQ.EditHiddenDetails": "Nie. Ak chcete upraviť sekciu, je potrebné ju zviditeľniť.",
+  "EditCollectivePageFAQ.EditHiddenDetails": "No. To edit a section, you need to make it visible.",
   "EditCollectivePageFAQ.HideBudget": "Prečo nemôžem skryť sekciu rozpočtu?",
   "EditCollectivePageFAQ.HideBudgetDetails": "Open Collective je založený na transparentnosti a viditeľnosť rozpočtovej časti je jej kľúčovou súčasťou.",
   "EditCollectivePageFAQ.Publish": "Kedy budú zverejnené zmeny?",
