@@ -1048,7 +1048,7 @@
   "EditCollectivePageFAQ.Data": "Если я отключу раздел, его содержимое удалится?",
   "EditCollectivePageFAQ.DataDetails": "Нет, при отключении раздела ваши данные сохраняются. Вы можете включить его в любое время.",
   "EditCollectivePageFAQ.EditHidden": "Могу ли я редактировать отключенный раздел?",
-  "EditCollectivePageFAQ.EditHiddenDetails": "No. To edit a section, you need to make it to visible.",
+  "EditCollectivePageFAQ.EditHiddenDetails": "No. To edit a section, you need to make it visible.",
   "EditCollectivePageFAQ.HideBudget": "Почему я не могу скрыть свой раздел бюджета?",
   "EditCollectivePageFAQ.HideBudgetDetails": "Open Collective is all about transparency, and visibility of the budget section is a key part of that.",
   "EditCollectivePageFAQ.Publish": "When will changes be published?",
