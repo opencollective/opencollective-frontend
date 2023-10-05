@@ -1048,7 +1048,7 @@
   "EditCollectivePageFAQ.Data": "Om jag inaktiverar ett avsnitt kommer dess innehåll att tas bort?",
   "EditCollectivePageFAQ.DataDetails": "Nej, din data sparas när du inaktiverar ett avsnitt. Du kan återaktivera det när som helst.",
   "EditCollectivePageFAQ.EditHidden": "Kan jag redigera ett inaktiverat avsnitt?",
-  "EditCollectivePageFAQ.EditHiddenDetails": "Nej. För att redigera ett avsnitt, måste du göra det aktivt och synligt.",
+  "EditCollectivePageFAQ.EditHiddenDetails": "No. To edit a section, you need to make it visible.",
   "EditCollectivePageFAQ.HideBudget": "Varför kan jag inte dölja min budget?",
   "EditCollectivePageFAQ.HideBudgetDetails": "Open Collectives främsta funktion är öppenhet och insyn i budgets.",
   "EditCollectivePageFAQ.Publish": "När kommer ändringarna att publiceras?",
