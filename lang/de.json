@@ -1048,7 +1048,7 @@
   "EditCollectivePageFAQ.Data": "Wenn ich einen Abschnitt deaktiviere, wird sein Inhalt gelöscht?",
   "EditCollectivePageFAQ.DataDetails": "Nein, deine Daten bleiben erhalten, wenn du einen Abschnitt deaktivierst. Du kannst ihn jederzeit reaktivieren.",
   "EditCollectivePageFAQ.EditHidden": "Kann ich einen deaktivierten Bereich bearbeiten?",
-  "EditCollectivePageFAQ.EditHiddenDetails": "Nein. Um einen Abschnitt zu bearbeiten, musst du ihn sichtbar machen.",
+  "EditCollectivePageFAQ.EditHiddenDetails": "No. To edit a section, you need to make it visible.",
   "EditCollectivePageFAQ.HideBudget": "Warum kann ich mein Budget nicht ausblenden?",
   "EditCollectivePageFAQ.HideBudgetDetails": "Bei Open Collective geht es in erster Linie um Transparenz und die Sichtbarkeit des Budgetabschnittes ist ein wesentlicher Bestandteil dessen.",
   "EditCollectivePageFAQ.Publish": "Wann werden Änderungen veröffentlicht?",
