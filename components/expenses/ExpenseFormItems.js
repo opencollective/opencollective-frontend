@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
-import { filter, isEmpty, range } from 'lodash';
+import { filter, isEmpty, range, some } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -9,7 +9,7 @@ import { formatErrorMessage } from '../../lib/errors';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemsMustHaveFiles, newExpenseItem } from './lib/items';
-import { updateExpenseFormWithUploadResult } from './lib/ocr';
+import { compareItemOCRValues, itemHasOCR, updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
@@ -146,6 +146,13 @@ class ExpenseFormItems extends React.PureComponent {
     return filter(range(items.length), index => items[index].__isUploadingFromMultiDropzone);
   }
 
+  getItemsOCRComparisons(items) {
+    return items.reduce((comparisons, item) => {
+      comparisons[item.id] = compareItemOCRValues(item, this.props.form.values.currency);
+      return comparisons;
+    }, {});
+  }
+
   render() {
     const { availableCurrencies, hasOCRFeature, collective } = this.props;
     const { values, errors, setFieldValue } = this.props.form;
@@ -155,6 +162,12 @@ class ExpenseFormItems extends React.PureComponent {
     const isCreditCardCharge = values.type === expenseTypes.CHARGE;
     const items = values.items || [];
     const hasItems = items.length > 0;
+    const itemsWithOCR = items.filter(itemHasOCR);
+    const itemsOCRComparisons = this.getItemsOCRComparisons(itemsWithOCR);
+    const ocrMismatchWarningFields = ['amount', 'incurredAt'];
+    const hasOCRWarnings = some(itemsOCRComparisons, comparison =>
+      some(comparison, (value, field) => ocrMismatchWarningFields.includes(field) && value.hasMismatch),
+    );
 
     if (!hasItems && requireFile) {
       return (
@@ -227,8 +240,17 @@ class ExpenseFormItems extends React.PureComponent {
             isInvoice={isInvoice}
             hasOCRFeature={hasOCRFeature}
             collective={collective}
+            ocrComparison={itemsOCRComparisons[attachment.id]}
           />
         ))}
+        {itemsWithOCR.length > 0 && (
+          <MessageBox type={hasOCRWarnings ? 'warning' : 'info'} withIcon mt={3}>
+            <FormattedMessage
+              defaultMessage="Please confirm the {count,plural,one{date and amount} other{dates and amounts}} before proceeding."
+              values={{ count: itemsWithOCR.length }}
+            />
+          </MessageBox>
+        )}
         {taxType && (
           <div>
             <Flex alignItems="center" mt={24}>
