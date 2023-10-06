@@ -14,6 +14,7 @@ import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
 import ToastProvider from '../components/ToastProvider';
+import { TooltipProvider } from '../components/ui/Tooltip';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
@@ -28,9 +29,11 @@ export const decorators = [
       <ThemeProvider theme={theme}>
         <IntlProvider locale="en">
           <UserProvider>
-            <ToastProvider>
-              <Story />
-            </ToastProvider>
+            <TooltipProvider>
+              <ToastProvider>
+                <Story />
+              </ToastProvider>
+            </TooltipProvider>
           </UserProvider>
         </IntlProvider>
       </ThemeProvider>

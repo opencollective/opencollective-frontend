@@ -1,17 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FastField, Field } from 'formik';
+import { FastField, Field, useFormikContext } from 'formik';
 import { escape, get, isEmpty, pick, unescape } from 'lodash';
+import Lottie from 'lottie-react';
+import { AlertTriangle } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isURL } from 'validator';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
+import { formatValueAsCurrency } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
+import { cn } from '../../lib/utils';
 import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemsMustHaveFiles } from './lib/items';
-import { updateExpenseFormWithUploadResult } from './lib/ocr';
+import { checkExpenseItemCanBeSplit, updateExpenseFormWithUploadResult } from './lib/ocr';
 
+import * as ScanningAnimationJSON from '../../public/static/animations/scanning.json';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import RichTextEditor from '../RichTextEditor';
@@ -22,6 +27,10 @@ import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import { Span } from '../Text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
+
+import { ExpenseItemDescriptionHint } from './ItemDescriptionHint';
+import { SplitExpenseItemsModal } from './SplitExpenseItemsModal';
 
 export const msg = defineMessages({
   previewImgAlt: {
@@ -31,12 +40,6 @@ export const msg = defineMessages({
   descriptionLabel: {
     id: 'Fields.description',
     defaultMessage: 'Description',
-  },
-  invoiceDescriptionHint: {
-    defaultMessage: 'Specify item or activity and timeframe, e.g. "Volunteer Training, April 2023"',
-  },
-  receiptDescriptionHint: {
-    defaultMessage: 'Describe the expense, e.g. "Dinner with the team"',
   },
   amountLabel: {
     id: 'Fields.amount',
@@ -93,7 +96,7 @@ export const validateExpenseItem = (expense, item) => {
   return errors;
 };
 
-export const prepareExpenseItemForSubmit = (item, isInvoice, isGrant) => {
+export const prepareExpenseItemForSubmit = (expenseData, item) => {
   // The frontend currently ignores the time part of the date, we default to midnight UTC
   const incurredAtFullDate = item.incurredAt || new Date().toISOString().split('T')[0];
   const incurredAt = incurredAtFullDate.match(/^\d{4}-\d{2}-\d{2}$/)
@@ -104,7 +107,7 @@ export const prepareExpenseItemForSubmit = (item, isInvoice, isGrant) => {
     incurredAt,
     ...pick(item, [
       ...(item.__isNew ? [] : ['id']), // Omit item's ids that were created for keying purposes
-      ...(isInvoice || isGrant ? [] : ['url']), // never submit URLs for invoices or requests
+      ...(expenseItemsMustHaveFiles(expenseData.type) ? ['url'] : []), // never submit URLs for invoices or requests
       'description',
       'amount',
     ]),
@@ -119,10 +122,42 @@ const AttachmentLabel = () => (
   </Span>
 );
 
+const WithOCRComparisonWarning = ({ comparison, formatValue, children, mrClass = 'mr-10' }) => (
+  <div className="relative">
+    {children}
+    {Boolean(comparison?.hasMismatch) && (
+      <div className={cn('absolute right-0 top-0 mt-[9px]', mrClass)}>
+        <Tooltip>
+          <TooltipTrigger>
+            <AlertTriangle size={16} color="#CB9C03" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <FormattedMessage
+              defaultMessage="This value does not match the one scanned from the document ({value})"
+              values={{ value: formatValue ? formatValue(comparison.ocrValue) : comparison.ocrValue.toString() }}
+            />
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    )}
+  </div>
+);
+
+WithOCRComparisonWarning.propTypes = {
+  children: PropTypes.node,
+  mrClass: PropTypes.string,
+  formatValue: PropTypes.func,
+  comparison: PropTypes.shape({
+    hasMismatch: PropTypes.bool,
+    ocrValue: PropTypes.any,
+  }),
+};
+
 /**
  * Form for a single attachment. Must be used with Formik.
  */
 const ExpenseItemForm = ({
+  collective,
   attachment,
   errors,
   onRemove,
@@ -138,10 +173,12 @@ const ExpenseItemForm = ({
   availableCurrencies,
   onCurrencyChange,
   isInvoice,
-  isLastItem,
   hasOCRFeature,
+  ocrComparison,
 }) => {
   const intl = useIntl();
+  const [showSplitConfirm, setShowSplitConfirm] = React.useState(false);
+  const form = useFormikContext();
   const { formatMessage } = intl;
   const attachmentKey = `attachment-${attachment.id || attachment.url}`;
   const getFieldName = field => `items[${itemIdx}].${field}`;
@@ -182,8 +219,10 @@ const ExpenseItemForm = ({
                     useGraphQL={hasOCRFeature}
                     parseDocument={hasOCRFeature}
                     onGraphQLSuccess={uploadResults => {
-                      updateExpenseFormWithUploadResult(form, uploadResults, itemIdx);
+                      updateExpenseFormWithUploadResult(collective, form, uploadResults, [itemIdx]);
                     }}
+                    isLoading={attachment.__isUploadingFromMultiDropzone}
+                    UploadingComponent={() => <Lottie animationData={ScanningAnimationJSON} loop autoPlay />}
                   />
                 </StyledInputField>
               );
@@ -191,37 +230,40 @@ const ExpenseItemForm = ({
           </FastField>
         )}
         <Box flex="1 1" minWidth={170} mt={2}>
-          <StyledInputField
-            name={getFieldName('description')}
-            error={getError('description')}
-            hint={formatMessage(isInvoice ? msg.invoiceDescriptionHint : msg.receiptDescriptionHint)}
-            htmlFor={`${attachmentKey}-description`}
-            label={formatMessage(msg.descriptionLabel)}
-            labelFontSize="13px"
-            required={!isOptional}
-          >
-            {inputProps =>
-              isRichText ? (
-                <Field
-                  as={RichTextEditor}
-                  {...inputProps}
-                  inputName={inputProps.name}
-                  withBorders
-                  version="simplified"
-                />
-              ) : (
-                <Field name={inputProps.name}>
-                  {({ field, form: { setFieldValue } }) => (
+          <Field name={getFieldName('description')}>
+            {({ field, form }) => (
+              <StyledInputField
+                name={field.name}
+                error={getError('description')}
+                hint={<ExpenseItemDescriptionHint item={attachment} isInvoice={isInvoice} form={form} field={field} />}
+                htmlFor={`${attachmentKey}-description`}
+                label={formatMessage(msg.descriptionLabel)}
+                labelFontSize="13px"
+                required={!isOptional}
+              >
+                {inputProps =>
+                  isRichText ? (
+                    <RichTextEditor
+                      inputName={inputProps.name}
+                      error={inputProps.error}
+                      withBorders
+                      version="simplified"
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      value={field.value}
+                    />
+                  ) : (
                     <StyledInput
                       {...inputProps}
                       value={unescape(field.value)}
-                      onChange={e => setFieldValue(inputProps.name, escape(e.target.value))}
+                      onChange={e => form.setFieldValue(field.name, escape(e.target.value))}
+                      placeholder={get(attachment, '__file.name') || get(attachment, '__file.path')}
                     />
-                  )}
-                </Field>
-              )
-            }
-          </StyledInputField>
+                  )
+                }
+              </StyledInputField>
+            )}
+          </Field>
           <Flex justifyContent="flex-end" flexDirection={['column', 'row']}>
             {requireDate && (
               <StyledInputField
@@ -240,11 +282,15 @@ const ExpenseItemForm = ({
                 {inputProps => (
                   <Field maxHeight={39} {...inputProps}>
                     {({ field }) => (
-                      <StyledInput
-                        {...inputProps}
-                        {...field}
-                        value={typeof field.value === 'string' ? field.value.split('T')[0] : field.value}
-                      />
+                      <WithOCRComparisonWarning comparison={ocrComparison?.['incurredAt']}>
+                        <StyledInput
+                          {...inputProps}
+                          {...field}
+                          py="7px"
+                          width="100%"
+                          value={typeof field.value === 'string' ? field.value.split('T')[0] : field.value}
+                        />
+                      </WithOCRComparisonWarning>
                     )}
                   </Field>
                 )}
@@ -267,19 +313,24 @@ const ExpenseItemForm = ({
               {inputProps => (
                 <Field name={inputProps.name}>
                   {({ field, form: { setFieldValue } }) => (
-                    <StyledInputAmount
-                      {...field}
-                      {...inputProps}
-                      currency={currency}
-                      currencyDisplay="CODE"
-                      min={isOptional ? undefined : 1}
-                      maxWidth="100%"
-                      placeholder="0.00"
-                      onChange={(value, e) => setFieldValue(e.target.name, value)}
-                      onCurrencyChange={onCurrencyChange}
-                      hasCurrencyPicker={hasMultiCurrency || !currency} // Makes sure user can re-select currency after a reset
-                      availableCurrencies={availableCurrencies}
-                    />
+                    <WithOCRComparisonWarning
+                      comparison={ocrComparison?.['amount']}
+                      formatValue={amount => formatValueAsCurrency(amount, { locale: intl.locale })}
+                    >
+                      <StyledInputAmount
+                        {...field}
+                        {...inputProps}
+                        currency={currency}
+                        currencyDisplay="CODE"
+                        min={isOptional ? undefined : 1}
+                        maxWidth="100%"
+                        placeholder="0.00"
+                        onChange={(value, e) => setFieldValue(e.target.name, value)}
+                        onCurrencyChange={onCurrencyChange}
+                        hasCurrencyPicker={hasMultiCurrency || !currency} // Makes sure user can re-select currency after a reset
+                        availableCurrencies={availableCurrencies}
+                      />
+                    </WithOCRComparisonWarning>
                   )}
                 </Field>
               )}
@@ -300,13 +351,31 @@ const ExpenseItemForm = ({
             {formatMessage(requireFile ? msg.removeReceipt : msg.removeItem)}
           </StyledButton>
         )}
-        {!isLastItem && <StyledHr flex="1" borderStyle="dashed" borderColor="black.200" />}
+        {checkExpenseItemCanBeSplit(attachment, form.values.type) && (
+          <React.Fragment>
+            <StyledButton
+              type="button"
+              buttonStyle="secondary"
+              buttonSize="tiny"
+              isBorderless
+              mr={2}
+              onClick={() => setShowSplitConfirm(true)}
+            >
+              <FormattedMessage defaultMessage="Split items" />
+            </StyledButton>
+            {showSplitConfirm && (
+              <SplitExpenseItemsModal form={form} itemIdx={itemIdx} onClose={() => setShowSplitConfirm(false)} />
+            )}
+          </React.Fragment>
+        )}
+        <StyledHr flex="1" borderStyle="dashed" borderColor="black.200" />
       </Flex>
     </Box>
   );
 };
 
 ExpenseItemForm.propTypes = {
+  collective: PropTypes.object,
   /** The currency of the collective */
   currency: PropTypes.string,
   /** ReactHookForm key */
@@ -335,17 +404,20 @@ ExpenseItemForm.propTypes = {
   availableCurrencies: PropTypes.arrayOf(PropTypes.string),
   /** Is it an invoice */
   isInvoice: PropTypes.bool,
-  /** the attachment data */
+  /** the item data. TODO: Rename to "item" */
   attachment: PropTypes.shape({
     id: PropTypes.string,
     url: PropTypes.string,
     description: PropTypes.string,
     incurredAt: PropTypes.string,
     amount: PropTypes.number,
+    __parsingResult: PropTypes.object,
+    __canBeSplit: PropTypes.boolean,
+    __isUploadingFromMultiDropzone: PropTypes.boolean,
   }).isRequired,
   editOnlyDescriptiveInfo: PropTypes.bool,
-  isLastItem: PropTypes.bool,
   itemIdx: PropTypes.number.isRequired,
+  ocrComparison: PropTypes.object,
 };
 
 ExpenseItemForm.defaultProps = {

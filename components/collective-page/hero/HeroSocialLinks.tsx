@@ -64,7 +64,7 @@ export default function HeroSocialLinks({ socialLinks, relMe }: HeroSocialLinksP
         openInNewTabNoFollow={!relMe}
         openInNewTabNoFollowRelMe={!!relMe}
       >
-        <StyledRoundButton size={32} mt={2} mr={3}>
+        <StyledRoundButton size={32}>
           <Icon size={12} />
         </StyledRoundButton>
       </StyledLink>

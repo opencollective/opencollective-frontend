@@ -1,49 +1,6 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
-
-import { Flex } from './Grid';
-import Hide from './Hide';
-import StyledButton from './StyledButton';
-import { Span } from './Text';
-
-const SearchButton = styled(StyledButton)`
-  color: #6b7280;
-  font-weight: 400;
-  height: 40px;
-  padding: 0 12px;
-  max-width: 280px;
-  width: 280px;
-  min-width: 120px;
-  flex-shrink: 4;
-
-  @media screen and (max-width: 52em) {
-    width: 32px;
-    min-width: 32px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0;
-    border: none;
-  }
-
-  .slash {
-    border: 1px solid #d1d5db;
-    background-color: #f1f5f9;
-    border-radius: 4px;
-    padding: 0 4px;
-    letter-spacing: 0;
-  }
-
-  &:active,
-  :hover {
-    .slash {
-      background-color: inherit;
-    }
-  }
-`;
 
 const SearchTrigger = ({ setShowSearchModal }) => {
   React.useEffect(() => {
@@ -58,19 +15,18 @@ const SearchTrigger = ({ setShowSearchModal }) => {
   }, []);
 
   return (
-    <SearchButton onClick={() => setShowSearchModal(true)}>
-      <Flex alignItems="center" gridGap="6px">
-        <Search size={16} />
-        <Hide xs sm>
-          <Span fontSize="12px" fontWeight={400} lineHeight="16px">
-            <FormattedMessage
-              defaultMessage="Search for Profiles and Collectives {slash}"
-              values={{ slash: <span className="slash">/</span> }}
-            />
-          </Span>
-        </Hide>
-      </Flex>
-    </SearchButton>
+    <button
+      className="relative flex h-8 w-8 items-center justify-center gap-1.5 rounded-full border text-slate-500 ring-black ring-offset-2 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 md:w-auto md:justify-start md:px-2 md:pr-4"
+      onClick={() => setShowSearchModal(true)}
+    >
+      <Search size={16} />
+      <span className="hidden text-xs md:block">
+        <FormattedMessage
+          defaultMessage="Type {slash} to search for Collectives..."
+          values={{ slash: <span className="rounded-sm border bg-slate-100 px-1">/</span> }}
+        />
+      </span>
+    </button>
   );
 };
 

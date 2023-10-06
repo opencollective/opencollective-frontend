@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { ChevronLeft } from '@styled-icons/boxicons-regular/ChevronLeft';
 import { ChevronRight } from '@styled-icons/boxicons-regular/ChevronRight';
-import { ArrowDownTray } from '@styled-icons/heroicons-outline/ArrowDownTray';
-import { ArrowTopRightOnSquare } from '@styled-icons/heroicons-outline/ArrowTopRightOnSquare';
-import { XMark } from '@styled-icons/heroicons-outline/XMark';
 import { themeGet } from '@styled-system/theme-get';
 import FocusTrap from 'focus-trap-react';
+import { Download, ExternalLink, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -282,7 +280,7 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
                   download
                   target="_blank"
                 >
-                  <ArrowDownTray size={24} />
+                  <Download size={24} />
                 </ButtonLink>
               </StyledTooltip>
               <StyledTooltip
@@ -292,7 +290,7 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
                 delayHide={0}
               >
                 <ButtonLink href={selectedItem?.url} target="_blank">
-                  <ArrowTopRightOnSquare size={24} />
+                  <ExternalLink size={24} />
                 </ButtonLink>
               </StyledTooltip>
               <StyledTooltip
@@ -302,7 +300,7 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
                 delayHide={0}
               >
                 <Button onClick={onClose}>
-                  <XMark size="24" aria-hidden="true" />
+                  <X size="24" aria-hidden="true" />
                 </Button>
               </StyledTooltip>
             </Flex>

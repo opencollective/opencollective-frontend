@@ -12,6 +12,8 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
+import { expenseTypeSupportsAttachments } from './lib/attachments';
+import { expenseItemsMustHaveFiles } from './lib/items';
 
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import Avatar from '../Avatar';
@@ -278,7 +280,7 @@ const ExpenseSummary = ({
           {expenseItems.map((attachment, attachmentIdx) => (
             <React.Fragment key={attachment.id || attachmentIdx}>
               <Flex my={24} flexWrap="wrap">
-                {(isReceipt || attachment.url) && (
+                {attachment.url && expenseItemsMustHaveFiles(expense.type) && (
                   <Box mr={3} mb={3} width={['100%', 'auto']}>
                     <UploadedFilePreview
                       url={attachment.url}
@@ -363,7 +365,7 @@ const ExpenseSummary = ({
           </Flex>
         )}
       </Flex>
-      {expense?.attachedFiles?.length > 0 && (
+      {expenseTypeSupportsAttachments(expense?.type) && expense?.attachedFiles?.length > 0 && (
         <React.Fragment>
           <Flex my={4} alignItems="center">
             {!expense && isLoading ? (

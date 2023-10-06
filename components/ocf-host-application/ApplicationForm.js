@@ -16,7 +16,7 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyChecked, verifyEmailPattern, verifyFieldLength } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { i18nOCFApplicationFormLabel } from '../../lib/i18n/ocf-form';
+import { i18nCustomApplicationFormLabel } from '../../lib/i18n/custom-application-form';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';
@@ -306,7 +306,7 @@ const ApplicationForm = ({
                       </Box>
                       <Box width={['256px', '234px', '324px']}>
                         <StyledInputFormikField
-                          label={i18nOCFApplicationFormLabel(intl, 'location')}
+                          label={i18nCustomApplicationFormLabel(intl, 'location')}
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -322,7 +322,7 @@ const ApplicationForm = ({
                         <Flex flexDirection={['column', 'row']}>
                           <Box mr={[null, 3]}>
                             <StyledInputFormikField
-                              label={i18nOCFApplicationFormLabel(intl, 'name')}
+                              label={i18nCustomApplicationFormLabel(intl, 'name')}
                               labelFontSize="13px"
                               labelColor="#4E5052"
                               labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -340,7 +340,7 @@ const ApplicationForm = ({
                           </Box>
                           <Box my={2}>
                             <StyledInputFormikField
-                              label={i18nOCFApplicationFormLabel(intl, 'email')}
+                              label={i18nCustomApplicationFormLabel(intl, 'email')}
                               labelFontSize="13px"
                               labelColor="#4E5052"
                               labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -368,7 +368,7 @@ const ApplicationForm = ({
                         <Flex flexDirection={['column', 'row']}>
                           <Box my={2} mr={[null, 3]}>
                             <StyledInputFormikField
-                              label={i18nOCFApplicationFormLabel(intl, 'initiativeName')}
+                              label={i18nCustomApplicationFormLabel(intl, 'initiativeName')}
                               labelFontSize="13px"
                               labelColor="#4E5052"
                               labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -385,7 +385,7 @@ const ApplicationForm = ({
                           </Box>
                           <Box width={['256px', '234px', '324px']} my={2}>
                             <StyledInputFormikField
-                              label={i18nOCFApplicationFormLabel(intl, 'slug')}
+                              label={i18nCustomApplicationFormLabel(intl, 'slug')}
                               helpText={<FormattedMessage defaultMessage="This can be edited later" />}
                               labelFontSize="13px"
                               labelColor="#4E5052"
@@ -424,7 +424,7 @@ const ApplicationForm = ({
                       <Flex flexDirection={['column', 'row']}>
                         <Box mr={[null, 3]}>
                           <StyledInputFormikField
-                            label={i18nOCFApplicationFormLabel(intl, 'initiativeDuration')}
+                            label={i18nCustomApplicationFormLabel(intl, 'initiativeDuration')}
                             labelFontSize="13px"
                             labelColor="#4E5052"
                             labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -441,7 +441,7 @@ const ApplicationForm = ({
                         </Box>
                         <Box width={['256px', '234px', '324px']} my={2}>
                           <StyledInputFormikField
-                            label={i18nOCFApplicationFormLabel(intl, 'totalAmountRaised')}
+                            label={i18nCustomApplicationFormLabel(intl, 'totalAmountRaised')}
                             labelFontSize="13px"
                             labelColor="#4E5052"
                             labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -473,7 +473,7 @@ const ApplicationForm = ({
                       <Flex flexDirection={['column', 'row']}>
                         <Box width={['256px', '234px', '324px']} my={2} mr={[null, 3]}>
                           <StyledInputFormikField
-                            label={i18nOCFApplicationFormLabel(intl, 'totalAmountToBeRaised')}
+                            label={i18nCustomApplicationFormLabel(intl, 'totalAmountToBeRaised')}
                             labelFontSize="13px"
                             labelColor="#4E5052"
                             labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -498,7 +498,7 @@ const ApplicationForm = ({
                         </Box>
                         <Box width={['256px', '234px', '324px']} my={2}>
                           <StyledInputFormikField
-                            label={i18nOCFApplicationFormLabel(intl, 'expectedFundingPartner')}
+                            label={i18nCustomApplicationFormLabel(intl, 'expectedFundingPartner')}
                             labelFontSize="13px"
                             labelColor="#4E5052"
                             labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -519,7 +519,7 @@ const ApplicationForm = ({
                       </Flex>
                       <Box width={['256px', '484px', '663px']} my={2}>
                         <StyledInputFormikField
-                          label={i18nOCFApplicationFormLabel(intl, 'initiativeDescription')}
+                          label={i18nCustomApplicationFormLabel(intl, 'initiativeDescription')}
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -544,7 +544,7 @@ const ApplicationForm = ({
                       </Box>
                       <Box width={['256px', '484px', '663px']} my={2}>
                         <StyledInputFormikField
-                          label={i18nOCFApplicationFormLabel(intl, 'missionImpactExplanation')}
+                          label={i18nCustomApplicationFormLabel(intl, 'missionImpactExplanation')}
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}
@@ -670,7 +670,7 @@ const ApplicationForm = ({
                       </Box>
                       <Box width={['256px', '484px', '663px']} my={2}>
                         <StyledInputFormikField
-                          label={i18nOCFApplicationFormLabel(intl, 'websiteAndSocialLinks')}
+                          label={i18nCustomApplicationFormLabel(intl, 'websiteAndSocialLinks')}
                           labelFontSize="13px"
                           labelColor="#4E5052"
                           labelProps={{ fontWeight: '600', lineHeight: '16px' }}

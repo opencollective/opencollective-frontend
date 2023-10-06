@@ -23,8 +23,9 @@ export type PreviewFeature = {
 export const previewFeatures: PreviewFeature[] = [
   {
     key: PREVIEW_FEATURE_KEYS.DASHBOARD,
-    title: 'Workspace',
-    description: 'Introducing improved navigation and a central admin dashboard for all accounts.',
+    title: 'Dashboard',
+    description:
+      'A central space to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations.',
     publicBeta: true,
     enabledByDefaultFor: ['opencollective'],
   },

@@ -1,9 +1,7 @@
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
-import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
+import { getRequestIntl } from '../lib/i18n/request';
 
 // import Banner from '../components/collectives/Banner';
 import JoinUsSection from '../components/collectives/sections/JoinUs';
@@ -27,16 +25,6 @@ const messages = defineMessages({
 
 const HomePage = () => {
   const { formatMessage } = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
-  const router = useRouter();
-  const shouldRedirectToDashboard =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) && router.asPath === '/';
-
-  useEffect(() => {
-    if (shouldRedirectToDashboard) {
-      router.replace('/workspace');
-    }
-  }, [shouldRedirectToDashboard]);
 
   return (
     <Page
@@ -59,8 +47,11 @@ const HomePage = () => {
 };
 
 HomePage.getInitialProps = ({ req, res }) => {
-  if (res && req && (req.language || req.locale === 'en')) {
-    res.set('Cache-Control', 'public, s-maxage=3600');
+  if (res && req) {
+    const { locale } = getRequestIntl(req);
+    if (locale === 'en') {
+      res.setHeader('Cache-Control', 'public, s-maxage=3600');
+    }
   }
 
   let skipDataFromTree = false;

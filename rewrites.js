@@ -130,12 +130,9 @@ exports.REWRITES = [
     source: '/dashboard',
     destination: '/dashboard',
   },
+  { source: '/workspace', destination: '/dashboard' },
   {
     source: '/dashboard/:slug/:section?/:subpath*',
-    destination: '/dashboard',
-  },
-  {
-    source: '/workspace',
     destination: '/dashboard',
   },
   {
@@ -362,6 +359,11 @@ exports.REWRITES = [
   {
     source: '/applications',
     destination: '/applications',
+  },
+  // Robots.txt
+  {
+    source: '/robots.txt',
+    destination: '/api/robots',
   },
   // Collective
   // ----------

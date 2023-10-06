@@ -9,10 +9,10 @@ import { FormattedMessage } from 'react-intl';
 
 import { ERROR } from '../lib/errors';
 
+import Footer from './navigation/Footer';
 import Body from './Body';
 import Container from './Container';
 import { ErrorFallbackLinks } from './ErrorFallbackLinks';
-import Footer from './Footer';
 import { Box, Flex } from './Grid';
 import Header from './Header';
 import Image from './Image';

@@ -6,7 +6,7 @@ import { useNewsAndUpdates } from './NewsAndUpdatesProvider';
 
 const GlobalNewsAndUpdates = () => {
   const { showNewsAndUpdates, setShowNewsAndUpdates } = useNewsAndUpdates();
-  return showNewsAndUpdates ? <NewsAndUpdatesModal onClose={() => setShowNewsAndUpdates(false)} /> : null;
+  return <NewsAndUpdatesModal open={showNewsAndUpdates} setOpen={open => setShowNewsAndUpdates(open)} />;
 };
 
 GlobalNewsAndUpdates.propTypes = {

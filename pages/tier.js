@@ -88,7 +88,9 @@ class TierPage extends React.Component {
     ) : (
       <Page {...this.getPageMetaData(data.Tier)}>
         {data.loading || !data.Tier || !data.Tier.collective ? (
-          <Loading />
+          <div className="py-16 sm:py-32">
+            <Loading />
+          </div>
         ) : (
           <CollectiveThemeProvider collective={data.Tier.collective}>
             <TierPageContent

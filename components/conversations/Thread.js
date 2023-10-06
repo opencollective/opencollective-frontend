@@ -40,7 +40,16 @@ const ItemContainer = styled.div`
 /**
  * A thread is meant to display comments and activities in a chronological order.
  */
-const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasMore, fetchMore }) => {
+const Thread = ({
+  collective,
+  items,
+  onCommentDeleted,
+  LoggedInUser,
+  theme,
+  hasMore,
+  fetchMore,
+  getClickedComment,
+}) => {
   const [loading, setLoading] = React.useState(false);
 
   if (!items || items.length === 0) {
@@ -80,6 +89,7 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
                       canReply={Boolean(LoggedInUser)}
                       onDelete={onCommentDeleted}
                       reactions={item.reactions}
+                      onReplyClick={getClickedComment}
                     />
                   </ItemContainer>
                 </Flex>
@@ -104,7 +114,7 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
             return null;
         }
       })}
-      <hr />
+      <hr className="my-5" />
       {hasMore && fetchMore && (
         <Container margin="0.65rem">
           <StyledButton onClick={handleLoadMore} loading={loading} textTransform="capitalize">
@@ -138,6 +148,7 @@ Thread.propTypes = {
   LoggedInUser: PropTypes.object,
   /** @ignore from withTheme */
   theme: PropTypes.object,
+  getClickedComment: PropTypes.func,
 };
 
 export default React.memo(withUser(withTheme(Thread)));

@@ -37,12 +37,14 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
           isActive
           isHost
           policies {
+            id
             REQUIRE_2FA_FOR_ADMINS
           }
           ... on AccountWithParent {
             parent {
               id
               policies {
+                id
                 REQUIRE_2FA_FOR_ADMINS
               }
             }

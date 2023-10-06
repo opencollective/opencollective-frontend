@@ -88,23 +88,26 @@ export const searchQuery = gql`
 const CardContainer = styled.div`
   border-radius: 16px;
   cursor: crosshair;
-  transition: box-shadow 0.3s;
+  transition:
+    box-shadow 0.3s,
+    outline 0.3s;
   &:hover {
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   }
   ${props =>
     props.$isSelected &&
     css`
-      box-shadow: 0px 0px 10px red;
+      box-shadow: 0px 0px 5px red;
+      outline: 1px solid red;
       &:hover {
-        box-shadow: 0px 0px 5px red;
+        box-shadow: 0px 0px 10px red;
       }
     `}
 `;
 
 const AccountsContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   grid-gap: 20px;
   margin-top: 20px;
 `;
@@ -188,7 +191,8 @@ const BanAccountsWithSearch = () => {
                   title={truncate(stripHTML(account.longDescription), { length: 256 })}
                 >
                   <div>
-                    <hr />
+                    <hr className="my-5" />
+
                     <Box>
                       <strong>Received</strong>:{' '}
                       {formatCurrency(account.stats.totalAmountReceived.valueInCents, account.currency)}

@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import Container from '../Container';
 import { Box } from '../Grid';
-import PendingApplications from '../host-dashboard/applications/PendingApplications';
+import HostApplications from '../host-dashboard/applications/HostApplications';
 import HostDashboardExpenses from '../host-dashboard/HostDashboardExpenses';
 import HostDashboardHostedCollectives from '../host-dashboard/HostDashboardHostedCollectives';
 import HostDashboardReports from '../host-dashboard/HostDashboardReports';
@@ -35,7 +35,8 @@ const ADMIN_PANEL_SECTIONS = {
   [HOST_DASHBOARD_SECTIONS.FINANCIAL_CONTRIBUTIONS]: FinancialContributions,
   [HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS]: PendingContributions,
   [HOST_DASHBOARD_SECTIONS.EXPENSES]: HostDashboardExpenses,
-  [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: PendingApplications,
+  [HOST_DASHBOARD_SECTIONS.HOST_APPLICATIONS]: HostApplications,
+  [HOST_DASHBOARD_SECTIONS.PENDING_APPLICATIONS]: HostApplications,
   [HOST_DASHBOARD_SECTIONS.REPORTS]: HostDashboardReports,
   [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
   [HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,

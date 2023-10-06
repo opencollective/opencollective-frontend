@@ -19,6 +19,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
+import { itemHasOCR } from './lib/ocr';
 
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
@@ -42,6 +43,7 @@ import { H1, H5, Span } from '../Text';
 
 import { editExpenseMutation } from './graphql/mutations';
 import { expensePageQuery } from './graphql/queries';
+import { ConfirmOCRValues } from './ConfirmOCRValues';
 import ExpenseForm, { msg as expenseFormMsg, prepareExpenseForSubmit } from './ExpenseForm';
 import ExpenseInviteNotificationBanner from './ExpenseInviteNotificationBanner';
 import ExpenseMissingReceiptNotificationBanner from './ExpenseMissingReceiptNotificationBanner';
@@ -118,6 +120,10 @@ function Expense(props) {
     showFilesViewerModal: false,
   });
   const [openUrl, setOpenUrl] = useState(null);
+  const [replyingToComment, setReplyingToComment] = useState(null);
+  const [hasConfirmedOCR, setConfirmedOCR] = useState(false);
+  const hasItemsWithOCR = Boolean(state.editedExpense?.items?.some(itemHasOCR));
+  const mustConfirmOCR = hasItemsWithOCR && !hasConfirmedOCR;
   const pollingInterval = 60;
   let pollingTimeout = null;
   let pollingStarted = false;
@@ -372,7 +378,7 @@ function Expense(props) {
         data-cy="save-expense-btn"
         onClick={() => onSummarySubmit(state.editedExpense)}
         loading={state.isSubmitting}
-        disabled={isDraft ? !loggedInAccount && !state.tos : false}
+        disabled={isDraft ? !loggedInAccount && !state.tos : mustConfirmOCR}
       >
         {isDraft && !loggedInAccount ? (
           <FormattedMessage id="Expense.JoinAndSubmit" defaultMessage="Join and Submit" />
@@ -577,6 +583,13 @@ function Expense(props) {
                 </Fragment>
               )}
               {!isDraft && <ExpenseNotesForm onChange={onNotesChanges} defaultValue={expense.privateMessage} />}
+              {hasItemsWithOCR && (
+                <ConfirmOCRValues
+                  onConfirm={setConfirmedOCR}
+                  items={state.editedExpense.items}
+                  currency={state.editedExpense.currency}
+                />
+              )}
               {isRecurring && <ExpenseRecurringBanner expense={expense} />}
               {drawerActionsContainer ? (
                 createPortal(confirmSaveButtons, drawerActionsContainer)
@@ -644,6 +657,7 @@ function Expense(props) {
                 fetchMore={fetchMoreComments}
                 onCommentDeleted={onCommentDeleted}
                 loading={loading}
+                getClickedComment={setReplyingToComment}
               />
             ) : null}
           </Box>
@@ -655,6 +669,7 @@ function Expense(props) {
               </Box>
               <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
                 <CommentForm
+                  replyingToComment={replyingToComment}
                   id="new-comment-on-expense"
                   ExpenseId={expense && expense.id}
                   disabled={!expense}

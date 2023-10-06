@@ -50,6 +50,9 @@ export const managedOrderFragment = gql`
       slug
       isIncognito
       type
+      ... on Individual {
+        isGuest
+      }
     }
     toAccount {
       id

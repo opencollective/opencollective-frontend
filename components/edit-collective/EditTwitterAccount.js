@@ -7,11 +7,11 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { gqlV1 } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
-import InputSwitch from '../InputSwitch';
 import StyledButton from '../StyledButton';
 import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
 import { TOAST_TYPE, withToasts } from '../ToastProvider';
+import { Switch } from '../ui/Switch';
 
 const DEFAULT_TWEETS = {
   newBacker: '{backerTwitterHandle} thank you for your contribution of {amount} 🙏 - it makes a difference!',
@@ -144,11 +144,11 @@ class EditTwitterAccount extends React.Component {
             </Label>
           </Box>
           <div>
-            <InputSwitch
+            <Switch
               id={`${notificationType}.active`}
               name={`${notificationType}.active`}
               checked={connectedAccount.settings[notificationType].active}
-              onChange={event => this.handleChange(notificationType, 'active', event.target.checked)}
+              onCheckedChange={checked => this.handleChange(notificationType, 'active', checked)}
             />
           </div>
         </Flex>

@@ -24,7 +24,6 @@ import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledSpinner from '../StyledSpinner';
-import { H1 } from '../Text';
 
 import { getDefaultKinds, parseTransactionKinds } from './filters/TransactionsKindFilter';
 import { parseTransactionPaymentMethodTypes } from './filters/TransactionsPaymentMethodTypeFilter';
@@ -95,7 +94,7 @@ const Transactions = ({
   });
 
   const transactionsRoute = isDashboard
-    ? `/workspace/${account?.slug}/transactions`
+    ? `/dashboard/${account?.slug}/transactions`
     : `${getCollectivePageCanonicalURL(account)}/transactions`;
 
   // Refetch data when user logs in or out
@@ -190,29 +189,20 @@ const Transactions = ({
 
   return (
     <Container>
-      <Flex justifyContent="space-between" alignItems="baseline" gap="16px">
-        <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+      <div className="flex flex-wrap justify-between gap-4">
+        <h1 className={isDashboard ? 'text-2xl font-bold leading-10 tracking-tight' : 'text-[32px] leading-10'}>
           <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
-        </H1>
-        <Box flexGrow={[1, 0]}>
+        </h1>
+        <div className="flex-grow sm:flex-grow-0">
           <SearchBar
             placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…' })}
             defaultValue={router.query.searchTerm}
             height="40px"
             onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
           />
-        </Box>
-      </Flex>
-      <Flex
-        mb={['8px', '23px']}
-        mt={4}
-        mx="8px"
-        flexDirection={['column', 'row']}
-        flexWrap={['wrap', null, null, null, 'nowrap']}
-        justifyContent="flex-end"
-        alignItems={['stretch', 'flex-end']}
-        gap="8px"
-      >
+        </div>
+      </div>
+      <div className="mx-2 my-2 flex flex-col items-stretch gap-2 md:flex-row md:flex-wrap md:items-end">
         <TransactionsFilters
           filters={router.query}
           kinds={transactions?.kinds}
@@ -220,7 +210,7 @@ const Transactions = ({
           collective={account}
           onChange={queryParams => updateFilters({ ...queryParams, offset: null })}
         />
-        <Flex justifyContent="space-evenly">
+        <div className="flex justify-evenly">
           {canDownloadInvoices && (
             <Link href={`/${account.slug}/admin/payment-receipts`}>
               <StyledButton
@@ -228,7 +218,6 @@ const Transactions = ({
                 minWidth={140}
                 height={38}
                 width="100%"
-                mb="8px"
                 p="6px 10px"
                 isBorderless
                 whiteSpace="nowrap"
@@ -239,8 +228,8 @@ const Transactions = ({
             </Link>
           )}
           <TransactionsDownloadCSV collective={account} query={router.query} width="100%" />
-        </Flex>
-      </Flex>
+        </div>
+      </div>
 
       <Flex
         mx="8px"

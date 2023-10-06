@@ -52,21 +52,21 @@ describe('New expense flow', () => {
 
       // Upload 2 files to the multi-files dropzone
       cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
-        {
-          contents: 'test/cypress/fixtures/images/receipt.jpg',
-          fileName: 'receipt0.jpg',
-          mimeType: 'image/jpeg',
-        },
+        [
+          {
+            contents: 'test/cypress/fixtures/images/receipt.jpg',
+            fileName: 'receipt0.jpg',
+            mimeType: 'image/jpeg',
+          },
+          {
+            contents: 'test/cypress/fixtures/images/receipt.jpg',
+            fileName: 'receipt1.jpg',
+            mimeType: 'image/jpeg',
+          },
+        ],
         { action: 'drag-drop' },
       );
-      cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
-        {
-          contents: 'test/cypress/fixtures/images/receipt.jpg',
-          fileName: 'receipt1.jpg',
-          mimeType: 'image/jpeg',
-        },
-        { action: 'drag-drop' },
-      );
+
       cy.getByDataCy('expense-attachment-form').should('have.length', 2);
 
       // Fill info for first attachment
@@ -246,7 +246,7 @@ describe('New expense flow', () => {
     });
 
     describe('submit on behalf', () => {
-      it('can invite an existing user to submit an expense', () => {
+      it('can invite an existing user to submit an expense and edit the submitted draft', () => {
         cy.getByDataCy('radio-expense-type-INVOICE').click();
 
         cy.getByDataCy('select-expense-payee').click();
@@ -256,6 +256,7 @@ describe('New expense flow', () => {
         // TODO: Make sure there's no payout method input visible
 
         cy.get('textarea[name="description"]').type('Service Invoice');
+        cy.get('input[name="items[0].description"]').type('Item 1');
         cy.get('input[name="items[0].amount"]').type('{selectall}4200');
         cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
 
@@ -268,6 +269,24 @@ describe('New expense flow', () => {
           'contain',
           `An invitation to submit this expense has been sent to`,
         );
+
+        // Edits the Draft
+        cy.getByDataCy('more-actions').click();
+        cy.getByDataCy('edit-expense-btn').should('exist'); // wait for form to be submitted
+        cy.getByDataCy('edit-expense-btn').click({ force: true });
+        cy.get('textarea[name="invoiceInfo"]').type('VAT ES 123123');
+        cy.getByDataCy('expense-next').click();
+        cy.get('textarea[name="description"]').type('{selectall}Edited Service Invoice');
+        cy.get('input[name="items[0].amount"]').type('{selectall}420');
+
+        cy.getByDataCy('expense-summary-btn').click();
+        cy.getByDataCy('save-expense-btn').click();
+        cy.wait(500);
+
+        cy.getByDataCy('expense-status-msg').should('contain', 'Draft');
+        cy.getByDataCy('expense-description').should('contain', 'Edited Service Invoice');
+        cy.getByDataCy('expense-summary-invoice-info').should('contain', 'VAT ES 123123');
+        cy.getByDataCy('expense-items-total-amount').should('contain', '$420.00');
       });
 
       it('can invite a third-party user to submit an expense', () => {

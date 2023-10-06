@@ -16,6 +16,7 @@ import Loading from '../../Loading';
 import Pagination from '../../Pagination';
 import { P } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
 import VirtualCardsTable from '../../virtual-cards/VirtualCardsTable';
 import VirtualCardFilters from '../../VirtualCardFilters';
 
@@ -190,10 +191,10 @@ const HostVirtualCards = props => {
   return (
     <Fragment>
       <Box>
-        <P fontSize="24px" fontWeight="700" lineHeight="32px" mb={3}>
+        <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
-        </P>
-        <P>
+        </h1>
+        <p className="mb-4 text-muted-foreground">
           <FormattedMessage
             id="Host.VirtualCards.List.Description"
             defaultMessage="Make payments easier by creating virtual cards. One Collective can have multiple virtual cards. <learnMoreLink>Learn more</learnMoreLink>"
@@ -204,7 +205,8 @@ const HostVirtualCards = props => {
               }),
             }}
           />
-        </P>
+        </p>
+        <StripeVirtualCardComplianceStatement />
         <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters
             loading={loading}

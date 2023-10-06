@@ -24,6 +24,9 @@ const ButtonItem = styled(StyledButton)<ButtonItemProps>`
   &:active p {
     color: white;
   }
+  a {
+    color: ${themeGet('colors.primary.600')};
+  }
   &:hover,
   &:focus {
     /* Use a higher z-index on hover to get all the borders colored */

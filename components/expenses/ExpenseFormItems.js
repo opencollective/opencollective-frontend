@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
-import { isEmpty } from 'lodash';
+import { filter, isEmpty, range, some } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -9,7 +9,7 @@ import { formatErrorMessage } from '../../lib/errors';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemsMustHaveFiles, newExpenseItem } from './lib/items';
-import { updateExpenseFormWithUploadResult } from './lib/ocr';
+import { compareItemOCRValues, itemHasOCR, updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
@@ -141,8 +141,20 @@ class ExpenseFormItems extends React.PureComponent {
     }
   }
 
+  getUploadingItemsIndexes() {
+    const { items } = this.props.form.values;
+    return filter(range(items.length), index => items[index].__isUploadingFromMultiDropzone);
+  }
+
+  getItemsOCRComparisons(items) {
+    return items.reduce((comparisons, item) => {
+      comparisons[item.id] = compareItemOCRValues(item, this.props.form.values.currency);
+      return comparisons;
+    }, {});
+  }
+
   render() {
-    const { availableCurrencies, hasOCRFeature } = this.props;
+    const { availableCurrencies, hasOCRFeature, collective } = this.props;
     const { values, errors, setFieldValue } = this.props.form;
     const requireFile = expenseItemsMustHaveFiles(values.type);
     const isGrant = values.type === expenseTypes.GRANT;
@@ -150,6 +162,12 @@ class ExpenseFormItems extends React.PureComponent {
     const isCreditCardCharge = values.type === expenseTypes.CHARGE;
     const items = values.items || [];
     const hasItems = items.length > 0;
+    const itemsWithOCR = items.filter(itemHasOCR);
+    const itemsOCRComparisons = this.getItemsOCRComparisons(itemsWithOCR);
+    const ocrMismatchWarningFields = ['amount', 'incurredAt'];
+    const hasOCRWarnings = some(itemsOCRComparisons, comparison =>
+      some(comparison, (value, field) => ocrMismatchWarningFields.includes(field) && value.hasMismatch),
+    );
 
     if (!hasItems && requireFile) {
       return (
@@ -160,13 +178,28 @@ class ExpenseFormItems extends React.PureComponent {
             kind="EXPENSE_ITEM"
             data-cy="expense-multi-attachments-dropzone"
             onSuccess={files => filesListToItems(files).map(this.props.push)}
-            onReject={uploadErrors => this.setState({ uploadErrors })}
+            onReject={uploadErrors => {
+              this.setState({ uploadErrors });
+              // Remove the dummy items added by this component
+              const otherItems = this.props.form.values.items.filter(item => !item.__isUploadingFromMultiDropzone);
+              this.props.form.setFieldValue('items', otherItems);
+            }}
             mockImageGenerator={index => `https://loremflickr.com/120/120/invoice?lock=${index}`}
             mb={3}
             useGraphQL={hasOCRFeature}
             parseDocument={hasOCRFeature}
+            onDrop={files => {
+              // Insert dummy items to display the loading states when uploading through GraphQL
+              if (hasOCRFeature) {
+                this.props.form.setFieldValue(
+                  'items',
+                  files.map(file => newExpenseItem({ __isUploadingFromMultiDropzone: true, __file: file })),
+                );
+              }
+            }}
             onGraphQLSuccess={uploadResults => {
-              updateExpenseFormWithUploadResult(this.props.form, uploadResults);
+              const indexesToUpdate = this.getUploadingItemsIndexes();
+              updateExpenseFormWithUploadResult(collective, this.props.form, uploadResults, indexesToUpdate);
             }}
           >
             <P color="black.700" mt={1} px={2}>
@@ -205,10 +238,19 @@ class ExpenseFormItems extends React.PureComponent {
             availableCurrencies={availableCurrencies}
             onCurrencyChange={async value => await this.onCurrencyChange(value)}
             isInvoice={isInvoice}
-            isLastItem={index === items.length - 1}
             hasOCRFeature={hasOCRFeature}
+            collective={collective}
+            ocrComparison={itemsOCRComparisons[attachment.id]}
           />
         ))}
+        {itemsWithOCR.length > 0 && (
+          <MessageBox type={hasOCRWarnings ? 'warning' : 'info'} withIcon mt={3}>
+            <FormattedMessage
+              defaultMessage="Please confirm the {count,plural,one{date and amount} other{dates and amounts}} before proceeding."
+              values={{ count: itemsWithOCR.length }}
+            />
+          </MessageBox>
+        )}
         {taxType && (
           <div>
             <Flex alignItems="center" mt={24}>

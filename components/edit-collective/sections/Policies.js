@@ -59,6 +59,7 @@ const setPoliciesMutation = gql`
     setPolicies(account: $account, policies: $policies) {
       id
       policies {
+        id
         EXPENSE_AUTHOR_CANNOT_APPROVE {
           enabled
           amountInCents
@@ -256,7 +257,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
 
   React.useEffect(() => {
     if (data) {
-      formik.setFieldValue('policies', omitDeep(data?.account?.policies || {}, ['__typename']));
+      formik.setFieldValue('policies', omitDeep(data?.account?.policies || {}, ['__typename', 'id']));
     }
   }, [data]);
 

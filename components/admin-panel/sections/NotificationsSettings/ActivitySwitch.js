@@ -9,9 +9,9 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 
 import { Box, Flex } from '../../../Grid';
-import InputSwitch from '../../../InputSwitch';
 import StyledTooltip from '../../../StyledTooltip';
 import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
+import { Switch } from '../../../ui/Switch';
 
 import { accountActivitySubscriptionsFragment } from './fragments';
 
@@ -95,13 +95,11 @@ const ActivitySwitch = ({ account, activityType }) => {
       ) : (
         <Box width="16px" />
       )}
-      <InputSwitch
+      <Switch
         name={`${activityType}-switch`}
         checked={isSubscribed}
         disabled={isOverridedByAll}
-        onChange={event =>
-          handleToggle({ type: activityType, account: { id: account.id }, active: event.target.checked })
-        }
+        onCheckedChange={checked => handleToggle({ type: activityType, account: { id: account.id }, active: checked })}
       />
     </Flex>
   );

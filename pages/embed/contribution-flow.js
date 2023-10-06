@@ -141,7 +141,6 @@ class EmbedContributionFlowPage extends React.Component {
 }
 
 const addContributionFlowData = graphql(contributionFlowAccountQuery, {
-  skip: props => Boolean(props.tierId),
   options: props => ({
     variables: { collectiveSlug: props.collectiveSlug, tierId: props.tierId, includeTier: Boolean(props.tierId) },
     context: API_V2_CONTEXT,

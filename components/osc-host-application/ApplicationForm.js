@@ -5,7 +5,7 @@ import { ArrowLeft2 } from '@styled-icons/icomoon/ArrowLeft2';
 import { ArrowRight2 } from '@styled-icons/icomoon/ArrowRight2';
 import { Form, Formik } from 'formik';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import spdxLicenses from 'spdx-license-list';
 
 import { suggestSlug } from '../../lib/collective.lib';
@@ -19,6 +19,7 @@ import {
   verifyURLPattern,
 } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { i18nLabels } from '../../lib/i18n/custom-application-form';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import NextIllustration from '../collectives/HomeNextIllustration';
@@ -98,108 +99,6 @@ const applyToHostMutation = gql`
     }
   }
 `;
-
-const messages = defineMessages({
-  nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: 'Collective name' },
-  suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
-  descriptionLabel: {
-    id: 'createCollective.form.descriptionLabel',
-    defaultMessage: 'What does your Collective do?',
-  },
-  tagsLabel: { id: 'Tags', defaultMessage: 'Tags' },
-  descriptionHint: {
-    id: 'createCollective.form.descriptionHint',
-    defaultMessage: 'Write a short description (150 characters max)',
-  },
-  descriptionPlaceholder: {
-    id: 'create.collective.placeholder',
-    defaultMessage: 'Making the world a better place',
-  },
-  errorSlugHyphen: {
-    id: 'createCollective.form.error.slug.hyphen',
-    defaultMessage: 'Collective handle cannot start or end with a hyphen',
-  },
-  name: {
-    id: 'OCFHostApplication.name.label',
-    defaultMessage: 'Your Name',
-  },
-  email: {
-    id: 'Form.yourEmail',
-    defaultMessage: 'Your email address',
-  },
-  slug: {
-    id: 'createCollective.form.slugLabel',
-    defaultMessage: 'Set your profile URL',
-  },
-  repositoryUrl: {
-    id: 'HostApplication.form.RepositoryUrlLabel',
-    defaultMessage: 'Your Repository or Organization',
-  },
-  repositoryLicense: {
-    id: 'HostApplication.form.license',
-    defaultMessage: 'License',
-  },
-  tellUsMoreLabel: {
-    id: 'HostApplication.form.tellUsMoreLabel',
-    defaultMessage: "Tell us a little about your project, what you're working on and what you need from us.",
-  },
-  tellUsMorePlaceholder: {
-    id: 'HostApplication.form.tellUsMorePlaceHolder',
-    defaultMessage: 'Please include all the info you think is valuable of your Collective',
-  },
-  tellUsMoreHelpText: {
-    id: 'HostApplication.form.tellUsMoreHelpText',
-    defaultMessage: 'We want to know more about you and how we can help you.',
-  },
-  linksToPreviousEvents: {
-    id: 'HostApplication.form.linksToPreviousEvents',
-    defaultMessage: 'Links to previous events (if any)',
-  },
-  linksToPreviousEventsPlaceholder: {
-    id: 'HostApplication.form.linksToPreviousEventsPlaceholder',
-    defaultMessage: 'Enter URL of previous events.',
-  },
-  linksToPreviousEventsHelpText: {
-    id: 'HostApplication.form.linksToPreviousEventsHelpText',
-    defaultMessage:
-      'YouTube, Discord, Disqus, Meetup, Eventbrite events etc are all welcome. We just want to understand your community presence.',
-  },
-  amountOfMembers: {
-    id: 'HostApplication.form.amountOfMembers',
-    defaultMessage: 'How many members do you have?',
-  },
-  extraLicenseInfo: {
-    id: 'HostApplication.form.extraLicenseInfo',
-    defaultMessage: 'Extra information about your license(s)',
-  },
-  extraLicenseInfoHelpText: {
-    id: 'HostApplication.form.extraLicenseInfoHelpText',
-    defaultMessage: 'If your license is unrecognized or have more than one license, add information here',
-  },
-  publicInformation: {
-    id: 'HostApplication.form.publicInformation',
-    defaultMessage:
-      'This information is public. Please do not add any personal information such as names or addresses in this field.',
-  },
-  aboutYourCommunityTitle: {
-    id: 'HostApplication.form.aboutYourCommunity',
-    defaultMessage: 'About your Community {optional}',
-  },
-  aboutYourCommunitySubtitle: {
-    id: 'HostApplication.form.aboutYourCommunity.subtitle',
-    defaultMessage:
-      'If applicable, please share information about your community and your events so we can properly consider your application.',
-  },
-  aboutYourCodeTitle: {
-    id: 'HostApplication.form.code',
-    defaultMessage: 'About your Code {optional}',
-  },
-  aboutYourCodeSubtitle: {
-    id: 'HostApplication.form.code.subtitle',
-    defaultMessage:
-      "If a codebase is central to your community's work please share information about your code and license so we can properly consider your application.",
-  },
-});
 
 const useApplicationMutation = canApplyWithCollective =>
   useMutation(canApplyWithCollective ? applyToHostMutation : createCollectiveMutation, {
@@ -401,7 +300,7 @@ const ApplicationForm = ({
                         <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} py={2}>
                           <Box>
                             <StyledInputFormikField
-                              label={intl.formatMessage(messages.name)}
+                              label={intl.formatMessage(i18nLabels.name)}
                               labelFontSize="16px"
                               labelProps={{ fontWeight: '600' }}
                               disabled={!!LoggedInUser}
@@ -417,7 +316,7 @@ const ApplicationForm = ({
                           </Box>
                           <Box>
                             <StyledInputFormikField
-                              label={intl.formatMessage(messages.email)}
+                              label={intl.formatMessage(i18nLabels.email)}
                               labelFontSize="16px"
                               labelProps={{ fontWeight: '600' }}
                               disabled={!!LoggedInUser}
@@ -444,7 +343,7 @@ const ApplicationForm = ({
                           <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} mb={3}>
                             <Box>
                               <StyledInputFormikField
-                                label={intl.formatMessage(messages.nameLabel)}
+                                label={intl.formatMessage(i18nLabels.nameLabel)}
                                 labelFontSize="16px"
                                 labelProps={{ fontWeight: '600' }}
                                 name="collective.name"
@@ -459,7 +358,7 @@ const ApplicationForm = ({
                             </Box>
                             <Box>
                               <StyledInputFormikField
-                                label={intl.formatMessage(messages.slug)}
+                                label={intl.formatMessage(i18nLabels.slug)}
                                 helpText={<FormattedMessage defaultMessage="This can be edited later" />}
                                 labelFontSize="16px"
                                 labelProps={{ fontWeight: '600' }}
@@ -492,7 +391,7 @@ const ApplicationForm = ({
                               htmlFor="description"
                               labelFontSize="16px"
                               labelProps={{ fontWeight: '600' }}
-                              label={intl.formatMessage(messages.descriptionLabel)}
+                              label={intl.formatMessage(i18nLabels.descriptionLabel)}
                               required
                               data-cy="ccf-form-description"
                             >
@@ -504,12 +403,12 @@ const ApplicationForm = ({
                                   maxLength={150}
                                   showCount
                                   fontSize="14px"
-                                  placeholder={intl.formatMessage(messages.descriptionPlaceholder)}
+                                  placeholder={intl.formatMessage(i18nLabels.descriptionPlaceholder)}
                                 />
                               )}
                             </StyledInputFormikField>
                             <P fontSize="13px" lineHeight="20px" color="black.600" mt="6px">
-                              {intl.formatMessage(messages.descriptionHint)}
+                              {intl.formatMessage(i18nLabels.descriptionHint)}
                             </P>
                           </Box>
                           <Box>
@@ -518,7 +417,7 @@ const ApplicationForm = ({
                               htmlFor="tags"
                               labelFontSize="16px"
                               labelProps={{ fontWeight: '600' }}
-                              label={intl.formatMessage(messages.tagsLabel)}
+                              label={intl.formatMessage(i18nLabels.tagsLabel)}
                               data-cy="ccf-form-tags"
                             >
                               {({ field }) => (
@@ -582,7 +481,7 @@ const ApplicationForm = ({
                       </StyledInputFormikField>
 
                       <CollapseSection
-                        title={intl.formatMessage(messages.aboutYourCodeTitle, {
+                        title={intl.formatMessage(i18nLabels.aboutYourCodeTitle, {
                           optional:
                             values.applicationData.typeOfProject === 'COMMUNITY' ? (
                               <Span fontWeight={400} color="black.700">
@@ -593,12 +492,12 @@ const ApplicationForm = ({
                         isExpanded={codeSectionExpanded}
                         toggleExpanded={() => setCodeSectionExpanded(!codeSectionExpanded)}
                         imageSrc="/static/images/night-sky.png"
-                        subtitle={intl.formatMessage(messages.aboutYourCodeSubtitle)}
+                        subtitle={intl.formatMessage(i18nLabels.aboutYourCodeSubtitle)}
                       >
                         <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} pt={2}>
                           <Box>
                             <StyledInputFormikField
-                              label={intl.formatMessage(messages.repositoryUrl)}
+                              label={intl.formatMessage(i18nLabels.repositoryUrl)}
                               labelFontSize="16px"
                               labelProps={{ fontWeight: '600' }}
                               name="applicationData.repositoryUrl"
@@ -623,7 +522,7 @@ const ApplicationForm = ({
                           </Box>
 
                           <StyledInputFormikField
-                            label={intl.formatMessage(messages.repositoryLicense)}
+                            label={intl.formatMessage(i18nLabels.repositoryLicense)}
                             labelFontSize="16px"
                             labelProps={{ fontWeight: '600' }}
                             name="applicationData.licenseSpdxId"
@@ -651,25 +550,25 @@ const ApplicationForm = ({
                             htmlFor="extraLicenseInformation"
                             labelFontSize="16px"
                             labelProps={{ fontWeight: '600' }}
-                            label={intl.formatMessage(messages.extraLicenseInfo)}
+                            label={intl.formatMessage(i18nLabels.extraLicenseInfo)}
                           >
                             {({ field }) => (
                               <StyledTextarea
                                 {...field}
                                 rows={4}
                                 fontSize="14px"
-                                placeholder={intl.formatMessage(messages.extraLicenseInfoHelpText)}
+                                placeholder={intl.formatMessage(i18nLabels.extraLicenseInfoHelpText)}
                               />
                             )}
                           </StyledInputFormikField>
                           <P fontSize="13px" lineHeight="20px" color="black.700" mt={2}>
-                            <FormattedMessage {...messages.extraLicenseInfoHelpText} />
+                            <FormattedMessage {...i18nLabels.extraLicenseInfoHelpText} />
                           </P>
                         </Box>
                       </CollapseSection>
 
                       <CollapseSection
-                        title={intl.formatMessage(messages.aboutYourCommunityTitle, {
+                        title={intl.formatMessage(i18nLabels.aboutYourCommunityTitle, {
                           optional:
                             values.applicationData.typeOfProject === 'CODE' ? (
                               <Span fontWeight={400} color="black.700">
@@ -680,12 +579,12 @@ const ApplicationForm = ({
                         isExpanded={communitySectionExpanded}
                         toggleExpanded={() => setCommunitySectionExpanded(!communitySectionExpanded)}
                         imageSrc="/static/images/community.png"
-                        subtitle={intl.formatMessage(messages.aboutYourCommunitySubtitle)}
+                        subtitle={intl.formatMessage(i18nLabels.aboutYourCommunitySubtitle)}
                       >
                         <Grid gridTemplateColumns={['1fr', 'repeat(2, minmax(0, 1fr))']} gridGap={3} pt={2}>
                           <Box>
                             <StyledInputFormikField
-                              label={intl.formatMessage(messages.amountOfMembers)}
+                              label={intl.formatMessage(i18nLabels.amountOfMembers)}
                               labelFontSize="16px"
                               labelProps={{ fontWeight: '600' }}
                               name="applicationData.amountOfMembers"
@@ -709,19 +608,19 @@ const ApplicationForm = ({
                             htmlFor="previousEvents"
                             labelFontSize="16px"
                             labelProps={{ fontWeight: '600' }}
-                            label={intl.formatMessage(messages.linksToPreviousEvents)}
+                            label={intl.formatMessage(i18nLabels.linksToPreviousEvents)}
                           >
                             {({ field }) => (
                               <StyledTextarea
                                 {...field}
                                 rows={4}
                                 fontSize="14px"
-                                placeholder={intl.formatMessage(messages.linksToPreviousEventsPlaceholder)}
+                                placeholder={intl.formatMessage(i18nLabels.linksToPreviousEventsPlaceholder)}
                               />
                             )}
                           </StyledInputFormikField>
                           <P fontSize="13px" lineHeight="20px" color="black.700" mt={2}>
-                            <FormattedMessage {...messages.linksToPreviousEventsHelpText} />
+                            <FormattedMessage {...i18nLabels.linksToPreviousEventsHelpText} />
                           </P>
                         </Box>
                       </CollapseSection>
@@ -808,7 +707,7 @@ const ApplicationForm = ({
                           required={true}
                           labelFontSize="16px"
                           labelProps={{ fontWeight: '600' }}
-                          label={intl.formatMessage(messages.tellUsMoreLabel)}
+                          label={intl.formatMessage(i18nLabels.tellUsMoreLabel)}
                           data-cy="ccf-form-message"
                         >
                           {({ field }) => (
@@ -816,12 +715,12 @@ const ApplicationForm = ({
                               {...field}
                               rows={6}
                               fontSize="14px"
-                              placeholder={intl.formatMessage(messages.tellUsMorePlaceholder)}
+                              placeholder={intl.formatMessage(i18nLabels.tellUsMorePlaceholder)}
                             />
                           )}
                         </StyledInputFormikField>
                         <P fontSize="13px" lineHeight="20px" color="black.700" mt={2}>
-                          <FormattedMessage {...messages.tellUsMoreHelpText} />
+                          <FormattedMessage {...i18nLabels.tellUsMoreHelpText} />
                         </P>
                       </Box>
 

@@ -1,29 +1,29 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { flatten } from 'lodash';
+import { ArrowRight, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
+import { HELP_MESSAGE } from '../../../../lib/constants/dismissable-help-message';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { WorkspaceHomeQuery } from '../../../../lib/graphql/types/v2/graphql';
 import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 
-import Container from '../../../Container';
+import DismissibleMessage from '../../../DismissibleMessage';
 import ExpenseDrawer from '../../../expenses/ExpenseDrawer';
 import { Flex } from '../../../Grid';
 import Image from '../../../Image';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
-import StyledLink from '../../../StyledLink';
 import { makeTruncatedValueAllSelectedLabelContainer, StyledSelectFilter } from '../../../StyledSelectFilter';
-import { H1, H2, P } from '../../../Text';
+import { H2 } from '../../../Text';
+import { Alert, AlertDescription, AlertTitle } from '../../../ui/Alert';
 import { AdminSectionProps } from '../../types';
 
 import { workspaceHomeQuery } from './query';
 import TimelineItem from './TimelineItem';
-
 const PAGE_SIZE = 20;
 
 const REACT_SELECT_COMPONENT_OVERRIDE = {
@@ -32,11 +32,6 @@ const REACT_SELECT_COMPONENT_OVERRIDE = {
   ),
   MultiValue: () => null, // Items will be displayed as a truncated string in `TruncatedValueContainer `
 };
-
-const Banner = styled(Flex)`
-  border-radius: 16px;
-  border: 1px solid ${({ theme }) => theme.colors.black[200]};
-`;
 
 const getFilterOptions = intl => [
   { value: 'EXPENSES,VIRTUAL_CARDS', label: intl.formatMessage(ActivityClassesI18N['expenses.title']) },
@@ -73,117 +68,153 @@ const Home = (props: AdminSectionProps) => {
   }, [error, data]);
 
   return (
-    <Container maxWidth={'100%'}>
-      <H1 fontSize="24px" lineHeight="32px" fontWeight="700">
-        <FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />
-      </H1>
-      <P mt={2} fontSize="14px" fontWeight="400" color="black.700">
-        <FormattedMessage
-          id="Dashboard.Home.Subtitle"
-          defaultMessage="A quick look at all that is relevant for you inside Open Collective"
-        />
-      </P>
-      <Banner mt="48px" p="16px 16px 24px 16px" flexDirection="column">
-        <Flex alignItems="center" gap="16px">
-          <Image alt="" width={96} height={96} src="/static/images/dashboard.png" />
-          <H1 fontSize="24px" lineHeight="32px" fontWeight="700">
-            <FormattedMessage id="Dashboard.Banner.Title" defaultMessage="This is your new workspace" />
-          </H1>
-        </Flex>
-        <P mt="24px" fontSize="14px" fontWeight="400" lineHeight="24px" color="black.700">
-          <FormattedMessage
-            id="Dashboard.Banner.Description"
-            defaultMessage="We created this new space for you to keep on top of everything you need to do financially for your community, team account management, and settings in a unified place that will be the new base of the experience using Open Collective. Welcome!"
-          />
-        </P>
+    <div className="flex flex-col-reverse xl:flex-row">
+      <div className="flex-1">
+        <h1 className="text-2xl font-bold leading-10 tracking-tight">
+          <FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />
+        </h1>
 
-        <P mt="24px" fontSize="13px" fontWeight="500">
-          <StyledLink
-            href="https://docs.google.com/forms/d/1-WGUCUF_i5HPS6AsN8kTfqofyt0q0HB-q7na4cQL788/viewform"
-            openInNewTab
+        <p className="text-muted-foreground">
+          <FormattedMessage
+            id="Dashboard.Home.Subtitle"
+            defaultMessage="The latest news and updates you need to know in Open Collective."
+          />
+        </p>
+
+        <Flex flexDirection="column" mt="48px">
+          <Flex
+            justifyContent="space-between"
+            alignItems={[null, 'center']}
+            flexDirection={['column', 'row']}
+            gap="8px"
           >
-            <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />
-          </StyledLink>
-        </P>
-      </Banner>
-      <Flex flexDirection="column" mt="48px">
-        <Flex justifyContent="space-between" alignItems={[null, 'center']} flexDirection={['column', 'row']} gap="8px">
-          <H2 fontSize="20px" lineHeight="28px" fontWeight="700">
-            <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
-          </H2>
+            <H2 fontSize="20px" lineHeight="28px" fontWeight="700">
+              <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
+            </H2>
 
-          <StyledSelectFilter
-            intl={intl}
-            inputId="activity-filter"
-            isClearable={false}
-            onChange={setFilters}
-            options={filterOptions}
-            components={REACT_SELECT_COMPONENT_OVERRIDE}
-            value={filters}
-            closeMenuOnSelect={false}
-            hideSelectedOptions={false}
-            isMulti
-            maxWidth={['100%', 300]}
-            minWidth={150}
-            styles={{
-              control: { flexWrap: 'nowrap' },
-            }}
-            {...props}
-          />
-        </Flex>
-        <P mt="16px" mb="48px" fontSize="14px" fontWeight="400" color="black.700">
-          <FormattedMessage
-            id="Dashboard.Home.ActivitySubtitle"
-            defaultMessage="Everything that's relevant to you inside Open Collective as a feed."
-          />
-        </P>
-        {error && !isTimelineBeingGenerated ? (
-          <MessageBoxGraphqlError error={error} />
-        ) : isTimelineBeingGenerated || (!activities.length && loading) ? (
-          <React.Fragment>
-            {isTimelineBeingGenerated && (
-              <MessageBox type="info" withIcon mb="24px">
-                <FormattedMessage defaultMessage="Generating activity timeline..." />
+            <StyledSelectFilter
+              intl={intl}
+              inputId="activity-filter"
+              isClearable={false}
+              onChange={setFilters}
+              options={filterOptions}
+              components={REACT_SELECT_COMPONENT_OVERRIDE}
+              value={filters}
+              closeMenuOnSelect={false}
+              hideSelectedOptions={false}
+              isMulti
+              maxWidth={['100%', 300]}
+              minWidth={150}
+              styles={{
+                control: { flexWrap: 'nowrap' },
+              }}
+              {...props}
+            />
+          </Flex>
+          <div className="mt-4 space-y-4">
+            {error && !isTimelineBeingGenerated ? (
+              <MessageBoxGraphqlError error={error} />
+            ) : isTimelineBeingGenerated || (!activities.length && loading) ? (
+              <React.Fragment>
+                {isTimelineBeingGenerated && (
+                  <MessageBox type="info" withIcon mb="24px">
+                    <FormattedMessage defaultMessage="Generating activity timeline..." />
+                  </MessageBox>
+                )}
+                <TimelineItem />
+                <TimelineItem />
+                <TimelineItem />
+                <TimelineItem />
+                <TimelineItem />
+              </React.Fragment>
+            ) : !activities ? (
+              <MessageBox type="info" withIcon>
+                <FormattedMessage defaultMessage="No activity yet" />
               </MessageBox>
+            ) : (
+              activities.map(activity => (
+                <TimelineItem key={activity.id} activity={activity} openExpense={id => setOpenExpenseLegacyId(id)} />
+              ))
             )}
-            <TimelineItem />
-            <TimelineItem />
-            <TimelineItem />
-            <TimelineItem />
-            <TimelineItem />
-          </React.Fragment>
-        ) : !activities ? (
-          <MessageBox type="info" withIcon>
-            <FormattedMessage defaultMessage="No activity yet" />
-          </MessageBox>
-        ) : (
-          activities.map(activity => (
-            <TimelineItem key={activity.id} activity={activity} openExpense={id => setOpenExpenseLegacyId(id)} />
-          ))
-        )}
-        {canViewMore && (
-          <StyledButton
-            mt={2}
-            width="100%"
-            buttonSize="small"
-            loading={loading}
-            onClick={() =>
-              fetchMore({
-                variables: { dateTo: activities[activities.length - 1].createdAt },
-                updateQuery: (prevResult, { fetchMoreResult }) => {
-                  const account = fetchMoreResult?.account;
-                  account.feed = [...prevResult.account.feed, ...account.feed];
-                  return { account };
-                },
-              })
-            }
-          >
-            <FormattedMessage defaultMessage="View more" />
-          </StyledButton>
-        )}
-        <ExpenseDrawer openExpenseLegacyId={openExpenseLegacyId} handleClose={() => setOpenExpenseLegacyId(null)} />
-      </Flex>
-    </Container>
+          </div>
+          {canViewMore && (
+            <StyledButton
+              mt={4}
+              width="100%"
+              buttonSize="small"
+              loading={loading}
+              onClick={() =>
+                fetchMore({
+                  variables: { dateTo: activities[activities.length - 1].createdAt },
+                  updateQuery: (prevResult, { fetchMoreResult }) => {
+                    const account = fetchMoreResult?.account;
+                    account.feed = [...prevResult.account.feed, ...account.feed];
+                    return { account };
+                  },
+                })
+              }
+            >
+              <FormattedMessage defaultMessage="View more" />
+            </StyledButton>
+          )}
+          <ExpenseDrawer openExpenseLegacyId={openExpenseLegacyId} handleClose={() => setOpenExpenseLegacyId(null)} />
+        </Flex>
+      </div>
+      <div className="xl:ml-8 xl:w-64">
+        <DismissibleMessage messageId={HELP_MESSAGE.WELCOME_TO_DASHBOARD}>
+          {({ dismiss }) => (
+            <Alert className="relative mb-8 flex items-start gap-4 fade-in">
+              <Image
+                className="block h-12 w-12 xl:hidden"
+                alt="Illustration of plant"
+                width={48}
+                height={48}
+                src="/static/images/dashboard.png"
+              />
+              <div>
+                <div className="mb-2 flex items-start gap-3">
+                  <Image
+                    className="hidden h-12 w-12 xl:block"
+                    alt="Illustration of plant"
+                    width={48}
+                    height={48}
+                    src="/static/images/dashboard.png"
+                  />
+                  <AlertTitle className="text-lg leading-tight">
+                    <FormattedMessage id="Dashboard.Banner.Title" defaultMessage="Welcome to your new dashboard" />
+                  </AlertTitle>
+                </div>
+
+                <AlertDescription className="mt-1 max-w-prose">
+                  <FormattedMessage
+                    id="Dashboard.Banner.Description"
+                    defaultMessage="We’ve created this space for you to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations."
+                  />
+                  <div className="mt-3 flex justify-between space-x-2">
+                    <a
+                      href="https://docs.google.com/forms/d/1-WGUCUF_i5HPS6AsN8kTfqofyt0q0HB-q7na4cQL788/viewform"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className=" group font-medium hover:underline"
+                    >
+                      <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />{' '}
+                      <ArrowRight className="inline-block group-hover:animate-arrow-right" size={16} />
+                    </a>
+                  </div>
+                </AlertDescription>
+              </div>
+
+              <button
+                className="absolute right-1 top-1 rounded-full p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                onClick={dismiss}
+              >
+                <X size={16} />
+              </button>
+            </Alert>
+          )}
+        </DismissibleMessage>
+      </div>
+    </div>
   );
 };
 

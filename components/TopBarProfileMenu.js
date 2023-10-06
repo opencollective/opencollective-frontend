@@ -12,9 +12,8 @@ import styled from 'styled-components';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
-import { getSettingsRoute, getWorkspaceRoute } from '../lib/url-helpers';
+import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
 
-import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -126,7 +125,7 @@ const UserAccountLinks = ({
       <UserMenuLinkEntry
         isMobileMenuLink={isMobileView}
         href={
-          useDashboard ? getWorkspaceRoute(LoggedInUser.collective, 'info') : getSettingsRoute(LoggedInUser.collective)
+          useDashboard ? getDashboardRoute(LoggedInUser.collective, 'info') : getSettingsRoute(LoggedInUser.collective)
         }
       >
         <FormattedMessage id="Settings" defaultMessage="Settings" />
@@ -135,7 +134,7 @@ const UserAccountLinks = ({
         isMobileMenuLink={isMobileView}
         href={
           useDashboard
-            ? getWorkspaceRoute(LoggedInUser.collective, 'manage-contributions')
+            ? getDashboardRoute(LoggedInUser.collective, 'manage-contributions')
             : `/${LoggedInUser.collective.slug}/manage-contributions`
         }
       >
@@ -145,7 +144,7 @@ const UserAccountLinks = ({
         isMobileMenuLink={isMobileView}
         href={
           useDashboard
-            ? getWorkspaceRoute(LoggedInUser.collective, 'expenses')
+            ? getDashboardRoute(LoggedInUser.collective, 'expenses')
             : `/${LoggedInUser.collective.slug}/submitted-expenses`
         }
       >
@@ -155,7 +154,7 @@ const UserAccountLinks = ({
         isMobileMenuLink={isMobileView}
         href={
           useDashboard
-            ? getWorkspaceRoute(LoggedInUser.collective, 'transactions')
+            ? getDashboardRoute(LoggedInUser.collective, 'transactions')
             : `/${LoggedInUser.collective.slug}/transactions`
         }
       >
@@ -308,7 +307,7 @@ class TopBarProfileMenu extends React.Component {
                 </Flex>
                 <Flex py={3} mt={1} alignItems="center" justifyContent="space-between">
                   <Flex>
-                    <Avatar collective={LoggedInUser.collective} radius={40} mr={2} />
+                    <Avatar collective={LoggedInUser.collective} radius={36} mr={2} />
                     <Box>
                       <P color="black.800" fontWeight="500" fontSize="14px" lineHeight="20px">
                         {LoggedInUser.collective.name}
@@ -448,9 +447,11 @@ class TopBarProfileMenu extends React.Component {
             </Hide>
           )}
         </Flex>
-        {showPreviewFeaturesModal && (
-          <PreviewFeaturesModal onClose={() => this.setState({ showPreviewFeaturesModal: false })} />
-        )}
+
+        <PreviewFeaturesModal
+          open={showPreviewFeaturesModal}
+          setOpen={open => this.setState({ showPreviewFeaturesModal: open })}
+        />
       </Container>
     );
   }
@@ -461,19 +462,15 @@ class TopBarProfileMenu extends React.Component {
 
     return (
       <React.Fragment>
-        <StyledProfileButton isBorderless onClick={this.toggleProfileMenu}>
+        <StyledProfileButton height={32} isBorderless onClick={this.toggleProfileMenu}>
           <Flex alignItems="center" data-cy="user-menu-trigger">
-            <Avatar collective={get(LoggedInUser, 'collective')} radius="40px" mr={2} />
+            <Avatar collective={get(LoggedInUser, 'collective')} radius={32} mr={2} />
             <Hide xs>
               <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
             </Hide>
           </Flex>
         </StyledProfileButton>
-        <Hide sm md lg>
-          <Container position="absolute" mx={27} my={-47}>
-            <ChangelogTrigger height="24px" width="24px" backgroundSize="9.49px 13.5px" />
-          </Container>
-        </Hide>
+
         {showProfileMenu && (
           <React.Fragment>
             <HideGlobalScroll />
@@ -500,7 +497,7 @@ class TopBarProfileMenu extends React.Component {
     }
 
     return (
-      <div className="LoginTopBarProfileButton">
+      <div className="h-8">
         {status === 'loading' && (
           <P color="#D5DAE0" fontSize="0.85rem" px={3} py={2} display="inline-block">
             <FormattedMessage id="loading" defaultMessage="loading" />

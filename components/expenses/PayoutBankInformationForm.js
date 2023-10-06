@@ -24,7 +24,7 @@ import { P, Span } from '../Text';
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
 const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => ({ label: name, value: key }));
 
-const TW_API_COLLECTIVE_SLUG = process.env.TW_API_COLLECTIVE_SLUG;
+const WISE_PLATFORM_COLLECTIVE_SLUG = process.env.WISE_PLATFORM_COLLECTIVE_SLUG || process.env.TW_API_COLLECTIVE_SLUG;
 
 export const msg = defineMessages({
   currency: {
@@ -203,7 +203,7 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
                     formik.setFieldValue(field.name, value);
                     if (input.refreshRequirementsOnChange) {
                       refetch({
-                        slug: host ? host.slug : TW_API_COLLECTIVE_SLUG,
+                        slug: host ? host.slug : WISE_PLATFORM_COLLECTIVE_SLUG,
                         currency,
                         accountDetails: get(set({ ...formik.values }, field.name, value), getFieldName('data')),
                       });
@@ -265,7 +265,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     // B) If `host` is set, we expect to be in 2 cases:
     //      * The Collective Host has Wise configured and we should be able to fetch `requiredFields` from it
     //      * The Collective Host doesn't have Wise configured and `host` is already switched to the Platform account
-    variables: { slug: host ? host.slug : TW_API_COLLECTIVE_SLUG, currency },
+    variables: { slug: host ? host.slug : WISE_PLATFORM_COLLECTIVE_SLUG, currency },
   });
 
   // Make sure we load the form data on initial load. Otherwise certain form fields such
@@ -458,7 +458,7 @@ const availableCurrenciesQuery = gql`
 const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, ignoreBlockedCurrencies, optional }) => {
   const { data, loading } = useQuery(availableCurrenciesQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: TW_API_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
+    variables: { slug: WISE_PLATFORM_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
     // Skip fetching/loading if the currency is fixed (2) (3)
     // Or if availableCurrencies is already available. Expense Flow + Host with Wise configured (1)
     skip: Boolean(fixedCurrency || host?.transferwise?.availableCurrencies),

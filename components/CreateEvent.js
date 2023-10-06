@@ -10,11 +10,11 @@ import { getErrorFromGraphqlException } from '../lib/errors';
 import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 
+import Footer from './navigation/Footer';
 import Body from './Body';
 import CollectiveNavbar from './collective-navbar';
 import Container from './Container';
 import CreateEventForm from './CreateEventForm';
-import Footer from './Footer';
 import Header from './Header';
 import { getI18nLink } from './I18nFormatters';
 import Link from './Link';

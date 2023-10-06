@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import Body from '../components/Body';
 import ErrorPage from '../components/ErrorPage';
-import Footer from '../components/Footer';
 import Header from '../components/Header';
+import Footer from '../components/navigation/Footer';
 
 import { withUser } from './UserProvider';
 

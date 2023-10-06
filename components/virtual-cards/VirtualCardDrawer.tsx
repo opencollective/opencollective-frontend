@@ -1,6 +1,5 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import styled from '@emotion/styled';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
@@ -10,7 +9,7 @@ import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spendi
 
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';
-import Drawer, { DrawerActions } from '../Drawer';
+import { Drawer, DrawerActions, DrawerHeader } from '../Drawer';
 import EditVirtualCardModal from '../edit-collective/EditVirtualCardModal';
 import { ActionsButton, CardContainer, CardDetails, StateLabel } from '../edit-collective/VirtualCard';
 import { Box, Flex } from '../Grid';
@@ -20,10 +19,10 @@ import LinkCollective from '../LinkCollective';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
-import StyledHr from '../StyledHr';
-import StyledLink from '../StyledLink';
-import { H4, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { InfoList, InfoListItem } from '../ui/InfoList';
+
+import { StripeVirtualCardComplianceStatement } from './StripeVirtualCardComplianceStatement';
 
 type VirtualCardDrawerProps = {
   open: boolean;
@@ -74,26 +73,6 @@ const virtualCardQuery = gql`
   }
 `;
 
-const InfoLabel = styled.p`
-  color: var(--dark-700, #4d4f51);
-  font-size: 12px;
-  font-family: Inter;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 16px;
-  letter-spacing: 0.72px;
-  text-transform: uppercase;
-`;
-
-const InfoValue = styled.p`
-  color: #4d4f51;
-  font-size: 14px;
-  font-family: Inter;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 20px;
-`;
-
 export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
   const intl = useIntl();
   const { addToast } = useToasts();
@@ -141,10 +120,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
       ) : (
         virtualCard && (
           <React.Fragment>
-            <H4 fontSize="20px" fontWeight="700">
-              {virtualCard?.name}
-            </H4>
-
+            <DrawerHeader title={virtualCard?.name} onClose={props.onClose} />
             <CardContainer mt="24px" width="366px" height="248px" flexDirection="column">
               <div />
               <Box flexGrow={1} m="24px 24px 0 24px">
@@ -159,88 +135,61 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
               </Box>
             </CardContainer>
 
-            <StyledHr my="32px" />
-
-            <Flex flexDirection="column" gap="32px">
-              <Box>
-                <InfoLabel>
-                  <FormattedMessage defaultMessage="Assigned to" />
-                </InfoLabel>
-                <Flex alignItems="center" gridGap={2}>
-                  <Avatar collective={virtualCard.assignee} radius={24} />
-                  <StyledLink
-                    as={LinkCollective}
-                    collective={virtualCard.assignee}
-                    color="black.700"
-                    truncateOverflow
-                    textDecoration="underline"
-                  />
-                </Flex>
-              </Box>
-              <Box>
-                <InfoLabel>
-                  <FormattedMessage id="Collective" defaultMessage="Collective" />
-                </InfoLabel>
-                <Flex alignItems="center" gridGap={2}>
-                  <Avatar collective={virtualCard.account} radius={24} />
-                  <StyledLink
-                    as={LinkCollective}
+            <InfoList className="mt-8 sm:grid-cols-2">
+              <InfoListItem
+                className="sm:col-span-2"
+                title={<FormattedMessage defaultMessage="Account" />}
+                value={
+                  <LinkCollective
                     collective={virtualCard.account}
-                    color="black.700"
-                    truncateOverflow
-                    textDecoration="underline"
-                  />
-                </Flex>
-              </Box>
-              <Flex gap="32px">
-                <Box>
-                  <InfoLabel>
-                    <FormattedMessage id="agreement.createdOn" defaultMessage="Created on" />
-                  </InfoLabel>
-                  <InfoValue>
-                    <DateTime dateStyle="medium" value={virtualCard.createdAt} />
-                  </InfoValue>
-                </Box>
-                <Box>
-                  <InfoLabel>
-                    <FormattedMessage defaultMessage="Available balance" />
-                  </InfoLabel>
-                  <InfoValue>
-                    {getAvailableLimitShortString(
-                      intl,
-                      virtualCard.currency,
-                      virtualCard.remainingLimit,
-                      virtualCard.spendingLimitAmount,
-                      virtualCard.spendingLimitInterval,
-                      {
-                        AvailableAmount: I18nBold,
-                        AmountSeparator: v => <strong>&nbsp;{v}&nbsp;</strong>,
-                        LimitAmount: v => (
-                          <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
-                            {v}
-                          </Span>
-                        ),
-                        LimitInterval: v => (
-                          <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
-                            {v}
-                          </Span>
-                        ),
-                      },
-                    )}
-                  </InfoValue>
-                </Box>
-                {virtualCard.spendingLimitRenewsOn && (
-                  <Box>
-                    <InfoLabel>
-                      <FormattedMessage defaultMessage="Renews on" />
-                    </InfoLabel>
-                    <InfoValue>
-                      <DateTime dateStyle="medium" value={virtualCard.spendingLimitRenewsOn} />
-                    </InfoValue>
-                  </Box>
+                    className="flex items-center gap-2 font-medium hover:underline"
+                  >
+                    <Avatar collective={virtualCard.account} radius={24} /> {virtualCard.account.name}
+                  </LinkCollective>
+                }
+              />
+
+              <InfoListItem
+                title={<FormattedMessage defaultMessage="Assigned to" />}
+                value={
+                  <LinkCollective
+                    collective={virtualCard.assignee}
+                    className="flex items-center gap-2 font-medium hover:underline"
+                  >
+                    <Avatar collective={virtualCard.assignee} radius={24} /> {virtualCard.assignee.name}
+                  </LinkCollective>
+                }
+              />
+
+              <InfoListItem
+                title={<FormattedMessage id="agreement.createdOn" defaultMessage="Created on" />}
+                value={<DateTime dateStyle="medium" value={virtualCard.createdAt} />}
+              />
+              <InfoListItem
+                title={<FormattedMessage defaultMessage="Available balance" />}
+                value={getAvailableLimitShortString(
+                  intl,
+                  virtualCard.currency,
+                  virtualCard.remainingLimit,
+                  virtualCard.spendingLimitAmount,
+                  virtualCard.spendingLimitInterval,
+                  {
+                    AvailableAmount: I18nBold,
+                    AmountSeparator: v => <strong>&nbsp;{v}&nbsp;</strong>,
+                    LimitAmount: v => <span className="italic text-slate-600">{v}</span>,
+                    LimitInterval: v => <span className="italic text-slate-600">{v}</span>,
+                  },
                 )}
-              </Flex>
-            </Flex>
+              />
+
+              {virtualCard.spendingLimitRenewsOn && (
+                <InfoListItem
+                  title={<FormattedMessage defaultMessage="Renews on" />}
+                  value={<DateTime dateStyle="medium" value={virtualCard.spendingLimitRenewsOn} />}
+                />
+              )}
+              <InfoListItem className="sm:col-span-2" value={<StripeVirtualCardComplianceStatement />} />
+            </InfoList>
           </React.Fragment>
         )
       )}

@@ -1,21 +1,21 @@
 import React from 'react';
-import { ColumnDef, flexRender, getCoreRowModel, TableMeta, useReactTable } from '@tanstack/react-table';
+import { ColumnDef, flexRender, getCoreRowModel, Row, TableMeta, useReactTable } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/Table';
 import LoadingPlaceholder from './LoadingPlaceholder';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table';
-import { P } from './Text';
-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   loading?: boolean;
   meta?: TableMeta<any>;
   hideHeader?: boolean;
-  highlightRowOnHover?: boolean;
   emptyMessage?: () => React.ReactNode;
   nbPlaceholders?: number;
-  headerProps?: React.ComponentProps<typeof TableHeader>;
+  onClickRow?: (row: Row<TData>) => void;
+  className?: string;
+  innerClassName?: string;
+  mobileTableView?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -26,8 +26,7 @@ export function DataTable<TData, TValue>({
   emptyMessage,
   hideHeader,
   nbPlaceholders = 10,
-  highlightRowOnHover = true,
-  headerProps,
+  onClickRow,
   ...tableProps
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
@@ -40,13 +39,13 @@ export function DataTable<TData, TValue>({
   return (
     <Table {...tableProps}>
       {!hideHeader && (
-        <TableHeader {...headerProps}>
+        <TableHeader>
           {table.getHeaderGroups().map(headerGroup => (
-            <TableRow key={headerGroup.id}>
+            <TableRow key={headerGroup.id} highlightOnHover={false}>
               {headerGroup.headers.map(header => {
                 const columnMeta = header.column.columnDef.meta || {};
                 return (
-                  <TableHead key={header.id} textAlign="left" {...columnMeta['styles']}>
+                  <TableHead key={header.id} className={columnMeta['className']}>
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 );
@@ -64,7 +63,9 @@ export function DataTable<TData, TValue>({
               {table.getAllFlatColumns().map(column => (
                 // eslint-disable-next-line react/no-array-index-key
                 <TableCell key={column.id}>
-                  <LoadingPlaceholder height={16} width={100} m={3} borderRadius={8} />
+                  <div className="w-1/2">
+                    <LoadingPlaceholder height={16} className="" borderRadius={8} />
+                  </div>
                 </TableCell>
               ))}
             </TableRow>
@@ -72,21 +73,29 @@ export function DataTable<TData, TValue>({
         ) : table.getRowModel().rows?.length ? (
           table.getRowModel().rows.map(row => (
             <TableRow
-              highlightOnHover={highlightRowOnHover}
               key={row.id}
               data-state={row.getIsSelected() && 'selected'}
+              {...(onClickRow && {
+                onClick: () => onClickRow(row),
+                className: 'cursor-pointer',
+              })}
             >
-              {row.getVisibleCells().map(cell => (
-                <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-              ))}
+              {row.getVisibleCells().map(cell => {
+                const columnMeta = cell.column.columnDef.meta || {};
+                return (
+                  <TableCell key={cell.id} className={columnMeta['className']}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                );
+              })}
             </TableRow>
           ))
         ) : (
-          <TableRow>
+          <TableRow highlightOnHover={false}>
             <TableCell colSpan={columns.length}>
-              <P p={4} textAlign="center">
+              <p className="p-4 text-center text-slate-500">
                 {emptyMessage ? emptyMessage() : <FormattedMessage defaultMessage="No data" />}
-              </P>
+              </p>
             </TableCell>
           </TableRow>
         )}

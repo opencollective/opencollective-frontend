@@ -2909,6 +2909,36 @@ type Host implements Account & AccountWithContributions {
   stripe: StripeConnectedAccount
 
   """
+  Applications for this host
+  """
+  hostApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Search term for collective tags, id, name, slug and description.
+    """
+    searchTerm: String
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter applications by status
+    """
+    status: HostApplicationStatus
+  ): HostApplicationCollection!
+
+  """
   Pending applications for this host
   """
   pendingApplications(
@@ -2932,6 +2962,7 @@ type Host implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
   ): HostApplicationCollection!
+    @deprecated(reason: "2023-08-25: Deprecated in favour of host.hostApplications(status: PENDING).")
   hostedVirtualCards(
     """
     Search term (card name, card last four digits)
@@ -4373,6 +4404,7 @@ type VirtualCardCollection implements Collection {
 }
 
 type Policies {
+  id: String
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
@@ -4468,6 +4500,11 @@ type AccountPermissions {
   Whether the current user can mark this order as expired
   """
   addFunds: Permission!
+
+  """
+  Whether the current user can mark this order as expired
+  """
+  contact: Permission!
 }
 
 type Permission {
@@ -8355,6 +8392,11 @@ type Individual implements Account {
   Has the account a password set? For authenticated user: scope: "account".
   """
   hasPassword: Boolean
+
+  """
+  User two factor methods
+  """
+  twoFactorMethods: [UserTwoFactorMethod]
 }
 
 """
@@ -8420,6 +8462,27 @@ type PersonalToken {
   The date on which the personal token was last updated
   """
   updatedAt: DateTime
+}
+
+"""
+User two factor authentication method
+"""
+type UserTwoFactorMethod {
+  id: String!
+  method: TwoFactorMethod!
+  name: String!
+  createdAt: DateTime!
+  description: String
+  icon: String
+}
+
+"""
+A two factor authentication method
+"""
+enum TwoFactorMethod {
+  TOTP
+  YUBIKEY_OTP
+  WEBAUTHN
 }
 
 """
@@ -13668,6 +13731,16 @@ type Mutation {
   ): Account!
 
   """
+  Create WebAuthn public key registration request options
+  """
+  createWebAuthnRegistrationOptions(
+    """
+    Account that will create a WebAuthn registration
+    """
+    account: AccountReferenceInput!
+  ): JSON!
+
+  """
   Add 2FA to the Individual if it does not have it. Scope: "account".
   """
   addTwoFactorAuthTokenToIndividual(
@@ -13692,6 +13765,11 @@ type Mutation {
   """
   removeTwoFactorAuthTokenFromIndividual(
     """
+    Method to remove from this account
+    """
+    userTwoFactorMethod: UserTwoFactorMethodReferenceInput
+
+    """
     Account that will have 2FA removed from it
     """
     account: AccountReferenceInput!
@@ -13700,11 +13778,27 @@ type Mutation {
     The two factor method to remove. Removes all if empty
     """
     type: TwoFactorMethod
+      @deprecated(reason: "2023-08-01: Use the two factor method reference to specify method to remove")
 
     """
     The 6-digit 2FA code
     """
-    code: String @deprecated(reason: "2FA code to validate this action must be set via 2FA header")
+    code: String @deprecated(reason: "2023-08-01: 2FA code to validate this action must be set via 2FA header")
+  ): Individual!
+
+  """
+  Edit 2FA method
+  """
+  editTwoFactorAuthenticationMethod(
+    """
+    Method to edit
+    """
+    userTwoFactorMethod: UserTwoFactorMethodReferenceInput!
+
+    """
+    New name for the method
+    """
+    name: String
   ): Individual!
 
   """
@@ -13757,6 +13851,11 @@ type Mutation {
     message: NonEmptyString!
     subject: String
   ): SendMessageResult
+
+  """
+  Regenerate two factor authentication recovery codes
+  """
+  regenerateRecoveryCodes: [String!]
   createApplication(application: ApplicationCreateInput!): Application
   updateApplication(application: ApplicationUpdateInput!): Application
   deleteApplication(application: ApplicationReferenceInput!): Application
@@ -14162,6 +14261,26 @@ type Mutation {
   ): Boolean!
 
   """
+  Follows a given Collective. Scope: "account"
+  """
+  followAccount(
+    """
+    user will follow this account
+    """
+    account: AccountReferenceInput!
+  ): FollowAccountResult!
+
+  """
+  Unfollows a given Collective. Scope: "account"
+  """
+  unfollowAccount(
+    """
+    account to unfollow
+    """
+    account: AccountReferenceInput!
+  ): UnfollowAccountResult!
+
+  """
   Edit the public message for the given Member of a Collective. Scope: "account".
   """
   editPublicMessage(
@@ -14542,22 +14661,6 @@ type Mutation {
     """
     year: Int!
   ): SetTaxFormResult
-
-  """
-  Add platform tips to a transaction. Scope: "transactions".
-  """
-  addPlatformTipToTransaction(
-    """
-    Reference to the transaction in the platform tip
-    """
-    transaction: TransactionReferenceInput!
-
-    """
-    Amount of the platform tip
-    """
-    amount: AmountInput!
-  ): Transaction!
-    @deprecated(reason: "2022-07-06: This feature will not be supported in the future. Please don't rely on it.")
 
   """
   Refunds a transaction. Scope: "transactions".
@@ -15115,12 +15218,9 @@ type AddTwoFactorAuthTokenToIndividualResponse {
   recoveryCodes: [String]
 }
 
-"""
-A two factor authentication method
-"""
-enum TwoFactorMethod {
-  TOTP
-  YUBIKEY_OTP
+input UserTwoFactorMethodReferenceInput {
+  id: String
+  legacyId: Int
 }
 
 input AccountUpdateInput {
@@ -15887,6 +15987,16 @@ input MemberInvitationReferenceInput {
   legacyId: Int
 }
 
+type FollowAccountResult {
+  individual: Individual!
+  member: Member!
+}
+
+type UnfollowAccountResult {
+  individual: Individual!
+  member: Member
+}
+
 input OAuthAuthorizationReferenceInput {
   """
   The id identifying the OAuth Authorization (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -16161,6 +16271,11 @@ input OrderContextInput {
   Whether this order was created using the embedded contribution flow
   """
   isEmbed: Boolean
+
+  """
+  Whether this order was created using the new platform tip flow
+  """
+  isNewPlatformTipFlow: Boolean
 }
 
 input OrderUpdateInput {

@@ -98,16 +98,16 @@ const ContributionsBudget = ({ collective, defaultTimeInterval, ...props }) => {
             disabled={loading}
           />
           <GraphTypeButton active={graphType === GRAPH_TYPES.LIST} onClick={() => setGraphType(GRAPH_TYPES.LIST)}>
-            <FormatListBulleted />
+            <FormatListBulleted size="18px" />
           </GraphTypeButton>
           <GraphTypeButton active={graphType === GRAPH_TYPES.TIME} onClick={() => setGraphType(GRAPH_TYPES.TIME)}>
-            <Timeline />
+            <Timeline size="18px" />
           </GraphTypeButton>
           <GraphTypeButton active={graphType === GRAPH_TYPES.BAR} onClick={() => setGraphType(GRAPH_TYPES.BAR)}>
-            <BarChart />
+            <BarChart size="18px" />
           </GraphTypeButton>
           <GraphTypeButton active={graphType === GRAPH_TYPES.PIE} onClick={() => setGraphType(GRAPH_TYPES.PIE)}>
-            <PieChart />
+            <PieChart size="18px" />
           </GraphTypeButton>
         </Flex>
       </Flex>

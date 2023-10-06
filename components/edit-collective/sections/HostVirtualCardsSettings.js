@@ -16,6 +16,7 @@ import StyledInputField from '../../StyledInputField';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
 import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
@@ -96,6 +97,9 @@ const HostVirtualCards = props => {
 
   return (
     <Fragment>
+      <Box my={3}>
+        <StripeVirtualCardComplianceStatement />
+      </Box>
       <Box>
         <SettingsSectionTitle>
           <FormattedMessage id="Host.VirtualCards.Settings.Title" defaultMessage="Settings and Policy" />

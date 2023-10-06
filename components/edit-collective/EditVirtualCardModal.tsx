@@ -31,6 +31,7 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal
 import StyledSelect from '../StyledSelect';
 import { P, Span } from '../Text';
 import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const editVirtualCardMutation = gql`
   mutation editVirtualCard(
@@ -133,6 +134,7 @@ const VirtualCardPoliciesQuery = gql`
     account(slug: $slug) {
       id
       policies {
+        id
         MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
           ALL_TIME {
             valueInCents
@@ -331,7 +333,7 @@ export default function EditVirtualCardModal({
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
   return (
-    <StyledModal width="382px" onClose={handleClose} trapFocus {...modalProps}>
+    <StyledModal width="420px" onClose={handleClose} trapFocus {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose} hideCloseIcon={false}>
           {isEditing ? (
@@ -529,6 +531,9 @@ export default function EditVirtualCardModal({
               </React.Fragment>
             )}
           </Flex>
+          <Box mt={3}>
+            <StripeVirtualCardComplianceStatement />
+          </Box>
         </ModalBody>
         <ModalFooter isFullWidth>
           <Flex justifyContent="flex-end" flexWrap="wrap">

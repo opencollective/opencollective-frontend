@@ -32,8 +32,6 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
-import StyledHr from '../StyledHr';
-import { H1 } from '../Text';
 
 import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
@@ -294,25 +292,22 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
   };
 
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
-      <Flex mb={24} alignItems="center" flexWrap="wrap">
-        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
+    <React.Fragment>
+      <div className="mb-5 flex flex-wrap justify-between gap-4">
+        <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-        </H1>
-        <Box mx="auto" />
-        <Box p={2}>
-          <SearchBar
-            defaultValue={query.searchTerm}
-            onSubmit={searchTerm =>
-              router.push({
-                pathname: pageRoute,
-                query: getQueryParams({ searchTerm, offset: null }),
-              })
-            }
-          />
-        </Box>
-      </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
+        </h1>
+        <SearchBar
+          height="40px"
+          defaultValue={query.searchTerm}
+          onSubmit={searchTerm =>
+            router.push({
+              pathname: pageRoute,
+              query: getQueryParams({ searchTerm, offset: null }),
+            })
+          }
+        />
+      </div>
       {paypalPreApprovalError && (
         <DismissibleMessage>
           {({ dismiss }) => (
@@ -464,7 +459,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
           </Flex>
         </React.Fragment>
       )}
-    </Box>
+    </React.Fragment>
   );
 };
 

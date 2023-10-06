@@ -48,14 +48,16 @@ const uploadFileMutation = gql`
 
 type useGraphQLFileUploaderProps = {
   onSuccess?: (result: UploadFileResult[]) => void;
-  onReject?: (message: string) => void;
+  onReject?: (message: string | string[]) => void;
   mockImageGenerator?: () => string;
+  isMulti?: boolean;
 };
 
 export const useGraphQLFileUploader = ({
   onSuccess = undefined,
   onReject = undefined,
   mockImageGenerator = undefined,
+  isMulti = true,
 }: useGraphQLFileUploaderProps) => {
   const [isUploading, setIsUploading] = React.useState(false);
   const [callUploadFile] = useMutation(uploadFileMutation, { context: API_V2_CONTEXT });
@@ -66,7 +68,7 @@ export const useGraphQLFileUploader = ({
   const reportErrorMessage = React.useCallback(
     (errorMsg: string) => {
       if (onReject) {
-        onReject(errorMsg);
+        onReject(isMulti ? [errorMsg] : errorMsg);
       } else {
         addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
       }
@@ -108,7 +110,7 @@ export const useGraphQLFileUploader = ({
           setIsUploading(false);
         }
       },
-      [onSuccess, onReject, mockImageGenerator],
+      [onSuccess, onReject, mockImageGenerator, isMulti],
     ),
   };
 };

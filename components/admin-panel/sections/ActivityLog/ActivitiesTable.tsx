@@ -1,45 +1,20 @@
 import React from 'react';
-import { themeGet } from '@styled-system/theme-get';
 import { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 import { Activity } from '../../../../lib/graphql/types/v2/graphql';
 import { BREAKPOINTS, useWindowResize } from '../../../../lib/hooks/useWindowResize';
 
-import Container from '../../../Container';
 import { DataTable } from '../../../DataTable';
 import DateTime from '../../../DateTime';
 import StyledHr from '../../../StyledHr';
 import StyledLinkButton from '../../../StyledLinkButton';
-import { P } from '../../../Text';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
+import { TableActionsButton } from '../../../ui/Table';
 
 import ActivityDescription from './ActivityDescription';
 import ActivityListItem from './ActivityListItem';
 import { ActivityUser } from './ActivityUser';
-
-const CELL_PADDING = '8px';
-
-const CellButton = styled.button`
-  border: 0;
-  width: 100%;
-  outline: none;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-weight: 500;
-  color: ${themeGet('colors.black.900')};
-
-  &:hover,
-  :focus-visible {
-    .title {
-      text-decoration: underline;
-    }
-  }
-`;
 
 interface ActivityItemMeta extends TableMeta<Activity> {
   openActivity: (activity: Activity) => void;
@@ -48,14 +23,9 @@ interface ActivityItemMeta extends TableMeta<Activity> {
 export const cardColumns: ColumnDef<Activity>[] = [
   {
     accessorKey: 'summary',
-    cell: ({ row, table }) => {
+    cell: ({ row }) => {
       const activity = row.original;
-      const meta = table.options.meta as ActivityItemMeta;
-      return (
-        <CellButton onClick={() => meta.openActivity(activity)}>
-          <ActivityListItem activity={activity} />
-        </CellButton>
-      );
+      return <ActivityListItem activity={activity} />;
     },
   },
 ];
@@ -64,44 +34,66 @@ export const tableColumns: ColumnDef<Activity>[] = [
   {
     accessorKey: 'createdAt',
     header: () => <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
-    meta: { styles: { width: '15%' } },
-    cell: ({ cell, table }) => {
+    meta: { className: 'w-32' },
+    cell: ({ cell }) => {
       const createdAt = cell.getValue() as Activity['createdAt'];
-      const meta = table.options.meta as ActivityItemMeta;
       return (
-        <CellButton onClick={() => meta.openActivity(cell.row.original)}>
-          <Container p={CELL_PADDING} fontSize="13px" color="black.700" fontWeight="normal">
-            <DateTime value={createdAt} />
-          </Container>
-        </CellButton>
+        <div className="text-slate-700">
+          <DateTime dateStyle="medium" value={createdAt} />
+        </div>
       );
     },
   },
   {
     accessorKey: 'individual',
     header: () => <FormattedMessage id="Tags.USER" defaultMessage="User" />,
-    meta: { styles: { width: '20%' } },
+    meta: { className: 'w-40 xl:w-56' },
     cell: ({ cell }) => {
       const activity = cell.row.original;
       return (
-        <Container display="flex" p={CELL_PADDING} fontSize="12px">
-          <ActivityUser activity={activity} showBy={false} avatarSize={20} />
-        </Container>
+        <div className="truncate text-slate-700">
+          <span className="truncate">
+            <ActivityUser activity={activity} showBy={false} avatarSize={20} />
+          </span>
+        </div>
       );
     },
   },
   {
     accessorKey: 'description',
     header: () => <FormattedMessage id="Fields.description" defaultMessage="Description" />,
+    cell: ({ cell }) => {
+      const activity = cell.row.original;
+      return (
+        <div className="truncate">
+          <ActivityDescription activity={activity} />
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'actions',
+    header: null,
+    meta: { className: 'w-14' },
     cell: ({ cell, table }) => {
       const activity = cell.row.original;
       const meta = table.options.meta as ActivityItemMeta;
       return (
-        <CellButton onClick={() => meta.openActivity(activity)}>
-          <Container fontSize="13px" p={CELL_PADDING}>
-            <ActivityDescription activity={activity} />
-          </Container>
-        </CellButton>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <TableActionsButton />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={e => {
+                e.stopPropagation();
+                meta.openActivity(activity);
+              }}
+            >
+              <FormattedMessage defaultMessage="View details" />
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       );
     },
   },
@@ -128,18 +120,19 @@ export default function ActivitiesTable({
   return (
     <DataTable
       data-cy="activities-table"
+      innerClassName="table-fixed"
       hideHeader={!isTableView}
       columns={columns}
       data={activities?.nodes || []}
       meta={{ openActivity } as ActivityItemMeta}
       loading={loading}
       nbPlaceholders={nbPlaceholders}
-      headerProps={{ px: CELL_PADDING, py: 3 }}
+      onClickRow={row => openActivity(row.original)}
       emptyMessage={() => (
         <div>
-          <P fontSize="16px">
+          <p className="text-base">
             <FormattedMessage defaultMessage="No agreements" />
-          </P>
+          </p>
           {resetFilters && (
             <div>
               <StyledHr maxWidth={300} m="16px auto" borderColor="black.100" />

@@ -27,6 +27,9 @@
     "development": {
       "compact": false
     },
+    "jest": {
+      "plugins": ["require-context-hook"]
+    },
     "e2e": {
       "plugins": ["istanbul"]
     },

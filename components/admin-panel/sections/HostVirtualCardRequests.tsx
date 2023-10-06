@@ -16,6 +16,7 @@ import { P } from '../../Text';
 import { VirtualCardRequestDrawer } from '../../virtual-card-requests/VirtualCardRequestDrawer';
 import VirtualCardRequestFilter from '../../virtual-card-requests/VirtualCardRequestFilter';
 import { VirtualCardRequestsTable } from '../../virtual-card-requests/VirtualCardRequestsTable';
+import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const hostVirtualCardRequestsQuery = gql`
   query HostVirtualCardRequests(
@@ -87,7 +88,7 @@ type HostVirtualCardRequestsProps = {
   hostSlug: string;
 };
 
-export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
+export default function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
   const queryFilter = useQueryFilter({
     ignoreQueryParams: ['slug', 'section'],
     filters: {
@@ -137,10 +138,10 @@ export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
 
   return (
     <Box>
-      <P fontSize="24px" fontWeight="700" lineHeight="32px" mb={3}>
+      <h1 className="text-2xl font-bold leading-10 tracking-tight">
         <FormattedMessage id="VirtualCardRequests.Title" defaultMessage="Virtual Card Requests" />
-      </P>
-      <P mb={3}>
+      </h1>
+      <p className="mb-4 text-muted-foreground">
         <FormattedMessage
           id="Host.VirtualCardRequests.List.Description"
           defaultMessage="Manage virtual card requests made by your hosted collectives. <learnMoreLink>Learn more</learnMoreLink>"
@@ -151,7 +152,10 @@ export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
             }),
           }}
         />
-      </P>
+      </p>
+      <Box mb={3}>
+        <StripeVirtualCardComplianceStatement />
+      </Box>
       <VirtualCardRequestFilter
         virtualCardRequestStatusFilter={queryFilter.values.virtualCardRequestStatus}
         onVirtualCardRequestStatusFilter={queryFilter.setVirtualCardRequestStatus}
@@ -198,5 +202,3 @@ export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
     </Box>
   );
 }
-
-export default HostVirtualCardRequests;

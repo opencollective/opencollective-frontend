@@ -18,7 +18,7 @@ export const HOST_DASHBOARD_SECTIONS = {
   HOSTED_COLLECTIVES: 'hosted-collectives',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   HOST_VIRTUAL_CARD_REQUESTS: 'host-virtual-card-requests',
-  PENDING_APPLICATIONS: 'pending-applications',
+  HOST_APPLICATIONS: 'host-applications',
 };
 
 export const ABOUT_ORG_SECTIONS = {
@@ -53,6 +53,7 @@ export const FISCAL_HOST_SECTIONS = {
 export const COLLECTIVE_SECTIONS = {
   HOME: 'home',
   DASHBOARD_OVERVIEW: 'overview',
+  CONTRIBUTORS: 'contributors',
   CONTRIBUTIONS: 'contributions',
   ADVANCED: 'advanced',
   AUTHORIZED_APPS: 'authorized-apps',
@@ -146,9 +147,9 @@ export const SECTION_LABELS = defineMessages({
     id: 'PendingContributions',
     defaultMessage: 'Pending Contributions',
   },
-  [ALL_SECTIONS.PENDING_APPLICATIONS]: {
-    id: 'AdminPanel.Menu.PendingApplications',
-    defaultMessage: 'Pending Applications',
+  [ALL_SECTIONS.HOST_APPLICATIONS]: {
+    id: 'Menu.HostApplications',
+    defaultMessage: 'Host Applications',
   },
   [ALL_SECTIONS.OVERVIEW]: {
     id: 'AdminPanel.Menu.Overview',
@@ -294,5 +295,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.CONTRIBUTIONS]: {
     id: 'Contributions',
     defaultMessage: 'Contributions',
+  },
+  [ALL_SECTIONS.CONTRIBUTORS]: {
+    id: 'Contributors',
+    defaultMessage: 'Contributors',
   },
 });
