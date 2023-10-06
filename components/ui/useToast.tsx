@@ -2,7 +2,6 @@
 import * as React from 'react';
 
 import type { ToastActionElement, ToastProps } from './Toast';
-import { func } from 'prop-types';
 
 const TOAST_LIMIT = 3;
 const TOAST_REMOVE_DELAY_IN_MS = 1000000;
