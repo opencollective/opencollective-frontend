@@ -89,7 +89,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
   const [uploadedImage, setUploadedImage] = React.useState(null);
   const borderRadius = getAvatarBorderRadius(collective.type);
   const [editImage] = useMutation(editCollectiveAvatarMutation);
-  const { toast, removeToasts } = useToast();
+  const { toast, dismissToasts } = useToast();
 
   const onDropImage = async ([image]) => {
     if (image) {
@@ -131,7 +131,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
           resolve(false);
         } else {
           resolve(true);
-          removeToasts(toast => Boolean(toast.__isAvatarUploadError));
+          dismissToasts(toast => Boolean(toast.__isAvatarUploadError));
         }
       };
       img.src = image.preview;
