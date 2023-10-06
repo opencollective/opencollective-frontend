@@ -1,9 +1,10 @@
 import React from 'react';
+import { gql, useMutation } from '@apollo/client';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import ReactAnimateHeight from 'react-animate-height';
 import { FormattedMessage } from 'react-intl';
 
-import { sendInAppSurveyResponse } from '../lib/api';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
 import { Button } from './ui/Button';
@@ -14,6 +15,24 @@ export enum SURVEY_KEY {
   EXPENSE_SUBMITTED = 'EXPENSE_SUBMITTED',
   CONTRIBUTION_COMPLETED = 'CONTRIBUTION_COMPLETED',
 }
+
+const sendSurveyResponseMutation = gql`
+  mutation sendSurveyResponse(
+    $surveyKey: String!
+    $responseId: String!
+    $score: Int!
+    $text: String
+    $okToContact: Boolean
+  ) {
+    sendSurveyResponse(
+      surveyKey: $surveyKey
+      responseId: $responseId
+      score: $score
+      text: $text
+      okToContact: $okToContact
+    )
+  }
+`;
 
 export function Survey({
   surveyKey,
@@ -27,6 +46,7 @@ export function Survey({
   hasParentTitle?: boolean;
 }) {
   const { LoggedInUser } = useLoggedInUser();
+  const [sendInAppSurveyResponse] = useMutation(sendSurveyResponseMutation, { context: API_V2_CONTEXT });
   const [score, setScore] = React.useState(null);
   const [text, setText] = React.useState('');
   const [completed, setCompleted] = React.useState(false);
@@ -40,7 +60,7 @@ export function Survey({
   const sendResponse = async ({ surveyKey, responseId, score, text, okToContact }) => {
     setLoading(true);
     try {
-      await sendInAppSurveyResponse({ surveyKey, responseId, score, text, okToContact });
+      await sendInAppSurveyResponse({ variables: { surveyKey, responseId, score, text, okToContact } });
     } catch (error) {
       setError(error.message);
     }
