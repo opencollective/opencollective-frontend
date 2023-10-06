@@ -1,12 +1,12 @@
 import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Tags } from '@styled-icons/bootstrap/Tags';
 import { Palette } from '@styled-icons/boxicons-regular/Palette';
 import { Camera } from '@styled-icons/feather/Camera';
 import { Globe } from '@styled-icons/feather/Globe';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import { first } from 'lodash';
+import { Tags } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';

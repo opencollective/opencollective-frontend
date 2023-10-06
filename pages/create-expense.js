@@ -6,6 +6,7 @@ import { omit } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
+import { itemHasOCR } from '../components/expenses/lib/ocr';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { expenseSubmissionAllowed, getCollectivePageMetadata, getCollectiveTypeForUrl } from '../lib/collective.lib';
 import expenseTypes from '../lib/constants/expenseTypes';
@@ -23,6 +24,7 @@ import { collectiveNavbarFieldsFragment } from '../components/collective-page/gr
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
 import ErrorPage from '../components/ErrorPage';
+import { ConfirmOCRValues } from '../components/expenses/ConfirmOCRValues';
 import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
 import ExpenseForm, { EXPENSE_FORM_STEPS, prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
@@ -132,6 +134,7 @@ class CreateExpensePage extends React.Component {
       formPersister: null,
       isInitialForm: true,
       recurring: null,
+      hasConfirmedOCR: false,
     };
   }
 
@@ -314,8 +317,9 @@ class CreateExpensePage extends React.Component {
     const collective = data && data.account;
     const host = collective && collective.host;
     const loggedInAccount = data && data.loggedInAccount;
-
     const payoutProfiles = getPayoutProfiles(loggedInAccount);
+    const hasItemsWithOCR = Boolean(this.state.expense?.items?.some(itemHasOCR));
+    const mustConfirmOCR = hasItemsWithOCR && !this.state.hasConfirmedOCR;
 
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)}>
@@ -413,6 +417,15 @@ class CreateExpensePage extends React.Component {
                                 onChange={this.onNotesChanges}
                                 defaultValue={this.state.expense.privateMessage}
                               />
+                              <div className="mt-5">
+                                {hasItemsWithOCR && (
+                                  <ConfirmOCRValues
+                                    items={this.state.expense.items}
+                                    onConfirm={hasConfirmedOCR => this.setState({ hasConfirmedOCR })}
+                                    currency={this.state.expense.currency}
+                                  />
+                                )}
+                              </div>
                               <Flex flexWrap="wrap" mt={4}>
                                 <StyledButton
                                   mt={2}
@@ -436,6 +449,7 @@ class CreateExpensePage extends React.Component {
                                   data-cy="submit-expense-btn"
                                   onClick={this.onSummarySubmit}
                                   loading={this.state.isSubmitting}
+                                  disabled={mustConfirmOCR}
                                   minWidth={175}
                                 >
                                   {this.state.expense?.type === expenseTypes.GRANT ? (

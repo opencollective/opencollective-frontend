@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { CardElement, ElementsConsumer } from '@stripe/react-stripe-js';
-import { Question } from '@styled-icons/octicons/Question';
 import { isUndefined } from 'lodash';
+import { HelpCircle } from 'lucide-react';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -157,7 +157,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
                 </Span>
               )}
             >
-              <Question size="1.1em" />
+              <HelpCircle size="1.1em" />
             </StyledTooltip>
           </Flex>
         )}

@@ -1,5 +1,5 @@
 import { FormikProps } from 'formik';
-import { cloneDeep, get, set } from 'lodash';
+import { cloneDeep, get, isNil, set } from 'lodash';
 
 import { Account, ExpenseType, UploadFileResult } from '../../../lib/graphql/types/v2/graphql';
 
@@ -205,4 +205,78 @@ export const checkExpenseSupportsOCR = (expenseType: ExpenseType, loggedInUser):
 
 export const checkExpenseItemCanBeSplit = (item: ExpenseItemFormValues, expenseType: ExpenseType): boolean => {
   return Boolean(item.__canBeSplit && [ExpenseType.RECEIPT, ExpenseType.INVOICE].includes(expenseType));
+};
+
+type FieldsWithOCRSupport = 'description' | 'incurredAt' | 'amount' | 'url';
+
+type ExpenseItemFields = Extract<keyof ExpenseItemFormValues, FieldsWithOCRSupport>;
+
+export const ITEM_OCR_ROOT_FIELD_MAPPING: Record<ExpenseItemFields, string> = {
+  url: '__file.url',
+  incurredAt: '__parsingResult.date',
+  description: '__parsingResult.description',
+  amount: '__parsingResult.amount',
+};
+
+export const ITEM_OCR_FIELD_MAPPING: Record<Exclude<ExpenseItemFields, 'url'>, string> = {
+  incurredAt: '__itemParsingResult.incurredAt',
+  description: '__itemParsingResult.description',
+  amount: '__itemParsingResult.amount',
+};
+
+/**
+ * Check whether there's a mismatch between the OCR value and the value entered by the user.
+ */
+const compareItemOCRValue = (
+  item: ExpenseItemFormValues,
+  field: Omit<keyof ExpenseItemFormValues, `_${string}`>,
+  expenseCurrency: string,
+): {
+  hasMismatch: boolean;
+  ocrValue: any;
+} => {
+  const existingValue = item[field as keyof ExpenseItemFormValues];
+  const checkValue = ocrValue => {
+    if (isNil(existingValue) || isNil(ocrValue)) {
+      return { hasMismatch: false, ocrValue };
+    } else if (field === 'amount') {
+      return {
+        hasMismatch: ocrValue.currency !== expenseCurrency || existingValue !== ocrValue.valueInCents,
+        ocrValue,
+      };
+    } else {
+      return { hasMismatch: existingValue !== ocrValue, ocrValue };
+    }
+  };
+
+  // If there's an item available, we try to match on it
+  const itemOCRValue = get(item, ITEM_OCR_FIELD_MAPPING[field as keyof ExpenseItemFormValues]);
+  if (!isNil(itemOCRValue)) {
+    return checkValue(itemOCRValue);
+  }
+
+  // Otherwise we match on the root value
+  const rootOCRValue = get(item, ITEM_OCR_ROOT_FIELD_MAPPING[field as keyof ExpenseItemFormValues]);
+  return checkValue(rootOCRValue);
+};
+
+type ExpenseOCRValuesComparison = Record<FieldsWithOCRSupport, { hasMismatch: boolean; ocrValue: any }>;
+
+export const compareItemOCRValues = (
+  item: ExpenseItemFormValues,
+  expenseCurrency: string,
+): ExpenseOCRValuesComparison => {
+  return Object.keys(ITEM_OCR_FIELD_MAPPING).reduce((result, field) => {
+    result[field as keyof ExpenseItemFormValues] = compareItemOCRValue(
+      item,
+      field as Omit<keyof ExpenseItemFormValues, `_${string}`>,
+      expenseCurrency,
+    );
+    return result;
+  }, {} as ExpenseOCRValuesComparison);
+};
+
+/** Return true if the item has an OCR parsing result */
+export const itemHasOCR = (item: ExpenseItemFormValues): boolean => {
+  return Boolean(item.__parsingResult || item.__itemParsingResult);
 };
