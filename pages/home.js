@@ -1,6 +1,6 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
-
+import cookie from 'cookie';
 import { getRequestIntl } from '../lib/i18n/request';
 
 // import Banner from '../components/collectives/Banner';
@@ -46,7 +46,20 @@ const HomePage = () => {
   );
 };
 
-HomePage.getInitialProps = ({ req, res }) => {
+export const getServerSideProps = async context => {
+  const cookies = cookie.parse((context.req && context.req.headers.cookie) || '');
+  console.log('cookies', cookies);
+  const redirectToDashboard = cookies.redirectToDashboard === 'true';
+
+  if (redirectToDashboard) {
+    return {
+      redirect: {
+        destination: '/dashboard',
+        permanent: false,
+      },
+    };
+  }
+  const { req, res } = context;
   if (res && req) {
     const { locale } = getRequestIntl(req);
     if (locale === 'en') {
@@ -60,8 +73,7 @@ HomePage.getInitialProps = ({ req, res }) => {
   if (req) {
     skipDataFromTree = true;
   }
-
-  return { skipDataFromTree };
+  return { props: { skipDataFromTree } };
 };
 
 export default HomePage;
