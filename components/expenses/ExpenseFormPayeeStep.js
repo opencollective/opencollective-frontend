@@ -225,6 +225,7 @@ const ExpenseFormPayeeStep = ({
   editingExpense,
   handleClearPayeeStep,
   drawerActionsContainer,
+  disablePayee,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -282,6 +283,7 @@ const ExpenseFormPayeeStep = ({
           emptyCustomOptions={payeeOptions}
           customOptionsPosition={CUSTOM_OPTIONS_POSITION.BOTTOM}
           getDefaultOptions={build => values.payee && build(values.payee)}
+          disabled={disablePayee}
           invitable
           onInvite={onInvite}
           LoggedInUser={loggedInAccount}
@@ -296,6 +298,7 @@ const ExpenseFormPayeeStep = ({
           getDefaultOptions={build => values.payee && build(values.payee)}
           data-cy="select-expense-payee"
           isSearchable
+          disabled={disablePayee}
           collective={values.payee}
           onChange={({ value }) => {
             formik.setFieldValue('payee', value);
@@ -539,6 +542,7 @@ ExpenseFormPayeeStep.propTypes = {
   onInvite: PropTypes.func,
   onChange: PropTypes.func,
   isOnBehalf: PropTypes.bool,
+  disablePayee: PropTypes.bool,
   loggedInAccount: PropTypes.object,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,

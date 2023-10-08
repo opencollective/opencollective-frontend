@@ -18,6 +18,7 @@ export const HOST_DASHBOARD_SECTIONS = {
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   HOST_VIRTUAL_CARD_REQUESTS: 'host-virtual-card-requests',
   HOST_APPLICATIONS: 'host-applications',
+  PENDING_APPLICATIONS: 'pending-applications',
 };
 
 export const ABOUT_ORG_SECTIONS = {

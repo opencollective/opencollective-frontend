@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { createGlobalStyle } from 'styled-components';
 
 import { createError, ERROR } from '../../lib/errors';
+import { onPressEnter } from '../../lib/form-utils';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, setLocalStorage } from '../../lib/local-storage';
 import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
@@ -180,6 +181,7 @@ export default function TwoFactorAuthenticationModal() {
             onChange={setTwoFactorCode}
             supportedMethods={supportedMethods}
             disabled={confirming}
+            onSubmit={confirm}
           />
         )}
 
@@ -245,6 +247,7 @@ export default function TwoFactorAuthenticationModal() {
 function AuthenticatorOption(props: {
   value: string;
   onChange: (string) => void;
+  onSubmit?: () => void;
   supportedMethods: string[];
   disabled: boolean;
 }) {
@@ -266,6 +269,7 @@ function AuthenticatorOption(props: {
         pattern={'[0-9]{6}'}
         inputMode="numeric"
         value={props.value}
+        onKeyUp={onPressEnter(props.onSubmit)}
         onChange={e => props.onChange(e.target.value)}
         disabled={props.disabled}
         autoFocus

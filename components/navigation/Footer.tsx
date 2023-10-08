@@ -3,8 +3,7 @@ import { Github } from '@styled-icons/fa-brands/Github';
 import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
 import { Slack } from '@styled-icons/fa-brands/Slack';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
-import { Mail } from '@styled-icons/octicons/Mail';
-import { ChevronDown, ExternalLink } from 'lucide-react';
+import { ChevronDown, ExternalLink, Mail } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';

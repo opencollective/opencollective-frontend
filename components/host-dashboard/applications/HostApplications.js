@@ -38,7 +38,7 @@ const ROUTE_PARAMS = ['hostCollectiveSlug', 'slug', 'section', 'view'];
 
 const updateQuery = (router, newParams) => {
   const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
-  const pathname = router.asPath.split('?')[0];
+  const pathname = router.asPath.split('?')[0].split('#')[0];
   return router.push({ pathname, query });
 };
 
@@ -59,11 +59,21 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
     context: API_V2_CONTEXT,
   });
 
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  // Open application account id, checking hash for backwards compatibility
+  const accountId = Number(router.query.accountId || window?.location.hash.split('application-')[1]);
   const [applicationInDrawer, setApplicationInDrawer] = React.useState(null);
+  const drawerOpen = accountId && applicationInDrawer;
 
-  const pageRoute = isDashboard ? `/workspace/${hostSlug}/host-applications` : `/${hostSlug}/admin/host-applications`;
+  React.useEffect(() => {
+    if (accountId) {
+      const application = data?.host?.hostApplications?.nodes?.find(a => a.account.legacyId === accountId);
+      if (application) {
+        setApplicationInDrawer(application);
+      }
+    }
+  }, [accountId, data?.host?.hostApplications]);
 
+  const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-applications` : `/${hostSlug}/admin/host-applications`;
   const hostApplications = data?.host?.hostApplications;
   const initViews = [
     {
@@ -117,7 +127,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
 
       <DashboardViews
         query={query}
-        omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
+        omitMatchingParams={[...ROUTE_PARAMS, 'orderBy', 'accountId']}
         views={views}
         onChange={query => {
           router.push(
@@ -149,10 +159,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
         hostApplications={hostApplications}
         nbPlaceholders={COLLECTIVES_PER_PAGE}
         loading={loading}
-        openApplication={application => {
-          setDrawerOpen(true);
-          setApplicationInDrawer(application);
-        }}
+        openApplication={application => updateQuery(router, { accountId: application.account.legacyId })}
       />
 
       <div className="mt-16 flex justify-center">
@@ -166,7 +173,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
 
       <HostApplicationDrawer
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={() => updateQuery(router, { accountId: null })}
         host={data?.host}
         application={applicationInDrawer}
       />

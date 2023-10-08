@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
-import { Reply as ReplyIcon } from '@styled-icons/bootstrap/Reply';
 import { DotsHorizontalRounded } from '@styled-icons/boxicons-regular/DotsHorizontalRounded';
 import { Share2 as ShareIcon } from '@styled-icons/feather/Share2';
 import { X } from '@styled-icons/feather/X';
 import { Edit } from '@styled-icons/material/Edit';
+import { Reply as ReplyIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { usePopper } from 'react-popper';
 import styled from 'styled-components';
@@ -43,6 +43,10 @@ const CommentBtn = styled(StyledButton).attrs({ buttonSize: 'small' })`
   width: 100%;
   text-align: left;
   border: none;
+
+  svg {
+    display: inline-block;
+  }
 
   span {
     margin-left: 12px;
@@ -111,7 +115,7 @@ const ReplyButton = ({ onReplyClick }) => {
   return (
     <React.Fragment>
       <CommentBtn data-cy="reply-comment-btn" onClick={onReplyClick}>
-        <ReplyIcon size="1em" mr={2} />
+        <ReplyIcon size="1em" />
         <FormattedMessage tagName="span" id="Reply" defaultMessage="Reply" />
       </CommentBtn>
     </React.Fragment>

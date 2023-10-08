@@ -1,9 +1,9 @@
 import { FormikProps } from 'formik';
-import { cloneDeep, get, partition, set } from 'lodash';
+import { cloneDeep, get, isNil, set } from 'lodash';
 
-import { Account, UploadFileResult } from '../../../lib/graphql/types/v2/graphql';
+import { Account, ExpenseType, UploadFileResult } from '../../../lib/graphql/types/v2/graphql';
 
-import type { ExpenseFormValues } from '../types/FormValues';
+import type { ExpenseFormValues, ExpenseItemFormValues } from '../types/FormValues';
 
 import { expenseItemsMustHaveFiles, newExpenseItem } from './items';
 import { getSupportedCurrencies } from './utils';
@@ -14,17 +14,14 @@ import { getSupportedCurrencies } from './utils';
  */
 const updateExpenseItemWithUploadResult = (
   formValues: ExpenseFormValues,
-  parsingResult: UploadFileResult['parsingResult']['expense'],
+  uploadResult: UploadFileResult,
   itemIdx: number,
 ): boolean => {
   const itemPath = `items[${itemIdx}]`;
   const itemValues = get(formValues, itemPath) || newExpenseItem();
 
-  // Store the parsing result in the item so that it can be later split if needed
-  itemValues.__parsingResult = parsingResult;
-
   // Set item URL
-  const fileUrl = get(parsingResult, 'items[0].url'); // All items are supposed to have the same URL
+  const fileUrl = uploadResult.file?.url;
   if (fileUrl) {
     if (expenseItemsMustHaveFiles(formValues.type)) {
       itemValues.url = fileUrl;
@@ -33,10 +30,17 @@ const updateExpenseItemWithUploadResult = (
     }
   }
 
-  // Set item description
-  if (parsingResult.description) {
-    itemValues.description = parsingResult.description;
+  // Store the parsing result in the item so that it can be later split if needed
+  const parsingResult = uploadResult.parsingResult?.expense;
+  if (!parsingResult) {
+    return Boolean(fileUrl);
   }
+
+  // Update internal form props
+  delete itemValues.__isUploadingFromMultiDropzone;
+  itemValues.__parsingResult = parsingResult;
+  itemValues.__canBeSplit = filterParsableItems(parsingResult.items).length > 1;
+  itemValues.__file = uploadResult.file;
 
   // We don't allow changing the date or amount for virtual cards
   if (formValues.type !== 'CHARGE') {
@@ -58,10 +62,18 @@ const updateExpenseItemWithUploadItem = (
   formValues: ExpenseFormValues,
   uploadItem: UploadFileResult['parsingResult']['expense']['items'][0],
   itemIdx: number,
+  defaultAttributes = {},
 ): boolean => {
   const itemPath = `items[${itemIdx}]`;
   const itemValues = get(formValues, itemPath) || newExpenseItem();
-  delete itemValues.__parsingResult;
+
+  // Merge default attributes
+  Object.assign(itemValues, defaultAttributes);
+
+  // Update internal form props
+  delete itemValues.__isUploadingFromMultiDropzone;
+  itemValues.__canBeSplit = false;
+  itemValues.__itemParsingResult = uploadItem;
 
   // Set item URL
   if (uploadItem.url) {
@@ -70,11 +82,6 @@ const updateExpenseItemWithUploadItem = (
     } else if (!formValues.attachedFiles?.find(file => file.url === uploadItem.url)) {
       formValues.attachedFiles = [...formValues.attachedFiles, { url: uploadItem.url }];
     }
-  }
-
-  // Set item description
-  if (uploadItem.description) {
-    itemValues.description = uploadItem.description;
   }
 
   // We don't allow changing the date or amount for virtual cards
@@ -112,56 +119,44 @@ export const updateExpenseFormWithUploadResult = (
   collective: Account,
   form: FormikProps<ExpenseFormValues>,
   uploadResults: UploadFileResult[],
-  itemIdxToReplace: number = 0,
+  /** Keep this to null to append items at the end */
+  itemIndexesToReplace: number[] = null,
 ) => {
   const formValues = cloneDeep(form.values);
-  const getParsedExpense = (uploadResult: UploadFileResult) => get(uploadResult, 'parsingResult.expense');
-  const [resultsWithOCR, resultsWithoutOCR] = partition(uploadResults, getParsedExpense);
-  const isVirtualCardCharge = formValues.type === 'CHARGE';
+  const resultsThatReplaceItems = uploadResults.slice(0, itemIndexesToReplace?.length || 0);
+  const resultsToAppend = uploadResults.slice(itemIndexesToReplace?.length || 0);
 
-  const firstParsingResult = resultsWithOCR?.[0]?.parsingResult?.expense;
-  if (firstParsingResult) {
-    // Update global values if there's a single document
-    if (uploadResults.length === 1) {
-      // Expense title/description
-      if (!form.values.description) {
-        formValues.description = firstParsingResult.description;
-      }
-
-      // Currency - we only force it if no amount have been set yet
-      if (form.values.type !== 'CHARGE') {
-        const parsedCurrency = firstParsingResult.amount?.currency;
-        if (canSetCurrency(formValues, collective, parsedCurrency)) {
-          formValues.currency = parsedCurrency;
-        }
-      }
+  // Update global values if there's a single document
+  const uniqueOCRResult = uploadResults.length === 1 && uploadResults.find(result => result.parsingResult?.expense);
+  if (uniqueOCRResult) {
+    // Expense title/description
+    if (!form.values.description) {
+      formValues.description = uniqueOCRResult.parsingResult.expense.description;
     }
 
-    // Update first item
-    updateExpenseItemWithUploadResult(formValues, firstParsingResult, itemIdxToReplace);
+    // Currency - we only force it if no amount have been set yet
+    if (form.values.type !== 'CHARGE') {
+      const parsedCurrency = uniqueOCRResult.parsingResult.expense.amount?.currency;
+      if (canSetCurrency(formValues, collective, parsedCurrency)) {
+        formValues.currency = parsedCurrency;
+      }
+    }
   }
 
-  // Append other items at the end
-  resultsWithOCR.slice(1).forEach(uploadResult => {
-    updateExpenseItemWithUploadResult(formValues, uploadResult.parsingResult.expense, formValues.items.length);
+  // Replace items specified with `itemIndexesToReplace`
+  resultsThatReplaceItems.forEach((uploadResult, idx) => {
+    updateExpenseItemWithUploadResult(formValues, uploadResult, itemIndexesToReplace[idx]);
   });
 
-  // We still want to add any unparsed files as items/attachments
-  if (!isVirtualCardCharge && resultsWithoutOCR.length > 0) {
-    if (expenseItemsMustHaveFiles(formValues.type)) {
-      formValues.items = [
-        ...formValues.items,
-        ...resultsWithoutOCR.map(result => newExpenseItem({ url: result.file.url })),
-      ];
-    } else {
-      formValues.attachedFiles = [
-        ...formValues.attachedFiles,
-        ...resultsWithoutOCR.map(result => ({ url: result.file.url })),
-      ];
-    }
-  }
+  // Append other items at the end
+  resultsToAppend.forEach(uploadResult => {
+    updateExpenseItemWithUploadResult(formValues, uploadResult, formValues.items.length);
+  });
 
+  // Update form with the new values
   form.setValues(formValues);
+
+  return true;
 };
 
 export const filterParsableItems = (items: UploadFileResult['parsingResult']['expense']['items']) => {
@@ -172,31 +167,116 @@ export const filterParsableItems = (items: UploadFileResult['parsingResult']['ex
   }
 };
 
-export const itemCanBeSplit = (item: ExpenseFormValues['items'][0]): boolean => {
-  return filterParsableItems(item.__parsingResult?.items).length > 1;
-};
-
 export const splitExpenseItem = (form: FormikProps<ExpenseFormValues>, itemIdx: number): boolean => {
   const newFormValues = cloneDeep(form.values);
   const item = get(newFormValues, `items[${itemIdx}]`);
 
-  if (!item || !itemCanBeSplit(item)) {
+  if (!item?.__canBeSplit) {
     return false;
   }
 
   const parsedItems = filterParsableItems(item.__parsingResult.items);
 
-  // Update the item itself with the first parsing result
+  // Reset the first item's description and update it with the first parsing result
+  newFormValues.items[itemIdx].description = '';
   updateExpenseItemWithUploadItem(newFormValues, parsedItems[0], itemIdx);
 
   // Create new items for the other parsing results
   parsedItems.slice(1).forEach((parsedItem, idx) => {
     const newItemIdx = itemIdx + idx + 1;
     newFormValues.items.splice(newItemIdx, 0, null);
-    updateExpenseItemWithUploadItem(newFormValues, parsedItem, newItemIdx);
+    updateExpenseItemWithUploadItem(newFormValues, parsedItem, newItemIdx, { __file: item.__file });
   });
 
   form.setValues(newFormValues);
 
   return true;
+};
+
+export const checkExpenseSupportsOCR = (expenseType: ExpenseType, loggedInUser): boolean => {
+  if (['RECEIPT', 'CHARGE'].includes(expenseType)) {
+    return true;
+  } else if (expenseType === 'INVOICE') {
+    return Boolean(loggedInUser?.isRoot);
+  } else {
+    return false;
+  }
+};
+
+export const checkExpenseItemCanBeSplit = (item: ExpenseItemFormValues, expenseType: ExpenseType): boolean => {
+  return Boolean(item.__canBeSplit && [ExpenseType.RECEIPT, ExpenseType.INVOICE].includes(expenseType));
+};
+
+type FieldsWithOCRSupport = 'description' | 'incurredAt' | 'amount' | 'url';
+
+type ExpenseItemFields = Extract<keyof ExpenseItemFormValues, FieldsWithOCRSupport>;
+
+export const ITEM_OCR_ROOT_FIELD_MAPPING: Record<ExpenseItemFields, string> = {
+  url: '__file.url',
+  incurredAt: '__parsingResult.date',
+  description: '__parsingResult.description',
+  amount: '__parsingResult.amount',
+};
+
+export const ITEM_OCR_FIELD_MAPPING: Record<Exclude<ExpenseItemFields, 'url'>, string> = {
+  incurredAt: '__itemParsingResult.incurredAt',
+  description: '__itemParsingResult.description',
+  amount: '__itemParsingResult.amount',
+};
+
+/**
+ * Check whether there's a mismatch between the OCR value and the value entered by the user.
+ */
+const compareItemOCRValue = (
+  item: ExpenseItemFormValues,
+  field: Omit<keyof ExpenseItemFormValues, `_${string}`>,
+  expenseCurrency: string,
+): {
+  hasMismatch: boolean;
+  ocrValue: any;
+} => {
+  const existingValue = item[field as keyof ExpenseItemFormValues];
+  const checkValue = ocrValue => {
+    if (isNil(existingValue) || isNil(ocrValue)) {
+      return { hasMismatch: false, ocrValue };
+    } else if (field === 'amount') {
+      return {
+        hasMismatch: ocrValue.currency !== expenseCurrency || existingValue !== ocrValue.valueInCents,
+        ocrValue,
+      };
+    } else {
+      return { hasMismatch: existingValue !== ocrValue, ocrValue };
+    }
+  };
+
+  // If there's an item available, we try to match on it
+  const itemOCRValue = get(item, ITEM_OCR_FIELD_MAPPING[field as keyof ExpenseItemFormValues]);
+  if (!isNil(itemOCRValue)) {
+    return checkValue(itemOCRValue);
+  }
+
+  // Otherwise we match on the root value
+  const rootOCRValue = get(item, ITEM_OCR_ROOT_FIELD_MAPPING[field as keyof ExpenseItemFormValues]);
+  return checkValue(rootOCRValue);
+};
+
+type ExpenseOCRValuesComparison = Record<FieldsWithOCRSupport, { hasMismatch: boolean; ocrValue: any }>;
+
+export const compareItemOCRValues = (
+  item: ExpenseItemFormValues,
+  expenseCurrency: string,
+): ExpenseOCRValuesComparison => {
+  return Object.keys(ITEM_OCR_FIELD_MAPPING).reduce((result, field) => {
+    result[field as keyof ExpenseItemFormValues] = compareItemOCRValue(
+      item,
+      field as Omit<keyof ExpenseItemFormValues, `_${string}`>,
+      expenseCurrency,
+    );
+    return result;
+  }, {} as ExpenseOCRValuesComparison);
+};
+
+/** Return true if the item has an OCR parsing result */
+export const itemHasOCR = (item: ExpenseItemFormValues): boolean => {
+  return Boolean(item.__parsingResult || item.__itemParsingResult);
 };

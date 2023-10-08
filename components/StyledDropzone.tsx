@@ -87,6 +87,7 @@ const ReplaceContainer = styled.div`
  */
 const StyledDropzone = ({
   onReject = undefined,
+  onDrop = undefined,
   children = null,
   isLoading = false,
   loadingProgress = undefined,
@@ -106,6 +107,7 @@ const StyledDropzone = ({
   useGraphQL = false,
   parseDocument = false,
   onGraphQLSuccess = undefined,
+  UploadingComponent = undefined,
   kind,
   ...props
 }: StyledDropzoneProps) => {
@@ -115,6 +117,7 @@ const StyledDropzone = ({
     mockImageGenerator,
     onSuccess: onGraphQLSuccess,
     onReject,
+    isMulti,
   });
 
   // Sanity checks
@@ -124,8 +127,9 @@ const StyledDropzone = ({
     throw new Error('StyledDropzone: parseDocument cannot be used with collectFilesOnly');
   }
 
-  const onDrop = React.useCallback(
+  const onDropCallback = React.useCallback(
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+      onDrop?.(acceptedFiles, fileRejections);
       if (collectFilesOnly) {
         onSuccess?.(acceptedFiles, fileRejections);
       } else if (useGraphQL) {
@@ -134,9 +138,9 @@ const StyledDropzone = ({
         uploadFiles(acceptedFiles, fileRejections);
       }
     },
-    [collectFilesOnly, onSuccess, uploadFiles],
+    [collectFilesOnly, onSuccess, uploadFiles, onDrop],
   );
-  const dropzoneParams = { accept, minSize, maxSize, multiple: isMulti, onDrop };
+  const dropzoneParams = { accept, minSize, maxSize, multiple: isMulti, onDrop: onDropCallback };
   const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneParams);
 
   minHeight = size || minHeight;
@@ -168,7 +172,7 @@ const StyledDropzone = ({
             alignItems="center"
             size={innerMinHeight}
           >
-            <StyledSpinner size="70%" />
+            {UploadingComponent ? <UploadingComponent /> : <StyledSpinner size="70%" />}
           </Container>
           {isUploading && <Container fontSize="9px">{uploadProgress}%</Container>}
           {isLoading && !isNil(loadingProgress) && <Container>{loadingProgress}%</Container>}
@@ -244,8 +248,10 @@ const StyledDropzone = ({
 };
 
 type StyledDropzoneProps = {
-  /** Called back with the rejectd files */
+  /** Called back with the rejected files */
   onReject?: () => void;
+  /** Called when the user drops files */
+  onDrop?: (acceptedFiles, rejectedFiles) => void;
   /** Name for the input */
   name: string;
   /** Content to show inside the dropzone. Defaults to message "Drag and drop one or..." */
@@ -280,6 +286,7 @@ type StyledDropzoneProps = {
   useGraphQL?: boolean;
   onGraphQLSuccess?: (uploadResults: UploadFileResult[]) => void;
   parseDocument?: boolean;
+  UploadingComponent?: React.ComponentType;
 } & (
   | {
       /** Collect File only, do not upload files */
