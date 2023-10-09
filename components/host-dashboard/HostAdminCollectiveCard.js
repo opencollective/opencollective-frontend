@@ -109,6 +109,7 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
               size={32}
               fontSize="16px"
               onClick={() => setCurrentModal('addFunds')}
+              disabled={collective.isFrozen}
               title={intl.formatMessage({ id: 'menu.addFunds', defaultMessage: 'Add Funds' })}
             >
               {getCurrencySymbol(collective.currency)}
