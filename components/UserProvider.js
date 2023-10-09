@@ -12,7 +12,7 @@ import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from 
 import UserClass from '../lib/LoggedInUser';
 import { withTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 
-import { TOAST_TYPE, withToasts } from './ToastProvider';
+import { toast } from './ui/useToast';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,
@@ -26,7 +26,7 @@ export const UserContext = React.createContext({
 class UserProvider extends React.Component {
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired,
-    addToast: PropTypes.func,
+    toast: PropTypes.func,
     twoFactorAuthPrompt: PropTypes.object,
     router: PropTypes.object,
     token: PropTypes.string,
@@ -112,7 +112,7 @@ class UserProvider extends React.Component {
         this.logout();
         this.setState({ loadingLoggedInUser: false });
         const message = formatErrorMessage(intl, createError(ERROR.JWT_EXPIRED));
-        this.props.addToast({ type: TOAST_TYPE.ERROR, message });
+        toast({ variant: 'error', message });
         return null;
       }
 
@@ -153,8 +153,8 @@ class UserProvider extends React.Component {
             return LoggedInUser;
           } catch (e) {
             this.setState({ loadingLoggedInUser: false, errorLoggedInUser: e.message });
-            this.props.addToast({
-              type: TOAST_TYPE.ERROR,
+            toast({
+              variant: 'error',
               message: e.message,
             });
 
@@ -215,8 +215,8 @@ const withUser = WrappedComponent => {
   return WithUser;
 };
 
-export default withToasts(
-  injectIntl(withApollo(withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(injectIntl(UserProvider)))))),
+export default injectIntl(
+  withApollo(withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(injectIntl(UserProvider))))),
 );
 
 export { UserConsumer, withUser };

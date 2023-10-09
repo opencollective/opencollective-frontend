@@ -10,7 +10,7 @@ import ConfirmationModal from '../ConfirmationModal';
 import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 export const editAccountTypeMutation = gql`
   mutation EditAccountType($account: AccountReferenceInput!) {
@@ -23,7 +23,7 @@ export const editAccountTypeMutation = gql`
 `;
 
 const AccountType = () => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const [selectedAccountOption, setSelectedAccountOption] = React.useState([]);
   const [editAccountType, { loading }] = useMutation(editAccountTypeMutation, { context: API_V2_CONTEXT });
@@ -40,12 +40,12 @@ const AccountType = () => {
           account: { slug: selectedAccountOption?.value?.slug },
         },
       });
-      addToast({ type: TOAST_TYPE.SUCCESS, title: 'Account Type Successfully Changed', message: callToAction });
+      toast({ variant: 'success', title: 'Account Type Successfully Changed', message: callToAction });
       // Reset form and purge cache
       setIsConfirmationModelOpen(false);
       setSelectedAccountOption([]);
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   }, [selectedAccountOption, callToAction]);
 

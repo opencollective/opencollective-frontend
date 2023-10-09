@@ -33,7 +33,7 @@ import StyledHr from '../StyledHr';
 import StyledInputTags from '../StyledInputTags';
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
-import { useToasts } from '../ToastProvider';
+import { toast } from '../ui/useToast';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseFormItems from './ExpenseFormItems';
@@ -279,7 +279,6 @@ const ExpenseFormBody = ({
   supportedExpenseTypes,
 }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
   const { formatMessage } = intl;
   const formRef = React.useRef();
   const { LoggedInUser } = useLoggedInUser();
@@ -584,8 +583,8 @@ const ExpenseFormBody = ({
               setInitWithOCR(uploadResult);
             }
 
-            addToast({
-              type: 'SUCCESS',
+            toast({
+              variant: 'success',
               message: (
                 <FormattedMessage defaultMessage="The expense has been automatically prefilled with the information from the document" />
               ),

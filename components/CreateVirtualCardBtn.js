@@ -3,16 +3,16 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import EditVirtualCardModal from './edit-collective/EditVirtualCardModal';
+import { useToast } from './ui/useToast';
 import StyledButton from './StyledButton';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const CreateVirtualCardBtn = ({ children, host, collective }) => {
   const [showModal, setShowModal] = React.useState(false);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const handleCreateCardSuccess = () => {
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
+    toast({
+      variant: 'success',
       message: <FormattedMessage defaultMessage="Card successfully created" />,
     });
     setShowModal(false);

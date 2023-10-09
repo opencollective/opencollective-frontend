@@ -12,7 +12,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import { H3 } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const regenerateRecoveryCodesMutation = gql`
   mutation RegenerateRecoveryCodes {
@@ -26,7 +26,7 @@ type RecoverySettingsProps = {
 
 export function RecoverySettings(props: RecoverySettingsProps) {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [isRegenetingRecoveryCodes, setIsRegenetingRecoveryCodes] = React.useState(false);
 
   const [regenerateRecoveryCodes, { loading }] = useMutation<{ regenerateRecoveryCodes: string[] }>(
@@ -42,7 +42,7 @@ export function RecoverySettings(props: RecoverySettingsProps) {
       setIsRegenetingRecoveryCodes(false);
       props.onRecoveryCodes(res.data.regenerateRecoveryCodes);
     } catch (err) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, err) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
     }
   }, [intl, props.onRecoveryCodes]);
 

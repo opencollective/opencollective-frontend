@@ -13,7 +13,7 @@ import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledTextarea from '../StyledTextarea';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import { validateOauthApplicationValues } from './lib';
 
@@ -36,7 +36,7 @@ const INITIAL_VALUES = {
 
 const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [createApplication] = useMutation(createApplicationMutation, {
     context: API_V2_CONTEXT,
     update: cache => {
@@ -57,8 +57,8 @@ const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) 
           try {
             const appInput = { ...values, account: { id: account.id } };
             const result = await createApplication({ variables: { application: appInput } });
-            addToast({
-              type: TOAST_TYPE.SUCCESS,
+            toast({
+              variant: 'success',
               message: intl.formatMessage(
                 { defaultMessage: 'Application "{name}" created' },
                 { name: result.data.createApplication.name },
@@ -66,7 +66,7 @@ const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) 
             });
             onSuccess(result.data.createApplication, account);
           } catch (e) {
-            addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+            toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
           }
         }}
       >

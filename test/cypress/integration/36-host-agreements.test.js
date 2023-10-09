@@ -21,7 +21,7 @@ describe('Host agreements', () => {
       .type('This group can expense an unlimited number of potatoes\n\nNo restrictions whatsoever.');
     // Submit
     cy.contains('button', 'Create Agreement').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Agreement created' });
+    cy.checkToast({ variant: 'success', message: 'Agreement created' });
     cy.getByDataCy('agreement-drawer').should('not.exist'); // It closes the drawer
 
     // ---- Check agreement in the list ----
@@ -43,7 +43,7 @@ describe('Host agreements', () => {
     cy.get('@agreementForm').find('#input-title').clear().type('Unlimited potatoes (updated)');
     cy.get('@agreementForm').find('#input-expiresAt').clear().type('2062-11-07');
     cy.contains('button', 'Save Changes').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Agreement updated' });
+    cy.checkToast({ variant: 'success', message: 'Agreement updated' });
     cy.getByDataCy('agreement-drawer').should('not.exist'); // It closes the drawer
     cy.get('@firstRow').contains('Unlimited potatoes (updated)');
     cy.get('@firstRow').contains('Nov 7, 2062');
@@ -77,7 +77,7 @@ describe('Host agreements', () => {
     cy.getByDataCy('more-actions-delete-expense-btn').click();
     cy.contains('This will permanently delete the agreement and all its attachments').should('be.visible');
     cy.getByDataCy('confirmation-modal-continue').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Agreement deleted successfully' });
+    cy.checkToast({ variant: 'success', message: 'Agreement deleted successfully' });
     cy.getByDataCy('agreement-drawer').should('not.exist'); // It closes the drawer
     cy.contains('[data-cy="agreements-table"]', 'No agreements');
   });

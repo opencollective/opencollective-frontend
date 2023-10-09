@@ -32,8 +32,8 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledMo
 import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
 import { Span } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import { Switch } from '../../ui/Switch';
+import { useToast } from '../../ui/useToast';
 
 import ConfirmTierDeleteModal from './ConfirmTierDeleteModal';
 
@@ -831,7 +831,7 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
   const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation, { context: API_V2_CONTEXT });
 
   const [isConfirmingDelete, setIsConfirmingDelete] = React.useState(false);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const onDeleteTierClick = React.useCallback(async () => {
     setIsConfirmingDelete(true);
@@ -852,15 +852,15 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
           },
         });
         onClose();
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
+        toast({
+          variant: 'success',
           message: intl.formatMessage(
             { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} deleted.' },
             { type: tier.type },
           ),
         });
       } catch (e) {
-        addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e.message) });
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e.message) });
       } finally {
         setIsConfirmingDelete(false);
       }
@@ -887,8 +887,8 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
           try {
             const result = await submitFormMutation({ variables: { tier, account: { legacyId: collective.id } } });
             onUpdate?.(result);
-            addToast({
-              type: TOAST_TYPE.SUCCESS,
+            toast({
+              variant: 'success',
               message: isEditing
                 ? intl.formatMessage(
                     { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} updated.' },
@@ -901,7 +901,7 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
             });
             onClose();
           } catch (e) {
-            addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+            toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
           }
         }}
       >

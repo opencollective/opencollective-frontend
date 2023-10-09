@@ -62,7 +62,9 @@ const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
         id={feature.key}
         checked={isChecked}
         disabled={loading}
-        onCheckedChange={checked => togglePreviewFeature(feature.key, checked)}
+        onCheckedChange={checked => {
+          togglePreviewFeature(feature.key, checked);
+        }}
       />
     </div>
   );

@@ -16,8 +16,8 @@ import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledTag from '../StyledTag';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { InfoList, InfoListItem } from '../ui/InfoList';
+import { useToast } from '../ui/useToast';
 import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const virtualCardRequestQuery = gql`
@@ -68,7 +68,7 @@ const RejectVirtualCardRequestMutation = gql`
 
 function VirtualCardRequestDrawerActions({ virtualCardRequest }: { virtualCardRequest: VirtualCardRequest }) {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [isVirtualCardModalOpen, setIsVirtualCardModalOpen] = React.useState(false);
 
@@ -85,7 +85,7 @@ function VirtualCardRequestDrawerActions({ virtualCardRequest }: { virtualCardRe
     try {
       await rejectRequestMutation();
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   }, [rejectRequestMutation, intl]);
   const loading = rejectRequestMutationResult.loading;

@@ -10,8 +10,8 @@ import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 
 import { Box, Flex } from '../../../Grid';
 import StyledTooltip from '../../../StyledTooltip';
-import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
 import { Switch } from '../../../ui/Switch';
+import { useToast } from '../../../ui/useToast';
 
 import { accountActivitySubscriptionsFragment } from './fragments';
 
@@ -34,7 +34,7 @@ const setEmailNotificationMutation = gql`
 `;
 
 const ActivitySwitch = ({ account, activityType }) => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const existingSetting = account.activitySubscriptions?.find(
     notification =>
@@ -62,8 +62,8 @@ const ActivitySwitch = ({ account, activityType }) => {
       setSubscribed(variables.active);
       await setEmailNotification({ variables });
     } catch (e) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: (
           <FormattedMessage
             id="NotificationsSettings.ToggleError"

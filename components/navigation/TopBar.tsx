@@ -157,7 +157,6 @@ const TopBar = ({ account }: TopBarProps) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
   const router = useRouter();
-
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
 
@@ -196,7 +195,6 @@ const TopBar = ({ account }: TopBarProps) => {
 
           <Flex alignItems="center" gridGap={2} flexShrink={4} flexGrow={0}>
             <SearchTrigger setShowSearchModal={setShowSearchModal} />
-
             <div className="hidden sm:block">
               <ChangelogTrigger />
             </div>

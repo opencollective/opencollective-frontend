@@ -13,7 +13,7 @@ describe('Recurring contributions', () => {
         cy.contains('[data-cy="select-option"]', 'Monthly').click();
         cy.get('input[data-cy="amount"]').type('10');
         cy.getByDataCy('confirm-btn').click();
-        cy.checkToast({ type: 'SUCCESS', message: 'Tier created.' });
+        cy.checkToast({ variant: 'success', message: 'Tier created.' });
         cy.logout();
       })
       .then(() => {
