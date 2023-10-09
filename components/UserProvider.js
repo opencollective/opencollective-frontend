@@ -85,6 +85,11 @@ class UserProvider extends React.Component {
     removeFromLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE);
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
     await this.props.client.clearStore();
+
+    // Refetch the LoggedInUser query to make the API clear the rootRedirect cookie
+    await this.props.client.refetchQueries({
+      include: ['LoggedInUser'],
+    });
   };
 
   login = async token => {
