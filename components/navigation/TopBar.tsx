@@ -198,7 +198,9 @@ const TopBar = ({ account }: TopBarProps) => {
             <div className="hidden sm:block">
               <ChangelogTrigger />
             </div>
-            <ProfileMenu />
+            <ProfileMenu
+              logoutParameters={{ skipQueryRefetch: onDashboardRoute, redirect: onDashboardRoute ? '/' : undefined }}
+            />
           </Flex>
         </div>
       </div>
