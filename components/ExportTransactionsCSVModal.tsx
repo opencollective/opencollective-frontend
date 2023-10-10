@@ -61,6 +61,7 @@ type CSVField =
   | 'orderLegacyId'
   | 'orderFrequency'
   | 'orderProcessedDate'
+  | 'orderCustomData'
   | 'paymentMethodService'
   | 'paymentMethodType'
   | 'expenseId'
@@ -117,6 +118,7 @@ const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
     'orderMemo',
     'orderFrequency',
     'orderProcessedDate',
+    'orderCustomData',
     'paymentMethodService',
     'paymentMethodType',
   ],
@@ -205,6 +207,7 @@ const FieldLabels: Record<CSVField, React.ReactNode> = {
   orderFrequency: <FormattedMessage defaultMessage="Contribution Frequency" />,
   orderMemo: <FormattedMessage defaultMessage="Contribution Memo" />,
   orderProcessedDate: <FormattedMessage defaultMessage="Contribution Processed Date" />,
+  orderCustomData: <FormattedMessage defaultMessage="Contribution Custom Data" />,
   paymentMethodService: <FormattedMessage defaultMessage="Payment Method Service" />,
   paymentMethodType: <FormattedMessage defaultMessage="Payment Method Type" />,
   expenseId: <FormattedMessage defaultMessage="Expense ID" />,
