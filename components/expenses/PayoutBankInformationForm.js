@@ -488,7 +488,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
     return (
       <MessageBox fontSize="12px" type="warning">
         <FormattedMessage
-          defaultMessage="An error ocurred while preparing the form for bank accounts. Please contact <I18nSupportLink>support</I18nSupportLink>"
+          defaultMessage="An error occurred while preparing the form for bank accounts. Please contact <I18nSupportLink>support</I18nSupportLink>"
           values={{ I18nSupportLink }}
         />
       </MessageBox>
