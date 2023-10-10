@@ -10,7 +10,6 @@ import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import { getIntlProps } from '../lib/i18n/request';
 import theme from '../lib/theme';
 import defaultColors from '../lib/theme/colors';
-import withData from '../lib/withData';
 
 import DefaultPaletteStyle from '../components/DefaultPaletteStyle';
 import StripeProviderSSR from '../components/StripeProvider';
@@ -34,7 +33,11 @@ Router.onRouteChangeComplete = () => NProgress.done();
 
 Router.onRouteChangeError = () => NProgress.done();
 
+import memoizeOne from 'memoize-one';
+
+import { APOLLO_STATE_PROP_NAME, initClient } from '../lib/apollo-client';
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
+import { withTwoFactorAuthentication } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import sentryLib from '../server/sentry';
 
 import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
@@ -44,6 +47,7 @@ import { TooltipProvider } from '../components/ui/Tooltip';
 
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
+    twoFactorAuthContext: PropTypes.object,
     pageProps: PropTypes.object.isRequired,
     scripts: PropTypes.object.isRequired,
     locale: PropTypes.string,
@@ -112,12 +116,18 @@ class OpenCollectiveFrontendApp extends App {
     });
   }
 
-  render() {
-    const { client, Component, pageProps, scripts, locale } = this.props;
+  getApolloClient = memoizeOne(pageProps => {
+    return initClient({
+      initialState: pageProps[APOLLO_STATE_PROP_NAME],
+      twoFactorAuthContext: this.props.twoFactorAuthContext,
+    });
+  });
 
+  render() {
+    const { Component, pageProps, scripts, locale } = this.props;
     return (
       <Fragment>
-        <ApolloProvider client={client}>
+        <ApolloProvider client={this.getApolloClient(pageProps)}>
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
               <IntlProvider locale={locale}>
@@ -126,7 +136,6 @@ class OpenCollectiveFrontendApp extends App {
                     <NewsAndUpdatesProvider>
                       <Component {...pageProps} />
                       <Toaster />
-
                       <GlobalNewsAndUpdates />
                       <TwoFactorAuthenticationModal />
                     </NewsAndUpdatesProvider>
@@ -145,4 +154,4 @@ class OpenCollectiveFrontendApp extends App {
   }
 }
 
-export default withData(OpenCollectiveFrontendApp);
+export default withTwoFactorAuthentication(OpenCollectiveFrontendApp);

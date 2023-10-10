@@ -136,6 +136,7 @@ const ProcessExpenseButtons = ({
   isMoreActions,
   displaySecurityChecks,
   isViewingExpenseInHostContext,
+  disabled,
 }) => {
   const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] = React.useState();
   const [selectedAction, setSelectedAction] = React.useState(null);
@@ -181,7 +182,7 @@ const ProcessExpenseButtons = ({
     const isSelectedAction = selectedAction === action;
     return {
       ...buttonProps,
-      disabled: loading && !isSelectedAction,
+      disabled: disabled || (loading && !isSelectedAction),
       loading: loading && isSelectedAction,
     };
   };
@@ -362,6 +363,7 @@ ProcessExpenseButtons.propTypes = {
   displayMarkAsIncomplete: PropTypes.bool,
   displaySecurityChecks: PropTypes.bool,
   isViewingExpenseInHostContext: PropTypes.bool,
+  disabled: PropTypes.bool,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {

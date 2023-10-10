@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { gql, useLazyQuery } from '@apollo/client';
-import { get } from 'lodash';
-import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { gql } from '@apollo/client';
+import { get, pick } from 'lodash';
+import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 
-import { initClient } from '../lib/apollo-client';
+import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
@@ -114,48 +114,38 @@ type UpdatePageArgs = {
   updateSlug: string;
 };
 
-export const getServerSideProps: GetServerSideProps<UpdatePageArgs> = async ctx => {
-  const query = ctx.query as UpdatePageArgs;
-  const client = initClient();
-  const { data, error } = await client.query({
-    query: updatePageQuery,
-    variables: query,
-    context: API_V2_CONTEXT,
-    fetchPolicy: 'network-only',
-    errorPolicy: 'ignore',
-  });
+const updatePageSSRQueryHelpers = getSSRQueryHelpers({
+  query: updatePageQuery,
+  getPropsFromContext: ctx => pick(ctx.query, ['collectiveSlug', 'updateSlug']) as UpdatePageArgs,
+  getVariablesFromContext: (ctx, props) => props,
+  context: API_V2_CONTEXT,
+});
 
-  return {
-    props: { ...query, ...data, error: error || null }, // will be passed to the page component as props
-  };
-};
+export const getServerSideProps = updatePageSSRQueryHelpers.getServerSideProps;
 
 export default function UpdatePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { collectiveSlug, updateSlug } = props;
   const { LoggedInUser } = useLoggedInUser();
-  const [fetchData, query] = useLazyQuery(updatePageQuery, {
-    variables: { collectiveSlug, updateSlug },
-    context: API_V2_CONTEXT,
-  });
+  const queryResult = updatePageSSRQueryHelpers.useQuery(props);
   const router = useRouter();
+  const { updateSlug, collectiveSlug } = props;
 
-  const { account, update } = query?.data || props;
+  const { account, update } = queryResult?.data || {};
   const comments = get(update, 'comments.nodes', []);
   const totalCommentsCount = get(update, 'comments.totalCount', 0);
   const [replyingToComment, setReplyingToComment] = useState(null);
 
   React.useEffect(() => {
     if (LoggedInUser) {
-      fetchData();
+      queryResult.refetch();
     }
-  }, [LoggedInUser]);
+  }, [LoggedInUser, update]);
 
   React.useEffect(() => {
     addParentToURLIfMissing(router, account, `/updates/${updateSlug}`);
   });
 
-  const fetchMore = async () => {
-    await query.fetchMore({
+  const fetchMoreComments = async () => {
+    await queryResult.fetchMore({
       variables: { collectiveSlug, updateSlug, offset: get(update, 'comments.nodes', []).length },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) {
@@ -207,7 +197,7 @@ export default function UpdatePage(props: InferGetServerSidePropsType<typeof get
           editable={Boolean(LoggedInUser?.isAdminOfCollective(account))}
           LoggedInUser={LoggedInUser}
           compact={false}
-          isReloadingData={query.loading}
+          isReloadingData={queryResult.loading}
         />
         {update.userCanSeeUpdate && (
           <Box pl={[0, 5]}>
@@ -216,9 +206,9 @@ export default function UpdatePage(props: InferGetServerSidePropsType<typeof get
                 <Thread
                   collective={account}
                   hasMore={comments.length < totalCommentsCount}
-                  fetchMore={fetchMore}
+                  fetchMore={fetchMoreComments}
                   items={comments}
-                  onCommentDeleted={() => query.refetch()}
+                  onCommentDeleted={() => queryResult.refetch()}
                   getClickedComment={setReplyingToComment}
                 />
               </Container>
@@ -233,7 +223,7 @@ export default function UpdatePage(props: InferGetServerSidePropsType<typeof get
                     id="new-update"
                     replyingToComment={replyingToComment}
                     UpdateId={update.id}
-                    onSuccess={() => query.refetch()}
+                    onSuccess={() => queryResult.refetch()}
                   />
                 </Box>
               </Flex>
