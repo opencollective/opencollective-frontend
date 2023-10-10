@@ -130,7 +130,7 @@
     "uuid": "9.0.1",
     "validator": "13.11.0",
     "webpack-manifest-plugin": "5.0.0",
-    "winston": "3.10.0"
+    "winston": "3.11.0"
   },
   "scripts": {
     "build": "npm-run-all build:updates build:next build:server",
