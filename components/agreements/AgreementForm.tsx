@@ -21,7 +21,7 @@ import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledTextarea from '../StyledTextarea';
 import { H4 } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from './fragments';
 
@@ -124,7 +124,7 @@ type AgreementFormProps = {
 
 const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel, openFileViewer }: AgreementFormProps) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const initialValues = cloneDeep(agreement || {});
   const drawerActionsContainer = useDrawerActionsContainer();
   const isEditing = Boolean(agreement);
@@ -155,8 +155,8 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel, op
 
               const result = await submitAgreement({ variables });
               onEdit?.(result.data.editAgreement);
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 message: intl.formatMessage({ defaultMessage: 'Agreement updated' }),
               });
             } else {
@@ -164,14 +164,14 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel, op
               const variables = { ...values, account, host: { legacyId: hostLegacyId } };
               const result = await submitAgreement({ variables });
               onCreate?.(result.data.addAgreement);
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 message: intl.formatMessage({ defaultMessage: 'Agreement created' }),
               });
             }
           } catch (e) {
-            addToast({
-              type: TOAST_TYPE.ERROR,
+            toast({
+              variant: 'error',
               message: i18nGraphqlException(intl, e),
             });
           }

@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
+import { useToast } from './ui/useToast';
 import UpdateAudienceBreakdown from './updates/UpdateAudienceBreakdown';
 import ConfirmationModal from './ConfirmationModal';
 import Container from './Container';
@@ -15,7 +16,6 @@ import { Box } from './Grid';
 import StyledButton from './StyledButton';
 import StyledSelect from './StyledSelect';
 import { Label } from './Text';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const publishUpdateMutation = gql`
   mutation PublishUpdate($id: String!, $audience: UpdateAudience) {
@@ -89,7 +89,7 @@ const PublishUpdateBtn = ({ id, isHost, isChangelog }) => {
   const intl = useIntl();
   const [audience, setAudience] = React.useState('ALL');
   const [showModal, setShowModal] = React.useState(false);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const { data, loading } = useQuery(updateQuery, { context: API_V2_CONTEXT, variables: { id, audience } });
   const [callPublishUpdate, { loading: isSubmitting }] = useMutation(publishUpdateMutation, {
     context: API_V2_CONTEXT,
@@ -128,7 +128,7 @@ const PublishUpdateBtn = ({ id, isHost, isChangelog }) => {
               try {
                 await callPublishUpdate({ variables: { id, audience } });
               } catch (e) {
-                addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+                toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               } finally {
                 setShowModal(false);
               }

@@ -3,7 +3,7 @@ import { gql, useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import { TOAST_TYPE, useToasts } from '../../components/ToastProvider';
+import { useToast } from '../../components/ui/useToast';
 
 import { canUseMockImageUpload, mockImageUpload } from '../api';
 import { i18nGraphqlException } from '../errors';
@@ -61,7 +61,7 @@ export const useGraphQLFileUploader = ({
 }: useGraphQLFileUploaderProps) => {
   const [isUploading, setIsUploading] = React.useState(false);
   const [callUploadFile] = useMutation(uploadFileMutation, { context: API_V2_CONTEXT });
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
 
   // A helper to make sure we always show the error somewhere
@@ -70,7 +70,7 @@ export const useGraphQLFileUploader = ({
       if (onReject) {
         onReject(isMulti ? [errorMsg] : errorMsg);
       } else {
-        addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
+        toast({ variant: 'error', message: errorMsg });
       }
     },
     [onReject],

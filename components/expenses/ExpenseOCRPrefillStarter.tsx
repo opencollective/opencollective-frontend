@@ -11,7 +11,7 @@ import StyledInput from '../StyledInput';
 import StyledLinkButton from '../StyledLinkButton';
 import StyledTag from '../StyledTag';
 import { P } from '../Text';
-import { useToasts } from '../ToastProvider';
+import { toast } from '../ui/useToast';
 
 import type { ExpenseFormValues } from './types/FormValues';
 
@@ -25,7 +25,6 @@ export const ExpenseOCRPrefillStarter = ({
   collective: Account;
 }) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const { addToast } = useToasts();
   const { isUploading, uploadFile } = useGraphQLFileUploader({ onSuccess });
 
   return (
@@ -40,8 +39,7 @@ export const ExpenseOCRPrefillStarter = ({
           multiple={true}
           onChange={event => {
             onUpload?.();
-            addToast({
-              type: 'INFO',
+            toast({
               message: (
                 <FormattedMessage defaultMessage="Uploading document... You can continue filling the form while we process the document." />
               ),

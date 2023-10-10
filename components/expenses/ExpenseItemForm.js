@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FastField, Field, useFormikContext } from 'formik';
+import { Field, useFormikContext } from 'formik';
 import { escape, get, isEmpty, pick, unescape } from 'lodash';
 import Lottie from 'lottie-react';
 import { AlertTriangle } from 'lucide-react';
@@ -85,6 +85,8 @@ export const validateExpenseItem = (expense, item) => {
       errors.url = createError(ERROR.FORM_FIELD_REQUIRED);
     } else if (!isURL(item.url)) {
       errors.url = createError(ERROR.FORM_FIELD_PATTERN);
+    } else if (item.__isUploading) {
+      errors.url = createError(ERROR.FORM_FILE_UPLOADING);
     }
   }
 
@@ -126,7 +128,7 @@ const WithOCRComparisonWarning = ({ comparison, formatValue, children, mrClass =
   <div className="relative">
     {children}
     {Boolean(comparison?.hasMismatch) && (
-      <div className={cn('absolute right-0 top-0 mt-[9px]', mrClass)}>
+      <div className={cn('absolute right-0 top-0 mt-[9px]', mrClass)} data-cy="mismatch-warning">
         <Tooltip>
           <TooltipTrigger>
             <AlertTriangle size={16} color="#CB9C03" />
@@ -181,20 +183,23 @@ const ExpenseItemForm = ({
   const form = useFormikContext();
   const { formatMessage } = intl;
   const attachmentKey = `attachment-${attachment.id || attachment.url}`;
-  const getFieldName = field => `items[${itemIdx}].${field}`;
+  const itemPath = `items[${itemIdx}]`;
+  const getFieldName = field => `${itemPath}.${field}`;
   const getError = field => formatFormErrorMessage(intl, get(errors, getFieldName(field)));
+  const isLoading = Boolean(attachment.__isUploading);
 
   return (
     <Box mb={18} data-cy="expense-attachment-form">
       <Flex flexWrap="wrap">
         {requireFile && (
-          <FastField name={getFieldName('url')}>
+          <Field name={getFieldName('url')}>
             {({ field, form, meta }) => {
               const hasValidUrl = field.value && isURL(field.value);
               return (
                 <StyledInputField
                   mr={[1, 4]}
                   mt={2}
+                  maxWidth={[null, 112]}
                   htmlFor={attachmentKey}
                   label={<AttachmentLabel />}
                   data-cy="attachment-url-field"
@@ -210,24 +215,28 @@ const ExpenseItemForm = ({
                     error={
                       meta.error?.type === ERROR.FORM_FIELD_REQUIRED ? formatMessage(msg.receiptRequired) : meta.error
                     }
-                    onSuccess={({ url }) => form.setFieldValue(field.name, url)}
+                    onSuccess={({ url }) => form.setFieldValue(itemPath, { ...attachment, url, __isUploading: false })}
                     mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=${attachmentKey}`}
                     fontSize="13px"
                     size={[84, 112]}
                     value={hasValidUrl && field.value}
-                    onReject={onUploadError}
+                    onReject={(...args) => {
+                      form.setFieldValue(itemPath, { ...attachment, __isUploading: false });
+                      onUploadError(...args);
+                    }}
                     useGraphQL={hasOCRFeature}
                     parseDocument={hasOCRFeature}
                     onGraphQLSuccess={uploadResults => {
                       updateExpenseFormWithUploadResult(collective, form, uploadResults, [itemIdx]);
                     }}
-                    isLoading={attachment.__isUploadingFromMultiDropzone}
+                    isLoading={isLoading}
                     UploadingComponent={() => <Lottie animationData={ScanningAnimationJSON} loop autoPlay />}
+                    onDrop={() => form.setFieldValue(itemPath, { ...attachment, __isUploading: true })}
                   />
                 </StyledInputField>
               );
             }}
-          </FastField>
+          </Field>
         )}
         <Box flex="1 1" minWidth={170} mt={2}>
           <Field name={getFieldName('description')}>
@@ -412,8 +421,8 @@ ExpenseItemForm.propTypes = {
     incurredAt: PropTypes.string,
     amount: PropTypes.number,
     __parsingResult: PropTypes.object,
-    __canBeSplit: PropTypes.boolean,
-    __isUploadingFromMultiDropzone: PropTypes.boolean,
+    __canBeSplit: PropTypes.bool,
+    __isUploading: PropTypes.bool,
   }).isRequired,
   editOnlyDescriptiveInfo: PropTypes.bool,
   itemIdx: PropTypes.number.isRequired,

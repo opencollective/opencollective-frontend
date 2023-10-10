@@ -38,8 +38,8 @@ import StyledTextarea from '../StyledTextarea';
 import StyledTooltip from '../StyledTooltip';
 import { TaxesFormikFields } from '../taxes/TaxesFormikFields';
 import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { TwoFactorAuthRequiredMessage } from '../TwoFactorAuthRequiredMessage';
+import { useToast } from '../ui/useToast';
 
 const EDITABLE_FIELDS = [
   'amount',
@@ -749,7 +749,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
 
 const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreatePendingContributionFormProps) => {
   const { LoggedInUser } = useLoggedInUser();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const { data, loading } = useQuery<CreatePendingContributionModalQuery>(createPendingContributionModalQuery, {
     context: API_V2_CONTEXT,
@@ -829,8 +829,8 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
 
               const result = await editPendingOrder({ variables: { order } });
 
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 message: (
                   <FormattedMessage
                     defaultMessage="Pending contribution #{orderId} updated"
@@ -854,8 +854,8 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
 
               const result = await createPendingOrder({ variables: { order } });
 
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 message: (
                   <FormattedMessage
                     defaultMessage="Pending contribution created with reference #{orderId}"

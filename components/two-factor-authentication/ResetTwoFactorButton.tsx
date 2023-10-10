@@ -12,7 +12,7 @@ import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../Confirmation
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const RemoveTwoFactorAuthenticationMutation = gql`
   mutation RemoveTwoFactorAuthentication($account: AccountReferenceInput!) {
@@ -37,7 +37,7 @@ type ResetTwoFactorButtonProps = {
 
 export function ResetTwoFactorButton(props: ResetTwoFactorButtonProps) {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [isRemovingTwoFactorAuthentication, setIsRemovingTwoFactorAuthentication] = React.useState(false);
   const [removeTwoFactorAuthentication] = useMutation(RemoveTwoFactorAuthenticationMutation);
@@ -66,14 +66,14 @@ export function ResetTwoFactorButton(props: ResetTwoFactorButtonProps) {
           },
         },
       });
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: <FormattedMessage defaultMessage="Two factor authentication disabled." />,
       });
       return CONFIRMATION_MODAL_TERMINATE;
     } catch (e) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: i18nGraphqlException(intl, e),
       });
     } finally {

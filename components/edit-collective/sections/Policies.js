@@ -24,7 +24,7 @@ import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { useToast } from '../../ui/useToast';
 
 import { getSettingsQuery } from './EditCollectivePage';
 import SettingsSectionTitle from './SettingsSectionTitle';
@@ -133,7 +133,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const [selected, setSelected] = React.useState([]);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   // GraphQL
   const { loading, data } = useQuery(getSettingsQuery, {
@@ -218,13 +218,13 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
           }),
         ]);
 
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
+        toast({
+          variant: 'success',
           message: formatMessage({ defaultMessage: 'Policies updated successfully' }),
         });
       } catch (e) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: i18nGraphqlException(intl, e),
         });
       }

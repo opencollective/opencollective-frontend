@@ -35,7 +35,7 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy=name]').type('Free ticket');
     cy.get('input[data-cy=amount]').type('0');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
     cy.getByDataCy('menu-account-avatar-link').click();
 
     // Go to the contribution flow
@@ -60,7 +60,7 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy=name]').type('Paying Ticket');
     cy.get('input[data-cy=amount]').type('10');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
     cy.getByDataCy('menu-account-avatar-link').click();
 
     // Go to the contribution flow
@@ -93,7 +93,7 @@ describe('event.createOrder page', () => {
     cy.get('input[data-cy=amount]').type('10');
     cy.get('input[data-cy=minimumAmount]').type('5');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
     cy.getByDataCy('menu-account-avatar-link').click();
 
     // Go to the contribution flow
@@ -132,7 +132,7 @@ describe('event.createOrder page', () => {
     cy.get('[data-cy=name]').type('Ticket with VAT');
     cy.get('input[data-cy=amount]').type('10');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
     cy.getByDataCy('menu-account-avatar-link').click();
 
     // Go to the contribution flow

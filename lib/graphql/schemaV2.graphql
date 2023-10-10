@@ -4498,12 +4498,12 @@ type AccountPermissions {
   id: String!
 
   """
-  Whether the current user can mark this order as expired
+  Whether the current user can add funds to this account
   """
   addFunds: Permission!
 
   """
-  Whether the current user can mark this order as expired
+  Whether the current user can contact this account
   """
   contact: Permission!
 }
@@ -15029,6 +15029,11 @@ type Mutation {
     """
     agreement: AgreementReferenceInput!
   ): Agreement!
+
+  """
+  Send In-App Survey response
+  """
+  sendSurveyResponse(surveyKey: String!, responseId: String!, score: Int!, text: String, okToContact: Boolean): Boolean
 }
 
 """

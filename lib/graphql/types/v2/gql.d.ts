@@ -42,6 +42,10 @@ export function gql(source: "\n  mutation DeleteUpdate($id: String!) {\n    dele
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  mutation sendSurveyResponse(\n    $surveyKey: String!\n    $responseId: String!\n    $score: Int!\n    $text: String\n    $okToContact: Boolean\n  ) {\n    sendSurveyResponse(\n      surveyKey: $surveyKey\n      responseId: $responseId\n      score: $score\n      text: $text\n      okToContact: $okToContact\n    )\n  }\n"): typeof import('./graphql').SendSurveyResponseDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query FindAFiscalHostQuery(\n    $tags: [String]\n    $limit: Int\n    $offset: Int\n    $country: [CountryISO]\n    $currency: String\n    $searchTerm: String\n  ) {\n    hosts(\n      tag: $tags\n      limit: $limit\n      offset: $offset\n      tagSearchOperator: OR\n      country: $country\n      currency: $currency\n      searchTerm: $searchTerm\n    ) {\n      totalCount\n      limit\n      offset\n      nodes {\n        id\n        legacyId\n        createdAt\n        settings\n        type\n        name\n        slug\n        description\n        longDescription\n        currency\n        totalHostedCollectives\n        hostFeePercent\n        isTrustedHost\n        location {\n          id\n          country\n        }\n        tags\n      }\n    }\n  }\n"): typeof import('./graphql').FindAFiscalHostQueryDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -75,6 +79,10 @@ export function gql(source: "\n  fragment AgreementViewFields on Agreement {\n  
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  fragment NavbarFields on CollectiveFeatures {\n    id\n    ABOUT\n    CONNECTED_ACCOUNTS\n    RECEIVE_FINANCIAL_CONTRIBUTIONS\n    RECURRING_CONTRIBUTIONS\n    EVENTS\n    PROJECTS\n    USE_EXPENSES\n    RECEIVE_EXPENSES\n    USE_EXPENSES\n    COLLECTIVE_GOALS\n    TOP_FINANCIAL_CONTRIBUTORS\n    CONVERSATIONS\n    UPDATES\n    TEAM\n    CONTACT_FORM\n    RECEIVE_HOST_APPLICATIONS\n    HOST_DASHBOARD\n    TRANSACTIONS\n    REQUEST_VIRTUAL_CARDS\n  }\n"): typeof import('./graphql').NavbarFieldsFragmentDoc;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query UpdatesSection($slug: String!, $onlyPublishedUpdates: Boolean) {\n    account(slug: $slug) {\n      id\n      updates(limit: 3, onlyPublishedUpdates: $onlyPublishedUpdates) {\n        nodes {\n          id\n          id\n          slug\n          title\n          summary\n          createdAt\n          publishedAt\n          isPrivate\n          userCanSeeUpdate\n          fromAccount {\n            id\n            type\n            name\n            slug\n            imageUrl\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').UpdatesSectionDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

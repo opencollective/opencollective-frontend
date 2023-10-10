@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -9,6 +8,7 @@ import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { TierTypes } from '../lib/constants/tiers-types';
 import { sortEvents } from '../lib/events';
 import { gqlV1 } from '../lib/graphql/helpers';
+import { ssrGraphQLQuery } from '../lib/graphql/with-ssr-query';
 import { sortTiersForCollective } from '../lib/tier-utils';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 import { getWebsiteUrl } from '../lib/utils';
@@ -52,7 +52,7 @@ const CardsContainer = styled(Grid).attrs({
   }
 `;
 
-class TiersPage extends React.Component {
+class ContributePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, verb } }) {
     return { slug: collectiveSlug, verb };
   }
@@ -60,7 +60,6 @@ class TiersPage extends React.Component {
   static propTypes = {
     slug: PropTypes.string, // from getInitialProps, for addContributePageData
     verb: PropTypes.string, // from getInitialProps
-    query: PropTypes.object, // from getInitialProps
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object,
   };
@@ -453,17 +452,16 @@ const contributePageQuery = gqlV1/* GraphQL */ `
   ${fragments.contributeCardProjectFieldsFragment}
 `;
 
-const addContributePageData = graphql(contributePageQuery, {
-  options: props => ({
-    variables: {
-      slug: props.slug,
-      nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
-      includeTiers: ['contribute', 'tiers'].includes(props.verb),
-      includeEvents: ['contribute', 'events'].includes(props.verb),
-      includeProjects: ['contribute', 'projects'].includes(props.verb),
-      includeConnectedCollectives: ['contribute', 'connected-collectives'].includes(props.verb),
-    },
+const addContributePageData = ssrGraphQLQuery({
+  query: contributePageQuery,
+  getVariablesFromProps: props => ({
+    slug: props.slug,
+    nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+    includeTiers: ['contribute', 'tiers'].includes(props.verb),
+    includeEvents: ['contribute', 'events'].includes(props.verb),
+    includeProjects: ['contribute', 'projects'].includes(props.verb),
+    includeConnectedCollectives: ['contribute', 'connected-collectives'].includes(props.verb),
   }),
 });
 
-export default withUser(addContributePageData(TiersPage));
+export default withUser(addContributePageData(ContributePage));

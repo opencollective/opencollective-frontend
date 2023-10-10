@@ -11,7 +11,7 @@ import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import { H3 } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import { UserTwoFactorMethodItem } from './UserTwoFactorMethodItem';
 
@@ -57,7 +57,7 @@ export function DevicesSettings(props: DevicesSettingsProps) {
   const intl = useIntl();
   const twoFactorMethods = props.userTwoFactorAuthenticationMethods.filter(m => m.method === TwoFactorMethod.WEBAUTHN);
   const hasTwoFactorMethod = twoFactorMethods.length > 0;
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [createPublicKeyRequestOptions] = useMutation(CreateWebAuthnRegistrationOptionsMutation, {
     context: API_V2_CONTEXT,
@@ -93,12 +93,12 @@ export function DevicesSettings(props: DevicesSettingsProps) {
         props.onRecoveryCodes(result.data.addTwoFactorAuthTokenToIndividual.recoveryCodes);
       }
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: intl.formatMessage(I18nMessages.DEVICE_ADDED),
       });
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: e.message });
+      toast({ variant: 'error', message: e.message });
     }
   }, [props.individual.id, intl]);
 

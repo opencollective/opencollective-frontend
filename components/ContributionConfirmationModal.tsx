@@ -12,6 +12,7 @@ import { TaxInput } from '../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../lib/i18n/taxes';
 import { getCurrentDateInUTC } from '../lib/utils';
 
+import { useToast } from './ui/useToast';
 import Container from './Container';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import { Box, Flex } from './Grid';
@@ -23,7 +24,6 @@ import StyledInputPercentage from './StyledInputPercentage';
 import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from './StyledModal';
 import StyledTooltip from './StyledTooltip';
 import { Label, P, Span } from './Text';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 export const confirmContributionFieldsFragment = gql`
   fragment ConfirmContributionFields on Order {
@@ -134,7 +134,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
   const [taxPercent, setTaxPercent] = useState(defaultTaxPercent);
   const [processedAt, setProcessedAt] = useState(getCurrentDateInUTC());
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [confirmOrder, { loading: submitting }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });
   const contributionAmount = amountReceived - platformTip;
   const grossContributionAmount = Math.round(contributionAmount / (1 + taxPercent / 100));
@@ -183,14 +183,14 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
                 },
               },
             });
-            addToast({
-              type: TOAST_TYPE.SUCCESS,
+            toast({
+              variant: 'success',
               message: intl.formatMessage({ defaultMessage: 'Contribution confirmed successfully' }),
             });
             onSuccess?.();
             onClose();
           } catch (e) {
-            addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+            toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
           }
         }}
       >
