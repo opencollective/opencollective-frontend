@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
-import { cloneDeep, pick } from 'lodash';
+import { cloneDeep, omit, pick } from 'lodash';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -234,11 +234,11 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel, op
               >
                 {({ field }) => (
                   <StyledInput
-                    {...field}
+                    {...omit(field, ['value', 'onChange', 'onBlur'])}
                     type="date"
                     width="100%"
                     maxLength={60}
-                    value={stripTime(formik.values.expiresAt)}
+                    defaultValue={stripTime(formik.values.expiresAt)}
                     onChange={e => {
                       // Consider date input as UTC
                       formik.setFieldValue('expiresAt', e.target.value ? `${e.target.value}T00:00:00.000Z` : null);
