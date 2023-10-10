@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { Field, FieldArray, Form, Formik } from 'formik';
 import { first, isEmpty, omit, pick } from 'lodash';
+import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -16,7 +17,7 @@ import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { AmountPropTypeShape } from '../../lib/prop-types';
-import { flattenObjectDeep } from '../../lib/utils';
+import { flattenObjectDeep, parseToBoolean } from '../../lib/utils';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { addNewExpenseItem, newExpenseItem } from './lib/items';
 import { checkExpenseSupportsOCR, updateExpenseFormWithUploadResult } from './lib/ocr';
@@ -261,6 +262,10 @@ const getDefaultStep = (defaultStep, stepOneCompleted, isCreditCardCharge) => {
   }
 };
 
+const checkOCREnabled = (loggedInUser, router) => {
+  return loggedInUser?.hasPreviewFeatureEnabled('EXPENSE_OCR') || parseToBoolean(router.query.ocr);
+};
+
 const ExpenseFormBody = ({
   formik,
   payoutProfiles,
@@ -280,12 +285,13 @@ const ExpenseFormBody = ({
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
+  const router = useRouter();
   const formRef = React.useRef();
   const { LoggedInUser } = useLoggedInUser();
   const [hideOCRPrefillStater, setHideOCRPrefillStarter] = React.useState(false);
   const { values, handleChange, errors, setValues, dirty, touched, resetForm, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
-  const hasOCRPreviewEnabled = LoggedInUser?.hasPreviewFeatureEnabled('EXPENSE_OCR');
+  const hasOCRPreviewEnabled = checkOCREnabled(LoggedInUser, router);
   const hasOCRFeature = hasOCRPreviewEnabled && checkExpenseSupportsOCR(values.type, LoggedInUser);
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
@@ -572,7 +578,7 @@ const ExpenseFormBody = ({
           supportedExpenseTypes={supportedExpenseTypes}
         />
       )}
-      {Boolean(!values.type && !hideOCRPrefillStater && hasOCRPreviewEnabled && LoggedInUser.isRoot) && (
+      {Boolean(!values.type && !hideOCRPrefillStater && hasOCRPreviewEnabled && LoggedInUser?.isRoot) && (
         <ExpenseOCRPrefillStarter
           onUpload={() => setHideOCRPrefillStarter(true)}
           onSuccess={uploadResult => {
