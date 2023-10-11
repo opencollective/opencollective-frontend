@@ -62,8 +62,8 @@ export const paymentMethodFragment = gql`
 `;
 
 export const paymentMethodsQuery = gql`
-  query UpdatePaymentMethodPopUpPaymentMethod($accountId: String!, $orderId: String!) {
-    account(id: $accountId) {
+  query UpdatePaymentMethodPopUpPaymentMethod($accountSlug: String!, $orderId: String!) {
+    account(slug: $accountSlug) {
       id
       paymentMethods(type: [CREDITCARD, GIFTCARD, PREPAID, COLLECTIVE]) {
         id
@@ -257,7 +257,7 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
 
   // GraphQL mutations and queries
   const { data, refetch } = useQuery(paymentMethodsQuery, {
-    variables: { accountId: account.id, orderId: contribution.id },
+    variables: { accountSlug: account.slug, orderId: contribution.id },
     context: API_V2_CONTEXT,
     fetchPolicy: 'network-only',
   });

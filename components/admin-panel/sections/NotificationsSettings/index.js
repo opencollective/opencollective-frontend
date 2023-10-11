@@ -38,8 +38,8 @@ const NecessaryNotificationsList = styled.ul`
 `;
 
 const userActivitySubscriptionsQuery = gql`
-  query ActivitySubscriptionsSettingsQuery($id: String!) {
-    account(id: $id) {
+  query ActivitySubscriptionsSettingsQuery($slug: String!) {
+    account(slug: $slug) {
       id
       ... on Individual {
         newsletterOptIn
@@ -177,9 +177,9 @@ GroupSettings.propTypes = {
   title: PropTypes.node,
 };
 
-const NotificationsSettings = ({ account, subpath }) => {
+const NotificationsSettings = ({ accountSlug, subpath }) => {
   const { data, loading } = useQuery(userActivitySubscriptionsQuery, {
-    variables: { id: account.id },
+    variables: { slug: accountSlug },
     context: API_V2_CONTEXT,
   });
   const [setNewsletterOptIn, { loading: setNewsletterOptInLoading }] = useMutation(setNewsletterOptInMutation, {
@@ -446,9 +446,7 @@ const NotificationsSettings = ({ account, subpath }) => {
 };
 
 NotificationsSettings.propTypes = {
-  account: PropTypes.shape({
-    id: PropTypes.string,
-  }),
+  accountSlug: PropTypes.string.isRequired,
   subpath: PropTypes.arrayOf(PropTypes.string),
 };
 

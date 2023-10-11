@@ -22,6 +22,8 @@ import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import Avatar from '../../Avatar';
 import Container from '../../Container';
+import DashboardHeader from '../../dashboard/DashboardHeader';
+import { DashboardSectionProps } from '../../dashboard/types';
 import EditMemberModal from '../../edit-collective/sections/team/EditMemberModal';
 import InviteMemberModal from '../../edit-collective/sections/team/InviteMemberModal';
 import { teamSectionQuery } from '../../edit-collective/sections/team/queries';
@@ -38,7 +40,6 @@ import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
 import { P } from '../../Text';
-import { AdminSectionProps } from '../types';
 
 const MemberContainer = styled(Container)`
   display: block;
@@ -197,35 +198,13 @@ const ChildrenCollectiveSection = ({ account, refetch }: ChildrenCollectiveSecti
   );
 };
 
-const Team = (props: AdminSectionProps) => {
+const Team = ({ accountSlug }: DashboardSectionProps) => {
   const [showInviteModal, setShowInviteModal] = React.useState(false);
   const intl = useIntl();
   const { loading, data, refetch, error } = useQuery(teamSectionQuery, {
     context: API_V2_CONTEXT,
-    variables: { collectiveSlug: props.account.slug, account: { slug: props.account.slug } },
+    variables: { collectiveSlug: accountSlug, account: { slug: accountSlug } },
   });
-
-  if (loading) {
-    return <Loading />;
-  } else if (error) {
-    return (
-      <MessageBox type="error" withIcon fontSize="13px">
-        {i18nGraphqlException(intl, error)}
-      </MessageBox>
-    );
-  } else if (data?.account?.isFrozen) {
-    return (
-      <MessageBox type="warning" fontSize="13px" withIcon>
-        <FormattedMessage defaultMessage="This account is currently frozen, its team members therefore cannot be edited." />{' '}
-        {isFeatureEnabled(data.account.host, FEATURES.CONTACT_FORM) && (
-          <FormattedMessage
-            defaultMessage="Please <ContactLink>contact</ContactLink> your fiscal host for more details."
-            values={{ ContactLink: getI18nLink({ href: `${getCollectivePageRoute(data.account.host)}/contact` }) }}
-          />
-        )}
-      </MessageBox>
-    );
-  }
 
   const host = data?.account?.host;
   const members = [...(data?.account?.members?.nodes || []), ...(data?.memberInvitations || [])];
@@ -235,116 +214,128 @@ const Team = (props: AdminSectionProps) => {
 
   return (
     <React.Fragment>
-      <Box>
-        <P fontSize="24px" fontWeight="700" lineHeight="32px" mb={3}>
-          <FormattedMessage id="ContributorsFilter.Core" defaultMessage="Team" />
-        </P>
-      </Box>
-      <Box>
-        {[CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(props.account.type) &&
-          Boolean(host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins) && (
-            <P lineHeight="20px" letterSpacing="normal" mt={3}>
-              <FormattedMessage
-                defaultMessage="Your host requires that Collectives have {numberOfAdmins, plural, one {# active administrator} other {# active administrators} }."
-                values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
-              />
-              {host?.policies?.COLLECTIVE_MINIMUM_ADMINS.freeze && (
-                <React.Fragment>
-                  &nbsp;
+      <DashboardHeader title={<FormattedMessage id="ContributorsFilter.Core" defaultMessage="Team" />} />
+
+      {loading ? (
+        <Loading />
+      ) : error ? (
+        <MessageBox type="error" withIcon fontSize="13px">
+          {i18nGraphqlException(intl, error)}
+        </MessageBox>
+      ) : data?.account?.isFrozen ? (
+        <MessageBox type="warning" fontSize="13px" withIcon>
+          <FormattedMessage defaultMessage="This account is currently frozen, its team members therefore cannot be edited." />{' '}
+          {isFeatureEnabled(data.account.host, FEATURES.CONTACT_FORM) && (
+            <FormattedMessage
+              defaultMessage="Please <ContactLink>contact</ContactLink> your fiscal host for more details."
+              values={{ ContactLink: getI18nLink({ href: `${getCollectivePageRoute(data.account.host)}/contact` }) }}
+            />
+          )}
+        </MessageBox>
+      ) : (
+        <React.Fragment>
+          <Box>
+            {[CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(data?.account?.type) &&
+              Boolean(host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins) && (
+                <P lineHeight="20px" letterSpacing="normal" mt={3}>
                   <FormattedMessage
-                    defaultMessage="In case of a shortfall, your collective will be frozen until the minimum required administrators are added."
+                    defaultMessage="Your host requires that Collectives have {numberOfAdmins, plural, one {# active administrator} other {# active administrators} }."
                     values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                   />
-                </React.Fragment>
+                  {host?.policies?.COLLECTIVE_MINIMUM_ADMINS.freeze && (
+                    <React.Fragment>
+                      &nbsp;
+                      <FormattedMessage
+                        defaultMessage="In case of a shortfall, your collective will be frozen until the minimum required administrators are added."
+                        values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                      />
+                    </React.Fragment>
+                  )}
+                </P>
               )}
+
+            {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
+              nbAdmins < host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins && (
+                <MessageBox type="error" my={3} fontSize="13px">
+                  <FormattedMessage
+                    defaultMessage="Your collective doesn’t meet the requirements of having a minimum of {numberOfAdmins, plural, one {# administrator} other {# administrators} }. Add more administrators to comply with your host’s policy."
+                    values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+                  />
+                </MessageBox>
+              )}
+
+            <StyledHr mt={3} borderColor="black.200" flex="1 1" />
+            <P as="ul" fontSize="14px" lineHeight="18px" mt={4}>
+              {[roles.ADMIN, roles.MEMBER, roles.ACCOUNTANT].map(role => (
+                <Box as="li" key={role} mb={2}>
+                  {MemberRoleDescription({ role })}
+                </Box>
+              ))}
             </P>
-          )}
+          </Box>
 
-        {host?.policies?.COLLECTIVE_MINIMUM_ADMINS &&
-          nbAdmins < host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins && (
-            <MessageBox type="error" my={3} fontSize="13px">
-              <FormattedMessage
-                defaultMessage="Your collective doesn’t meet the requirements of having a minimum of {numberOfAdmins, plural, one {# administrator} other {# administrators} }. Add more administrators to comply with your host’s policy."
-                values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
+          <Grid
+            mt={4}
+            gridGap={20}
+            gridTemplateColumns="repeat(auto-fill, 164px)"
+            flexGrow="1"
+            gap="2px"
+            justifyContent={['center', null, 'start']}
+          >
+            <InviteNewCard>
+              <Flex alignItems="center" justifyContent="center" height="100%" onClick={() => setShowInviteModal(true)}>
+                <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100%">
+                  <StyledRoundButton data-cy="invite-member-btn" buttonStyle="dark" fontSize={25}>
+                    +
+                  </StyledRoundButton>
+                  <P mt={3} color="black.700">
+                    <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
+                  </P>
+                </Flex>
+              </Flex>
+            </InviteNewCard>
+            {members.map((m, idx) => (
+              <MemberCard
+                key={`${m.id}-${data?.account.id}`}
+                index={idx}
+                member={m}
+                account={data?.account}
+                nbAdmins={nbAdmins}
+                refetch={refetch}
               />
-            </MessageBox>
+            ))}
+          </Grid>
+
+          {childrenAccountsWithMembers.length > 0 && (
+            <React.Fragment>
+              <P fontSize="18px" fontWeight="700" lineHeight="32px" mt={5}>
+                <FormattedMessage id="OtherAdmins" defaultMessage="Other Admins" />
+              </P>
+              <P>
+                <FormattedMessage defaultMessage="This collective has Events and Projects that hold members with privileged access roles outside your admin team." />
+              </P>
+              {childrenAccountsWithMembers.map(child => (
+                <ChildrenCollectiveSection account={child} key={child.id} refetch={refetch} />
+              ))}
+            </React.Fragment>
           )}
 
-        <StyledHr mt={3} borderColor="black.200" flex="1 1" />
-        <P as="ul" fontSize="14px" lineHeight="18px" mt={4}>
-          {[roles.ADMIN, roles.MEMBER, roles.ACCOUNTANT].map(role => (
-            <Box as="li" key={role} mb={2}>
-              {MemberRoleDescription({ role })}
-            </Box>
-          ))}
-        </P>
-      </Box>
-
-      <Grid
-        mt={4}
-        gridGap={20}
-        gridTemplateColumns="repeat(auto-fill, 164px)"
-        flexGrow="1"
-        gap="2px"
-        justifyContent={['center', null, 'start']}
-      >
-        <InviteNewCard>
-          <Flex alignItems="center" justifyContent="center" height="100%" onClick={() => setShowInviteModal(true)}>
-            <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100%">
-              <StyledRoundButton data-cy="invite-member-btn" buttonStyle="dark" fontSize={25}>
-                +
-              </StyledRoundButton>
-              <P mt={3} color="black.700">
-                <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
-              </P>
-            </Flex>
+          <Flex justifyContent="center" flexWrap="wrap" mt={5}>
+            <Link href={`/${accountSlug}`}>
+              <StyledButton mx={2} minWidth={200}>
+                <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
+              </StyledButton>
+            </Link>
           </Flex>
-        </InviteNewCard>
-        {members.map((m, idx) => (
-          <MemberCard
-            key={`${m.id}-${props.account.id}`}
-            index={idx}
-            member={m}
-            account={props.account}
-            nbAdmins={nbAdmins}
-            refetch={refetch}
-          />
-        ))}
-      </Grid>
-
-      {childrenAccountsWithMembers.length > 0 && (
-        <React.Fragment>
-          <P fontSize="18px" fontWeight="700" lineHeight="32px" mt={5}>
-            <FormattedMessage id="OtherAdmins" defaultMessage="Other Admins" />
-          </P>
-          <P>
-            <FormattedMessage defaultMessage="This collective has Events and Projects that hold members with privileged access roles outside your admin team." />
-          </P>
-          {childrenAccountsWithMembers.map(child => (
-            <ChildrenCollectiveSection account={child} key={child.id} refetch={refetch} />
-          ))}
+          {showInviteModal && (
+            <InviteMemberModal
+              intl={intl}
+              collective={data?.account}
+              membersIds={members.map(m => m.id)}
+              cancelHandler={() => setShowInviteModal(false)}
+            />
+          )}
         </React.Fragment>
-      )}
-
-      {error && (
-        <MessageBox type="error" withIcon my={3}>
-          {error.message}
-        </MessageBox>
-      )}
-      <Flex justifyContent="center" flexWrap="wrap" mt={5}>
-        <Link href={`/${props.account.slug}`}>
-          <StyledButton mx={2} minWidth={200}>
-            <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
-          </StyledButton>
-        </Link>
-      </Flex>
-      {showInviteModal && (
-        <InviteMemberModal
-          intl={intl}
-          collective={props.account}
-          membersIds={members.map(m => m.id)}
-          cancelHandler={() => setShowInviteModal(false)}
-        />
       )}
     </React.Fragment>
   );
