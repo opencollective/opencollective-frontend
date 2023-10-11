@@ -414,10 +414,10 @@ Cypress.Commands.add('checkStepsProgress', ({ enabled = [], disabled = [] }) => 
   Array.isArray(disabled) ? disabled.forEach(isDisabled) : isDisabled(disabled);
 });
 
-Cypress.Commands.add('checkToast', ({ type, message }) => {
+Cypress.Commands.add('checkToast', ({ variant, message }) => {
   const $toast = cy.contains('[data-cy="toast-notification"]', message);
-  if (type) {
-    $toast.should('have.attr', 'data-type', type);
+  if (variant) {
+    $toast.should('have.attr', 'data-variant', variant);
   }
 });
 

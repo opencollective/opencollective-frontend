@@ -15,7 +15,7 @@ import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { useToast } from '../../ui/useToast';
 import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
@@ -43,13 +43,13 @@ const messages = defineMessages({
 
 const HostVirtualCards = props => {
   const { formatMessage } = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [updateAccountSetting, { loading: updateLoading }] = useMutation(updateAccountSettingsMutation, {
     context: API_V2_CONTEXT,
     onError: e => {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: (
           <FormattedMessage
             id="Host.VirtualCards.Settings.Error"
@@ -89,8 +89,8 @@ const HostVirtualCards = props => {
         value,
       },
     });
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
+    toast({
+      variant: 'success',
       message: <FormattedMessage id="Host.VirtualCards.Settings.Success" defaultMessage="Setting updated" />,
     });
   };

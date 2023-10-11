@@ -14,7 +14,7 @@ import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
 import StyledHr from '../../StyledHr';
 import { P, Span } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { useToast } from '../../ui/useToast';
 
 const updateCustomMessageMutation = gql`
   mutation UpdateCustomMessage($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
@@ -33,13 +33,13 @@ const CustomMessage = ({ collective }) => {
   const [customMessage, setCustomMessage] = useState(thankYouMessage);
   const [isModified, setIsModified] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [updateCustomEmailMessage, { loading }] = useMutation(updateCustomMessageMutation, {
     context: API_V2_CONTEXT,
     onError: e => {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: (
           <FormattedMessage
             defaultMessage="Error updating custom email message: {error}"
@@ -51,8 +51,8 @@ const CustomMessage = ({ collective }) => {
       });
     },
     onCompleted: () => {
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: <FormattedMessage defaultMessage="Email message updated" />,
       });
     },

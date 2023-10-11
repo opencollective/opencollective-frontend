@@ -1,17 +1,18 @@
 import React, { useEffect } from 'react';
-import { gql, useLazyQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { cloneDeep, isEmpty, omitBy } from 'lodash';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
-import { initClient } from '../lib/apollo-client';
+import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -91,10 +92,10 @@ export const updatesPageQuery = gql`
   ${collectiveNavbarFieldsFragment}
 `;
 
-const getPropsFromQuery = (query: Record<string, string>) => ({
-  slug: query?.collectiveSlug,
-  orderBy: query?.orderBy || null,
-  searchTerm: query?.searchTerm || null,
+const getPropsFromQuery = (query: NextParsedUrlQuery) => ({
+  slug: query?.collectiveSlug as string,
+  orderBy: (Array.isArray(query?.orderBy) ? query?.orderBy[0] : query?.orderBy) || null,
+  searchTerm: (Array.isArray(query?.searchTerm) ? query?.searchTerm[0] : query?.searchTerm) || null,
 });
 
 export const getUpdatesVariables = (slug, orderBy = null, searchTerm = null) => {
@@ -107,57 +108,30 @@ export const getUpdatesVariables = (slug, orderBy = null, searchTerm = null) => 
   };
 };
 
-type UpdatesPageProps = {
-  slug: string;
-  orderBy?: string;
-  searchTerm?: string;
-  data: Partial<any>;
-  error?: any;
-};
+const updatesPageQueryHelper = getSSRQueryHelpers<
+  ReturnType<typeof getUpdatesVariables>,
+  ReturnType<typeof getPropsFromQuery>
+>({
+  query: updatesPageQuery,
+  context: API_V2_CONTEXT,
+  getPropsFromContext: ctx => getPropsFromQuery(ctx.query),
+  getVariablesFromContext: (ctx, props) => getUpdatesVariables(props.slug, props.orderBy, props.searchTerm),
+});
 
-export const getServerSideProps: GetServerSideProps<UpdatesPageProps> = async ctx => {
-  const props = getPropsFromQuery(ctx.query as any);
-
-  // Fetch data from GraphQL API for SSR
-  const client = initClient();
-  const { data, error } = await client.query({
-    query: updatesPageQuery,
-    variables: getUpdatesVariables(props.slug, props.orderBy, props.searchTerm),
-    context: API_V2_CONTEXT,
-    fetchPolicy: 'network-only',
-    errorPolicy: 'ignore',
-  });
-
-  return {
-    props: {
-      ...props,
-      data,
-      error: error || null,
-    },
-  };
-};
+export const getServerSideProps = updatesPageQueryHelper.getServerSideProps;
 
 export default function UpdatesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
-
-  // render() {
-  const queryProps = getPropsFromQuery(router.query as any);
-  const [fetchData, query] = useLazyQuery(updatesPageQuery, {
-    variables: getUpdatesVariables(queryProps.slug, queryProps.orderBy, queryProps.searchTerm),
-    context: API_V2_CONTEXT,
-  });
-
-  const error = query?.error || props.error;
-  const data = query?.data || props.data;
+  const queryResult = updatesPageQueryHelper.useQuery(props);
 
   useEffect(() => {
-    addParentToURLIfMissing(router, props?.data.account, '/updates');
+    addParentToURLIfMissing(router, queryResult.data.account, '/updates');
   });
 
   useEffect(() => {
-    if (LoggedInUser?.isAdminOfCollective?.(props.data.account)) {
-      fetchData();
+    if (LoggedInUser?.isAdminOfCollective?.(queryResult.data.account)) {
+      queryResult.refetch();
     }
   }, [LoggedInUser]);
 
@@ -168,56 +142,46 @@ export default function UpdatesPage(props: InferGetServerSidePropsType<typeof ge
   };
 
   const fetchMore = () => {
-    if (!query.called) {
-      return fetchData({
-        variables: {
-          ...query.variables,
-          offset: 0,
-          limit: data.account.updates.nodes.length + UPDATES_PER_PAGE,
-        },
-      });
-    } else {
-      return query.fetchMore({
-        variables: {
-          offset: data.account.updates.nodes.length,
-          limit: UPDATES_PER_PAGE,
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          const data = isEmpty(previousResult) ? props.data : previousResult;
-          if (!fetchMoreResult) {
-            return data;
-          }
+    return queryResult.fetchMore({
+      variables: {
+        offset: queryResult.data.account.updates.nodes.length,
+        limit: UPDATES_PER_PAGE,
+      },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        const data = isEmpty(previousResult) ? queryResult.data : previousResult;
+        if (!fetchMoreResult) {
+          return data;
+        }
 
-          const result = cloneDeep(data);
-          const updates = data.account?.updates;
-          result.account.updates = {
-            ...updates,
-            nodes: [...updates.nodes, ...fetchMoreResult.account.updates.nodes],
-          };
-          return result;
-        },
-      });
-    }
+        const result = cloneDeep(data);
+        const updates = data.account?.updates;
+        result.account.updates = {
+          ...updates,
+          nodes: [...updates.nodes, ...fetchMoreResult.account.updates.nodes],
+        };
+        return result;
+      },
+    });
   };
 
-  const isUpdatesSupported = isFeatureSupported(data.account, FEATURES.UPDATES);
+  const isUpdatesSupported = isFeatureSupported(queryResult.data.account, FEATURES.UPDATES);
 
-  if (error) {
-    return <ErrorPage error={error} />;
-  } else if (!data.account) {
-    return <ErrorPage data={data} />;
+  if (queryResult.error) {
+    return <ErrorPage error={queryResult.error} />;
+  } else if (!queryResult.data.account) {
+    return <ErrorPage data={queryResult.data} />;
   } else if (!isUpdatesSupported) {
     return <ErrorPage error={{ type: ERROR.NOT_FOUND }} />;
   }
 
-  const collective = data.account;
+  const collective = queryResult.data.account;
   const updates = collective?.updates;
 
   return (
     <div className="UpdatesPage">
       <Header
         collective={collective}
-        loading={data.loading}
+        loading={queryResult.loading}
         LoggedInUser={LoggedInUser}
         canonicalURL={`${getCollectivePageCanonicalURL(collective)}/updates`}
         noRobots={!shouldIndexAccountOnSearchEngines(collective)}
@@ -261,7 +225,7 @@ export default function UpdatesPage(props: InferGetServerSidePropsType<typeof ge
             }
           />
           <Box mt={4} mb={5}>
-            {data.loading ? (
+            {queryResult.loading ? (
               <Loading />
             ) : (
               <Updates collective={collective} updates={updates} fetchMore={fetchMore} LoggedInUser={LoggedInUser} />

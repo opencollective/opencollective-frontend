@@ -38,6 +38,8 @@ import { withUser } from '../../components/UserProvider';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
 import Link from '../Link';
+import { Survey, SURVEY_KEY } from '../Survey';
+import { toast } from '../ui/useToast';
 
 import { orderSuccessFragment } from './graphql/fragments';
 import PublicMessageForm from './ContributionFlowPublicMessage';
@@ -135,6 +137,12 @@ class ContributionFlowSuccess extends React.Component {
 
   componentDidMount() {
     track(AnalyticsEvent.CONTRIBUTION_SUCCESS);
+    if (this.props.LoggedInUser) {
+      toast({
+        message: <Survey surveyKey={SURVEY_KEY.CONTRIBUTION_COMPLETED} />,
+        duration: 20000,
+      });
+    }
   }
 
   componentDidUpdate() {

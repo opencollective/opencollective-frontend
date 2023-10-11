@@ -143,7 +143,7 @@ class ExpenseFormItems extends React.PureComponent {
 
   getUploadingItemsIndexes() {
     const { items } = this.props.form.values;
-    return filter(range(items.length), index => items[index].__isUploadingFromMultiDropzone);
+    return filter(range(items.length), index => items[index].__isUploading);
   }
 
   getItemsOCRComparisons(items) {
@@ -151,6 +151,12 @@ class ExpenseFormItems extends React.PureComponent {
       comparisons[item.id] = compareItemOCRValues(item, this.props.form.values.currency);
       return comparisons;
     }, {});
+  }
+
+  removeMultiUploadingItems() {
+    const isMultiUploadingItem = item => item.__isUploading && item.__fromInput === 'multi';
+    const otherItems = this.props.form.values.items.filter(item => !isMultiUploadingItem(item));
+    this.props.form.setFieldValue('items', otherItems);
   }
 
   render() {
@@ -180,9 +186,7 @@ class ExpenseFormItems extends React.PureComponent {
             onSuccess={files => filesListToItems(files).map(this.props.push)}
             onReject={uploadErrors => {
               this.setState({ uploadErrors });
-              // Remove the dummy items added by this component
-              const otherItems = this.props.form.values.items.filter(item => !item.__isUploadingFromMultiDropzone);
-              this.props.form.setFieldValue('items', otherItems);
+              this.removeMultiUploadingItems();
             }}
             mockImageGenerator={index => `https://loremflickr.com/120/120/invoice?lock=${index}`}
             mb={3}
@@ -193,7 +197,7 @@ class ExpenseFormItems extends React.PureComponent {
               if (hasOCRFeature) {
                 this.props.form.setFieldValue(
                   'items',
-                  files.map(file => newExpenseItem({ __isUploadingFromMultiDropzone: true, __file: file })),
+                  files.map(file => newExpenseItem({ __isUploading: true, __file: file, __fromInput: 'multi' })),
                 );
               }
             }}

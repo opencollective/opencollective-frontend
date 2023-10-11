@@ -113,6 +113,7 @@ const ExpenseSummary = ({
         onEdit={onEdit}
         expense={expense}
         isViewingExpenseInHostContext={isViewingExpenseInHostContext}
+        disabled={isLoading}
         onDelete={() => {
           onDelete?.(expense);
           onClose?.();
@@ -127,6 +128,7 @@ const ExpenseSummary = ({
             permissions={expense?.permissions}
             collective={collective}
             host={host}
+            disabled={isLoading}
             onDelete={() => {
               onDelete?.(expense);
               onClose?.();

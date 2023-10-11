@@ -19,8 +19,8 @@ import LinkCollective from '../LinkCollective';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { InfoList, InfoListItem } from '../ui/InfoList';
+import { useToast } from '../ui/useToast';
 
 import { StripeVirtualCardComplianceStatement } from './StripeVirtualCardComplianceStatement';
 
@@ -75,7 +75,7 @@ const virtualCardQuery = gql`
 
 export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [isEditingVirtualCard, setIsEditingVirtualCard] = React.useState(false);
 
@@ -92,12 +92,12 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
   const handleEditSuccess = React.useCallback(
     message => {
       setIsEditingVirtualCard(false);
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: message,
       });
     },
-    [addToast],
+    [toast],
   );
 
   const { loading, data, error } = query;
@@ -200,7 +200,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
             <ActionsButton
               virtualCard={virtualCard}
               host={virtualCard.host}
-              onError={error => addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, error) })}
+              onError={error => toast({ variant: 'error', message: i18nGraphqlException(intl, error) })}
               canDeleteVirtualCard={props.canDeleteVirtualCard}
               onDeleteRefetchQuery={props.onDeleteRefetchQuery}
               hideViewTransactions

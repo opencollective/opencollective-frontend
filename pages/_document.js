@@ -11,6 +11,7 @@ import { createIntl, createIntlCache } from 'react-intl';
 import { ServerStyleSheet } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
+import { APOLLO_STATE_PROP_NAME, initClient } from '../lib/apollo-client';
 import { getIntlProps, getLocaleMessages } from '../lib/i18n/request';
 import { parseToBoolean } from '../lib/utils';
 import { getCSPHeader } from '../server/content-security-policy';
@@ -83,7 +84,6 @@ export default class IntlDocument extends Document {
         });
 
       const initialProps = await Document.getInitialProps(ctx);
-
       return {
         ...initialProps,
         clientAnalytics,
@@ -95,6 +95,7 @@ export default class IntlDocument extends Document {
             {sheet.getStyleElement()}
           </React.Fragment>
         ),
+        [APOLLO_STATE_PROP_NAME]: initClient().cache.extract(),
       };
     } finally {
       sheet.seal();

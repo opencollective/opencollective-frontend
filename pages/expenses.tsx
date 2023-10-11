@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import { gql, useLazyQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { has, isNil, omitBy } from 'lodash';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
-import { initClient } from '../lib/apollo-client';
+import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
@@ -200,8 +200,7 @@ const getPropsFromQuery = query => ({
   ),
 });
 
-const getVariablesFromQuery = query => {
-  const props = getPropsFromQuery(query);
+const getVariablesFromProps = (props: Partial<ReturnType<typeof getPropsFromQuery>>) => {
   const amountRange = parseAmountRange(props.query.amount);
   const { from: dateFrom, to: dateTo } = parseDateInterval(props.query.period);
   const showSubmitted = props.query.direction === 'SUBMITTED';
@@ -229,51 +228,45 @@ const getVariablesFromQuery = query => {
 type ExpensesPageProps = {
   collectiveSlug: string;
   parentCollectiveSlug: string;
-  data: Partial<ExpensesPageQuery>;
-  error?: any;
+  query: Partial<{
+    offset: number;
+    limit: number;
+    type: string;
+    status: string;
+    payout: string;
+    direction: string;
+    period: string;
+    amount: string;
+    tag: string;
+    searchTerm: string;
+    orderBy: string;
+  }>;
 };
 
-export const getServerSideProps: GetServerSideProps<ExpensesPageProps> = async ctx => {
-  const props = getPropsFromQuery(ctx.query);
-  const variables = getVariablesFromQuery(ctx.query);
+const expensePageQueryHelpers = getSSRQueryHelpers<ReturnType<typeof getVariablesFromProps>, ExpensesPageProps>({
+  query: expensesPageQuery,
+  context: API_V2_CONTEXT,
+  getPropsFromContext: ctx => getPropsFromQuery(ctx.query),
+  getVariablesFromContext: (ctx, props) => getVariablesFromProps(props),
+});
 
-  // Fetch data from GraphQL API for SSR
-  const client = initClient();
-  const { data, error } = await client.query({
-    query: expensesPageQuery,
-    variables,
-    context: API_V2_CONTEXT,
-    fetchPolicy: 'network-only',
-    errorPolicy: 'ignore',
-  });
-
-  return {
-    props: {
-      ...props,
-      data,
-      error: error || null,
-    },
-  };
-};
+export const getServerSideProps = expensePageQueryHelpers.getServerSideProps;
 
 export default function ExpensesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
+  const query = expensePageQueryHelpers.useQuery(props);
 
-  const [fetchData, query] = useLazyQuery(expensesPageQuery, {
-    variables: getVariablesFromQuery(router.query),
-    context: API_V2_CONTEXT,
-  });
-
+  // Refetch data when logging in/out
   useEffect(() => {
     if (LoggedInUser) {
-      fetchData();
+      query.refetch();
     }
   }, [LoggedInUser]);
 
-  const error = query?.error || props.error;
-  const data: ExpensesPageQuery = query?.data || props.data;
+  const error = query?.error;
+  const data: ExpensesPageQuery = query?.data;
 
   const metadata = {
     ...getCollectivePageMetadata(data.account),

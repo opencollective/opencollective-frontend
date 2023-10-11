@@ -138,7 +138,7 @@ const StyledDropzone = ({
         uploadFiles(acceptedFiles, fileRejections);
       }
     },
-    [collectFilesOnly, onSuccess, uploadFiles, onDrop],
+    [collectFilesOnly, onSuccess, uploadFiles, uploadFileWithGraphQL, onDrop],
   );
   const dropzoneParams = { accept, minSize, maxSize, multiple: isMulti, onDrop: onDropCallback };
   const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneParams);
@@ -164,6 +164,7 @@ const StyledDropzone = ({
           height="100%"
           width="100%"
           minHeight={innerMinHeight}
+          data-loading="true"
         >
           <Container
             position="absolute"
