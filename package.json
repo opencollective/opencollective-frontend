@@ -130,7 +130,7 @@
     "uuid": "9.0.1",
     "validator": "13.11.0",
     "webpack-manifest-plugin": "5.0.0",
-    "winston": "3.10.0"
+    "winston": "3.11.0"
   },
   "scripts": {
     "build": "npm-run-all build:updates build:next build:server",
@@ -211,7 +211,7 @@
     "@storybook/react": "7.4.6",
     "@types/apollo-upload-client": "17.0.3",
     "@types/cookie": "^0.5.1",
-    "@types/react": "18.2.27",
+    "@types/react": "18.2.28",
     "@types/styled-components": "^5.1.26",
     "@types/styled-system": "^5.1.16",
     "@types/webpack-env": "^1.18.1",

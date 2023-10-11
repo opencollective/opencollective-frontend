@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -75,18 +75,25 @@ const RecurringContributionsContainer = ({
   LoggedInUser,
   isLoading,
   displayFilters,
+  filter: outsideFilter,
   ...props
 }) => {
   const isAdminOrRoot = Boolean(LoggedInUser?.isAdminOfCollective(account) || LoggedInUser?.isRoot);
   const intl = useIntl();
   const [editingContributionId, setEditingContributionId] = React.useState();
-  const [filter, setFilter] = React.useState(FILTERS.ACTIVE);
+  const [filter, setFilter] = React.useState(outsideFilter ?? FILTERS.ACTIVE);
   const displayedRecurringContributions = React.useMemo(() => {
     const filteredContributions = filterContributions(recurringContributions?.nodes || [], filter);
     return isAdminOrRoot
       ? filteredContributions
       : filteredContributions.filter(contrib => contrib.status !== ORDER_STATUS.ERROR);
   }, [recurringContributions, filter, isAdminOrRoot]);
+
+  useEffect(() => {
+    if (outsideFilter) {
+      setFilter(outsideFilter);
+    }
+  }, [outsideFilter]);
 
   // Reset edit when changing filters and contribution is not in the list anymore
   React.useEffect(() => {
@@ -163,6 +170,7 @@ RecurringContributionsContainer.propTypes = {
   LoggedInUser: PropTypes.object,
   displayFilters: PropTypes.bool,
   isLoading: PropTypes.bool,
+  filter: PropTypes.oneOf(Object.values(FILTERS)),
 };
 
 export default withUser(RecurringContributionsContainer);
