@@ -16,6 +16,7 @@ const LOCALE_ALIASES = {
   'es-ES': 'es',
   'pt-PT': 'pt',
   sk: 'sk-SK',
+  'zh-CN': 'zh',
 };
 
 if (!TOKEN) {
