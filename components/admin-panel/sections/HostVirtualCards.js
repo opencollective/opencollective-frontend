@@ -116,7 +116,7 @@ const hostVirtualCardsQuery = gql`
 
 const VIRTUAL_CARDS_PER_PAGE = 20;
 
-const HostVirtualCards = props => {
+const HostVirtualCards = ({ accountSlug: hostSlug }) => {
   const queryFilter = useQueryFilter({
     ignoreQueryParams: ['slug', 'section'],
     filters: {
@@ -147,7 +147,7 @@ const HostVirtualCards = props => {
   const { loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
     context: API_V2_CONTEXT,
     variables: {
-      slug: props.hostSlug,
+      slug: hostSlug,
       limit,
       offset,
       status: queryFilter.values.virtualCardStatus,
@@ -282,8 +282,7 @@ const HostVirtualCards = props => {
 };
 
 HostVirtualCards.propTypes = {
-  hostSlug: PropTypes.string,
-  hideTopsection: PropTypes.func,
+  accountSlug: PropTypes.string.isRequired,
 };
 
 export default HostVirtualCards;

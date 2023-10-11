@@ -158,10 +158,11 @@ export const ActionsButton = props => {
     try {
       if (isActive) {
         await pauseCard({ variables: { virtualCard: { id: virtualCard.id } } });
+        handleActionSuccess(<FormattedMessage defaultMessage="Card paused" />);
       } else {
         await resumeCard({ variables: { virtualCard: { id: virtualCard.id } } });
+        handleActionSuccess(<FormattedMessage defaultMessage="Card resumed" />);
       }
-      handleActionSuccess();
     } catch (e) {
       props.onError(e);
     }

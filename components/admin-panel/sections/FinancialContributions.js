@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 
 import OrdersWithData from '../../orders/OrdersWithData';
 
-const FinancialContributions = ({ hostSlug }) => {
-  return <OrdersWithData accountSlug={hostSlug} showPlatformTip showDisputesWarning />;
+const FinancialContributions = ({ accountSlug }) => {
+  return <OrdersWithData accountSlug={accountSlug} showPlatformTip showDisputesWarning />;
 };
 
 FinancialContributions.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
+  accountSlug: PropTypes.string.isRequired,
 };
 
 export default FinancialContributions;

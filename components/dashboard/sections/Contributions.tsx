@@ -31,7 +31,8 @@ import {
 } from '../../ui/DropdownMenu';
 import { Pagination } from '../../ui/Pagination';
 import { TableActionsButton } from '../../ui/Table';
-import { AdminSectionProps } from '../types';
+import DashboardHeader from '../DashboardHeader';
+import { DashboardSectionProps } from '../types';
 
 enum ContributionsTab {
   RECURRING = 'RECURRING',
@@ -323,11 +324,11 @@ const pickQueryFilters = query =>
     QUERY_FORMATERS[key] ? QUERY_FORMATERS[key](value) : value,
   );
 
-type ContributionsProps = AdminSectionProps & {
+type ContributionsProps = DashboardSectionProps & {
   direction?: 'INCOMING' | 'OUTGOING';
 };
 
-const Contributions = ({ account, direction }: ContributionsProps) => {
+const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
   const router = useRouter();
   const intl = useIntl();
   const [tab, setTab] = React.useState<ContributionsTab>(ContributionsTab.RECURRING);
@@ -338,7 +339,7 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
     error: metadataError,
   } = useQuery(dashboardContributionsMetadataQuery, {
     variables: {
-      slug: account.slug,
+      slug: accountSlug,
       filter: direction || 'OUTGOING',
     },
     context: API_V2_CONTEXT,
@@ -350,7 +351,7 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
     error: queryError,
   } = useQuery(dashboardContributionsQuery, {
     variables: {
-      slug: account.slug,
+      slug: accountSlug,
       filter: direction || 'OUTGOING',
       limit: PAGE_SIZE,
       ...VIEWS[tab],
@@ -398,22 +399,38 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
 
   return (
     <Container>
-      <div className="flex justify-between gap-4">
-        <h1 className="text-2xl font-bold leading-10 tracking-tight">
-          {isIncoming ? (
-            <FormattedMessage id="Contributors" defaultMessage="Contributors" />
+      <DashboardHeader
+        title={
+          isIncoming ? (
+            <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
           ) : (
-            <FormattedMessage id="Contributions" defaultMessage="Contributions" />
-          )}
-        </h1>
-        <SearchBar
-          placeholder={intl.formatMessage({ defaultMessage: 'Search...', id: 'search.placeholder' })}
-          defaultValue={router.query.searchTerm}
-          height="40px"
-          onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
-        />
-      </div>
-      <Box my="24px">
+            <FormattedMessage id="OutgoingContributions" defaultMessage="Outgoing Contributions" />
+          )
+        }
+        description={
+          isIncoming ? (
+            <FormattedMessage
+              id="IncomingContributions.description"
+              defaultMessage="Contributions to your Collective."
+            />
+          ) : (
+            <FormattedMessage
+              id="OutgoingContributions.description"
+              defaultMessage="Manage your contributions to other Collectives."
+            />
+          )
+        }
+        actions={
+          <SearchBar
+            placeholder={intl.formatMessage({ defaultMessage: 'Search...', id: 'search.placeholder' })}
+            defaultValue={router.query.searchTerm}
+            height="40px"
+            onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
+          />
+        }
+      />
+
+      <Box mb="24px">
         <StyledTabs tabs={tabs} selectedId={tab} onChange={handleTabUpdate} />
       </Box>
       <div className="flex flex-col gap-4">
@@ -435,7 +452,7 @@ const Contributions = ({ account, direction }: ContributionsProps) => {
       </div>
       {editOrder.order && (
         <EditOrderModal
-          account={account}
+          accountSlug={accountSlug}
           order={editOrder.order}
           action={editOrder.action}
           onClose={() => setEditOrder({ order: null, action: null })}

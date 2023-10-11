@@ -435,9 +435,11 @@ class EditCollectiveForm extends React.Component {
       case ALL_SECTIONS.PAYMENT_METHODS:
         return <PaymentMethods collectiveSlug={collective.slug} />;
 
+      // TIERS has been moved out in new Dashboard to be a top level section. Can be removed from here when Dashboard is no longer a preview feature.
       case ALL_SECTIONS.TIERS:
         return <Tiers collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
 
+      // TICKETS has been moved out in new Dashboard to be a top level section. Can be removed from here when Dashboard is no longer a preview feature.
       case ALL_SECTIONS.TICKETS:
         return <Tickets collective={collective} />;
 

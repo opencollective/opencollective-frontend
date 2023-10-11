@@ -214,7 +214,7 @@ const getTiersOptions = (intl, tiers) => {
 };
 
 type CreatePendingContributionFormProps = {
-  host: CreatePendingContributionModalQuery['host'];
+  hostSlug: string;
   edit?: Partial<OrderPageQuery['order']>;
   onClose: () => void;
   onSuccess?: () => void;
@@ -747,13 +747,13 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   );
 };
 
-const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreatePendingContributionFormProps) => {
+const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePendingContributionFormProps) => {
   const { LoggedInUser } = useLoggedInUser();
   const { toast } = useToast();
 
   const { data, loading } = useQuery<CreatePendingContributionModalQuery>(createPendingContributionModalQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: _host.slug },
+    variables: { slug: hostSlug },
   });
 
   const host = data?.host;

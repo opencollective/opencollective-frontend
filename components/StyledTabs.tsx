@@ -60,7 +60,7 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps & Parameters<t
               )}
             >
               {tab.label}{' '}
-              {typeof tab.count !== 'undefined' && (
+              {tab.count > 0 && (
                 <span
                   className={cn(
                     'ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',

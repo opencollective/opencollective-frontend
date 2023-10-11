@@ -100,28 +100,30 @@ const hostDashboardMetaDataQuery = gql`
         }
       }
     }
-
-    ready_to_pay: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: READY_TO_PAY)
-      @include(if: $getViewCounts) {
+    all: expenses(host: { slug: $hostSlug }, limit: 0) @include(if: $getViewCounts) {
+      totalCount
+    }
+    ready_to_pay: expenses(host: { slug: $hostSlug }, limit: 0, status: READY_TO_PAY) @include(if: $getViewCounts) {
       totalCount
     }
     scheduled_for_payment: expenses(
       host: { slug: $hostSlug }
       limit: 0
-      offset: 0
       status: SCHEDULED_FOR_PAYMENT
       payoutMethodType: BANK_ACCOUNT
     ) @include(if: $getViewCounts) {
       totalCount
     }
-    on_hold: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: ON_HOLD) @include(if: $getViewCounts) {
+    on_hold: expenses(host: { slug: $hostSlug }, limit: 0, status: ON_HOLD) @include(if: $getViewCounts) {
       totalCount
     }
-    incomplete: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: INCOMPLETE)
-      @include(if: $getViewCounts) {
+    incomplete: expenses(host: { slug: $hostSlug }, limit: 0, status: INCOMPLETE) @include(if: $getViewCounts) {
       totalCount
     }
-    error: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: ERROR) @include(if: $getViewCounts) {
+    error: expenses(host: { slug: $hostSlug }, limit: 0, status: ERROR) @include(if: $getViewCounts) {
+      totalCount
+    }
+    paid: expenses(host: { slug: $hostSlug }, limit: 0, status: PAID) @include(if: $getViewCounts) {
       totalCount
     }
   }
@@ -190,7 +192,7 @@ const hasParams = query => {
 };
 
 const initViews = [
-  { label: <FormattedMessage defaultMessage="All" />, query: {}, id: 'all' },
+  { label: <FormattedMessage defaultMessage="All" />, query: {}, id: 'all', showCount: true },
   {
     label: 'Ready to pay',
     query: { status: 'READY_TO_PAY', orderBy: 'CREATED_AT,ASC' },
@@ -224,11 +226,12 @@ const initViews = [
   {
     label: <FormattedMessage defaultMessage="Paid" />,
     query: { status: 'PAID' },
-    id: 'recently_paid',
+    showCount: true,
+    id: 'paid',
   },
 ];
 
-const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
+const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
   const router = useRouter() || {};
   const { LoggedInUser } = useLoggedInUser();
   const expensePipelineFeatureIsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_PIPELINE);
@@ -464,7 +467,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
 };
 
 HostDashboardExpenses.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
+  accountSlug: PropTypes.string.isRequired,
   isDashboard: PropTypes.bool,
 };
 
