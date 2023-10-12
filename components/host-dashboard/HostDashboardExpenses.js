@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { parseDateInterval } from '../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -191,48 +191,9 @@ const hasParams = query => {
   });
 };
 
-const initViews = [
-  { label: <FormattedMessage defaultMessage="All" />, query: {}, id: 'all', showCount: true },
-  {
-    label: 'Ready to pay',
-    query: { status: 'READY_TO_PAY', orderBy: 'CREATED_AT,ASC' },
-    showCount: true,
-    id: 'ready_to_pay',
-  },
-  {
-    label: <FormattedMessage id="expense.scheduledForPayment" defaultMessage="Scheduled for payment" />,
-    query: { status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', orderBy: 'CREATED_AT,ASC' },
-    showCount: true,
-    id: 'scheduled_for_payment',
-  },
-  {
-    label: <FormattedMessage defaultMessage="On hold" />,
-    query: { status: 'ON_HOLD', orderBy: 'CREATED_AT,ASC' },
-    showCount: true,
-    id: 'on_hold',
-  },
-  {
-    label: <FormattedMessage defaultMessage="Incomplete" />,
-    query: { status: 'INCOMPLETE', orderBy: 'CREATED_AT,ASC' },
-    showCount: true,
-    id: 'incomplete',
-  },
-  {
-    label: <FormattedMessage id="Error" defaultMessage="Error" />,
-    query: { status: 'ERROR', orderBy: 'CREATED_AT,ASC' },
-    showCount: true,
-    id: 'error',
-  },
-  {
-    label: <FormattedMessage defaultMessage="Paid" />,
-    query: { status: 'PAID' },
-    showCount: true,
-    id: 'paid',
-  },
-];
-
 const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
   const router = useRouter() || {};
+  const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const expensePipelineFeatureIsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_PIPELINE);
   const query = expensePipelineFeatureIsEnabled ? router.query : enforceDefaultParamsOnQuery(router.query);
@@ -278,17 +239,45 @@ const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
 
   const { data, error, loading } = expenses;
 
-  const views = React.useMemo(() => {
-    if (!metaData) {
-      return initViews;
-    }
-    return initViews.map(view => {
-      return {
-        ...view,
-        count: metaData[view.id]?.totalCount,
-      };
-    });
-  }, [metaData]);
+  const views = [
+    { label: intl.formatMessage({ defaultMessage: 'All' }), query: {}, id: 'all', count: metaData?.all?.totalCount },
+    {
+      label: 'Ready to pay',
+      query: { status: 'READY_TO_PAY', orderBy: 'CREATED_AT,ASC' },
+      id: 'ready_to_pay',
+      count: metaData?.ready_to_pay?.totalCount,
+    },
+    {
+      label: intl.formatMessage({ id: 'expense.scheduledForPayment', defaultMessage: 'Scheduled for payment' }),
+      query: { status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', orderBy: 'CREATED_AT,ASC' },
+      id: 'scheduled_for_payment',
+      count: metaData?.scheduled_for_payment?.totalCount,
+    },
+    {
+      label: intl.formatMessage({ defaultMessage: 'On hold' }),
+      query: { status: 'ON_HOLD', orderBy: 'CREATED_AT,ASC' },
+      id: 'on_hold',
+      count: metaData?.on_hold?.totalCount,
+    },
+    {
+      label: intl.formatMessage({ defaultMessage: 'Incomplete' }),
+      query: { status: 'INCOMPLETE', orderBy: 'CREATED_AT,ASC' },
+      id: 'incomplete',
+      count: metaData?.incomplete?.totalCount,
+    },
+    {
+      label: intl.formatMessage({ id: 'Error', defaultMessage: 'Error' }),
+      query: { status: 'ERROR', orderBy: 'CREATED_AT,ASC' },
+      id: 'error',
+      count: metaData?.error?.totalCount,
+    },
+    {
+      label: intl.formatMessage({ defaultMessage: 'Paid' }),
+      query: { status: 'PAID' },
+      id: 'paid',
+      count: metaData?.paid?.totalCount,
+    },
+  ];
 
   const getQueryParams = newParams => {
     return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
@@ -371,7 +360,7 @@ const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
       {expensePipelineFeatureIsEnabled && (
         <DashboardViews
           query={query}
-          omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
+          omitMatchingParams={[...ROUTE_PARAMS, 'orderBy', 'limit', 'offset']}
           views={views}
           onChange={query => {
             router.push(
@@ -436,7 +425,7 @@ const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
             expenses={paginatedExpenses.nodes}
             view="admin"
             onProcess={(expense, cache) => {
-              hasFilters && onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData });
+              onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData });
             }}
             useDrawer
             openExpenseLegacyId={Number(router.query.openExpenseId)}
