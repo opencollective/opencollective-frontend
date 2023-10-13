@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
+import { HostAdminAccountingSection } from '../admin-panel/sections/accounting';
 import AccountSettings from '../admin-panel/sections/AccountSettings';
 import HostVirtualCardRequests from '../admin-panel/sections/HostVirtualCardRequests';
 import HostVirtualCards from '../admin-panel/sections/HostVirtualCards';
@@ -31,6 +32,7 @@ import DashboardHeader from './DashboardHeader';
 
 const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
+  [SECTIONS.HOST_ACCOUNTING]: HostAdminAccountingSection,
   [SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: HostFinancialContributions,
   [SECTIONS.HOST_EXPENSES]: HostDashboardExpenses,
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,

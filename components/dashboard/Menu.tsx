@@ -249,6 +249,10 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               ...(isHost
                 ? [
                     { section: ALL_SECTIONS.FISCAL_HOSTING },
+                    {
+                      section: ALL_SECTIONS.HOST_ACCOUNTING,
+                      if: ['development', 'staging'].includes(process.env.OC_ENV),
+                    },
                     { section: ALL_SECTIONS.INVOICES_RECEIPTS },
                     { section: ALL_SECTIONS.RECEIVING_MONEY },
                     { section: ALL_SECTIONS.SENDING_MONEY },

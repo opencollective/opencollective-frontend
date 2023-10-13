@@ -24,6 +24,7 @@ const DUPLICATED_IGNORED_MESSAGES = new Set([
   'unknown', // Can have different translations if it is "unknown user" or "unknown type",
   'applications', // Can have different translations if it is "host applications" or OAuth "applications"
   'application', // Can have different translations if it is "host application" or OAuth "application"
+  'code', // Can have different translations based on the context (accounting code, program code, etc.)
 ]);
 
 /**
@@ -44,7 +45,7 @@ const jsonMessages = JSON.parse(messagesFile);
 const defaultMessages = mapValues(jsonMessages, message => message.defaultMessage);
 
 /**
- * Store new keys in translation file without overwritting the existing ones.
+ * Store new keys in translation file without overwriting the existing ones.
  */
 const translatedMessages = (locale, defaultMessages, updatedKeys) => {
   const filename = `${LANG_DIR}${locale}.json`;

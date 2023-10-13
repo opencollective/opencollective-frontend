@@ -47,6 +47,9 @@ export const ActivityTimelineMessageI18n = defineMessages({
 });
 
 export const ActivityDescriptionI18n = defineMessages({
+  ACCOUNTING_CATEGORIES_EDITED: {
+    defaultMessage: 'Chart of account edited',
+  },
   // Collective creation & applications
   COLLECTIVE_CREATED: {
     defaultMessage:
