@@ -713,6 +713,7 @@ enum SocialLinkType {
   GHOST
   PEERTUBE
   TIKTOK
+  TWITCH
 }
 
 enum ImageFormat {
