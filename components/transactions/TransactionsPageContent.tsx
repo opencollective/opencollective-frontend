@@ -23,7 +23,6 @@ import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
-import StyledSpinner from '../StyledSpinner';
 
 import { getDefaultKinds, parseTransactionKinds } from './filters/TransactionsKindFilter';
 import { parseTransactionPaymentMethodTypes } from './filters/TransactionsPaymentMethodTypeFilter';
@@ -173,12 +172,6 @@ const Transactions = ({
   });
   const canDownloadInvoices = checkCanDownloadInvoices();
 
-  if (!account && loading) {
-    return <Loading />;
-  } else if (!account) {
-    return <MessageBoxGraphqlError error={error} />;
-  }
-
   const transactionsAndProcessingOrders =
     state.hasProcessingOrders && variables.displayPendingContributions && !variables.offset
       ? [
@@ -283,9 +276,7 @@ const Transactions = ({
 
       <Box mt={['8px', '23px']}>
         {error ? (
-          <MessageBox type="error" withIcon>
-            {getErrorFromGraphqlException(error).message}
-          </MessageBox>
+          <MessageBoxGraphqlError error={error} />
         ) : !loading && !transactions?.nodes?.length ? (
           <MessageBox type="info" withIcon data-cy="zero-transactions-message">
             {hasFilters ? (
@@ -308,7 +299,7 @@ const Transactions = ({
           </MessageBox>
         ) : loading ? (
           <Flex p="16px" justifyContent="center">
-            <StyledSpinner />
+            <Loading />
           </Flex>
         ) : (
           <React.Fragment>

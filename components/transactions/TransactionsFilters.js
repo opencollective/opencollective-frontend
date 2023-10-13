@@ -46,13 +46,13 @@ const TransactionsFilters = ({ collective, filters, kinds, paymentMethodTypes, o
         <FilterLabel htmlFor="transactions-filter-period">
           <FormattedMessage id="Period" defaultMessage="Period" />
         </FilterLabel>
-        <PeriodFilter {...getFilterProps('period', encodeDateInterval)} minDate={collective.createdAt} />
+        <PeriodFilter {...getFilterProps('period', encodeDateInterval)} minDate={collective?.createdAt} />
       </FilterContainer>
       <FilterContainer flexGrow={1}>
         <FilterLabel htmlFor="transactions-filter-amount">
           <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
         </FilterLabel>
-        <AmountFilter currency={collective.currency} {...getFilterProps('amount')} />
+        <AmountFilter currency={collective?.currency} {...getFilterProps('amount')} />
       </FilterContainer>
       <FilterContainer flexGrow={1}>
         <FilterLabel htmlFor="transactions-filter-kind">
