@@ -39,6 +39,7 @@ export const ORG_BUDGET_SECTIONS = {
 };
 
 export const FISCAL_HOST_SECTIONS = {
+  ACCOUNTING: 'accounting',
   FISCAL_HOSTING: 'fiscal-hosting',
   SECURITY: 'security',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',

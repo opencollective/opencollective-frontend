@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { ColumnDef, flexRender, getCoreRowModel, Row, TableMeta, useReactTable } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
@@ -16,19 +16,24 @@ interface DataTableProps<TData, TValue> {
   className?: string;
   innerClassName?: string;
   mobileTableView?: boolean;
+  footer?: React.ReactNode;
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-  meta,
-  loading,
-  emptyMessage,
-  hideHeader,
-  nbPlaceholders = 10,
-  onClickRow,
-  ...tableProps
-}: DataTableProps<TData, TValue>) {
+function DataTableWithRef<TData, TValue>(
+  {
+    columns,
+    data,
+    meta,
+    loading,
+    emptyMessage,
+    hideHeader,
+    nbPlaceholders = 10,
+    onClickRow,
+    footer,
+    ...tableProps
+  }: DataTableProps<TData, TValue>,
+  ref: React.Ref<HTMLTableElement>,
+) {
   const table = useReactTable({
     data,
     columns,
@@ -37,7 +42,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <Table {...tableProps}>
+    <Table {...tableProps} ref={ref}>
       {!hideHeader && (
         <TableHeader>
           {table.getHeaderGroups().map(headerGroup => (
@@ -100,6 +105,16 @@ export function DataTable<TData, TValue>({
           </TableRow>
         )}
       </TableBody>
+
+      {footer && (
+        <tfoot>
+          <tr>
+            <th colSpan={table.getCenterLeafColumns().length}>{footer}</th>
+          </tr>
+        </tfoot>
+      )}
     </Table>
   );
 }
+
+export const DataTable = forwardRef(DataTableWithRef);

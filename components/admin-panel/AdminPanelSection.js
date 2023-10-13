@@ -14,6 +14,7 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 import { H2 } from '../Text';
 
+import { HostAdminAccountingSection } from './sections/accounting';
 import AccountSettings from './sections/AccountSettings';
 import FinancialContributions from './sections/FinancialContributions';
 import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
@@ -46,6 +47,7 @@ const ADMIN_PANEL_SECTIONS = {
 
 const FISCAL_HOST_SETTINGS_SECTIONS = {
   [FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
+  [FISCAL_HOST_SECTIONS.ACCOUNTING]: HostAdminAccountingSection,
 };
 
 const Title = styled(H2)`

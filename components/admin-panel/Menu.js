@@ -80,6 +80,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
           />
           <MenuLink collective={collective} section={HOST_SECTIONS.HOST_APPLICATIONS} if={!isAccountantOnly} />
           <MenuLink collective={collective} section={HOST_SECTIONS.HOSTED_COLLECTIVES} if={!isAccountantOnly} />
+          <MenuLink collective={collective} section={HOST_SECTIONS.ACCOUNTING} />
           <MenuLink
             collective={collective}
             section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS}
@@ -111,6 +112,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
           >
             <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.FISCAL_HOSTING} />
             <MenuGroup if={isHost}>
+              <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.ACCOUNTING} />
               <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS} />
               <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.RECEIVING_MONEY} />
               <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />
@@ -220,6 +222,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ADVANCED} />
         </MenuGroup>
         <MenuGroup if={isSelfHostedAccount(collective) && !isAccountantOnly} mt={24}>
+          <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.ACCOUNTING} />
           <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.INVOICES_RECEIPTS} />
           <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.RECEIVING_MONEY} />
           <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SENDING_MONEY} />
