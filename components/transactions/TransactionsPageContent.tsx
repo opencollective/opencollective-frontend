@@ -14,11 +14,11 @@ import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../../li
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import Container from '../Container';
-import ErrorPage from '../ErrorPage';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
@@ -176,7 +176,7 @@ const Transactions = ({
   if (!account && loading) {
     return <Loading />;
   } else if (!account) {
-    return <ErrorPage error={error} loading={loading} />;
+    return <MessageBoxGraphqlError error={error} />;
   }
 
   const transactionsAndProcessingOrders =
