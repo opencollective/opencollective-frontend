@@ -46,9 +46,13 @@ function contributeWithNewUsBankAccount({ name } = {}) {
 function waitOrderStatus(status = 'PAID') {
   cy.retryChain(
     () =>
-      cy.get('@collective').then(col => {
-        cy.visit(`${col.slug}/orders`);
-        return cy.contains('Financial contribution to'); // orders loaded
+      // Get order ID from `data-cy` attribute
+      cy.get(`[data-cy*='order-success-details-']`).then($el => {
+        const orderId = parseInt($el.data('cy').replace('order-success-details-', ''));
+        cy.get('@collective').then(col => {
+          cy.visit(`/${col.slug}/contributions/${orderId}`);
+          return cy.getByDataCy('contribution-page-content'); // contribution loaded
+        });
       }),
     () => {
       if (cy.$$(`[data-cy='order-${status}']`).length === 0) {
@@ -335,7 +339,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       waitOrderStatus();
 
       cy.get('@collective').then(col => {
-        cy.visit(`${col.slug}/orders`);
+        cy.visit(`${col.slug}/transactions`);
       });
 
       cy.contains('Financial contribution to TestCollective');

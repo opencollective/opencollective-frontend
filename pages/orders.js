@@ -1,51 +1,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
-import { addCollectiveNavbarData } from '../lib/graphql/queries';
-
-import CollectiveNavbar from '../components/collective-navbar';
 import Container from '../components/Container';
-import { Box } from '../components/Grid';
-import OrdersWithData from '../components/orders/OrdersWithData';
+import Link from '../components/Link';
+import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
-import { withUser } from '../components/UserProvider';
 
 class OrdersPage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, filter, value } }) {
-    return { slug: collectiveSlug, filter, value };
+  static getInitialProps({ query: { collectiveSlug } }) {
+    return { slug: collectiveSlug };
   }
 
   static propTypes = {
-    slug: PropTypes.string, // for addCollectiveNavbarData
-    filter: PropTypes.string,
-    value: PropTypes.string,
-    data: PropTypes.shape({
-      account: PropTypes.object,
-      loading: PropTypes.bool,
-    }).isRequired, // from withData
-    LoggedInUser: PropTypes.object,
+    slug: PropTypes.string.isRequired,
   };
 
   render() {
-    const { slug, data, LoggedInUser } = this.props;
-    const collective = data?.account;
     return (
       <Page>
-        {(data?.loading || data?.account) && (
-          <Container mb={4}>
-            <CollectiveNavbar
-              isLoading={data.loading}
-              collective={data.account}
-              isAdmin={LoggedInUser?.isAdminOfCollective(collective)}
+        <Container py={[4, 5, 6]} px={2} maxWidth={500} mx="auto">
+          <MessageBox type="info">
+            <FormattedMessage
+              defaultMessage="This page does not exists anymore. You can see all the contributions by changing the filters on the <TransactionsLink>transactions page</TransactionsLink>."
+              values={{
+                TransactionsLink: msg => <Link href={`/${this.props.slug}/transactions`}>{msg}</Link>,
+              }}
             />
-          </Container>
-        )}
-        <Box py={4}>
-          <OrdersWithData accountSlug={slug} />
-        </Box>
+          </MessageBox>
+        </Container>
       </Page>
     );
   }
 }
 
-export default withUser(addCollectiveNavbarData(OrdersPage));
+export default OrdersPage;
