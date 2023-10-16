@@ -19,6 +19,7 @@ import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
 import { TaxesFormikFields } from '../taxes/TaxesFormikFields';
 import { P, Span } from '../Text';
+import { toast } from '../ui/useToast';
 
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseItemForm from './ExpenseItemForm';
@@ -46,8 +47,6 @@ class ExpenseFormItems extends React.PureComponent {
       setFieldTouched: PropTypes.func,
     }).isRequired,
   };
-
-  state = { uploadErrors: null };
 
   componentDidMount() {
     const { values } = this.props.form;
@@ -85,25 +84,20 @@ class ExpenseFormItems extends React.PureComponent {
     }
   };
 
-  renderErrors() {
-    const { uploadErrors } = this.state;
-    if (!uploadErrors?.length) {
-      return null;
-    } else {
-      return (
-        <MessageBox type="error" withIcon mb={2}>
-          <strong>
-            <FormattedMessage
-              id="FilesUploadFailed"
-              defaultMessage="{count, plural, one {The file} other {# files}} failed to upload"
-              values={{ count: uploadErrors.length }}
-            />
-          </strong>
-          <P mt={1} pl={22}>
-            {formatErrorMessage(this.props.intl, uploadErrors[0]?.message)}
-          </P>
-        </MessageBox>
-      );
+  reportErrors(errors) {
+    if (errors?.length) {
+      const firstMessage = typeof errors[0] === 'string' ? errors[0] : errors[0].message;
+      toast({
+        variant: 'error',
+        title: (
+          <FormattedMessage
+            id="FilesUploadFailed"
+            defaultMessage="{count, plural, one {The file} other {# files}} failed to upload"
+            values={{ count: errors.length }}
+          />
+        ),
+        message: formatErrorMessage(this.props.intl, firstMessage),
+      });
     }
   }
 
@@ -178,14 +172,13 @@ class ExpenseFormItems extends React.PureComponent {
     if (!hasItems && requireFile) {
       return (
         <React.Fragment>
-          {this.renderErrors()}
           <StyledDropzone
             {...attachmentDropzoneParams}
             kind="EXPENSE_ITEM"
             data-cy="expense-multi-attachments-dropzone"
             onSuccess={files => filesListToItems(files).map(this.props.push)}
             onReject={uploadErrors => {
-              this.setState({ uploadErrors });
+              this.reportErrors(uploadErrors);
               this.removeMultiUploadingItems();
             }}
             mockImageGenerator={index => `https://loremflickr.com/120/120/invoice?lock=${index}`}
@@ -223,7 +216,6 @@ class ExpenseFormItems extends React.PureComponent {
     const hasTaxFields = this.hasTaxFields(taxType);
     return (
       <Box>
-        {this.renderErrors()}
         {items.map((attachment, index) => (
           <ExpenseItemForm
             key={`item-${attachment.id}`}
@@ -235,7 +227,7 @@ class ExpenseFormItems extends React.PureComponent {
             requireFile={requireFile}
             requireDate={!isGrant}
             isRichText={isGrant}
-            onUploadError={e => this.setState({ uploadErrors: [e] })}
+            onUploadError={e => this.reportErrors([e])}
             isOptional={values.payee?.isInvite}
             editOnlyDescriptiveInfo={isCreditCardCharge}
             hasMultiCurrency={!index && availableCurrencies?.length > 1} // Only display currency picker for the first item
