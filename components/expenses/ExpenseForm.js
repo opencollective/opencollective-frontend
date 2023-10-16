@@ -8,7 +8,7 @@ import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getAccountReferenceInput } from '../../lib/collective.lib';
+import { getAccountReferenceInput, isInternalHost } from '../../lib/collective.lib';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { getSupportedExpenseTypes } from '../../lib/expenses';
@@ -262,8 +262,11 @@ const getDefaultStep = (defaultStep, stepOneCompleted, isCreditCardCharge) => {
   }
 };
 
-const checkOCREnabled = (loggedInUser, router) => {
-  return loggedInUser?.hasPreviewFeatureEnabled('EXPENSE_OCR') || parseToBoolean(router.query.ocr);
+const checkOCREnabled = (loggedInUser, router, host) => {
+  const urlFlag = router.query.ocr && parseToBoolean(router.query.ocr);
+  return (
+    urlFlag !== false && isInternalHost(host) && (loggedInUser?.hasPreviewFeatureEnabled('EXPENSE_OCR') || urlFlag)
+  );
 };
 
 const ExpenseFormBody = ({
@@ -291,7 +294,7 @@ const ExpenseFormBody = ({
   const [hideOCRPrefillStater, setHideOCRPrefillStarter] = React.useState(false);
   const { values, handleChange, errors, setValues, dirty, touched, resetForm, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
-  const hasOCRPreviewEnabled = checkOCREnabled(LoggedInUser, router);
+  const hasOCRPreviewEnabled = checkOCREnabled(LoggedInUser, router, collective.host);
   const hasOCRFeature = hasOCRPreviewEnabled && checkExpenseSupportsOCR(values.type, LoggedInUser);
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
