@@ -25,7 +25,7 @@ import Footer from '../components/navigation/Footer';
 import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import { transactionsQueryCollectionFragment } from '../components/transactions/graphql/fragments';
-import Transactions, { getVariablesFromQuery } from '../components/transactions/TransactionsPage';
+import Transactions, { getVariablesFromQuery } from '../components/transactions/TransactionsPageContent';
 
 const processingOrderFragment = gql`
   fragment ProcessingOrderFields on Order {

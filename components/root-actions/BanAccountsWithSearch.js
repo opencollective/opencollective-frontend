@@ -19,7 +19,7 @@ import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import { banAccountsMutation } from './BanAccounts';
 import BanAccountsSummary from './BanAccountsSummary';
@@ -123,7 +123,7 @@ const BanAccountsWithSearch = () => {
   const [includeAssociatedAccounts, setIncludeAssociatedAccounts] = React.useState(true);
   const [dryRunData, setDryRunData] = React.useState(null);
   const [_banAccounts, { loading: submitting }] = useMutation(banAccountsMutation, { context: API_V2_CONTEXT });
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const isValid = Boolean(selectedAccounts?.length);
   const toggleAccountSelection = account => {
@@ -248,8 +248,8 @@ const BanAccountsWithSearch = () => {
             const result = await banAccounts(true);
             setDryRunData(result.data.banAccount);
           } catch (e) {
-            addToast({
-              type: TOAST_TYPE.ERROR,
+            toast({
+              variant: 'error',
               message: i18nGraphqlException(intl, e),
             });
           }
@@ -270,14 +270,14 @@ const BanAccountsWithSearch = () => {
               setDryRunData(null);
               setSelectedAccounts([]);
               refetch(); // Refresh the search results, no need to wait for it
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 title: `Successfully banned ${result.data.banAccount.accounts.length} accounts`,
                 message: <P whiteSpace="pre-wrap">{result.data.banAccount.message}</P>,
               });
             } catch (e) {
-              addToast({
-                type: TOAST_TYPE.ERROR,
+              toast({
+                variant: 'error',
                 message: i18nGraphqlException(intl, e),
               });
             }

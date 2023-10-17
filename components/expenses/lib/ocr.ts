@@ -37,18 +37,22 @@ const updateExpenseItemWithUploadResult = (
   }
 
   // Update internal form props
-  delete itemValues.__isUploadingFromMultiDropzone;
+  itemValues.__isUploading = false;
   itemValues.__parsingResult = parsingResult;
   itemValues.__canBeSplit = filterParsableItems(parsingResult.items).length > 1;
   itemValues.__file = uploadResult.file;
 
   // We don't allow changing the date or amount for virtual cards
   if (formValues.type !== 'CHARGE') {
-    if (parsingResult.date) {
+    if (parsingResult.date && isNil(itemValues.incurredAt)) {
       itemValues.incurredAt = parsingResult.date;
     }
 
-    if (parsingResult.amount?.valueInCents && parsingResult.amount.currency === formValues.currency) {
+    if (
+      parsingResult.amount?.valueInCents &&
+      parsingResult.amount.currency === formValues.currency &&
+      !itemValues.amount
+    ) {
       itemValues.amount = parsingResult.amount.valueInCents;
     }
   }
@@ -71,7 +75,7 @@ const updateExpenseItemWithUploadItem = (
   Object.assign(itemValues, defaultAttributes);
 
   // Update internal form props
-  delete itemValues.__isUploadingFromMultiDropzone;
+  itemValues.__isUploading = false;
   itemValues.__canBeSplit = false;
   itemValues.__itemParsingResult = uploadItem;
 
@@ -153,6 +157,13 @@ export const updateExpenseFormWithUploadResult = (
     updateExpenseItemWithUploadResult(formValues, uploadResult, formValues.items.length);
   });
 
+  // Make sure all items are marked as uploaded, even if there's no parsing result
+  itemIndexesToReplace?.forEach(idx => {
+    if (formValues.items[idx]?.__isUploading) {
+      formValues.items[idx].__isUploading = false;
+    }
+  });
+
   // Update form with the new values
   form.setValues(formValues);
 
@@ -185,7 +196,7 @@ export const splitExpenseItem = (form: FormikProps<ExpenseFormValues>, itemIdx: 
   parsedItems.slice(1).forEach((parsedItem, idx) => {
     const newItemIdx = itemIdx + idx + 1;
     newFormValues.items.splice(newItemIdx, 0, null);
-    updateExpenseItemWithUploadItem(newFormValues, parsedItem, newItemIdx, { __file: item.__file });
+    updateExpenseItemWithUploadItem(newFormValues, parsedItem, newItemIdx, { __file: item.__file, url: item.url });
   });
 
   form.setValues(newFormValues);

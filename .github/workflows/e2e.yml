@@ -29,6 +29,8 @@ env:
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   STRIPE_WEBHOOK_KEY: ${{ secrets.STRIPE_WEBHOOK_KEY }}
   STRIPE_WEBHOOK_SIGNING_SECRET: ${{ secrets.STRIPE_WEBHOOK_SIGNING_SECRET }}
+  AWS_KEY: ${{ secrets.AWS_KEY }}
+  AWS_SECRET: ${{ secrets.AWS_SECRET }}
 
 jobs:
   e2e:
@@ -215,12 +217,11 @@ jobs:
         run: ./scripts/run_e2e_tests.sh
         env:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
-
       - name: Archive test screenshots
         uses: actions/upload-artifact@v3
         with:
           name: screenshots
-          path: opencollective-frontend/test/cypress/screenshots
+          path: test/cypress/screenshots
         if: ${{ failure() }}
 
       - name: Report Coverage

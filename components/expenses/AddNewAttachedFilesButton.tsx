@@ -8,7 +8,7 @@ import { getMessageForRejectedDropzoneFiles, useImageUploader } from '../../lib/
 import { attachmentDropzoneParams } from './lib/attachments';
 
 import StyledButton from '../StyledButton';
-import { useToasts } from '../ToastProvider';
+import { toast } from '../ui/useToast';
 
 const AddNewAttachedFilesButton = ({
   disabled,
@@ -19,7 +19,6 @@ const AddNewAttachedFilesButton = ({
   onGraphQLSuccess,
 }: AddNewAttachedFilesButtonProps) => {
   const kind = 'EXPENSE_ATTACHED_FILE';
-  const { addToast } = useToasts();
   const intl = useIntl();
   const { isUploading, uploadFiles } = useImageUploader({
     isMulti: true,
@@ -37,8 +36,8 @@ const AddNewAttachedFilesButton = ({
   const onDrop = React.useCallback(
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {
       if (fileRejections?.length) {
-        addToast({
-          type: 'ERROR',
+        toast({
+          variant: 'error',
           message: getMessageForRejectedDropzoneFiles(intl, fileRejections, attachmentDropzoneParams.accept),
         });
       } else if (useGraphQL) {

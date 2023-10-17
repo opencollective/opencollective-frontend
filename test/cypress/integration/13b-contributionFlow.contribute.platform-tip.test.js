@@ -101,7 +101,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
     cy.get('[data-cy="minimumAmount"]input').type('{backspace}{backspace}{backspace}0');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Tier updated.' });
+    cy.checkToast({ variant: 'success', message: 'Tier updated.' });
     cy.visit(`/${collective.slug}/contribute`);
     cy.get('[data-cy="contribute-btn"]:first').click();
 

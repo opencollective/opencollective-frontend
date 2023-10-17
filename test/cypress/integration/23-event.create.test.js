@@ -35,14 +35,14 @@ describe('event.create.test.js', () => {
     cy.get('input[data-cy=amount]').type('0');
     cy.get('input[data-cy=maxQuantity]').type('10');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
 
     // Create another ticket
     cy.getByDataCy('create-ticket').click();
     cy.get('[data-cy=name]').type('Paid ticket');
     cy.get('input[data-cy=amount]').type('15');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
     cy.getByDataCy('menu-account-avatar-link').click();
 
     // Check collective page
@@ -61,7 +61,7 @@ describe('event.create.test.js', () => {
     cy.getByDataCy('contribute-card-tier').last().find('button').click();
     cy.getByDataCy('delete-btn').click();
     cy.getByDataCy('confirm-delete-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket deleted.' });
+    cy.checkToast({ variant: 'success', message: 'Ticket deleted.' });
     // edit event tiers
     cy.getByDataCy('menu-item-tiers').click();
     cy.getByDataCy('create-contribute-tier').click();
@@ -69,7 +69,7 @@ describe('event.create.test.js', () => {
     cy.get('[data-cy=description]').type('Become a sponsor');
     cy.get('input[data-cy=amount]').type('200');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Tier created.' });
+    cy.checkToast({ variant: 'success', message: 'Tier created.' });
     cy.wait(2000);
     // verify update
     cy.getByDataCy('menu-account-avatar-link').click();

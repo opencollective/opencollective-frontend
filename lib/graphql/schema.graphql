@@ -1005,6 +1005,7 @@ enum SocialLinkType {
   GHOST
   PEERTUBE
   TIKTOK
+  TWITCH
 }
 
 """

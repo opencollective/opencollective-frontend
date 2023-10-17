@@ -27,8 +27,8 @@ import StyledLink from '../../StyledLink';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
 import { InfoList, InfoListItem } from '../../ui/InfoList';
+import { type Toast, useToast } from '../../ui/useToast';
 import AcceptRejectButtons from '../AcceptRejectButtons';
 import ApplicationMessageModal from '../ApplicationMessageModal';
 import ValidatedRepositoryInfo from '../ValidatedRepositoryInfo';
@@ -84,11 +84,11 @@ StatusTag.propTypes = {
   status: PropTypes.oneOf(['PENDING', 'REJECTED', 'APPROVED']),
 };
 
-const getSuccessToast = (intl, action, collective, result) => {
+const getSuccessToast = (intl, action, collective, result): Toast => {
   if (action === ACTIONS.SEND_PRIVATE_MESSAGE || action === ACTIONS.SEND_PUBLIC_MESSAGE) {
     const conversation = get(result, 'data.processHostApplication.conversation');
     return {
-      type: TOAST_TYPE.SUCCESS,
+      variant: 'success',
       duration: 10000,
       title: conversation ? (
         <FormattedMessage id="Conversation.created" defaultMessage="Conversation created" />
@@ -109,16 +109,18 @@ const getSuccessToast = (intl, action, collective, result) => {
     };
   } else if (action === ACTIONS.APPROVE) {
     return {
-      type: TOAST_TYPE.SUCCESS,
+      variant: 'success',
       message: intl.formatMessage(msg.approved, { name: collective.name }),
     };
   } else if (action === ACTIONS.REJECT) {
     return {
-      type: TOAST_TYPE.SUCCESS,
+      variant: 'success',
       message: intl.formatMessage(msg.rejected, { name: collective.name }),
     };
   } else {
-    return { type: TOAST_TYPE.SUCCESS };
+    return {
+      variant: 'success',
+    };
   }
 };
 
@@ -134,7 +136,7 @@ export function HostApplication({
   const intl = useIntl();
   const [status, setStatus] = React.useState(application?.status);
   const [showContactModal, setShowContactModal] = React.useState(false);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const account = application.account as Account & {
     admins: MemberCollection;
   };
@@ -158,8 +160,8 @@ export function HostApplication({
     try {
       const variables = { host: { id: host.id }, account: { id: account.id }, action, message };
       const result = await callProcessApplication({ variables });
+      toast(getSuccessToast(intl, action, account, result));
 
-      addToast(getSuccessToast(intl, action, account, result));
       if (action === ACTIONS.APPROVE) {
         setStatus(HostApplicationStatus.APPROVED);
       } else if (action === ACTIONS.REJECT) {
@@ -170,7 +172,7 @@ export function HostApplication({
       }
       return result;
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   };
 

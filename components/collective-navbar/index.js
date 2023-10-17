@@ -592,7 +592,6 @@ const CollectiveNavbar = ({
 
           {!onlyInfos && (
             <Container
-              overflowY="auto"
               display={['block', 'flex']}
               width="100%"
               justifyContent="space-between"

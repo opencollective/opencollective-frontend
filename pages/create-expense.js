@@ -45,7 +45,8 @@ import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree, { SignInOverlayBackground } from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import StyledCard from '../components/StyledCard';
-import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
+import { Survey, SURVEY_KEY } from '../components/Survey';
+import { toast } from '../components/ui/useToast';
 import { withUser } from '../components/UserProvider';
 
 const STEPS = { ...EXPENSE_FORM_STEPS, SUMMARY: 'summary' };
@@ -78,8 +79,6 @@ class CreateExpensePage extends React.Component {
     createExpense: PropTypes.func.isRequired,
     /** from apollo */
     draftExpenseAndInviteUser: PropTypes.func.isRequired,
-    /** from withToast */
-    addToast: PropTypes.func.isRequired,
     /** from apollo */
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -240,7 +239,10 @@ class CreateExpensePage extends React.Component {
         this.setState({ expense, step: STEPS.SUMMARY, isInitialForm: false });
       }
     } catch (e) {
-      this.props.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(this.props.intl, e) });
+      toast({
+        variant: 'error',
+        description: i18nGraphqlException(this.props.intl, e),
+      });
     }
   };
 
@@ -270,16 +272,21 @@ class CreateExpensePage extends React.Component {
       await this.props.router.push(
         `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
       );
-      this.props.addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
         title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
-        message: (
+        description: this.props.LoggedInUser ? (
+          <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED} />
+        ) : (
           <FormattedMessage id="Expense.SuccessPage" defaultMessage="You can edit or review updates on this page." />
         ),
+        duration: 20000,
       });
       window.scrollTo(0, 0);
     } catch (e) {
-      this.props.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(this.props.intl, e) });
+      toast({
+        variant: 'error',
+        description: i18nGraphqlException(this.props.intl, e),
+      });
       this.setState({ isSubmitting: false });
     }
   };
@@ -632,7 +639,6 @@ const addHoc = compose(
   addCreateExpensePageData,
   addCreateExpenseMutation,
   addDraftExpenseAndInviteUserMutation,
-  withToasts,
   injectIntl,
 );
 

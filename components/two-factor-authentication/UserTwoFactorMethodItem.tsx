@@ -13,7 +13,7 @@ import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const RemoveTwoFactorAuthFromIndividualMutation = gql`
   mutation RemoveTwoFactorAuthFromIndividual(
@@ -63,7 +63,7 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
   const [newMethodName, setNewMethodName] = React.useState(props.userTwoFactorMethod.name);
 
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [removeTwoFactorMethod, removing] = useMutation(RemoveTwoFactorAuthFromIndividualMutation, {
     context: API_V2_CONTEXT,
@@ -171,21 +171,21 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
           continueHandler={async () => {
             try {
               await removeTwoFactorMethod();
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 message: <FormattedMessage defaultMessage="Two factor method removed successfully" />,
               });
               setIsConfirmingRemove(false);
               return CONFIRMATION_MODAL_TERMINATE;
             } catch (e) {
-              addToast({
-                type: TOAST_TYPE.ERROR,
+              toast({
+                variant: 'error',
                 message: i18nGraphqlException(intl, e),
               });
             }
           }}
         >
-          <FormattedMessage defaultMessage="This will permanently removed this two factor method" />
+          <FormattedMessage defaultMessage="This will permanently remove this two factor method" />
         </ConfirmationModal>
       )}
     </React.Fragment>

@@ -271,11 +271,9 @@ const PeriodFilter = ({ onChange, value, inputId, minDate = null, ...props }) =>
       {({ setOpen }) => (
         <Box mx="8px" my="8px" width="190px">
           <PeriodFilterForm onChange={setTmpDateInterval} value={tmpDateInterval} minDate={minDate} inputId={inputId} />
-          <Flex mt={2}>
+          <Flex flexWrap="wrap" mt={3} gap="8px">
             <StyledButton
               buttonSize="medium"
-              mr={2}
-              mt="12px"
               flex="1"
               onClick={() => {
                 setTmpDateInterval(DEFAULT_INTERVAL);
@@ -288,7 +286,6 @@ const PeriodFilter = ({ onChange, value, inputId, minDate = null, ...props }) =>
             <StyledButton
               buttonSize="medium"
               buttonStyle="primary"
-              mt="12px"
               data-cy="btn-apply-period-filter"
               flex="1"
               onClick={() => {

@@ -24,7 +24,7 @@ import StyledInputFormikField from '../StyledInputFormikField';
 import StyledLink from '../StyledLink';
 import StyledSelect from '../StyledSelect';
 import { H3, H4, P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 import WarnIfUnsavedChanges from '../WarnIfUnsavedChanges';
 
 import DeletePersonalTokenModal from './DeletePersonalTokenModal';
@@ -87,7 +87,7 @@ const LABEL_STYLES = { fontWeight: 700, fontSize: '16px', lineHeight: '24px' };
 const PersonalTokenSettings = ({ backPath, id }) => {
   const intl = useIntl();
   const router = useRouter();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const { data, loading, error } = useQuery(personalTokenQuery, { variables: { id }, context: API_V2_CONTEXT });
   const [updateToken] = useMutation(updatePersonalTokenMutation, { context: API_V2_CONTEXT });
@@ -141,8 +141,8 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                   expiresAt: filteredValue.expiresAt ? filteredValue.expiresAt : null,
                 };
                 const result = await updateToken({ variables: { personalToken } });
-                addToast({
-                  type: TOAST_TYPE.SUCCESS,
+                toast({
+                  variant: 'success',
                   message: intl.formatMessage(
                     { defaultMessage: 'Personal token "{name}" updated' },
                     { name: result.data.updatePersonalToken.name },
@@ -155,7 +155,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                   },
                 });
               } catch (e) {
-                addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+                toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }
             }}
           >

@@ -33,7 +33,7 @@ import { fadeIn } from '../components/StyledKeyframes';
 import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import StyledTag from '../components/StyledTag';
 import { H1, P, Span } from '../components/Text';
-import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
+import { toast } from '../components/ui/useToast';
 
 const CollectiveCardContainer = styled.div`
   animation: ${fadeIn} 0.2s;
@@ -164,7 +164,6 @@ class SearchPage extends React.Component {
     router: PropTypes.object, // from next.js
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object,
-    addToast: PropTypes.func.isRequired, // from withToasts
     isHost: PropTypes.bool,
     type: PropTypes.array,
   };
@@ -271,8 +270,8 @@ class SearchPage extends React.Component {
 
   handleCopy = () => {
     copy(window.location.href);
-    this.props.addToast({
-      type: TOAST_TYPE.SUCCESS,
+    toast({
+      variant: 'success',
       message: <FormattedMessage defaultMessage="Search Result Copied!" />,
     });
   };
@@ -640,4 +639,4 @@ export const addSearchPageData = graphql(searchPageQuery, {
   }),
 });
 
-export default withToasts(injectIntl(withRouter(addSearchPageData(SearchPage))));
+export default injectIntl(withRouter(addSearchPageData(SearchPage)));

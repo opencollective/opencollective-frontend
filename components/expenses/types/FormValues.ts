@@ -14,9 +14,10 @@ export interface ExpenseItemFormValues {
   __isNew?: boolean;
   __parsingResult?: UploadFileResult['parsingResult']['expense'];
   __itemParsingResult?: UploadFileResult['parsingResult']['expense']['items'][0];
-  __isUploadingFromMultiDropzone?: boolean;
+  __isUploading?: boolean;
   __canBeSplit?: boolean;
   __file?: File;
+  __fromInput?: 'multi';
 }
 
 /**

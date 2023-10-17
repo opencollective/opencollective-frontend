@@ -16,7 +16,7 @@ import { getScheduledExpensesQueryVariables, scheduledExpensesQuery } from '../h
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
@@ -136,6 +136,7 @@ const ProcessExpenseButtons = ({
   isMoreActions,
   displaySecurityChecks,
   isViewingExpenseInHostContext,
+  disabled,
 }) => {
   const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] = React.useState();
   const [selectedAction, setSelectedAction] = React.useState(null);
@@ -143,7 +144,7 @@ const ProcessExpenseButtons = ({
   const mutationOptions = { context: API_V2_CONTEXT, update: onUpdate };
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   React.useEffect(() => {
     onModalToggle?.(!!confirmProcessExpenseAction);
@@ -172,8 +173,7 @@ const ProcessExpenseButtons = ({
       await processExpense({ variables, refetchQueries });
       return true;
     } catch (e) {
-      // Display a toast with light variant since we're in a modal
-      addToast({ type: TOAST_TYPE.ERROR, variant: 'light', ...getErrorContent(intl, e, host) });
+      toast({ variant: 'error', ...getErrorContent(intl, e, host) });
       return false;
     }
   };
@@ -182,7 +182,7 @@ const ProcessExpenseButtons = ({
     const isSelectedAction = selectedAction === action;
     return {
       ...buttonProps,
-      disabled: loading && !isSelectedAction,
+      disabled: disabled || (loading && !isSelectedAction),
       loading: loading && isSelectedAction,
     };
   };
@@ -363,6 +363,7 @@ ProcessExpenseButtons.propTypes = {
   displayMarkAsIncomplete: PropTypes.bool,
   displaySecurityChecks: PropTypes.bool,
   isViewingExpenseInHostContext: PropTypes.bool,
+  disabled: PropTypes.bool,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {

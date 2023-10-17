@@ -16,7 +16,6 @@ import EditVirtualCardModal from '../edit-collective/EditVirtualCardModal';
 import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
 import StyledTag from '../StyledTag';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from '../ui/DropdownMenu';
 import { TableActionsButton } from '../ui/Table';
+import { useToast } from '../ui/useToast';
 
 import VirtualCardRequestCard from './VirtualCardRequestCard';
 
@@ -45,7 +45,7 @@ function VirtualCardRequestTableActions({
   onSelectedVirtualCardRequest: (virtualCardRequest: VirtualCardRequest) => void;
 }) {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [isVirtualCardModalOpen, setIsVirtualCardModalOpen] = React.useState(false);
 
@@ -62,7 +62,7 @@ function VirtualCardRequestTableActions({
     try {
       await rejectRequestMutation();
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   }, [rejectRequestMutation, intl]);
   const loading = rejectRequestMutationResult.loading;

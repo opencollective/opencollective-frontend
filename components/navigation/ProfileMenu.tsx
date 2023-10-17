@@ -19,7 +19,7 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import useLoggedInUser, { UserContextProps } from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn } from '../../lib/utils';
 
@@ -95,7 +95,7 @@ const MenuItem = ({
   );
 };
 
-const ProfileMenu = () => {
+const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserContextProps['logout']>[0] }) => {
   const router = useRouter();
   const { LoggedInUser, logout } = useLoggedInUser();
   const [isMenuOpen, setMenuOpen] = React.useState(false);
@@ -107,6 +107,8 @@ const ProfileMenu = () => {
     variables: { memberAccount: { slug: LoggedInUser?.collective?.slug } },
     skip: !LoggedInUser,
     context: API_V2_CONTEXT,
+    // We ignore errors here because the logout action can trigger refetch before LoggedInUser is set to null and we don't really care if this query fails
+    errorPolicy: 'ignore',
   });
 
   React.useEffect(() => {
@@ -196,7 +198,7 @@ const ProfileMenu = () => {
 
             <Separator className="my-1" />
 
-            <MenuItem Icon={LogOut} onClick={() => logout()}>
+            <MenuItem Icon={LogOut} onClick={() => logout(logoutParameters)}>
               <FormattedMessage id="menu.logout" defaultMessage="Log out" />
             </MenuItem>
           </div>

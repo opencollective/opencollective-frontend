@@ -19,7 +19,7 @@ import StyledInput from '../StyledInput';
 import StyledLinkButton from '../StyledLinkButton';
 import StyledModal, { Modal, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const HideOtherModalsGlobalStyle = createGlobalStyle`
   ${Modal} {
@@ -45,7 +45,7 @@ function initialMethod(supportedMethods: string[]) {
 }
 
 export default function TwoFactorAuthenticationModal() {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const { LoggedInUser } = useLoggedInUser();
 
   const prompt = useTwoFactorAuthenticationPrompt();
@@ -83,7 +83,7 @@ export default function TwoFactorAuthenticationModal() {
         code: base64AuthenticationResponse,
       });
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: e.message });
+      toast({ variant: 'error', message: e.message });
       return;
     } finally {
       setConfirming(false);

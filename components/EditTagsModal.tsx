@@ -7,13 +7,13 @@ import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { API_V2_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
 import { Collective } from '../lib/graphql/types/v2/graphql';
 
+import { toast } from './ui/useToast';
 import CollectiveTagsInput from './CollectiveTagsInput';
 import { Flex } from './Grid';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledInputFormikField from './StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const editTagsMutation = gqlV1`
   mutation editCollective(
@@ -45,7 +45,6 @@ export type EditTagsModalProps = {
 };
 
 export default function EditTagsModal({ collective, onClose }: EditTagsModalProps) {
-  const { addToast } = useToasts();
   const [editTags, { loading }] = useMutation(editTagsMutation);
 
   const { data: { tagStats } = { tagStats: null } } = useQuery(tagStatsQuery, {
@@ -69,8 +68,8 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
 
       await editTags({ variables });
     } catch (e) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: (
           <FormattedMessage
             defaultMessage="Error submiting form: {error}"
@@ -82,8 +81,8 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
       });
       return;
     }
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
+    toast({
+      variant: 'success',
       message: <FormattedMessage defaultMessage="Successfully updated tags" />,
     });
     handleClose();

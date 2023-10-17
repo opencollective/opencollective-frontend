@@ -11,7 +11,7 @@ import { Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const connectAccountsMutation = gql`
   mutation ConnectAccounts($memberAccount: AccountReferenceInput!, $account: AccountReferenceInput!) {
@@ -33,7 +33,7 @@ const ConnectAccountsForm = () => {
   const [submitConnectAccounts, { loading }] = useMutation(connectAccountsMutation, { context: API_V2_CONTEXT });
   const [memberAccount, setMemberAccount] = React.useState(null);
   const [account, setAccount] = React.useState(null);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const isValid = memberAccount && account;
   const intl = useIntl();
   const connectCTA = getConnectCTA(memberAccount, account);
@@ -47,8 +47,8 @@ const ConnectAccountsForm = () => {
         },
       });
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: (
           <React.Fragment>
             <LinkCollective collective={memberAccount} /> is now connected to <LinkCollective collective={account} />
@@ -60,9 +60,9 @@ const ConnectAccountsForm = () => {
       setMemberAccount(null);
       setAccount(null);
     } catch (e) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
-        variant: 'light',
+      toast({
+        variant: 'error',
+
         message: i18nGraphqlException(intl, e),
       });
     }

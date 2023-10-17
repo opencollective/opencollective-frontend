@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 
+import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
 const hostTermsQuery = gql`
@@ -14,14 +16,19 @@ const hostTermsQuery = gql`
   }
 `;
 
-const TermsOfFiscalSponsorship = ({ hostCollectiveSlug }) => {
-  const router = useRouter();
-  const { data, loading } = useQuery(hostTermsQuery, {
-    variables: { hostCollectiveSlug },
-    context: API_V2_CONTEXT,
-    skip: !hostCollectiveSlug,
-  });
+const getVariablesFromContext = context => ({ hostCollectiveSlug: context.query.hostCollectiveSlug as string });
 
+const tosQueryHelper = getSSRQueryHelpers<ReturnType<typeof getVariablesFromContext>>({
+  query: hostTermsQuery,
+  context: API_V2_CONTEXT,
+  getVariablesFromContext,
+});
+
+export const getServerSideProps = tosQueryHelper.getServerSideProps;
+
+const TermsOfFiscalSponsorship = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter();
+  const { data, loading } = tosQueryHelper.useQuery(props);
   const termsOfService = data?.host?.termsUrl;
   const isTrustedHost = data?.host?.isTrustedHost;
 
@@ -34,10 +41,6 @@ const TermsOfFiscalSponsorship = ({ hostCollectiveSlug }) => {
   }
 
   return null;
-};
-
-export const getServerSideProps = async ({ query }) => {
-  return { props: { hostCollectiveSlug: query.hostCollectiveSlug } };
 };
 
 TermsOfFiscalSponsorship.propTypes = {

@@ -8,7 +8,7 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
 import StyledButton from '../../../StyledButton';
-import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
+import { useToast } from '../../../ui/useToast';
 
 import { inviteMemberMutation } from './InviteMemberModal';
 
@@ -16,7 +16,7 @@ const ResendMemberInviteBtn = ({ member, collective }) => {
   const [inviteMember, { loading, error, data }] = useMutation(inviteMemberMutation, { context: API_V2_CONTEXT });
   const success = !error && data?.inviteMember?.id;
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   return (
     <StyledButton
       buttonStyle={success ? 'successSecondary' : 'standard'}
@@ -35,8 +35,8 @@ const ResendMemberInviteBtn = ({ member, collective }) => {
             },
           });
         } catch (e) {
-          addToast({
-            type: TOAST_TYPE.ERROR,
+          toast({
+            variant: 'error',
             title: intl.formatMessage({ defaultMessage: 'Cannot send member invitation' }),
             message: i18nGraphqlException(intl, e),
           });

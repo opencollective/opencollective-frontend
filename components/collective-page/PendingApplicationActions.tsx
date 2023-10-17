@@ -10,11 +10,11 @@ import { Flex } from '../Grid';
 import AcceptRejectButtons from '../host-dashboard/AcceptRejectButtons';
 import { processApplicationMutation } from '../host-dashboard/applications/queries';
 import { NotificationBarButton } from '../NotificationBar';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 export default function PendingApplicationActions({ collective, refetch }) {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [callProcessApplication, { loading }] = useMutation(processApplicationMutation, {
     context: API_V2_CONTEXT,
   });
@@ -34,7 +34,7 @@ export default function PendingApplicationActions({ collective, refetch }) {
         await refetch();
       }
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   };
 

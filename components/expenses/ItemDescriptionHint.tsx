@@ -27,6 +27,7 @@ export const ExpenseItemDescriptionHint = ({ item, isInvoice, form, field }: Exp
           values={{
             description: (
               <StyledLinkButton
+                data-cy="btn-use-suggested-description"
                 title={intl.formatMessage({ defaultMessage: 'Use suggested description' })}
                 onClick={() => {
                   form.setFieldValue(field.name, suggested);
