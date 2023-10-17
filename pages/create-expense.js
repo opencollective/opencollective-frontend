@@ -273,8 +273,9 @@ class CreateExpensePage extends React.Component {
         `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
       );
       toast({
+        variant: 'success',
         title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
-        description: this.props.LoggedInUser ? (
+        message: this.props.LoggedInUser ? (
           <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED} />
         ) : (
           <FormattedMessage id="Expense.SuccessPage" defaultMessage="You can edit or review updates on this page." />
@@ -285,7 +286,7 @@ class CreateExpensePage extends React.Component {
     } catch (e) {
       toast({
         variant: 'error',
-        description: i18nGraphqlException(this.props.intl, e),
+        message: i18nGraphqlException(this.props.intl, e),
       });
       this.setState({ isSubmitting: false });
     }
