@@ -230,7 +230,7 @@ const MenuSectionHeader = ({ section, hidePlusIcon, closeDrawer }) => {
               href={plusButton.href}
               aria-label={intl.formatMessage(plusButton.text)}
               onClick={closeDrawer}
-              tabIndex="-1"
+              tabIndex={-1}
               className="mr-1.5 flex h-6 w-6 items-center justify-center rounded-full border"
             >
               <Plus size={12} color="#76777A" />

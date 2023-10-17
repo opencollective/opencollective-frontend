@@ -16,3 +16,8 @@ export const VirtualCardRequestStatusI18n = defineMessages({
     defaultMessage: 'Pending',
   },
 });
+
+export const i18nVirtualCardRequestStatus = (intl, status) => {
+  const i18nMsg = VirtualCardRequestStatusI18n[status];
+  return i18nMsg ? intl.formatMessage(i18nMsg) : status;
+};

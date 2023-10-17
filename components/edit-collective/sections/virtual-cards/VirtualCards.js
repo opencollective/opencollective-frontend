@@ -20,7 +20,7 @@ import VirtualCard from '../../VirtualCard';
 
 import VirtualCardFilters from './VirtualCardFilters';
 
-const virtualCardsQuery = gql`
+export const virtualCardsQuery = gql`
   query AccountVirtualCards(
     $slug: String
     $limit: Int!

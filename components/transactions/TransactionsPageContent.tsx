@@ -237,7 +237,7 @@ const Transactions = ({
         flexDirection={['column', 'row']}
         alignItems={['stretch', 'flex-end']}
       >
-        {state.hasProcessingOrders && (
+        {true && (
           <StyledCheckbox
             checked={router.query.displayPendingContributions !== 'false' ? true : false}
             onChange={({ checked }) => updateFilters({ displayPendingContributions: checked })}
@@ -249,7 +249,7 @@ const Transactions = ({
             }
           />
         )}
-        {state.hasChildren && (
+        {true && (
           <StyledCheckbox
             checked={router.query.ignoreChildrenTransactions ? true : false}
             onChange={({ checked }) => updateFilters({ ignoreChildrenTransactions: checked })}
@@ -261,7 +261,7 @@ const Transactions = ({
             }
           />
         )}
-        {state.hasGiftCards && (
+        {true && (
           <StyledCheckbox
             checked={router.query.ignoreGiftCardsTransactions ? true : false}
             onChange={({ checked }) => updateFilters({ ignoreGiftCardsTransactions: checked })}
@@ -270,7 +270,7 @@ const Transactions = ({
             }
           />
         )}
-        {state.hasIncognito && (
+        {true && (
           <StyledCheckbox
             checked={router.query.ignoreIncognitoTransactions ? true : false}
             onChange={({ checked }) => updateFilters({ ignoreIncognitoTransactions: checked })}

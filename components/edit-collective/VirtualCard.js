@@ -13,12 +13,14 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getAvailableLimitString } from '../../lib/i18n/virtual-card-spending-limit';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getDashboardObjectIdURL } from '../../lib/stripe/dashboard';
 
 import Avatar from '../Avatar';
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
 import DismissIcon from '../icons/DismissIcon';
+import Link from '../Link';
 import StyledLink from '../StyledLink';
 import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
@@ -39,7 +41,7 @@ export const CardContainer = styled(Flex)`
   border-radius: 12px;
   background: #050505;
   position: relative;
-
+  max-width: 400px;
   color: #fff;
 
   transition:
@@ -238,14 +240,16 @@ export const ActionsButton = props => {
           )}
           {!props.hideViewTransactions && (
             <React.Fragment>
-              <DropdownMenuItem asChild>
-                <a
-                  href={`/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+              <DropdownMenuItem>
+                <Link
+                  href={
+                    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
+                      ? `/dashboard/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`
+                      : `/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`
+                  }
                 >
                   <FormattedMessage defaultMessage="View transactions" />
-                </a>
+                </Link>
               </DropdownMenuItem>
             </React.Fragment>
           )}
@@ -450,11 +454,11 @@ const VirtualCard = props => {
   const cardNumber = `****  ****  ****  ${virtualCard.last4}`;
 
   return (
-    <CardContainer width="366px" height="248px" flexDirection="column">
+    <CardContainer flexDirection="column">
       <div />
-      <Box flexGrow={1} m="24px 24px 0 24px">
+      <Box flexGrow={1} m="24px 24px 12px 24px">
         <Flex fontSize="16px" lineHeight="24px" fontWeight="500" justifyContent="space-between">
-          <Box>{name}</Box>
+          <div className="truncate">{name}</div>
           <StateLabel isActive={isActive}>
             {(virtualCard.data.state || virtualCard.data.status).toUpperCase()}
           </StateLabel>

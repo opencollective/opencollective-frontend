@@ -1,27 +1,26 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { isEmpty, isNil, omitBy, pick, toNumber } from 'lodash';
-import { Archive, MoreHorizontal, Pencil } from 'lucide-react';
-import { useRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { isEmpty, pick } from 'lodash';
+import { Archive, MoreHorizontal, Pencil, PlusIcon } from 'lucide-react';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { z } from 'zod';
 
 import { HELP_MESSAGE } from '../../../lib/constants/dismissable-help-message';
+import { FilterComponentConfigs, Views } from '../../../lib/filters/filter-types';
+import { boolean, limit, offset } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { DashboardVendorsQuery } from '../../../lib/graphql/types/v2/graphql';
+import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { cn } from '../../../lib/utils';
 
 import Avatar from '../../Avatar';
-import Container from '../../Container';
 import { DataTable } from '../../DataTable';
 import DismissibleMessage from '../../DismissibleMessage';
 import { Drawer } from '../../Drawer';
 import { I18nWithColumn } from '../../I18nFormatters';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
-import SearchBar from '../../SearchBar';
 import StyledModal from '../../StyledModal';
-import StyledTabs from '../../StyledTabs';
 import { Button } from '../../ui/Button';
 import {
   DropdownMenu,
@@ -37,20 +36,16 @@ import { setVendorArchiveMutation, vendorFieldFragment, VendorFieldsFragment } f
 import VendorDetails, { VendorContactTag } from '../../vendors/VendorDetails';
 import VendorForm from '../../vendors/VendorForm';
 import DashboardHeader from '../DashboardHeader';
+import { EmptyResults } from '../EmptyResults';
+import { Filterbar } from '../filters/Filterbar';
+import { searchFilter } from '../filters/SearchFilter';
+import { DashboardSectionProps } from '../types';
 
 enum VendorsTab {
   ALL = 'ALL',
   ARCHIVED = 'ARCHIVED',
   POTENTIAL_VENDORS = 'POTENTIAL_VENDORS',
 }
-
-const PAGE_SIZE = 20;
-
-const TAB_VALUES = {
-  [VendorsTab.ALL]: { isArchived: false, includePotentialVendors: false },
-  [VendorsTab.ARCHIVED]: { isArchived: true, includePotentialVendors: false },
-  [VendorsTab.POTENTIAL_VENDORS]: { includePotentialVendors: true },
-};
 
 const dashboardVendorsQuery = gql`
   query DashboardVendors(
@@ -264,22 +259,57 @@ const OrgsTable = ({ orgs, loading, openOrg }) => {
     />
   );
 };
+const PAGE_SIZE = 20;
 
-const pickQueryFilters = query =>
-  omitBy(
-    {
-      searchTerm: query.searchTerm,
-      offset: toNumber(query.offset || 0),
-    },
-    isNil,
-  );
+const schema = z.object({
+  limit: limit.default(PAGE_SIZE),
+  offset,
+  searchTerm: searchFilter.schema,
+  isArchived: boolean.optional().default(false),
+  includePotentialVendors: boolean.optional().default(false),
+});
 
-const Vendors = ({ accountSlug }) => {
-  const router = useRouter();
+type FilterValues = z.infer<typeof schema>;
+
+const filters: FilterComponentConfigs<FilterValues> = {
+  searchTerm: searchFilter.filter,
+  isArchived: {
+    labelMsg: defineMessage({ defaultMessage: 'Archived' }),
+  },
+  includePotentialVendors: {
+    labelMsg: defineMessage({ defaultMessage: 'Include potential vendors' }),
+  },
+};
+
+const Vendors = ({ accountSlug }: DashboardSectionProps) => {
   const intl = useIntl();
-  const [tab, setTab] = React.useState<VendorsTab>(VendorsTab.ALL);
-  const queryValues = pickQueryFilters(router.query);
-  const tabValues = TAB_VALUES[tab];
+  const views: Views<FilterValues> = [
+    {
+      id: VendorsTab.ALL,
+      label: intl.formatMessage({ defaultMessage: 'All' }),
+      filter: {},
+    },
+    {
+      id: VendorsTab.ARCHIVED,
+      label: intl.formatMessage({ defaultMessage: 'Archived' }),
+      filter: {
+        isArchived: true,
+      },
+    },
+    {
+      id: VendorsTab.POTENTIAL_VENDORS,
+      label: intl.formatMessage({ defaultMessage: 'Potential vendors' }),
+      filter: {
+        includePotentialVendors: true,
+      },
+    },
+  ];
+  const queryFilter = useQueryFilter({
+    filters,
+    schema,
+    views,
+  });
+
   const {
     data,
     previousData,
@@ -289,9 +319,7 @@ const Vendors = ({ accountSlug }) => {
   } = useQuery<DashboardVendorsQuery>(dashboardVendorsQuery, {
     variables: {
       slug: accountSlug,
-      limit: PAGE_SIZE,
-      ...tabValues,
-      ...queryValues,
+      ...queryFilter.variables,
     },
     fetchPolicy: 'cache-and-network',
     context: API_V2_CONTEXT,
@@ -313,39 +341,18 @@ const Vendors = ({ accountSlug }) => {
   };
   const handleSetArchive = async vendor =>
     archiveVendor({ variables: { vendor: pick(vendor, ['id']), archive: !vendor.isArchived } });
-  const updateFilters = props =>
-    router.replace({
-      pathname: router.asPath.split('?')[0],
-      query: pickQueryFilters({ ...router.query, ...props }),
-    });
-  const handleTabUpdate = tab => {
-    setTab(tab);
-    updateFilters({ offset: null });
-  };
 
   const host = (data || previousData)?.account?.['host'];
-  const tabs = [
-    {
-      id: VendorsTab.ALL,
-      label: 'All',
-    },
-    {
-      id: VendorsTab.ARCHIVED,
-      label: 'Archived',
-    },
-    {
-      id: VendorsTab.POTENTIAL_VENDORS,
-      label: 'Potential vendors',
-    },
-  ];
+
   const pages = Math.ceil((host?.vendors?.totalCount || 1) / PAGE_SIZE);
-  const currentPage = toNumber((queryValues.offset || 0) + PAGE_SIZE) / PAGE_SIZE;
+  const currentPage = ((queryFilter.values.offset || 0) + PAGE_SIZE) / PAGE_SIZE;
+
   const isDrawerOpen = Boolean(vendorDetail || createEditVendor?.['id'] || orgDetail);
   const loading = queryLoading;
   const error = queryError;
 
   return (
-    <Container>
+    <div className="flex flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage defaultMessage="Vendors" />}
         description={
@@ -354,24 +361,18 @@ const Vendors = ({ accountSlug }) => {
             defaultMessage="Manage all the external organizations acting as vendors for the Collectives you host."
           />
         }
+        actions={
+          <Button size="sm" className="gap-1" onClick={() => setCreateEditVendor(true)}>
+            <span>
+              <FormattedMessage defaultMessage="Create vendor" />
+            </span>
+            <PlusIcon size={20} />
+          </Button>
+        }
       />
+      <Filterbar {...queryFilter} />
 
-      <div className="mt-2 flex flex-grow flex-row gap-4">
-        <SearchBar
-          placeholder={intl.formatMessage({ defaultMessage: 'Search...', id: 'search.placeholder' })}
-          defaultValue={router.query.searchTerm}
-          height="40px"
-          onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
-          className="flex-grow"
-        />
-        <Button className="rounded-full" onClick={() => setCreateEditVendor(true)}>
-          + <FormattedMessage defaultMessage="Create vendor" />
-        </Button>
-      </div>
-      <div className="my-6">
-        <StyledTabs tabs={tabs} selectedId={tab} onChange={handleTabUpdate} />
-      </div>
-      {tab === VendorsTab.POTENTIAL_VENDORS && (
+      {queryFilter.activeViewId === VendorsTab.POTENTIAL_VENDORS && (
         <DismissibleMessage messageId={HELP_MESSAGE.POTENTIAL_VENDORS}>
           {({ dismiss }) => (
             <MessageBox type="info" className="mb-6">
@@ -391,13 +392,16 @@ const Vendors = ({ accountSlug }) => {
         </DismissibleMessage>
       )}
       <div className="flex flex-col gap-4">
-        {error && <MessageBoxGraphqlError error={error} />}
-        {loading && <LoadingPlaceholder height="250px" width="100%" borderRadius="16px" />}
-        {!error &&
-          !loading &&
-          (tab === VendorsTab.POTENTIAL_VENDORS ? (
-            <OrgsTable orgs={host?.['potentialVendors']?.nodes || []} loading={loading} openOrg={setOrgDetail} />
-          ) : (
+        {error ? (
+          <MessageBoxGraphqlError error={error} />
+        ) : !loading &&
+          ((queryFilter.activeViewId === VendorsTab.POTENTIAL_VENDORS && host?.['potentialVendors']?.nodes) ||
+            host['vendors']?.nodes.length === 0) ? (
+          <EmptyResults hasFilters={queryFilter.hasFilters} onResetFilters={() => queryFilter.resetFilters({})} />
+        ) : queryFilter.activeViewId === VendorsTab.POTENTIAL_VENDORS ? (
+          <OrgsTable orgs={host?.['potentialVendors']?.nodes || []} loading={loading} openOrg={setOrgDetail} />
+        ) : (
+          <React.Fragment>
             <VendorsTable
               vendors={host?.['vendors']?.nodes}
               loading={loading}
@@ -405,14 +409,12 @@ const Vendors = ({ accountSlug }) => {
               openVendor={setVendorDetail}
               handleSetArchive={handleSetArchive}
             />
-          ))}
-
-        {tab !== VendorsTab.POTENTIAL_VENDORS && (
-          <Pagination
-            totalPages={pages}
-            page={currentPage}
-            onChange={page => updateFilters({ offset: (page - 1) * PAGE_SIZE })}
-          />
+            <Pagination
+              totalPages={pages}
+              page={currentPage}
+              onChange={page => queryFilter.setFilter('offset', (page - 1) * PAGE_SIZE)}
+            />
+          </React.Fragment>
         )}
       </div>
 
@@ -471,7 +473,7 @@ const Vendors = ({ accountSlug }) => {
           />
         )}
       </Drawer>
-    </Container>
+    </div>
   );
 };
 

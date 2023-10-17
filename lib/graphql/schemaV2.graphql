@@ -2532,6 +2532,10 @@ type Host implements Account & AccountWithContributions {
     """
     searchTerm: String
   ): VendorCollection!
+
+  """
+  Returns a list of organizations that only transacted with this host and all its admins are also admins of this host.
+  """
   potentialVendors(
     """
     The number of results to fetch (default 10, max 1000)
