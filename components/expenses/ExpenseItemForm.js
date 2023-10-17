@@ -263,7 +263,7 @@ const ExpenseItemForm = ({
               error={getError('amount')}
               htmlFor={`${attachmentKey}-amount`}
               label={formatMessage(msg.amountLabel)}
-              required={!isOptional}
+              required={true}
               labelFontSize="13px"
               inputType="number"
               flex="1 1 30%"
@@ -280,7 +280,7 @@ const ExpenseItemForm = ({
                       {...inputProps}
                       currency={currency}
                       currencyDisplay="CODE"
-                      min={isOptional ? undefined : 1}
+                      min={0}
                       maxWidth="100%"
                       placeholder="0.00"
                       onChange={(value, e) => setFieldValue(e.target.name, value)}
