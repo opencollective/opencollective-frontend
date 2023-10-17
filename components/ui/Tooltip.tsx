@@ -7,7 +7,9 @@ const TooltipProvider = TooltipPrimitive.Provider;
 
 const Tooltip = TooltipPrimitive.Root;
 
-const TooltipTrigger = TooltipPrimitive.Trigger;
+const TooltipTrigger = (props: React.ComponentProps<typeof TooltipPrimitive.Trigger>) => (
+  <TooltipPrimitive.Trigger type="button" {...props} />
+);
 
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
