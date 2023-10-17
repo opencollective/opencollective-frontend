@@ -13,20 +13,11 @@ import Menu from './Menu';
 
 interface AdminPanelSideBarProps {
   isLoading?: boolean;
-  selectedSection?: string;
-  isAccountantOnly?: boolean;
   onRoute?: (...args: any[]) => void;
   activeSlug?: string;
 }
 
-const AdminPanelSideBar = ({
-  activeSlug,
-  isAccountantOnly,
-  isLoading,
-  selectedSection,
-  onRoute: _onRoute,
-  ...props
-}: AdminPanelSideBarProps) => {
+const AdminPanelSideBar = ({ activeSlug, isLoading, onRoute: _onRoute, ...props }: AdminPanelSideBarProps) => {
   const [isMenuOpen, setMenuOpen] = React.useState(false);
   const { viewport } = useWindowResize();
   const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
@@ -49,7 +40,7 @@ const AdminPanelSideBar = ({
             </div>
           ))
         ) : (
-          <Menu {...{ selectedSection, onRoute, isAccountantOnly }} />
+          <Menu {...{ onRoute }} />
         )}
       </div>
     ),

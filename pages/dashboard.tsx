@@ -13,7 +13,7 @@ import { require2FAForAdmins } from '../lib/policies';
 
 import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
-import AdminPanelSection from '../components/dashboard/DashboardSection';
+import DashboardSection from '../components/dashboard/DashboardSection';
 import { adminPanelQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
 import Link from '../components/Link';
@@ -47,7 +47,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return null;
   } else if (isIndividualAccount(account)) {
-    return ALL_SECTIONS.DASHBOARD_OVERVIEW;
+    return ALL_SECTIONS.OVERVIEW;
   } else if (isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
   } else {
@@ -186,22 +186,12 @@ const DashboardPage = () => {
             className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row md:px-6 lg:gap-12 lg:py-8"
             data-cy="admin-panel-container"
           >
-            <AdminPanelSideBar
-              isLoading={isLoading}
-              activeSlug={activeSlug}
-              selectedSection={selectedSection}
-              isAccountantOnly={LoggedInUser?.isAccountantOnly(account)}
-            />
+            <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} />
             {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage className="lg:mt-16" />
             ) : (
               <div className="max-w-[1000px] flex-1 sm:overflow-x-clip">
-                <AdminPanelSection
-                  section={selectedSection}
-                  isLoading={isLoading}
-                  collective={account}
-                  subpath={subpath}
-                />
+                <DashboardSection section={selectedSection} isLoading={isLoading} account={account} subpath={subpath} />
               </div>
             )}
           </div>

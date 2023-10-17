@@ -7,6 +7,7 @@ import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { Account, Host, VirtualCardRequestCollection } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
+import { DashboardSectionProps } from '../../dashboard/types';
 import { Box, Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
@@ -83,12 +84,7 @@ const hostVirtualCardRequestsQuery = gql`
   }
 `;
 
-type HostVirtualCardRequestsProps = {
-  account: Account;
-  hostSlug: string;
-};
-
-export default function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
+export default function HostVirtualCardRequests({ accountSlug: hostSlug }: DashboardSectionProps) {
   const queryFilter = useQueryFilter({
     ignoreQueryParams: ['slug', 'section'],
     filters: {
@@ -123,7 +119,7 @@ export default function HostVirtualCardRequests(props: HostVirtualCardRequestsPr
   }>(hostVirtualCardRequestsQuery, {
     context: API_V2_CONTEXT,
     variables: {
-      hostSlug: props.hostSlug,
+      hostSlug,
       collective: queryFilter.values.collectiveSlug ? [{ slug: queryFilter.values.collectiveSlug }] : null,
       selectedCollectiveSlug: queryFilter.values.collectiveSlug,
       status: queryFilter.values.virtualCardRequestStatus,

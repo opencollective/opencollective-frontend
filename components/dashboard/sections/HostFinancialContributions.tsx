@@ -1,35 +1,35 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { ORDER_STATUS } from '../../lib/constants/order-status';
-import { parseDateInterval } from '../../lib/date-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { usePrevious } from '../../lib/hooks/usePrevious';
+import { ORDER_STATUS } from '../../../lib/constants/order-status';
+import { parseDateInterval } from '../../../lib/date-utils';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
+import { usePrevious } from '../../../lib/hooks/usePrevious';
 
-import { parseAmountRange } from '../budget/filters/AmountFilter';
-import { confirmContributionFieldsFragment } from '../ContributionConfirmationModal';
-import { Box, Flex } from '../Grid';
-import CreatePendingOrderModal from '../host-dashboard/CreatePendingOrderModal';
-import { DisputedContributionsWarning } from '../host-dashboard/DisputedContributionsWarning';
-import Link from '../Link';
-import LoadingPlaceholder from '../LoadingPlaceholder';
-import MessageBox from '../MessageBox';
-import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
-import Pagination from '../Pagination';
-import SearchBar from '../SearchBar';
-import StyledButton from '../StyledButton';
-
-import OrdersFilters from './OrdersFilters';
-import OrdersList from './OrdersList';
+import { parseAmountRange } from '../../budget/filters/AmountFilter';
+import { confirmContributionFieldsFragment } from '../../ContributionConfirmationModal';
+import { Box, Flex } from '../../Grid';
+import CreatePendingOrderModal from '../../host-dashboard/CreatePendingOrderModal';
+import Link from '../../Link';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
+import MessageBox from '../../MessageBox';
+import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
+import OrdersFilters from '../../orders/OrdersFilters';
+import OrdersList from '../../orders/OrdersList';
+import Pagination from '../../Pagination';
+import SearchBar from '../../SearchBar';
+import StyledButton from '../../StyledButton';
+import DashboardHeader from '../DashboardHeader';
+import DashboardViews from '../DashboardViews';
+import { DashboardSectionProps } from '../types';
 
 const accountOrdersQuery = gql`
   query Orders(
-    $accountSlug: String
+    $hostSlug: String
     $limit: Int!
     $offset: Int!
     $status: [OrderStatus]
@@ -39,16 +39,8 @@ const accountOrdersQuery = gql`
     $dateTo: DateTime
     $searchTerm: String
   ) {
-    account(slug: $accountSlug) {
-      id
-      slug
-      currency
-      legacyId
-      name
-      isHost
-    }
     orders(
-      account: { slug: $accountSlug }
+      account: { slug: $hostSlug }
       includeHostedAccounts: true
       filter: INCOMING
       status: $status
@@ -109,20 +101,63 @@ const accountOrdersQuery = gql`
   ${confirmContributionFieldsFragment}
 `;
 
+const accountOrdersMetaDataQuery = gql`
+  query OrdersMetaData($hostSlug: String) {
+    account(slug: $hostSlug) {
+      id
+      slug
+      currency
+      legacyId
+      name
+      isHost
+    }
+    all: orders(account: { slug: $hostSlug }, includeHostedAccounts: true, filter: INCOMING, limit: 0) {
+      totalCount
+    }
+    pending: orders(
+      account: { slug: $hostSlug }
+      includeHostedAccounts: true
+      filter: INCOMING
+      status: PENDING
+      limit: 0
+    ) {
+      totalCount
+    }
+    disputed: orders(
+      account: { slug: $hostSlug }
+      includeHostedAccounts: true
+      filter: INCOMING
+      status: DISPUTED
+      limit: 0
+    ) {
+      totalCount
+    }
+    in_review: orders(
+      account: { slug: $hostSlug }
+      includeHostedAccounts: true
+      filter: INCOMING
+      status: IN_REVIEW
+      limit: 0
+    ) {
+      totalCount
+    }
+  }
+`;
+
 const ORDERS_PER_PAGE = 15;
 
 const isValidStatus = status => {
   return Boolean(ORDER_STATUS[status]);
 };
 
-const getVariablesFromQuery = (query, forcedStatus) => {
+const getVariablesFromQuery = query => {
   const amountRange = parseAmountRange(query.amount);
   const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
   const searchTerm = query.searchTerm || null;
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || ORDERS_PER_PAGE,
-    status: forcedStatus ? forcedStatus : isValidStatus(query.status) ? query.status : null,
+    status: isValidStatus(query.status) ? query.status : null,
     minAmount: amountRange[0] && amountRange[0] * 100,
     maxAmount: amountRange[1] && amountRange[1] * 100,
     dateFrom,
@@ -163,18 +198,50 @@ const updateQuery = (router, newParams) => {
   return router.push({ pathname, query });
 };
 
-const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreatePendingOrder }) => {
-  const router = useRouter() || { query: {} };
+const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
+  const router = useRouter();
   const intl = useIntl();
   const hasFilters = React.useMemo(() => hasParams(router.query), [router.query]);
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
-  const queryVariables = { accountSlug, ...getVariablesFromQuery(router.query, status) };
+  const queryVariables = { hostSlug, ...getVariablesFromQuery(router.query) };
   const queryParams = { variables: queryVariables, context: API_V2_CONTEXT };
   const { data, error, loading, variables, refetch } = useQuery(accountOrdersQuery, queryParams);
+  const pageRoute = `/dashboard/${hostSlug}/orders`;
+
+  const { data: metaData, refetch: refetchMetaData } = useQuery(accountOrdersMetaDataQuery, {
+    variables: { hostSlug },
+    context: API_V2_CONTEXT,
+  });
+
+  const views = [
+    {
+      label: intl.formatMessage({ defaultMessage: 'All' }),
+      query: {},
+      id: 'all',
+      count: metaData?.all?.totalCount,
+    },
+    {
+      label: intl.formatMessage({ defaultMessage: 'Pending' }),
+      query: { status: 'PENDING' },
+      count: metaData?.pending?.totalCount,
+      id: 'pending',
+    },
+    {
+      label: intl.formatMessage({ defaultMessage: 'Disputed' }),
+      query: { status: 'DISPUTED' },
+      count: metaData?.disputed?.totalCount,
+      id: 'disputed',
+    },
+    {
+      label: intl.formatMessage({ id: 'order.in_review', defaultMessage: 'In Review' }),
+      query: { status: 'IN_REVIEW' },
+      count: metaData?.in_review?.totalCount,
+      id: 'in_review',
+    },
+  ];
 
   const { LoggedInUser } = useLoggedInUser();
   const prevLoggedInUser = usePrevious(LoggedInUser);
-  const isHostAdmin = LoggedInUser?.isAdminOfCollective(data?.account);
 
   // Refetch data when user logs in
   React.useEffect(() => {
@@ -185,24 +252,63 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
 
   return (
     <Box maxWidth={1000} width="100%" m="0 auto">
-      <div className="flex flex-wrap justify-between gap-4">
-        <h1 className="text-2xl font-bold leading-10 tracking-tight">
-          {title || <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
-        </h1>
+      <DashboardHeader
+        title={<FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
+        description={<FormattedMessage defaultMessage="Contributions for Collectives you host." />}
+        actions={
+          <React.Fragment>
+            <SearchBar
+              height="40px"
+              defaultValue={queryVariables.searchTerm}
+              onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
+              placeholder={intl.formatMessage(messages.searchPlaceholder)}
+            />
+            <React.Fragment>
+              <StyledButton
+                onClick={() => setShowCreatePendingOrderModal(true)}
+                buttonSize="small"
+                buttonStyle="primary"
+                height="38px"
+                lineHeight="12px"
+                data-cy="create-pending-contribution"
+              >
+                <FormattedMessage defaultMessage="Create pending" />
+              </StyledButton>
+              {showCreatePendingOrderModal && (
+                <CreatePendingOrderModal
+                  hostSlug={hostSlug}
+                  onClose={() => setShowCreatePendingOrderModal(false)}
+                  onSuccess={() => {
+                    refetch();
+                    refetchMetaData();
+                  }}
+                />
+              )}
+            </React.Fragment>
+          </React.Fragment>
+        }
+      />
 
-        <SearchBar
-          height="40px"
-          defaultValue={router.query.searchTerm}
-          onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-          placeholder={intl.formatMessage(messages.searchPlaceholder)}
-        />
-      </div>
-      <hr className="my-5" />
+      <DashboardViews
+        query={router.query}
+        omitMatchingParams={ROUTE_PARAMS}
+        views={views}
+        onChange={query => {
+          router.push(
+            {
+              pathname: pageRoute,
+              query,
+            },
+            undefined,
+            { scroll: false },
+          );
+        }}
+      />
       <Flex mb={34}>
         <Box flexGrow="1" mr="18px">
-          {data?.account ? (
+          {metaData?.account ? (
             <OrdersFilters
-              currency={data.account.currency}
+              currency={metaData.account.currency}
               filters={router.query}
               onChange={queryParams => updateQuery(router, { ...queryParams, offset: null })}
               hasStatus={!status}
@@ -211,31 +317,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
             <LoadingPlaceholder height={70} />
           ) : null}
         </Box>
-        {isHostAdmin && canCreatePendingOrder && (
-          <React.Fragment>
-            <StyledButton
-              onClick={() => setShowCreatePendingOrderModal(true)}
-              buttonSize="small"
-              buttonStyle="primary"
-              height="38px"
-              lineHeight="12px"
-              mt="17px"
-              data-cy="create-pending-contribution"
-            >
-              <FormattedMessage id="create" defaultMessage="Create" />
-              &nbsp;+
-            </StyledButton>
-            {showCreatePendingOrderModal && (
-              <CreatePendingOrderModal
-                hostSlug={data.account.slug}
-                onClose={() => setShowCreatePendingOrderModal(false)}
-                onSuccess={() => refetch()}
-              />
-            )}
-          </React.Fragment>
-        )}
       </Flex>
-      {Boolean(data?.account?.isHost && isHostAdmin) && <DisputedContributionsWarning hostSlug={accountSlug} />}
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : !loading && !data.orders?.nodes.length ? (
@@ -264,7 +346,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
             isLoading={loading}
             orders={data?.orders?.nodes}
             nbPlaceholders={variables.limit}
-            showPlatformTip={showPlatformTip}
+            showPlatformTip
           />
           <Flex mt={5} justifyContent="center">
             <Pagination
@@ -280,14 +362,4 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
   );
 };
 
-OrdersWithData.propTypes = {
-  accountSlug: PropTypes.string.isRequired,
-  /** If provided, only orders matching this status will be fetched */
-  status: PropTypes.string,
-  /** An optional title to be used instead of "Financial contributions" */
-  title: PropTypes.node,
-  showPlatformTip: PropTypes.bool,
-  canCreatePendingOrder: PropTypes.bool,
-};
-
-export default OrdersWithData;
+export default HostFinancialContributions;

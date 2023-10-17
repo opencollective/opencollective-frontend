@@ -127,7 +127,7 @@ const updateQuery = (router, newParams) => {
   return router.push({ pathname, query });
 };
 
-const HostDashboardHostedCollectives = ({ hostSlug }) => {
+const HostDashboardHostedCollectives = ({ accountSlug: hostSlug }) => {
   const router = useRouter() || {};
   const query = router.query;
   const hasFilters = React.useMemo(() => checkIfQueryHasFilters(query), [query]);
@@ -204,8 +204,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
 };
 
 HostDashboardHostedCollectives.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
-  router: PropTypes.object,
+  accountSlug: PropTypes.string.isRequired,
 };
 
 export default HostDashboardHostedCollectives;

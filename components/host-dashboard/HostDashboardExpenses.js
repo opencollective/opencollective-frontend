@@ -109,7 +109,6 @@ const hostDashboardMetaDataQuery = gql`
     scheduled_for_payment: expenses(
       host: { slug: $hostSlug }
       limit: 0
-      offset: 0
       status: SCHEDULED_FOR_PAYMENT
       payoutMethodType: BANK_ACCOUNT
     ) @include(if: $getViewCounts) {
@@ -192,7 +191,7 @@ const hasParams = query => {
   });
 };
 
-const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
+const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
   const router = useRouter() || {};
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
@@ -288,7 +287,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
     <React.Fragment>
       <div className="mb-5 flex flex-wrap justify-between gap-4">
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
-          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+          <FormattedMessage id="Payments" defaultMessage="Payments" />
         </h1>
         <SearchBar
           height="40px"
@@ -457,7 +456,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
 };
 
 HostDashboardExpenses.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
+  accountSlug: PropTypes.string.isRequired,
   isDashboard: PropTypes.bool,
 };
 

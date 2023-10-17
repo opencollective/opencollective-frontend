@@ -70,7 +70,7 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
   if (AdminSectionComponent) {
     return (
       <Container width="100%">
-        <AdminSectionComponent account={collective} hostSlug={collective.slug} subpath={subpath} />
+        <AdminSectionComponent accountSlug={collective.slug} subpath={subpath} />
       </Container>
     );
   }
@@ -80,7 +80,7 @@ const AdminPanelSection = ({ collective, isLoading, section, subpath }) => {
   if (FiscalHostSettingsComponent) {
     return (
       <Container width="100%">
-        <FiscalHostSettingsComponent collective={collective} />
+        <FiscalHostSettingsComponent account={collective} collective={collective} />
       </Container>
     );
   }

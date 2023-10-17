@@ -23,6 +23,7 @@ const DUPLICATED_IGNORED_MESSAGES = new Set([
   'type', // Can have different masculine/feminine for some languages based on the context
   'unknown', // Can have different translations if it is "unknown user" or "unknown type",
   'applications', // Can have different translations if it is "host applications" or OAuth "applications"
+  'application', // Can have different translations if it is "host application" or OAuth "application"
 ]);
 
 /**
