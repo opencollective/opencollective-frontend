@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
-import { gql, useLazyQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { omit } from 'lodash';
-import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 
-import { initClient } from '../lib/apollo-client';
+import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
@@ -205,40 +204,26 @@ type TransactionsPageProps = {
     ignoreChildrenTransactions?: string;
     displayPendingContributions?: string;
   };
-  data: {
-    account: any;
-    transactions: any;
-  };
-  error: any;
 };
 
-export const getServerSideProps: GetServerSideProps<TransactionsPageProps> = async ctx => {
-  const query = ctx.query as TransactionsPageProps['query'];
-  const slug = query.collectiveSlug;
-  const client = initClient();
-  const { data, error } = await client.query({
+const transactionsPageQueryHelper = getSSRQueryHelpers<ReturnType<typeof getVariablesFromQuery>, TransactionsPageProps>(
+  {
     query: transactionsPageQuery,
-    variables: { slug, ...getVariablesFromQuery(query) },
+    getPropsFromContext: ctx => ({ query: ctx.query as TransactionsPageProps['query'] }),
+    getVariablesFromContext: ctx => ({ ...getVariablesFromQuery(ctx.query), slug: ctx.query.collectiveSlug }),
     context: API_V2_CONTEXT,
-    fetchPolicy: 'network-only',
-    errorPolicy: 'ignore',
-  });
+  },
+);
 
-  return {
-    props: { query, data, error: error || null }, // will be passed to the page component as props
-  };
-};
+export const getServerSideProps = transactionsPageQueryHelper.getServerSideProps;
 
-export default function TransactionsPage(props: TransactionsPageProps) {
+export default function TransactionsPage(props) {
   const { LoggedInUser } = useLoggedInUser();
-  const [fetchData, query] = useLazyQuery(transactionsPageQuery, {
-    variables: { slug: props.query.collectiveSlug, ...getVariablesFromQuery(props.query) },
-    context: API_V2_CONTEXT,
-  });
+  const { data, error, variables, refetch, loading } = transactionsPageQueryHelper.useQuery(props);
   const router = useRouter();
   useEffect(() => {
     if (LoggedInUser) {
-      fetchData();
+      refetch();
     }
   }, [LoggedInUser]);
   useEffect(() => {
@@ -246,11 +231,8 @@ export default function TransactionsPage(props: TransactionsPageProps) {
     addParentToURLIfMissing(router, account, `/transactions`, queryParameters);
   });
 
-  const error = query?.error || props.error;
-  const data = query?.data || props.data;
-  const account = query?.data?.account || props.data?.account;
-  const transactions = query.called ? query?.data?.transactions : props.data?.transactions;
-  const { variables, refetch, loading } = query || {};
+  const account = data?.account;
+  const transactions = data?.transactions;
 
   if (!account && loading) {
     return (
