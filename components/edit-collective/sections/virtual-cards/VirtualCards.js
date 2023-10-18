@@ -159,7 +159,7 @@ const VirtualCards = ({ accountSlug, isDashboard }) => {
           </P>
         )}
 
-        {data.account.host?.settings?.virtualcards?.policy && (
+        {data?.account.host?.settings?.virtualcards?.policy && (
           <P mt={3}>
             <Collapse
               title={
@@ -179,16 +179,16 @@ const VirtualCards = ({ accountSlug, isDashboard }) => {
         <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters
             filters={routerQuery}
-            collective={data.account}
-            host={data.account.host}
-            virtualCardMerchants={data.account.virtualCardMerchants.nodes}
+            collective={data?.account}
+            host={data?.account.host}
+            virtualCardMerchants={data?.account?.virtualCardMerchants.nodes}
             onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
             displayPeriodFilter
           />
         </Flex>
       </Box>
       <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
-        {data.account.virtualCards.nodes.map(virtualCard => (
+        {data?.account?.virtualCards.nodes.map(virtualCard => (
           <VirtualCard
             host={data.account.host}
             canEditVirtualCard={virtualCard.data.status === 'active'}
@@ -204,7 +204,7 @@ const VirtualCards = ({ accountSlug, isDashboard }) => {
       <Flex mt={5} justifyContent="center">
         <Pagination
           route={pageRoute}
-          total={data.account.virtualCards.totalCount}
+          total={data?.account?.virtualCards.totalCount}
           limit={VIRTUAL_CARDS_PER_PAGE}
           offset={offset}
           ignoredQueryParams={['slug', 'section']}
