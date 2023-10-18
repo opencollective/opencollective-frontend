@@ -1,7 +1,5 @@
 require('../env');
 
-const path = require('path');
-
 const next = require('next');
 const express = require('express');
 const helmet = require('helmet');
@@ -24,7 +22,7 @@ app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflar
 
 const dev = process.env.NODE_ENV === 'development';
 
-const nextApp = next({ dev, dir: path.dirname(__dirname) });
+const nextApp = next({ dev });
 
 const port = process.env.PORT;
 
