@@ -4416,6 +4416,7 @@ type Policies {
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
+  EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
 }
 
 type EXPENSE_AUTHOR_CANNOT_APPROVE {
@@ -4446,6 +4447,11 @@ type MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
   PER_AUTHORIZATION: Amount
   WEEKLY: Amount
   YEARLY: Amount
+}
+
+type EXPENSE_CATEGORIZATION {
+  requiredForExpenseSubmitters: Boolean
+  requiredForCollectiveAdmins: Boolean
 }
 
 type ActivitySubscription {
@@ -15345,6 +15351,7 @@ input PoliciesInput {
   REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
+  EXPENSE_CATEGORIZATION: PoliciesExpenseCategorizationInput
 }
 
 input PoliciesCollectiveExpenseAuthorCannotApprove {
@@ -15358,6 +15365,11 @@ input PoliciesCollectiveMinimumAdminsInput {
   numberOfAdmins: Int
   applies: PolicyApplication
   freeze: Boolean
+}
+
+input PoliciesExpenseCategorizationInput {
+  requiredForExpenseSubmitters: Boolean
+  requiredForCollectiveAdmins: Boolean
 }
 
 type SendMessageResult {

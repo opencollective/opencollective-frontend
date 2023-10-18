@@ -3,7 +3,7 @@ import { defineMessages } from 'react-intl';
 export const SECTIONS = {
   OVERVIEW: 'overview',
   REPORTS: 'reports',
-  HOST_ACCOUNTING: 'host-accounting',
+  CHART_OF_ACCOUNTS: 'chart-of-accounts',
   HOST_EXPENSES: 'host-expenses',
   HOST_AGREEMENTS: 'host-agreements',
   HOST_FINANCIAL_CONTRIBUTIONS: 'orders',
@@ -153,9 +153,8 @@ export const SECTION_LABELS = defineMessages({
     id: 'editCollective.fiscalHosting',
     defaultMessage: 'Fiscal Hosting',
   },
-  [ALL_SECTIONS.HOST_ACCOUNTING]: {
-    id: 'home.accounting',
-    defaultMessage: 'Accounting',
+  [ALL_SECTIONS.CHART_OF_ACCOUNTS]: {
+    defaultMessage: 'Chart of Accounts',
   },
   [ALL_SECTIONS.TEAM]: {
     id: 'ContributorsFilter.Core',

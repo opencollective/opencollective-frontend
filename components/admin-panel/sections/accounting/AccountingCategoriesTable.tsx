@@ -147,7 +147,7 @@ export const AccountingCategoriesTable = ({ hostSlug }: AccountingCategoriesTabl
 
   // Show a warning if the user tries to leave the page with unsaved changes
   const isSaved = isEqual(categories, categoriesFromData);
-  useWarnIfUnsavedChanges(isSaved);
+  useWarnIfUnsavedChanges(!isSaved);
 
   // (Re)load the categories when fresh data is available
   React.useEffect(() => {

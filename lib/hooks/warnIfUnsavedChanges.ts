@@ -2,7 +2,7 @@
  * Same as `components/WarnIfUnsavedChanges.js` but as a hook.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { defineMessage, useIntl } from 'react-intl';
 
@@ -22,10 +22,15 @@ export default function useWarnIfUnsavedChanges(hasUnsavedChanges) {
   const router = useRouter();
   const intl = useIntl();
 
+  // Use a ref to make sure the callbacks always have the latest value
+  const hasUnsavedChangesRef = useRef(hasUnsavedChanges);
+  hasUnsavedChangesRef.current = hasUnsavedChanges;
+
+  // ComponentDidMount
   useEffect(() => {
     /** Triggered when closing tabs */
     const handleRouteChangeStart = () => {
-      if (hasUnsavedChanges && !confirm(intl.formatMessage(confirmMessage))) {
+      if (hasUnsavedChangesRef.current && !confirm(intl.formatMessage(confirmMessage))) {
         router.events.emit('routeChangeError'); // For NProgress to stop the loading indicator
         throw new IgnorableError('Abort page navigation');
       }
@@ -36,7 +41,7 @@ export default function useWarnIfUnsavedChanges(hasUnsavedChanges) {
      * an error, which will produce an error in dev but should work fine in prod.
      */
     const handleBeforeUnload = e => {
-      if (hasUnsavedChanges) {
+      if (hasUnsavedChangesRef.current) {
         e.preventDefault();
         const message = intl.formatMessage(confirmMessage);
         e.returnValue = message;
