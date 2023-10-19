@@ -18,6 +18,7 @@ import { P, Span } from '../Text';
 
 import StepProfileInfoMessage from './StepProfileInfoMessage';
 import { contributionRequiresAddress, contributionRequiresLegalName } from './utils';
+import { TierTypes } from '../../lib/constants/tiers-types';
 
 export const validateGuestProfile = (stepProfile, stepDetails, tier) => {
   if (contributionRequiresAddress(stepDetails, tier)) {
@@ -97,8 +98,14 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
         label={<FormattedMessage defaultMessage="Your name" />}
         labelFontSize="16px"
         labelFontWeight="700"
-        required
-        hint={<FormattedMessage defaultMessage="This is your display name or alias." />}
+        required={tier.type === TierTypes.TICKET}
+        hint={
+          tier.type === TierTypes.TICKET ? (
+            <FormattedMessage defaultMessage="This is your display name or alias." />
+          ) : (
+            <FormattedMessage defaultMessage="This is your display name or alias. Leave it in blank to appear as guest." />
+          )
+        }
       >
         {inputProps => (
           <StyledInput
