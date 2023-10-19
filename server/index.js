@@ -22,7 +22,7 @@ app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflar
 
 const dev = process.env.NODE_ENV === 'development';
 
-const nextApp = next({ dev });
+const nextApp = next({ dev, hostname: process.env.INTERNAL_FRONTEND_URL });
 
 const port = process.env.PORT;
 
