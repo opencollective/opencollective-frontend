@@ -1,16 +1,16 @@
 import React from 'react';
 import { flatten, isEmpty, omit } from 'lodash';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import { simpleDateToISOString } from '../lib/date-utils';
 import type { Account } from '../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../lib/hooks/useAsyncCall';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 
-import { PeriodFilterForm } from './filters/PeriodFilter';
+import { getIntervalFromValue, PeriodFilterForm } from './filters/PeriodFilter';
 import { Box, Flex, Grid } from './Grid';
 import MessageBox from './MessageBox';
-import { getSelectedPeriodOptionFromInterval, PERIOD_FILTER_PRESETS } from './PeriodFilterPresetsSelect';
+import PeriodFilterPresetsSelect from './PeriodFilterPresetsSelect';
 import StyledButton from './StyledButton';
 import StyledCheckbox from './StyledCheckbox';
 import StyledHr from './StyledHr';
@@ -257,22 +257,13 @@ const ExportTransactionsCSVModal = ({
 }: ExportTransactionsCSVModalProps) => {
   const isHostReport = Boolean(host);
 
-  const intl = useIntl();
-  const [tmpDateInterval, setTmpDateInterval] = React.useState(dateInterval || { to: null, from: null });
+  const intervalFromValue = React.useMemo(() => getIntervalFromValue(dateInterval), [dateInterval]);
+  const [tmpDateInterval, setTmpDateInterval] = React.useState(intervalFromValue);
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [fieldOption, setFieldOption] = React.useState(FieldOptions[0].value);
   const [fields, setFields] = React.useState(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
   const [isValidDateInterval, setIsValidDateInterval] = React.useState(true);
-  const datePresetSelectedOption = React.useMemo(
-    () => getSelectedPeriodOptionFromInterval(tmpDateInterval as any),
-    [tmpDateInterval],
-  );
-  const datePresetOptions = React.useMemo(() => {
-    return Object.keys(PERIOD_FILTER_PRESETS).map(presetKey => ({
-      value: presetKey,
-      label: PERIOD_FILTER_PRESETS[presetKey].label,
-    }));
-  }, [intl]);
+
   const {
     loading: isFetchingRows,
     call: fetchRows,
@@ -372,7 +363,7 @@ const ExportTransactionsCSVModal = ({
         env === 'development' || env === 'e2e'
           ? `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120`
           : // It is not possible to use HttpOnly when setting from JavaScript.
-            // I'm enforcing SameSitre and Domain in production to prevent CSRF.
+            // I'm enforcing SameSite and Domain in production to prevent CSRF.
             `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
     }
     setDownloadUrl(getUrl());
@@ -415,12 +406,14 @@ const ExportTransactionsCSVModal = ({
               name="datePresets"
               mt={1}
             >
-              {inputProps => (
-                <StyledSelect
-                  {...inputProps}
-                  options={datePresetOptions}
-                  onChange={({ value }) => setTmpDateInterval(PERIOD_FILTER_PRESETS[value].getInterval())}
-                  value={datePresetSelectedOption}
+              {() => (
+                <PeriodFilterPresetsSelect
+                  inputId="csv-export-date-presets-select"
+                  // @ts-ignore PeriodFilterPresetsSelect is not typed yet, the following conflicts with proptypes
+                  SelectComponent={StyledSelect}
+                  onChange={setTmpDateInterval}
+                  interval={tmpDateInterval}
+                  styles={null}
                   width="100%"
                 />
               )}
