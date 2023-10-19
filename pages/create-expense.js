@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { omit } from 'lodash';
+import { omit, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
@@ -269,9 +269,10 @@ class CreateExpensePage extends React.Component {
       const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
       const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
       const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
-      await this.props.router.push(
-        `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
-      );
+      await this.props.router.push({
+        pathname: `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
+        query: pick(this.props.router.query, ['ocr']),
+      });
       toast({
         variant: 'success',
         title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,

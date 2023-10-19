@@ -14,7 +14,7 @@ export type PreviewFeature = {
   description: string;
   publicBeta: boolean; // If true, the feature will be available to toggle for all users.
   closedBetaAccessFor?: string[]; // Account slugs. Members and admins of these accounts will see this feature as a Closed Beta preview in the Preview Features modal.
-  enabledByDefaultFor?: string[]; // Account slugs. Members and admins of these accounts will have the feature enabled by default.
+  enabledByDefaultFor?: ('*' | string)[]; // Account slugs. Members and admins of these accounts will have the feature enabled by default.
   env?: Array<'development' | 'test' | 'e2e' | 'staging' | 'production'>; // If set, the feature will be available only in the specified environments.
 };
 
@@ -42,8 +42,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Expense AI assistant',
     description: 'Introducing an AI assistant to help you create expenses.',
     publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe'],
-    enabledByDefaultFor: ['opencollective'],
+    enabledByDefaultFor: ['*'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION,
