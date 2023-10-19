@@ -9,6 +9,8 @@ import { IgnorableError } from '../lib/errors';
  * A component to warn users if they try to leave with unsaved data. Just set
  * `hasUnsavedChanges` to true when this is the case and this component will block any
  * attempt to leave the page.
+ *
+ * See `lib/hooks/warnIfUnsavedChanges.ts` for the hook version of this component.
  */
 class WarnIfUnsavedChanges extends React.Component {
   static propTypes = {

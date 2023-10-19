@@ -58,6 +58,14 @@ export function gql(source: "\n  query HostVirtualCardRequests(\n    $hostSlug: 
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query AdminAccountingCategoriesQuery($hostId: String!) {\n    host(id: $hostId) {\n      id\n      accountingCategories {\n        totalCount\n        nodes {\n          id\n          code\n          name\n          friendlyName\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').AdminAccountingCategoriesQueryDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation EditAccountingCategories($hostId: String!, $categories: [AccountingCategoryInput!]!) {\n    editAccountingCategories(account: { id: $hostId }, categories: $categories) {\n      id\n      ... on Organization {\n        host {\n          id\n          accountingCategories {\n            totalCount\n            nodes {\n              id\n              code\n              name\n              friendlyName\n            }\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').EditAccountingCategoriesDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  fragment AgreementMutationFields on Agreement {\n    id\n    ...AgreementViewFields\n    account {\n      id\n      ... on AccountWithHost {\n        # Refetch account agreements count to update the cache\n        hostAgreements {\n          totalCount\n        }\n      }\n    }\n  }\n  \n"): typeof import('./graphql').AgreementMutationFieldsFragmentDoc;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -295,6 +303,10 @@ export function gql(source: "\n  query OrderPage($legacyId: Int!, $collectiveSlu
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query SubmittedExpensesPage(\n    $collectiveSlug: String!\n    $limit: Int!\n    $offset: Int!\n    $type: ExpenseType\n    $tags: [String]\n    $status: ExpenseStatusFilter\n    $minAmount: Int\n    $maxAmount: Int\n    $payoutMethodType: PayoutMethodType\n    $dateFrom: DateTime\n    $dateTo: DateTime\n    $searchTerm: String\n    $orderBy: ChronologicalOrderInput\n  ) {\n    account(slug: $collectiveSlug) {\n      id\n      legacyId\n      slug\n      type\n      imageUrl\n      backgroundImageUrl\n      twitterHandle\n      name\n      currency\n      isArchived\n      isActive\n      settings\n      createdAt\n      supportedExpenseTypes\n      isHost\n      features {\n        id\n        ...NavbarFields\n      }\n    }\n    expenses(\n      createdByAccount: { slug: $collectiveSlug }\n      limit: $limit\n      offset: $offset\n      type: $type\n      tag: $tags\n      status: $status\n      minAmount: $minAmount\n      maxAmount: $maxAmount\n      payoutMethodType: $payoutMethodType\n      dateFrom: $dateFrom\n      dateTo: $dateTo\n      searchTerm: $searchTerm\n      orderBy: $orderBy\n    ) {\n      totalCount\n      offset\n      limit\n      nodes {\n        id\n        ...ExpensesListFieldsFragment\n        amountInCreatedByAccountCurrency: amountV2(currencySource: CREATED_BY_ACCOUNT) {\n          value\n          valueInCents\n          currency\n          exchangeRate {\n            date\n            value\n            source\n            isApproximate\n          }\n        }\n        host {\n          id\n          ...ExpenseHostFields\n        }\n      }\n    }\n  }\n\n  \n  \n  \n"): typeof import('./graphql').SubmittedExpensesPageDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query HostTermsQuery($hostCollectiveSlug: String!) {\n    host(slug: $hostCollectiveSlug) {\n      id\n      termsUrl\n      isTrustedHost\n    }\n  }\n"): typeof import('./graphql').HostTermsQueryDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
