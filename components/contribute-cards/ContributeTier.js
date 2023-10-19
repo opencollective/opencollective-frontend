@@ -143,7 +143,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
       <Flex flexDirection="column" justifyContent="space-between" height="100%">
         <Box>
           {tier.maxQuantity > 0 && (
-            <P fontSize="1.1rem" color="#e69900" textTransform="uppercase" fontWeight="500" letterSpacing="1px" mb={2}>
+            <P fontSize="0.7rem" color="#e69900" textTransform="uppercase" fontWeight="500" letterSpacing="1px" mb={2}>
               <FormattedMessage
                 id="tier.limited"
                 values={{

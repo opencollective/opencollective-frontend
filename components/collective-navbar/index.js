@@ -26,7 +26,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import { getCollectivePageRoute, getSettingsRoute, getWorkspaceRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute, getSettingsRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -324,7 +324,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
         <Link
           href={
             LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-              ? getWorkspaceRoute(collective)
+              ? getDashboardRoute(collective)
               : getSettingsRoute(collective)
           }
           data-cy="edit-collective-btn"
@@ -332,10 +332,10 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
           <ActionButton tabIndex="-1">
             <Settings size="1em" />
             <Span ml={2}>
-              {collective.isHost ? (
+              {LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) ? (
+                <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+              ) : collective.isHost ? (
                 <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
-              ) : LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) ? (
-                <FormattedMessage id="Workspace" defaultMessage="Workspace" />
               ) : (
                 <FormattedMessage id="Settings" defaultMessage="Settings" />
               )}
@@ -398,7 +398,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
         <Link
           href={
             LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-              ? getWorkspaceRoute(collective, 'manage-contributions')
+              ? getDashboardRoute(collective, 'manage-contributions')
               : `${getCollectivePageRoute(collective)}/manage-contributions`
           }
         >
@@ -592,7 +592,6 @@ const CollectiveNavbar = ({
 
           {!onlyInfos && (
             <Container
-              overflowY="auto"
               display={['block', 'flex']}
               width="100%"
               justifyContent="space-between"

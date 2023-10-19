@@ -13,7 +13,7 @@ const ResetPasswordCompleted = ({ LoggedInUser, loadingLoggedInUser }) => {
   return (
     <Page noRobots showFooter={false}>
       <Container pt={[4, 5]} pb={6} px={3} textAlign="center" data-cy="reset-password-success-page">
-        <Image src="/static/images/sign-in-illustration.png" width="624" height="372" />
+        <Image src="/static/images/sign-in-illustration.png" width={624} height={372} />
         <P fontSize="32px" lineHeight="40px" color="black.900" fontWeight={700}>
           <FormattedMessage defaultMessage="Your password was updated." />
         </P>

@@ -7,6 +7,7 @@ import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { Account, Host, VirtualCardRequestCollection } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
+import { DashboardSectionProps } from '../../dashboard/types';
 import { Box, Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
@@ -16,6 +17,7 @@ import { P } from '../../Text';
 import { VirtualCardRequestDrawer } from '../../virtual-card-requests/VirtualCardRequestDrawer';
 import VirtualCardRequestFilter from '../../virtual-card-requests/VirtualCardRequestFilter';
 import { VirtualCardRequestsTable } from '../../virtual-card-requests/VirtualCardRequestsTable';
+import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const hostVirtualCardRequestsQuery = gql`
   query HostVirtualCardRequests(
@@ -82,12 +84,7 @@ const hostVirtualCardRequestsQuery = gql`
   }
 `;
 
-type HostVirtualCardRequestsProps = {
-  account: Account;
-  hostSlug: string;
-};
-
-export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
+export default function HostVirtualCardRequests({ accountSlug: hostSlug }: DashboardSectionProps) {
   const queryFilter = useQueryFilter({
     ignoreQueryParams: ['slug', 'section'],
     filters: {
@@ -122,7 +119,7 @@ export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
   }>(hostVirtualCardRequestsQuery, {
     context: API_V2_CONTEXT,
     variables: {
-      hostSlug: props.hostSlug,
+      hostSlug,
       collective: queryFilter.values.collectiveSlug ? [{ slug: queryFilter.values.collectiveSlug }] : null,
       selectedCollectiveSlug: queryFilter.values.collectiveSlug,
       status: queryFilter.values.virtualCardRequestStatus,
@@ -137,10 +134,10 @@ export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
 
   return (
     <Box>
-      <P fontSize="24px" fontWeight="700" lineHeight="32px" mb={3}>
+      <h1 className="text-2xl font-bold leading-10 tracking-tight">
         <FormattedMessage id="VirtualCardRequests.Title" defaultMessage="Virtual Card Requests" />
-      </P>
-      <P mb={3}>
+      </h1>
+      <p className="mb-4 text-muted-foreground">
         <FormattedMessage
           id="Host.VirtualCardRequests.List.Description"
           defaultMessage="Manage virtual card requests made by your hosted collectives. <learnMoreLink>Learn more</learnMoreLink>"
@@ -151,7 +148,10 @@ export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
             }),
           }}
         />
-      </P>
+      </p>
+      <Box mb={3}>
+        <StripeVirtualCardComplianceStatement />
+      </Box>
       <VirtualCardRequestFilter
         virtualCardRequestStatusFilter={queryFilter.values.virtualCardRequestStatus}
         onVirtualCardRequestStatusFilter={queryFilter.setVirtualCardRequestStatus}
@@ -198,5 +198,3 @@ export function HostVirtualCardRequests(props: HostVirtualCardRequestsProps) {
     </Box>
   );
 }
-
-export default HostVirtualCardRequests;

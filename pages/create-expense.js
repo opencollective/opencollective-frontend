@@ -2,10 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { omit } from 'lodash';
+import { omit, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
+import { itemHasOCR } from '../components/expenses/lib/ocr';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { expenseSubmissionAllowed, getCollectivePageMetadata, getCollectiveTypeForUrl } from '../lib/collective.lib';
 import expenseTypes from '../lib/constants/expenseTypes';
@@ -23,6 +24,7 @@ import { collectiveNavbarFieldsFragment } from '../components/collective-page/gr
 import Container from '../components/Container';
 import ContainerOverlay from '../components/ContainerOverlay';
 import ErrorPage from '../components/ErrorPage';
+import { ConfirmOCRValues } from '../components/expenses/ConfirmOCRValues';
 import CreateExpenseDismissibleIntro from '../components/expenses/CreateExpenseDismissibleIntro';
 import ExpenseForm, { EXPENSE_FORM_STEPS, prepareExpenseForSubmit } from '../components/expenses/ExpenseForm';
 import ExpenseInfoSidebar from '../components/expenses/ExpenseInfoSidebar';
@@ -43,7 +45,8 @@ import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import SignInOrJoinFree, { SignInOverlayBackground } from '../components/SignInOrJoinFree';
 import StyledButton from '../components/StyledButton';
 import StyledCard from '../components/StyledCard';
-import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
+import { Survey, SURVEY_KEY } from '../components/Survey';
+import { toast } from '../components/ui/useToast';
 import { withUser } from '../components/UserProvider';
 
 const STEPS = { ...EXPENSE_FORM_STEPS, SUMMARY: 'summary' };
@@ -76,8 +79,6 @@ class CreateExpensePage extends React.Component {
     createExpense: PropTypes.func.isRequired,
     /** from apollo */
     draftExpenseAndInviteUser: PropTypes.func.isRequired,
-    /** from withToast */
-    addToast: PropTypes.func.isRequired,
     /** from apollo */
     data: PropTypes.shape({
       loading: PropTypes.bool,
@@ -132,6 +133,7 @@ class CreateExpensePage extends React.Component {
       formPersister: null,
       isInitialForm: true,
       recurring: null,
+      hasConfirmedOCR: false,
     };
   }
 
@@ -237,7 +239,10 @@ class CreateExpensePage extends React.Component {
         this.setState({ expense, step: STEPS.SUMMARY, isInitialForm: false });
       }
     } catch (e) {
-      this.props.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(this.props.intl, e) });
+      toast({
+        variant: 'error',
+        description: i18nGraphqlException(this.props.intl, e),
+      });
     }
   };
 
@@ -264,19 +269,26 @@ class CreateExpensePage extends React.Component {
       const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
       const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
       const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
-      await this.props.router.push(
-        `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
-      );
-      this.props.addToast({
-        type: TOAST_TYPE.SUCCESS,
+      await this.props.router.push({
+        pathname: `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
+        query: pick(this.props.router.query, ['ocr']),
+      });
+      toast({
+        variant: 'success',
         title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
-        message: (
+        message: this.props.LoggedInUser ? (
+          <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED} />
+        ) : (
           <FormattedMessage id="Expense.SuccessPage" defaultMessage="You can edit or review updates on this page." />
         ),
+        duration: 20000,
       });
       window.scrollTo(0, 0);
     } catch (e) {
-      this.props.addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(this.props.intl, e) });
+      toast({
+        variant: 'error',
+        message: i18nGraphqlException(this.props.intl, e),
+      });
       this.setState({ isSubmitting: false });
     }
   };
@@ -314,8 +326,9 @@ class CreateExpensePage extends React.Component {
     const collective = data && data.account;
     const host = collective && collective.host;
     const loggedInAccount = data && data.loggedInAccount;
-
     const payoutProfiles = getPayoutProfiles(loggedInAccount);
+    const hasItemsWithOCR = Boolean(this.state.expense?.items?.some(itemHasOCR));
+    const mustConfirmOCR = hasItemsWithOCR && !this.state.hasConfirmedOCR;
 
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)}>
@@ -413,6 +426,15 @@ class CreateExpensePage extends React.Component {
                                 onChange={this.onNotesChanges}
                                 defaultValue={this.state.expense.privateMessage}
                               />
+                              <div className="mt-5">
+                                {hasItemsWithOCR && (
+                                  <ConfirmOCRValues
+                                    items={this.state.expense.items}
+                                    onConfirm={hasConfirmedOCR => this.setState({ hasConfirmedOCR })}
+                                    currency={this.state.expense.currency}
+                                  />
+                                )}
+                              </div>
                               <Flex flexWrap="wrap" mt={4}>
                                 <StyledButton
                                   mt={2}
@@ -436,6 +458,7 @@ class CreateExpensePage extends React.Component {
                                   data-cy="submit-expense-btn"
                                   onClick={this.onSummarySubmit}
                                   loading={this.state.isSubmitting}
+                                  disabled={mustConfirmOCR}
                                   minWidth={175}
                                 >
                                   {this.state.expense?.type === expenseTypes.GRANT ? (
@@ -618,7 +641,6 @@ const addHoc = compose(
   addCreateExpensePageData,
   addCreateExpenseMutation,
   addDraftExpenseAndInviteUserMutation,
-  withToasts,
   injectIntl,
 );
 

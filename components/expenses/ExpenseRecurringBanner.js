@@ -20,7 +20,7 @@ import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const recurringExpensePropType = PropTypes.shape({
   id: PropTypes.string,
@@ -39,21 +39,21 @@ const deleteExpenseMutation = gql`
 const ExpenseRecurringEditModal = ({ onClose, expense }) => {
   const { recurringExpense } = expense;
   const [deleteExpense, { loading }] = useMutation(deleteExpenseMutation, { context: API_V2_CONTEXT });
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const router = useRouter();
 
   const handleDeletion = async () => {
     try {
       await deleteExpense({ variables: { expense: pick(expense, ['id']) } });
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: intl.formatMessage({ defaultMessage: 'Expense deleted' }),
       });
       router.push(getCollectivePageRoute(expense.account));
       onClose();
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   };
 

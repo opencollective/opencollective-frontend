@@ -16,15 +16,9 @@ import { getRecurringContributionsSectionQueryVariables } from '../sections/Recu
 import { getTransactionsSectionQueryVariables, transactionsSectionQuery } from '../sections/Transactions';
 import { getUpdatesSectionQueryVariables, updatesSectionQuery } from '../sections/Updates';
 
-import { collectivePageQuery, getCollectivePageQueryVariables } from './queries';
-
-export const preloadCollectivePageGraphqlQueries = async (slug, client) => {
-  const result = await client.query({
-    query: collectivePageQuery,
-    variables: getCollectivePageQueryVariables(slug),
-  });
-  const collective = result?.data?.Collective;
+export const preloadCollectivePageGraphqlQueries = async (client, collective) => {
   if (collective) {
+    const { slug } = collective;
     const sections = getFilteredSectionsForCollective(collective);
     const sectionsNames = getSectionsNames(sections);
     const queries = [];
@@ -80,6 +74,7 @@ export const preloadCollectivePageGraphqlQueries = async (slug, client) => {
         client.query({
           query: updatesSectionQuery,
           variables: getUpdatesSectionQueryVariables(slug),
+          context: API_V2_CONTEXT,
         }),
       );
     }

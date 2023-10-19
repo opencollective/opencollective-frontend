@@ -201,7 +201,7 @@ class UpdatePaymentPage extends React.Component {
           <Flex alignItems="center" flexDirection="column">
             <HappyBackground>
               <Box mt={5}>
-                <H1 color="white.full" fontSize={['3rem', null, '4rem']} textAlign="center">
+                <H1 color="white.full" fontSize={['1.9rem', null, '2.5rem']} textAlign="center">
                   <FormattedMessage id="updatePaymentMethod.title" defaultMessage="Update Payment Method" />
                 </H1>
               </Box>
@@ -209,7 +209,7 @@ class UpdatePaymentPage extends React.Component {
               {Boolean(data.PaymentMethod) && (
                 <React.Fragment>
                   <Box mt={3}>
-                    <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+                    <Subtitle fontSize={['0.95rem', null, '1.25rem']} maxWidth={['90%', '640px']}>
                       <Box>
                         <FormattedMessage
                           id="updatePaymentMethod.subtitle.line"
@@ -220,7 +220,7 @@ class UpdatePaymentPage extends React.Component {
                   </Box>
 
                   <Box mt={3}>
-                    <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+                    <Subtitle fontSize={['0.95rem', null, '1.25rem']} maxWidth={['90%', '640px']}>
                       <Box alignItems="left">
                         <AlignedBullets>
                           {orders.map(order => {

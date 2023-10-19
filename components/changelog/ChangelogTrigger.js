@@ -2,44 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
-import { themeGet } from '@styled-system/theme-get';
 import { cloneDeep } from 'lodash';
+import { Megaphone } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
-import { HELP_MESSAGE } from '../../lib/constants/dismissable-help-message';
 import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
 
-import Container from '../Container';
-import DismissibleMessage from '../DismissibleMessage';
-import { Flex } from '../Grid';
 import { WebsiteName } from '../I18nFormatters';
 import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
-import StyledRoundButton from '../StyledRoundButton';
-import StyledTooltip from '../StyledTooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
-import ChangelogNotificationDropdown from './ChangelogNotificationDropdown';
-
-const FlameIcon = styled(StyledRoundButton)`
-  border-radius: 50%;
-  height: ${props => props.height || '40px'};
-  width: ${props => props.width || '40px'};
-
-  &,
-  &:active {
-    background: ${props => themeGet(props.backgroundColor)};
-    background-image: ${props => `url(${props.url})`};
-    background-repeat: no-repeat;
-    background-position: center center;
-  }
-
-  &:active {
-    background-color: transparent;
-  }
-`;
-
-const ChangelogTrigger = props => {
-  const { height, width, backgroundSize, setShowNewsAndUpdates, setChangelogViewDate } = props;
+const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
   const { data } = useQuery(loggedInUserQuery, { fetchPolicy: 'cache-only' });
   const LoggedInUser = data?.LoggedInUser;
   const hasSeenNewUpdates = LoggedInUser?.hasSeenLatestChangelogEntry;
@@ -56,47 +29,27 @@ const ChangelogTrigger = props => {
     });
   };
 
-  const TooltipContent = (
-    <FormattedMessage
-      id="ChangelogTrigger.tooltip.content"
-      defaultMessage="What's new with {WebsiteName}"
-      values={{ WebsiteName }}
-    />
-  );
-
   if (!LoggedInUser) {
     return null;
   }
 
   return (
-    <Flex>
-      {hasSeenNewUpdates ? (
-        <StyledTooltip delayHide={100} content={TooltipContent} noArrow>
-          <FlameIcon
-            height={height}
-            width={width}
-            onClick={handleShowNewUpdates}
-            backgroundColor="black.100"
-            backgroundSize={backgroundSize}
-            url="/static/images/flame-default.svg"
-          />
-        </StyledTooltip>
-      ) : (
-        <Container>
-          <FlameIcon
-            height={height}
-            width={width}
-            onClick={handleShowNewUpdates}
-            backgroundColor="yellow.100"
-            backgroundSize={backgroundSize}
-            url="/static/images/flame-red.svg"
-          />
-          <DismissibleMessage messageId={HELP_MESSAGE.CHANGELOG_NOTIFICATION_DROPDOWN}>
-            {({ dismiss }) => <ChangelogNotificationDropdown onClose={dismiss} />}
-          </DismissibleMessage>
-        </Container>
-      )}
-    </Flex>
+    <Tooltip>
+      <TooltipTrigger
+        className="relative flex h-8 w-8 items-center justify-center  rounded-full border text-slate-500 ring-black ring-offset-2 hover:bg-slate-50 focus:outline-none focus-visible:ring-2"
+        onClick={handleShowNewUpdates}
+      >
+        <Megaphone size={18} />
+        {!hasSeenNewUpdates && <div className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-primary" />}
+      </TooltipTrigger>
+      <TooltipContent>
+        <FormattedMessage
+          id="ChangelogTrigger.tooltip.content"
+          defaultMessage="What's new with {WebsiteName}"
+          values={{ WebsiteName }}
+        />
+      </TooltipContent>
+    </Tooltip>
   );
 };
 

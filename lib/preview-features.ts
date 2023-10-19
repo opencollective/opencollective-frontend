@@ -5,6 +5,7 @@ export enum PREVIEW_FEATURE_KEYS {
   DASHBOARD = 'dashboard',
   EXPENSE_PIPELINE = 'EXPENSE_PIPELINE',
   EXPENSE_OCR = 'EXPENSE_OCR',
+  EXPENSE_CATEGORIZATION = 'EXPENSE_CATEGORIZATION',
 }
 
 export type PreviewFeature = {
@@ -13,7 +14,7 @@ export type PreviewFeature = {
   description: string;
   publicBeta: boolean; // If true, the feature will be available to toggle for all users.
   closedBetaAccessFor?: string[]; // Account slugs. Members and admins of these accounts will see this feature as a Closed Beta preview in the Preview Features modal.
-  enabledByDefaultFor?: string[]; // Account slugs. Members and admins of these accounts will have the feature enabled by default.
+  enabledByDefaultFor?: ('*' | string)[]; // Account slugs. Members and admins of these accounts will have the feature enabled by default.
   env?: Array<'development' | 'test' | 'e2e' | 'staging' | 'production'>; // If set, the feature will be available only in the specified environments.
 };
 
@@ -23,10 +24,10 @@ export type PreviewFeature = {
 export const previewFeatures: PreviewFeature[] = [
   {
     key: PREVIEW_FEATURE_KEYS.DASHBOARD,
-    title: 'Workspace',
-    description: 'Introducing improved navigation and a central admin dashboard for all accounts.',
-    publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
+    title: 'Dashboard',
+    description:
+      'A central space to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations.',
+    publicBeta: true,
     enabledByDefaultFor: ['opencollective'],
   },
   {
@@ -41,8 +42,14 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Expense AI assistant',
     description: 'Introducing an AI assistant to help you create expenses.',
     publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
-    enabledByDefaultFor: ['opencollective'],
+    enabledByDefaultFor: ['*'],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION,
+    title: 'Expense categorization',
+    description: 'Facilitate your accounting by categorizing your expenses according to a chart of accounts.',
+    publicBeta: false,
+    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe'],
     env: ['development', 'staging'],
   },
 ];

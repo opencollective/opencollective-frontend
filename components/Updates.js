@@ -85,7 +85,7 @@ class Updates extends React.Component {
           )}
         </Container>
         {showLoadMore && (
-          <Container margin="1rem" textAlign="center">
+          <Container margin="0.65rem" textAlign="center">
             <StyledButton onClick={this.fetchMore} textTransform="capitalize">
               {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
               {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}

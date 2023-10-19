@@ -14,7 +14,7 @@ import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledSelect from '../StyledSelect';
 import { Label, P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { toast } from '../ui/useToast';
 
 const generateNewExpenseStatusOptions = intl => [
   {
@@ -43,7 +43,6 @@ type MarkExpenseAsUnpaidButtonProps = {
 
 const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidButtonProps) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
   const expenseStatusOptions = React.useMemo(() => generateNewExpenseStatusOptions(intl), [intl]);
   const [newExpenseStatusOption, setNewExpenseStatusOption] = React.useState(expenseStatusOptions[0]);
   const [uploading, setUploading] = React.useState(false);
@@ -65,7 +64,7 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
         message,
       });
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
 
     setHasModal(false);
@@ -120,7 +119,7 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
               />
             }
           />
-          <P fontSize="14px" lineHeight="18px" color="black.600" ml="2.2rem">
+          <P fontSize="14px" lineHeight="18px" color="black.600" ml="1.4rem">
             <FormattedMessage
               id="Expense.markAsUnpaid.details"
               defaultMessage="The amount will be credited back to the Collective balance."

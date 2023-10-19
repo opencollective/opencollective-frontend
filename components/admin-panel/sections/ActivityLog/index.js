@@ -4,7 +4,6 @@ import { gql, useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 import { parseDateInterval } from '../../../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
@@ -15,10 +14,10 @@ import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
-import StyledCard from '../../../StyledCard';
 
+import ActivitiesTable from './ActivitiesTable';
+import ActivityDetailsDrawer from './ActivityDetailsDrawer';
 import ActivityFilters from './ActivityFilters';
-import ActivityListItem from './ActivityListItem';
 import { isSupportedActivityTypeFilter } from './ActivityTypeFilter';
 
 const activityLogQuery = gql`
@@ -138,21 +137,7 @@ const activityLogQuery = gql`
   }
 `;
 
-const ActivityLogContainer = styled(StyledCard)`
-  & > *:not(:last-child) {
-    border-bottom: 1px solid #dcdde0;
-  }
-
-  a {
-    color: black;
-    text-decoration: underline dotted;
-    &:hover {
-      color: #4e5052;
-    }
-  }
-`;
-
-const ACTIVITY_LIMIT = 10;
+const ACTIVITY_LIMIT = 25;
 
 const getQueryVariables = (accountSlug, router) => {
   const routerQuery = omit(router.query, ['slug', 'section']);
@@ -201,10 +186,12 @@ const getChangesThatRequireUpdate = (account, queryParams) => {
 
 const ActivityLog = ({ accountSlug }) => {
   const router = useRouter();
+  const [selectedActivity, setSelectedActivity] = React.useState(null);
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
+  const queryVariables = getQueryVariables(accountSlug, router);
   const { data, loading, error } = useQuery(activityLogQuery, {
-    variables: getQueryVariables(accountSlug, router),
+    variables: queryVariables,
     context: API_V2_CONTEXT,
     fetchPolicy: 'network-only',
   });
@@ -226,7 +213,7 @@ const ActivityLog = ({ accountSlug }) => {
   }, [data?.account, routerQuery]);
 
   return (
-    <Box mt={3}>
+    <Box mt={3} fontSize="13px">
       <ActivityFilters
         filters={routerQuery}
         onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
@@ -250,11 +237,13 @@ const ActivityLog = ({ accountSlug }) => {
               <FormattedMessage defaultMessage="No activity yet" />
             </MessageBox>
           ) : (
-            <ActivityLogContainer>
-              {data.activities.nodes.map(activity => (
-                <ActivityListItem key={activity.id} activity={activity} />
-              ))}
-            </ActivityLogContainer>
+            <ActivitiesTable
+              activities={data.activities}
+              loading={loading}
+              nbPlaceholders={queryVariables.limit}
+              resetFilters={() => handleUpdateFilters({ type: null, offset: null })}
+              openActivity={activity => setSelectedActivity(activity)}
+            />
           )}
         </React.Fragment>
       )}
@@ -268,6 +257,7 @@ const ActivityLog = ({ accountSlug }) => {
           />
         </Container>
       )}
+      <ActivityDetailsDrawer activity={selectedActivity} onClose={() => setSelectedActivity(null)} />
     </Box>
   );
 };

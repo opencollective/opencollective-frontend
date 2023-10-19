@@ -12,7 +12,6 @@ import withData from '../lib/withData';
 import Body from '../components/Body';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
-import Footer from '../components/Footer';
 import HappyBackground from '../components/gift-cards/HappyBackground';
 import GiftCard from '../components/GiftCard';
 import { Box, Flex } from '../components/Grid';
@@ -20,6 +19,7 @@ import Header from '../components/Header';
 import Link from '../components/Link';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
+import Footer from '../components/navigation/Footer';
 import StyledButton from '../components/StyledButton';
 import { H1, H5 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
@@ -138,11 +138,11 @@ class RedeemedPage extends React.Component {
     } else {
       return (
         <div>
-          <Title fontSize={['3rem', null, '4rem']}>
+          <Title fontSize={['1.9rem', null, '2.5rem']}>
             <FormattedMessage id="redeemed.success" defaultMessage="Gift Card Redeemed!" /> 🎉
           </Title>
           <Flex flexWrap="wrap" maxWidth={750} m="0 auto" alignItems="center">
-            <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+            <Subtitle fontSize={['0.95rem', null, '1.25rem']} maxWidth={['90%', '640px']}>
               <Box>
                 <FormattedMessage
                   id="redeemed.subtitle.line1"

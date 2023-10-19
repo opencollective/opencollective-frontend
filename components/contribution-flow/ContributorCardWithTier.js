@@ -126,7 +126,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                 values={{
                   collective: collective.name,
                   tier: capitalize(contribution.tier?.name) || (
-                    <FormattedMessage id="Member.Role.CONTRIBUTOR" defaultMessage="Contributor" />
+                    <FormattedMessage id="Contributor" defaultMessage="Contributor" />
                   ),
                 }}
               />

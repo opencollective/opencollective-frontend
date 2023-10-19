@@ -4,7 +4,7 @@ import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import dayjs from 'dayjs';
-import { cloneDeep, find, get, set } from 'lodash';
+import { cloneDeep, find, get, isNil, set } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -498,6 +498,7 @@ class EditCollectiveForm extends React.Component {
         return (
           <Box>
             {collective.type === USER && <EditUserEmailForm />}
+            {collective.type === ORGANIZATION && <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />}
             {[COLLECTIVE, FUND, PROJECT, EVENT].includes(collective.type) && (
               <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
             )}
@@ -509,7 +510,7 @@ class EditCollectiveForm extends React.Component {
       // Fiscal Hosts
 
       case ALL_SECTIONS.FISCAL_HOSTING:
-        return <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />;
+        return null;
 
       case ALL_SECTIONS.RECEIVING_MONEY:
         return <ReceivingMoney collective={collective} />;
@@ -565,34 +566,32 @@ class EditCollectiveForm extends React.Component {
     const taxes = getApplicableTaxesForCountry(country);
 
     if (taxes.includes(TaxType.VAT)) {
+      const vatType = get(collective, 'settings.VAT.type');
+      const vatNumber = get(collective, 'settings.VAT.number');
+
       const getVATOptions = () => {
         const options = [
-          {
-            value: '',
-            label: intl.formatMessage(this.messages['VAT.None']),
-          },
-          {
-            value: VAT_OPTIONS.HOST,
-            label: intl.formatMessage(this.messages['VAT.Host']),
-          },
+          { value: '', label: intl.formatMessage(this.messages['VAT.None']) },
+          { value: VAT_OPTIONS.OWN, label: intl.formatMessage(this.messages['VAT.Own']) },
         ];
 
-        return collective.isHost
-          ? options
-          : [
-              ...options,
-              {
-                value: VAT_OPTIONS.OWN,
-                label: intl.formatMessage(this.messages['VAT.Own']),
-              },
-            ];
+        // Show a "Host" VAT option (default) when not a fiscal host, nor self-hosted, or when it's already set
+        if (!collective.isHost || vatType === VAT_OPTIONS.HOST) {
+          options.push({
+            value: VAT_OPTIONS.HOST,
+            label: intl.formatMessage(this.messages['VAT.Host']),
+          });
+        }
+
+        return options;
       };
 
       fields.push(
         {
           name: 'VAT',
           type: 'select',
-          defaultValue: get(collective, 'settings.VAT.type') || VAT_OPTIONS.HOST,
+          // For hosted accounts, we default to `HOST` for VAT type
+          defaultValue: !isNil(vatType) ? vatType : !collective.isHost ? VAT_OPTIONS.HOST : '',
           when: () => {
             return collective.isHost || AccountTypesWithHost.includes(collective.type);
           },
@@ -602,15 +601,9 @@ class EditCollectiveForm extends React.Component {
           name: 'VAT-number',
           type: 'string',
           placeholder: 'FRXX999999999',
-          defaultValue: get(collective, 'settings.VAT.number'),
+          defaultValue: vatNumber,
           when: () => {
-            const { collective } = this.state;
-            if (collective.type === COLLECTIVE || collective.type === EVENT) {
-              // Collectives can set a VAT number if configured
-              return get(collective, 'settings.VAT.type') === VAT_OPTIONS.OWN;
-            } else {
-              return true;
-            }
+            return Boolean(vatType) && (collective.isHost || vatType === VAT_OPTIONS.OWN);
           },
         },
       );
@@ -864,7 +857,7 @@ class EditCollectiveForm extends React.Component {
             )}
 
             {fields && fields.length > 0 && (
-              <Container className="actions" margin="5rem auto 1rem" textAlign="center">
+              <Container className="actions" margin="3.15rem auto 0.65rem" textAlign="center">
                 <StyledButton
                   buttonStyle="primary"
                   type="submit"
@@ -881,7 +874,7 @@ class EditCollectiveForm extends React.Component {
                   {submitBtnLabel}
                 </StyledButton>
 
-                <Container className="backToProfile" fontSize="1.3rem" margin="1rem">
+                <Container className="backToProfile" fontSize="0.8rem" margin="0.65rem">
                   <Link
                     data-cy="edit-collective-back-to-profile"
                     href={

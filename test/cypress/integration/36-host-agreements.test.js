@@ -1,7 +1,7 @@
 describe('Host agreements', () => {
   it('Use the agreements admin to create and edit agreements', () => {
     // ---- Load the list filter by newly created account ----
-    cy.login({ redirect: `/workspace/brusselstogetherasbl/host-agreements` });
+    cy.login({ redirect: `/dashboard/brusselstogetherasbl/host-agreements` });
     cy.contains('[data-cy="agreements-table"]', 'No agreements'); // Starts with no agreements
 
     // ---- Create an agreement ----
@@ -21,14 +21,14 @@ describe('Host agreements', () => {
       .type('This group can expense an unlimited number of potatoes\n\nNo restrictions whatsoever.');
     // Submit
     cy.contains('button', 'Create Agreement').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Agreement created' });
+    cy.checkToast({ variant: 'success', message: 'Agreement created' });
     cy.getByDataCy('agreement-drawer').should('not.exist'); // It closes the drawer
 
     // ---- Check agreement in the list ----
     cy.get('[data-cy="agreements-table"] tbody tr').first().as('firstRow');
     cy.get('@firstRow').contains('Veganizer BXL');
     cy.get('@firstRow').contains('Unlimited potatoes');
-    cy.get('@firstRow').contains('November 6, 2062');
+    cy.get('@firstRow').contains('Nov 6, 2062');
 
     // ---- Open drawer, make sure the info is there ----
     cy.get('@firstRow').find('td:nth-child(2)').click();
@@ -43,10 +43,10 @@ describe('Host agreements', () => {
     cy.get('@agreementForm').find('#input-title').clear().type('Unlimited potatoes (updated)');
     cy.get('@agreementForm').find('#input-expiresAt').clear().type('2062-11-07');
     cy.contains('button', 'Save Changes').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Agreement updated' });
+    cy.checkToast({ variant: 'success', message: 'Agreement updated' });
     cy.getByDataCy('agreement-drawer').should('not.exist'); // It closes the drawer
     cy.get('@firstRow').contains('Unlimited potatoes (updated)');
-    cy.get('@firstRow').contains('November 7, 2062');
+    cy.get('@firstRow').contains('Nov 7, 2062');
 
     // ---- Filters the agreements ----
     cy.getByDataCy('select-agreements-account').type('brussels');
@@ -56,10 +56,10 @@ describe('Host agreements', () => {
     cy.contains('[data-cy="agreements-table"]', 'Unlimited potatoes (updated)');
 
     // ---- Agreement count should be displayed in the expenses list ----
-    cy.getByDataCy('menu-item-host-expenses').click();
+    cy.getByDataCy('menu-item-Expenses').click(); // opening the Expenses menu group (that opens the 'Host expenses' page by default)
     cy.contains('[data-cy="expense-container-2340"]', 'Vegan Dining Week Client Dinner').as('expense');
     cy.get('@expense')
-      .find('a[href="/workspace/brusselstogetherasbl/host-agreements?account=veganizerbxl"]')
+      .find('a[href="/dashboard/brusselstogetherasbl/host-agreements?account=veganizerbxl"]')
       .contains('1 agreement');
 
     // ---- Agreement count should be displayed on the expense ----
@@ -67,7 +67,7 @@ describe('Host agreements', () => {
     cy.getByDataCy('expense-drawer').should('be.visible'); // Wait for the page to load
     cy.getByDataCy('expense-summary-collective').contains('Host Agreements: 1');
     cy.getByDataCy('expense-summary-collective')
-      .find('a[href="/workspace/brusselstogetherasbl/host-agreements?account=veganizerbxl"]')
+      .find('a[href="/dashboard/brusselstogetherasbl/host-agreements?account=veganizerbxl"]')
       .click();
 
     // ---- Delete the agreements ----
@@ -77,7 +77,7 @@ describe('Host agreements', () => {
     cy.getByDataCy('more-actions-delete-expense-btn').click();
     cy.contains('This will permanently delete the agreement and all its attachments').should('be.visible');
     cy.getByDataCy('confirmation-modal-continue').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Agreement deleted successfully' });
+    cy.checkToast({ variant: 'success', message: 'Agreement deleted successfully' });
     cy.getByDataCy('agreement-drawer').should('not.exist'); // It closes the drawer
     cy.contains('[data-cy="agreements-table"]', 'No agreements');
   });

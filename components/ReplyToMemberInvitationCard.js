@@ -19,7 +19,6 @@ import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledCard from './StyledCard';
 import StyledCheckbox from './StyledCheckbox';
-import StyledTag from './StyledTag';
 import { H3, P } from './Text';
 import { withUser } from './UserProvider';
 
@@ -127,12 +126,12 @@ const ReplyToMemberInvitationCard = ({ invitation, isSelected, refetchLoggedInUs
           )}
         </P>
       </Flex>
-      <hr />
-      <StyledTag textTransform="uppercase">{formatMemberRole(intl, invitation.role)}</StyledTag>
+      <hr className="my-5" />
+      <div className="rounded bg-slate-100 p-3 text-center">{formatMemberRole(intl, invitation.role)}</div>
       {hasRoleDescription(invitation.role) && (
-        <P my={3} px={2} color="black.600" lineHeight="18px">
+        <p className="my-4 px-2 text-sm text-slate-700">
           <MemberRoleDescription role={invitation.role} />
-        </P>
+        </p>
       )}
       {hasReplied && !isSubmitting ? (
         <P mt={4} color={accepted ? 'green.500' : 'red.500'} textAlign="center" mb={2} fontWeight="bold">

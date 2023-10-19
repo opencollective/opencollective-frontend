@@ -17,7 +17,7 @@ import MessageBox from '../MessageBox';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import Tags from '../Tags';
-import { H1, H5 } from '../Text';
+import { H5 } from '../Text';
 
 import { ExpensesDirection } from './filters/ExpensesDirection';
 import ExpensesOrder from './filters/ExpensesOrder';
@@ -32,7 +32,7 @@ const Expenses = props => {
   const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, onlySubmittedExpenses } = props;
 
   const expensesRoute = isDashboard
-    ? `/workspace/${variables.collectiveSlug}/expenses`
+    ? `/dashboard/${variables.collectiveSlug}/expenses`
     : `${getCollectivePageRoute(data?.account)}/expenses`;
 
   useEffect(() => {
@@ -92,15 +92,20 @@ const Expenses = props => {
 
   return (
     <Container>
-      <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-        {onlySubmittedExpenses ? (
-          <FormattedMessage defaultMessage="Submitted Expenses" />
-        ) : (
-          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-        )}
-      </H1>
-      <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}>
-        {!onlySubmittedExpenses && (
+      {!isDashboard && (
+        <React.Fragment>
+          <h1 className={'mb-6 text-[32px] leading-10'}>
+            {onlySubmittedExpenses ? (
+              <FormattedMessage defaultMessage="Submitted Expenses" />
+            ) : (
+              <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+            )}
+          </h1>
+        </React.Fragment>
+      )}
+
+      <Flex alignItems={[null, null, 'center']} mb="26px" flexWrap="wrap" gap="16px" mr={2}>
+        {!isDashboard && !onlySubmittedExpenses && (
           <Box flex="0 1" flexBasis={['100%', null, '380px']}>
             <ExpensesDirection
               value={query.direction || 'RECEIVED'}

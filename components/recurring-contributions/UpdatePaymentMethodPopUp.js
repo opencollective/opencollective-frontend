@@ -24,7 +24,7 @@ import StyledHr from '../StyledHr';
 import StyledRadioList from '../StyledRadioList';
 import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import AddPaymentMethod from './AddPaymentMethod';
 
@@ -62,8 +62,8 @@ export const paymentMethodFragment = gql`
 `;
 
 export const paymentMethodsQuery = gql`
-  query UpdatePaymentMethodPopUpPaymentMethod($accountId: String!, $orderId: String!) {
-    account(id: $accountId) {
+  query UpdatePaymentMethodPopUpPaymentMethod($accountSlug: String!, $orderId: String!) {
+    account(slug: $accountSlug) {
       id
       paymentMethods(type: [CREDITCARD, GIFTCARD, PREPAID, COLLECTIVE]) {
         id
@@ -204,7 +204,7 @@ export const sortAndFilterPaymentMethods = (
 };
 
 export const useUpdatePaymentMethod = contribution => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [submitUpdatePaymentMethod, { loading }] = useMutation(updatePaymentMethodMutation, mutationOptions);
 
   return {
@@ -221,8 +221,8 @@ export const useUpdatePaymentMethod = contribution => {
           }
           await submitUpdatePaymentMethod({ variables });
         }
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
+        toast({
+          variant: 'success',
           message: (
             <FormattedMessage
               id="subscription.createSuccessUpdated"
@@ -233,7 +233,7 @@ export const useUpdatePaymentMethod = contribution => {
         });
       } catch (error) {
         const errorMsg = getErrorFromGraphqlException(error).message;
-        addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
+        toast({ variant: 'error', message: errorMsg });
         return false;
       }
     },
@@ -242,7 +242,7 @@ export const useUpdatePaymentMethod = contribution => {
 
 const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, account }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   // state management
   const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
@@ -257,7 +257,7 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
 
   // GraphQL mutations and queries
   const { data, refetch } = useQuery(paymentMethodsQuery, {
-    variables: { accountId: account.id, orderId: contribution.id },
+    variables: { accountSlug: account.slug, orderId: contribution.id },
     context: API_V2_CONTEXT,
     fetchPolicy: 'network-only',
   });
@@ -277,8 +277,8 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
     const { message, response } = stripeError;
 
     if (!response) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: message,
       });
       setAddingPaymentMethod(false);
@@ -288,8 +288,8 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
     const stripe = await getStripe();
     const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
     if (result.error) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: result.error.message,
       });
       setAddingPaymentMethod(false);
@@ -301,8 +301,8 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
         });
         return handleSuccess(response.data.confirmCreditCard.paymentMethod);
       } catch (error) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: error.message,
         });
         setAddingPaymentMethod(false);
@@ -449,8 +449,8 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
               onClick={async () => {
                 setAddingPaymentMethod(true);
                 if (!stripe) {
-                  addToast({
-                    type: TOAST_TYPE.ERROR,
+                  toast({
+                    variant: 'error',
                     message: (
                       <FormattedMessage
                         id="Stripe.Initialization.Error"
@@ -465,7 +465,7 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
                 const { token, error } = await stripe.createToken(cardElement);
 
                 if (error) {
-                  addToast({ type: TOAST_TYPE.ERROR, message: error.message });
+                  toast({ variant: 'error', message: error.message });
                   return false;
                 }
                 const newStripePaymentMethod = stripeTokenToPaymentMethod(token);
@@ -481,7 +481,7 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
                   return handleAddPaymentMethodResponse(res.data.addCreditCard);
                 } catch (error) {
                   const errorMsg = getErrorFromGraphqlException(error).message;
-                  addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
+                  toast({ variant: 'error', message: errorMsg });
                   setAddingPaymentMethod(false);
                   return false;
                 }

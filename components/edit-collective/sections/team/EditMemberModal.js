@@ -16,7 +16,7 @@ import { Flex } from '../../../Grid';
 import StyledButton from '../../../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
 import StyledTooltip from '../../../StyledTooltip';
-import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
+import { useToast } from '../../../ui/useToast';
 
 import MemberForm from './MemberForm';
 import { teamSectionQuery } from './queries';
@@ -83,7 +83,7 @@ const EditMemberModal = props => {
 
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
 
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const isInvitation = get(member, '__typename') === 'MemberInvitation';
 
@@ -144,8 +144,8 @@ const EditMemberModal = props => {
         },
       });
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         title: <FormattedMessage id="editTeam.member.edit.success" defaultMessage="Member updated successfully." />,
       });
 
@@ -156,11 +156,10 @@ const EditMemberModal = props => {
       onEdit?.();
       cancelHandler();
     } catch (error) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         title: <FormattedMessage id="editTeam.member.edit.error" defaultMessage="Failed to update member." />,
         message: i18nGraphqlException(intl, error),
-        variant: 'light',
       });
     }
   };
@@ -181,8 +180,8 @@ const EditMemberModal = props => {
         },
       });
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: (
           <FormattedMessage
             id="editTeam.memberInvitation.edit.success"
@@ -194,8 +193,8 @@ const EditMemberModal = props => {
       onEdit?.();
       cancelHandler();
     } catch (error) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         title: (
           <FormattedMessage
             id="editTeam.memberInvitation.edit.error"
@@ -231,8 +230,8 @@ const EditMemberModal = props => {
           },
         });
 
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
+        toast({
+          variant: 'success',
           message: isInvitation ? (
             <FormattedMessage
               id="editTeam.memberInvitation.remove.success"
@@ -251,8 +250,8 @@ const EditMemberModal = props => {
         onEdit?.();
         cancelHandler();
       } catch (error) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           title: isInvitation ? (
             <FormattedMessage id="editTeam.member.remove.error" defaultMessage="Failed to remove member." />
           ) : (

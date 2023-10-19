@@ -42,6 +42,7 @@ const Comment = ({
   onDelete,
   reactions,
   canReply,
+  onReplyClick,
 }) => {
   const [isEditing, setEditing] = React.useState(false);
   const hasActions = !isEditing;
@@ -58,8 +59,12 @@ const Comment = ({
             isConversationRoot={isConversationRoot}
             canEdit={canEdit}
             canDelete={canDelete}
+            canReply={canReply}
             onDelete={onDelete}
             onEditClick={() => setEditing(true)}
+            onReplyClick={() => {
+              onReplyClick(comment);
+            }}
           />
         )}
       </Flex>
@@ -130,6 +135,8 @@ Comment.propTypes = {
   maxCommentHeight: PropTypes.number,
   /** Called when comment gets deleted */
   onDelete: PropTypes.func,
+  /** Called when comment gets selected*/
+  onReplyClick: PropTypes.func,
 };
 
 export default Comment;

@@ -46,7 +46,7 @@ const NameWrapper = styled(Container)`
 
 const MembershipWrapper = styled(Container)`
   border-top: 1px solid #f2f2f2;
-  padding: 1rem;
+  padding: 0.65rem;
   color: #303233;
 `;
 
@@ -61,7 +61,7 @@ const ValueWrapper = styled(Container)`
   font-weight: normal;
   text-align: center;
   color: #303233;
-  font-size: 1.4rem;
+  font-size: 0.85rem;
   margin: 3px 2px 0px;
   text-align: center;
   margin: auto;
@@ -194,7 +194,13 @@ class CollectiveCard extends React.Component {
     return (
       <Link href={route} target="_top">
         <CardWrapper className={`CollectiveCard ${collective.type}`} {...this.props}>
-          <Container position="relative" overflow="hidden" width="100%" height="14rem" borderBottom="5px solid #46b0ed">
+          <Container
+            position="relative"
+            overflow="hidden"
+            width="100%"
+            height="8.75rem"
+            borderBottom="5px solid #46b0ed"
+          >
             <Container
               position="absolute"
               top="0"
@@ -219,13 +225,13 @@ class CollectiveCard extends React.Component {
               <Avatar collective={collective} radius={65} />
             </Container>
           </Container>
-          <Container padding="1rem" minHeight="11rem">
+          <Container padding="0.65rem" minHeight="6.9rem">
             <NameWrapper>{collective.name}</NameWrapper>
             <Container
               fontWeight="normal"
               textAlign="center"
               color="#787d80"
-              fontSize="1.2rem"
+              fontSize="0.75rem"
               lineHeight="1.3"
               margin="0 5px"
               minHeight="50px"
@@ -234,7 +240,7 @@ class CollectiveCard extends React.Component {
               {truncatedDescription}
             </Container>
           </Container>
-          <Container fontSize="1.1rem" width="100%" minHeight="6rem" textAlign="center">
+          <Container fontSize="0.7rem" width="100%" minHeight="3.75rem" textAlign="center">
             {collective.type === 'COLLECTIVE' && backersCount > 0 && (
               <StatsWrapper>
                 <div className="backers">
@@ -346,7 +352,7 @@ class CollectiveCard extends React.Component {
                 membership.role === 'BACKER' &&
                 get(membership, 'stats.totalDonations') > 0 && (
                   <MembershipWrapper key={membership.id}>
-                    <Container fontSize="2rem">
+                    <Container fontSize="1.25rem">
                       <Currency
                         value={get(membership, 'stats.totalDonations')}
                         currency={get(membership, 'collective.currency')}

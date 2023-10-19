@@ -70,7 +70,7 @@ class SearchForm extends React.Component {
       autoComplete = 'on',
       fontStyle = '',
       letterSpacing = '0',
-      fontSize = '1.2rem',
+      fontSize = '0.75rem',
       lineHeight,
       fontWeight,
     } = this.props;
@@ -85,7 +85,7 @@ class SearchForm extends React.Component {
           p={this.props.py || 1}
         >
           <SearchButton as="button" ml={2} p={1}>
-            <Search size={18} color="#aaaaaa">
+            <Search size={18} className="text-slate-500">
               <title>Search</title>
             </Search>
           </SearchButton>

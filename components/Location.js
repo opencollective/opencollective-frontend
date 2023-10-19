@@ -52,7 +52,7 @@ function Location({ location, showTitle }) {
     <LocationSection id="location">
       <Container margin="30px 10px">
         {showTitle && <h1>Location</h1>}
-        <Container font-size="1.7rem" margin="5px 0px">
+        <Container font-size="1.05rem" margin="5px 0px">
           {name}
         </Container>
         <Container className="address" color="black.600">
@@ -62,7 +62,7 @@ function Location({ location, showTitle }) {
         </Container>
       </Container>
       {lat && long && (
-        <div className="map">
+        <div className="relative h-80 border">
           <Map lat={lat} long={long} />
         </div>
       )}

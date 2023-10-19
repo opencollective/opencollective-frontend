@@ -86,10 +86,10 @@ const RecurringContributionsCard = ({
           {showPaymentMethod && contribution.paymentMethod && (
             <Box mb={3}>
               <P mb={2} fontSize="14px" lineHeight="20px" fontWeight="400">
-                Payment method
+                <FormattedMessage id="Fields.paymentMethod" defaultMessage="Payment method" />
               </P>
               <Flex alignItems="center" height="28px">
-                <Box mr={2}>{getPaymentMethodIcon(contribution.paymentMethod, account)}</Box>
+                <Box mr={2}>{getPaymentMethodIcon(contribution.paymentMethod, account, 32)}</Box>
                 <Flex flexDirection="column" css={{ position: 'relative', minWidth: 0 }}>
                   <P
                     fontSize="11px"

@@ -32,7 +32,7 @@ class Membership extends React.Component {
 
     return (
       <React.Fragment>
-        <Container float="left" margin="1rem">
+        <Container float="left" margin="0.65rem">
           <CollectiveCard memberships={memberships} collective={collective} LoggedInUser={LoggedInUser} />
         </Container>
       </React.Fragment>

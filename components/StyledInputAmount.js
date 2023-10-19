@@ -220,9 +220,9 @@ StyledInputAmount.propTypes = {
   /** OnChange function */
   onBlur: PropTypes.func,
   /** Minimum amount (in CENTS) */
-  min: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  min: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** Maximum amount (in CENTS) */
-  max: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  max: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** Value */
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** Currency style. If hasCurrencyPicker is true, `CODE` will be enforced. */

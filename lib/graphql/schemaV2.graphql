@@ -713,6 +713,7 @@ enum SocialLinkType {
   GHOST
   PEERTUBE
   TIKTOK
+  TWITCH
 }
 
 enum ImageFormat {
@@ -1366,6 +1367,11 @@ type Expense {
   Custom data for this expense
   """
   customData: JSON
+
+  """
+  The merchant ID for this expense
+  """
+  merchantId: String
 }
 
 """
@@ -2833,6 +2839,11 @@ type Host implements Account & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  List of accounting categories for this host
+  """
+  accountingCategories: AccountingCategoryCollection!
   hostFeePercent: Float
   totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
   totalHostedAccounts: Int
@@ -2904,6 +2915,36 @@ type Host implements Account & AccountWithContributions {
   stripe: StripeConnectedAccount
 
   """
+  Applications for this host
+  """
+  hostApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Search term for collective tags, id, name, slug and description.
+    """
+    searchTerm: String
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter applications by status
+    """
+    status: HostApplicationStatus
+  ): HostApplicationCollection!
+
+  """
   Pending applications for this host
   """
   pendingApplications(
@@ -2927,6 +2968,7 @@ type Host implements Account & AccountWithContributions {
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
   ): HostApplicationCollection!
+    @deprecated(reason: "2023-08-25: Deprecated in favour of host.hostApplications(status: PENDING).")
   hostedVirtualCards(
     """
     Search term (card name, card last four digits)
@@ -4368,11 +4410,13 @@ type VirtualCardCollection implements Collection {
 }
 
 type Policies {
+  id: String
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
+  EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
 }
 
 type EXPENSE_AUTHOR_CANNOT_APPROVE {
@@ -4403,6 +4447,11 @@ type MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
   PER_AUTHORIZATION: Amount
   WEEKLY: Amount
   YEARLY: Amount
+}
+
+type EXPENSE_CATEGORIZATION {
+  requiredForExpenseSubmitters: Boolean
+  requiredForCollectiveAdmins: Boolean
 }
 
 type ActivitySubscription {
@@ -4460,9 +4509,14 @@ type AccountPermissions {
   id: String!
 
   """
-  Whether the current user can mark this order as expired
+  Whether the current user can add funds to this account
   """
   addFunds: Permission!
+
+  """
+  Whether the current user can contact this account
+  """
+  contact: Permission!
 }
 
 type Permission {
@@ -4543,6 +4597,7 @@ type Activity {
 
 enum ActivityType {
   ACTIVITY_ALL
+  ACCOUNTING_CATEGORIES_EDITED
   CONNECTED_ACCOUNT_CREATED
   CONNECTED_ACCOUNT_ERROR
   COLLECTIVE_CREATED_GITHUB
@@ -4685,6 +4740,47 @@ type Webhook {
   activityType: ActivityType
   webhookUrl: URL
   account: Account!
+}
+
+"""
+A collection of "Accounting Categories"
+"""
+type AccountingCategoryCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+
+  """
+  The Accounting Categories
+  """
+  nodes: [AccountingCategory!]!
+}
+
+"""
+Fields for an accounting category
+"""
+type AccountingCategory {
+  id: String!
+
+  """
+  The code of the accounting category
+  """
+  code: String!
+
+  """
+  The technical name of the accounting category
+  """
+  name: String!
+
+  """
+  A friendly name for non-accountants (i.e. expense submitters and collective admins)
+  """
+  friendlyName: String
+
+  """
+  The account this category belongs to
+  """
+  account: Host!
 }
 
 """
@@ -8350,6 +8446,11 @@ type Individual implements Account {
   Has the account a password set? For authenticated user: scope: "account".
   """
   hasPassword: Boolean
+
+  """
+  User two factor methods
+  """
+  twoFactorMethods: [UserTwoFactorMethod]
 }
 
 """
@@ -8415,6 +8516,27 @@ type PersonalToken {
   The date on which the personal token was last updated
   """
   updatedAt: DateTime
+}
+
+"""
+User two factor authentication method
+"""
+type UserTwoFactorMethod {
+  id: String!
+  method: TwoFactorMethod!
+  name: String!
+  createdAt: DateTime!
+  description: String
+  icon: String
+}
+
+"""
+A two factor authentication method
+"""
+enum TwoFactorMethod {
+  TOTP
+  YUBIKEY_OTP
+  WEBAUTHN
 }
 
 """
@@ -11945,6 +12067,7 @@ enum CountryISO {
 
 enum ActivityAndClassesType {
   ACTIVITY_ALL
+  ACCOUNTING_CATEGORIES_EDITED
   CONNECTED_ACCOUNT_CREATED
   CONNECTED_ACCOUNT_ERROR
   COLLECTIVE_CREATED_GITHUB
@@ -13663,6 +13786,16 @@ type Mutation {
   ): Account!
 
   """
+  Create WebAuthn public key registration request options
+  """
+  createWebAuthnRegistrationOptions(
+    """
+    Account that will create a WebAuthn registration
+    """
+    account: AccountReferenceInput!
+  ): JSON!
+
+  """
   Add 2FA to the Individual if it does not have it. Scope: "account".
   """
   addTwoFactorAuthTokenToIndividual(
@@ -13687,6 +13820,11 @@ type Mutation {
   """
   removeTwoFactorAuthTokenFromIndividual(
     """
+    Method to remove from this account
+    """
+    userTwoFactorMethod: UserTwoFactorMethodReferenceInput
+
+    """
     Account that will have 2FA removed from it
     """
     account: AccountReferenceInput!
@@ -13695,11 +13833,27 @@ type Mutation {
     The two factor method to remove. Removes all if empty
     """
     type: TwoFactorMethod
+      @deprecated(reason: "2023-08-01: Use the two factor method reference to specify method to remove")
 
     """
     The 6-digit 2FA code
     """
-    code: String @deprecated(reason: "2FA code to validate this action must be set via 2FA header")
+    code: String @deprecated(reason: "2023-08-01: 2FA code to validate this action must be set via 2FA header")
+  ): Individual!
+
+  """
+  Edit 2FA method
+  """
+  editTwoFactorAuthenticationMethod(
+    """
+    Method to edit
+    """
+    userTwoFactorMethod: UserTwoFactorMethodReferenceInput!
+
+    """
+    New name for the method
+    """
+    name: String
   ): Individual!
 
   """
@@ -13752,6 +13906,26 @@ type Mutation {
     message: NonEmptyString!
     subject: String
   ): SendMessageResult
+
+  """
+  Regenerate two factor authentication recovery codes
+  """
+  regenerateRecoveryCodes: [String!]
+
+  """
+  Edit an accounting category. Returns the account with the updated categories.
+  """
+  editAccountingCategories(
+    """
+    The host to edit accounting categories for
+    """
+    account: AccountReferenceInput!
+
+    """
+    The list of categories to edit
+    """
+    categories: [AccountingCategoryInput!]!
+  ): Account!
   createApplication(application: ApplicationCreateInput!): Application
   updateApplication(application: ApplicationUpdateInput!): Application
   deleteApplication(application: ApplicationReferenceInput!): Application
@@ -14157,6 +14331,26 @@ type Mutation {
   ): Boolean!
 
   """
+  Follows a given Collective. Scope: "account"
+  """
+  followAccount(
+    """
+    user will follow this account
+    """
+    account: AccountReferenceInput!
+  ): FollowAccountResult!
+
+  """
+  Unfollows a given Collective. Scope: "account"
+  """
+  unfollowAccount(
+    """
+    account to unfollow
+    """
+    account: AccountReferenceInput!
+  ): UnfollowAccountResult!
+
+  """
   Edit the public message for the given Member of a Collective. Scope: "account".
   """
   editPublicMessage(
@@ -14539,22 +14733,6 @@ type Mutation {
   ): SetTaxFormResult
 
   """
-  Add platform tips to a transaction. Scope: "transactions".
-  """
-  addPlatformTipToTransaction(
-    """
-    Reference to the transaction in the platform tip
-    """
-    transaction: TransactionReferenceInput!
-
-    """
-    Amount of the platform tip
-    """
-    amount: AmountInput!
-  ): Transaction!
-    @deprecated(reason: "2022-07-06: This feature will not be supported in the future. Please don't rely on it.")
-
-  """
   Refunds a transaction. Scope: "transactions".
   """
   refundTransaction(
@@ -14920,6 +15098,46 @@ type Mutation {
     """
     agreement: AgreementReferenceInput!
   ): Agreement!
+
+  """
+  Create a new vendor for given host
+  """
+  createVendor(
+    """
+    Reference to the host that holds the vendor
+    """
+    host: AccountReferenceInput!
+
+    """
+    The vendor to create
+    """
+    vendor: VendorCreateInput!
+  ): Vendor!
+
+  """
+  Edit an existing vendor
+  """
+  editVendor(
+    """
+    Reference to the host that holds the vendor
+    """
+    vendor: VendorEditInput!
+  ): Vendor!
+
+  """
+  Delete a vendor
+  """
+  deleteVendor(
+    """
+    Reference to the vendor to delete
+    """
+    vendor: AccountReferenceInput!
+  ): Boolean!
+
+  """
+  Send In-App Survey response
+  """
+  sendSurveyResponse(surveyKey: String!, responseId: String!, score: Int!, text: String, okToContact: Boolean): Boolean
 }
 
 """
@@ -14965,6 +15183,11 @@ enum TaxType {
   New Zealand Good and Services Tax
   """
   GST
+
+  """
+  Employer Identification Number
+  """
+  EIN
 }
 
 input CollectiveCreateInput {
@@ -15110,12 +15333,9 @@ type AddTwoFactorAuthTokenToIndividualResponse {
   recoveryCodes: [String]
 }
 
-"""
-A two factor authentication method
-"""
-enum TwoFactorMethod {
-  TOTP
-  YUBIKEY_OTP
+input UserTwoFactorMethodReferenceInput {
+  id: String
+  legacyId: Int
 }
 
 input AccountUpdateInput {
@@ -15131,6 +15351,7 @@ input PoliciesInput {
   REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
+  EXPENSE_CATEGORIZATION: PoliciesExpenseCategorizationInput
 }
 
 input PoliciesCollectiveExpenseAuthorCannotApprove {
@@ -15146,6 +15367,11 @@ input PoliciesCollectiveMinimumAdminsInput {
   freeze: Boolean
 }
 
+input PoliciesExpenseCategorizationInput {
+  requiredForExpenseSubmitters: Boolean
+  requiredForCollectiveAdmins: Boolean
+}
+
 type SendMessageResult {
   success: Boolean
 }
@@ -15154,6 +15380,31 @@ type SendMessageResult {
 A string that cannot be passed as an empty value
 """
 scalar NonEmptyString
+
+"""
+Input for creating or updating an account category
+"""
+input AccountingCategoryInput {
+  """
+  The ID of the accounting category to edit
+  """
+  id: NonEmptyString
+
+  """
+  The code of the accounting category
+  """
+  code: NonEmptyString
+
+  """
+  The technical name of the accounting category
+  """
+  name: NonEmptyString
+
+  """
+  A friendly name for non-accountants (i.e. expense submitters and collective admins)
+  """
+  friendlyName: String
+}
 
 """
 Input type for Application
@@ -15882,6 +16133,16 @@ input MemberInvitationReferenceInput {
   legacyId: Int
 }
 
+type FollowAccountResult {
+  individual: Individual!
+  member: Member!
+}
+
+type UnfollowAccountResult {
+  individual: Individual!
+  member: Member
+}
+
 input OAuthAuthorizationReferenceInput {
   """
   The id identifying the OAuth Authorization (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -16156,6 +16417,11 @@ input OrderContextInput {
   Whether this order was created using the embedded contribution flow
   """
   isEmbed: Boolean
+
+  """
+  Whether this order was created using the new platform tip flow
+  """
+  isNewPlatformTipFlow: Boolean
 }
 
 input OrderUpdateInput {
@@ -16480,14 +16746,17 @@ type ParseUploadedFileResult {
   message: String
 
   """
-  The confidence of the parsing result
-  """
-  confidence: StrictPercentage
-
-  """
   The parsed expense information
   """
   expense: ExpenseParsedFileInfo
+}
+
+type ExpenseParsedFileInfo {
+  confidence: StrictPercentage
+  description: String
+  amount: Amount
+  date: Date
+  items: [ExpenseItemParsedFileInfo!]!
 }
 
 """
@@ -16495,16 +16764,17 @@ A positive float value between 0 and 100
 """
 scalar StrictPercentage
 
-type ExpenseParsedFileInfo {
-  description: String
-  amount: Amount
-  incurredAt: Date
-}
-
 """
 A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
 scalar Date
+
+type ExpenseItemParsedFileInfo {
+  description: String
+  amount: Amount
+  incurredAt: Date
+  url: String
+}
 
 input UploadFileInput {
   """
@@ -16701,4 +16971,55 @@ input AgreementReferenceInput {
   The internal id of the agreement (ie: 580)
   """
   legacyId: Int
+}
+
+input VendorCreateInput {
+  name: NonEmptyString!
+  legalName: String
+  tags: [NonEmptyString]
+  address: String
+  imageUrl: String
+  vendorInfo: VendorInfoInput
+}
+
+"""
+Some context about the vendor
+"""
+input VendorInfoInput {
+  contact: VendorContactInput
+  taxFormUrl: String
+  taxType: TaxType
+  taxId: String
+  notes: String
+}
+
+"""
+Some context about the vendor contact person
+"""
+input VendorContactInput {
+  name: String
+  email: String
+}
+
+input VendorEditInput {
+  """
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the account (ie: 580)
+  """
+  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
+
+  """
+  The slug identifying the account (ie: babel for https://opencollective.com/babel)
+  """
+  slug: String
+  name: String
+  legalName: String
+  tags: String
+  address: String
+  imageUrl: String
+  vendorInfo: VendorInfoInput
 }

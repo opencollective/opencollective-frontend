@@ -15,7 +15,7 @@ import { Label, Strong } from './Text';
 const ParameterColumnHeader = styled.th`
   font-size: 12px;
   font-weight: bold;
-  padding: 0.1rem 1rem 0.1rem 0;
+  padding: 0.05rem 0.65rem 0.05rem 0;
 `;
 
 class ExportImages extends React.Component {

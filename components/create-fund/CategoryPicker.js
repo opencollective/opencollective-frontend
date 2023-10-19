@@ -94,7 +94,7 @@ const CreateFundCategoryPicker = () => {
                 <Link
                   href={{
                     pathname: `/fund/${router.query.verb}`,
-                    query: { category: 'europe' },
+                    query: { category: 'oce-foundation' },
                   }}
                 >
                   <StyledButton fontSize="13px" buttonStyle="primary" minHeight="36px" mt={[2, 3]} mb={3} px={3}>
@@ -104,7 +104,7 @@ const CreateFundCategoryPicker = () => {
                 <P textAlign="center">
                   It will be hosted by
                   <br />
-                  Open Collective Europe ASBL
+                  Open Collective Europe Foundation
                 </P>
               </Flex>
             </Container>

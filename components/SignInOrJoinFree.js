@@ -12,6 +12,7 @@ import { i18nGraphqlException } from '../lib/errors';
 import { gqlV1 } from '../lib/graphql/helpers';
 import { getWebsiteUrl } from '../lib/utils';
 
+import { toast } from './ui/useToast';
 import Container from './Container';
 import CreateProfile from './CreateProfile';
 import { Box, Flex } from './Grid';
@@ -20,7 +21,6 @@ import Loading from './Loading';
 import SignIn from './SignIn';
 import StyledHr from './StyledHr';
 import { Span } from './Text';
-import { TOAST_TYPE, withToasts } from './ToastProvider';
 import { withUser } from './UserProvider';
 
 const SignInFooterLink = styled(Link)`
@@ -68,7 +68,6 @@ class SignInOrJoinFree extends React.Component {
     signInLabel: PropTypes.node,
     intl: PropTypes.object,
     router: PropTypes.object,
-    addToast: PropTypes.func.isRequired,
     hideFooter: PropTypes.bool,
     isOAuth: PropTypes.bool,
     showSubHeading: PropTypes.bool,
@@ -81,6 +80,8 @@ class SignInOrJoinFree extends React.Component {
     }),
     /* From UserProvider / withUser */
     login: PropTypes.func,
+    /** whether the input needs to be auto-focused */
+    autoFocus: PropTypes.bool,
   };
 
   constructor(props) {
@@ -167,8 +168,8 @@ class SignInOrJoinFree extends React.Component {
       } else if (e.message?.includes('Two-factor authentication is enabled')) {
         this.setState({ submitting: false });
       } else {
-        this.props.addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: e.message || 'Server error',
         });
         this.setState({ submitting: false });
@@ -206,8 +207,8 @@ class SignInOrJoinFree extends React.Component {
     } catch (error) {
       const emailAlreadyExists = get(error, 'graphQLErrors.0.extensions.code') === 'EMAIL_ALREADY_EXISTS';
       if (!emailAlreadyExists) {
-        this.props.addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: i18nGraphqlException(this.props.intl, error),
         });
       }
@@ -255,6 +256,7 @@ class SignInOrJoinFree extends React.Component {
               isOAuth={this.props.isOAuth}
               oAuthAppName={this.props.oAuthApplication?.name}
               oAuthAppImage={this.props.oAuthApplication?.account?.imageUrl}
+              autoFocus={this.props.autoFocus}
             />
           ) : (
             <Flex flexDirection="column" width={1} alignItems="center">
@@ -328,4 +330,4 @@ const signupMutation = gqlV1/* GraphQL */ `
 
 export const addSignupMutation = graphql(signupMutation, { name: 'createUser' });
 
-export default withToasts(injectIntl(addSignupMutation(withUser(withRouter(SignInOrJoinFree)))));
+export default withUser(injectIntl(addSignupMutation(withRouter(SignInOrJoinFree))));

@@ -20,6 +20,7 @@ import MergeAccountsForm from '../components/root-actions/MergeAccountsForm';
 import MoveAuthoredContributions from '../components/root-actions/MoveAuthoredContributions';
 import MoveExpenses from '../components/root-actions/MoveExpenses';
 import MoveReceivedContributions from '../components/root-actions/MoveReceivedContributions';
+import RecurringContributions from '../components/root-actions/RecurringContributions';
 import RootActivityLog from '../components/root-actions/RootActivityLog';
 import UnhostAccountForm from '../components/root-actions/UnhostAccountForm';
 import StyledCard from '../components/StyledCard';
@@ -47,6 +48,12 @@ const MENU = [
     id: 'Account Type',
     Component: AccountType,
     description: `This tool is meant to convert a User account to an Organization type. The organization account will have the fields copied from the initial user account. Please notify the user to go through and update the organization account details after this is done. The location data for the user (if exists) will become public for the organization.`,
+  },
+  {
+    id: 'Recurring Contributions',
+    Component: RecurringContributions,
+    description: `This tool is designed to help root admins to update recurring contributions of users`,
+    useCard: false,
   },
   { id: 'Activity Log', Component: RootActivityLog, useCard: false },
   {
@@ -118,7 +125,7 @@ const MenuEntry = styled.div`
       cursor: default;
       background: #f9f9f9;
       border-bottom: 1px solid #eaeaea;
-      box-shadow: 0px -3px 6px #eaeaea;
+      box-shadow: 0px 3px 6px #eaeaea;
     `}
 `;
 
@@ -133,8 +140,8 @@ const RootActionsPage = () => {
       rootOnly
       navTitle={intl.formatMessage({ id: 'RootActions', defaultMessage: 'Root Actions' })}
     >
-      <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" my={5}>
-        <Container borderRight="1px solid #e5e5e5">
+      <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth={1400} m="0 auto">
+        <Container borderRight="1px solid #e5e5e5" fontSize="14px">
           {MENU.filter(e => showHiddenActions || !e.isHidden).map(menuEntry =>
             menuEntry.type === 'category' ? (
               <MenuEntry key={menuEntry.id} title={menuEntry.title || menuEntry.id} $type="category">

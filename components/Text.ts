@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css, CSSProp } from 'styled-components';
 import {
   color,
   ColorProps,
@@ -33,6 +33,7 @@ export type TextProps = ColorProps &
   WordBreakProps &
   CursorProps & {
     truncateOverflow?: boolean;
+    css?: CSSProp;
   };
 
 export const P = styled.p.attrs<TextProps>(props => ({

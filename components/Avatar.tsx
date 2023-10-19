@@ -52,6 +52,18 @@ const StyledAvatar = styled(Flex).attrs<StyledAvatarProps>(props => ({
   ${layout}
 `;
 
+/**
+ * Returns the max avatar height multiplied by 2 (for retina screens)
+ */
+const getImageHeightFromRadius = (radius: string | number | string[] | number[]): number | undefined => {
+  const normalizeValue = (value: string | number) => (typeof value === 'string' ? parseInt(value, 10) : value);
+  if (Array.isArray(radius)) {
+    return !radius.length ? undefined : Math.max(...radius.map(normalizeValue)) * 2;
+  } else {
+    return normalizeValue(radius) * 2;
+  }
+};
+
 const Avatar = ({
   collective = null,
   src = undefined,
@@ -78,7 +90,7 @@ const Avatar = ({
         child = <Icon size={radius} />;
       }
     } else {
-      src = getCollectiveImage(collective);
+      src = getCollectiveImage(collective, { height: getImageHeightFromRadius(radius) });
     }
 
     if (!src && !child) {
@@ -110,7 +122,10 @@ Avatar.propTypes = {
   src: PropTypes.string,
   /** Collective type */
   type: PropTypes.oneOf(Object.keys(CollectiveType)),
-  /** Avatar size */
+  /**
+   Avatar size.
+   TODO: This prop name is confusing. It's not a radius, it's a diameter. We should call it "size"
+   */
   radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** Duration to transition size. Disabled if 0, null or undefined */
   animationDuration: PropTypes.number,

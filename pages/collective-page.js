@@ -1,21 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
 import dynamic from 'next/dynamic';
 import { withRouter } from 'next/router';
 import { createGlobalStyle } from 'styled-components';
 
 import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
+import { ssrGraphQLQuery } from '../lib/graphql/with-ssr-query';
+import { getRequestIntl } from '../lib/i18n/request';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
-import sentryLib from '../server/sentry';
 
 import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
 import { preloadCollectivePageGraphqlQueries } from '../components/collective-page/graphql/preload';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../components/collective-page/graphql/queries';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
-import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
@@ -58,30 +57,20 @@ const GlobalStyles = createGlobalStyle`
  * to render `components/collective-page` with everything needed.
  */
 class CollectivePage extends React.Component {
-  static async getInitialProps(ctx) {
+  static getInitialProps(ctx) {
     const {
-      client,
       req,
       res,
       query: { slug, status, step, mode, action },
     } = ctx;
-    if (res && req && (req.language || req.locale === 'en')) {
-      res.set('Cache-Control', 'public, s-maxage=300');
-    }
-
-    let skipDataFromTree = false;
-
-    // If on server side
-    if (req) {
-      try {
-        await preloadCollectivePageGraphqlQueries(slug, client);
-        skipDataFromTree = true;
-      } catch (err) {
-        sentryLib.captureException(err, ctx);
+    if (res && req) {
+      const { locale } = getRequestIntl(req);
+      if (locale === 'en') {
+        res.setHeader('Cache-Control', 'public, s-maxage=300');
       }
     }
 
-    return { slug, status, step, mode, skipDataFromTree, action };
+    return { slug, status, step, mode, action };
   }
 
   static propTypes = {
@@ -155,9 +144,8 @@ class CollectivePage extends React.Component {
   render() {
     const { slug, data, LoggedInUser, status, step, mode, action } = this.props;
     const { showOnboardingModal } = this.state;
-
     const collective = data?.Collective || data?.previousData?.Collective;
-    const loading = data.loading && !collective;
+    const loading = data?.loading && !collective;
     if (!loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
@@ -173,7 +161,7 @@ class CollectivePage extends React.Component {
     }
 
     // Don't allow /collective/apply
-    if (action === 'apply' && !collective?.isHost) {
+    if (action === 'apply' && collective && !collective.isHost) {
       return <Custom404 />;
     }
 
@@ -186,9 +174,9 @@ class CollectivePage extends React.Component {
       >
         <GlobalStyles />
         {loading ? (
-          <Container py={[5, 6]}>
+          <div className="py-16 sm:py-32">
             <Loading />
-          </Container>
+          </div>
         ) : (
           <React.Fragment>
             <CollectiveNotificationBar
@@ -242,10 +230,11 @@ class CollectivePage extends React.Component {
   }
 }
 
-const addCollectivePageData = graphql(collectivePageQuery, {
-  options: props => ({
-    variables: getCollectivePageQueryVariables(props.slug),
-  }),
+const addCollectivePageData = ssrGraphQLQuery({
+  query: collectivePageQuery,
+  getVariablesFromProps: ({ slug }) => getCollectivePageQueryVariables(slug),
+  useLegacyDataStructure: true,
+  preload: (client, result) => preloadCollectivePageGraphqlQueries(client, result?.data?.Collective),
 });
 
 export default withRouter(withUser(addCollectivePageData(CollectivePage)));

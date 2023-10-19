@@ -10,6 +10,7 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { API_V2_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import { getRequestIntl } from '../lib/i18n/request';
 import { parseToBoolean } from '../lib/utils';
 
 import TopContributors from '../components/collective-page/TopContributors';
@@ -210,9 +211,10 @@ class BannerIframe extends React.Component {
   static getInitialProps({ query: { collectiveSlug, id, style, useNewFormat }, req, res }) {
     // Allow to be embedded as Iframe everywhere
     if (res) {
+      const { locale } = getRequestIntl(req);
       res.removeHeader('X-Frame-Options');
-      if (req && (req.language || req.locale === 'en')) {
-        res.set('Cache-Control', 'public, s-maxage=7200');
+      if (locale === 'en') {
+        res.setHeader('Cache-Control', 'public, s-maxage=7200');
       }
     }
 

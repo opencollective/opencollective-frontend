@@ -73,17 +73,17 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
           {useDashboard && !onHomeRoute ? (
             <Fragment>
               <ListItem>
-                <Link href="/workspace" onClick={closeMenu}>
-                  <FormattedMessage id="Workspace" defaultMessage="Workspace" />
+                <Link href="/dashboard" onClick={closeMenu}>
+                  <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
                 </Link>
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Link href="/search" onClick={closeMenu}>
-                  <FormattedMessage defaultMessage="Explore" />
+                  <FormattedMessage id="Explore" defaultMessage="Explore" />
                 </Link>
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Link href="/help" onClick={closeMenu}>
                   <FormattedMessage defaultMessage="Help & Support" />
@@ -120,7 +120,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   </Box>
                 )}
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Flex
                   justifyContent="space-between"
@@ -149,7 +149,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   </Box>
                 )}
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Flex
                   justifyContent="space-between"
@@ -173,7 +173,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   </Box>
                 )}
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Link href={'/help'} onClick={closeMenu}>
                   <FormattedMessage defaultMessage="Help & Support" />
@@ -181,10 +181,10 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
               </ListItem>
               {useDashboard && (
                 <Fragment>
-                  <hr />
+                  <hr className="my-5" />
                   <ListItem>
-                    <Link href="/workspace" onClick={closeMenu}>
-                      <FormattedMessage id="Workspace" defaultMessage="Workspace" />
+                    <Link href="/dashboard" onClick={closeMenu}>
+                      <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
                     </Link>
                   </ListItem>
                 </Fragment>

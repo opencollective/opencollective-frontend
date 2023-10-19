@@ -85,7 +85,7 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
           <StyledCard p="24px">
             <Flex>
               <Flex flex="0 0 64px" height="64px" justifyContent="center" alignItems="center">
-                <Image src="/static/icons/apps.png" width="52px" height="52px" alt="" />
+                <Image src="/static/icons/apps.png" width={52} height={52} alt="" />
               </Flex>
               <Flex flexDirection="column" ml={3}>
                 <P fontSize="14px" fontWeight="700" lineHeight="20px" mb="12px">

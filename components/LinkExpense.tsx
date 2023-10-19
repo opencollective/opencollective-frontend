@@ -21,9 +21,10 @@ type LinkExpenseProps = {
 
   title?: string;
   openInNewTab?: boolean;
+  className?: string;
 };
 
-const LinkExpense = ({ collective, expense, onClick, ...props }: LinkExpenseProps) => {
+const LinkExpense = ({ collective, expense, onClick, className, ...props }: LinkExpenseProps) => {
   const parentCollectiveSlugRoute = collective.parent?.slug
     ? `/${collective.parent.slug}/${getCollectiveTypeForUrl(collective)}`
     : '';
@@ -36,7 +37,7 @@ const LinkExpense = ({ collective, expense, onClick, ...props }: LinkExpenseProp
       onClick(expenseId);
     };
   }
-  return <Link href={href} {...props} />;
+  return <Link href={href} className={className} {...props} />;
 };
 
 export default LinkExpense;

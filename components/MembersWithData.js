@@ -110,7 +110,7 @@ class MembersWithData extends React.Component {
           flexDirection="row"
           justifyContent="center"
           overflow="hidden"
-          margin="1rem 0"
+          margin="0.65rem 0"
         >
           {members.map(member => (
             <Member
@@ -124,7 +124,7 @@ class MembersWithData extends React.Component {
           ))}
         </Container>
         {members.length % 10 === 0 && members.length >= limit && (
-          <Container margin="1rem" textAlign="center">
+          <Container margin="0.65rem" textAlign="center">
             <StyledButton onClick={this.fetchMore}>
               {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
               {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}

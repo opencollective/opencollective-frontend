@@ -1,7 +1,5 @@
 require('../env');
 
-const path = require('path');
-
 const next = require('next');
 const express = require('express');
 const helmet = require('helmet');
@@ -9,7 +7,6 @@ const cookieParser = require('cookie-parser');
 const cloudflareIps = require('cloudflare-ip/ips.json');
 const throng = require('throng');
 
-const intl = require('./intl');
 const logger = require('./logger');
 const loggerMiddleware = require('./logger-middleware');
 const routes = require('./routes');
@@ -25,7 +22,7 @@ app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflar
 
 const dev = process.env.NODE_ENV === 'development';
 
-const nextApp = next({ dev, dir: path.dirname(__dirname) });
+const nextApp = next({ dev });
 
 const port = process.env.PORT;
 
@@ -66,8 +63,6 @@ const start = id =>
     );
 
     app.use(cookieParser());
-
-    app.use(intl.middleware());
 
     if (parseToBooleanDefaultFalse(process.env.DUPLICATE_HANDLER)) {
       app.use(

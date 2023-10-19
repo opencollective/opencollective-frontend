@@ -18,18 +18,18 @@ import { getUpdatesSectionQueryVariables, updatesSectionQuery } from '../compone
 import Container from '../components/Container';
 import EditUpdateForm from '../components/EditUpdateForm';
 import ErrorPage from '../components/ErrorPage';
-import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
+import Footer from '../components/navigation/Footer';
 import StyledButton from '../components/StyledButton';
 import StyledButtonSet from '../components/StyledButtonSet';
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-import { getUpdatesVariables, updatesQuery } from './updates';
+import { getUpdatesVariables, updatesPageQuery } from './updates';
 
 const BackButtonWrapper = styled(Container)`
   position: relative;
@@ -106,11 +106,15 @@ class CreateUpdatePage extends React.Component {
         variables: { update },
         refetchQueries: [
           {
-            query: updatesQuery,
+            query: updatesPageQuery,
             context: API_V2_CONTEXT,
             variables: getUpdatesVariables(this.props.slug),
           },
-          { query: updatesSectionQuery, variables: getUpdatesSectionQueryVariables(this.props.slug, true) },
+          {
+            query: updatesSectionQuery,
+            context: API_V2_CONTEXT,
+            variables: getUpdatesSectionQueryVariables(this.props.slug, true),
+          },
         ],
       });
       this.setState({ isModified: false });

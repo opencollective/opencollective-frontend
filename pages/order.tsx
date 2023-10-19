@@ -1,16 +1,16 @@
 import React from 'react';
-import { gql, useLazyQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { isEmpty, orderBy, partition, round, toNumber } from 'lodash';
 import { GetServerSideProps } from 'next';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { initClient } from '../lib/apollo-client';
+import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective.lib';
 import dayjs from '../lib/dayjs';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { Account, AccountWithHost, OrderPageQuery, OrderPageQueryVariables } from '../lib/graphql/types/v2/graphql';
+import { Account, AccountWithHost } from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { i18nPaymentMethodProviderType } from '../lib/i18n/payment-method-provider-type';
 import { i18nTaxType } from '../lib/i18n/taxes';
@@ -184,20 +184,16 @@ const orderPageQuery = gql`
   ${confirmContributionFieldsFragment}
 `;
 
-export const getServerSideProps: GetServerSideProps = async context => {
-  const { collectiveSlug, OrderId } = context.query as { collectiveSlug: string; OrderId: string };
-  const client = initClient();
-  const { data, error } = await client.query<OrderPageQuery, OrderPageQueryVariables>({
-    query: orderPageQuery,
-    variables: { legacyId: toNumber(OrderId), collectiveSlug },
-    context: API_V2_CONTEXT,
-    fetchPolicy: 'network-only',
-    errorPolicy: 'ignore',
-  });
-  return {
-    props: { query: context.query, ...data, error: error || null }, // will be passed to the page component as props
-  };
-};
+const contributionPageQueryHelper = getSSRQueryHelpers<{ legacyId: number; collectiveSlug: string }>({
+  query: orderPageQuery,
+  context: API_V2_CONTEXT,
+  getVariablesFromContext: ({ query }) => ({
+    legacyId: toNumber(query.OrderId),
+    collectiveSlug: query.collectiveSlug as string,
+  }),
+});
+
+export const getServerSideProps: GetServerSideProps = contributionPageQueryHelper.getServerSideProps;
 
 const messages = defineMessages({
   title: {
@@ -316,20 +312,17 @@ const getTransactionsToDisplay = (account, transactions) => {
   return [...accountTransactions, ...tipTransactionsToDisplay];
 };
 
-export default function OrderPage(props: OrderPageQuery & { error: any }) {
+export default function OrderPage(props) {
   const { LoggedInUser } = useLoggedInUser();
-  const [fetchData, query] = useLazyQuery<OrderPageQuery, OrderPageQueryVariables>(orderPageQuery, {
-    variables: { legacyId: toNumber(props.order?.legacyId), collectiveSlug: props.account.slug },
-    context: API_V2_CONTEXT,
-  });
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
+  const queryResult = contributionPageQueryHelper.useQuery(props);
+  const variables = contributionPageQueryHelper.getVariablesFromPageProps(props);
+  const baseMetadata = getCollectivePageMetadata(queryResult.data?.account);
 
-  const baseMetadata = getCollectivePageMetadata(props?.account);
-
-  const data = query?.data || props;
-  const account = data.account as Account & AccountWithHost;
-  const order = data.order;
-  const error = query?.error || props.error;
+  const data = queryResult?.data;
+  const account = data?.account as Account & AccountWithHost;
+  const order = data?.order;
+  const error = queryResult?.error;
 
   const isPending = order?.status === 'PENDING';
   const isOverdue =
@@ -338,13 +331,14 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
     dayjs().isAfter(dayjs(order?.pendingContributionData.expectedAt));
   const intl = useIntl();
 
+  // Refetch when users logs in
   React.useEffect(() => {
     if (LoggedInUser) {
-      fetchData();
+      queryResult.refetch();
     }
   }, [LoggedInUser]);
 
-  if (!order || order.toAccount.slug !== props.account.slug) {
+  if (!order || order.toAccount?.slug !== variables.collectiveSlug) {
     return <Custom404 />;
   }
 
@@ -658,9 +652,9 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                           </StyledButton>
                           {showCreatePendingOrderModal && (
                             <CreatePendingOrderModal
-                              host={account.host}
+                              hostSlug={account.host.slug}
                               onClose={() => setShowCreatePendingOrderModal(false)}
-                              onSuccess={() => query.refetch()}
+                              onSuccess={() => queryResult.refetch()}
                               edit={order}
                             />
                           )}{' '}
@@ -671,7 +665,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                       <ProcessOrderButtons
                         order={order}
                         permissions={order.permissions}
-                        onSuccess={() => query.refetch()}
+                        onSuccess={() => queryResult.refetch()}
                       />
                     </ButtonsContainer>
                   </Flex>

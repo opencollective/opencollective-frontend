@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
-import Container from '../components/Container';
 import { Box } from '../components/Grid';
 import { getI18nLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
@@ -32,8 +31,8 @@ class SignInLinkSent extends Component {
     const isValidEmail = email && isEmail(email);
     return (
       <Page title="Login Link Sent" noRobots showFooter={false}>
-        <Container pt={[4, 5]} pb={6} px={3} textAlign="center">
-          <Image src="/static/images/sign-in-illustration.png" width="624" height="372" />
+        <div className="flex flex-col items-center px-4 pb-32 pt-8 text-center sm:pt-16">
+          <Image src="/static/images/sign-in-illustration.png" width={624} height={372} />
           <P fontSize="32px" lineHeight="40px" fontWeight={700} color="black.900">
             <FormattedMessage id="SignIn.LinkSent" defaultMessage="Your magic link is on its way!" />
           </P>
@@ -63,7 +62,7 @@ class SignInLinkSent extends Component {
               }}
             />
           </P>
-        </Container>
+        </div>
       </Page>
     );
   }

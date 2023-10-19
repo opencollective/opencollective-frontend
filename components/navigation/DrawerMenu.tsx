@@ -25,9 +25,12 @@ const StyledDrawerContainer = styled.div<{ maxWidth: string }>`
 
 const StyledMUIDrawer = styled(MUIDrawer)`
   height: 100vh !important;
-
+  z-index: 3000;
   .MuiDrawer-paper {
     border-radius: ${props => (props.anchor === 'left' ? '0 12px 12px 0' : '12px 0 0 12px')};
+  }
+  .MuiBackdrop-root {
+    background-color: rgba(0, 0, 0, 0.25);
   }
 `;
 
@@ -35,6 +38,9 @@ const StyledCloseButton = styled(StyledRoundButton)`
   width: 32px;
   height: 32px;
   color: #4b5563;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StyledMenuItem = styled(Link)`

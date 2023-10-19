@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { space } from 'styled-system';
 
+import { CollectiveType } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import Avatar from '../Avatar';
@@ -56,7 +57,8 @@ const DropdownButton = styled.button`
   border: 1px solid #e6e8eb;
   width: 100%;
   border-radius: 24px;
-  padding: 8px 16px;
+  padding: 8px 12px;
+  margin: 0 -4px;
   align-items: center;
   justify-content: space-between;
   transition: all 50ms ease-out;
@@ -65,7 +67,7 @@ const DropdownButton = styled.button`
   &:hover,
   :active,
   :focus {
-    background: #f9f9f9;
+    background: #f8fafc;
   }
 
   div {
@@ -96,6 +98,19 @@ const CREATE_NEW_LINKS = {
   COLLECTIVE: '/create',
 };
 
+const EMPTY_GROUP_STATE = {
+  [CollectiveType.COLLECTIVE]: {
+    emptyMessage: <FormattedMessage defaultMessage="Create a collective to collect and spend money transparently" />,
+    linkLabel: <FormattedMessage id="home.create" defaultMessage="Create a Collective" />,
+  },
+  [CollectiveType.ORGANIZATION]: {
+    emptyMessage: (
+      <FormattedMessage defaultMessage="A profile representing a company or organization instead of an individual" />
+    ),
+    linkLabel: <FormattedMessage id="host.organization.create" defaultMessage="Create an Organization" />,
+  },
+};
+
 const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   const isAdministratedAccount = m => ['ADMIN', 'ACCOUNTANT'].includes(m.role) && !m.collective.isIncognito;
   let administratedAccounts = loggedInUser?.memberOf.filter(isAdministratedAccount).map(m => m.collective) || [];
@@ -109,7 +124,11 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   const archivedAccounts = administratedAccounts.filter(a => a.isArchived);
   const activeAccounts = administratedAccounts.filter(a => !a.isArchived);
 
-  const groupedAccounts = groupBy(activeAccounts, a => a.type);
+  const groupedAccounts = {
+    [CollectiveType.COLLECTIVE]: [],
+    [CollectiveType.ORGANIZATION]: [],
+    ...groupBy(activeAccounts, a => a.type),
+  };
   if (archivedAccounts?.length > 0) {
     groupedAccounts.ARCHIVED = archivedAccounts;
   }
@@ -129,7 +148,7 @@ const Option = ({
   description = description || (
     <FormattedMessage
       id="AccountSwitcher.Description"
-      defaultMessage="{type, select, USER {My workspace} COLLECTIVE {Collective admin} ORGANIZATION {Organization admin} EVENT {Event admin} FUND {Fund admin} PROJECT {Project admin} other {}}"
+      defaultMessage="{type, select, USER {Personal profile} COLLECTIVE {Collective admin} ORGANIZATION {Organization admin} EVENT {Event admin} FUND {Fund admin} PROJECT {Project admin} other {}}"
       values={{ type: collective?.type }}
     />
   );
@@ -155,7 +174,7 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
     <React.Fragment>
       <StyledMenuEntry
         key={account.id}
-        href={`/workspace/${account.slug}`}
+        href={`/dashboard/${account.slug}`}
         title={account.name}
         $isActive={activeSlug === account.slug}
       >
@@ -171,6 +190,9 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
               setExpanded(!expanded);
             }}
             flexShrink={0}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
           >
             {expanded ? <ChevronUp size="16px" /> : <ChevronDown size="16px" />}
           </StyledRoundButton>
@@ -183,7 +205,7 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
           .map(child => (
             <StyledMenuEntry
               key={child?.id}
-              href={`/workspace/${child.slug}`}
+              href={`/dashboard/${child.slug}`}
               title={child.name}
               $isActive={activeSlug === child.slug}
               ml={3}
@@ -206,7 +228,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
   const activeAccount = allAdministratedAccounts.find(a => a.slug === activeSlug) || loggedInUserCollective;
 
   return (
-    <Dropdown trigger="click" flexGrow="1">
+    <Dropdown trigger="click" className="flex-grow">
       {({ triggerProps, dropdownProps }) => (
         <React.Fragment>
           <Flex alignItems="center" flex={0}>
@@ -220,7 +242,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
               <Flex p={2} flexDirection="column" gridGap={3}>
                 <StyledMenuEntry
                   key={loggedInUserCollective?.id}
-                  href={`/workspace/${loggedInUserCollective?.slug}`}
+                  href={`/dashboard/${loggedInUserCollective?.slug}`}
                   title={loggedInUserCollective?.name}
                   $isActive={activeSlug === loggedInUserCollective?.slug}
                 >
@@ -245,7 +267,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                           />
                         </Span>
                         <StyledHr width="100%" borderColor="black.300" />
-                        {CREATE_NEW_LINKS[collectiveType] && (
+                        {CREATE_NEW_LINKS[collectiveType] && accounts.length > 0 && (
                           <Link href={CREATE_NEW_LINKS[collectiveType]}>
                             <StyledRoundButton
                               minWidth={24}
@@ -260,6 +282,22 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                           </Link>
                         )}
                       </Flex>
+                      {EMPTY_GROUP_STATE[collectiveType] && accounts.length === 0 && (
+                        <div className="mx-1 flex flex-col">
+                          <p className="text-xs text-muted-foreground">
+                            {EMPTY_GROUP_STATE[collectiveType].emptyMessage}
+                          </p>
+                          <Link
+                            className="my-3 inline-flex items-center rounded-lg border border-input px-6 py-4 text-accent-foreground shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+                            href="/create"
+                          >
+                            <div className="mr-3 rounded-full border bg-white p-2 text-muted-foreground">
+                              <Plus size={12} />
+                            </div>
+                            {EMPTY_GROUP_STATE[collectiveType].linkLabel}
+                          </Link>
+                        </div>
+                      )}
                       {accounts
                         ?.sort((a, b) => a.name.localeCompare(b.name))
                         .map(account => <MenuEntry key={account.id} account={account} activeSlug={activeSlug} />)}

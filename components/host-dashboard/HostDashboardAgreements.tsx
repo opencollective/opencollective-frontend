@@ -13,13 +13,13 @@ import AgreementDrawer from '../agreements/AgreementDrawer';
 import AgreementsTable from '../agreements/AgreementsTable';
 import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from '../agreements/fragments';
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import { DashboardSectionProps } from '../dashboard/types';
 import FilesViewerModal from '../FilesViewerModal';
-import { Box, Flex } from '../Grid';
+import { Flex } from '../Grid';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import StyledButton from '../StyledButton';
-import StyledHr from '../StyledHr';
-import { H1, Span } from '../Text';
+import { Span } from '../Text';
 
 const hostDashboardAgreementsQuery = gql`
   query HostAgreements($hostSlug: String!, $limit: Int!, $offset: Int!, $account: [AccountReferenceInput]) {
@@ -74,7 +74,7 @@ const hasPagination = (data, queryVariables): boolean => {
   return Boolean(queryVariables.offset || (totalCount && totalCount > NB_AGREEMENTS_DISPLAYED));
 };
 
-const HostDashboardAgreements = ({ hostSlug }) => {
+const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
   const query = router.query;
@@ -102,11 +102,11 @@ const HostDashboardAgreements = ({ hostSlug }) => {
 
   const canEdit = Boolean(LoggedInUser && !LoggedInUser.isAccountantOnly(data?.host));
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
-      <Flex mb={24} justifyContent="space-between" alignItems="center" flexWrap="wrap" gridGap="16px">
-        <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
+    <React.Fragment>
+      <div className="flex flex-wrap justify-between gap-4">
+        <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="Agreements" defaultMessage="Agreements" />
-        </H1>
+        </h1>
         <Flex alignItems="center" gridGap="16px" flexWrap="wrap">
           <CollectivePickerAsync
             inputId="agreements-account"
@@ -145,8 +145,8 @@ const HostDashboardAgreements = ({ hostSlug }) => {
             </StyledButton>
           )}
         </Flex>
-      </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
+      </div>
+      <hr className="my-5" />
       {error ? (
         <MessageBoxGraphqlError error={error} my={4} />
       ) : (
@@ -204,7 +204,7 @@ const HostDashboardAgreements = ({ hostSlug }) => {
           parentTitle={`${agreementFilePreview.account.name} / ${agreementFilePreview.title}`}
         />
       )}
-    </Box>
+    </React.Fragment>
   );
 };
 

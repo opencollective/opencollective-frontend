@@ -15,7 +15,8 @@ import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
 import Pagination from '../../Pagination';
 import { P } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { useToast } from '../../ui/useToast';
+import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
 import VirtualCardsTable from '../../virtual-cards/VirtualCardsTable';
 import VirtualCardFilters from '../../VirtualCardFilters';
 
@@ -115,7 +116,7 @@ const hostVirtualCardsQuery = gql`
 
 const VIRTUAL_CARDS_PER_PAGE = 20;
 
-const HostVirtualCards = props => {
+const HostVirtualCards = ({ accountSlug: hostSlug }) => {
   const queryFilter = useQueryFilter({
     ignoreQueryParams: ['slug', 'section'],
     filters: {
@@ -142,11 +143,11 @@ const HostVirtualCards = props => {
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
   const limit = parseInt(routerQuery.limit) || VIRTUAL_CARDS_PER_PAGE;
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const { loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
     context: API_V2_CONTEXT,
     variables: {
-      slug: props.hostSlug,
+      slug: hostSlug,
       limit,
       offset,
       status: queryFilter.values.virtualCardStatus,
@@ -168,8 +169,8 @@ const HostVirtualCards = props => {
   const [displayCreateVirtualCardModal, setCreateVirtualCardModalDisplay] = React.useState(false);
 
   const handleAssignCardSuccess = message => {
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
+    toast({
+      variant: 'success',
       message: message || (
         <FormattedMessage id="Host.VirtualCards.AssignCard.Success" defaultMessage="Card successfully assigned" />
       ),
@@ -179,8 +180,8 @@ const HostVirtualCards = props => {
   };
 
   const handleCreateVirtualCardSuccess = message => {
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
+    toast({
+      variant: 'success',
       message: message || <FormattedMessage defaultMessage="Virtual card successfully created" />,
     });
     setCreateVirtualCardModalDisplay(false);
@@ -190,10 +191,10 @@ const HostVirtualCards = props => {
   return (
     <Fragment>
       <Box>
-        <P fontSize="24px" fontWeight="700" lineHeight="32px" mb={3}>
+        <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />
-        </P>
-        <P>
+        </h1>
+        <p className="mb-4 text-muted-foreground">
           <FormattedMessage
             id="Host.VirtualCards.List.Description"
             defaultMessage="Make payments easier by creating virtual cards. One Collective can have multiple virtual cards. <learnMoreLink>Learn more</learnMoreLink>"
@@ -204,7 +205,8 @@ const HostVirtualCards = props => {
               }),
             }}
           />
-        </P>
+        </p>
+        <StripeVirtualCardComplianceStatement />
         <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters
             loading={loading}
@@ -280,8 +282,7 @@ const HostVirtualCards = props => {
 };
 
 HostVirtualCards.propTypes = {
-  hostSlug: PropTypes.string,
-  hideTopsection: PropTypes.func,
+  accountSlug: PropTypes.string.isRequired,
 };
 
 export default HostVirtualCards;

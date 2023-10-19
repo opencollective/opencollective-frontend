@@ -55,7 +55,7 @@ export const AvatarWithLink = ({ account, secondaryAccount, size }: AvatarWithLi
         {mainAvatar}
         <SecondaryAvatarContainer borderRadius={getAvatarBorderRadius(secondaryAccount.type)}>
           <LinkCollective collective={secondaryAccount}>
-            <Avatar collective={secondaryAccount} radius={size / 2.5} />
+            <Avatar collective={secondaryAccount} radius={size / 2} />
           </LinkCollective>
         </SecondaryAvatarContainer>
       </DualAvatarContainer>

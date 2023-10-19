@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { Field, FieldArray, Form, Formik } from 'formik';
 import { first, isEmpty, omit, pick } from 'lodash';
+import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getAccountReferenceInput } from '../../lib/collective.lib';
+import { getAccountReferenceInput, isInternalHost } from '../../lib/collective.lib';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { getSupportedExpenseTypes } from '../../lib/expenses';
@@ -16,7 +17,10 @@ import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { AmountPropTypeShape } from '../../lib/prop-types';
-import { flattenObjectDeep } from '../../lib/utils';
+import { flattenObjectDeep, parseToBoolean } from '../../lib/utils';
+import { expenseTypeSupportsAttachments } from './lib/attachments';
+import { addNewExpenseItem, newExpenseItem } from './lib/items';
+import { checkExpenseSupportsOCR, updateExpenseFormWithUploadResult } from './lib/ocr';
 import { checkRequiresAddress, getSupportedCurrencies, validateExpenseTaxes } from './lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -30,9 +34,10 @@ import StyledHr from '../StyledHr';
 import StyledInputTags from '../StyledInputTags';
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
+import { toast } from '../ui/useToast';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
-import ExpenseFormItems, { addNewExpenseItem, newExpenseItem } from './ExpenseFormItems';
+import ExpenseFormItems from './ExpenseFormItems';
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
 import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';
@@ -128,10 +133,7 @@ const CREATE_PAYEE_PROFILE_FIELDS = ['name', 'email', 'legalName', 'organization
  * like URLs for items when the expense is an invoice.
  */
 export const prepareExpenseForSubmit = expenseData => {
-  // The collective picker still uses API V1 for when creating a new profile on the fly
-  const isInvoice = expenseData.type === expenseTypes.INVOICE;
-  const isGrant = expenseData.type === expenseTypes.GRANT;
-  const keepAttachedFiles = isInvoice || isGrant;
+  const keepAttachedFiles = expenseTypeSupportsAttachments(expenseData.type);
 
   // Prepare payee
   let payee;
@@ -140,6 +142,7 @@ export const prepareExpenseForSubmit = expenseData => {
     // See https://github.com/opencollective/opencollective-api/blob/88e9864a716e4a2ad5237a81cee177b781829f42/server/graphql/v2/input/ExpenseInviteDraftInput.ts#L29
     if (expenseData.payee.isInvite) {
       payee = pick(expenseData.payee, ['id', 'legacyId', ...CREATE_PAYEE_PROFILE_FIELDS]);
+      // The collective picker still uses API V1 for when creating a new profile on the fly
       if (payee.legacyId) {
         payee.id = payee.legacyId;
         delete payee.legacyId;
@@ -176,7 +179,7 @@ export const prepareExpenseForSubmit = expenseData => {
     payoutMethod,
     attachedFiles: keepAttachedFiles ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
-    items: expenseData.items.map(item => prepareExpenseItemForSubmit(item, isInvoice, isGrant)),
+    items: expenseData.items.map(item => prepareExpenseItemForSubmit(expenseData, item)),
   };
 };
 
@@ -259,6 +262,13 @@ const getDefaultStep = (defaultStep, stepOneCompleted, isCreditCardCharge) => {
   }
 };
 
+const checkOCREnabled = (loggedInUser, router, host) => {
+  const urlFlag = router.query.ocr && parseToBoolean(router.query.ocr);
+  return (
+    urlFlag !== false && isInternalHost(host) && (loggedInUser?.hasPreviewFeatureEnabled('EXPENSE_OCR') || urlFlag)
+  );
+};
+
 const ExpenseFormBody = ({
   formik,
   payoutProfiles,
@@ -278,11 +288,14 @@ const ExpenseFormBody = ({
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
+  const router = useRouter();
   const formRef = React.useRef();
   const { LoggedInUser } = useLoggedInUser();
   const [hideOCRPrefillStater, setHideOCRPrefillStarter] = React.useState(false);
   const { values, handleChange, errors, setValues, dirty, touched, resetForm, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
+  const hasOCRPreviewEnabled = checkOCREnabled(LoggedInUser, router, collective.host);
+  const hasOCRFeature = hasOCRPreviewEnabled && checkExpenseSupportsOCR(values.type, LoggedInUser);
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
   const isReceipt = values.type === expenseTypes.RECEIPT;
@@ -298,6 +311,7 @@ const ExpenseFormBody = ({
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
   const availableCurrencies = getSupportedCurrencies(collective, values.payoutMethod);
   const [step, setStep] = React.useState(() => getDefaultStep(defaultStep, stepOneCompleted, isCreditCardCharge));
+  const [initWithOCR, setInitWithOCR] = React.useState(null);
 
   // Only true when logged in and drafting the expense
   const [isOnBehalf, setOnBehalf] = React.useState(false);
@@ -315,17 +329,19 @@ const ExpenseFormBody = ({
 
   // When user logs in we set its account as the default payout profile if not yet defined
   React.useEffect(() => {
+    const payeePayoutProfile = values?.payee && payoutProfiles?.find(p => p.slug === values.payee.slug);
     if (values?.draft?.payee && !loggedInAccount && !isRecurring) {
       formik.setFieldValue('payee', {
         ...values.draft.payee,
         isInvite: false,
         isNewUser: true,
       });
+    } else if (!payeePayoutProfile && loggedInAccount && isDraft) {
+      setOnBehalf(true);
     }
     // If creating a new expense or completing an expense submitted on your behalf, automatically select your default profile.
     else if (!isOnBehalf && (isDraft || !values.payee) && loggedInAccount && !isEmpty(payoutProfiles)) {
-      const defaultProfile =
-        (values.payee && payoutProfiles.find(p => p.slug === values.payee.slug)) || first(payoutProfiles);
+      const defaultProfile = payeePayoutProfile || first(payoutProfiles);
       formik.setFieldValue('payee', defaultProfile);
     }
     // Update the form state with private fields that were refeched after the user was authenticated
@@ -338,6 +354,14 @@ const ExpenseFormBody = ({
       }
     }
   }, [payoutProfiles, loggedInAccount]);
+
+  // Pre-fill with OCR data when the expense type is set
+  React.useEffect(() => {
+    if (initWithOCR && values.type) {
+      updateExpenseFormWithUploadResult(collective, formik, initWithOCR);
+      setInitWithOCR(null);
+    }
+  }, [initWithOCR, values.type]);
 
   // Pre-fill address based on the payout profile
   React.useEffect(() => {
@@ -457,6 +481,7 @@ const ExpenseFormBody = ({
         handleClearPayeeStep={() => setShowResetModal(true)}
         payoutProfiles={payoutProfiles}
         loggedInAccount={loggedInAccount}
+        disablePayee={isDraft && isOnBehalf}
         onChange={payee => {
           setOnBehalf(payee.isInvite);
         }}
@@ -556,8 +581,25 @@ const ExpenseFormBody = ({
           supportedExpenseTypes={supportedExpenseTypes}
         />
       )}
-      {!values.type && !hideOCRPrefillStater && LoggedInUser?.hasPreviewFeatureEnabled('EXPENSE_OCR') && (
-        <ExpenseOCRPrefillStarter form={formik} onSuccess={() => setHideOCRPrefillStarter(true)} />
+      {Boolean(!values.type && !hideOCRPrefillStater && hasOCRPreviewEnabled && LoggedInUser?.isRoot) && (
+        <ExpenseOCRPrefillStarter
+          onUpload={() => setHideOCRPrefillStarter(true)}
+          onSuccess={uploadResult => {
+            // We want to make sure that the expense type is set before prefilling the form
+            if (values.type) {
+              updateExpenseFormWithUploadResult(collective, formik, uploadResult);
+            } else {
+              setInitWithOCR(uploadResult);
+            }
+
+            toast({
+              variant: 'success',
+              message: (
+                <FormattedMessage defaultMessage="The expense has been automatically prefilled with the information from the document" />
+              ),
+            });
+          }}
+        />
       )}
       {isRecurring && <ExpenseRecurringBanner expense={expense} />}
       {values.type && (
@@ -662,6 +704,7 @@ const ExpenseFormBody = ({
                 {values.type === expenseTypes.INVOICE && (
                   <Box my={40}>
                     <ExpenseAttachedFilesForm
+                      collective={collective}
                       title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
                       description={
                         <FormattedMessage
@@ -669,8 +712,9 @@ const ExpenseFormBody = ({
                           defaultMessage="If you already have an invoice document, you can upload it here."
                         />
                       }
-                      onChange={files => formik.setFieldValue('attachedFiles', files)}
+                      form={formik}
                       defaultValue={values.attachedFiles}
+                      hasOCRFeature={hasOCRFeature}
                     />
                   </Box>
                 )}
@@ -699,6 +743,7 @@ const ExpenseFormBody = ({
                         {...fieldsArrayProps}
                         collective={collective}
                         availableCurrencies={availableCurrencies}
+                        hasOCRFeature={hasOCRFeature}
                       />
                     )}
                   </FieldArray>
@@ -707,6 +752,7 @@ const ExpenseFormBody = ({
                 {values.type === expenseTypes.GRANT && (
                   <Box my={40}>
                     <ExpenseAttachedFilesForm
+                      collective={collective}
                       title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}
                       description={
                         <FormattedMessage
@@ -714,8 +760,9 @@ const ExpenseFormBody = ({
                           defaultMessage="If you want to include any documentation, you can upload it here."
                         />
                       }
-                      onChange={files => formik.setFieldValue('attachedFiles', files)}
+                      form={formik}
                       defaultValue={values.attachedFiles}
+                      hasOCRFeature={hasOCRFeature}
                     />
                   </Box>
                 )}

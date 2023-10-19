@@ -65,7 +65,7 @@ const TransactionsKindFilter = ({ onChange, value, kinds, ...props }) => {
       closeMenuOnSelect={false}
       hideSelectedOptions={false}
       isMulti
-      maxWidth={['100%', 200, 300]}
+      maxWidth={['100%']}
       minWidth={150}
       styles={{
         control: { flexWrap: 'nowrap' },

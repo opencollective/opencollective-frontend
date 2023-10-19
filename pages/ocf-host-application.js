@@ -13,7 +13,7 @@ import ApplicationForm from '../components/ocf-host-application/ApplicationForm'
 import TermsOfFiscalSponsorship from '../components/ocf-host-application/TermsOfFiscalSponsorship';
 import YourInitiativeIsNearlyThere from '../components/ocf-host-application/YourInitiativeIsNearlyThere';
 import Page from '../components/Page';
-import { TOAST_TYPE, useToasts } from '../components/ToastProvider';
+import { useToast } from '../components/ui/useToast';
 import { withUser } from '../components/UserProvider';
 
 const ocfCollectiveApplicationQuery = gql`
@@ -42,6 +42,7 @@ const ocfHostApplicationPageQuery = gql`
       id
       slug
       policies {
+        id
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
         }
@@ -104,7 +105,7 @@ const OCFHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
   const [initialValues, setInitialValues] = useState(formValues);
   const intl = useIntl();
   const router = useRouter();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const step = router.query.step || 'intro';
   const collectiveSlug = router.query.collectiveSlug;
@@ -118,8 +119,8 @@ const OCFHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
     variables: { slug: collectiveSlug },
     skip: !(LoggedInUser && collectiveSlug && step === 'form'),
     onError: error => {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         title: intl.formatMessage(messages['error.title']),
         message: i18nGraphqlException(intl, error),
       });
@@ -132,8 +133,8 @@ const OCFHostApplication = ({ loadingLoggedInUser, LoggedInUser }) => {
 
   React.useEffect(() => {
     if (step === 'form' && collectiveSlug && collective && (!canApplyWithCollective || hasHost)) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         title: intl.formatMessage(messages['error.title']),
         message: hasHost
           ? intl.formatMessage(

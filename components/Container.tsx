@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { CSSProp } from 'styled-components';
 import {
   background,
   BackgroundProps,
@@ -59,6 +59,7 @@ export type ContainerProps = FlexboxProps &
   WordBreakProps &
   React.HTMLProps<HTMLDivElement> & {
     clearfix?: boolean;
+    css?: CSSProp;
   };
 
 const Container = styled.div<ContainerProps>`

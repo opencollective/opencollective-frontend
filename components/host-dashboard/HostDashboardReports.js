@@ -21,7 +21,7 @@ import { PERIOD_FILTER_PRESETS } from '../PeriodFilterPresetsSelect';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
-import { H1, H2 } from '../Text';
+import { H2 } from '../Text';
 
 import HostCSVDownloadButton from './reports-section/HostCSVDownloadButton';
 import HostFeesSection from './reports-section/HostFeesSection';
@@ -162,7 +162,7 @@ const getDefaultDateInterval = () => {
   };
 };
 
-const HostDashboardReports = ({ hostSlug }) => {
+const HostDashboardReports = ({ accountSlug: hostSlug }) => {
   const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
   const [collectives, setCollectives] = React.useState(null);
   const dateFrom = simpleDateToISOString(dateInterval?.from, false, dateInterval?.timezoneType);
@@ -190,13 +190,10 @@ const HostDashboardReports = ({ hostSlug }) => {
   }
 
   return (
-    <Box m="0 auto" px={2}>
-      <Flex alignItems="center" mb={24} flexWrap="wrap">
-        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
-          <FormattedMessage id="Reports" defaultMessage="Reports" />
-        </H1>
-        <Box mx="auto" />
-      </Flex>
+    <Box m="0 auto">
+      <h1 className="text-2xl font-bold leading-10 tracking-tight">
+        <FormattedMessage id="Reports" defaultMessage="Reports" />
+      </h1>
       <Container
         position={['relative', 'sticky']}
         top="0"
@@ -283,7 +280,7 @@ const HostDashboardReports = ({ hostSlug }) => {
 };
 
 HostDashboardReports.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
+  accountSlug: PropTypes.string.isRequired,
 };
 
 export default HostDashboardReports;

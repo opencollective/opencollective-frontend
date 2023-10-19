@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import { Form, Formik } from 'formik';
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -142,17 +142,16 @@ const MemberForm = props => {
                 inputType="date"
                 label={<P fontWeight="bold">{intl.formatMessage(memberFormMessages.sinceLabel)}</P>}
                 mt={3}
+                required
               >
                 {({ form, field }) => (
                   <StyledInput
-                    {...field}
+                    {...omit(field, ['value', 'onChange', 'onBlur'])}
                     required
                     onChange={event => {
-                      if (event.target.value) {
-                        form.setFieldValue(field.name, event.target.value);
-                      }
+                      form.setFieldValue(field.name, event.target.value);
                     }}
-                    value={field.value}
+                    defaultValue={field.value}
                   />
                 )}
               </StyledInputFormikField>

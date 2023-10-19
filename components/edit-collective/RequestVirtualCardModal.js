@@ -28,7 +28,8 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal
 import StyledSelect from '../StyledSelect';
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
+import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const initialValues = {
   agreement: false,
@@ -65,7 +66,7 @@ const RequestVirtualCardModal = props => {
     label: intl.formatMessage(VirtualCardLimitIntervalI18n[interval]),
   }));
 
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [requestNewVirtualCard, { loading: isCreating, error: createError }] = useMutation(requestVirtualCardMutation, {
     context: API_V2_CONTEXT,
   });
@@ -85,8 +86,8 @@ const RequestVirtualCardModal = props => {
         },
       });
       props.onSuccess?.();
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: <FormattedMessage id="Collective.VirtualCards.RequestCard.Success" defaultMessage="Card requested!" />,
       });
       props.onClose?.();
@@ -271,6 +272,9 @@ const RequestVirtualCardModal = props => {
               onChange={({ checked }) => formik.setFieldValue('agreement', checked)}
               error={formik.touched.agreement && formik.errors.agreement}
             />
+          </Box>
+          <Box mt={3}>
+            <StripeVirtualCardComplianceStatement />
           </Box>
           {createError && (
             <Box mt={3}>

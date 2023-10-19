@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
-import { Ban } from '@styled-icons/fa-solid/Ban';
-import { Check } from '@styled-icons/fa-solid/Check';
+import { Ban, Check, Info } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { Flex } from '../Grid';
@@ -28,7 +26,7 @@ const AcceptRejectButtons = ({
       {disabledMessage && (
         <StyledTooltip content={disabledMessage}>
           <Span color="black.600">
-            <InfoCircle size={24} />
+            <Info size={24} />
           </Span>
         </StyledTooltip>
       )}
@@ -45,9 +43,7 @@ const AcceptRejectButtons = ({
       ) : (
         <StyledButton
           minWidth={100}
-          buttonSize="tiny"
           buttonStyle="successSecondary"
-          height={32}
           disabled={disabled || isLoading}
           loading={isLoading && action === 'APPROVE'}
           data-cy={`${collective.slug}-approve`}
@@ -56,7 +52,7 @@ const AcceptRejectButtons = ({
             onApprove();
           }}
         >
-          <Check size={12} />
+          <Check size={14} className="inline-block" />
           &nbsp; <FormattedMessage id="actions.approve" defaultMessage="Approve" />
         </StyledButton>
       )}
@@ -71,15 +67,13 @@ const AcceptRejectButtons = ({
       ) : (
         <StyledButton
           minWidth={100}
-          buttonSize="tiny"
           buttonStyle="dangerSecondary"
-          height={32}
           onClick={() => setShowRejectModal(true)}
           disabled={isLoading}
           loading={isLoading && action === 'REJECT'}
           data-cy={`${collective.slug}-reject`}
         >
-          <Ban size={12} />
+          <Ban size={14} className="inline-block" />
           &nbsp; <FormattedMessage id="actions.reject" defaultMessage="Reject" />
         </StyledButton>
       )}
@@ -100,7 +94,7 @@ const AcceptRejectButtons = ({
 
 AcceptRejectButtons.propTypes = {
   collective: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.string,
     slug: PropTypes.string,
   }),
   isLoading: PropTypes.bool,

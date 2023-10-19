@@ -10,7 +10,7 @@ import { H5, P } from './Text';
 const Title = styled(H5)``;
 
 const Instructions = styled(P)`
-  font-size: 1.2rem;
+  font-size: 0.75rem;
   color: #9d9fa3;
 `;
 

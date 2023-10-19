@@ -12,7 +12,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledInputField from '../StyledInputField';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 export const editAccountFlagsMutation = gql`
   mutation EditAccountFlags(
@@ -34,7 +34,7 @@ export const editAccountFlagsMutation = gql`
 `;
 
 const AccountSettings = () => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const [selectedAccountOption, setSelectedAccountOption] = React.useState([]);
   const [archivedFlag, setArchivedFlag] = React.useState();
@@ -157,15 +157,15 @@ const AccountSettings = () => {
                     isTwoFactorAuthEnabled: twoFactorEnabledFlag,
                   },
                 });
-                addToast({
-                  type: TOAST_TYPE.SUCCESS,
+                toast({
+                  variant: 'success',
                   title: 'Success',
                   message: 'Account flags saved',
                 });
                 setEnableSave(false);
               } catch (e) {
-                addToast({
-                  type: TOAST_TYPE.ERROR,
+                toast({
+                  variant: 'error',
                   message: i18nGraphqlException(intl, e),
                 });
               }

@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { Copy } from '@styled-icons/feather/Copy';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
 import { margin } from 'styled-system';
 
@@ -12,7 +11,6 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
-import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getAvailableLimitString } from '../../lib/i18n/virtual-card-spending-limit';
 import { getDashboardObjectIdURL } from '../../lib/stripe/dashboard';
@@ -21,12 +19,17 @@ import Avatar from '../Avatar';
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
 import DismissIcon from '../icons/DismissIcon';
-import StyledCard from '../StyledCard';
-import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
 import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/DropdownMenu';
+import { useToast } from '../ui/useToast';
 
 import DeleteVirtualCardModal from './DeleteVirtualCardModal';
 import EditVirtualCardModal from './EditVirtualCardModal';
@@ -85,28 +88,6 @@ const Action = styled.button`
   }
 `;
 
-const Arrow = styled.div`
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: inherit;
-  visibility: hidden;
-  bottom: 4px;
-
-  ::before {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: inherit;
-  }
-
-  ::before {
-    visibility: visible;
-    content: '';
-    transform: rotate(45deg);
-  }
-`;
-
 export const StateLabel = styled(Box)`
   align-self: center;
   padding: 2px 6px;
@@ -144,13 +125,10 @@ const resumeCardMutation = gql`
 `;
 
 export const ActionsButton = props => {
-  const wrapperRef = React.useRef();
-  const arrowRef = React.useRef();
-  const [displayActions, setDisplayActions] = React.useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = React.useState(false);
   const [isEditingVirtualCard, setIsEditingVirtualCard] = React.useState(false);
   const [isDeletingVirtualCard, setIsDeletingVirtualCard] = React.useState(false);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const { LoggedInUser } = useLoggedInUser();
   const { virtualCard, host, canEditVirtualCard, canDeleteVirtualCard, confirmOnPauseCard } = props;
 
@@ -158,19 +136,13 @@ export const ActionsButton = props => {
     message => {
       setIsEditingVirtualCard(false);
       setIsDeletingVirtualCard(false);
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: message,
       });
     },
-    [addToast],
+    [toast],
   );
-
-  useGlobalBlur(wrapperRef, outside => {
-    if (outside) {
-      setDisplayActions(false);
-    }
-  });
 
   const [pauseCard, { loading: pauseLoading }] = useMutation(pauseCardMutation, {
     context: API_V2_CONTEXT,
@@ -186,10 +158,11 @@ export const ActionsButton = props => {
     try {
       if (isActive) {
         await pauseCard({ variables: { virtualCard: { id: virtualCard.id } } });
+        handleActionSuccess(<FormattedMessage defaultMessage="Card paused" />);
       } else {
         await resumeCard({ variables: { virtualCard: { id: virtualCard.id } } });
+        handleActionSuccess(<FormattedMessage defaultMessage="Card resumed" />);
       }
-      handleActionSuccess();
     } catch (e) {
       props.onError(e);
     }
@@ -202,123 +175,92 @@ export const ActionsButton = props => {
   const As = props.as || Action;
 
   return (
-    <span ref={wrapperRef}>
-      <Manager>
-        <Reference>
-          {({ ref }) => (
-            <As ref={ref} onClick={() => setDisplayActions(true)}>
-              <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
-            </As>
+    <React.Fragment>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <As>
+            <FormattedMessage id="CollectivePage.NavBar.ActionMenu.Actions" defaultMessage="Actions" />
+          </As>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align={props.openVirtualCardDrawer ? 'end' : 'center'}>
+          {props.openVirtualCardDrawer && (
+            <React.Fragment>
+              <DropdownMenuItem onClick={() => props.openVirtualCardDrawer(virtualCard)}>
+                <FormattedMessage defaultMessage="View details" />
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </React.Fragment>
           )}
-        </Reference>
-        {displayActions && (
-          <Popper
-            placement="top-start"
-            modifiers={[
-              {
-                name: 'arrow',
-                options: {
-                  element: arrowRef,
-                },
-              },
-            ]}
-          >
-            {({ placement, ref, style, arrowProps }) => (
-              <div
-                data-placement={placement}
-                ref={ref}
-                style={{
-                  ...style,
-                }}
-              >
-                <StyledCard
-                  m={1}
-                  mb={2}
-                  overflow="auto"
-                  overflowY="auto"
-                  padding="12px 15px"
-                  width="180px"
-                  borderWidth="0px"
-                  boxShadow="0px 8px 12px rgba(20, 20, 20, 0.16)"
+
+          {virtualCard.provider === 'STRIPE' && (
+            <DropdownMenuItem
+              onClick={e => {
+                e.preventDefault();
+                confirmOnPauseCard && isActive ? setShowConfirmationModal(true) : handlePauseUnpause();
+              }}
+              disabled={isLoading || isCanceled}
+            >
+              {isActive ? (
+                <FormattedMessage id="VirtualCards.PauseCard" defaultMessage="Pause Card" />
+              ) : (
+                <FormattedMessage id="VirtualCards.ResumeCard" defaultMessage="Resume Card" />
+              )}
+              {isLoading && <StyledSpinner ml={2} size="0.9em" mb="2px" />}
+            </DropdownMenuItem>
+          )}
+          {canDeleteVirtualCard && (
+            <React.Fragment>
+              <DropdownMenuItem onClick={() => setIsDeletingVirtualCard(true)} disabled={isCanceled}>
+                <FormattedMessage defaultMessage="Delete Card" />
+              </DropdownMenuItem>
+            </React.Fragment>
+          )}
+          {canEditVirtualCard && (
+            <React.Fragment>
+              <DropdownMenuItem onClick={() => setIsEditingVirtualCard(true)}>
+                <FormattedMessage defaultMessage="Edit Card Details" />
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </React.Fragment>
+          )}
+          {isHostAdmin && (
+            <React.Fragment>
+              <DropdownMenuItem asChild>
+                <a
+                  href={getDashboardObjectIdURL(virtualCard.id, props.host?.stripe?.username)}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <Flex flexDirection="column" fontSize="13px" lineHeight="16px" fontWeight="500">
-                    {virtualCard.provider === 'STRIPE' && (
-                      <Action
-                        onClick={() =>
-                          confirmOnPauseCard && isActive ? setShowConfirmationModal(true) : handlePauseUnpause()
-                        }
-                        disabled={isLoading || isCanceled}
-                      >
-                        {isActive ? (
-                          <FormattedMessage id="VirtualCards.PauseCard" defaultMessage="Pause Card" />
-                        ) : (
-                          <FormattedMessage id="VirtualCards.ResumeCard" defaultMessage="Resume Card" />
-                        )}{' '}
-                        {isLoading && <StyledSpinner size="0.9em" mb="2px" />}
-                      </Action>
-                    )}
-                    {canDeleteVirtualCard && (
-                      <React.Fragment>
-                        <StyledHr borderColor="black.300" mt={2} mb={2} />
-                        <Action onClick={() => setIsDeletingVirtualCard(true)} disabled={isCanceled}>
-                          <FormattedMessage defaultMessage="Delete Card" />
-                        </Action>
-                      </React.Fragment>
-                    )}
-                    {canEditVirtualCard && (
-                      <React.Fragment>
-                        <StyledHr borderColor="black.300" mt={2} mb={2} />
-                        <Action onClick={() => setIsEditingVirtualCard(true)}>
-                          <FormattedMessage defaultMessage="Edit Card Details" />
-                        </Action>
-                      </React.Fragment>
-                    )}
-                    {isHostAdmin && (
-                      <React.Fragment>
-                        <StyledHr borderColor="black.300" mt={2} mb={2} />
-                        <a
-                          href={getDashboardObjectIdURL(virtualCard.id, props.host?.stripe?.username)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <Action>
-                            <FormattedMessage defaultMessage="View on Stripe" />
-                          </Action>
-                        </a>
-                      </React.Fragment>
-                    )}
-                    {!props.hideViewTransactions && (
-                      <React.Fragment>
-                        <StyledHr borderColor="black.300" mt={2} mb={2} />
-                        <a
-                          href={`/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <Action>
-                            <FormattedMessage defaultMessage="View transactions" />
-                          </Action>
-                        </a>
-                      </React.Fragment>
-                    )}
-                    {virtualCard.assignee?.email && (
-                      <React.Fragment>
-                        <StyledHr borderColor="black.300" mt={2} mb={2} />
-                        <a href={`mailto:${virtualCard.assignee?.email}`} target="_blank" rel="noopener noreferrer">
-                          <Action>
-                            <FormattedMessage defaultMessage="Contact assignee" />
-                          </Action>
-                        </a>
-                      </React.Fragment>
-                    )}
-                  </Flex>
-                  <Arrow ref={arrowRef} {...arrowProps} />
-                </StyledCard>
-              </div>
-            )}
-          </Popper>
-        )}
-      </Manager>
+                  <FormattedMessage defaultMessage="View on Stripe" />
+                </a>
+              </DropdownMenuItem>
+            </React.Fragment>
+          )}
+          {!props.hideViewTransactions && (
+            <React.Fragment>
+              <DropdownMenuItem asChild>
+                <a
+                  href={`/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FormattedMessage defaultMessage="View transactions" />
+                </a>
+              </DropdownMenuItem>
+            </React.Fragment>
+          )}
+          {virtualCard.assignee?.email && (
+            <React.Fragment>
+              <DropdownMenuItem asChild>
+                <a href={`mailto:${virtualCard.assignee?.email}`} target="_blank" rel="noopener noreferrer">
+                  <FormattedMessage defaultMessage="Contact assignee" />
+                </a>
+              </DropdownMenuItem>
+            </React.Fragment>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       {showConfirmationModal && (
         <ConfirmationModal
           isDanger
@@ -352,7 +294,7 @@ export const ActionsButton = props => {
           virtualCard={virtualCard}
         />
       )}
-    </span>
+    </React.Fragment>
   );
 };
 
@@ -375,6 +317,7 @@ ActionsButton.propTypes = {
   canEditVirtualCard: PropTypes.bool,
   canDeleteVirtualCard: PropTypes.bool,
   onDeleteRefetchQuery: PropTypes.string,
+  openVirtualCardDrawer: PropTypes.func,
   hideViewTransactions: PropTypes.bool,
   as: PropTypes.any,
 };
@@ -428,12 +371,12 @@ const getLimitString = ({
 };
 
 export function CardDetails({ virtualCard }) {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const handleCopy = value => () => {
     navigator.clipboard.writeText(value);
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
+    toast({
+      variant: 'success',
       message: <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />,
     });
   };
@@ -498,7 +441,7 @@ CardDetails.propTypes = {
 const VirtualCard = props => {
   const [displayDetails, setDisplayDetails] = React.useState(false);
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const { virtualCard } = props;
 
   const isActive = virtualCard.data.state === 'OPEN' || virtualCard.data.status === 'active';
@@ -580,7 +523,7 @@ const VirtualCard = props => {
           <ActionsButton
             virtualCard={virtualCard}
             host={props.host}
-            onError={error => addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, error) })}
+            onError={error => toast({ variant: 'error', message: i18nGraphqlException(intl, error) })}
             onDeleteRefetchQuery={props.onDeleteRefetchQuery}
             confirmOnPauseCard={props.confirmOnPauseCard}
             canEditVirtualCard={props.canEditVirtualCard}
@@ -596,7 +539,6 @@ const VirtualCard = props => {
           ) : (
             <React.Fragment>
               <FormattedMessage id="VirtualCards.DisplayDetails" defaultMessage="View Card Details" />
-              &nbsp;&rarr;
             </React.Fragment>
           )}
         </Action>

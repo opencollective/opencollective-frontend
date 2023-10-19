@@ -21,7 +21,7 @@ import { slideInUp } from '../StyledKeyframes';
 import StyledRadioList from '../StyledRadioList';
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 import { withUser } from '../UserProvider';
 
 import UpdateOrderPopUp from './UpdateOrderPopUp';
@@ -82,8 +82,8 @@ const cancelRecurringContributionMutation = gql`
   }
 `;
 
-const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, account }) => {
-  const { addToast } = useToasts();
+const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, account, LoggedInUser }) => {
+  const { toast } = useToast();
   const [menuState, setMenuState] = useState('mainMenu');
   const intl = useIntl();
   const [cancelReason, setCancelReason] = useState('NO_LONGER_WANT_TO_SUPPORT');
@@ -115,7 +115,8 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
             </Flex>
             <GrayXCircle size={26} onClick={onCloseEdit} />
           </Flex>
-          {account.type !== 'COLLECTIVE' && (
+          {/** This popup is also used by root users, and we don't want them to touch the payment methods */}
+          {account.type !== 'COLLECTIVE' && Boolean(LoggedInUser?.isAdminOfCollective(account)) && (
             <MenuItem
               flexGrow={1 / 4}
               width={1}
@@ -254,8 +255,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
                     },
                   });
                   onCloseEdit();
-                  addToast({
-                    type: TOAST_TYPE.INFO,
+                  toast({
                     message: (
                       <FormattedMessage
                         id="subscription.createSuccessCancel"
@@ -266,7 +266,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
                   });
                 } catch (error) {
                   const errorMsg = getErrorFromGraphqlException(error).message;
-                  addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
+                  toast({ variant: 'error', message: errorMsg });
                 }
               }}
             >

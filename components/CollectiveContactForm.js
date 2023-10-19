@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 
-import Container from './Container';
+import { useToast } from './ui/useToast';
 import { Box } from './Grid';
 import MessageBox from './MessageBox';
 import MessageBoxGraphqlError from './MessageBoxGraphqlError';
@@ -15,7 +15,6 @@ import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import StyledTextarea from './StyledTextarea';
 import { H2, P, Span } from './Text';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const sendMessageMutation = gql`
   mutation SendMessage($account: AccountReferenceInput!, $message: NonEmptyString!, $subject: String) {
@@ -30,7 +29,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange 
   const [message, setMessage] = React.useState('');
   const [error, setError] = React.useState(null);
   const [submit, { data, loading }] = useMutation(sendMessageMutation, { context: API_V2_CONTEXT });
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   // Dispatch changes to onChange if set
   React.useEffect(() => {
@@ -111,10 +110,10 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange 
         )}
       </StyledInputField>
       {error && <MessageBoxGraphqlError error={error} mt={3} />}
-      <Container mt={2}>
+      <p className="mt-2 text-sm">
         <FormattedMessage defaultMessage="Message needs to be at least 10 characters long" />
-      </Container>
-      {isModal && <hr />}
+      </p>
+      {isModal && <hr className="my-5" />}
       <Box textAlign={isModal ? 'right' : ''}>
         <StyledButton
           mt={isModal ? 0 : 4}
@@ -134,8 +133,8 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange 
                 },
               });
               if (isModal) {
-                addToast({
-                  type: TOAST_TYPE.SUCCESS,
+                toast({
+                  variant: 'success',
                   message: <FormattedMessage id="MessageSent" defaultMessage="Message sent" />,
                 });
                 onClose();

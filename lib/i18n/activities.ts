@@ -47,6 +47,9 @@ export const ActivityTimelineMessageI18n = defineMessages({
 });
 
 export const ActivityDescriptionI18n = defineMessages({
+  ACCOUNTING_CATEGORIES_EDITED: {
+    defaultMessage: 'Chart of account edited',
+  },
   // Collective creation & applications
   COLLECTIVE_CREATED: {
     defaultMessage:
@@ -69,6 +72,9 @@ export const ActivityDescriptionI18n = defineMessages({
   },
   COLLECTIVE_APPROVED: {
     defaultMessage: '<Account></Account> application approved',
+  },
+  COLLECTIVE_UNHOSTED: {
+    defaultMessage: '<Account></Account> unhosted',
   },
   // Freezing collectives
   COLLECTIVE_FROZEN: {
@@ -167,19 +173,17 @@ export const ActivityDescriptionI18n = defineMessages({
   },
   // Members
   COLLECTIVE_MEMBER_CREATED: {
-    defaultMessage: '<FromAccount></FromAccount> joined <Account></Account> as a <MemberRole></MemberRole>',
+    defaultMessage: '<FromAccount></FromAccount> joined <Account></Account> as <MemberRole></MemberRole>',
   },
   COLLECTIVE_MEMBER_INVITED: {
-    defaultMessage:
-      '<FromAccount></FromAccount> was invited to join <Account></Account> as a <MemberRole></MemberRole>',
+    defaultMessage: '<FromAccount></FromAccount> was invited to join <Account></Account> as <MemberRole></MemberRole>',
   },
   COLLECTIVE_CORE_MEMBER_INVITED: {
-    defaultMessage:
-      '<FromAccount></FromAccount> was invited to join <Account></Account> as a <MemberRole></MemberRole>',
+    defaultMessage: '<FromAccount></FromAccount> was invited to join <Account></Account> as <MemberRole></MemberRole>',
   },
   COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED: {
     defaultMessage:
-      '<FromAccount></FromAccount> declined the invitation to join <Account></Account> as a <MemberRole></MemberRole>',
+      '<FromAccount></FromAccount> declined the invitation to join <Account></Account> as <MemberRole></MemberRole>',
   },
   COLLECTIVE_CORE_MEMBER_ADDED: {
     defaultMessage:
@@ -349,6 +353,9 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
   COLLECTIVE_CREATED: {
     id: 'WebhookEvents.COLLECTIVE_CREATED',
     defaultMessage: 'Collective created',
+  },
+  COLLECTIVE_UNHOSTED: {
+    defaultMessage: 'Collective unhosted',
   },
   ORGANIZATION_COLLECTIVE_CREATED: {
     defaultMessage: 'Organization created',

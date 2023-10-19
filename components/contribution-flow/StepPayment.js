@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { AnalyticsEvent } from '../../lib/analytics/events';
+import { track } from '../../lib/analytics/plausible';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../../lib/policies';
 
@@ -23,6 +25,10 @@ const StepPayment = ({
   disabledPaymentMethodTypes,
 }) => {
   const { LoggedInUser } = useLoggedInUser();
+
+  React.useEffect(() => {
+    track(AnalyticsEvent.CONTRIBUTION_PAYMENT_STEP);
+  }, []);
 
   if (require2FAForAdmins(stepProfile) && !LoggedInUser?.hasTwoFactorAuth) {
     return <TwoFactorAuthRequiredMessage borderWidth={0} noTitle />;

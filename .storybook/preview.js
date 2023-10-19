@@ -13,7 +13,8 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
-import ToastProvider from '../components/ToastProvider';
+import { TooltipProvider } from '../components/ui/Tooltip';
+import { Toaster } from '../components/ui/Toaster';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
@@ -28,9 +29,10 @@ export const decorators = [
       <ThemeProvider theme={theme}>
         <IntlProvider locale="en">
           <UserProvider>
-            <ToastProvider>
+            <TooltipProvider>
               <Story />
-            </ToastProvider>
+              <Toaster />
+            </TooltipProvider>
           </UserProvider>
         </IntlProvider>
       </ThemeProvider>

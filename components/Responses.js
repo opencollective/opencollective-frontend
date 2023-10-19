@@ -17,7 +17,7 @@ class Responses extends React.Component {
     }
     return (
       <Container width="100%" display="inline-block">
-        <Container margin="3rem auto" maxWidth="960px">
+        <Container margin="1.9rem auto" maxWidth="960px">
           {responses.map(response => (
             <Response key={`${get(response, 'user.id', 0)}-${response.createdAt}`} response={response} />
           ))}

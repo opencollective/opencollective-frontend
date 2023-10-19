@@ -14,13 +14,13 @@ import { compose, isValidEmail } from '../lib/utils';
 import Body from '../components/Body';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
-import Footer from '../components/Footer';
 import CollectiveCard from '../components/gift-cards/CollectiveCard';
 import HappyBackground from '../components/gift-cards/HappyBackground';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import LinkCollective from '../components/LinkCollective';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
+import Footer from '../components/navigation/Footer';
 import RedeemForm from '../components/RedeemForm';
 import RedeemSuccess from '../components/RedeemSuccess';
 import StyledButton from '../components/StyledButton';
@@ -145,13 +145,13 @@ class RedeemPage extends React.Component {
       return (
         <React.Fragment>
           <Box mt={5}>
-            <H1 color="white.full" textAlign="center" fontSize={['3rem', null, '4rem']}>
+            <H1 color="white.full" textAlign="center" fontSize={['1.9rem', null, '2.5rem']}>
               <FormattedMessage id="redeem.title" defaultMessage="Redeem Gift Card" />
             </H1>
           </Box>
 
           <Box mt={2}>
-            <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+            <Subtitle fontSize={['0.95rem', null, '1.25rem']} maxWidth={['90%', '640px']}>
               <Box>
                 <FormattedMessage
                   id="redeem.subtitle.line1"
@@ -169,7 +169,7 @@ class RedeemPage extends React.Component {
       return (
         <CollectiveCard collective={collective} mt={5}>
           <LinkCollective collective={collective}>
-            <H1 color="black.900" fontSize="3rem" lineHeight="1em" wordBreak="break-word" my={2} textAlign="center">
+            <H1 color="black.900" fontSize="1.9rem" lineHeight="1em" wordBreak="break-word" my={2} textAlign="center">
               {collective.name}
             </H1>
           </LinkCollective>

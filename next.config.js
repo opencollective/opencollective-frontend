@@ -4,7 +4,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 const { withSentryConfig } = require('@sentry/nextjs');
 const CopyPlugin = require('copy-webpack-plugin');
-
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const path = require('path');
 require('./env');
 const { REWRITES } = require('./rewrites');
@@ -23,6 +23,9 @@ const nextConfig = {
     outputFileTracingExcludes: {
       '*': ['node_modules/@swc/core-linux-x64-gnu', 'node_modules/@swc/core-linux-x64-musl'],
     },
+    outputFileTracingIncludes: {
+      '/_document': ['./.next/language-manifest.json'],
+    },
   },
   webpack: (config, { webpack, buildId }) => {
     config.plugins.push(
@@ -37,12 +40,13 @@ const nextConfig = {
         API_KEY: null,
         API_URL: null,
         PDF_SERVICE_URL: null,
+        DISABLE_MOCK_UPLOADS: false,
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
         NEXT_IMAGES_URL: null,
         REST_URL: null,
         SENTRY_DSN: null,
-        TW_API_COLLECTIVE_SLUG: null,
+        WISE_PLATFORM_COLLECTIVE_SLUG: null,
         WISE_ENVIRONMENT: 'sandbox',
         HCAPTCHA_SITEKEY: false,
         CAPTCHA_ENABLED: false,
@@ -70,6 +74,18 @@ const nextConfig = {
       );
     }
 
+    // Copying cMaps to get non-latin characters to work in PDFs (https://github.com/wojtekmaj/react-pdf#support-for-non-latin-characters)
+    config.plugins.push(
+      new CopyPlugin({
+        patterns: [
+          {
+            from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'cmaps'),
+            to: path.join(__dirname, 'public/static/cmaps'),
+          },
+        ],
+      }),
+    );
+
     // Copy pdfjs worker to public folder (used by PDFViewer component)
     // (Workaround for working with react-pdf and CommonJS - if moving to ESM this can be removed)
     // TODO(ESM): Move this to standard ESM
@@ -81,6 +97,25 @@ const nextConfig = {
             to: path.join(__dirname, 'public/static/scripts'),
           },
         ],
+      }),
+    );
+
+    // generates a manifest of languages and the respective webpack chunk url
+    config.plugins.push(
+      new WebpackManifestPlugin({
+        fileName: 'language-manifest.json',
+        generate(seed, files) {
+          return files.reduce((manifest, file) => {
+            const match = file.name.match(/i18n-messages-(.*)-json.js$/);
+            if (match) {
+              manifest[match[1]] = file.path;
+            }
+            return manifest;
+          }, seed);
+        },
+        filter(file) {
+          return file.isChunk && file.name.match(/^i18n-messages-.*/);
+        },
       }),
     );
 
@@ -142,30 +177,47 @@ const nextConfig = {
     return REWRITES;
   },
   async headers() {
-    return process.env.IS_VERCEL === 'true'
-      ? [
-          // Prevent indexing of our Vercel deployments
+    return [
+      // Prevent indexing of non-production deployments
+      {
+        source: '/(.*?)',
+        headers: [
           {
-            source: '/(.*?)',
-            headers: [
-              {
-                key: 'x-robots-tag',
-                value: 'none',
-              },
-            ],
+            key: 'x-robots-tag',
+            value: 'none',
           },
-          // Exception for "Next images", if on the configured domain
+        ],
+        missing: [
           {
-            source: '/_next/image(.*?)',
-            headers: [
-              {
-                key: 'x-robots-tag',
-                value: 'all',
-              },
-            ],
+            type: 'header',
+            key: 'host',
+            value: 'opencollective.com',
           },
-        ]
-      : [];
+          {
+            type: 'header',
+            key: 'original-hostname',
+            value: 'opencollective.com',
+          },
+        ],
+      },
+      // Exception for "Next images", if on the configured domain
+      {
+        source: '/_next/image(.*?)',
+        headers: [
+          {
+            key: 'x-robots-tag',
+            value: 'all',
+          },
+        ],
+        has: [
+          {
+            type: 'header',
+            key: 'host',
+            value: 'next-images.opencollective.com',
+          },
+        ],
+      },
+    ];
   },
   async redirects() {
     return [
@@ -225,19 +277,14 @@ const nextConfig = {
   },
 };
 
-// Bypasses conflict bug between @sentry/nextjs and depcheck
-const isDepcheck = process.argv[1]?.includes('.bin/depcheck');
+let exportedConfig = withSentryConfig({
+  ...nextConfig,
+  sentry: {
+    disableServerWebpackPlugin: true,
+    disableClientWebpackPlugin: true,
+  },
+});
 
-let exportedConfig = nextConfig;
-if (!isDepcheck) {
-  exportedConfig = withSentryConfig({
-    ...nextConfig,
-    sentry: {
-      disableServerWebpackPlugin: true,
-      disableClientWebpackPlugin: true,
-    },
-  });
-}
 if (process.env.ANALYZE) {
   // eslint-disable-next-line node/no-unpublished-require
   const withBundleAnalyzer = require('@next/bundle-analyzer')({

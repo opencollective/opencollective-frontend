@@ -54,7 +54,7 @@ const messages = defineMessages({
 const SearchFormContainer = styled(Box)`
   width: 100%;
   max-width: 278px;
-  min-width: 10rem;
+  min-width: 6.25rem;
 `;
 
 const EXPENSES_PER_PAGE = 10;

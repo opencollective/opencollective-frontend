@@ -43,6 +43,7 @@ export const getSettingsQuery = gql`
       isHost
       settings
       policies {
+        id
         EXPENSE_AUTHOR_CANNOT_APPROVE {
           enabled
           amountInCents
@@ -55,11 +56,16 @@ export const getSettingsQuery = gql`
           freeze
         }
         COLLECTIVE_ADMINS_CAN_REFUND
+        EXPENSE_CATEGORIZATION {
+          requiredForExpenseSubmitters
+          requiredForCollectiveAdmins
+        }
       }
       ... on AccountWithHost {
         host {
           id
           policies {
+            id
             EXPENSE_AUTHOR_CANNOT_APPROVE {
               enabled
               amountInCents

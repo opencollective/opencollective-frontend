@@ -3,8 +3,8 @@ import { useApolloClient, useLazyQuery } from '@apollo/client';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
-import { getVariableFromProps } from '../../pages/expense';
-import Drawer from '../Drawer';
+import { getVariablesFromQuery } from '../../pages/expense';
+import { Drawer } from '../Drawer';
 
 import { expensePageQuery } from './graphql/queries';
 import Expense from './Expense';
@@ -26,12 +26,19 @@ export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initia
 
   useEffect(() => {
     if (openExpenseLegacyId) {
-      getExpense({ variables: getVariableFromProps({ legacyExpenseId: openExpenseLegacyId }) });
+      getExpense({ variables: getVariablesFromQuery({ ExpenseId: openExpenseLegacyId }) });
     }
   }, [openExpenseLegacyId]);
 
   return (
-    <Drawer open={Boolean(openExpenseLegacyId)} onClose={handleClose} showActionsContainer data-cy="expense-drawer">
+    <Drawer
+      showCloseButton
+      open={Boolean(openExpenseLegacyId)}
+      onClose={handleClose}
+      showActionsContainer
+      data-cy="expense-drawer"
+      className="max-w-3xl"
+    >
       <Expense
         data={initialExpenseValues ? { ...data, expense: { ...initialExpenseValues, ...data?.expense } } : data}
         // Making sure to initially set loading to true before the query is called

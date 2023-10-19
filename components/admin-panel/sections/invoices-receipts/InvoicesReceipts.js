@@ -18,7 +18,7 @@ import StyledHr from '../../../StyledHr';
 import StyledInputField from '../../../StyledInputField';
 import StyledSelect from '../../../StyledSelect';
 import { H2, P, Span } from '../../../Text';
-import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
+import { useToast } from '../../../ui/useToast';
 
 import { useReceipt } from './hooks/useReceipt';
 import ReceiptTemplateForm from './ReceiptTemplateForm';
@@ -36,11 +36,11 @@ const BILL_TO_OPTIONS = [
   { value: 'collective', label: <FormattedMessage id="Collective" defaultMessage="Collective" /> },
 ];
 
-const InvoicesReceipts = ({ collective }) => {
+const InvoicesReceipts = ({ account }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
-  const defaultReceipt = useReceipt({ template: 'default', settings: collective.settings });
-  const alternativeReceipt = useReceipt({ template: 'alternative', settings: collective.settings });
+  const { toast } = useToast();
+  const defaultReceipt = useReceipt({ template: 'default', settings: account.settings });
+  const alternativeReceipt = useReceipt({ template: 'alternative', settings: account.settings });
   const [setSettings, { loading, error, data }] = useMutation(editCollectiveSettingsMutation);
   const [showAlternativeReceiptsSection, setShowAlternativeReceiptsSection] = React.useState(
     alternativeReceipt.values.title !== undefined,
@@ -56,8 +56,8 @@ const InvoicesReceipts = ({ collective }) => {
   // For Bill To
   const getBillToOption = value => BILL_TO_OPTIONS.find(option => option.value === value) || BILL_TO_OPTIONS[0];
   const getInExpenseTemplate = (account, field) => get(account, `settings.invoice.expenseTemplates.default.${field}`);
-  const [billTo, setBillTo] = React.useState(getInExpenseTemplate(collective, 'billTo'));
-  const billToIsSaved = getInExpenseTemplate(collective, 'billTo') === billTo;
+  const [billTo, setBillTo] = React.useState(getInExpenseTemplate(account, 'billTo'));
+  const billToIsSaved = getInExpenseTemplate(account, 'billTo') === billTo;
 
   const deleteAlternativeReceipt = () => {
     alternativeReceipt.changeValues({ title: undefined, info: undefined });
@@ -206,16 +206,16 @@ const InvoicesReceipts = ({ collective }) => {
           onClick={() => {
             setSettings({
               variables: {
-                id: collective.legacyId,
+                id: account.legacyId,
                 settings: {
-                  ...collective.settings,
+                  ...account.settings,
                   invoice: getInvoiceTemplatesObj(),
                 },
               },
             });
             setIsFieldChanged(false);
-            addToast({
-              type: TOAST_TYPE.SUCCESS,
+            toast({
+              variant: 'success',
               message: <FormattedMessage defaultMessage="Invoices updated successfully" />,
             });
           }}
@@ -232,7 +232,7 @@ const InvoicesReceipts = ({ collective }) => {
 };
 
 InvoicesReceipts.propTypes = {
-  collective: PropTypes.shape({
+  account: PropTypes.shape({
     legacyId: PropTypes.number.isRequired,
     settings: PropTypes.object,
   }).isRequired,

@@ -1,6 +1,6 @@
 import { defineMessage, defineMessages, IntlShape } from 'react-intl';
 
-import { formatCurrency } from '../currency-utils';
+import { formatCurrency, type Options as FormatCurrencyOptions } from '../currency-utils';
 import { Amount, Currency, VirtualCardLimitInterval } from '../graphql/types/v2/graphql';
 
 const VirtualCardSpendingLimitShortI18n = defineMessages({
@@ -78,11 +78,12 @@ export function getAvailableLimitShortString(
   spendingLimitAmount: Amount | number,
   spendingLimitInterval: VirtualCardLimitInterval,
   { AvailableAmount = v => v, AmountSeparator = v => v, LimitAmount = v => v, LimitInterval = v => v } = {},
+  options: FormatCurrencyOptions = { precision: 2 },
 ) {
   return intl.formatMessage(AvailableLimitShortI18n, {
     spendingLimitInterval,
-    spendingLimitAmount: formatCurrency(spendingLimitAmount, currency),
-    availableLimitAmount: formatCurrency(availableLimitAmount, currency),
+    spendingLimitAmount: formatCurrency(spendingLimitAmount, currency, options),
+    availableLimitAmount: formatCurrency(availableLimitAmount, currency, options),
     spendingLimitIntervalShort: getSpendingLimitIntervalShortString(intl, spendingLimitInterval),
     AvailableAmount,
     AmountSeparator,

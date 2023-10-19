@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get, sortBy, startCase } from 'lodash';
+import { cloneDeep, get, sortBy, startCase } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -129,7 +129,7 @@ class CollectiveGoals extends React.Component {
   };
 
   getCollectivePageSections = (baseSections, checked) => {
-    const sections = [...(baseSections || [])];
+    const sections = cloneDeep([...(baseSections || [])]);
     const goalsSection = sections.find(({ name }) => name === Sections.GOALS);
     if (goalsSection) {
       goalsSection.isEnabled = checked;

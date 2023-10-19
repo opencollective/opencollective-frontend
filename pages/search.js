@@ -33,7 +33,7 @@ import { fadeIn } from '../components/StyledKeyframes';
 import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import StyledTag from '../components/StyledTag';
 import { H1, P, Span } from '../components/Text';
-import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
+import { toast } from '../components/ui/useToast';
 
 const CollectiveCardContainer = styled.div`
   animation: ${fadeIn} 0.2s;
@@ -88,7 +88,7 @@ const I18nFilters = defineMessages({
 const SearchFormContainer = styled(Box)`
   height: 58px;
   width: 608px;
-  min-width: 10rem;
+  min-width: 6.25rem;
 `;
 
 const FilterLabel = styled.label`
@@ -164,7 +164,6 @@ class SearchPage extends React.Component {
     router: PropTypes.object, // from next.js
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object,
-    addToast: PropTypes.func.isRequired, // from withToasts
     isHost: PropTypes.bool,
     type: PropTypes.array,
   };
@@ -271,8 +270,8 @@ class SearchPage extends React.Component {
 
   handleCopy = () => {
     copy(window.location.href);
-    this.props.addToast({
-      type: TOAST_TYPE.SUCCESS,
+    toast({
+      variant: 'success',
       message: <FormattedMessage defaultMessage="Search Result Copied!" />,
     });
   };
@@ -299,7 +298,7 @@ class SearchPage extends React.Component {
     const selectedTypeFilter = this.props.isHost ? 'HOST' : this.props.type.length === 1 ? this.props.type[0] : 'ALL';
 
     return (
-      <Page navTitle={intl.formatMessage({ defaultMessage: 'Explore' })} showSearch={false}>
+      <Page navTitle={intl.formatMessage({ defaultMessage: 'Explore', id: 'Explore' })} showSearch={false}>
         <Container
           backgroundImage="url(/static/images/home/fiscalhost-blue-bg-lg.png)"
           style={{ transform: 'rotate(180deg)' }}
@@ -640,4 +639,4 @@ export const addSearchPageData = graphql(searchPageQuery, {
   }),
 });
 
-export default withToasts(injectIntl(withRouter(addSearchPageData(SearchPage))));
+export default injectIntl(withRouter(addSearchPageData(SearchPage)));

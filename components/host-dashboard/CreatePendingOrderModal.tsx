@@ -38,8 +38,8 @@ import StyledTextarea from '../StyledTextarea';
 import StyledTooltip from '../StyledTooltip';
 import { TaxesFormikFields } from '../taxes/TaxesFormikFields';
 import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
 import { TwoFactorAuthRequiredMessage } from '../TwoFactorAuthRequiredMessage';
+import { useToast } from '../ui/useToast';
 
 const EDITABLE_FIELDS = [
   'amount',
@@ -101,6 +101,7 @@ const createPendingContributionModalQuery = gql`
         hostFees
       }
       policies {
+        id
         REQUIRE_2FA_FOR_ADMINS
       }
       hostFeePercent
@@ -212,15 +213,6 @@ const getTiersOptions = (intl, tiers) => {
   ];
 };
 
-type CreatePendingContributionFormProps = {
-  host: CreatePendingContributionModalQuery['host'];
-  edit?: Partial<OrderPageQuery['order']>;
-  onClose: () => void;
-  onSuccess?: () => void;
-  loading?: boolean;
-  error?: any;
-};
-
 const Field = styled(StyledInputFormikField).attrs({
   labelFontSize: '16px',
   labelFontWeight: '700',
@@ -243,6 +235,15 @@ const getAmountsFromValues = values => {
   const hostFee = Math.round(gross * (values.hostFeePercent / 100));
   const valid = total > 0 && contribution > 0;
   return { total, tip, contribution, tax, gross, hostFee, valid };
+};
+
+type CreatePendingContributionFormProps = {
+  host: CreatePendingContributionModalQuery['host'];
+  edit?: Partial<OrderPageQuery['order']>;
+  onClose: () => void;
+  onSuccess?: () => void;
+  loading?: boolean;
+  error?: any;
 };
 
 const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePendingContributionFormProps) => {
@@ -745,14 +746,20 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     </Form>
   );
 };
+type CreatePendingContributionModalProps = {
+  hostSlug: string;
+  edit?: Partial<OrderPageQuery['order']>;
+  onClose: () => void;
+  onSuccess?: () => void;
+};
 
-const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreatePendingContributionFormProps) => {
+const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePendingContributionModalProps) => {
   const { LoggedInUser } = useLoggedInUser();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const { data, loading } = useQuery<CreatePendingContributionModalQuery>(createPendingContributionModalQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: _host.slug },
+    variables: { slug: hostSlug },
   });
 
   const host = data?.host;
@@ -828,8 +835,8 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
 
               const result = await editPendingOrder({ variables: { order } });
 
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 message: (
                   <FormattedMessage
                     defaultMessage="Pending contribution #{orderId} updated"
@@ -853,8 +860,8 @@ const CreatePendingContributionModal = ({ host: _host, edit, ...props }: CreateP
 
               const result = await createPendingOrder({ variables: { order } });
 
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 message: (
                   <FormattedMessage
                     defaultMessage="Pending contribution created with reference #{orderId}"

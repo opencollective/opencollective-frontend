@@ -6,7 +6,6 @@ const proxy = require('express-http-proxy');
 const { template, trim } = require('lodash');
 
 const downloadFileHandler = require('./download-file');
-const intl = require('./intl');
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
 const maxAge = (maxAge = 60) => {
@@ -18,38 +17,6 @@ const maxAge = (maxAge = 60) => {
 
 module.exports = (expressApp, nextApp) => {
   const app = expressApp;
-
-  // Add X-Robots-Tag header to prevent indexing non-production websites
-  if (process.env.OC_ENV !== 'production') {
-    app.use((req, res, next) => {
-      res.set('X-Robots-Tag', 'none');
-      next();
-    });
-  }
-
-  app.use((req, res, next) => {
-    if (!req.language && req.locale !== 'en') {
-      // Prevent server side caching of non english content
-      res.set('Cache-Control', 'no-store, no-cache, max-age=0');
-    } else {
-      // When using Cloudflare, there might be a default cache
-      // We're setting that for all requests to reduce the default to 1 minute
-      res.set('Cache-Control', 'public, max-age=60');
-    }
-    next();
-  });
-
-  app.use((req, res, next) => {
-    if (req.query.language && intl.supportedLanguages.includes(req.query.language) && req.query.set) {
-      res.cookie('language', req.language);
-      const url = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
-      url.searchParams.delete('language');
-      url.searchParams.delete('set');
-      res.redirect(`${url.pathname}${url.search}`);
-      return;
-    }
-    next();
-  });
 
   // Support older assets from website
   app.use('/public/images', express.static(path.join(__dirname, '../public/static/images')));
@@ -92,21 +59,6 @@ module.exports = (expressApp, nextApp) => {
       }),
     );
   }
-
-  /**
-   * Prevent indexation from search engines
-   * (out of 'production' environment)
-   */
-  app.get('/robots.txt', (req, res, next) => {
-    const hostname = req.get('original-hostname') || req.hostname;
-    if (hostname !== 'opencollective.com') {
-      res.setHeader('Content-Type', 'text/plain');
-      res.send('User-agent: *\nDisallow: /');
-    } else {
-      // Will send public/robots.txt
-      next();
-    }
-  });
 
   // This is used by Cypress to collect server side coverage
   if (process.env.OC_ENV === 'e2e' || process.env.E2E_TEST) {

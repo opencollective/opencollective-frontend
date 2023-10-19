@@ -26,6 +26,7 @@ const defaults = {
   WEBSITE_URL: 'http://localhost:3000',
   REST_URL: 'https://rest-staging.opencollective.com',
   PDF_SERVICE_URL: 'https://pdf-staging.opencollective.com',
+  DISABLE_MOCK_UPLOADS: false,
   PAYPAL_ENVIRONMENT: 'sandbox',
   STRIPE_KEY: 'pk_test_VgSB4VSg2wb5LdAkz7p38Gw8',
   GOOGLE_MAPS_API_KEY: 'AIzaSyAZJnIxtBw5bxnu2QoCUiLCjV1nk84Vnk0',
@@ -34,17 +35,29 @@ const defaults = {
   CAPTCHA_ENABLED: false,
   CAPTCHA_PROVIDER: 'HCAPTCHA',
   CLIENT_ANALYTICS_ENABLED: false,
-  TW_API_COLLECTIVE_SLUG: 'opencollective-host',
+  CLIENT_ANALYTICS_DOMAIN: 'localhost',
+  CLIENT_ANALYTICS_EXCLUSIONS: '/**/banner.html, /**/contribute/button, /**/donate/button',
+  WISE_PLATFORM_COLLECTIVE_SLUG: 'opencollective-host',
   OC_APPLICATION: 'frontend',
   OC_ENV: process.env.NODE_ENV || 'development',
   OC_SECRET: crypto.randomBytes(16).toString('hex'),
-  WISE_ENVIRONMENT: process.env.OC_ENV === 'production' ? 'production' : 'sandbox',
-  API_PROXY: 'true',
+  WISE_ENVIRONMENT: 'sandbox',
+  API_PROXY: true,
   SENTRY_TRACES_SAMPLE_RATE: null,
 };
 
+if ((process.env.OC_ENV || process.env.NODE_ENV || 'production') === 'production') {
+  defaults.PAYPAL_ENVIRONMENT = 'production';
+  defaults.WISE_ENVIRONMENT = 'production';
+}
+
+if ((process.env.OC_ENV || process.env.NODE_ENV || 'development') === 'development') {
+  defaults.GRAPHQL_BENCHMARK = true;
+}
+
 if (['production', 'staging'].includes(process.env.OC_ENV)) {
-  defaults.TW_API_COLLECTIVE_SLUG = 'opencollective';
+  defaults.API_PROXY = false;
+  defaults.WISE_PLATFORM_COLLECTIVE_SLUG = 'opencollective';
 }
 
 if (['e2e'].includes(process.env.OC_ENV)) {

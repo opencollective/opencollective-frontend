@@ -11,6 +11,8 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { AnalyticsEvent } from '../../lib/analytics/events';
+import { track } from '../../lib/analytics/plausible';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -36,6 +38,8 @@ import { withUser } from '../../components/UserProvider';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
 import Link from '../Link';
+import { Survey, SURVEY_KEY } from '../Survey';
+import { toast } from '../ui/useToast';
 
 import { orderSuccessFragment } from './graphql/fragments';
 import PublicMessageForm from './ContributionFlowPublicMessage';
@@ -130,6 +134,16 @@ class ContributionFlowSuccess extends React.Component {
     isEmbed: PropTypes.bool,
     data: PropTypes.object,
   };
+
+  componentDidMount() {
+    track(AnalyticsEvent.CONTRIBUTION_SUCCESS);
+    if (this.props.LoggedInUser) {
+      toast({
+        message: <Survey surveyKey={SURVEY_KEY.CONTRIBUTION_COMPLETED} />,
+        duration: 20000,
+      });
+    }
+  }
 
   componentDidUpdate() {
     const {

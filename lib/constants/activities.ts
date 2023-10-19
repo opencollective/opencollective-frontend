@@ -52,6 +52,7 @@ export const ActivityTypes = {
   COLLECTIVE_REJECTED: 'collective.rejected',
   COLLECTIVE_TRANSACTION_CREATED: 'collective.transaction.created',
   COLLECTIVE_UNFROZEN: 'collective.unfrozen',
+  COLLECTIVE_UNHOSTED: 'collective.unhosted',
   COLLECTIVE_UPDATE_CREATED: 'collective.update.created',
   COLLECTIVE_UPDATE_PUBLISHED: 'collective.update.published',
   COLLECTIVE_VIRTUAL_CARD_ADDED: 'collective.virtualcard.added',

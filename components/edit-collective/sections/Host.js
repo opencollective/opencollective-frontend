@@ -123,7 +123,7 @@ class Host extends React.Component {
 
     if (get(collective, 'host.id') === collective.id) {
       return (
-        <Fragment>
+        <div className="flex flex-col space-y-4">
           <p>
             <FormattedMessage
               id="editCollective.selfHost.label"
@@ -170,7 +170,7 @@ class Host extends React.Component {
               </p>
             </Fragment>
           )}
-        </Fragment>
+        </div>
       );
     }
 

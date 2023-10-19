@@ -34,7 +34,7 @@ import TopBarProfileMenu from './TopBarProfileMenu';
 
 const NavList = styled(Flex)`
   list-style: none;
-  min-width: 20rem;
+  min-width: 12.5rem;
   text-align: right;
   align-items: center;
 `;
@@ -93,7 +93,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
     return regex.test(router.asPath);
   };
 
-  const onDashboardRoute = isRouteActive('/workspace');
+  const onDashboardRoute = isRouteActive('/dashboard');
 
   const useDashboard =
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) ||
@@ -115,7 +115,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
     >
       <Link href="/">
         <Flex alignItems="center">
-          <Image width="36" height="36" src="/static/images/opencollective-icon.png" alt="Open Collective" />
+          <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />
           <Hide xs sm md>
             <Box mx={2}>
               <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
@@ -265,16 +265,14 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
             </Flex>
           </NavButton>
         )}
-        {showSearchModal && <SearchModal onClose={() => setShowSearchModal(false)} />}
+        <SearchModal open={showSearchModal} setOpen={setShowSearchModal} />
       </Flex>
 
       {showProfileAndChangelogMenu && (
         <React.Fragment>
-          <Container mr={3}>
-            <Hide xs>
-              <ChangelogTrigger />
-            </Hide>
-          </Container>
+          <div className="mr-2 hidden sm:block">
+            <ChangelogTrigger />
+          </div>
           <TopBarProfileMenu />
         </React.Fragment>
       )}

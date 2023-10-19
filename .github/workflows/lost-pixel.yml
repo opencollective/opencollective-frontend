@@ -19,7 +19,7 @@ jobs:
         run: npm run styleguide:build
 
       - name: Lost Pixel
-        uses: lost-pixel/lost-pixel@v3.4.1
+        uses: lost-pixel/lost-pixel@v3.7.2
         env:
           LOST_PIXEL_API_KEY: ${{ secrets.LOST_PIXEL_API_KEY }}
           LOST_PIXEL_PROJECT_ID: ${{ secrets.LOST_PIXEL_PROJECT_ID }}

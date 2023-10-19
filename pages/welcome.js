@@ -53,7 +53,7 @@ const Welcome = () => {
           mt={['100px', 0]}
         >
           <Box mt="-64px">
-            <Image src="/static/images/sample-avatar.png" height="128px" width="128px" />
+            <Image src="/static/images/sample-avatar.png" height={128} width={128} />
           </Box>
           <Flex fontSize="24px" fontWeight="700" color="black.900" lineHeight="32px" pt="40px" pb="40px">
             {LoggedInUser?.collective?.name}
@@ -70,7 +70,7 @@ const Welcome = () => {
                   </Flex>
                 </Box>
                 <Box pl="39px">
-                  <Image src="/static/images/right-arrow.png" alt="Right Arrow" width="22px" height="20px" />
+                  <Image src="/static/images/right-arrow.png" alt="Right Arrow" width={22} height={20} />
                 </Box>
               </Flex>
             </WelcomeOptionContainer>
@@ -87,7 +87,7 @@ const Welcome = () => {
                   </Flex>
                 </Box>
                 <Box pl="39px">
-                  <Image src="/static/images/right-arrow.png" alt="Right Arrow" width="22px" height="20px" />
+                  <Image src="/static/images/right-arrow.png" alt="Right Arrow" width={22} height={20} />
                 </Box>
               </Flex>
             </WelcomeOptionContainer>
@@ -104,7 +104,7 @@ const Welcome = () => {
                   </Flex>
                 </Box>
                 <Box pl="39px">
-                  <Image src="/static/images/right-arrow.png" alt="Right Arrow" width="22px" height="20px" />
+                  <Image src="/static/images/right-arrow.png" alt="Right Arrow" width={22} height={20} />
                 </Box>
               </Flex>
             </WelcomeOptionContainer>

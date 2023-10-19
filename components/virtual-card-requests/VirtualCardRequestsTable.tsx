@@ -1,10 +1,7 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { themeGet } from '@styled-system/theme-get';
 import { CellContext, ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontalIcon } from 'lucide-react';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -17,46 +14,19 @@ import { DataTable } from '../DataTable';
 import DateTime from '../DateTime';
 import EditVirtualCardModal from '../edit-collective/EditVirtualCardModal';
 import { Box, Flex } from '../Grid';
-import LinkCollective from '../LinkCollective';
 import Loading from '../Loading';
-import PopupMenu from '../PopupMenu';
-import StyledHr from '../StyledHr';
-import StyledRoundButton from '../StyledRoundButton';
 import StyledTag from '../StyledTag';
-import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/DropdownMenu';
+import { TableActionsButton } from '../ui/Table';
+import { useToast } from '../ui/useToast';
 
 import VirtualCardRequestCard from './VirtualCardRequestCard';
-
-const Action = styled.button`
-  padding: 8px;
-  margin: 0 8px;
-  cursor: pointer;
-  line-height: 16px;
-  font-size: 14px;
-  font-weight: 500;
-  border: none;
-  background: transparent;
-  outline: none;
-  text-align: inherit;
-  text-transform: capitalize;
-
-  color: ${props => props.theme.colors.black[800]};
-
-  :hover {
-    color: ${props => props.theme.colors.black[700]};
-  }
-
-  :focus {
-    color: ${props => props.theme.colors.black[700]};
-    text-decoration: underline;
-  }
-
-  svg {
-    margin-right: 8px;
-    vertical-align: text-top;
-  }
-`;
 
 const RejectVirtualCardRequestMutation = gql`
   mutation RejectVirtualCardRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {
@@ -67,9 +37,15 @@ const RejectVirtualCardRequestMutation = gql`
   }
 `;
 
-function VirtualCardRequestTableActions({ virtualCardRequest }: { virtualCardRequest: VirtualCardRequest }) {
+function VirtualCardRequestTableActions({
+  virtualCardRequest,
+  onSelectedVirtualCardRequest,
+}: {
+  virtualCardRequest: VirtualCardRequest;
+  onSelectedVirtualCardRequest: (virtualCardRequest: VirtualCardRequest) => void;
+}) {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [isVirtualCardModalOpen, setIsVirtualCardModalOpen] = React.useState(false);
 
@@ -86,35 +62,45 @@ function VirtualCardRequestTableActions({ virtualCardRequest }: { virtualCardReq
     try {
       await rejectRequestMutation();
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   }, [rejectRequestMutation, intl]);
   const loading = rejectRequestMutationResult.loading;
 
   return (
     <React.Fragment>
-      <PopupMenu
-        placement="bottom-start"
-        Button={({ onClick }) => (
-          <StyledRoundButton size={24} color="#C4C7CC" onClick={onClick}>
-            <MoreHorizontalIcon size={12} color="#76777A" />
-          </StyledRoundButton>
-        )}
-      >
-        <Flex flexDirection="column">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <TableActionsButton />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            onClick={() => {
+              onSelectedVirtualCardRequest(virtualCardRequest);
+            }}
+          >
+            <FormattedMessage defaultMessage="View details" />
+          </DropdownMenuItem>
           {virtualCardRequest.status === VirtualCardRequestStatus.PENDING && (
             <React.Fragment>
-              <Action disabled={loading} onClick={() => setIsVirtualCardModalOpen(true)}>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                disabled={loading}
+                onClick={e => {
+                  e.stopPropagation();
+                  setIsVirtualCardModalOpen(true);
+                }}
+              >
                 <FormattedMessage id="actions.approve" defaultMessage="Approve" />
-              </Action>
-              <StyledHr borderColor="black.100" my={2} mx={2} />
-              <Action disabled={loading} onClick={rejectRequest}>
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled={loading} onClick={rejectRequest}>
                 <FormattedMessage id="actions.reject" defaultMessage="Reject" />
-              </Action>
+              </DropdownMenuItem>
             </React.Fragment>
           )}
-        </Flex>
-      </PopupMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       {isVirtualCardModalOpen && (
         <EditVirtualCardModal
           host={virtualCardRequest.host}
@@ -134,27 +120,6 @@ function VirtualCardRequestTableActions({ virtualCardRequest }: { virtualCardReq
   );
 }
 
-const CellButton = styled.button`
-  border: 0;
-  width: 100%;
-  outline: none;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding: 16px;
-  font-weight: 500;
-  color: ${themeGet('colors.black.900')};
-  &:hover,
-  :focus-visible {
-    .title {
-      text-decoration: underline;
-    }
-  }
-`;
-
 type VirtualCardRequestsTableMeta = {
   onSelectedVirtualCardRequest: (virtualCardRequest: VirtualCardRequest) => void;
   intl: IntlShape;
@@ -164,85 +129,69 @@ export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
   {
     accessorKey: 'account',
     header: () => <FormattedMessage defaultMessage="Account" />,
+    meta: { className: 'w-48' },
+
     cell: ({ cell }: CellContext<VirtualCardRequest, Account>) => {
       const account = cell.getValue();
       return (
-        <Flex alignItems="center" p={3} gridGap={2}>
-          <Avatar collective={account} radius={20} />
-          <LinkCollective collective={account}>
-            <Span letterSpacing="0" color="black.700" truncateOverflow fontSize="14px">
-              {account.name}
-            </Span>
-          </LinkCollective>
-        </Flex>
+        <div className="flex items-center gap-2 truncate">
+          <Avatar collective={account} radius={24} />
+          <span className="truncate">{account.name}</span>
+        </div>
       );
     },
   },
   {
     accessorKey: 'assignee',
+    meta: { className: 'w-36' },
+
     header: () => <FormattedMessage defaultMessage="Assignee" />,
     cell: ({ cell }: CellContext<VirtualCardRequest, Account>) => {
       const assignee = cell.getValue();
       return (
-        <Flex alignItems="center" p={3} gridGap={2}>
-          <Avatar collective={assignee} radius={20} />
-          <LinkCollective collective={assignee}>
-            <Span letterSpacing="0" color="black.700" truncateOverflow fontSize="14px">
-              {assignee.name}
-            </Span>
-          </LinkCollective>
-        </Flex>
+        <div className="flex items-center gap-2 truncate">
+          <Avatar collective={assignee} radius={24} />
+          <span className="truncate">{assignee.name}</span>
+        </div>
       );
     },
   },
   {
     accessorKey: 'purpose',
     header: () => <FormattedMessage id="Fields.purpose" defaultMessage="Purpose" />,
-    cell: ({ cell, row, table }: CellContext<VirtualCardRequest, string>) => {
+    cell: ({ cell }: CellContext<VirtualCardRequest, string>) => {
       const purpose = cell.getValue();
-      const meta = table.options.meta as VirtualCardRequestsTableMeta;
-      return (
-        <CellButton onClick={() => meta.onSelectedVirtualCardRequest(row.original)}>
-          <Box style={{ textOverflow: 'ellipsis' }} overflow="hidden" maxWidth="250px" fontSize="14px">
-            {purpose}
-          </Box>
-        </CellButton>
-      );
+      return <div className="truncate">{purpose}</div>;
     },
   },
   {
     accessorKey: 'createdAt',
+    meta: { className: 'w-28' },
     header: () => <FormattedMessage id="VirtualCards.CreatedAt" defaultMessage="Created At" />,
     cell: ({ cell }: CellContext<VirtualCardRequest, string>) => {
       return (
-        <Box textAlign="center">
+        <div className="">
           <DateTime dateStyle="medium" value={cell.getValue()} />
-        </Box>
+        </div>
       );
     },
   },
   {
     accessorKey: 'spendingLimitAmount',
+    meta: { className: 'w-32' },
     header: () => <FormattedMessage id="VirtualCards.SpendingLimit" defaultMessage="Spending Limit" />,
     cell: ({ row, table }) => {
       const vcr = row.original;
       const meta = table.options.meta as VirtualCardRequestsTableMeta;
       return getSpendingLimitShortString(meta.intl, vcr.currency, vcr.spendingLimitAmount, vcr.spendingLimitInterval, {
-        LimitAmount: v => (
-          <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
-            {v}
-          </Span>
-        ),
-        LimitInterval: v => (
-          <Span fontSize="14px" fontWeight="normal" color="black.600" fontStyle="italic">
-            {v}
-          </Span>
-        ),
+        LimitAmount: v => <span className="italic text-slate-600">{v}</span>,
+        LimitInterval: v => <span className="italic text-slate-600">{v}</span>,
       });
     },
   },
   {
     accessorKey: 'status',
+    meta: { className: 'w-28' },
     header: () => <FormattedMessage id="VirtualCards.Status" defaultMessage="Status" />,
     cell: ({ cell }: CellContext<VirtualCardRequest, string>) => {
       const status = cell.getValue();
@@ -268,11 +217,19 @@ export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
   {
     accessorKey: 'actions',
     header: () => '',
-    cell: ({ row }: CellContext<VirtualCardRequest, string>) => {
+    meta: { className: 'w-14' },
+
+    cell: ({ row, table }: CellContext<VirtualCardRequest, string>) => {
+      const { onSelectedVirtualCardRequest } = table.options.meta as VirtualCardRequestsTableMeta;
       return (
-        row.original.status === VirtualCardRequestStatus.PENDING && (
-          <VirtualCardRequestTableActions virtualCardRequest={row.original} />
-        )
+        // Stop click propagation to prevent the row from being clicked
+        // eslint-disable-next-line
+        <div onClick={e => e.stopPropagation()}>
+          <VirtualCardRequestTableActions
+            virtualCardRequest={row.original}
+            onSelectedVirtualCardRequest={onSelectedVirtualCardRequest}
+          />
+        </div>
       );
     },
   },
@@ -301,16 +258,16 @@ export function VirtualCardRequestsTable(props: VirtualCardRequestsTableProps) {
       {isTableView ? (
         <DataTable
           data-cy="virtual-card-requests-table"
+          innerClassName="table-fixed"
           columns={tableColumns}
           meta={virtualCardRequestsTableMeta}
           data={props.virtualCardRequests || []}
           loading={props.loading}
+          onClickRow={row => props?.onSelectedVirtualCardRequest(row.original)}
           emptyMessage={() => (
-            <div>
-              <P fontSize="16px">
-                <FormattedMessage defaultMessage="No Virtual Card Requests" />
-              </P>
-            </div>
+            <p className="font-base">
+              <FormattedMessage defaultMessage="No Virtual Card Requests" />
+            </p>
           )}
         />
       ) : props.loading ? (

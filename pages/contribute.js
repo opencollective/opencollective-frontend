@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -9,6 +8,7 @@ import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { TierTypes } from '../lib/constants/tiers-types';
 import { sortEvents } from '../lib/events';
 import { gqlV1 } from '../lib/graphql/helpers';
+import { ssrGraphQLQuery } from '../lib/graphql/with-ssr-query';
 import { sortTiersForCollective } from '../lib/tier-utils';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 import { getWebsiteUrl } from '../lib/utils';
@@ -26,12 +26,12 @@ import ContributeEvent from '../components/contribute-cards/ContributeEvent';
 import ContributeProject from '../components/contribute-cards/ContributeProject';
 import ContributeTier from '../components/contribute-cards/ContributeTier';
 import ErrorPage from '../components/ErrorPage';
-import Footer from '../components/Footer';
 import { Box, Flex, Grid } from '../components/Grid';
 import Header from '../components/Header';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
+import Footer from '../components/navigation/Footer';
 import StyledButton from '../components/StyledButton';
 import { H2, P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
@@ -52,7 +52,7 @@ const CardsContainer = styled(Grid).attrs({
   }
 `;
 
-class TiersPage extends React.Component {
+class ContributePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, verb } }) {
     return { slug: collectiveSlug, verb };
   }
@@ -60,7 +60,6 @@ class TiersPage extends React.Component {
   static propTypes = {
     slug: PropTypes.string, // from getInitialProps, for addContributePageData
     verb: PropTypes.string, // from getInitialProps
-    query: PropTypes.object, // from getInitialProps
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object,
   };
@@ -347,7 +346,14 @@ class TiersPage extends React.Component {
 }
 
 const contributePageQuery = gqlV1/* GraphQL */ `
-  query ContributePage($slug: String!, $nbContributorsPerContributeCard: Int) {
+  query ContributePage(
+    $slug: String!
+    $nbContributorsPerContributeCard: Int
+    $includeTiers: Boolean!
+    $includeEvents: Boolean!
+    $includeProjects: Boolean!
+    $includeConnectedCollectives: Boolean!
+  ) {
     Collective(slug: $slug) {
       id
       slug
@@ -402,19 +408,19 @@ const contributePageQuery = gqlV1/* GraphQL */ `
         isIncognito
         tiersIds
       }
-      tiers {
+      tiers @include(if: $includeTiers) {
         id
         ...ContributeCardTierFields
       }
-      events(includePastEvents: true, includeInactive: true) {
+      events(includePastEvents: true, includeInactive: true) @include(if: $includeEvents) {
         id
         ...ContributeCardEventFields
       }
-      projects {
+      projects @include(if: $includeProjects) {
         id
         ...ContributeCardProjectFields
       }
-      connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
+      connectedCollectives: members(role: "CONNECTED_COLLECTIVE") @include(if: $includeConnectedCollectives) {
         id
         collective: member {
           id
@@ -445,15 +451,17 @@ const contributePageQuery = gqlV1/* GraphQL */ `
   ${fragments.contributeCardEventFieldsFragment}
   ${fragments.contributeCardProjectFieldsFragment}
 `;
-/* eslint-enable graphql/template-strings */
 
-const addContributePageData = graphql(contributePageQuery, {
-  options: props => ({
-    variables: {
-      slug: props.slug,
-      nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
-    },
+const addContributePageData = ssrGraphQLQuery({
+  query: contributePageQuery,
+  getVariablesFromProps: props => ({
+    slug: props.slug,
+    nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+    includeTiers: ['contribute', 'tiers'].includes(props.verb),
+    includeEvents: ['contribute', 'events'].includes(props.verb),
+    includeProjects: ['contribute', 'projects'].includes(props.verb),
+    includeConnectedCollectives: ['contribute', 'connected-collectives'].includes(props.verb),
   }),
 });
 
-export default withUser(addContributePageData(TiersPage));
+export default withUser(addContributePageData(ContributePage));

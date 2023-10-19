@@ -13,7 +13,7 @@ import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
-import { getCollectivePageRoute, getWorkspaceRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
@@ -191,7 +191,7 @@ const ExpenseBudgetItem = ({
                         lineHeight="1.5em"
                         textDecoration="none"
                         color="black.900"
-                        fontSize={`${fontSize}px`}
+                        fontSize={fontSize}
                         data-cy="expense-title"
                       >
                         {value}
@@ -203,13 +203,17 @@ const ExpenseBudgetItem = ({
 
               <P mt="5px" fontSize="12px" color="black.700">
                 {isAdminView ? (
-                  <LinkCollective collective={expense.account} />
+                  <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.account} />
                 ) : (
                   <FormattedMessage
                     defaultMessage="from {payee} to {account}"
                     values={{
-                      payee: <LinkCollective collective={expense.payee} />,
-                      account: <LinkCollective collective={expense.account} />,
+                      payee: (
+                        <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.payee} />
+                      ),
+                      account: (
+                        <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.account} />
+                      ),
                     }}
                   />
                 )}
@@ -369,7 +373,7 @@ const ExpenseBudgetItem = ({
                     <StyledLink
                       as={Link}
                       color="black.700"
-                      href={`${getWorkspaceRoute(host, 'host-agreements')}?account=${expense.account.slug}`}
+                      href={`${getDashboardRoute(host, 'host-agreements')}?account=${expense.account.slug}`}
                     >
                       <FormattedMessage
                         defaultMessage="{count, plural, one {# agreement} other {# agreements}}"

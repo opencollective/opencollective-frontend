@@ -1,103 +1,182 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @font-face {
   font-family: 'Inter';
-  font-style:  normal;
+  font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../fonts/inter/Inter-Regular.woff2") format("woff2"),
-       url("../fonts/inter/Inter-Regular.woff") format("woff");
+  src:
+    url('../fonts/inter/Inter-Regular.woff2') format('woff2'),
+    url('../fonts/inter/Inter-Regular.woff') format('woff');
 }
 @font-face {
   font-family: 'Inter';
-  font-style:  italic;
+  font-style: italic;
   font-weight: 400;
   font-display: swap;
-  src: url("../fonts/inter/Inter-Italic.woff2") format("woff2"),
-       url("../fonts/inter/Inter-Italic.woff") format("woff");
+  src:
+    url('../fonts/inter/Inter-Italic.woff2') format('woff2'),
+    url('../fonts/inter/Inter-Italic.woff') format('woff');
 }
 
 @font-face {
   font-family: 'Inter';
-  font-style:  normal;
+  font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url("../fonts/inter/Inter-Medium.woff2") format("woff2"),
-       url("../fonts/inter/Inter-Medium.woff") format("woff");
+  src:
+    url('../fonts/inter/Inter-Medium.woff2') format('woff2'),
+    url('../fonts/inter/Inter-Medium.woff') format('woff');
 }
 @font-face {
   font-family: 'Inter';
-  font-style:  italic;
+  font-style: italic;
   font-weight: 500;
   font-display: swap;
-  src: url("../fonts/inter/Inter-MediumItalic.woff2") format("woff2"),
-       url("../fonts/inter/Inter-MediumItalic.woff") format("woff");
+  src:
+    url('../fonts/inter/Inter-MediumItalic.woff2') format('woff2'),
+    url('../fonts/inter/Inter-MediumItalic.woff') format('woff');
 }
 
 @font-face {
   font-family: 'Inter';
-  font-style:  normal;
+  font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("../fonts/inter/Inter-SemiBold.woff2") format("woff2"),
-       url("../fonts/inter/Inter-SemiBold.woff") format("woff");
+  src:
+    url('../fonts/inter/Inter-SemiBold.woff2') format('woff2'),
+    url('../fonts/inter/Inter-SemiBold.woff') format('woff');
 }
 @font-face {
   font-family: 'Inter';
-  font-style:  italic;
+  font-style: italic;
   font-weight: 600;
   font-display: swap;
-  src: url("../fonts/inter/Inter-SemiBoldItalic.woff2") format("woff2"),
-       url("../fonts/inter/Inter-SemiBoldItalic.woff") format("woff");
+  src:
+    url('../fonts/inter/Inter-SemiBoldItalic.woff2') format('woff2'),
+    url('../fonts/inter/Inter-SemiBoldItalic.woff') format('woff');
 }
 
 @font-face {
   font-family: 'Inter';
-  font-style:  normal;
+  font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("../fonts/inter/Inter-Bold.woff2") format("woff2"),
-       url("../fonts/inter/Inter-Bold.woff") format("woff");
+  src:
+    url('../fonts/inter/Inter-Bold.woff2') format('woff2'),
+    url('../fonts/inter/Inter-Bold.woff') format('woff');
 }
 @font-face {
   font-family: 'Inter';
-  font-style:  italic;
+  font-style: italic;
   font-weight: 700;
   font-display: swap;
-  src: url("../fonts/inter/Inter-BoldItalic.woff2") format("woff2"),
-       url("../fonts/inter/Inter-BoldItalic.woff") format("woff");
+  src:
+    url('../fonts/inter/Inter-BoldItalic.woff2') format('woff2'),
+    url('../fonts/inter/Inter-BoldItalic.woff') format('woff');
 }
 
 @font-face {
   font-family: 'Inter';
-  font-style:  normal;
+  font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url("../fonts/inter/Inter-ExtraBold.woff2") format("woff2"),
-       url("../fonts/inter/Inter-ExtraBold.woff") format("woff");
+  src:
+    url('../fonts/inter/Inter-ExtraBold.woff2') format('woff2'),
+    url('../fonts/inter/Inter-ExtraBold.woff') format('woff');
 }
 @font-face {
   font-family: 'Inter';
-  font-style:  italic;
+  font-style: italic;
   font-weight: 800;
   font-display: swap;
-  src: url("../fonts/inter/Inter-ExtraBoldItalic.woff2") format("woff2"),
-       url("../fonts/inter/Inter-ExtraBoldItalic.woff") format("woff");
+  src:
+    url('../fonts/inter/Inter-ExtraBoldItalic.woff2') format('woff2'),
+    url('../fonts/inter/Inter-ExtraBoldItalic.woff') format('woff');
 }
 
 @font-face {
   font-family: 'Inter';
-  font-style:  normal;
+  font-style: normal;
   font-weight: 900;
   font-display: swap;
-  src: url("../fonts/inter/Inter-Black.woff2") format("woff2"),
-       url("../fonts/inter/Inter-Black.woff") format("woff");
+  src:
+    url('../fonts/inter/Inter-Black.woff2') format('woff2'),
+    url('../fonts/inter/Inter-Black.woff') format('woff');
 }
 @font-face {
   font-family: 'Inter';
-  font-style:  italic;
+  font-style: italic;
   font-weight: 900;
   font-display: swap;
-  src: url("../fonts/inter/Inter-BlackItalic.woff2") format("woff2"),
-       url("../fonts/inter/Inter-BlackItalic.woff") format("woff");
+  src:
+    url('../fonts/inter/Inter-BlackItalic.woff2') format('woff2'),
+    url('../fonts/inter/Inter-BlackItalic.woff') format('woff');
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply h-full overflow-y-scroll bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
 }
 
 html {
@@ -110,89 +189,8 @@ html {
   --gunmetal: #505559;
   --fade-blue: #97b7f3;
 
-  font-size: 62.5%;
   height: 100%;
   width: 100%;
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-a:hover {
-  color: #797d80;
-}
-
-summary {
-  color: #337ab7;
-  cursor: pointer;
-}
-
-body > div:first-child {
-  position: relative;
-  min-height: 100%;
-}
-
-@media (max-width: 600px) {
-  html {
-    font-size: 55%;
-  }
-}
-
-section {
-  margin: 3rem 0px;
-}
-
-h1 {
-  text-align: center;
-  margin: 40px 0px 20px;
-  font-size: 4rem;
-  letter-spacing: -1.2px;
-}
-
-h2,
-h3 {
-  letter-spacing: -0.4px;
-}
-
-.map {
-  border: 1px solid #eee;
-  height: 300px;
-  position: relative;
-}
-
-.map-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0);
-}
-
-.row {
-  display: flex;
-  flex-direction: row;
-}
-
-a {
-  color: #3385ff;
-}
-
-.btn-primary {
-  background-color: #3385ff;
-  border-color: #3385ff;
-}
-
-.clear {
-  clear: both;
-}
-
-.hidden {
-  display: none;
 }
 
 #nprogress {
@@ -204,79 +202,65 @@ a {
   display: none;
 }
 
-/** @deprecated These legacy styles from `Body.js` should be removed */
-.content {
-  max-width: 1260px;
-  padding: 2rem 30px;
-  margin: 0 auto;
-  line-height: 1.5;
-  overflow: hidden;
+#nprogress .bar {
+  @apply bg-blue-500;
 }
 
-@media (max-width: 420px) {
-  .content {
-    padding: 1rem 1.5rem;
-  }
+.markdown {
+  @apply leading-7 text-slate-900;
+}
+.markdown h1,
+h2,
+h3,
+h4 {
+  @apply text-slate-950;
+}
+.markdown h1 {
+  @apply scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl;
+}
+.markdown h2 {
+  @apply mt-10 scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0;
+}
+.markdown h3 {
+  @apply mt-8 scroll-m-20 text-xl font-semibold tracking-tight;
+}
+.markdown h4 {
+  @apply mt-4 scroll-m-20 text-xl font-semibold tracking-tight;
+}
+.markdown p {
+  @apply leading-7 [&:not(:first-child)]:mt-4;
+}
+.markdown p.lead {
+  @apply text-lg text-slate-600 sm:text-xl;
+}
+.markdown blockquote {
+  @apply mt-6 border-l-2 pl-6 italic;
+}
+.markdown ul {
+  @apply my-6 ml-6 list-disc [&>li]:mt-2;
+}
+.markdown iframe {
+  @apply max-w-full;
+}
+.markdown code {
+  @apply relative rounded bg-slate-100 px-1.5 py-1 font-mono text-sm font-semibold;
+}
+.markdown th {
+  @apply min-w-[200px] pt-2 text-left align-top;
 }
 
-.content p {
-  text-overflow: ellipsis;
-}
-
-/* START: Legacy Bootstrap styles, added for retro-compatibility */
-* {
-  box-sizing: border-box;
-}
-
-body {
-  color: #333;
-  font-size: 14px;
-}
-
-a {
-  text-decoration: none;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 500;
-}
-
+/* TODO: Migrate away from these default styles below */
 label {
+  font-size: 14px;
   display: inline-block;
   font-weight: 700;
 }
 
-.form-control {
-  width: 100%;
+summary {
+  color: #337ab7;
+  cursor: pointer;
 }
 
-button, input, select, textarea {
-  font: inherit;
+section {
+  margin: 1.9rem 0px;
 }
-
-hr {
-  margin-top: 20px;
-  margin-bottom: 20px;
-  border: 0;
-  border-top: 1px solid #eee;
-}
-
-pre {
-  display: block;
-  padding: 9.5px;
-  margin: 0 0 10px;
-  font-size: 13px;
-  line-height: 1.42857143;
-  color: #333;
-  word-break: break-all;
-  word-wrap: break-word;
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-th {
-  text-align: left;
-}
-
-/* END: Legacy Bootstrap styles, added for retro-compatibility */

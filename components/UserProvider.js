@@ -12,7 +12,7 @@ import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from 
 import UserClass from '../lib/LoggedInUser';
 import { withTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 
-import { TOAST_TYPE, withToasts } from './ToastProvider';
+import { toast } from './ui/useToast';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,
@@ -26,7 +26,7 @@ export const UserContext = React.createContext({
 class UserProvider extends React.Component {
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired,
-    addToast: PropTypes.func,
+    toast: PropTypes.func,
     twoFactorAuthPrompt: PropTypes.object,
     router: PropTypes.object,
     token: PropTypes.string,
@@ -79,11 +79,30 @@ class UserProvider extends React.Component {
     }
   };
 
-  logout = async () => {
+  logout = async ({ redirect, skipQueryRefetch } = {}) => {
     removeFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
     removeFromLocalStorage(LOCAL_STORAGE_KEYS.LAST_DASHBOARD_SLUG);
+    removeFromLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE);
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
-    await this.props.client.resetStore();
+    // Clear the Apollo store without automatically refetching queries
+    await this.props.client.clearStore();
+
+    // By default, we refetch all queries to make sure we don't display stale data
+    if (!skipQueryRefetch) {
+      await this.props.client.reFetchObservableQueries();
+    }
+    // Otherwise we refetch only the LoggedInUser query to make the API clear the rootRedirect cookie
+    else {
+      await this.props.client.refetchQueries({
+        include: ['LoggedInUser'],
+      });
+    }
+
+    if (redirect) {
+      this.props.router.push({
+        pathname: redirect,
+      });
+    }
   };
 
   login = async token => {
@@ -111,7 +130,7 @@ class UserProvider extends React.Component {
         this.logout();
         this.setState({ loadingLoggedInUser: false });
         const message = formatErrorMessage(intl, createError(ERROR.JWT_EXPIRED));
-        this.props.addToast({ type: TOAST_TYPE.ERROR, message });
+        toast({ variant: 'error', message });
         return null;
       }
 
@@ -125,8 +144,12 @@ class UserProvider extends React.Component {
             const decodedToken = jwt.decode(token);
 
             const result = await twoFactorAuthPrompt.open({
-              supportedMethods: decodedToken.supported2FAMethods ?? ['totp', 'recovery_code'],
+              supportedMethods: decodedToken.supported2FAMethods,
+              authenticationOptions: decodedToken.authenticationOptions,
+              isRequired: true,
+              allowRecovery: true,
             });
+
             const LoggedInUser = await getLoggedInUser({
               token: getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN),
               twoFactorAuthenticatorCode: result.code,
@@ -148,8 +171,8 @@ class UserProvider extends React.Component {
             return LoggedInUser;
           } catch (e) {
             this.setState({ loadingLoggedInUser: false, errorLoggedInUser: e.message });
-            this.props.addToast({
-              type: TOAST_TYPE.ERROR,
+            toast({
+              variant: 'error',
               message: e.message,
             });
 
@@ -210,8 +233,8 @@ const withUser = WrappedComponent => {
   return WithUser;
 };
 
-export default withToasts(
-  injectIntl(withApollo(withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(injectIntl(UserProvider)))))),
+export default injectIntl(
+  withApollo(withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(injectIntl(UserProvider))))),
 );
 
 export { UserConsumer, withUser };

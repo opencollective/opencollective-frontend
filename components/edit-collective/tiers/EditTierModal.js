@@ -21,7 +21,6 @@ import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import { Box, Flex } from '../../Grid';
 import InputFieldPresets from '../../InputFieldPresets';
-import InputSwitch from '../../InputSwitch';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
@@ -33,7 +32,8 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledMo
 import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
 import { Span } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { Switch } from '../../ui/Switch';
+import { useToast } from '../../ui/useToast';
 
 import ConfirmTierDeleteModal from './ConfirmTierDeleteModal';
 
@@ -429,10 +429,10 @@ function FormFields({ collective, values, hideTypeSelect }) {
             alignItems={'center'}
           >
             {({ field, form }) => (
-              <InputSwitch
+              <Switch
                 name={field.name}
                 checked={field.value}
-                onChange={event => form.setFieldValue(field.name, event.target.checked)}
+                onCheckedChange={checked => form.setFieldValue(field.name, checked)}
               />
             )}
           </StyledInputFormikField>
@@ -459,10 +459,10 @@ function FormFields({ collective, values, hideTypeSelect }) {
             alignItems={'center'}
           >
             {({ field, form }) => (
-              <InputSwitch
+              <Switch
                 name={field.name}
                 checked={field.value}
-                onChange={event => form.setFieldValue(field.name, event.target.checked)}
+                onCheckedChange={checked => form.setFieldValue(field.name, checked)}
               />
             )}
           </StyledInputFormikField>
@@ -555,7 +555,7 @@ const EditSectionContainer = styled(Flex)`
   overflow-y: scroll;
   flex-grow: 1;
   flex-direction: column;
-  padding-right: 1rem;
+  padding-right: 0.65rem;
   min-width: 250px;
 
   @media (min-width: 700px) {
@@ -621,11 +621,11 @@ const ModalContainer = styled(StyledModal)`
 
 const FieldDescription = styled.div`
   color: #737373;
-  font-size: 1.2rem;
+  font-size: 0.75rem;
 `;
 
 const ContributeCardPreviewContainer = styled.div`
-  padding: 2rem;
+  padding: 1.25rem;
   @media (max-width: 700px) {
     padding: 0;
   }
@@ -831,7 +831,7 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
   const [deleteTier, { loading: isDeleting }] = useMutation(deleteTierMutation, { context: API_V2_CONTEXT });
 
   const [isConfirmingDelete, setIsConfirmingDelete] = React.useState(false);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const onDeleteTierClick = React.useCallback(async () => {
     setIsConfirmingDelete(true);
@@ -852,15 +852,15 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
           },
         });
         onClose();
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
+        toast({
+          variant: 'success',
           message: intl.formatMessage(
             { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} deleted.' },
             { type: tier.type },
           ),
         });
       } catch (e) {
-        addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e.message) });
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e.message) });
       } finally {
         setIsConfirmingDelete(false);
       }
@@ -887,8 +887,8 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
           try {
             const result = await submitFormMutation({ variables: { tier, account: { legacyId: collective.id } } });
             onUpdate?.(result);
-            addToast({
-              type: TOAST_TYPE.SUCCESS,
+            toast({
+              variant: 'success',
               message: isEditing
                 ? intl.formatMessage(
                     { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} updated.' },
@@ -901,7 +901,7 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
             });
             onClose();
           } catch (e) {
-            addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+            toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
           }
         }}
       >
@@ -936,7 +936,7 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
                   </PreviewSectionContainer>
                 </ModalSectionContainer>
               </ModalBody>
-              <ModalFooter isFullWidth dividerMargin="1rem 0">
+              <ModalFooter isFullWidth dividerMargin="0.65rem 0">
                 <EditModalActionsContainer>
                   {isEditing && (
                     <DeleteModalButton

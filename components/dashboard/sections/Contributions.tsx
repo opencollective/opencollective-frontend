@@ -1,12 +1,10 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { DotsHorizontalRounded } from '@styled-icons/boxicons-regular/DotsHorizontalRounded';
-import { themeGet } from '@styled-system/theme-get';
+import { compact, isNil, mapValues, omitBy, pick, toNumber } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { BREAKPOINTS, useWindowResize } from '../../../lib/hooks/useWindowResize';
 
 import Avatar from '../../Avatar';
 import Container from '../../Container';
@@ -14,21 +12,54 @@ import { DataTable } from '../../DataTable';
 import DateTime from '../../DateTime';
 import EditOrderModal, { EditOrderActions } from '../../EditOrderModal';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
-import { Box, Flex } from '../../Grid';
+import { Box } from '../../Grid';
+import LinkCollective from '../../LinkCollective';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import OrderStatusTag from '../../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../../PaymentMethodTypeWithIcon';
-import PopupMenu from '../../PopupMenu';
 import { managedOrderFragment } from '../../recurring-contributions/graphql/queries';
-import StyledButton from '../../StyledButton';
-import StyledRoundButton from '../../StyledRoundButton';
+import SearchBar from '../../SearchBar';
 import StyledTabs from '../../StyledTabs';
-import { H1, P, Span } from '../../Text';
-import { AdminSectionProps } from '../types';
+import { Span } from '../../Text';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../../ui/DropdownMenu';
+import { Pagination } from '../../ui/Pagination';
+import { TableActionsButton } from '../../ui/Table';
+import DashboardHeader from '../DashboardHeader';
+import { DashboardSectionProps } from '../types';
 
-const manageContributionsQuery = gql`
-  query DashboardRecurringContributions($slug: String!) {
+enum ContributionsTab {
+  RECURRING = 'RECURRING',
+  ONETIME = 'ONETIME',
+  CANCELED = 'CANCELED',
+}
+
+const VIEWS = {
+  RECURRING: {
+    onlyActiveSubscriptions: true,
+    includeIncognito: true,
+  },
+  ONETIME: {
+    includeIncognito: true,
+    status: ['PAID'],
+    frequency: 'ONETIME',
+    minAmount: 1,
+  },
+  CANCELED: {
+    includeIncognito: true,
+    status: ['CANCELLED'],
+    minAmount: 1,
+  },
+};
+
+const dashboardContributionsMetadataQuery = gql`
+  query DashboardRecurringMetadataContributions($slug: String!, $filter: AccountOrdersFilter!) {
     account(slug: $slug) {
       id
       legacyId
@@ -43,21 +74,45 @@ const manageContributionsQuery = gql`
           slug
         }
       }
-      recurring: orders(filter: OUTGOING, onlyActiveSubscriptions: true, includeIncognito: true) {
+      RECURRING: orders(filter: $filter, onlyActiveSubscriptions: true, includeIncognito: true) {
         totalCount
-        nodes {
-          id
-          ...ManagedOrderFields
-        }
       }
-      oneTime: orders(filter: OUTGOING, frequency: ONETIME, status: [PAID], includeIncognito: true, minAmount: 1) {
+      ONETIME: orders(filter: $filter, frequency: ONETIME, status: [PAID], includeIncognito: true, minAmount: 1) {
         totalCount
-        nodes {
-          id
-          ...ManagedOrderFields
-        }
       }
-      canceled: orders(filter: OUTGOING, status: [CANCELLED], includeIncognito: true) {
+      CANCELED: orders(filter: $filter, status: [CANCELLED], includeIncognito: true) {
+        totalCount
+      }
+    }
+  }
+`;
+
+const dashboardContributionsQuery = gql`
+  query DashboardRecurringContributions(
+    $slug: String!
+    $searchTerm: String
+    $offset: Int
+    $limit: Int
+    $filter: AccountOrdersFilter!
+    $frequency: ContributionFrequency
+    $status: [OrderStatus!]
+    $onlyActiveSubscriptions: Boolean
+    $includeIncognito: Boolean
+    $minAmount: Int
+  ) {
+    account(slug: $slug) {
+      id
+      orders(
+        filter: $filter
+        frequency: $frequency
+        status: $status
+        onlyActiveSubscriptions: $onlyActiveSubscriptions
+        includeIncognito: $includeIncognito
+        minAmount: $minAmount
+        searchTerm: $searchTerm
+        offset: $offset
+        limit: $limit
+      ) {
         totalCount
         nodes {
           id
@@ -69,65 +124,38 @@ const manageContributionsQuery = gql`
   ${managedOrderFragment}
 `;
 
-const ActionButton = styled.button`
-  appearance: none;
-  border: none;
-  cursor: pointer;
-  outline: 0;
-  min-width: max-content;
-  background: transparent;
-  background-color: transparent;
-  border: 0;
-  padding: 8px 12px;
-  margin: 0 8px;
-  font-size: 13px;
-  border-radius: 6px;
-  white-space: nowrap;
-  vertical-align: middle;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: ${props => props.color || props.theme.colors.black[800]};
-  gap: 8px;
-  cursor: pointer;
-  &:hover {
-    background-color: #f4f5f7;
-    text-decoration: none;
-    svg {
-      color: #334155;
-    }
-  }
-
-  svg {
-    color: #94a3b8;
-    height: 14px;
-    width: 14px;
-  }
-
-  @media screen and (max-width: ${themeGet('breakpoints.0')}) {
-    font-size: 16px;
-    padding: 12px;
-
-    svg {
-      height: 16px;
-      width: 16px;
-    }
-  }
-`;
-
-const getColumns = ({ tab, setEditOrder, intl }) => {
+const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
   const toAccount = {
     accessorKey: 'toAccount',
     header: intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' }),
     cell: ({ cell }) => {
       const toAccount = cell.getValue();
       return (
-        <Flex alignItems="center" maxWidth="200px">
-          <Avatar size={24} collective={toAccount} mr={2} />
-          <Span as="span" truncateOverflow>
-            {toAccount.name}
-          </Span>
-        </Flex>
+        <LinkCollective collective={toAccount} className="hover:underline">
+          <div className="flex max-w-[200px] items-center">
+            <Avatar size={24} collective={toAccount} mr={2} />
+            <Span as="span" truncateOverflow>
+              {toAccount.name}
+            </Span>
+          </div>
+        </LinkCollective>
+      );
+    },
+  };
+  const fromAccount = {
+    accessorKey: 'fromAccount',
+    header: intl.formatMessage({ id: 'Contributor', defaultMessage: 'Contributor' }),
+    cell: ({ cell }) => {
+      const fromAccount = cell.getValue();
+      return (
+        <LinkCollective collective={fromAccount} className="hover:underline">
+          <div className="flex max-w-[200px] items-center">
+            <Avatar size={24} collective={fromAccount} mr={2} />
+            <Span as="span" truncateOverflow>
+              {fromAccount.name}
+            </Span>
+          </div>
+        </LinkCollective>
       );
     },
   };
@@ -141,7 +169,11 @@ const getColumns = ({ tab, setEditOrder, intl }) => {
     cell: ({ cell }) => {
       const pm = cell.getValue();
       if (pm) {
-        return <PaymentMethodTypeWithIcon iconSize={18} type={pm.type} />;
+        return (
+          <div className="flex items-center gap-2 truncate">
+            <PaymentMethodTypeWithIcon iconSize={18} type={pm.type} />
+          </div>
+        );
       }
     },
   };
@@ -151,16 +183,16 @@ const getColumns = ({ tab, setEditOrder, intl }) => {
     cell: ({ cell }) => {
       const status = cell.getValue();
       return (
-        <Flex>
+        <div>
           <OrderStatusTag status={status} />
-        </Flex>
+        </div>
       );
     },
   };
 
-  if (tab === 'oneTime') {
+  if (tab === ContributionsTab.ONETIME) {
     return [
-      toAccount,
+      isIncoming ? fromAccount : toAccount,
       orderId,
       paymentMethod,
       {
@@ -168,7 +200,11 @@ const getColumns = ({ tab, setEditOrder, intl }) => {
         header: intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
         cell: ({ cell }) => {
           const amount = cell.getValue();
-          return <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />;
+          return (
+            <div className="flex items-center gap-2 truncate">
+              <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />
+            </div>
+          );
         },
       },
       {
@@ -176,12 +212,16 @@ const getColumns = ({ tab, setEditOrder, intl }) => {
         header: intl.formatMessage({ id: 'expense.incurredAt', defaultMessage: 'Date' }),
         cell: ({ cell }) => {
           const date = cell.getValue();
-          return <DateTime value={date} dateStyle="medium" timeStyle={undefined} />;
+          return (
+            <div className="flex items-center gap-2 truncate">
+              <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
+            </div>
+          );
         },
       },
       status,
     ];
-  } else if (['recurring', 'canceled'].includes(tab)) {
+  } else if ([ContributionsTab.RECURRING, ContributionsTab.CANCELED].includes(tab)) {
     const amount = {
       accessorKey: 'amount',
       header: intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
@@ -189,7 +229,9 @@ const getColumns = ({ tab, setEditOrder, intl }) => {
         const amount = cell.getValue();
         const order = row.original;
         return (
-          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} frequency={order.frequency} />
+          <div className="flex items-center gap-2 truncate">
+            <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} frequency={order.frequency} />
+          </div>
         );
       },
     };
@@ -198,7 +240,11 @@ const getColumns = ({ tab, setEditOrder, intl }) => {
       header: intl.formatMessage({ id: 'TotalDonated', defaultMessage: 'Total Donated' }),
       cell: ({ cell }) => {
         const amount = cell.getValue();
-        return <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />;
+        return (
+          <div className="flex items-center gap-2 truncate">
+            <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />
+          </div>
+        );
       },
     };
     const processedAt = {
@@ -207,253 +253,203 @@ const getColumns = ({ tab, setEditOrder, intl }) => {
       cell: ({ cell }) => {
         const date = cell.getValue();
         if (date) {
-          return <DateTime value={date} dateStyle="medium" timeStyle={undefined} />;
+          return (
+            <div className="flex items-center gap-2 truncate">
+              <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
+            </div>
+          );
         }
       },
     };
 
-    if (tab === 'recurring') {
-      return [
-        toAccount,
+    if (tab === ContributionsTab.RECURRING) {
+      const actions = {
+        accessorKey: 'actions',
+        header: null,
+        meta: { className: 'flex justify-end' },
+        cell: ({ row }) => {
+          const order = row.original;
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <TableActionsButton />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}>
+                  <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setEditOrder({ order, action: 'editAmount' })}>
+                  <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-red-600" onClick={() => setEditOrder({ order, action: 'cancel' })}>
+                  <FormattedMessage id="subscription.menu.cancelContribution" defaultMessage="Cancel contribution" />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+      };
+      return compact([
+        isIncoming ? fromAccount : toAccount,
         orderId,
         paymentMethod,
         amount,
         totalDonations,
         processedAt,
         status,
-        {
-          header: intl.formatMessage({ id: 'CollectivePage.NavBar.ActionMenu.Actions', defaultMessage: 'Actions' }),
-          cell: ({ row }) => {
-            const order = row.original;
-            return (
-              <Flex justifyContent="center">
-                <PopupMenu
-                  placement="bottom-start"
-                  Button={({ onClick }) => (
-                    <StyledRoundButton data-cy="actions" size={32} onClick={onClick} buttonSize="small">
-                      <DotsHorizontalRounded size="24px" color={themeGet('colors.black.600')} />
-                    </StyledRoundButton>
-                  )}
-                >
-                  {() => (
-                    <Flex flexDirection="column">
-                      <ActionButton onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}>
-                        <FormattedMessage
-                          id="subscription.menu.editPaymentMethod"
-                          defaultMessage="Update payment method"
-                        />
-                      </ActionButton>
-                      <ActionButton onClick={() => setEditOrder({ order, action: 'editAmount' })}>
-                        <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
-                      </ActionButton>
-                      <ActionButton
-                        onClick={() => setEditOrder({ order, action: 'cancel' })}
-                        color={themeGet('colors.red.600')}
-                      >
-                        <FormattedMessage
-                          id="subscription.menu.cancelContribution"
-                          defaultMessage="Cancel contribution"
-                        />
-                      </ActionButton>
-                    </Flex>
-                  )}
-                </PopupMenu>
-              </Flex>
-            );
-          },
-        },
-      ];
+        isIncoming ? null : actions,
+      ]);
     } else {
-      return [toAccount, orderId, paymentMethod, amount, totalDonations, processedAt, status];
+      return [
+        isIncoming ? fromAccount : toAccount,
+        orderId,
+        paymentMethod,
+        amount,
+        totalDonations,
+        processedAt,
+        status,
+      ];
     }
   }
 };
 
-export const cardColumns = ({ tab, setEditOrder }) => [
-  {
-    accessorKey: 'summary',
-    header: null,
-    cell: ({ row }) => {
-      const order = row.original;
-      return (
-        <Flex alignItems="center" gap="16px">
-          <Avatar collective={order.toAccount} radius={40} />
-          <Flex flexDirection="column" gap="8px" flexGrow={1}>
-            <Flex justifyContent={['flex-start', 'space-between']} gap="8px" alignItems="baseline">
-              <P fontSize="13px" fontWeight="400">
-                <FormattedMessage id="order.id" defaultMessage="Contribution #" />
-                {order.legacyId}
-              </P>
-              <Flex
-                alignItems={['flex-end', 'center']}
-                flexDirection={['column', 'row']}
-                gap="16px"
-                justifyContent={['space-between', 'flex-end']}
-                flexGrow={1}
-              >
-                {order.frequency && order.processedAt && (
-                  <P fontSize="13px" fontWeight="400" display={['none', 'block']}>
-                    <FormattedMessage defaultMessage="Last charge" />
-                    :&nbsp;
-                    <DateTime value={order.processedAt} dateStyle="medium" timeStyle={undefined} />
-                  </P>
-                )}
-                <OrderStatusTag status={order.status} />
-                <P fontSize="16px">
-                  <FormattedMoneyAmount
-                    amount={order.amount.valueInCents}
-                    currency={order.amount.currency}
-                    frequency={order.frequency}
-                  />
-                </P>
-              </Flex>
-            </Flex>
-            <Flex justifyContent="space-between" alignItems="baseline" flexDirection={['column', 'row']} gap="8px">
-              <Flex fontSize="13px" fontWeight="400">
-                {order.frequency && order.totalDonations && (
-                  <Box mr="16px">
-                    <FormattedMessage defaultMessage="Total contributed" />
-                    :&nbsp;
-                    <FormattedMoneyAmount
-                      amount={order.totalDonations.valueInCents}
-                      currency={order.totalDonations.currency}
-                    />
-                  </Box>
-                )}
-                {order.paymentMethod && <PaymentMethodTypeWithIcon iconSize={18} type={order.paymentMethod?.type} />}
-              </Flex>
-              <Flex justifyContent={['space-between', 'flex-end']} alignItems="baseline" width={['100%', 'auto']}>
-                {order.frequency && order.processedAt && (
-                  <P fontSize="13px" fontWeight="400" display={['block', 'none']}>
-                    <FormattedMessage defaultMessage="Last charge" />
-                    :&nbsp;
-                    <DateTime value={order.processedAt} dateStyle="medium" timeStyle={undefined} />
-                  </P>
-                )}
-                {tab === 'recurring' && (
-                  <Flex justifyContent="center">
-                    <PopupMenu
-                      placement="bottom-start"
-                      Button={({ onClick }) => (
-                        <StyledButton data-cy="actions" onClick={onClick} buttonSize="tiny">
-                          <FormattedMessage id="Edit" defaultMessage="Edit" />
-                        </StyledButton>
-                      )}
-                    >
-                      {() => (
-                        <Flex flexDirection="column">
-                          <ActionButton onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}>
-                            <FormattedMessage
-                              id="subscription.menu.editPaymentMethod"
-                              defaultMessage="Update payment method"
-                            />
-                          </ActionButton>
-                          <ActionButton onClick={() => setEditOrder({ order, action: 'editAmount' })}>
-                            <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
-                          </ActionButton>
-                          <ActionButton
-                            onClick={() => setEditOrder({ order, action: 'cancel' })}
-                            color={themeGet('colors.red.600')}
-                          >
-                            <FormattedMessage
-                              id="subscription.menu.cancelContribution"
-                              defaultMessage="Cancel contribution"
-                            />
-                          </ActionButton>
-                        </Flex>
-                      )}
-                    </PopupMenu>
-                  </Flex>
-                )}
-              </Flex>
-            </Flex>
-          </Flex>
-        </Flex>
-      );
+const PAGE_SIZE = 20;
+const QUERY_FILTERS = ['searchTerm', 'offset'];
+const QUERY_FORMATERS = {
+  offset: toNumber,
+};
+const pickQueryFilters = query =>
+  mapValues(omitBy(pick(query, QUERY_FILTERS), isNil), (value, key) =>
+    QUERY_FORMATERS[key] ? QUERY_FORMATERS[key](value) : value,
+  );
+
+type ContributionsProps = DashboardSectionProps & {
+  direction?: 'INCOMING' | 'OUTGOING';
+};
+
+const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
+  const router = useRouter();
+  const intl = useIntl();
+  const [tab, setTab] = React.useState<ContributionsTab>(ContributionsTab.RECURRING);
+  const queryValues = pickQueryFilters(router.query);
+  const {
+    data: metadata,
+    loading: metadataLoading,
+    error: metadataError,
+  } = useQuery(dashboardContributionsMetadataQuery, {
+    variables: {
+      slug: accountSlug,
+      filter: direction || 'OUTGOING',
     },
-  },
-];
-
-const TableWrapper = styled.div`
-  > div {
-    border-radius: 16px;
-  }
-
-  thead th {
-    padding: 16px 0px;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 18px;
-    color: ${props => props.theme.colors.black[700]};
-    :first-child {
-      padding-left: 20px;
-    }
-    :last-child {
-      padding-right: 20px;
-    }
-  }
-
-  tbody tr td {
-    font-size: 13px;
-    padding: 16px 0px;
-    color: ${props => props.theme.colors.black[800]};
-    :first-child {
-      padding-left: 20px;
-    }
-    :last-child {
-      padding-right: 20px;
-    }
-  }
-`;
-
-const Home = ({ account }: AdminSectionProps) => {
-  const { data, loading } = useQuery(manageContributionsQuery, {
-    variables: { slug: account.slug },
     context: API_V2_CONTEXT,
   });
-  const intl = useIntl();
-  const [tab, setTab] = React.useState('recurring');
-  const [view, setView] = React.useState<'table' | 'card'>('table');
+  const {
+    data,
+    previousData,
+    loading: queryLoading,
+    error: queryError,
+  } = useQuery(dashboardContributionsQuery, {
+    variables: {
+      slug: accountSlug,
+      filter: direction || 'OUTGOING',
+      limit: PAGE_SIZE,
+      ...VIEWS[tab],
+      ...queryValues,
+    },
+    context: API_V2_CONTEXT,
+  });
   const [editOrder, setEditOrder] = React.useState<{ order?: { id: string }; action: EditOrderActions }>({
     order: null,
     action: null,
   });
-  const error = false;
 
   const tabs = [
-    { id: 'recurring', label: 'Recurring', count: data?.account?.recurring?.totalCount || undefined },
-    { id: 'oneTime', label: 'One-Time', count: data?.account?.oneTime?.totalCount || undefined },
-    { id: 'canceled', label: 'Canceled', count: data?.account?.canceled?.totalCount || undefined },
+    {
+      id: ContributionsTab.RECURRING,
+      label: 'Recurring',
+      count: metadata?.account?.[ContributionsTab.RECURRING].totalCount,
+    },
+    {
+      id: ContributionsTab.ONETIME,
+      label: 'One-Time',
+      count: metadata?.account?.[ContributionsTab.ONETIME].totalCount,
+    },
+    {
+      id: ContributionsTab.CANCELED,
+      label: 'Canceled',
+      count: metadata?.account?.[ContributionsTab.CANCELED].totalCount,
+    },
   ];
 
-  useWindowResize(() => setView(window.innerWidth > BREAKPOINTS.LARGE ? 'table' : 'card'));
+  const selectedOrders = data?.account?.orders.nodes || [];
+  const pages = Math.ceil(((data || previousData)?.account?.orders.totalCount || 1) / PAGE_SIZE);
+  const currentPage = toNumber((queryValues.offset || 0) + PAGE_SIZE) / PAGE_SIZE;
+  const isIncoming = direction === 'INCOMING';
+  const loading = metadataLoading || queryLoading;
+  const error = metadataError || queryError;
 
-  const selectedOrders = data?.account?.[tab]?.nodes || [];
-  const columns = view === 'table' ? getColumns({ tab, setEditOrder, intl }) : cardColumns({ tab, setEditOrder });
+  const updateFilters = props =>
+    router.replace({ pathname: router.asPath.split('?')[0], query: pickQueryFilters({ ...router.query, ...props }) });
+  const handleTabUpdate = tab => {
+    setTab(tab);
+    updateFilters({ offset: null });
+  };
+  const columns = getColumns({ tab, setEditOrder, intl, isIncoming });
 
   return (
     <Container>
-      <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-        <FormattedMessage id="Contributions" defaultMessage="Contributions" />
-      </H1>
-      <StyledTabs tabs={tabs} selectedId={tab} onChange={setTab} mt="24px" />
-      <Flex flexDirection="column" mt="24px">
+      <DashboardHeader
+        title={
+          isIncoming ? (
+            <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
+          ) : (
+            <FormattedMessage id="OutgoingContributions" defaultMessage="Outgoing Contributions" />
+          )
+        }
+        description={
+          isIncoming ? (
+            <FormattedMessage id="IncomingContributions.description" defaultMessage="Contributions to your account." />
+          ) : (
+            <FormattedMessage
+              id="OutgoingContributions.description"
+              defaultMessage="Manage your contributions to other Collectives."
+            />
+          )
+        }
+        actions={
+          <SearchBar
+            placeholder={intl.formatMessage({ defaultMessage: 'Search...', id: 'search.placeholder' })}
+            defaultValue={router.query.searchTerm}
+            height="40px"
+            onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
+          />
+        }
+      />
+
+      <Box mb="24px">
+        <StyledTabs tabs={tabs} selectedId={tab} onChange={handleTabUpdate} />
+      </Box>
+      <div className="flex flex-col gap-4">
         {error && <MessageBoxGraphqlError error={error} />}
         {loading && <LoadingPlaceholder height="250px" width="100%" borderRadius="16px" />}
         {!error && !loading && (
-          <TableWrapper>
-            <DataTable
-              columns={columns}
-              data={selectedOrders}
-              highlightRowOnHover={false}
-              hideHeader={view === 'card'}
-            />
-          </TableWrapper>
+          <DataTable
+            columns={columns}
+            data={selectedOrders}
+            mobileTableView
+            emptyMessage={() => <FormattedMessage id="NoContributions" defaultMessage="No contributions" />}
+          />
         )}
-      </Flex>
+        <Pagination
+          totalPages={pages}
+          page={currentPage}
+          onChange={page => updateFilters({ offset: (page - 1) * PAGE_SIZE })}
+        />
+      </div>
       {editOrder.order && (
         <EditOrderModal
-          account={account}
+          accountSlug={accountSlug}
           order={editOrder.order}
           action={editOrder.action}
           onClose={() => setEditOrder({ order: null, action: null })}
@@ -463,4 +459,4 @@ const Home = ({ account }: AdminSectionProps) => {
   );
 };
 
-export default Home;
+export default Contributions;

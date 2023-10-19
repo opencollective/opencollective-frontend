@@ -1,8 +1,8 @@
 const breakpoints = [
   '40em', //  640px - xsmall
-  '52em', //  832px - small
+  '48em', //  768pz - small
   '64em', // 1024px - medium
-  '88em', // 1408px - large
+  '80em', // 1280px - large
 ];
 
 export default breakpoints;

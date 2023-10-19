@@ -6,7 +6,7 @@ import { BREAKPOINTS, getViewportFromWidth, VIEWPORTS } from '../withViewport';
 export { BREAKPOINTS, VIEWPORTS };
 
 export const useWindowResize = (onResizeCallback?) => {
-  const [viewport, setViewport] = useState<keyof typeof VIEWPORTS>(VIEWPORTS.UNKNOWN);
+  const [viewport, setViewport] = useState<VIEWPORTS>(VIEWPORTS.UNKNOWN);
   const callback = (...args) => {
     const newViewport = getViewportFromWidth(window.innerWidth);
     setViewport(newViewport);

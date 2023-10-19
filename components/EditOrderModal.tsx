@@ -27,6 +27,7 @@ import {
   sortAndFilterPaymentMethods,
   useUpdatePaymentMethod,
 } from './recurring-contributions/UpdatePaymentMethodPopUp';
+import { toast } from './ui/useToast';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import { Box, Flex } from './Grid';
 import I18nFormatters from './I18nFormatters';
@@ -40,7 +41,6 @@ import StyledRadioList from './StyledRadioList';
 import StyledSelect from './StyledSelect';
 import StyledTextarea from './StyledTextarea';
 import { H4, P, Span } from './Text';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const i18nReasons = defineMessages({
   NO_LONGER_WANT_TO_SUPPORT: {
@@ -56,7 +56,7 @@ export type EditOrderActions = 'cancel' | 'editAmount' | 'editPaymentMethod';
 type EditOrderModalProps = {
   onClose: () => void;
   order: any;
-  account: any;
+  accountSlug: string;
   action: EditOrderActions;
 };
 
@@ -71,7 +71,6 @@ const cancelRecurringContributionMutation = gql`
 
 const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
 
   const [submitCancellation] = useMutation(cancelRecurringContributionMutation, {
     context: API_V2_CONTEXT,
@@ -83,8 +82,7 @@ const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
         variables: values,
       });
       props.onClose();
-      addToast({
-        type: TOAST_TYPE.INFO,
+      toast({
         message: (
           <FormattedMessage
             id="subscription.createSuccessCancel"
@@ -95,7 +93,7 @@ const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
       });
     } catch (error) {
       const errorMsg = getErrorFromGraphqlException(error).message;
-      addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
+      toast({ variant: 'error', message: errorMsg });
     }
   };
   const formik = useFormik({
@@ -165,7 +163,6 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
 
   // state management
   const { locale } = useIntl();
-  const { addToast } = useToasts();
   const { isSubmittingOrder, updateOrder } = useUpdateOrder({ contribution: props.order, onSuccess: props.onClose });
   const tiers = get(data, 'account.tiers.nodes', null);
   const disableCustomContributions = get(data, 'account.settings.disableCustomContributions', false);
@@ -309,7 +306,7 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
               tier={selectedTier}
               style={{ height: 47, size: 'responsive' }}
               subscriptionStartDate={getSubscriptionStartDate(props.order)}
-              onError={e => addToast({ type: TOAST_TYPE.ERROR, title: e.message })}
+              onError={e => toast({ variant: 'error', title: e.message })}
               onSuccess={({ subscriptionId }) =>
                 updateOrder(selectedTier, selectedAmountOption, inputAmountValue, subscriptionId)
               }
@@ -333,13 +330,11 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
 
 const EditPaymentMethodModal = withStripeLoader(
   ({
-    account,
+    accountSlug,
     order: contribution,
     loadStripe,
     ...props
   }: Omit<EditOrderModalProps, 'action'> & { loadStripe: any }) => {
-    const { addToast } = useToasts();
-
     const mutationOptions = { context: API_V2_CONTEXT };
     // state management
     const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
@@ -354,7 +349,7 @@ const EditPaymentMethodModal = withStripeLoader(
 
     // GraphQL mutations and queries
     const { data, refetch } = useQuery(paymentMethodsQuery, {
-      variables: { accountId: account.id, orderId: contribution.id },
+      variables: { accountSlug, orderId: contribution.id },
       context: API_V2_CONTEXT,
       fetchPolicy: 'network-only',
     });
@@ -374,8 +369,8 @@ const EditPaymentMethodModal = withStripeLoader(
       const { message, response } = stripeError;
 
       if (!response) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: message,
         });
         setAddingPaymentMethod(false);
@@ -385,8 +380,8 @@ const EditPaymentMethodModal = withStripeLoader(
       const stripe = await getStripe();
       const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
       if (result.error) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: result.error.message,
         });
         setAddingPaymentMethod(false);
@@ -398,8 +393,8 @@ const EditPaymentMethodModal = withStripeLoader(
           });
           return handleSuccess(response.data.confirmCreditCard.paymentMethod);
         } catch (error) {
-          addToast({
-            type: TOAST_TYPE.ERROR,
+          toast({
+            variant: 'error',
             message: error.message,
           });
           setAddingPaymentMethod(false);
@@ -542,8 +537,8 @@ const EditPaymentMethodModal = withStripeLoader(
                 onClick={async () => {
                   setAddingPaymentMethod(true);
                   if (!stripe) {
-                    addToast({
-                      type: TOAST_TYPE.ERROR,
+                    toast({
+                      variant: 'error',
                       message: (
                         <FormattedMessage
                           id="Stripe.Initialization.Error"
@@ -558,7 +553,7 @@ const EditPaymentMethodModal = withStripeLoader(
                   const { token, error } = await stripe.createToken(cardElement);
 
                   if (error) {
-                    addToast({ type: TOAST_TYPE.ERROR, message: error.message });
+                    toast({ variant: 'error', message: error.message });
                     return false;
                   }
                   const newStripePaymentMethod = stripeTokenToPaymentMethod(token);
@@ -568,13 +563,13 @@ const EditPaymentMethodModal = withStripeLoader(
                       variables: {
                         creditCardInfo: newCreditCardInfo,
                         name: get(newStripePaymentMethod, 'name'),
-                        account: { id: account.id },
+                        account: { slug: accountSlug },
                       },
                     });
                     return handleAddPaymentMethodResponse(res.data.addCreditCard);
                   } catch (error) {
                     const errorMsg = getErrorFromGraphqlException(error).message;
-                    addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
+                    toast({ variant: 'error', message: errorMsg });
                     setAddingPaymentMethod(false);
                     return false;
                   }
