@@ -5,6 +5,7 @@ export enum PREVIEW_FEATURE_KEYS {
   DASHBOARD = 'dashboard',
   EXPENSE_PIPELINE = 'EXPENSE_PIPELINE',
   EXPENSE_OCR = 'EXPENSE_OCR',
+  EXPENSE_CATEGORIZATION = 'EXPENSE_CATEGORIZATION',
 }
 
 export type PreviewFeature = {
@@ -43,5 +44,13 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe'],
     enabledByDefaultFor: ['opencollective'],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION,
+    title: 'Expense categorization',
+    description: 'Facilitate your accounting by categorizing your expenses according to a chart of accounts.',
+    publicBeta: false,
+    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe'],
+    env: ['development', 'staging'],
   },
 ];

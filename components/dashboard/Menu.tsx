@@ -24,6 +24,7 @@ import { isHostAccount, isIndividualAccount, isInternalHost, isSelfHostedAccount
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import { ALL_SECTIONS } from './constants';
@@ -250,8 +251,8 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
                 ? [
                     { section: ALL_SECTIONS.FISCAL_HOSTING },
                     {
-                      section: ALL_SECTIONS.HOST_ACCOUNTING,
-                      if: ['development', 'staging'].includes(process.env.OC_ENV),
+                      section: ALL_SECTIONS.CHART_OF_ACCOUNTS,
+                      if: Boolean(LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION)),
                     },
                     { section: ALL_SECTIONS.INVOICES_RECEIPTS },
                     { section: ALL_SECTIONS.RECEIVING_MONEY },

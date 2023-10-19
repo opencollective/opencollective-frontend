@@ -56,6 +56,10 @@ export const getSettingsQuery = gql`
           freeze
         }
         COLLECTIVE_ADMINS_CAN_REFUND
+        EXPENSE_CATEGORIZATION {
+          requiredForExpenseSubmitters
+          requiredForCollectiveAdmins
+        }
       }
       ... on AccountWithHost {
         host {

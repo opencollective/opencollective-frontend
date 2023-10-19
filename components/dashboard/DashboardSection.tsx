@@ -32,7 +32,7 @@ import DashboardHeader from './DashboardHeader';
 
 const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
-  [SECTIONS.HOST_ACCOUNTING]: HostAdminAccountingSection,
+  [SECTIONS.CHART_OF_ACCOUNTS]: HostAdminAccountingSection,
   [SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: HostFinancialContributions,
   [SECTIONS.HOST_EXPENSES]: HostDashboardExpenses,
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
