@@ -9,13 +9,13 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
+import { getCurrentLocalDateStr } from '../../lib/date-utils';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../lib/policies';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
-import { getCurrentDateInUTC } from '../../lib/utils';
 
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../collective-page/graphql/queries';
 import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
@@ -227,7 +227,7 @@ const getInitialValues = values => ({
   hostFeePercent: null,
   description: '',
   memo: null,
-  processedAt: getCurrentDateInUTC(),
+  processedAt: getCurrentLocalDateStr(),
   fromAccount: null,
   tier: null,
   tax: null,
