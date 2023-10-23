@@ -11,7 +11,12 @@ const RootActivityLog = () => {
     <Box my={4}>
       <StyledInputField htmlFor="activity-log-account" label="Account" flex="1 1">
         {({ id }) => (
-          <CollectivePickerAsync inputId={id} onChange={({ value }) => setAccount(value)} collective={account} />
+          <CollectivePickerAsync
+            inputId={id}
+            onChange={({ value }) => setAccount(value)}
+            collective={account}
+            skipGuests={false}
+          />
         )}
       </StyledInputField>
       {account && <ActivityLog accountSlug={account.slug} />}
