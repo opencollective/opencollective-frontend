@@ -211,6 +211,19 @@ const HTMLContent = styled(
     overflow-x: auto;
   }
 
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  ul li,
+  ol li {
+    margin-left: 1.5em;
+  }
+
   ${typography}
   ${space}
 
