@@ -551,7 +551,7 @@ class EditCollectiveForm extends React.Component {
         return <HostVirtualCardsSettings collective={collective} />;
 
       case ALL_SECTIONS.VIRTUAL_CARDS:
-        return <VirtualCards collective={collective} />;
+        return <VirtualCards collective={collective} accountSlug={collective.slug} />;
 
       default:
         return null;
