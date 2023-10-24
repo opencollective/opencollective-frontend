@@ -134,6 +134,10 @@ export function gql(source: "\n  query WorkspaceHome($slug: String!, $limit: Int
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query DashboardVendors($slug: String!, $searchTerm: String, $isArchived: Boolean) {\n    account(slug: $slug) {\n      id\n      name\n      legalName\n      slug\n      type\n\n      ... on Host {\n        expensePolicy\n        settings\n        currency\n        features {\n          id\n          MULTI_CURRENCY_EXPENSES\n        }\n        location {\n          id\n          address\n          country\n        }\n        transferwise {\n          id\n          availableCurrencies\n        }\n        supportedPayoutMethods\n        isTrustedHost\n      }\n\n      vendors(searchTerm: $searchTerm, isArchived: $isArchived) {\n        id\n        ...VendorFields\n      }\n    }\n  }\n  \n"): typeof import('./graphql').DashboardVendorsDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  mutation editVirtualCard(\n    $virtualCard: VirtualCardReferenceInput!\n    $name: String!\n    $limitAmount: AmountInput\n    $limitInterval: VirtualCardLimitInterval\n    $assignee: AccountReferenceInput!\n  ) {\n    editVirtualCard(\n      virtualCard: $virtualCard\n      name: $name\n      limitAmount: $limitAmount\n      limitInterval: $limitInterval\n      assignee: $assignee\n    ) {\n      id\n      name\n      spendingLimitAmount\n      spendingLimitInterval\n      assignee {\n        id\n        name\n        slug\n        imageUrl\n      }\n    }\n  }\n"): typeof import('./graphql').EditVirtualCardDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -283,6 +287,22 @@ export function gql(source: "\n  mutation RemoveTwoFactorAuthFromIndividual(\n  
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation EditTwoFactorAuthenticationMethod($userTwoFactorMethod: UserTwoFactorMethodReferenceInput!, $name: String!) {\n    editTwoFactorAuthenticationMethod(userTwoFactorMethod: $userTwoFactorMethod, name: $name) {\n      id\n      hasTwoFactorAuth\n      twoFactorMethods {\n        id\n        method\n        name\n        createdAt\n        description\n        icon\n      }\n    }\n  }\n"): typeof import('./graphql').EditTwoFactorAuthenticationMethodDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation CreateVendor($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {\n    createVendor(host: $host, vendor: $vendor) {\n      id\n      ...VendorFields\n    }\n  }\n  \n"): typeof import('./graphql').CreateVendorDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation EditVendor($vendor: VendorEditInput!) {\n    editVendor(vendor: $vendor) {\n      id\n      ...VendorFields\n    }\n  }\n  \n"): typeof import('./graphql').EditVendorDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment VendorFields on Vendor {\n    id\n    slug\n    name\n    type\n    description\n    tags\n    imageUrl(height: 96)\n    isArchived\n    createdAt\n\n    location {\n      id\n      address\n      country\n      name\n      structured\n    }\n\n    createdByAccount {\n      id\n      slug\n      name\n      imageUrl\n    }\n\n    vendorInfo {\n      contact {\n        name\n        email\n      }\n      taxFormUrl\n      taxType\n      taxId\n      notes\n    }\n\n    payoutMethods {\n      id\n      type\n      name\n      data\n    }\n  }\n"): typeof import('./graphql').VendorFieldsFragmentDoc;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation SetVendorArchive($vendor: VendorEditInput!, $archive: Boolean!) {\n    editVendor(archive: $archive, vendor: $vendor) {\n      id\n      ...VendorFields\n    }\n  }\n  \n"): typeof import('./graphql').SetVendorArchiveDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

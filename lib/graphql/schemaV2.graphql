@@ -663,6 +663,26 @@ interface Account {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  Get the list of vendors for this account
+  """
+  vendors(
+    """
+    Rank vendors based on their relationship with this account
+    """
+    forAccount: AccountReferenceInput
+
+    """
+    Filter on archived vendors
+    """
+    isArchived: Boolean
+
+    """
+    Search vendors related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+  ): [Vendor]
 }
 
 """
@@ -2779,6 +2799,26 @@ type Host implements Account & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  Returns a list of vendors that works with this host
+  """
+  vendors(
+    """
+    Rank vendors based on their relationship with this account
+    """
+    forAccount: AccountReferenceInput
+
+    """
+    Filter on archived vendors
+    """
+    isArchived: Boolean
+
+    """
+    Search vendors related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+  ): [Vendor]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -3353,6 +3393,7 @@ enum PaymentMethodType {
   sepa_debit @deprecated(reason: "Please use uppercase values")
   bacs_debit @deprecated(reason: "Please use uppercase values")
   bancontact @deprecated(reason: "Please use uppercase values")
+  link @deprecated(reason: "Please use uppercase values")
   ALIPAY
   CREDITCARD
   PREPAID
@@ -3369,6 +3410,7 @@ enum PaymentMethodType {
   SEPA_DEBIT
   BACS_DEBIT
   BANCONTACT
+  LINK
 }
 
 input VirtualCardReferenceInput {
@@ -4672,6 +4714,9 @@ enum ActivityType {
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
+  VENDOR_CREATED
+  VENDOR_EDITED
+  VENDOR_DELETED
   ORDER_PENDING_CREATED
   ORDER_PENDING_FOLLOWUP
   ORDER_PENDING_RECEIVED
@@ -6196,6 +6241,26 @@ type Bot implements Account {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  Returns a list of vendors that works with this host
+  """
+  vendors(
+    """
+    Rank vendors based on their relationship with this account
+    """
+    forAccount: AccountReferenceInput
+
+    """
+    Filter on archived vendors
+    """
+    isArchived: Boolean
+
+    """
+    Search vendors related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+  ): [Vendor]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -6731,6 +6796,26 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  Returns a list of vendors that works with this host
+  """
+  vendors(
+    """
+    Rank vendors based on their relationship with this account
+    """
+    forAccount: AccountReferenceInput
+
+    """
+    Filter on archived vendors
+    """
+    isArchived: Boolean
+
+    """
+    Search vendors related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+  ): [Vendor]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7635,6 +7720,26 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  Returns a list of vendors that works with this host
+  """
+  vendors(
+    """
+    Rank vendors based on their relationship with this account
+    """
+    forAccount: AccountReferenceInput
+
+    """
+    Filter on archived vendors
+    """
+    isArchived: Boolean
+
+    """
+    Search vendors related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+  ): [Vendor]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8388,6 +8493,26 @@ type Individual implements Account {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  Returns a list of vendors that works with this host
+  """
+  vendors(
+    """
+    Rank vendors based on their relationship with this account
+    """
+    forAccount: AccountReferenceInput
+
+    """
+    Filter on archived vendors
+    """
+    isArchived: Boolean
+
+    """
+    Search vendors related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+  ): [Vendor]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9124,6 +9249,26 @@ type Organization implements Account & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  Returns a list of vendors that works with this host
+  """
+  vendors(
+    """
+    Rank vendors based on their relationship with this account
+    """
+    forAccount: AccountReferenceInput
+
+    """
+    Filter on archived vendors
+    """
+    isArchived: Boolean
+
+    """
+    Search vendors related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+  ): [Vendor]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9782,6 +9927,26 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  Returns a list of vendors that works with this host
+  """
+  vendors(
+    """
+    Rank vendors based on their relationship with this account
+    """
+    forAccount: AccountReferenceInput
+
+    """
+    Filter on archived vendors
+    """
+    isArchived: Boolean
+
+    """
+    Search vendors related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+  ): [Vendor]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9882,6 +10047,32 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+  acceptsPublicExpenses: Boolean
+  vendorInfo: VendorInfo
+
+  """
+  The account who created this order
+  """
+  createdByAccount: Account
+}
+
+"""
+Some context about the vendor
+"""
+type VendorInfo {
+  contact: VendorContact
+  taxFormUrl: String
+  taxType: String
+  taxId: String
+  notes: String
+}
+
+"""
+Some context about the vendor contact person
+"""
+type VendorContact {
+  name: String
+  email: String
 }
 
 """
@@ -12142,6 +12333,9 @@ enum ActivityAndClassesType {
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
+  VENDOR_CREATED
+  VENDOR_EDITED
+  VENDOR_DELETED
   ORDER_PENDING_CREATED
   ORDER_PENDING_FOLLOWUP
   ORDER_PENDING_RECEIVED
@@ -12759,6 +12953,26 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  Returns a list of vendors that works with this host
+  """
+  vendors(
+    """
+    Rank vendors based on their relationship with this account
+    """
+    forAccount: AccountReferenceInput
+
+    """
+    Filter on archived vendors
+    """
+    isArchived: Boolean
+
+    """
+    Search vendors related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+  ): [Vendor]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -13404,6 +13618,26 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  Returns a list of vendors that works with this host
+  """
+  vendors(
+    """
+    Rank vendors based on their relationship with this account
+    """
+    forAccount: AccountReferenceInput
+
+    """
+    Filter on archived vendors
+    """
+    isArchived: Boolean
+
+    """
+    Search vendors related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+  ): [Vendor]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -15122,6 +15356,11 @@ type Mutation {
     Reference to the host that holds the vendor
     """
     vendor: VendorEditInput!
+
+    """
+    Whether to archive (true) or unarchive (unarchive) the vendor
+    """
+    archive: Boolean
   ): Vendor!
 
   """
@@ -15183,11 +15422,6 @@ enum TaxType {
   New Zealand Good and Services Tax
   """
   GST
-
-  """
-  Employer Identification Number
-  """
-  EIN
 }
 
 input CollectiveCreateInput {
@@ -16977,9 +17211,11 @@ input VendorCreateInput {
   name: NonEmptyString!
   legalName: String
   tags: [NonEmptyString]
-  address: String
+  location: LocationInput
   imageUrl: String
+  acceptsPublicExpenses: Boolean
   vendorInfo: VendorInfoInput
+  payoutMethod: PayoutMethodInput
 }
 
 """
@@ -16988,7 +17224,7 @@ Some context about the vendor
 input VendorInfoInput {
   contact: VendorContactInput
   taxFormUrl: String
-  taxType: TaxType
+  taxType: String
   taxId: String
   notes: String
 }
@@ -17016,10 +17252,12 @@ input VendorEditInput {
   The slug identifying the account (ie: babel for https://opencollective.com/babel)
   """
   slug: String
-  name: String
+  name: NonEmptyString
   legalName: String
-  tags: String
-  address: String
+  tags: [NonEmptyString]
+  location: LocationInput
   imageUrl: String
+  acceptsPublicExpenses: Boolean
   vendorInfo: VendorInfoInput
+  payoutMethod: PayoutMethodInput
 }
