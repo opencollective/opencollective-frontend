@@ -73,9 +73,10 @@ class SearchForm extends React.Component {
       fontSize = '0.75rem',
       lineHeight,
       fontWeight,
+      className,
     } = this.props;
     return (
-      <form action="/search" method="GET" onSubmit={onSubmit}>
+      <form action="/search" method="GET" onSubmit={onSubmit} className={className}>
         <SearchInputContainer
           borderRadius={borderRadius}
           borderColor={borderColor}
@@ -151,6 +152,7 @@ SearchForm.propTypes = {
   letterSpacing: PropTypes.string,
   lineHeight: PropTypes.string,
   fontWeight: PropTypes.string,
+  className: PropTypes.string,
   closeSearchModal: PropTypes.func,
 };
 
