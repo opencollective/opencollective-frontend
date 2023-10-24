@@ -1087,6 +1087,8 @@ export type Application = {
   legacyId: Scalars['Int'];
   name?: Maybe<Scalars['String']>;
   oAuthAuthorization?: Maybe<OAuthAuthorization>;
+  /** Whether this application is allowed to directly use operations that would normally require 2FA */
+  preAuthorize2FA: Scalars['Boolean'];
   redirectUri?: Maybe<Scalars['URL']>;
   /** @deprecated 2022-06-16: This Application object will only be used for OAuth tokens. Use PersonalToken for user tokens */
   type?: Maybe<ApplicationType>;
@@ -5647,7 +5649,7 @@ export type Mutation = {
   createPayoutMethod?: Maybe<PayoutMethod>;
   /** To submit a new order. Scope: "orders". */
   createPendingOrder: Order;
-  createPersonalToken?: Maybe<PersonalToken>;
+  createPersonalToken: PersonalToken;
   /** Create a Project. Scope: "account". */
   createProject?: Maybe<Project>;
   /** Create a tier. */
@@ -5801,7 +5803,7 @@ export type Mutation = {
   updateApplication?: Maybe<Application>;
   /** Update an Order's amount, tier, or payment method. Scope: "orders". */
   updateOrder?: Maybe<Order>;
-  updatePersonalToken?: Maybe<PersonalToken>;
+  updatePersonalToken: PersonalToken;
   /** Updates collective social links */
   updateSocialLinks: Array<SocialLink>;
   /** Update webhook. Scope: "webhooks". */
@@ -6669,6 +6671,8 @@ export type OAuthAuthorization = {
   id?: Maybe<Scalars['String']>;
   /** The last time of token was used */
   lastUsedAt?: Maybe<Scalars['DateTime']>;
+  /** Whether this OAuth token is allowed to directly use operations that would normally require 2FA */
+  preAuthorize2FA: Scalars['Boolean'];
   /** The attached scopes. */
   scope?: Maybe<Array<Maybe<OAuthScope>>>;
   /** The time of last update */
@@ -7459,6 +7463,7 @@ export enum PaymentMethodType {
   CRYPTO = 'CRYPTO',
   GIFTCARD = 'GIFTCARD',
   HOST = 'HOST',
+  LINK = 'LINK',
   MANUAL = 'MANUAL',
   PAYMENT = 'PAYMENT',
   PAYMENT_INTENT = 'PAYMENT_INTENT',
@@ -7484,6 +7489,8 @@ export enum PaymentMethodType {
   giftcard = 'giftcard',
   /** @deprecated Please use uppercase values */
   host = 'host',
+  /** @deprecated Please use uppercase values */
+  link = 'link',
   /** @deprecated Please use uppercase values */
   manual = 'manual',
   /** @deprecated Please use uppercase values */
@@ -7639,6 +7646,8 @@ export type PersonalToken = {
   id: Scalars['String'];
   /** A friendly name for users to easily find their personal tokens */
   name?: Maybe<Scalars['String']>;
+  /** Whether this token is allowed to directly use operations that would normally require 2FA */
+  preAuthorize2FA: Scalars['Boolean'];
   /** The scopes of the personal token */
   scope?: Maybe<Array<Maybe<OAuthScope>>>;
   /** The personal token */
@@ -7662,6 +7671,8 @@ export type PersonalTokenCreateInput = {
   account?: InputMaybe<AccountReferenceInput>;
   expiresAt?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
+  /** Whether this token is allowed to directly use operations that would normally require 2FA */
+  preAuthorize2FA?: InputMaybe<Scalars['Boolean']>;
   scope?: InputMaybe<Array<InputMaybe<OAuthScope>>>;
 };
 
@@ -7680,6 +7691,8 @@ export type PersonalTokenUpdateInput = {
   /** The legacy public id identifying the personal-token (ie: 4242) */
   legacyId?: InputMaybe<Scalars['Int']>;
   name?: InputMaybe<Scalars['String']>;
+  /** Whether this token is allowed to directly use operations that would normally require 2FA */
+  preAuthorize2FA?: InputMaybe<Scalars['Boolean']>;
   scope?: InputMaybe<Array<InputMaybe<OAuthScope>>>;
 };
 

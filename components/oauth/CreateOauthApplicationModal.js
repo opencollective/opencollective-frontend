@@ -37,6 +37,7 @@ const INITIAL_VALUES = {
 const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) => {
   const intl = useIntl();
   const { toast } = useToast();
+  const [isWaitingForOnSuccess, setIsWaitingForOnSuccess] = React.useState(false);
   const [createApplication] = useMutation(createApplicationMutation, {
     context: API_V2_CONTEXT,
     update: cache => {
@@ -64,9 +65,12 @@ const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) 
                 { name: result.data.createApplication.name },
               ),
             });
-            onSuccess(result.data.createApplication, account);
+            setIsWaitingForOnSuccess(true);
+            await onSuccess(result.data.createApplication, account);
           } catch (e) {
             toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+          } finally {
+            setIsWaitingForOnSuccess(false);
           }
         }}
       >
@@ -123,7 +127,12 @@ const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) 
             </ModalBody>
             <ModalFooter>
               <Flex gap="16px" justifyContent="center">
-                <StyledButton type="submit" buttonStyle="primary" buttonSize="small" loading={isSubmitting}>
+                <StyledButton
+                  type="submit"
+                  buttonStyle="primary"
+                  buttonSize="small"
+                  loading={isSubmitting || isWaitingForOnSuccess}
+                >
                   <FormattedMessage defaultMessage="Create app" />
                 </StyledButton>
                 <StyledButton

@@ -22,6 +22,7 @@ const applicationQuery = gql`
       name
       clientId
       redirectUri
+      preAuthorize2FA
       account {
         id
         name
