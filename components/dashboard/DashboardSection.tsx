@@ -26,6 +26,7 @@ import Overview from './sections/Overview';
 import ReceivedExpenses from './sections/ReceivedExpenses';
 import SubmittedExpenses from './sections/SubmittedExpenses';
 import Transactions from './sections/Transactions';
+import Vendors from './sections/Vendors';
 import VirtualCards from './sections/VirtualCards';
 import { LEGACY_SECTIONS, LEGACY_SETTINGS_SECTIONS, SECTION_LABELS, SECTIONS, SETTINGS_SECTIONS } from './constants';
 import DashboardHeader from './DashboardHeader';
@@ -48,6 +49,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.TRANSACTIONS]: Transactions,
   [SECTIONS.VIRTUAL_CARDS]: VirtualCards,
   [SECTIONS.TEAM]: Team,
+  [SECTIONS.VENDORS]: Vendors,
 };
 
 const SETTINGS_COMPONENTS = {

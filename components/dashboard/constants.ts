@@ -18,6 +18,7 @@ export const SECTIONS = {
   TRANSACTIONS: 'transactions',
   VIRTUAL_CARDS: 'virtual-cards',
   TEAM: 'team',
+  VENDORS: 'vendors',
 };
 
 export const SETTINGS_SECTIONS = {
@@ -229,5 +230,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.INCOMING_CONTRIBUTIONS]: {
     id: 'IncomingContributions',
     defaultMessage: 'Incoming Contributions',
+  },
+  [ALL_SECTIONS.VENDORS]: {
+    id: 'Vendors',
+    defaultMessage: 'Vendors',
   },
 });

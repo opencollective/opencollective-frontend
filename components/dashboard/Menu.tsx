@@ -13,6 +13,7 @@ import {
   LucideIcon,
   Receipt,
   Settings,
+  Store,
   Ticket,
   Users2,
 } from 'lucide-react';
@@ -177,6 +178,11 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: isHost,
       section: ALL_SECTIONS.REPORTS,
       Icon: BarChart2,
+    },
+    {
+      if: isHost,
+      section: ALL_SECTIONS.VENDORS,
+      Icon: Store,
     },
     {
       if: isType(account, EVENT),
