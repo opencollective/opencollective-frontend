@@ -287,7 +287,7 @@ const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
     <React.Fragment>
       <div className="mb-5 flex flex-wrap justify-between gap-4">
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
-          <FormattedMessage id="Payments" defaultMessage="Payments" />
+          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         </h1>
         <SearchBar
           height="40px"
