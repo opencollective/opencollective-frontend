@@ -69,6 +69,7 @@ const accountOrdersQuery = gql`
           slug
           name
           imageUrl
+          type
         }
         pendingContributionData {
           expectedAt
@@ -85,6 +86,7 @@ const accountOrdersQuery = gql`
           slug
           name
           imageUrl
+          type
           isHost
           ... on AccountWithHost {
             bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
