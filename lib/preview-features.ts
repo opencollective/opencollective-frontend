@@ -50,7 +50,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Expense categorization',
     description: 'Facilitate your accounting by categorizing your expenses according to a chart of accounts.',
     publicBeta: false,
-    closedBetaAccessFor: ['foundation'],
+    closedBetaAccessFor: ['foundation', 'opensource', 'europe'],
     alwaysEnableInDev: true,
   },
 ];
