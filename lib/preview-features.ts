@@ -16,6 +16,7 @@ export type PreviewFeature = {
   closedBetaAccessFor?: string[]; // Account slugs. Members and admins of these accounts will see this feature as a Closed Beta preview in the Preview Features modal.
   enabledByDefaultFor?: ('*' | string)[]; // Account slugs. Members and admins of these accounts will have the feature enabled by default.
   env?: Array<'development' | 'test' | 'e2e' | 'staging' | 'production'>; // If set, the feature will be available only in the specified environments.
+  alwaysEnableInDev?: boolean; // If true, the feature will be enabled by default in development.
 };
 
 /**
@@ -49,7 +50,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Expense categorization',
     description: 'Facilitate your accounting by categorizing your expenses according to a chart of accounts.',
     publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe'],
-    env: ['development', 'staging'],
+    closedBetaAccessFor: ['foundation'],
+    alwaysEnableInDev: true,
   },
 ];
