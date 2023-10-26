@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
-import { cloneDeep, omit, pick } from 'lodash';
+import { cloneDeep, pick } from 'lodash';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -50,7 +50,6 @@ const editVendorMutation = gql`
 const EDITABLE_FIELDS = [
   'name',
   'legalName',
-  'taxRequired',
   'location',
   'vendorInfo.taxFormUrl',
   'vendorInfo.taxType',
@@ -82,7 +81,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel }: VendorFormProps) => {
       {
         ...pick(values, EDITABLE_FIELDS),
         vendorInfo: {
-          ...omit(values.vendorInfo, ['otherTaxType']),
+          ...pick(values.vendorInfo, ['contact', 'notes', 'taxFormUrl', 'taxId', 'taxType']),
           taxType: values.vendorInfo?.taxType === 'OTHER' ? values.vendorInfo.otherTaxType : values.vendorInfo.taxType,
         },
       },
@@ -156,12 +155,10 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel }: VendorFormProps) => {
                     {...field}
                     onCheckedChange={checked => {
                       form.setFieldValue(field.name, checked);
-                      // if (!checked) {
-                      //   form.setFieldValue(field.name, null);
-                      // }
+                      if (!checked) {
+                        form.setFieldValue(field.name, null);
+                      }
                     }}
-                    onChange={null}
-                    onBlur={null}
                   />
                   <label htmlFor="taxRequired" className="font-normal">
                     <FormattedMessage defaultMessage="Requires tax form" />
