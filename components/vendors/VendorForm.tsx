@@ -6,6 +6,7 @@ import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { requireFields, verifyEmailPattern, verifyURLPattern } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { DashboardVendorsQuery } from '../../lib/graphql/types/v2/graphql';
 import { omitDeep } from '../../lib/utils';
@@ -66,6 +67,23 @@ type VendorFormProps = {
   onSuccess?: Function;
   onCancel: () => void;
   isModal?: boolean;
+};
+
+const validateVendorForm = values => {
+  const requiredFields = ['name'];
+  if (values.vendorInfo.taxType === 'OTHER') {
+    requiredFields.push('vendorInfo.otherTaxType');
+  }
+  const errors = requireFields(values, requiredFields);
+
+  if (values.vendorInfo?.contact?.email) {
+    verifyEmailPattern(errors, values, 'vendorInfo.contact.email');
+  }
+  if (values.vendorInfo?.taxFormUrl) {
+    verifyURLPattern(errors, values, 'vendorInfo.taxFormUrl');
+  }
+
+  return errors;
 };
 
 const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormProps) => {
@@ -133,7 +151,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
           </button>
         )}
       </div>
-      <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+      <Formik initialValues={initialValues} onSubmit={handleSubmit} validate={validateVendorForm}>
         {formik => {
           const actionButtons = (
             <div className="flex flex-grow justify-between gap-2">
@@ -274,6 +292,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 {({ field }) => (
                   <StyledInput
                     {...field}
+                    type="email"
                     width="100%"
                     maxWidth={500}
                     maxLength={60}
