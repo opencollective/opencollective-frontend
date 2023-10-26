@@ -217,11 +217,13 @@ jobs:
         run: ./scripts/run_e2e_tests.sh
         env:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
-      - name: Archive test screenshots
+      - name: Archive test recordings
         uses: actions/upload-artifact@v3
         with:
-          name: screenshots
-          path: test/cypress/screenshots
+          name: cypress-recordings
+          path: |
+            test/cypress/screenshots
+            test/cypress/videos
         if: ${{ failure() }}
 
       - name: Report Coverage

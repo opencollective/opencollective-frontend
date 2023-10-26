@@ -156,7 +156,7 @@ describe('host dashboard', () => {
 
       // Mark as expired
       cy.getByDataCy('MARK_AS_EXPIRED-button').click();
-      cy.getByDataCy('confirmation-modal-continue').click();
+      cy.get('[data-cy="MARK_AS_EXPIRED-confirmation-modal"] [data-cy="confirmation-modal-continue"]').click();
       cy.contains('[data-cy=order-status-msg]', 'Expired');
 
       // Mark as paid

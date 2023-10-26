@@ -56,7 +56,7 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
 
   const triggerAction = async action => {
     // Prevent submitting the action if another one is being submitted at the same time
-    if (loading) {
+    if (loading && selectedAction === action) {
       return;
     }
 
@@ -112,6 +112,7 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
       )}
       {hasConfirm && (
         <ConfirmationModal
+          data-cy={`${selectedAction}-confirmation-modal`}
           onClose={() => setConfirm(false)}
           continueHandler={() => triggerAction(selectedAction)}
           isDanger={selectedAction === 'MARK_AS_EXPIRED'}

@@ -1,5 +1,6 @@
 // eslint-disable-next-line node/no-unpublished-require
 const { defineConfig } = require('cypress');
+const fs = require('fs');
 
 module.exports = defineConfig({
   experimentalMemoryManagement: true,
@@ -8,7 +9,7 @@ module.exports = defineConfig({
   projectId: 'yt5kwm',
   defaultCommandTimeout: 15000,
   responseTimeout: 60000,
-  video: false,
+  video: true,
   chromeWebSecurity: false,
   scrollBehavior: 'center',
   blockHosts: ['wtfismyip.com', 'images.opencollective.com', 'images-staging.opencollective.com', 'localhost:3001'],
@@ -38,6 +39,18 @@ module.exports = defineConfig({
           console.log(...message); // eslint-disable-line no-console
           return null;
         },
+      });
+
+      // Delete videos if the test succeeds
+      on('after:spec', (spec, results) => {
+        if (results && results.video) {
+          // Do we have failures for any retry attempts?
+          const failures = results.tests.some(test => test.attempts.some(attempt => attempt.state === 'failed'));
+          if (!failures) {
+            // delete the video if the spec passed and no tests retried
+            fs.unlinkSync(results.video);
+          }
+        }
       });
 
       config.baseUrl = process.env.WEBSITE_URL || 'http://localhost:3000';
