@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { isNil, omitBy, pick } from 'lodash';
+import { isEmpty, isNil, omitBy, pick } from 'lodash';
 import { Archive, MoreHorizontal, Pencil } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -112,28 +112,35 @@ const getColumns = ({ editVendor, openVendor, handleSetArchive }) => {
       cell: ({ row }) => {
         const vendor = row.original;
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <TableActionsButton>
-                <MoreHorizontal className="relative h-3 w-3  " aria-hidden="true" />
-              </TableActionsButton>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem className="cursor-pointer" onClick={() => editVendor(vendor)}>
-                <Pencil className="mr-2" size="16" />
-                <FormattedMessage id="actions.edit" defaultMessage="Edit" />
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer" onClick={() => handleSetArchive(vendor)}>
-                <Archive className="mr-2" size="16" />
-                {vendor.isArchived ? (
-                  <FormattedMessage id="actions.unarchive" defaultMessage="Unarchive" />
-                ) : (
-                  <FormattedMessage id="actions.archive" defaultMessage="Archive" />
-                )}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="row flex items-center">
+            {vendor.vendorInfo?.taxFormRequired && isEmpty(vendor.vendorInfo?.taxFormUrl) && (
+              <span className="mr-2 rounded-sm bg-yellow-300 px-2 py-1 text-xs font-bold text-slate-800">
+                <FormattedMessage defaultMessage="Pending tax form" />
+              </span>
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <TableActionsButton>
+                  <MoreHorizontal className="relative h-3 w-3  " aria-hidden="true" />
+                </TableActionsButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => editVendor(vendor)}>
+                  <Pencil className="mr-2" size="16" />
+                  <FormattedMessage id="actions.edit" defaultMessage="Edit" />
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer" onClick={() => handleSetArchive(vendor)}>
+                  <Archive className="mr-2" size="16" />
+                  {vendor.isArchived ? (
+                    <FormattedMessage id="actions.unarchive" defaultMessage="Unarchive" />
+                  ) : (
+                    <FormattedMessage id="actions.archive" defaultMessage="Archive" />
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         );
       },
     },

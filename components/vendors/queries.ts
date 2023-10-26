@@ -35,6 +35,7 @@ export const vendorFieldFragment = gql`
         email
       }
       taxFormUrl
+      taxFormRequired
       taxType
       taxId
       notes

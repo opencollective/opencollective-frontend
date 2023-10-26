@@ -53,6 +53,7 @@ const EDITABLE_FIELDS = [
   'legalName',
   'location',
   'vendorInfo.taxFormUrl',
+  'vendorInfo.taxFormRequired',
   'vendorInfo.taxType',
   'vendorInfo.taxId',
   'vendorInfo.contact.name',
@@ -98,7 +99,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
       {
         ...pick(values, EDITABLE_FIELDS),
         vendorInfo: {
-          ...pick(values.vendorInfo, ['contact', 'notes', 'taxFormUrl', 'taxId', 'taxType']),
+          ...pick(values.vendorInfo, ['contact', 'notes', 'taxFormUrl', 'taxFormRequired', 'taxId', 'taxType']),
           taxType:
             values.vendorInfo?.taxType === 'OTHER' ? values.vendorInfo?.otherTaxType : values.vendorInfo?.taxType,
         },
@@ -190,8 +191,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 )}
               </StyledInputFormikField>
               <StyledInputFormikField
-                name="taxRequired"
-                id="taxRequired"
+                name="vendorInfo.taxFormRequired"
                 label={intl.formatMessage({ defaultMessage: 'Tax form' })}
                 labelProps={FIELD_LABEL_PROPS}
                 mt={3}
@@ -200,6 +200,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                   <div className="flex items-center gap-2">
                     <Switch
                       {...field}
+                      checked={field.value}
                       onCheckedChange={checked => {
                         form.setFieldValue(field.name, checked);
                         if (!checked) {
@@ -213,13 +214,12 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                   </div>
                 )}
               </StyledInputFormikField>
-              {formik.values.taxRequired && (
+              {formik.values.vendorInfo?.taxFormRequired && (
                 <StyledInputFormikField
                   name="vendorInfo.taxFormUrl"
                   label={intl.formatMessage({ defaultMessage: 'Tax form URL' })}
                   labelProps={FIELD_LABEL_PROPS}
                   mt={3}
-                  required={formik.values.taxRequired}
                 >
                   {({ field }) => (
                     <StyledInputGroup {...field} prepend="https://" width="100%" maxWidth={500} maxLength={60} />
