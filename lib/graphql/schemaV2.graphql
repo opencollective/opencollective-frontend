@@ -2818,6 +2818,11 @@ type Host implements Account & AccountWithContributions {
     Search vendors related to this term based on name, description, tags, slug, and location
     """
     searchTerm: String
+
+    """
+    Limit the number of vendors returned
+    """
+    limit: Int
   ): [Vendor]
   webhooks(
     """
@@ -4459,6 +4464,7 @@ type Policies {
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
+  EXPENSE_PUBLIC_VENDORS: Boolean
 }
 
 type EXPENSE_AUTHOR_CANNOT_APPROVE {
@@ -6260,6 +6266,11 @@ type Bot implements Account {
     Search vendors related to this term based on name, description, tags, slug, and location
     """
     searchTerm: String
+
+    """
+    Limit the number of vendors returned
+    """
+    limit: Int
   ): [Vendor]
   webhooks(
     """
@@ -6815,6 +6826,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Search vendors related to this term based on name, description, tags, slug, and location
     """
     searchTerm: String
+
+    """
+    Limit the number of vendors returned
+    """
+    limit: Int
   ): [Vendor]
   webhooks(
     """
@@ -7739,6 +7755,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Search vendors related to this term based on name, description, tags, slug, and location
     """
     searchTerm: String
+
+    """
+    Limit the number of vendors returned
+    """
+    limit: Int
   ): [Vendor]
   webhooks(
     """
@@ -8512,6 +8533,11 @@ type Individual implements Account {
     Search vendors related to this term based on name, description, tags, slug, and location
     """
     searchTerm: String
+
+    """
+    Limit the number of vendors returned
+    """
+    limit: Int
   ): [Vendor]
   webhooks(
     """
@@ -9268,6 +9294,11 @@ type Organization implements Account & AccountWithContributions {
     Search vendors related to this term based on name, description, tags, slug, and location
     """
     searchTerm: String
+
+    """
+    Limit the number of vendors returned
+    """
+    limit: Int
   ): [Vendor]
   webhooks(
     """
@@ -9946,6 +9977,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     Search vendors related to this term based on name, description, tags, slug, and location
     """
     searchTerm: String
+
+    """
+    Limit the number of vendors returned
+    """
+    limit: Int
   ): [Vendor]
   webhooks(
     """
@@ -10047,7 +10083,6 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
-  acceptsPublicExpenses: Boolean
   vendorInfo: VendorInfo
 
   """
@@ -10062,6 +10097,7 @@ Some context about the vendor
 type VendorInfo {
   contact: VendorContact
   taxFormUrl: String
+  taxFormRequired: Boolean
   taxType: String
   taxId: String
   notes: String
@@ -10231,6 +10267,11 @@ type Query {
     The order of results. Defaults to [RANK, DESC] (or [CREATED_AT, DESC] if `supportedPaymentMethodService` is provided)
     """
     orderBy: OrderByInput
+
+    """
+    Include vendors for this host
+    """
+    includeVendorsForHost: AccountReferenceInput
   ): AccountCollection!
   activities(
     """
@@ -12972,6 +13013,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Search vendors related to this term based on name, description, tags, slug, and location
     """
     searchTerm: String
+
+    """
+    Limit the number of vendors returned
+    """
+    limit: Int
   ): [Vendor]
   webhooks(
     """
@@ -13637,6 +13683,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Search vendors related to this term based on name, description, tags, slug, and location
     """
     searchTerm: String
+
+    """
+    Limit the number of vendors returned
+    """
+    limit: Int
   ): [Vendor]
   webhooks(
     """
@@ -15586,6 +15637,7 @@ input PoliciesInput {
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
   EXPENSE_CATEGORIZATION: PoliciesExpenseCategorizationInput
+  EXPENSE_PUBLIC_VENDORS: Boolean
 }
 
 input PoliciesCollectiveExpenseAuthorCannotApprove {
@@ -17213,7 +17265,6 @@ input VendorCreateInput {
   tags: [NonEmptyString]
   location: LocationInput
   imageUrl: String
-  acceptsPublicExpenses: Boolean
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
 }
@@ -17223,6 +17274,7 @@ Some context about the vendor
 """
 input VendorInfoInput {
   contact: VendorContactInput
+  taxFormRequired: Boolean
   taxFormUrl: String
   taxType: String
   taxId: String
@@ -17257,7 +17309,6 @@ input VendorEditInput {
   tags: [NonEmptyString]
   location: LocationInput
   imageUrl: String
-  acceptsPublicExpenses: Boolean
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
 }
