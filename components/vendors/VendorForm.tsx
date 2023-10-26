@@ -81,7 +81,8 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
         ...pick(values, EDITABLE_FIELDS),
         vendorInfo: {
           ...pick(values.vendorInfo, ['contact', 'notes', 'taxFormUrl', 'taxId', 'taxType']),
-          taxType: values.vendorInfo?.taxType === 'OTHER' ? values.vendorInfo.otherTaxType : values.vendorInfo.taxType,
+          taxType:
+            values.vendorInfo?.taxType === 'OTHER' ? values.vendorInfo?.otherTaxType : values.vendorInfo?.taxType,
         },
       },
       ['__typename'],
@@ -109,6 +110,11 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
     { label: 'GST', value: 'GST' },
     { label: <FormattedMessage defaultMessage="Other" />, value: 'OTHER' },
   ];
+  const initialValues = cloneDeep(pick(vendor, EDITABLE_FIELDS) || {});
+  if (initialValues.vendorInfo?.taxType && !['EIN', 'VAT', 'GST'].includes(initialValues.vendorInfo?.taxType)) {
+    initialValues.vendorInfo['otherTaxType'] = initialValues.vendorInfo?.taxType;
+    initialValues.vendorInfo.taxType = 'OTHER';
+  }
 
   return (
     <div>
@@ -145,180 +151,180 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
           );
 
           return (
-          <Form data-cy="vendor-form">
-            <StyledInputFormikField
-              name="name"
-              label={intl.formatMessage({ defaultMessage: "Vendor's name" })}
-              labelProps={FIELD_LABEL_PROPS}
-              mt={3}
-              required
-            >
-              {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
-            </StyledInputFormikField>
-            <StyledInputFormikField
-              name="legalName"
-              label={intl.formatMessage({ defaultMessage: "Vendor's legal name" })}
-              labelProps={FIELD_LABEL_PROPS}
-              mt={3}
-            >
-              {({ field }) => (
-                <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} placeholder={formik.values.name} />
-              )}
-            </StyledInputFormikField>
-            <StyledInputFormikField
-              name="taxRequired"
-              id="taxRequired"
-              label={intl.formatMessage({ defaultMessage: 'Tax form' })}
-              labelProps={FIELD_LABEL_PROPS}
-              mt={3}
-            >
-              {({ field, form }) => (
-                <div className="flex items-center gap-2">
-                  <Switch
-                    {...field}
-                    onCheckedChange={checked => {
-                      form.setFieldValue(field.name, checked);
-                      if (!checked) {
-                        form.setFieldValue(field.name, null);
-                      }
-                    }}
-                  />
-                  <label htmlFor="taxRequired" className="font-normal">
-                    <FormattedMessage defaultMessage="Requires tax form" />
-                  </label>
-                </div>
-              )}
-            </StyledInputFormikField>
-            {formik.values.taxRequired && (
+            <Form data-cy="vendor-form">
               <StyledInputFormikField
-                name="vendorInfo.taxFormUrl"
-                label={intl.formatMessage({ defaultMessage: 'Tax form URL' })}
+                name="name"
+                label={intl.formatMessage({ defaultMessage: "Vendor's name" })}
                 labelProps={FIELD_LABEL_PROPS}
                 mt={3}
-                required={formik.values.taxRequired}
+                required
+              >
+                {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
+              </StyledInputFormikField>
+              <StyledInputFormikField
+                name="legalName"
+                label={intl.formatMessage({ defaultMessage: "Vendor's legal name" })}
+                labelProps={FIELD_LABEL_PROPS}
+                mt={3}
               >
                 {({ field }) => (
-                  <StyledInputGroup {...field} prepend="https://" width="100%" maxWidth={500} maxLength={60} />
+                  <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} placeholder={formik.values.name} />
                 )}
               </StyledInputFormikField>
-            )}
-            <p className="mb-3 mt-4 text-base font-bold">
-              <FormattedMessage defaultMessage="Tax identification" />
-            </p>
-            <StyledInputFormikField
-              name="vendorInfo.taxType"
-              label={intl.formatMessage({ defaultMessage: 'Identification system' })}
-              labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
-              mt={3}
-            >
-              {({ field }) => (
-                <StyledSelect
-                  {...field}
-                  width="100%"
-                  options={taxOptions}
-                  value={taxOptions.find(c => c.value === field.value) || null}
-                  onChange={({ value }) => formik.setFieldValue(field.name, value)}
-                />
-              )}
-            </StyledInputFormikField>
-            {formik.values?.vendorInfo?.taxType === 'OTHER' && (
               <StyledInputFormikField
-                name="vendorInfo.otherTaxType"
-                label={intl.formatMessage({ defaultMessage: 'Identification sytem' })}
+                name="taxRequired"
+                id="taxRequired"
+                label={intl.formatMessage({ defaultMessage: 'Tax form' })}
+                labelProps={FIELD_LABEL_PROPS}
+                mt={3}
+              >
+                {({ field, form }) => (
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      {...field}
+                      onCheckedChange={checked => {
+                        form.setFieldValue(field.name, checked);
+                        if (!checked) {
+                          form.setFieldValue(field.name, null);
+                        }
+                      }}
+                    />
+                    <label htmlFor="taxRequired" className="font-normal">
+                      <FormattedMessage defaultMessage="Requires tax form" />
+                    </label>
+                  </div>
+                )}
+              </StyledInputFormikField>
+              {formik.values.taxRequired && (
+                <StyledInputFormikField
+                  name="vendorInfo.taxFormUrl"
+                  label={intl.formatMessage({ defaultMessage: 'Tax form URL' })}
+                  labelProps={FIELD_LABEL_PROPS}
+                  mt={3}
+                  required={formik.values.taxRequired}
+                >
+                  {({ field }) => (
+                    <StyledInputGroup {...field} prepend="https://" width="100%" maxWidth={500} maxLength={60} />
+                  )}
+                </StyledInputFormikField>
+              )}
+              <p className="mb-3 mt-4 text-base font-bold">
+                <FormattedMessage defaultMessage="Tax identification" />
+              </p>
+              <StyledInputFormikField
+                name="vendorInfo.taxType"
+                label={intl.formatMessage({ defaultMessage: 'Identification system' })}
+                labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
+                mt={3}
+              >
+                {({ field }) => (
+                  <StyledSelect
+                    {...field}
+                    width="100%"
+                    options={taxOptions}
+                    value={taxOptions.find(c => c.value === field.value) || null}
+                    onChange={({ value }) => formik.setFieldValue(field.name, value)}
+                  />
+                )}
+              </StyledInputFormikField>
+              {formik.values?.vendorInfo?.taxType === 'OTHER' && (
+                <StyledInputFormikField
+                  name="vendorInfo.otherTaxType"
+                  label={intl.formatMessage({ defaultMessage: 'Identification sytem' })}
+                  labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
+                  mt={3}
+                >
+                  {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
+                </StyledInputFormikField>
+              )}
+              <StyledInputFormikField
+                name="vendorInfo.taxId"
+                label={intl.formatMessage({ defaultMessage: 'ID Number' })}
                 labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
                 mt={3}
               >
                 {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
               </StyledInputFormikField>
-            )}
-            <StyledInputFormikField
-              name="vendorInfo.taxId"
-              label={intl.formatMessage({ defaultMessage: 'ID Number' })}
-              labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
-              mt={3}
-            >
-              {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
-            </StyledInputFormikField>
 
-            <p className="mb-3 mt-4 text-base font-bold">
-              <FormattedMessage defaultMessage="Mailing address" />
-            </p>
-            <StyledInputLocation
-              onChange={values => {
-                formik.setFieldValue('location', values);
-              }}
-              location={formik.values.location}
-              errors={formik.errors.location as object}
-              required={false}
-            />
-            <StyledInputFormikField
-              name="vendorInfo.contact.name"
-              label={intl.formatMessage({ defaultMessage: 'Contact name' })}
-              labelProps={FIELD_LABEL_PROPS}
-              mt={3}
-            >
-              {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
-            </StyledInputFormikField>
-            <StyledInputFormikField
-              name="vendorInfo.contact.email"
-              label={intl.formatMessage({ defaultMessage: "Contact's email" })}
-              labelProps={FIELD_LABEL_PROPS}
-              mt={3}
-            >
-              {({ field }) => (
-                <StyledInput
-                  {...field}
-                  width="100%"
-                  maxWidth={500}
-                  maxLength={60}
-                  placeholder="t.anderson@opencollective.com"
-                />
-              )}
-            </StyledInputFormikField>
-            <StyledInputFormikField
-              name="payoutMethod"
-              htmlFor="payout-method"
-              flex="1"
-              mt={3}
-              label={intl.formatMessage({ defaultMessage: 'Payout method' })}
-              labelProps={FIELD_LABEL_PROPS}
-            >
-              {({ field }) => (
-                <PayoutMethodSelect
-                  {...field}
-                  payoutMethod={field.value}
-                  collective={{ host }}
-                  payoutMethods={vendor?.payoutMethods || []}
-                  onChange={({ value }) => formik.setFieldValue('payoutMethod', value)}
-                />
-              )}
-            </StyledInputFormikField>
-            {formik.values.payoutMethod && (
-              <Field name="payoutMethod">
+              <p className="mb-3 mt-4 text-base font-bold">
+                <FormattedMessage defaultMessage="Mailing address" />
+              </p>
+              <StyledInputLocation
+                onChange={values => {
+                  formik.setFieldValue('location', values);
+                }}
+                location={formik.values.location}
+                errors={formik.errors.location as object}
+                required={false}
+              />
+              <StyledInputFormikField
+                name="vendorInfo.contact.name"
+                label={intl.formatMessage({ defaultMessage: 'Contact name' })}
+                labelProps={FIELD_LABEL_PROPS}
+                mt={3}
+              >
+                {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
+              </StyledInputFormikField>
+              <StyledInputFormikField
+                name="vendorInfo.contact.email"
+                label={intl.formatMessage({ defaultMessage: "Contact's email" })}
+                labelProps={FIELD_LABEL_PROPS}
+                mt={3}
+              >
                 {({ field }) => (
-                  <div className="mt-3 flex-grow">
-                    <PayoutMethodForm fieldsPrefix="payoutMethod" payoutMethod={field.value} host={host} />
-                  </div>
+                  <StyledInput
+                    {...field}
+                    width="100%"
+                    maxWidth={500}
+                    maxLength={60}
+                    placeholder="t.anderson@opencollective.com"
+                  />
                 )}
-              </Field>
-            )}
-            <StyledInputFormikField
-              name="vendorInfo.notes"
-              label={intl.formatMessage({ defaultMessage: 'Notes' })}
-              labelProps={FIELD_LABEL_PROPS}
-              mt={3}
-            >
-              {({ field }) => (
-                <StyledTextarea {...field} width="100%" maxWidth={500} maxLength={60} minHeight={160} autoSize />
+              </StyledInputFormikField>
+              <StyledInputFormikField
+                name="payoutMethod"
+                htmlFor="payout-method"
+                flex="1"
+                mt={3}
+                label={intl.formatMessage({ defaultMessage: 'Payout method' })}
+                labelProps={FIELD_LABEL_PROPS}
+              >
+                {({ field }) => (
+                  <PayoutMethodSelect
+                    {...field}
+                    payoutMethod={field.value}
+                    collective={{ host }}
+                    payoutMethods={vendor?.payoutMethods || []}
+                    onChange={({ value }) => formik.setFieldValue('payoutMethod', value)}
+                  />
+                )}
+              </StyledInputFormikField>
+              {formik.values.payoutMethod && (
+                <Field name="payoutMethod">
+                  {({ field }) => (
+                    <div className="mt-3 flex-grow">
+                      <PayoutMethodForm fieldsPrefix="payoutMethod" payoutMethod={field.value} host={host} />
+                    </div>
+                  )}
+                </Field>
               )}
-            </StyledInputFormikField>
+              <StyledInputFormikField
+                name="vendorInfo.notes"
+                label={intl.formatMessage({ defaultMessage: 'Notes' })}
+                labelProps={FIELD_LABEL_PROPS}
+                mt={3}
+              >
+                {({ field }) => (
+                  <StyledTextarea {...field} width="100%" maxWidth={500} maxLength={60} minHeight={160} autoSize />
+                )}
+              </StyledInputFormikField>
 
               {drawerActionsContainer ? (
                 createPortal(actionButtons, drawerActionsContainer)
               ) : (
                 <div className="mt-6">{actionButtons}</div>
               )}
-          </Form>
+            </Form>
           );
         }}
       </Formik>
