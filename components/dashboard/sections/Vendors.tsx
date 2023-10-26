@@ -16,6 +16,7 @@ import { Drawer } from '../../Drawer';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import SearchBar from '../../SearchBar';
+import StyledModal from '../../StyledModal';
 import StyledTabs from '../../StyledTabs';
 import { Button } from '../../ui/Button';
 import {
@@ -171,7 +172,7 @@ const Vendors = ({ accountSlug }) => {
   const [createEditVendor, setCreateEditVendor] = React.useState<VendorFieldsFragment | boolean>(false);
   const [vendorDetail, setVendorDetail] = React.useState(null);
 
-  const closeModal = () => {
+  const closeDrawer = () => {
     setCreateEditVendor(false);
     setVendorDetail(null);
   };
@@ -194,8 +195,7 @@ const Vendors = ({ accountSlug }) => {
       label: 'Archived',
     },
   ];
-
-  const isModalOpen = Boolean(createEditVendor || vendorDetail);
+  const isDrawerOpen = Boolean(vendorDetail || createEditVendor?.['id']);
   const loading = queryLoading;
   const error = queryError;
   const columns = getColumns({
@@ -245,9 +245,23 @@ const Vendors = ({ accountSlug }) => {
           />
         )}
       </div>
+
+      {createEditVendor === true && (
+        <StyledModal onClose={closeDrawer} width="570px">
+          <VendorForm
+            host={data?.account}
+            onSuccess={() => {
+              setCreateEditVendor(false);
+              refetch();
+            }}
+            onCancel={() => setCreateEditVendor(false)}
+            isModal
+          />
+        </StyledModal>
+      )}
       <Drawer
-        open={isModalOpen}
-        onClose={closeModal}
+        open={isDrawerOpen}
+        onClose={closeDrawer}
         className={cn(vendorDetail && 'max-w-2xl')}
         showActionsContainer
         showCloseButton

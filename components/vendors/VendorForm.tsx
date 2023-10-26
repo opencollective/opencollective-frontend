@@ -2,6 +2,7 @@ import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
 import { cloneDeep, pick } from 'lodash';
+import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -18,7 +19,6 @@ import StyledInputGroup from '../StyledInputGroup';
 import StyledInputLocation from '../StyledInputLocation';
 import StyledSelect from '../StyledSelect';
 import StyledTextarea from '../StyledTextarea';
-import { H4 } from '../Text';
 import { Button } from '../ui/Button';
 import { Switch } from '../ui/Switch';
 import { useToast } from '../ui/useToast';
@@ -65,13 +65,12 @@ type VendorFormProps = {
   host?: Omit<DashboardVendorsQuery['account'], 'vendors'>;
   onSuccess?: Function;
   onCancel: () => void;
+  isModal?: boolean;
 };
 
-const VendorForm = ({ vendor, host, onSuccess, onCancel }: VendorFormProps) => {
+const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormProps) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const initialValues = cloneDeep(pick(vendor, EDITABLE_FIELDS) || {});
-
   const [createVendor] = useMutation(createVendorMutation, { context: API_V2_CONTEXT });
   const [editVendor] = useMutation(editVendorMutation, { context: API_V2_CONTEXT });
   const drawerActionsContainer = useDrawerActionsContainer();
@@ -113,15 +112,39 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel }: VendorFormProps) => {
 
   return (
     <div>
-      <H4 mb={32}>
+      <div className="mb-3 flex justify-between text-xl font-bold">
         {vendor ? (
           <FormattedMessage defaultMessage="Edit Vendor" />
         ) : (
           <FormattedMessage defaultMessage="Create Vendor" />
         )}
-      </H4>
+        {isModal && (
+          <button
+            onClick={onCancel}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-transparent bg-transparent text-slate-500 ring-2 ring-transparent transition-colors hover:text-slate-950  focus:outline-none focus-visible:ring-black active:ring-black group-hover:border-slate-200 group-hover:bg-white data-[state=open]:ring-black"
+          >
+            <X size="20px" />
+          </button>
+        )}
+      </div>
       <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-        {formik => (
+        {formik => {
+          const actionButtons = (
+            <div className="flex flex-grow justify-between gap-2">
+              <Button onClick={onCancel} variant="outline" className="rounded-full">
+                <FormattedMessage id="Cancel" defaultMessage="Cancel" />
+              </Button>
+              <Button onClick={formik.submitForm} className="rounded-full">
+                {vendor ? (
+                  <FormattedMessage id="Vendor.Update" defaultMessage="Update vendor" />
+                ) : (
+                  <FormattedMessage id="Vendors.Create" defaultMessage="Create vendor" />
+                )}
+              </Button>
+            </div>
+          );
+
+          return (
           <Form data-cy="vendor-form">
             <StyledInputFormikField
               name="name"
@@ -290,24 +313,14 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel }: VendorFormProps) => {
               )}
             </StyledInputFormikField>
 
-            {drawerActionsContainer &&
-              createPortal(
-                <div className="flex flex-grow justify-between gap-2">
-                  <Button onClick={onCancel} variant="outline" className="rounded-full">
-                    <FormattedMessage id="Cancel" defaultMessage="Cancel" />
-                  </Button>
-                  <Button onClick={formik.submitForm} className="rounded-full">
-                    {vendor ? (
-                      <FormattedMessage id="Vendor.Update" defaultMessage="Update vendor" />
-                    ) : (
-                      <FormattedMessage id="Vendors.Create" defaultMessage="Create vendor" />
-                    )}
-                  </Button>
-                </div>,
-                drawerActionsContainer,
+              {drawerActionsContainer ? (
+                createPortal(actionButtons, drawerActionsContainer)
+              ) : (
+                <div className="mt-6">{actionButtons}</div>
               )}
           </Form>
-        )}
+          );
+        }}
       </Formik>
     </div>
   );
