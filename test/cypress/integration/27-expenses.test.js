@@ -24,13 +24,13 @@ describe('Expense flow', () => {
         collective = c;
         cy.signup({
           user: { name: 'Potatoes Lover' },
-          redirect: `/${collective.slug}/expenses/new`,
+          redirect: `/${collective.slug}/expenses/new?ocr=false`,
         }).then(u => (user = u));
       });
     });
 
     beforeEach(() => {
-      cy.login({ email: user.email, redirect: `/${collective.slug}/expenses/new` });
+      cy.login({ email: user.email, redirect: `/${collective.slug}/expenses/new?ocr=false` });
     });
 
     it('has a dismissible help message', () => {

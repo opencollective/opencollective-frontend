@@ -273,7 +273,7 @@ const ExpenseItemForm = ({
               </StyledInputField>
             )}
           </Field>
-          <Flex justifyContent="flex-end" flexDirection={['column', 'row']}>
+          <Flex justifyContent="flex-end" flexDirection={['column', null, null, 'row']} gridGap="8px">
             {requireDate && (
               <StyledInputField
                 name={getFieldName('incurredAt')}
@@ -285,7 +285,6 @@ const ExpenseItemForm = ({
                 labelFontSize="13px"
                 flex={requireFile ? '1 1 44%' : '1 1 50%'}
                 mt={3}
-                mr={[0, '8px']}
                 disabled={editOnlyDescriptiveInfo}
               >
                 {inputProps => (
@@ -314,8 +313,8 @@ const ExpenseItemForm = ({
               labelFontSize="13px"
               inputType="number"
               flex="1 1 30%"
-              minWidth={150}
-              maxWidth={['100%', '40%']}
+              minWidth={200}
+              maxWidth={['100%', null, null, '40%']}
               mt={3}
               disabled={editOnlyDescriptiveInfo}
             >
@@ -325,6 +324,7 @@ const ExpenseItemForm = ({
                     <WithOCRComparisonWarning
                       comparison={ocrComparison?.['amount']}
                       formatValue={amount => formatValueAsCurrency(amount, { locale: intl.locale })}
+                      mrClass="mr-7"
                     >
                       <StyledInputAmount
                         {...field}

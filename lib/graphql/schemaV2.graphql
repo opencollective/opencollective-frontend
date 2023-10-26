@@ -713,6 +713,7 @@ enum SocialLinkType {
   GHOST
   PEERTUBE
   TIKTOK
+  TWITCH
 }
 
 enum ImageFormat {
@@ -2838,6 +2839,11 @@ type Host implements Account & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  List of accounting categories for this host
+  """
+  accountingCategories: AccountingCategoryCollection!
   hostFeePercent: Float
   totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
   totalHostedAccounts: Int
@@ -4410,6 +4416,7 @@ type Policies {
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
+  EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
 }
 
 type EXPENSE_AUTHOR_CANNOT_APPROVE {
@@ -4440,6 +4447,11 @@ type MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
   PER_AUTHORIZATION: Amount
   WEEKLY: Amount
   YEARLY: Amount
+}
+
+type EXPENSE_CATEGORIZATION {
+  requiredForExpenseSubmitters: Boolean
+  requiredForCollectiveAdmins: Boolean
 }
 
 type ActivitySubscription {
@@ -4585,6 +4597,7 @@ type Activity {
 
 enum ActivityType {
   ACTIVITY_ALL
+  ACCOUNTING_CATEGORIES_EDITED
   CONNECTED_ACCOUNT_CREATED
   CONNECTED_ACCOUNT_ERROR
   COLLECTIVE_CREATED_GITHUB
@@ -4727,6 +4740,47 @@ type Webhook {
   activityType: ActivityType
   webhookUrl: URL
   account: Account!
+}
+
+"""
+A collection of "Accounting Categories"
+"""
+type AccountingCategoryCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+
+  """
+  The Accounting Categories
+  """
+  nodes: [AccountingCategory!]!
+}
+
+"""
+Fields for an accounting category
+"""
+type AccountingCategory {
+  id: String!
+
+  """
+  The code of the accounting category
+  """
+  code: String!
+
+  """
+  The technical name of the accounting category
+  """
+  name: String!
+
+  """
+  A friendly name for non-accountants (i.e. expense submitters and collective admins)
+  """
+  friendlyName: String
+
+  """
+  The account this category belongs to
+  """
+  account: Host!
 }
 
 """
@@ -12013,6 +12067,7 @@ enum CountryISO {
 
 enum ActivityAndClassesType {
   ACTIVITY_ALL
+  ACCOUNTING_CATEGORIES_EDITED
   CONNECTED_ACCOUNT_CREATED
   CONNECTED_ACCOUNT_ERROR
   COLLECTIVE_CREATED_GITHUB
@@ -13856,6 +13911,21 @@ type Mutation {
   Regenerate two factor authentication recovery codes
   """
   regenerateRecoveryCodes: [String!]
+
+  """
+  Edit an accounting category. Returns the account with the updated categories.
+  """
+  editAccountingCategories(
+    """
+    The host to edit accounting categories for
+    """
+    account: AccountReferenceInput!
+
+    """
+    The list of categories to edit
+    """
+    categories: [AccountingCategoryInput!]!
+  ): Account!
   createApplication(application: ApplicationCreateInput!): Application
   updateApplication(application: ApplicationUpdateInput!): Application
   deleteApplication(application: ApplicationReferenceInput!): Application
@@ -15030,6 +15100,41 @@ type Mutation {
   ): Agreement!
 
   """
+  Create a new vendor for given host
+  """
+  createVendor(
+    """
+    Reference to the host that holds the vendor
+    """
+    host: AccountReferenceInput!
+
+    """
+    The vendor to create
+    """
+    vendor: VendorCreateInput!
+  ): Vendor!
+
+  """
+  Edit an existing vendor
+  """
+  editVendor(
+    """
+    Reference to the host that holds the vendor
+    """
+    vendor: VendorEditInput!
+  ): Vendor!
+
+  """
+  Delete a vendor
+  """
+  deleteVendor(
+    """
+    Reference to the vendor to delete
+    """
+    vendor: AccountReferenceInput!
+  ): Boolean!
+
+  """
   Send In-App Survey response
   """
   sendSurveyResponse(surveyKey: String!, responseId: String!, score: Int!, text: String, okToContact: Boolean): Boolean
@@ -15078,6 +15183,11 @@ enum TaxType {
   New Zealand Good and Services Tax
   """
   GST
+
+  """
+  Employer Identification Number
+  """
+  EIN
 }
 
 input CollectiveCreateInput {
@@ -15241,6 +15351,7 @@ input PoliciesInput {
   REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
+  EXPENSE_CATEGORIZATION: PoliciesExpenseCategorizationInput
 }
 
 input PoliciesCollectiveExpenseAuthorCannotApprove {
@@ -15256,6 +15367,11 @@ input PoliciesCollectiveMinimumAdminsInput {
   freeze: Boolean
 }
 
+input PoliciesExpenseCategorizationInput {
+  requiredForExpenseSubmitters: Boolean
+  requiredForCollectiveAdmins: Boolean
+}
+
 type SendMessageResult {
   success: Boolean
 }
@@ -15264,6 +15380,31 @@ type SendMessageResult {
 A string that cannot be passed as an empty value
 """
 scalar NonEmptyString
+
+"""
+Input for creating or updating an account category
+"""
+input AccountingCategoryInput {
+  """
+  The ID of the accounting category to edit
+  """
+  id: NonEmptyString
+
+  """
+  The code of the accounting category
+  """
+  code: NonEmptyString
+
+  """
+  The technical name of the accounting category
+  """
+  name: NonEmptyString
+
+  """
+  A friendly name for non-accountants (i.e. expense submitters and collective admins)
+  """
+  friendlyName: String
+}
 
 """
 Input type for Application
@@ -16830,4 +16971,55 @@ input AgreementReferenceInput {
   The internal id of the agreement (ie: 580)
   """
   legacyId: Int
+}
+
+input VendorCreateInput {
+  name: NonEmptyString!
+  legalName: String
+  tags: [NonEmptyString]
+  address: String
+  imageUrl: String
+  vendorInfo: VendorInfoInput
+}
+
+"""
+Some context about the vendor
+"""
+input VendorInfoInput {
+  contact: VendorContactInput
+  taxFormUrl: String
+  taxType: TaxType
+  taxId: String
+  notes: String
+}
+
+"""
+Some context about the vendor contact person
+"""
+input VendorContactInput {
+  name: String
+  email: String
+}
+
+input VendorEditInput {
+  """
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the account (ie: 580)
+  """
+  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
+
+  """
+  The slug identifying the account (ie: babel for https://opencollective.com/babel)
+  """
+  slug: String
+  name: String
+  legalName: String
+  tags: String
+  address: String
+  imageUrl: String
+  vendorInfo: VendorInfoInput
 }

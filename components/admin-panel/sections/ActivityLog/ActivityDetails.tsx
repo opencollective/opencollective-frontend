@@ -9,6 +9,7 @@ import { Activity } from '../../../../lib/graphql/types/v2/graphql';
 import { Box } from '../../../Grid';
 
 import { CollectiveEditedDetails } from './CollectiveEditedDetails';
+import { GenericActivityDiffDataWithList } from './GenericActivityDiffDataWithList';
 
 const ValueContainer = styled.div`
   background: ${props => props.theme.colors.black[100]};
@@ -19,6 +20,10 @@ const ValueContainer = styled.div`
 `;
 
 const ActivityDetailComponents = {
+  ACCOUNTING_CATEGORIES_EDITED: {
+    title: defineMessage({ defaultMessage: 'Changes' }),
+    Component: GenericActivityDiffDataWithList,
+  },
   COLLECTIVE_EDITED: {
     title: defineMessage({ defaultMessage: 'Changes' }),
     Component: CollectiveEditedDetails,

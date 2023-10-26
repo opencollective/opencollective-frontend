@@ -32,7 +32,9 @@ const Expenses = props => {
   const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, onlySubmittedExpenses } = props;
 
   const expensesRoute = isDashboard
-    ? `/dashboard/${variables.collectiveSlug}/expenses`
+    ? query.direction === 'SUBMITTED'
+      ? `/dashboard/${variables.collectiveSlug}/submitted-expenses`
+      : `/dashboard/${variables.collectiveSlug}/expenses`
     : `${getCollectivePageRoute(data?.account)}/expenses`;
 
   useEffect(() => {
@@ -92,16 +94,20 @@ const Expenses = props => {
 
   return (
     <Container>
-      <h1 className={isDashboard ? 'text-2xl font-bold leading-10 tracking-tight' : 'text-[32px] leading-10'}>
-        {onlySubmittedExpenses ? (
-          <FormattedMessage defaultMessage="Submitted Expenses" />
-        ) : (
-          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-        )}
-      </h1>
+      {!isDashboard && (
+        <React.Fragment>
+          <h1 className={'mb-6 text-[32px] leading-10'}>
+            {onlySubmittedExpenses ? (
+              <FormattedMessage defaultMessage="Submitted Expenses" />
+            ) : (
+              <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+            )}
+          </h1>
+        </React.Fragment>
+      )}
 
-      <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}>
-        {!onlySubmittedExpenses && (
+      <Flex alignItems={[null, null, 'center']} mb="26px" flexWrap="wrap" gap="16px" mr={2}>
+        {!isDashboard && !onlySubmittedExpenses && (
           <Box flex="0 1" flexBasis={['100%', null, '380px']}>
             <ExpensesDirection
               value={query.direction || 'RECEIVED'}

@@ -20,7 +20,7 @@ import StyledButton from '../../../StyledButton';
 import { makeTruncatedValueAllSelectedLabelContainer, StyledSelectFilter } from '../../../StyledSelectFilter';
 import { H2 } from '../../../Text';
 import { Alert, AlertDescription, AlertTitle } from '../../../ui/Alert';
-import { AdminSectionProps } from '../../types';
+import { DashboardSectionProps } from '../../types';
 
 import { workspaceHomeQuery } from './query';
 import TimelineItem from './TimelineItem';
@@ -42,14 +42,14 @@ const getFilterOptions = intl => [
   },
 ];
 
-const Home = (props: AdminSectionProps) => {
+const Home = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
   const filterOptions = React.useMemo(() => getFilterOptions(intl), [intl]);
   const [filters, setFilters] = React.useState(filterOptions);
   const [isTimelineBeingGenerated, setIsTimelineBeingGenerated] = React.useState(false);
   const [openExpenseLegacyId, setOpenExpenseLegacyId] = React.useState<number | null>(null);
-  const slug = router.query?.as || props.account.slug;
+  const slug = router.query?.as || accountSlug;
   const { data, loading, error, fetchMore, refetch } = useQuery(workspaceHomeQuery, {
     variables: { slug, limit: PAGE_SIZE, classes: flatten(filters.map(f => f.value.split(','))) },
     context: API_V2_CONTEXT,
@@ -108,7 +108,6 @@ const Home = (props: AdminSectionProps) => {
               styles={{
                 control: { flexWrap: 'nowrap' },
               }}
-              {...props}
             />
           </Flex>
           <div className="mt-4 space-y-4">

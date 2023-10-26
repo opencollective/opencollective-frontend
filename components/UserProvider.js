@@ -79,17 +79,30 @@ class UserProvider extends React.Component {
     }
   };
 
-  logout = async () => {
+  logout = async ({ redirect, skipQueryRefetch } = {}) => {
     removeFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
     removeFromLocalStorage(LOCAL_STORAGE_KEYS.LAST_DASHBOARD_SLUG);
     removeFromLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE);
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
+    // Clear the Apollo store without automatically refetching queries
     await this.props.client.clearStore();
 
-    // Refetch the LoggedInUser query to make the API clear the rootRedirect cookie
-    await this.props.client.refetchQueries({
-      include: ['LoggedInUser'],
-    });
+    // By default, we refetch all queries to make sure we don't display stale data
+    if (!skipQueryRefetch) {
+      await this.props.client.reFetchObservableQueries();
+    }
+    // Otherwise we refetch only the LoggedInUser query to make the API clear the rootRedirect cookie
+    else {
+      await this.props.client.refetchQueries({
+        include: ['LoggedInUser'],
+      });
+    }
+
+    if (redirect) {
+      this.props.router.push({
+        pathname: redirect,
+      });
+    }
   };
 
   login = async token => {

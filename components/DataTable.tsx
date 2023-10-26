@@ -16,6 +16,8 @@ interface DataTableProps<TData, TValue> {
   className?: string;
   innerClassName?: string;
   mobileTableView?: boolean;
+  footer?: React.ReactNode;
+  tableRef?: React.Ref<HTMLTableElement>;
 }
 
 export function DataTable<TData, TValue>({
@@ -27,6 +29,8 @@ export function DataTable<TData, TValue>({
   hideHeader,
   nbPlaceholders = 10,
   onClickRow,
+  footer,
+  tableRef,
   ...tableProps
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
@@ -37,7 +41,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <Table {...tableProps}>
+    <Table {...tableProps} ref={tableRef}>
       {!hideHeader && (
         <TableHeader>
           {table.getHeaderGroups().map(headerGroup => (
@@ -100,6 +104,14 @@ export function DataTable<TData, TValue>({
           </TableRow>
         )}
       </TableBody>
+
+      {footer && (
+        <tfoot>
+          <tr>
+            <th colSpan={table.getCenterLeafColumns().length}>{footer}</th>
+          </tr>
+        </tfoot>
+      )}
     </Table>
   );
 }

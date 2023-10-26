@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { omit } from 'lodash';
+import { omit, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
@@ -269,12 +269,14 @@ class CreateExpensePage extends React.Component {
       const parentCollectiveSlugRoute = parentCollectiveSlug ? `${parentCollectiveSlug}/` : '';
       const collectiveType = parentCollectiveSlug ? getCollectiveTypeForUrl(data?.account) : undefined;
       const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
-      await this.props.router.push(
-        `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
-      );
+      await this.props.router.push({
+        pathname: `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
+        query: pick(this.props.router.query, ['ocr']),
+      });
       toast({
+        variant: 'success',
         title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
-        description: this.props.LoggedInUser ? (
+        message: this.props.LoggedInUser ? (
           <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED} />
         ) : (
           <FormattedMessage id="Expense.SuccessPage" defaultMessage="You can edit or review updates on this page." />
@@ -285,7 +287,7 @@ class CreateExpensePage extends React.Component {
     } catch (e) {
       toast({
         variant: 'error',
-        description: i18nGraphqlException(this.props.intl, e),
+        message: i18nGraphqlException(this.props.intl, e),
       });
       this.setState({ isSubmitting: false });
     }

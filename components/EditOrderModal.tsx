@@ -56,7 +56,7 @@ export type EditOrderActions = 'cancel' | 'editAmount' | 'editPaymentMethod';
 type EditOrderModalProps = {
   onClose: () => void;
   order: any;
-  account: any;
+  accountSlug: string;
   action: EditOrderActions;
 };
 
@@ -330,7 +330,7 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
 
 const EditPaymentMethodModal = withStripeLoader(
   ({
-    account,
+    accountSlug,
     order: contribution,
     loadStripe,
     ...props
@@ -349,7 +349,7 @@ const EditPaymentMethodModal = withStripeLoader(
 
     // GraphQL mutations and queries
     const { data, refetch } = useQuery(paymentMethodsQuery, {
-      variables: { accountId: account.id, orderId: contribution.id },
+      variables: { accountSlug, orderId: contribution.id },
       context: API_V2_CONTEXT,
       fetchPolicy: 'network-only',
     });
@@ -563,7 +563,7 @@ const EditPaymentMethodModal = withStripeLoader(
                       variables: {
                         creditCardInfo: newCreditCardInfo,
                         name: get(newStripePaymentMethod, 'name'),
-                        account: { id: account.id },
+                        account: { slug: accountSlug },
                       },
                     });
                     return handleAddPaymentMethodResponse(res.data.addCreditCard);

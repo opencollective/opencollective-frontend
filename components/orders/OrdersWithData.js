@@ -171,6 +171,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
   const queryVariables = { accountSlug, ...getVariablesFromQuery(router.query, status) };
   const queryParams = { variables: queryVariables, context: API_V2_CONTEXT };
   const { data, error, loading, variables, refetch } = useQuery(accountOrdersQuery, queryParams);
+
   const { LoggedInUser } = useLoggedInUser();
   const prevLoggedInUser = usePrevious(LoggedInUser);
   const isHostAdmin = LoggedInUser?.isAdminOfCollective(data?.account);
@@ -188,6 +189,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           {title || <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
         </h1>
+
         <SearchBar
           height="40px"
           defaultValue={router.query.searchTerm}
@@ -225,7 +227,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
             </StyledButton>
             {showCreatePendingOrderModal && (
               <CreatePendingOrderModal
-                host={data.account}
+                hostSlug={data.account.slug}
                 onClose={() => setShowCreatePendingOrderModal(false)}
                 onSuccess={() => refetch()}
               />

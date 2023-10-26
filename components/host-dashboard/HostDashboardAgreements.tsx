@@ -13,6 +13,7 @@ import AgreementDrawer from '../agreements/AgreementDrawer';
 import AgreementsTable from '../agreements/AgreementsTable';
 import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from '../agreements/fragments';
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import { DashboardSectionProps } from '../dashboard/types';
 import FilesViewerModal from '../FilesViewerModal';
 import { Flex } from '../Grid';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
@@ -73,7 +74,7 @@ const hasPagination = (data, queryVariables): boolean => {
   return Boolean(queryVariables.offset || (totalCount && totalCount > NB_AGREEMENTS_DISPLAYED));
 };
 
-const HostDashboardAgreements = ({ hostSlug }) => {
+const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
   const query = router.query;

@@ -162,7 +162,7 @@ const getDefaultDateInterval = () => {
   };
 };
 
-const HostDashboardReports = ({ hostSlug }) => {
+const HostDashboardReports = ({ accountSlug: hostSlug }) => {
   const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
   const [collectives, setCollectives] = React.useState(null);
   const dateFrom = simpleDateToISOString(dateInterval?.from, false, dateInterval?.timezoneType);
@@ -280,7 +280,7 @@ const HostDashboardReports = ({ hostSlug }) => {
 };
 
 HostDashboardReports.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
+  accountSlug: PropTypes.string.isRequired,
 };
 
 export default HostDashboardReports;

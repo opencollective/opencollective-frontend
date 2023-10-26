@@ -21,7 +21,12 @@ const RecurringContributions = () => {
     <Box my={4}>
       <StyledInputField htmlFor="recurring-contributions-account" label="Account" flex="1 1">
         {({ id }) => (
-          <CollectivePickerAsync inputId={id} onChange={({ value }) => setAccount(value)} collective={account} />
+          <CollectivePickerAsync
+            inputId={id}
+            onChange={({ value }) => setAccount(value)}
+            collective={account}
+            skipGuests={false}
+          />
         )}
       </StyledInputField>
       {loading ? (

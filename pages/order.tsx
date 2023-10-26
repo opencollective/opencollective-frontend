@@ -652,7 +652,7 @@ export default function OrderPage(props) {
                           </StyledButton>
                           {showCreatePendingOrderModal && (
                             <CreatePendingOrderModal
-                              host={account.host}
+                              hostSlug={account.host.slug}
                               onClose={() => setShowCreatePendingOrderModal(false)}
                               onSuccess={() => queryResult.refetch()}
                               edit={order}

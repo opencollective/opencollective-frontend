@@ -37,7 +37,9 @@ const virtualCardsQuery = gql`
       type
       name
       imageUrl
+      currency
       ... on AccountWithHost {
+        isApproved
         host {
           legacyId
           slug
@@ -46,6 +48,7 @@ const virtualCardsQuery = gql`
           name
           imageUrl
           settings
+          currency
         }
       }
       virtualCards(
@@ -107,7 +110,7 @@ const virtualCardsQuery = gql`
 
 const VIRTUAL_CARDS_PER_PAGE = 6;
 
-const VirtualCards = props => {
+const VirtualCards = ({ accountSlug, isDashboard }) => {
   const router = useRouter();
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
@@ -116,7 +119,7 @@ const VirtualCards = props => {
   const { loading, data } = useQuery(virtualCardsQuery, {
     context: API_V2_CONTEXT,
     variables: {
-      slug: props.collective.slug,
+      slug: accountSlug,
       limit: VIRTUAL_CARDS_PER_PAGE,
       offset,
       state,
@@ -129,30 +132,34 @@ const VirtualCards = props => {
   if (loading) {
     return <Loading />;
   }
+  const pageRoute = isDashboard ? `/dashboard/${accountSlug}/virtual-cards` : `/${accountSlug}/admin/virtual-cards`;
 
   const handleUpdateFilters = queryParams => {
     return router.push({
-      pathname: `/${props.collective.slug}/admin/virtual-cards`,
+      pathname: pageRoute,
       query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
     });
   };
 
   return (
-    <Box width={['366px', '764px']}>
+    <Box>
       <Box>
-        <P>
-          <FormattedMessage
-            id="VirtualCards.Description"
-            defaultMessage="Use a virtual card to spend from your collective's budget. You can request multiple cards (review the host's policy to see how many). Your fiscal host will create the card for you and assign it a limit and a merchant. You will be notified by email once the card is assigned. <learnMoreLink>Learn more</learnMoreLink>"
-            values={{
-              learnMoreLink: getI18nLink({
-                href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
-                openInNewTabNoFollow: true,
-              }),
-            }}
-          />
-        </P>
-        {props.collective.host?.settings?.virtualcards?.policy && (
+        {!isDashboard && (
+          <P>
+            <FormattedMessage
+              id="VirtualCards.Description"
+              defaultMessage="Use a virtual card to spend from your collective's budget. You can request multiple cards (review the host's policy to see how many). Your fiscal host will create the card for you and assign it a limit and a merchant. You will be notified by email once the card is assigned. <learnMoreLink>Learn more</learnMoreLink>"
+              values={{
+                learnMoreLink: getI18nLink({
+                  href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
+                  openInNewTabNoFollow: true,
+                }),
+              }}
+            />
+          </P>
+        )}
+
+        {data?.account.host?.settings?.virtualcards?.policy && (
           <P mt={3}>
             <Collapse
               title={
@@ -160,34 +167,34 @@ const VirtualCards = props => {
                   id="VirtualCards.Policy.Reminder"
                   defaultMessage="{hostName} Virtual Card use Policy"
                   values={{
-                    hostName: props.collective.host.name,
+                    hostName: data.account.host.name,
                   }}
                 />
               }
             >
-              <HTMLContent content={props.collective.host?.settings?.virtualcards?.policy} />
+              <HTMLContent content={data.account.host?.settings?.virtualcards?.policy} />
             </Collapse>
           </P>
         )}
         <Flex mt={3} flexDirection={['row', 'column']}>
           <VirtualCardFilters
             filters={routerQuery}
-            collective={props.collective}
-            host={props.collective.host}
-            virtualCardMerchants={data.account.virtualCardMerchants.nodes}
+            collective={data?.account}
+            host={data?.account.host}
+            virtualCardMerchants={data?.account?.virtualCardMerchants.nodes}
             onChange={queryParams => handleUpdateFilters({ ...queryParams, offset: null })}
             displayPeriodFilter
           />
         </Flex>
       </Box>
       <Grid mt={4} gridTemplateColumns={['100%', '366px 366px']} gridGap="32px 24px">
-        {data.account.virtualCards.nodes.map(virtualCard => (
+        {data?.account?.virtualCards.nodes.map(virtualCard => (
           <VirtualCard
             host={data.account.host}
             canEditVirtualCard={virtualCard.data.status === 'active'}
             canPauseOrResumeVirtualCard
             canDeleteVirtualCard
-            confirmOnPauseCard={props.collective.type === CollectiveType.COLLECTIVE}
+            confirmOnPauseCard={data.account.type === CollectiveType.COLLECTIVE}
             key={virtualCard.id}
             virtualCard={virtualCard}
             onDeleteRefetchQuery="AccountVirtualCards"
@@ -196,8 +203,8 @@ const VirtualCards = props => {
       </Grid>
       <Flex mt={5} justifyContent="center">
         <Pagination
-          route={`/${props.collective.slug}/admin/virtual-cards`}
-          total={data.account.virtualCards.totalCount}
+          route={pageRoute}
+          total={data?.account?.virtualCards.totalCount}
           limit={VIRTUAL_CARDS_PER_PAGE}
           offset={offset}
           ignoredQueryParams={['slug', 'section']}
@@ -208,14 +215,8 @@ const VirtualCards = props => {
 };
 
 VirtualCards.propTypes = {
-  collective: PropTypes.shape({
-    slug: PropTypes.string,
-    type: PropTypes.string,
-    virtualCards: PropTypes.object,
-    virtualCardMerchants: PropTypes.array,
-    host: PropTypes.object,
-  }),
-  hideTopsection: PropTypes.func,
+  accountSlug: PropTypes.string.isRequired,
+  isDashboard: PropTypes.bool,
 };
 
 export default VirtualCards;

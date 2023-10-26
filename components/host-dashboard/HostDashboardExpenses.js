@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { gql, useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { parseDateInterval } from '../../lib/date-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -100,28 +100,30 @@ const hostDashboardMetaDataQuery = gql`
         }
       }
     }
-
-    ready_to_pay: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: READY_TO_PAY)
-      @include(if: $getViewCounts) {
+    all: expenses(host: { slug: $hostSlug }, limit: 0) @include(if: $getViewCounts) {
+      totalCount
+    }
+    ready_to_pay: expenses(host: { slug: $hostSlug }, limit: 0, status: READY_TO_PAY) @include(if: $getViewCounts) {
       totalCount
     }
     scheduled_for_payment: expenses(
       host: { slug: $hostSlug }
       limit: 0
-      offset: 0
       status: SCHEDULED_FOR_PAYMENT
       payoutMethodType: BANK_ACCOUNT
     ) @include(if: $getViewCounts) {
       totalCount
     }
-    on_hold: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: ON_HOLD) @include(if: $getViewCounts) {
+    on_hold: expenses(host: { slug: $hostSlug }, limit: 0, status: ON_HOLD) @include(if: $getViewCounts) {
       totalCount
     }
-    incomplete: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: INCOMPLETE)
-      @include(if: $getViewCounts) {
+    incomplete: expenses(host: { slug: $hostSlug }, limit: 0, status: INCOMPLETE) @include(if: $getViewCounts) {
       totalCount
     }
-    error: expenses(host: { slug: $hostSlug }, limit: 0, offset: 0, status: ERROR) @include(if: $getViewCounts) {
+    error: expenses(host: { slug: $hostSlug }, limit: 0, status: ERROR) @include(if: $getViewCounts) {
+      totalCount
+    }
+    paid: expenses(host: { slug: $hostSlug }, limit: 0, status: PAID) @include(if: $getViewCounts) {
       totalCount
     }
   }
@@ -189,47 +191,9 @@ const hasParams = query => {
   });
 };
 
-const initViews = [
-  { label: <FormattedMessage defaultMessage="All" />, query: {}, id: 'all' },
-  {
-    label: 'Ready to pay',
-    query: { status: 'READY_TO_PAY', orderBy: 'CREATED_AT,ASC' },
-    showCount: true,
-    id: 'ready_to_pay',
-  },
-  {
-    label: <FormattedMessage id="expense.scheduledForPayment" defaultMessage="Scheduled for payment" />,
-    query: { status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', orderBy: 'CREATED_AT,ASC' },
-    showCount: true,
-    id: 'scheduled_for_payment',
-  },
-  {
-    label: <FormattedMessage defaultMessage="On hold" />,
-    query: { status: 'ON_HOLD', orderBy: 'CREATED_AT,ASC' },
-    showCount: true,
-    id: 'on_hold',
-  },
-  {
-    label: <FormattedMessage defaultMessage="Incomplete" />,
-    query: { status: 'INCOMPLETE', orderBy: 'CREATED_AT,ASC' },
-    showCount: true,
-    id: 'incomplete',
-  },
-  {
-    label: <FormattedMessage id="Error" defaultMessage="Error" />,
-    query: { status: 'ERROR', orderBy: 'CREATED_AT,ASC' },
-    showCount: true,
-    id: 'error',
-  },
-  {
-    label: <FormattedMessage defaultMessage="Paid" />,
-    query: { status: 'PAID' },
-    id: 'recently_paid',
-  },
-];
-
-const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
+const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
   const router = useRouter() || {};
+  const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const expensePipelineFeatureIsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_PIPELINE);
   const query = expensePipelineFeatureIsEnabled ? router.query : enforceDefaultParamsOnQuery(router.query);
@@ -275,17 +239,45 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
 
   const { data, error, loading } = expenses;
 
-  const views = React.useMemo(() => {
-    if (!metaData) {
-      return initViews;
-    }
-    return initViews.map(view => {
-      return {
-        ...view,
-        count: metaData[view.id]?.totalCount,
-      };
-    });
-  }, [metaData]);
+  const views = [
+    { label: intl.formatMessage({ defaultMessage: 'All' }), query: {}, id: 'all', count: metaData?.all?.totalCount },
+    {
+      label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
+      query: { status: 'READY_TO_PAY', orderBy: 'CREATED_AT,ASC' },
+      id: 'ready_to_pay',
+      count: metaData?.ready_to_pay?.totalCount,
+    },
+    {
+      label: intl.formatMessage({ id: 'expense.scheduledForPayment', defaultMessage: 'Scheduled for payment' }),
+      query: { status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', orderBy: 'CREATED_AT,ASC' },
+      id: 'scheduled_for_payment',
+      count: metaData?.scheduled_for_payment?.totalCount,
+    },
+    {
+      label: intl.formatMessage({ defaultMessage: 'On hold' }),
+      query: { status: 'ON_HOLD', orderBy: 'CREATED_AT,ASC' },
+      id: 'on_hold',
+      count: metaData?.on_hold?.totalCount,
+    },
+    {
+      label: intl.formatMessage({ defaultMessage: 'Incomplete' }),
+      query: { status: 'INCOMPLETE', orderBy: 'CREATED_AT,ASC' },
+      id: 'incomplete',
+      count: metaData?.incomplete?.totalCount,
+    },
+    {
+      label: intl.formatMessage({ id: 'Error', defaultMessage: 'Error' }),
+      query: { status: 'ERROR', orderBy: 'CREATED_AT,ASC' },
+      id: 'error',
+      count: metaData?.error?.totalCount,
+    },
+    {
+      label: intl.formatMessage({ defaultMessage: 'Paid' }),
+      query: { status: 'PAID' },
+      id: 'paid',
+      count: metaData?.paid?.totalCount,
+    },
+  ];
 
   const getQueryParams = newParams => {
     return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
@@ -295,7 +287,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
     <React.Fragment>
       <div className="mb-5 flex flex-wrap justify-between gap-4">
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
-          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+          <FormattedMessage id="Payments" defaultMessage="Payments" />
         </h1>
         <SearchBar
           height="40px"
@@ -464,7 +456,7 @@ const HostDashboardExpenses = ({ hostSlug, isDashboard }) => {
 };
 
 HostDashboardExpenses.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
+  accountSlug: PropTypes.string.isRequired,
   isDashboard: PropTypes.bool,
 };
 

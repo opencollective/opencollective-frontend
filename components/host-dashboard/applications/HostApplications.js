@@ -49,7 +49,7 @@ const enforceDefaultParamsOnQuery = query => {
   };
 };
 
-const HostApplications = ({ hostSlug, isDashboard }) => {
+const HostApplications = ({ accountSlug: hostSlug, isDashboard }) => {
   const router = useRouter() || {};
   const intl = useIntl();
   const query = enforceDefaultParamsOnQuery(router.query);
@@ -182,7 +182,7 @@ const HostApplications = ({ hostSlug, isDashboard }) => {
 };
 
 HostApplications.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
+  accountSlug: PropTypes.string.isRequired,
   isDashboard: PropTypes.bool,
 };
 

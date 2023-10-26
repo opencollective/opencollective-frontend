@@ -185,7 +185,7 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
             }
           }}
         >
-          <FormattedMessage defaultMessage="This will permanently removed this two factor method" />
+          <FormattedMessage defaultMessage="This will permanently remove this two factor method" />
         </ConfirmationModal>
       )}
     </React.Fragment>

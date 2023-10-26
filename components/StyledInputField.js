@@ -126,7 +126,7 @@ const StyledInputField = ({
           </Span>
         </Box>
       )}
-      {hint && (!error || typeof error !== 'string') && (
+      {hint && (
         <Box mt="6px">
           <Span fontSize="12px" color="black.700" css={{ verticalAlign: 'middle' }}>
             {hint}
