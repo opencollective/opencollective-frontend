@@ -199,7 +199,7 @@ const expenseFormPayeeStepQuery = gql`
           id
           slug
           legacyId
-          vendors(forAccount: { slug: $collectiveSlug }) {
+          vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
             id
             slug
             name
