@@ -152,7 +152,7 @@ const getPayeeOptions = (intl, payoutProfiles) => {
       options: getProfileOptions(INDIVIDUAL),
     },
     {
-      label: intl.formatMessage({ id: 'vendors', defaultMessage: 'Vendors' }),
+      label: intl.formatMessage({ defaultMessage: 'Vendors' }),
       options: getProfileOptions(VENDOR),
     },
     {

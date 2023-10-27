@@ -157,7 +157,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
           const actionButtons = (
             <div className="flex flex-grow justify-between gap-2">
               <Button onClick={onCancel} variant="outline" className="rounded-full">
-                <FormattedMessage id="Cancel" defaultMessage="Cancel" />
+                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </Button>
               <Button onClick={formik.submitForm} className="rounded-full">
                 {vendor ? (
@@ -192,7 +192,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
               </StyledInputFormikField>
               <StyledInputFormikField
                 name="vendorInfo.taxFormRequired"
-                label={intl.formatMessage({ defaultMessage: 'Tax form' })}
+                label={intl.formatMessage({ id: 'TaxForm', defaultMessage: 'Tax form' })}
                 labelProps={FIELD_LABEL_PROPS}
                 mt={3}
               >
@@ -277,7 +277,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
               />
               <StyledInputFormikField
                 name="vendorInfo.contact.name"
-                label={intl.formatMessage({ defaultMessage: 'Contact name' })}
+                label={intl.formatMessage({ id: 'ContactName', defaultMessage: 'Contact name' })}
                 labelProps={FIELD_LABEL_PROPS}
                 mt={3}
               >
@@ -305,7 +305,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 htmlFor="payout-method"
                 flex="1"
                 mt={3}
-                label={intl.formatMessage({ defaultMessage: 'Payout method' })}
+                label={intl.formatMessage({ id: 'ExpenseForm.PayoutOptionLabel', defaultMessage: 'Payout method' })}
                 labelProps={FIELD_LABEL_PROPS}
               >
                 {({ field }) => (
@@ -329,7 +329,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
               )}
               <StyledInputFormikField
                 name="vendorInfo.notes"
-                label={intl.formatMessage({ defaultMessage: 'Notes' })}
+                label={intl.formatMessage({ id: 'expense.notes', defaultMessage: 'Notes' })}
                 labelProps={FIELD_LABEL_PROPS}
                 mt={3}
               >

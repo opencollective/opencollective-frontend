@@ -52,11 +52,11 @@ const VendorDetails = ({ vendor, onCancel, editVendor }: VendorDetailsProps) => 
       <SectionTitle>{vendor.name}</SectionTitle>
       <div className="mt-4 flex gap-8">
         <HeaderInfo>
-          <FormattedMessage defaultMessage="Created on" />
+          <FormattedMessage id="agreement.createdOn" defaultMessage="Created on" />
           <FormattedDate value={vendor.createdAt} dateStyle="medium" />
         </HeaderInfo>
         <HeaderInfo>
-          <FormattedMessage defaultMessage="Created by" />
+          <FormattedMessage id="Agreement.createdBy" defaultMessage="Created by" />
           <React.Fragment>
             <LinkCollective collective={vendor.createdByAccount}>{vendor.createdByAccount.name}</LinkCollective>
           </React.Fragment>
@@ -94,7 +94,7 @@ const VendorDetails = ({ vendor, onCancel, editVendor }: VendorDetailsProps) => 
         )}
         {payoutMethod && (
           <VendorInfo>
-            <FormattedMessage defaultMessage="Payout Method" />
+            <FormattedMessage id="SecurityScope.PayoutMethod" defaultMessage="Payout Method" />
             <PayoutMethodData payoutMethod={payoutMethod} />
           </VendorInfo>
         )}
@@ -102,7 +102,7 @@ const VendorDetails = ({ vendor, onCancel, editVendor }: VendorDetailsProps) => 
       {notes && (
         <div className="mt-4 flex flex-col">
           <SectionTitle>
-            <FormattedMessage defaultMessage="Notes" />
+            <FormattedMessage id="expense.notes" defaultMessage="Notes" />
           </SectionTitle>
           <div>{notes}</div>
         </div>
@@ -111,10 +111,10 @@ const VendorDetails = ({ vendor, onCancel, editVendor }: VendorDetailsProps) => 
         createPortal(
           <div className="flex flex-grow justify-between gap-2">
             <Button onClick={onCancel} variant="outline" className="rounded-full">
-              <FormattedMessage id="Cancel" defaultMessage="Cancel" />
+              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </Button>
             <Button onClick={editVendor} className="rounded-full">
-              <FormattedMessage id="Vendor.Edit" defaultMessage="Edit Vendor" />
+              <FormattedMessage defaultMessage="Edit Vendor" />
             </Button>
           </div>,
           drawerActionsContainer,

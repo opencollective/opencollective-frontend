@@ -128,15 +128,15 @@ const getColumns = ({ editVendor, openVendor, handleSetArchive }) => {
               <DropdownMenuContent>
                 <DropdownMenuItem className="cursor-pointer" onClick={() => editVendor(vendor)}>
                   <Pencil className="mr-2" size="16" />
-                  <FormattedMessage id="actions.edit" defaultMessage="Edit" />
+                  <FormattedMessage id="Edit" defaultMessage="Edit" />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="cursor-pointer" onClick={() => handleSetArchive(vendor)}>
                   <Archive className="mr-2" size="16" />
                   {vendor.isArchived ? (
-                    <FormattedMessage id="actions.unarchive" defaultMessage="Unarchive" />
+                    <FormattedMessage id="collective.unarchive.confirm.btn" defaultMessage="Unarchive" />
                   ) : (
-                    <FormattedMessage id="actions.archive" defaultMessage="Archive" />
+                    <FormattedMessage id="collective.archive.confirm.btn" defaultMessage="Archive" />
                   )}
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -215,7 +215,7 @@ const Vendors = ({ accountSlug }) => {
   return (
     <Container>
       <DashboardHeader
-        title={<FormattedMessage id="Vendors" defaultMessage="Vendors" />}
+        title={<FormattedMessage defaultMessage="Vendors" />}
         description={
           <FormattedMessage
             id="Vendors.Description"

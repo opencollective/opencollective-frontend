@@ -232,7 +232,6 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Incoming Contributions',
   },
   [ALL_SECTIONS.VENDORS]: {
-    id: 'Vendors',
     defaultMessage: 'Vendors',
   },
 });
