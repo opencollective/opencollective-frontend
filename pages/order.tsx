@@ -154,6 +154,7 @@ const orderPageQuery = gql`
         parent {
           id
           slug
+          name
           imageUrl
           backgroundImageUrl
           twitterHandle

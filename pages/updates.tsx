@@ -50,13 +50,17 @@ export const updatesPageQuery = gql`
       ... on Event {
         parent {
           id
+          name
           slug
+          imageUrl
         }
       }
       ... on Project {
         parent {
           id
+          name
           slug
+          imageUrl
         }
       }
       features {
