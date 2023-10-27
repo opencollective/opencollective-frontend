@@ -77,15 +77,25 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           if: isHost,
           section: ALL_SECTIONS.HOST_EXPENSES,
-          label: intl.formatMessage({ id: 'Payments', defaultMessage: 'Payments' }),
+          label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
         },
         {
           section: ALL_SECTIONS.EXPENSES,
-          label: intl.formatMessage({ defaultMessage: 'Received' }),
+          label: intl.formatMessage(
+            {
+              defaultMessage: 'To {accountName}',
+            },
+            { accountName: account.name },
+          ),
         },
         {
           section: ALL_SECTIONS.SUBMITTED_EXPENSES,
-          label: intl.formatMessage({ defaultMessage: 'Submitted' }),
+          label: intl.formatMessage(
+            {
+              defaultMessage: 'From {accountName}',
+            },
+            { accountName: account.name },
+          ),
         },
       ],
     },
@@ -103,15 +113,25 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       subMenu: [
         {
           if: isHost || isSelfHosted,
-          label: intl.formatMessage({ id: 'FinancialContributions', defaultMessage: 'Financial Contributions' }),
+          label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
           section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
         },
         {
-          label: intl.formatMessage({ defaultMessage: 'Incoming' }),
+          label: intl.formatMessage(
+            {
+              defaultMessage: 'To {accountName}',
+            },
+            { accountName: account.name },
+          ),
           section: ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
         },
         {
-          label: intl.formatMessage({ defaultMessage: 'Outgoing' }),
+          label: intl.formatMessage(
+            {
+              defaultMessage: 'From {accountName}',
+            },
+            { accountName: account.name },
+          ),
           section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
         },
       ],

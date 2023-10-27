@@ -52,8 +52,8 @@ export const MenuLink = ({ section, subMenu, Icon, label, href, isBeta, classNam
         data-cy={`menu-item-${section || label}`}
         className={classNames}
       >
-        <div className="flex flex-1 items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="flex w-full flex-1 items-center justify-between">
+          <div className="flex items-center gap-2 overflow-hidden">
             {Icon && (
               <Icon
                 size={18}
