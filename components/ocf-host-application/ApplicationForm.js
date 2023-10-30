@@ -144,11 +144,11 @@ const ApplicationForm = ({
       'applicationData.websiteAndSocialLinks',
     ]);
 
-    verifyEmailPattern(errors, values, 'user.email');
-
-    // verifyFieldLength(intl, errors, values, 'collective.name', 1, 50);
-    // verifyFieldLength(intl, errors, values, 'collective.slug', 1, 30);
-    verifyFieldLength(intl, errors, values, 'collective.description', 1, 250);
+    // User is not inputting a Collective or User if there is already a Collective that they apply with
+    if (!canApplyWithCollective) {
+      verifyEmailPattern(errors, values, 'user.email');
+      verifyFieldLength(intl, errors, values, 'collective.description', 1, 255);
+    }
     verifyFieldLength(intl, errors, values, 'applicationData.missionImpactExplanation', 1, 250);
 
     verifyChecked(errors, values, 'termsOfServiceOC');
