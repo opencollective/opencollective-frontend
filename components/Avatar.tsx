@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
-import { Calendar, TestTube2 } from 'lucide-react';
+import { round } from 'lodash';
+import { Calendar, Store, TestTube2 } from 'lucide-react';
 import styled from 'styled-components';
 import { border, BorderProps, color, layout, space } from 'styled-system';
 
@@ -83,7 +84,7 @@ const Avatar = ({
     } else if (collective.isGuest && shouldUseDefaultGuestAvatar(collective.name)) {
       src = defaultImage.GUEST;
     } else if (type === 'VENDOR') {
-      src = defaultImage.ORGANIZATION;
+      child = <Store size={round(radius * 0.8)} />;
     } else if (useIcon) {
       const Icon = COLLECTIVE_TYPE_ICON[type];
       if (Icon) {

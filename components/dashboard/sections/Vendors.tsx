@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { isEmpty, isNil, omitBy, pick } from 'lodash';
-import { Archive, MoreHorizontal, Pencil, Store } from 'lucide-react';
+import { Archive, MoreHorizontal, Pencil } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -9,6 +9,7 @@ import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { DashboardVendorsQuery } from '../../../lib/graphql/types/v2/graphql';
 import { cn } from '../../../lib/utils';
 
+import Avatar from '../../Avatar';
 import Container from '../../Container';
 import { DataTable } from '../../DataTable';
 import { Drawer } from '../../Drawer';
@@ -93,7 +94,7 @@ const getColumns = ({ editVendor, openVendor, handleSetArchive }) => {
           <div className="flex">
             <button className="flex max-w-[200px] cursor-pointer items-center" onClick={() => openVendor(vendor)}>
               <div className="mr-2 rounded-sm bg-slate-200 p-1 text-slate-500">
-                <Store size={18} />
+                <Avatar collective={vendor} radius={18} />
               </div>
               {vendor.name}
             </button>
