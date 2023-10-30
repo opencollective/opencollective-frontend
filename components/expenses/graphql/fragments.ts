@@ -140,6 +140,21 @@ export const expenseHostFields = gql`
     plan {
       id
     }
+    accountingCategories {
+      nodes {
+        id
+        name
+        friendlyName
+        code
+      }
+    }
+    policies {
+      id
+      EXPENSE_CATEGORIZATION {
+        requiredForExpenseSubmitters
+        requiredForCollectiveAdmins
+      }
+    }
   }
 `;
 
@@ -156,6 +171,12 @@ export const expensePageExpenseFieldsFragment = gql`
     privateMessage
     tags
     amount
+    accountingCategory {
+      id
+      code
+      name
+      friendlyName
+    }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
       currency

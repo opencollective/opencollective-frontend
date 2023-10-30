@@ -112,7 +112,9 @@ export default class StyledTextarea extends React.PureComponent {
     // Reset height to 0 so component will auto-size
     target.style.height = 0;
     // Use the scroll height to define size
-    target.style.height = `${target.scrollHeight}px`;
+    const isBorderless = [`0`, '0px'].includes(this.props.border);
+    const borderSpace = isBorderless ? 0 : 2;
+    target.style.height = `${target.scrollHeight + borderSpace}px`;
   }
 
   onChange = e => {

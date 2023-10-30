@@ -19,6 +19,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep, parseToBoolean } from '../../lib/utils';
+import { userMustSetAccountingCategory } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { addNewExpenseItem, newExpenseItem } from './lib/items';
 import { checkExpenseSupportsOCR, updateExpenseFormWithUploadResult } from './lib/ocr';
@@ -29,15 +30,17 @@ import { Box, Flex } from '../Grid';
 import { serializeAddress } from '../I18nAddressFields';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledInputTags from '../StyledInputTags';
 import StyledTextarea from '../StyledTextarea';
-import { P, Span } from '../Text';
+import { Label, P, Span } from '../Text';
 import { toast } from '../ui/useToast';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
+import ExpenseCategorySelect from './ExpenseCategorySelect';
 import ExpenseFormItems from './ExpenseFormItems';
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
@@ -120,6 +123,7 @@ const getDefaultExpense = (collective, supportedExpenseTypes) => {
     currency: collective.currency,
     taxes: null,
     type: isSingleSupportedExpenseType ? supportedExpenseTypes[0] : undefined,
+    accountingCategory: undefined,
     payeeLocation: {
       address: '',
       country: null,
@@ -181,6 +185,7 @@ export const prepareExpenseForSubmit = expenseData => {
     attachedFiles: keepAttachedFiles ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => prepareExpenseItemForSubmit(expenseData, item)),
+    accountingCategory: !expenseData.accountingCategory ? null : pick(expenseData.accountingCategory, ['id']),
   };
 };
 
@@ -676,17 +681,15 @@ const ExpenseFormBody = ({
               <Field
                 as={StyledTextarea}
                 autoFocus={autoFocusTitle}
-                border="0"
                 error={errors.description}
                 fontSize="24px"
                 id="expense-description"
                 maxLength={255}
                 mt={3}
                 name="description"
-                px={2}
-                py={1}
+                px="12px"
+                py="8px"
                 width="100%"
-                withOutline
                 autoSize
                 placeholder={
                   values.type === expenseTypes.GRANT
@@ -695,7 +698,7 @@ const ExpenseFormBody = ({
                 }
               />
               <HiddenFragment show={hasBaseFormFieldsCompleted || isInvite}>
-                <Flex alignItems="flex-start" mt={3}>
+                <Flex alignItems="flex-start" mt="8px">
                   <ExpenseTypeTag type={values.type} mr="4px" />
                   <StyledInputTags
                     suggestedTags={expensesTags}
@@ -708,6 +711,34 @@ const ExpenseFormBody = ({
                     value={values.tags}
                   />
                 </Flex>
+                {userMustSetAccountingCategory(LoggedInUser, collective) && (
+                  <div className="mt-10">
+                    <Label
+                      htmlFor="ExpenseCategoryInput"
+                      color="black.900"
+                      fontSize="18px"
+                      lineHeight="26px"
+                      fontWeight="bold"
+                    >
+                      <FormattedMessage defaultMessage="Set Expense Category" />
+                    </Label>
+                    <div className="mt-2 flex">
+                      <div className="basis-[300px]">
+                        <ExpenseCategorySelect
+                          id="ExpenseCategoryInput"
+                          required={true}
+                          host={collective.host}
+                          selectedCategory={values.accountingCategory}
+                          allowNone={!LoggedInUser.isHostAdmin(collective.host)}
+                          onChange={value => formik.setFieldValue('accountingCategory', value)}
+                        />
+                      </div>
+                    </div>
+                    <MessageBox type="info" fontSize="12px" mt="24px">
+                      <FormattedMessage defaultMessage="Please make sure that all the expense items in this expense belong to the selected expense category. If needed, you may submit additional items in separate expenses with different expense categories." />
+                    </MessageBox>
+                  </div>
+                )}
                 {values.type === expenseTypes.INVOICE && (
                   <Box my={40}>
                     <ExpenseAttachedFilesForm
