@@ -69,11 +69,10 @@ const dashboardVendorsQuery = gql`
         }
         supportedPayoutMethods
         isTrustedHost
-      }
-
-      vendors(searchTerm: $searchTerm, isArchived: $isArchived) {
-        id
-        ...VendorFields
+        vendors(searchTerm: $searchTerm, isArchived: $isArchived) {
+          id
+          ...VendorFields
+        }
       }
     }
   }
