@@ -200,18 +200,20 @@ const expenseFormPayeeStepQuery = gql`
           slug
           legacyId
           vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
-            id
-            slug
-            name
-            type
-            description
-            imageUrl(height: 64)
-            payoutMethods {
+            nodes {
               id
-              type
+              slug
               name
-              data
-              isSaved
+              type
+              description
+              imageUrl(height: 64)
+              payoutMethods {
+                id
+                type
+                name
+                data
+                isSaved
+              }
             }
           }
         }
@@ -267,7 +269,7 @@ const ExpenseFormPayeeStep = ({
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
 
-  const vendors = get(data, 'account.host.vendors', []);
+  const vendors = get(data, 'account.host.vendors.nodes', []);
   const payeeOptions = React.useMemo(
     () => getPayeeOptions(intl, [...payoutProfiles, ...vendors]),
     [payoutProfiles, vendors],

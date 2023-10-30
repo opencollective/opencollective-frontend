@@ -145,13 +145,15 @@ const createPendingContributionModalCollectiveQuery = gql`
         host {
           id
           legacyId
-          vendors(forAccount: { slug: $slug }) {
-            id
-            slug
-            name
-            type
-            description
-            imageUrl(height: 64)
+          vendors(forAccount: { slug: $slug }, limit: 5) {
+            nodes {
+              id
+              slug
+              name
+              type
+              description
+              imageUrl(height: 64)
+            }
           }
         }
       }
@@ -305,9 +307,10 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     receiptTemplateTitles.push({ value: 'alternative', label: receiptTemplates?.alternative?.title });
   }
 
-  const recommendedVendors = collective?.host?.vendors
-    ?.map(vendor => ({ value: vendor, label: <DefaultCollectiveLabel value={vendor} /> }))
-    ?.slice(0, 5);
+  const recommendedVendors = collective?.host?.vendors?.nodes?.map(vendor => ({
+    value: vendor,
+    label: <DefaultCollectiveLabel value={vendor} />,
+  }));
   const defaultSources = [
     ...(recommendedVendors || []),
     {

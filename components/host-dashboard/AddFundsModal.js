@@ -209,12 +209,14 @@ const addFundsAccountQuery = gql`
           }
           isTrustedHost
           vendors(forAccount: { slug: $slug }) {
-            id
-            slug
-            name
-            type
-            description
-            imageUrl(height: 64)
+            nodes {
+              id
+              slug
+              name
+              type
+              description
+              imageUrl(height: 64)
+            }
           }
         }
       }
@@ -347,9 +349,10 @@ const AddFundsModal = ({ collective, ...props }) => {
   const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const receiptTemplates = host?.settings?.invoice?.templates;
-  const recommendedVendors = host?.vendors
-    ?.map(vendor => ({ value: vendor, label: <DefaultCollectiveLabel value={vendor} /> }))
-    ?.slice(0, 5);
+  const recommendedVendors = host?.vendors?.nodes?.map(vendor => ({
+    value: vendor,
+    label: <DefaultCollectiveLabel value={vendor} />,
+  }));
 
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {

@@ -70,8 +70,11 @@ const dashboardVendorsQuery = gql`
         supportedPayoutMethods
         isTrustedHost
         vendors(searchTerm: $searchTerm, isArchived: $isArchived) {
-          id
-          ...VendorFields
+          totalCount
+          nodes {
+            id
+            ...VendorFields
+          }
         }
       }
     }
@@ -244,7 +247,7 @@ const Vendors = ({ accountSlug }) => {
         {!error && !loading && (
           <DataTable
             columns={columns}
-            data={data.account.vendors}
+            data={data.account['vendors']?.nodes}
             emptyMessage={() => <FormattedMessage id="NoVendors" defaultMessage="No vendors" />}
             loading={loading}
             mobileTableView
