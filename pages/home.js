@@ -48,21 +48,20 @@ const HomePage = () => {
 };
 
 export const getServerSideProps = async ({ req, res }) => {
-  const cookies = cookie.parse((req && req.headers.cookie) || '');
-  const redirectToDashboard = req.url === '/' && cookies.rootRedirect === 'dashboard';
-  if (redirectToDashboard) {
-    return {
-      redirect: {
-        destination: '/dashboard',
-        permanent: false,
-      },
-    };
-  }
-
+  // const redirectToDashboard = req.url === '/' && typeof cookies.rootRedirect !== 'undefined';
+  // if (redirectToDashboard) {
+  //   return {
+  //     redirect: {
+  //       destination: '/dashboard',
+  //       permanent: false,
+  //     },
+  //   };
+  // }
   if (res && req) {
     const { locale } = getRequestIntl(req);
     if (locale === 'en') {
       res.setHeader('Cache-Control', 'public, s-maxage=3600');
+      res.setHeader('Vary', 'Cookie');
     }
   }
 

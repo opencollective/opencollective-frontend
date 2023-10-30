@@ -27,7 +27,8 @@
     "scripts",
     "server",
     "stories",
-    "test"
+    "test",
+    "middleware.ts"
   ],
   "exclude": ["node_modules"]
 }

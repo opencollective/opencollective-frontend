@@ -277,13 +277,15 @@ const nextConfig = {
   },
 };
 
-let exportedConfig = withSentryConfig({
-  ...nextConfig,
-  sentry: {
-    disableServerWebpackPlugin: true,
-    disableClientWebpackPlugin: true,
-  },
-});
+let exportedConfig = ['production'].includes(process.env.OC_ENV)
+  ? withSentryConfig({
+      ...nextConfig,
+      sentry: {
+        disableServerWebpackPlugin: true,
+        disableClientWebpackPlugin: true,
+      },
+    })
+  : nextConfig;
 
 if (process.env.ANALYZE) {
   // eslint-disable-next-line node/no-unpublished-require
