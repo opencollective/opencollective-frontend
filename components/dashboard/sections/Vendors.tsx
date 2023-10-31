@@ -46,35 +46,37 @@ const dashboardVendorsQuery = gql`
   query DashboardVendors($slug: String!, $searchTerm: String, $isArchived: Boolean) {
     account(slug: $slug) {
       id
-      name
-      legalName
-      slug
-      type
-
-      ... on Host {
-        expensePolicy
-        settings
-        currency
-        features {
+      ... on Organization {
+        host {
           id
-          MULTI_CURRENCY_EXPENSES
-        }
-        location {
-          id
-          address
-          country
-        }
-        transferwise {
-          id
-          availableCurrencies
-        }
-        supportedPayoutMethods
-        isTrustedHost
-        vendors(searchTerm: $searchTerm, isArchived: $isArchived) {
-          totalCount
-          nodes {
+          name
+          legalName
+          slug
+          type
+          expensePolicy
+          settings
+          currency
+          features {
             id
-            ...VendorFields
+            MULTI_CURRENCY_EXPENSES
+          }
+          location {
+            id
+            address
+            country
+          }
+          transferwise {
+            id
+            availableCurrencies
+          }
+          supportedPayoutMethods
+          isTrustedHost
+          vendors(searchTerm: $searchTerm, isArchived: $isArchived) {
+            totalCount
+            nodes {
+              id
+              ...VendorFields
+            }
           }
         }
       }
@@ -196,6 +198,7 @@ const Vendors = ({ accountSlug }) => {
     updateFilters({ offset: null });
   };
 
+  const host = data?.account?.['host'];
   const tabs = [
     {
       id: VendorsTab.ALL,
@@ -248,7 +251,7 @@ const Vendors = ({ accountSlug }) => {
         {!error && !loading && (
           <DataTable
             columns={columns}
-            data={data.account['vendors']?.nodes}
+            data={host['vendors']?.nodes}
             emptyMessage={() => <FormattedMessage id="NoVendors" defaultMessage="No vendors" />}
             loading={loading}
             mobileTableView
@@ -260,7 +263,7 @@ const Vendors = ({ accountSlug }) => {
       {createEditVendor === true && (
         <StyledModal onClose={closeDrawer} width="570px">
           <VendorForm
-            host={data?.account}
+            host={host}
             onSuccess={() => {
               setCreateEditVendor(false);
               refetch();
@@ -279,7 +282,7 @@ const Vendors = ({ accountSlug }) => {
       >
         {createEditVendor && (
           <VendorForm
-            host={data?.account}
+            host={host}
             vendor={typeof createEditVendor === 'boolean' ? undefined : createEditVendor}
             onSuccess={() => {
               setCreateEditVendor(false);
