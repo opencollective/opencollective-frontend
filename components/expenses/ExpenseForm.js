@@ -34,6 +34,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
+import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputTags from '../StyledInputTags';
 import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
@@ -192,7 +193,7 @@ export const prepareExpenseForSubmit = expenseData => {
 /**
  * Validate the expense
  */
-const validateExpense = (intl, expense) => {
+const validateExpense = (intl, expense, collective, LoggedInUser) => {
   const isCardCharge = expense.type === expenseTypes.CHARGE;
   if (expense.payee?.isInvite) {
     return expense.payee.id
@@ -234,6 +235,10 @@ const validateExpense = (intl, expense) => {
 
   if (checkRequiresAddress(expense)) {
     Object.assign(errors, requireFields(expense, ['payeeLocation.country', 'payeeLocation.address']));
+  }
+
+  if (userMustSetAccountingCategory(LoggedInUser, collective)) {
+    Object.assign(errors, requireFields(expense, ['accountingCategory'], { allowNull: true }));
   }
 
   return errors;
@@ -724,14 +729,25 @@ const ExpenseFormBody = ({
                     </Label>
                     <div className="mt-2 flex">
                       <div className="basis-[300px]">
-                        <ExpenseCategorySelect
-                          id="ExpenseCategoryInput"
-                          required={true}
-                          host={collective.host}
-                          selectedCategory={values.accountingCategory}
-                          allowNone={!LoggedInUser.isHostAdmin(collective.host)}
-                          onChange={value => formik.setFieldValue('accountingCategory', value)}
-                        />
+                        <StyledInputFormikField name="accountingCategory" lab>
+                          {({ meta }) => (
+                            <div>
+                              <ExpenseCategorySelect
+                                id="ExpenseCategoryInput"
+                                host={collective.host}
+                                selectedCategory={values.accountingCategory}
+                                allowNone={!LoggedInUser.isHostAdmin(collective.host)}
+                                onChange={value => formik.setFieldValue('accountingCategory', value)}
+                                error={Boolean(meta.error)}
+                              />
+                              {meta.error && meta.touched && (
+                                <Span color="red.500" fontSize="12px" mt="4px">
+                                  {meta.error}
+                                </Span>
+                              )}
+                            </div>
+                          )}
+                        </StyledInputFormikField>
                       </div>
                     </div>
                     <MessageBox type="info" fontSize="12px" mt="24px">
@@ -932,9 +948,10 @@ const ExpenseForm = ({
   const isDraft = expense?.status === ExpenseStatus.DRAFT;
   const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
   const intl = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
   const supportedExpenseTypes = React.useMemo(() => getSupportedExpenseTypes(collective), [collective]);
   const initialValues = { ...getDefaultExpense(collective, supportedExpenseTypes), ...expense };
-  const validate = expenseData => validateExpense(intl, expenseData);
+  const validate = expenseData => validateExpense(intl, expenseData, collective, LoggedInUser);
   if (isDraft) {
     initialValues.items = expense.draft.items?.map(newExpenseItem) || [];
     initialValues.taxes = expense.draft.taxes;

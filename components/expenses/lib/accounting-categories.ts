@@ -14,3 +14,8 @@ export const userMustSetAccountingCategory = (user: LoggedInUser, collective: Ac
 
   return false;
 };
+
+export const collectiveAdminsMustConfirmAccountingCategory = (collective: AccountWithHost): boolean => {
+  const policy = getPolicy<'EXPENSE_CATEGORIZATION'>(collective?.host, 'EXPENSE_CATEGORIZATION');
+  return Boolean(policy?.requiredForCollectiveAdmins);
+};

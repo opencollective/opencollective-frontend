@@ -422,6 +422,7 @@ export const expensePageExpenseFieldsFragment = gql`
       id
       canEdit
       canEditTags
+      canEditAccountingCategory
       canDelete
       canSeeInvoiceInfo
       canApprove
@@ -539,6 +540,12 @@ export const expensesListFieldsFragment = gql`
     comments {
       totalCount
     }
+    accountingCategory {
+      id
+      name
+      friendlyName
+      code
+    }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
       currency
@@ -592,6 +599,7 @@ export const expensesListFieldsFragment = gql`
       canMarkAsIncomplete
       canSeeInvoiceInfo
       canEditTags
+      canEditAccountingCategory
       canUnschedulePayment
       canHold
       canRelease

@@ -1,38 +1,70 @@
 import React from 'react';
-import { isUndefined } from 'lodash';
-import { IntlShape, useIntl } from 'react-intl';
+import { get, isUndefined, pick, size } from 'lodash';
+import { Check, ChevronDown } from 'lucide-react';
+import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
 import { AccountingCategory, Host } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/Command';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 
 type ExpenseCategorySelectProps = {
   host: Host;
   selectedCategory: AccountingCategory | undefined | null;
   onChange: (category: AccountingCategory) => void;
   allowNone?: boolean;
-  required?: boolean;
   id?: string;
+  error?: boolean;
+  children?: React.ReactNode;
+};
+
+const VALUE_NONE = '__none__';
+
+type OptionsMap = {
+  [key in string | typeof VALUE_NONE]?: {
+    value: AccountingCategory | null;
+    searchText: string;
+    label: string;
+  };
+};
+
+const getSearchTextFromCategory = (category: AccountingCategory) => {
+  return Object.values(pick(category, ['name', 'friendlyName', 'code']))
+    .join(' ')
+    .toLocaleLowerCase();
+};
+
+const getCategoryLabel = (intl: IntlShape, category: AccountingCategory) => {
+  if (category === null) {
+    return intl.formatMessage({ defaultMessage: "I don't know" });
+  } else if (category) {
+    return category.friendlyName || category.name;
+  }
 };
 
 const getOptions = (intl: IntlShape, host: Host, allowNone: boolean) => {
-  const options =
-    host?.accountingCategories?.nodes?.map(category => ({
-      value: category.id,
-      label: category.friendlyName || category.name,
-      category,
-    })) || [];
+  const hostCategories = get(host, 'accountingCategories.nodes', []);
+  const categoriesById: OptionsMap = {};
+
+  hostCategories.forEach(category => {
+    categoriesById[category.id] = {
+      value: category,
+      label: getCategoryLabel(intl, category),
+      searchText: getSearchTextFromCategory(category),
+    };
+  });
 
   if (allowNone) {
-    options.push({
+    const label = getCategoryLabel(intl, null);
+    categoriesById[VALUE_NONE] = {
       value: null,
-      label: intl.formatMessage({ id: 'AccountingCategory.DoNotKnow', defaultMessage: "I don't know" }),
-      category: null,
-    });
+      label,
+      searchText: label.toLocaleLowerCase(),
+    };
   }
 
-  return options;
+  return categoriesById;
 };
 
 const ExpenseCategorySelect = ({
@@ -40,39 +72,59 @@ const ExpenseCategorySelect = ({
   selectedCategory,
   onChange,
   id,
-  required,
+  error,
   allowNone = false,
+  children,
 }: ExpenseCategorySelectProps) => {
   const intl = useIntl();
   const options = React.useMemo(() => getOptions(intl, host, allowNone), [host, allowNone]);
-  const value = isUndefined(selectedCategory) ? undefined : selectedCategory?.id || null;
+  const [isOpen, setOpen] = React.useState(false);
   return (
-    <Select
-      disabled={!options.length}
-      required={required && isUndefined(selectedCategory)}
-      value={value}
-      onValueChange={categoryId => onChange(options.find(option => option.value === categoryId)?.category || null)}
-    >
-      <SelectTrigger id={id}>
-        <div className="flex items-center gap-2 overflow-hidden">
-          <span className={cn('truncate', { 'text-gray-400': isUndefined(selectedCategory) })}>
-            <SelectValue
-              aria-label={selectedCategory?.friendlyName || selectedCategory?.name}
-              placeholder={intl.formatMessage({ defaultMessage: 'Select category' })}
-            />
-          </span>
-        </div>
-      </SelectTrigger>
-      <SelectContent className="relative max-h-80 max-w-full">
-        {options.map(option => (
-          <SelectItem key={option.value} value={option.value}>
-            <div className="flex max-w-[--radix-popper-anchor-width]  items-center gap-1">
-              <span className="truncate">{option.label}</span>
-            </div>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div>
+      <Popover open={isOpen} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          {children || (
+            <button
+              id={id}
+              className={cn('flex w-full items-center justify-between rounded-lg border px-3 py-2', {
+                'border-red-500': error,
+                'border-gray-300': !error,
+              })}
+            >
+              <span className={cn('mr-3 max-w-[328px]  truncate', { 'text-gray-400': isUndefined(selectedCategory) })}>
+                {getCategoryLabel(intl, selectedCategory) || intl.formatMessage({ defaultMessage: 'Select category' })}
+              </span>
+              <ChevronDown size="1em" />
+            </button>
+          )}
+        </PopoverTrigger>
+        <PopoverContent className="z-[5000] w-[200px] p-0">
+          <Command filter={(categoryId, search) => (options[categoryId].searchText.includes(search) ? 1 : 0)}>
+            {size(options) > 10 && <CommandInput placeholder="Filter by name" />}
+            <CommandEmpty>
+              <FormattedMessage defaultMessage="No category found" />
+            </CommandEmpty>
+            <CommandGroup>
+              {Object.entries(options).map(([categoryId, { label }]) => (
+                <CommandItem
+                  key={categoryId}
+                  value={categoryId}
+                  onSelect={categoryId => {
+                    onChange(options[categoryId].value);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn('mr-2 h-4 w-4', categoryId === selectedCategory?.id ? 'opacity-100' : 'opacity-0')}
+                  />
+                  {label}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 };
 
