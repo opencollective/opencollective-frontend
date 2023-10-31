@@ -323,6 +323,7 @@ const ExpenseFormPayeeStep = ({
           invitable
           onInvite={onInvite}
           LoggedInUser={loggedInAccount}
+          includeVendorsForHostId={collective.host?.legacyId || undefined}
           addLoggedInUserAsAdmin
           excludeAdminFields
           loading={loading}
@@ -586,6 +587,7 @@ ExpenseFormPayeeStep.propTypes = {
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
     host: PropTypes.shape({
+      legacyId: PropTypes.number,
       transferwise: PropTypes.shape({
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
