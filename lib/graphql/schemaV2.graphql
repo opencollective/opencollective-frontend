@@ -2288,7 +2288,7 @@ type Host implements Account & AccountWithContributions {
     Search vendors related to this term based on name, description, tags, slug, and location
     """
     searchTerm: String
-  ): VendorCollection
+  ): VendorCollection!
 }
 
 """
