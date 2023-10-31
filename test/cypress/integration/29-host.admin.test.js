@@ -157,7 +157,7 @@ describe('host dashboard', () => {
       // Mark as expired
       cy.getByDataCy('MARK_AS_EXPIRED-button').click();
       cy.get('[data-cy="MARK_AS_EXPIRED-confirmation-modal"] [data-cy="confirmation-modal-continue"]').click();
-      cy.wait(500);
+      cy.checkToast({ variant: 'success', message: 'The contribution has been marked as expired' });
       cy.contains('[data-cy=order-status-msg]', 'Expired');
 
       // Mark as paid

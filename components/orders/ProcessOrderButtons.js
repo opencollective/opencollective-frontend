@@ -114,7 +114,16 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
         <ConfirmationModal
           data-cy={`${selectedAction}-confirmation-modal`}
           onClose={() => setConfirm(false)}
-          continueHandler={() => triggerAction(selectedAction)}
+          continueHandler={() =>
+            triggerAction(selectedAction).then(() => {
+              if (selectedAction === 'MARK_AS_EXPIRED') {
+                toast({
+                  variant: 'success',
+                  message: intl.formatMessage({ defaultMessage: 'The contribution has been marked as expired' }),
+                });
+              }
+            })
+          }
           isDanger={selectedAction === 'MARK_AS_EXPIRED'}
           isSuccess={selectedAction === 'MARK_AS_PAID'}
           continueLabel={
