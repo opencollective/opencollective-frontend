@@ -23,6 +23,7 @@ import { StripePaymentMethodsLabels } from '../../lib/stripe/payment-methods';
 import { getWebsiteUrl } from '../../lib/utils';
 
 import CreditCardInactive from '../icons/CreditCardInactive';
+import { TierTypes } from '../../lib/constants/tiers-types';
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
 export const STRIPE_PAYMENT_ELEMENT_KEY = 'stripe-payment-element';
@@ -392,7 +393,8 @@ export const contributionRequiresAddress = (stepDetails, tier) => {
 export const contributionRequiresLegalName = (stepDetails, tier) => {
   return Boolean(
     (stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 250e2) || // Above $250/year
-      tier?.requireAddress, // Or if enforced by the tier, a valid address requires a legal name
+      tier?.requireAddress || // Or if enforced by the tier, a valid address requires a legal name
+      tier?.type === TierTypes.TICKET,
   );
 };
 

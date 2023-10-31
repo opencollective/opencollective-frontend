@@ -4,6 +4,8 @@ import { set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
+import { TierTypes } from '../../lib/constants/tiers-types';
+
 import Captcha, { isCaptchaEnabled } from '../Captcha';
 import Container from '../Container';
 import { Flex } from '../Grid';
@@ -18,7 +20,6 @@ import { P, Span } from '../Text';
 
 import StepProfileInfoMessage from './StepProfileInfoMessage';
 import { contributionRequiresAddress, contributionRequiresLegalName } from './utils';
-import { TierTypes } from '../../lib/constants/tiers-types';
 
 export const validateGuestProfile = (stepProfile, stepDetails, tier) => {
   if (contributionRequiresAddress(stepDetails, tier)) {
@@ -98,13 +99,9 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
         label={<FormattedMessage defaultMessage="Your name" />}
         labelFontSize="16px"
         labelFontWeight="700"
-        required={tier.type === TierTypes.TICKET}
+        required={false}
         hint={
-          tier.type === TierTypes.TICKET ? (
-            <FormattedMessage defaultMessage="This is your display name or alias." />
-          ) : (
-            <FormattedMessage defaultMessage="This is your display name or alias. Leave it in blank to appear as guest." />
-          )
+          <FormattedMessage defaultMessage="This is your display name or alias. Leave it in blank to appear as guest." />
         }
       >
         {inputProps => (
