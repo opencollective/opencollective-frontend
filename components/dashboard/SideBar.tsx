@@ -49,10 +49,10 @@ const AdminPanelSideBar = ({ activeSlug, isLoading, onRoute: _onRoute, ...props 
 
   return (
     <div
-      className={cn(' w-full flex-shrink-0 flex-grow-0 md:w-64', isMobile && 'sticky top-0 bg-white py-2.5')}
+      className={cn('w-full flex-shrink-0 flex-grow-0 md:w-64', isMobile && 'sticky top-0 z-10 bg-white py-2.5')}
       {...props}
     >
-      <div className="sticky top-8 z-10">
+      <div className="sticky top-8">
         <div className="flex flex-row-reverse gap-4 sm:flex-auto md:flex-col">
           <AccountSwitcher activeSlug={activeSlug} />
           {isMobile && (
