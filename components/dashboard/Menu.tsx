@@ -180,7 +180,7 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: BarChart2,
     },
     {
-      if: isHost,
+      if: isHost && hasFeature(account, FEATURES.HOST_VENDORS),
       section: ALL_SECTIONS.VENDORS,
       Icon: Store,
     },
