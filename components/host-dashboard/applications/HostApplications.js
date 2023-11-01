@@ -113,7 +113,7 @@ const HostApplications = ({ accountSlug: hostSlug, isDashboard }) => {
   }, [data]);
 
   return (
-    <Box maxWidth={1000} m="0 auto">
+    <Box maxWidth={1024} m="0 auto">
       <div className="flex flex-wrap justify-between gap-4">
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="Menu.HostApplications" defaultMessage="Host Applications" />

@@ -17,6 +17,7 @@ import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import theme from '../lib/theme';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
+import DynamicTopBar from './navigation/preview/TopBar';
 import NewTopBar from './navigation/TopBar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -75,7 +76,7 @@ const NavItem = styled(StyledLink)`
   }
 `;
 
-const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, navTitle, loading }) => {
+const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, navTitle }) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const ref = useRef();
@@ -100,7 +101,10 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
     (onDashboardRoute && !LoggedInUser && loadingLoggedInUser);
 
   if (useDashboard) {
-    return <NewTopBar {...{ showSearch, menuItems, showProfileAndChangelogMenu, account, navTitle, loading }} />;
+    if (LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR)) {
+      return <DynamicTopBar {...{ account, navTitle }} />;
+    }
+    return <NewTopBar {...{ account }} />;
   }
 
   return (
@@ -294,7 +298,6 @@ TopBar.propTypes = {
   menuItems: PropTypes.object,
   account: PropTypes.object,
   navTitle: PropTypes.string,
-  loading: PropTypes.bool,
 };
 
 TopBar.defaultProps = {

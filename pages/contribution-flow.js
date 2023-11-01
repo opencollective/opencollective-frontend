@@ -122,6 +122,7 @@ class NewContributionFlowPage extends React.Component {
         showFooter={false}
         menuItemsV2={{ solutions: false, product: false, company: false, docs: false }}
         showSearch={false}
+        collective={data.account}
       >
         {this.renderPageContent()}
       </Page>

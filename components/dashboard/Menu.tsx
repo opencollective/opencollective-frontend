@@ -23,11 +23,10 @@ import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isInternalHost, isSelfHostedAccount } from '../../lib/collective.lib';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
-import { ALL_SECTIONS } from './constants';
+import { ALL_SECTIONS, SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
 import { MenuLink } from './MenuLink';
 
@@ -50,7 +49,7 @@ type GroupMenuItem = {
 
 export type MenuItem = PageMenuItem | GroupMenuItem;
 
-const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
+export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isIndividual = isIndividualAccount(account);
   const isHost = isHostAccount(account);
   const isSelfHosted = isSelfHostedAccount(account);
@@ -294,26 +293,25 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     items
       // filter root items
       .filter(item => item.if !== false)
-      // filter subMenu items
+      // filter subMenu items and add labels where missing
       .map(item => {
         if (item.type === 'group') {
           return {
             ...item,
-            subMenu: item.subMenu.filter(item => item.if !== false),
+            subMenu: item.subMenu
+              .filter(item => item.if !== false)
+              .map(item => ({ ...item, label: item.label || intl.formatMessage(SECTION_LABELS[item.section]) })),
           };
         }
-        return item;
+        return { ...item, label: item.label || intl.formatMessage(SECTION_LABELS[item.section]) };
       })
   );
 };
 
-const Menu = ({ onRoute }) => {
+const Menu = ({ onRoute, menuItems }) => {
   const router = useRouter();
   const intl = useIntl();
   const { account } = React.useContext(DashboardContext);
-  const { LoggedInUser } = useLoggedInUser();
-
-  const menuItems = React.useMemo(() => getMenuItems({ intl, account, LoggedInUser }), [account, LoggedInUser, intl]);
 
   React.useEffect(() => {
     if (onRoute) {
