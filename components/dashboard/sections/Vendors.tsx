@@ -93,15 +93,13 @@ const getColumns = ({ editVendor, openVendor, handleSetArchive }) => {
         const vendor = row.original;
         const contact = vendor.vendorInfo?.contact;
         return (
-          <div className="flex">
+          <div className="flex items-center">
             <button className="flex max-w-[200px] cursor-pointer items-center" onClick={() => openVendor(vendor)}>
-              <div className="mr-2 rounded-sm bg-slate-200 p-1 text-slate-500">
-                <Avatar collective={vendor} radius={18} />
-              </div>
+              <Avatar collective={vendor} radius={40} className="mr-4" />
               {vendor.name}
             </button>
             {contact && (
-              <VendorContactTag className="ml-2">
+              <VendorContactTag className="ml-3">
                 <span className="font-normal">
                   <FormattedMessage defaultMessage="Contact:" />
                 </span>

@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
-import { round } from 'lodash';
 import { Calendar, Store, TestTube2 } from 'lucide-react';
 import styled from 'styled-components';
 import { border, BorderProps, color, layout, space } from 'styled-system';
@@ -84,7 +83,13 @@ const Avatar = ({
     } else if (collective.isGuest && shouldUseDefaultGuestAvatar(collective.name)) {
       src = defaultImage.GUEST;
     } else if (type === 'VENDOR') {
-      child = <Store size={round(radius * 0.8)} />;
+      const iconSize = 2 * Math.round((radius * 0.6) / 2);
+      const padding = (radius - iconSize) / 2;
+      child = (
+        <div className="rounded-sm bg-slate-100  text-slate-300" style={{ padding }}>
+          <Store size={iconSize} />
+        </div>
+      );
     } else if (useIcon) {
       const Icon = COLLECTIVE_TYPE_ICON[type];
       if (Icon) {
