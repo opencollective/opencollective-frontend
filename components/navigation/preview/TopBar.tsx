@@ -95,7 +95,18 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
   };
 
   const onDashboardRoute = isRouteActive('/dashboard');
-  const onHomeRoute = isRouteActive('/home');
+  const homeRoutes = [
+    '/',
+    '/home',
+    '/collectives',
+    '/become-a-sponsor',
+    '/become-a-host',
+    '/pricing',
+    '/how-it-works',
+    '/fiscal-hosting',
+    '/e2c',
+  ];
+  const onHomeRoute = homeRoutes.some(isRouteActive);
 
   const ocLogoRoute = LoggedInUser ? '/dashboard' : '/home';
   const parentCollective = account?.parentCollective || account?.parent;

@@ -92,7 +92,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   const SettingsComponent = SETTINGS_COMPONENTS[section];
   if (SettingsComponent) {
     return (
-      <div className=" max-w-screen-md">
+      <div className="max-w-screen-md">
         <SettingsComponent account={account} subpath={subpath} />
       </div>
     );
@@ -100,7 +100,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
-      <div className=" max-w-screen-md">
+      <div className="max-w-screen-md">
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <AccountSettings account={account} section={section} />
