@@ -23,6 +23,7 @@ app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflar
 const dev = process.env.NODE_ENV === 'development';
 
 const nextApp = next({ dev });
+const nextRequestHandler = nextApp.getRequestHandler();
 
 const port = process.env.PORT;
 
@@ -35,14 +36,6 @@ const start = id =>
     logger.info(
       `Starting with NODE_ENV=${process.env.NODE_ENV} OC_ENV=${process.env.OC_ENV} API_URL=${process.env.API_URL}`,
     );
-
-    app.all('/_next/webpack-hmr', (req, res) => {
-      nextApp.getRequestHandler(req, res);
-    });
-
-    // Not much documentation on this,
-    // but we should ensure this goes to the default Next.js handler
-    app.get('/__nextjs_original-stack-frame', nextApp.getRequestHandler());
 
     await hyperwatch(app);
 
@@ -76,7 +69,10 @@ const start = id =>
       );
     }
 
-    app.use(routes(app, nextApp));
+    routes(app);
+
+    app.get('*', (req, res) => nextRequestHandler(req, res));
+
     app.use(loggerMiddleware.errorLogger);
 
     app.listen(port, err => {
