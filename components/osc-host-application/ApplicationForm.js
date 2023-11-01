@@ -372,7 +372,6 @@ const ApplicationForm = ({
                                 {({ field }) => (
                                   <StyledInputGroup
                                     prepend="opencollective.com/"
-                                    type="url"
                                     placeholder="agora"
                                     {...field}
                                     onChange={e => setFieldValue('collective.slug', e.target.value)}

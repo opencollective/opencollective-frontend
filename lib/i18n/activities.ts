@@ -325,6 +325,12 @@ export const ActivityDescriptionI18n = defineMessages({
   DEACTIVATED_COLLECTIVE_AS_HOST: {
     defaultMessage: 'Deactivated <Account></Account> as a host',
   },
+  VENDOR_EDITED: {
+    defaultMessage: 'Vendor <Vendor></Vendor> edited',
+  },
+  VENDOR_CREATED: {
+    defaultMessage: 'Vendor <Vendor></Vendor> created',
+  },
 });
 
 type ActivityTranslations = Partial<Record<keyof typeof ActivityTypes, MessageDescriptor>>;

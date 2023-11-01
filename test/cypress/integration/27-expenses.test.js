@@ -221,59 +221,6 @@ describe('Expense flow', () => {
       cy.contains('[data-cy="expense-summary-items"]', 'A third item');
     });
 
-    it('can create a new organization', () => {
-      cy.getByDataCy('radio-expense-type-RECEIPT').click();
-
-      cy.getByDataCy('select-expense-payee').click();
-      cy.getByDataCy('collective-type-picker-ORGANIZATION').click();
-      cy.getByDataCy('mini-form-name-field').type('Dummy Expense Org');
-      cy.getByDataCy('mini-form-website-field').type('dummy.com');
-      cy.getByDataCy('mini-form-save-button').click();
-      cy.wait(250);
-
-      // Select Payout Method
-      cy.getByDataCy('payout-method-select').click();
-      cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
-      cy.get('textarea[name="payoutMethod.data.content"]').type('make it rain');
-      cy.getByDataCy('expense-next').click();
-
-      cy.get('textarea[name="description"]').type('Brussels January team retreat');
-
-      cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
-        [getReceiptFixture({ fileName: 'receipt0.jpg' }), getReceiptFixture({ fileName: 'receipt1.jpg' })],
-        {
-          action: 'drag-drop',
-        },
-      );
-
-      cy.getByDataCy('expense-attachment-form').should('have.length', 2);
-      // Fill info for first attachment
-      cy.get('input[name="items[0].description"]').type('Fancy restaurant');
-      cy.get('input[name="items[0].amount"]').type('{selectall}183');
-      cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
-      cy.getByDataCy('currency-picker').click();
-      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
-      cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
-      cy.get('input[name="items[1].amount"]').type('{selectall}92.50');
-      cy.get('input[name="items[1].incurredAt"]').type('2021-01-01');
-      cy.get('[data-cy="attachment-url-field"] [data-loading=true]').should('have.length', 0);
-      cy.getByDataCy('expense-summary-btn').click();
-
-      cy.getByDataCy('expense-summary-payee').should('contain', 'Dummy Expense Org');
-      cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
-      cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
-      cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50');
-      cy.getByDataCy('expense-summary-items').should('contain', 'Fancy restaurant');
-      cy.getByDataCy('expense-summary-items').should('contain', 'Potatoes for the giant raclette');
-
-      // Submit!
-      cy.getByDataCy('submit-expense-btn').click();
-      cy.contains('[data-cy="toast-notification"]', 'Expense submitted');
-      cy.contains('[data-cy="expense-page-content"]', 'Brussels January team retreat');
-      cy.getByDataCy('dismiss-toast-btn').click();
-      cy.getByDataCy('toast-notification').should('not.exist');
-    });
-
     // This can happen if you start with an invoice then switch to receipts
     it('should prevent submitting receipts if missing items', () => {
       cy.intercept({

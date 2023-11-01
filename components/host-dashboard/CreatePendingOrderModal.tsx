@@ -141,6 +141,22 @@ const createPendingContributionModalCollectiveQuery = gql`
           }
         }
       }
+      ... on AccountWithHost {
+        host {
+          id
+          legacyId
+          vendors(forAccount: { slug: $slug }, limit: 5) {
+            nodes {
+              id
+              slug
+              name
+              type
+              description
+              imageUrl(height: 64)
+            }
+          }
+        }
+      }
       ... on AccountWithContributions {
         tiers {
           nodes {
@@ -291,7 +307,12 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     receiptTemplateTitles.push({ value: 'alternative', label: receiptTemplates?.alternative?.title });
   }
 
+  const recommendedVendors = collective?.host?.vendors?.nodes?.map(vendor => ({
+    value: vendor,
+    label: <DefaultCollectiveLabel value={vendor} />,
+  }));
   const defaultSources = [
+    ...(recommendedVendors || []),
     {
       value: host,
       label: <DefaultCollectiveLabel value={host} />,
@@ -422,14 +443,14 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
             <CollectivePickerAsync
               inputId={field.id}
               data-cy="create-pending-contribution-source"
-              types={['USER', 'ORGANIZATION']}
-              creatable
+              types={['USER', 'ORGANIZATION', 'VENDOR']}
               error={field.error}
               createCollectiveOptionalFields={['location.address', 'location.country']}
               onBlur={() => form.setFieldTouched(field.name, true)}
               customOptions={defaultSources}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               collective={field.value}
+              includeVendorsForHostId={collective?.host?.legacyId}
               menuPortalTarget={null}
             />
           )}

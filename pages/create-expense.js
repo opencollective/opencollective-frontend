@@ -493,6 +493,7 @@ const hostFieldsFragment = gql`
     id
     name
     legalName
+    legacyId
     slug
     type
     expensePolicy

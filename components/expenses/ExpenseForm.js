@@ -9,6 +9,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getAccountReferenceInput, isInternalHost } from '../../lib/collective.lib';
+import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { getSupportedExpenseTypes } from '../../lib/expenses';
@@ -194,7 +195,11 @@ const validateExpense = (intl, expense) => {
       : requireFields(expense, ['description', 'payee', 'payee.name', 'payee.email']);
   }
 
-  const errors = isCardCharge ? {} : requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
+  const errors = isCardCharge
+    ? {}
+    : expense.payee?.type === CollectiveType.VENDOR
+    ? requireFields(expense, ['description', 'payee', 'currency'])
+    : requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
 
   if (expense.items.length > 0) {
     const itemsErrors = expense.items.map(item => validateExpenseItem(expense, item));
@@ -303,9 +308,10 @@ const ExpenseFormBody = ({
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
   const isRecurring = expense && expense.recurringExpense !== null;
   const stepOneCompleted =
-    values.payoutMethod &&
-    isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency'))) &&
-    checkAddressValuesAreCompleted(values);
+    values.payee?.type === CollectiveType.VENDOR ||
+    (values.payoutMethod &&
+      isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency'))) &&
+      checkAddressValuesAreCompleted(values));
   const stepTwoCompleted = isInvite
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
@@ -336,7 +342,7 @@ const ExpenseFormBody = ({
         isInvite: false,
         isNewUser: true,
       });
-    } else if (!payeePayoutProfile && loggedInAccount && isDraft) {
+    } else if (!payeePayoutProfile && loggedInAccount && isDraft && values?.payee.type !== CollectiveType.VENDOR) {
       setOnBehalf(true);
     }
     // If creating a new expense or completing an expense submitted on your behalf, automatically select your default profile.
@@ -485,9 +491,10 @@ const ExpenseFormBody = ({
         onChange={payee => {
           setOnBehalf(payee.isInvite);
         }}
-        onNext={() => {
-          const shouldSkipValidation = isOnBehalf && isEmpty(values.payoutMethod);
-          const validation = !shouldSkipValidation && validatePayoutMethod(values.payoutMethod);
+        onNext={values => {
+          const shouldSkipPayoutMethodValidation =
+            (isOnBehalf || values.payee?.type === CollectiveType.VENDOR) && isEmpty(values.payoutMethod);
+          const validation = !shouldSkipPayoutMethodValidation && validatePayoutMethod(values.payoutMethod);
           if (isEmpty(validation)) {
             setStep(EXPENSE_FORM_STEPS.EXPENSE);
           } else {

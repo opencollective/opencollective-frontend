@@ -102,6 +102,7 @@ const orderPageQuery = gql`
         fromAccount {
           id
           slug
+          type
           name
           imageUrl
           isIncognito
@@ -109,6 +110,7 @@ const orderPageQuery = gql`
         account {
           id
           slug
+          type
           name
           imageUrl
           isIncognito
