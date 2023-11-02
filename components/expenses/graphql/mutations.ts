@@ -12,3 +12,17 @@ export const editExpenseMutation = gql`
 
   ${expensePageExpenseFieldsFragment}
 `;
+
+export const editExpenseCategoryMutation = gql`
+  mutation EditExpenseCategory($expenseId: String!, $category: AccountingCategoryReferenceInput!) {
+    editExpense(expense: { id: $expenseId, accountingCategory: $category }) {
+      id
+      accountingCategory {
+        id
+        name
+        friendlyName
+        code
+      }
+    }
+  }
+`;
