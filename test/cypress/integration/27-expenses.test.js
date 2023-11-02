@@ -202,7 +202,7 @@ describe('Expense flow', () => {
       cy.get('input[name="items[2].incurredAt"]').should('have.value', '2021-01-01');
 
       // Check mismatch warnings
-      cy.contains('Please confirm the dates and amounts before proceeding.');
+      cy.contains('Please verify the dates and amounts before proceeding.');
       cy.get('[data-cy="expense-attachment-form"]:eq(2) [data-cy="mismatch-warning"]').should('have.length', 2);
       cy.get('input[name="items[1].amount"]').type('{selectall}7').blur();
       cy.get('[data-cy="expense-attachment-form"]:eq(1) [data-cy="mismatch-warning"]').should('have.length', 1);
