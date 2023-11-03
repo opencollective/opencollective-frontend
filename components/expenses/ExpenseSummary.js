@@ -91,8 +91,10 @@ const ExpenseSummary = ({
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
   const isGrant = expense?.type === expenseTypes.GRANT;
+  const isDraft = expense?.status === ExpenseStatus.DRAFT;
   const existsInAPI = expense && (expense.id || expense.legacyId);
-  const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
+  const createdByAccount =
+    (isDraft ? expense?.requestedByAccount || expense?.createdByAccount : expense?.createdByAccount) || {};
   const expenseItems = expense?.items?.length > 0 ? expense.items : expense?.draft?.items || [];
   const expenseTaxes = expense?.taxes?.length > 0 ? expense.taxes : expense?.draft?.taxes || [];
   const isMultiCurrency =
@@ -204,7 +206,7 @@ const ExpenseSummary = ({
               <Avatar collective={createdByAccount} size={24} />
             </LinkCollective>
             <P ml={2} lineHeight="16px" fontSize="14px" color="black.700" data-cy="expense-author">
-              {expense.requestedByAccount ? (
+              {isDraft && expense.requestedByAccount ? (
                 <FormattedMessage
                   id="Expense.RequestedBy"
                   defaultMessage="Invited by {name}"
