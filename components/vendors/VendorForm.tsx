@@ -300,29 +300,27 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                   />
                 )}
               </StyledInputFormikField>
-              <StyledInputFormikField
-                name="payoutMethod"
-                htmlFor="payout-method"
-                flex="1"
-                mt={3}
-                label={intl.formatMessage({ id: 'ExpenseForm.PayoutOptionLabel', defaultMessage: 'Payout method' })}
-                labelProps={FIELD_LABEL_PROPS}
-              >
-                {({ field }) => (
-                  <PayoutMethodSelect
-                    {...field}
-                    payoutMethod={field.value}
-                    collective={{ host }}
-                    payoutMethods={vendor?.payoutMethods || []}
-                    onChange={({ value }) => formik.setFieldValue('payoutMethod', value)}
-                  />
-                )}
-              </StyledInputFormikField>
+              <div className="mt-3 flex-grow">
+                <p className="mb-2 text-base font-bold">
+                  <FormattedMessage id="ExpenseForm.PayoutOptionLabel" defaultMessage="Payout method" />
+                </p>
+                <PayoutMethodSelect
+                  collective={{ host } as any}
+                  payoutMethods={vendor?.payoutMethods || []}
+                  payoutMethod={formik.values.payoutMethod}
+                  onChange={({ value }) => formik.setFieldValue('payoutMethod', value)}
+                />
+              </div>
               {formik.values.payoutMethod && (
                 <Field name="payoutMethod">
                   {({ field }) => (
-                    <div className="mt-3 flex-grow">
-                      <PayoutMethodForm fieldsPrefix="payoutMethod" payoutMethod={field.value} host={host} />
+                    <div className="mt-3  flex-grow">
+                      <PayoutMethodForm
+                        fieldsPrefix="payoutMethod"
+                        payoutMethod={field.value}
+                        host={host}
+                        required={false}
+                      />
                     </div>
                   )}
                 </Field>
