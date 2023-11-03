@@ -1,11 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Times as RemoveIcon } from '@styled-icons/fa-solid/Times';
 import { get, groupBy, isEmpty, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-intl';
 
 import { AccountTypesWithHost } from '../../lib/constants/collectives';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -51,54 +50,52 @@ const payoutMethodLabels = defineMessages({
   },
 });
 
+type PayoutMethodSelectProps = {
+  /** @ignore from injectIntl */
+  intl: IntlShape;
+  /** @ignore from mutation */
+  removePayoutMethod?: (object) => Promise<any>;
+  /** Use this prop to control the component */
+  payoutMethod?: {
+    id: string | number;
+    type: string;
+  };
+  /** The payout methods */
+  payoutMethods?: {
+    id: string | number;
+    type?: string;
+  }[];
+  /** Default value */
+  defaultPayoutMethod?: {
+    id: string | number;
+    type: string;
+  };
+  /** The Collective paying the expense */
+  collective?: {
+    host?: {
+      id: string;
+      connectedAccounts: any[];
+      supportedPayoutMethods: any[];
+      isTrustedHost: boolean;
+    };
+  };
+  /** The Acccount being paid with the expense */
+  payee?: {
+    id: string;
+    type: string;
+    host?: {
+      id: string;
+    };
+  };
+  onChange: (object) => void;
+  onRemove?: (object) => void;
+};
+
 /**
  * An overset of `StyledSelect` specialized for payout methods. Accepts all the props
  * from `StyledSelect`.
  */
-class PayoutMethodSelect extends React.Component {
-  static propTypes = {
-    /** @ignore from injectIntl */
-    intl: PropTypes.object,
-    /** @ignore from mutation */
-    removePayoutMethod: PropTypes.func,
-    /** Use this prop to control the component */
-    payoutMethod: PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      type: PropTypes.oneOf(Object.values(PayoutMethodType)),
-    }),
-    /** The payout methods */
-    payoutMethods: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        type: PropTypes.oneOf(Object.values(PayoutMethodType)),
-      }),
-    ),
-    /** Default value */
-    defaultPayoutMethod: PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      type: PropTypes.oneOf(Object.values(PayoutMethodType)),
-    }),
-    /** The Collective paying the expense */
-    collective: PropTypes.shape({
-      host: PropTypes.shape({
-        id: PropTypes.string,
-        connectedAccounts: PropTypes.arrayOf(PropTypes.shape({ service: PropTypes.string })),
-        supportedPayoutMethods: PropTypes.array,
-        isTrustedHost: PropTypes.bool,
-      }),
-    }).isRequired,
-    /** The Acccount being paid with the expense */
-    payee: PropTypes.shape({
-      id: PropTypes.string,
-      type: PropTypes.string,
-      host: PropTypes.shape({
-        id: PropTypes.string,
-      }),
-    }),
-    onChange: PropTypes.func.isRequired,
-    onRemove: PropTypes.func.isRequired,
-  };
-
+class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
   state = { removingPayoutMethod: null };
 
   getPayoutMethodLabel = payoutMethod => {
@@ -288,7 +285,7 @@ class PayoutMethodSelect extends React.Component {
               defaultMessage="This Expense is between different Hosts but the recipient Host doesn't have a suitable Payout Method available ({payoutMethodTypes})."
               values={{
                 payoutMethodTypes: Object.values(styledSelectOptions)
-                  .map(option => option.label)
+                  .map(option => option['label'])
                   .join(', '),
               }}
             />
@@ -345,7 +342,7 @@ const removePayoutMethodMutation = gql`
   }
 `;
 
-const addRemovePayoutMethodMutation = graphql(removePayoutMethodMutation, {
+const addRemovePayoutMethodMutation = graphql<PayoutMethodSelectProps>(removePayoutMethodMutation, {
   name: 'removePayoutMethod',
   options: { context: API_V2_CONTEXT },
 });
