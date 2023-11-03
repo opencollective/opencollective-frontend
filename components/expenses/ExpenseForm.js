@@ -736,7 +736,7 @@ const ExpenseFormBody = ({
                                 id="ExpenseCategoryInput"
                                 host={collective.host}
                                 selectedCategory={values.accountingCategory}
-                                allowNone={!LoggedInUser.isHostAdmin(collective.host)}
+                                allowNone={!LoggedInUser?.isHostAdmin(collective.host)}
                                 onChange={value => formik.setFieldValue('accountingCategory', value)}
                                 error={Boolean(meta.error)}
                               />
