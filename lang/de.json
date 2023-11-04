@@ -1,7 +1,7 @@
 {
   "++1FQ+": "Eine Erinnerung wegen einer ungültig werdenden Kreditkarte wurde versandt an <Account></Account>",
   "+5KHJy": "Token löschen",
-  "+5Vgek": "Vendor's legal name",
+  "+5Vgek": "Rechtlicher Name des Herstellers",
   "+7ZAeJ": "<Individual></Individual> hat <Expense>{expenseDescription}</Expense> bezahlt",
   "+a+2ug": "Teilnehmende",
   "+cQ6YM": "Cover aktualisiert",
@@ -29,7 +29,7 @@
   "/mqxVR": "Ausgabe <Expense>{expenseDescription}</Expense> als unvollständig markiert",
   "/rbxQW": "<Account></Account> als Host aktiviert",
   "/smQQF": "Ausgabe <Expense>{expenseDescription}</Expense> von <FromAccount></FromAccount> zu <Account></Account> aktualisiert",
-  "/VnDMl": "Other",
+  "/VnDMl": "Andere",
   "/XDuMs": "Erstelle {type, select, TICKET {Ticket} other {Stufe}}",
   "/Y9m/t": "Gebe {slash} ein, um nach Kollektiven zu suchen...",
   "03Q893": "Dies kann später bearbeitet werden",
