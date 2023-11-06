@@ -21,7 +21,7 @@
     "@graphql-typed-document-node/core": "3.2.0",
     "@hcaptcha/react-hcaptcha": "1.8.1",
     "@hyperwatch/hyperwatch": "3.9.4",
-    "@mui/material": "5.14.16",
+    "@mui/material": "5.14.17",
     "@opencollective/taxes": "4.1.0",
     "@popperjs/core": "2.11.8",
     "@radix-ui/react-checkbox": "1.0.4",
