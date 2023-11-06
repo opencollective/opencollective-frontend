@@ -638,11 +638,16 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               </SettingsSectionTitle>
               <div className="mb-1">
                 <div className="mb-2 text-base font-bold">
-                  <FormattedMessage defaultMessage="Expense submission" />
+                  <FormattedMessage defaultMessage="Public Expense submission" />
                 </div>
+                <p className="mb-2 text-sm">
+                  <FormattedMessage defaultMessage="By default only fiscal host administrators can submit expenses on behalf of vendors. You can allow other users who submit expenses to collectives you host to also submit expenses on behalf vendors." />
+                </p>
                 <StyledCheckbox
                   name={`checkbox-EXPENSE_PUBLIC_VENDORS-requiredForExpenseSubmitters`}
-                  label={<FormattedMessage defaultMessage="Allow expense submission to vendors by all users" />}
+                  label={
+                    <FormattedMessage defaultMessage="Allow expense submission on behalf of vendors by all users" />
+                  }
                   checked={formik.values.policies?.EXPENSE_PUBLIC_VENDORS}
                   onChange={({ checked }) => {
                     const newPolicies = cloneDeep(formik.values.policies);
