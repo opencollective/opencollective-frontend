@@ -88,6 +88,18 @@ const messages = defineMessages({
     id: 'actions.release',
     defaultMessage: 'Release Hold',
   },
+  MARK_AS_SPAM_TITLE: {
+    id: 'actions.spam',
+    defaultMessage: 'Mark as Spam',
+  },
+  MARK_AS_SPAM_DESCRIPTION: {
+    id: 'Expense.MarkAsSpamWarning',
+    defaultMessage: 'This will prevent the submitter account to post new expenses. Are you sure?',
+  },
+  MARK_AS_SPAM_CONFIRM_BUTTON: {
+    id: 'actions.spam',
+    defaultMessage: 'Mark as Spam',
+  },
 });
 
 const MessagesPerType: Record<
@@ -129,11 +141,17 @@ const MessagesPerType: Record<
     description: messages.RELEASE_DESCRIPTION,
     confirmBtn: messages.RELEASE_CONFIRM_BUTTON,
   },
+  MARK_AS_SPAM: {
+    title: messages.MARK_AS_SPAM_TITLE,
+    description: messages.MARK_AS_SPAM_DESCRIPTION,
+    confirmBtn: messages.MARK_AS_SPAM_CONFIRM_BUTTON,
+  },
 };
 
 export type ConfirmProcessExpenseModalType =
   | 'REQUEST_RE_APPROVAL'
   | 'MARK_AS_INCOMPLETE'
+  | 'MARK_AS_SPAM'
   | 'APPROVE'
   | 'UNAPPROVE'
   | 'REJECT'
@@ -197,6 +215,12 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
         }
         case 'RELEASE': {
           await processExpense.release({
+            message,
+          });
+          break;
+        }
+        case 'MARK_AS_SPAM': {
+          await processExpense.markAsSpam({
             message,
           });
           break;

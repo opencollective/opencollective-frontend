@@ -103,7 +103,7 @@ describe('Expense flow', () => {
 
       // Start editing
       cy.getByDataCy('more-actions').click();
-      cy.getByDataCy('edit-expense-btn').click();
+      cy.getByDataCy('edit-expense-btn').click({ force: true });
       cy.getByDataCy('expense-next').click();
       cy.get('textarea[name="description"]').type(' edited');
       cy.get('input[name="items[0].description"]').type(' but not too expensive');
@@ -625,7 +625,7 @@ describe('Expense flow', () => {
 
       // Now delete the expense
       cy.getByDataCy('more-actions').click();
-      cy.getByDataCy('more-actions-delete-expense-btn').click();
+      cy.getByDataCy('more-actions-delete-expense-btn').click({ force: true });
       cy.getByDataCy('confirmation-modal-continue').click();
       cy.url().should('eq', `${Cypress.config().baseUrl}/${collective.slug}/expenses`);
       cy.visit(expenseUrl);

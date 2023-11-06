@@ -237,7 +237,7 @@ const ProcessExpenseButtons = ({
           </ButtonLabel>
         </StyledButton>
       )}
-      {permissions.canMarkAsSpam && (
+      {permissions.canMarkAsSpam && !isMoreActions && (
         <StyledButton
           {...getButtonProps('MARK_AS_SPAM')}
           buttonStyle="dangerSecondary"

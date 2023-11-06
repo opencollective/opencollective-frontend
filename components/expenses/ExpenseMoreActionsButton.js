@@ -20,7 +20,6 @@ import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import useClipboard from '../../lib/hooks/useClipboard';
 import { getCollectivePageCanonicalURL, getCollectivePageRoute } from '../../lib/url-helpers';
 
-import { Flex } from '../Grid';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
 
@@ -57,6 +56,7 @@ const Action = styled.button`
   }
 
   > svg {
+    display: inline-block;
     margin-right: 14px;
   }
 `;
@@ -111,7 +111,21 @@ const ExpenseMoreActionsButton = ({
         )}
       >
         {({ setOpen }) => (
-          <Flex flexDirection="column">
+          <div className="flex flex-col">
+            {permissions.canMarkAsSpam && (
+              <Action
+                disabled={processExpense.loading || isDisabled}
+                buttonStyle="dangerSecondary"
+                data-cy="spam-button"
+                onClick={async () => {
+                  setProcessModal('MARK_AS_SPAM');
+                  setOpen(false);
+                }}
+              >
+                <FlagIcon size={14} />
+                <FormattedMessage id="actions.spam" defaultMessage="Mark as Spam" />
+              </Action>
+            )}
             {permissions?.canApprove && props.isViewingExpenseInHostContext && (
               <Action
                 loading={processExpense.loading && processExpense.currentAction === 'APPROVE'}
@@ -224,7 +238,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="CopyLink" defaultMessage="Copy link" />
               )}
             </Action>
-          </Flex>
+          </div>
         )}
       </PopupMenu>
       {processModal && (
