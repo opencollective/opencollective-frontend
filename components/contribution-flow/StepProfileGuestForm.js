@@ -4,8 +4,6 @@ import { set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
-import { TierTypes } from '../../lib/constants/tiers-types';
-
 import Captcha, { isCaptchaEnabled } from '../Captcha';
 import Container from '../Container';
 import { Flex } from '../Grid';
