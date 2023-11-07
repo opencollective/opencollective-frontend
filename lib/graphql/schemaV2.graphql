@@ -19,6 +19,11 @@ type Application {
   redirectUri: URL
   account: Account!
   oAuthAuthorization: OAuthAuthorization
+
+  """
+  Whether this application is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean!
 }
 
 """
@@ -66,6 +71,11 @@ type OAuthAuthorization {
   The attached scopes.
   """
   scope: [OAuthScope]
+
+  """
+  Whether this OAuth token is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean!
 }
 
 """
@@ -8577,6 +8587,11 @@ type PersonalToken {
   The date on which the personal token was last updated
   """
   updatedAt: DateTime
+
+  """
+  Whether this token is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean!
 }
 
 """
@@ -15052,8 +15067,8 @@ type Mutation {
   Delete a tier.
   """
   deleteTier(tier: TierReferenceInput!, stopRecurringContributions: Boolean! = false): Tier!
-  createPersonalToken(personalToken: PersonalTokenCreateInput!): PersonalToken
-  updatePersonalToken(personalToken: PersonalTokenUpdateInput!): PersonalToken
+  createPersonalToken(personalToken: PersonalTokenCreateInput!): PersonalToken!
+  updatePersonalToken(personalToken: PersonalTokenUpdateInput!): PersonalToken!
   deletePersonalToken(personalToken: PersonalTokenReferenceInput!): PersonalToken
 
   """
@@ -16997,6 +17012,11 @@ input PersonalTokenCreateInput {
   expiresAt: String
 
   """
+  Whether this token is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean = false
+
+  """
   The account to use as the owner of the application. Defaults to currently logged in user.
   """
   account: AccountReferenceInput
@@ -17018,6 +17038,11 @@ input PersonalTokenUpdateInput {
   name: String
   scope: [OAuthScope]
   expiresAt: String
+
+  """
+  Whether this token is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean
 }
 
 input PersonalTokenReferenceInput {
