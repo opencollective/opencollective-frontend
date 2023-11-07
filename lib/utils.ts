@@ -263,8 +263,6 @@ export const omitDeep = (obj, keys) =>
     {},
   );
 
-export const getCurrentDateInUTC = () => new Date().toISOString().split('T')[0];
-
 /**
  * Sort options as: All, then by alphabetical order, then "No payment method" or "Other" at the end
  */

@@ -140,8 +140,11 @@ const ApplicationForm = ({
       'applicationData.typeOfProject',
     ]);
 
-    verifyEmailPattern(errors, values, 'user.email');
-    verifyFieldLength(intl, errors, values, 'collective.description', 1, 150);
+    // User is not inputting a Collective or User if there is already a Collective that they apply with
+    if (!canApplyWithCollective) {
+      verifyEmailPattern(errors, values, 'user.email');
+      verifyFieldLength(intl, errors, values, 'collective.description', 1, 255);
+    }
     verifyURLPattern(errors, values, 'applicationData.repositoryUrl');
     verifyChecked(errors, values, 'termsOfServiceOC');
 
@@ -369,7 +372,6 @@ const ApplicationForm = ({
                                 {({ field }) => (
                                   <StyledInputGroup
                                     prepend="opencollective.com/"
-                                    type="url"
                                     placeholder="agora"
                                     {...field}
                                     onChange={e => setFieldValue('collective.slug', e.target.value)}

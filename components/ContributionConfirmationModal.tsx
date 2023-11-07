@@ -6,11 +6,11 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { getCurrentLocalDateStr } from '../lib/date-utils';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { TaxInput } from '../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../lib/i18n/taxes';
-import { getCurrentDateInUTC } from '../lib/utils';
 
 import { useToast } from './ui/useToast';
 import Container from './Container';
@@ -44,12 +44,14 @@ export const confirmContributionFieldsFragment = gql`
       id
       slug
       name
+      type
       imageUrl
     }
     toAccount {
       id
       slug
       name
+      type
       imageUrl
       ... on AccountWithHost {
         bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
@@ -132,7 +134,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
   const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
   const [hostFeePercent, setHostFeePercent] = useState(defaultHostFeePercent);
   const [taxPercent, setTaxPercent] = useState(defaultTaxPercent);
-  const [processedAt, setProcessedAt] = useState(getCurrentDateInUTC());
+  const [processedAt, setProcessedAt] = useState(getCurrentLocalDateStr());
   const intl = useIntl();
   const { toast } = useToast();
   const [confirmOrder, { loading: submitting }] = useMutation(confirmContributionMutation, { context: API_V2_CONTEXT });

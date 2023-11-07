@@ -6,16 +6,19 @@ export enum PREVIEW_FEATURE_KEYS {
   EXPENSE_PIPELINE = 'EXPENSE_PIPELINE',
   EXPENSE_OCR = 'EXPENSE_OCR',
   EXPENSE_CATEGORIZATION = 'EXPENSE_CATEGORIZATION',
+  DYNAMIC_TOP_BAR = 'DYNAMIC_TOP_BAR',
 }
 
 export type PreviewFeature = {
   key: PREVIEW_FEATURE_KEYS | `${PREVIEW_FEATURE_KEYS}`;
   title: string;
-  description: string;
+  description?: string;
   publicBeta: boolean; // If true, the feature will be available to toggle for all users.
   closedBetaAccessFor?: string[]; // Account slugs. Members and admins of these accounts will see this feature as a Closed Beta preview in the Preview Features modal.
   enabledByDefaultFor?: ('*' | string)[]; // Account slugs. Members and admins of these accounts will have the feature enabled by default.
   env?: Array<'development' | 'test' | 'e2e' | 'staging' | 'production'>; // If set, the feature will be available only in the specified environments.
+  alwaysEnableInDev?: boolean; // If true, the feature will be enabled by default in development.
+  dependsOn?: PREVIEW_FEATURE_KEYS;
 };
 
 /**
@@ -29,6 +32,12 @@ export const previewFeatures: PreviewFeature[] = [
       'A central space to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations.',
     publicBeta: true,
     enabledByDefaultFor: ['opencollective'],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR,
+    title: 'Dynamic top bar',
+    publicBeta: true,
+    dependsOn: PREVIEW_FEATURE_KEYS.DASHBOARD,
   },
   {
     key: PREVIEW_FEATURE_KEYS.EXPENSE_PIPELINE,
@@ -49,7 +58,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Expense categorization',
     description: 'Facilitate your accounting by categorizing your expenses according to a chart of accounts.',
     publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe'],
-    env: ['development', 'staging'],
+    closedBetaAccessFor: ['foundation', 'opensource', 'europe'],
+    alwaysEnableInDev: true,
   },
 ];

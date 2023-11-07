@@ -20,6 +20,7 @@ import AutosizeText from '../AutosizeText';
 import { AvatarWithLink } from '../AvatarWithLink';
 import Container from '../Container';
 import DateTime from '../DateTime';
+import { AccountingCategoryPill } from '../expenses/AccountingCategoryPill';
 import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTypeTag from '../expenses/ExpenseTypeTag';
@@ -200,6 +201,21 @@ const ExpenseBudgetItem = ({
                   </AutosizeText>
                 </StyledLink>
               </StyledTooltip>
+
+              {isAdminView &&
+                (expense.accountingCategory || LoggedInUser.hasPreviewFeatureEnabled('EXPENSE_CATEGORIZATION')) && (
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm font-normal text-neutral-700">
+                      <FormattedMessage id="expense.accountingCategory" defaultMessage="Category" />
+                    </span>
+                    <AccountingCategoryPill
+                      expense={expense}
+                      host={host}
+                      canEdit={get(expense, 'permissions.canEditAccountingCategory', false)}
+                      allowNone={false}
+                    />
+                  </div>
+                )}
 
               <P mt="5px" fontSize="12px" color="black.700">
                 {isAdminView ? (
@@ -448,6 +464,7 @@ ExpenseBudgetItem.propTypes = {
     amountInAccountCurrency: AmountPropTypeShape,
     currency: PropTypes.string.isRequired,
     permissions: PropTypes.object,
+    accountingCategory: PropTypes.object,
     items: PropTypes.arrayOf(PropTypes.object),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
     attachedFiles: PropTypes.arrayOf(PropTypes.object),

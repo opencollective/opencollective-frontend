@@ -91,7 +91,7 @@ const TierPage = (pageProps: InferGetServerSidePropsType<typeof getServerSidePro
   return !data?.Tier || !data.Tier.collective || error ? (
     <ErrorPage data={error || data} />
   ) : (
-    <Page {...getPageMetaData(pageProps, data)}>
+    <Page collective={collective} {...getPageMetaData(pageProps, data)}>
       {loading ? (
         <div className="py-16 sm:py-32">
           <Loading />

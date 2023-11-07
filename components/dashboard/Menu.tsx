@@ -13,6 +13,7 @@ import {
   LucideIcon,
   Receipt,
   Settings,
+  Store,
   Ticket,
   Users2,
 } from 'lucide-react';
@@ -23,11 +24,10 @@ import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isInternalHost, isSelfHostedAccount } from '../../lib/collective.lib';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
-import { ALL_SECTIONS } from './constants';
+import { ALL_SECTIONS, SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
 import { MenuLink } from './MenuLink';
 
@@ -50,7 +50,7 @@ type GroupMenuItem = {
 
 export type MenuItem = PageMenuItem | GroupMenuItem;
 
-const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
+export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isIndividual = isIndividualAccount(account);
   const isHost = isHostAccount(account);
   const isSelfHosted = isSelfHostedAccount(account);
@@ -77,15 +77,25 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           if: isHost,
           section: ALL_SECTIONS.HOST_EXPENSES,
-          label: intl.formatMessage({ id: 'Payments', defaultMessage: 'Payments' }),
+          label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
         },
         {
           section: ALL_SECTIONS.EXPENSES,
-          label: intl.formatMessage({ defaultMessage: 'Received' }),
+          label: intl.formatMessage(
+            {
+              defaultMessage: 'To {accountName}',
+            },
+            { accountName: account.name },
+          ),
         },
         {
           section: ALL_SECTIONS.SUBMITTED_EXPENSES,
-          label: intl.formatMessage({ defaultMessage: 'Submitted' }),
+          label: intl.formatMessage(
+            {
+              defaultMessage: 'From {accountName}',
+            },
+            { accountName: account.name },
+          ),
         },
       ],
     },
@@ -103,15 +113,25 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       subMenu: [
         {
           if: isHost || isSelfHosted,
-          label: intl.formatMessage({ id: 'FinancialContributions', defaultMessage: 'Financial Contributions' }),
+          label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
           section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
         },
         {
-          label: intl.formatMessage({ defaultMessage: 'Incoming' }),
+          label: intl.formatMessage(
+            {
+              defaultMessage: 'To {accountName}',
+            },
+            { accountName: account.name },
+          ),
           section: ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
         },
         {
-          label: intl.formatMessage({ defaultMessage: 'Outgoing' }),
+          label: intl.formatMessage(
+            {
+              defaultMessage: 'From {accountName}',
+            },
+            { accountName: account.name },
+          ),
           section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
         },
       ],
@@ -157,6 +177,11 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: isHost,
       section: ALL_SECTIONS.REPORTS,
       Icon: BarChart2,
+    },
+    {
+      if: isHost && hasFeature(account, FEATURES.HOST_VENDORS),
+      section: ALL_SECTIONS.VENDORS,
+      Icon: Store,
     },
     {
       if: isType(account, EVENT),
@@ -274,26 +299,25 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     items
       // filter root items
       .filter(item => item.if !== false)
-      // filter subMenu items
+      // filter subMenu items and add labels where missing
       .map(item => {
         if (item.type === 'group') {
           return {
             ...item,
-            subMenu: item.subMenu.filter(item => item.if !== false),
+            subMenu: item.subMenu
+              .filter(item => item.if !== false)
+              .map(item => ({ ...item, label: item.label || intl.formatMessage(SECTION_LABELS[item.section]) })),
           };
         }
-        return item;
+        return { ...item, label: item.label || intl.formatMessage(SECTION_LABELS[item.section]) };
       })
   );
 };
 
-const Menu = ({ onRoute }) => {
+const Menu = ({ onRoute, menuItems }) => {
   const router = useRouter();
   const intl = useIntl();
   const { account } = React.useContext(DashboardContext);
-  const { LoggedInUser } = useLoggedInUser();
-
-  const menuItems = React.useMemo(() => getMenuItems({ intl, account, LoggedInUser }), [account, LoggedInUser, intl]);
 
   React.useEffect(() => {
     if (onRoute) {

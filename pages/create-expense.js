@@ -493,6 +493,7 @@ const hostFieldsFragment = gql`
     id
     name
     legalName
+    legacyId
     slug
     type
     expensePolicy
@@ -510,6 +511,21 @@ const hostFieldsFragment = gql`
     transferwise {
       id
       availableCurrencies
+    }
+    accountingCategories {
+      nodes {
+        id
+        name
+        friendlyName
+        code
+      }
+    }
+    policies {
+      id
+      EXPENSE_CATEGORIZATION {
+        requiredForExpenseSubmitters
+        requiredForCollectiveAdmins
+      }
     }
     supportedPayoutMethods
     isTrustedHost

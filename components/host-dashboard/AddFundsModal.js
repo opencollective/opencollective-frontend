@@ -9,13 +9,13 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
+import { getCurrentLocalDateStr } from '../../lib/date-utils';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../lib/policies';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
-import { getCurrentDateInUTC } from '../../lib/utils';
 
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../collective-page/graphql/queries';
 import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
@@ -195,6 +195,7 @@ const addFundsAccountQuery = gql`
         addedFundsHostFeePercent: hostFeePercent(paymentMethodType: HOST)
         host {
           id
+          legacyId
           slug
           name
           settings
@@ -207,6 +208,16 @@ const addFundsAccountQuery = gql`
             REQUIRE_2FA_FOR_ADMINS
           }
           isTrustedHost
+          vendors(forAccount: { slug: $slug }) {
+            nodes {
+              id
+              slug
+              name
+              type
+              description
+              imageUrl(height: 64)
+            }
+          }
         }
       }
       ... on AccountWithContributions {
@@ -227,7 +238,7 @@ const getInitialValues = values => ({
   hostFeePercent: null,
   description: '',
   memo: null,
-  processedAt: getCurrentDateInUTC(),
+  processedAt: getCurrentLocalDateStr(),
   fromAccount: null,
   tier: null,
   tax: null,
@@ -338,6 +349,10 @@ const AddFundsModal = ({ collective, ...props }) => {
   const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const receiptTemplates = host?.settings?.invoice?.templates;
+  const recommendedVendors = host?.vendors?.nodes?.map(vendor => ({
+    value: vendor,
+    label: <DefaultCollectiveLabel value={vendor} />,
+  }));
 
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
@@ -420,14 +435,13 @@ const AddFundsModal = ({ collective, ...props }) => {
             const taxAmount = !values.tax?.rate ? 0 : Math.round(values.amount - values.amount / (1 + values.tax.rate));
             const hostFee = Math.round((values.amount - taxAmount) * (hostFeePercent / 100));
 
-            const defaultSources = [];
-            defaultSources.push({
-              value: host,
-              label: <DefaultCollectiveLabel value={host} />,
-            });
-            if (host?.id !== account.id) {
-              defaultSources.push({ value: account, label: <DefaultCollectiveLabel value={account} /> });
-            }
+            const defaultSources = [
+              ...(recommendedVendors || []),
+              {
+                value: host,
+                label: <DefaultCollectiveLabel value={host} />,
+              },
+            ];
 
             if (!fundDetails.showSuccessModal) {
               return (
@@ -446,14 +460,14 @@ const AddFundsModal = ({ collective, ...props }) => {
                         <CollectivePickerAsync
                           inputId={field.id}
                           data-cy="add-funds-source"
-                          types={['USER', 'ORGANIZATION']}
-                          creatable
+                          types={['USER', 'ORGANIZATION', 'VENDOR']}
                           error={field.error}
                           createCollectiveOptionalFields={['location.address', 'location.country']}
                           onBlur={() => form.setFieldTouched(field.name, true)}
                           customOptions={defaultSources}
                           onChange={({ value }) => form.setFieldValue(field.name, value)}
                           menuPortalTarget={null}
+                          includeVendorsForHostId={host?.legacyId || undefined}
                         />
                       )}
                     </Field>

@@ -20,7 +20,15 @@ const editAccountSettingsMutation = gql`
   }
 `;
 
-const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
+const PreviewFeatureCard = ({
+  feature,
+  disabled,
+  dependentFeatures,
+}: {
+  feature: PreviewFeature;
+  disabled?: boolean;
+  dependentFeatures?: PreviewFeature[];
+}) => {
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [isChecked, setIsChecked] = React.useState(LoggedInUser.hasPreviewFeatureEnabled(feature.key));
   const [loading, setLoading] = React.useState(false);
@@ -43,29 +51,36 @@ const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
   };
 
   return (
-    <div className="flex flex-row items-center justify-between gap-3 rounded-lg border p-4" key={feature.title}>
-      <div className="space-y-0.5">
-        <label className="flex flex-wrap items-center gap-x-2 text-base font-medium" htmlFor={feature.key}>
-          <span>{feature.title}</span>
-          <Badge size="sm" type={feature.publicBeta ? 'success' : 'warning'}>
-            {feature.publicBeta ? (
-              <FormattedMessage id="PreviewFeatures.publicBeta" defaultMessage="Public beta" />
-            ) : (
-              <FormattedMessage id="PreviewFeatures.LimitedAccess" defaultMessage="Limited preview" />
-            )}
-          </Badge>
-        </label>
+    <div className="flex flex-col gap-2 rounded-lg border p-4" key={feature.title}>
+      <div className="flex flex-row items-center justify-between gap-3">
+        <div className="space-y-0.5">
+          <label className="flex flex-wrap items-center gap-x-2 text-base font-medium" htmlFor={feature.key}>
+            <span>{feature.title}</span>
+            <Badge size="sm" type={feature.publicBeta ? 'success' : 'warning'}>
+              {feature.publicBeta ? (
+                <FormattedMessage id="PreviewFeatures.publicBeta" defaultMessage="Public beta" />
+              ) : (
+                <FormattedMessage id="PreviewFeatures.LimitedAccess" defaultMessage="Limited preview" />
+              )}
+            </Badge>
+          </label>
 
-        <p className="text-sm text-muted-foreground">{feature.description}</p>
+          {feature.description && <p className="text-sm text-muted-foreground">{feature.description}</p>}
+        </div>
+        <Switch
+          id={feature.key}
+          checked={isChecked}
+          disabled={loading || disabled}
+          onCheckedChange={checked => togglePreviewFeature(feature.key, checked)}
+        />
       </div>
-      <Switch
-        id={feature.key}
-        checked={isChecked}
-        disabled={loading}
-        onCheckedChange={checked => {
-          togglePreviewFeature(feature.key, checked);
-        }}
-      />
+      {dependentFeatures?.length > 0 && (
+        <div className="mt-2 flex flex-col gap-2">
+          {dependentFeatures.map(dependentFeature => (
+            <PreviewFeatureCard key={dependentFeature.key} feature={dependentFeature} disabled={!isChecked} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -94,7 +109,12 @@ const PreviewFeaturesModal = ({ open, setOpen }: { open: boolean; setOpen: (open
             />
           </DialogDescription>
         </DialogHeader>
-        {previewFeatures?.map(feature => <PreviewFeatureCard key={feature.key} feature={feature} />)}
+        {previewFeatures
+          ?.filter(f => !f.dependsOn)
+          .map(feature => {
+            const dependentFeatures = previewFeatures.filter(f => f.dependsOn === feature.key);
+            return <PreviewFeatureCard key={feature.key} feature={feature} dependentFeatures={dependentFeatures} />;
+          })}
       </DialogContent>
     </Dialog>
   );

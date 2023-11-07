@@ -3,7 +3,6 @@ import { omitBy } from 'lodash';
 
 import { Box } from '../Grid';
 import Tabs from '../StyledTabs';
-
 const omit = (query, keys) => {
   return omitBy(query, (value, key) => !value || (keys && keys.includes(key)));
 };

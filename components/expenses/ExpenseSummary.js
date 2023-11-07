@@ -12,6 +12,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
+import { userMustSetAccountingCategory } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles } from './lib/items';
 
@@ -27,8 +28,10 @@ import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import Tags from '../Tags';
 import { H1, H4, P, Span } from '../Text';
+import { Separator } from '../ui/Separator';
 import UploadedFilePreview from '../UploadedFilePreview';
 
+import { AccountingCategoryPill } from './AccountingCategoryPill';
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 import ExpenseMoreActionsButton from './ExpenseMoreActionsButton';
@@ -88,8 +91,10 @@ const ExpenseSummary = ({
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
   const isGrant = expense?.type === expenseTypes.GRANT;
+  const isDraft = expense?.status === ExpenseStatus.DRAFT;
   const existsInAPI = expense && (expense.id || expense.legacyId);
-  const createdByAccount = expense?.requestedByAccount || expense?.createdByAccount || {};
+  const createdByAccount =
+    (isDraft ? expense?.requestedByAccount || expense?.createdByAccount : expense?.createdByAccount) || {};
   const expenseItems = expense?.items?.length > 0 ? expense.items : expense?.draft?.items || [];
   const expenseTaxes = expense?.taxes?.length > 0 ? expense.taxes : expense?.draft?.taxes || [];
   const isMultiCurrency =
@@ -178,7 +183,20 @@ const ExpenseSummary = ({
           )}
         </Flex>
       </Flex>
-      <Tags expense={expense} isLoading={isLoading} canEdit={canEditTags} suggestedTags={suggestedTags} />
+      <div className="flex gap-2 align-middle">
+        {Boolean(expense?.accountingCategory || userMustSetAccountingCategory(LoggedInUser, collective)) && (
+          <React.Fragment>
+            <AccountingCategoryPill
+              host={host}
+              expense={expense}
+              canEdit={Boolean(expense.permissions?.canEditAccountingCategory)}
+              allowNone={!LoggedInUser?.isAdminOfCollectiveOrHost(expense.account)}
+            />
+            <Separator orientation="vertical" className="h-[24px] w-[2px]" />
+          </React.Fragment>
+        )}
+        <Tags expense={expense} isLoading={isLoading} canEdit={canEditTags} suggestedTags={suggestedTags} />
+      </div>
       <Flex alignItems="center" mt="12px">
         {isLoading && !expense ? (
           <LoadingPlaceholder height={24} width={200} />
@@ -188,7 +206,7 @@ const ExpenseSummary = ({
               <Avatar collective={createdByAccount} size={24} />
             </LinkCollective>
             <P ml={2} lineHeight="16px" fontSize="14px" color="black.700" data-cy="expense-author">
-              {expense.requestedByAccount ? (
+              {isDraft && expense.requestedByAccount ? (
                 <FormattedMessage
                   id="Expense.RequestedBy"
                   defaultMessage="Invited by {name}"
@@ -430,6 +448,7 @@ ExpenseSummary.propTypes = {
   expense: PropTypes.shape({
     id: PropTypes.string,
     legacyId: PropTypes.number,
+    accountingCategory: PropTypes.object,
     description: PropTypes.string.isRequired,
     longDescription: PropTypes.string,
     amount: PropTypes.number.isRequired,
@@ -530,6 +549,7 @@ ExpenseSummary.propTypes = {
     permissions: PropTypes.shape({
       canSeeInvoiceInfo: PropTypes.bool,
       canDelete: PropTypes.bool,
+      canEditAccountingCategory: PropTypes.bool,
     }),
     comments: PropTypes.shape({
       totalCount: PropTypes.number,

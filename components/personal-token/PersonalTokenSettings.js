@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { pick } from 'lodash';
+import { AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -24,6 +25,7 @@ import StyledInputFormikField from '../StyledInputFormikField';
 import StyledLink from '../StyledLink';
 import StyledSelect from '../StyledSelect';
 import { H3, H4, P, Span } from '../Text';
+import { Checkbox } from '../ui/Checkbox';
 import { useToast } from '../ui/useToast';
 import WarnIfUnsavedChanges from '../WarnIfUnsavedChanges';
 
@@ -36,6 +38,7 @@ const personalTokenSettingsFragment = gql`
     name
     scope
     expiresAt
+    preAuthorize2FA
     token
   }
 `;
@@ -116,10 +119,8 @@ const PersonalTokenSettings = ({ backPath, id }) => {
               <FormattedMessage defaultMessage="Personal Token" />
             </H4>
             <Flex flexWrap="wrap" justifyContent="space-between">
-              <Flex flexDirection="column" width="100%">
-                <CodeContainer data-cy="personalToken-token" fontSize="14px" color="black.800" css={{}}>
-                  {data.personalToken.token}
-                </CodeContainer>
+              <Flex flexDirection="column" width="100%" data-cy="personalToken-token">
+                <ObfuscatedClientSecret secret={data.personalToken.token} />
               </Flex>
             </Flex>
           </StyledCard>
@@ -133,7 +134,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
             validate={values => validatePersonalTokenValues(intl, values)}
             onSubmit={async (values, { resetForm }) => {
               try {
-                const filteredValue = pick(values, ['name', 'scope', 'expiresAt']);
+                const filteredValue = pick(values, ['name', 'scope', 'expiresAt', 'preAuthorize2FA']);
                 const personalToken = {
                   ...filteredValue,
                   id,
@@ -209,6 +210,35 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                       data-cy="personal-token-scope"
                     />
                   )}
+                </StyledInputFormikField>
+
+                <StyledInputFormikField
+                  name="preAuthorize2FA"
+                  mt={20}
+                  labelProps={LABEL_STYLES}
+                  label={
+                    <div className="flex items-center">
+                      <AlertTriangle className="mr-2 inline-block" size={16} />
+                      <span>
+                        {intl.formatMessage({ id: 'token.advancedPrivileges', defaultMessage: 'Advanced privileges' })}
+                      </span>
+                    </div>
+                  }
+                >
+                  {({ form, field }) => {
+                    return (
+                      <div className="my-1 flex items-center">
+                        <Checkbox
+                          id="preAuthorize2FA-checkbox"
+                          checked={field.value}
+                          onCheckedChange={value => form.setFieldValue(field.name, value)}
+                        />
+                        <label htmlFor="preAuthorize2FA-checkbox" className="ml-2 text-xs font-normal leading-none">
+                          <FormattedMessage defaultMessage="Allow this token to directly use operations that would normally require 2FA" />
+                        </label>
+                      </div>
+                    );
+                  }}
                 </StyledInputFormikField>
 
                 <StyledInputFormikField

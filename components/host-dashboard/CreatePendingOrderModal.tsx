@@ -40,6 +40,7 @@ import { TaxesFormikFields } from '../taxes/TaxesFormikFields';
 import { P, Span } from '../Text';
 import { TwoFactorAuthRequiredMessage } from '../TwoFactorAuthRequiredMessage';
 import { useToast } from '../ui/useToast';
+import { vendorFieldFragment } from '../vendors/queries';
 
 const EDITABLE_FIELDS = [
   'amount',
@@ -95,6 +96,7 @@ const createPendingContributionModalQuery = gql`
       slug
       currency
       settings
+      hostFeePercent
 
       plan {
         id
@@ -104,10 +106,18 @@ const createPendingContributionModalQuery = gql`
         id
         REQUIRE_2FA_FOR_ADMINS
       }
-      hostFeePercent
       isTrustedHost
+      vendors {
+        totalCount
+        nodes {
+          id
+          ...VendorFields
+        }
+      }
     }
   }
+
+  ${vendorFieldFragment}
 `;
 
 const createPendingContributionModalCollectiveQuery = gql`
@@ -137,6 +147,22 @@ const createPendingContributionModalCollectiveQuery = gql`
                 legacyId
                 name
               }
+            }
+          }
+        }
+      }
+      ... on AccountWithHost {
+        host {
+          id
+          legacyId
+          vendors(forAccount: { slug: $slug }, limit: 5) {
+            nodes {
+              id
+              slug
+              name
+              type
+              description
+              imageUrl(height: 64)
             }
           }
         }
@@ -268,6 +294,25 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     setFieldValue('amount.currency', data?.account?.currency || host.currency);
   }, [data?.account]);
 
+  React.useEffect(() => {
+    if (values.fromAccount?.type === 'VENDOR') {
+      const vendorInfo = host?.vendors?.nodes?.find(vendor => vendor.id === formik.values?.fromAccount?.id)?.vendorInfo;
+      if (vendorInfo?.contact) {
+        formik.touched.fromAccountInfo?.['name'] !== true &&
+          setFieldValue('fromAccountInfo.name', vendorInfo.contact.name);
+        formik.touched.fromAccountInfo?.['email'] !== true &&
+          setFieldValue('fromAccountInfo.email', vendorInfo.contact.email);
+      }
+    } else {
+      formik.touched.fromAccountInfo?.['name'] !== true &&
+        formik.values?.fromAccountInfo?.name &&
+        setFieldValue('fromAccountInfo.name', '');
+      formik.touched.fromAccountInfo?.['email'] !== true &&
+        formik.values?.fromAccountInfo?.email &&
+        setFieldValue('fromAccountInfo.email', '');
+    }
+  }, [values.fromAccount]);
+
   const collective = data?.account;
   const currency = collective?.currency || host.currency;
   const childrenOptions = collective?.childrenAccounts?.nodes || [];
@@ -278,7 +323,6 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const tiersOptions = childAccount
     ? getTiersOptions(intl, childAccount?.tiers?.nodes || [])
     : getTiersOptions(intl, collective?.tiers?.nodes || []);
-
   const receiptTemplates = host?.settings?.invoice?.templates;
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
@@ -291,7 +335,12 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     receiptTemplateTitles.push({ value: 'alternative', label: receiptTemplates?.alternative?.title });
   }
 
+  const recommendedVendors = collective?.host?.vendors?.nodes?.map(vendor => ({
+    value: vendor,
+    label: <DefaultCollectiveLabel value={vendor} />,
+  }));
   const defaultSources = [
+    ...(recommendedVendors || []),
     {
       value: host,
       label: <DefaultCollectiveLabel value={host} />,
@@ -422,14 +471,14 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
             <CollectivePickerAsync
               inputId={field.id}
               data-cy="create-pending-contribution-source"
-              types={['USER', 'ORGANIZATION']}
-              creatable
+              types={['USER', 'ORGANIZATION', 'VENDOR']}
               error={field.error}
               createCollectiveOptionalFields={['location.address', 'location.country']}
               onBlur={() => form.setFieldTouched(field.name, true)}
               customOptions={defaultSources}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               collective={field.value}
+              includeVendorsForHostId={collective?.host?.legacyId}
               menuPortalTarget={null}
             />
           )}
@@ -779,6 +828,7 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
     props.onClose();
   };
 
+  const error = createOrderError || editOrderError;
   const initialValues = edit
     ? {
         ...edit,
@@ -791,7 +841,6 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
       }
     : { hostFeePercent: host?.hostFeePercent || 0 };
 
-  const error = createOrderError || editOrderError;
   return (
     <CreatePendingContributionModalContainer {...props} trapFocus onClose={handleClose}>
       <ModalHeader>

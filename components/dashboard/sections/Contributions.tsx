@@ -247,20 +247,6 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
         );
       },
     };
-    const processedAt = {
-      accessorKey: 'processedAt',
-      header: intl.formatMessage({ id: 'LastCharge', defaultMessage: 'Last Charge' }),
-      cell: ({ cell }) => {
-        const date = cell.getValue();
-        if (date) {
-          return (
-            <div className="flex items-center gap-2 truncate">
-              <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
-            </div>
-          );
-        }
-      },
-    };
 
     if (tab === ContributionsTab.RECURRING) {
       const actions = {
@@ -296,20 +282,11 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
         paymentMethod,
         amount,
         totalDonations,
-        processedAt,
         status,
         isIncoming ? null : actions,
       ]);
     } else {
-      return [
-        isIncoming ? fromAccount : toAccount,
-        orderId,
-        paymentMethod,
-        amount,
-        totalDonations,
-        processedAt,
-        status,
-      ];
+      return [isIncoming ? fromAccount : toAccount, orderId, paymentMethod, amount, totalDonations, status];
     }
   }
 };

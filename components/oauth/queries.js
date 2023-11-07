@@ -10,6 +10,8 @@ export const authorizedAppsQuery = gql`
           id
           createdAt
           lastUsedAt
+          scope
+          preAuthorize2FA
           account {
             id
             name
