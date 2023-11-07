@@ -33,7 +33,8 @@ import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
 
-import HostInfoCard, { hostInfoCardFields } from './HostInfoCard';
+import ExpensePipelineOverview from './expenses/ExpensePipelineOverview';
+import { hostInfoCardFields } from './HostInfoCard';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
 const hostDashboardExpensesQuery = gql`
@@ -98,6 +99,45 @@ const hostDashboardMetaDataQuery = gql`
           valueInCents
           currency
         }
+      }
+    }
+    wise_ready_to_pay: expenses(
+      host: { slug: $hostSlug }
+      limit: 0
+      status: READY_TO_PAY
+      payoutMethodType: BANK_ACCOUNT
+    ) {
+      totalCount
+      totalAmount {
+        valueInCents
+      }
+    }
+    wise_scheduled_for_payment: expenses(
+      host: { slug: $hostSlug }
+      limit: 0
+      status: SCHEDULED_FOR_PAYMENT
+      payoutMethodType: BANK_ACCOUNT
+    ) {
+      totalCount
+      totalAmount {
+        valueInCents
+      }
+    }
+    paypal_ready_to_pay: expenses(host: { slug: $hostSlug }, limit: 0, status: READY_TO_PAY, payoutMethodType: PAYPAL) {
+      totalCount
+      totalAmount {
+        valueInCents
+      }
+    }
+    paypal_scheduled_for_payment: expenses(
+      host: { slug: $hostSlug }
+      limit: 0
+      status: SCHEDULED_FOR_PAYMENT
+      payoutMethodType: PAYPAL
+    ) {
+      totalCount
+      totalAmount {
+        valueInCents
       }
     }
     all: expenses(host: { slug: $hostSlug }, limit: 0) @include(if: $getViewCounts) {
@@ -331,7 +371,22 @@ const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
         ) : error ? (
           <MessageBoxGraphqlError error={error} />
         ) : (
-          <HostInfoCard host={metaData.host} />
+          <ExpensePipelineOverview
+            className="pt-4"
+            host={metaData?.host}
+            wise={{
+              readyToPayCount: metaData?.wise_ready_to_pay?.totalCount,
+              readyToPayAmount: metaData?.wise_ready_to_pay?.totalAmount,
+              scheduledForPaymentCount: metaData?.wise_scheduled_for_payment?.totalCount,
+              scheduledForPaymentAmount: metaData?.wise_scheduled_for_payment?.totalAmount,
+            }}
+            paypal={{
+              readyToPayCount: metaData?.paypal_ready_to_pay?.totalCount,
+              readyToPayAmount: metaData?.paypal_ready_to_pay?.totalAmount,
+              scheduledForPaymentCount: metaData?.paypal_scheduled_for_payment?.totalCount,
+              scheduledForPaymentAmount: metaData?.paypal_scheduled_for_payment?.totalAmount,
+            }}
+          />
         )}
       </Box>
       <ScheduledExpensesBanner

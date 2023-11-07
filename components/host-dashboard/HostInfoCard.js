@@ -53,6 +53,7 @@ export const hostInfoCardFields = gql`
       }
     }
     stripe {
+      username
       issuingBalance {
         valueInCents
         currency

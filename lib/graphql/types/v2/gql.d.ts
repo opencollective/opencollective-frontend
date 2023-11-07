@@ -254,6 +254,10 @@ export function gql(source: "\n  mutation ProcessHostApplication(\n    $host: Ac
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query ExpensesScheduledForPayment($hostSlug: String!) {\n    expenses(host: { slug: $hostSlug }, status: SCHEDULED_FOR_PAYMENT, payoutMethodType: BANK_ACCOUNT) {\n      totalCount\n      nodes {\n        id\n      }\n    }\n  }\n"): typeof import('./graphql').ExpensesScheduledForPaymentDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query MemberInvitationsCount($memberAccount: AccountReferenceInput!) {\n    memberInvitations(memberAccount: $memberAccount) {\n      id\n    }\n  }\n"): typeof import('./graphql').MemberInvitationsCountDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
