@@ -8,7 +8,7 @@
   "private": true,
   "engines": {
     "node": ">=18.15.0 <19.0.0",
-    "npm": "9.x"
+    "npm": "10.x"
   },
   "files": [],
   "dependencies": {
