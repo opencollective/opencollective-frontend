@@ -89,7 +89,7 @@ const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?
     const result = await nodeFetch(url, options);
 
     // Complete benchmark measure and log
-    if (process.env.GRAPHQL_BENCHMARK) {
+    if (parseToBoolean(process.env.GRAPHQL_BENCHMARK)) {
       const end = process.hrtime.bigint();
       const executionTime = Math.round(Number(end - start) / 1000000);
       const apiExecutionTime = result.headers.get('Execution-Time');
