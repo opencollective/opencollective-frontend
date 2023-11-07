@@ -1,6 +1,6 @@
 import React from 'react';
 import { get, isUndefined, pick, size } from 'lodash';
-import { Check, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
 import { AccountingCategory, Host } from '../../lib/graphql/types/v2/graphql';
@@ -8,6 +8,7 @@ import { cn } from '../../lib/utils';
 
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
+import { Separator } from '../ui/Separator';
 
 type ExpenseCategorySelectProps = {
   host: Host;
@@ -98,27 +99,27 @@ const ExpenseCategorySelect = ({
             </button>
           )}
         </PopoverTrigger>
-        <PopoverContent className="z-[5000] w-[200px] p-0">
+        <PopoverContent className="z-[5000] w-[320px] p-0">
           <Command filter={(categoryId, search) => (options[categoryId].searchText.includes(search) ? 1 : 0)}>
             {size(options) > 10 && <CommandInput placeholder="Filter by name" />}
             <CommandEmpty>
               <FormattedMessage defaultMessage="No category found" />
             </CommandEmpty>
-            <CommandGroup>
-              {Object.entries(options).map(([categoryId, { label }]) => (
-                <CommandItem
-                  key={categoryId}
-                  value={categoryId}
-                  onSelect={categoryId => {
-                    onChange(options[categoryId].value);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn('mr-2 h-4 w-4', categoryId === selectedCategory?.id ? 'opacity-100' : 'opacity-0')}
-                  />
-                  {label}
-                </CommandItem>
+            <CommandGroup className="max-h-[300px] overflow-y-auto">
+              {Object.entries(options).map(([categoryId, { label }], idx) => (
+                <React.Fragment key={categoryId}>
+                  <CommandItem
+                    value={categoryId}
+                    className={cn('p-3 text-sm', { 'font-semibold': selectedCategory?.id === categoryId })}
+                    onSelect={categoryId => {
+                      onChange(options[categoryId].value);
+                      setOpen(false);
+                    }}
+                  >
+                    {label}
+                  </CommandItem>
+                  {idx < size(options) - 1 && <Separator className="mx-2 my-1 bg-neutral-100" />}
+                </React.Fragment>
               ))}
             </CommandGroup>
           </Command>
