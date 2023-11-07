@@ -60,6 +60,7 @@ export const getSettingsQuery = gql`
           requiredForExpenseSubmitters
           requiredForCollectiveAdmins
         }
+        EXPENSE_PUBLIC_VENDORS
       }
       ... on AccountWithHost {
         host {

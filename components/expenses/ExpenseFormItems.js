@@ -239,10 +239,11 @@ class ExpenseFormItems extends React.PureComponent {
             ocrComparison={itemsOCRComparisons[attachment.id]}
           />
         ))}
-        {itemsWithOCR.length > 0 && (
+        {/** Do not display OCR warnings for OCR charges since date/amount can't be changed */}
+        {!isCreditCardCharge && itemsWithOCR.length > 0 && (
           <MessageBox type={hasOCRWarnings ? 'warning' : 'info'} withIcon mt={3}>
             <FormattedMessage
-              defaultMessage="Please confirm the {count,plural,one{date and amount} other{dates and amounts}} before proceeding."
+              defaultMessage="Please verify the {count,plural,one{date and amount} other{dates and amounts}} before proceeding."
               values={{ count: itemsWithOCR.length }}
             />
           </MessageBox>

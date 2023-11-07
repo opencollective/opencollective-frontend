@@ -34,6 +34,10 @@ const CollectiveTypesI18n = defineMessages({
     id: 'collective.types.user',
     defaultMessage: '{n, plural, one {person} other {people}}',
   },
+  [CollectiveType.VENDOR]: {
+    id: 'collective.types.vendor',
+    defaultMessage: '{n, plural, one {Vendor} other {Vendors}}',
+  },
 });
 
 const Messages = defineMessages({
@@ -66,7 +70,7 @@ export const DefaultCollectiveLabel = ({ value: collective }) => (
         {truncate(collective.name, { length: 40 })}
       </Span>
       <Span fontSize="11px" lineHeight="13px" color="black.500">
-        {collective.slug ? `@${collective.slug}` : collective.email || ''}
+        {collective.slug && collective.type !== 'VENDOR' ? `@${collective.slug}` : collective.email || ''}
       </Span>
     </CollectiveLabelTextContainer>
   </Flex>
@@ -93,9 +97,9 @@ export const CUSTOM_OPTIONS_POSITION = {
   BOTTOM: 'BOTTOM',
 };
 
-const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
+const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, VENDOR } = CollectiveType;
 
-const sortedAccountTypes = ['INDIVIDUAL', USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT];
+const sortedAccountTypes = [VENDOR, 'INDIVIDUAL', USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT];
 
 /**
  * An overset og `StyledSelect` specialized to display, filter and pick a collective from a given list.

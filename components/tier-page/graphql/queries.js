@@ -74,6 +74,7 @@ export const tierPageQuery = gqlV1/* GraphQL */ `
         parentCollective {
           id
           slug
+          name
           twitterHandle
           image
           backgroundImageUrl

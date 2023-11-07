@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field } from 'formik';
+import { pickBy } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import { isOCError } from '../lib/errors';
@@ -39,15 +40,18 @@ const StyledInputFormikField = ({
                 {children({
                   form,
                   meta,
-                  field: {
-                    ...field,
-                    name: name || htmlFor,
-                    id: htmlFor,
-                    type: props.inputType,
-                    disabled: props.disabled,
-                    required: props.required,
-                    error: showError,
-                  },
+                  field: pickBy(
+                    {
+                      ...field,
+                      name: name || htmlFor,
+                      id: htmlFor,
+                      type: props.inputType,
+                      disabled: props.disabled,
+                      required: props.required,
+                      error: showError,
+                    },
+                    value => value !== undefined,
+                  ),
                 })}
                 {showError && (
                   <P display="block" color="red.500" pt={2} fontSize="10px">

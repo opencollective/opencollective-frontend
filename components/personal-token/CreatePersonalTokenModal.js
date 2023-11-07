@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { gql, useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
+import { AlertTriangle } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { stripTime } from '../../lib/date-utils';
@@ -15,6 +16,7 @@ import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
+import { Checkbox } from '../ui/Checkbox';
 import { useToast } from '../ui/useToast';
 
 import { getScopesOptions, validatePersonalTokenValues } from './lib';
@@ -24,6 +26,9 @@ const createPersonalTokenMutation = gql`
     createPersonalToken(personalToken: $personalToken) {
       id
       name
+      scope
+      expiresAt
+      preAuthorize2FA
     }
   }
 `;
@@ -34,11 +39,13 @@ const INITIAL_VALUES = {
   name: '',
   scope: [],
   expiresAt: '',
+  preAuthorize2FA: false,
 };
 
 const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => {
   const intl = useIntl();
   const { toast } = useToast();
+  const [isWaitingForOnSuccess, setIsWaitingForOnSuccess] = React.useState(false);
   const [createPersonalToken] = useMutation(createPersonalTokenMutation, {
     context: API_V2_CONTEXT,
     update: cache => {
@@ -71,9 +78,12 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
                 { name: result.data.createPersonalToken.name },
               ),
             });
-            onSuccess(result.data.createPersonalToken, account);
+            setIsWaitingForOnSuccess(true);
+            await onSuccess(result.data.createPersonalToken, account);
           } catch (e) {
             toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+          } finally {
+            setIsWaitingForOnSuccess(false);
           }
         }}
       >
@@ -129,6 +139,34 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
               </StyledInputFormikField>
 
               <StyledInputFormikField
+                name="preAuthorize2FA"
+                mt={20}
+                labelProps={LABEL_STYLES}
+                label={
+                  <div className="flex items-center">
+                    <AlertTriangle className="mr-2 inline-block" size={16} />
+                    <span>
+                      {intl.formatMessage({ id: 'token.advancedPrivileges', defaultMessage: 'Advanced privileges' })}
+                    </span>
+                  </div>
+                }
+              >
+                {({ form, field }) => {
+                  return (
+                    <div className="my-1 flex items-center">
+                      <Checkbox
+                        id="preAuthorize2FA-checkbox"
+                        onCheckedChange={value => form.setFieldValue(field.name, value)}
+                      />
+                      <label htmlFor="preAuthorize2FA-checkbox" className="ml-2 text-xs font-normal leading-none">
+                        <FormattedMessage defaultMessage="Allow this token to directly use operations that would normally require 2FA" />
+                      </label>
+                    </div>
+                  );
+                }}
+              </StyledInputFormikField>
+
+              <StyledInputFormikField
                 name="expiresAt"
                 label={intl.formatMessage({ defaultMessage: 'Expiration date' })}
                 labelProps={LABEL_STYLES}
@@ -144,7 +182,12 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
             </ModalBody>
             <ModalFooter>
               <Flex gap="16px" justifyContent="center">
-                <StyledButton type="submit" buttonStyle="primary" buttonSize="small" loading={isSubmitting}>
+                <StyledButton
+                  type="submit"
+                  buttonStyle="primary"
+                  buttonSize="small"
+                  loading={isSubmitting || isWaitingForOnSuccess}
+                >
                   <FormattedMessage defaultMessage="Create token" />
                 </StyledButton>
                 <StyledButton

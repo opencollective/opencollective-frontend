@@ -44,12 +44,14 @@ export const confirmContributionFieldsFragment = gql`
       id
       slug
       name
+      type
       imageUrl
     }
     toAccount {
       id
       slug
       name
+      type
       imageUrl
       ... on AccountWithHost {
         bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)

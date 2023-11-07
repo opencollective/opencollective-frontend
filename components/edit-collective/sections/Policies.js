@@ -80,6 +80,7 @@ const setPoliciesMutation = gql`
           requiredForExpenseSubmitters
           requiredForCollectiveAdmins
         }
+        EXPENSE_PUBLIC_VENDORS
       }
     }
   }
@@ -631,6 +632,31 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                   }
                 />
               ))}
+            </Container>
+            <Container>
+              <SettingsSectionTitle mt={4}>
+                <FormattedMessage defaultMessage="Vendors" />
+              </SettingsSectionTitle>
+              <div className="mb-1">
+                <div className="mb-2 text-base font-bold">
+                  <FormattedMessage defaultMessage="Public Expense submission" />
+                </div>
+                <p className="mb-2 text-sm">
+                  <FormattedMessage defaultMessage="By default only fiscal host administrators can submit expenses on behalf of vendors. You can allow other users who submit expenses to collectives you host to also submit expenses on behalf vendors." />
+                </p>
+                <StyledCheckbox
+                  name={`checkbox-EXPENSE_PUBLIC_VENDORS-requiredForExpenseSubmitters`}
+                  label={
+                    <FormattedMessage defaultMessage="Allow expense submission on behalf of vendors by all users" />
+                  }
+                  checked={formik.values.policies?.EXPENSE_PUBLIC_VENDORS}
+                  onChange={({ checked }) => {
+                    const newPolicies = cloneDeep(formik.values.policies);
+                    set(newPolicies, 'EXPENSE_PUBLIC_VENDORS', checked);
+                    formik.setFieldValue('policies', newPolicies);
+                  }}
+                />
+              </div>
             </Container>
             {LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION) && (
               <Container>

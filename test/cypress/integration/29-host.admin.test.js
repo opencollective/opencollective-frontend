@@ -97,7 +97,7 @@ describe('host dashboard', () => {
       cy.get('[data-cy="add-funds-amount"]').type('20');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
       cy.get('[data-cy="add-funds-source"]').type(collectiveSlug);
-      cy.contains(`@${collectiveSlug}`).click();
+      cy.contains(`@brusselstogetherasbl`).click();
       cy.get('[data-cy="add-funds-submit-btn"]').click();
       cy.contains('button', 'Finish').click();
       cy.contains('button', 'Finish').should('not.exist');
@@ -156,7 +156,8 @@ describe('host dashboard', () => {
 
       // Mark as expired
       cy.getByDataCy('MARK_AS_EXPIRED-button').click();
-      cy.getByDataCy('confirmation-modal-continue').click();
+      cy.get('[data-cy="MARK_AS_EXPIRED-confirmation-modal"] [data-cy="confirmation-modal-continue"]').click();
+      cy.checkToast({ variant: 'success', message: 'The contribution has been marked as expired' });
       cy.contains('[data-cy=order-status-msg]', 'Expired');
 
       // Mark as paid

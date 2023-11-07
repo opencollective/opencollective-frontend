@@ -340,36 +340,36 @@ Cypress.Commands.add('fillStripeInput', fillStripeInput);
  *
  * @param {boolean} approve: Set to false to reject
  */
-Cypress.Commands.add('complete3dSecure', (approve = true) => {
+Cypress.Commands.add('complete3dSecure', (approve = true, { version = 1 } = {}) => {
   const iframeSelector = 'iframe[name^="__privateStripeFrame"]';
   const targetBtn = approve ? '#test-source-authorize-3ds' : '#test-source-fail-3ds';
 
   cy.get(iframeSelector)
     .should($stripeFrame => {
       const frameContent = $stripeFrame.contents();
-      const challengeFrame = frameContent.find('body iframe#challengeFrame');
-      expect(challengeFrame).to.exist;
 
-      const acsFrame = challengeFrame.contents().find('iframe[name="acsFrame"]');
-      expect(acsFrame).to.exist;
+      let buttonsFrame = frameContent.find('body iframe#challengeFrame');
+      expect(buttonsFrame).to.exist;
 
-      const frameBody = acsFrame.contents().find('body');
-      expect(frameBody).to.exist;
+      // With 3DSecure v2, the buttons are stored directly in the iframe. With v1, there is an extra iframe.
+      if (version === 1) {
+        const acsFrame = buttonsFrame.contents().find('iframe[name="acsFrame"]');
+        expect(acsFrame).to.exist;
+        buttonsFrame = acsFrame;
+      }
 
-      expect(frameBody.find(targetBtn)).to.exist;
+      const challengeFrameBody = buttonsFrame.contents().find('body');
+      expect(challengeFrameBody).to.exist;
+      expect(challengeFrameBody.find(targetBtn)).to.exist;
     })
     .then($iframe => {
-      const btn = cy.wrap(
-        $iframe
-          .contents()
-          .find('body iframe#challengeFrame')
-          .contents()
-          .find('iframe[name="acsFrame"]')
-          .contents()
-          .find('body')
-          .find(targetBtn),
-      );
+      const $challengeFrameContent = $iframe.contents().find('body iframe#challengeFrame').contents();
+      let $btnContainer = $challengeFrameContent;
+      if (version === 1) {
+        $btnContainer = $btnContainer.find('iframe[name="acsFrame"]').contents();
+      }
 
+      const btn = cy.wrap($btnContainer.find('body').find(targetBtn));
       btn.click();
     });
 });

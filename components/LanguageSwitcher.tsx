@@ -25,7 +25,7 @@ export function LanguageSwitcher() {
   const localeContext = useLocaleContext();
   const intl = useIntl();
   const languageOptions = React.useMemo(generateLanguageOptions, []);
-  const defaultLanguage = languageOptions.find(language => language.value === intl.locale);
+  const defaultLanguage = languageOptions.find(language => language.value === intl.locale) || languageOptions[0];
   return (
     <div className="relative">
       <Select onValueChange={value => localeContext.setLocale(value)} defaultValue={defaultLanguage.value}>

@@ -69,6 +69,7 @@ const accountOrdersQuery = gql`
           slug
           name
           imageUrl
+          type
         }
         pendingContributionData {
           expectedAt
@@ -85,6 +86,7 @@ const accountOrdersQuery = gql`
           slug
           name
           imageUrl
+          type
           isHost
           ... on AccountWithHost {
             bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
@@ -251,7 +253,7 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
   }, [LoggedInUser]);
 
   return (
-    <Box maxWidth={1000} width="100%" m="0 auto">
+    <div className="w-full">
       <DashboardHeader
         title={<FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
         description={<FormattedMessage defaultMessage="Contributions for Collectives you host." />}
@@ -358,7 +360,7 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
           </Flex>
         </React.Fragment>
       )}
-    </Box>
+    </div>
   );
 };
 

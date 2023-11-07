@@ -68,6 +68,7 @@ export const getActivityVariables = (
       </ResourceTag>
     ),
   Host: () => <CollectiveTag collective={activity.host} />,
+  Vendor: () => <CollectiveTag collective={activity.data?.vendor} />,
   CommentEntity: () => {
     if (activity.expense) {
       return (

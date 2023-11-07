@@ -9,6 +9,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getAccountReferenceInput, isInternalHost } from '../../lib/collective.lib';
+import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { getSupportedExpenseTypes } from '../../lib/expenses';
@@ -18,6 +19,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep, parseToBoolean } from '../../lib/utils';
+import { userMustSetAccountingCategory } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { addNewExpenseItem, newExpenseItem } from './lib/items';
 import { checkExpenseSupportsOCR, updateExpenseFormWithUploadResult } from './lib/ocr';
@@ -28,15 +30,18 @@ import { Box, Flex } from '../Grid';
 import { serializeAddress } from '../I18nAddressFields';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
+import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputTags from '../StyledInputTags';
 import StyledTextarea from '../StyledTextarea';
-import { P, Span } from '../Text';
+import { Label, P, Span } from '../Text';
 import { toast } from '../ui/useToast';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
+import ExpenseCategorySelect from './ExpenseCategorySelect';
 import ExpenseFormItems from './ExpenseFormItems';
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
@@ -119,6 +124,7 @@ const getDefaultExpense = (collective, supportedExpenseTypes) => {
     currency: collective.currency,
     taxes: null,
     type: isSingleSupportedExpenseType ? supportedExpenseTypes[0] : undefined,
+    accountingCategory: undefined,
     payeeLocation: {
       address: '',
       country: null,
@@ -180,13 +186,14 @@ export const prepareExpenseForSubmit = expenseData => {
     attachedFiles: keepAttachedFiles ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => prepareExpenseItemForSubmit(expenseData, item)),
+    accountingCategory: !expenseData.accountingCategory ? null : pick(expenseData.accountingCategory, ['id']),
   };
 };
 
 /**
  * Validate the expense
  */
-const validateExpense = (intl, expense) => {
+const validateExpense = (intl, expense, collective, LoggedInUser) => {
   const isCardCharge = expense.type === expenseTypes.CHARGE;
   if (expense.payee?.isInvite) {
     return expense.payee.id
@@ -194,7 +201,11 @@ const validateExpense = (intl, expense) => {
       : requireFields(expense, ['description', 'payee', 'payee.name', 'payee.email']);
   }
 
-  const errors = isCardCharge ? {} : requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
+  const errors = isCardCharge
+    ? {}
+    : expense.payee?.type === CollectiveType.VENDOR
+    ? requireFields(expense, ['description', 'payee', 'currency'])
+    : requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
 
   if (expense.items.length > 0) {
     const itemsErrors = expense.items.map(item => validateExpenseItem(expense, item));
@@ -224,6 +235,10 @@ const validateExpense = (intl, expense) => {
 
   if (checkRequiresAddress(expense)) {
     Object.assign(errors, requireFields(expense, ['payeeLocation.country', 'payeeLocation.address']));
+  }
+
+  if (userMustSetAccountingCategory(LoggedInUser, collective)) {
+    Object.assign(errors, requireFields(expense, ['accountingCategory'], { allowNull: true }));
   }
 
   return errors;
@@ -303,9 +318,10 @@ const ExpenseFormBody = ({
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
   const isRecurring = expense && expense.recurringExpense !== null;
   const stepOneCompleted =
-    values.payoutMethod &&
-    isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency'))) &&
-    checkAddressValuesAreCompleted(values);
+    values.payee?.type === CollectiveType.VENDOR ||
+    (values.payoutMethod &&
+      isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency'))) &&
+      checkAddressValuesAreCompleted(values));
   const stepTwoCompleted = isInvite
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
@@ -336,7 +352,7 @@ const ExpenseFormBody = ({
         isInvite: false,
         isNewUser: true,
       });
-    } else if (!payeePayoutProfile && loggedInAccount && isDraft) {
+    } else if (!payeePayoutProfile && loggedInAccount && isDraft && values?.payee.type !== CollectiveType.VENDOR) {
       setOnBehalf(true);
     }
     // If creating a new expense or completing an expense submitted on your behalf, automatically select your default profile.
@@ -485,9 +501,10 @@ const ExpenseFormBody = ({
         onChange={payee => {
           setOnBehalf(payee.isInvite);
         }}
-        onNext={() => {
-          const shouldSkipValidation = isOnBehalf && isEmpty(values.payoutMethod);
-          const validation = !shouldSkipValidation && validatePayoutMethod(values.payoutMethod);
+        onNext={values => {
+          const shouldSkipPayoutMethodValidation =
+            (isOnBehalf || values.payee?.type === CollectiveType.VENDOR) && isEmpty(values.payoutMethod);
+          const validation = !shouldSkipPayoutMethodValidation && validatePayoutMethod(values.payoutMethod);
           if (isEmpty(validation)) {
             setStep(EXPENSE_FORM_STEPS.EXPENSE);
           } else {
@@ -669,17 +686,15 @@ const ExpenseFormBody = ({
               <Field
                 as={StyledTextarea}
                 autoFocus={autoFocusTitle}
-                border="0"
                 error={errors.description}
                 fontSize="24px"
                 id="expense-description"
                 maxLength={255}
                 mt={3}
                 name="description"
-                px={2}
-                py={1}
+                px="12px"
+                py="8px"
                 width="100%"
-                withOutline
                 autoSize
                 placeholder={
                   values.type === expenseTypes.GRANT
@@ -688,7 +703,7 @@ const ExpenseFormBody = ({
                 }
               />
               <HiddenFragment show={hasBaseFormFieldsCompleted || isInvite}>
-                <Flex alignItems="flex-start" mt={3}>
+                <Flex alignItems="flex-start" mt="8px">
                   <ExpenseTypeTag type={values.type} mr="4px" />
                   <StyledInputTags
                     suggestedTags={expensesTags}
@@ -701,6 +716,45 @@ const ExpenseFormBody = ({
                     value={values.tags}
                   />
                 </Flex>
+                {userMustSetAccountingCategory(LoggedInUser, collective) && (
+                  <div className="mt-10">
+                    <Label
+                      htmlFor="ExpenseCategoryInput"
+                      color="black.900"
+                      fontSize="18px"
+                      lineHeight="26px"
+                      fontWeight="bold"
+                    >
+                      <FormattedMessage defaultMessage="Set Expense Category" />
+                    </Label>
+                    <div className="mt-2 flex">
+                      <div className="basis-[300px]">
+                        <StyledInputFormikField name="accountingCategory" lab>
+                          {({ meta }) => (
+                            <div>
+                              <ExpenseCategorySelect
+                                id="ExpenseCategoryInput"
+                                host={collective.host}
+                                selectedCategory={values.accountingCategory}
+                                allowNone={!LoggedInUser?.isHostAdmin(collective.host)}
+                                onChange={value => formik.setFieldValue('accountingCategory', value)}
+                                error={Boolean(meta.error)}
+                              />
+                              {meta.error && meta.touched && (
+                                <Span color="red.500" fontSize="12px" mt="4px">
+                                  {meta.error}
+                                </Span>
+                              )}
+                            </div>
+                          )}
+                        </StyledInputFormikField>
+                      </div>
+                    </div>
+                    <MessageBox type="info" fontSize="12px" mt="24px">
+                      <FormattedMessage defaultMessage="Please make sure that all the expense items in this expense belong to the selected expense category. If needed, you may submit additional items in separate expenses with different expense categories." />
+                    </MessageBox>
+                  </div>
+                )}
                 {values.type === expenseTypes.INVOICE && (
                   <Box my={40}>
                     <ExpenseAttachedFilesForm
@@ -894,9 +948,10 @@ const ExpenseForm = ({
   const isDraft = expense?.status === ExpenseStatus.DRAFT;
   const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
   const intl = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
   const supportedExpenseTypes = React.useMemo(() => getSupportedExpenseTypes(collective), [collective]);
   const initialValues = { ...getDefaultExpense(collective, supportedExpenseTypes), ...expense };
-  const validate = expenseData => validateExpense(intl, expenseData);
+  const validate = expenseData => validateExpense(intl, expenseData, collective, LoggedInUser);
   if (isDraft) {
     initialValues.items = expense.draft.items?.map(newExpenseItem) || [];
     initialValues.taxes = expense.draft.taxes;

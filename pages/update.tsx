@@ -65,6 +65,8 @@ const updatePageQuery = gql`
         parent {
           id
           slug
+          name
+          imageUrl
         }
       }
     }

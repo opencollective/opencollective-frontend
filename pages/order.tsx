@@ -12,6 +12,7 @@ import dayjs from '../lib/dayjs';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { Account, AccountWithHost } from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { usePrevious } from '../lib/hooks/usePrevious';
 import { i18nPaymentMethodProviderType } from '../lib/i18n/payment-method-provider-type';
 import { i18nTaxType } from '../lib/i18n/taxes';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
@@ -102,6 +103,7 @@ const orderPageQuery = gql`
         fromAccount {
           id
           slug
+          type
           name
           imageUrl
           isIncognito
@@ -109,6 +111,7 @@ const orderPageQuery = gql`
         account {
           id
           slug
+          type
           name
           imageUrl
           isIncognito
@@ -154,6 +157,7 @@ const orderPageQuery = gql`
         parent {
           id
           slug
+          name
           imageUrl
           backgroundImageUrl
           twitterHandle
@@ -314,6 +318,7 @@ const getTransactionsToDisplay = (account, transactions) => {
 
 export default function OrderPage(props) {
   const { LoggedInUser } = useLoggedInUser();
+  const prevLoggedInUser = usePrevious(LoggedInUser);
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
   const queryResult = contributionPageQueryHelper.useQuery(props);
   const variables = contributionPageQueryHelper.getVariablesFromPageProps(props);
@@ -333,10 +338,10 @@ export default function OrderPage(props) {
 
   // Refetch when users logs in
   React.useEffect(() => {
-    if (LoggedInUser) {
+    if (!prevLoggedInUser && LoggedInUser) {
       queryResult.refetch();
     }
-  }, [LoggedInUser]);
+  }, [LoggedInUser, prevLoggedInUser]);
 
   if (!order || order.toAccount?.slug !== variables.collectiveSlug) {
     return <Custom404 />;

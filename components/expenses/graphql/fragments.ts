@@ -140,6 +140,21 @@ export const expenseHostFields = gql`
     plan {
       id
     }
+    accountingCategories {
+      nodes {
+        id
+        name
+        friendlyName
+        code
+      }
+    }
+    policies {
+      id
+      EXPENSE_CATEGORIZATION {
+        requiredForExpenseSubmitters
+        requiredForCollectiveAdmins
+      }
+    }
   }
 `;
 
@@ -156,6 +171,12 @@ export const expensePageExpenseFieldsFragment = gql`
     privateMessage
     tags
     amount
+    accountingCategory {
+      id
+      code
+      name
+      friendlyName
+    }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
       currency
@@ -401,6 +422,7 @@ export const expensePageExpenseFieldsFragment = gql`
       id
       canEdit
       canEditTags
+      canEditAccountingCategory
       canDelete
       canSeeInvoiceInfo
       canApprove
@@ -518,6 +540,12 @@ export const expensesListFieldsFragment = gql`
     comments {
       totalCount
     }
+    accountingCategory {
+      id
+      name
+      friendlyName
+      code
+    }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
       currency
@@ -571,6 +599,7 @@ export const expensesListFieldsFragment = gql`
       canMarkAsIncomplete
       canSeeInvoiceInfo
       canEditTags
+      canEditAccountingCategory
       canUnschedulePayment
       canHold
       canRelease

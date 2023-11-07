@@ -19,6 +19,11 @@ type Application {
   redirectUri: URL
   account: Account!
   oAuthAuthorization: OAuthAuthorization
+
+  """
+  Whether this application is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean!
 }
 
 """
@@ -66,6 +71,11 @@ type OAuthAuthorization {
   The attached scopes.
   """
   scope: [OAuthScope]
+
+  """
+  Whether this OAuth token is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean!
 }
 
 """
@@ -1229,6 +1239,11 @@ type Expense {
   accountCurrencyFxRate: Float! @deprecated(reason: "2022-02-09: Please use amountV2")
 
   """
+  The accounting category attached to this expense
+  """
+  accountingCategory: AccountingCategory
+
+  """
   The time of creation
   """
   createdAt: DateTime!
@@ -1400,862 +1415,30 @@ enum ExpenseCurrencySource {
 }
 
 """
-All supported currencies
+Fields for an accounting category
 """
-enum Currency {
-  """
-  US Dollar
-  """
-  USD
-
-  """
-  UAE Dirham
-  """
-  AED
-
-  """
-  Afghani
-  """
-  AFN
-
-  """
-  Lek
-  """
-  ALL
-
-  """
-  Armenian Dram
-  """
-  AMD
-
-  """
-  Netherlands Antillean Guilder
-  """
-  ANG
-
-  """
-  Kwanza
-  """
-  AOA
-
-  """
-  Argentine Peso
-  """
-  ARS
-
-  """
-  Australian Dollar
-  """
-  AUD
-
-  """
-  Aruban Florin
-  """
-  AWG
-
-  """
-  Azerbaijanian Manat
-  """
-  AZN
-
-  """
-  Convertible Mark
-  """
-  BAM
-
-  """
-  Barbados Dollar
-  """
-  BBD
-
-  """
-  Taka
-  """
-  BDT
-
-  """
-  Bulgarian Lev
-  """
-  BGN
-
-  """
-  Burundi Franc
-  """
-  BIF
-
-  """
-  Bermudian Dollar
-  """
-  BMD
-
-  """
-  Brunei Dollar
-  """
-  BND
-
-  """
-  Boliviano
-  """
-  BOB
-
-  """
-  Brazilian Real
-  """
-  BRL
-
-  """
-  Bahamian Dollar
-  """
-  BSD
-
-  """
-  Pula
-  """
-  BWP
-
-  """
-  Belarussian Ruble
-  """
-  BYN
-
-  """
-  Belize Dollar
-  """
-  BZD
-
-  """
-  Canadian Dollar
-  """
-  CAD
-
-  """
-  Congolese Franc
-  """
-  CDF
-
-  """
-  Swiss Franc
-  """
-  CHF
-
-  """
-  Chilean Peso
-  """
-  CLP
-
-  """
-  Yuan Renminbi
-  """
-  CNY
-
-  """
-  Colombian Peso
-  """
-  COP
-
-  """
-  Costa Rican Colon
-  """
-  CRC
-
-  """
-  Cabo Verde Escudo
-  """
-  CVE
-
-  """
-  Czech Koruna
-  """
-  CZK
-
-  """
-  Djibouti Franc
-  """
-  DJF
-
-  """
-  Danish Krone
-  """
-  DKK
-
-  """
-  Dominican Peso
-  """
-  DOP
-
-  """
-  Algerian Dinar
-  """
-  DZD
-
-  """
-  Egyptian Pound
-  """
-  EGP
-
-  """
-  Ethiopian Birr
-  """
-  ETB
-
-  """
-  Euro
-  """
-  EUR
-
-  """
-  Fiji Dollar
-  """
-  FJD
-
-  """
-  Falkland Islands Pound
-  """
-  FKP
-
-  """
-  Pound Sterling
-  """
-  GBP
-
-  """
-  Lari
-  """
-  GEL
-
-  """
-  Gibraltar Pound
-  """
-  GIP
-
-  """
-  Dalasi
-  """
-  GMD
-
-  """
-  Guinea Franc
-  """
-  GNF
-
-  """
-  Quetzal
-  """
-  GTQ
-
-  """
-  Guyana Dollar
-  """
-  GYD
-
-  """
-  Hong Kong Dollar
-  """
-  HKD
-
-  """
-  Lempira
-  """
-  HNL
-
-  """
-  Kuna
-  """
-  HRK
-
-  """
-  Gourde
-  """
-  HTG
-
-  """
-  Forint
-  """
-  HUF
-
-  """
-  Rupiah
-  """
-  IDR
-
-  """
-  New Israeli Sheqel
-  """
-  ILS
-
-  """
-  Indian Rupee
-  """
-  INR
-
-  """
-  Iceland Krona
-  """
-  ISK
-
-  """
-  Jamaican Dollar
-  """
-  JMD
-
-  """
-  Yen
-  """
-  JPY
-
-  """
-  Kenyan Shilling
-  """
-  KES
-
-  """
-  Som
-  """
-  KGS
-
-  """
-  Riel
-  """
-  KHR
-
-  """
-  Comoro Franc
-  """
-  KMF
-
-  """
-  Won
-  """
-  KRW
-
-  """
-  Cayman Islands Dollar
-  """
-  KYD
-
-  """
-  Tenge
-  """
-  KZT
-
-  """
-  Kip
-  """
-  LAK
-
-  """
-  Lebanese Pound
-  """
-  LBP
-
-  """
-  Sri Lanka Rupee
-  """
-  LKR
-
-  """
-  Liberian Dollar
-  """
-  LRD
-
-  """
-  Loti
-  """
-  LSL
-
-  """
-  Moroccan Dirham
-  """
-  MAD
-
-  """
-  Moldovan Leu
-  """
-  MDL
-
-  """
-  Malagasy Ariary
-  """
-  MGA
-
-  """
-  Denar
-  """
-  MKD
-
-  """
-  Kyat
-  """
-  MMK
-
-  """
-  Tugrik
-  """
-  MNT
-
-  """
-  Pataca
-  """
-  MOP
-
-  """
-  Mauritius Rupee
-  """
-  MUR
-
-  """
-  Rufiyaa
-  """
-  MVR
-
-  """
-  Kwacha
-  """
-  MWK
-
-  """
-  Mexican Peso
-  """
-  MXN
-
-  """
-  Malaysian Ringgit
-  """
-  MYR
-
-  """
-  Mozambique Metical
-  """
-  MZN
-
-  """
-  Namibia Dollar
-  """
-  NAD
-
-  """
-  Naira
-  """
-  NGN
-
-  """
-  Cordoba Oro
-  """
-  NIO
-
-  """
-  Norwegian Krone
-  """
-  NOK
-
-  """
-  Nepalese Rupee
-  """
-  NPR
-
-  """
-  New Zealand Dollar
-  """
-  NZD
-
-  """
-  Balboa
-  """
-  PAB
-
-  """
-  Nuevo Sol
-  """
-  PEN
-
-  """
-  Kina
-  """
-  PGK
-
-  """
-  Philippine Peso
-  """
-  PHP
-
-  """
-  Pakistan Rupee
-  """
-  PKR
-
-  """
-  Zloty
-  """
-  PLN
-
-  """
-  Guarani
-  """
-  PYG
-
-  """
-  Qatari Rial
-  """
-  QAR
-
-  """
-  Romanian Leu
-  """
-  RON
-
-  """
-  Serbian Dinar
-  """
-  RSD
-
-  """
-  Russian Ruble
-  """
-  RUB
-
-  """
-  Rwanda Franc
-  """
-  RWF
-
-  """
-  Saudi Riyal
-  """
-  SAR
-
-  """
-  Solomon Islands Dollar
-  """
-  SBD
-
-  """
-  Seychelles Rupee
-  """
-  SCR
-
-  """
-  Swedish Krona
-  """
-  SEK
-
-  """
-  Singapore Dollar
-  """
-  SGD
-
-  """
-  Saint Helena Pound
-  """
-  SHP
-
-  """
-  Leone
-  """
-  SLL
-
-  """
-  Somali Shilling
-  """
-  SOS
-
-  """
-  Surinam Dollar
-  """
-  SRD
-
-  """
-  Lilangeni
-  """
-  SZL
-
-  """
-  Baht
-  """
-  THB
-
-  """
-  Somoni
-  """
-  TJS
-
-  """
-  Pa’anga
-  """
-  TOP
-
-  """
-  Turkish Lira
-  """
-  TRY
-
-  """
-  Trinidad and Tobago Dollar
-  """
-  TTD
-
-  """
-  New Taiwan Dollar
-  """
-  TWD
-
-  """
-  Tanzanian Shilling
-  """
-  TZS
-
-  """
-  Hryvnia
-  """
-  UAH
-
-  """
-  Uganda Shilling
-  """
-  UGX
-
-  """
-  Peso Uruguayo
-  """
-  UYU
-
-  """
-  Uzbekistan Sum
-  """
-  UZS
-
-  """
-  Dong
-  """
-  VND
-
-  """
-  Vatu
-  """
-  VUV
-
-  """
-  Tala
-  """
-  WST
-
-  """
-  CFA Franc BEAC
-  """
-  XAF
-
-  """
-  East Caribbean Dollar
-  """
-  XCD
-
-  """
-  CFA Franc BCEAO
-  """
-  XOF
-
-  """
-  CFP Franc
-  """
-  XPF
-
-  """
-  Yemeni Rial
-  """
-  YER
-
-  """
-  Rand
-  """
-  ZAR
-
-  """
-  Zambian Kwacha
-  """
-  ZMW
-}
-
-"""
-All supported expense types
-"""
-enum ExpenseType {
-  """
-  Invoice: Charge for your time or get paid in advance.
-  """
-  INVOICE
-
-  """
-  Receipt: Get paid back for a purchase already made.
-  """
-  RECEIPT
-
-  """
-  Funding Request: Request funding for a project or initiative.
-  """
-  FUNDING_REQUEST
-
-  """
-  Grant: Request funding for a project or initiative.
-  """
-  GRANT
-
-  """
-  Unclassified expense
-  """
-  UNCLASSIFIED
-
-  """
-  Credit Card Charge: Payment done using an issued (virtual) credit card issued by your Fiscal Host.
-  """
-  CHARGE
-
-  """
-  Settlement: expense generated by Open Collective to collect money owed by Fiscal Hosts.
-  """
-  SETTLEMENT
-}
-
-enum ExpenseStatus {
-  DRAFT
-  UNVERIFIED
-  PENDING
-  INCOMPLETE
-  APPROVED
-  REJECTED
-  PROCESSING
-  ERROR
-  PAID
-  SCHEDULED_FOR_PAYMENT
-  SPAM
-  CANCELED
-}
-
-"""
-A collection of "Comments"
-"""
-type CommentCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Comment]
-}
-
-"""
-This represents an Comment
-"""
-type Comment {
-  id: String
-  createdAt: DateTime
-  html: String
-  fromAccount: Account
-  account: Account
-
-  """
-  The type of this comment
-  """
-  type: CommentType!
-
-  """
-  Returns a map of reactions counts for this comment
-  """
-  reactions: JSON
-
-  """
-  Returns the list of reactions added to this comment by logged in user
-  """
-  userReactions: [String]
-}
-
-"""
-All supported comment contexts
-"""
-enum CommentType {
-  """
-  Default regular comment
-  """
-  COMMENT
-
-  """
-  Comment is visible only to host admins
-  """
-  PRIVATE_NOTE
-}
-
-"""
-The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON
-
-"""
-Input to order results chronologically
-"""
-input ChronologicalOrderInput {
-  """
-  Field to chronologically order by.
-  """
-  field: DateTimeField! = CREATED_AT
-
-  """
-  Ordering direction.
-  """
-  direction: OrderDirection! = DESC
-}
-
-"""
-All possible DateTime fields for a resource
-"""
-enum DateTimeField {
-  """
-  The creation time of a resource
-  """
-  CREATED_AT
-}
-
-"""
-Possible directions in which to order a list of items
-"""
-enum OrderDirection {
-  ASC
-  DESC
-}
-
-"""
-Type for Geographic location
-"""
-type Location {
-  """
-  Unique identifier for this location
-  """
-  id: String
-
-  """
-  A short name for the location (eg. Open Collective Headquarters)
-  """
-  name: String
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
+type AccountingCategory {
+  id: String!
 
   """
-  Two letters country code (eg. FR, BE...etc)
+  The code of the accounting category
   """
-  country: String
+  code: String!
 
   """
-  Latitude
+  The technical name of the accounting category
   """
-  lat: Float
+  name: String!
 
   """
-  Longitude
+  A friendly name for non-accountants (i.e. expense submitters and collective admins)
   """
-  long: Float
+  friendlyName: String
 
   """
-  Structured JSON address
+  The account this category belongs to
   """
-  structured: JSON
+  account: Host!
 }
 
 """
@@ -3086,6 +2269,36 @@ type Host implements Account & AccountWithContributions {
     """
     accounts: [AccountReferenceInput]
   ): AgreementCollection!
+
+  """
+  Returns a list of vendors that works with this host
+  """
+  vendors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Rank vendors based on their relationship with this account
+    """
+    forAccount: AccountReferenceInput
+
+    """
+    Filter on archived vendors
+    """
+    isArchived: Boolean
+
+    """
+    Search vendors related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+  ): VendorCollection!
 }
 
 """
@@ -3234,6 +2447,39 @@ type Contributor {
   publicMessage: String
 }
 
+"""
+Input to order results chronologically
+"""
+input ChronologicalOrderInput {
+  """
+  Field to chronologically order by.
+  """
+  field: DateTimeField! = CREATED_AT
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection! = DESC
+}
+
+"""
+All possible DateTime fields for a resource
+"""
+enum DateTimeField {
+  """
+  The creation time of a resource
+  """
+  CREATED_AT
+}
+
+"""
+Possible directions in which to order a list of items
+"""
+enum OrderDirection {
+  ASC
+  DESC
+}
+
 input AccountReferenceInput {
   """
   The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -3353,6 +2599,7 @@ enum PaymentMethodType {
   sepa_debit @deprecated(reason: "Please use uppercase values")
   bacs_debit @deprecated(reason: "Please use uppercase values")
   bancontact @deprecated(reason: "Please use uppercase values")
+  link @deprecated(reason: "Please use uppercase values")
   ALIPAY
   CREDITCARD
   PREPAID
@@ -3369,6 +2616,7 @@ enum PaymentMethodType {
   SEPA_DEBIT
   BACS_DEBIT
   BANCONTACT
+  LINK
 }
 
 input VirtualCardReferenceInput {
@@ -3389,6 +2637,11 @@ enum AccountOrdersFilter {
   INCOMING
   OUTGOING
 }
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
 
 """
 A collection of "Conversations"
@@ -3425,6 +2678,57 @@ type Conversation {
   comments(limit: Int! = 150, offset: Int! = 0): CommentCollection!
   followers(limit: Int! = 10, offset: Int! = 0): AccountCollection!
   stats: ConversationStats
+}
+
+"""
+This represents an Comment
+"""
+type Comment {
+  id: String
+  createdAt: DateTime
+  html: String
+  fromAccount: Account
+  account: Account
+
+  """
+  The type of this comment
+  """
+  type: CommentType!
+
+  """
+  Returns a map of reactions counts for this comment
+  """
+  reactions: JSON
+
+  """
+  Returns the list of reactions added to this comment by logged in user
+  """
+  userReactions: [String]
+}
+
+"""
+All supported comment contexts
+"""
+enum CommentType {
+  """
+  Default regular comment
+  """
+  COMMENT
+
+  """
+  Comment is visible only to host admins
+  """
+  PRIVATE_NOTE
+}
+
+"""
+A collection of "Comments"
+"""
+type CommentCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Comment]
 }
 
 """
@@ -3469,6 +2773,46 @@ type TagStat {
   Total amount for this tag
   """
   amount: Amount
+}
+
+"""
+All supported expense types
+"""
+enum ExpenseType {
+  """
+  Invoice: Charge for your time or get paid in advance.
+  """
+  INVOICE
+
+  """
+  Receipt: Get paid back for a purchase already made.
+  """
+  RECEIPT
+
+  """
+  Funding Request: Request funding for a project or initiative.
+  """
+  FUNDING_REQUEST
+
+  """
+  Grant: Request funding for a project or initiative.
+  """
+  GRANT
+
+  """
+  Unclassified expense
+  """
+  UNCLASSIFIED
+
+  """
+  Credit Card Charge: Payment done using an issued (virtual) credit card issued by your Fiscal Host.
+  """
+  CHARGE
+
+  """
+  Settlement: expense generated by Open Collective to collect money owed by Fiscal Hosts.
+  """
+  SETTLEMENT
 }
 
 """
@@ -3701,6 +3045,46 @@ type OAuthApplicationCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Application]
+}
+
+"""
+Type for Geographic location
+"""
+type Location {
+  """
+  Unique identifier for this location
+  """
+  id: String
+
+  """
+  A short name for the location (eg. Open Collective Headquarters)
+  """
+  name: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
+  country: String
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
 }
 
 """
@@ -4118,6 +3502,681 @@ type AccountStats {
 }
 
 """
+All supported currencies
+"""
+enum Currency {
+  """
+  US Dollar
+  """
+  USD
+
+  """
+  UAE Dirham
+  """
+  AED
+
+  """
+  Afghani
+  """
+  AFN
+
+  """
+  Lek
+  """
+  ALL
+
+  """
+  Armenian Dram
+  """
+  AMD
+
+  """
+  Netherlands Antillean Guilder
+  """
+  ANG
+
+  """
+  Kwanza
+  """
+  AOA
+
+  """
+  Argentine Peso
+  """
+  ARS
+
+  """
+  Australian Dollar
+  """
+  AUD
+
+  """
+  Aruban Florin
+  """
+  AWG
+
+  """
+  Azerbaijanian Manat
+  """
+  AZN
+
+  """
+  Convertible Mark
+  """
+  BAM
+
+  """
+  Barbados Dollar
+  """
+  BBD
+
+  """
+  Taka
+  """
+  BDT
+
+  """
+  Bulgarian Lev
+  """
+  BGN
+
+  """
+  Burundi Franc
+  """
+  BIF
+
+  """
+  Bermudian Dollar
+  """
+  BMD
+
+  """
+  Brunei Dollar
+  """
+  BND
+
+  """
+  Boliviano
+  """
+  BOB
+
+  """
+  Brazilian Real
+  """
+  BRL
+
+  """
+  Bahamian Dollar
+  """
+  BSD
+
+  """
+  Pula
+  """
+  BWP
+
+  """
+  Belarussian Ruble
+  """
+  BYN
+
+  """
+  Belize Dollar
+  """
+  BZD
+
+  """
+  Canadian Dollar
+  """
+  CAD
+
+  """
+  Congolese Franc
+  """
+  CDF
+
+  """
+  Swiss Franc
+  """
+  CHF
+
+  """
+  Chilean Peso
+  """
+  CLP
+
+  """
+  Yuan Renminbi
+  """
+  CNY
+
+  """
+  Colombian Peso
+  """
+  COP
+
+  """
+  Costa Rican Colon
+  """
+  CRC
+
+  """
+  Cabo Verde Escudo
+  """
+  CVE
+
+  """
+  Czech Koruna
+  """
+  CZK
+
+  """
+  Djibouti Franc
+  """
+  DJF
+
+  """
+  Danish Krone
+  """
+  DKK
+
+  """
+  Dominican Peso
+  """
+  DOP
+
+  """
+  Algerian Dinar
+  """
+  DZD
+
+  """
+  Egyptian Pound
+  """
+  EGP
+
+  """
+  Ethiopian Birr
+  """
+  ETB
+
+  """
+  Euro
+  """
+  EUR
+
+  """
+  Fiji Dollar
+  """
+  FJD
+
+  """
+  Falkland Islands Pound
+  """
+  FKP
+
+  """
+  Pound Sterling
+  """
+  GBP
+
+  """
+  Lari
+  """
+  GEL
+
+  """
+  Gibraltar Pound
+  """
+  GIP
+
+  """
+  Dalasi
+  """
+  GMD
+
+  """
+  Guinea Franc
+  """
+  GNF
+
+  """
+  Quetzal
+  """
+  GTQ
+
+  """
+  Guyana Dollar
+  """
+  GYD
+
+  """
+  Hong Kong Dollar
+  """
+  HKD
+
+  """
+  Lempira
+  """
+  HNL
+
+  """
+  Kuna
+  """
+  HRK
+
+  """
+  Gourde
+  """
+  HTG
+
+  """
+  Forint
+  """
+  HUF
+
+  """
+  Rupiah
+  """
+  IDR
+
+  """
+  New Israeli Sheqel
+  """
+  ILS
+
+  """
+  Indian Rupee
+  """
+  INR
+
+  """
+  Iceland Krona
+  """
+  ISK
+
+  """
+  Jamaican Dollar
+  """
+  JMD
+
+  """
+  Yen
+  """
+  JPY
+
+  """
+  Kenyan Shilling
+  """
+  KES
+
+  """
+  Som
+  """
+  KGS
+
+  """
+  Riel
+  """
+  KHR
+
+  """
+  Comoro Franc
+  """
+  KMF
+
+  """
+  Won
+  """
+  KRW
+
+  """
+  Cayman Islands Dollar
+  """
+  KYD
+
+  """
+  Tenge
+  """
+  KZT
+
+  """
+  Kip
+  """
+  LAK
+
+  """
+  Lebanese Pound
+  """
+  LBP
+
+  """
+  Sri Lanka Rupee
+  """
+  LKR
+
+  """
+  Liberian Dollar
+  """
+  LRD
+
+  """
+  Loti
+  """
+  LSL
+
+  """
+  Moroccan Dirham
+  """
+  MAD
+
+  """
+  Moldovan Leu
+  """
+  MDL
+
+  """
+  Malagasy Ariary
+  """
+  MGA
+
+  """
+  Denar
+  """
+  MKD
+
+  """
+  Kyat
+  """
+  MMK
+
+  """
+  Tugrik
+  """
+  MNT
+
+  """
+  Pataca
+  """
+  MOP
+
+  """
+  Mauritius Rupee
+  """
+  MUR
+
+  """
+  Rufiyaa
+  """
+  MVR
+
+  """
+  Kwacha
+  """
+  MWK
+
+  """
+  Mexican Peso
+  """
+  MXN
+
+  """
+  Malaysian Ringgit
+  """
+  MYR
+
+  """
+  Mozambique Metical
+  """
+  MZN
+
+  """
+  Namibia Dollar
+  """
+  NAD
+
+  """
+  Naira
+  """
+  NGN
+
+  """
+  Cordoba Oro
+  """
+  NIO
+
+  """
+  Norwegian Krone
+  """
+  NOK
+
+  """
+  Nepalese Rupee
+  """
+  NPR
+
+  """
+  New Zealand Dollar
+  """
+  NZD
+
+  """
+  Balboa
+  """
+  PAB
+
+  """
+  Nuevo Sol
+  """
+  PEN
+
+  """
+  Kina
+  """
+  PGK
+
+  """
+  Philippine Peso
+  """
+  PHP
+
+  """
+  Pakistan Rupee
+  """
+  PKR
+
+  """
+  Zloty
+  """
+  PLN
+
+  """
+  Guarani
+  """
+  PYG
+
+  """
+  Qatari Rial
+  """
+  QAR
+
+  """
+  Romanian Leu
+  """
+  RON
+
+  """
+  Serbian Dinar
+  """
+  RSD
+
+  """
+  Russian Ruble
+  """
+  RUB
+
+  """
+  Rwanda Franc
+  """
+  RWF
+
+  """
+  Saudi Riyal
+  """
+  SAR
+
+  """
+  Solomon Islands Dollar
+  """
+  SBD
+
+  """
+  Seychelles Rupee
+  """
+  SCR
+
+  """
+  Swedish Krona
+  """
+  SEK
+
+  """
+  Singapore Dollar
+  """
+  SGD
+
+  """
+  Saint Helena Pound
+  """
+  SHP
+
+  """
+  Leone
+  """
+  SLL
+
+  """
+  Somali Shilling
+  """
+  SOS
+
+  """
+  Surinam Dollar
+  """
+  SRD
+
+  """
+  Lilangeni
+  """
+  SZL
+
+  """
+  Baht
+  """
+  THB
+
+  """
+  Somoni
+  """
+  TJS
+
+  """
+  Pa’anga
+  """
+  TOP
+
+  """
+  Turkish Lira
+  """
+  TRY
+
+  """
+  Trinidad and Tobago Dollar
+  """
+  TTD
+
+  """
+  New Taiwan Dollar
+  """
+  TWD
+
+  """
+  Tanzanian Shilling
+  """
+  TZS
+
+  """
+  Hryvnia
+  """
+  UAH
+
+  """
+  Uganda Shilling
+  """
+  UGX
+
+  """
+  Peso Uruguayo
+  """
+  UYU
+
+  """
+  Uzbekistan Sum
+  """
+  UZS
+
+  """
+  Dong
+  """
+  VND
+
+  """
+  Vatu
+  """
+  VUV
+
+  """
+  Tala
+  """
+  WST
+
+  """
+  CFA Franc BEAC
+  """
+  XAF
+
+  """
+  East Caribbean Dollar
+  """
+  XCD
+
+  """
+  CFA Franc BCEAO
+  """
+  XOF
+
+  """
+  CFP Franc
+  """
+  XPF
+
+  """
+  Yemeni Rial
+  """
+  YER
+
+  """
+  Rand
+  """
+  ZAR
+
+  """
+  Zambian Kwacha
+  """
+  ZMW
+}
+
+"""
 Amount time series
 """
 type TimeSeriesAmount implements TimeSeries {
@@ -4417,6 +4476,7 @@ type Policies {
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
+  EXPENSE_PUBLIC_VENDORS: Boolean
 }
 
 type EXPENSE_AUTHOR_CANNOT_APPROVE {
@@ -4672,6 +4732,9 @@ enum ActivityType {
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
+  VENDOR_CREATED
+  VENDOR_EDITED
+  VENDOR_DELETED
   ORDER_PENDING_CREATED
   ORDER_PENDING_FOLLOWUP
   ORDER_PENDING_RECEIVED
@@ -4754,33 +4817,6 @@ type AccountingCategoryCollection implements Collection {
   The Accounting Categories
   """
   nodes: [AccountingCategory!]!
-}
-
-"""
-Fields for an accounting category
-"""
-type AccountingCategory {
-  id: String!
-
-  """
-  The code of the accounting category
-  """
-  code: String!
-
-  """
-  The technical name of the accounting category
-  """
-  name: String!
-
-  """
-  A friendly name for non-accountants (i.e. expense submitters and collective admins)
-  """
-  friendlyName: String
-
-  """
-  The account this category belongs to
-  """
-  account: Host!
 }
 
 """
@@ -5196,6 +5232,31 @@ type Agreement {
 }
 
 """
+A collection of Vendors
+"""
+type VendorCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Vendor!]
+}
+
+enum ExpenseStatus {
+  DRAFT
+  UNVERIFIED
+  PENDING
+  INCOMPLETE
+  APPROVED
+  REJECTED
+  PROCESSING
+  ERROR
+  PAID
+  SCHEDULED_FOR_PAYMENT
+  SPAM
+  CANCELED
+}
+
+"""
 Fields for an expense's attached file
 """
 type ExpenseAttachedFile {
@@ -5284,6 +5345,11 @@ type ExpensePermissions {
   canEdit: Boolean!
 
   """
+  Whether the current user can edit the expense accounting category
+  """
+  canEditAccountingCategory: Boolean!
+
+  """
   Tags permissions are a bit different, and can be edited by admins even if the expense has already been paid
   """
   canEditTags: Boolean!
@@ -5351,6 +5417,11 @@ type ExpensePermissions {
   canHold: Boolean!
   canRelease: Boolean!
   edit: Permission!
+
+  """
+  Whether the current user can edit the expense accounting category
+  """
+  editAccountingCategory: Boolean!
   editTags: Permission!
   delete: Permission!
   seeInvoiceInfo: Permission!
@@ -8516,6 +8587,11 @@ type PersonalToken {
   The date on which the personal token was last updated
   """
   updatedAt: DateTime
+
+  """
+  Whether this token is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean!
 }
 
 """
@@ -9264,7 +9340,7 @@ scalar JSONObject
 """
 This represents a Vendor account
 """
-type Vendor implements Account & AccountWithHost & AccountWithContributions {
+type Vendor implements Account & AccountWithContributions {
   id: String!
   legacyId: Int!
 
@@ -9318,9 +9394,9 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   isFrozen: Boolean!
 
   """
-  Returns whether it's active: can accept financial contributions and pay expenses.
+  Returns whether the account accepts financial contributions.
   """
-  isActive: Boolean!
+  isActive: Boolean
 
   """
   Returns whether the account is setup to Host collectives.
@@ -9796,51 +9872,6 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   ): WebhookCollection!
 
   """
-  Returns the Fiscal Host
-  """
-  host: Host
-
-  """
-  Describe how the host charges the collective
-  """
-  hostFeesStructure: HostFeeStructure
-
-  """
-  Fees percentage that the host takes for this collective
-  """
-  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
-
-  """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Float!
-
-  """
-  Date of approval by the Fiscal Host.
-  """
-  approvedAt: DateTime
-
-  """
-  Returns whether it's approved by the Fiscal Host
-  """
-  isApproved: Boolean!
-
-  """
-  Returns agreements this account has with its host, or null if not enough permissions.
-  """
-  hostAgreements(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 30
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): AgreementCollection
-
-  """
   Number of unique financial contributors.
   """
   totalFinancialContributors(
@@ -9878,10 +9909,41 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   ): ContributorCollection!
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Float!
+
+  """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+  vendorInfo: VendorInfo
+
+  """
+  The account who created this order
+  """
+  createdByAccount: Account
+}
+
+"""
+Some context about the vendor
+"""
+type VendorInfo {
+  contact: VendorContact
+  taxFormUrl: String
+  taxFormRequired: Boolean
+  taxType: String
+  taxId: String
+  notes: String
+}
+
+"""
+Some context about the vendor contact person
+"""
+type VendorContact {
+  name: String
+  email: String
 }
 
 """
@@ -10040,6 +10102,11 @@ type Query {
     The order of results. Defaults to [RANK, DESC] (or [CREATED_AT, DESC] if `supportedPaymentMethodService` is provided)
     """
     orderBy: OrderByInput
+
+    """
+    Include vendors for this host
+    """
+    includeVendorsForHost: AccountReferenceInput
   ): AccountCollection!
   activities(
     """
@@ -12142,6 +12209,9 @@ enum ActivityAndClassesType {
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
+  VENDOR_CREATED
+  VENDOR_EDITED
+  VENDOR_DELETED
   ORDER_PENDING_CREATED
   ORDER_PENDING_FOLLOWUP
   ORDER_PENDING_RECEIVED
@@ -14997,8 +15067,8 @@ type Mutation {
   Delete a tier.
   """
   deleteTier(tier: TierReferenceInput!, stopRecurringContributions: Boolean! = false): Tier!
-  createPersonalToken(personalToken: PersonalTokenCreateInput!): PersonalToken
-  updatePersonalToken(personalToken: PersonalTokenUpdateInput!): PersonalToken
+  createPersonalToken(personalToken: PersonalTokenCreateInput!): PersonalToken!
+  updatePersonalToken(personalToken: PersonalTokenUpdateInput!): PersonalToken!
   deletePersonalToken(personalToken: PersonalTokenReferenceInput!): PersonalToken
 
   """
@@ -15122,6 +15192,11 @@ type Mutation {
     Reference to the host that holds the vendor
     """
     vendor: VendorEditInput!
+
+    """
+    Whether to archive (true) or unarchive (unarchive) the vendor
+    """
+    archive: Boolean
   ): Vendor!
 
   """
@@ -15183,11 +15258,6 @@ enum TaxType {
   New Zealand Good and Services Tax
   """
   GST
-
-  """
-  Employer Identification Number
-  """
-  EIN
 }
 
 input CollectiveCreateInput {
@@ -15352,6 +15422,7 @@ input PoliciesInput {
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
   EXPENSE_CATEGORIZATION: PoliciesExpenseCategorizationInput
+  EXPENSE_PUBLIC_VENDORS: Boolean
 }
 
 input PoliciesCollectiveExpenseAuthorCannotApprove {
@@ -15644,6 +15715,11 @@ input ExpenseCreateInput {
   Custom data to be stored in the expense
   """
   customData: JSON
+
+  """
+  The accounting category this expense belongs to
+  """
+  accountingCategory: AccountingCategoryReferenceInput
 }
 
 input PayoutMethodInput {
@@ -15711,6 +15787,16 @@ input ExpenseTaxInput {
   Tax identification number, if any
   """
   idNumber: String
+}
+
+"""
+Reference to an accounting category
+"""
+input AccountingCategoryReferenceInput {
+  """
+  The ID of the accounting category
+  """
+  id: NonEmptyString!
 }
 
 input RecurringExpenseInput {
@@ -15805,6 +15891,11 @@ input ExpenseUpdateInput {
   Custom data to be stored in the expense
   """
   customData: JSON
+
+  """
+  The accounting category this expense belongs to
+  """
+  accountingCategory: AccountingCategoryReferenceInput
 }
 
 input ExpenseItemInput {
@@ -16040,6 +16131,11 @@ input ExpenseInviteDraftInput {
   Custom data to be stored in the expense
   """
   customData: JSON
+
+  """
+  The accounting category this expense belongs to
+  """
+  accountingCategory: AccountingCategoryReferenceInput
 
   """
   Note to be sent to the invited user through email.
@@ -16916,6 +17012,11 @@ input PersonalTokenCreateInput {
   expiresAt: String
 
   """
+  Whether this token is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean = false
+
+  """
   The account to use as the owner of the application. Defaults to currently logged in user.
   """
   account: AccountReferenceInput
@@ -16937,6 +17038,11 @@ input PersonalTokenUpdateInput {
   name: String
   scope: [OAuthScope]
   expiresAt: String
+
+  """
+  Whether this token is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean
 }
 
 input PersonalTokenReferenceInput {
@@ -16977,9 +17083,10 @@ input VendorCreateInput {
   name: NonEmptyString!
   legalName: String
   tags: [NonEmptyString]
-  address: String
+  location: LocationInput
   imageUrl: String
   vendorInfo: VendorInfoInput
+  payoutMethod: PayoutMethodInput
 }
 
 """
@@ -16987,8 +17094,9 @@ Some context about the vendor
 """
 input VendorInfoInput {
   contact: VendorContactInput
+  taxFormRequired: Boolean
   taxFormUrl: String
-  taxType: TaxType
+  taxType: String
   taxId: String
   notes: String
 }
@@ -17016,10 +17124,11 @@ input VendorEditInput {
   The slug identifying the account (ie: babel for https://opencollective.com/babel)
   """
   slug: String
-  name: String
+  name: NonEmptyString
   legalName: String
-  tags: String
-  address: String
+  tags: [NonEmptyString]
+  location: LocationInput
   imageUrl: String
   vendorInfo: VendorInfoInput
+  payoutMethod: PayoutMethodInput
 }

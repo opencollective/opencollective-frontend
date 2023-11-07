@@ -149,7 +149,7 @@ class CollectivePage extends React.Component {
     if (!loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!collective) {
+      } else if (!collective || collective.type === 'VENDOR') {
         return <ErrorPage error={generateNotFoundError(slug)} log={false} />;
       } else if (collective.isPledged && !collective.isActive) {
         return <PledgedCollectivePage collective={collective} />;
