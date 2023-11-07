@@ -62,7 +62,7 @@
     "classnames": "2.3.2",
     "cloudflare-ip": "0.0.7",
     "clsx": "2.0.0",
-    "cookie": "0.5.0",
+    "cookie": "0.6.0",
     "cookie-parser": "1.4.6",
     "copy-to-clipboard": "3.3.3",
     "copy-webpack-plugin": "11.0.0",
