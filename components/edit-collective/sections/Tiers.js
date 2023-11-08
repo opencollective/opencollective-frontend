@@ -118,7 +118,10 @@ const Tiers = ({ collective }) => {
           <div>
             <Box mb={4}>
               <P fontSize="14px" lineHeight="20x" mb={3}>
-                <FormattedMessage defaultMessage="The custom contribution adds a default tier on your collective that doesn't enforce any minimum amount or interval. This is the easiest way for people to contribute to your Collective, but it cannot be customized." />
+                <FormattedMessage
+                  id="tier.defaultContribution.description"
+                  defaultMessage="The default contribution tier doesn't enforce any minimum amount or interval. This is the easiest way for people to contribute to your Collective, but it cannot be customized."
+                />
               </P>
               <Mutation
                 mutation={editAccountSettingsMutation}
@@ -129,8 +132,8 @@ const Tiers = ({ collective }) => {
                   <StyledCheckbox
                     name="custom-contributions"
                     label={intl.formatMessage({
-                      id: 'tier.customContributions.label',
-                      defaultMessage: 'Enable flexible contributions',
+                      id: 'tier.defaultContribution.label',
+                      defaultMessage: 'Enable default contribution tier',
                     })}
                     defaultChecked={!get(collective, 'settings.disableCustomContributions', false)}
                     width="auto"
