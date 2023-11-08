@@ -10,7 +10,7 @@ import hasFeature, { FEATURES } from '../lib/allowed-features';
 import { getCollectivePageMetadata, shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { stripHTML } from '../lib/utils';
+import { stripHTML } from '../lib/html';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';

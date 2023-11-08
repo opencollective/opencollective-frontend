@@ -10,8 +10,9 @@ import { i18nGraphqlException } from '../../../lib/errors';
 import { DEFAULT_SUPPORTED_EXPENSE_TYPES } from '../../../lib/expenses';
 import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
+import { stripHTML } from '../../../lib/html';
 import { PREVIEW_FEATURE_KEYS } from '../../../lib/preview-features';
-import { omitDeep, stripHTML } from '../../../lib/utils';
+import { omitDeep } from '../../../lib/utils';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';

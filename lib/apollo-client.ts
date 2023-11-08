@@ -57,7 +57,7 @@ const getGraphqlUrl = (apiVersion, internal = false) => {
 };
 
 const getCustomAgent = () => {
-  if (!customAgent) {
+  if (typeof window === 'undefined' && !customAgent) {
     const { FETCH_AGENT_KEEP_ALIVE, FETCH_AGENT_KEEP_ALIVE_MSECS } = process.env;
     const keepAlive = FETCH_AGENT_KEEP_ALIVE !== undefined ? parseToBoolean(FETCH_AGENT_KEEP_ALIVE) : true;
     const keepAliveMsecs = FETCH_AGENT_KEEP_ALIVE_MSECS ? Number(FETCH_AGENT_KEEP_ALIVE_MSECS) : 10000;
@@ -71,57 +71,59 @@ const getCustomAgent = () => {
 };
 
 const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?: string } = {}) => {
-  const nodeFetch = require('node-fetch');
+  if (typeof window === 'undefined') {
+    const nodeFetch = require('node-fetch');
 
-  options.agent = getCustomAgent();
+    options.agent = getCustomAgent();
 
-  // Add headers to help the API identify origin of requests
-  options.headers = options.headers || {};
-  options.headers['oc-env'] = process.env.OC_ENV;
-  options.headers['oc-secret'] = process.env.OC_SECRET;
-  options.headers['oc-application'] = process.env.OC_APPLICATION;
-  options.headers['user-agent'] = 'opencollective-frontend/1.0 node-fetch/1.0';
+    // Add headers to help the API identify origin of requests
+    options.headers = options.headers || {};
+    options.headers['oc-env'] = process.env.OC_ENV;
+    options.headers['oc-secret'] = process.env.OC_SECRET;
+    options.headers['oc-application'] = process.env.OC_APPLICATION;
+    options.headers['user-agent'] = 'opencollective-frontend/1.0 node-fetch/1.0';
 
-  // Start benchmarking if the request is server side
-  const start = process.hrtime.bigint();
+    // Start benchmarking if the request is server side
+    const start = process.hrtime.bigint();
 
-  const result = await nodeFetch(url, options);
+    const result = await nodeFetch(url, options);
 
-  // Complete benchmark measure and log
-  if (parseToBoolean(process.env.GRAPHQL_BENCHMARK)) {
-    const end = process.hrtime.bigint();
-    const executionTime = Math.round(Number(end - start) / 1000000);
-    const apiExecutionTime = result.headers.get('Execution-Time');
-    const graphqlCache = result.headers.get('GraphQL-Cache');
-    const latencyTime = apiExecutionTime ? executionTime - Number(apiExecutionTime) : null;
-    const body = JSON.parse(options.body);
-    if (body.operationName || body.variables) {
-      const pickList = [
-        'CollectiveId',
-        'collectiveSlug',
-        'CollectiveSlug',
-        'id',
-        'ledgacyId',
-        'legacyExpenseId',
-        'slug',
-        'term',
-        'tierId',
-      ];
-      const operationName = body.operationName || 'anonymous GraphQL query';
-      const variables = pick(body.variables, pickList) || {};
-      // eslint-disable-next-line no-console
-      console.log(
-        '-> Fetched',
-        operationName,
-        variables,
-        executionTime ? `in ${executionTime}ms` : '',
-        latencyTime ? `latency=${latencyTime}ms` : '',
-        graphqlCache ? `GraphQL Cache ${graphqlCache}` : '',
-      );
+    // Complete benchmark measure and log
+    if (parseToBoolean(process.env.GRAPHQL_BENCHMARK)) {
+      const end = process.hrtime.bigint();
+      const executionTime = Math.round(Number(end - start) / 1000000);
+      const apiExecutionTime = result.headers.get('Execution-Time');
+      const graphqlCache = result.headers.get('GraphQL-Cache');
+      const latencyTime = apiExecutionTime ? executionTime - Number(apiExecutionTime) : null;
+      const body = JSON.parse(options.body);
+      if (body.operationName || body.variables) {
+        const pickList = [
+          'CollectiveId',
+          'collectiveSlug',
+          'CollectiveSlug',
+          'id',
+          'legacyId',
+          'legacyExpenseId',
+          'slug',
+          'term',
+          'tierId',
+        ];
+        const operationName = body.operationName || 'anonymous GraphQL query';
+        const variables = pick(body.variables, pickList) || {};
+        // eslint-disable-next-line no-console
+        console.log(
+          '-> Fetched',
+          operationName,
+          variables,
+          executionTime ? `in ${executionTime}ms` : '',
+          latencyTime ? `latency=${latencyTime}ms` : '',
+          graphqlCache ? `GraphQL Cache ${graphqlCache}` : '',
+        );
+      }
     }
-  }
 
-  return result;
+    return result;
+  }
 };
 
 function createLink({ twoFactorAuthContext }) {

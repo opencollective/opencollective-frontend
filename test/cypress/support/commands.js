@@ -5,6 +5,7 @@ import { CreditCards } from '../../stripe-helpers';
 
 import { defaultTestUserEmail } from './data';
 import { randomEmail, randomSlug } from './faker';
+import generateToken from './token';
 
 // const gqlV1 = gql;
 
@@ -432,6 +433,10 @@ Cypress.Commands.add('assertLoggedIn', user => {
     cy.contains('[data-cy="user-menu"]', user.email);
     cy.getByDataCy('user-menu-trigger').click(); // To close the menu
   }
+});
+
+Cypress.Commands.add('generateToken', async expiresIn => {
+  return await generateToken(expiresIn);
 });
 
 /**

@@ -28,6 +28,8 @@ const nextConfig = {
     },
   },
   webpack: (config, { webpack, buildId }) => {
+    config.resolve.alias['@sentry/replay'] = false;
+
     config.plugins.push(
       // Ignore __tests__
       new webpack.IgnorePlugin({ resourceRegExp: /[\\/]__tests__[\\/]/ }),
