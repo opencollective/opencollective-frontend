@@ -84,7 +84,7 @@
     "glob": "10.3.10",
     "graphql": "16.8.1",
     "helmet": "7.1.0",
-    "jose": "4.14.6",
+    "jose": "4.15.4",
     "load-script": "2.0.0",
     "lodash": "4.17.21",
     "lottie-react": "2.4.0",
