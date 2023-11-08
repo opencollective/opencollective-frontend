@@ -264,7 +264,7 @@
     "nyc": "^15.1.0",
     "postcss": "8.4.31",
     "prettier": "3.0.3",
-    "prettier-plugin-tailwindcss": "0.5.6",
+    "prettier-plugin-tailwindcss": "0.5.7",
     "raf": "^3.4.1",
     "raw-loader": "^4.0.2",
     "react-test-renderer": "^18.2.0",
