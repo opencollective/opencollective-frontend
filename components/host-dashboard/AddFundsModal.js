@@ -4,7 +4,7 @@ import { gql, useMutation, useQuery } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
-import { get, isEmpty } from 'lodash';
+import { get, groupBy, isEmpty, map } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -13,6 +13,7 @@ import { getCurrentLocalDateStr } from '../../lib/date-utils';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import formatCollectiveType from '../../lib/i18n/collective-type';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../lib/policies';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -178,6 +179,7 @@ const addFundsAccountQuery = gql`
       }
       ... on Host {
         id
+        type
         slug
         name
         settings
@@ -195,6 +197,7 @@ const addFundsAccountQuery = gql`
         addedFundsHostFeePercent: hostFeePercent(paymentMethodType: HOST)
         host {
           id
+          type
           legacyId
           slug
           name
@@ -349,10 +352,17 @@ const AddFundsModal = ({ collective, ...props }) => {
   const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const receiptTemplates = host?.settings?.invoice?.templates;
-  const recommendedVendors = host?.vendors?.nodes?.map(vendor => ({
-    value: vendor,
-    label: <DefaultCollectiveLabel value={vendor} />,
-  }));
+  const recommendedVendors = host?.vendors?.nodes || [];
+  const defaultSources = [...(recommendedVendors || []), host];
+  const defaultSourcesOptions = map(groupBy(defaultSources, 'type'), (accounts, type) => {
+    return {
+      label: formatCollectiveType(intl, type, accounts.length),
+      options: accounts.map(account => ({
+        value: account,
+        label: <DefaultCollectiveLabel value={account} />,
+      })),
+    };
+  });
 
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
@@ -435,14 +445,6 @@ const AddFundsModal = ({ collective, ...props }) => {
             const taxAmount = !values.tax?.rate ? 0 : Math.round(values.amount - values.amount / (1 + values.tax.rate));
             const hostFee = Math.round((values.amount - taxAmount) * (hostFeePercent / 100));
 
-            const defaultSources = [
-              ...(recommendedVendors || []),
-              {
-                value: host,
-                label: <DefaultCollectiveLabel value={host} />,
-              },
-            ];
-
             if (!fundDetails.showSuccessModal) {
               return (
                 <Form data-cy="add-funds-form">
@@ -464,7 +466,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           error={field.error}
                           createCollectiveOptionalFields={['location.address', 'location.country']}
                           onBlur={() => form.setFieldTouched(field.name, true)}
-                          customOptions={defaultSources}
+                          customOptions={defaultSourcesOptions}
                           onChange={({ value }) => form.setFieldValue(field.name, value)}
                           menuPortalTarget={null}
                           includeVendorsForHostId={host?.legacyId || undefined}
