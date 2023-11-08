@@ -603,7 +603,7 @@ class EditCollectiveForm extends React.Component {
           placeholder: 'FRXX999999999',
           defaultValue: vatNumber,
           when: () => {
-            return Boolean(vatType) && (collective.isHost || vatType === VAT_OPTIONS.OWN);
+            return vatType !== VAT_OPTIONS.HOST || collective.isHost;
           },
         },
       );
@@ -731,7 +731,6 @@ class EditCollectiveForm extends React.Component {
           disabled:
             ([COLLECTIVE, FUND].includes(collective.type) && collective.isActive) || collective.isHost ? true : false,
         },
-        ...this.getApplicableTaxesFields(),
         {
           name: 'tags',
           maxLength: 128,
@@ -750,6 +749,7 @@ class EditCollectiveForm extends React.Component {
           when: () => collective.type === USER,
           isPrivate: true,
         },
+        ...this.getApplicableTaxesFields(),
       ],
       'fiscal-hosting': [
         {
