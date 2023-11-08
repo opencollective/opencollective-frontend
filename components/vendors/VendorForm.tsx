@@ -6,6 +6,7 @@ import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyEmailPattern, verifyURLPattern } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { DashboardVendorsQuery } from '../../lib/graphql/types/v2/graphql';
@@ -107,18 +108,22 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
       ['__typename'],
     );
 
-    if (vendor) {
-      await editVendor({ variables: { vendor: { ...data, id: vendor.id } } });
-      toast({
-        variant: 'success',
-        message: <FormattedMessage defaultMessage="Vendor Updated" />,
-      });
-    } else {
-      await createVendor({ variables: { vendor: data, host: pick(host, ['id', 'slug']) } });
-      toast({
-        variant: 'success',
-        message: <FormattedMessage defaultMessage="Vendor Created" />,
-      });
+    try {
+      if (vendor) {
+        await editVendor({ variables: { vendor: { ...data, id: vendor.id } } });
+        toast({
+          variant: 'success',
+          message: <FormattedMessage defaultMessage="Vendor Updated" />,
+        });
+      } else {
+        await createVendor({ variables: { vendor: data, host: pick(host, ['id', 'slug']) } });
+        toast({
+          variant: 'success',
+          message: <FormattedMessage defaultMessage="Vendor Created" />,
+        });
+      }
+    } catch (e) {
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
     onSuccess?.();
   };
