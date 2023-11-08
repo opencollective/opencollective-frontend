@@ -12,6 +12,7 @@ import {
   PAYMENT_METHOD_TYPE,
 } from '../../lib/constants/payment-methods';
 import roles from '../../lib/constants/roles';
+import { TierTypes } from '../../lib/constants/tiers-types';
 import { PaymentMethodService, PaymentMethodType } from '../../lib/graphql/types/v2/graphql';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
@@ -23,7 +24,6 @@ import { StripePaymentMethodsLabels } from '../../lib/stripe/payment-methods';
 import { getWebsiteUrl } from '../../lib/utils';
 
 import CreditCardInactive from '../icons/CreditCardInactive';
-import { TierTypes } from '../../lib/constants/tiers-types';
 
 export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
 export const STRIPE_PAYMENT_ELEMENT_KEY = 'stripe-payment-element';
