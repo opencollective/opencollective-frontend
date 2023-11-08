@@ -5,7 +5,7 @@ import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import dayjs from 'dayjs';
 import { Form, Formik, useFormikContext } from 'formik';
-import { cloneDeep, debounce, omit, pick } from 'lodash';
+import { cloneDeep, debounce, groupBy, map, omit, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -14,6 +14,7 @@ import { requireFields, verifyEmailPattern } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { CreatePendingContributionModalQuery, OrderPageQuery } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import formatCollectiveType from '../../lib/i18n/collective-type';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../lib/policies';
 import { omitDeep } from '../../lib/utils';
@@ -335,17 +336,17 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     receiptTemplateTitles.push({ value: 'alternative', label: receiptTemplates?.alternative?.title });
   }
 
-  const recommendedVendors = collective?.host?.vendors?.nodes?.map(vendor => ({
-    value: vendor,
-    label: <DefaultCollectiveLabel value={vendor} />,
-  }));
-  const defaultSources = [
-    ...(recommendedVendors || []),
-    {
-      value: host,
-      label: <DefaultCollectiveLabel value={host} />,
-    },
-  ];
+  const recommendedVendors = collective?.host?.vendors?.nodes || [];
+  const defaultSources = [...(recommendedVendors || []), host];
+  const defaultSourcesOptions = map(groupBy(defaultSources, 'type'), (accounts, type) => {
+    return {
+      label: formatCollectiveType(intl, type, accounts.length),
+      options: accounts.map(account => ({
+        value: account,
+        label: <DefaultCollectiveLabel value={account} />,
+      })),
+    };
+  });
 
   const expectedAtOptions = [
     {
@@ -475,7 +476,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               error={field.error}
               createCollectiveOptionalFields={['location.address', 'location.country']}
               onBlur={() => form.setFieldTouched(field.name, true)}
-              customOptions={defaultSources}
+              customOptions={defaultSourcesOptions}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               collective={field.value}
               includeVendorsForHostId={collective?.host?.legacyId}
