@@ -4,8 +4,7 @@ describe('event.createOrder page', () => {
   let collective = null;
 
   const createEvent = name => {
-    // Create event
-    cy.visit(`${collective.slug}/events/new`);
+    cy.login({ redirect: `${collective.slug}/events/new` });
     cy.get('.inputs input[name="name"]').type(name);
     cy.get('.inputs .startsAt input[type="datetime-local"]')
       .clear()
