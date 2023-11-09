@@ -24,7 +24,7 @@
   "/aBz/1": "转到 Open Collective 上 {accountName} 的公共页面",
   "/CCt2w": "编辑{type, select, TICKET {门票} other {等级}}",
   "/EO1Lu": "所有 {account} 管理员都要设置双重认证",
-  "/GQXtd": "Not you? <SignOutLink>Sign out</SignOutLink> to switch profile.",
+  "/GQXtd": "不是你？<SignOutLink>登出</SignOutLink> 以切换账户。",
   "/gUYR+": "源文件：{source}",
   "/J1LvF": "传统交易编号",
   "/mqxVR": "标记费用 <Expense>{expenseDescription}</Expense> 为未完成",
