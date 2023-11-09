@@ -392,6 +392,7 @@ class CreateExpensePage extends React.Component {
                         {step !== STEPS.SUMMARY ? (
                           <ExpenseForm
                             collective={collective}
+                            host={host}
                             loading={loadingLoggedInUser}
                             loggedInAccount={loggedInAccount}
                             onSubmit={this.onFormSubmit}

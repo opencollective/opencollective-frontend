@@ -184,7 +184,7 @@ const ExpenseSummary = ({
         </Flex>
       </Flex>
       <div className="flex gap-2 align-middle">
-        {Boolean(expense?.accountingCategory || userMustSetAccountingCategory(LoggedInUser, collective)) && (
+        {Boolean(expense?.accountingCategory || userMustSetAccountingCategory(LoggedInUser, collective, host)) && (
           <React.Fragment>
             <AccountingCategoryPill
               host={host}
