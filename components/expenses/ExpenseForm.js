@@ -193,7 +193,7 @@ export const prepareExpenseForSubmit = expenseData => {
 /**
  * Validate the expense
  */
-const validateExpense = (intl, expense, collective, LoggedInUser) => {
+const validateExpense = (intl, expense, collective, host, LoggedInUser) => {
   const isCardCharge = expense.type === expenseTypes.CHARGE;
   if (expense.payee?.isInvite) {
     return expense.payee.id
@@ -237,7 +237,7 @@ const validateExpense = (intl, expense, collective, LoggedInUser) => {
     Object.assign(errors, requireFields(expense, ['payeeLocation.country', 'payeeLocation.address']));
   }
 
-  if (userMustSetAccountingCategory(LoggedInUser, collective)) {
+  if (userMustSetAccountingCategory(LoggedInUser, collective, host)) {
     Object.assign(errors, requireFields(expense, ['accountingCategory'], { allowNull: true }));
   }
 
@@ -962,7 +962,7 @@ const ExpenseForm = ({
   const { LoggedInUser } = useLoggedInUser();
   const supportedExpenseTypes = React.useMemo(() => getSupportedExpenseTypes(collective), [collective]);
   const initialValues = { ...getDefaultExpense(collective, supportedExpenseTypes), ...expense };
-  const validate = expenseData => validateExpense(intl, expenseData, collective, LoggedInUser);
+  const validate = expenseData => validateExpense(intl, expenseData, collective, host, LoggedInUser);
   if (isDraft) {
     initialValues.items = expense.draft.items?.map(newExpenseItem) || [];
     initialValues.taxes = expense.draft.taxes;

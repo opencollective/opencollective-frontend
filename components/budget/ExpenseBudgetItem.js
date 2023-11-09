@@ -14,6 +14,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
+import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-categories';
 
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
@@ -202,20 +203,19 @@ const ExpenseBudgetItem = ({
                 </StyledLink>
               </StyledTooltip>
 
-              {isAdminView &&
-                (expense.accountingCategory || LoggedInUser.hasPreviewFeatureEnabled('EXPENSE_CATEGORIZATION')) && (
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm font-normal text-neutral-700">
-                      <FormattedMessage id="expense.accountingCategory" defaultMessage="Category" />
-                    </span>
-                    <AccountingCategoryPill
-                      expense={expense}
-                      host={host}
-                      canEdit={get(expense, 'permissions.canEditAccountingCategory', false)}
-                      allowNone={false}
-                    />
-                  </div>
-                )}
+              {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, expense.account, host) && (
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-normal text-neutral-700">
+                    <FormattedMessage id="expense.accountingCategory" defaultMessage="Category" />
+                  </span>
+                  <AccountingCategoryPill
+                    expense={expense}
+                    host={host}
+                    canEdit={get(expense, 'permissions.canEditAccountingCategory', false)}
+                    allowNone={false}
+                  />
+                </div>
+              )}
 
               <P mt="5px" fontSize="12px" color="black.700">
                 {isAdminView ? (

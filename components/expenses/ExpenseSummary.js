@@ -12,7 +12,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
-import { userMustSetAccountingCategory } from './lib/accounting-categories';
+import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles } from './lib/items';
 
@@ -184,7 +184,7 @@ const ExpenseSummary = ({
         </Flex>
       </Flex>
       <div className="flex gap-2 align-middle">
-        {Boolean(expense?.accountingCategory || userMustSetAccountingCategory(LoggedInUser, collective, host)) && (
+        {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, collective, host) && (
           <React.Fragment>
             <AccountingCategoryPill
               host={host}
