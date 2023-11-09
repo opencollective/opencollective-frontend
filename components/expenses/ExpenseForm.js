@@ -288,6 +288,7 @@ const ExpenseFormBody = ({
   formik,
   payoutProfiles,
   collective,
+  host,
   expense,
   autoFocusTitle,
   onCancel,
@@ -309,7 +310,7 @@ const ExpenseFormBody = ({
   const [hideOCRPrefillStater, setHideOCRPrefillStarter] = React.useState(false);
   const { values, handleChange, errors, setValues, dirty, touched, resetForm, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
-  const hasOCRPreviewEnabled = checkOCREnabled(LoggedInUser, router, collective.host);
+  const hasOCRPreviewEnabled = checkOCREnabled(LoggedInUser, router, host);
   const hasOCRFeature = hasOCRPreviewEnabled && checkExpenseSupportsOCR(values.type, LoggedInUser);
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
@@ -430,7 +431,7 @@ const ExpenseFormBody = ({
       const formValues = formPersister.loadValues();
       if (formValues) {
         // Reset payoutMethod if host is no longer connected to TransferWise
-        if (formValues.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT && !collective.host?.transferwise) {
+        if (formValues.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT && !host?.transferwise) {
           formValues.payoutMethod = undefined;
         }
         setValues(
@@ -716,7 +717,7 @@ const ExpenseFormBody = ({
                     value={values.tags}
                   />
                 </Flex>
-                {userMustSetAccountingCategory(LoggedInUser, collective) && (
+                {userMustSetAccountingCategory(LoggedInUser, collective, host) && (
                   <div className="mt-10">
                     <Label
                       htmlFor="ExpenseCategoryInput"
@@ -734,9 +735,9 @@ const ExpenseFormBody = ({
                             <div>
                               <ExpenseCategorySelect
                                 id="ExpenseCategoryInput"
-                                host={collective.host}
+                                host={host}
                                 selectedCategory={values.accountingCategory}
-                                allowNone={!LoggedInUser?.isHostAdmin(collective.host)}
+                                allowNone={!LoggedInUser?.isAdminOfCollective(host)}
                                 onChange={value => formik.setFieldValue('accountingCategory', value)}
                                 error={Boolean(meta.error)}
                               />
@@ -836,7 +837,7 @@ const ExpenseFormBody = ({
       )}
       {step === EXPENSE_FORM_STEPS.EXPENSE && (
         <StyledCard mt={4} p={[16, 24, 32]} overflow="initial">
-          <ExpenseSummaryAdditionalInformation expense={formik.values} host={collective.host} collective={collective} />
+          <ExpenseSummaryAdditionalInformation expense={formik.values} host={host} collective={collective} />
         </StyledCard>
       )}
       {showResetModal && (
@@ -883,22 +884,22 @@ ExpenseFormBody.propTypes = {
   loading: PropTypes.bool,
   isDraft: PropTypes.bool,
   expensesTags: PropTypes.arrayOf(PropTypes.string),
+  host: PropTypes.shape({
+    transferwise: PropTypes.shape({
+      availableCurrencies: PropTypes.arrayOf(PropTypes.object),
+    }),
+    settings: PropTypes.shape({
+      expenseTypes: PropTypes.shape({
+        GRANT: PropTypes.bool,
+        RECEIPT: PropTypes.bool,
+        INVOICE: PropTypes.bool,
+      }),
+    }),
+  }),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
-    host: PropTypes.shape({
-      transferwise: PropTypes.shape({
-        availableCurrencies: PropTypes.arrayOf(PropTypes.object),
-      }),
-      settings: PropTypes.shape({
-        expenseTypes: PropTypes.shape({
-          GRANT: PropTypes.bool,
-          RECEIPT: PropTypes.bool,
-          INVOICE: PropTypes.bool,
-        }),
-      }),
-    }),
     settings: PropTypes.object,
     isApproved: PropTypes.bool,
   }).isRequired,
@@ -931,6 +932,7 @@ ExpenseFormBody.propTypes = {
 const ExpenseForm = ({
   onSubmit,
   collective,
+  host,
   expense,
   originalExpense,
   payoutProfiles,
@@ -982,6 +984,7 @@ const ExpenseForm = ({
           formik={formik}
           payoutProfiles={payoutProfiles}
           collective={collective}
+          host={host}
           expense={originalExpense}
           autoFocusTitle={autoFocusTitle}
           onCancel={onCancel}
@@ -1013,15 +1016,15 @@ ExpenseForm.propTypes = {
   expensesTags: PropTypes.arrayOf(PropTypes.string),
   /** Defines the default selected step, if accessible (previous steps need to be completed) */
   defaultStep: PropTypes.oneOf(Object.values(EXPENSE_FORM_STEPS)),
+  host: PropTypes.shape({
+    slug: PropTypes.string.isRequired,
+    transferwise: PropTypes.shape({
+      availableCurrencies: PropTypes.arrayOf(PropTypes.object),
+    }),
+  }),
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
-    host: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-      transferwise: PropTypes.shape({
-        availableCurrencies: PropTypes.arrayOf(PropTypes.object),
-      }),
-    }),
     settings: PropTypes.object,
     isApproved: PropTypes.bool,
   }).isRequired,

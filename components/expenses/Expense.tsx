@@ -609,6 +609,7 @@ function Expense(props) {
           ) : (
             <ExpenseForm
               collective={collective}
+              host={host}
               loading={loading || loadingLoggedInUser || isRefetchingDataForUser}
               expense={editedExpense || expense}
               originalExpense={expense}
