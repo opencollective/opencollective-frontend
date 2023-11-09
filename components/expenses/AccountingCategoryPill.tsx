@@ -1,5 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
+import { ClassValue } from 'clsx';
 import { ChevronDown } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -22,6 +23,8 @@ type AccountingCategoryPillProps = {
   allowNone?: boolean;
 };
 
+const BADGE_CLASS: ClassValue = 'rounded-lg bg-red-50 px-3 py-1 text-sm font-normal text-neutral-800';
+
 const getCategoryLabel = (category: AccountingCategory) => {
   if (!category) {
     return <FormattedMessage id="accountingCategory.doNotKnow" defaultMessage="Unknown category" />;
@@ -30,7 +33,7 @@ const getCategoryLabel = (category: AccountingCategory) => {
   }
 };
 
-const AdminAccountingCategoryPill = ({ badgeClass, expense, host, allowNone }) => {
+const AdminAccountingCategoryPill = ({ expense, host, allowNone }: Omit<AccountingCategoryPillProps, 'canEdit'>) => {
   const intl = useIntl();
   const [editExpense, { loading }] = useMutation(editExpenseCategoryMutation, { context: API_V2_CONTEXT });
   const { toast } = useToast();
@@ -40,6 +43,8 @@ const AdminAccountingCategoryPill = ({ badgeClass, expense, host, allowNone }) =
       host={host}
       allowNone={allowNone}
       selectedCategory={expense.accountingCategory}
+      submitterCategory={expense.valuesByRole?.submitter?.accountingCategory}
+      accountAdminCategory={expense.valuesByRole?.accountAdmin?.accountingCategory}
       onChange={async selectedCategory => {
         try {
           await editExpense({
@@ -53,7 +58,7 @@ const AdminAccountingCategoryPill = ({ badgeClass, expense, host, allowNone }) =
         }
       }}
     >
-      <Button className={cn(badgeClass, 'h-auto hover:bg-red-50 hover:opacity-90')}>
+      <Button className={cn(BADGE_CLASS, 'h-auto hover:bg-red-50 hover:opacity-90')}>
         <span className="mr-1">{getCategoryLabel(expense.accountingCategory)}</span>
         {loading ? <StyledSpinner size="1em" /> : <ChevronDown size="1em" />}
       </Button>
@@ -62,10 +67,9 @@ const AdminAccountingCategoryPill = ({ badgeClass, expense, host, allowNone }) =
 };
 
 export const AccountingCategoryPill = ({ expense, host, canEdit, allowNone }: AccountingCategoryPillProps) => {
-  const badgeClass = 'rounded-lg bg-red-50 px-3 py-1 text-sm font-normal text-neutral-800';
   if (!canEdit) {
-    return <div className={badgeClass}>{getCategoryLabel(expense.accountingCategory)}</div>;
+    return <div className={BADGE_CLASS}>{getCategoryLabel(expense.accountingCategory)}</div>;
   } else {
-    return <AdminAccountingCategoryPill badgeClass={badgeClass} expense={expense} host={host} allowNone={allowNone} />;
+    return <AdminAccountingCategoryPill expense={expense} host={host} allowNone={allowNone} />;
   }
 };

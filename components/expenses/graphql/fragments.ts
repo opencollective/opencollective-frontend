@@ -102,6 +102,15 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
   }
 `;
 
+const accountingCategoryFields = gql`
+  fragment AccountingCategoryFields on AccountingCategory {
+    id
+    name
+    friendlyName
+    code
+  }
+`;
+
 export const expenseHostFields = gql`
   fragment ExpenseHostFields on Host {
     id
@@ -143,9 +152,7 @@ export const expenseHostFields = gql`
     accountingCategories {
       nodes {
         id
-        name
-        friendlyName
-        code
+        ...AccountingCategoryFields
       }
     }
     policies {
@@ -156,6 +163,7 @@ export const expenseHostFields = gql`
       }
     }
   }
+  ${accountingCategoryFields}
 `;
 
 export const expensePageExpenseFieldsFragment = gql`
@@ -173,9 +181,22 @@ export const expensePageExpenseFieldsFragment = gql`
     amount
     accountingCategory {
       id
-      code
-      name
-      friendlyName
+      ...AccountingCategoryFields
+    }
+    valuesByRole {
+      id
+      submitter {
+        accountingCategory {
+          id
+          ...AccountingCategoryFields
+        }
+      }
+      accountAdmin {
+        accountingCategory {
+          id
+          ...AccountingCategoryFields
+        }
+      }
     }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
@@ -526,6 +547,7 @@ export const expensePageExpenseFieldsFragment = gql`
 
   ${expenseHostFields}
   ${collectiveNavbarFieldsFragment}
+  ${accountingCategoryFields}
 `;
 
 export const expensesListFieldsFragment = gql`
@@ -542,9 +564,22 @@ export const expensesListFieldsFragment = gql`
     }
     accountingCategory {
       id
-      name
-      friendlyName
-      code
+      ...AccountingCategoryFields
+    }
+    valuesByRole {
+      id
+      submitter {
+        accountingCategory {
+          id
+          ...AccountingCategoryFields
+        }
+      }
+      accountAdmin {
+        accountingCategory {
+          id
+          ...AccountingCategoryFields
+        }
+      }
     }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
@@ -645,6 +680,7 @@ export const expensesListFieldsFragment = gql`
       name
     }
   }
+  ${accountingCategoryFields}
 `;
 
 export const expensesListAdminFieldsFragment = gql`

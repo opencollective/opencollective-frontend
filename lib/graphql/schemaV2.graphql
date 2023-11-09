@@ -1244,6 +1244,11 @@ type Expense {
   accountingCategory: AccountingCategory
 
   """
+  If available, this field will contain a breakdown of the expense values depending on who edited it
+  """
+  valuesByRole: ExpenseValuesByRole
+
+  """
   The time of creation
   """
   createdAt: DateTime!
@@ -5239,6 +5244,34 @@ type VendorCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Vendor!]
+}
+
+type ExpenseValuesByRole {
+  id: NonEmptyString!
+
+  """
+  The values provided by the expense submitter(s)
+  """
+  submitter: ExpenseValuesRoleDetails
+
+  """
+  The values provided by the account admin(s)
+  """
+  accountAdmin: ExpenseValuesRoleDetails
+
+  """
+  The values provided by the host admin(s)
+  """
+  hostAdmin: ExpenseValuesRoleDetails
+}
+
+"""
+A string that cannot be passed as an empty value
+"""
+scalar NonEmptyString
+
+type ExpenseValuesRoleDetails {
+  accountingCategory: AccountingCategory
 }
 
 enum ExpenseStatus {
@@ -10345,6 +10378,24 @@ type Query {
     """
     virtualCards: [VirtualCardReferenceInput]
   ): ExpenseCollection!
+  expenseTagStats(
+    """
+    Return tags which includes this search term.
+    """
+    tagSearchTerm: String
+
+    """
+    Return tags from expenses to accounts hosted by this account. Can not be used together with "account".
+    """
+    host: AccountReferenceInput
+
+    """
+    Return tags from expenses to this account. Can not be used together with "host".
+    """
+    account: AccountReferenceInput
+    limit: Int! = 10
+    offset: Int! = 0
+  ): TagStatsCollection!
   fund(
     """
     The public id identifying the Fund (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -12309,6 +12360,16 @@ enum ExpenseStatusFilter {
 }
 
 """
+A collection of "Tags"
+"""
+type TagStatsCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [TagStat]
+}
+
+"""
 This represents an Project account
 """
 type Fund implements Account & AccountWithHost & AccountWithContributions {
@@ -13579,16 +13640,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   The Account parenting this account
   """
   parent: Account
-}
-
-"""
-A collection of "Tags"
-"""
-type TagStatsCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [TagStat]
 }
 
 input TierReferenceInput {
@@ -15446,11 +15497,6 @@ input PoliciesExpenseCategorizationInput {
 type SendMessageResult {
   success: Boolean
 }
-
-"""
-A string that cannot be passed as an empty value
-"""
-scalar NonEmptyString
 
 """
 Input for creating or updating an account category
