@@ -353,7 +353,16 @@ const ExpenseFormBody = ({
         isInvite: false,
         isNewUser: true,
       });
-    } else if (!payeePayoutProfile && loggedInAccount && isDraft && values?.payee.type !== CollectiveType.VENDOR) {
+    }
+    // If logged in user edits a DRAFT without a key and it's not the payee, we'll presume they only want to edit the draft and not submit the draft
+    else if (
+      !payeePayoutProfile &&
+      loggedInAccount &&
+      isDraft &&
+      values?.payee.type !== CollectiveType.VENDOR &&
+      !router.query?.key &&
+      !isRecurring
+    ) {
       setOnBehalf(true);
     }
     // If creating a new expense or completing an expense submitted on your behalf, automatically select your default profile.
