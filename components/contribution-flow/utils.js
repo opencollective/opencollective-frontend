@@ -12,6 +12,7 @@ import {
   PAYMENT_METHOD_TYPE,
 } from '../../lib/constants/payment-methods';
 import roles from '../../lib/constants/roles';
+import { TierTypes } from '../../lib/constants/tiers-types';
 import { PaymentMethodService, PaymentMethodType } from '../../lib/graphql/types/v2/graphql';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
@@ -392,7 +393,8 @@ export const contributionRequiresAddress = (stepDetails, tier) => {
 export const contributionRequiresLegalName = (stepDetails, tier) => {
   return Boolean(
     (stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 250e2) || // Above $250/year
-      tier?.requireAddress, // Or if enforced by the tier, a valid address requires a legal name
+      tier?.requireAddress || // Or if enforced by the tier, a valid address requires a legal name
+      tier?.type === TierTypes.TICKET,
   );
 };
 
