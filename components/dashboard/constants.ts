@@ -116,8 +116,7 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Profile Page',
   },
   [ALL_SECTIONS.CONNECTED_ACCOUNTS]: {
-    id: 'editCollective.menu.connectedAccounts',
-    defaultMessage: 'Connected Accounts',
+    defaultMessage: 'Social Accounts',
   },
   [ALL_SECTIONS.EXPORT]: {
     id: 'editCollective.menu.export',
@@ -208,8 +207,8 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Virtual Card Requests',
   },
   [ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS]: {
-    id: 'VirtualCardsSettings.Title',
-    defaultMessage: 'Virtual Cards Settings',
+    id: 'VirtualCards.Title',
+    defaultMessage: 'Virtual Cards',
   },
   [ALL_SECTIONS.VIRTUAL_CARDS]: {
     id: 'VirtualCards.Title',
