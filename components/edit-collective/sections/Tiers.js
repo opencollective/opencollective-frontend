@@ -25,14 +25,22 @@ import { listTierQuery } from '../tiers/EditTierModal';
 import { collectiveSettingsV1Query } from './EditCollectivePage';
 
 // TODO Make this a common function with the contribute section
-const getFinancialContributions = (collective, sortedTiers) => {
-  const hasCustomContribution = !get(collective, 'settings.disableCustomContributions', false);
-  const waysToContribute = [];
+const getTiers = (collective, sortedTiers) => {
+  const defaultContributionEnabled = !get(collective, 'settings.disableCustomContributions', false);
 
-  sortedTiers.forEach(tier => {
-    if (tier === 'custom') {
-      if (hasCustomContribution) {
-        waysToContribute.push({
+  const createdTierCards = sortedTiers.map(tier => ({
+    key: tier.id,
+    Component: ContributeTier,
+    componentProps: {
+      collective,
+      tier,
+      hideContributors: true,
+      hideCTA: true,
+    },
+  }));
+  const additionalTierCards = defaultContributionEnabled
+    ? [
+        {
           key: 'custom',
           Component: ContributeCustom,
           componentProps: {
@@ -40,23 +48,11 @@ const getFinancialContributions = (collective, sortedTiers) => {
             hideContributors: true,
             hideCTA: true,
           },
-        });
-      }
-    } else {
-      waysToContribute.push({
-        key: tier.id,
-        Component: ContributeTier,
-        componentProps: {
-          collective,
-          tier,
-          hideContributors: true,
-          hideCTA: true,
         },
-      });
-    }
-  });
+      ]
+    : [];
 
-  return waysToContribute;
+  return [...createdTierCards, ...additionalTierCards];
 };
 
 const CardsContainer = styled(Grid).attrs({
@@ -154,7 +150,7 @@ const Tiers = ({ collective }) => {
             </Box>
             <AdminContributeCardsContainer
               collective={collective}
-              cards={getFinancialContributions(collective, filteredTiers)}
+              cards={getTiers(collective, filteredTiers)}
               CardsContainer={CardsContainer}
               useTierModals
               enableReordering={false}
