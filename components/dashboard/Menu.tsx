@@ -222,75 +222,121 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' }),
       Icon: Settings,
       subMenu: [
-        ...(isAccountantOnly
-          ? []
-          : [
-              { section: ALL_SECTIONS.INFO },
-              { section: ALL_SECTIONS.COLLECTIVE_PAGE },
-              { section: ALL_SECTIONS.COLLECTIVE_GOALS, if: isOneOfTypes(account, [COLLECTIVE, PROJECT]) },
+        // General
+        {
+          section: ALL_SECTIONS.INFO,
+          if: !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.COLLECTIVE_PAGE,
+          if: !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.CONNECTED_ACCOUNTS, // Displayed as "Social accounts"
+          if: isOneOfTypes(account, [COLLECTIVE, ORGANIZATION]) && !isAccountantOnly,
+        },
+        // Host sections
+        ...(isHost || isSelfHosted
+          ? [
               {
-                section: ALL_SECTIONS.CONNECTED_ACCOUNTS,
-                if: isOneOfTypes(account, [COLLECTIVE, ORGANIZATION]),
-              },
-              { section: ALL_SECTIONS.POLICIES, if: isOneOfTypes(account, [COLLECTIVE, FUND]) }, // POLICIES also available for Fiscal hosts further down in this list
-              { section: ALL_SECTIONS.CUSTOM_EMAIL, if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]) },
-              { section: ALL_SECTIONS.EXPORT, if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]) },
-              { section: ALL_SECTIONS.HOST, if: isOneOfTypes(account, [COLLECTIVE, FUND]) },
-              {
-                section: ALL_SECTIONS.PAYMENT_METHODS,
-                if: ['ACTIVE', 'AVAILABLE'].includes(account.features.USE_PAYMENT_METHODS),
-              },
-            ]),
-        { section: ALL_SECTIONS.PAYMENT_RECEIPTS, if: isOneOfTypes(account, [INDIVIDUAL, USER, ORGANIZATION]) },
-        ...(isAccountantOnly
-          ? []
-          : [
-              {
-                section: ALL_SECTIONS.NOTIFICATIONS,
-                if: isIndividualAccount(account),
+                section: ALL_SECTIONS.FISCAL_HOSTING,
+                if: !isAccountantOnly && !isSelfHosted,
               },
               {
-                section: ALL_SECTIONS.GIFT_CARDS,
-                if: ['ACTIVE', 'AVAILABLE'].includes(account.features.EMIT_GIFT_CARDS),
+                section: ALL_SECTIONS.POLICIES,
+                if: isOneOfTypes(account, [USER, ORGANIZATION]) && !isAccountantOnly,
               },
-              { section: ALL_SECTIONS.WEBHOOKS },
-              { section: ALL_SECTIONS.AUTHORIZED_APPS, if: isIndividualAccount(account) },
-              { section: ALL_SECTIONS.USER_SECURITY, if: isIndividualAccount(account) },
               {
-                section: ALL_SECTIONS.FOR_DEVELOPERS,
-                if: isOneOfTypes(account, [COLLECTIVE, USER, INDIVIDUAL, ORGANIZATION]),
+                section: ALL_SECTIONS.RECEIVING_MONEY,
+                if: !isAccountantOnly,
               },
-              { section: ALL_SECTIONS.ACTIVITY_LOG },
               {
-                section: ALL_SECTIONS.SECURITY,
-                if: isOneOfTypes(account, [COLLECTIVE, FUND, ORGANIZATION]),
+                section: ALL_SECTIONS.SENDING_MONEY,
+                if: !isAccountantOnly,
               },
-              ...(isSelfHosted
-                ? [
-                    { section: ALL_SECTIONS.INVOICES_RECEIPTS },
-                    { section: ALL_SECTIONS.RECEIVING_MONEY },
-                    { section: ALL_SECTIONS.SENDING_MONEY },
-                  ]
-                : []),
-              ...(isHost
-                ? [
-                    { section: ALL_SECTIONS.FISCAL_HOSTING },
-                    {
-                      section: ALL_SECTIONS.CHART_OF_ACCOUNTS,
-                      if: Boolean(LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION)),
-                    },
-                    { section: ALL_SECTIONS.INVOICES_RECEIPTS },
-                    { section: ALL_SECTIONS.RECEIVING_MONEY },
-                    { section: ALL_SECTIONS.SENDING_MONEY },
-                    {
-                      section: ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS,
-                      if: hasFeature(account, FEATURES.VIRTUAL_CARDS),
-                    },
-                    { section: ALL_SECTIONS.POLICIES, if: isOneOfTypes(account, [USER, ORGANIZATION]) },
-                  ]
-                : []),
-              { section: ALL_SECTIONS.ADVANCED },
-            ]),
+              {
+                section: ALL_SECTIONS.CHART_OF_ACCOUNTS,
+                if: Boolean(LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION)),
+              },
+              {
+                section: ALL_SECTIONS.INVOICES_RECEIPTS,
+                if: !isAccountantOnly,
+              },
+              {
+                section: ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS,
+                if: hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly && !isSelfHosted,
+              },
+            ]
+          : []),
+        // Security
+        {
+          section: ALL_SECTIONS.SECURITY,
+          if: isOneOfTypes(account, [COLLECTIVE, FUND, ORGANIZATION]) && !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.USER_SECURITY,
+          if: isIndividualAccount(account),
+        },
+        {
+          section: ALL_SECTIONS.ACTIVITY_LOG,
+          if: !isAccountantOnly,
+        },
+        // Payments / Payouts
+        {
+          section: ALL_SECTIONS.PAYMENT_METHODS,
+          if: ['ACTIVE', 'AVAILABLE'].includes(account.features.USE_PAYMENT_METHODS) && !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.PAYMENT_RECEIPTS,
+          if: isOneOfTypes(account, [INDIVIDUAL, USER, ORGANIZATION]),
+        },
+        {
+          section: ALL_SECTIONS.GIFT_CARDS,
+          if: ['ACTIVE', 'AVAILABLE'].includes(account.features.EMIT_GIFT_CARDS) && !isAccountantOnly,
+        },
+        // Sections for individual accounts
+        {
+          section: ALL_SECTIONS.NOTIFICATIONS,
+          if: isIndividualAccount(account),
+        },
+        {
+          section: ALL_SECTIONS.AUTHORIZED_APPS,
+          if: isIndividualAccount(account),
+        },
+        // Collective sections
+        {
+          section: ALL_SECTIONS.HOST,
+          if: isOneOfTypes(account, [COLLECTIVE, FUND]) && !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.COLLECTIVE_GOALS,
+          if: isOneOfTypes(account, [COLLECTIVE, PROJECT]) && !isAccountantOnly,
+        },
+        {
+          // POLICIES also available for Fiscal hosts further up in this list
+          section: ALL_SECTIONS.POLICIES,
+          if: isOneOfTypes(account, [COLLECTIVE, FUND]) && !isHost && !isSelfHosted && !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.CUSTOM_EMAIL,
+          if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]) && !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.EXPORT,
+          if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]),
+        },
+        {
+          section: ALL_SECTIONS.FOR_DEVELOPERS,
+          if: isOneOfTypes(account, [COLLECTIVE, USER, INDIVIDUAL, ORGANIZATION]) && !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.WEBHOOKS,
+          if: !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.ADVANCED,
+          if: !isAccountantOnly,
+        },
       ],
     },
   ];
