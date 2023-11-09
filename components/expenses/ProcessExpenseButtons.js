@@ -197,7 +197,7 @@ const ProcessExpenseButtons = ({
           <PermissionButton
             {...getButtonProps('APPROVE')}
             onClick={() => {
-              if (collectiveAdminsMustConfirmAccountingCategory(collective)) {
+              if (collectiveAdminsMustConfirmAccountingCategory(collective, host)) {
                 setShowApproveExpenseModal(true);
               } else {
                 triggerAction('APPROVE');
