@@ -94,6 +94,10 @@ const Wrapper = styled(Flex)<WrapperProps>`
 
   justify-content: center;
   align-items: center;
+
+  @media (max-width: 1200px) {
+    width: 100vw;
+  }
 `;
 
 const StyledArrowButton = styled.button<{
@@ -188,6 +192,13 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
   const intl = useIntl();
   const initialIndex = openFileUrl ? files?.findIndex(f => f.url === openFileUrl) : 0;
   const [selectedIndex, setSelectedIndex] = useState(initialIndex);
+
+  React.useEffect(() => {
+    if (openFileUrl) {
+      const idx = files?.findIndex(f => f.url === openFileUrl) ?? 0;
+      setSelectedIndex(idx);
+    }
+  }, [openFileUrl, files]);
 
   const onArrowLeft = React.useCallback(() => setSelectedIndex(selectedIndex => Math.max(selectedIndex - 1, 0)), []);
   const onArrowRight = React.useCallback(
