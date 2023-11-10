@@ -34,14 +34,15 @@ export const collectiveAdminsMustConfirmAccountingCategory = (
 };
 
 export const shouldDisplayExpenseCategoryPill = (
-  user: LoggedInUser,
+  user: LoggedInUser | null,
   expense: Expense,
   account: Account,
   host: Host,
 ): boolean => {
   return Boolean(
     expense?.accountingCategory ||
-      (get(host, 'accountingCategories.nodes', []).length > 0 &&
+      (user &&
+        get(host, 'accountingCategories.nodes', []).length > 0 &&
         (userMustSetAccountingCategory(user, account, host) ||
           user.hasPreviewFeatureEnabled('EXPENSE_CATEGORIZATION'))),
   );
