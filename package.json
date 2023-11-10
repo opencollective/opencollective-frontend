@@ -220,6 +220,7 @@
     "autoprefixer": "10.4.16",
     "babel-loader": "^8.2.3",
     "babel-plugin-formatjs": "^10.5.0",
+    "babel-plugin-import": "^1.13.8",
     "babel-plugin-istanbul": "^6.1.1",
     "babel-plugin-react-docgen": "^4.2.1",
     "babel-plugin-react-remove-properties": "^0.3.0",
