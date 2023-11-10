@@ -137,7 +137,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isHost,
+      if: isHost && !isAccountantOnly,
       type: 'group',
       Icon: Building,
       label: intl.formatMessage({ id: 'Collectives', defaultMessage: 'Collectives' }),
@@ -158,7 +158,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
     },
     {
-      if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS),
+      if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'VirtualCards.Title', defaultMessage: 'Virtual Cards' }),
       Icon: CreditCard,
@@ -179,7 +179,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: BarChart2,
     },
     {
-      if: isHost && hasFeature(account, FEATURES.HOST_VENDORS),
+      if: isHost && hasFeature(account, FEATURES.HOST_VENDORS) && !isAccountantOnly,
       section: ALL_SECTIONS.VENDORS,
       Icon: Store,
     },
@@ -200,12 +200,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: ArrowRightLeft,
     },
     {
-      if: !isOneOfTypes(account, [EVENT, USER]),
+      if: !isOneOfTypes(account, [EVENT, USER]) && !isAccountantOnly,
       section: ALL_SECTIONS.TIERS,
       Icon: HeartHandshake,
     },
     {
-      if: !isIndividual,
+      if: !isIndividual && !isAccountantOnly,
       section: ALL_SECTIONS.TEAM,
       Icon: Users2,
     },
