@@ -17,6 +17,7 @@ type ExpenseCategorySelectProps = {
   accountAdminCategory?: AccountingCategory;
   onChange: (category: AccountingCategory) => void;
   allowNone?: boolean;
+  showCode?: boolean;
   id?: string;
   error?: boolean;
   children?: React.ReactNode;
@@ -28,7 +29,7 @@ type OptionsMap = {
   [key in string | typeof VALUE_NONE]?: {
     value: AccountingCategory | null;
     searchText: string;
-    label: string;
+    label: React.ReactNode;
   };
 };
 
@@ -55,7 +56,7 @@ const getSelectionInfoForLabel = (
   category: AccountingCategory | null,
   submitterCategory: AccountingCategory | undefined | null,
   accountAdminCategory: AccountingCategory | undefined | null,
-): React.ReactNode => {
+): React.ReactNode | null => {
   if (!submitterCategory && !accountAdminCategory) {
     return null;
   }
@@ -77,21 +78,24 @@ const getSelectionInfoForLabel = (
         />
       </span>
     );
+  } else {
+    return null;
   }
 };
 
 const getCategoryLabel = (
   intl: IntlShape,
   category: AccountingCategory,
+  showCode: boolean,
   submitterCategory: AccountingCategory | null,
   accountAdminCategory: AccountingCategory | null,
-) => {
+): React.ReactNode => {
   // Get category label
-  let result;
+  let categoryStr;
   if (category === null) {
-    result = intl.formatMessage({ defaultMessage: "I don't know" });
+    categoryStr = intl.formatMessage({ defaultMessage: "I don't know" });
   } else if (category) {
-    result =
+    categoryStr =
       category.friendlyName ||
       category.name ||
       intl.formatMessage({ id: 'accountingCategory.doNotKnow', defaultMessage: 'Unknown category' });
@@ -99,21 +103,19 @@ const getCategoryLabel = (
 
   // Add selection info
   const selectionInfo = getSelectionInfoForLabel(category, submitterCategory, accountAdminCategory);
-  if (selectionInfo) {
-    result = (
-      <React.Fragment>
-        {result}
-        {selectionInfo}
-      </React.Fragment>
-    );
-  }
-
-  return result;
+  return (
+    <React.Fragment>
+      {showCode && <span className="mr-2 italic text-neutral-700">#{category.code}</span>}
+      {categoryStr}
+      {selectionInfo}
+    </React.Fragment>
+  );
 };
 
 const getOptions = (
   intl: IntlShape,
   host: Host,
+  showCode: boolean,
   allowNone: boolean,
   submitterCategory: AccountingCategory | null,
   accountAdminCategory: AccountingCategory | null,
@@ -124,13 +126,13 @@ const getOptions = (
   hostCategories.forEach(category => {
     categoriesById[category.id] = {
       value: category,
-      label: getCategoryLabel(intl, category, submitterCategory, accountAdminCategory),
+      label: getCategoryLabel(intl, category, showCode, submitterCategory, accountAdminCategory),
       searchText: getSearchTextFromCategory(category),
     };
   });
 
   if (allowNone) {
-    const label = getCategoryLabel(intl, null, submitterCategory, accountAdminCategory);
+    const label = getCategoryLabel(intl, null, false, submitterCategory, accountAdminCategory);
     categoriesById[VALUE_NONE] = {
       value: null,
       label,
@@ -150,13 +152,14 @@ const ExpenseCategorySelect = ({
   id,
   error,
   allowNone = false,
+  showCode = false,
   children,
 }: ExpenseCategorySelectProps) => {
   const intl = useIntl();
   const [isOpen, setOpen] = React.useState(false);
   const options = React.useMemo(
-    () => getOptions(intl, host, allowNone, submitterCategory, accountAdminCategory),
-    [host, allowNone, submitterCategory, accountAdminCategory],
+    () => getOptions(intl, host, showCode, allowNone, submitterCategory, accountAdminCategory),
+    [host, allowNone, showCode, submitterCategory, accountAdminCategory],
   );
 
   return (
@@ -172,7 +175,7 @@ const ExpenseCategorySelect = ({
               })}
             >
               <span className={cn('mr-3 max-w-[328px]  truncate', { 'text-gray-400': isUndefined(selectedCategory) })}>
-                {getCategoryLabel(intl, selectedCategory, submitterCategory, accountAdminCategory) ||
+                {getCategoryLabel(intl, selectedCategory, showCode, submitterCategory, accountAdminCategory) ||
                   intl.formatMessage({ defaultMessage: 'Select category' })}
               </span>
               <ChevronDown size="1em" />

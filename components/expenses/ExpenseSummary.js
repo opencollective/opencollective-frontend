@@ -190,7 +190,8 @@ const ExpenseSummary = ({
               host={host}
               expense={expense}
               canEdit={Boolean(expense.permissions?.canEditAccountingCategory)}
-              allowNone={!LoggedInUser?.isAdminOfCollectiveOrHost(expense.account)}
+              allowNone={!isLoggedInUserExpenseHostAdmin}
+              showCodeInSelect={isLoggedInUserExpenseHostAdmin}
             />
             <Separator orientation="vertical" className="h-[24px] w-[2px]" />
           </React.Fragment>
