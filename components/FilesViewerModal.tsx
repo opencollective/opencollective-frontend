@@ -68,7 +68,7 @@ const Scroller = styled.div`
 `;
 
 export const ModalOverlay = styled.button`
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -88,7 +88,7 @@ const Wrapper = styled(Flex)<WrapperProps>`
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: calc(100vw - var(--drawer-width, 0px));
   height: 100vh;
   z-index: ${props => props.zindex || 3000};
 
@@ -231,7 +231,7 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
     <React.Fragment>
       <GlobalModalStyle />
 
-      <FocusTrap>
+      <FocusTrap focusTrapOptions={{ allowOutsideClick: true }}>
         <Wrapper
           tabIndex={0}
           onKeyDown={event => {
