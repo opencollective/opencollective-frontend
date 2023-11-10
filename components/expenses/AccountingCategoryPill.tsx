@@ -1,6 +1,5 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { ClassValue } from 'clsx';
 import { ChevronDown } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -20,10 +19,13 @@ type AccountingCategoryPillProps = {
   expense: Expense;
   canEdit: boolean;
   host: Host;
+  /** Whether to allow the user to select "I don't know" */
   allowNone?: boolean;
+  /** Whether to show the category code in the select */
+  showCodeInSelect?: boolean;
 };
 
-const BADGE_CLASS: ClassValue = 'rounded-lg bg-red-50 px-3 py-1 text-sm font-normal text-neutral-800';
+const BADGE_CLASS = cn('red rounded-lg bg-neutral-100 px-3 py-1  text-xs font-medium text-neutral-800');
 
 const getCategoryLabel = (category: AccountingCategory) => {
   if (!category) {
@@ -33,7 +35,12 @@ const getCategoryLabel = (category: AccountingCategory) => {
   }
 };
 
-const AdminAccountingCategoryPill = ({ expense, host, allowNone }: Omit<AccountingCategoryPillProps, 'canEdit'>) => {
+const AdminAccountingCategoryPill = ({
+  expense,
+  host,
+  allowNone,
+  showCodeInSelect,
+}: Omit<AccountingCategoryPillProps, 'canEdit'>) => {
   const intl = useIntl();
   const [editExpense, { loading }] = useMutation(editExpenseCategoryMutation, { context: API_V2_CONTEXT });
   const { toast } = useToast();
@@ -45,6 +52,7 @@ const AdminAccountingCategoryPill = ({ expense, host, allowNone }: Omit<Accounti
       selectedCategory={expense.accountingCategory}
       submitterCategory={expense.valuesByRole?.submitter?.accountingCategory}
       accountAdminCategory={expense.valuesByRole?.accountAdmin?.accountingCategory}
+      showCode={showCodeInSelect}
       onChange={async selectedCategory => {
         try {
           await editExpense({
@@ -58,7 +66,7 @@ const AdminAccountingCategoryPill = ({ expense, host, allowNone }: Omit<Accounti
         }
       }}
     >
-      <Button className={cn(BADGE_CLASS, 'h-auto hover:bg-red-50 hover:opacity-90')}>
+      <Button className={cn(BADGE_CLASS, 'h-auto hover:bg-neutral-50 hover:opacity-90')}>
         <span className="mr-1">{getCategoryLabel(expense.accountingCategory)}</span>
         {loading ? <StyledSpinner size="1em" /> : <ChevronDown size="1em" />}
       </Button>
@@ -66,10 +74,23 @@ const AdminAccountingCategoryPill = ({ expense, host, allowNone }: Omit<Accounti
   );
 };
 
-export const AccountingCategoryPill = ({ expense, host, canEdit, allowNone }: AccountingCategoryPillProps) => {
+export const AccountingCategoryPill = ({
+  expense,
+  host,
+  canEdit,
+  allowNone,
+  showCodeInSelect = false,
+}: AccountingCategoryPillProps) => {
   if (!canEdit) {
     return <div className={BADGE_CLASS}>{getCategoryLabel(expense.accountingCategory)}</div>;
   } else {
-    return <AdminAccountingCategoryPill expense={expense} host={host} allowNone={allowNone} />;
+    return (
+      <AdminAccountingCategoryPill
+        expense={expense}
+        host={host}
+        allowNone={allowNone}
+        showCodeInSelect={showCodeInSelect}
+      />
+    );
   }
 };

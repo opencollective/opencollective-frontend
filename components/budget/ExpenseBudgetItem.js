@@ -212,7 +212,8 @@ const ExpenseBudgetItem = ({
                     expense={expense}
                     host={host}
                     canEdit={get(expense, 'permissions.canEditAccountingCategory', false)}
-                    allowNone={false}
+                    allowNone={!isLoggedInUserExpenseHostAdmin}
+                    showCodeInSelect={isLoggedInUserExpenseHostAdmin}
                   />
                 </div>
               )}
