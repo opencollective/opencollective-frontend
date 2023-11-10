@@ -5,6 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useWarnIfUnsavedChanges from '../../../../lib/hooks/warnIfUnsavedChanges';
 
 import { DataTable } from '../../../DataTable';
@@ -74,14 +75,17 @@ const EditableCell = ({ getValue, row, column, table }) => {
 
   const placeholderPath = column.columnDef.meta?.placeholderPath;
   const placeholder = placeholderPath ? get(row.original, placeholderPath) : column.columnDef.header;
+  if (table.options.meta.disabled) {
+    return <span className="w-full p-2">{value}</span>;
+  }
+
   return (
     <input
       placeholder={placeholder}
       {...column.columnDef.meta?.input}
-      className="w-full rounded p-2 outline-[--primary-color-300]"
+      className={'w-full rounded p-2 outline-[--primary-color-300]'}
       value={value}
       onChange={e => table.options.meta.update(row.index, column.id, e.target.value)}
-      disabled={table.options.meta.disabled}
     />
   );
 };
@@ -110,6 +114,9 @@ const columns = [
     header: null,
     meta: { className: 'w-14' },
     cell: ({ cell, table }) => {
+      if (table.options.meta.disabled) {
+        return null;
+      }
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -136,6 +143,7 @@ export const AccountingCategoriesTable = ({ hostSlug }: AccountingCategoriesTabl
   const { toast } = useToast();
   const tableRef = React.useRef(null);
   const [rowIdxToFocus, setRowIdxToFocus] = React.useState<number | null>(null);
+  const { LoggedInUser } = useLoggedInUser();
   const graphQLParams = { context: API_V2_CONTEXT, variables: { hostSlug } };
   const { data, error, loading } = useQuery(accountingCategoriesQuery, graphQLParams);
   const categoriesFromData = get(data, 'host.accountingCategories.nodes', []);
@@ -168,6 +176,7 @@ export const AccountingCategoriesTable = ({ hostSlug }: AccountingCategoriesTabl
     return <MessageBoxGraphqlError error={error} />;
   }
 
+  const isAdmin = Boolean(data?.host && LoggedInUser?.isAdminOfCollective(data?.host)); // Accountants can't edit accounting categories
   return (
     <form
       onSubmit={async e => {
@@ -190,6 +199,7 @@ export const AccountingCategoriesTable = ({ hostSlug }: AccountingCategoriesTabl
         emptyMessage={() => <FormattedMessage defaultMessage="No chart of accounts" />}
         meta={
           {
+            disabled: !isAdmin,
             remove: rowIndex => {
               setRowIdxToFocus(null);
               setCategories(categories => {
@@ -208,23 +218,25 @@ export const AccountingCategoriesTable = ({ hostSlug }: AccountingCategoriesTabl
           } as AccountingCategoriesTableMeta
         }
         footer={
-          <div className="flex justify-end space-x-2 border-t border-slate-200 px-4 py-2">
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                // Add one row and focus its first input
-                setCategories([...categories, cloneDeep(DEFAULT_CATEGORY)]);
-                setRowIdxToFocus(categories.length);
-              }}
-            >
-              + <FormattedMessage id="accountingCategory.add" defaultMessage="Add new" />
-            </Button>
-            <Button type="submit" size="sm" disabled={isSaved} loading={submitting} className="min-w-[60px]">
-              <FormattedMessage id="save" defaultMessage="Save" />
-            </Button>
-          </div>
+          isAdmin && (
+            <div className="flex justify-end space-x-2 border-t border-slate-200 px-4 py-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  // Add one row and focus its first input
+                  setCategories([...categories, cloneDeep(DEFAULT_CATEGORY)]);
+                  setRowIdxToFocus(categories.length);
+                }}
+              >
+                + <FormattedMessage id="accountingCategory.add" defaultMessage="Add new" />
+              </Button>
+              <Button type="submit" size="sm" disabled={isSaved} loading={submitting} className="min-w-[60px]">
+                <FormattedMessage id="save" defaultMessage="Save" />
+              </Button>
+            </div>
+          )
         }
       />
     </form>
