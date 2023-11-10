@@ -23,7 +23,7 @@ type AccountingCategoryPillProps = {
   allowNone?: boolean;
 };
 
-const BADGE_CLASS: ClassValue = 'rounded-lg bg-red-50 px-3 py-1 text-sm font-normal text-neutral-800';
+const BADGE_CLASS = cn('red rounded-lg bg-neutral-100 px-3 py-1  text-xs font-medium text-neutral-800');
 
 const getCategoryLabel = (category: AccountingCategory) => {
   if (!category) {
@@ -58,7 +58,7 @@ const AdminAccountingCategoryPill = ({ expense, host, allowNone }: Omit<Accounti
         }
       }}
     >
-      <Button className={cn(BADGE_CLASS, 'h-auto hover:bg-red-50 hover:opacity-90')}>
+      <Button className={cn(BADGE_CLASS, 'h-auto hover:bg-neutral-50 hover:opacity-90')}>
         <span className="mr-1">{getCategoryLabel(expense.accountingCategory)}</span>
         {loading ? <StyledSpinner size="1em" /> : <ChevronDown size="1em" />}
       </Button>
