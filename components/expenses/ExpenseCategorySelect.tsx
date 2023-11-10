@@ -89,7 +89,11 @@ const getCategoryLabel = (
   showCode: boolean,
   submitterCategory: AccountingCategory | null,
   accountAdminCategory: AccountingCategory | null,
-): React.ReactNode => {
+): React.ReactNode | null => {
+  if (isUndefined(category)) {
+    return null;
+  }
+
   // Get category label
   let categoryStr;
   if (category === null) {
@@ -105,7 +109,7 @@ const getCategoryLabel = (
   const selectionInfo = getSelectionInfoForLabel(category, submitterCategory, accountAdminCategory);
   return (
     <React.Fragment>
-      {showCode && <span className="mr-2 italic text-neutral-700">#{category.code}</span>}
+      {showCode && category && <span className="mr-2 italic text-neutral-700">#{category.code}</span>}
       {categoryStr}
       {selectionInfo}
     </React.Fragment>
@@ -174,8 +178,12 @@ const ExpenseCategorySelect = ({
                 'border-gray-300': !error,
               })}
             >
-              <span className={cn('mr-3 max-w-[328px]  truncate', { 'text-gray-400': isUndefined(selectedCategory) })}>
-                {getCategoryLabel(intl, selectedCategory, showCode, submitterCategory, accountAdminCategory) ||
+              <span
+                className={cn('mr-3 max-w-[328px] truncate text-sm', {
+                  'text-gray-400': isUndefined(selectedCategory),
+                })}
+              >
+                {getCategoryLabel(intl, selectedCategory, false, submitterCategory, accountAdminCategory) ||
                   intl.formatMessage({ defaultMessage: 'Select category' })}
               </span>
               <ChevronDown size="1em" />

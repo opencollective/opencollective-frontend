@@ -12,6 +12,7 @@ import { getAccountReferenceInput, isInternalHost } from '../../lib/collective.l
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { formatErrorMessage } from '../../lib/errors';
 import { getSupportedExpenseTypes } from '../../lib/expenses';
 import { requireFields } from '../../lib/form-utils';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
@@ -314,6 +315,7 @@ const ExpenseFormBody = ({
   const hasOCRFeature = hasOCRPreviewEnabled && checkExpenseSupportsOCR(values.type, LoggedInUser);
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
+  const isHostAdmin = Boolean(LoggedInUser?.isAdminOfCollective(host));
   const isReceipt = values.type === expenseTypes.RECEIPT;
   const isGrant = values.type === expenseTypes.GRANT;
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
@@ -746,13 +748,14 @@ const ExpenseFormBody = ({
                                 id="ExpenseCategoryInput"
                                 host={host}
                                 selectedCategory={values.accountingCategory}
-                                allowNone={!LoggedInUser?.isAdminOfCollective(host)}
                                 onChange={value => formik.setFieldValue('accountingCategory', value)}
                                 error={Boolean(meta.error)}
+                                allowNone={!isHostAdmin}
+                                showCode={isHostAdmin}
                               />
                               {meta.error && meta.touched && (
                                 <Span color="red.500" fontSize="12px" mt="4px">
-                                  {meta.error}
+                                  {formatErrorMessage(intl, meta.error)}
                                 </Span>
                               )}
                             </div>
