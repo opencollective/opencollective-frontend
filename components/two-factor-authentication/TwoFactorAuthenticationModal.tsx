@@ -290,9 +290,9 @@ function RecoveryCodeOptions(props: { value: string; onChange: (string) => void;
         name="2fa-code-input"
         type="text"
         mt={3}
+        placeholder="ABCDEFGHIJKLM123"
         minHeight={50}
         fontSize="20px"
-        inputMode="numeric"
         value={props.value}
         onChange={e => props.onChange(e.target.value)}
         disabled={props.disabled}
