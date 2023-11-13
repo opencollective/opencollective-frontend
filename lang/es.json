@@ -231,6 +231,7 @@
   "accountingCategory.doNotKnow": "Unknown category",
   "AccountingCategory.friendlyName": "Friendly name",
   "accountingCategory.selectedBy": "Selected by {isSelectedBySubmitter, select, true {submitter} other {}}{hasBoth, select, true { and } other {}}{isSelectedByAccountAdmin, select, true {collective admin} other {}}",
+  "Accounts.PastAndArchived": "Past & Archived",
   "AccountSwitcher.Category.Titles": "{type, select, USER {Mi espacio de trabajo} COLLECTIVE {Mis Colectivos} ORGANIZATION {Mis Organizaciones} EVENT {Mis Eventos} FUND {Mis Fondos} PROJECT {Mis Proyectos} ARCHIVED {Archivado} other {}}",
   "AccountSwitcher.Description": "{type, select, USER {Perfil personal} COLLECTIVE {Administrador del Colectivo} ORGANIZATION {Administrador de la Organización} EVENT {Administrador del Evento} FUND {Administrador del Fondo} PROJECT {Administrador del Proyecto} other {}}",
   "ACH Debit": "Débito ACH",

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { groupBy, isEmpty, uniqBy } from 'lodash';
+import { groupBy, isEmpty, partition, uniqBy } from 'lodash';
 import { LayoutDashboard, Plus } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
 import { isPastEvent } from '../../lib/events';
-import { getDashboardRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
 import Collapse from '../Collapse';
@@ -70,11 +70,11 @@ const CollectiveListItem = styled.div`
   }
 `;
 
-const MembershipLine = ({ user, membership, closeDrawer }) => {
+const MembershipLine = ({ user, collective, closeDrawer }) => {
   return (
     <CollectiveListItem className="group h-9">
-      <MenuLink href={`/${membership.collective.slug}`} onClick={closeDrawer}>
-        <Avatar collective={membership.collective} radius={16} />
+      <MenuLink href={getCollectivePageRoute(collective)} onClick={closeDrawer}>
+        <Avatar collective={collective} radius={16} />
         <P
           fontSize="inherit"
           fontWeight="inherit"
@@ -83,17 +83,17 @@ const MembershipLine = ({ user, membership, closeDrawer }) => {
           letterSpacing={0}
           truncateOverflow
         >
-          {membership.collective.name}
+          {collective.name}
         </P>
       </MenuLink>
 
-      {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
+      {Boolean(user?.canSeeAdminPanel(collective)) && (
         <div className="absolute bottom-1 right-1 top-1">
           <Tooltip>
             <TooltipTrigger>
               <Link
                 className="flex h-7 w-7 items-center justify-center rounded-md border bg-white text-slate-950 opacity-0 transition-all hover:border-white hover:bg-slate-900 hover:text-white group-hover:opacity-100"
-                href={getDashboardRoute(membership.collective)}
+                href={getDashboardRoute(collective)}
                 onClick={closeDrawer}
               >
                 <LayoutDashboard size="14px" strokeWidth={1.5} />
@@ -111,55 +111,40 @@ const MembershipLine = ({ user, membership, closeDrawer }) => {
 
 MembershipLine.propTypes = {
   user: PropTypes.object,
-  membership: PropTypes.object,
+  collective: PropTypes.object,
   closeDrawer: PropTypes.func,
 };
 
-const sortMemberships = (memberships: LoggedInUser['memberOf']) => {
-  if (!memberships?.length) {
+const sortCollectives = (collectives: LoggedInUser['memberOf'][0]['collective'][]) => {
+  if (!collectives?.length) {
     return [];
   } else {
-    return memberships.sort((a, b) => {
-      return a.collective.slug.localeCompare(b.collective.slug);
+    return collectives.sort((a, b) => {
+      return a.slug.localeCompare(b.slug);
     });
   }
 };
 
-const filterArchivedMemberships = (memberships: LoggedInUser['memberOf']) => {
-  const archivedMemberships = memberships.filter(m => {
-    if (
-      m.role !== 'BACKER' &&
-      m.collective.isArchived &&
-      !(m.collective.type === 'EVENT' && isPastEvent(m.collective))
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  });
+const getAllCollectivesForMenu = (memberships: LoggedInUser['memberOf']) => {
+  const collectives = memberships.filter(m => m.role !== 'BACKER' && m.collective).map(m => m.collective);
+  const administratedChildren = memberships
+    .filter(m => m.role === 'ADMIN' && m.collective?.children?.length)
+    .map(m => m.collective.children.map(c => ({ ...c, parentCollective: m.collective })))
+    .flat();
 
-  return uniqBy(archivedMemberships, m => m.collective.id);
+  return uniqBy([...collectives, ...administratedChildren], c => c.id);
 };
 
-const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
-  const filteredMemberships = memberships.filter(m => {
-    if (m.role === 'BACKER' || m.collective.isArchived) {
-      return false;
-    } else if (m.collective.type === 'EVENT' && isPastEvent(m.collective)) {
-      return false;
-    } else {
-      return Boolean(m.collective);
-    }
-  });
-
-  return uniqBy(filteredMemberships, m => m.collective.id);
+const partitionActiveCollectives = (collectives: LoggedInUser['memberOf'][0]['collective'][]) => {
+  const checkActive = c => !c.isArchived && !(c.type === 'EVENT' && isPastEvent(c, { gracePeriodInDays: 30 }));
+  return partition(collectives, checkActive);
 };
 
-const MembershipsList = ({ user, memberships, closeDrawer }) => {
+const MembershipsList = ({ user, collectives, closeDrawer }) => {
   return (
     <Box as="ul" p={0} my={2}>
-      {sortMemberships(memberships).map(member => (
-        <MembershipLine key={member.id} membership={member} user={user} closeDrawer={closeDrawer} />
+      {sortCollectives(collectives).map(collective => (
+        <MembershipLine key={collective.id} collective={collective} user={user} closeDrawer={closeDrawer} />
       ))}
     </Box>
   );
@@ -167,7 +152,7 @@ const MembershipsList = ({ user, memberships, closeDrawer }) => {
 
 MembershipsList.propTypes = {
   user: PropTypes.object,
-  memberships: PropTypes.array,
+  collectives: PropTypes.array,
   closeDrawer: PropTypes.func,
 };
 
@@ -212,7 +197,7 @@ const MENU_SECTIONS = {
     },
   },
   ARCHIVED: {
-    title: defineMessage({ id: 'Archived', defaultMessage: 'Archived' }),
+    title: defineMessage({ id: 'Accounts.PastAndArchived', defaultMessage: 'Past & Archived' }),
   },
 };
 
@@ -250,13 +235,13 @@ type ProfileMenuMembershipsProps = {
 
 const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsProps) => {
   const intl = useIntl();
-  const memberships = filterMemberships(user.memberOf);
-  const archivedMemberships = filterArchivedMemberships(user.memberOf);
-  const groupedMemberships = groupBy(memberships, m => m.collective.type);
-  groupedMemberships.ARCHIVED = archivedMemberships;
-  const hasNoMemberships = isEmpty(memberships);
+  const allCollectives = getAllCollectivesForMenu(user.memberOf);
+  const [activeCollectives, archivedCollectives] = partitionActiveCollectives(allCollectives);
+  const groupedCollectives = groupBy(activeCollectives, c => c.type);
+  groupedCollectives.ARCHIVED = archivedCollectives;
+  const hasNoMemberships = isEmpty(activeCollectives);
   const shouldDisplaySection = section => {
-    return MENU_SECTIONS[section].emptyMessage || !isEmpty(groupedMemberships[section]);
+    return MENU_SECTIONS[section].emptyMessage || !isEmpty(groupedCollectives[section]);
   };
 
   return (
@@ -269,8 +254,8 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
       {Object.keys(MENU_SECTIONS)
         .filter(shouldDisplaySection)
         .map((accountType, i) => {
-          const memberships = groupedMemberships[accountType];
-          const sectionIsEmpty = isEmpty(memberships);
+          const collectives = groupedCollectives[accountType];
+          const sectionIsEmpty = isEmpty(collectives);
           const sectionData = MENU_SECTIONS[accountType];
           return (
             <React.Fragment key={accountType}>
@@ -319,10 +304,10 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
                       />
                     }
                   >
-                    <MembershipsList memberships={memberships} user={user} closeDrawer={closeDrawer} />
+                    <MembershipsList collectives={collectives} user={user} closeDrawer={closeDrawer} />
                   </Collapse>
                 ) : (
-                  <MembershipsList memberships={memberships} user={user} closeDrawer={closeDrawer} />
+                  <MembershipsList collectives={collectives} user={user} closeDrawer={closeDrawer} />
                 )}
               </AccountList>
             </React.Fragment>
