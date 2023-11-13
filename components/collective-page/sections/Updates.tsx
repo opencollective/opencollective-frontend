@@ -188,8 +188,8 @@ const SectionUpdates = ({ collective, isAdmin }) => {
                         <StyledTooltip
                           content={() => (
                             <FormattedMessage
-                              id="update.private.lock_text"
-                              defaultMessage="This update is for contributors only"
+                              defaultMessage="This update {audience, select, COLLECTIVE_ADMINS {is for team members of hosted collectives only} FINANCIAL_CONTRIBUTORS {is for financial contributors only} ALL {is public} other {might be limited to a specific audience}}"
+                              values={{ audience: update.notificationAudience }}
                             />
                           )}
                         >
