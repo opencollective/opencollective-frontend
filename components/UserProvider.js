@@ -184,10 +184,10 @@ class UserProvider extends React.Component {
             }
           }
         }
+      } else {
+        // Store the error
+        this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
       }
-
-      // Store the error
-      this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
     }
   };
 
