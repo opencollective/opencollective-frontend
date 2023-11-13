@@ -65,8 +65,8 @@ export default function useQueryFilter<F extends Filters>(opts: UseQueryFilterOp
       const deserializedValue = filterDefinition.isMulti
         ? filterQueryValues.map(s => deserializeFn(s))
         : filterQueryValues.length > 0
-        ? deserializeFn(filterQueryValues?.[0])
-        : null;
+          ? deserializeFn(filterQueryValues?.[0])
+          : null;
 
       return {
         ...acc,
