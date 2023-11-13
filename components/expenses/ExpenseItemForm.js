@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, useFormikContext } from 'formik';
-import { escape, get, isEmpty, pick, unescape } from 'lodash';
+import { escape, get, isEmpty, isUndefined, pick, unescape } from 'lodash';
 import Lottie from 'lottie-react';
 import { AlertTriangle } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -17,6 +17,7 @@ import { expenseItemsMustHaveFiles } from './lib/items';
 import { checkExpenseItemCanBeSplit, updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import * as ScanningAnimationJSON from '../../public/static/animations/scanning.json';
+import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import RichTextEditor from '../RichTextEditor';
@@ -26,9 +27,10 @@ import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
-import { Span } from '../Text';
+import { P, Span } from '../Text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
+import { AccountingCategoryPill } from './AccountingCategoryPill';
 import { ExpenseItemDescriptionHint } from './ItemDescriptionHint';
 import { SplitExpenseItemsModal } from './SplitExpenseItemsModal';
 
@@ -187,6 +189,7 @@ const ExpenseItemForm = ({
   const getFieldName = field => `${itemPath}.${field}`;
   const getError = field => formatFormErrorMessage(intl, get(errors, getFieldName(field)));
   const isLoading = Boolean(attachment.__isUploading);
+  const hasAccountingCategory = !isUndefined(form.values.accountingCategory);
 
   return (
     <Box mb={18} data-cy="expense-attachment-form">
@@ -273,7 +276,7 @@ const ExpenseItemForm = ({
               </StyledInputField>
             )}
           </Field>
-          <Flex justifyContent="flex-end" flexDirection={['column', null, null, 'row']} gridGap="8px">
+          <Flex justifyContent="flex-end" flexDirection={['column', null, null, 'row']} gridGap="16px">
             {requireDate && (
               <StyledInputField
                 name={getFieldName('incurredAt')}
@@ -283,7 +286,7 @@ const ExpenseItemForm = ({
                 required={!isOptional}
                 label={formatMessage(msg.dateLabel)}
                 labelFontSize="13px"
-                flex={requireFile ? '1 1 44%' : '1 1 50%'}
+                flex={requireFile ? '1 1 44%' : hasAccountingCategory ? '1 1 33%' : '1 1 50%'}
                 mt={3}
                 disabled={editOnlyDescriptiveInfo}
               >
@@ -344,6 +347,16 @@ const ExpenseItemForm = ({
                 </Field>
               )}
             </StyledInputField>
+            {hasAccountingCategory && (
+              <Container fontSize="12px" flex="1 1 33%" mt={3}>
+                <P fontSize="13px" lineHeight="1.15em" fontWeight="normal" mr="8px" mb="8px">
+                  <FormattedMessage defaultMessage="Expense category" />
+                </P>
+                <div className="flex h-[40px] items-center">
+                  <AccountingCategoryPill expense={form.values} host={collective.host} canEdit={false} showEmpty />
+                </div>
+              </Container>
+            )}
           </Flex>
         </Box>
       </Flex>

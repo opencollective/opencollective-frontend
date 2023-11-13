@@ -16,6 +16,24 @@
     "babel-plugin-react-docgen",
     "babel-plugin-styled-components",
     [
+      "import",
+      {
+        "libraryName": "lodash",
+        "libraryDirectory": "",
+        "camel2DashComponentName": false
+      },
+      "lodash"
+    ],
+    [
+      "import",
+      {
+        "libraryName": "validator",
+        "libraryDirectory": "lib",
+        "camel2DashComponentName": false
+      },
+      "validator"
+    ],
+    [
       "babel-plugin-formatjs",
       {
         "ast": true,

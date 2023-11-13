@@ -1,6 +1,4 @@
 import * as Sentry from '@sentry/nextjs';
-import accepts from 'accepts';
-import cookie from 'cookie';
 import { pick } from 'lodash';
 import { NextPageContext } from 'next';
 
@@ -40,7 +38,8 @@ export function getRequestIntl(req: NextPageContext['req']): IntlProps {
 
     if (queryLanguage && supportedLanguages.includes(queryLanguage)) {
       language = queryLanguage;
-    } else {
+    } else if (typeof window === 'undefined') {
+      const cookie = require('cookie');
       const cookies = cookie.parse(req?.headers?.['cookie'] ?? '');
       const cookieLanguage = cookies?.['language'];
 
@@ -52,7 +51,10 @@ export function getRequestIntl(req: NextPageContext['req']): IntlProps {
     if (['test', 'e2e', 'ci'].includes(process.env.OC_ENV)) {
       locale = language || 'en';
     } else {
-      locale = language || accepts(req).language(supportedLanguages) || 'en';
+      if (typeof window === 'undefined') {
+        const accepts = require('accepts');
+        locale = language || accepts(req).language(supportedLanguages) || 'en';
+      }
     }
 
     return {

@@ -14,12 +14,14 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
+import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-categories';
 
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
 import { AvatarWithLink } from '../AvatarWithLink';
 import Container from '../Container';
 import DateTime from '../DateTime';
+import { AccountingCategoryPill } from '../expenses/AccountingCategoryPill';
 import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTypeTag from '../expenses/ExpenseTypeTag';
@@ -200,6 +202,21 @@ const ExpenseBudgetItem = ({
                   </AutosizeText>
                 </StyledLink>
               </StyledTooltip>
+
+              {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, expense.account, host) && (
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-normal text-neutral-700">
+                    <FormattedMessage id="expense.accountingCategory" defaultMessage="Category" />
+                  </span>
+                  <AccountingCategoryPill
+                    expense={expense}
+                    host={host}
+                    canEdit={get(expense, 'permissions.canEditAccountingCategory', false)}
+                    allowNone={!isLoggedInUserExpenseHostAdmin}
+                    showCodeInSelect={isLoggedInUserExpenseHostAdmin}
+                  />
+                </div>
+              )}
 
               <P mt="5px" fontSize="12px" color="black.700">
                 {isAdminView ? (
@@ -448,6 +465,7 @@ ExpenseBudgetItem.propTypes = {
     amountInAccountCurrency: AmountPropTypeShape,
     currency: PropTypes.string.isRequired,
     permissions: PropTypes.object,
+    accountingCategory: PropTypes.object,
     items: PropTypes.arrayOf(PropTypes.object),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
     attachedFiles: PropTypes.arrayOf(PropTypes.object),

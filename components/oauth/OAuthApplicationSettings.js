@@ -13,6 +13,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { Flex } from '../Grid';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
@@ -33,6 +34,7 @@ const applicationSettingsFragment = gql`
     id
     name
     description
+    preAuthorize2FA
     redirectUri
     clientId
     clientSecret
@@ -109,6 +111,11 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
             </H3>
             <StyledHr ml={2} flex="1" borderColor="black.400" />
           </Flex>
+          {data.application.preAuthorize2FA && (
+            <MessageBox type="warning" withIcon mt={16}>
+              <FormattedMessage defaultMessage="This application can directly perform critical operations that would normally require 2FA." />
+            </MessageBox>
+          )}
           <StyledCard maxWidth="600px" p={3} my={4}>
             <H4 fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb="20px">
               <FormattedMessage defaultMessage="Client ID and client secret" />

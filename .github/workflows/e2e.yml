@@ -82,7 +82,7 @@ jobs:
           sudo tar xzvf /tmp/stripe_1.13.9_linux_x86_64.tar.gz -C /bin/
 
       - name: Checkout (frontend)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -110,7 +110,7 @@ jobs:
 
       - name: Checkout (api - matching branch)
         if: steps.check-matching-branch.outputs.status == 200
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
@@ -118,13 +118,13 @@ jobs:
 
       - name: Checkout (api - main)
         if: steps.check-matching-branch.outputs.status != 200
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
 
       - name: Checkout (images)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: opencollective/opencollective-images
           path: opencollective-images
@@ -217,11 +217,13 @@ jobs:
         run: ./scripts/run_e2e_tests.sh
         env:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
-      - name: Archive test screenshots
+      - name: Archive test recordings
         uses: actions/upload-artifact@v3
         with:
-          name: screenshots
-          path: test/cypress/screenshots
+          name: cypress-recordings
+          path: |
+            test/cypress/screenshots
+            test/cypress/videos
         if: ${{ failure() }}
 
       - name: Report Coverage

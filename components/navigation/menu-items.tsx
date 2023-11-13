@@ -1,11 +1,13 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-export const dashboardFooterItems = [
-  {
-    label: <FormattedMessage id="home" defaultMessage="Home" />,
-    href: '/home',
-  },
+type Item = {
+  label: React.ReactNode;
+  href?: string;
+  items?: Item[];
+};
+
+export const landingPageItems: Item[] = [
   {
     label: <FormattedMessage defaultMessage="Solutions" />,
     items: [
@@ -48,6 +50,14 @@ export const dashboardFooterItems = [
       },
     ],
   },
+];
+
+export const dashboardFooterItems: Item[] = [
+  {
+    label: <FormattedMessage id="home" defaultMessage="Home" />,
+    href: '/home',
+  },
+  ...landingPageItems,
   {
     label: <FormattedMessage defaultMessage="Help & Support" />,
     href: '/help',
@@ -62,7 +72,7 @@ export const dashboardFooterItems = [
   },
 ];
 
-export const regularFooterItems = [
+export const regularFooterItems: Item[] = [
   {
     label: <FormattedMessage id="platform" defaultMessage="Platform" />,
     items: [

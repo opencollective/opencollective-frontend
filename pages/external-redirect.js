@@ -72,7 +72,7 @@ const ExternalRedirectPage = () => {
   }, [router, query.url]);
 
   return (
-    <Page>
+    <Page noRobots>
       <Flex justifyContent="center" alignItems="center" py={[4, 5, 6]}>
         {isReady ? (
           <StyledCard maxWidth={450}>

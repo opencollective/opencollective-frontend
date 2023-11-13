@@ -392,6 +392,7 @@ class CreateExpensePage extends React.Component {
                         {step !== STEPS.SUMMARY ? (
                           <ExpenseForm
                             collective={collective}
+                            host={host}
                             loading={loadingLoggedInUser}
                             loggedInAccount={loggedInAccount}
                             onSubmit={this.onFormSubmit}
@@ -493,6 +494,7 @@ const hostFieldsFragment = gql`
     id
     name
     legalName
+    legacyId
     slug
     type
     expensePolicy
@@ -510,6 +512,21 @@ const hostFieldsFragment = gql`
     transferwise {
       id
       availableCurrencies
+    }
+    accountingCategories {
+      nodes {
+        id
+        name
+        friendlyName
+        code
+      }
+    }
+    policies {
+      id
+      EXPENSE_CATEGORIZATION {
+        requiredForExpenseSubmitters
+        requiredForCollectiveAdmins
+      }
     }
     supportedPayoutMethods
     isTrustedHost

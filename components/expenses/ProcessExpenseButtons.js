@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { collectiveAdminsMustConfirmAccountingCategory } from './lib/accounting-categories';
 
 import { getScheduledExpensesQueryVariables, scheduledExpensesQuery } from '../host-dashboard/ScheduledExpensesBanner';
 import Link from '../Link';
@@ -19,6 +20,7 @@ import StyledTooltip from '../StyledTooltip';
 import { useToast } from '../ui/useToast';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
+import ApproveExpenseModal from './ApproveExpenseModal';
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import DeleteExpenseButton from './DeleteExpenseButton';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
@@ -139,6 +141,7 @@ const ProcessExpenseButtons = ({
   disabled,
 }) => {
   const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] = React.useState();
+  const [showApproveExpenseModal, setShowApproveExpenseModal] = React.useState(false);
   const [selectedAction, setSelectedAction] = React.useState(null);
   const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
   const mutationOptions = { context: API_V2_CONTEXT, update: onUpdate };
@@ -193,7 +196,13 @@ const ProcessExpenseButtons = ({
         (permissions.approve.allowed || permissions.approve.reason === PERMISSION_CODES.AUTHOR_CANNOT_APPROVE) && (
           <PermissionButton
             {...getButtonProps('APPROVE')}
-            onClick={() => triggerAction('APPROVE')}
+            onClick={() => {
+              if (collectiveAdminsMustConfirmAccountingCategory(collective, host)) {
+                setShowApproveExpenseModal(true);
+              } else {
+                triggerAction('APPROVE');
+              }
+            }}
             buttonStyle="secondary"
             data-cy="approve-button"
             icon={<ApproveIcon size={12} />}
@@ -228,7 +237,7 @@ const ProcessExpenseButtons = ({
           </ButtonLabel>
         </StyledButton>
       )}
-      {permissions.canMarkAsSpam && (
+      {permissions.canMarkAsSpam && !isMoreActions && (
         <StyledButton
           {...getButtonProps('MARK_AS_SPAM')}
           buttonStyle="dangerSecondary"
@@ -313,6 +322,17 @@ const ProcessExpenseButtons = ({
             onModalToggle?.(false);
           }}
           expense={expense}
+        />
+      )}
+      {showApproveExpenseModal && (
+        <ApproveExpenseModal
+          expense={expense}
+          host={host}
+          onConfirm={() => triggerAction('APPROVE')}
+          onClose={() => {
+            setShowApproveExpenseModal(false);
+            onModalToggle?.(false);
+          }}
         />
       )}
     </React.Fragment>

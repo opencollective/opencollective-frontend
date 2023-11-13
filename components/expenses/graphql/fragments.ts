@@ -102,6 +102,15 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
   }
 `;
 
+const accountingCategoryFields = gql`
+  fragment AccountingCategoryFields on AccountingCategory {
+    id
+    name
+    friendlyName
+    code
+  }
+`;
+
 export const expenseHostFields = gql`
   fragment ExpenseHostFields on Host {
     id
@@ -140,7 +149,21 @@ export const expenseHostFields = gql`
     plan {
       id
     }
+    accountingCategories {
+      nodes {
+        id
+        ...AccountingCategoryFields
+      }
+    }
+    policies {
+      id
+      EXPENSE_CATEGORIZATION {
+        requiredForExpenseSubmitters
+        requiredForCollectiveAdmins
+      }
+    }
   }
+  ${accountingCategoryFields}
 `;
 
 export const expensePageExpenseFieldsFragment = gql`
@@ -156,6 +179,25 @@ export const expensePageExpenseFieldsFragment = gql`
     privateMessage
     tags
     amount
+    accountingCategory {
+      id
+      ...AccountingCategoryFields
+    }
+    valuesByRole {
+      id
+      submitter {
+        accountingCategory {
+          id
+          ...AccountingCategoryFields
+        }
+      }
+      accountAdmin {
+        accountingCategory {
+          id
+          ...AccountingCategoryFields
+        }
+      }
+    }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
       currency
@@ -401,6 +443,7 @@ export const expensePageExpenseFieldsFragment = gql`
       id
       canEdit
       canEditTags
+      canEditAccountingCategory
       canDelete
       canSeeInvoiceInfo
       canApprove
@@ -504,6 +547,7 @@ export const expensePageExpenseFieldsFragment = gql`
 
   ${expenseHostFields}
   ${collectiveNavbarFieldsFragment}
+  ${accountingCategoryFields}
 `;
 
 export const expensesListFieldsFragment = gql`
@@ -517,6 +561,25 @@ export const expensesListFieldsFragment = gql`
     amount
     comments {
       totalCount
+    }
+    accountingCategory {
+      id
+      ...AccountingCategoryFields
+    }
+    valuesByRole {
+      id
+      submitter {
+        accountingCategory {
+          id
+          ...AccountingCategoryFields
+        }
+      }
+      accountAdmin {
+        accountingCategory {
+          id
+          ...AccountingCategoryFields
+        }
+      }
     }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
@@ -571,6 +634,7 @@ export const expensesListFieldsFragment = gql`
       canMarkAsIncomplete
       canSeeInvoiceInfo
       canEditTags
+      canEditAccountingCategory
       canUnschedulePayment
       canHold
       canRelease
@@ -616,6 +680,7 @@ export const expensesListFieldsFragment = gql`
       name
     }
   }
+  ${accountingCategoryFields}
 `;
 
 export const expensesListAdminFieldsFragment = gql`

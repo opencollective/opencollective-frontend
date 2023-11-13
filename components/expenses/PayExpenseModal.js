@@ -79,8 +79,13 @@ const getPayoutLabel = (intl, type) => {
   return i18nPayoutMethodType(intl, type, { aliasBankAccountToTransferWise: true });
 };
 
-const getPayoutOptionValue = (payoutMethodType, isAuto, host) => {
+const getPayoutOptionValue = (payoutMethod, isAuto, host) => {
+  const payoutMethodType = payoutMethod?.type || PayoutMethodType.OTHER;
   if (payoutMethodType === PayoutMethodType.OTHER) {
+    return { forceManual: true, action: 'PAY' };
+  }
+  // TODO: remove this when we implement the missing Brazilian TRANSFER NATURE field.
+  else if (payoutMethod?.data?.type === 'brazil') {
     return { forceManual: true, action: 'PAY' };
   } else if (payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !host.transferwise) {
     return { forceManual: true, action: 'PAY' };
@@ -184,10 +189,10 @@ const SectionLabel = styled.p`
   text-transform: uppercase;
 `;
 
-const getInitialValues = (expense, host, payoutMethodType) => {
+const getInitialValues = (expense, host) => {
   return {
     ...DEFAULT_VALUES,
-    ...getPayoutOptionValue(payoutMethodType, true, host),
+    ...getPayoutOptionValue(expense.payoutMethod, true, host),
     feesPayer: expense.feesPayer || DEFAULT_VALUES.feesPayer,
     totalAmountPaidInHostCurrency: expense.currency === host.currency ? expense.amount : null,
   };
@@ -220,7 +225,7 @@ const calculateAmounts = ({ formik, expense, quote, host, feesPayer }) => {
 const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, LoggedInUser }) => {
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
-  const initialValues = getInitialValues(expense, host, payoutMethodType);
+  const initialValues = getInitialValues(expense, host);
   const formik = useFormik({ initialValues, validate, onSubmit });
   const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
@@ -229,6 +234,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
   const hasAutomaticManualPicker = ![PayoutMethodType.OTHER, PayoutMethodType.ACCOUNT_BALANCE].includes(
     payoutMethodType,
   );
+
   const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT;
   const quoteQuery = useQuery(quoteExpenseQuery, {
     variables: { id: expense.id },

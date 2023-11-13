@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
-import jwt from 'jsonwebtoken';
+import { decodeJwt } from 'jose';
 import { get, isEqual } from 'lodash';
 import Router, { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
@@ -134,14 +134,12 @@ class UserProvider extends React.Component {
         return null;
       }
 
-      // Store the error
-      this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
       if (error.message.includes('Two-factor authentication is enabled')) {
         // eslint-disable-next-line no-constant-condition
         while (true) {
           try {
-            const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-            const decodedToken = jwt.decode(token);
+            const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
+            const decodedToken = decodeJwt(token);
 
             const result = await twoFactorAuthPrompt.open({
               supportedMethods: decodedToken.supported2FAMethods,
@@ -151,7 +149,7 @@ class UserProvider extends React.Component {
             });
 
             const LoggedInUser = await getLoggedInUser({
-              token: getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN),
+              token: getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN),
               twoFactorAuthenticatorCode: result.code,
               twoFactorAuthenticationType: result.type,
             });
@@ -167,6 +165,7 @@ class UserProvider extends React.Component {
                 LoggedInUser,
               });
             }
+            removeFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
 
             return LoggedInUser;
           } catch (e) {
@@ -185,6 +184,9 @@ class UserProvider extends React.Component {
             }
           }
         }
+      } else {
+        // Store the error
+        this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
       }
     }
   };

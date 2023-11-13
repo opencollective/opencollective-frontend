@@ -1,7 +1,6 @@
 import speakeasy from 'speakeasy';
 
 import { randomEmail, randomGmailEmail, randomHotMail } from '../support/faker';
-import generateToken from '../support/token';
 
 describe('signin', () => {
   it('redirects directly when using a dev test account', () => {
@@ -13,13 +12,18 @@ describe('signin', () => {
   });
 
   it('can signin with a valid token and is redirected', () => {
-    cy.visit(`/signin/${generateToken()}?next=/apex`);
+    cy.generateToken().then(token => {
+      cy.visit(`/signin/${token}?next=/apex`);
+    });
+
     cy.assertLoggedIn();
     cy.url().should('eq', `${Cypress.config().baseUrl}/apex`);
   });
 
   it('can signin with a valid token and is redirected, even if next is URL encoded', () => {
-    cy.visit(`/signin/${generateToken()}?next=%2Fapex`);
+    cy.generateToken().then(token => {
+      cy.visit(`/signin/${token}?next=%2Fapex`);
+    });
     cy.assertLoggedIn();
     cy.url().should('eq', `${Cypress.config().baseUrl}/apex`);
   });
@@ -33,7 +37,9 @@ describe('signin', () => {
   });
 
   it('shows an error when token is expired', () => {
-    cy.visit(`/signin?token=${generateToken(null, -100000)}`);
+    cy.generateToken(-100000).then(token => {
+      cy.visit(`/signin?token=${token}`);
+    });
     cy.contains('Sign In failed: Token rejected.');
     cy.contains('You can ask for a new sign in link using the form below.');
     cy.contains('Sign in or create a personal account to continue');
@@ -65,7 +71,9 @@ describe('signin', () => {
     cy.assertLoggedIn();
 
     // Try to signin with an expired token
-    cy.visit(`/signin?token=${generateToken(null, -1000000)}&next=/apex`);
+    cy.generateToken(-1000000).then(token => {
+      cy.visit(`/signin?token=${token}&next=/apex`);
+    });
 
     // Should be logged in with the old account
     cy.assertLoggedIn();

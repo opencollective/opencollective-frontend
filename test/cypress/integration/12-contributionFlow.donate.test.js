@@ -147,23 +147,23 @@ describe('Contribution Flow: Donate', () => {
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.checkStepsProgress({ enabled: ['details', 'profile', 'payment'] });
     cy.wait(3000); // Wait for stripe to be loaded
-    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
+    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE_2 });
     cy.contains('button', 'Contribute $42').click();
     cy.wait(8000); // Wait for order to be submitted and popup to appear
 
     // Rejecting the validation should produce an error
-    cy.complete3dSecure(false);
+    cy.complete3dSecure(false, { version: 2 });
     cy.contains('We are unable to authenticate your payment method.');
 
     // Refill stripe input to avoid using the same token twice
-    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
+    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE_2 });
 
     // Re-trigger the popup
     cy.contains('button', 'Contribute $42').click();
 
     // Approving the validation should create the order
     cy.wait(8000); // Wait for order to be submitted and popup to appear
-    cy.complete3dSecure(true);
+    cy.complete3dSecure(true, { version: 2 });
     cy.getByDataCy('order-success', { timeout: 20000 });
     cy.contains('You are now supporting APEX.');
   });

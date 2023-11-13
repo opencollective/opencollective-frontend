@@ -19,6 +19,7 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
     $parentCollectiveIds: [Int]
     $skipGuests: Boolean
     $includeArchived: Boolean
+    $includeVendorsForHostId: Int
   ) {
     search(
       term: $term
@@ -28,6 +29,7 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
       parentCollectiveIds: $parentCollectiveIds
       skipGuests: $skipGuests
       includeArchived: $includeArchived
+      includeVendorsForHostId: $includeVendorsForHostId
     ) {
       id
       collectives {
@@ -126,6 +128,7 @@ const CollectivePickerAsync = ({
   isLoading = false,
   skipGuests = true,
   includeArchived = false,
+  includeVendorsForHostId = undefined,
   ...props
 }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
@@ -147,6 +150,7 @@ const CollectivePickerAsync = ({
         parentCollectiveIds,
         skipGuests,
         includeArchived,
+        includeVendorsForHostId,
       });
     }
   }, [types, limit, hostCollectiveIds, parentCollectiveIds, term]);
@@ -206,6 +210,8 @@ CollectivePickerAsync.propTypes = {
   onInvite: PropTypes.func,
   /** Include archived collectives **/
   includeArchived: PropTypes.bool,
+  /** Include vendors for the given host id**/
+  includeVendorsForHostId: PropTypes.number,
 };
 
 export default CollectivePickerAsync;
