@@ -25,7 +25,7 @@ import { listTierQuery } from '../tiers/EditTierModal';
 import { collectiveSettingsV1Query } from './EditCollectivePage';
 
 // TODO Make this a common function with the contribute section
-const getTiers = (collective, sortedTiers) => {
+const getTiers = (collective, sortedTiers, intl) => {
   const defaultContributionEnabled = !get(collective, 'settings.disableCustomContributions', false);
 
   const createdTierCards = sortedTiers.map(tier => ({
@@ -47,6 +47,7 @@ const getTiers = (collective, sortedTiers) => {
             collective,
             hideContributors: true,
             hideCTA: true,
+            missingCTAMsg: intl.formatMessage({ defaultMessage: 'The default contribution tier cannot be edited.' }),
           },
         },
       ]
@@ -150,7 +151,7 @@ const Tiers = ({ collective }) => {
             </Box>
             <AdminContributeCardsContainer
               collective={collective}
-              cards={getTiers(collective, filteredTiers)}
+              cards={getTiers(collective, filteredTiers, intl)}
               CardsContainer={CardsContainer}
               useTierModals
               enableReordering={false}

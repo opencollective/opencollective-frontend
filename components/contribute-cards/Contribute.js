@@ -73,7 +73,7 @@ const CoverImage = styled.div`
 `;
 
 /** Tier's description */
-const Description = styled.div`
+const descriptionStyle = css`
   overflow-wrap: break-word;
   margin: 8px 0;
   font-size: 14px;
@@ -84,6 +84,17 @@ const Description = styled.div`
 
   /* Neutral Tints / 700 */
   color: #4e5052;
+`;
+const Description = styled.div`
+  ${descriptionStyle}
+`;
+
+const MissingCTAExplanation = styled.div`
+  ${descriptionStyle}
+  flex: 0;
+  font-style: italic;
+  font-size: 12px;
+  padding-bottom: 4px;
 `;
 
 /** Translations */
@@ -211,6 +222,7 @@ const ContributeCard = ({
   onClickEdit,
   tier,
   isPreview,
+  missingCTAMsg,
   ...props
 }) => {
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
@@ -242,6 +254,7 @@ const ContributeCard = ({
             {title}
           </Container>
           <Description data-cy="contribute-description">{children}</Description>
+          {(hideCTA || disableCTA) && missingCTAMsg && <MissingCTAExplanation>{missingCTAMsg}</MissingCTAExplanation>}
         </Flex>
         <Box>
           {!disableCTA && !hideCTA && (
@@ -359,6 +372,7 @@ ContributeCard.propTypes = {
   collective: PropTypes.object,
   isPreview: PropTypes.bool,
   onClickEdit: PropTypes.func,
+  missingCTAMsg: PropTypes.string,
 };
 
 export default injectIntl(ContributeCard);
