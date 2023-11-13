@@ -250,8 +250,8 @@ const ExpenseSummaryAdditionalInformation = ({
                 !expense.payoutMethod?.type && (expense.draft || expense.payee.isInvite)
                   ? expense.draft?.payoutMethod?.type || INVITE
                   : isCharge
-                  ? VIRTUAL_CARD
-                  : expense.payoutMethod?.type
+                    ? VIRTUAL_CARD
+                    : expense.payoutMethod?.type
               }
               name={expense?.virtualCard?.name && `${expense.virtualCard.name} Card (${expense.virtualCard.last4})`}
             />

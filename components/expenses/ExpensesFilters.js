@@ -67,14 +67,14 @@ const ExpensesFilters = ({
             label: intl.formatMessage(I18nMessages.ALL),
           }
         : props.chargeHasReceiptFilter === true
-        ? {
-            value: true,
-            label: intl.formatMessage(I18nMessages.HAS_RECEIPTS),
-          }
-        : {
-            value: false,
-            label: intl.formatMessage(I18nMessages.HAS_NO_RECEIPTS),
-          },
+          ? {
+              value: true,
+              label: intl.formatMessage(I18nMessages.HAS_RECEIPTS),
+            }
+          : {
+              value: false,
+              label: intl.formatMessage(I18nMessages.HAS_NO_RECEIPTS),
+            },
     [intl, props.chargeHasReceiptFilter],
   );
 

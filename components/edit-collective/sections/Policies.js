@@ -679,7 +679,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                   <StyledCheckbox
                     name={`checkbox-EXPENSE_CATEGORIZATION-requiredForExpenseSubmitters`}
                     label={
-                      <FormattedMessage defaultMessage="Require expense submitters to select an expense category when submitting an expense" />
+                      <FormattedMessage defaultMessage="Require expense submitters to select a category when submitting an expense" />
                     }
                     checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForExpenseSubmitters}
                     onChange={({ checked }) => {

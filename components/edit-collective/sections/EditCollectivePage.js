@@ -104,10 +104,10 @@ const ItemContainer = styled.div`
     props.isDragging
       ? '#f0f8ff'
       : !props.isDragOverlay
-      ? 'transparent'
-      : props.isSubSection
-      ? props.theme.colors.black[100]
-      : 'white'};
+        ? 'transparent'
+        : props.isSubSection
+          ? props.theme.colors.black[100]
+          : 'white'};
 
   ${props =>
     props.isDragOverlay &&
