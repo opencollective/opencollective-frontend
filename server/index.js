@@ -23,6 +23,7 @@ app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflar
 const dev = process.env.NODE_ENV === 'development';
 
 const nextApp = next({ dev });
+const nextRequestHandler = nextApp.getRequestHandler();
 
 const port = process.env.PORT;
 
@@ -76,7 +77,12 @@ const start = id =>
       );
     }
 
-    app.use(routes(app, nextApp));
+    routes(app);
+
+    app.all('*', (req, res) => {
+      return nextRequestHandler(req, res);
+    });
+
     app.use(loggerMiddleware.errorLogger);
 
     app.listen(port, err => {

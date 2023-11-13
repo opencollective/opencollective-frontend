@@ -1,5 +1,5 @@
 import { ThemeProvider } from 'styled-components';
-import { RouterContext } from 'next/dist/shared/lib/router-context';
+import { RouterContext } from 'next/dist/shared/lib/router-context.shared-runtime';
 import { IntlProvider } from 'react-intl';
 import theme from '../lib/theme';
 import { ApolloProvider } from '@apollo/client';
