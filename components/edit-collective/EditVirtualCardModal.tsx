@@ -228,8 +228,8 @@ export default function EditVirtualCardModal({
           account: isEditing
             ? undefined
             : typeof collective.id === 'string'
-            ? { id: collective.id }
-            : { legacyId: collective.id },
+              ? { id: collective.id }
+              : { legacyId: collective.id },
           name: cardName,
           assignee: { id: assignee.id },
           limitAmount: undefined,

@@ -205,8 +205,8 @@ const validateExpense = (intl, expense, collective, host, LoggedInUser) => {
   const errors = isCardCharge
     ? {}
     : expense.payee?.type === CollectiveType.VENDOR
-    ? requireFields(expense, ['description', 'payee', 'currency'])
-    : requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
+      ? requireFields(expense, ['description', 'payee', 'currency'])
+      : requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
 
   if (expense.items.length > 0) {
     const itemsErrors = expense.items.map(item => validateExpenseItem(expense, item));

@@ -320,8 +320,8 @@ const CreateCollectiveMiniForm = ({
                       isUser
                         ? 'e.g., Jane Doe, Frank Zappa'
                         : isCollective
-                        ? 'e.g., Webpack, Babel'
-                        : 'e.g., AirBnb, TripleByte'
+                          ? 'e.g., Webpack, Babel'
+                          : 'e.g., AirBnb, TripleByte'
                     }
                     data-cy="mini-form-name-field"
                   />
