@@ -208,7 +208,7 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
   useKeyBoardShortcut({ callback: onArrowRight, keyMatch: ARROW_RIGHT_KEY });
   useKeyBoardShortcut({ callback: onArrowLeft, keyMatch: ARROW_LEFT_KEY });
 
-  const selectedItem = files?.length ? files[selectedIndex] : null;
+  const selectedItem = files?.length ? files?.[selectedIndex] : null;
 
   const nbFiles = files?.length || 0;
   const hasMultipleFiles = nbFiles > 1;
