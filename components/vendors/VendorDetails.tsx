@@ -47,7 +47,7 @@ const VendorDetails = ({ vendor, onCancel, editVendor }: VendorDetailsProps) => 
   return (
     <div>
       <H4 mb={32}>
-        <FormattedMessage defaultMessage="Vendor's Detail" />
+        <FormattedMessage defaultMessage="Vendor's Details" />
       </H4>
       <SectionTitle>{vendor.name}</SectionTitle>
       <div className="mt-4 flex gap-8">

@@ -132,7 +132,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
     { label: 'EIN', value: 'EIN' },
     { label: 'VAT', value: 'VAT' },
     { label: 'GST', value: 'GST' },
-    { label: <FormattedMessage defaultMessage="Other" />, value: 'OTHER' },
+    { label: <FormattedMessage id="taxType.Other" defaultMessage="Other" />, value: 'OTHER' },
   ];
   const initialValues = cloneDeep(pick(vendor, EDITABLE_FIELDS) || {});
   if (initialValues.vendorInfo?.taxType && !['EIN', 'VAT', 'GST'].includes(initialValues.vendorInfo?.taxType)) {
@@ -253,7 +253,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
               {formik.values?.vendorInfo?.taxType === 'OTHER' && (
                 <StyledInputFormikField
                   name="vendorInfo.otherTaxType"
-                  label={intl.formatMessage({ defaultMessage: 'Identification sytem' })}
+                  label={intl.formatMessage({ defaultMessage: 'Identification system' })}
                   labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
                   mt={3}
                 >
