@@ -35,8 +35,8 @@ const CollectiveTypesI18n = defineMessages({
     defaultMessage: '{n, plural, one {person} other {people}}',
   },
   [CollectiveType.VENDOR]: {
-    id: 'collective.types.vendor',
-    defaultMessage: '{n, plural, one {Vendor} other {Vendors}}',
+    id: 'CollectiveType.Vendor',
+    defaultMessage: '{count, plural, one {Vendor} other {Vendors}}',
   },
 });
 
@@ -156,7 +156,8 @@ class CollectivePicker extends React.PureComponent {
     return sortedActiveTypes.map(type => {
       const sectionI18n = CollectiveTypesI18n[type];
       const sortedCollectives = sortFunc(collectivesByTypes[type]);
-      const sectionLabel = sectionI18n ? intl.formatMessage(sectionI18n, { n: sortedCollectives.length }) : type;
+      const i18nParams = { count: sortedCollectives.length, n: sortedCollectives.length };
+      const sectionLabel = sectionI18n ? intl.formatMessage(sectionI18n, i18nParams) : type;
       return {
         label: sectionLabel || '',
         options: sortedCollectives.map(this.buildCollectiveOption),

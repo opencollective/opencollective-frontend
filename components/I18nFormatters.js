@@ -38,6 +38,8 @@ export const I18nPrivacyLink = msg => (
   </StyledLink>
 );
 
+export const I18nWithColumn = item => <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item }} />;
+
 export const WebsiteName = 'Open Collective';
 
 const I18nFormatters = {

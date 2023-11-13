@@ -13,6 +13,7 @@ import Avatar from '../../Avatar';
 import Container from '../../Container';
 import { DataTable } from '../../DataTable';
 import { Drawer } from '../../Drawer';
+import { I18nWithColumn } from '../../I18nFormatters';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import SearchBar from '../../SearchBar';
@@ -101,7 +102,7 @@ const getColumns = ({ editVendor, openVendor, handleSetArchive }) => {
             {contact && (
               <VendorContactTag className="ml-3">
                 <span className="font-normal">
-                  <FormattedMessage defaultMessage="Contact:" />
+                  {I18nWithColumn(<FormattedMessage id="Contact" defaultMessage="Contact" />)}
                 </span>
                 <a href={`mailto:${contact.email}`}>{contact.name}</a>
               </VendorContactTag>
