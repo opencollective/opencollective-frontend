@@ -84,7 +84,7 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
         {admins && (
           <div className="mt-4 flex flex-1 flex-col">
             <SectionTitle>
-              <FormattedMessage defaultMessage="Admins" />
+              <FormattedMessage id="Admins" defaultMessage="Admins" />
             </SectionTitle>
             <div className="flex gap-4">
               {admins.map(admin => (
@@ -101,10 +101,10 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
             <FormattedMessage defaultMessage="Activity" />
           </SectionTitle>
           <Link href={`${dashboardLink}/host-expenses?searchTerm=%40${organization.slug}`} className="text-sm">
-            {organization.expenses.totalCount} <FormattedMessage defaultMessage="Expenses" />
+            {organization.expenses.totalCount} <FormattedMessage id="Expenses" defaultMessage="Expenses" />
           </Link>
           <Link href={`${dashboardLink}/orders?searchTerm=%40${organization.slug}`} className="text-sm">
-            {organization.orders.totalCount} <FormattedMessage defaultMessage="Contributions" />
+            {organization.orders.totalCount} <FormattedMessage id="Contributions" defaultMessage="Contributions" />
           </Link>
         </div>
       </div>
