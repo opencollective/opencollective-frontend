@@ -82,7 +82,7 @@ const Avatar = ({
       src = defaultImage.ANONYMOUS;
     } else if (collective.isGuest && shouldUseDefaultGuestAvatar(collective.name)) {
       src = defaultImage.GUEST;
-    } else if (type === 'VENDOR') {
+    } else if (type === 'VENDOR' && !collective.imageUrl) {
       const iconSize = 2 * Math.round((radius * 0.6) / 2);
       const padding = (radius - iconSize) / 2;
       child = (
