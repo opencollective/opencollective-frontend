@@ -85,6 +85,7 @@ const updatePageQuery = gql`
       userCanPublishUpdate
       reactions
       userReactions
+      notificationAudience
       account {
         id
         slug
