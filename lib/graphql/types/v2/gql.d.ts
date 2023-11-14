@@ -254,6 +254,10 @@ export function gql(source: "\n  mutation ProcessHostApplication(\n    $host: Ac
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query ExpensePipelineOverview($hostSlug: String!, $currency: Currency!) {\n    wiseReadyToPay: expenses(\n      host: { slug: $hostSlug }\n      limit: 0\n      status: READY_TO_PAY\n      payoutMethodType: BANK_ACCOUNT\n    ) {\n      totalCount\n      aggregation {\n        totalAmount(currency: $currency) {\n          valueInCents\n          currency\n        }\n      }\n    }\n    wiseScheduledForPayment: expenses(\n      host: { slug: $hostSlug }\n      limit: 0\n      status: SCHEDULED_FOR_PAYMENT\n      payoutMethodType: BANK_ACCOUNT\n    ) {\n      totalCount\n      aggregation {\n        totalAmount(currency: $currency) {\n          valueInCents\n          currency\n        }\n      }\n    }\n    paypalReadyToPay: expenses(host: { slug: $hostSlug }, limit: 0, status: READY_TO_PAY, payoutMethodType: PAYPAL) {\n      totalCount\n      aggregation {\n        totalAmount(currency: $currency) {\n          valueInCents\n          currency\n        }\n      }\n    }\n    paypalScheduledForPayment: expenses(\n      host: { slug: $hostSlug }\n      limit: 0\n      status: SCHEDULED_FOR_PAYMENT\n      payoutMethodType: PAYPAL\n    ) {\n      totalCount\n      aggregation {\n        totalAmount(currency: $currency) {\n          valueInCents\n          currency\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').ExpensePipelineOverviewDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query ExpensesScheduledForPayment($hostSlug: String!) {\n    expenses(host: { slug: $hostSlug }, status: SCHEDULED_FOR_PAYMENT, payoutMethodType: BANK_ACCOUNT) {\n      totalCount\n      nodes {\n        id\n      }\n    }\n  }\n"): typeof import('./graphql').ExpensesScheduledForPaymentDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.

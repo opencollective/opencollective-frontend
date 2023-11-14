@@ -1,4 +1,5 @@
 import React from 'react';
+import { gql, useQuery } from '@apollo/client';
 import { Paypal } from '@styled-icons/fa-brands/Paypal';
 import { StripeS } from '@styled-icons/fa-brands/StripeS';
 import clsx from 'clsx';
@@ -6,12 +7,15 @@ import { FormattedMessage } from 'react-intl';
 
 import { connectAccount } from '../../../lib/api';
 import { createError, ERROR } from '../../../lib/errors';
-import { Amount, Host } from '../../../lib/graphql/types/v2/graphql';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { Amount, ExpenseCollection, ExpenseCollectionAggregation, Host } from '../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
 import { getDashboardUrl } from '../../../lib/stripe/dashboard';
 
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import TransferwiseIcon from '../../icons/TransferwiseIcon';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
+import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
 import StyledLink from '../../StyledLink';
@@ -21,45 +25,118 @@ import TransferwiseDetailsIcon from '../TransferwiseDetailsIcon';
 
 import PayExpensesScheduledForPaymentButton from './PayExpensesScheduledForPaymentButton';
 
+const ExpensePipelineOverviewQuery = gql`
+  query ExpensePipelineOverview($hostSlug: String!, $currency: Currency!) {
+    wiseReadyToPay: expenses(
+      host: { slug: $hostSlug }
+      limit: 0
+      status: READY_TO_PAY
+      payoutMethodType: BANK_ACCOUNT
+    ) {
+      totalCount
+      aggregation {
+        totalAmount(currency: $currency) {
+          valueInCents
+          currency
+        }
+      }
+    }
+    wiseScheduledForPayment: expenses(
+      host: { slug: $hostSlug }
+      limit: 0
+      status: SCHEDULED_FOR_PAYMENT
+      payoutMethodType: BANK_ACCOUNT
+    ) {
+      totalCount
+      aggregation {
+        totalAmount(currency: $currency) {
+          valueInCents
+          currency
+        }
+      }
+    }
+    paypalReadyToPay: expenses(host: { slug: $hostSlug }, limit: 0, status: READY_TO_PAY, payoutMethodType: PAYPAL) {
+      totalCount
+      aggregation {
+        totalAmount(currency: $currency) {
+          valueInCents
+          currency
+        }
+      }
+    }
+    paypalScheduledForPayment: expenses(
+      host: { slug: $hostSlug }
+      limit: 0
+      status: SCHEDULED_FOR_PAYMENT
+      payoutMethodType: PAYPAL
+    ) {
+      totalCount
+      aggregation {
+        totalAmount(currency: $currency) {
+          valueInCents
+          currency
+        }
+      }
+    }
+  }
+`;
+
 type ExpensePipelineOverviewProps = {
   className?: string;
   host: Pick<
     Host,
     'id' | 'legacyId' | 'currency' | 'paypalPreApproval' | 'transferwise' | 'stripe' | 'paypalPreApproval' | 'slug'
   >;
-  wise: {
-    readyToPayAmount?: Amount;
-    readyToPayCount?: number;
-    scheduledForPaymentAmount?: Amount;
-    scheduledForPaymentCount?: number;
-  };
-  paypal: {
-    readyToPayAmount?: Amount;
-    readyToPayCount?: number;
-    scheduledForPaymentAmount?: Amount;
-    scheduledForPaymentCount?: number;
-  };
 };
 
 export default function ExpensePipelineOverview(props: ExpensePipelineOverviewProps) {
+  const { data, loading, error } = useQuery<{
+    wiseReadyToPay: Pick<ExpenseCollection, 'totalCount'> & {
+      aggregation: Pick<ExpenseCollectionAggregation, 'totalAmount'>;
+    };
+    wiseScheduledForPayment: Pick<ExpenseCollection, 'totalCount'> & {
+      aggregation: Pick<ExpenseCollectionAggregation, 'totalAmount'>;
+    };
+    paypalReadyToPay: Pick<ExpenseCollection, 'totalCount'> & {
+      aggregation: Pick<ExpenseCollectionAggregation, 'totalAmount'>;
+    };
+    paypalScheduledForPayment: Pick<ExpenseCollection, 'totalCount'> & {
+      aggregation: Pick<ExpenseCollectionAggregation, 'totalAmount'>;
+    };
+  }>(ExpensePipelineOverviewQuery, {
+    context: API_V2_CONTEXT,
+    variables: {
+      hostSlug: props.host.slug,
+      currency: props.host.currency,
+    },
+  });
+
+  if (loading) {
+    return <LoadingPlaceholder height={150} />;
+  }
+
+  if (error) {
+    return <MessageBoxGraphqlError error={error} />;
+  }
+
   return (
     <div className={clsx('flex gap-4', props.className)}>
       <WiseStatus
         className="w-full"
         host={props.host}
-        readyToPayAmount={props.wise.readyToPayAmount}
-        readyToPayCount={props.wise.readyToPayCount}
-        scheduledForPaymentAmount={props.wise.scheduledForPaymentAmount}
-        scheduledForPaymentCount={props.wise.scheduledForPaymentCount}
+        readyToPayAmount={data.wiseReadyToPay.aggregation.totalAmount}
+        readyToPayCount={data.wiseReadyToPay.totalCount}
+        scheduledForPaymentAmount={data.wiseScheduledForPayment.aggregation.totalAmount}
+        scheduledForPaymentCount={data.wiseScheduledForPayment.totalCount}
       />
       {props.host?.paypalPreApproval && (
         <PayPalStatus
           className="w-full"
           host={props.host}
-          readyToPayAmount={props.paypal.readyToPayAmount}
-          readyToPayCount={props.paypal.readyToPayCount}
-          scheduledForPaymentAmount={props.paypal.scheduledForPaymentAmount}
-          scheduledForPaymentCount={props.paypal.scheduledForPaymentCount}
+          readyToPayAmount={data.paypalReadyToPay.aggregation.totalAmount}
+          readyToPayCount={data.paypalReadyToPay.totalCount}
+          scheduledForPaymentAmount={data.paypalScheduledForPayment.aggregation.totalAmount}
+          scheduledForPaymentCount={data.paypalScheduledForPayment.totalCount}
         />
       )}
       {props.host?.stripe?.issuingBalance && <StripeIssuingStatus className="w-full" host={props.host} />}
