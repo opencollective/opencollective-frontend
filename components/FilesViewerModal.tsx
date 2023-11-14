@@ -68,7 +68,7 @@ const Scroller = styled.div`
 `;
 
 export const ModalOverlay = styled.button`
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -88,12 +88,16 @@ const Wrapper = styled(Flex)<WrapperProps>`
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: calc(100vw - var(--drawer-width, 0px));
   height: 100vh;
   z-index: ${props => props.zindex || 3000};
 
   justify-content: center;
   align-items: center;
+
+  @media (max-width: 1200px) {
+    width: 100vw;
+  }
 `;
 
 const StyledArrowButton = styled.button<{
@@ -189,6 +193,13 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
   const initialIndex = openFileUrl ? files?.findIndex(f => f.url === openFileUrl) : 0;
   const [selectedIndex, setSelectedIndex] = useState(initialIndex);
 
+  React.useEffect(() => {
+    if (openFileUrl) {
+      const idx = files?.findIndex(f => f.url === openFileUrl) ?? 0;
+      setSelectedIndex(idx);
+    }
+  }, [openFileUrl, files]);
+
   const onArrowLeft = React.useCallback(() => setSelectedIndex(selectedIndex => Math.max(selectedIndex - 1, 0)), []);
   const onArrowRight = React.useCallback(
     () => setSelectedIndex(selectedIndex => Math.min(selectedIndex + 1, (files?.length || 1) - 1)),
@@ -197,7 +208,7 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
   useKeyBoardShortcut({ callback: onArrowRight, keyMatch: ARROW_RIGHT_KEY });
   useKeyBoardShortcut({ callback: onArrowLeft, keyMatch: ARROW_LEFT_KEY });
 
-  const selectedItem = files?.length ? files[selectedIndex] : null;
+  const selectedItem = files?.length ? files?.[selectedIndex] : null;
 
   const nbFiles = files?.length || 0;
   const hasMultipleFiles = nbFiles > 1;
@@ -231,7 +242,7 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
     <React.Fragment>
       <GlobalModalStyle />
 
-      <FocusTrap>
+      <FocusTrap focusTrapOptions={{ allowOutsideClick: true }}>
         <Wrapper
           tabIndex={0}
           onKeyDown={event => {
