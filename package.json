@@ -38,7 +38,7 @@
     "@sentry/nextjs": "^7.49.0",
     "@shopify/address": "4.2.0",
     "@simplewebauthn/browser": "8.3.4",
-    "@stripe/react-stripe-js": "2.3.1",
+    "@stripe/react-stripe-js": "2.3.2",
     "@stripe/stripe-js": "2.1.11",
     "@styled-icons/boxicons-regular": "10.47.0",
     "@styled-icons/boxicons-solid": "10.47.0",
