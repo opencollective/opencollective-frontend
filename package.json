@@ -19,7 +19,7 @@
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
     "@graphql-typed-document-node/core": "3.2.0",
-    "@hcaptcha/react-hcaptcha": "1.9.0",
+    "@hcaptcha/react-hcaptcha": "1.9.1",
     "@hyperwatch/hyperwatch": "4.0.0",
     "@mui/material": "5.14.18",
     "@opencollective/taxes": "4.1.0",
