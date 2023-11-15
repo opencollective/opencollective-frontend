@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { isEmpty, isNil, omitBy, pick } from 'lodash';
+import { isEmpty, isNil, omitBy, pick, toNumber } from 'lodash';
 import { Archive, MoreHorizontal, Pencil } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -30,6 +30,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../ui/DropdownMenu';
+import { Pagination } from '../../ui/Pagination';
 import { TableActionsButton } from '../../ui/Table';
 import OrganizationDetails from '../../vendors/OrganizationDetails';
 import { setVendorArchiveMutation, vendorFieldFragment, VendorFieldsFragment } from '../../vendors/queries';
@@ -43,6 +44,8 @@ enum VendorsTab {
   POTENTIAL_VENDORS = 'POTENTIAL_VENDORS',
 }
 
+const PAGE_SIZE = 20;
+
 const TAB_VALUES = {
   [VendorsTab.ALL]: { isArchived: false, includePotentialVendors: false },
   [VendorsTab.ARCHIVED]: { isArchived: true, includePotentialVendors: false },
@@ -55,6 +58,8 @@ const dashboardVendorsQuery = gql`
     $searchTerm: String
     $isArchived: Boolean
     $includePotentialVendors: Boolean!
+    $limit: Int
+    $offset: Int
   ) {
     account(slug: $slug) {
       id
@@ -83,8 +88,10 @@ const dashboardVendorsQuery = gql`
           }
           supportedPayoutMethods
           isTrustedHost
-          vendors(searchTerm: $searchTerm, isArchived: $isArchived) {
+          vendors(searchTerm: $searchTerm, isArchived: $isArchived, limit: $limit, offset: $offset) {
             totalCount
+            offset
+            limit
             nodes {
               id
               ...VendorFields
@@ -258,9 +265,14 @@ const OrgsTable = ({ orgs, loading, openOrg }) => {
   );
 };
 
-const QUERY_FILTERS = ['searchTerm'];
-
-const pickQueryFilters = query => omitBy(pick(query, QUERY_FILTERS), isNil);
+const pickQueryFilters = query =>
+  omitBy(
+    {
+      searchTerm: query.searchTerm,
+      offset: toNumber(query.offset || 0),
+    },
+    isNil,
+  );
 
 const Vendors = ({ accountSlug }) => {
   const router = useRouter();
@@ -277,6 +289,7 @@ const Vendors = ({ accountSlug }) => {
   } = useQuery<DashboardVendorsQuery>(dashboardVendorsQuery, {
     variables: {
       slug: accountSlug,
+      limit: PAGE_SIZE,
       ...tabValues,
       ...queryValues,
     },
@@ -301,7 +314,10 @@ const Vendors = ({ accountSlug }) => {
   const handleSetArchive = async vendor =>
     archiveVendor({ variables: { vendor: pick(vendor, ['id']), archive: !vendor.isArchived } });
   const updateFilters = props =>
-    router.replace({ pathname: router.asPath.split('?')[0], query: pickQueryFilters({ ...router.query, ...props }) });
+    router.replace({
+      pathname: router.asPath.split('?')[0],
+      query: pickQueryFilters({ ...router.query, ...props }),
+    });
   const handleTabUpdate = tab => {
     setTab(tab);
     updateFilters({ offset: null });
@@ -322,6 +338,8 @@ const Vendors = ({ accountSlug }) => {
       label: 'Potential vendors',
     },
   ];
+  const pages = Math.ceil((host?.vendors?.totalCount || 1) / PAGE_SIZE);
+  const currentPage = toNumber((queryValues.offset || 0) + PAGE_SIZE) / PAGE_SIZE;
   const isDrawerOpen = Boolean(vendorDetail || createEditVendor?.['id'] || orgDetail);
   const loading = queryLoading;
   const error = queryError;
@@ -388,6 +406,14 @@ const Vendors = ({ accountSlug }) => {
               handleSetArchive={handleSetArchive}
             />
           ))}
+
+        {tab !== VendorsTab.POTENTIAL_VENDORS && (
+          <Pagination
+            totalPages={pages}
+            page={currentPage}
+            onChange={page => updateFilters({ offset: (page - 1) * PAGE_SIZE })}
+          />
+        )}
       </div>
 
       {createEditVendor === true && (
