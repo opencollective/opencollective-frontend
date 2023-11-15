@@ -207,6 +207,11 @@ interface Account {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -496,6 +501,8 @@ interface Account {
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   expenses(
+    direction: ExpenseDirection
+
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -1591,6 +1598,11 @@ type Host implements Account & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -1912,6 +1924,8 @@ type Host implements Account & AccountWithContributions {
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   expenses(
+    direction: ExpenseDirection
+
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -2876,6 +2890,21 @@ type ExpenseCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Expense]
+}
+
+"""
+Describes the role in which an account is involved in an expense. This is used to filter
+"""
+enum ExpenseDirection {
+  """
+  Submitted: The account is the one who submitted the expense and possibly the beneficiary.
+  """
+  SUBMITTED
+
+  """
+  Received: The account is the one who received the expense and the one who's paying for it.
+  """
+  RECEIVED
 }
 
 """
@@ -6080,6 +6109,11 @@ type Bot implements Account {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -6401,6 +6435,8 @@ type Bot implements Account {
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   expenses(
+    direction: ExpenseDirection
+
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -6722,6 +6758,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -7043,6 +7084,8 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   expenses(
+    direction: ExpenseDirection
+
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -7733,6 +7776,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -8054,6 +8102,8 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   expenses(
+    direction: ExpenseDirection
+
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -8595,6 +8645,11 @@ type Individual implements Account {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -8916,6 +8971,8 @@ type Individual implements Account {
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   expenses(
+    direction: ExpenseDirection
+
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -9443,6 +9500,11 @@ type Organization implements Account & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -9764,6 +9826,8 @@ type Organization implements Account & AccountWithContributions {
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   expenses(
+    direction: ExpenseDirection
+
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -10206,6 +10270,11 @@ type Vendor implements Account & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -10527,6 +10596,8 @@ type Vendor implements Account & AccountWithContributions {
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   expenses(
+    direction: ExpenseDirection
+
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -13274,6 +13345,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -13595,6 +13671,8 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   expenses(
+    direction: ExpenseDirection
+
     """
     The number of results to fetch (default 10, max 1000)
     """
@@ -14026,6 +14104,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -14347,6 +14430,8 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
   expenses(
+    direction: ExpenseDirection
+
     """
     The number of results to fetch (default 10, max 1000)
     """
