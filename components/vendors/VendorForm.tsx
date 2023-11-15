@@ -92,8 +92,8 @@ const validateVendorForm = values => {
 const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormProps) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const [createVendor] = useMutation(createVendorMutation, { context: API_V2_CONTEXT });
-  const [editVendor] = useMutation(editVendorMutation, { context: API_V2_CONTEXT });
+  const [createVendor, { loading: isCreating }] = useMutation(createVendorMutation, { context: API_V2_CONTEXT });
+  const [editVendor, { loading: isEditing }] = useMutation(editVendorMutation, { context: API_V2_CONTEXT });
   const drawerActionsContainer = useDrawerActionsContainer();
 
   const handleSubmit = async values => {
@@ -135,11 +135,12 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
     { label: 'GST', value: 'GST' },
     { label: <FormattedMessage id="taxType.Other" defaultMessage="Other" />, value: 'OTHER' },
   ];
-  const initialValues = cloneDeep(pick(vendor, EDITABLE_FIELDS) || {});
+  const initialValues = cloneDeep(pick(vendor, EDITABLE_FIELDS));
   if (initialValues.vendorInfo?.taxType && !['EIN', 'VAT', 'GST'].includes(initialValues.vendorInfo?.taxType)) {
     initialValues.vendorInfo['otherTaxType'] = initialValues.vendorInfo?.taxType;
     initialValues.vendorInfo.taxType = 'OTHER';
   }
+  const loading = isCreating || isEditing;
 
   return (
     <div>
@@ -162,10 +163,10 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
         {formik => {
           const actionButtons = (
             <div className="flex flex-grow justify-between gap-2">
-              <Button onClick={onCancel} variant="outline" className="rounded-full">
+              <Button onClick={onCancel} variant="outline" className="rounded-full" disabled={loading}>
                 <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </Button>
-              <Button onClick={formik.submitForm} className="rounded-full">
+              <Button onClick={formik.submitForm} loading={loading} className="rounded-full">
                 {vendor ? (
                   <FormattedMessage id="Vendor.Update" defaultMessage="Update vendor" />
                 ) : (

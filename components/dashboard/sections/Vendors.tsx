@@ -101,7 +101,7 @@ const dashboardVendorsQuery = gql`
               orders {
                 totalCount
               }
-              expenses(status: PAID) {
+              expenses(status: PAID, direction: SUBMITTED) {
                 totalCount
               }
               members(role: ADMIN, includeInherited: true) {
