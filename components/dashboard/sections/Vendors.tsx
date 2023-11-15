@@ -5,6 +5,7 @@ import { Archive, MoreHorizontal, Pencil } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { HELP_MESSAGE } from '../../../lib/constants/dismissable-help-message';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { DashboardVendorsQuery } from '../../../lib/graphql/types/v2/graphql';
 import { cn } from '../../../lib/utils';
@@ -12,9 +13,11 @@ import { cn } from '../../../lib/utils';
 import Avatar from '../../Avatar';
 import Container from '../../Container';
 import { DataTable } from '../../DataTable';
+import DismissibleMessage from '../../DismissibleMessage';
 import { Drawer } from '../../Drawer';
 import { I18nWithColumn } from '../../I18nFormatters';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
+import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import SearchBar from '../../SearchBar';
 import StyledModal from '../../StyledModal';
@@ -350,6 +353,25 @@ const Vendors = ({ accountSlug }) => {
       <div className="my-6">
         <StyledTabs tabs={tabs} selectedId={tab} onChange={handleTabUpdate} />
       </div>
+      {tab === VendorsTab.POTENTIAL_VENDORS && (
+        <DismissibleMessage messageId={HELP_MESSAGE.POTENTIAL_VENDORS}>
+          {({ dismiss }) => (
+            <MessageBox type="info" className="mb-6">
+              <p>
+                <FormattedMessage
+                  id="PotentialVendors.Description"
+                  defaultMessage="These are organizations you've had activity with; either by sending them money or by receiving contributions from them. You can transform these organizations into vendors to have a better management of this activity."
+                />
+              </p>
+              <p className="mt-3">
+                <Button variant="link" className="h-fit p-0 text-xs" onClick={dismiss}>
+                  <FormattedMessage defaultMessage="Ok, don't show me this again" />
+                </Button>
+              </p>
+            </MessageBox>
+          )}
+        </DismissibleMessage>
+      )}
       <div className="flex flex-col gap-4">
         {error && <MessageBoxGraphqlError error={error} />}
         {loading && <LoadingPlaceholder height="250px" width="100%" borderRadius="16px" />}

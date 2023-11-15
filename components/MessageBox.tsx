@@ -43,6 +43,7 @@ type MessageProps = BordersProps &
 type MessageBoxProps = MessageProps & {
   isLoading?: boolean;
   withIcon?: boolean;
+  className?: string;
   children: React.ReactNode;
 };
 
