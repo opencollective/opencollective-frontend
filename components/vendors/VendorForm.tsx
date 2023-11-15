@@ -53,6 +53,7 @@ const EDITABLE_FIELDS = [
   'name',
   'legalName',
   'location',
+  'vendorInfo',
   'vendorInfo.taxFormUrl',
   'vendorInfo.taxFormRequired',
   'vendorInfo.taxType',
@@ -73,7 +74,7 @@ type VendorFormProps = {
 
 const validateVendorForm = values => {
   const requiredFields = ['name'];
-  if (values.vendorInfo.taxType === 'OTHER') {
+  if (values.vendorInfo?.taxType === 'OTHER') {
     requiredFields.push('vendorInfo.otherTaxType');
   }
   const errors = requireFields(values, requiredFields);
