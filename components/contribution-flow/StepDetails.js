@@ -42,7 +42,6 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
   const [isOtherAmountSelected, setOtherAmountSelected] = React.useState(getDefaultOtherAmountSelected);
   const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
   const { LoggedInUser } = useLoggedInUser();
-  const selectedInterval = stepDetails?.interval;
   const tierCustomFields = tier?.customFields;
   const hostCustomFields = collective.host?.settings?.contributionFlow?.customFields;
   const customFieldsConfig = React.useMemo(
@@ -51,6 +50,8 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
   );
 
   const minAmount = getTierMinAmount(tier, currency);
+  const noIntervalBecauseFreeContribution = minAmount === 0 && amount === 0;
+  const selectedInterval = noIntervalBecauseFreeContribution ? INTERVALS.oneTime : stepDetails?.interval;
   const hasQuantity = (tier?.type === TierTypes.TICKET && !tier.singleTicket) || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
   const supportsRecurring = canContributeRecurring(collective, LoggedInUser) && (!tier || tier?.interval);
@@ -101,7 +102,7 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
           buttonProps={{ px: 2, py: '5px' }}
           role="group"
           aria-label="Amount types"
-          disabled={minAmount === 0 && amount === 0}
+          disabled={noIntervalBecauseFreeContribution}
           onChange={interval => {
             if (tier && tier.interval !== INTERVALS.flexible) {
               setTemporaryInterval(interval);
