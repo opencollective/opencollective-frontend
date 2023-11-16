@@ -17,7 +17,7 @@ const getTypeCaption = type => {
   } else if (type === CollectiveType.COLLECTIVE) {
     return <FormattedMessage id="collective.create" defaultMessage="Create Collective" />;
   } else if (type === CollectiveType.VENDOR) {
-    return <FormattedMessage id="vendor.create" defaultMessage="Create Vendor" />;
+    return <FormattedMessage defaultMessage="Create Vendor" />;
   } else {
     return null;
   }

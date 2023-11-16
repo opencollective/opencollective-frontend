@@ -114,7 +114,7 @@ const VendorDetails = ({ vendor, onCancel, editVendor }: VendorDetailsProps) => 
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </Button>
             <Button onClick={editVendor} className="rounded-full">
-              <FormattedMessage defaultMessage="Edit Vendor" />
+              <FormattedMessage id="vendor.edit" defaultMessage="Edit Vendor" />
             </Button>
           </div>,
           drawerActionsContainer,

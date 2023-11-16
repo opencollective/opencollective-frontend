@@ -147,7 +147,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
     <div>
       <div className="mb-3 flex justify-between text-xl font-bold">
         {vendor ? (
-          <FormattedMessage defaultMessage="Edit Vendor" />
+          <FormattedMessage id="vendor.edit" defaultMessage="Edit Vendor" />
         ) : (
           <FormattedMessage defaultMessage="Create Vendor" />
         )}
@@ -171,7 +171,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 {vendor ? (
                   <FormattedMessage id="Vendor.Update" defaultMessage="Update vendor" />
                 ) : (
-                  <FormattedMessage id="Vendors.Create" defaultMessage="Create vendor" />
+                  <FormattedMessage defaultMessage="Create vendor" />
                 )}
               </Button>
             </div>
