@@ -274,6 +274,7 @@ class CollectivePicker extends React.PureComponent {
       inputId,
       intl,
       collectives,
+      creatable,
       customOptions,
       formatOptionLabel,
       getDefaultOptions,
@@ -327,7 +328,10 @@ class CollectivePicker extends React.PureComponent {
                     return renderNewCollectiveOption ? (
                       renderNewCollectiveOption()
                     ) : (
-                      <CollectiveTypePicker onChange={this.setCreateFormCollectiveType} types={option.types || types} />
+                      <CollectiveTypePicker
+                        onChange={this.setCreateFormCollectiveType}
+                        types={option.types || (typeof creatable === 'object' ? creatable : types)}
+                      />
                     );
                   } else if (option[FLAG_INVITE_NEW]) {
                     return (
@@ -390,6 +394,11 @@ class CollectivePicker extends React.PureComponent {
                             showCreatedCollective: true,
                           }));
                         }}
+                        otherInitialValues={
+                          createFormCollectiveType === CollectiveType.VENDOR
+                            ? { ParentCollectiveId: this.props.HostCollectiveId }
+                            : {}
+                        }
                         {...prefillValue}
                       />
                     )}
@@ -443,7 +452,7 @@ CollectivePicker.propTypes = {
   /** Whether we should group collectives by type */
   groupByType: PropTypes.bool,
   /** If true, a permanent option to create a collective will be displayed in the select */
-  creatable: PropTypes.bool,
+  creatable: PropTypes.oneOfType([PropTypes.bool, PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType)))]),
   /** If creatable is true, this will be used to render the "Create new ..." */
   renderNewCollectiveOption: PropTypes.node,
   /** If true, a permanent option to invite a new user will be displayed in the select */
@@ -476,6 +485,7 @@ CollectivePicker.propTypes = {
   createCollectiveOptionalFields: PropTypes.array,
   /** StyledSelect pass-through property */
   styles: PropTypes.object,
+  HostCollectiveId: PropTypes.number,
 };
 
 CollectivePicker.defaultProps = {

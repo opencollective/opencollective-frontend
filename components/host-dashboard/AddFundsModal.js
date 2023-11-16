@@ -464,12 +464,13 @@ const AddFundsModal = ({ collective, ...props }) => {
                           data-cy="add-funds-source"
                           types={['USER', 'ORGANIZATION', 'VENDOR']}
                           error={field.error}
-                          createCollectiveOptionalFields={['location.address', 'location.country']}
                           onBlur={() => form.setFieldTouched(field.name, true)}
                           customOptions={defaultSourcesOptions}
                           onChange={({ value }) => form.setFieldValue(field.name, value)}
                           menuPortalTarget={null}
                           includeVendorsForHostId={host?.legacyId || undefined}
+                          creatable={['USER', 'VENDOR']}
+                          HostCollectiveId={host?.legacyId}
                         />
                       )}
                     </Field>
