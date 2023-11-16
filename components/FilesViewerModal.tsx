@@ -242,7 +242,7 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
     <React.Fragment>
       <GlobalModalStyle />
 
-      <FocusTrap focusTrapOptions={{ allowOutsideClick: true }}>
+      <FocusTrap focusTrapOptions={{ clickOutsideDeactivates: true }}>
         <Wrapper
           tabIndex={0}
           onKeyDown={event => {
