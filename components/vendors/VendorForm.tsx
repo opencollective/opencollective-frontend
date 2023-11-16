@@ -123,13 +123,14 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
           message: <FormattedMessage defaultMessage="Vendor Created" />,
         });
       }
+      onSuccess?.();
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
-    onSuccess?.();
   };
 
   const taxOptions = [
+    { label: <FormattedMessage id="Account.None" defaultMessage="None" />, value: undefined },
     { label: 'EIN', value: 'EIN' },
     { label: 'VAT', value: 'VAT' },
     { label: 'GST', value: 'GST' },
@@ -146,7 +147,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
     <div>
       <div className="mb-3 flex justify-between text-xl font-bold">
         {vendor ? (
-          <FormattedMessage defaultMessage="Edit Vendor" />
+          <FormattedMessage id="vendor.edit" defaultMessage="Edit Vendor" />
         ) : (
           <FormattedMessage defaultMessage="Create Vendor" />
         )}
@@ -170,7 +171,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 {vendor ? (
                   <FormattedMessage id="Vendor.Update" defaultMessage="Update vendor" />
                 ) : (
-                  <FormattedMessage id="Vendors.Create" defaultMessage="Create vendor" />
+                  <FormattedMessage defaultMessage="Create vendor" />
                 )}
               </Button>
             </div>
@@ -191,6 +192,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 name="legalName"
                 label={intl.formatMessage({ defaultMessage: "Vendor's legal name" })}
                 labelProps={FIELD_LABEL_PROPS}
+                required={false}
                 mt={3}
               >
                 {({ field }) => (
@@ -201,6 +203,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 name="vendorInfo.taxFormRequired"
                 label={intl.formatMessage({ id: 'TaxForm', defaultMessage: 'Tax form' })}
                 labelProps={FIELD_LABEL_PROPS}
+                required={false}
                 mt={3}
               >
                 {({ field, form }) => (
@@ -226,6 +229,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                   name="vendorInfo.taxFormUrl"
                   label={intl.formatMessage({ defaultMessage: 'Tax form URL' })}
                   labelProps={FIELD_LABEL_PROPS}
+                  required={false}
                   mt={3}
                 >
                   {({ field }) => (
@@ -240,6 +244,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 name="vendorInfo.taxType"
                 label={intl.formatMessage({ defaultMessage: 'Identification system' })}
                 labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
+                required={false}
                 mt={3}
               >
                 {({ field }) => (
@@ -257,6 +262,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                   name="vendorInfo.otherTaxType"
                   label={intl.formatMessage({ defaultMessage: 'Identification system' })}
                   labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
+                  required={true}
                   mt={3}
                 >
                   {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
@@ -266,6 +272,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 name="vendorInfo.taxId"
                 label={intl.formatMessage({ defaultMessage: 'ID Number' })}
                 labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
+                required={formik.values?.vendorInfo?.taxType !== undefined}
                 mt={3}
               >
                 {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
@@ -286,6 +293,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 name="vendorInfo.contact.name"
                 label={intl.formatMessage({ id: 'ContactName', defaultMessage: 'Contact name' })}
                 labelProps={FIELD_LABEL_PROPS}
+                required={false}
                 mt={3}
               >
                 {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
@@ -294,6 +302,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 name="vendorInfo.contact.email"
                 label={intl.formatMessage({ defaultMessage: "Contact's email" })}
                 labelProps={FIELD_LABEL_PROPS}
+                required={false}
                 mt={3}
               >
                 {({ field }) => (
@@ -308,8 +317,18 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 )}
               </StyledInputFormikField>
               <div className="mt-3 flex-grow">
-                <p className="mb-2 text-base font-bold">
-                  <FormattedMessage id="ExpenseForm.PayoutOptionLabel" defaultMessage="Payout method" />
+                <p className="mb-2 text-[#4D4F51]">
+                  <FormattedMessage
+                    id="OptionalFieldLabel"
+                    defaultMessage="{field} (optional)"
+                    values={{
+                      field: (
+                        <span className="text-base font-bold text-black">
+                          <FormattedMessage id="ExpenseForm.PayoutOptionLabel" defaultMessage="Payout method" />
+                        </span>
+                      ),
+                    }}
+                  />
                 </p>
                 <PayoutMethodSelect
                   collective={{ host } as any}
@@ -336,6 +355,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 name="vendorInfo.notes"
                 label={intl.formatMessage({ id: 'expense.notes', defaultMessage: 'Notes' })}
                 labelProps={FIELD_LABEL_PROPS}
+                required={false}
                 mt={3}
               >
                 {({ field }) => (

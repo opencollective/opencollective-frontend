@@ -365,7 +365,7 @@ const Vendors = ({ accountSlug }) => {
           className="flex-grow"
         />
         <Button className="rounded-full" onClick={() => setCreateEditVendor(true)}>
-          + <FormattedMessage id="Vendors.Create" defaultMessage="Create vendor" />
+          + <FormattedMessage defaultMessage="Create vendor" />
         </Button>
       </div>
       <div className="my-6">
