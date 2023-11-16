@@ -1,10 +1,13 @@
 import * as React from 'react';
+import { PopoverAnchor } from '@radix-ui/react-popover';
 import { useCommandState } from 'carloslfu-cmdk-internal';
 import { cx } from 'class-variance-authority';
 import clsx from 'clsx';
 import { flatten, groupBy, uniqBy } from 'lodash';
 import { Check, ChevronsUpDown, PlusCircle, Star } from 'lucide-react';
 import memoizeOne from 'memoize-one';
+// eslint-disable-next-line no-restricted-imports -- components/Link does not currently accept a ref, whichis required when used 'asChild' of Button
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -12,13 +15,14 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { useWindowResize } from '../../../lib/hooks/useWindowResize';
 import formatCollectiveType from '../../../lib/i18n/collective-type';
+import { getDashboardRoute } from '../../../lib/url-helpers';
 import { cn } from '../../../lib/utils';
 import { VIEWPORTS } from '../../../lib/withViewport';
 
 import Avatar from '../../Avatar';
 import DividerIcon from '../../DividerIcon';
 import { Button } from '../../ui/Button';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../../ui/Command';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../../ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/Popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/Tooltip';
 
@@ -52,7 +56,7 @@ const AccountItem = ({ account, active, isChild, setOpen, activeAccount, default
       }}
       value={account.slug}
       className={cn(
-        'group flex items-center justify-between',
+        'group flex items-center justify-between gap-1',
         selected && !active && !isChild && 'bg-slate-200',
         active ? 'aria-selected:bg-slate-100' : 'aria-selected:bg-transparent',
       )}
@@ -147,7 +151,7 @@ const AccountsCommand = ({
   };
   return (
     <Command
-      className={cn('w-60', isChild && 'border-l', active ? 'bg-white' : 'bg-slate-50')}
+      className={cn('w-60 rounded-none', isChild && 'border-l', active ? 'bg-white' : 'bg-slate-50')}
       onMouseOver={() => onActive()}
       onFocus={e => {
         if (e.relatedTarget instanceof HTMLInputElement) {
@@ -158,55 +162,57 @@ const AccountsCommand = ({
       onValueChange={v => setSelectedValue(v)}
     >
       <CommandInput placeholder={inputPlaceholder} autoFocus={active} />
-      <CommandEmpty>
-        <FormattedMessage defaultMessage="No account found." />
-      </CommandEmpty>
-      {Object.entries(groupedAccounts).map(([collectiveType, accounts]) => {
-        return (
-          <CommandGroup
-            key={collectiveType}
-            heading={
-              collectiveType === CollectiveType.INDIVIDUAL
-                ? intl.formatMessage({ defaultMessage: 'Personal Account' })
-                : formatCollectiveType(intl, collectiveType, 2)
-            }
-          >
-            {accounts.map(account => {
-              return (
-                <AccountItem
-                  key={account.slug}
-                  account={account}
-                  activeAccount={activeAccount}
-                  setOpen={setOpen}
-                  active={active}
-                  selected={selectedValue === account.slug}
-                  isChild={isChild}
-                  defaultSlug={defaultSlug}
-                  setDefaultSlug={setDefaultSlug}
-                />
-              );
-            })}
-            {CREATE_NEW_BUTTONS[collectiveType] && (
-              <CommandItem
-                value={`${collectiveType}-create`}
-                onSelect={() => {
-                  const route = CREATE_NEW_BUTTONS[collectiveType].getRoute(selectedParentSlug);
-                  router.push(route);
-                }}
-                className={cn(
-                  'flex items-center gap-2 text-muted-foreground hover:text-foreground',
-                  active ? 'aria-selected:bg-slate-100' : 'aria-selected:bg-transparent',
-                )}
-              >
-                <PlusCircle strokeWidth={1} absoluteStrokeWidth size={16} className="text-slate-500" />{' '}
-                <span className="truncate">{CREATE_NEW_BUTTONS[collectiveType].linkLabel}</span>
-              </CommandItem>
-            )}
-          </CommandGroup>
-        );
-      })}
+      <CommandList className="max-h-[min(420px,calc(var(--radix-popper-available-height)-70px))]">
+        <CommandEmpty>
+          <FormattedMessage defaultMessage="No account found." />
+        </CommandEmpty>
+        {Object.entries(groupedAccounts).map(([collectiveType, accounts]) => {
+          return (
+            <CommandGroup
+              key={collectiveType}
+              heading={
+                collectiveType === CollectiveType.INDIVIDUAL
+                  ? intl.formatMessage({ defaultMessage: 'Personal Account' })
+                  : formatCollectiveType(intl, collectiveType, 2)
+              }
+            >
+              {accounts.map(account => {
+                return (
+                  <AccountItem
+                    key={account.slug}
+                    account={account}
+                    activeAccount={activeAccount}
+                    setOpen={setOpen}
+                    active={active}
+                    selected={selectedValue === account.slug}
+                    isChild={isChild}
+                    defaultSlug={defaultSlug}
+                    setDefaultSlug={setDefaultSlug}
+                  />
+                );
+              })}
+              {CREATE_NEW_BUTTONS[collectiveType] && (
+                <CommandItem
+                  value={`${collectiveType}-create`}
+                  onSelect={() => {
+                    const route = CREATE_NEW_BUTTONS[collectiveType].getRoute(selectedParentSlug);
+                    router.push(route);
+                  }}
+                  className={cn(
+                    'flex items-center gap-2 text-muted-foreground hover:text-foreground',
+                    active ? 'aria-selected:bg-slate-100' : 'aria-selected:bg-transparent',
+                  )}
+                >
+                  <PlusCircle strokeWidth={1} absoluteStrokeWidth size={16} className="text-slate-500" />{' '}
+                  <span className="truncate">{CREATE_NEW_BUTTONS[collectiveType].linkLabel}</span>
+                </CommandItem>
+              )}
+            </CommandGroup>
+          );
+        })}
 
-      {archivedAccounts.length > 0 && <HiddenGroup accounts={archivedAccounts} />}
+        {archivedAccounts.length > 0 && <HiddenGroup accounts={archivedAccounts} />}
+      </CommandList>
     </Command>
   );
 };
@@ -226,8 +232,8 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
 
   const groupedAccounts = {
     [CollectiveType.INDIVIDUAL]: [loggedInUser.collective],
-    [CollectiveType.COLLECTIVE]: [],
     [CollectiveType.ORGANIZATION]: [],
+    [CollectiveType.COLLECTIVE]: [],
     ...groupBy(activeAccounts, a => a.type),
   };
   // if (archivedAccounts?.length > 0) {
@@ -255,9 +261,11 @@ const getGroupedChildAccounts = memoizeOne(accounts => {
 export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlug }) {
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
+  const router = useRouter();
   const { viewport } = useWindowResize();
   const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
 
+  // const [open, setOpen] = React.useState(false);
   const loggedInUserCollective = LoggedInUser?.collective;
   const { groupedAccounts, archivedAccounts } = getGroupedAdministratedAccounts(LoggedInUser);
   const rootAccounts = flatten(Object.values({ ...groupedAccounts, archived: archivedAccounts }));
@@ -316,45 +324,51 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
         }
       }}
     >
-      <PopoverTrigger asChild>
+      <PopoverAnchor asChild>
         <div className="flex items-center gap-2.5">
           {parentAccount && (
             <div className="hidden items-center gap-2.5 md:flex">
               <Button
                 variant="outline"
+                asChild
                 role="combobox"
+                onClick={() => router.push(`/dashboard/${parentAccount.slug}`)}
                 aria-expanded={open}
                 className={clsx(
-                  'group h-8 justify-between gap-1.5 whitespace-nowrap rounded-full border-transparent px-2 hover:border-border',
+                  'group h-8 justify-between gap-1.5 whitespace-nowrap rounded-full border-transparent px-2 ',
                   parentAccount ? 'max-w-[14rem]' : 'w-auto',
                 )}
               >
-                <div className="flex items-center gap-2 truncate">
-                  <Avatar collective={parentAccount} radius={20} />
-                  <div className="truncate">{parentAccount.name}</div>
-                </div>
-                <ChevronsUpDown size={16} className="shrink-0 text-slate-500 group-hover:text-slate-900" />
+                <Link href={getDashboardRoute(parentAccount)}>
+                  <div className="flex items-center gap-2 truncate">
+                    <Avatar collective={parentAccount} radius={20} />
+                    <div className="truncate">{parentAccount.name}</div>
+                  </div>
+                </Link>
               </Button>
               <DividerIcon size={32} className="-mx-4 text-slate-300" />
             </div>
           )}
 
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className={clsx(
-              'group h-8 max-w-[10rem] justify-between gap-1.5 whitespace-nowrap rounded-full px-2 sm:max-w-[14rem]',
-            )}
-          >
-            <div className="flex items-center gap-2 truncate">
-              <Avatar collective={activeAccount} radius={20} />
-              <div className="truncate">{activeAccount?.name}</div>
-            </div>
-            <ChevronsUpDown size={16} className="shrink-0 text-slate-500 group-hover:text-slate-900" />
-          </Button>
+          <PopoverTrigger asChild>
+            <Button
+              onClick={() => !open && setOpen(true)}
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className={clsx(
+                'group h-8 max-w-[10rem] justify-between gap-1.5 whitespace-nowrap rounded-full px-2 sm:max-w-[14rem]',
+              )}
+            >
+              <div className="flex items-center gap-2 truncate">
+                <Avatar collective={activeAccount} radius={20} />
+                <div className="truncate">{activeAccount?.name}</div>
+              </div>
+              <ChevronsUpDown size={16} className="shrink-0 text-slate-500 group-hover:text-slate-900" />
+            </Button>
+          </PopoverTrigger>
         </div>
-      </PopoverTrigger>
+      </PopoverAnchor>
       <PopoverContent
         align="start"
         className={cx('grid w-auto overflow-hidden rounded-xl p-0', showChildPane ? 'grid-cols-2' : 'grid-cols-1')}

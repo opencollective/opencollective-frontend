@@ -143,7 +143,7 @@ const DashboardPage = () => {
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
     if (activeSlug && activeSlug !== lastWorkspaceVisit.slug) {
-      if (!useDynamicTopBar) {
+      if (LoggedInUser && !useDynamicTopBar) {
         // this is instead configured as "default" account in NewAccountSwitcher
         setLastWorkspaceVisit({ slug: activeSlug });
       }
