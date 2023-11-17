@@ -1,5 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
+import { omitBy } from 'lodash';
 import { PlusIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
@@ -161,16 +162,19 @@ const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedVirtualCards
   date: dateFilter.toVariables,
   amount: (value, key, meta) => {
     const { minAmount, maxAmount } = amountFilter.toVariables(value, key, meta);
-    return {
-      amountFrom: {
-        valueInCents: minAmount,
-        currency: meta?.currency,
+    return omitBy(
+      {
+        amountFrom: {
+          valueInCents: minAmount,
+          currency: meta?.currency,
+        },
+        amountTo: {
+          valueInCents: maxAmount,
+          currency: meta?.currency,
+        },
       },
-      amountTo: {
-        valueInCents: maxAmount,
-        currency: meta?.currency,
-      },
-    };
+      value => !value.valueInCents,
+    );
   },
   account: (slugs, key) => ({ [key]: slugs.map(slug => ({ slug })) }),
 };
