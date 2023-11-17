@@ -24,7 +24,7 @@ export const searchFilter: FilterConfig<z.infer<typeof searchFilterSchema>> = {
 function SearchFilter({ value, labelMsg, onChange, isViewActive }: FilterComponentProps<string>) {
   const intl = useIntl();
   const [input, setInput] = React.useState(value);
-  const debouncedOnChange = debounce(onChange, 500);
+  const debouncedOnChange = React.useMemo(() => debounce(onChange, 500), [onChange]);
   const inputRef = React.useRef(null);
 
   React.useEffect(() => {
