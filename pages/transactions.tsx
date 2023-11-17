@@ -143,6 +143,7 @@ export const transactionsPageQuery = gql`
         parent {
           id
           slug
+          name
         }
       }
       ... on AccountWithHost {
