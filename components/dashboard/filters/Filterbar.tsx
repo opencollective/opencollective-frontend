@@ -8,7 +8,7 @@ import { cn } from '../../../lib/utils';
 import Tabs from '../../Tabs';
 import { Separator } from '../../ui/Separator';
 
-import { FilterDropdown } from './FilterDropdown';
+import FilterDropdown from './FilterDropdown';
 
 function useGetFilterbarOptions(filters, values, defaultSchemaValues) {
   const filterKeys = Object.keys(filters);

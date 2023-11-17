@@ -88,4 +88,4 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps & Parameters<t
   );
 };
 
-export default Tabs;
+export default React.memo(Tabs) as typeof Tabs;

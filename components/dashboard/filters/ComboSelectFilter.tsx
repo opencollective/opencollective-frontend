@@ -68,7 +68,7 @@ const useDebouncedSearch = (searchFunc, input, delay) => {
   }, [input, searchFunc, debouncedSearch]);
 };
 
-export default function ComboSelectFilter({
+function ComboSelectFilter({
   value,
   isMulti = false,
   options = [],
@@ -166,3 +166,5 @@ export default function ComboSelectFilter({
     </Command>
   );
 }
+
+export default React.memo(ComboSelectFilter) as typeof ComboSelectFilter;

@@ -171,7 +171,7 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
   );
 };
 
-export function FilterDropdown<FV, FM>({
+function FilterDropdown<FV, FM>({
   filterKey: currentFilterKey,
   remainingFilters,
   filters,
@@ -236,3 +236,5 @@ export function FilterDropdown<FV, FM>({
     </Popover>
   );
 }
+
+export default React.memo(FilterDropdown) as typeof FilterDropdown;

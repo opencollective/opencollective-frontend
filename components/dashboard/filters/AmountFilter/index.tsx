@@ -22,16 +22,6 @@ function amountToVariables(value: z.infer<typeof amountFilterSchema>): {
   };
 }
 
-export const amountFilter: FilterConfig<z.infer<typeof amountFilterSchema>> = {
-  schema: amountFilterSchema,
-  toVariables: amountToVariables,
-  filter: {
-    labelMsg: defineMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
-    Component: AmountFilter,
-    valueRenderer: ({ value, meta }) => <AmountFilterValue value={value} currency={meta.currency} />,
-  },
-};
-
 const formatNumber = (str: string) => stringToCents.parse(str);
 const toStr = (number?: number | null) => (number ? number / 100 : undefined);
 const stringToCents = z.coerce
@@ -93,7 +83,8 @@ const renderOptions = (value: AmountFilterValueType, onChange: (tmpValue: Amount
   }
 };
 
-export function AmountFilter({
+// eslint-disable-next-line prefer-arrow-callback
+const AmountFilter = React.memo(function AmountFilter({
   value,
   onChange,
 }: {
@@ -125,4 +116,14 @@ export function AmountFilter({
       {renderOptions(value, onChange)}
     </div>
   );
-}
+});
+
+export const amountFilter: FilterConfig<z.infer<typeof amountFilterSchema>> = {
+  schema: amountFilterSchema,
+  toVariables: amountToVariables,
+  filter: {
+    labelMsg: defineMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
+    Component: AmountFilter,
+    valueRenderer: ({ value, meta }) => <AmountFilterValue value={value} currency={meta.currency} />,
+  },
+};
