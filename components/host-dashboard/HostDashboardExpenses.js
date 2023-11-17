@@ -382,6 +382,7 @@ const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
             filters={query}
             explicitAllForStatus
             displayOnHoldPseudoStatus
+            showChargeHasReceiptFilter
             chargeHasReceiptFilter={queryFilter.values.chargeHasReceipts}
             onChargeHasReceiptFilterChange={queryFilter.setChargeHasReceipts}
             onChange={queryParams =>
