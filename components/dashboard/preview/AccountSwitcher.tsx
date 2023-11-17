@@ -251,9 +251,7 @@ const getGroupedChildAccounts = memoizeOne(accounts => {
     [CollectiveType.EVENT]: [],
     ...groupBy(activeAccounts, a => a.type),
   };
-  // if (archivedAccounts?.length > 0) {
-  //   groupedAccounts.archived = archivedAccounts;
-  // }
+
   return { groupedAccounts, archivedAccounts };
 });
 
@@ -264,7 +262,6 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
   const { viewport } = useWindowResize();
   const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
 
-  // const [open, setOpen] = React.useState(false);
   const loggedInUserCollective = LoggedInUser?.collective;
   const { groupedAccounts, archivedAccounts } = getGroupedAdministratedAccounts(LoggedInUser);
   const rootAccounts = flatten(Object.values({ ...groupedAccounts, archived: archivedAccounts }));
