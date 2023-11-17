@@ -2,13 +2,14 @@ import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { Paypal } from '@styled-icons/fa-brands/Paypal';
 import { StripeS } from '@styled-icons/fa-brands/StripeS';
+import { Info } from '@styled-icons/feather/Info';
 import clsx from 'clsx';
 import { FormattedMessage } from 'react-intl';
 
 import { connectAccount } from '../../../lib/api';
 import { createError, ERROR } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { Amount, ExpenseCollection, ExpenseCollectionAggregation, Host } from '../../../lib/graphql/types/v2/graphql';
+import { Amount, ExpenseCollection, Host } from '../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
 import { getDashboardUrl } from '../../../lib/stripe/dashboard';
 
@@ -21,7 +22,7 @@ import StyledCard from '../../StyledCard';
 import StyledLink from '../../StyledLink';
 import StyledTooltip from '../../StyledTooltip';
 import { getPaypalExpiryInfo } from '../PaypalPreApprovalDetailsIcon';
-import TransferwiseDetailsIcon from '../TransferwiseDetailsIcon';
+import TransferwiseDetailsIcon, { BalancesBreakdown } from '../TransferwiseDetailsIcon';
 
 import PayExpensesScheduledForPaymentButton from './PayExpensesScheduledForPaymentButton';
 
@@ -34,8 +35,12 @@ const ExpensePipelineOverviewQuery = gql`
       payoutMethodType: BANK_ACCOUNT
     ) {
       totalCount
-      aggregation {
-        totalAmount(currency: $currency) {
+      totalAmount {
+        amount(currency: $currency) {
+          valueInCents
+          currency
+        }
+        amountsByCurrency {
           valueInCents
           currency
         }
@@ -48,8 +53,12 @@ const ExpensePipelineOverviewQuery = gql`
       payoutMethodType: BANK_ACCOUNT
     ) {
       totalCount
-      aggregation {
-        totalAmount(currency: $currency) {
+      totalAmount {
+        amount(currency: $currency) {
+          valueInCents
+          currency
+        }
+        amountsByCurrency {
           valueInCents
           currency
         }
@@ -57,8 +66,12 @@ const ExpensePipelineOverviewQuery = gql`
     }
     paypalReadyToPay: expenses(host: { slug: $hostSlug }, limit: 0, status: READY_TO_PAY, payoutMethodType: PAYPAL) {
       totalCount
-      aggregation {
-        totalAmount(currency: $currency) {
+      totalAmount {
+        amount(currency: $currency) {
+          valueInCents
+          currency
+        }
+        amountsByCurrency {
           valueInCents
           currency
         }
@@ -71,8 +84,12 @@ const ExpensePipelineOverviewQuery = gql`
       payoutMethodType: PAYPAL
     ) {
       totalCount
-      aggregation {
-        totalAmount(currency: $currency) {
+      totalAmount {
+        amount(currency: $currency) {
+          valueInCents
+          currency
+        }
+        amountsByCurrency {
           valueInCents
           currency
         }
@@ -91,18 +108,10 @@ type ExpensePipelineOverviewProps = {
 
 export default function ExpensePipelineOverview(props: ExpensePipelineOverviewProps) {
   const { data, loading, error } = useQuery<{
-    wiseReadyToPay: Pick<ExpenseCollection, 'totalCount'> & {
-      aggregation: Pick<ExpenseCollectionAggregation, 'totalAmount'>;
-    };
-    wiseScheduledForPayment: Pick<ExpenseCollection, 'totalCount'> & {
-      aggregation: Pick<ExpenseCollectionAggregation, 'totalAmount'>;
-    };
-    paypalReadyToPay: Pick<ExpenseCollection, 'totalCount'> & {
-      aggregation: Pick<ExpenseCollectionAggregation, 'totalAmount'>;
-    };
-    paypalScheduledForPayment: Pick<ExpenseCollection, 'totalCount'> & {
-      aggregation: Pick<ExpenseCollectionAggregation, 'totalAmount'>;
-    };
+    wiseReadyToPay: Pick<ExpenseCollection, 'totalCount' | 'totalAmount'>;
+    wiseScheduledForPayment: Pick<ExpenseCollection, 'totalCount' | 'totalAmount'>;
+    paypalReadyToPay: Pick<ExpenseCollection, 'totalCount' | 'totalAmount'>;
+    paypalScheduledForPayment: Pick<ExpenseCollection, 'totalCount' | 'totalAmount'>;
   }>(ExpensePipelineOverviewQuery, {
     context: API_V2_CONTEXT,
     variables: {
@@ -124,19 +133,23 @@ export default function ExpensePipelineOverview(props: ExpensePipelineOverviewPr
       <WiseStatus
         className="w-full"
         host={props.host}
-        readyToPayAmount={data.wiseReadyToPay.aggregation.totalAmount}
+        readyToPayAmount={data.wiseReadyToPay.totalAmount.amount}
         readyToPayCount={data.wiseReadyToPay.totalCount}
-        scheduledForPaymentAmount={data.wiseScheduledForPayment.aggregation.totalAmount}
+        readyToPayAmountByCurrency={data.wiseReadyToPay.totalAmount.amountsByCurrency}
+        scheduledForPaymentAmount={data.wiseScheduledForPayment.totalAmount.amount}
         scheduledForPaymentCount={data.wiseScheduledForPayment.totalCount}
+        scheduledForPaymentAmountByCurrency={data.wiseScheduledForPayment.totalAmount.amountsByCurrency}
       />
       {props.host?.paypalPreApproval && (
         <PayPalStatus
           className="w-full"
           host={props.host}
-          readyToPayAmount={data.paypalReadyToPay.aggregation.totalAmount}
+          readyToPayAmount={data.paypalReadyToPay.totalAmount.amount}
           readyToPayCount={data.paypalReadyToPay.totalCount}
-          scheduledForPaymentAmount={data.paypalScheduledForPayment.aggregation.totalAmount}
+          readyToPayAmountByCurrency={data.paypalReadyToPay.totalAmount.amountsByCurrency}
+          scheduledForPaymentAmount={data.paypalScheduledForPayment.totalAmount.amount}
           scheduledForPaymentCount={data.paypalScheduledForPayment.totalCount}
+          scheduledForPaymentAmountByCurrency={data.paypalScheduledForPayment.totalAmount.amountsByCurrency}
         />
       )}
       {props.host?.stripe?.issuingBalance && <StripeIssuingStatus className="w-full" host={props.host} />}
@@ -149,8 +162,10 @@ type WiseStatusProps = {
   host: Pick<Host, 'id' | 'transferwise' | 'currency' | 'slug'>;
   readyToPayCount?: number;
   readyToPayAmount?: Amount;
+  readyToPayAmountByCurrency?: Amount[];
   scheduledForPaymentCount?: number;
   scheduledForPaymentAmount?: Amount;
+  scheduledForPaymentAmountByCurrency?: Amount[];
 };
 
 function WiseStatus(props: WiseStatusProps) {
@@ -183,13 +198,19 @@ function WiseStatus(props: WiseStatusProps) {
       <div className="mt-3 flex justify-between text-xs text-slate-700">
         <div>
           <FormattedMessage defaultMessage="Ready to Pay ({count})" values={{ count: props?.readyToPayCount ?? 0 }} />
-          <div className="mt-2 text-base text-slate-900">
+          <div className="mt-2 flex gap-2 text-base text-slate-900">
             <FormattedMoneyAmount
               showCurrencyCode={false}
               currency={props.host?.currency}
               amount={props?.readyToPayAmount?.valueInCents}
               amountStyles={null}
             />
+
+            {props.readyToPayAmountByCurrency?.length > 0 && (
+              <StyledTooltip content={() => <BalancesBreakdown balances={props.readyToPayAmountByCurrency} />}>
+                <Info size={16} color="#76777A" />
+              </StyledTooltip>
+            )}
           </div>
         </div>
         <div>
@@ -197,13 +218,19 @@ function WiseStatus(props: WiseStatusProps) {
             defaultMessage="Total Batched ({count})"
             values={{ count: props?.scheduledForPaymentCount ?? 0 }}
           />
-          <div className="mt-2 text-base text-slate-900">
+          <div className="mt-2 flex gap-2 text-base text-slate-900">
             <FormattedMoneyAmount
               showCurrencyCode={false}
               currency={props.host?.currency}
               amount={props?.host?.transferwise?.amountBatched?.valueInCents}
               amountStyles={null}
             />
+
+            {props.scheduledForPaymentAmountByCurrency?.length > 0 && (
+              <StyledTooltip content={() => <BalancesBreakdown balances={props.scheduledForPaymentAmountByCurrency} />}>
+                <Info size={16} color="#76777A" />
+              </StyledTooltip>
+            )}
           </div>
         </div>
       </div>
@@ -240,8 +267,10 @@ type PayPalStatusProps = {
   host: Pick<Host, 'legacyId' | 'paypalPreApproval' | 'currency'>;
   readyToPayCount?: number;
   readyToPayAmount?: Amount;
+  readyToPayAmountByCurrency?: Amount[];
   scheduledForPaymentCount?: number;
   scheduledForPaymentAmount?: Amount;
+  scheduledForPaymentAmountByCurrency?: Amount[];
 };
 
 function PayPalStatus(props: PayPalStatusProps) {
@@ -282,13 +311,19 @@ function PayPalStatus(props: PayPalStatusProps) {
       <div className="mt-3 flex justify-between text-xs text-slate-700">
         <div>
           <FormattedMessage defaultMessage="Ready to Pay ({count})" values={{ count: props?.readyToPayCount ?? 0 }} />
-          <div className="mt-2 text-base text-slate-900">
+          <div className="mt-2 flex gap-2 text-base text-slate-900">
             <FormattedMoneyAmount
               showCurrencyCode={false}
               currency={props.host?.currency}
               amount={props?.readyToPayAmount?.valueInCents}
               amountStyles={null}
             />
+
+            {props.readyToPayAmountByCurrency?.length > 0 && (
+              <StyledTooltip content={() => <BalancesBreakdown balances={props.readyToPayAmountByCurrency} />}>
+                <Info size={16} color="#76777A" />
+              </StyledTooltip>
+            )}
           </div>
         </div>
         <div>
@@ -296,13 +331,19 @@ function PayPalStatus(props: PayPalStatusProps) {
             defaultMessage="Total Batched ({count})"
             values={{ count: props?.scheduledForPaymentCount ?? 0 }}
           />
-          <div className="mt-2 text-base text-slate-900">
+          <div className="mt-2 flex gap-2 text-base  text-slate-900">
             <FormattedMoneyAmount
               showCurrencyCode={false}
               currency={props.host?.currency}
               amount={props?.scheduledForPaymentAmount?.valueInCents}
               amountStyles={null}
             />
+
+            {props.scheduledForPaymentAmountByCurrency?.length > 0 && (
+              <StyledTooltip content={() => <BalancesBreakdown balances={props.scheduledForPaymentAmountByCurrency} />}>
+                <Info size={16} color="#76777A" />
+              </StyledTooltip>
+            )}
           </div>
         </div>
       </div>
