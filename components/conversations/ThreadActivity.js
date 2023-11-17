@@ -246,7 +246,21 @@ const ThreadActivity = ({ activity }) => {
                 id="ByUser"
                 defaultMessage="By {userName}"
                 values={{
-                  userName: <StyledLink as={LinkCollective} color="black.800" collective={activity.individual} />,
+                  userName: (
+                    <StyledLink
+                      as={LinkCollective}
+                      color="black.800"
+                      collective={activity.individual}
+                      withHoverCard
+                      hoverCardProps={{
+                        hoverCardContentProps: { side: 'top' },
+                        includeAdminMembership: {
+                          accountSlug: activity.account?.slug,
+                          hostSlug: activity.account?.host?.slug,
+                        },
+                      }}
+                    />
+                  ),
                 }}
               />
             </Span>
@@ -292,6 +306,12 @@ ThreadActivity.propTypes = {
       id: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
+    }),
+    account: PropTypes.shape({
+      slug: PropTypes.string.isRequired,
+      host: PropTypes.shape({
+        slug: PropTypes.string.isRequired,
+      }),
     }),
   }),
 };

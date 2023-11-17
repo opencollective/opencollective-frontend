@@ -11,6 +11,7 @@ import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../../../lib/hooks/usePrevious';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
+import { accountHoverCardFields } from '../../../AccountHoverCard';
 import { confirmContributionFieldsFragment } from '../../../ContributionConfirmationModal';
 import { Flex } from '../../../Grid';
 import CreatePendingOrderModal from '../../../host-dashboard/CreatePendingOrderModal';
@@ -25,7 +26,7 @@ import { DashboardSectionProps } from '../../types';
 
 import { filters, schema, toVariables } from './filters';
 
-const accountOrdersQuery = gql`
+const hostOrdersQuery = gql`
   query HostContributions(
     $hostSlug: String
     $limit: Int!
@@ -72,6 +73,10 @@ const accountOrdersQuery = gql`
           name
           imageUrl
           type
+          ... on Individual {
+            emails
+          }
+          ...AccountHoverCardFields
         }
         pendingContributionData {
           expectedAt
@@ -93,6 +98,7 @@ const accountOrdersQuery = gql`
           ... on AccountWithHost {
             bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
           }
+          ...AccountHoverCardFields
         }
         permissions {
           id
@@ -103,9 +109,10 @@ const accountOrdersQuery = gql`
     }
   }
   ${confirmContributionFieldsFragment}
+  ${accountHoverCardFields}
 `;
 
-const accountOrdersMetaDataQuery = gql`
+const hostOrdersMetaDataQuery = gql`
   query OrdersMetaData($hostSlug: String) {
     account(slug: $hostSlug) {
       id
@@ -154,7 +161,7 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
   const intl = useIntl();
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
 
-  const { data: metaData, refetch: refetchMetaData } = useQuery(accountOrdersMetaDataQuery, {
+  const { data: metaData, refetch: refetchMetaData } = useQuery(hostOrdersMetaDataQuery, {
     variables: { hostSlug },
     context: API_V2_CONTEXT,
   });
@@ -196,7 +203,7 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
     },
   });
 
-  const { data, error, loading, variables, refetch } = useQuery(accountOrdersQuery, {
+  const { data, error, loading, variables, refetch } = useQuery(hostOrdersQuery, {
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
   });

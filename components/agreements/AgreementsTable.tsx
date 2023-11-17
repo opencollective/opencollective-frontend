@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { Agreement } from '../../lib/graphql/types/v2/graphql';
 
+import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import { DataTable } from '../DataTable';
 import DateTime from '../DateTime';
@@ -29,10 +30,15 @@ export const columns: ColumnDef<Agreement>[] = [
     cell: ({ cell }) => {
       const account = cell.getValue() as Agreement['account'];
       return (
-        <div className="flex items-center gap-2 truncate">
-          <Avatar collective={account} radius={24} />
-          <span className="truncate">{account.name}</span>
-        </div>
+        <AccountHoverCard
+          account={account}
+          trigger={
+            <div className="flex items-center gap-2 truncate">
+              <Avatar collective={account} radius={24} />
+              <span className="truncate">{account.name}</span>
+            </div>
+          }
+        />
       );
     },
   },

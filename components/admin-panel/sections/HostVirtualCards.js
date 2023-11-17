@@ -12,6 +12,7 @@ import useQueryFilter, {
   DateRangeFilter,
 } from '../../../lib/hooks/deprecated/useQueryFilter';
 
+import { accountHoverCardFields } from '../../AccountHoverCard';
 import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal';
 import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';
 import { Box, Flex } from '../../Grid';
@@ -83,6 +84,7 @@ const hostVirtualCardsQuery = gql`
             name
             slug
             imageUrl
+            ...AccountHoverCardFields
           }
           assignee {
             id
@@ -90,6 +92,7 @@ const hostVirtualCardsQuery = gql`
             email
             slug
             imageUrl
+            ...AccountHoverCardFields
           }
         }
       }
@@ -116,6 +119,7 @@ const hostVirtualCardsQuery = gql`
       }
     }
   }
+  ${accountHoverCardFields}
 `;
 
 const VIRTUAL_CARDS_PER_PAGE = 20;

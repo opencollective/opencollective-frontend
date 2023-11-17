@@ -1,5 +1,7 @@
 import { gql } from '@apollo/client';
 
+import { accountHoverCardFields } from '../AccountHoverCard';
+
 export const commentFieldsFragment = gql`
   fragment CommentFields on Comment {
     id
@@ -8,14 +10,26 @@ export const commentFieldsFragment = gql`
     reactions
     userReactions
     type
+    account {
+      id
+      slug
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+        }
+      }
+    }
     fromAccount {
       id
       type
       name
       slug
       imageUrl
+      ...AccountHoverCardFields
     }
   }
+  ${accountHoverCardFields}
 `;
 
 export const conversationListFragment = gql`
