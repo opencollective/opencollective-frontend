@@ -45,7 +45,6 @@ const ExpensesFilters = ({
   showOrderFilter = true,
   wrap = true,
   displayOnHoldPseudoStatus = false,
-  showChargeHasReceiptFilter = false,
   ...props
 }) => {
   const intl = useIntl();
@@ -140,19 +139,17 @@ const ExpensesFilters = ({
           <ExpensesOrder {...getFilterProps('orderBy')} />
         </FilterContainer>
       )}
-      {showChargeHasReceiptFilter && (
-        <FilterContainer>
-          <FilterLabel htmlFor="expenses-charge-has-receipts">
-            <FormattedMessage id="expenses.chargeHasReceiptsFilter" defaultMessage="Charge Receipts" />
-          </FilterLabel>
-          <StyledSelectFilter
-            inputId="expenses-charge-has-receipts"
-            onChange={newValue => props.onChargeHasReceiptFilterChange(newValue.value)}
-            value={chargeHasReceiptFilterValue}
-            options={chargeHasReceiptFilterOptions}
-          />
-        </FilterContainer>
-      )}
+      <FilterContainer>
+        <FilterLabel htmlFor="expenses-charge-has-receipts">
+          <FormattedMessage id="expenses.chargeHasReceiptsFilter" defaultMessage="Charge Receipts" />
+        </FilterLabel>
+        <StyledSelectFilter
+          inputId="expenses-charge-has-receipts"
+          onChange={newValue => props.onChargeHasReceiptFilterChange(newValue.value)}
+          value={chargeHasReceiptFilterValue}
+          options={chargeHasReceiptFilterOptions}
+        />
+      </FilterContainer>
     </Flex>
   );
 };
