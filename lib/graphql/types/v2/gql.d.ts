@@ -114,6 +114,30 @@ export function gql(source: "\n  fragment UpdateListFragment on UpdateCollection
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query ExpenseTags($searchTerm: String, $host: AccountReferenceInput, $account: AccountReferenceInput) {\n    expenseTagStats(tagSearchTerm: $searchTerm, host: $host, account: $account) {\n      nodes {\n        id\n        tag\n      }\n    }\n  }\n"): typeof import('./graphql').ExpenseTagsDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment AccountFields on Account {\n    __typename\n    id\n    name\n    slug\n    type\n    description\n    imageUrl\n  }\n"): typeof import('./graphql').AccountFieldsFragmentDoc;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment AccountHoverCardFields on Account {\n    __typename\n    id\n    name\n    slug\n    type\n    description\n    imageUrl\n    ... on AccountWithParent {\n      parent {\n        id\n        slug\n        name\n        imageUrl\n        hostMembers: members(role: [HOST]) {\n          nodes {\n            id\n            since\n          }\n        }\n      }\n    }\n\n    hostMembers: members(role: [HOST]) {\n      nodes {\n        id\n        since\n      }\n    }\n  }\n"): typeof import('./graphql').AccountHoverCardFieldsFragmentDoc;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query Account($slug: String!, $withHoverCard: Boolean!) {\n    account(slug: $slug) {\n      id\n      ...AccountFields\n      ...AccountHoverCardFields @include(if: $withHoverCard)\n    }\n  }\n  \n  \n"): typeof import('./graphql').AccountDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query HostedAccountFilterSearchQuery(\n    $searchTerm: String\n    $hostSlug: String\n    $orderBy: OrderByInput\n    $withHoverCard: Boolean!\n  ) {\n    accounts(searchTerm: $searchTerm, host: { slug: $hostSlug }, orderBy: $orderBy) {\n      nodes {\n        id\n        ...AccountFields\n        ...AccountHoverCardFields @include(if: $withHoverCard)\n      }\n    }\n  }\n  \n  \n"): typeof import('./graphql').HostedAccountFilterSearchQueryDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query VirtualCardQuery($id: String!) {\n    virtualCard(virtualCard: { id: $id }) {\n      id\n      name\n      last4\n    }\n  }\n"): typeof import('./graphql').VirtualCardQueryDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query HostAgreements($hostSlug: String!, $limit: Int!, $offset: Int!, $account: [AccountReferenceInput]) {\n    host(slug: $hostSlug) {\n      id\n      legacyId\n      slug\n      hostedAccountAgreements(limit: $limit, offset: $offset, accounts: $account) {\n        totalCount\n        nodes {\n          id\n          ...AgreementViewFields\n        }\n      }\n    }\n  }\n  \n"): typeof import('./graphql').HostAgreementsDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -286,30 +310,6 @@ export function gql(source: "\n  query ExpensePage($legacyExpenseId: Int!, $draf
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query ExpenseTags($searchTerm: String, $host: AccountReferenceInput, $account: AccountReferenceInput) {\n    expenseTagStats(tagSearchTerm: $searchTerm, host: $host, account: $account) {\n      nodes {\n        id\n        tag\n      }\n    }\n  }\n"): typeof import('./graphql').ExpenseTagsDocument;
-  /**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n  fragment AccountFields on Account {\n    __typename\n    id\n    name\n    slug\n    type\n    description\n    imageUrl\n  }\n"): typeof import('./graphql').AccountFieldsFragmentDoc;
-  /**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n  fragment AccountHoverCardFields on Account {\n    __typename\n    id\n    name\n    slug\n    type\n    description\n    imageUrl\n    ... on AccountWithParent {\n      parent {\n        id\n        slug\n        name\n        imageUrl\n        hostMembers: members(role: [HOST]) {\n          nodes {\n            id\n            since\n          }\n        }\n      }\n    }\n\n    hostMembers: members(role: [HOST]) {\n      nodes {\n        id\n        since\n      }\n    }\n  }\n"): typeof import('./graphql').AccountHoverCardFieldsFragmentDoc;
-  /**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n  query Account($slug: String!, $withHoverCard: Boolean!) {\n    account(slug: $slug) {\n      id\n      ...AccountFields\n      ...AccountHoverCardFields @include(if: $withHoverCard)\n    }\n  }\n  \n  \n"): typeof import('./graphql').AccountDocument;
-  /**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n  query HostedAccountFilterSearchQuery(\n    $searchTerm: String\n    $hostSlug: String\n    $orderBy: OrderByInput\n    $withHoverCard: Boolean!\n  ) {\n    accounts(searchTerm: $searchTerm, host: { slug: $hostSlug }, orderBy: $orderBy) {\n      nodes {\n        id\n        ...AccountFields\n        ...AccountHoverCardFields @include(if: $withHoverCard)\n      }\n    }\n  }\n  \n  \n"): typeof import('./graphql').HostedAccountFilterSearchQueryDocument;
-  /**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n  query VirtualCardQuery($id: String!) {\n    virtualCard(virtualCard: { id: $id }) {\n      id\n      name\n      last4\n    }\n  }\n"): typeof import('./graphql').VirtualCardQueryDocument;
-  /**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function gql(source: "\n  query CreatePendingContributionModal($slug: String!) {\n    host(slug: $slug) {\n      id\n      legacyId\n      type\n      isHost\n      name\n      slug\n      currency\n      settings\n      hostFeePercent\n\n      plan {\n        id\n        hostFees\n      }\n      policies {\n        id\n        REQUIRE_2FA_FOR_ADMINS\n      }\n      isTrustedHost\n      vendors {\n        totalCount\n        nodes {\n          id\n          ...VendorFields\n        }\n      }\n    }\n  }\n\n  \n"): typeof import('./graphql').CreatePendingContributionModalDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -438,7 +438,7 @@ export function gql(source: "\n  fragment ProcessingOrderFields on Order {\n    
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query TransactionsPage(\n    $slug: String!\n    $limit: Int!\n    $offset: Int!\n    $type: TransactionType\n    $paymentMethodType: [PaymentMethodType]\n    $minAmount: Int\n    $maxAmount: Int\n    $dateFrom: DateTime\n    $dateTo: DateTime\n    $searchTerm: String\n    $kind: [TransactionKind]\n    $includeIncognitoTransactions: Boolean\n    $includeGiftCardTransactions: Boolean\n    $includeChildrenTransactions: Boolean\n    $virtualCard: [VirtualCardReferenceInput]\n    $orderBy: ChronologicalOrderInput\n  ) {\n    account(slug: $slug) {\n      id\n      legacyId\n      slug\n      name\n      type\n      createdAt\n      imageUrl(height: 256)\n      currency\n      settings\n      features {\n        id\n        ...NavbarFields\n      }\n      ... on AccountWithParent {\n        parent {\n          id\n          slug\n        }\n      }\n      ... on AccountWithHost {\n        host {\n          id\n          slug\n        }\n      }\n      processingOrders: orders(filter: OUTGOING, includeIncognito: true, status: [PENDING, PROCESSING]) {\n        totalCount\n        nodes {\n          id\n          ...ProcessingOrderFields\n        }\n      }\n    }\n    transactions(\n      account: { slug: $slug }\n      limit: $limit\n      offset: $offset\n      type: $type\n      paymentMethodType: $paymentMethodType\n      minAmount: $minAmount\n      maxAmount: $maxAmount\n      dateFrom: $dateFrom\n      dateTo: $dateTo\n      searchTerm: $searchTerm\n      kind: $kind\n      includeIncognitoTransactions: $includeIncognitoTransactions\n      includeGiftCardTransactions: $includeGiftCardTransactions\n      includeChildrenTransactions: $includeChildrenTransactions\n      includeDebts: true\n      virtualCard: $virtualCard\n      orderBy: $orderBy\n    ) {\n      ...TransactionsQueryCollectionFragment\n    }\n  }\n  \n  \n  \n"): typeof import('./graphql').TransactionsPageDocument;
+export function gql(source: "\n  query TransactionsPage(\n    $slug: String!\n    $limit: Int!\n    $offset: Int!\n    $type: TransactionType\n    $paymentMethodType: [PaymentMethodType]\n    $minAmount: Int\n    $maxAmount: Int\n    $dateFrom: DateTime\n    $dateTo: DateTime\n    $searchTerm: String\n    $kind: [TransactionKind]\n    $includeIncognitoTransactions: Boolean\n    $includeGiftCardTransactions: Boolean\n    $includeChildrenTransactions: Boolean\n    $virtualCard: [VirtualCardReferenceInput]\n    $orderBy: ChronologicalOrderInput\n  ) {\n    account(slug: $slug) {\n      id\n      legacyId\n      slug\n      name\n      type\n      createdAt\n      imageUrl(height: 256)\n      currency\n      settings\n      features {\n        id\n        ...NavbarFields\n      }\n      ... on AccountWithParent {\n        parent {\n          id\n          slug\n          name\n        }\n      }\n      ... on AccountWithHost {\n        host {\n          id\n          slug\n        }\n      }\n      processingOrders: orders(filter: OUTGOING, includeIncognito: true, status: [PENDING, PROCESSING]) {\n        totalCount\n        nodes {\n          id\n          ...ProcessingOrderFields\n        }\n      }\n    }\n    transactions(\n      account: { slug: $slug }\n      limit: $limit\n      offset: $offset\n      type: $type\n      paymentMethodType: $paymentMethodType\n      minAmount: $minAmount\n      maxAmount: $maxAmount\n      dateFrom: $dateFrom\n      dateTo: $dateTo\n      searchTerm: $searchTerm\n      kind: $kind\n      includeIncognitoTransactions: $includeIncognitoTransactions\n      includeGiftCardTransactions: $includeGiftCardTransactions\n      includeChildrenTransactions: $includeChildrenTransactions\n      includeDebts: true\n      virtualCard: $virtualCard\n      orderBy: $orderBy\n    ) {\n      ...TransactionsQueryCollectionFragment\n    }\n  }\n  \n  \n  \n"): typeof import('./graphql').TransactionsPageDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

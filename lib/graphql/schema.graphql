@@ -36,7 +36,7 @@ interface CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -726,12 +726,11 @@ enum OrderStatus {
   PAID
   ERROR
   PROCESSING
+  REJECTED
   ACTIVE
   CANCELLED
   PENDING
   EXPIRED
-  PLEDGED
-  REJECTED
   DISPUTED
   REFUNDED
   IN_REVIEW
@@ -2134,7 +2133,7 @@ type Collective implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2398,7 +2397,7 @@ type Event implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2662,7 +2661,7 @@ type Fund implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2926,7 +2925,7 @@ type Organization implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3190,7 +3189,7 @@ type Project implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3699,7 +3698,7 @@ type User implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3964,7 +3963,7 @@ type Vendor implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -4488,8 +4487,6 @@ type Mutation {
   """
   editPublicMessage(FromCollectiveId: Int!, CollectiveId: Int!, message: String): [Member]
     @deprecated(reason: "2021-01-27: Please use editPublicMessage from GQLV2")
-  createOrder(order: OrderInputType!): OrderType
-    @deprecated(reason: "2020-10-13: This mutation has been moved to GQLV2")
 
   """
   Update a payment method
@@ -4906,126 +4903,6 @@ Input type for ConnectedAccountInputType
 input ConnectedAccountInputType {
   id: Int
   settings: JSON
-}
-
-"""
-Input type for OrderType
-"""
-input OrderInputType {
-  id: Int
-  quantity: Int = 1
-  totalAmount: Int
-  hostFeePercent: Float
-  platformFeePercent: Float
-  platformFee: Int
-  isFeesOnTop: Boolean
-  currency: String
-  interval: String
-  description: String
-  publicMessage: String
-  privateMessage: String
-  paymentMethod: PaymentMethodInputType
-  user: UserInputType @deprecated(reason: "2020-10-13: This field is now ignored")
-  fromCollective: CollectiveAttributesInputType
-  collective: CollectiveAttributesInputType!
-  tier: TierInputType
-  customData: JSON
-  recaptchaToken: String
-
-  """
-  Use this when fromAccount is null to pass the guest info
-  """
-  guestInfo: GuestInfoInput
-
-  """
-  The amount of taxes that were included in totalAmount
-  """
-  taxAmount: Int = 0
-
-  """
-  User country, to know which tax applies
-  """
-  countryISO: String
-
-  """
-  User tax ID number
-  """
-  taxIDNumber: String
-}
-
-"""
-Input type for PaymentMethod (paypal/stripe)
-"""
-input PaymentMethodInputType {
-  id: Int
-  uuid: String
-  token: String
-  service: String
-
-  """
-  creditcard, giftcard, prepaid, manual...
-  """
-  type: String
-  customerId: String
-  data: JSON
-  name: String
-  primary: Boolean
-  monthlyLimitPerMember: Int
-  currency: String
-  save: Boolean
-}
-
-"""
-Input type for guest contributions
-"""
-input GuestInfoInput {
-  """
-  Contributor's email
-  """
-  email: String
-
-  """
-  Display name of the user
-  """
-  name: String
-
-  """
-  Legal name of the user
-  """
-  legalName: String
-
-  """
-  The unique guest token
-  """
-  token: String
-
-  """
-  Captcha validation for creating an order
-  """
-  captcha: CaptchaInput
-}
-
-"""
-Captcha related information
-"""
-input CaptchaInput {
-  """
-  Captcha validation token
-  """
-  token: String!
-
-  """
-  Catpcha provider
-  """
-  provider: CaptchaProvider!
-}
-
-"""
-Implemented Captcha Providers
-"""
-enum CaptchaProvider {
-  HCAPTCHA
-  RECAPTCHA
 }
 
 """
