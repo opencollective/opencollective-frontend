@@ -16,6 +16,7 @@ export const SECTIONS = {
   EXPENSES: 'expenses',
   SUBMITTED_EXPENSES: 'submitted-expenses',
   TRANSACTIONS: 'transactions',
+  HOST_TRANSACTIONS: 'host-transactions',
   VIRTUAL_CARDS: 'virtual-cards',
   TEAM: 'team',
   VENDORS: 'vendors',

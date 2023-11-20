@@ -16,7 +16,7 @@ export enum SURVEY_KEY {
   CONTRIBUTION_COMPLETED = 'CONTRIBUTION_COMPLETED',
 }
 
-const sendSurveyResponseMutation = gql`
+export const sendSurveyResponseMutation = gql`
   mutation SendSurveyResponse(
     $surveyKey: String!
     $responseId: String!

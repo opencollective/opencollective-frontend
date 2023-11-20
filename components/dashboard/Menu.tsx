@@ -196,8 +196,15 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: HeartHandshake,
     },
     {
+      if: !isHost || !LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_TRANSACTION_PAGE),
       section: ALL_SECTIONS.TRANSACTIONS,
       Icon: ArrowRightLeft,
+    },
+    {
+      if: isHost && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_TRANSACTION_PAGE),
+      section: ALL_SECTIONS.HOST_TRANSACTIONS,
+      Icon: ArrowRightLeft,
+      label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
     },
     {
       if: !isOneOfTypes(account, [EVENT, USER]) && !isAccountantOnly,

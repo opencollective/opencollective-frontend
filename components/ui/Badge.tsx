@@ -24,6 +24,11 @@ const badgeVariants = cva('inline-flex align-middle items-center font-medium', {
   },
   compoundVariants: [
     {
+      size: 'xs',
+      round: false,
+      className: 'rounded-sm',
+    },
+    {
       size: 'sm',
       round: false,
       className: 'rounded-md',
