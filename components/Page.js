@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import Body from '../components/Body';
@@ -34,7 +34,7 @@ const Page = ({
 
   const childProps = { LoggedInUser, loadingLoggedInUser };
   return (
-    <Fragment>
+    <div>
       <Header
         showSearch={showSearch}
         title={title}
@@ -53,7 +53,7 @@ const Page = ({
       />
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       {showFooter && <Footer />}
-    </Fragment>
+    </div>
   );
 };
 

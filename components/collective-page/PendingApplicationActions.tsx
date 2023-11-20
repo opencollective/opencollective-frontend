@@ -6,9 +6,9 @@ import { useIntl } from 'react-intl';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
+import { processApplicationMutation } from '../dashboard/sections/collectives/queries';
 import { Flex } from '../Grid';
 import AcceptRejectButtons from '../host-dashboard/AcceptRejectButtons';
-import { processApplicationMutation } from '../host-dashboard/applications/queries';
 import { NotificationBarButton } from '../NotificationBar';
 import { useToast } from '../ui/useToast';
 

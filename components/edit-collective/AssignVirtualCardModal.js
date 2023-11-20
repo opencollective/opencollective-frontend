@@ -76,7 +76,7 @@ const throttledCall = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
 
-const AssignVirtualCardModal = ({ collective, host, onSuccess, onClose, ...modalProps }) => {
+const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClose, ...modalProps }) => {
   const { toast } = useToast();
   const [assignNewVirtualCard, { loading: isBusy }] = useMutation(assignNewVirtualCardMutation, {
     context: API_V2_CONTEXT,

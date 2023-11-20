@@ -212,7 +212,7 @@ export default function VirtualCardsTable(props: VirtualCardsTableProps) {
   } else {
     return (
       <Grid justifyContent="center" mt={4} gridTemplateColumns={['100%', '366px']} gridGap="32px 24px">
-        {props.virtualCards.map(vc => (
+        {props.virtualCards?.map(vc => (
           <VirtualCard
             key={vc.id}
             host={props.host}

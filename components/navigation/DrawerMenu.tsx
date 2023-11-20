@@ -43,7 +43,7 @@ const StyledCloseButton = styled(StyledRoundButton)`
   justify-content: center;
 `;
 
-const StyledMenuItem = styled(Link)`
+const StyledMenuItem = styled(Link)<{ $isActive?: boolean }>`
   border: 0;
   background-color: transparent;
   color: #334155;

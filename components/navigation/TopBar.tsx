@@ -60,7 +60,7 @@ const MobileFooterIconContainer = styled(Box)`
   border-radius: 24px;
 `;
 
-const MainNavItem = styled(Link)`
+const MainNavItem = styled(Link)<{ isActive: boolean }>`
   display: flex;
   align-items: center;
   gap: 8px;
@@ -97,8 +97,7 @@ const MainNavItem = styled(Link)`
       }
     }
   `}
-  ${props => props.primary && `border: 1px solid #d1d5db;`}
-  font-weight: ${props => (props.lightWeight ? `400` : '500')};
+  font-weight: 500;
   ${props => props.isActive && `background-color: #f1f5f9;`}
 
   span {

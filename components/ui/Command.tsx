@@ -2,17 +2,19 @@
 
 import * as React from 'react';
 import { DialogProps } from '@radix-ui/react-dialog';
-import { Command as CommandPrimitive } from 'carloslfu-cmdk-internal';
 /* The 'carloslfu-cmdk-internal' package above is a fork of `cmdk` but bundling the latest fixes
   that are not published on npm yet. These fixes are needed for the AccountSwitcher to work properly.
   When cmdk releases 0.2.1 or 0.3.0 we should switch over to that.
   Reference: https://github.com/pacocoursey/cmdk/issues/129
 */
-import { Search } from 'lucide-react';
+import { Command as CommandPrimitive } from 'carloslfu-cmdk-internal';
+import clsx from 'clsx';
+import { Loader2, Search } from 'lucide-react';
 
 import { cn } from '../../lib/utils';
 
 import { Dialog, DialogContent } from './Dialog';
+import { Skeleton } from './Skeleton';
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -45,21 +47,26 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
 
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => (
-  // eslint-disable-next-line react/no-unknown-property
-  <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
-    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-    <CommandPrimitive.Input
-      ref={ref}
-      className={cn(
-        'flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
-        className,
-      )}
-      {...props}
-    />
-  </div>
-));
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & {
+    loading?: boolean;
+  }
+>(({ className, loading, ...props }, ref) => {
+  const Icon = loading ? Loader2 : Search;
+  return (
+    // eslint-disable-next-line react/no-unknown-property
+    <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
+      <Icon className={clsx('mr-2 h-4 w-4 shrink-0 opacity-50', loading && 'animate-spin')} />
+      <CommandPrimitive.Input
+        ref={ref}
+        className={cn(
+          'flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
+          className,
+        )}
+        {...props}
+      />
+    </div>
+  );
+});
 
 CommandInput.displayName = CommandPrimitive.Input.displayName;
 
@@ -80,9 +87,22 @@ CommandList.displayName = CommandPrimitive.List.displayName;
 const CommandEmpty = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Empty>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
->((props, ref) => <CommandPrimitive.Empty ref={ref} className="py-6 text-center text-sm" {...props} />);
+>((props, ref) => (
+  <CommandPrimitive.Empty ref={ref} className="py-4 text-center text-sm text-muted-foreground" {...props} />
+));
 
 CommandEmpty.displayName = CommandPrimitive.Empty.displayName;
+
+const CommandLoading = React.forwardRef<
+  React.ElementRef<typeof CommandPrimitive.Loading>,
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Loading>
+>((props, ref) => (
+  <CommandPrimitive.Loading ref={ref} className="rounded-sm px-2 py-1.5 text-sm" {...props}>
+    <Skeleton className="h-8" />
+  </CommandPrimitive.Loading>
+));
+
+CommandLoading.displayName = CommandPrimitive.Loading.displayName;
 
 const CommandGroup = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Group>,
@@ -135,6 +155,7 @@ export {
   CommandInput,
   CommandList,
   CommandEmpty,
+  CommandLoading,
   CommandGroup,
   CommandItem,
   CommandShortcut,
