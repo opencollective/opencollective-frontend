@@ -102,7 +102,7 @@ function ComboSelectFilter({
     if (isMulti) {
       onChange(isSelected ? selected.filter(v => v !== value) : [...selected, value]);
     } else {
-      onChange(isSelected ? null : value);
+      onChange(isSelected ? undefined : value);
     }
   };
   return (
