@@ -395,7 +395,8 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
         {error ? (
           <MessageBoxGraphqlError error={error} />
         ) : !loading &&
-          ((queryFilter.activeViewId === VendorsTab.POTENTIAL_VENDORS && host?.['potentialVendors']?.nodes) ||
+          ((queryFilter.activeViewId === VendorsTab.POTENTIAL_VENDORS &&
+            host?.['potentialVendors']?.nodes?.length === 0) ||
             host['vendors']?.nodes.length === 0) ? (
           <EmptyResults hasFilters={queryFilter.hasFilters} onResetFilters={() => queryFilter.resetFilters({})} />
         ) : queryFilter.activeViewId === VendorsTab.POTENTIAL_VENDORS ? (
