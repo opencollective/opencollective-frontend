@@ -21,26 +21,15 @@ import StyledLink from '../../StyledLink';
 import { P, Span, Strong } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
 import { listTierQuery } from '../tiers/EditTierModal';
-
 import { collectiveSettingsV1Query } from './EditCollectivePage';
+import { sortTiersForCollective } from '../../../lib/tier-utils';
 
-// TODO Make this a common function with the contribute section
-const getTiers = (collective, sortedTiers, intl) => {
-  const defaultContributionEnabled = !get(collective, 'settings.disableCustomContributions', false);
+const getSortedContributeCards = (collective, intl) => {
+  const sortedTiers = sortTiersForCollective(collective, collective.tiers);
 
-  const createdTierCards = sortedTiers.map(tier => ({
-    key: tier.id,
-    Component: ContributeTier,
-    componentProps: {
-      collective,
-      tier,
-      hideContributors: true,
-      hideCTA: true,
-    },
-  }));
-  const additionalTierCards = defaultContributionEnabled
-    ? [
-        {
+  const sortedContributeCards = sortedTiers.map(tier =>
+    tier === 'custom'
+      ? {
           key: 'custom',
           Component: ContributeCustom,
           componentProps: {
@@ -49,11 +38,20 @@ const getTiers = (collective, sortedTiers, intl) => {
             hideCTA: true,
             missingCTAMsg: intl.formatMessage({ defaultMessage: 'The default contribution tier cannot be edited.' }),
           },
+        }
+      : {
+          key: tier.id,
+          Component: ContributeTier,
+          componentProps: {
+            collective,
+            tier,
+            hideContributors: true,
+            hideCTA: true,
+          },
         },
-      ]
-    : [];
+  );
 
-  return [...createdTierCards, ...additionalTierCards];
+  return sortedContributeCards;
 };
 
 const CardsContainer = styled(Grid).attrs({
@@ -74,8 +72,6 @@ const CardsContainer = styled(Grid).attrs({
 const Tiers = ({ collective }) => {
   const variables = { accountSlug: collective.slug };
   const { data, loading, error, refetch } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
-  const tiers = sortBy(get(data, 'account.tiers.nodes', []), 'legacyId');
-  const filteredTiers = collective.type === 'EVENT' ? tiers.filter(tier => tier.type !== 'TICKET') : tiers; // Events have their tickets displayed in the "Tickets" section
   const intl = useIntl();
   return (
     <div>
@@ -151,7 +147,7 @@ const Tiers = ({ collective }) => {
             </Box>
             <AdminContributeCardsContainer
               collective={collective}
-              cards={getTiers(collective, filteredTiers, intl)}
+              cards={getSortedContributeCards(collective, intl)}
               CardsContainer={CardsContainer}
               useTierModals
               enableReordering={false}
