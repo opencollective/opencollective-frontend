@@ -6,7 +6,11 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import useQueryFilter, { AmountRangeFilter, BooleanFilter, DateRangeFilter } from '../../../lib/hooks/useQueryFilter';
+import useQueryFilter, {
+  AmountRangeFilter,
+  BooleanFilter,
+  DateRangeFilter,
+} from '../../../lib/hooks/deprecated/useQueryFilter';
 
 import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal';
 import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';

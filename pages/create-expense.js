@@ -241,7 +241,7 @@ class CreateExpensePage extends React.Component {
     } catch (e) {
       toast({
         variant: 'error',
-        description: i18nGraphqlException(this.props.intl, e),
+        message: i18nGraphqlException(this.props.intl, e),
       });
     }
   };

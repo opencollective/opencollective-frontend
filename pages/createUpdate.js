@@ -34,16 +34,18 @@ import { getUpdatesVariables, updatesPageQuery } from './updates';
 const BackButtonWrapper = styled(Container)`
   position: relative;
   color: #71757a;
-  margin-right: 62px;
-  margin-left: 20px;
-  @media (max-width: 600px) {
-    margin-left: 0;
-  }
 `;
 
 const CreateUpdateWrapper = styled(Flex)`
+  max-width: 1400px;
+  margin: 32px auto;
+  grid-gap: 64px;
+  padding: 0 16px;
+  align-items: baseline;
   @media (max-width: 830px) {
     flex-direction: column;
+    grid-gap: 32px;
+    padding: 0 8px;
   }
 `;
 
@@ -157,7 +159,7 @@ class CreateUpdatePage extends React.Component {
           {loadingLoggedInUser ? (
             <Loading />
           ) : (
-            <CreateUpdateWrapper className="content" mt={4} alignItems="baseline">
+            <CreateUpdateWrapper>
               <BackButtonWrapper>
                 <Link href={`/${collective.slug}/updates`}>
                   <Container display="flex" color="#71757A" fontSize="14px" alignItems="center">

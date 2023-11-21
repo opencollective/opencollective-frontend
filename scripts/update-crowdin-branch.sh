@@ -11,6 +11,6 @@ git pull &&
   npm run langs:update-progress &&
   git add . &&
   git status &&
-  echo "Eventually commit the changes above, and if everything looks ok, run:" &&
+  echo "If everything looks ok, commit and push the changes by running:" &&
   echo "git commit -m 'i18n: Update locale files'" &&
   echo "git push origin $CROWDIN_BRANCH"

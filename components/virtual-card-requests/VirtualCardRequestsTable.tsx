@@ -205,8 +205,8 @@ export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
             status === VirtualCardRequestStatus.PENDING
               ? 'warning'
               : status === VirtualCardRequestStatus.APPROVED
-              ? 'success'
-              : 'error'
+                ? 'success'
+                : 'error'
           }
         >
           {status}

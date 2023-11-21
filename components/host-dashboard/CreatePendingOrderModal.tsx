@@ -474,13 +474,14 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               data-cy="create-pending-contribution-source"
               types={['USER', 'ORGANIZATION', 'VENDOR']}
               error={field.error}
-              createCollectiveOptionalFields={['location.address', 'location.country']}
               onBlur={() => form.setFieldTouched(field.name, true)}
               customOptions={defaultSourcesOptions}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               collective={field.value}
               includeVendorsForHostId={collective?.host?.legacyId}
               menuPortalTarget={null}
+              creatable={['USER', 'VENDOR']}
+              HostCollectiveId={host?.legacyId}
             />
           )}
         </Field>

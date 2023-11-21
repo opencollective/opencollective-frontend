@@ -79,8 +79,8 @@ class Member extends React.Component {
     const tierName = membership.tier
       ? singular(membership.tier.name)
       : this.messages[membership.role]
-      ? intl.formatMessage(this.messages[membership.role])
-      : membership.role;
+        ? intl.formatMessage(this.messages[membership.role])
+        : membership.role;
     let memberSinceStr = '';
     if (tierName) {
       memberSinceStr += capitalize(tierName);

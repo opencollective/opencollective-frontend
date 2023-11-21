@@ -97,14 +97,14 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
             label: intl.formatMessage(I18nMessages.ALL),
           }
         : props.missingReceipts === true
-        ? {
-            value: true,
-            label: intl.formatMessage(I18nMessages.RECEIPT_MISSING),
-          }
-        : {
-            value: false,
-            label: intl.formatMessage(I18nMessages.NO_RECEIPT_MISSING),
-          },
+          ? {
+              value: true,
+              label: intl.formatMessage(I18nMessages.RECEIPT_MISSING),
+            }
+          : {
+              value: false,
+              label: intl.formatMessage(I18nMessages.NO_RECEIPT_MISSING),
+            },
     [intl, props.missingReceipts],
   );
 

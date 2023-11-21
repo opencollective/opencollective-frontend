@@ -47,7 +47,7 @@ const VendorDetails = ({ vendor, onCancel, editVendor }: VendorDetailsProps) => 
   return (
     <div>
       <H4 mb={32}>
-        <FormattedMessage defaultMessage="Vendor's Detail" />
+        <FormattedMessage defaultMessage="Vendor's Details" />
       </H4>
       <SectionTitle>{vendor.name}</SectionTitle>
       <div className="mt-4 flex gap-8">
@@ -114,7 +114,7 @@ const VendorDetails = ({ vendor, onCancel, editVendor }: VendorDetailsProps) => 
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </Button>
             <Button onClick={editVendor} className="rounded-full">
-              <FormattedMessage defaultMessage="Edit Vendor" />
+              <FormattedMessage id="vendor.edit" defaultMessage="Edit Vendor" />
             </Button>
           </div>,
           drawerActionsContainer,

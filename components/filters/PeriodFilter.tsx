@@ -57,7 +57,7 @@ export const getNewInterval = (interval, changeField, newValue) => {
  * Date is locally stored as '2020-01-01'. We need to force the time to make sure it's not modified
  * by timezones when parsed.
  */
-const parseDateForDateRange = (dateStr, isEndOfDay) => {
+export const parseDateForDateRange = (dateStr, isEndOfDay) => {
   if (!dateStr) {
     return null;
   } else if (!isEndOfDay) {
@@ -164,9 +164,9 @@ export const PeriodFilterForm = ({
             {({ item }) => {
               switch (item) {
                 case 'local':
-                  return <FormattedMessage defaultMessage="Local" />;
+                  return <FormattedMessage id="Timezone.Local" defaultMessage="Local" />;
                 case 'UTC':
-                  return <FormattedMessage defaultMessage="UTC" />;
+                  return <FormattedMessage id="Timezone.UTC" defaultMessage="UTC" />;
               }
             }}
           </StyledButtonSet>

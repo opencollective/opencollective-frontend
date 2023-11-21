@@ -78,6 +78,7 @@ export const updatesPageQuery = gql`
           publishedAt
           updatedAt
           userCanSeeUpdate
+          notificationAudience
           tags
           isPrivate
           isChangelog

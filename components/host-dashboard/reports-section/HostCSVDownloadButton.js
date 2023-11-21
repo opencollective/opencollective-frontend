@@ -3,24 +3,16 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import ExportTransactionsCSVModal from '../../ExportTransactionsCSVModal';
-import StyledButton from '../../StyledButton';
+import { Button } from '../../ui/Button';
 
 const HostCSVDownloadButton = ({ host, collectives, dateInterval }) => {
   const [displayModal, setDisplayModal] = React.useState(false);
 
   return (
     <React.Fragment>
-      <StyledButton
-        buttonStyle="primary"
-        buttonSize="small"
-        py="7px"
-        minWidth={140}
-        width="100%"
-        onClick={() => setDisplayModal(true)}
-        disabled={!host}
-      >
+      <Button size="sm" variant="outline" className="" onClick={() => setDisplayModal(true)} disabled={!host}>
         <FormattedMessage defaultMessage="Export CSV" />
-      </StyledButton>
+      </Button>
       {displayModal && (
         <ExportTransactionsCSVModal
           dateInterval={dateInterval}

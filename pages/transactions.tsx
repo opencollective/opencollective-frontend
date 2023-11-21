@@ -124,6 +124,7 @@ export const transactionsPageQuery = gql`
     $includeGiftCardTransactions: Boolean
     $includeChildrenTransactions: Boolean
     $virtualCard: [VirtualCardReferenceInput]
+    $orderBy: ChronologicalOrderInput
   ) {
     account(slug: $slug) {
       id
@@ -143,6 +144,7 @@ export const transactionsPageQuery = gql`
         parent {
           id
           slug
+          name
         }
       }
       ... on AccountWithHost {
@@ -176,6 +178,7 @@ export const transactionsPageQuery = gql`
       includeChildrenTransactions: $includeChildrenTransactions
       includeDebts: true
       virtualCard: $virtualCard
+      orderBy: $orderBy
     ) {
       ...TransactionsQueryCollectionFragment
     }

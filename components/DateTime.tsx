@@ -21,6 +21,7 @@ type DateTimeProps = {
   value: string | Date | typeof dayjs;
   dateStyle?: 'full' | 'long' | 'medium' | 'short';
   timeStyle?: 'full' | 'long' | 'medium' | 'short' | null | undefined;
+  className?: string;
 };
 
 /**
