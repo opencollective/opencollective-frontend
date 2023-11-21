@@ -200,6 +200,9 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
     initialValues.vendorInfo['otherTaxType'] = initialValues.vendorInfo?.taxType;
     initialValues.vendorInfo.taxType = 'OTHER';
   }
+  if (vendor.payoutMethods?.length > 0) {
+    initialValues['payoutMethod'] = vendor.payoutMethods[0];
+  }
   const loading = isCreating || isEditing;
 
   return (
