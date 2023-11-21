@@ -2821,12 +2821,20 @@ export type CreditHostFeeArgs = {
 /** This represents a Credit transaction */
 export type CreditNetAmountArgs = {
   fetchHostFee?: InputMaybe<Scalars['Boolean']>;
+  fetchPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
 };
 
 
 /** This represents a Credit transaction */
 export type CreditNetAmountInHostCurrencyArgs = {
   fetchHostFee?: InputMaybe<Scalars['Boolean']>;
+  fetchPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
+};
+
+
+/** This represents a Credit transaction */
+export type CreditPaymentProcessorFeeArgs = {
+  fetchPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
 };
 
 
@@ -3236,12 +3244,20 @@ export type DebitHostFeeArgs = {
 /** This represents a Debit transaction */
 export type DebitNetAmountArgs = {
   fetchHostFee?: InputMaybe<Scalars['Boolean']>;
+  fetchPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
 };
 
 
 /** This represents a Debit transaction */
 export type DebitNetAmountInHostCurrencyArgs = {
   fetchHostFee?: InputMaybe<Scalars['Boolean']>;
+  fetchPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
+};
+
+
+/** This represents a Debit transaction */
+export type DebitPaymentProcessorFeeArgs = {
+  fetchPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
 };
 
 
@@ -7215,6 +7231,7 @@ export enum OrderStatus {
   NEW = 'NEW',
   PAID = 'PAID',
   PENDING = 'PENDING',
+  PLEDGED = 'PLEDGED',
   PROCESSING = 'PROCESSING',
   REFUNDED = 'REFUNDED',
   REJECTED = 'REJECTED',
@@ -9371,12 +9388,20 @@ export type TransactionHostFeeArgs = {
 /** Transaction interface shared by all kind of transactions (Debit, Credit) */
 export type TransactionNetAmountArgs = {
   fetchHostFee?: InputMaybe<Scalars['Boolean']>;
+  fetchPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
 };
 
 
 /** Transaction interface shared by all kind of transactions (Debit, Credit) */
 export type TransactionNetAmountInHostCurrencyArgs = {
   fetchHostFee?: InputMaybe<Scalars['Boolean']>;
+  fetchPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
+};
+
+
+/** Transaction interface shared by all kind of transactions (Debit, Credit) */
+export type TransactionPaymentProcessorFeeArgs = {
+  fetchPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
 };
 
 
