@@ -245,7 +245,7 @@
     "css-loader": "^6.7.3",
     "cypress": "^13.0.0",
     "cz-conventional-changelog": "^3.3.0",
-    "esbuild": "0.19.5",
+    "esbuild": "0.19.7",
     "eslint": "^8.38.0",
     "eslint-config-opencollective": "^3.0.3",
     "eslint-plugin-babel": "^5.3.1",
