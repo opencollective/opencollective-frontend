@@ -89,8 +89,7 @@ const Description = styled.div`
   ${descriptionStyle}
 `;
 
-const MissingCTAExplanation = styled.div`
-  ${descriptionStyle}
+const MissingCTAExplanation = styled(Description)`
   flex: 0;
   font-style: italic;
   font-size: 12px;
