@@ -1,204 +1,192 @@
 import React from 'react';
-import { compact, isEmpty, isNil, omit, uniq } from 'lodash';
+import { forEach, isEmpty, isNil, isUndefined, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
+import { useIntl } from 'react-intl';
+import { z } from 'zod';
 
-import { encodeDateInterval, parseDateInterval } from '../date-utils';
+import { toast } from '../../components/ui/useToast';
 
-interface CommonFilterDefinition {
-  isMulti?: boolean;
-  queryParam?: string;
-}
+import type {
+  FilterComponentConfigs,
+  FiltersToVariables,
+  resetFilters,
+  SetFilter,
+  SetFilters,
+  Views,
+} from '../filters/filter-types';
+import {
+  destructureFilterValues,
+  getActiveViewId,
+  getFilterValueFromQueryValue,
+  getQueryValueFromFilterValue,
+  structureQueryValues,
+} from '../filters/filter-utils';
 
-interface FilterDefinitionWithoutSerialization extends CommonFilterDefinition {
-  deserialize?: never;
-  serialize?: never;
-}
-
-interface FilterDefinitionWithSerialization extends CommonFilterDefinition {
-  deserialize: (q: string) => any;
-  serialize: (v: any) => string;
-}
-
-type FilterDefinition = FilterDefinitionWithoutSerialization | FilterDefinitionWithSerialization;
-
-type Filters = {
-  [K: string]: FilterDefinition;
+export type useQueryFilterReturnType<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQueryVars> = {
+  values: z.infer<S>;
+  variables: Partial<GQLQueryVars>;
+  resetFilters: resetFilters<z.infer<S>>;
+  setFilter: SetFilter<z.infer<S>>;
+  setFilters: SetFilters<z.infer<S>>;
+  hasFilters: boolean;
+  activeViewId?: string;
+  filters: FilterComponentConfigs<z.infer<S>>;
+  views?: Views<z.infer<S>>;
+  meta?: any;
+  defaultSchemaValues: Partial<z.infer<S>>;
 };
 
-type UseQueryFilterOptions<F extends Filters> = {
-  filters: F;
-  ignoreQueryParams?: string[];
-};
-
-type FilterValueType<F extends FilterDefinition> = F extends FilterDefinitionWithSerialization
-  ? ReturnType<F['deserialize']>
-  : string;
-type FilterValuesType<F extends FilterDefinition> = F extends { isMulti: true }
-  ? Array<FilterValueType<F>>
-  : FilterValueType<F>;
-
-type UseQueryFilterHook<F extends Filters> = {
-  setFilter<K extends keyof F>(filter: K, value: FilterValuesType<F[K]>): void;
-  values: {
-    [K in keyof F]: FilterValuesType<F[K]>;
-  };
-} & {
-  [K in string & keyof F as `set${Capitalize<K>}`]: (value: FilterValuesType<F[K]>) => void;
-};
-
-export default function useQueryFilter<F extends Filters>(opts: UseQueryFilterOptions<F>): UseQueryFilterHook<F> {
+export default function useQueryFilter<
+  S extends z.ZodObject<z.ZodRawShape, any, any>,
+  GQLQueryVars,
+  FilterMeta = any,
+>(opts: {
+  schema: S; // Schema for all query filters (both those which are available to the user in Query and those which are not)
+  filters: FilterComponentConfigs<z.infer<S>, FilterMeta>; // Configuration of filters available to the user in the `Filter` component (used in this hook to determine `hasFilters` and `activeViewId`)
+  toVariables?: Partial<FiltersToVariables<z.infer<S>, GQLQueryVars, FilterMeta>>;
+  defaultFilterValues?: Partial<z.infer<S>>; // Default values for filters, views[0].filter will be used if not set
+  meta?: FilterMeta;
+  views?: Views<z.infer<S>>;
+}): useQueryFilterReturnType<S, GQLQueryVars> {
   const router = useRouter();
+  const intl = useIntl();
 
-  const filterValues = React.useMemo(() => {
-    return Object.keys(opts.filters).reduce((acc, filterName) => {
-      const filterDefinition = opts.filters[filterName];
-      const filterQueryParam = filterDefinition.queryParam ?? filterName;
-      const deserializeFn = filterDefinition?.deserialize ?? (v => v);
+  // Default values set by the page, views, or the user (eventually)
+  const defaultFilterValues = opts.defaultFilterValues || opts.views?.[0]?.filter || {};
+  // Default values defined by the schema
+  const defaultSchemaValues = opts.schema.parse({});
 
-      let filterQueryValues = router.query[filterQueryParam];
-      if (typeof filterQueryValues === 'string') {
-        filterQueryValues = [filterQueryValues];
-      }
+  const values = React.useMemo(() => {
+    const query = structureQueryValues(router.query);
 
-      filterQueryValues = compact(uniq(filterQueryValues));
-
-      const deserializedValue = filterDefinition.isMulti
-        ? filterQueryValues.map(s => deserializeFn(s))
-        : filterQueryValues.length > 0
-          ? deserializeFn(filterQueryValues?.[0])
-          : null;
-
-      return {
+    // Add defaultFilterValues (which are not part of the URL query)
+    // and remove default value fallback "ALL" before parsing the query
+    const queryWithDefaultFilterValues = Object.keys(defaultFilterValues).reduce(
+      (acc, filterName) => ({
         ...acc,
-        [filterName]: deserializedValue,
-      };
-    }, {}) as { [K in keyof F]: FilterValuesType<F[K]> };
-  }, [opts.filters, router.query]);
+        [filterName]: getFilterValueFromQueryValue(query[filterName], defaultFilterValues[filterName]),
+      }),
+      query,
+    );
 
-  const setFilter = React.useCallback(
-    (filterName: keyof F, filterValue: any) => {
-      const filterDefinition = opts.filters[filterName];
-      const filterQueryParam = filterDefinition.queryParam ?? filterName;
-      const serializeFn = filterDefinition?.serialize ?? (v => v);
+    // This will validate the query values against the schema (and add the default schema values if those fields are not set))
+    const result = opts.schema.safeParse(queryWithDefaultFilterValues);
 
-      const serializedValue = filterDefinition.isMulti
-        ? (filterValue as Array<any>).map(v => serializeFn(v))
-        : serializeFn(filterValue);
+    if (result.success) {
+      return result.data;
+    } else if (result.success === false) {
+      addFilterValidationErrorToast(result.error, intl);
+    }
+    return opts.schema.parse(defaultFilterValues);
+  }, [opts.schema, router.query, defaultFilterValues]);
 
-      let newFilterQueryValues = omit(router.query, opts.ignoreQueryParams);
+  const variables = React.useMemo(() => {
+    let apiVariables: Partial<GQLQueryVars> = {};
 
-      if (!serializedValue || serializedValue.length === 0) {
-        newFilterQueryValues = omit(newFilterQueryValues, filterQueryParam);
+    // Iterate over each entry in the values object
+    for (const [key, value] of Object.entries(omitBy(values, isUndefined))) {
+      // If a specific toVariables function exists for this key, use it
+      if (opts.toVariables?.[key]) {
+        apiVariables = {
+          ...apiVariables,
+          ...opts.toVariables[key](value, key, opts.meta),
+        };
       } else {
-        newFilterQueryValues = { ...newFilterQueryValues, [filterQueryParam]: serializedValue };
+        apiVariables = {
+          ...apiVariables,
+          [key]: value,
+        };
+      }
+    }
+
+    return apiVariables;
+  }, [values, opts.toVariables, opts.meta]);
+
+  const resetFilters = React.useCallback(
+    newFilters => {
+      const result = opts.schema.safeParse(newFilters);
+
+      if (result.success) {
+        const filterValues = result.data;
+        // Get replacements for default values that should not be part of the URL query
+        const queryWithReplacementsForDefaults = Object.keys({ ...defaultFilterValues, ...defaultSchemaValues }).reduce(
+          (acc, filterName) => ({
+            ...acc,
+            [filterName]: getQueryValueFromFilterValue(
+              filterValues[filterName],
+              defaultFilterValues[filterName],
+              defaultSchemaValues?.[filterName],
+            ),
+          }),
+          filterValues,
+        );
+
+        const desctructuredQueryValues = destructureFilterValues(queryWithReplacementsForDefaults);
+        const query = omitBy(desctructuredQueryValues, isNil);
+        const basePath = router.asPath.split('?')[0];
+
+        router.push(
+          {
+            pathname: basePath,
+            query,
+          },
+          null,
+          { scroll: false },
+        );
       }
 
-      const basePath = router.asPath.split('?')[0];
-      router.push(
-        {
-          pathname: basePath,
-          query: newFilterQueryValues,
-        },
-        null,
-        { scroll: false },
-      );
+      if (result.success === false) {
+        addFilterValidationErrorToast(result.error, intl);
+      }
     },
-    [opts.ignoreQueryParams, opts.filters, router, router.query],
+    [defaultFilterValues, opts.schema, router.asPath],
   );
 
-  const setFns = React.useMemo(() => {
-    return Object.keys(opts.filters).reduce((acc, filterName) => {
-      return {
-        ...acc,
-        [`set${capitalize(filterName)}`]: (value: string[]) => setFilter(filterName, value),
-      };
-    }, {}) as { [K in string & keyof F as `set${Capitalize<K>}`]: (value: FilterValuesType<F[K]>) => void };
-  }, [opts.filters, setFilter]);
+  const setFilter = React.useCallback(
+    (filterName, filterValue) => resetFilters({ ...values, [filterName]: filterValue }),
+    [values, resetFilters],
+  );
+
+  const setFilters = React.useCallback(
+    newFilters => resetFilters({ ...values, ...newFilters }),
+    [values, resetFilters],
+  );
+
+  const hasFilters = React.useMemo(
+    () => !isEmpty(omitBy(opts.filters, (v, key) => values[key] === defaultSchemaValues[key] || key === 'orderBy')),
+    [values, opts.filters, defaultSchemaValues],
+  );
+
+  const activeViewId = React.useMemo(
+    () => getActiveViewId(values, { filters: opts.filters, views: opts.views, defaultSchemaValues }),
+    [values, opts.filters, opts.views],
+  );
 
   return {
-    ...setFns,
+    values,
+    variables,
+    resetFilters,
     setFilter,
-    values: filterValues,
+    setFilters,
+    hasFilters,
+    activeViewId,
+    defaultSchemaValues,
+    filters: opts.filters,
+    views: opts.views,
+    meta: opts.meta,
   };
 }
 
-function capitalize(v: string) {
-  const first = v[0];
-  return `${first.toUpperCase()}${v.slice(1)}`;
+function addFilterValidationErrorToast(error, intl) {
+  let errorMessage = '';
+
+  forEach(error.errors, error => {
+    errorMessage = `${errorMessage} ${error.path.join(', ')}: ${error.message} \n`;
+  });
+
+  toast({
+    variant: 'error',
+    title: intl.formatMessage({ defaultMessage: 'Filter validation error' }),
+    message: errorMessage,
+  });
 }
-
-export const BooleanFilter = {
-  serialize: v => {
-    if (isNil(v)) {
-      return null;
-    }
-
-    if (v === true) {
-      return 'true';
-    } else {
-      return 'false';
-    }
-  },
-  deserialize: v => {
-    if (isEmpty(v)) {
-      return null;
-    }
-
-    return v === 'true';
-  },
-};
-
-export const DateRangeFilter = {
-  serialize: encodeDateInterval,
-  deserialize: parseDateInterval,
-};
-
-export const AmountRangeFilter = {
-  serialize: v => {
-    if (!v) {
-      return null;
-    }
-
-    const fromAmount = isNil(v.fromAmount) ? 0 : v.fromAmount / 100;
-    const toAmount = isNil(v.toAmount) ? Infinity : v.toAmount / 100;
-    if (fromAmount === toAmount) {
-      return `${fromAmount}`;
-    }
-
-    if (toAmount === Infinity) {
-      if (fromAmount === 0) {
-        return null;
-      }
-      return `${fromAmount}+`;
-    }
-    return `${fromAmount}-${toAmount}`;
-  },
-  deserialize: v => {
-    if (!v || v.length === 0) {
-      return null;
-    }
-
-    if (v.includes('+')) {
-      const [fromAmount] = v.split('+');
-
-      return {
-        fromAmount: fromAmount * 100,
-        toAmount: null,
-      };
-    }
-
-    if (v.includes('-')) {
-      const [fromAmount, toAmount] = v.split('-');
-
-      return {
-        fromAmount: fromAmount * 100,
-        toAmount: toAmount * 100,
-      };
-    }
-
-    return {
-      fromAmount: v * 100,
-      toAmount: v * 100,
-    };
-  },
-};
