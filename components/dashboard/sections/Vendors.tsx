@@ -435,7 +435,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
       <Drawer
         open={isDrawerOpen}
         onClose={closeDrawer}
-        className={cn((vendorDetail || orgDetail) && 'max-w-2xl')}
+        className={cn(vendorDetail || orgDetail ? 'max-w-2xl' : 'max-w-xl')}
         showActionsContainer
         showCloseButton
       >
@@ -465,6 +465,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
 
         {vendorDetail && (
           <VendorDetails
+            host={host}
             vendor={vendorDetail}
             editVendor={() => {
               setCreateEditVendor(vendorDetail);

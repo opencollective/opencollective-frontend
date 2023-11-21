@@ -48,6 +48,14 @@ export const vendorFieldFragment = gql`
       name
       data
     }
+
+    orders {
+      totalCount
+    }
+
+    expenses(status: PAID, direction: SUBMITTED) {
+      totalCount
+    }
   }
 `;
 
