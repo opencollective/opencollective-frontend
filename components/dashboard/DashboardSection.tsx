@@ -93,7 +93,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (SettingsComponent) {
     return (
       <div className="max-w-screen-md">
-        <SettingsComponent account={account} subpath={subpath} />
+        <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
     );
   }
