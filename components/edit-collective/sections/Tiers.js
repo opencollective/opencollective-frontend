@@ -25,8 +25,8 @@ import { listTierQuery } from '../tiers/EditTierModal';
 
 import { collectiveSettingsV1Query } from './EditCollectivePage';
 
-const getSortedContributeCards = (collective, intl) => {
-  const sortedTiers = sortTiersForCollective(collective, collective.tiers);
+const getSortedContributeCards = (collective, tiers, intl) => {
+  const sortedTiers = sortTiersForCollective(collective, tiers);
 
   const sortedContributeCards = sortedTiers.map(tier =>
     tier === 'custom'
@@ -72,8 +72,9 @@ const CardsContainer = styled(Grid).attrs({
  */
 const Tiers = ({ collective }) => {
   const variables = { accountSlug: collective.slug };
-  const { loading, error, refetch } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
+  const { data, loading, error, refetch } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
   const intl = useIntl();
+  const tiers = get(data, 'account.tiers.nodes', []);
   return (
     <div>
       <Grid gridTemplateColumns={['1fr', '172px 1fr']} gridGap={62} mt={34}>
@@ -148,7 +149,7 @@ const Tiers = ({ collective }) => {
             </Box>
             <AdminContributeCardsContainer
               collective={collective}
-              cards={getSortedContributeCards(collective, intl)}
+              cards={getSortedContributeCards(collective, tiers, intl)}
               CardsContainer={CardsContainer}
               useTierModals
               enableReordering={false}
