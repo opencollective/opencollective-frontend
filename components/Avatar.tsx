@@ -71,9 +71,10 @@ const Avatar = ({
   radius = 42,
   name = undefined,
   useIcon = false,
+  children = null,
   ...styleProps
 }) => {
-  let child = null;
+  let child = children;
   // Use collective object instead of props
   if (collective) {
     type = collective.type;
