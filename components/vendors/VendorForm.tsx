@@ -196,11 +196,14 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
     { label: <FormattedMessage id="taxType.Other" defaultMessage="Other" />, value: 'OTHER' },
   ];
   const initialValues = cloneDeep(pick(vendor, EDITABLE_FIELDS));
+  if (vendor?.hasImage !== true) {
+    initialValues.imageUrl = null;
+  }
   if (initialValues.vendorInfo?.taxType && !['EIN', 'VAT', 'GST'].includes(initialValues.vendorInfo?.taxType)) {
     initialValues.vendorInfo['otherTaxType'] = initialValues.vendorInfo?.taxType;
     initialValues.vendorInfo.taxType = 'OTHER';
   }
-  if (vendor.payoutMethods?.length > 0) {
+  if (vendor?.payoutMethods?.length > 0) {
     initialValues['payoutMethod'] = vendor.payoutMethods[0];
   }
   const loading = isCreating || isEditing;
@@ -249,7 +252,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                       name={field.name}
                       value={field.value}
                       onSuccess={({ url }) => form.setFieldValue(field.name, url)}
-                      onReject={() => form.setFieldValue(field.name, vendor.imageUrl)}
+                      onReject={() => form.setFieldValue(field.name, vendor?.imageUrl)}
                       minSize={1024}
                       maxSize={2e3 * 1024}
                     />

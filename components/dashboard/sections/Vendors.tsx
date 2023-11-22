@@ -11,7 +11,6 @@ import { boolean, limit, offset } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { DashboardVendorsQuery } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
-import { cn } from '../../../lib/utils';
 
 import Avatar from '../../Avatar';
 import { DataTable } from '../../DataTable';
@@ -435,7 +434,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
       <Drawer
         open={isDrawerOpen}
         onClose={closeDrawer}
-        className={cn(vendorDetail || orgDetail ? 'max-w-2xl' : 'max-w-xl')}
+        className={vendorDetail || orgDetail ? 'max-w-2xl' : 'max-w-xl'}
         showActionsContainer
         showCloseButton
       >
