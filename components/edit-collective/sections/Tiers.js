@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
-import { get, sortBy } from 'lodash';
+import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { sortTiersForCollective } from '../../../lib/tier-utils';
 
 import AdminContributeCardsContainer from '../../contribute-cards/AdminContributeCardsContainer';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
@@ -21,8 +22,8 @@ import StyledLink from '../../StyledLink';
 import { P, Span, Strong } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
 import { listTierQuery } from '../tiers/EditTierModal';
+
 import { collectiveSettingsV1Query } from './EditCollectivePage';
-import { sortTiersForCollective } from '../../../lib/tier-utils';
 
 const getSortedContributeCards = (collective, intl) => {
   const sortedTiers = sortTiersForCollective(collective, collective.tiers);
@@ -71,7 +72,7 @@ const CardsContainer = styled(Grid).attrs({
  */
 const Tiers = ({ collective }) => {
   const variables = { accountSlug: collective.slug };
-  const { data, loading, error, refetch } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
+  const { loading, error, refetch } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
   const intl = useIntl();
   return (
     <div>
