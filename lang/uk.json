@@ -3038,6 +3038,7 @@
   "Transaction.Type.Credit": "Кредит",
   "transaction.usingGiftCardFrom": "скориставшись {giftCard} від {collective}",
   "TransactionDetails.HostFee": "Транзакція включає комісію фіскального агента {amount}",
+  "TransactionDetails.PaymentProcessorFee": "This transaction includes {amount} payment processor fees",
   "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "Use the filters to define the transactions you would like to download.",
   "transactions.downloadcsvbutton": "Завантажити CSV-файл",

@@ -3038,6 +3038,7 @@
   "Transaction.Type.Credit": "Crédit",
   "transaction.usingGiftCardFrom": "avec une {giftCard} de {collective}",
   "TransactionDetails.HostFee": "Cette transaction comprend {amount} de frais d'Hôte",
+  "TransactionDetails.PaymentProcessorFee": "This transaction includes {amount} payment processor fees",
   "transactions.displayPendingContributions": "Afficher les contributions en attente",
   "Transactions.DownloadCSV.Description": "Utilisez les filtres pour définir les transactions que vous souhaitez télécharger.",
   "transactions.downloadcsvbutton": "Télécharger CSV",

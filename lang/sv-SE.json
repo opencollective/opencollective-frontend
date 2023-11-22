@@ -3038,6 +3038,7 @@
   "Transaction.Type.Credit": "Kredit",
   "transaction.usingGiftCardFrom": "använder ett {giftCard} från {collective}",
   "TransactionDetails.HostFee": "Denna transaktion inkluderar {amount} för värdavgifter",
+  "TransactionDetails.PaymentProcessorFee": "This transaction includes {amount} payment processor fees",
   "transactions.displayPendingContributions": "Visa väntande bidrag",
   "Transactions.DownloadCSV.Description": "Använd filtren för att specificera de transaktioner du vill ladda ner.",
   "transactions.downloadcsvbutton": "Ladda ner CSV",

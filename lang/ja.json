@@ -3038,6 +3038,7 @@
   "Transaction.Type.Credit": "クレジット",
   "transaction.usingGiftCardFrom": "using a {giftCard} from {collective}",
   "TransactionDetails.HostFee": "この取引にはホスト手数料 {amount} が含まれています",
+  "TransactionDetails.PaymentProcessorFee": "This transaction includes {amount} payment processor fees",
   "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "Use the filters to define the transactions you would like to download.",
   "transactions.downloadcsvbutton": "CSV をダウンロード",

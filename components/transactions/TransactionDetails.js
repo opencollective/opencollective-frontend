@@ -161,7 +161,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                   <Fragment>
                     <br />
                     <FormattedMessage
-                      id="TransactionDetails.HostFee"
+                      id="TransactionDetails.PaymentProcessorFee"
                       defaultMessage="This transaction includes {amount} payment processor fees"
                       values={{
                         amount: (
