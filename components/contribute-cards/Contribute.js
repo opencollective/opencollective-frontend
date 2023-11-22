@@ -73,7 +73,7 @@ const CoverImage = styled.div`
 `;
 
 /** Tier's description */
-const descriptionStyle = css`
+const Description = styled.div`
   overflow-wrap: break-word;
   margin: 8px 0;
   font-size: 14px;
@@ -84,9 +84,6 @@ const descriptionStyle = css`
 
   /* Neutral Tints / 700 */
   color: #4e5052;
-`;
-const Description = styled.div`
-  ${descriptionStyle}
 `;
 
 const MissingCTAExplanation = styled(Description)`
