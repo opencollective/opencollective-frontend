@@ -29,6 +29,7 @@ const accountingCategoriesQuery = gql`
   query AdminAccountingCategoriesQuery($hostSlug: String!) {
     host(slug: $hostSlug) {
       id
+      slug
       accountingCategories {
         totalCount
         nodes {
@@ -50,6 +51,7 @@ const editAccountingCategoryMutation = gql`
       ... on Organization {
         host {
           id
+          slug
           accountingCategories {
             totalCount
             nodes {
@@ -176,7 +178,7 @@ export const AccountingCategoriesTable = ({ hostSlug }: AccountingCategoriesTabl
     return <MessageBoxGraphqlError error={error} />;
   }
 
-  const isAdmin = Boolean(data?.host && LoggedInUser?.isAdminOfCollective(data?.host)); // Accountants can't edit accounting categories
+  const isAdmin = Boolean(LoggedInUser?.isAdminOfCollective(data?.host)); // Accountants can't edit accounting categories
   return (
     <form
       onSubmit={async e => {
