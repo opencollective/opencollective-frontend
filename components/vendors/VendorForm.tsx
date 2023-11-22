@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
 import { cloneDeep, pick } from 'lodash';
-import { Download, Pencil, X } from 'lucide-react';
+import { Download, Pencil, Trash, Upload, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { FileRejection, useDropzone } from 'react-dropzone';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -13,7 +13,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { DashboardVendorsQuery, UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
 import { useImageUploader } from '../../lib/hooks/useImageUploader';
 import { elementFromClass } from '../../lib/react-utils';
-import { omitDeep } from '../../lib/utils';
+import { cn, omitDeep } from '../../lib/utils';
 
 import Avatar from '../Avatar';
 import { useDrawerActionsContainer } from '../Drawer';
@@ -86,10 +86,11 @@ const AvatarContainer = elementFromClass(
 
 const EditAvatarButton = elementFromClass(
   'button',
-  'absolute top-[-12px] right-[-12px] flex items-center justify-center rounded-full bg-slate-200 hover:bg-slate-100 hover:text-slate-500 text-slate-600 w-6 h-6 p-1',
+  'flex items-center justify-center rounded-full bg-slate-200 hover:bg-slate-100 hover:text-slate-500 text-slate-600 w-6 h-6 p-1',
 );
 
 const VendorAvatar = ({ value, name, radius, minSize, maxSize, onSuccess, onReject }) => {
+  const intl = useIntl();
   const { uploadFiles, isUploading } = useImageUploader({
     isMulti: false,
     mockImageGenerator: () => `https://loremflickr.com/120/120/logo`,
@@ -107,13 +108,16 @@ const VendorAvatar = ({ value, name, radius, minSize, maxSize, onSuccess, onReje
   const dropzoneParams = { accept: DROPZONE_ACCEPT_IMAGES, minSize, maxSize, multiple: false, onDrop: onDropCallback };
   const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneParams);
   const { onClick, ...dropProps } = getRootProps();
+
   return (
-    <AvatarContainer data-cy={`avatar-dropzone`} style={{ height: radius, width: radius }} {...dropProps}>
-      {!isDragActive && (
-        <EditAvatarButton type="button" onClick={onClick}>
-          <Pencil size={16} />
-        </EditAvatarButton>
-      )}
+    <AvatarContainer
+      data-cy={`avatar-dropzone`}
+      className={cn('group', !value && 'cursor-pointer')}
+      style={{ height: radius, width: radius }}
+      {...dropProps}
+      onClick={!value ? onClick : undefined}
+      role={!value ? 'button' : undefined}
+    >
       <input name={name} {...getInputProps()} />
       {isDragActive ? (
         <div className="text-slate-700">
@@ -122,7 +126,45 @@ const VendorAvatar = ({ value, name, radius, minSize, maxSize, onSuccess, onReje
       ) : isUploading ? (
         <StyledSpinner size={32} />
       ) : (
-        <Avatar src={value} type="VENDOR" radius={radius} />
+        <Avatar src={value} type="VENDOR" radius={radius}>
+          {value ? (
+            !isDragActive && (
+              <div className="flex gap-2">
+                <EditAvatarButton
+                  type="button"
+                  className="hidden group-focus-within:block group-hover:block"
+                  onClick={onClick}
+                  title={intl.formatMessage(
+                    {
+                      id: 'HeroAvatar.Edit',
+                      defaultMessage: 'Edit {imgType, select, AVATAR {avatar} other {logo}}',
+                    },
+                    { imgType: 'LOGO' },
+                  )}
+                >
+                  <Pencil size={16} />
+                </EditAvatarButton>
+
+                <EditAvatarButton
+                  type="button"
+                  className="hidden group-focus-within:block group-hover:block"
+                  onClick={() => onSuccess({ url: null })}
+                  title={intl.formatMessage(
+                    {
+                      id: 'HeroAvatar.Remove',
+                      defaultMessage: 'Remove {imgType, select, AVATAR {avatar} other {logo}}',
+                    },
+                    { imgType: 'LOGO' },
+                  )}
+                >
+                  <Trash size={16} />
+                </EditAvatarButton>
+              </div>
+            )
+          ) : (
+            <Upload size={24} />
+          )}
+        </Avatar>
       )}
     </AvatarContainer>
   );
