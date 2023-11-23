@@ -200,14 +200,19 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
       if (!values.twoFactorAuthenticatorCode) {
         errors.twoFactorAuthenticatorCode = intl.formatMessage(I18nMessages.REQUIRED);
       } else {
-        const verified = speakeasy.totp.verify({
-          secret: base32,
-          encoding: 'base32',
-          token: values.twoFactorAuthenticatorCode,
-          window: 2,
-        });
+        try {
+          const verified = speakeasy.totp.verify({
+            secret: base32,
+            encoding: 'base32',
+            token: values.twoFactorAuthenticatorCode,
+            window: 2,
+          });
 
-        if (!verified) {
+          if (!verified) {
+            errors.twoFactorAuthenticatorCode = intl.formatMessage(I18nMessages.INVALID_TOTP_CODE);
+          }
+        } catch (error) {
+          // Handle the error appropriately, log it, or set an error message.
           errors.twoFactorAuthenticatorCode = intl.formatMessage(I18nMessages.INVALID_TOTP_CODE);
         }
       }
