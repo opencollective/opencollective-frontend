@@ -120,7 +120,7 @@
     "react-select": "5.8.0",
     "react-swipeable": "7.0.1",
     "react-text-mask": "5.5.0",
-    "react-window": "1.8.9",
+    "react-window": "1.8.10",
     "redis": "4.6.11",
     "sanitize-html": "2.11.0",
     "slugify": "1.6.6",
