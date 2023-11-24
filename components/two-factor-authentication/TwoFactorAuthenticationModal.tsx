@@ -7,7 +7,12 @@ import { createGlobalStyle } from 'styled-components';
 import { createError, ERROR } from '../../lib/errors';
 import { onPressEnter } from '../../lib/form-utils';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS, setLocalStorage } from '../../lib/local-storage';
+import {
+  getFromLocalStorage,
+  LOCAL_STORAGE_KEYS,
+  removeFromLocalStorage,
+  setLocalStorage,
+} from '../../lib/local-storage';
 import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import { getSettingsRoute } from '../../lib/url-helpers';
 
@@ -89,6 +94,11 @@ export default function TwoFactorAuthenticationModal() {
       setConfirming(false);
     }
   }, [prompt]);
+
+  const closeModal = () => {
+    removeFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
+    window.location.reload();
+  };
 
   const cancel = React.useCallback(() => {
     setTwoFactorCode('');
@@ -219,11 +229,9 @@ export default function TwoFactorAuthenticationModal() {
 
       <ModalFooter isFullWidth dividerMargin="0.65rem 0">
         <Flex justifyContent="right" flexWrap="wrap">
-          {cancellable && (
-            <StyledButton disabled={confirming} mr={2} minWidth={120} onClick={cancel}>
-              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-            </StyledButton>
-          )}
+          <StyledButton disabled={confirming} mr={2} minWidth={120} onClick={closeModal}>
+            <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+          </StyledButton>
           <StyledButton
             ml={2}
             minWidth={120}
