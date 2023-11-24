@@ -1,25 +1,23 @@
 import { PREVIEW_FEATURE_KEYS, PreviewFeature } from '../preview-features';
 
+type GraphQLV1Collective = Partial<{
+  id: number;
+  slug: string;
+  name: string;
+  type: string;
+  imageUrl: string;
+  isArchived: boolean;
+  isIncognito: boolean;
+  children: GraphQLV1Collective[];
+}>;
+
 export type LoggedInUser = {
   id: number;
-  collective: {
-    id: number;
-    slug: string;
-    name: string;
-    type: string;
-  };
+  collective: GraphQLV1Collective;
   memberOf: Array<{
     id: number;
     role: string;
-    collective: {
-      id: number;
-      slug: string;
-      name: string;
-      type: string;
-      imageUrl: string;
-      isArchived: boolean;
-      isIncognito: boolean;
-    };
+    collective: GraphQLV1Collective;
   }>;
   hasTwoFactorAuth: boolean;
   hasRole: (roles: string[] | string, collective) => boolean;
