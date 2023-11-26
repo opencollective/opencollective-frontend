@@ -2,7 +2,7 @@ import React from 'react';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
 import { Slack } from '@styled-icons/fa-brands/Slack';
-import { Twitter } from '@styled-icons/fa-brands/Twitter';
+import Twitter from '../icons/Twitter';
 import { ChevronDown, ExternalLink, Mail } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
