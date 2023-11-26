@@ -22,12 +22,6 @@ import { withUser } from '../components/UserProvider';
 
 import Custom404 from './404';
 
-/** A page rendered when collective is pledged and not active yet */
-const PledgedCollectivePage = dynamic(
-  () => import(/* webpackChunkName: 'PledgedCollectivePage' */ '../components/PledgedCollectivePage'),
-  { loading: Loading },
-);
-
 /** A page rendered when collective is incognito */
 const IncognitoUserCollective = dynamic(
   () => import(/* webpackChunkName: 'IncognitoUserCollective' */ '../components/IncognitoUserCollective'),
@@ -102,7 +96,6 @@ class CollectivePage extends React.Component {
         isArchived: PropTypes.bool,
         isHost: PropTypes.bool,
         isActive: PropTypes.bool,
-        isPledged: PropTypes.bool,
         isIncognito: PropTypes.bool,
         isGuest: PropTypes.bool,
         parentCollective: PropTypes.shape({ slug: PropTypes.string, image: PropTypes.string }),
@@ -149,10 +142,8 @@ class CollectivePage extends React.Component {
     if (!loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!collective) {
+      } else if (!collective || collective.type === 'VENDOR') {
         return <ErrorPage error={generateNotFoundError(slug)} log={false} />;
-      } else if (collective.isPledged && !collective.isActive) {
-        return <PledgedCollectivePage collective={collective} />;
       } else if (collective.isIncognito) {
         return <IncognitoUserCollective collective={collective} />;
       } else if (collective.isGuest) {

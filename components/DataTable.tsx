@@ -2,8 +2,8 @@ import React from 'react';
 import { ColumnDef, flexRender, getCoreRowModel, Row, TableMeta, useReactTable } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
+import { Skeleton } from './ui/Skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/Table';
-import LoadingPlaceholder from './LoadingPlaceholder';
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -68,7 +68,7 @@ export function DataTable<TData, TValue>({
                 // eslint-disable-next-line react/no-array-index-key
                 <TableCell key={column.id}>
                   <div className="w-1/2">
-                    <LoadingPlaceholder height={16} className="" borderRadius={8} />
+                    <Skeleton className="h-4 rounded-lg" />
                   </div>
                 </TableCell>
               ))}

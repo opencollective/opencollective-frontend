@@ -27,7 +27,9 @@ const nextConfig = {
       '/_document': ['./.next/language-manifest.json'],
     },
   },
-  webpack: (config, { webpack, buildId }) => {
+  webpack: (config, { webpack, isServer, dev, buildId }) => {
+    config.resolve.alias['@sentry/replay'] = false;
+
     config.plugins.push(
       // Ignore __tests__
       new webpack.IgnorePlugin({ resourceRegExp: /[\\/]__tests__[\\/]/ }),
@@ -170,6 +172,19 @@ const nextConfig = {
       include: /node_modules/,
       type: 'javascript/auto',
     });
+
+    if (!isServer && !dev) {
+      config.optimization.splitChunks.cacheGroups.appCommon = {
+        name: 'appCommon',
+        chunks(chunk) {
+          return chunk.name === 'pages/_app';
+        },
+        test(module) {
+          return /node_modules[/\\]/.test(module.nameForCondition() || '');
+        },
+        enforce: true,
+      };
+    }
 
     return config;
   },

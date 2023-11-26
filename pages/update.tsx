@@ -9,8 +9,8 @@ import { shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { stripHTML } from '../lib/html';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
-import { stripHTML } from '../lib/utils';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
@@ -65,6 +65,8 @@ const updatePageQuery = gql`
         parent {
           id
           slug
+          name
+          imageUrl
         }
       }
     }
@@ -83,6 +85,7 @@ const updatePageQuery = gql`
       userCanPublishUpdate
       reactions
       userReactions
+      notificationAudience
       account {
         id
         slug

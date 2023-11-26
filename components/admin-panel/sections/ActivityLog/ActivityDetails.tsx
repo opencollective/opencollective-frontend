@@ -28,6 +28,10 @@ const ActivityDetailComponents = {
     title: defineMessage({ defaultMessage: 'Changes' }),
     Component: CollectiveEditedDetails,
   },
+  VENDOR_EDITED: {
+    title: defineMessage({ defaultMessage: 'Changes' }),
+    Component: CollectiveEditedDetails,
+  },
   DEFAULT: {
     title: defineMessage({ id: 'Details', defaultMessage: 'Details' }),
     Component: ({ activity }) => <ValueContainer>{JSON.stringify(activity.data, null, 2)}</ValueContainer>,

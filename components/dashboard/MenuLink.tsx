@@ -40,8 +40,8 @@ export const MenuLink = ({ section, subMenu, Icon, label, href, isBeta, classNam
   }
 
   const classNames = cn(
-    'group w-full flex gap-x-3 rounded-full py-1.5 px-3 text-sm leading-6 font-medium transition-colors',
-    isSelected ? 'bg-blue-50/50 text-blue-700' : 'text-slate-700 hover:text-blue-700 hover:bg-blue-50/50',
+    'group flex w-full gap-x-3 rounded-full px-3 py-1.5 text-sm font-medium leading-6 transition-colors',
+    isSelected ? 'bg-blue-50/50 text-blue-700' : 'text-slate-700 hover:bg-blue-50/50 hover:text-blue-700',
     className,
   );
 

@@ -135,8 +135,8 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     fromAccount: props.stepProfile.isGuest
       ? undefined
       : typeof props.stepProfile.id === 'string'
-      ? { id: props.stepProfile.id }
-      : { legacyId: props.stepProfile.id },
+        ? { id: props.stepProfile.id }
+        : { legacyId: props.stepProfile.id },
     guestInfo: props.stepProfile.isGuest ? getGuestInfoFromStepProfile(props.stepProfile) : undefined,
     toAccount: pick(props.toAccount, 'id'),
   });

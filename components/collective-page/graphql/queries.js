@@ -30,7 +30,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       currency
       settings
       isActive
-      isPledged
       isApproved
       isArchived
       isFrozen

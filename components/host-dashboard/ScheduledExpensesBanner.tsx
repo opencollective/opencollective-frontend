@@ -109,7 +109,7 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
 
   return (
     <React.Fragment>
-      <MessageBox type="success" mb={4}>
+      <MessageBox type="success">
         <Flex alignItems="baseline" flexDirection={['column', 'row']} gap="8px">
           <Box>
             <TransferwiseIcon size="1em" color="#25B869" mr={2} />

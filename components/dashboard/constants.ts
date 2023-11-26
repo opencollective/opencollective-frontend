@@ -18,6 +18,7 @@ export const SECTIONS = {
   TRANSACTIONS: 'transactions',
   VIRTUAL_CARDS: 'virtual-cards',
   TEAM: 'team',
+  VENDORS: 'vendors',
 };
 
 export const SETTINGS_SECTIONS = {
@@ -72,6 +73,8 @@ export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.TRANSACTIONS,
   ALL_SECTIONS.EXPENSES,
   ALL_SECTIONS.HOST_AGREEMENTS,
+  ALL_SECTIONS.SUBMITTED_EXPENSES,
+  ALL_SECTIONS.CHART_OF_ACCOUNTS,
 ];
 
 export const SECTION_LABELS = defineMessages({
@@ -115,8 +118,7 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Profile Page',
   },
   [ALL_SECTIONS.CONNECTED_ACCOUNTS]: {
-    id: 'editCollective.menu.connectedAccounts',
-    defaultMessage: 'Connected Accounts',
+    defaultMessage: 'Social Accounts',
   },
   [ALL_SECTIONS.EXPORT]: {
     id: 'editCollective.menu.export',
@@ -207,8 +209,8 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Virtual Card Requests',
   },
   [ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS]: {
-    id: 'VirtualCardsSettings.Title',
-    defaultMessage: 'Virtual Cards Settings',
+    id: 'VirtualCards.Title',
+    defaultMessage: 'Virtual Cards',
   },
   [ALL_SECTIONS.VIRTUAL_CARDS]: {
     id: 'VirtualCards.Title',
@@ -229,5 +231,8 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.INCOMING_CONTRIBUTIONS]: {
     id: 'IncomingContributions',
     defaultMessage: 'Incoming Contributions',
+  },
+  [ALL_SECTIONS.VENDORS]: {
+    defaultMessage: 'Vendors',
   },
 });

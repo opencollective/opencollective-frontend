@@ -1,9 +1,8 @@
-const fs = require('fs');
 const path = require('path');
 
 const express = require('express');
 const proxy = require('express-http-proxy');
-const { template, trim } = require('lodash');
+const { trim } = require('lodash');
 
 const downloadFileHandler = require('./download-file');
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
@@ -82,42 +81,6 @@ module.exports = (expressApp, nextApp) => {
       }
     }
     next();
-  });
-
-  app.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', maxAge(86400), (req, res) => {
-    const color = req.query.color === 'blue' ? 'blue' : 'white';
-    res.sendFile(
-      path.join(__dirname, `../public/static/images/buttons/${req.params.verb}-button-${color}${req.params.size}.png`),
-    );
-  });
-
-  app.get('/:collectiveSlug/:verb(contribute|donate)/button.js', maxAge(86400), (req, res) => {
-    const content = fs.readFileSync(path.join(__dirname, './templates/button.js'), 'utf8');
-    const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
-    res.setHeader('content-type', 'application/javascript');
-    res.removeHeader('X-Frame-Options');
-    res.send(
-      compiled({
-        collectiveSlug: req.params.collectiveSlug,
-        verb: req.params.verb,
-        host: process.env.WEBSITE_URL || `http://localhost:${process.env.PORT || 3000}`,
-      }),
-    );
-  });
-
-  app.get('/:collectiveSlug/:widget(widget|events|collectives|banner).js', maxAge(86400), (req, res) => {
-    const content = fs.readFileSync(path.join(__dirname, './templates/widget.js'), 'utf8');
-    const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
-    res.setHeader('content-type', 'application/javascript');
-    res.send(
-      compiled({
-        style: '{}',
-        ...req.query,
-        collectiveSlug: req.params.collectiveSlug,
-        widget: req.params.widget,
-        host: process.env.WEBSITE_URL || `http://localhost:${process.env.PORT || 3000}`,
-      }),
-    );
   });
 
   return nextApp.getRequestHandler();

@@ -5,28 +5,29 @@ import { useIntl } from 'react-intl';
 
 import { HostAdminAccountingSection } from '../admin-panel/sections/accounting';
 import AccountSettings from '../admin-panel/sections/AccountSettings';
-import HostVirtualCardRequests from '../admin-panel/sections/HostVirtualCardRequests';
-import HostVirtualCards from '../admin-panel/sections/HostVirtualCards';
 import InvoicesReceipts from '../admin-panel/sections/invoices-receipts/InvoicesReceipts';
 import NotificationsSettings from '../admin-panel/sections/NotificationsSettings';
 import Team from '../admin-panel/sections/Team';
 import Container from '../Container';
-import HostApplications from '../host-dashboard/applications/HostApplications';
-import HostDashboardAgreements from '../host-dashboard/HostDashboardAgreements';
-import HostDashboardExpenses from '../host-dashboard/HostDashboardExpenses';
-import HostDashboardHostedCollectives from '../host-dashboard/HostDashboardHostedCollectives';
-import HostDashboardReports from '../host-dashboard/HostDashboardReports';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 
-import HostFinancialContributions from './sections/HostFinancialContributions';
-import IncomingContributions from './sections/IncomingContributions';
-import OutgoingContributions from './sections/OutgoingContributions';
+import HostApplications from './sections/collectives/HostApplications';
+import HostFinancialContributions from './sections/contributions/HostFinancialContributions';
+import IncomingContributions from './sections/contributions/IncomingContributions';
+import OutgoingContributions from './sections/contributions/OutgoingContributions';
+import HostExpenses from './sections/expenses/HostDashboardExpenses';
+import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
+import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
+import HostDashboardAgreements from './sections/HostDashboardAgreements';
+import HostDashboardHostedCollectives from './sections/HostDashboardHostedCollectives';
+import HostDashboardReports from './sections/HostDashboardReports';
+import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
+import HostVirtualCards from './sections/HostVirtualCards';
 import Overview from './sections/Overview';
-import ReceivedExpenses from './sections/ReceivedExpenses';
-import SubmittedExpenses from './sections/SubmittedExpenses';
 import Transactions from './sections/Transactions';
-import VirtualCards from './sections/VirtualCards';
+import Vendors from './sections/Vendors';
+import VirtualCards from './sections/virtual-cards/VirtualCards';
 import { LEGACY_SECTIONS, LEGACY_SETTINGS_SECTIONS, SECTION_LABELS, SECTIONS, SETTINGS_SECTIONS } from './constants';
 import DashboardHeader from './DashboardHeader';
 
@@ -34,7 +35,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
   [SECTIONS.CHART_OF_ACCOUNTS]: HostAdminAccountingSection,
   [SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: HostFinancialContributions,
-  [SECTIONS.HOST_EXPENSES]: HostDashboardExpenses,
+  [SECTIONS.HOST_EXPENSES]: HostExpenses,
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
   [SECTIONS.HOST_APPLICATIONS]: HostApplications,
   [SECTIONS.REPORTS]: HostDashboardReports,
@@ -48,6 +49,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.TRANSACTIONS]: Transactions,
   [SECTIONS.VIRTUAL_CARDS]: VirtualCards,
   [SECTIONS.TEAM]: Team,
+  [SECTIONS.VENDORS]: Vendors,
 };
 
 const SETTINGS_COMPONENTS = {
@@ -91,7 +93,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (SettingsComponent) {
     return (
       <div className="max-w-screen-md">
-        <SettingsComponent account={account} subpath={subpath} />
+        <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
     );
   }

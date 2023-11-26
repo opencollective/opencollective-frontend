@@ -19,6 +19,11 @@ type Application {
   redirectUri: URL
   account: Account!
   oAuthAuthorization: OAuthAuthorization
+
+  """
+  Whether this application is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean!
 }
 
 """
@@ -66,6 +71,11 @@ type OAuthAuthorization {
   The attached scopes.
   """
   scope: [OAuthScope]
+
+  """
+  Whether this OAuth token is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean!
 }
 
 """
@@ -197,6 +207,11 @@ interface Account {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -485,6 +500,114 @@ interface Account {
     """
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
+  expenses(
+    direction: ExpenseDirection
+
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Reference of an account that is the payee of an expense
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of an account that is the payer of an expense
+    """
+    account: AccountReferenceInput
+
+    """
+    Return expenses only for this host
+    """
+    host: AccountReferenceInput
+
+    """
+    Return expenses only created by this INDIVIDUAL account
+    """
+    createdByAccount: AccountReferenceInput
+
+    """
+    Use this field to filter expenses on their statuses
+    """
+    status: ExpenseStatusFilter
+
+    """
+    Use this field to filter expenses on their type (RECEIPT/INVOICE)
+    """
+    type: ExpenseType
+
+    """
+    Only expenses that match these tags
+    """
+    tags: [String] @deprecated(reason: "2020-06-30: Please use tag (singular)")
+
+    """
+    Only expenses that match these tags
+    """
+    tag: [String]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return expenses where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return expenses that use the given type as payout method
+    """
+    payoutMethodType: PayoutMethodType
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Whether to include expenses from children of the account (Events and Projects)
+    """
+    includeChildrenExpenses: Boolean! = false
+
+    """
+    Only return expenses that contains this custom data. Requires being an admin of the collective, payee or host.
+    """
+    customData: JSON
+
+    """
+    Filter expenses of type charges based on presence of receipts
+    """
+    chargeHasReceipts: Boolean
+
+    """
+    Filter expenses of type charges using these virtual cards
+    """
+    virtualCards: [VirtualCardReferenceInput]
+  ): ExpenseCollection!
   settings: JSON!
   conversations(
     limit: Int! = 15
@@ -612,7 +735,8 @@ interface Account {
   virtualCards(
     limit: Int! = 100
     offset: Int! = 0
-    state: String = null
+    state: String = null @deprecated(reason: "2023-11-06: Please use status.")
+    status: [VirtualCardStatus]
     merchantAccount: AccountReferenceInput = null
 
     """
@@ -990,12 +1114,11 @@ enum OrderStatus {
   PAID
   ERROR
   PROCESSING
+  REJECTED
   ACTIVE
   CANCELLED
   PENDING
   EXPIRED
-  PLEDGED
-  REJECTED
   DISPUTED
   REFUNDED
   IN_REVIEW
@@ -1229,6 +1352,16 @@ type Expense {
   accountCurrencyFxRate: Float! @deprecated(reason: "2022-02-09: Please use amountV2")
 
   """
+  The accounting category attached to this expense
+  """
+  accountingCategory: AccountingCategory
+
+  """
+  If available, this field will contain a breakdown of the expense values depending on who edited it
+  """
+  valuesByRole: ExpenseValuesByRole
+
+  """
   The time of creation
   """
   createdAt: DateTime!
@@ -1397,6 +1530,2275 @@ enum ExpenseCurrencySource {
   The expense currency expressed as the expense currency
   """
   CREATED_BY_ACCOUNT
+}
+
+"""
+Fields for an accounting category
+"""
+type AccountingCategory {
+  id: String!
+
+  """
+  The code of the accounting category
+  """
+  code: String!
+
+  """
+  The technical name of the accounting category
+  """
+  name: String!
+
+  """
+  A friendly name for non-accountants (i.e. expense submitters and collective admins)
+  """
+  friendlyName: String
+
+  """
+  The account this category belongs to
+  """
+  account: Host!
+}
+
+"""
+This represents an Host account
+"""
+type Host implements Account & AccountWithContributions {
+  id: String!
+  legacyId: Int!
+
+  """
+  The slug identifying the account (ie: babel)
+  """
+  slug: String!
+  type: AccountType!
+
+  """
+  Public name
+  """
+  name: String
+
+  """
+  Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
+  """
+  legalName: String
+  description: String
+  longDescription: String
+  tags: [String]
+  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
+  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
+  socialLinks: [SocialLink!]!
+  currency: String
+  expensePolicy: String
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
+  imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
+  backgroundImageUrl(height: Int, format: ImageFormat): String
+
+  """
+  The time of creation
+  """
+  createdAt: DateTime
+  updatedAt: DateTime
+
+  """
+  Returns whether this account is archived
+  """
+  isArchived: Boolean!
+
+  """
+  Whether this account is frozen
+  """
+  isFrozen: Boolean!
+
+  """
+  Returns whether the account accepts financial contributions.
+  """
+  isActive: Boolean
+
+  """
+  Returns whether the account is setup to Host collectives.
+  """
+  isHost: Boolean!
+
+  """
+  Returns true if the remote user is an admin of this account
+  """
+  isAdmin: Boolean!
+  parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
+
+  """
+  Get all members (admins, members, backers, followers)
+  """
+  members(
+    limit: Int! = 100
+    offset: Int! = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+
+    """
+    Admin only. To filter on the email address of a member, useful to check if a member exists.
+    """
+    email: EmailAddress
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+    includeInherited: Boolean = true
+  ): MemberCollection!
+
+  """
+  [AUTHENTICATED] Returns the pending invitations
+  """
+  memberInvitations(
+    """
+    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
+    """
+    memberAccount: AccountReferenceInput
+
+    """
+    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
+    """
+    account: AccountReferenceInput
+
+    """
+    An array of Member roles to filter for
+    """
+    role: [MemberRole]
+  ): [MemberInvitation]
+  memberOf(
+    limit: Int! = 150
+    offset: Int! = 0
+    role: [MemberRole]
+    accountType: [AccountType]
+    account: AccountReferenceInput
+
+    """
+    Filter on whether the account is a host or not
+    """
+    isHostAccount: Boolean
+
+    """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean
+
+    """
+    Filter on archived collectives
+    """
+    isArchived: Boolean
+
+    """
+    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
+    """
+    includeIncognito: Boolean = true
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
+
+    """
+    Filters on the Host fees structure applied to this account
+    """
+    hostFeesStructure: HostFeeStructure
+
+    """
+    Order of the results
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Order the query by requested role order
+    """
+    orderByRoles: Boolean
+  ): MemberOfCollection!
+
+  """
+  Returns the emails of the account. Individuals only have one, but organizations can have multiple emails.
+  """
+  emails: [EmailAddress!]
+  transactions(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    The transaction type (DEBIT or CREDIT)
+    """
+    type: TransactionType
+
+    """
+    The payment method types. Can include `null` for transactions without a payment method
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
+    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of the host accounting the transaction
+    """
+    host: AccountReferenceInput
+
+    """
+    NOT IMPLEMENTED. Only return transactions that match these tags.
+    """
+    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return transactions where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
+
+    """
+    Only return transactions that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transactions that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Only return transactions with an Expense attached
+    """
+    hasExpense: Boolean
+
+    """
+    Only return transactions with an Order attached
+    """
+    hasOrder: Boolean
+
+    """
+    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
+    """
+    includeRegularTransactions: Boolean! = true
+
+    """
+    If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
+    """
+    includeIncognitoTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from children (Events and Projects)
+    """
+    includeChildrenTransactions: Boolean! = false
+
+    """
+    Whether to include transactions from Gift Cards issued by the account.
+    """
+    includeGiftCardTransactions: Boolean! = false
+
+    """
+    Whether to include debt transactions
+    """
+    includeDebts: Boolean! = false
+
+    """
+    To filter by transaction kind
+    """
+    kind: [TransactionKind]
+
+    """
+    The transactions group to filter by
+    """
+    group: String
+    virtualCard: [VirtualCardReferenceInput]
+  ): TransactionCollection!
+  orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
+    """
+    paymentMethod: PaymentMethodReferenceInput
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
+    """
+    onlySubscriptions: Boolean
+
+    """
+    Same as onlySubscriptions, but returns only orders with active subscriptions
+    """
+    onlyActiveSubscriptions: Boolean
+  ): OrderCollection!
+  expenses(
+    direction: ExpenseDirection
+
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Reference of an account that is the payee of an expense
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of an account that is the payer of an expense
+    """
+    account: AccountReferenceInput
+
+    """
+    Return expenses only for this host
+    """
+    host: AccountReferenceInput
+
+    """
+    Return expenses only created by this INDIVIDUAL account
+    """
+    createdByAccount: AccountReferenceInput
+
+    """
+    Use this field to filter expenses on their statuses
+    """
+    status: ExpenseStatusFilter
+
+    """
+    Use this field to filter expenses on their type (RECEIPT/INVOICE)
+    """
+    type: ExpenseType
+
+    """
+    Only expenses that match these tags
+    """
+    tags: [String] @deprecated(reason: "2020-06-30: Please use tag (singular)")
+
+    """
+    Only expenses that match these tags
+    """
+    tag: [String]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return expenses where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return expenses that use the given type as payout method
+    """
+    payoutMethodType: PayoutMethodType
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Whether to include expenses from children of the account (Events and Projects)
+    """
+    includeChildrenExpenses: Boolean! = false
+
+    """
+    Only return expenses that contains this custom data. Requires being an admin of the collective, payee or host.
+    """
+    customData: JSON
+
+    """
+    Filter expenses of type charges based on presence of receipts
+    """
+    chargeHasReceipts: Boolean
+
+    """
+    Filter expenses of type charges using these virtual cards
+    """
+    virtualCards: [VirtualCardReferenceInput]
+  ): ExpenseCollection!
+  settings: JSON!
+  conversations(
+    limit: Int! = 15
+    offset: Int! = 0
+
+    """
+    Only return conversations matching this tag
+    """
+    tag: String
+  ): ConversationCollection!
+
+  """
+  Returns conversation's tags for collective sorted by popularity
+  """
+  conversationsTags(limit: Int! = 30): [TagStat]
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(limit: Int! = 30): [TagStat]
+
+  """
+  The list of expense types supported by this account
+  """
+  supportedExpenseTypes: [ExpenseType!]!
+  transferwise: TransferWise
+
+  """
+  The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses".
+  """
+  payoutMethods: [PayoutMethod]
+
+  """
+  The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
+  """
+  paymentMethods(
+    type: [PaymentMethodType]
+    enumType: [PaymentMethodType] @deprecated(reason: "2021-08-20: use type instead from now")
+    service: [PaymentMethodService]
+
+    """
+    Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
+    """
+    includeExpired: Boolean
+  ): [PaymentMethod]
+
+  """
+  The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA)
+  """
+  paymentMethodsWithPendingConfirmation: [PaymentMethod]
+
+  """
+  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  """
+  connectedAccounts: [ConnectedAccount]
+
+  """
+  The list of applications created by this account. Admin only. Scope: "applications".
+  """
+  oAuthApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): OAuthApplicationCollection
+
+  """
+  The address associated to this account. This field is always public for collectives and events.
+  """
+  location: Location
+  categories: [String]!
+  stats: AccountStats
+
+  """
+  Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates".
+  """
+  updates(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Only return published updates.
+    """
+    onlyPublishedUpdates: Boolean = false
+    onlyChangelogUpdates: Boolean
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+    searchTerm: String
+  ): UpdateCollection!
+
+  """
+  Describes the features enabled and available for this account
+  """
+  features: CollectiveFeatures!
+
+  """
+  Virtual Cards attached to the account. Admin only. Scope: "virtualCards".
+  """
+  virtualCards(
+    limit: Int! = 100
+    offset: Int! = 0
+    state: String = null @deprecated(reason: "2023-11-06: Please use status.")
+    status: [VirtualCardStatus]
+    merchantAccount: AccountReferenceInput = null
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: DateTime = null
+
+    """
+    Only return expenses that were created before this date
+    """
+    dateTo: DateTime = null
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+  ): VirtualCardCollection
+
+  """
+  Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
+  """
+  virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
+  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+
+  """
+  Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
+  """
+  policies: Policies!
+
+  """
+  List of activities that the logged-in user is subscribed for this collective
+  """
+  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
+
+  """
+  Logged-in user permissions on an account
+  """
+  permissions: AccountPermissions!
+  feed(
+    """
+    Only returns activities before this date
+    """
+    dateTo: DateTime
+
+    """
+    Number of activities to retrieve
+    """
+    limit: Int
+
+    """
+    The classes of activity types to filter for
+    """
+    classes: [ActivityClassType]
+  ): [Activity]
+  webhooks(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    account: AccountReferenceInput!
+  ): WebhookCollection!
+
+  """
+  Number of unique financial contributors.
+  """
+  totalFinancialContributors(
+    """
+    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+    """
+    accountType: AccountType
+  ): Int!
+  tiers(
+    """
+    The number of results to fetch
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): TierCollection!
+
+  """
+  All the persons and entities that contribute to this account
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    roles: [MemberRole]
+  ): ContributorCollection!
+
+  """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Float!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+  contributionPolicy: String
+
+  """
+  List of accounting categories for this host
+  """
+  accountingCategories: AccountingCategoryCollection!
+  hostFeePercent: Float
+  totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
+  totalHostedAccounts: Int
+  isOpenToApplications: Boolean
+  termsUrl: URL
+  plan: HostPlan!
+  hostMetrics(
+    """
+    A collection of accounts for which the metrics should be returned.
+    """
+    account: [AccountReferenceInput!]
+
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+  ): HostMetrics!
+  hostMetricsTimeSeries(
+    """
+    A collection of accounts for which the metrics should be returned.
+    """
+    account: [AccountReferenceInput!]
+
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+  ): HostMetricsTimeSeries!
+
+  """
+  The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
+  """
+  supportedPaymentMethods: [PaymentMethodLegacyType]
+  bankAccount: PayoutMethod
+
+  """
+  Paypal preapproval info. Returns null if PayPal account is not connected.
+  """
+  paypalPreApproval: PaymentMethod
+
+  """
+  If the host supports PayPal, this will contain the client ID to use in the frontend
+  """
+  paypalClientId: String
+
+  """
+  The list of payout methods this Host accepts for its expenses
+  """
+  supportedPayoutMethods: [PayoutMethodType]
+
+  """
+  Stripe connected account
+  """
+  stripe: StripeConnectedAccount
+
+  """
+  Applications for this host
+  """
+  hostApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Search term for collective tags, id, name, slug and description.
+    """
+    searchTerm: String
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter applications by status
+    """
+    status: HostApplicationStatus
+  ): HostApplicationCollection!
+
+  """
+  Pending applications for this host
+  """
+  pendingApplications(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+  ): HostApplicationCollection!
+    @deprecated(reason: "2023-08-25: Deprecated in favour of host.hostApplications(status: PENDING).")
+  hostedVirtualCards(
+    """
+    Search term (card name, card last four digits)
+    """
+    searchTerm: String
+    limit: Int! = 100
+    offset: Int! = 0
+    state: String = null @deprecated(reason: "2023-06-12: Please use status.")
+    status: [VirtualCardStatus]
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
+    merchantAccount: AccountReferenceInput = null
+    collectiveAccountIds: [AccountReferenceInput] = null
+
+    """
+    Returns virtual cards with expenses from this date.
+    """
+    withExpensesDateFrom: DateTime
+
+    """
+    Returns virtual cards with expenses to this date.
+    """
+    withExpensesDateTo: DateTime
+
+    """
+    Filter virtual cards with at least this amount in cents charged
+    """
+    spentAmountFrom: AmountInput
+
+    """
+    Filter virtual cards with up to this amount in cents charged
+    """
+    spentAmountTo: AmountInput
+
+    """
+    Filter virtual cards by whether they are missing receipts for any charges
+    """
+    hasMissingReceipts: Boolean
+  ): VirtualCardCollection!
+  hostedVirtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+  hostedVirtualCardCollectives(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+  contributionStats(
+    """
+    A collection of accounts for which the contribution stats should be returned.
+    """
+    account: [AccountReferenceInput!]
+
+    """
+    Calculate contribution statistics beginning from this date.
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate contribution statistics until this date.
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series
+    """
+    timeUnit: TimeUnit
+  ): ContributionStats!
+  expenseStats(
+    """
+    A collection of accounts for which the expense stats should be returned.
+    """
+    account: [AccountReferenceInput!]
+
+    """
+    Calculate expense statistics beginning from this date.
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate expense statistics until this date.
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+  ): ExpenseStats!
+
+  """
+  Returns whether the host is trusted or not
+  """
+  isTrustedHost: Boolean!
+
+  """
+  Returns whether the host has any Stripe disputed orders
+  """
+  hasDisputedOrders: Boolean
+
+  """
+  Returns whether the host has any Stripe in review orders
+  """
+  hasInReviewOrders: Boolean
+
+  """
+  Returns agreements with Hosted Accounts
+  """
+  hostedAccountAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter by accounts participating in the agreement
+    """
+    accounts: [AccountReferenceInput]
+  ): AgreementCollection!
+
+  """
+  Returns a list of vendors that works with this host
+  """
+  vendors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Rank vendors based on their relationship with this account
+    """
+    forAccount: AccountReferenceInput
+
+    """
+    Filter on archived vendors
+    """
+    isArchived: Boolean
+
+    """
+    Search vendors related to this term based on name, description, tags, slug, and location
+    """
+    searchTerm: String
+  ): VendorCollection!
+
+  """
+  Returns a list of organizations that only transacted with this host and all its admins are also admins of this host.
+  """
+  potentialVendors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AccountCollection!
+}
+
+"""
+An account that can receive financial contributions
+"""
+interface AccountWithContributions {
+  """
+  Number of unique financial contributors.
+  """
+  totalFinancialContributors(
+    """
+    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
+    """
+    accountType: AccountType
+  ): Int!
+  tiers(
+    """
+    The number of results to fetch
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): TierCollection!
+
+  """
+  All the persons and entities that contribute to this account
+  """
+  contributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    roles: [MemberRole]
+  ): ContributorCollection!
+
+  """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Float!
+
+  """
+  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
+  """
+  platformContributionAvailable: Boolean!
+  contributionPolicy: String
+}
+
+"""
+A collection of "Tiers"
+"""
+type TierCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Tier]
+}
+
+"""
+A collection of "Contributor"
+"""
+type ContributorCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Contributor]
+}
+
+"\n    A person or an entity that contributes financially or by any other mean to the mission\n    of the collective. While \"Member\" is dedicated to permissions, this type is meant\n    to surface all the public contributors.\n  "
+type Contributor {
+  """
+  A unique identifier for this member
+  """
+  id: String!
+
+  """
+  Name of the contributor
+  """
+  name: String!
+
+  """
+  All the roles for a given contributor
+  """
+  roles: [MemberRole]
+
+  """
+  True if the contributor is a collective admin
+  """
+  isAdmin: Boolean!
+
+  """
+  True if the contributor is a core contributor
+  """
+  isCore: Boolean!
+
+  """
+  True if the contributor is a financial contributor
+  """
+  isBacker: Boolean!
+
+  """
+  Member join date
+  """
+  since: DateTime!
+
+  """
+  How much money the user has contributed for this (in cents, using collective currency)
+  """
+  totalAmountDonated: Int!
+
+  """
+  Whether the contributor is an individual, an organization...
+  """
+  type: String!
+
+  """
+  Defines if the contributors wants to be incognito (name not displayed)
+  """
+  isIncognito: Boolean!
+
+  """
+  Description of how the member contribute. Will usually be a tier name, or "design" or "code".
+  """
+  description: String
+
+  """
+  If the contributor has a page on Open Collective, this is the slug to link to it
+  """
+  collectiveSlug: String
+
+  """
+  Contributor avatar or logo
+  """
+  image(height: Int, format: ImageFormat): String
+
+  """
+  A public message from contributors to describe their contributions
+  """
+  publicMessage: String
+}
+
+"""
+Input to order results chronologically
+"""
+input ChronologicalOrderInput {
+  """
+  Field to chronologically order by.
+  """
+  field: DateTimeField! = CREATED_AT
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection! = DESC
+}
+
+"""
+All possible DateTime fields for a resource
+"""
+enum DateTimeField {
+  """
+  The creation time of a resource
+  """
+  CREATED_AT
+}
+
+"""
+Possible directions in which to order a list of items
+"""
+enum OrderDirection {
+  ASC
+  DESC
+}
+
+input AccountReferenceInput {
+  """
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the account (ie: 580)
+  """
+  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
+
+  """
+  The slug identifying the account (ie: babel for https://opencollective.com/babel)
+  """
+  slug: String
+}
+
+"""
+A collection of "MemberOf" (ie: Collective backed by an Organization)
+"""
+type MemberOfCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [MemberOf]
+  roles: [MemberOfCollectionRoles]
+}
+
+"""
+An existing member role and account type combination used used to filter collections
+"""
+type MemberOfCollectionRoles {
+  type: AccountType!
+  role: MemberRole!
+}
+
+"""
+All supported expense types
+"""
+enum HostFeeStructure {
+  """
+  Use global host fees
+  """
+  DEFAULT
+
+  """
+  Custom fee for this Collective only
+  """
+  CUSTOM_FEE
+
+  """
+  Set a monthly retainer for this Collective
+  """
+  MONTHLY_RETAINER
+}
+
+"""
+Input to order results
+"""
+input OrderByInput {
+  """
+  Field to order by.
+  """
+  field: OrderByFieldType!
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection!
+}
+
+"""
+Possible fields you can use to order by
+"""
+enum OrderByFieldType {
+  CREATED_AT
+  MEMBER_COUNT
+  TOTAL_CONTRIBUTED
+
+  """
+  The financial activity of the collective (number of transactions)
+  """
+  ACTIVITY
+  RANK
+}
+
+"""
+A collection of Transactions (Debit or Credit)
+"""
+type TransactionCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Transaction]
+  kinds: [TransactionKind]
+
+  """
+  The types of payment methods used in this collection, regardless of the pagination
+  """
+  paymentMethodTypes: [PaymentMethodType]!
+}
+
+enum PaymentMethodType {
+  alipay @deprecated(reason: "Please use uppercase values")
+  creditcard @deprecated(reason: "Please use uppercase values")
+  prepaid @deprecated(reason: "Please use uppercase values")
+  payment @deprecated(reason: "Please use uppercase values")
+  subscription @deprecated(reason: "Please use uppercase values")
+  collective @deprecated(reason: "Please use uppercase values")
+  host @deprecated(reason: "Please use uppercase values")
+  adaptive @deprecated(reason: "Please use uppercase values")
+  giftcard @deprecated(reason: "Please use uppercase values")
+  manual @deprecated(reason: "Please use uppercase values")
+  crypto @deprecated(reason: "Please use uppercase values")
+  paymentintent @deprecated(reason: "Please use uppercase values")
+  us_bank_account @deprecated(reason: "Please use uppercase values")
+  sepa_debit @deprecated(reason: "Please use uppercase values")
+  bacs_debit @deprecated(reason: "Please use uppercase values")
+  bancontact @deprecated(reason: "Please use uppercase values")
+  link @deprecated(reason: "Please use uppercase values")
+  ALIPAY
+  CREDITCARD
+  PREPAID
+  PAYMENT
+  SUBSCRIPTION
+  COLLECTIVE
+  HOST
+  ADAPTIVE
+  GIFTCARD
+  MANUAL
+  CRYPTO
+  PAYMENT_INTENT
+  US_BANK_ACCOUNT
+  SEPA_DEBIT
+  BACS_DEBIT
+  BANCONTACT
+  LINK
+}
+
+input VirtualCardReferenceInput {
+  id: String
+}
+
+input PaymentMethodReferenceInput {
+  """
+  The id assigned to the payment method
+  """
+  id: String
+}
+
+"""
+Account orders filter (INCOMING or OUTGOING)
+"""
+enum AccountOrdersFilter {
+  INCOMING
+  OUTGOING
+}
+
+"""
+A collection of "Expenses"
+"""
+type ExpenseCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Expense]
+}
+
+"""
+Describes the role in which an account is involved in an expense. This is used to filter
+"""
+enum ExpenseDirection {
+  """
+  Submitted: The account is the one who submitted the expense and possibly the beneficiary.
+  """
+  SUBMITTED
+
+  """
+  Received: The account is the one who received the expense and the one who's paying for it.
+  """
+  RECEIVED
+}
+
+"""
+Describes the values allowed to filter expenses, namely all the expense statuses and the special "READY_TO_PAY" value.
+"""
+enum ExpenseStatusFilter {
+  DRAFT
+  UNVERIFIED
+  PENDING
+  INCOMPLETE
+  APPROVED
+  REJECTED
+  PROCESSING
+  ERROR
+  PAID
+  SCHEDULED_FOR_PAYMENT
+  SPAM
+  CANCELED
+
+  """
+  Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
+  """
+  READY_TO_PAY
+
+  """
+  Only expenses that are on hold
+  """
+  ON_HOLD
+}
+
+"""
+All supported expense types
+"""
+enum ExpenseType {
+  """
+  Invoice: Charge for your time or get paid in advance.
+  """
+  INVOICE
+
+  """
+  Receipt: Get paid back for a purchase already made.
+  """
+  RECEIPT
+
+  """
+  Funding Request: Request funding for a project or initiative.
+  """
+  FUNDING_REQUEST
+
+  """
+  Grant: Request funding for a project or initiative.
+  """
+  GRANT
+
+  """
+  Unclassified expense
+  """
+  UNCLASSIFIED
+
+  """
+  Credit Card Charge: Payment done using an issued (virtual) credit card issued by your Fiscal Host.
+  """
+  CHARGE
+
+  """
+  Settlement: expense generated by Open Collective to collect money owed by Fiscal Hosts.
+  """
+  SETTLEMENT
+}
+
+enum PayoutMethodType {
+  OTHER
+  PAYPAL
+  BANK_ACCOUNT
+  ACCOUNT_BALANCE
+  CREDIT_CARD
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""
+A collection of "Conversations"
+"""
+type ConversationCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Conversation]
+}
+
+"""
+A conversation thread
+"""
+type Conversation {
+  id: String!
+  slug: String!
+  title: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  tags: [String]
+  summary: String!
+  account: Account
+  fromAccount: Account
+
+  """
+  The root comment / starter for this conversation
+  """
+  body: Comment
+
+  """
+  List the comments for this conversation. Not backed by a loader, don't use this in lists.
+  """
+  comments(limit: Int! = 150, offset: Int! = 0): CommentCollection!
+  followers(limit: Int! = 10, offset: Int! = 0): AccountCollection!
+  stats: ConversationStats
+}
+
+"""
+This represents an Comment
+"""
+type Comment {
+  id: String
+  createdAt: DateTime
+  html: String
+  fromAccount: Account
+  account: Account
+
+  """
+  The type of this comment
+  """
+  type: CommentType!
+
+  """
+  Returns a map of reactions counts for this comment
+  """
+  reactions: JSON
+
+  """
+  Returns the list of reactions added to this comment by logged in user
+  """
+  userReactions: [String]
+}
+
+"""
+All supported comment contexts
+"""
+enum CommentType {
+  """
+  Default regular comment
+  """
+  COMMENT
+
+  """
+  Comment is visible only to host admins
+  """
+  PRIVATE_NOTE
+}
+
+"""
+A collection of "Comments"
+"""
+type CommentCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Comment]
+}
+
+"""
+A collection of "Accounts"
+"""
+type AccountCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Account]
+}
+
+type ConversationStats {
+  id: String!
+
+  """
+  Total number of comments for this conversation
+  """
+  commentsCount: Int
+}
+
+"""
+Statistics for a given tag
+"""
+type TagStat {
+  """
+  An unique identifier for this tag
+  """
+  id: String!
+
+  """
+  Name/Label of the tag
+  """
+  tag: String!
+
+  """
+  Number of entries for this tag
+  """
+  count: Int!
+
+  """
+  Total amount for this tag
+  """
+  amount: Amount
+}
+
+"""
+A payout method
+"""
+type PayoutMethod {
+  """
+  Unique identifier for this payout method
+  """
+  id: String!
+
+  """
+  The type of this payout method (usually the payment provider)
+  """
+  type: PayoutMethodType
+
+  """
+  A friendly name for users to easily find their payout methods
+  """
+  name: String
+
+  """
+  Whether this payout method has been saved to be used for future payouts
+  """
+  isSaved: Boolean
+
+  """
+  The actual data for this payout method. Content depends on the type.
+  """
+  data: JSON
+}
+
+"""
+PaymentMethod model
+"""
+type PaymentMethod {
+  id: String
+  legacyId: Int
+  name: String
+  service: PaymentMethodService
+  type: PaymentMethodType
+
+  """
+  Defines the type of the payment method. Meant to be moved to "type" in the future.
+  """
+  providerType: PaymentMethodLegacyType @deprecated(reason: "2021-03-02: Please use service + type")
+
+  """
+  Returns the balance amount and the currency of this paymentMethod
+  """
+  balance: Amount!
+  account: Account
+
+  """
+  For gift cards, this field will return to the source payment method
+  """
+  sourcePaymentMethod: PaymentMethod
+  data: JSON
+  limitedToHosts: [Host]
+  expiryDate: DateTime
+  createdAt: DateTime
+
+  """
+  For monthly gift cards, this field will return the monthly limit
+  """
+  monthlyLimit: Amount
+
+  """
+  Get all the orders associated with this payment method
+  """
+  orders(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    If account is a host, also include hosted accounts orders
+    """
+    includeHostedAccounts: Boolean
+
+    """
+    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
+    """
+    includeIncognito: Boolean = false
+
+    """
+    Account orders filter (INCOMING or OUTGOING)
+    """
+    filter: AccountOrdersFilter
+
+    """
+    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency
+
+    """
+    Use this field to filter orders on their statuses
+    """
+    status: [OrderStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return orders where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return orders where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return orders that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return orders that were created before this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+
+    """
+    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
+    """
+    onlySubscriptions: Boolean
+
+    """
+    Same as onlySubscriptions, but returns only orders with active subscriptions
+    """
+    onlyActiveSubscriptions: Boolean
+  ): OrderCollection
+}
+
+enum PaymentMethodService {
+  PAYPAL
+  STRIPE
+  OPENCOLLECTIVE
+  PREPAID
+  THEGIVINGBLOCK
+}
+
+enum PaymentMethodLegacyType {
+  ALIPAY
+  CREDIT_CARD
+  GIFT_CARD
+  PREPAID_BUDGET
+  ACCOUNT_BALANCE
+  PAYPAL
+  BANK_TRANSFER
+  ADDED_FUNDS
+  CRYPTO
+  PAYMENT_INTENT
+  US_BANK_ACCOUNT
+  SEPA_DEBIT
+  BACS_DEBIT
+  BANCONTACT
+}
+
+"""
+This represents a Connected Account
+"""
+type ConnectedAccount {
+  """
+  Unique identifier for this connected account
+  """
+  id: String!
+
+  """
+  The internal database identifier of the Connected Account (ie: 580)
+  """
+  legacyId: Int @deprecated(reason: "2020-05-01: should only be used during the transition to GraphQL API v2.")
+
+  """
+  The date on which the ConnectedAccount was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date on which the ConnectedAccount was last updated
+  """
+  updatedAt: DateTime!
+  settings: JSON
+  service: ConnectedAccountService!
+}
+
+"""
+All supported services a user can connect with
+"""
+enum ConnectedAccountService {
+  paypal
+  stripe
+  stripe_customer
+  github
+  twitter
+  transferwise
+  privacy @deprecated(reason: "Not using this service anymore")
+  thegivingblock
+  meetup @deprecated(reason: "Not using this service anymore")
+}
+
+"""
+A collection of "Application"
+"""
+type OAuthApplicationCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Application]
+}
+
+"""
+Type for Geographic location
+"""
+type Location {
+  """
+  Unique identifier for this location
+  """
+  id: String
+
+  """
+  A short name for the location (eg. Open Collective Headquarters)
+  """
+  name: String
+
+  """
+  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
+  """
+  address: String
+
+  """
+  Two letters country code (eg. FR, BE...etc)
+  """
+  country: String
+
+  """
+  Latitude
+  """
+  lat: Float
+
+  """
+  Longitude
+  """
+  long: Float
+
+  """
+  Structured JSON address
+  """
+  structured: JSON
+}
+
+"""
+Stats for the Account
+"""
+type AccountStats {
+  id: String
+
+  """
+  Amount of money in cents in the currency of the collective currently available to spend
+  """
+  balanceWithBlockedFunds: Amount! @deprecated(reason: "2022-12-13: Use balance + withBlockedFunds instead")
+
+  """
+  Amount of money in cents in the currency of the collective
+  """
+  balance(
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+
+    """
+    Include transactions from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+
+    """
+    An optional currency. If not provided, will use the collective currency.
+    """
+    currency: Currency
+
+    """
+    Remove blocked funds from the balance
+    """
+    withBlockedFunds: Boolean = false
+  ): Amount!
+
+  """
+  The consolidated amount of all the events and projects combined.
+  """
+  consolidatedBalance: Amount! @deprecated(reason: "2022-09-02: Use balance + includeChildren instead")
+
+  """
+  Average amount spent per month based on the last 90 days
+  """
+  monthlySpending: Amount!
+
+  """
+  Total amount spent
+  """
+  totalAmountSpent(
+    """
+    Return the net amount (with payment processor fees removed)
+    """
+    net: Boolean = false
+
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+
+    """
+    Calculate amount for the last x months. Cannot be used with startDate/endDate
+    """
+    periodInMonths: Int
+
+    """
+    Include transactions from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+
+    """
+    An optional currency. If not provided, will use the collective currency.
+    """
+    currency: Currency
+
+    """
+    Include transactions using Gift Cards (not working together with includeChildren)
+    """
+    includeGiftCards: Boolean = false
+  ): Amount!
+
+  """
+  Total amount received
+  """
+  totalAmountReceived(
+    """
+    Return the net amount (with payment processor fees removed)
+    """
+    net: Boolean = false
+
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+
+    """
+    Calculate amount for the last x months. Cannot be used with startDate/endDate
+    """
+    periodInMonths: Int
+
+    """
+    Include transactions from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+
+    """
+    An optional currency. If not provided, will use the collective currency.
+    """
+    currency: Currency
+
+    """
+    Set this to true to use cached data
+    """
+    useCache: Boolean! = false
+      @deprecated(reason: "2022-12-14: this is not used anymore as results should be fast by default")
+  ): Amount!
+
+  """
+  Total amount received time series
+  """
+  totalAmountReceivedTimeSeries(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+
+    """
+    Return the net amount (with payment processor fees removed)
+    """
+    net: Boolean = false
+
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+
+    """
+    Calculate amount for the last x months. Cannot be used with startDate/endDate
+    """
+    periodInMonths: Int
+
+    """
+    Include transactions from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+
+    """
+    An optional currency. If not provided, will use the collective currency.
+    """
+    currency: Currency
+  ): TimeSeriesAmount!
+
+  """
+  Total of paid expenses to the account, filter per expense type
+  """
+  totalPaidExpenses(
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+
+    """
+    An optional currency. If not provided, will use the collective currency.
+    """
+    currency: Currency
+
+    """
+    Filter by ExpenseType
+    """
+    expenseType: [ExpenseType]
+  ): Amount!
+  yearlyBudget: Amount!
+  yearlyBudgetManaged: Amount!
+    @deprecated(reason: "2023-03-01: This field will be removed soon, please use totalMoneyManaged")
+
+  """
+  Total net amount received
+  """
+  totalNetAmountReceived(
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+
+    """
+    Calculate amount for the last x months. Cannot be used with startDate/endDate
+    """
+    periodInMonths: Int
+
+    """
+    Include transactions from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): Amount! @deprecated(reason: "2022-12-13: Use totalAmountReceived + net=true instead")
+
+  """
+  Total net amount received time series
+  """
+  totalNetAmountReceivedTimeSeries(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
+
+    """
+    Calculate amount for the last x months. Cannot be used with startDate/endDate
+    """
+    periodInMonths: Int
+
+    """
+    Include transactions from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+
+    """
+    An optional currency. If not provided, will use the collective currency.
+    """
+    currency: Currency
+  ): TimeSeriesAmount! @deprecated(reason: "2022-12-13: Use totalAmountReceivedTimeSeries + net=true instead")
+  activeRecurringContributions: JSON
+    @deprecated(reason: "2022-10-21: Use activeRecurringContributionsV2 while we migrate to better semantics.")
+  activeRecurringContributionsV2(
+    """
+    The frequency of the recurring contribution (MONTHLY or YEARLY)
+    """
+    frequency: ContributionFrequency! = MONTHLY
+  ): Amount
+
+  """
+  Returns expense tags for collective sorted by popularity
+  """
+  expensesTags(
+    limit: Int! = 100
+    truncate: Int = 7
+
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+
+    """
+    Include transactions from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): [AmountStats]
+
+  """
+  History of the expense tags used by this collective.
+  """
+  expensesTagsTimeSeries(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+
+    """
+    Include transactions from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): TimeSeriesAmount!
+  contributionsCount(
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+
+    """
+    Include transactions from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): Int!
+  contributorsCount(
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+
+    """
+    Include transactions from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): Int!
+
+  """
+  Return amount stats for contributions (default, and only for now: one-time vs recurring)
+  """
+  contributionsAmount(
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+
+    """
+    Include transactions from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): [AmountStats]
+
+  """
+  Return amount time series for contributions (default, and only for now: one-time vs recurring)
+  """
+  contributionsAmountTimeSeries(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+
+    """
+    Include transactions from children (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): TimeSeriesAmount!
 }
 
 """
@@ -2075,2049 +4477,6 @@ enum Currency {
 }
 
 """
-All supported expense types
-"""
-enum ExpenseType {
-  """
-  Invoice: Charge for your time or get paid in advance.
-  """
-  INVOICE
-
-  """
-  Receipt: Get paid back for a purchase already made.
-  """
-  RECEIPT
-
-  """
-  Funding Request: Request funding for a project or initiative.
-  """
-  FUNDING_REQUEST
-
-  """
-  Grant: Request funding for a project or initiative.
-  """
-  GRANT
-
-  """
-  Unclassified expense
-  """
-  UNCLASSIFIED
-
-  """
-  Credit Card Charge: Payment done using an issued (virtual) credit card issued by your Fiscal Host.
-  """
-  CHARGE
-
-  """
-  Settlement: expense generated by Open Collective to collect money owed by Fiscal Hosts.
-  """
-  SETTLEMENT
-}
-
-enum ExpenseStatus {
-  DRAFT
-  UNVERIFIED
-  PENDING
-  INCOMPLETE
-  APPROVED
-  REJECTED
-  PROCESSING
-  ERROR
-  PAID
-  SCHEDULED_FOR_PAYMENT
-  SPAM
-  CANCELED
-}
-
-"""
-A collection of "Comments"
-"""
-type CommentCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Comment]
-}
-
-"""
-This represents an Comment
-"""
-type Comment {
-  id: String
-  createdAt: DateTime
-  html: String
-  fromAccount: Account
-  account: Account
-
-  """
-  The type of this comment
-  """
-  type: CommentType!
-
-  """
-  Returns a map of reactions counts for this comment
-  """
-  reactions: JSON
-
-  """
-  Returns the list of reactions added to this comment by logged in user
-  """
-  userReactions: [String]
-}
-
-"""
-All supported comment contexts
-"""
-enum CommentType {
-  """
-  Default regular comment
-  """
-  COMMENT
-
-  """
-  Comment is visible only to host admins
-  """
-  PRIVATE_NOTE
-}
-
-"""
-The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON
-
-"""
-Input to order results chronologically
-"""
-input ChronologicalOrderInput {
-  """
-  Field to chronologically order by.
-  """
-  field: DateTimeField! = CREATED_AT
-
-  """
-  Ordering direction.
-  """
-  direction: OrderDirection! = DESC
-}
-
-"""
-All possible DateTime fields for a resource
-"""
-enum DateTimeField {
-  """
-  The creation time of a resource
-  """
-  CREATED_AT
-}
-
-"""
-Possible directions in which to order a list of items
-"""
-enum OrderDirection {
-  ASC
-  DESC
-}
-
-"""
-Type for Geographic location
-"""
-type Location {
-  """
-  Unique identifier for this location
-  """
-  id: String
-
-  """
-  A short name for the location (eg. Open Collective Headquarters)
-  """
-  name: String
-
-  """
-  Postal address without country (eg. 12 opensource avenue, 7500 Paris)
-  """
-  address: String
-
-  """
-  Two letters country code (eg. FR, BE...etc)
-  """
-  country: String
-
-  """
-  Latitude
-  """
-  lat: Float
-
-  """
-  Longitude
-  """
-  long: Float
-
-  """
-  Structured JSON address
-  """
-  structured: JSON
-}
-
-"""
-This represents an Host account
-"""
-type Host implements Account & AccountWithContributions {
-  id: String!
-  legacyId: Int!
-
-  """
-  The slug identifying the account (ie: babel)
-  """
-  slug: String!
-  type: AccountType!
-
-  """
-  Public name
-  """
-  name: String
-
-  """
-  Private, legal name. Used for expense receipts, taxes, etc. Scope: "account".
-  """
-  legalName: String
-  description: String
-  longDescription: String
-  tags: [String]
-  website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
-  twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
-  githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
-  repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
-  socialLinks: [SocialLink!]!
-  currency: String
-  expensePolicy: String
-
-  """
-  Defines if the contributors wants to be incognito (name not displayed)
-  """
-  isIncognito: Boolean!
-  imageUrl(height: Int, format: ImageFormat): String
-  backgroundImageUrl(height: Int, format: ImageFormat): String
-
-  """
-  The time of creation
-  """
-  createdAt: DateTime
-  updatedAt: DateTime
-
-  """
-  Returns whether this account is archived
-  """
-  isArchived: Boolean!
-
-  """
-  Whether this account is frozen
-  """
-  isFrozen: Boolean!
-
-  """
-  Returns whether the account accepts financial contributions.
-  """
-  isActive: Boolean
-
-  """
-  Returns whether the account is setup to Host collectives.
-  """
-  isHost: Boolean!
-
-  """
-  Returns true if the remote user is an admin of this account
-  """
-  isAdmin: Boolean!
-  parentAccount: Account @deprecated(reason: "2022-12-16: use parent on AccountWithParent instead")
-
-  """
-  Get all members (admins, members, backers, followers)
-  """
-  members(
-    limit: Int! = 100
-    offset: Int! = 0
-    role: [MemberRole]
-    accountType: [AccountType]
-
-    """
-    Admin only. To filter on the email address of a member, useful to check if a member exists.
-    """
-    email: EmailAddress
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
-    includeInherited: Boolean = true
-  ): MemberCollection!
-
-  """
-  [AUTHENTICATED] Returns the pending invitations
-  """
-  memberInvitations(
-    """
-    A reference to an account (usually Individual). Will return invitations sent to the account to join as a member
-    """
-    memberAccount: AccountReferenceInput
-
-    """
-    A reference to an account (usually Collective, Fund or Organization). Will return invitations sent to join this account as a member.
-    """
-    account: AccountReferenceInput
-
-    """
-    An array of Member roles to filter for
-    """
-    role: [MemberRole]
-  ): [MemberInvitation]
-  memberOf(
-    limit: Int! = 150
-    offset: Int! = 0
-    role: [MemberRole]
-    accountType: [AccountType]
-    account: AccountReferenceInput
-
-    """
-    Filter on whether the account is a host or not
-    """
-    isHostAccount: Boolean
-
-    """
-    Filter on (un)approved collectives
-    """
-    isApproved: Boolean
-
-    """
-    Filter on archived collectives
-    """
-    isArchived: Boolean
-
-    """
-    Whether incognito profiles should be included in the result. Only works if requesting user is an admin of the account.
-    """
-    includeIncognito: Boolean = true
-
-    """
-    A term to search membership. Searches in collective tags, name, slug, members description and role.
-    """
-    searchTerm: String
-
-    """
-    Filters on the Host fees structure applied to this account
-    """
-    hostFeesStructure: HostFeeStructure
-
-    """
-    Order of the results
-    """
-    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Order the query by requested role order
-    """
-    orderByRoles: Boolean
-  ): MemberOfCollection!
-
-  """
-  Returns the emails of the account. Individuals only have one, but organizations can have multiple emails.
-  """
-  emails: [EmailAddress!]
-  transactions(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 100
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    The transaction type (DEBIT or CREDIT)
-    """
-    type: TransactionType
-
-    """
-    The payment method types. Can include `null` for transactions without a payment method
-    """
-    paymentMethodType: [PaymentMethodType]
-
-    """
-    Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
-    """
-    fromAccount: AccountReferenceInput
-
-    """
-    Reference of the host accounting the transaction
-    """
-    host: AccountReferenceInput
-
-    """
-    NOT IMPLEMENTED. Only return transactions that match these tags.
-    """
-    tags: [String] @deprecated(reason: "2020-08-09: Was never implemented.")
-
-    """
-    The order of results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Only return transactions where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
-
-    """
-    Only return transactions where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int @deprecated(reason: "2020-08-09: GraphQL v2 should not expose amounts as integer.")
-
-    """
-    Only return transactions that were created after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Only return transactions that were created before this date
-    """
-    dateTo: DateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
-
-    """
-    Only return transactions with an Expense attached
-    """
-    hasExpense: Boolean
-
-    """
-    Only return transactions with an Order attached
-    """
-    hasOrder: Boolean
-
-    """
-    Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
-    """
-    includeRegularTransactions: Boolean! = true
-
-    """
-    If the account is a user and this field is true, contributions from the incognito profile will be included too (admins only)
-    """
-    includeIncognitoTransactions: Boolean! = false
-
-    """
-    Whether to include transactions from children (Events and Projects)
-    """
-    includeChildrenTransactions: Boolean! = false
-
-    """
-    Whether to include transactions from Gift Cards issued by the account.
-    """
-    includeGiftCardTransactions: Boolean! = false
-
-    """
-    Whether to include debt transactions
-    """
-    includeDebts: Boolean! = false
-
-    """
-    To filter by transaction kind
-    """
-    kind: [TransactionKind]
-
-    """
-    The transactions group to filter by
-    """
-    group: String
-    virtualCard: [VirtualCardReferenceInput]
-  ): TransactionCollection!
-  orders(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 100
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    If account is a host, also include hosted accounts orders
-    """
-    includeHostedAccounts: Boolean
-
-    """
-    Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
-    """
-    paymentMethod: PaymentMethodReferenceInput
-
-    """
-    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
-    """
-    includeIncognito: Boolean = false
-
-    """
-    Account orders filter (INCOMING or OUTGOING)
-    """
-    filter: AccountOrdersFilter
-
-    """
-    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
-    """
-    frequency: ContributionFrequency
-
-    """
-    Use this field to filter orders on their statuses
-    """
-    status: [OrderStatus]
-
-    """
-    The order of results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Only return orders where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int
-
-    """
-    Only return orders where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int
-
-    """
-    Only return orders that were created after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Only return orders that were created before this date
-    """
-    dateTo: DateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
-
-    """
-    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
-    """
-    onlySubscriptions: Boolean
-
-    """
-    Same as onlySubscriptions, but returns only orders with active subscriptions
-    """
-    onlyActiveSubscriptions: Boolean
-  ): OrderCollection!
-  settings: JSON!
-  conversations(
-    limit: Int! = 15
-    offset: Int! = 0
-
-    """
-    Only return conversations matching this tag
-    """
-    tag: String
-  ): ConversationCollection!
-
-  """
-  Returns conversation's tags for collective sorted by popularity
-  """
-  conversationsTags(limit: Int! = 30): [TagStat]
-
-  """
-  Returns expense tags for collective sorted by popularity
-  """
-  expensesTags(limit: Int! = 30): [TagStat]
-
-  """
-  The list of expense types supported by this account
-  """
-  supportedExpenseTypes: [ExpenseType!]!
-  transferwise: TransferWise
-
-  """
-  The list of payout methods that this collective can use to get paid. In most cases, admin only and scope: "expenses".
-  """
-  payoutMethods: [PayoutMethod]
-
-  """
-  The list of payment methods that this collective can use to pay for Orders. Admin or Host only. Scope: "orders".
-  """
-  paymentMethods(
-    type: [PaymentMethodType]
-    enumType: [PaymentMethodType] @deprecated(reason: "2021-08-20: use type instead from now")
-    service: [PaymentMethodService]
-
-    """
-    Whether to include expired payment methods. Payment methods expired since more than 6 months will never be returned.
-    """
-    includeExpired: Boolean
-  ): [PaymentMethod]
-
-  """
-  The list of payment methods for this account that are pending a client confirmation (3D Secure / SCA)
-  """
-  paymentMethodsWithPendingConfirmation: [PaymentMethod]
-
-  """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
-  """
-  connectedAccounts: [ConnectedAccount]
-
-  """
-  The list of applications created by this account. Admin only. Scope: "applications".
-  """
-  oAuthApplications(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): OAuthApplicationCollection
-
-  """
-  The address associated to this account. This field is always public for collectives and events.
-  """
-  location: Location
-  categories: [String]!
-  stats: AccountStats
-
-  """
-  Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates".
-  """
-  updates(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Only return published updates.
-    """
-    onlyPublishedUpdates: Boolean = false
-    onlyChangelogUpdates: Boolean
-    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-    searchTerm: String
-  ): UpdateCollection!
-
-  """
-  Describes the features enabled and available for this account
-  """
-  features: CollectiveFeatures!
-
-  """
-  Virtual Cards attached to the account. Admin only. Scope: "virtualCards".
-  """
-  virtualCards(
-    limit: Int! = 100
-    offset: Int! = 0
-    state: String = null
-    merchantAccount: AccountReferenceInput = null
-
-    """
-    Only return expenses that were created after this date
-    """
-    dateFrom: DateTime = null
-
-    """
-    Only return expenses that were created before this date
-    """
-    dateTo: DateTime = null
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-  ): VirtualCardCollection
-
-  """
-  Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
-  """
-  virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
-
-  """
-  Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
-  """
-  policies: Policies!
-
-  """
-  List of activities that the logged-in user is subscribed for this collective
-  """
-  activitySubscriptions(channel: ActivityChannel): [ActivitySubscription]
-
-  """
-  Logged-in user permissions on an account
-  """
-  permissions: AccountPermissions!
-  feed(
-    """
-    Only returns activities before this date
-    """
-    dateTo: DateTime
-
-    """
-    Number of activities to retrieve
-    """
-    limit: Int
-
-    """
-    The classes of activity types to filter for
-    """
-    classes: [ActivityClassType]
-  ): [Activity]
-  webhooks(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-    account: AccountReferenceInput!
-  ): WebhookCollection!
-
-  """
-  Number of unique financial contributors.
-  """
-  totalFinancialContributors(
-    """
-    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
-    """
-    accountType: AccountType
-  ): Int!
-  tiers(
-    """
-    The number of results to fetch
-    """
-    limit: Int! = 100
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): TierCollection!
-
-  """
-  All the persons and entities that contribute to this account
-  """
-  contributors(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-    roles: [MemberRole]
-  ): ContributorCollection!
-
-  """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Float!
-
-  """
-  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
-  """
-  platformContributionAvailable: Boolean!
-  contributionPolicy: String
-
-  """
-  List of accounting categories for this host
-  """
-  accountingCategories: AccountingCategoryCollection!
-  hostFeePercent: Float
-  totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
-  totalHostedAccounts: Int
-  isOpenToApplications: Boolean
-  termsUrl: URL
-  plan: HostPlan!
-  hostMetrics(
-    """
-    A collection of accounts for which the metrics should be returned.
-    """
-    account: [AccountReferenceInput!]
-
-    """
-    The start date of the time series
-    """
-    dateFrom: DateTime
-
-    """
-    The end date of the time series
-    """
-    dateTo: DateTime
-  ): HostMetrics!
-  hostMetricsTimeSeries(
-    """
-    A collection of accounts for which the metrics should be returned.
-    """
-    account: [AccountReferenceInput!]
-
-    """
-    The start date of the time series
-    """
-    dateFrom: DateTime
-
-    """
-    The end date of the time series
-    """
-    dateTo: DateTime
-
-    """
-    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
-    """
-    timeUnit: TimeUnit
-  ): HostMetricsTimeSeries!
-
-  """
-  The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
-  """
-  supportedPaymentMethods: [PaymentMethodLegacyType]
-  bankAccount: PayoutMethod
-
-  """
-  Paypal preapproval info. Returns null if PayPal account is not connected.
-  """
-  paypalPreApproval: PaymentMethod
-
-  """
-  If the host supports PayPal, this will contain the client ID to use in the frontend
-  """
-  paypalClientId: String
-
-  """
-  The list of payout methods this Host accepts for its expenses
-  """
-  supportedPayoutMethods: [PayoutMethodType]
-
-  """
-  Stripe connected account
-  """
-  stripe: StripeConnectedAccount
-
-  """
-  Applications for this host
-  """
-  hostApplications(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Search term for collective tags, id, name, slug and description.
-    """
-    searchTerm: String
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Filter applications by status
-    """
-    status: HostApplicationStatus
-  ): HostApplicationCollection!
-
-  """
-  Pending applications for this host
-  """
-  pendingApplications(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    A term to search membership. Searches in collective tags, name, slug, members description and role.
-    """
-    searchTerm: String
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-  ): HostApplicationCollection!
-    @deprecated(reason: "2023-08-25: Deprecated in favour of host.hostApplications(status: PENDING).")
-  hostedVirtualCards(
-    """
-    Search term (card name, card last four digits)
-    """
-    searchTerm: String
-    limit: Int! = 100
-    offset: Int! = 0
-    state: String = null @deprecated(reason: "2023-06-12: Please use status.")
-    status: [VirtualCardStatus]
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: DESC }
-    merchantAccount: AccountReferenceInput = null
-    collectiveAccountIds: [AccountReferenceInput] = null
-
-    """
-    Returns virtual cards with expenses from this date.
-    """
-    withExpensesDateFrom: DateTime
-
-    """
-    Returns virtual cards with expenses to this date.
-    """
-    withExpensesDateTo: DateTime
-
-    """
-    Filter virtual cards with at least this amount in cents charged
-    """
-    spentAmountFrom: AmountInput
-
-    """
-    Filter virtual cards with up to this amount in cents charged
-    """
-    spentAmountTo: AmountInput
-
-    """
-    Filter virtual cards by whether they are missing receipts for any charges
-    """
-    hasMissingReceipts: Boolean
-  ): VirtualCardCollection!
-  hostedVirtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection!
-  hostedVirtualCardCollectives(limit: Int! = 100, offset: Int! = 0): AccountCollection!
-  contributionStats(
-    """
-    A collection of accounts for which the contribution stats should be returned.
-    """
-    account: [AccountReferenceInput!]
-
-    """
-    Calculate contribution statistics beginning from this date.
-    """
-    dateFrom: DateTime
-
-    """
-    Calculate contribution statistics until this date.
-    """
-    dateTo: DateTime
-
-    """
-    The time unit of the time series
-    """
-    timeUnit: TimeUnit
-  ): ContributionStats!
-  expenseStats(
-    """
-    A collection of accounts for which the expense stats should be returned.
-    """
-    account: [AccountReferenceInput!]
-
-    """
-    Calculate expense statistics beginning from this date.
-    """
-    dateFrom: DateTime
-
-    """
-    Calculate expense statistics until this date.
-    """
-    dateTo: DateTime
-
-    """
-    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
-    """
-    timeUnit: TimeUnit
-  ): ExpenseStats!
-
-  """
-  Returns whether the host is trusted or not
-  """
-  isTrustedHost: Boolean!
-
-  """
-  Returns whether the host has any Stripe disputed orders
-  """
-  hasDisputedOrders: Boolean
-
-  """
-  Returns whether the host has any Stripe in review orders
-  """
-  hasInReviewOrders: Boolean
-
-  """
-  Returns agreements with Hosted Accounts
-  """
-  hostedAccountAgreements(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Filter by accounts participating in the agreement
-    """
-    accounts: [AccountReferenceInput]
-  ): AgreementCollection!
-}
-
-"""
-An account that can receive financial contributions
-"""
-interface AccountWithContributions {
-  """
-  Number of unique financial contributors.
-  """
-  totalFinancialContributors(
-    """
-    Type of account (COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
-    """
-    accountType: AccountType
-  ): Int!
-  tiers(
-    """
-    The number of results to fetch
-    """
-    limit: Int! = 100
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): TierCollection!
-
-  """
-  All the persons and entities that contribute to this account
-  """
-  contributors(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-    roles: [MemberRole]
-  ): ContributorCollection!
-
-  """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Float!
-
-  """
-  Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
-  """
-  platformContributionAvailable: Boolean!
-  contributionPolicy: String
-}
-
-"""
-A collection of "Tiers"
-"""
-type TierCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Tier]
-}
-
-"""
-A collection of "Contributor"
-"""
-type ContributorCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Contributor]
-}
-
-"\n    A person or an entity that contributes financially or by any other mean to the mission\n    of the collective. While \"Member\" is dedicated to permissions, this type is meant\n    to surface all the public contributors.\n  "
-type Contributor {
-  """
-  A unique identifier for this member
-  """
-  id: String!
-
-  """
-  Name of the contributor
-  """
-  name: String!
-
-  """
-  All the roles for a given contributor
-  """
-  roles: [MemberRole]
-
-  """
-  True if the contributor is a collective admin
-  """
-  isAdmin: Boolean!
-
-  """
-  True if the contributor is a core contributor
-  """
-  isCore: Boolean!
-
-  """
-  True if the contributor is a financial contributor
-  """
-  isBacker: Boolean!
-
-  """
-  Member join date
-  """
-  since: DateTime!
-
-  """
-  How much money the user has contributed for this (in cents, using collective currency)
-  """
-  totalAmountDonated: Int!
-
-  """
-  Whether the contributor is an individual, an organization...
-  """
-  type: String!
-
-  """
-  Defines if the contributors wants to be incognito (name not displayed)
-  """
-  isIncognito: Boolean!
-
-  """
-  Description of how the member contribute. Will usually be a tier name, or "design" or "code".
-  """
-  description: String
-
-  """
-  If the contributor has a page on Open Collective, this is the slug to link to it
-  """
-  collectiveSlug: String
-
-  """
-  Contributor avatar or logo
-  """
-  image(height: Int, format: ImageFormat): String
-
-  """
-  A public message from contributors to describe their contributions
-  """
-  publicMessage: String
-}
-
-input AccountReferenceInput {
-  """
-  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String
-
-  """
-  The internal id of the account (ie: 580)
-  """
-  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
-
-  """
-  The slug identifying the account (ie: babel for https://opencollective.com/babel)
-  """
-  slug: String
-}
-
-"""
-A collection of "MemberOf" (ie: Collective backed by an Organization)
-"""
-type MemberOfCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [MemberOf]
-  roles: [MemberOfCollectionRoles]
-}
-
-"""
-An existing member role and account type combination used used to filter collections
-"""
-type MemberOfCollectionRoles {
-  type: AccountType!
-  role: MemberRole!
-}
-
-"""
-All supported expense types
-"""
-enum HostFeeStructure {
-  """
-  Use global host fees
-  """
-  DEFAULT
-
-  """
-  Custom fee for this Collective only
-  """
-  CUSTOM_FEE
-
-  """
-  Set a monthly retainer for this Collective
-  """
-  MONTHLY_RETAINER
-}
-
-"""
-Input to order results
-"""
-input OrderByInput {
-  """
-  Field to order by.
-  """
-  field: OrderByFieldType!
-
-  """
-  Ordering direction.
-  """
-  direction: OrderDirection!
-}
-
-"""
-Possible fields you can use to order by
-"""
-enum OrderByFieldType {
-  CREATED_AT
-  MEMBER_COUNT
-  TOTAL_CONTRIBUTED
-
-  """
-  The financial activity of the collective (number of transactions)
-  """
-  ACTIVITY
-  RANK
-}
-
-"""
-A collection of Transactions (Debit or Credit)
-"""
-type TransactionCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Transaction]
-  kinds: [TransactionKind]
-
-  """
-  The types of payment methods used in this collection, regardless of the pagination
-  """
-  paymentMethodTypes: [PaymentMethodType]!
-}
-
-enum PaymentMethodType {
-  alipay @deprecated(reason: "Please use uppercase values")
-  creditcard @deprecated(reason: "Please use uppercase values")
-  prepaid @deprecated(reason: "Please use uppercase values")
-  payment @deprecated(reason: "Please use uppercase values")
-  subscription @deprecated(reason: "Please use uppercase values")
-  collective @deprecated(reason: "Please use uppercase values")
-  host @deprecated(reason: "Please use uppercase values")
-  adaptive @deprecated(reason: "Please use uppercase values")
-  giftcard @deprecated(reason: "Please use uppercase values")
-  manual @deprecated(reason: "Please use uppercase values")
-  crypto @deprecated(reason: "Please use uppercase values")
-  paymentintent @deprecated(reason: "Please use uppercase values")
-  us_bank_account @deprecated(reason: "Please use uppercase values")
-  sepa_debit @deprecated(reason: "Please use uppercase values")
-  bacs_debit @deprecated(reason: "Please use uppercase values")
-  bancontact @deprecated(reason: "Please use uppercase values")
-  ALIPAY
-  CREDITCARD
-  PREPAID
-  PAYMENT
-  SUBSCRIPTION
-  COLLECTIVE
-  HOST
-  ADAPTIVE
-  GIFTCARD
-  MANUAL
-  CRYPTO
-  PAYMENT_INTENT
-  US_BANK_ACCOUNT
-  SEPA_DEBIT
-  BACS_DEBIT
-  BANCONTACT
-}
-
-input VirtualCardReferenceInput {
-  id: String
-}
-
-input PaymentMethodReferenceInput {
-  """
-  The id assigned to the payment method
-  """
-  id: String
-}
-
-"""
-Account orders filter (INCOMING or OUTGOING)
-"""
-enum AccountOrdersFilter {
-  INCOMING
-  OUTGOING
-}
-
-"""
-A collection of "Conversations"
-"""
-type ConversationCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Conversation]
-}
-
-"""
-A conversation thread
-"""
-type Conversation {
-  id: String!
-  slug: String!
-  title: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  tags: [String]
-  summary: String!
-  account: Account
-  fromAccount: Account
-
-  """
-  The root comment / starter for this conversation
-  """
-  body: Comment
-
-  """
-  List the comments for this conversation. Not backed by a loader, don't use this in lists.
-  """
-  comments(limit: Int! = 150, offset: Int! = 0): CommentCollection!
-  followers(limit: Int! = 10, offset: Int! = 0): AccountCollection!
-  stats: ConversationStats
-}
-
-"""
-A collection of "Accounts"
-"""
-type AccountCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Account]
-}
-
-type ConversationStats {
-  id: String!
-
-  """
-  Total number of comments for this conversation
-  """
-  commentsCount: Int
-}
-
-"""
-Statistics for a given tag
-"""
-type TagStat {
-  """
-  An unique identifier for this tag
-  """
-  id: String!
-
-  """
-  Name/Label of the tag
-  """
-  tag: String!
-
-  """
-  Number of entries for this tag
-  """
-  count: Int!
-
-  """
-  Total amount for this tag
-  """
-  amount: Amount
-}
-
-"""
-A payout method
-"""
-type PayoutMethod {
-  """
-  Unique identifier for this payout method
-  """
-  id: String!
-
-  """
-  The type of this payout method (usually the payment provider)
-  """
-  type: PayoutMethodType
-
-  """
-  A friendly name for users to easily find their payout methods
-  """
-  name: String
-
-  """
-  Whether this payout method has been saved to be used for future payouts
-  """
-  isSaved: Boolean
-
-  """
-  The actual data for this payout method. Content depends on the type.
-  """
-  data: JSON
-}
-
-enum PayoutMethodType {
-  OTHER
-  PAYPAL
-  BANK_ACCOUNT
-  ACCOUNT_BALANCE
-  CREDIT_CARD
-}
-
-"""
-PaymentMethod model
-"""
-type PaymentMethod {
-  id: String
-  legacyId: Int
-  name: String
-  service: PaymentMethodService
-  type: PaymentMethodType
-
-  """
-  Defines the type of the payment method. Meant to be moved to "type" in the future.
-  """
-  providerType: PaymentMethodLegacyType @deprecated(reason: "2021-03-02: Please use service + type")
-
-  """
-  Returns the balance amount and the currency of this paymentMethod
-  """
-  balance: Amount!
-  account: Account
-
-  """
-  For gift cards, this field will return to the source payment method
-  """
-  sourcePaymentMethod: PaymentMethod
-  data: JSON
-  limitedToHosts: [Host]
-  expiryDate: DateTime
-  createdAt: DateTime
-
-  """
-  For monthly gift cards, this field will return the monthly limit
-  """
-  monthlyLimit: Amount
-
-  """
-  Get all the orders associated with this payment method
-  """
-  orders(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 100
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    If account is a host, also include hosted accounts orders
-    """
-    includeHostedAccounts: Boolean
-
-    """
-    Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
-    """
-    includeIncognito: Boolean = false
-
-    """
-    Account orders filter (INCOMING or OUTGOING)
-    """
-    filter: AccountOrdersFilter
-
-    """
-    Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
-    """
-    frequency: ContributionFrequency
-
-    """
-    Use this field to filter orders on their statuses
-    """
-    status: [OrderStatus]
-
-    """
-    The order of results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Only return orders where the amount is greater than or equal to this value (in cents)
-    """
-    minAmount: Int
-
-    """
-    Only return orders where the amount is lower than or equal to this value (in cents)
-    """
-    maxAmount: Int
-
-    """
-    Only return orders that were created after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Only return orders that were created before this date
-    """
-    dateTo: DateTime
-
-    """
-    The term to search
-    """
-    searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
-
-    """
-    Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
-    """
-    onlySubscriptions: Boolean
-
-    """
-    Same as onlySubscriptions, but returns only orders with active subscriptions
-    """
-    onlyActiveSubscriptions: Boolean
-  ): OrderCollection
-}
-
-enum PaymentMethodService {
-  PAYPAL
-  STRIPE
-  OPENCOLLECTIVE
-  PREPAID
-  THEGIVINGBLOCK
-}
-
-enum PaymentMethodLegacyType {
-  ALIPAY
-  CREDIT_CARD
-  GIFT_CARD
-  PREPAID_BUDGET
-  ACCOUNT_BALANCE
-  PAYPAL
-  BANK_TRANSFER
-  ADDED_FUNDS
-  CRYPTO
-  PAYMENT_INTENT
-  US_BANK_ACCOUNT
-  SEPA_DEBIT
-  BACS_DEBIT
-  BANCONTACT
-}
-
-"""
-This represents a Connected Account
-"""
-type ConnectedAccount {
-  """
-  Unique identifier for this connected account
-  """
-  id: String!
-
-  """
-  The internal database identifier of the Connected Account (ie: 580)
-  """
-  legacyId: Int @deprecated(reason: "2020-05-01: should only be used during the transition to GraphQL API v2.")
-
-  """
-  The date on which the ConnectedAccount was created
-  """
-  createdAt: DateTime!
-
-  """
-  The date on which the ConnectedAccount was last updated
-  """
-  updatedAt: DateTime!
-  settings: JSON
-  service: ConnectedAccountService!
-}
-
-"""
-All supported services a user can connect with
-"""
-enum ConnectedAccountService {
-  paypal
-  stripe
-  stripe_customer
-  github
-  twitter
-  transferwise
-  privacy @deprecated(reason: "Not using this service anymore")
-  thegivingblock
-  meetup @deprecated(reason: "Not using this service anymore")
-}
-
-"""
-A collection of "Application"
-"""
-type OAuthApplicationCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Application]
-}
-
-"""
-Stats for the Account
-"""
-type AccountStats {
-  id: String
-
-  """
-  Amount of money in cents in the currency of the collective currently available to spend
-  """
-  balanceWithBlockedFunds: Amount! @deprecated(reason: "2022-12-13: Use balance + withBlockedFunds instead")
-
-  """
-  Amount of money in cents in the currency of the collective
-  """
-  balance(
-    """
-    Calculate amount before this date
-    """
-    dateTo: DateTime
-
-    """
-    Include transactions from children (Projects and Events)
-    """
-    includeChildren: Boolean = false
-
-    """
-    An optional currency. If not provided, will use the collective currency.
-    """
-    currency: Currency
-
-    """
-    Remove blocked funds from the balance
-    """
-    withBlockedFunds: Boolean = false
-  ): Amount!
-
-  """
-  The consolidated amount of all the events and projects combined.
-  """
-  consolidatedBalance: Amount! @deprecated(reason: "2022-09-02: Use balance + includeChildren instead")
-
-  """
-  Average amount spent per month based on the last 90 days
-  """
-  monthlySpending: Amount!
-
-  """
-  Total amount spent
-  """
-  totalAmountSpent(
-    """
-    Return the net amount (with payment processor fees removed)
-    """
-    net: Boolean = false
-
-    """
-    Filter by kind
-    """
-    kind: [TransactionKind]
-
-    """
-    Calculate amount after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Calculate amount before this date
-    """
-    dateTo: DateTime
-
-    """
-    Calculate amount for the last x months. Cannot be used with startDate/endDate
-    """
-    periodInMonths: Int
-
-    """
-    Include transactions from children (Projects and Events)
-    """
-    includeChildren: Boolean = false
-
-    """
-    An optional currency. If not provided, will use the collective currency.
-    """
-    currency: Currency
-
-    """
-    Include transactions using Gift Cards (not working together with includeChildren)
-    """
-    includeGiftCards: Boolean = false
-  ): Amount!
-
-  """
-  Total amount received
-  """
-  totalAmountReceived(
-    """
-    Return the net amount (with payment processor fees removed)
-    """
-    net: Boolean = false
-
-    """
-    Filter by kind
-    """
-    kind: [TransactionKind]
-
-    """
-    Calculate amount after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Calculate amount before this date
-    """
-    dateTo: DateTime
-
-    """
-    Calculate amount for the last x months. Cannot be used with startDate/endDate
-    """
-    periodInMonths: Int
-
-    """
-    Include transactions from children (Projects and Events)
-    """
-    includeChildren: Boolean = false
-
-    """
-    An optional currency. If not provided, will use the collective currency.
-    """
-    currency: Currency
-
-    """
-    Set this to true to use cached data
-    """
-    useCache: Boolean! = false
-      @deprecated(reason: "2022-12-14: this is not used anymore as results should be fast by default")
-  ): Amount!
-
-  """
-  Total amount received time series
-  """
-  totalAmountReceivedTimeSeries(
-    """
-    The start date of the time series
-    """
-    dateFrom: DateTime
-
-    """
-    The end date of the time series
-    """
-    dateTo: DateTime
-
-    """
-    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
-    """
-    timeUnit: TimeUnit
-
-    """
-    Return the net amount (with payment processor fees removed)
-    """
-    net: Boolean = false
-
-    """
-    Filter by kind
-    """
-    kind: [TransactionKind]
-
-    """
-    Calculate amount for the last x months. Cannot be used with startDate/endDate
-    """
-    periodInMonths: Int
-
-    """
-    Include transactions from children (Projects and Events)
-    """
-    includeChildren: Boolean = false
-
-    """
-    An optional currency. If not provided, will use the collective currency.
-    """
-    currency: Currency
-  ): TimeSeriesAmount!
-
-  """
-  Total of paid expenses to the account, filter per expense type
-  """
-  totalPaidExpenses(
-    """
-    Calculate amount after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Calculate amount before this date
-    """
-    dateTo: DateTime
-
-    """
-    An optional currency. If not provided, will use the collective currency.
-    """
-    currency: Currency
-
-    """
-    Filter by ExpenseType
-    """
-    expenseType: [ExpenseType]
-  ): Amount!
-  yearlyBudget: Amount!
-  yearlyBudgetManaged: Amount!
-    @deprecated(reason: "2023-03-01: This field will be removed soon, please use totalMoneyManaged")
-
-  """
-  Total net amount received
-  """
-  totalNetAmountReceived(
-    """
-    Filter by kind
-    """
-    kind: [TransactionKind]
-
-    """
-    Calculate amount after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Calculate amount before this date
-    """
-    dateTo: DateTime
-
-    """
-    Calculate amount for the last x months. Cannot be used with startDate/endDate
-    """
-    periodInMonths: Int
-
-    """
-    Include transactions from children (Projects and Events)
-    """
-    includeChildren: Boolean = false
-  ): Amount! @deprecated(reason: "2022-12-13: Use totalAmountReceived + net=true instead")
-
-  """
-  Total net amount received time series
-  """
-  totalNetAmountReceivedTimeSeries(
-    """
-    The start date of the time series
-    """
-    dateFrom: DateTime
-
-    """
-    The end date of the time series
-    """
-    dateTo: DateTime
-
-    """
-    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
-    """
-    timeUnit: TimeUnit
-
-    """
-    Filter by kind
-    """
-    kind: [TransactionKind]
-
-    """
-    Calculate amount for the last x months. Cannot be used with startDate/endDate
-    """
-    periodInMonths: Int
-
-    """
-    Include transactions from children (Projects and Events)
-    """
-    includeChildren: Boolean = false
-
-    """
-    An optional currency. If not provided, will use the collective currency.
-    """
-    currency: Currency
-  ): TimeSeriesAmount! @deprecated(reason: "2022-12-13: Use totalAmountReceivedTimeSeries + net=true instead")
-  activeRecurringContributions: JSON
-    @deprecated(reason: "2022-10-21: Use activeRecurringContributionsV2 while we migrate to better semantics.")
-  activeRecurringContributionsV2(
-    """
-    The frequency of the recurring contribution (MONTHLY or YEARLY)
-    """
-    frequency: ContributionFrequency! = MONTHLY
-  ): Amount
-
-  """
-  Returns expense tags for collective sorted by popularity
-  """
-  expensesTags(
-    limit: Int! = 100
-    truncate: Int = 7
-
-    """
-    Calculate amount after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Calculate amount before this date
-    """
-    dateTo: DateTime
-
-    """
-    Include transactions from children (Projects and Events)
-    """
-    includeChildren: Boolean = false
-  ): [AmountStats]
-
-  """
-  History of the expense tags used by this collective.
-  """
-  expensesTagsTimeSeries(
-    """
-    The start date of the time series
-    """
-    dateFrom: DateTime
-
-    """
-    The end date of the time series
-    """
-    dateTo: DateTime
-
-    """
-    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
-    """
-    timeUnit: TimeUnit
-
-    """
-    Include transactions from children (Projects and Events)
-    """
-    includeChildren: Boolean = false
-  ): TimeSeriesAmount!
-  contributionsCount(
-    """
-    Calculate amount after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Calculate amount before this date
-    """
-    dateTo: DateTime
-
-    """
-    Include transactions from children (Projects and Events)
-    """
-    includeChildren: Boolean = false
-  ): Int!
-  contributorsCount(
-    """
-    Calculate amount after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Calculate amount before this date
-    """
-    dateTo: DateTime
-
-    """
-    Include transactions from children (Projects and Events)
-    """
-    includeChildren: Boolean = false
-  ): Int!
-
-  """
-  Return amount stats for contributions (default, and only for now: one-time vs recurring)
-  """
-  contributionsAmount(
-    """
-    Calculate amount after this date
-    """
-    dateFrom: DateTime
-
-    """
-    Calculate amount before this date
-    """
-    dateTo: DateTime
-
-    """
-    Include transactions from children (Projects and Events)
-    """
-    includeChildren: Boolean = false
-  ): [AmountStats]
-
-  """
-  Return amount time series for contributions (default, and only for now: one-time vs recurring)
-  """
-  contributionsAmountTimeSeries(
-    """
-    The start date of the time series
-    """
-    dateFrom: DateTime
-
-    """
-    The end date of the time series
-    """
-    dateTo: DateTime
-
-    """
-    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
-    """
-    timeUnit: TimeUnit
-
-    """
-    Include transactions from children (Projects and Events)
-    """
-    includeChildren: Boolean = false
-  ): TimeSeriesAmount!
-}
-
-"""
 Amount time series
 """
 type TimeSeriesAmount implements TimeSeries {
@@ -4409,6 +4768,15 @@ type VirtualCardCollection implements Collection {
   nodes: [VirtualCard]
 }
 
+"""
+The status of a virtual card
+"""
+enum VirtualCardStatus {
+  ACTIVE
+  INACTIVE
+  CANCELED
+}
+
 type Policies {
   id: String
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
@@ -4417,6 +4785,7 @@ type Policies {
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
+  EXPENSE_PUBLIC_VENDORS: Boolean
 }
 
 type EXPENSE_AUTHOR_CANNOT_APPROVE {
@@ -4640,6 +5009,7 @@ enum ActivityType {
   TAXFORM_REQUEST
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
+  COLLECTIVE_VIRTUAL_CARD_RESUMED
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY
   COLLECTIVE_VIRTUAL_CARD_DELETED
@@ -4666,17 +5036,18 @@ enum ActivityType {
   TICKET_CONFIRMED
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
   ORDER_PENDING
-  ORDER_PENDING_CRYPTO
   ORDER_PENDING_CONTRIBUTION_NEW
   ORDER_PENDING_CONTRIBUTION_REMINDER
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
+  VENDOR_CREATED
+  VENDOR_EDITED
+  VENDOR_DELETED
   ORDER_PENDING_CREATED
   ORDER_PENDING_FOLLOWUP
   ORDER_PENDING_RECEIVED
   ORDERS_SUSPICIOUS
-  BACKYOURSTACK_DISPATCH_CONFIRMED
   PAYMENT_FAILED
   PAYMENT_CREDITCARD_CONFIRMATION
   PAYMENT_CREDITCARD_EXPIRING
@@ -4709,6 +5080,8 @@ enum ActivityType {
   COLLECTIVE_VIRTUAL_CARD_CREATED
   SUBSCRIPTION_CONFIRMED
   COLLECTIVE_COMMENT_CREATED
+  ORDER_PENDING_CRYPTO
+  BACKYOURSTACK_DISPATCH_CONFIRMED
 }
 
 enum ActivityClassType {
@@ -4754,33 +5127,6 @@ type AccountingCategoryCollection implements Collection {
   The Accounting Categories
   """
   nodes: [AccountingCategory!]!
-}
-
-"""
-Fields for an accounting category
-"""
-type AccountingCategory {
-  id: String!
-
-  """
-  The code of the accounting category
-  """
-  code: String!
-
-  """
-  The technical name of the accounting category
-  """
-  name: String!
-
-  """
-  A friendly name for non-accountants (i.e. expense submitters and collective admins)
-  """
-  friendlyName: String
-
-  """
-  The account this category belongs to
-  """
-  account: Host!
 }
 
 """
@@ -5079,15 +5425,6 @@ enum HostApplicationStatus {
 }
 
 """
-The status of a virtual card
-"""
-enum VirtualCardStatus {
-  ACTIVE
-  INACTIVE
-  CANCELED
-}
-
-"""
 Input type for an amount with the value and currency
 """
 input AmountInput {
@@ -5196,6 +5533,59 @@ type Agreement {
 }
 
 """
+A collection of Vendors
+"""
+type VendorCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Vendor!]
+}
+
+type ExpenseValuesByRole {
+  id: NonEmptyString!
+
+  """
+  The values provided by the expense submitter(s)
+  """
+  submitter: ExpenseValuesRoleDetails
+
+  """
+  The values provided by the account admin(s)
+  """
+  accountAdmin: ExpenseValuesRoleDetails
+
+  """
+  The values provided by the host admin(s)
+  """
+  hostAdmin: ExpenseValuesRoleDetails
+}
+
+"""
+A string that cannot be passed as an empty value
+"""
+scalar NonEmptyString
+
+type ExpenseValuesRoleDetails {
+  accountingCategory: AccountingCategory
+}
+
+enum ExpenseStatus {
+  DRAFT
+  UNVERIFIED
+  PENDING
+  INCOMPLETE
+  APPROVED
+  REJECTED
+  PROCESSING
+  ERROR
+  PAID
+  SCHEDULED_FOR_PAYMENT
+  SPAM
+  CANCELED
+}
+
+"""
 Fields for an expense's attached file
 """
 type ExpenseAttachedFile {
@@ -5284,6 +5674,11 @@ type ExpensePermissions {
   canEdit: Boolean!
 
   """
+  Whether the current user can edit the expense accounting category
+  """
+  canEditAccountingCategory: Boolean!
+
+  """
   Tags permissions are a bit different, and can be edited by admins even if the expense has already been paid
   """
   canEditTags: Boolean!
@@ -5351,6 +5746,11 @@ type ExpensePermissions {
   canHold: Boolean!
   canRelease: Boolean!
   edit: Permission!
+
+  """
+  Whether the current user can edit the expense accounting category
+  """
+  editAccountingCategory: Boolean!
   editTags: Permission!
   delete: Permission!
   seeInvoiceInfo: Permission!
@@ -5713,6 +6113,11 @@ type Bot implements Account {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -6033,6 +6438,114 @@ type Bot implements Account {
     """
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
+  expenses(
+    direction: ExpenseDirection
+
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Reference of an account that is the payee of an expense
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of an account that is the payer of an expense
+    """
+    account: AccountReferenceInput
+
+    """
+    Return expenses only for this host
+    """
+    host: AccountReferenceInput
+
+    """
+    Return expenses only created by this INDIVIDUAL account
+    """
+    createdByAccount: AccountReferenceInput
+
+    """
+    Use this field to filter expenses on their statuses
+    """
+    status: ExpenseStatusFilter
+
+    """
+    Use this field to filter expenses on their type (RECEIPT/INVOICE)
+    """
+    type: ExpenseType
+
+    """
+    Only expenses that match these tags
+    """
+    tags: [String] @deprecated(reason: "2020-06-30: Please use tag (singular)")
+
+    """
+    Only expenses that match these tags
+    """
+    tag: [String]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return expenses where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return expenses that use the given type as payout method
+    """
+    payoutMethodType: PayoutMethodType
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Whether to include expenses from children of the account (Events and Projects)
+    """
+    includeChildrenExpenses: Boolean! = false
+
+    """
+    Only return expenses that contains this custom data. Requires being an admin of the collective, payee or host.
+    """
+    customData: JSON
+
+    """
+    Filter expenses of type charges based on presence of receipts
+    """
+    chargeHasReceipts: Boolean
+
+    """
+    Filter expenses of type charges using these virtual cards
+    """
+    virtualCards: [VirtualCardReferenceInput]
+  ): ExpenseCollection!
   settings: JSON!
   conversations(
     limit: Int! = 15
@@ -6145,7 +6658,8 @@ type Bot implements Account {
   virtualCards(
     limit: Int! = 100
     offset: Int! = 0
-    state: String = null
+    state: String = null @deprecated(reason: "2023-11-06: Please use status.")
+    status: [VirtualCardStatus]
     merchantAccount: AccountReferenceInput = null
 
     """
@@ -6248,6 +6762,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -6568,6 +7087,114 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
+  expenses(
+    direction: ExpenseDirection
+
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Reference of an account that is the payee of an expense
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of an account that is the payer of an expense
+    """
+    account: AccountReferenceInput
+
+    """
+    Return expenses only for this host
+    """
+    host: AccountReferenceInput
+
+    """
+    Return expenses only created by this INDIVIDUAL account
+    """
+    createdByAccount: AccountReferenceInput
+
+    """
+    Use this field to filter expenses on their statuses
+    """
+    status: ExpenseStatusFilter
+
+    """
+    Use this field to filter expenses on their type (RECEIPT/INVOICE)
+    """
+    type: ExpenseType
+
+    """
+    Only expenses that match these tags
+    """
+    tags: [String] @deprecated(reason: "2020-06-30: Please use tag (singular)")
+
+    """
+    Only expenses that match these tags
+    """
+    tag: [String]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return expenses where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return expenses that use the given type as payout method
+    """
+    payoutMethodType: PayoutMethodType
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Whether to include expenses from children of the account (Events and Projects)
+    """
+    includeChildrenExpenses: Boolean! = false
+
+    """
+    Only return expenses that contains this custom data. Requires being an admin of the collective, payee or host.
+    """
+    customData: JSON
+
+    """
+    Filter expenses of type charges based on presence of receipts
+    """
+    chargeHasReceipts: Boolean
+
+    """
+    Filter expenses of type charges using these virtual cards
+    """
+    virtualCards: [VirtualCardReferenceInput]
+  ): ExpenseCollection!
   settings: JSON!
   conversations(
     limit: Int! = 15
@@ -6680,7 +7307,8 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   virtualCards(
     limit: Int! = 100
     offset: Int! = 0
-    state: String = null
+    state: String = null @deprecated(reason: "2023-11-06: Please use status.")
+    status: [VirtualCardStatus]
     merchantAccount: AccountReferenceInput = null
 
     """
@@ -7152,6 +7780,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -7472,6 +8105,114 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
+  expenses(
+    direction: ExpenseDirection
+
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Reference of an account that is the payee of an expense
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of an account that is the payer of an expense
+    """
+    account: AccountReferenceInput
+
+    """
+    Return expenses only for this host
+    """
+    host: AccountReferenceInput
+
+    """
+    Return expenses only created by this INDIVIDUAL account
+    """
+    createdByAccount: AccountReferenceInput
+
+    """
+    Use this field to filter expenses on their statuses
+    """
+    status: ExpenseStatusFilter
+
+    """
+    Use this field to filter expenses on their type (RECEIPT/INVOICE)
+    """
+    type: ExpenseType
+
+    """
+    Only expenses that match these tags
+    """
+    tags: [String] @deprecated(reason: "2020-06-30: Please use tag (singular)")
+
+    """
+    Only expenses that match these tags
+    """
+    tag: [String]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return expenses where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return expenses that use the given type as payout method
+    """
+    payoutMethodType: PayoutMethodType
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Whether to include expenses from children of the account (Events and Projects)
+    """
+    includeChildrenExpenses: Boolean! = false
+
+    """
+    Only return expenses that contains this custom data. Requires being an admin of the collective, payee or host.
+    """
+    customData: JSON
+
+    """
+    Filter expenses of type charges based on presence of receipts
+    """
+    chargeHasReceipts: Boolean
+
+    """
+    Filter expenses of type charges using these virtual cards
+    """
+    virtualCards: [VirtualCardReferenceInput]
+  ): ExpenseCollection!
   settings: JSON!
   conversations(
     limit: Int! = 15
@@ -7584,7 +8325,8 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   virtualCards(
     limit: Int! = 100
     offset: Int! = 0
-    state: String = null
+    state: String = null @deprecated(reason: "2023-11-06: Please use status.")
+    status: [VirtualCardStatus]
     merchantAccount: AccountReferenceInput = null
 
     """
@@ -7907,6 +8649,11 @@ type Individual implements Account {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -8227,6 +8974,114 @@ type Individual implements Account {
     """
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
+  expenses(
+    direction: ExpenseDirection
+
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Reference of an account that is the payee of an expense
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of an account that is the payer of an expense
+    """
+    account: AccountReferenceInput
+
+    """
+    Return expenses only for this host
+    """
+    host: AccountReferenceInput
+
+    """
+    Return expenses only created by this INDIVIDUAL account
+    """
+    createdByAccount: AccountReferenceInput
+
+    """
+    Use this field to filter expenses on their statuses
+    """
+    status: ExpenseStatusFilter
+
+    """
+    Use this field to filter expenses on their type (RECEIPT/INVOICE)
+    """
+    type: ExpenseType
+
+    """
+    Only expenses that match these tags
+    """
+    tags: [String] @deprecated(reason: "2020-06-30: Please use tag (singular)")
+
+    """
+    Only expenses that match these tags
+    """
+    tag: [String]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return expenses where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return expenses that use the given type as payout method
+    """
+    payoutMethodType: PayoutMethodType
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Whether to include expenses from children of the account (Events and Projects)
+    """
+    includeChildrenExpenses: Boolean! = false
+
+    """
+    Only return expenses that contains this custom data. Requires being an admin of the collective, payee or host.
+    """
+    customData: JSON
+
+    """
+    Filter expenses of type charges based on presence of receipts
+    """
+    chargeHasReceipts: Boolean
+
+    """
+    Filter expenses of type charges using these virtual cards
+    """
+    virtualCards: [VirtualCardReferenceInput]
+  ): ExpenseCollection!
   settings: JSON!
   conversations(
     limit: Int! = 15
@@ -8337,7 +9192,8 @@ type Individual implements Account {
   virtualCards(
     limit: Int! = 100
     offset: Int! = 0
-    state: String = null
+    state: String = null @deprecated(reason: "2023-11-06: Please use status.")
+    status: [VirtualCardStatus]
     merchantAccount: AccountReferenceInput = null
 
     """
@@ -8516,6 +9372,11 @@ type PersonalToken {
   The date on which the personal token was last updated
   """
   updatedAt: DateTime
+
+  """
+  Whether this token is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean!
 }
 
 """
@@ -8643,6 +9504,11 @@ type Organization implements Account & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -8963,6 +9829,114 @@ type Organization implements Account & AccountWithContributions {
     """
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
+  expenses(
+    direction: ExpenseDirection
+
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Reference of an account that is the payee of an expense
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of an account that is the payer of an expense
+    """
+    account: AccountReferenceInput
+
+    """
+    Return expenses only for this host
+    """
+    host: AccountReferenceInput
+
+    """
+    Return expenses only created by this INDIVIDUAL account
+    """
+    createdByAccount: AccountReferenceInput
+
+    """
+    Use this field to filter expenses on their statuses
+    """
+    status: ExpenseStatusFilter
+
+    """
+    Use this field to filter expenses on their type (RECEIPT/INVOICE)
+    """
+    type: ExpenseType
+
+    """
+    Only expenses that match these tags
+    """
+    tags: [String] @deprecated(reason: "2020-06-30: Please use tag (singular)")
+
+    """
+    Only expenses that match these tags
+    """
+    tag: [String]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return expenses where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return expenses that use the given type as payout method
+    """
+    payoutMethodType: PayoutMethodType
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Whether to include expenses from children of the account (Events and Projects)
+    """
+    includeChildrenExpenses: Boolean! = false
+
+    """
+    Only return expenses that contains this custom data. Requires being an admin of the collective, payee or host.
+    """
+    customData: JSON
+
+    """
+    Filter expenses of type charges based on presence of receipts
+    """
+    chargeHasReceipts: Boolean
+
+    """
+    Filter expenses of type charges using these virtual cards
+    """
+    virtualCards: [VirtualCardReferenceInput]
+  ): ExpenseCollection!
   settings: JSON!
   conversations(
     limit: Int! = 15
@@ -9073,7 +10047,8 @@ type Organization implements Account & AccountWithContributions {
   virtualCards(
     limit: Int! = 100
     offset: Int! = 0
-    state: String = null
+    state: String = null @deprecated(reason: "2023-11-06: Please use status.")
+    status: [VirtualCardStatus]
     merchantAccount: AccountReferenceInput = null
 
     """
@@ -9264,7 +10239,7 @@ scalar JSONObject
 """
 This represents a Vendor account
 """
-type Vendor implements Account & AccountWithHost & AccountWithContributions {
+type Vendor implements Account & AccountWithContributions {
   id: String!
   legacyId: Int!
 
@@ -9299,6 +10274,11 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -9318,9 +10298,9 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   isFrozen: Boolean!
 
   """
-  Returns whether it's active: can accept financial contributions and pay expenses.
+  Returns whether the account accepts financial contributions.
   """
-  isActive: Boolean!
+  isActive: Boolean
 
   """
   Returns whether the account is setup to Host collectives.
@@ -9619,6 +10599,114 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
     """
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
+  expenses(
+    direction: ExpenseDirection
+
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Reference of an account that is the payee of an expense
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of an account that is the payer of an expense
+    """
+    account: AccountReferenceInput
+
+    """
+    Return expenses only for this host
+    """
+    host: AccountReferenceInput
+
+    """
+    Return expenses only created by this INDIVIDUAL account
+    """
+    createdByAccount: AccountReferenceInput
+
+    """
+    Use this field to filter expenses on their statuses
+    """
+    status: ExpenseStatusFilter
+
+    """
+    Use this field to filter expenses on their type (RECEIPT/INVOICE)
+    """
+    type: ExpenseType
+
+    """
+    Only expenses that match these tags
+    """
+    tags: [String] @deprecated(reason: "2020-06-30: Please use tag (singular)")
+
+    """
+    Only expenses that match these tags
+    """
+    tag: [String]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return expenses where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return expenses that use the given type as payout method
+    """
+    payoutMethodType: PayoutMethodType
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Whether to include expenses from children of the account (Events and Projects)
+    """
+    includeChildrenExpenses: Boolean! = false
+
+    """
+    Only return expenses that contains this custom data. Requires being an admin of the collective, payee or host.
+    """
+    customData: JSON
+
+    """
+    Filter expenses of type charges based on presence of receipts
+    """
+    chargeHasReceipts: Boolean
+
+    """
+    Filter expenses of type charges using these virtual cards
+    """
+    virtualCards: [VirtualCardReferenceInput]
+  ): ExpenseCollection!
   settings: JSON!
   conversations(
     limit: Int! = 15
@@ -9731,7 +10819,8 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   virtualCards(
     limit: Int! = 100
     offset: Int! = 0
-    state: String = null
+    state: String = null @deprecated(reason: "2023-11-06: Please use status.")
+    status: [VirtualCardStatus]
     merchantAccount: AccountReferenceInput = null
 
     """
@@ -9796,51 +10885,6 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   ): WebhookCollection!
 
   """
-  Returns the Fiscal Host
-  """
-  host: Host
-
-  """
-  Describe how the host charges the collective
-  """
-  hostFeesStructure: HostFeeStructure
-
-  """
-  Fees percentage that the host takes for this collective
-  """
-  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
-
-  """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Float!
-
-  """
-  Date of approval by the Fiscal Host.
-  """
-  approvedAt: DateTime
-
-  """
-  Returns whether it's approved by the Fiscal Host
-  """
-  isApproved: Boolean!
-
-  """
-  Returns agreements this account has with its host, or null if not enough permissions.
-  """
-  hostAgreements(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 30
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): AgreementCollection
-
-  """
   Number of unique financial contributors.
   """
   totalFinancialContributors(
@@ -9878,10 +10922,41 @@ type Vendor implements Account & AccountWithHost & AccountWithContributions {
   ): ContributorCollection!
 
   """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Float!
+
+  """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+  vendorInfo: VendorInfo
+
+  """
+  The account who created this order
+  """
+  createdByAccount: Account
+}
+
+"""
+Some context about the vendor
+"""
+type VendorInfo {
+  contact: VendorContact
+  taxFormUrl: String
+  taxFormRequired: Boolean
+  taxType: String
+  taxId: String
+  notes: String
+}
+
+"""
+Some context about the vendor contact person
+"""
+type VendorContact {
+  name: String
+  email: String
 }
 
 """
@@ -10040,6 +11115,11 @@ type Query {
     The order of results. Defaults to [RANK, DESC] (or [CREATED_AT, DESC] if `supportedPaymentMethodService` is provided)
     """
     orderBy: OrderByInput
+
+    """
+    Include vendors for this host
+    """
+    includeVendorsForHost: AccountReferenceInput
   ): AccountCollection!
   activities(
     """
@@ -10278,6 +11358,24 @@ type Query {
     """
     virtualCards: [VirtualCardReferenceInput]
   ): ExpenseCollection!
+  expenseTagStats(
+    """
+    Return tags which includes this search term.
+    """
+    tagSearchTerm: String
+
+    """
+    Return tags from expenses to accounts hosted by this account. Can not be used together with "account".
+    """
+    host: AccountReferenceInput
+
+    """
+    Return tags from expenses to this account. Can not be used together with "host".
+    """
+    account: AccountReferenceInput
+    limit: Int! = 10
+    offset: Int! = 0
+  ): TagStatsCollection!
   fund(
     """
     The public id identifying the Fund (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -12110,6 +13208,7 @@ enum ActivityAndClassesType {
   TAXFORM_REQUEST
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
+  COLLECTIVE_VIRTUAL_CARD_RESUMED
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY
   COLLECTIVE_VIRTUAL_CARD_DELETED
@@ -12136,17 +13235,18 @@ enum ActivityAndClassesType {
   TICKET_CONFIRMED
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
   ORDER_PENDING
-  ORDER_PENDING_CRYPTO
   ORDER_PENDING_CONTRIBUTION_NEW
   ORDER_PENDING_CONTRIBUTION_REMINDER
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
+  VENDOR_CREATED
+  VENDOR_EDITED
+  VENDOR_DELETED
   ORDER_PENDING_CREATED
   ORDER_PENDING_FOLLOWUP
   ORDER_PENDING_RECEIVED
   ORDERS_SUSPICIOUS
-  BACKYOURSTACK_DISPATCH_CONFIRMED
   PAYMENT_FAILED
   PAYMENT_CREDITCARD_CONFIRMATION
   PAYMENT_CREDITCARD_EXPIRING
@@ -12179,6 +13279,8 @@ enum ActivityAndClassesType {
   COLLECTIVE_VIRTUAL_CARD_CREATED
   SUBSCRIPTION_CONFIRMED
   COLLECTIVE_COMMENT_CREATED
+  ORDER_PENDING_CRYPTO
+  BACKYOURSTACK_DISPATCH_CONFIRMED
   COLLECTIVE
   EXPENSES
   CONTRIBUTIONS
@@ -12201,41 +13303,13 @@ input ExpenseReferenceInput {
 }
 
 """
-A collection of "Expenses"
+A collection of "Tags"
 """
-type ExpenseCollection implements Collection {
+type TagStatsCollection implements Collection {
   offset: Int
   limit: Int
   totalCount: Int
-  nodes: [Expense]
-}
-
-"""
-Describes the values allowed to filter expenses, namely all the expense statuses and the special "READY_TO_PAY" value.
-"""
-enum ExpenseStatusFilter {
-  DRAFT
-  UNVERIFIED
-  PENDING
-  INCOMPLETE
-  APPROVED
-  REJECTED
-  PROCESSING
-  ERROR
-  PAID
-  SCHEDULED_FOR_PAYMENT
-  SPAM
-  CANCELED
-
-  """
-  Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
-  """
-  READY_TO_PAY
-
-  """
-  Only expenses that are on hold
-  """
-  ON_HOLD
+  nodes: [TagStat]
 }
 
 """
@@ -12276,6 +13350,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -12596,6 +13675,114 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
+  expenses(
+    direction: ExpenseDirection
+
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Reference of an account that is the payee of an expense
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of an account that is the payer of an expense
+    """
+    account: AccountReferenceInput
+
+    """
+    Return expenses only for this host
+    """
+    host: AccountReferenceInput
+
+    """
+    Return expenses only created by this INDIVIDUAL account
+    """
+    createdByAccount: AccountReferenceInput
+
+    """
+    Use this field to filter expenses on their statuses
+    """
+    status: ExpenseStatusFilter
+
+    """
+    Use this field to filter expenses on their type (RECEIPT/INVOICE)
+    """
+    type: ExpenseType
+
+    """
+    Only expenses that match these tags
+    """
+    tags: [String] @deprecated(reason: "2020-06-30: Please use tag (singular)")
+
+    """
+    Only expenses that match these tags
+    """
+    tag: [String]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return expenses where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return expenses that use the given type as payout method
+    """
+    payoutMethodType: PayoutMethodType
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Whether to include expenses from children of the account (Events and Projects)
+    """
+    includeChildrenExpenses: Boolean! = false
+
+    """
+    Only return expenses that contains this custom data. Requires being an admin of the collective, payee or host.
+    """
+    customData: JSON
+
+    """
+    Filter expenses of type charges based on presence of receipts
+    """
+    chargeHasReceipts: Boolean
+
+    """
+    Filter expenses of type charges using these virtual cards
+    """
+    virtualCards: [VirtualCardReferenceInput]
+  ): ExpenseCollection!
   settings: JSON!
   conversations(
     limit: Int! = 15
@@ -12708,7 +13895,8 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   virtualCards(
     limit: Int! = 100
     offset: Int! = 0
-    state: String = null
+    state: String = null @deprecated(reason: "2023-11-06: Please use status.")
+    status: [VirtualCardStatus]
     merchantAccount: AccountReferenceInput = null
 
     """
@@ -12921,6 +14109,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
+
+  """
+  Returns whether this account has a custom image
+  """
+  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -13241,6 +14434,114 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     onlyActiveSubscriptions: Boolean
   ): OrderCollection!
+  expenses(
+    direction: ExpenseDirection
+
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Reference of an account that is the payee of an expense
+    """
+    fromAccount: AccountReferenceInput
+
+    """
+    Reference of an account that is the payer of an expense
+    """
+    account: AccountReferenceInput
+
+    """
+    Return expenses only for this host
+    """
+    host: AccountReferenceInput
+
+    """
+    Return expenses only created by this INDIVIDUAL account
+    """
+    createdByAccount: AccountReferenceInput
+
+    """
+    Use this field to filter expenses on their statuses
+    """
+    status: ExpenseStatusFilter
+
+    """
+    Use this field to filter expenses on their type (RECEIPT/INVOICE)
+    """
+    type: ExpenseType
+
+    """
+    Only expenses that match these tags
+    """
+    tags: [String] @deprecated(reason: "2020-06-30: Please use tag (singular)")
+
+    """
+    Only expenses that match these tags
+    """
+    tag: [String]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Only return expenses where the amount is greater than or equal to this value (in cents)
+    """
+    minAmount: Int
+
+    """
+    Only return expenses where the amount is lower than or equal to this value (in cents)
+    """
+    maxAmount: Int
+
+    """
+    Only return expenses that use the given type as payout method
+    """
+    payoutMethodType: PayoutMethodType
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return expenses that were created after this date
+    """
+    dateTo: DateTime
+
+    """
+    The term to search
+    """
+    searchTerm: String
+
+    """
+    Whether to include expenses from children of the account (Events and Projects)
+    """
+    includeChildrenExpenses: Boolean! = false
+
+    """
+    Only return expenses that contains this custom data. Requires being an admin of the collective, payee or host.
+    """
+    customData: JSON
+
+    """
+    Filter expenses of type charges based on presence of receipts
+    """
+    chargeHasReceipts: Boolean
+
+    """
+    Filter expenses of type charges using these virtual cards
+    """
+    virtualCards: [VirtualCardReferenceInput]
+  ): ExpenseCollection!
   settings: JSON!
   conversations(
     limit: Int! = 15
@@ -13353,7 +14654,8 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   virtualCards(
     limit: Int! = 100
     offset: Int! = 0
-    state: String = null
+    state: String = null @deprecated(reason: "2023-11-06: Please use status.")
+    status: [VirtualCardStatus]
     merchantAccount: AccountReferenceInput = null
 
     """
@@ -13509,16 +14811,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   The Account parenting this account
   """
   parent: Account
-}
-
-"""
-A collection of "Tags"
-"""
-type TagStatsCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [TagStat]
 }
 
 input TierReferenceInput {
@@ -14997,8 +16289,8 @@ type Mutation {
   Delete a tier.
   """
   deleteTier(tier: TierReferenceInput!, stopRecurringContributions: Boolean! = false): Tier!
-  createPersonalToken(personalToken: PersonalTokenCreateInput!): PersonalToken
-  updatePersonalToken(personalToken: PersonalTokenUpdateInput!): PersonalToken
+  createPersonalToken(personalToken: PersonalTokenCreateInput!): PersonalToken!
+  updatePersonalToken(personalToken: PersonalTokenUpdateInput!): PersonalToken!
   deletePersonalToken(personalToken: PersonalTokenReferenceInput!): PersonalToken
 
   """
@@ -15122,6 +16414,11 @@ type Mutation {
     Reference to the host that holds the vendor
     """
     vendor: VendorEditInput!
+
+    """
+    Whether to archive (true) or unarchive (unarchive) the vendor
+    """
+    archive: Boolean
   ): Vendor!
 
   """
@@ -15133,6 +16430,21 @@ type Mutation {
     """
     vendor: AccountReferenceInput!
   ): Boolean!
+
+  """
+  Convert an organization to a vendor
+  """
+  convertOrganizationToVendor(
+    """
+    Reference to the organization to convert
+    """
+    organization: AccountReferenceInput!
+
+    """
+    Reference to the host that will hold the vendor
+    """
+    host: AccountReferenceInput!
+  ): Vendor!
 
   """
   Send In-App Survey response
@@ -15183,11 +16495,6 @@ enum TaxType {
   New Zealand Good and Services Tax
   """
   GST
-
-  """
-  Employer Identification Number
-  """
-  EIN
 }
 
 input CollectiveCreateInput {
@@ -15352,6 +16659,7 @@ input PoliciesInput {
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
   EXPENSE_CATEGORIZATION: PoliciesExpenseCategorizationInput
+  EXPENSE_PUBLIC_VENDORS: Boolean
 }
 
 input PoliciesCollectiveExpenseAuthorCannotApprove {
@@ -15375,11 +16683,6 @@ input PoliciesExpenseCategorizationInput {
 type SendMessageResult {
   success: Boolean
 }
-
-"""
-A string that cannot be passed as an empty value
-"""
-scalar NonEmptyString
 
 """
 Input for creating or updating an account category
@@ -15644,6 +16947,11 @@ input ExpenseCreateInput {
   Custom data to be stored in the expense
   """
   customData: JSON
+
+  """
+  The accounting category this expense belongs to
+  """
+  accountingCategory: AccountingCategoryReferenceInput
 }
 
 input PayoutMethodInput {
@@ -15711,6 +17019,16 @@ input ExpenseTaxInput {
   Tax identification number, if any
   """
   idNumber: String
+}
+
+"""
+Reference to an accounting category
+"""
+input AccountingCategoryReferenceInput {
+  """
+  The ID of the accounting category
+  """
+  id: NonEmptyString!
 }
 
 input RecurringExpenseInput {
@@ -15805,6 +17123,11 @@ input ExpenseUpdateInput {
   Custom data to be stored in the expense
   """
   customData: JSON
+
+  """
+  The accounting category this expense belongs to
+  """
+  accountingCategory: AccountingCategoryReferenceInput
 }
 
 input ExpenseItemInput {
@@ -16040,6 +17363,11 @@ input ExpenseInviteDraftInput {
   Custom data to be stored in the expense
   """
   customData: JSON
+
+  """
+  The accounting category this expense belongs to
+  """
+  accountingCategory: AccountingCategoryReferenceInput
 
   """
   Note to be sent to the invited user through email.
@@ -16916,6 +18244,11 @@ input PersonalTokenCreateInput {
   expiresAt: String
 
   """
+  Whether this token is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean = false
+
+  """
   The account to use as the owner of the application. Defaults to currently logged in user.
   """
   account: AccountReferenceInput
@@ -16937,6 +18270,11 @@ input PersonalTokenUpdateInput {
   name: String
   scope: [OAuthScope]
   expiresAt: String
+
+  """
+  Whether this token is allowed to directly use operations that would normally require 2FA
+  """
+  preAuthorize2FA: Boolean
 }
 
 input PersonalTokenReferenceInput {
@@ -16977,9 +18315,10 @@ input VendorCreateInput {
   name: NonEmptyString!
   legalName: String
   tags: [NonEmptyString]
-  address: String
+  location: LocationInput
   imageUrl: String
   vendorInfo: VendorInfoInput
+  payoutMethod: PayoutMethodInput
 }
 
 """
@@ -16987,8 +18326,9 @@ Some context about the vendor
 """
 input VendorInfoInput {
   contact: VendorContactInput
+  taxFormRequired: Boolean
   taxFormUrl: String
-  taxType: TaxType
+  taxType: String
   taxId: String
   notes: String
 }
@@ -17016,10 +18356,11 @@ input VendorEditInput {
   The slug identifying the account (ie: babel for https://opencollective.com/babel)
   """
   slug: String
-  name: String
+  name: NonEmptyString
   legalName: String
-  tags: String
-  address: String
+  tags: [NonEmptyString]
+  location: LocationInput
   imageUrl: String
   vendorInfo: VendorInfoInput
+  payoutMethod: PayoutMethodInput
 }

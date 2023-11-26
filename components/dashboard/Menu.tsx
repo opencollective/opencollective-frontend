@@ -13,6 +13,7 @@ import {
   LucideIcon,
   Receipt,
   Settings,
+  Store,
   Ticket,
   Users2,
 } from 'lucide-react';
@@ -23,11 +24,10 @@ import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isInternalHost, isSelfHostedAccount } from '../../lib/collective.lib';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
-import { ALL_SECTIONS } from './constants';
+import { ALL_SECTIONS, SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
 import { MenuLink } from './MenuLink';
 
@@ -50,7 +50,7 @@ type GroupMenuItem = {
 
 export type MenuItem = PageMenuItem | GroupMenuItem;
 
-const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
+export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isIndividual = isIndividualAccount(account);
   const isHost = isHostAccount(account);
   const isSelfHosted = isSelfHostedAccount(account);
@@ -137,7 +137,7 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isHost,
+      if: isHost && !isAccountantOnly,
       type: 'group',
       Icon: Building,
       label: intl.formatMessage({ id: 'Collectives', defaultMessage: 'Collectives' }),
@@ -158,7 +158,7 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
     },
     {
-      if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS),
+      if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'VirtualCards.Title', defaultMessage: 'Virtual Cards' }),
       Icon: CreditCard,
@@ -179,6 +179,11 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: BarChart2,
     },
     {
+      if: isHost && hasFeature(account, FEATURES.HOST_VENDORS) && !isAccountantOnly,
+      section: ALL_SECTIONS.VENDORS,
+      Icon: Store,
+    },
+    {
       if: isType(account, EVENT),
       section: ALL_SECTIONS.TICKETS,
       label: intl.formatMessage({ defaultMessage: 'Ticket tiers' }),
@@ -195,12 +200,12 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: ArrowRightLeft,
     },
     {
-      if: !isOneOfTypes(account, [EVENT, USER]),
+      if: !isOneOfTypes(account, [EVENT, USER]) && !isAccountantOnly,
       section: ALL_SECTIONS.TIERS,
       Icon: HeartHandshake,
     },
     {
-      if: !isIndividual,
+      if: !isIndividual && !isAccountantOnly,
       section: ALL_SECTIONS.TEAM,
       Icon: Users2,
     },
@@ -217,75 +222,121 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' }),
       Icon: Settings,
       subMenu: [
-        ...(isAccountantOnly
-          ? []
-          : [
-              { section: ALL_SECTIONS.INFO },
-              { section: ALL_SECTIONS.COLLECTIVE_PAGE },
-              { section: ALL_SECTIONS.COLLECTIVE_GOALS, if: isOneOfTypes(account, [COLLECTIVE, PROJECT]) },
+        // General
+        {
+          section: ALL_SECTIONS.INFO,
+          if: !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.COLLECTIVE_PAGE,
+          if: !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.CONNECTED_ACCOUNTS, // Displayed as "Social accounts"
+          if: isOneOfTypes(account, [COLLECTIVE, ORGANIZATION]) && !isAccountantOnly,
+        },
+        // Host sections
+        ...(isHost || isSelfHosted
+          ? [
               {
-                section: ALL_SECTIONS.CONNECTED_ACCOUNTS,
-                if: isOneOfTypes(account, [COLLECTIVE, ORGANIZATION]),
-              },
-              { section: ALL_SECTIONS.POLICIES, if: isOneOfTypes(account, [COLLECTIVE, FUND]) }, // POLICIES also available for Fiscal hosts further down in this list
-              { section: ALL_SECTIONS.CUSTOM_EMAIL, if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]) },
-              { section: ALL_SECTIONS.EXPORT, if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]) },
-              { section: ALL_SECTIONS.HOST, if: isOneOfTypes(account, [COLLECTIVE, FUND]) },
-              {
-                section: ALL_SECTIONS.PAYMENT_METHODS,
-                if: ['ACTIVE', 'AVAILABLE'].includes(account.features.USE_PAYMENT_METHODS),
-              },
-            ]),
-        { section: ALL_SECTIONS.PAYMENT_RECEIPTS, if: isOneOfTypes(account, [INDIVIDUAL, USER, ORGANIZATION]) },
-        ...(isAccountantOnly
-          ? []
-          : [
-              {
-                section: ALL_SECTIONS.NOTIFICATIONS,
-                if: isIndividualAccount(account),
+                section: ALL_SECTIONS.FISCAL_HOSTING,
+                if: !isAccountantOnly && !isSelfHosted,
               },
               {
-                section: ALL_SECTIONS.GIFT_CARDS,
-                if: ['ACTIVE', 'AVAILABLE'].includes(account.features.EMIT_GIFT_CARDS),
+                section: ALL_SECTIONS.POLICIES,
+                if: isOneOfTypes(account, [USER, ORGANIZATION]) && !isAccountantOnly,
               },
-              { section: ALL_SECTIONS.WEBHOOKS },
-              { section: ALL_SECTIONS.AUTHORIZED_APPS, if: isIndividualAccount(account) },
-              { section: ALL_SECTIONS.USER_SECURITY, if: isIndividualAccount(account) },
               {
-                section: ALL_SECTIONS.FOR_DEVELOPERS,
-                if: isOneOfTypes(account, [COLLECTIVE, USER, INDIVIDUAL, ORGANIZATION]),
+                section: ALL_SECTIONS.RECEIVING_MONEY,
+                if: !isAccountantOnly,
               },
-              { section: ALL_SECTIONS.ACTIVITY_LOG },
               {
-                section: ALL_SECTIONS.SECURITY,
-                if: isOneOfTypes(account, [COLLECTIVE, FUND, ORGANIZATION]),
+                section: ALL_SECTIONS.SENDING_MONEY,
+                if: !isAccountantOnly,
               },
-              ...(isSelfHosted
-                ? [
-                    { section: ALL_SECTIONS.INVOICES_RECEIPTS },
-                    { section: ALL_SECTIONS.RECEIVING_MONEY },
-                    { section: ALL_SECTIONS.SENDING_MONEY },
-                  ]
-                : []),
-              ...(isHost
-                ? [
-                    { section: ALL_SECTIONS.FISCAL_HOSTING },
-                    {
-                      section: ALL_SECTIONS.CHART_OF_ACCOUNTS,
-                      if: Boolean(LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION)),
-                    },
-                    { section: ALL_SECTIONS.INVOICES_RECEIPTS },
-                    { section: ALL_SECTIONS.RECEIVING_MONEY },
-                    { section: ALL_SECTIONS.SENDING_MONEY },
-                    {
-                      section: ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS,
-                      if: hasFeature(account, FEATURES.VIRTUAL_CARDS),
-                    },
-                    { section: ALL_SECTIONS.POLICIES, if: isOneOfTypes(account, [USER, ORGANIZATION]) },
-                  ]
-                : []),
-              { section: ALL_SECTIONS.ADVANCED },
-            ]),
+              {
+                section: ALL_SECTIONS.CHART_OF_ACCOUNTS,
+                if: Boolean(LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION)),
+              },
+              {
+                section: ALL_SECTIONS.INVOICES_RECEIPTS,
+                if: !isAccountantOnly,
+              },
+              {
+                section: ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS,
+                if: hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly && !isSelfHosted,
+              },
+            ]
+          : []),
+        // Security
+        {
+          section: ALL_SECTIONS.SECURITY,
+          if: isOneOfTypes(account, [COLLECTIVE, FUND, ORGANIZATION]) && !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.USER_SECURITY,
+          if: isIndividualAccount(account),
+        },
+        {
+          section: ALL_SECTIONS.ACTIVITY_LOG,
+          if: !isAccountantOnly,
+        },
+        // Payments / Payouts
+        {
+          section: ALL_SECTIONS.PAYMENT_METHODS,
+          if: ['ACTIVE', 'AVAILABLE'].includes(account.features.USE_PAYMENT_METHODS) && !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.PAYMENT_RECEIPTS,
+          if: isOneOfTypes(account, [INDIVIDUAL, USER, ORGANIZATION]),
+        },
+        {
+          section: ALL_SECTIONS.GIFT_CARDS,
+          if: ['ACTIVE', 'AVAILABLE'].includes(account.features.EMIT_GIFT_CARDS) && !isAccountantOnly,
+        },
+        // Sections for individual accounts
+        {
+          section: ALL_SECTIONS.NOTIFICATIONS,
+          if: isIndividualAccount(account),
+        },
+        {
+          section: ALL_SECTIONS.AUTHORIZED_APPS,
+          if: isIndividualAccount(account),
+        },
+        // Collective sections
+        {
+          section: ALL_SECTIONS.HOST,
+          if: isOneOfTypes(account, [COLLECTIVE, FUND]) && !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.COLLECTIVE_GOALS,
+          if: isOneOfTypes(account, [COLLECTIVE, PROJECT]) && !isAccountantOnly,
+        },
+        {
+          // POLICIES also available for Fiscal hosts further up in this list
+          section: ALL_SECTIONS.POLICIES,
+          if: isOneOfTypes(account, [COLLECTIVE, FUND]) && !isHost && !isSelfHosted && !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.CUSTOM_EMAIL,
+          if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]) && !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.EXPORT,
+          if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]),
+        },
+        {
+          section: ALL_SECTIONS.FOR_DEVELOPERS,
+          if: isOneOfTypes(account, [COLLECTIVE, USER, INDIVIDUAL, ORGANIZATION]) && !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.WEBHOOKS,
+          if: !isAccountantOnly,
+        },
+        {
+          section: ALL_SECTIONS.ADVANCED,
+          if: !isAccountantOnly,
+        },
       ],
     },
   ];
@@ -294,26 +345,25 @@ const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     items
       // filter root items
       .filter(item => item.if !== false)
-      // filter subMenu items
+      // filter subMenu items and add labels where missing
       .map(item => {
         if (item.type === 'group') {
           return {
             ...item,
-            subMenu: item.subMenu.filter(item => item.if !== false),
+            subMenu: item.subMenu
+              .filter(item => item.if !== false)
+              .map(item => ({ ...item, label: item.label || intl.formatMessage(SECTION_LABELS[item.section]) })),
           };
         }
-        return item;
+        return { ...item, label: item.label || intl.formatMessage(SECTION_LABELS[item.section]) };
       })
   );
 };
 
-const Menu = ({ onRoute }) => {
+const Menu = ({ onRoute, menuItems }) => {
   const router = useRouter();
   const intl = useIntl();
   const { account } = React.useContext(DashboardContext);
-  const { LoggedInUser } = useLoggedInUser();
-
-  const menuItems = React.useMemo(() => getMenuItems({ intl, account, LoggedInUser }), [account, LoggedInUser, intl]);
 
   React.useEffect(() => {
     if (onRoute) {

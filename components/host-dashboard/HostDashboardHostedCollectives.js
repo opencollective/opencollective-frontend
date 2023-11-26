@@ -138,7 +138,7 @@ const HostDashboardHostedCollectives = ({ accountSlug: hostSlug }) => {
 
   const hostedMemberships = data?.host?.memberOf;
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
+    <Box maxWidth={1024} m="0 auto">
       <div className="flex flex-wrap justify-between gap-4">
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />

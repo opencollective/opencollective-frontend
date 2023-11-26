@@ -177,8 +177,8 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
                     virtualCardRequest.status === VirtualCardRequestStatus.PENDING
                       ? 'warning'
                       : virtualCardRequest.status === VirtualCardRequestStatus.APPROVED
-                      ? 'success'
-                      : 'error'
+                        ? 'success'
+                        : 'error'
                   }
                 >
                   {virtualCardRequest?.status}

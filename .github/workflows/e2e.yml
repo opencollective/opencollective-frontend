@@ -52,7 +52,7 @@ jobs:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: postgres:13.12
+        image: postgres:13.13
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
@@ -82,7 +82,7 @@ jobs:
           sudo tar xzvf /tmp/stripe_1.13.9_linux_x86_64.tar.gz -C /bin/
 
       - name: Checkout (frontend)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -110,7 +110,7 @@ jobs:
 
       - name: Checkout (api - matching branch)
         if: steps.check-matching-branch.outputs.status == 200
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
@@ -118,13 +118,13 @@ jobs:
 
       - name: Checkout (api - main)
         if: steps.check-matching-branch.outputs.status != 200
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
 
       - name: Checkout (images)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: opencollective/opencollective-images
           path: opencollective-images

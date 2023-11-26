@@ -80,6 +80,7 @@ export const contributionFlowAccountFieldsFragment = gql`
       parent {
         id
         slug
+        name
         settings
         imageUrl
         backgroundImageUrl

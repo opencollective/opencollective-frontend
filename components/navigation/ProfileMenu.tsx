@@ -60,7 +60,7 @@ const MenuItem = ({
   external?: boolean;
 }) => {
   const classes = cn(
-    'group flex justify-between items-center text-left gap-2 mx-2 rounded-md px-2 h-9 text-sm hover:bg-primary-foreground',
+    'group mx-2 flex h-9 items-center justify-between gap-2 rounded-md px-2 text-left text-sm hover:bg-primary-foreground',
     className,
   );
   const content = (
