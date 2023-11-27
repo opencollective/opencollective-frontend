@@ -216,6 +216,13 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
     },
   });
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      formik.handleSubmit();
+    }
+  };
+
   return (
     <StyledModal onClose={props.onClose}>
       <ModalHeader>
@@ -265,6 +272,7 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
                         minLength={6}
                         maxLength={6}
                         data-cy="add-two-factor-auth-totp-code-field"
+                        onKeyDown={handleKeyDown}
                       />
                     )}
                   </StyledInputField>
