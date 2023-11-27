@@ -221,6 +221,22 @@ export const expensePageExpenseFieldsFragment = gql`
       incurredAt
       description
       amount
+      amountV2 {
+        valueInCents
+        currency
+        exchangeRate {
+          date
+          value
+          source
+          fromCurrency
+          toCurrency
+        }
+      }
+      referenceExchangeRate {
+        value
+        fromCurrency
+        toCurrency
+      }
       url
       file {
         id

@@ -400,7 +400,6 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
                               value={inputAmountValue}
                               onChange={setInputAmountValue}
                               min={DEFAULT_MINIMUM_AMOUNT}
-                              precision={2}
                               px="2px"
                             />
                           </Box>

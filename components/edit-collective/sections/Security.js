@@ -190,7 +190,6 @@ const Security = ({ collective }) => {
                       value={values.payoutsTwoFactorAuth.rollingLimit}
                       onChange={value => setFieldValue('payoutsTwoFactorAuth.rollingLimit', value)}
                       min={100}
-                      precision={2}
                       disabled={!values.payoutsTwoFactorAuth.enabled}
                       px="2px"
                       placeholder={intl.formatMessage({

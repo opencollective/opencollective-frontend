@@ -1,13 +1,16 @@
 import getSymbolFromCurrency from 'currency-symbol-map';
 import { isNil, round } from 'lodash';
 
+import { ZERO_DECIMAL_CURRENCIES } from './constants/currency';
 import { CurrencyPrecision } from './constants/currency-precision';
-import { Amount, Currency } from './graphql/types/v2/graphql';
+import { Amount, Currency, CurrencyExchangeRate, CurrencyExchangeRateInput } from './graphql/types/v2/graphql';
 
 export type Options = {
   locale?: string;
   minimumFractionDigits?: number;
   precision?: number;
+  style?: 'currency' | 'decimal';
+  currencyDisplay?: 'symbol' | 'narrowSymbol' | 'code' | 'name';
 };
 
 function getCurrencySymbolFallback(currency: Currency): string {
@@ -42,6 +45,10 @@ export function graphqlAmountValueInCents(amount: Amount | number | null): numbe
   return amount;
 }
 
+export const getDefaultCurrencyPrecision = (currency: Currency): number => {
+  return ZERO_DECIMAL_CURRENCIES.includes(currency) ? 0 : 2;
+};
+
 export function formatCurrency(
   amount: Amount | number | null,
   currency: Currency = Currency.USD,
@@ -64,18 +71,22 @@ export function formatCurrency(
   }
 
   amount = amount / 100;
-  let minimumFractionDigits = 2;
-  let maximumFractionDigits = 2;
+  const defaultPrecision = getDefaultCurrencyPrecision(currency);
+  let minimumFractionDigits = defaultPrecision;
+  let maximumFractionDigits = defaultPrecision;
   if (Object.prototype.hasOwnProperty.call(options, 'minimumFractionDigits')) {
     minimumFractionDigits = options.minimumFractionDigits;
   } else if (Object.prototype.hasOwnProperty.call(options, 'precision')) {
     minimumFractionDigits = options.precision;
     maximumFractionDigits = options.precision;
+  } else if (ZERO_DECIMAL_CURRENCIES.includes(currency)) {
+    minimumFractionDigits = 0;
+    maximumFractionDigits = 0;
   }
 
   const formatAmount = (currencyDisplay: string): string => {
     return amount.toLocaleString(options.locale, {
-      style: 'currency',
+      style: options.style || 'currency',
       currency,
       minimumFractionDigits: minimumFractionDigits,
       maximumFractionDigits: maximumFractionDigits,
@@ -86,7 +97,7 @@ export function formatCurrency(
   try {
     // We manually add the exact currency (e.g. "$10 USD") in many places. This is to prevent
     // showing the currency twice is some locales ($US10 USD)
-    return formatAmount('narrowSymbol');
+    return formatAmount(options.currencyDisplay ?? 'narrowSymbol');
   } catch (e) {
     // ... unfortunately, some old versions of Safari doesn't support it, so we need a fallback
     return formatAmount('symbol');
@@ -126,6 +137,27 @@ export const getAmountInCents = (amount: Amount | number | null): number | null 
     } else if (!isNil(amount.value)) {
       return Math.round(amount.value * 100);
     }
+  }
+
+  return null;
+};
+
+/**
+ * Calculates the difference between the exchange rate provided by the user and the one provided by the platform.
+ * @returns {number} The difference between the exchange rates as a percentage, or null if the exchange rates are not comparable.
+ */
+export const diffExchangeRates = (
+  exchangeRate: CurrencyExchangeRate | CurrencyExchangeRateInput,
+  referenceExchangeRate: CurrencyExchangeRate | CurrencyExchangeRateInput,
+) => {
+  if (
+    exchangeRate &&
+    referenceExchangeRate &&
+    exchangeRate.source === 'USER' && // Only show warnings for user-provided exchange rates
+    exchangeRate.fromCurrency === referenceExchangeRate.fromCurrency &&
+    exchangeRate.toCurrency === referenceExchangeRate.toCurrency
+  ) {
+    return Math.abs((exchangeRate.value - referenceExchangeRate.value) / referenceExchangeRate.value);
   }
 
   return null;

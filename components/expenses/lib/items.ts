@@ -12,7 +12,7 @@ export const newExpenseItem = (attrs = {}): ExpenseItemFormValues => ({
   id: uuid(), // we generate it here to properly key lists, but it won't be submitted to API
   incurredAt: null,
   description: '',
-  amount: null,
+  amountV2: null,
   url: '',
   __isNew: true,
   __isUploading: false,
@@ -23,7 +23,7 @@ export const newExpenseItem = (attrs = {}): ExpenseItemFormValues => ({
  * Returns true if the item has been touched by the user
  */
 export const expenseItemIsTouched = (item: ExpenseItemFormValues): boolean => {
-  return Boolean(item.incurredAt || item.description || item.amount || item.url);
+  return Boolean(item.incurredAt || item.description || item.amountV2 || item.url);
 };
 
 /** Helper to add a new item to the form */

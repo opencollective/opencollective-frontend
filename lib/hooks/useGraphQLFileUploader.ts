@@ -30,6 +30,14 @@ const uploadFileMutation = gql`
           amount {
             valueInCents
             currency
+            exchangeRate {
+              value
+              fromCurrency
+              toCurrency
+              date
+              source
+              isApproximate
+            }
           }
           items {
             description

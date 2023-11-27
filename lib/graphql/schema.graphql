@@ -1901,6 +1901,11 @@ enum CurrencyExchangeRateSourceType {
   Wise API
   """
   WISE
+
+  """
+  User-provided exchange rate
+  """
+  USER
 }
 
 type EXPENSE_CATEGORIZATION {

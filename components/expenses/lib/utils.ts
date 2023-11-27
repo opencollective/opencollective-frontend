@@ -1,12 +1,18 @@
-import { isEmpty, isNil, sumBy, uniq } from 'lodash';
+import { isEmpty, isNil, round, sumBy, uniq } from 'lodash';
 
 import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { Currency, PayPalSupportedCurrencies } from '../../../lib/constants/currency';
 import expenseTypes from '../../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../../lib/constants/payout-method';
+import { diffExchangeRates } from '../../../lib/currency-utils';
 
 import { validateTaxInput } from '../../taxes/TaxesFormikFields';
+import { ExpenseItemFormValues } from '../types/FormValues';
+
+// Please adjust the values below based on `prepareItems` from `api/server/graphql/common/expenses.ts`
+export const FX_RATE_WARNING_THRESHOLD = 0.02;
+export const FX_RATE_ERROR_THRESHOLD = 0.1;
 
 export const checkRequiresAddress = values => {
   const collectiveTypesRequiringAddress = [CollectiveType.INDIVIDUAL, CollectiveType.USER, CollectiveType.ORGANIZATION];
@@ -27,17 +33,68 @@ export const getTaxAmount = (baseAmount, tax) => {
   return Math.round(baseAmount * tax.rate);
 };
 
-export const computeExpenseAmounts = (items, taxes) => {
-  const areAllItemsValid = items.every(item => !isNil(item.amount));
+/**
+ * Given an user-provided exchange rate and a reference, if both can safely be compared, this function will return
+ * warnings/errors when both values are too different.
+ */
+export const getExpenseExchangeRateWarningOrError = (intl, exchangeRate, referenceExchangeRate) => {
+  const exchangeRatesDiff = diffExchangeRates(exchangeRate, referenceExchangeRate);
+
+  if (exchangeRatesDiff > FX_RATE_ERROR_THRESHOLD) {
+    return {
+      error: intl.formatMessage(
+        {
+          defaultMessage:
+            "This exchange rate is too different from the one in our records ({value}) for that date and won't be accepted.",
+        },
+        { value: round(referenceExchangeRate.value, 7) },
+      ),
+    };
+  } else if (exchangeRatesDiff > FX_RATE_WARNING_THRESHOLD) {
+    return {
+      warning: intl.formatMessage(
+        {
+          defaultMessage:
+            'This exchange rate looks very different from the one in our records ({value}) for this date.',
+        },
+        { value: round(referenceExchangeRate.value, 7) },
+      ),
+    };
+  }
+
+  return null;
+};
+
+const itemHasValidAmount = (expenseCurrency: string, item: ExpenseItemFormValues): boolean => {
+  return Boolean(
+    // Either the item has an amount set with the same currency as the expense
+    item.amountV2?.valueInCents &&
+      (item.amountV2.currency === expenseCurrency ||
+        // Or a valid exchange rate was provided
+        (item.amountV2.exchangeRate &&
+          item.amountV2.exchangeRate.fromCurrency === item.amountV2.currency &&
+          item.amountV2.exchangeRate.toCurrency === expenseCurrency &&
+          item.amountV2.exchangeRate.value)),
+  );
+};
+
+const sumItemsAmounts = (expenseCurrency: string, items: ExpenseItemFormValues[]): number => {
+  return sumBy(items, item => {
+    const amountInCents = item.amountV2.valueInCents;
+    return item.amountV2.currency === expenseCurrency
+      ? amountInCents
+      : Math.round(amountInCents * item.amountV2.exchangeRate.value);
+  });
+};
+
+export const computeExpenseAmounts = (expenseCurrency: string, items: ExpenseItemFormValues[], taxes) => {
+  const areAllItemsValid = items.every(item => itemHasValidAmount(expenseCurrency, item));
   const activeTaxes = taxes?.filter(tax => !tax.isDisabled) || [];
   const hasTaxes = Boolean(activeTaxes.length);
   const areAllTaxesValid = !hasTaxes || activeTaxes.every(tax => isTaxRateValid(tax.rate));
-  const totalInvoiced = areAllItemsValid ? sumBy(items, 'amount') : null;
-  const totalAmount =
-    areAllItemsValid && areAllTaxesValid
-      ? totalInvoiced + sumBy(activeTaxes || [], tax => getTaxAmount(totalInvoiced, tax))
-      : null;
-
+  const totalInvoiced = !areAllItemsValid ? null : sumItemsAmounts(expenseCurrency, items);
+  const allTaxes = sumBy(activeTaxes || [], tax => getTaxAmount(totalInvoiced, tax));
+  const totalAmount = areAllItemsValid && areAllTaxesValid ? totalInvoiced + allTaxes : null;
   return { hasTaxes, totalInvoiced, totalAmount };
 };
 
