@@ -230,7 +230,7 @@ const ExpenseSummary = ({
                     id="Expense.ApprovedBy"
                     defaultMessage="Approved by {name}"
                     values={{
-                      name: <CreatedByUserLink account={expense.approvedBy[0]} />,
+                      name: <CreatedByUserLink account={expense.approvedBy.find(Boolean)} />,
                     }}
                   />
                 </React.Fragment>
