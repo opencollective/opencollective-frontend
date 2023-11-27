@@ -1,6 +1,7 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { compact, toNumber } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -278,6 +279,7 @@ type ContributionsProps = DashboardSectionProps & {
 
 const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
   const intl = useIntl();
+  const router = useRouter();
   const {
     data: metadata,
     loading: metadataLoading,
@@ -352,9 +354,10 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
     },
     context: API_V2_CONTEXT,
   });
+
   const [editOrder, setEditOrder] = React.useState<{ order?: { id: string }; action: EditOrderActions }>({
-    order: null,
-    action: null,
+    order: router.query.orderId ? { id: router.query.orderId as string } : null,
+    action: (router.query.action as EditOrderActions) ?? null,
   });
 
   const selectedOrders = data?.account?.orders.nodes || [];

@@ -65,7 +65,7 @@ export const paymentMethodsQuery = gql`
   query UpdatePaymentMethodPopUpPaymentMethod($accountSlug: String!, $orderId: String!) {
     account(slug: $accountSlug) {
       id
-      paymentMethods(type: [CREDITCARD, GIFTCARD, PREPAID, COLLECTIVE]) {
+      paymentMethods(type: [CREDITCARD, US_BANK_ACCOUNT, SEPA_DEBIT, BACS_DEBIT, GIFTCARD, PREPAID, COLLECTIVE]) {
         id
         ...UpdatePaymentMethodFragment
       }

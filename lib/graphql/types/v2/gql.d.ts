@@ -22,6 +22,10 @@ export function gql(source: "\n  mutation CancelRecurringContribution($order: Or
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n    mutation AddStripePaymentMethodFromSetupIntent($setupIntent: SetupIntentInput!, $account: AccountReferenceInput!) {\n      addStripePaymentMethodFromSetupIntent(setupIntent: $setupIntent, account: $account) {\n        id\n      }\n    }\n  "): typeof import('./graphql').AddStripePaymentMethodFromSetupIntentDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query tagStats($host: AccountReferenceInput) {\n    tagStats(host: $host, limit: 5) {\n      nodes {\n        id\n        tag\n      }\n    }\n  }\n"): typeof import('./graphql').TagStatsDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -94,7 +98,7 @@ export function gql(source: "\n  query UpdatesSection($slug: String!, $onlyPubli
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query ContributionFlowPaymentMethods($slug: String) {\n    account(slug: $slug) {\n      id\n      paymentMethods(\n        type: [CREDITCARD, US_BANK_ACCOUNT, SEPA_DEBIT, BACS_DEBIT, GIFTCARD, PREPAID, COLLECTIVE]\n        includeExpired: true\n      ) {\n        id\n        name\n        data\n        service\n        type\n        expiryDate\n        providerType\n        sourcePaymentMethod {\n          id\n          name\n          data\n          service\n          type\n          expiryDate\n          providerType\n          balance {\n            currency\n          }\n          limitedToHosts {\n            id\n            legacyId\n            slug\n          }\n        }\n        balance {\n          valueInCents\n          currency\n        }\n        account {\n          id\n          slug\n          type\n          name\n          imageUrl\n        }\n        limitedToHosts {\n          id\n          legacyId\n          slug\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').ContributionFlowPaymentMethodsDocument;
+export function gql(source: "\n  query ContributionFlowPaymentMethods($slug: String, $hostSlug: String) {\n    account(slug: $slug) {\n      id\n      paymentMethods(\n        type: [CREDITCARD, US_BANK_ACCOUNT, SEPA_DEBIT, BACS_DEBIT, GIFTCARD, PREPAID, COLLECTIVE]\n        includeExpired: true\n      ) {\n        id\n        name\n        data\n        service\n        type\n        expiryDate\n        providerType\n        sourcePaymentMethod {\n          id\n          name\n          data\n          service\n          type\n          expiryDate\n          providerType\n          balance {\n            currency\n          }\n          limitedToHosts {\n            id\n            legacyId\n            slug\n          }\n        }\n        balance {\n          valueInCents\n          currency\n        }\n        account {\n          id\n          slug\n          type\n          name\n          imageUrl\n        }\n        limitedToHosts {\n          id\n          legacyId\n          slug\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').ContributionFlowPaymentMethodsDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -335,6 +339,10 @@ export function gql(source: "\n  query ScheduledExpensesBanner($hostSlug: String
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query MemberInvitationsCount($memberAccount: AccountReferenceInput!) {\n    memberInvitations(memberAccount: $memberAccount) {\n      id\n    }\n  }\n"): typeof import('./graphql').MemberInvitationsCountDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query PaymentMethodPicker($accountSlug: String!, $hostSlug: String!) {\n    account(slug: $accountSlug) {\n      id\n      name\n      paymentMethods(type: [CREDITCARD, US_BANK_ACCOUNT, SEPA_DEBIT, BACS_DEBIT, GIFTCARD, PREPAID, COLLECTIVE]) {\n        id\n        name\n        data\n        service\n        type\n        account {\n          id\n          name\n          slug\n        }\n        balance {\n          value\n          valueInCents\n          currency\n        }\n        limitedToHosts {\n          id\n        }\n        sourcePaymentMethod {\n          id\n          limitedToHosts {\n            id\n          }\n        }\n      }\n    }\n    host(slug: $hostSlug) {\n      id\n      paypalClientId\n      supportedPaymentMethods\n    }\n  }\n"): typeof import('./graphql').PaymentMethodPickerDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -15880,6 +15880,16 @@ type Mutation {
   confirmCreditCard(paymentMethod: PaymentMethodReferenceInput!): CreditCardWithStripeError!
 
   """
+  Creates a Stripe setup intent
+  """
+  createSetupIntent(host: AccountReferenceInput!, account: AccountReferenceInput!): SetupIntent!
+
+  """
+  Adds a Stripe payment method
+  """
+  addStripePaymentMethodFromSetupIntent(setupIntent: SetupIntentInput!, account: AccountReferenceInput!): PaymentMethod!
+
+  """
   Create a new Payout Method to get paid through the platform. Scope: "expenses".
   """
   createPayoutMethod(
@@ -17978,6 +17988,24 @@ type CreditCardWithStripeError {
   This field will be set if there was an error with Stripe during strong customer authentication
   """
   stripeError: StripeError
+}
+
+"""
+A Stripe setup intent
+"""
+type SetupIntent {
+  id: String!
+  setupIntentClientSecret: String!
+  stripeAccount: String!
+  stripeAccountPublishableSecret: String!
+}
+
+"""
+A Stripe setup intent
+"""
+input SetupIntentInput {
+  id: String!
+  stripeAccount: String!
 }
 
 enum AccountCacheType {
