@@ -236,11 +236,6 @@ function WiseStatus(props: WiseStatusProps) {
         </div>
       </div>
       <div className="mt-2 flex justify-items-stretch gap-3">
-        {props?.scheduledForPaymentAmount?.valueInCents > 0 &&
-          mainBalance?.valueInCents >= props?.scheduledForPaymentAmount?.valueInCents && (
-            <PayExpensesScheduledForPaymentButton className="w-full" host={props.host} />
-          )}
-
         <StyledLink
           width="100%"
           openInNewTab
@@ -250,7 +245,7 @@ function WiseStatus(props: WiseStatusProps) {
               : 'https://docs.opencollective.com/help/fiscal-hosts/payouts/payouts-with-transferwise#connecting-transferwise'
           }
         >
-          <StyledButton buttonStyle="secondary" buttonSize="tiny" width="100%">
+          <StyledButton buttonSize="tiny" width="100%">
             {isConnected ? (
               <FormattedMessage defaultMessage="Refill Balance" />
             ) : (
@@ -258,6 +253,11 @@ function WiseStatus(props: WiseStatusProps) {
             )}
           </StyledButton>
         </StyledLink>
+
+        {props?.scheduledForPaymentAmount?.valueInCents > 0 &&
+          mainBalance?.valueInCents >= props?.scheduledForPaymentAmount?.valueInCents && (
+            <PayExpensesScheduledForPaymentButton className="w-full" host={props.host} />
+          )}
       </div>
     </StyledCard>
   );
@@ -349,7 +349,7 @@ function PayPalStatus(props: PayPalStatusProps) {
         </div>
       </div>
       <div className="mt-2 flex justify-items-stretch gap-3">
-        <StyledButton loading={loading} onClick={connect} width="100%" buttonStyle="secondary" buttonSize="tiny">
+        <StyledButton loading={loading} onClick={connect} width="100%" buttonSize="tiny">
           <FormattedMessage defaultMessage="Refill Balance" />
         </StyledButton>
       </div>
@@ -370,7 +370,7 @@ function StripeIssuingStatus(props: StripeIssuingStatusProps) {
           defaultMessage="{service} balance ({currency})"
           values={{ service: 'Stripe Issuing', currency: props?.host?.stripe?.issuingBalance?.currency }}
         />
-        <CcStripe size={16} />
+        <CcStripe />
       </div>
       <div className="mt-2 flex-grow text-2xl font-bold text-slate-900">
         <FormattedMoneyAmount
@@ -381,7 +381,7 @@ function StripeIssuingStatus(props: StripeIssuingStatusProps) {
       </div>
       <div className="mt-2 flex justify-items-stretch gap-3">
         <StyledLink width="100%" openInNewTab href={getDashboardUrl('topups', props.host.stripe.username)}>
-          <StyledButton buttonStyle="secondary" buttonSize="tiny" width="100%">
+          <StyledButton buttonSize="tiny" width="100%">
             <FormattedMessage defaultMessage="Refill Balance" />
           </StyledButton>
         </StyledLink>
