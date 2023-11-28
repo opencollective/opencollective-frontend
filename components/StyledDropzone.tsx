@@ -248,6 +248,13 @@ const StyledDropzone = ({
   );
 };
 
+type UploadedFile = {
+  name?: string;
+  url: string;
+  size?: number;
+  type: string;
+};
+
 type StyledDropzoneProps = {
   /** Called back with the rejected files */
   onReject?: () => void;
@@ -305,12 +312,12 @@ type StyledDropzoneProps = {
       | {
           isMulti?: true;
           /** Called back with the uploaded files on success */
-          onSuccess?: (fileUrls: string[]) => void;
+          onSuccess?: (files: UploadedFile[]) => void;
         }
       | {
           isMulti: false;
           /** Called back with the uploaded files on success */
-          onSuccess?: (fileUrls: string) => void;
+          onSuccess?: (file: UploadedFile) => void;
           /** if set, the image will be displayed and a "replace" banner will be added */
           value?: string;
         }

@@ -11,6 +11,7 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import Avatar from '../../../Avatar';
 import { Box, Flex } from '../../../Grid';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
+import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
 import StyledCard from '../../../StyledCard';
 import StyledHr from '../../../StyledHr';
@@ -178,7 +179,7 @@ GroupSettings.propTypes = {
 };
 
 const NotificationsSettings = ({ accountSlug, subpath }) => {
-  const { data, loading } = useQuery(userActivitySubscriptionsQuery, {
+  const { data, loading, error } = useQuery(userActivitySubscriptionsQuery, {
     variables: { slug: accountSlug },
     context: API_V2_CONTEXT,
   });
@@ -252,6 +253,7 @@ const NotificationsSettings = ({ accountSlug, subpath }) => {
           defaultMessage="We will always let you know about important changes, but you can customize other settings here. Manage email notifications for your individual profile as well as the collectives and organizations you are part of."
         />
       </P>
+      {error && <MessageBoxGraphqlError error={error} my={4} />}
       <StyledCard mt={4} p="24px">
         <P fontSize="18px" fontWeight="700" lineHeight="26px">
           <FormattedMessage

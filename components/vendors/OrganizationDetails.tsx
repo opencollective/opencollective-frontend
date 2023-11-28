@@ -130,7 +130,7 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
         >
           <p>
             <FormattedMessage
-              defaultMessage="I understand that this organization will be: {br}- Transformed into a vendor {br}- No longer be accessible to its admins as an organization on the platform {br}- Will no longer have a public profile"
+              defaultMessage="I understand that this organization will be: {br}- Transformed into a vendor; {br}- No longer be accessible to its admins as an organization on the platform; and, {br}- Will no longer have a public profile."
               values={{ br: <br /> }}
             />
           </p>
