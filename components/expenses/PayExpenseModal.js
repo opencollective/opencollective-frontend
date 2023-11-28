@@ -80,12 +80,11 @@ const getPayoutLabel = (intl, type) => {
 };
 
 const getPayoutOptionValue = (payoutMethod, isAuto, host) => {
-  const payoutMethodType = payoutMethod?.type || PayoutMethodType.OTHER;
+  const payoutMethodType = payoutMethod?.type;
   if (payoutMethodType === PayoutMethodType.OTHER) {
     return { forceManual: true, action: 'PAY' };
-  }
-  // TODO: remove this when we implement the missing Brazilian TRANSFER NATURE field.
-  else if (payoutMethod?.data?.type === 'brazil') {
+  } else if (payoutMethod?.data?.type === 'brazil') {
+    // TODO: remove this when we implement the missing Brazilian TRANSFER NATURE field.
     return { forceManual: true, action: 'PAY' };
   } else if (payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !host.transferwise) {
     return { forceManual: true, action: 'PAY' };
