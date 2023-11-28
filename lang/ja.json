@@ -25,7 +25,7 @@
   "/aBz/1": "Open Collective の {accountName} の公開ページに移動",
   "/CCt2w": "Edit {type, select, TICKET {Ticket} other {Tier}}",
   "/EO1Lu": "All {account} admins must have 2FA",
-  "/GQXtd": "Not you? <SignOutLink>Sign out</SignOutLink> to switch profile.",
+  "/GQXtd": "<SignOutLink>",
   "/gUYR+": "ソース: {source}",
   "/J1LvF": "Legacy Transaction ID",
   "/mqxVR": "Marked expense <Expense>{expenseDescription}</Expense> as incomplete",
