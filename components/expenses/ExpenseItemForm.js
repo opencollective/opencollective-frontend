@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, useFormikContext } from 'formik';
-import { escape, get, isEmpty, isUndefined, pick, unescape } from 'lodash';
+import { get, isEmpty, isUndefined, pick } from 'lodash';
 import Lottie from 'lottie-react';
 import { AlertTriangle } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -169,7 +169,6 @@ const ExpenseItemForm = ({
   currency,
   requireFile,
   requireDate,
-  isRichText,
   itemIdx,
   isOptional,
   editOnlyDescriptiveInfo,
@@ -253,26 +252,19 @@ const ExpenseItemForm = ({
                 labelFontSize="13px"
                 required={!isOptional}
               >
-                {inputProps =>
-                  isRichText ? (
-                    <RichTextEditor
-                      inputName={inputProps.name}
-                      error={inputProps.error}
-                      withBorders
-                      version="simplified"
-                      onChange={field.onChange}
-                      onBlur={field.onBlur}
-                      value={field.value}
-                    />
-                  ) : (
-                    <StyledInput
-                      {...inputProps}
-                      value={unescape(field.value)}
-                      onChange={e => form.setFieldValue(field.name, escape(e.target.value))}
-                      placeholder={get(attachment, '__file.name') || get(attachment, '__file.path')}
-                    />
-                  )
-                }
+                {inputProps => (
+                  <RichTextEditor
+                    inputName={inputProps.name}
+                    error={inputProps.error}
+                    withBorders
+                    version="simplified"
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    value={field.value}
+                    defaultValue={field.value}
+                    placeholder={get(attachment, '__file.name') || get(attachment, '__file.path')}
+                  />
+                )}
               </StyledInputField>
             )}
           </Field>
@@ -416,8 +408,6 @@ ExpenseItemForm.propTypes = {
   hasOCRFeature: PropTypes.bool,
   /** Whether this item is the first in the list */
   hasMultiCurrency: PropTypes.bool,
-  /** True if description is HTML */
-  isRichText: PropTypes.bool,
   /** Called when an attachment upload fails */
   onUploadError: PropTypes.func.isRequired,
   /** For multi-currency expenses: called when the expense's currency changes */

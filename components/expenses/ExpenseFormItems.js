@@ -226,7 +226,6 @@ class ExpenseFormItems extends React.PureComponent {
             onRemove={onRemove}
             requireFile={requireFile}
             requireDate={!isGrant}
-            isRichText={isGrant}
             onUploadError={e => this.reportErrors([e])}
             isOptional={values.payee?.isInvite}
             editOnlyDescriptiveInfo={isCreditCardCharge}
