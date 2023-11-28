@@ -1,7 +1,7 @@
 {
-  "++1FQ+": "Sent a reminder about expiring credit card to <Account></Account>",
+  "++1FQ+": "Odesláno připomenutí o vypršení platnosti kreditní karty do <Account></Account>",
   "+5KHJy": "Delete token",
-  "+5Vgek": "Vendor's legal name",
+  "+5Vgek": "Internet1 legal name",
   "+7ZAeJ": "<Individual></Individual> paid <Expense>{expenseDescription}</Expense>",
   "+a+2ug": "Members",
   "+cQ6YM": "Cover updated",
@@ -3315,7 +3315,7 @@
   "WebhookEvents.CONNECTED_ACCOUNT_CREATED": "Connected account added",
   "WebhookEvents.TICKET_CONFIRMED": "Ticket confirmed",
   "WebhookEvents.VIRTUAL_CARD_PURCHASE": "New virtual card purchase",
-  "webhooks.remove": "Odstranit webhook",
+  "webhooks.remove": "Remove webhook",
   "webhooks.save": "Uložit {count} webhooků",
   "webhooks.url.label": "URL",
   "week": "Weekly",
