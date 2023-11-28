@@ -3170,6 +3170,7 @@
   "uuJbG9": "<Individual></Individual> published a new update on <Account></Account>",
   "uuvv0g": "{email} does not exist on {WebsiteName}. Would you like to create an account with this email?",
   "uw0ZU2": "Kom igång helt gratis!",
+  "UW7XhX": "You are about to record a payment for {totalAmount} that includes a {paymentProcessorFeeAmount} payment processor fee. This fee looks unusually high.{newLine}{newLine}Are you sure you want to do this?",
   "uwFEIP": "Se till att uppmärksamma administratörerna om åtgärder krävs",
   "uX+lpu": "Host Agreements: <Color>{agreementsCount}</Color>",
   "uxL7Ai": "Nej, använd en annan e-post",

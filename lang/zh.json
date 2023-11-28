@@ -3170,6 +3170,7 @@
   "uuJbG9": "<Individual></Individual> 在 <Account></Account> 发布了更新",
   "uuvv0g": "{WebsiteName} 中似乎不存在 {email}。你想要使用这个邮箱创建一个账号吗？",
   "uw0ZU2": "免费开始",
+  "UW7XhX": "You are about to record a payment for {totalAmount} that includes a {paymentProcessorFeeAmount} payment processor fee. This fee looks unusually high.{newLine}{newLine}Are you sure you want to do this?",
   "uwFEIP": "请确保告知管理员是否需要操作",
   "uX+lpu": "托管方协议：<Color>{agreementsCount}</Color>",
   "uxL7Ai": "不，使用另一电子邮箱",

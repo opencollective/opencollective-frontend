@@ -218,6 +218,32 @@ const calculateAmounts = ({ formik, expense, quote, host, feesPayer }) => {
   }
 };
 
+const getHandleSubmit = (intl, currency, onSubmit) => async values => {
+  // Show a confirm if the fee is unusually high (more than 50% of the total amount)
+  if (
+    values.forceManual &&
+    values.paymentProcessorFeeInHostCurrency &&
+    values.paymentProcessorFeeInHostCurrency > values.totalAmountPaidInHostCurrency / 2 &&
+    !confirm(
+      intl.formatMessage(
+        {
+          defaultMessage:
+            'You are about to record a payment for {totalAmount} that includes a {paymentProcessorFeeAmount} payment processor fee. This fee looks unusually high.{newLine}{newLine}Are you sure you want to do this?',
+        },
+        {
+          totalAmount: formatCurrency(values.totalAmountPaidInHostCurrency, currency),
+          paymentProcessorFeeAmount: formatCurrency(values.paymentProcessorFeeInHostCurrency, currency),
+          newLine: '\n',
+        },
+      ),
+    )
+  ) {
+    return;
+  }
+
+  return onSubmit(values);
+};
+
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
  */
@@ -225,7 +251,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
   const initialValues = getInitialValues(expense, host);
-  const formik = useFormik({ initialValues, validate, onSubmit });
+  const formik = useFormik({ initialValues, validate, onSubmit: getHandleSubmit(intl, host.currency, onSubmit) });
   const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   const hasBankInfoWithoutWise = payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
