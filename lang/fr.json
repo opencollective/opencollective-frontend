@@ -3173,6 +3173,7 @@
   "uuJbG9": "<Individual></Individual> a publié une nouvelle mise à jour sur <Account></Account>",
   "uuvv0g": "{email} n'existe pas sur {WebsiteName}. Voulez-vous créer un compte avec cet e-mail ?",
   "uw0ZU2": "Commencez maintenant gratuitement !",
+  "UW7XhX": "You are about to record a payment for {totalAmount} that includes a {paymentProcessorFeeAmount} payment processor fee. This fee looks unusually high.{newLine}{newLine}Are you sure you want to do this?",
   "uwFEIP": "Assurez-vous de prévenir les administrateurs si une action est nécessaire",
   "uX+lpu": "Accords d'hébergement : <Color>{agreementsCount}</Color>",
   "uxL7Ai": "Utilisez une autre adresse e-mail",
