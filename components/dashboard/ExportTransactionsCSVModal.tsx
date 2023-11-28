@@ -363,8 +363,10 @@ const ExportTransactionsCSVModal = ({
   };
 
   React.useEffect(() => {
-    fetchRows();
-  }, [queryFilter.values, accountSlug, hostSlug]);
+    if (open) {
+      fetchRows();
+    }
+  }, [queryFilter.values, accountSlug, hostSlug, open]);
 
   React.useEffect(() => {
     const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
