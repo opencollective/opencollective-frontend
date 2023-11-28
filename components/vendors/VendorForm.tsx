@@ -2,24 +2,30 @@ import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
 import { cloneDeep, pick } from 'lodash';
-import { X } from 'lucide-react';
+import { Download, Pencil, Trash, Upload, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
+import { FileRejection, useDropzone } from 'react-dropzone';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyEmailPattern, verifyURLPattern } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { DashboardVendorsQuery } from '../../lib/graphql/types/v2/graphql';
-import { omitDeep } from '../../lib/utils';
+import { DashboardVendorsQuery, UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
+import { useImageUploader } from '../../lib/hooks/useImageUploader';
+import { elementFromClass } from '../../lib/react-utils';
+import { cn, omitDeep } from '../../lib/utils';
 
+import Avatar from '../Avatar';
 import { useDrawerActionsContainer } from '../Drawer';
 import PayoutMethodForm from '../expenses/PayoutMethodForm';
 import PayoutMethodSelect from '../expenses/PayoutMethodSelect';
+import { DROPZONE_ACCEPT_IMAGES } from '../StyledDropzone';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledInputLocation from '../StyledInputLocation';
 import StyledSelect from '../StyledSelect';
+import StyledSpinner from '../StyledSpinner';
 import StyledTextarea from '../StyledTextarea';
 import { Button } from '../ui/Button';
 import { Switch } from '../ui/Switch';
@@ -53,6 +59,7 @@ const EDITABLE_FIELDS = [
   'name',
   'legalName',
   'location',
+  'imageUrl',
   'vendorInfo',
   'vendorInfo.taxFormUrl',
   'vendorInfo.taxFormRequired',
@@ -72,6 +79,97 @@ type VendorFormProps = {
   isModal?: boolean;
 };
 
+const AvatarContainer = elementFromClass(
+  'div',
+  'flex items-center justify-center border border-solid border-slate-200 rounded-md relative',
+);
+
+const EditAvatarButton = elementFromClass(
+  'button',
+  'flex items-center justify-center rounded-full bg-slate-200 hover:bg-slate-100 hover:text-slate-500 text-slate-600 w-6 h-6 p-1',
+);
+
+const VendorAvatar = ({ value, name, radius, minSize, maxSize, onSuccess, onReject }) => {
+  const intl = useIntl();
+  const { uploadFiles, isUploading } = useImageUploader({
+    isMulti: false,
+    mockImageGenerator: () => `https://loremflickr.com/120/120/logo`,
+    onSuccess,
+    onReject,
+    kind: UploadedFileKind.ACCOUNT_AVATAR,
+    accept: DROPZONE_ACCEPT_IMAGES,
+  });
+  const onDropCallback = React.useCallback(
+    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+      uploadFiles(acceptedFiles, fileRejections);
+    },
+    [onSuccess, uploadFiles],
+  );
+  const dropzoneParams = { accept: DROPZONE_ACCEPT_IMAGES, minSize, maxSize, multiple: false, onDrop: onDropCallback };
+  const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneParams);
+  const { onClick, ...dropProps } = getRootProps();
+
+  return (
+    <AvatarContainer
+      data-cy={`avatar-dropzone`}
+      className={cn('group', !value && 'cursor-pointer')}
+      style={{ height: radius, width: radius }}
+      {...dropProps}
+      onClick={!value ? onClick : undefined}
+      role={!value ? 'button' : undefined}
+    >
+      <input name={name} {...getInputProps()} />
+      {isDragActive ? (
+        <div className="text-slate-700">
+          <Download size="20" />
+        </div>
+      ) : isUploading ? (
+        <StyledSpinner size={32} />
+      ) : (
+        <Avatar src={value} type="VENDOR" radius={radius}>
+          {value ? (
+            !isDragActive && (
+              <div className="flex gap-2">
+                <EditAvatarButton
+                  type="button"
+                  className="hidden group-focus-within:block group-hover:block"
+                  onClick={onClick}
+                  title={intl.formatMessage(
+                    {
+                      id: 'HeroAvatar.Edit',
+                      defaultMessage: 'Edit {imgType, select, AVATAR {avatar} other {logo}}',
+                    },
+                    { imgType: 'LOGO' },
+                  )}
+                >
+                  <Pencil size={16} />
+                </EditAvatarButton>
+
+                <EditAvatarButton
+                  type="button"
+                  className="hidden group-focus-within:block group-hover:block"
+                  onClick={() => onSuccess({ url: null })}
+                  title={intl.formatMessage(
+                    {
+                      id: 'HeroAvatar.Remove',
+                      defaultMessage: 'Remove {imgType, select, AVATAR {avatar} other {logo}}',
+                    },
+                    { imgType: 'LOGO' },
+                  )}
+                >
+                  <Trash size={16} />
+                </EditAvatarButton>
+              </div>
+            )
+          ) : (
+            <Upload size={24} />
+          )}
+        </Avatar>
+      )}
+    </AvatarContainer>
+  );
+};
+
 const validateVendorForm = values => {
   const requiredFields = ['name'];
   if (values.vendorInfo?.taxType === 'OTHER') {
@@ -84,6 +182,9 @@ const validateVendorForm = values => {
   }
   if (values.vendorInfo?.taxFormUrl) {
     verifyURLPattern(errors, values, 'vendorInfo.taxFormUrl');
+  }
+  if (values.imageUrl) {
+    verifyURLPattern(errors, values, 'imageUrl');
   }
 
   return errors;
@@ -137,15 +238,21 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
     { label: <FormattedMessage id="taxType.Other" defaultMessage="Other" />, value: 'OTHER' },
   ];
   const initialValues = cloneDeep(pick(vendor, EDITABLE_FIELDS));
+  if (vendor?.hasImage !== true) {
+    initialValues.imageUrl = null;
+  }
   if (initialValues.vendorInfo?.taxType && !['EIN', 'VAT', 'GST'].includes(initialValues.vendorInfo?.taxType)) {
     initialValues.vendorInfo['otherTaxType'] = initialValues.vendorInfo?.taxType;
     initialValues.vendorInfo.taxType = 'OTHER';
+  }
+  if (vendor?.payoutMethods?.length > 0) {
+    initialValues['payoutMethod'] = vendor.payoutMethods[0];
   }
   const loading = isCreating || isEditing;
 
   return (
     <div>
-      <div className="mb-3 flex justify-between text-xl font-bold">
+      <div className="flex justify-between text-xl font-bold">
         {vendor ? (
           <FormattedMessage id="vendor.edit" defaultMessage="Edit Vendor" />
         ) : (
@@ -178,16 +285,33 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
           );
 
           return (
-            <Form data-cy="vendor-form">
-              <StyledInputFormikField
-                name="name"
-                label={intl.formatMessage({ defaultMessage: "Vendor's name" })}
-                labelProps={FIELD_LABEL_PROPS}
-                mt={3}
-                required
-              >
-                {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
-              </StyledInputFormikField>
+            <Form data-cy="vendor-form" className="mt-7">
+              <div className="flex justify-stretch gap-4">
+                <Field name="imageUrl">
+                  {({ field, form }) => (
+                    <VendorAvatar
+                      radius={80}
+                      name={field.name}
+                      value={field.value}
+                      onSuccess={({ url }) => form.setFieldValue(field.name, url)}
+                      onReject={() => form.setFieldValue(field.name, vendor?.imageUrl)}
+                      minSize={1024}
+                      maxSize={2e3 * 1024}
+                    />
+                  )}
+                </Field>
+                <div className="flex-grow">
+                  <StyledInputFormikField
+                    name="name"
+                    label={intl.formatMessage({ defaultMessage: "Vendor's name" })}
+                    labelProps={FIELD_LABEL_PROPS}
+                    mt={3}
+                    required
+                  >
+                    {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
+                  </StyledInputFormikField>
+                </div>
+              </div>
               <StyledInputFormikField
                 name="legalName"
                 label={intl.formatMessage({ defaultMessage: "Vendor's legal name" })}

@@ -42,6 +42,7 @@ const StyledInput = styled.input`
   border-style: ${props => (props.bare ? 'none' : 'solid')};
   box-sizing: border-box;
   outline: none;
+  max-width: none;
 
   ${props => {
     if (props.withOutline) {
