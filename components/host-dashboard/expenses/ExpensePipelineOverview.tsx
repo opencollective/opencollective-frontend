@@ -1,8 +1,7 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { Paypal } from '@styled-icons/fa-brands/Paypal';
-import { StripeS } from '@styled-icons/fa-brands/StripeS';
 import { Info } from '@styled-icons/feather/Info';
+import { Paypal } from '@styled-icons/remix-line/Paypal';
 import clsx from 'clsx';
 import { FormattedMessage } from 'react-intl';
 
@@ -12,6 +11,8 @@ import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { Amount, ExpenseCollection, Host } from '../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
 import { getDashboardUrl } from '../../../lib/stripe/dashboard';
+
+import CcStripe from '../../../components/icons/Stripe';
 
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import TransferwiseIcon from '../../icons/TransferwiseIcon';
@@ -369,7 +370,7 @@ function StripeIssuingStatus(props: StripeIssuingStatusProps) {
           defaultMessage="{service} balance ({currency})"
           values={{ service: 'Stripe Issuing', currency: props?.host?.stripe?.issuingBalance?.currency }}
         />
-        <StripeS size={16} />
+        <CcStripe size={16} />
       </div>
       <div className="mt-2 flex-grow text-2xl font-bold text-slate-900">
         <FormattedMoneyAmount
