@@ -30,7 +30,7 @@ const updateExpenseItemWithUploadResult = (
     }
   }
 
-  // Store the parsing result in the item so that it can be later split if needed
+  // Store the parsing result in the item
   const parsingResult = uploadResult.parsingResult?.expense;
   if (!parsingResult) {
     return Boolean(fileUrl);
@@ -39,7 +39,6 @@ const updateExpenseItemWithUploadResult = (
   // Update internal form props
   itemValues.__isUploading = false;
   itemValues.__parsingResult = parsingResult;
-  itemValues.__canBeSplit = filterParsableItems(parsingResult.items).length > 1;
   itemValues.__file = uploadResult.file;
 
   // We don't allow changing the date or amount for virtual cards
@@ -59,47 +58,6 @@ const updateExpenseItemWithUploadResult = (
 
   set(formValues, itemPath, itemValues);
 
-  return true;
-};
-
-const updateExpenseItemWithUploadItem = (
-  formValues: ExpenseFormValues,
-  uploadItem: UploadFileResult['parsingResult']['expense']['items'][0],
-  itemIdx: number,
-  defaultAttributes = {},
-): boolean => {
-  const itemPath = `items[${itemIdx}]`;
-  const itemValues = get(formValues, itemPath) || newExpenseItem();
-
-  // Merge default attributes
-  Object.assign(itemValues, defaultAttributes);
-
-  // Update internal form props
-  itemValues.__isUploading = false;
-  itemValues.__canBeSplit = false;
-  itemValues.__itemParsingResult = uploadItem;
-
-  // Set item URL
-  if (uploadItem.url) {
-    if (expenseItemsMustHaveFiles(formValues.type)) {
-      itemValues.url = uploadItem.url;
-    } else if (!formValues.attachedFiles?.find(file => file.url === uploadItem.url)) {
-      formValues.attachedFiles = [...formValues.attachedFiles, { url: uploadItem.url }];
-    }
-  }
-
-  // We don't allow changing the date or amount for virtual cards
-  if (formValues.type !== 'CHARGE') {
-    if (uploadItem.incurredAt) {
-      itemValues.incurredAt = uploadItem.incurredAt;
-    }
-
-    if (uploadItem.amount?.valueInCents && uploadItem.amount.currency === formValues.currency) {
-      itemValues.amount = uploadItem.amount.valueInCents;
-    }
-  }
-
-  set(formValues, itemPath, itemValues);
   return true;
 };
 
@@ -178,32 +136,6 @@ export const filterParsableItems = (items: UploadFileResult['parsingResult']['ex
   }
 };
 
-export const splitExpenseItem = (form: FormikProps<ExpenseFormValues>, itemIdx: number): boolean => {
-  const newFormValues = cloneDeep(form.values);
-  const item = get(newFormValues, `items[${itemIdx}]`);
-
-  if (!item?.__canBeSplit) {
-    return false;
-  }
-
-  const parsedItems = filterParsableItems(item.__parsingResult.items);
-
-  // Reset the first item's description and update it with the first parsing result
-  newFormValues.items[itemIdx].description = '';
-  updateExpenseItemWithUploadItem(newFormValues, parsedItems[0], itemIdx);
-
-  // Create new items for the other parsing results
-  parsedItems.slice(1).forEach((parsedItem, idx) => {
-    const newItemIdx = itemIdx + idx + 1;
-    newFormValues.items.splice(newItemIdx, 0, null);
-    updateExpenseItemWithUploadItem(newFormValues, parsedItem, newItemIdx, { __file: item.__file, url: item.url });
-  });
-
-  form.setValues(newFormValues);
-
-  return true;
-};
-
 export const checkExpenseSupportsOCR = (expenseType: ExpenseType, loggedInUser): boolean => {
   if (['RECEIPT', 'CHARGE'].includes(expenseType)) {
     return true;
@@ -214,25 +146,14 @@ export const checkExpenseSupportsOCR = (expenseType: ExpenseType, loggedInUser):
   }
 };
 
-export const checkExpenseItemCanBeSplit = (item: ExpenseItemFormValues, expenseType: ExpenseType): boolean => {
-  return Boolean(item.__canBeSplit && [ExpenseType.RECEIPT, ExpenseType.INVOICE].includes(expenseType));
-};
-
-type FieldsWithOCRSupport = 'description' | 'incurredAt' | 'amount' | 'url';
+type FieldsWithOCRSupport = 'description' | 'incurredAt' | 'amount';
 
 type ExpenseItemFields = Extract<keyof ExpenseItemFormValues, FieldsWithOCRSupport>;
 
-export const ITEM_OCR_ROOT_FIELD_MAPPING: Record<ExpenseItemFields, string> = {
-  url: '__file.url',
+export const ITEM_OCR_FIELD_MAPPING: Record<ExpenseItemFields, string> = {
   incurredAt: '__parsingResult.date',
   description: '__parsingResult.description',
   amount: '__parsingResult.amount',
-};
-
-export const ITEM_OCR_FIELD_MAPPING: Record<Exclude<ExpenseItemFields, 'url'>, string> = {
-  incurredAt: '__itemParsingResult.incurredAt',
-  description: '__itemParsingResult.description',
-  amount: '__itemParsingResult.amount',
 };
 
 /**
@@ -260,15 +181,8 @@ const compareItemOCRValue = (
     }
   };
 
-  // If there's an item available, we try to match on it
-  const itemOCRValue = get(item, ITEM_OCR_FIELD_MAPPING[field as keyof ExpenseItemFormValues]);
-  if (!isNil(itemOCRValue)) {
-    return checkValue(itemOCRValue);
-  }
-
-  // Otherwise we match on the root value
-  const rootOCRValue = get(item, ITEM_OCR_ROOT_FIELD_MAPPING[field as keyof ExpenseItemFormValues]);
-  return checkValue(rootOCRValue);
+  const ocrValue = get(item, ITEM_OCR_FIELD_MAPPING[field as keyof ExpenseItemFormValues]);
+  return checkValue(ocrValue);
 };
 
 type ExpenseOCRValuesComparison = Record<FieldsWithOCRSupport, { hasMismatch: boolean; ocrValue: any }>;
@@ -289,5 +203,5 @@ export const compareItemOCRValues = (
 
 /** Return true if the item has an OCR parsing result */
 export const itemHasOCR = (item: ExpenseItemFormValues): boolean => {
-  return Boolean(item.__parsingResult || item.__itemParsingResult);
+  return Boolean(item.__parsingResult);
 };
