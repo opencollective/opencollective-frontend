@@ -19,7 +19,7 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import ExpensesList from '../../../expenses/ExpensesList';
-import HostInfoCard from '../../../host-dashboard/HostInfoCard';
+import ExpensePipelineOverview from '../../../host-dashboard/expenses/ExpensePipelineOverview';
 import ScheduledExpensesBanner from '../../../host-dashboard/ScheduledExpensesBanner';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
@@ -224,7 +224,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       ) : errorMetaData ? (
         <MessageBoxGraphqlError error={errorMetaData} />
       ) : (
-        <HostInfoCard host={metaData.host} />
+        <ExpensePipelineOverview className="pt-4" host={metaData.host} />
       )}
       <ScheduledExpensesBanner
         hostSlug={hostSlug}
