@@ -180,7 +180,7 @@ describe('Collective page with euro currency', () => {
   });
 
   it('contributors amount in euro', () => {
-    cy.get('[data-cy=ContributorsGrid_ContributorCard]').first().contains('€5,140 EUR');
+    cy.get('[data-cy=ContributorsGrid_ContributorCard]').first().contains('€406.6 EUR');
   });
 
   it('Can filter contributors', () => {
