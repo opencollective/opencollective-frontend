@@ -109,7 +109,7 @@ const filterArchivedMemberships = memberships => {
 
 const filterMemberships = memberships => {
   const filteredMemberships = memberships.filter(m => {
-    if (m.role === 'BACKER' || m.collective.isArchived) {
+    if (!['ADMIN', 'ACCOUNTANT', 'HOST'].includes(m.role) || m.collective.isArchived) {
       return false;
     } else if (m.collective.type === 'EVENT' && isPastEvent(m.collective)) {
       return false;
