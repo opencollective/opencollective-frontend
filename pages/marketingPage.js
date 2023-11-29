@@ -83,6 +83,7 @@ class MarketingPage extends React.Component {
         <div>
           <Header LoggedInUser={LoggedInUser} />
           <Body>
+            {/* We control the pages content, since it's defined in markdown files we host in this codebase */}
             <style type="text/css" dangerouslySetInnerHTML={{ __html: style }} />
             <div className={className} dangerouslySetInnerHTML={{ __html: html }} />
           </Body>
