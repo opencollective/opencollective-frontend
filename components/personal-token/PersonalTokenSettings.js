@@ -114,7 +114,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
             </H3>
             <StyledHr ml={2} flex="1" borderColor="black.400" />
           </Flex>
-          <StyledCard maxWidth="600px" p={3} my={4}>
+          <StyledCard maxWidth="600px" p={3} mt={4}>
             <H4 fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb="20px">
               <FormattedMessage defaultMessage="Personal Token" />
             </H4>
@@ -124,6 +124,21 @@ const PersonalTokenSettings = ({ backPath, id }) => {
               </Flex>
             </Flex>
           </StyledCard>
+          <P mb={4} mt="10px" fontSize={12} color="black.700" letter-spacing="-0.4px">
+            {intl.formatMessage(
+              {
+                id: 'token.docs',
+                defaultMessage:
+                  'Pass this code as Personal-Token HTTP header or personalToken query parameter in the URL. <Link>More info</Link>.',
+              },
+              {
+                Link: getI18nLink({
+                  href: 'https://docs.opencollective.com/help/developers/personal-tokens',
+                  openInNewTab: true,
+                }),
+              },
+            )}
+          </P>
           <Formik
             initialValues={{
               ...data.personalToken,
