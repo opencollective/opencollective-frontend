@@ -251,6 +251,8 @@ export const expensePageExpenseFieldsFragment = gql`
       slug
       name
       legalName
+      imageUrl
+      hasImage
       type
       isAdmin
       isActive
@@ -337,6 +339,7 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       type
       imageUrl
+      hasImage
       backgroundImageUrl
       isActive
       description
@@ -656,6 +659,7 @@ export const expensesListFieldsFragment = gql`
       slug
       name
       imageUrl(height: 80)
+      hasImage
       isAdmin
 
       # For Collectives, Funds, Events and Projects

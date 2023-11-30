@@ -52,6 +52,7 @@ export const transactionsQueryCollectionFragment = gql`
         slug
         type
         imageUrl
+        hasImage
         isIncognito
         ... on AccountWithParent {
           parent {
@@ -82,6 +83,7 @@ export const transactionsQueryCollectionFragment = gql`
         slug
         type
         imageUrl
+        hasImage
         isIncognito
         ... on Event {
           parent {

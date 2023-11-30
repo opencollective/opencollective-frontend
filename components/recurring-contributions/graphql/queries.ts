@@ -62,6 +62,7 @@ export const managedOrderFragment = gql`
       description
       tags
       imageUrl(height: 96)
+      hasImage
       backgroundImageUrl(height: 256)
       settings
       ... on AccountWithHost {
