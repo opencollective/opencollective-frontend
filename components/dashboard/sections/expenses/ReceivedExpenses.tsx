@@ -101,6 +101,8 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const { data, loading } = useQuery(accountExpensesQuery, {
     variables: {
       account: { slug: accountSlug },
+      fetchHostForExpenses: false, // Already fetched at the root level
+      hasAmountInCreatedByAccountCurrency: false,
       ...queryFilter.variables,
     },
     context: API_V2_CONTEXT,
