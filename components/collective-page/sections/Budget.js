@@ -348,7 +348,7 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
             {isLoading ? (
               <LoadingPlaceholder height={300} />
             ) : !allItems.length ? (
-              <Container textAlign="center" py={94} px={2}>
+              <div className="flex flex-col items-center justify-center px-1 py-[94px] text-center">
                 <Image src="/static/images/empty-jars.png" alt="Empty jars" width={125} height={125} />
                 <P fontWeight="500" fontSize="20px" lineHeight="28px">
                   <FormattedMessage id="Budget.Empty" defaultMessage="There are no transactions yet." />
@@ -359,7 +359,7 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
                     defaultMessage="Come back to this section once there is at least one transaction!"
                   />
                 </P>
-              </Container>
+              </div>
             ) : (
               allItems.map((item, idx) => {
                 return (

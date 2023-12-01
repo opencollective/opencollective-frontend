@@ -179,7 +179,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: BarChart2,
     },
     {
-      if: isHost && hasFeature(account, FEATURES.HOST_VENDORS) && !isAccountantOnly,
+      if: isHost && !isAccountantOnly,
       section: ALL_SECTIONS.VENDORS,
       Icon: Store,
     },

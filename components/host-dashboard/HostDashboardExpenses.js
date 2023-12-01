@@ -29,7 +29,7 @@ import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
 
-import HostInfoCard from './HostInfoCard';
+import ExpensePipelineOverview from './expenses/ExpensePipelineOverview';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
 /**
@@ -232,7 +232,7 @@ const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
         ) : error ? (
           <MessageBoxGraphqlError error={error} />
         ) : (
-          <HostInfoCard host={metaData.host} />
+          <ExpensePipelineOverview className="pt-4" host={metaData?.host} />
         )}
         <ScheduledExpensesBanner
           hostSlug={hostSlug}

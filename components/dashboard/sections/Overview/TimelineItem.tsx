@@ -32,7 +32,7 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
   const isLastWeek = dayjs(activity?.createdAt).isAfter(dayjs().subtract(1, 'week'));
   return (
     <div className="rounded-2xl border p-4 text-sm">
-      <div className="flex flex-1 gap-3">
+      <div className="flex flex-1 items-start gap-3">
         {isLoading ? (
           <LoadingPlaceholder height={32} width={32} borderRadius="50%" />
         ) : (
