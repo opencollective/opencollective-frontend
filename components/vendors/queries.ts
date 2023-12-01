@@ -49,11 +49,11 @@ export const vendorFieldFragment = gql`
       data
     }
 
-    orders {
+    orders(filter: OUTGOING, limit: 1) {
       totalCount
     }
 
-    expenses(status: PAID, direction: SUBMITTED) {
+    expenses(status: PAID, direction: SUBMITTED, limit: 1) {
       totalCount
     }
   }
