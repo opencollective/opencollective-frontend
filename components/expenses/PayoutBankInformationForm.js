@@ -31,6 +31,10 @@ export const msg = defineMessages({
     id: 'Currency',
     defaultMessage: 'Currency',
   },
+  fieldRequired: {
+    id: 'FieldRequired',
+    defaultMessage: '{name} is required.',
+  },
 });
 
 const requiredFieldsQuery = gql`
@@ -81,12 +85,16 @@ const CUSTOM_METHOD_LABEL_BY_CURRENCY = {
   },
 };
 
+const validateRequiredInput = (intl, input, required) =>
+  required ? value => (value ? undefined : intl.formatMessage(msg.fieldRequired, { name: input.name })) : undefined;
+
 const Input = ({ input, getFieldName, disabled, currency, loading, refetch, formik, host }) => {
   const intl = useIntl();
   const isAccountHolderName = input.key === 'accountHolderName';
   const fieldName = isAccountHolderName ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
   const required = disabled ? false : input.required;
-  let validate = required ? value => (value ? undefined : `${input.name} is required`) : undefined;
+  const submitted = Boolean(formik.submitCount);
+  let validate = validateRequiredInput(intl, input, required);
   if (input.type === 'text') {
     if (input.validationRegexp || input.minLength || input.maxLength) {
       validate = value => {
@@ -116,7 +124,7 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
               labelFontSize="13px"
               required={required}
               hideOptionalLabel={disabled}
-              error={(meta.touched || disabled) && meta.error}
+              error={(meta.touched || disabled || submitted) && meta.error}
               hint={input.hint}
             >
               {() => {
@@ -126,7 +134,7 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
                     <StyledInput
                       {...field}
                       placeholder={input.example}
-                      error={(meta.touched || disabled) && meta.error}
+                      error={(meta.touched || disabled || submitted) && meta.error}
                       disabled={disabled}
                       width="100%"
                       maxLength={input.maxLength}
@@ -159,14 +167,14 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
               labelFontSize="13px"
               required={required}
               hideOptionalLabel={disabled}
-              error={(meta.touched || disabled) && meta.error}
+              error={(meta.touched || disabled || submitted) && meta.error}
               hint={input.hint}
             >
               {() => (
                 <StyledInput
                   {...field}
                   type="date"
-                  error={(meta.touched || disabled) && meta.error}
+                  error={(meta.touched || disabled || submitted) && meta.error}
                   disabled={disabled}
                   width="100%"
                   value={get(formik.values, field.name) || ''}
@@ -188,13 +196,13 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
               labelFontSize="13px"
               required={required}
               hideOptionalLabel={disabled}
-              error={(meta.touched || disabled) && meta.error}
+              error={(meta.touched || disabled || submitted) && meta.error}
             >
               {() => (
                 <StyledSelect
                   inputId={field.name}
                   disabled={disabled}
-                  error={(meta.touched || disabled) && meta.error}
+                  error={(meta.touched || disabled || submitted) && meta.error}
                   isLoading={loading && !options.length}
                   name={field.name}
                   options={options}
@@ -258,6 +266,7 @@ FieldGroup.propTypes = {
 };
 
 const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
+  const intl = useIntl();
   const { loading, error, data, refetch } = useQuery(requiredFieldsQuery, {
     context: API_V2_CONTEXT,
     // A) If `fixedCurrency` was passed in PayoutBankInformationForm (2) (3)
@@ -321,21 +330,27 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
 
   const transactionMethodFieldName = getFieldName('data.type');
   const transactionMethod = get(formik.values, transactionMethodFieldName);
+  const submitted = Boolean(formik.submitCount);
+
+  const transactionMethodLabel =
+    CUSTOM_METHOD_LABEL_BY_CURRENCY?.[currency]?.requiredFields?.label ||
+    intl.formatMessage({
+      id: 'PayoutBankInformationForm.TransactionMethod',
+
+      defaultMessage: 'Transaction Method',
+    });
 
   return (
     <Flex flexDirection="column">
-      <Field name={getFieldName('data.type')}>
-        {({ field }) => (
+      <Field
+        name={getFieldName('data.type')}
+        validate={validateRequiredInput(intl, { name: transactionMethodLabel }, !disabled)}
+      >
+        {({ field, meta }) => (
           <StyledInputField
             name={field.name}
-            label={
-              CUSTOM_METHOD_LABEL_BY_CURRENCY?.[currency]?.requiredFields?.label || (
-                <FormattedMessage
-                  id="PayoutBankInformationForm.TransactionMethod"
-                  defaultMessage="Transaction Method"
-                />
-              )
-            }
+            label={transactionMethodLabel}
+            error={(meta.touched || disabled || submitted) && meta.error}
             labelFontSize="13px"
             mt={3}
             mb={2}
@@ -352,6 +367,8 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
                 options={transactionTypeValues}
                 value={transactionTypeValues.find(method => method.value === availableMethods?.type) || null}
                 disabled={disabled}
+                error={(meta.touched || disabled || submitted) && meta.error}
+                required
               />
             )}
           </StyledInputField>

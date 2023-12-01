@@ -48,6 +48,10 @@ const payoutMethodLabels = defineMessages({
     id: 'PayoutMethod.AccountBalance',
     defaultMessage: 'Open Collective (Account Balance)',
   },
+  none: {
+    id: 'PayoutMethod.None',
+    defaultMessage: 'None',
+  },
 });
 
 type PayoutMethodSelectProps = {
@@ -87,6 +91,7 @@ type PayoutMethodSelectProps = {
       id: string;
     };
   };
+  allowNull?: boolean;
   onChange: (object) => void;
   onRemove?: (object) => void;
 };
@@ -99,7 +104,9 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
   state = { removingPayoutMethod: null };
 
   getPayoutMethodLabel = payoutMethod => {
-    if (payoutMethod.id) {
+    if (!payoutMethod) {
+      return this.props.intl.formatMessage(payoutMethodLabels.none);
+    } else if (payoutMethod.id) {
       if (payoutMethod.name) {
         return payoutMethod.name;
       } else if (payoutMethod.type === PayoutMethodType.ACCOUNT_BALANCE) {
@@ -170,12 +177,12 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
     const isMenu = context === 'menu';
 
     const isDeletable =
-      value.isDeletable === undefined ? value.type !== PayoutMethodType.ACCOUNT_BALANCE : value.isDeletable;
+      value?.isDeletable === undefined ? value?.type !== PayoutMethodType.ACCOUNT_BALANCE : value?.isDeletable;
 
     return (
       <Flex justifyContent="space-between" alignItems="center">
         <Span fontSize={isMenu ? '13px' : '14px'}>{this.getPayoutMethodLabel(value)}</Span>
-        {isMenu && value.id && isDeletable && this.props.onRemove && (
+        {isMenu && value?.id && isDeletable && this.props.onRemove && (
           <StyledRoundButton
             size={20}
             ml={2}
@@ -239,7 +246,7 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
 
     const groupedPms = groupBy(payoutMethods, 'type');
 
-    return pmTypes.map(pmType => ({
+    const categorized = pmTypes.map(pmType => ({
       label: i18nPayoutMethodType(this.props.intl, pmType),
       options: [
         // Add existing payout methods for this type
@@ -254,6 +261,14 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
           : null,
       ].filter(option => option !== null),
     }));
+
+    if (this.props.allowNull) {
+      categorized.unshift({
+        value: null,
+      });
+    }
+
+    return categorized;
   });
 
   render() {
@@ -266,7 +281,7 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
     const payeeIsSameHost = payee && payee.host?.id === collective.host?.id;
 
     const styledSelectOptions = this.getOptions(collective.host, payoutMethods, payee);
-    const hasSuitablePayoutMethodOption = styledSelectOptions.find(({ options }) => options.length > 0) ? true : false;
+    const hasSuitablePayoutMethodOption = styledSelectOptions.find(({ options }) => options?.length > 0) ? true : false;
 
     if (payeeIsCollectiveFamilyType && !payeeIsSameHost) {
       if (!collective?.host?.isTrustedHost) {
