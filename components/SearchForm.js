@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { withRouter } from 'next/router';
 import styled from 'styled-components';
 import { borderColor, borderRadius, height, typography } from 'styled-system';
@@ -17,6 +17,13 @@ const SearchInputContainer = styled(Flex)`
   ${borderRadius};
   ${height};
   background-color: white;
+
+  input[type='search']::-webkit-search-cancel-button,
+  input[type='search']::-webkit-search-clear-button {
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+  }
 `;
 
 const SearchInput = styled(Box)`
@@ -24,6 +31,7 @@ const SearchInput = styled(Box)`
     appearance: none;
     background-color: transparent;
     border: none;
+    margin-right: 1.5rem;
     ${typography}
     ::placeholder {
       color: #9d9fa3;
@@ -32,6 +40,14 @@ const SearchInput = styled(Box)`
 `;
 
 const SearchButton = styled(Flex)`
+  && {
+    appearance: none;
+    background-color: transparent;
+    border: none;
+  }
+`;
+
+const ClearFilterButton = styled(Flex)`
   && {
     appearance: none;
     background-color: transparent;
@@ -74,6 +90,7 @@ class SearchForm extends React.Component {
       lineHeight,
       fontWeight,
       className,
+      onClearFilter,
     } = this.props;
     return (
       <form action="/search" method="GET" onSubmit={onSubmit} className={className}>
@@ -113,6 +130,11 @@ class SearchForm extends React.Component {
             onFocus={onFocus}
             autoComplete={autoComplete}
           />
+          {this.props.value && (
+            <ClearFilterButton as="button" ml={2} p={1}>
+              <X onClick={onClearFilter} size={13} className="text-slate-500" />
+            </ClearFilterButton>
+          )}
           {this.props.showSearchButton && (
             <StyledRoundButton
               style={{ backgroundColor: '#F9FAFB', color: '#323334', ...this.props.searchButtonStyles }}
@@ -154,6 +176,7 @@ SearchForm.propTypes = {
   fontWeight: PropTypes.string,
   className: PropTypes.string,
   closeSearchModal: PropTypes.func,
+  onClearFilter: PropTypes.func,
 };
 
 export default withRouter(SearchForm);
