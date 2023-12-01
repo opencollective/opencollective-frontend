@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, useFormikContext } from 'formik';
-import { escape, get, isEmpty, isUndefined, pick, unescape } from 'lodash';
+import { escape, get, isEmpty, pick, unescape } from 'lodash';
 import Lottie from 'lottie-react';
 import { AlertTriangle } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -187,7 +187,7 @@ const ExpenseItemForm = ({
   const getFieldName = field => `${itemPath}.${field}`;
   const getError = field => formatFormErrorMessage(intl, get(errors, getFieldName(field)));
   const isLoading = Boolean(attachment.__isUploading);
-  const hasAccountingCategory = !isUndefined(form.values.accountingCategory);
+  const hasAccountingCategory = Boolean(form.values.accountingCategory);
 
   return (
     <Box mb={18} data-cy="expense-attachment-form">
