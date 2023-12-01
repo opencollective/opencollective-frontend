@@ -459,6 +459,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                   payoutMethods={vendor?.payoutMethods || []}
                   payoutMethod={formik.values.payoutMethod}
                   onChange={({ value }) => formik.setFieldValue('payoutMethod', value)}
+                  allowNull
                 />
               </div>
               {formik.values.payoutMethod && (
@@ -469,7 +470,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                         fieldsPrefix="payoutMethod"
                         payoutMethod={field.value}
                         host={host}
-                        required={false}
+                        required={Boolean(formik.values.payoutMethod)}
                       />
                     </div>
                   )}
