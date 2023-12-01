@@ -16,10 +16,12 @@ import {
   FieldOptions,
   HOST_OMITTED_FIELDS,
 } from '../../lib/csv';
+import { getEnvVar } from '../../lib/env-utils';
 import { HostReportsPageQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
+import { parseToBoolean } from '../../lib/utils';
 
 import MessageBox from '../MessageBox';
 import StyledInputField from '../StyledInputField';
@@ -219,31 +221,33 @@ const ExportTransactionsCSVModal = ({
           <Filterbar {...queryFilter} filters={omit(queryFilter.filters, 'orderBy')} views={null} hideSeparator />
         </div>
 
-        <StyledInputField
-          label={<FormattedMessage defaultMessage="CSV Version" />}
-          labelFontWeight="500"
-          labelProps={{ fontSize: '16px', letterSpacing: '0px' }}
-          name="csvVersions"
-        >
-          {inputProps => (
-            <Select
-              onValueChange={value => handleCsvVersionsChange({ value })}
-              defaultValue={CsvVersions.find(option => option.value === csvVersion).value}
-              {...inputProps}
-            >
-              <SelectTrigger className="">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CsvVersions.map(option => (
-                  <SelectItem value={option.value} key={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-        </StyledInputField>
+        {parseToBoolean(getEnvVar('LEDGER_SEPARATE_PAYMENT_PROCESSOR_FEES')) && (
+          <StyledInputField
+            label={<FormattedMessage defaultMessage="CSV Version" />}
+            labelFontWeight="500"
+            labelProps={{ fontSize: '16px', letterSpacing: '0px' }}
+            name="csvVersions"
+          >
+            {inputProps => (
+              <Select
+                onValueChange={value => handleCsvVersionsChange({ value })}
+                defaultValue={CsvVersions.find(option => option.value === csvVersion).value}
+                {...inputProps}
+              >
+                <SelectTrigger className="">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CsvVersions.map(option => (
+                    <SelectItem value={option.value} key={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </StyledInputField>
+        )}
 
         <StyledInputField
           label={<FormattedMessage defaultMessage="Exported Fields" />}

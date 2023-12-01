@@ -18,9 +18,11 @@ import {
   HOST_OMITTED_FIELDS,
 } from '../lib/csv';
 import { simpleDateToISOString } from '../lib/date-utils';
+import { getEnvVar } from '../lib/env-utils';
 import type { Account } from '../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../lib/hooks/useAsyncCall';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
+import { parseToBoolean } from '../lib/utils';
 
 import { getIntervalFromValue, PeriodFilterForm } from './filters/PeriodFilter';
 import { Box, Flex, Grid } from './Grid';
@@ -242,24 +244,26 @@ const ExportTransactionsCSVModal = ({
             omitPresets
           />
 
-          <StyledInputField
-            label={<FormattedMessage defaultMessage="CSV Version" />}
-            labelFontWeight="700"
-            labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
-            name="csvVersions"
-            mt={3}
-            gridColumn="1 / span 2"
-          >
-            {inputProps => (
-              <StyledSelect
-                {...inputProps}
-                options={CsvVersions}
-                onChange={handleCsvVersionsChange}
-                defaultValue={CsvVersions.find(option => option.value === csvVersion)}
-                width="100%"
-              />
-            )}
-          </StyledInputField>
+          {parseToBoolean(getEnvVar('LEDGER_SEPARATE_PAYMENT_PROCESSOR_FEES')) && (
+            <StyledInputField
+              label={<FormattedMessage defaultMessage="CSV Version" />}
+              labelFontWeight="700"
+              labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
+              name="csvVersions"
+              mt={3}
+              gridColumn="1 / span 2"
+            >
+              {inputProps => (
+                <StyledSelect
+                  {...inputProps}
+                  options={CsvVersions}
+                  onChange={handleCsvVersionsChange}
+                  defaultValue={CsvVersions.find(option => option.value === csvVersion)}
+                  width="100%"
+                />
+              )}
+            </StyledInputField>
+          )}
 
           <StyledInputField
             label={<FormattedMessage defaultMessage="Exported Fields" />}
