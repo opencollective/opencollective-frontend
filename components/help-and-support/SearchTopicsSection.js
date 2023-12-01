@@ -154,6 +154,7 @@ const SearchTopics = () => {
               setIsLoading(true);
               debouncedSearch(query);
             }}
+            onClearFilter={() => setSearchQuery('')}
             onFocus={() => setShowSearchResults(true)}
             autoComplete="off"
             fontStyle="normal"
