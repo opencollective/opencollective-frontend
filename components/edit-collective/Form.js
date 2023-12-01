@@ -216,6 +216,14 @@ class EditCollectiveForm extends React.Component {
         id: 'newPricing.tab.hostFeeChargeExample',
         defaultMessage: `If your Host fee is 10% and your Collectives bring in $1,000, your Platform fee will be $15. If you host fee is 0%, your Platform fee will be 0.`,
       },
+      'settings.hostFeePercentPendingContributions.label': {
+        id: 'collective.hostFeePercentPendingContributions.title',
+        defaultMessage: 'Host fee for Pending Contributions',
+      },
+      'settings.hostFeePercentPendingContributions.description': {
+        id: 'collective.hostFeePercentPendingContributions.description',
+        defaultMessage: 'Default host fee set when creating pending contributions.',
+      },
       'location.label': {
         id: 'SectionLocation.Title',
         defaultMessage: 'Location',
@@ -777,6 +785,18 @@ class EditCollectiveForm extends React.Component {
           post: '%',
           defaultValue: get(this.state.collective, 'hostFeePercent'),
           when: () => collective.isHost && (collective.type === ORGANIZATION || collective.hostFeePercent !== 0),
+        },
+        {
+          name: 'settings.hostFeePercentPendingContributions',
+          type: 'number',
+          className: 'horizontal',
+          step: '0.01',
+          post: '%',
+          defaultValue: get(this.state.collective, 'settings.hostFeePercentPendingContributions'),
+          placeholder: get(this.state.collective, 'hostFeePercent'),
+          when: () =>
+            collective.isHost &&
+            (collective.type === ORGANIZATION || collective.settings.hostFeePercentPendingContributions !== 0),
         },
         {
           name: 'tos',

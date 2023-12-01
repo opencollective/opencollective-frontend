@@ -841,7 +841,7 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
         paymentMethod: edit.pendingContributionData?.paymentMethod,
         tax: edit.tax && omit(edit.tax, ['id']),
       }
-    : { hostFeePercent: host?.hostFeePercent || 0 };
+    : { hostFeePercent: host?.settings?.hostFeePercentPendingContributions || host?.hostFeePercent || 0 };
 
   return (
     <CreatePendingContributionModalContainer {...props} trapFocus onClose={handleClose}>
