@@ -479,7 +479,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
           {amounts?.effectiveRate ? (
             <AmountLine py={0}>
               <Label color="black.600" fontWeight="500">
-                <FormattedMessage id="EffectiveRate" defaultMessage="Effective rate" />
+                <FormattedMessage defaultMessage="Currency exchange rate" />
               </Label>
               <P fontSize="13px" color="black.600" whiteSpace="nowrap">
                 ~ {expense.currency} 1 = {amounts.totalAmount?.currency} {round(amounts.effectiveRate, 5)}
