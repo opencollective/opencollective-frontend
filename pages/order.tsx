@@ -687,14 +687,7 @@ export default function OrderPage(props) {
                 <Span fontSize="12px" color="black.700" fontWeight="bold">
                   <FormattedMessage id="Expense.PrivateNote" defaultMessage="Private note" />
                   &nbsp;&nbsp;
-                  <PrivateInfoIcon
-                    color="#969BA3"
-                    size={undefined}
-                    tooltipProps={undefined}
-                    withoutTooltip={undefined}
-                    // eslint-disable-next-line react/no-children-prop
-                    children={undefined}
-                  />
+                  <PrivateInfoIcon className="text-muted-foreground" size={12} />
                 </Span>
                 <HTMLContent color="black.700" mt={1} fontSize="13px" content={order.memo} />
               </Box>

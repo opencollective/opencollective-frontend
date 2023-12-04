@@ -287,7 +287,7 @@ const ExpenseSummaryAdditionalInformation = ({
               <Container fontSize="11px" fontWeight="500" mb={2}>
                 <FormattedMessage id="ExpenseForm.InvoiceInfo" defaultMessage="Additional invoice information" />
                 &nbsp;&nbsp;
-                <PrivateInfoIcon color="#969BA3" />
+                <PrivateInfoIcon />
               </Container>
               <P fontSize="11px" lineHeight="16px" whiteSpace="pre-wrap">
                 {expense.invoiceInfo}

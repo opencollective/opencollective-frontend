@@ -67,7 +67,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
             <Container fontSize="14px" fontWeight="700" mb={2}>
               <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" />
               &nbsp;&nbsp;
-              <PrivateInfoIcon color="#969BA3" />
+              <PrivateInfoIcon />
             </Container>
           )}
           <Container fontSize="14px" color="black.700">
@@ -82,7 +82,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
             <Container fontSize="14px" fontWeight="700" mb={2}>
               <FormattedMessage id="Details" defaultMessage="Details" />
               &nbsp;&nbsp;
-              <PrivateInfoIcon color="#969BA3" />
+              <PrivateInfoIcon />
             </Container>
           )}
           <Container fontSize="14px" color="black.700">
@@ -97,7 +97,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
             <Container fontSize="14px" fontWeight="700" mb={2}>
               <FormattedMessage id="Details" defaultMessage="Details" />
               &nbsp;&nbsp;
-              <PrivateInfoIcon color="#969BA3" />
+              <PrivateInfoIcon />
             </Container>
           )}
           {payoutMethod.data ? (

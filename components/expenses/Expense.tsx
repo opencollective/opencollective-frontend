@@ -94,7 +94,7 @@ const PrivateNoteLabel = () => {
     <Span fontSize="12px" color="black.700" fontWeight="bold">
       <FormattedMessage id="Expense.PrivateNote" defaultMessage="Private note" />
       &nbsp;&nbsp;
-      <PrivateInfoIcon color="#969BA3" />
+      <PrivateInfoIcon size={12} className="text-muted-foreground" />
     </Span>
   );
 };
