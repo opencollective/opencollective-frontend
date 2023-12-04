@@ -137,7 +137,7 @@ const SearchTopics = () => {
   return (
     <Flex justifyContent="center" alignItems="center" px="16px">
       <Flex mt={['9px', '32px']} flexDirection="column" ref={innerRef}>
-        <Box ref={setRefElement} data-cy="search-input">
+        <Box ref={setRefElement} maxWidth={'714px'} data-cy="search-input">
           <SearchForm
             width={['1', '500px', '608px']}
             borderRadius="100px"
