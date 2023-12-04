@@ -3348,7 +3348,7 @@
   "x7D8vH": "请说明此笔支出标记为未完成的原因。该原因将与用户分享并将作为评论记录于支出下。",
   "X8Pa2K": "{ count, plural, one {集体} other {集体}}已托管",
   "x92ME7": "托管方名称",
-  "x9TypM": "Since {date}",
+  "x9TypM": "自 {date} 起",
   "XfsYgz": "关于隐私政策",
   "XhMMHL": "尚无授权应用。你可以从<ForDevelopersLink>开发者</ForDevelopersLink>部分创建自己的 OAuth 应用程序。",
   "XhoJIl": " {account} 在 {date} {type, select, CREDIT {收到} DEBIT {付出} other {}}",
