@@ -281,8 +281,8 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   const selectedCollective = collective
     ? { ...collective, ...pick(data?.account, ['admins', 'memberInvitations']) }
     : collectives.length === 1
-    ? collectives[0]
-    : undefined;
+      ? collectives[0]
+      : undefined;
   const host = data?.host;
   const isOCFHost = host?.legacyId === OPENCOLLECTIVE_FOUNDATION_ID;
   const isOSCHost = host?.legacyId === OPENSOURCE_COLLECTIVE_ID;
@@ -466,8 +466,8 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                         isOCFHost
                                           ? `/foundation/apply/intro`
                                           : isOSCHost
-                                          ? '/opensource/apply/intro'
-                                          : `/${host.slug}/create`
+                                            ? '/opensource/apply/intro'
+                                            : `/${host.slug}/create`
                                       }
                                       data-cy="host-apply-new-collective-link"
                                     >

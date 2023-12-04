@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import MUIDrawer from '@mui/material/Drawer';
 import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
+import { createGlobalStyle } from 'styled-components';
 
 import { useTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import { cn } from '../lib/utils';
@@ -11,6 +12,12 @@ import StyledRoundButton from './StyledRoundButton';
 export const DrawerActionsContext = createContext(null);
 
 export const useDrawerActionsContainer = () => useContext(DrawerActionsContext);
+
+const GlobalDrawerStyle = createGlobalStyle<{ drawedWidth: number }>`
+  :root {
+    --drawer-width: ${({ drawedWidth }) => drawedWidth}px;
+  }
+`;
 
 export function Drawer({
   open,
@@ -33,8 +40,25 @@ export function Drawer({
   const [drawerActionsContainer, setDrawerActionsContainer] = useState(null);
   const twoFactorPrompt = useTwoFactorAuthenticationPrompt();
   const disableEnforceFocus = Boolean(twoFactorPrompt?.isOpen);
+
+  const drawerRef = useRef();
+  const [drawedWidth, setDrawerWidth] = useState(0);
+
+  useEffect(() => {
+    if (!drawerRef.current) {
+      return;
+    }
+
+    const observer = new ResizeObserver(entries => {
+      setDrawerWidth(entries[0].contentRect.width);
+    });
+    observer.observe(drawerRef.current);
+    return () => drawerRef.current && observer.unobserve(drawerRef.current);
+  }, [drawerRef.current]);
+
   return (
     <DrawerActionsContext.Provider value={drawerActionsContainer}>
+      <GlobalDrawerStyle drawedWidth={drawedWidth} />
       <MUIDrawer
         className="[&_.MuiBackdrop-root]:bg-slate-950/25"
         anchor="right"
@@ -42,7 +66,7 @@ export function Drawer({
         onClose={onClose}
         disableEnforceFocus={disableEnforceFocus}
       >
-        <div className={cn('flex h-full w-screen max-w-lg flex-col', className)} data-cy={dataCy}>
+        <div ref={drawerRef} className={cn('flex h-full w-screen max-w-lg flex-col', className)} data-cy={dataCy}>
           <div className="flex flex-1 flex-col overflow-y-scroll">
             <div className="relative py-6">
               {showCloseButton && (

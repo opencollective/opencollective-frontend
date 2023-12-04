@@ -143,7 +143,7 @@ const filterArchivedMemberships = (memberships: LoggedInUser['memberOf']) => {
 
 const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
   const filteredMemberships = memberships.filter(m => {
-    if (m.role === 'BACKER' || m.collective.isArchived) {
+    if (!['ADMIN', 'ACCOUNTANT', 'HOST'].includes(m.role) || m.collective.isArchived) {
       return false;
     } else if (m.collective.type === 'EVENT' && isPastEvent(m.collective)) {
       return false;
@@ -230,7 +230,7 @@ const MenuSectionHeader = ({ section, hidePlusIcon, closeDrawer }) => {
               href={plusButton.href}
               aria-label={intl.formatMessage(plusButton.text)}
               onClick={closeDrawer}
-              tabIndex="-1"
+              tabIndex={-1}
               className="mr-1.5 flex h-6 w-6 items-center justify-center rounded-full border"
             >
               <Plus size={12} color="#76777A" />

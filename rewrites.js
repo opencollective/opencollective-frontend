@@ -237,6 +237,19 @@ exports.REWRITES = [
     source: '/:collectiveSlug/conversations/:slug?-:id([a-z0-9]+)',
     destination: '/conversation',
   },
+  // Legacy Banners/Widgets/Buttons
+  {
+    source: '/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png',
+    destination: '/api/legacy/contribute',
+  },
+  {
+    source: '/:collectiveSlug/:verb(contribute|donate)/button.js',
+    destination: '/api/legacy/button',
+  },
+  {
+    source: '/:collectiveSlug/:widget(widget|events|collectives|banner).js',
+    destination: '/api/legacy/widget',
+  },
   // Contribute Flow
   // ---------------
   // Legacy create order route. Deprectated on 2019-02-12
@@ -268,15 +281,6 @@ exports.REWRITES = [
   {
     source: `/:collectiveSlug/:verb(events|projects)/:eventSlug/order/:tierId/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
-  },
-  // Pledges
-  {
-    source: `/pledges/new`,
-    destination: '/createPledge',
-  },
-  {
-    source: `/:slug/pledges/new`,
-    destination: '/createPledge',
   },
   // Marketing Pages
   {

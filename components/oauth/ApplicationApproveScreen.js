@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/fa-solid/Check';
-import { has } from 'lodash';
+import { difference, has } from 'lodash';
 import {
   AlertTriangle,
   ArrowRightLeft,
@@ -264,7 +264,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
                   </P>
                 </Flex>
               ))}
-              {filteredScopes.length > 0 && (
+              {difference(filteredScopes, ['email']).length > 0 && (
                 <MessageBox type="info" mt={40} fontSize="13px">
                   <FormattedMessage defaultMessage="These permissions are granted to all the accounts you're administrating, including your personal profile." />
                 </MessageBox>

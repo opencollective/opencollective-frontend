@@ -143,7 +143,7 @@ const DashboardPage = () => {
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
     if (activeSlug && activeSlug !== lastWorkspaceVisit.slug) {
-      if (!useDynamicTopBar) {
+      if (LoggedInUser && !useDynamicTopBar) {
         // this is instead configured as "default" account in NewAccountSwitcher
         setLastWorkspaceVisit({ slug: activeSlug });
       }
@@ -191,73 +191,85 @@ const DashboardPage = () => {
         setDefaultSlug: slug => setLastWorkspaceVisit({ slug }),
       }}
     >
-      <Page
-        noRobots
-        collective={account}
-        title={account ? `${account.name} - ${titleBase}` : titleBase}
-        pageTitle={titleBase}
-        showFooter={false}
-      >
-        {Boolean(notification) && <NotificationBar {...notification} />}
-        {blocker ? (
-          <div className="my-32 flex flex-col items-center">
-            <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
-              <p>{blocker}</p>
-              {LoggedInUser && (
-                <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
-                  <FormattedMessage defaultMessage="Go to your Dashboard" />
-                </Link>
-              )}
-            </MessageBox>
-            {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
-          </div>
-        ) : !useDynamicTopBar ? (
-          <div
-            className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row md:px-6 lg:gap-12 lg:py-8"
-            data-cy="admin-panel-container"
-          >
-            <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />
-            {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
-              <TwoFactorAuthRequiredMessage className="lg:mt-16" />
-            ) : (
-              <div className="max-w-[1000px] flex-1 sm:overflow-x-clip">
-                <DashboardSection section={selectedSection} isLoading={isLoading} account={account} subpath={subpath} />
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className={'flex min-h-[600px] flex-col items-stretch gap-6'} data-cy="admin-panel-container">
-            <DashboardTopBar isLoading={isLoading} account={account} menuItems={menuItems} />
-
-            {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
-              <TwoFactorAuthRequiredMessage className="lg:mt-16" />
-            ) : (
-              <div
-                className={clsx(
-                  'mx-auto grid w-full max-w-screen-2xl grid-cols-1 justify-center px-3 md:px-6',
-                  subMenu
-                    ? 'md:grid-cols-[minmax(200px,1fr)_minmax(0,1024px)_minmax(0,1fr)]'
-                    : 'md:grid-cols-[minmax(0,1fr)_minmax(0,1024px)_minmax(0,1fr)]',
+      <div className="flex min-h-screen flex-col justify-between">
+        <Page
+          noRobots
+          collective={account}
+          title={account ? `${account.name} - ${titleBase}` : titleBase}
+          pageTitle={titleBase}
+          showFooter={false}
+        >
+          {Boolean(notification) && <NotificationBar {...notification} />}
+          {blocker ? (
+            <div className="my-32 flex flex-col items-center">
+              <MessageBox type="warning" mb={4} maxWidth={400} withIcon>
+                <p>{blocker}</p>
+                {LoggedInUser && (
+                  <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
+                    <FormattedMessage defaultMessage="Go to your Dashboard" />
+                  </Link>
                 )}
-              >
-                {subMenu ? (
-                  <SubMenu
-                    className="mb-4 md:mr-4"
-                    subMenu={subMenu}
+              </MessageBox>
+              {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
+            </div>
+          ) : !useDynamicTopBar ? (
+            <div
+              className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row md:px-6 lg:gap-12 lg:py-8"
+              data-cy="admin-panel-container"
+            >
+              <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />
+              {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
+                <TwoFactorAuthRequiredMessage className="lg:mt-16" />
+              ) : (
+                <div className="max-w-[1000px] flex-1 px-1 sm:overflow-x-clip">
+                  <DashboardSection
+                    section={selectedSection}
+                    isLoading={isLoading}
                     account={account}
-                    selectedSection={selectedSection}
+                    subpath={subpath}
                   />
-                ) : (
-                  <div />
-                )}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className={'flex min-h-[600px] flex-col items-stretch gap-6 pb-10'} data-cy="admin-panel-container">
+              <DashboardTopBar isLoading={isLoading} account={account} menuItems={menuItems} />
 
-                <DashboardSection section={selectedSection} isLoading={isLoading} account={account} subpath={subpath} />
-              </div>
-            )}
-          </div>
-        )}
+              {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
+                <TwoFactorAuthRequiredMessage className="lg:mt-16" />
+              ) : (
+                <div
+                  className={clsx(
+                    'mx-auto grid w-full max-w-screen-2xl grid-cols-1 justify-center px-3 md:px-6',
+                    subMenu
+                      ? 'lg:grid-cols-[minmax(200px,1fr)_minmax(0,1024px)_minmax(0,1fr)]'
+                      : 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1024px)_minmax(0,1fr)]',
+                  )}
+                >
+                  {subMenu ? (
+                    <SubMenu
+                      className="mb-4 lg:mr-4"
+                      subMenu={subMenu}
+                      account={account}
+                      selectedSection={selectedSection}
+                    />
+                  ) : (
+                    <div />
+                  )}
+
+                  <DashboardSection
+                    section={selectedSection}
+                    isLoading={isLoading}
+                    account={account}
+                    subpath={subpath}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </Page>
         <Footer />
-      </Page>
+      </div>
     </DashboardContext.Provider>
   );
 };

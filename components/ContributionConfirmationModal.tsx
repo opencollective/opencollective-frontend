@@ -46,6 +46,7 @@ export const confirmContributionFieldsFragment = gql`
       name
       type
       imageUrl
+      hasImage
     }
     toAccount {
       id
@@ -53,6 +54,7 @@ export const confirmContributionFieldsFragment = gql`
       name
       type
       imageUrl
+      hasImage
       ... on AccountWithHost {
         bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
         host {

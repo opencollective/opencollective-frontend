@@ -2,7 +2,7 @@ describe('Host agreements', () => {
   it('Use the agreements admin to create and edit agreements', () => {
     // ---- Load the list filter by newly created account ----
     cy.login({ redirect: `/dashboard/brusselstogetherasbl/host-agreements` });
-    cy.contains('[data-cy="agreements-table"]', 'No agreements'); // Starts with no agreements
+    cy.contains('[data-cy="zero-results-message"]', 'No agreements');
 
     // ---- Create an agreement ----
     cy.getByDataCy('btn-new-agreement').click();
@@ -49,10 +49,13 @@ describe('Host agreements', () => {
     cy.get('@firstRow').contains('Nov 7, 2062');
 
     // ---- Filters the agreements ----
-    cy.getByDataCy('select-agreements-account').type('brussels');
-    cy.contains('[data-cy="select-option"]', 'BrusselsTogether').click();
-    cy.contains('[data-cy="agreements-table"]', 'No agreements');
-    cy.contains('[data-cy="agreements-table"] button', 'Reset filters').click(); // Has link to reset the (account) filter
+    cy.getByDataCy('filter-account').click();
+    cy.getByDataCy('combo-select-input').click().type('brussels');
+    // cy.getByDataCy('select-agreements-account').type('brussels');
+    cy.contains('[data-cy="combo-select-option"]', 'BrusselsTogether').click();
+    cy.getByDataCy('apply-filter').click();
+    cy.contains('[data-cy="zero-results-message"]', 'No matching agreements');
+    cy.contains('[data-cy="zero-results-message"] button', 'Reset filters').click(); // Has link to reset the (account) filter
     cy.contains('[data-cy="agreements-table"]', 'Unlimited potatoes (updated)');
 
     // ---- Agreement count should be displayed in the expenses list ----
@@ -79,6 +82,6 @@ describe('Host agreements', () => {
     cy.getByDataCy('confirmation-modal-continue').click();
     cy.checkToast({ variant: 'success', message: 'Agreement deleted successfully' });
     cy.getByDataCy('agreement-drawer').should('not.exist'); // It closes the drawer
-    cy.contains('[data-cy="agreements-table"]', 'No agreements');
+    cy.contains('[data-cy="zero-results-message"]', 'No matching agreements');
   });
 });

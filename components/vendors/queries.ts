@@ -11,6 +11,7 @@ export const vendorFieldFragment = gql`
     description
     tags
     imageUrl(height: 96)
+    hasImage
     isArchived
     createdAt
 
@@ -46,6 +47,14 @@ export const vendorFieldFragment = gql`
       type
       name
       data
+    }
+
+    orders(filter: OUTGOING, limit: 1) {
+      totalCount
+    }
+
+    expenses(status: PAID, direction: SUBMITTED, limit: 1) {
+      totalCount
     }
   }
 `;

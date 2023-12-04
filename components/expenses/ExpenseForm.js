@@ -39,7 +39,6 @@ import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputTags from '../StyledInputTags';
 import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
-import { toast } from '../ui/useToast';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseCategorySelect from './ExpenseCategorySelect';
@@ -48,7 +47,6 @@ import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } 
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
 import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';
 import { prepareExpenseItemForSubmit, validateExpenseItem } from './ExpenseItemForm';
-import { ExpenseOCRPrefillStarter } from './ExpenseOCRPrefillStarter';
 import ExpenseRecurringBanner from './ExpenseRecurringBanner';
 import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
 import ExpenseTypeRadioSelect from './ExpenseTypeRadioSelect';
@@ -205,8 +203,8 @@ const validateExpense = (intl, expense, collective, host, LoggedInUser) => {
   const errors = isCardCharge
     ? {}
     : expense.payee?.type === CollectiveType.VENDOR
-    ? requireFields(expense, ['description', 'payee', 'currency'])
-    : requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
+      ? requireFields(expense, ['description', 'payee', 'currency'])
+      : requireFields(expense, ['description', 'payee', 'payoutMethod', 'currency']);
 
   if (expense.items.length > 0) {
     const itemsErrors = expense.items.map(item => validateExpenseItem(expense, item));
@@ -308,7 +306,6 @@ const ExpenseFormBody = ({
   const router = useRouter();
   const formRef = React.useRef();
   const { LoggedInUser } = useLoggedInUser();
-  const [hideOCRPrefillStater, setHideOCRPrefillStarter] = React.useState(false);
   const { values, handleChange, errors, setValues, dirty, touched, resetForm, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
   const hasOCRPreviewEnabled = checkOCREnabled(LoggedInUser, router, host);
@@ -610,26 +607,6 @@ const ExpenseFormBody = ({
           supportedExpenseTypes={supportedExpenseTypes}
         />
       )}
-      {Boolean(!values.type && !hideOCRPrefillStater && hasOCRPreviewEnabled && LoggedInUser?.isRoot) && (
-        <ExpenseOCRPrefillStarter
-          onUpload={() => setHideOCRPrefillStarter(true)}
-          onSuccess={uploadResult => {
-            // We want to make sure that the expense type is set before prefilling the form
-            if (values.type) {
-              updateExpenseFormWithUploadResult(collective, formik, uploadResult);
-            } else {
-              setInitWithOCR(uploadResult);
-            }
-
-            toast({
-              variant: 'success',
-              message: (
-                <FormattedMessage defaultMessage="The expense has been automatically prefilled with the information from the document" />
-              ),
-            });
-          }}
-        />
-      )}
       {isRecurring && <ExpenseRecurringBanner expense={expense} />}
       {values.type && (
         <StyledCard mt={4} p={[16, 16, 32]} overflow="initial">
@@ -865,7 +842,6 @@ const ExpenseFormBody = ({
             } else {
               setStep(EXPENSE_FORM_STEPS.PAYEE);
               resetForm({ values: getDefaultExpense(collective, supportedExpenseTypes) });
-              setHideOCRPrefillStarter(false);
               if (formPersister) {
                 formPersister.clearValues();
                 window.scrollTo(0, 0);

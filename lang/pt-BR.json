@@ -3348,7 +3348,7 @@
   "x7D8vH": "Por favor, indique a razão pela qual esta despesa foi marcada como incompleta. O motivo será partilhado com o usuário e será documentado como um comentário à custa do mesmo.",
   "X8Pa2K": "{ count, plural, one {Collective} other {Collectives}} hosted",
   "x92ME7": "Nome do Administrador",
-  "x9TypM": "Desde {date}",
+  "x9TypM": "Since {date}",
   "XfsYgz": "Sobre a Privacidade",
   "XhMMHL": "Nenhum aplicativo autorizado ainda. Você pode criar seu próprio aplicativo OAuth a partir da seção <ForDevelopersLink>para desenvolvedores</ForDevelopersLink>.",
   "XhoJIl": "{type, select, CREDIT {Received by} DEBIT {Paid by} other {}} {account} on {date}",

@@ -22,8 +22,8 @@ export const useWindowScroll = () => {
         newYPosition === _yPosition
           ? _direction
           : newYPosition > _yPosition
-          ? ScrollDirection.DOWN
-          : ScrollDirection.UP;
+            ? ScrollDirection.DOWN
+            : ScrollDirection.UP;
       const scrollDifference = Math.abs(newYPosition - _yPosition);
 
       _accPosition = newDirection !== _direction ? scrollDifference : _accPosition + scrollDifference;

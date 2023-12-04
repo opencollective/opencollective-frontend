@@ -1,26 +1,4 @@
 """
-Application model
-"""
-type Application {
-  id: Int
-  type: ApplicationType
-  name: String
-  description: String
-  apiKey: String
-  clientId: String
-  clientSecret: String
-  callbackUrl: String
-}
-
-"""
-All application types
-"""
-enum ApplicationType {
-  API_KEY
-  OAUTH
-}
-
-"""
 Collective interface
 """
 interface CollectiveInterface {
@@ -58,7 +36,7 @@ interface CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -170,8 +148,6 @@ interface CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -750,12 +726,11 @@ enum OrderStatus {
   PAID
   ERROR
   PROCESSING
+  REJECTED
   ACTIVE
   CANCELLED
   PENDING
   EXPIRED
-  PLEDGED
-  REJECTED
   DISPUTED
   REFUNDED
   IN_REVIEW
@@ -1017,61 +992,6 @@ scalar URL
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
 scalar DateTime
-
-"""
-This represents an Update
-"""
-type UpdateType {
-  id: Int
-  views: Int
-  slug: String
-  image: String
-  isPrivate: Boolean
-  isChangelog: Boolean!
-  notificationAudience: UpdateAudienceTypeEnum
-  makePublicOn: IsoDateString
-
-  """
-  Indicates whether or not the user is allowed to see the content of this update
-  """
-  userCanSeeUpdate: Boolean
-  title: String
-  createdAt: DateString
-  updatedAt: DateString
-  publishedAt: DateString
-  summary: String
-  html: String
-  tags: [String]
-  createdByUser: UserDetails
-  fromCollective: CollectiveInterface
-  collective: CollectiveInterface
-  tier: Tier
-}
-
-"""
-Defines targets for an update
-"""
-enum UpdateAudienceTypeEnum {
-  """
-  Will be sent to collective admins and financial contributors
-  """
-  ALL
-
-  """
-  Will be sent to collective admins
-  """
-  COLLECTIVE_ADMINS
-
-  """
-  Will be sent to financial contributors
-  """
-  FINANCIAL_CONTRIBUTORS
-
-  """
-  Will be sent to no one
-  """
-  NO_ONE
-}
 
 """
 Properties by which PaymenMethods can be ordered
@@ -2213,7 +2133,7 @@ type Collective implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2374,8 +2294,6 @@ type Collective implements CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -2479,7 +2397,7 @@ type Event implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2640,8 +2558,6 @@ type Event implements CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -2745,7 +2661,7 @@ type Fund implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2906,8 +2822,6 @@ type Fund implements CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -3011,7 +2925,7 @@ type Organization implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3172,8 +3086,6 @@ type Organization implements CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -3277,7 +3189,7 @@ type Project implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3438,8 +3350,6 @@ type Project implements CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -3788,7 +3698,7 @@ type User implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3949,8 +3859,6 @@ type User implements CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -4015,7 +3923,6 @@ type User implements CollectiveInterface {
   categories: [String]!
   policies: Policies!
   email: String
-  applications: [Application] @deprecated(reason: "2023-07-19: Use GraphQL V2")
 }
 
 """
@@ -4056,7 +3963,7 @@ type Vendor implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -4217,8 +4124,6 @@ type Vendor implements CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -4582,8 +4487,6 @@ type Mutation {
   """
   editPublicMessage(FromCollectiveId: Int!, CollectiveId: Int!, message: String): [Member]
     @deprecated(reason: "2021-01-27: Please use editPublicMessage from GQLV2")
-  createOrder(order: OrderInputType!): OrderType
-    @deprecated(reason: "2020-10-13: This mutation has been moved to GQLV2")
 
   """
   Update a payment method
@@ -4707,7 +4610,6 @@ type Mutation {
     """
     id: Int!
   ): NotificationType
-  backyourstackDispatchOrder(id: Int!): BackYourStackDispatchState
 
   """
   Activate a collective as Host.
@@ -4983,7 +4885,6 @@ input UserInputType {
   name: String
   company: String
   image: String
-  username: String @deprecated(reason: "2022-01-13: Not used anymore. Will be ignored")
   description: String
   twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
@@ -5004,126 +4905,6 @@ input ConnectedAccountInputType {
 }
 
 """
-Input type for OrderType
-"""
-input OrderInputType {
-  id: Int
-  quantity: Int = 1
-  totalAmount: Int
-  hostFeePercent: Float
-  platformFeePercent: Float
-  platformFee: Int
-  isFeesOnTop: Boolean
-  currency: String
-  interval: String
-  description: String
-  publicMessage: String
-  privateMessage: String
-  paymentMethod: PaymentMethodInputType
-  user: UserInputType @deprecated(reason: "2020-10-13: This field is now ignored")
-  fromCollective: CollectiveAttributesInputType
-  collective: CollectiveAttributesInputType!
-  tier: TierInputType
-  customData: JSON
-  recaptchaToken: String
-
-  """
-  Use this when fromAccount is null to pass the guest info
-  """
-  guestInfo: GuestInfoInput
-
-  """
-  The amount of taxes that were included in totalAmount
-  """
-  taxAmount: Int = 0
-
-  """
-  User country, to know which tax applies
-  """
-  countryISO: String
-
-  """
-  User tax ID number
-  """
-  taxIDNumber: String
-}
-
-"""
-Input type for PaymentMethod (paypal/stripe)
-"""
-input PaymentMethodInputType {
-  id: Int
-  uuid: String
-  token: String
-  service: String
-
-  """
-  creditcard, giftcard, prepaid, manual...
-  """
-  type: String
-  customerId: String
-  data: JSON
-  name: String
-  primary: Boolean
-  monthlyLimitPerMember: Int
-  currency: String
-  save: Boolean
-}
-
-"""
-Input type for guest contributions
-"""
-input GuestInfoInput {
-  """
-  Contributor's email
-  """
-  email: String
-
-  """
-  Display name of the user
-  """
-  name: String
-
-  """
-  Legal name of the user
-  """
-  legalName: String
-
-  """
-  The unique guest token
-  """
-  token: String
-
-  """
-  Captcha validation for creating an order
-  """
-  captcha: CaptchaInput
-}
-
-"""
-Captcha related information
-"""
-input CaptchaInput {
-  """
-  Captcha validation token
-  """
-  token: String!
-
-  """
-  Catpcha provider
-  """
-  provider: CaptchaProvider!
-}
-
-"""
-Implemented Captcha Providers
-"""
-enum CaptchaProvider {
-  HCAPTCHA
-  RECAPTCHA
-}
-
-"""
 Input for stripe credit card data
 """
 input StripeCreditCardDataInputType {
@@ -5134,8 +4915,4 @@ input StripeCreditCardDataInputType {
   country: String
   funding: String
   zip: String
-}
-
-type BackYourStackDispatchState {
-  dispatching: Boolean
 }

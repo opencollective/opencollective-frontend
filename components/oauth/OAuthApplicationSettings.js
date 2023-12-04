@@ -11,6 +11,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
@@ -116,7 +117,7 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
               <FormattedMessage defaultMessage="This application can directly perform critical operations that would normally require 2FA." />
             </MessageBox>
           )}
-          <StyledCard maxWidth="600px" p={3} my={4}>
+          <StyledCard maxWidth="600px" p={3} mt={4}>
             <H4 fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb="20px">
               <FormattedMessage defaultMessage="Client ID and client secret" />
             </H4>
@@ -137,6 +138,21 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
               </Flex>
             </Flex>
           </StyledCard>
+          <P mb={4} mt="10px" fontSize={12} color="black.700" letter-spacing="-0.4px">
+            {intl.formatMessage(
+              {
+                id: 'oauth.docs',
+                defaultMessage:
+                  'Explore <Link>our documentation</Link> for guidance on authorizing OAuth applications.',
+              },
+              {
+                Link: getI18nLink({
+                  href: 'https://docs.opencollective.com/help/developers/oauth',
+                  openInNewTab: true,
+                }),
+              },
+            )}
+          </P>
           <Formik
             initialValues={data.application}
             validate={values => validateOauthApplicationValues(intl, values)}

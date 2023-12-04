@@ -167,7 +167,7 @@ const throttledCall = debounce((searchFunc, variables) => {
 export type EditVirtualCardModalProps = {
   host: Account;
   collective?: Account;
-  virtualCard: VirtualCard;
+  virtualCard?: VirtualCard;
   virtualCardRequest?: VirtualCardRequest;
   onSuccess: (el: React.ReactNode) => void;
   onClose: () => void;
@@ -228,8 +228,8 @@ export default function EditVirtualCardModal({
           account: isEditing
             ? undefined
             : typeof collective.id === 'string'
-            ? { id: collective.id }
-            : { legacyId: collective.id },
+              ? { id: collective.id }
+              : { legacyId: collective.id },
           name: cardName,
           assignee: { id: assignee.id },
           limitAmount: undefined,

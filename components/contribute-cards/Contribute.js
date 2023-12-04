@@ -86,6 +86,13 @@ const Description = styled.div`
   color: #4e5052;
 `;
 
+const MissingCTAExplanation = styled(Description)`
+  flex: 0;
+  font-style: italic;
+  font-size: 12px;
+  padding-bottom: 4px;
+`;
+
 /** Translations */
 const I18nContributionType = defineMessages({
   [ContributionTypes.FINANCIAL_CUSTOM]: {
@@ -211,6 +218,7 @@ const ContributeCard = ({
   onClickEdit,
   tier,
   isPreview,
+  missingCTAMsg,
   ...props
 }) => {
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
@@ -242,6 +250,7 @@ const ContributeCard = ({
             {title}
           </Container>
           <Description data-cy="contribute-description">{children}</Description>
+          {(hideCTA || disableCTA) && missingCTAMsg && <MissingCTAExplanation>{missingCTAMsg}</MissingCTAExplanation>}
         </Flex>
         <Box>
           {!disableCTA && !hideCTA && (
@@ -359,6 +368,7 @@ ContributeCard.propTypes = {
   collective: PropTypes.object,
   isPreview: PropTypes.bool,
   onClickEdit: PropTypes.func,
+  missingCTAMsg: PropTypes.string,
 };
 
 export default injectIntl(ContributeCard);

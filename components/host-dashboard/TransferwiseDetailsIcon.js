@@ -5,7 +5,7 @@ import { Info } from '@styled-icons/feather/Info';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledTooltip from '../StyledTooltip';
 
-const BalancesBreakdown = ({ balances }) => {
+export const BalancesBreakdown = ({ balances }) => {
   return (
     <div>
       {balances.map(({ valueInCents, currency }) => (

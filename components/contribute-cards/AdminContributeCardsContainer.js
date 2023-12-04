@@ -73,8 +73,8 @@ const AdminContributeCardsContainer = ({
   const createContributionTierRoute = hasDashboard
     ? `/dashboard/${collective.slug}/tiers`
     : isEvent
-    ? `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/admin/tiers`
-    : `/${collective.slug}/admin/tiers`;
+      ? `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/admin/tiers`
+      : `/${collective.slug}/admin/tiers`;
 
   const addNewMessage =
     createNewType === 'TICKET' ? (

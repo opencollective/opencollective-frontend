@@ -3348,7 +3348,7 @@
   "x7D8vH": "Proszę podać powód, dla którego ten wydatek został oznaczony jako niekompletny. Powód ten zostanie udostępniony użytkownikowi, a także udokumentowany jako komentarz pod wydatkiem.",
   "X8Pa2K": "Gospodarz { count, plural, one {Zbioru} few {Zbiorów} many {Zbiorów} other {Zbioru}}",
   "x92ME7": "Nazwa gospodarza",
-  "x9TypM": "Od {date}",
+  "x9TypM": "Since {date}",
   "XfsYgz": "O prywatności",
   "XhMMHL": "Nie ma jeszcze żadnej autoryzowanej aplikacji. Możesz stworzyć własną aplikację OAuth z sekcji <ForDevelopersLink>Dla programistów</ForDevelopersLink>.",
   "XhoJIl": "{type, select, CREDIT {Otrzymane przez} DEBIT {Płatne przez} other {}} {account} w dniu {date}",

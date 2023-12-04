@@ -1,8 +1,12 @@
+/**
+ * @deprecated This component has been integrated into `components/dashboard/Filterbar`, remove when PREVIEW_FEATURE_KEYS.DASHBOARD moves out of preview
+ */
+
 import React from 'react';
 import { omitBy } from 'lodash';
 
 import { Box } from '../Grid';
-import Tabs from '../StyledTabs';
+import Tabs from '../Tabs';
 const omit = (query, keys) => {
   return omitBy(query, (value, key) => !value || (keys && keys.includes(key)));
 };

@@ -16,7 +16,7 @@ type ExpenseItemDescriptionHintProps = {
 export const ExpenseItemDescriptionHint = ({ item, isInvoice, form, field }: ExpenseItemDescriptionHintProps) => {
   const [hideHint, setHideHint] = React.useState(false);
   const intl = useIntl();
-  const suggested = item.__itemParsingResult?.description || item.__parsingResult?.description;
+  const suggested = item.__parsingResult?.description;
 
   if (suggested && suggested !== field.value) {
     return (

@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { Account, Host, VirtualCardRequestCollection } from '../../../lib/graphql/types/v2/graphql';
-import useQueryFilter from '../../../lib/hooks/useQueryFilter';
+import useQueryFilter from '../../../lib/hooks/deprecated/useQueryFilter';
 
 import { DashboardSectionProps } from '../../dashboard/types';
 import { Box, Flex } from '../../Grid';
@@ -20,7 +20,7 @@ import { VirtualCardRequestsTable } from '../../virtual-card-requests/VirtualCar
 import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const hostVirtualCardRequestsQuery = gql`
-  query HostVirtualCardRequests(
+  query HostDashboardVirtualCardRequests(
     $hostSlug: String!
     $collective: [AccountReferenceInput]
     $selectedCollectiveSlug: String

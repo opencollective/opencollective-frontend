@@ -71,9 +71,10 @@ const Avatar = ({
   radius = 42,
   name = undefined,
   useIcon = false,
+  children = null,
   ...styleProps
 }) => {
-  let child = null;
+  let child = children;
   // Use collective object instead of props
   if (collective) {
     type = collective.type;
@@ -82,7 +83,7 @@ const Avatar = ({
       src = defaultImage.ANONYMOUS;
     } else if (collective.isGuest && shouldUseDefaultGuestAvatar(collective.name)) {
       src = defaultImage.GUEST;
-    } else if (type === 'VENDOR') {
+    } else if (type === 'VENDOR' && collective.hasImage !== true) {
       const iconSize = 2 * Math.round((radius * 0.6) / 2);
       const padding = (radius - iconSize) / 2;
       child = (

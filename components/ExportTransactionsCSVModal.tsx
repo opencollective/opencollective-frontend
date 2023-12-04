@@ -1,3 +1,4 @@
+// @deprecated, being replaced by components/dashboard/ExportTransactionsCSVModal.tsx - remove when new filters are applied everywhere
 import React from 'react';
 import { flatten, isEmpty, omit } from 'lodash';
 import { FormattedMessage } from 'react-intl';
