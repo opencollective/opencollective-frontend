@@ -18,7 +18,6 @@ import { i18nTaxType } from '../../lib/i18n/taxes';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { getAmountWithoutTaxes, getTaxAmount } from './lib/utils';
 
-import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -204,7 +203,8 @@ const calculateAmounts = ({ formik, expense, quote, host, feesPayer }) => {
       valueInCents: formik.values.paymentProcessorFeeInHostCurrency,
       currency: host.currency,
     };
-    const effectiveRate = expense.currency !== host.currency && totalAmount.valueInCents / expense.amount;
+    const grossAmount = totalAmount.valueInCents - (paymentProcessorFee.valueInCents || 0);
+    const effectiveRate = expense.currency !== host.currency && grossAmount / expense.amount;
     return { paymentProcessorFee, totalAmount, effectiveRate };
   } else if (quote) {
     const effectiveRate = expense.currency !== host.currency && quote.sourceAmount.valueInCents / expense.amount;
@@ -504,11 +504,11 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
           {amounts?.effectiveRate ? (
             <AmountLine py={0}>
               <Label color="black.600" fontWeight="500">
-                <FormattedMessage id="EffectiveRate" defaultMessage="Effective rate" />
+                <FormattedMessage defaultMessage="Currency exchange rate" />
               </Label>
-              <Flex>
-                <Container color="black.600">~ {round(amounts.effectiveRate, 5)}</Container>
-              </Flex>
+              <P fontSize="13px" color="black.600" whiteSpace="nowrap">
+                ~ {expense.currency} 1 = {amounts.totalAmount?.currency} {round(amounts.effectiveRate, 5)}
+              </P>
             </AmountLine>
           ) : null}
         </Box>
