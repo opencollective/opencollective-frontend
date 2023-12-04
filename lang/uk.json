@@ -3348,7 +3348,7 @@
   "x7D8vH": "Please mention the reason why this expense has been marked as incomplete. The reason will be shared with the user and also be documented as a comment under the expense.",
   "X8Pa2K": "{ count, plural, one {Колектив}  few {Колективи} many {Колективів} other {Колективів} } обслуговується",
   "x92ME7": "Host Name",
-  "x9TypM": "Since {date}",
+  "x9TypM": "З {date}",
   "XfsYgz": "Про приватність",
   "XhMMHL": "No Authorized App yet. You can create your own OAuth application from the <ForDevelopersLink>For Developers</ForDevelopersLink> section.",
   "XhoJIl": "{type, select, CREDIT {Received by} DEBIT {Paid by} other {}} {account} on {date}",
