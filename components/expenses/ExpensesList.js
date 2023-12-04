@@ -34,23 +34,25 @@ const FooterLabel = styled.span`
 `;
 
 const ExpensesTotal = ({ collective, host, expenses, expenseFieldForTotalAmount }) => {
-  const { total, isApproximate } = React.useMemo(() => {
+  const { total, currency, isApproximate } = React.useMemo(() => {
     let isApproximate = false;
     let total = 0;
+    let currency = collective?.currency || host?.currency;
     for (const expense of expenses) {
       total += expense[expenseFieldForTotalAmount]?.valueInCents || expense.amount;
+      currency = currency || expense[expenseFieldForTotalAmount]?.currency;
       if (expense[expenseFieldForTotalAmount]?.exchangeRate?.isApproximate) {
         isApproximate = true;
       }
     }
 
-    return { total, isApproximate };
+    return { total, currency, isApproximate };
   }, [expenses]);
 
   return (
     <React.Fragment>
       {isApproximate && `~ `}
-      <FormattedMoneyAmount amount={total} currency={collective?.currency || host?.currency} precision={2} />
+      <FormattedMoneyAmount amount={total} currency={currency} precision={2} />
     </React.Fragment>
   );
 };
@@ -111,7 +113,7 @@ const ExpensesList = ({
               <ExpenseBudgetItem
                 isInverted={isInverted}
                 expense={expense}
-                host={host}
+                host={host || expense.host}
                 showProcessActions
                 view={view}
                 onDelete={onDelete}

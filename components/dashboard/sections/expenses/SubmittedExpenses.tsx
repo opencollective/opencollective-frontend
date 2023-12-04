@@ -36,6 +36,8 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     collectiveSlug: accountSlug,
     createdByAccount,
     fromAccount,
+    fetchHostForExpenses: true,
+    hasAmountInCreatedByAccountCurrency: true, // To generate the `amountInCreatedByAccountCurrency` field below
     ...queryFilter.variables,
   };
 
@@ -76,6 +78,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
             view={'submitter'}
             useDrawer
             openExpenseLegacyId={Number(router.query.openExpenseId)}
+            expenseFieldForTotalAmount="amountInCreatedByAccountCurrency"
             setOpenExpenseLegacyId={legacyId => {
               router.push(
                 {
