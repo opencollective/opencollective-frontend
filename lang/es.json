@@ -3348,7 +3348,7 @@
   "x7D8vH": "Por favor, indica la razón por la que este gasto ha sido marcado como incompleto. La razón se compartirá con el usuario y también se documentará como un comentario bajo el gasto.",
   "X8Pa2K": "{ count, plural, one {Colectivo} other {Colectivos}} hosted",
   "x92ME7": "Nombre de Anfitrión",
-  "x9TypM": "Since {date}",
+  "x9TypM": "Desde {date}",
   "XfsYgz": "Sobre privacidad",
   "XhMMHL": "Todavía no hay ninguna App Autorizada. Puedes crear tu propia aplicación OAuth desde la sección <ForDevelopersLink>Para Desarrolladores</ForDevelopersLink>.",
   "XhoJIl": "{type, select, CREDIT {Recibido por} DEBIT {Pagado por} other {}} {account} el {date}",
