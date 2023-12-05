@@ -158,6 +158,7 @@ const addFundsAccountQuery = gql`
   query AddFundsAccount($slug: String!) {
     account(slug: $slug) {
       id
+      legacyId
       type
       isHost
       name
