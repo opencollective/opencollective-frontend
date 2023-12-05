@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import {
   PaymentIntent,
   Stripe,
@@ -11,7 +11,7 @@ import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import clsx from 'clsx';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import {
   Account,
   Host,

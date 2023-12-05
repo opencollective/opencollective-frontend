@@ -1,9 +1,9 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { VirtualCard as GraphQLVirtualCard, VirtualCardStatus } from '../../lib/graphql/types/v2/graphql';
 import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
@@ -35,7 +35,7 @@ type VirtualCardDrawerProps = {
 };
 
 const virtualCardQuery = gql`
-  query VirtualCard($virtualCard: VirtualCardReferenceInput!) {
+  query VirtualCardDrawer($virtualCard: VirtualCardReferenceInput!) {
     virtualCard(virtualCard: $virtualCard) {
       id
       name

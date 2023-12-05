@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
 import { map, omit } from 'lodash';
@@ -10,7 +9,7 @@ import styled, { css } from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql, gqlV1 } from '../../lib/graphql/helpers';
 import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
 import { compose, isValidUrl } from '../../lib/utils';
 
@@ -431,7 +430,7 @@ const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, 
 
 const addMemberInvitationQuery = graphql(
   gql`
-    query MemberInvitationsQuery($slug: String!) {
+    query MemberInvitations($slug: String!) {
       memberInvitations(account: { slug: $slug }, role: [ADMIN]) {
         id
         role

@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../../lib/graphql/helpers';
 
 const memberFieldsFragment = gql`
   fragment MemberFields on Member {

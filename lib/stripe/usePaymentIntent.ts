@@ -1,8 +1,8 @@
 import React from 'react';
-import { ApolloError, gql, useApolloClient } from '@apollo/client';
+import { ApolloError, useApolloClient } from '@apollo/client';
 import type { PaymentIntent, Stripe } from '@stripe/stripe-js';
 
-import { API_V2_CONTEXT } from '../graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../graphql/helpers';
 import { AccountReferenceInput, GuestInfoInput } from '../graphql/types/v2/graphql';
 import { loadScriptAsync } from '../utils';
 

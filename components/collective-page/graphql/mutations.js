@@ -1,6 +1,4 @@
-import { gql } from '@apollo/client';
-
-import { gqlV1 } from '../../../lib/graphql/helpers';
+import { gql, gqlV1 } from '../../../lib/graphql/helpers';
 
 export const editCollectiveSettingsMutation = gqlV1/* GraphQL */ `
   mutation EditCollectiveSettings($id: Int!, $settings: JSON) {

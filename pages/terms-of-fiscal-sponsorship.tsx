@@ -1,13 +1,12 @@
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
 const hostTermsQuery = gql`
-  query HostTermsQuery($hostCollectiveSlug: String!) {
+  query HostTerms($hostCollectiveSlug: String!) {
     host(slug: $hostCollectiveSlug) {
       id
       termsUrl

@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { closestCenter, DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -13,7 +13,7 @@ import styled, { css } from 'styled-components';
 import { getCollectiveSections, getSectionPath } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql, gqlV1 } from '../../../lib/graphql/helpers';
 import i18nNavbarCategory from '../../../lib/i18n/navbar-categories';
 import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
 

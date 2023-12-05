@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { gql } from '@apollo/client';
 import { cloneDeep, isEmpty, omitBy } from 'lodash';
 import { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
@@ -9,7 +8,7 @@ import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
 import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
 import { ERROR } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';

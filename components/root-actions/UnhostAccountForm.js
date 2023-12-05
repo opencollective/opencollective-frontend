@@ -1,9 +1,9 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql, gqlV1 } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import StyledButton from '../StyledButton';
@@ -11,7 +11,7 @@ import StyledInputField from '../StyledInputField';
 import { useToast } from '../ui/useToast';
 
 const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
-  query UnhostAccountSearchQuery($term: String!, $types: [TypeOfCollective], $limit: Int, $hostCollectiveIds: [Int]) {
+  query UnhostAccountSearch($term: String!, $types: [TypeOfCollective], $limit: Int, $hostCollectiveIds: [Int]) {
     search(term: $term, types: $types, limit: $limit, hostCollectiveIds: $hostCollectiveIds) {
       id
       collectives {

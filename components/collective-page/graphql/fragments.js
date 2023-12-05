@@ -39,7 +39,6 @@ export const collectiveNavbarFieldsFragment = gqlV1/* GraphQL */ `
     PROJECTS
     USE_EXPENSES
     RECEIVE_EXPENSES
-    USE_EXPENSES
     COLLECTIVE_GOALS
     TOP_FINANCIAL_CONTRIBUTORS
     CONVERSATIONS

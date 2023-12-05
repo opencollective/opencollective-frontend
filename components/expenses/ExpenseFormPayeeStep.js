@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { FastField, Field } from 'formik';
@@ -15,7 +15,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql, gqlV1 } from '../../lib/graphql/helpers';
 import { require2FAForAdmins } from '../../lib/policies';
 import { flattenObjectDeep } from '../../lib/utils';
 import { checkRequiresAddress } from './lib/utils';
@@ -190,7 +190,7 @@ const getPayeeOptions = (intl, payoutProfiles) => {
 };
 
 const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
-  query CollectivePickerSearchQuery(
+  query CollectivePickerSearch(
     $term: String!
     $types: [TypeOfCollective]
     $limit: Int

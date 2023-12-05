@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { Paypal } from '@styled-icons/remix-line/Paypal';
 import clsx from 'clsx';
@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { connectAccount } from '../../../lib/api';
 import { createError, ERROR } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { Amount, ExpenseCollection, Host } from '../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
 import { getDashboardUrl } from '../../../lib/stripe/dashboard';

@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { FastField, Field } from 'formik';
 import { debounce, isEmpty, omit, pick } from 'lodash';
@@ -12,7 +12,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { flattenObjectDeep } from '../../lib/utils';
 
 import { Box, Flex, Grid } from '../Grid';
@@ -31,7 +31,7 @@ import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
 
 const validateSlugQuery = gql`
-  query ValidateSlugQuery($slug: String) {
+  query ValidateSlug($slug: String) {
     account(slug: $slug, throwIfMissing: false) {
       id
       slug

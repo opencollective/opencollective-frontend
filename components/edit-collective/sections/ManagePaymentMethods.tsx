@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { CardElement, Elements } from '@stripe/react-stripe-js';
 import { Add } from '@styled-icons/material/Add';
 import clsx from 'clsx';
@@ -9,7 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { PAYMENT_METHOD_TYPE } from '../../../lib/constants/payment-methods';
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql, gqlV1 } from '../../../lib/graphql/helpers';
 import {
   Account,
   ConfirmOrderMutation,

@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../AccountHoverCard';
 import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
@@ -258,7 +258,6 @@ export const expensePageExpenseFieldsFragment = gql`
       isAdmin
       isActive
       description
-      imageUrl
       ...AccountHoverCardFields
       location {
         id
