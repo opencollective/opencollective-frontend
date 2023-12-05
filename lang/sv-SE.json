@@ -2209,6 +2209,7 @@
   "NewContributionFlow.ProtectTransactionTitle": "Vi skyddar din transaktion:",
   "NewContributionFlow.step.contributeAsGuest": "Fortsätt som gäst",
   "NewContributionFlow.Success.CTA.Join.Content": "Skapa ett konto och visa alla bidrag.",
+  "NewContributionFlow.Success.CTA.Newsletter.Header": "Subscribe to the Open{nbsp}Collective newsletter",
   "NewContributionFlow.Success.CTA.Read.Content": "Open Collective syfte är att främja transparens och hållbarhet i samhällen runt om i världen. Så här kan du delta.",
   "NewContributionFlow.Success.CTA.SignIn.Content": "Logga in med ditt Open Collective konto för att redigera din profil och hantera dina bidrag.",
   "NewContributionFlow.Success.DiscoverMore": "Upptäck fler kollektiv som {collective}",

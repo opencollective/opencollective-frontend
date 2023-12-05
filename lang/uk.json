@@ -2209,6 +2209,7 @@
   "NewContributionFlow.ProtectTransactionTitle": "Ми захищаємо ваш переказ:",
   "NewContributionFlow.step.contributeAsGuest": "Підтримати як гість",
   "NewContributionFlow.Success.CTA.Join.Content": "Створити обліковий запис і показати всі ваші внески.",
+  "NewContributionFlow.Success.CTA.Newsletter.Header": "Subscribe to the Open{nbsp}Collective newsletter",
   "NewContributionFlow.Success.CTA.Read.Content": "Мета Open Collective — сприяти прозорості та стійкості в спільнотах по всьому світу. Ось як ви можете долучитися.",
   "NewContributionFlow.Success.CTA.SignIn.Content": "Увійдіть за допомогою свого облікового запису Open Collective, щоб редагувати свій профіль та керувати своїми внесками.",
   "NewContributionFlow.Success.DiscoverMore": "Знайдіть більше колективів, подібних до {collective}",

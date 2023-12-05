@@ -2209,6 +2209,7 @@
   "NewContributionFlow.ProtectTransactionTitle": "我们保护你的交易：",
   "NewContributionFlow.step.contributeAsGuest": "作为访客贡献",
   "NewContributionFlow.Success.CTA.Join.Content": "创建账号并显示所有贡献。",
+  "NewContributionFlow.Success.CTA.Newsletter.Header": "Subscribe to the Open{nbsp}Collective newsletter",
   "NewContributionFlow.Success.CTA.Read.Content": "Open Collective aims to foster transparency and sustainability in communities around the world. Here's how you can participate.",
   "NewContributionFlow.Success.CTA.SignIn.Content": "登录 Open Collective 账号以编辑资料页和管理贡献。",
   "NewContributionFlow.Success.DiscoverMore": "探索更多类似于 {collective} 的集体",
