@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
@@ -12,6 +13,12 @@ import StyledButton from '../StyledButton';
 
 import { STEPS } from './constants';
 import { getTotalAmount } from './utils';
+
+const ButtonWithTextCentered = styled(StyledButton)`
+  span {
+    vertical-align: baseline;
+  }
+`;
 
 class ContributionFlowButtons extends React.Component {
   static propTypes = {
@@ -81,7 +88,7 @@ class ContributionFlowButtons extends React.Component {
             </StyledButton>
           )}
           {!paypalButtonProps || nextStep ? (
-            <StyledButton
+            <ButtonWithTextCentered
               mt={2}
               mx={[1, null, 2]}
               minWidth={!nextStep ? 185 : 145}
@@ -116,7 +123,7 @@ class ContributionFlowButtons extends React.Component {
               ) : (
                 <FormattedMessage id="contribute.submit" defaultMessage="Make contribution" />
               )}
-            </StyledButton>
+            </ButtonWithTextCentered>
           ) : (
             <Box mx={[1, null, 2]} minWidth={200} mt={2}>
               <PayWithPaypalButton {...paypalButtonProps} isSubmitting={isValidating || this.state.isLoadingNext} />

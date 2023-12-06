@@ -8,7 +8,6 @@ import { cn } from '../../lib/utils';
 
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
-import { Separator } from '../ui/Separator';
 
 type ExpenseCategorySelectProps = {
   host: Host;
@@ -191,13 +190,13 @@ const ExpenseCategorySelect = ({
           )}
         </PopoverTrigger>
         <PopoverContent className="z-[5000] w-[320px] p-0">
-          <Command filter={(categoryId, search) => (options[categoryId].searchText.includes(search) ? 1 : 0)}>
+          <Command filter={(categoryId, search) => (options[categoryId]?.searchText.includes(search) ? 1 : 0)}>
             {size(options) > 6 && <CommandInput placeholder="Filter by name" />}
             <CommandEmpty>
               <FormattedMessage defaultMessage="No category found" />
             </CommandEmpty>
             <CommandGroup className="max-h-[300px] overflow-y-auto">
-              {Object.entries(options).map(([categoryId, { label }], idx) => (
+              {Object.entries(options).map(([categoryId, { label }]) => (
                 <React.Fragment key={categoryId}>
                   <CommandItem
                     value={categoryId}
@@ -209,7 +208,6 @@ const ExpenseCategorySelect = ({
                   >
                     {label}
                   </CommandItem>
-                  {idx < size(options) - 1 && <Separator className="mx-2 my-1 bg-neutral-100" />}
                 </React.Fragment>
               ))}
             </CommandGroup>

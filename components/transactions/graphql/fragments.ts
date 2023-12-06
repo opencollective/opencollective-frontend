@@ -52,6 +52,7 @@ export const transactionsQueryCollectionFragment = gql`
         slug
         type
         imageUrl
+        hasImage
         isIncognito
         ... on AccountWithParent {
           parent {
@@ -82,6 +83,7 @@ export const transactionsQueryCollectionFragment = gql`
         slug
         type
         imageUrl
+        hasImage
         isIncognito
         ... on Event {
           parent {
@@ -170,7 +172,7 @@ export const transactionsQueryCollectionFragment = gql`
           slug
         }
       }
-      relatedTransactions(kind: [HOST_FEE, PAYMENT_PROCESSOR_COVER]) {
+      relatedTransactions(kind: [HOST_FEE, PAYMENT_PROCESSOR_FEE, PAYMENT_PROCESSOR_COVER]) {
         id
         type
         kind

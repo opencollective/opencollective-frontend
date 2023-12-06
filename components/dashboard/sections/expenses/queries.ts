@@ -27,6 +27,8 @@ export const accountExpensesQuery = gql`
     $virtualCards: [VirtualCardReferenceInput]
     $createdByAccount: AccountReferenceInput
     $includeChildrenExpenses: Boolean
+    $fetchHostForExpenses: Boolean!
+    $hasAmountInCreatedByAccountCurrency: Boolean!
   ) {
     expenses(
       account: $account
@@ -54,11 +56,28 @@ export const accountExpensesQuery = gql`
       nodes {
         id
         ...ExpensesListFieldsFragment
+        amountInCreatedByAccountCurrency: amountV2(currencySource: CREATED_BY_ACCOUNT)
+          @include(if: $hasAmountInCreatedByAccountCurrency) {
+          value
+          valueInCents
+          currency
+          exchangeRate {
+            date
+            value
+            source
+            isApproximate
+          }
+        }
+        host @include(if: $fetchHostForExpenses) {
+          id
+          ...ExpenseHostFields
+        }
       }
     }
   }
 
   ${expensesListFieldsFragment}
+  ${expenseHostFields}
 `;
 
 export const accountExpensesMetadataQuery = gql`

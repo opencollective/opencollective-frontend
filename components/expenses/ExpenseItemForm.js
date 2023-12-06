@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, useFormikContext } from 'formik';
-import { escape, get, isEmpty, isUndefined, pick, unescape } from 'lodash';
+import { escape, get, isEmpty, pick, unescape } from 'lodash';
 import Lottie from 'lottie-react';
 import { AlertTriangle } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -14,7 +14,7 @@ import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
 import { cn } from '../../lib/utils';
 import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemsMustHaveFiles } from './lib/items';
-import { checkExpenseItemCanBeSplit, updateExpenseFormWithUploadResult } from './lib/ocr';
+import { updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import * as ScanningAnimationJSON from '../../public/static/animations/scanning.json';
 import Container from '../Container';
@@ -32,7 +32,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 import { AccountingCategoryPill } from './AccountingCategoryPill';
 import { ExpenseItemDescriptionHint } from './ItemDescriptionHint';
-import { SplitExpenseItemsModal } from './SplitExpenseItemsModal';
 
 export const msg = defineMessages({
   previewImgAlt: {
@@ -181,7 +180,6 @@ const ExpenseItemForm = ({
   ocrComparison,
 }) => {
   const intl = useIntl();
-  const [showSplitConfirm, setShowSplitConfirm] = React.useState(false);
   const form = useFormikContext();
   const { formatMessage } = intl;
   const attachmentKey = `attachment-${attachment.id || attachment.url}`;
@@ -189,7 +187,7 @@ const ExpenseItemForm = ({
   const getFieldName = field => `${itemPath}.${field}`;
   const getError = field => formatFormErrorMessage(intl, get(errors, getFieldName(field)));
   const isLoading = Boolean(attachment.__isUploading);
-  const hasAccountingCategory = !isUndefined(form.values.accountingCategory);
+  const hasAccountingCategory = Boolean(form.values.accountingCategory);
 
   return (
     <Box mb={18} data-cy="expense-attachment-form">
@@ -373,23 +371,6 @@ const ExpenseItemForm = ({
             {formatMessage(requireFile ? msg.removeReceipt : msg.removeItem)}
           </StyledButton>
         )}
-        {checkExpenseItemCanBeSplit(attachment, form.values.type) && (
-          <React.Fragment>
-            <StyledButton
-              type="button"
-              buttonStyle="secondary"
-              buttonSize="tiny"
-              isBorderless
-              mr={2}
-              onClick={() => setShowSplitConfirm(true)}
-            >
-              <FormattedMessage defaultMessage="Split items" />
-            </StyledButton>
-            {showSplitConfirm && (
-              <SplitExpenseItemsModal form={form} itemIdx={itemIdx} onClose={() => setShowSplitConfirm(false)} />
-            )}
-          </React.Fragment>
-        )}
         <StyledHr flex="1" borderStyle="dashed" borderColor="black.200" />
       </Flex>
     </Box>
@@ -434,7 +415,6 @@ ExpenseItemForm.propTypes = {
     incurredAt: PropTypes.string,
     amount: PropTypes.number,
     __parsingResult: PropTypes.object,
-    __canBeSplit: PropTypes.bool,
     __isUploading: PropTypes.bool,
   }).isRequired,
   editOnlyDescriptiveInfo: PropTypes.bool,
