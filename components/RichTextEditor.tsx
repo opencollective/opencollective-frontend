@@ -228,7 +228,7 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
     })}
 `;
 
-const SUPPORTED_SERVICE_URLS = { youTube: 'https://www.youtube-nocookie.com/embed/', anchorFm: 'https://anchor.fm/' };
+const SUPPORTED_IFRAME_URLS = { youTube: 'https://www.youtube-nocookie.com/embed/', anchorFm: 'https://anchor.fm/' };
 
 type RichTextEditorState = {
   id: string;
@@ -403,9 +403,9 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
 
   constructVideoEmbedURL = (service, id) => {
     if (service === 'youtube') {
-      return `${SUPPORTED_SERVICE_URLS.youTube}${id}`;
+      return `${SUPPORTED_IFRAME_URLS.youTube}${id}`;
     } else if (service === 'anchorFm') {
-      return `${SUPPORTED_SERVICE_URLS.anchorFm}${id}`;
+      return `${SUPPORTED_IFRAME_URLS.anchorFm}${id}`;
     } else {
       return null;
     }
@@ -494,8 +494,8 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
     const { attachment } = e;
     const attachmentContent = get(attachment, 'attachment.attributes.values.content');
     const isEmbedAttachment =
-      attachmentContent?.includes(`<iframe src="${SUPPORTED_SERVICE_URLS.youTube}`) ||
-      attachmentContent?.includes(`<iframe src="${SUPPORTED_SERVICE_URLS.anchorFm}`);
+      attachmentContent?.includes(`<iframe src="${SUPPORTED_IFRAME_URLS.youTube}`) ||
+      attachmentContent?.includes(`<iframe src="${SUPPORTED_IFRAME_URLS.anchorFm}`);
     if (isEmbedAttachment) {
       return;
     } else if (!attachment.file) {

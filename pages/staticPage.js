@@ -49,6 +49,7 @@ class StaticPage extends React.Component {
               <Link href={`/${path}`}>{path}</Link>
             </div>
           )}
+          {/* We control the pages content, since it's defined in markdown files we host in this codebase */}
           <div dangerouslySetInnerHTML={{ __html: this.props.content }} />
         </div>
         <NewsletterContainer />
