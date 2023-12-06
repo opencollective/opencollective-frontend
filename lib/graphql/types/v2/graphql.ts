@@ -9759,6 +9759,8 @@ export type Vendor = Account & AccountWithContributions & {
   githubHandle?: Maybe<Scalars['String']>;
   /** Returns whether this account has a custom image */
   hasImage: Scalars['Boolean'];
+  /** Returns whether this account has any payout methods saved */
+  hasPayoutMethod?: Maybe<Scalars['Boolean']>;
   id: Scalars['String'];
   imageUrl?: Maybe<Scalars['String']>;
   /** Returns whether the account accepts financial contributions. */
