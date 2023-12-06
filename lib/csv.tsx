@@ -1,5 +1,4 @@
 import React from 'react';
-import { difference } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 export const AVERAGE_TRANSACTIONS_PER_MINUTE = 8240;
@@ -111,12 +110,12 @@ export const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
   legacy: ['platformFee', 'hostFee'],
 };
 
-export const FIELD_GROUPS_2024 = {
-  transaction: [...difference(FIELD_GROUPS.transaction, ['paymentProcessorFee'])],
-  accounts: [...FIELD_GROUPS.accounts],
-  order: [...FIELD_GROUPS.order],
-  expense: [...FIELD_GROUPS.expense],
-  tax: [...FIELD_GROUPS.tax],
+export const FIELD_GROUPS_2024: Record<string, readonly CSVField[]> = {
+  transaction: FIELD_GROUPS.transaction.filter(field => field !== 'paymentProcessorFee'),
+  accounts: FIELD_GROUPS.accounts,
+  order: FIELD_GROUPS.order,
+  expense: FIELD_GROUPS.expense,
+  tax: FIELD_GROUPS.tax,
   legacy: [...FIELD_GROUPS.legacy, 'paymentProcessorFee'],
 };
 
@@ -161,7 +160,7 @@ export const DEFAULT_FIELDS = [
   'orderMemo',
 ];
 
-export const DEFAULT_FIELDS_2024 = difference(DEFAULT_FIELDS, ['paymentProcessorFee']);
+export const DEFAULT_FIELDS_2024 = DEFAULT_FIELDS.filter(field => field !== 'paymentProcessorFee');
 
 export const FieldLabels: Record<CSVField, React.ReactNode> = {
   date: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
