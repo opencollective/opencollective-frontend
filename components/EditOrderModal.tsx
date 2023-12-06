@@ -519,7 +519,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
   }, [router.query.orderId, router.query.stripeAccount, router.query.setup_intent, router.query.redirect_status]);
 
   return (
-    <StyledModal onClose={props.onClose} maxWidth="420px">
+    <StyledModal onClose={props.onClose} maxWidth="480px" width="100%">
       <ModalHeader onClose={props.onClose}>
         <H4 fontSize="20px" fontWeight="700">
           <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
