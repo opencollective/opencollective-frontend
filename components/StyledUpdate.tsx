@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Lock } from '@styled-icons/fa-solid/Lock';
+import { Markup } from 'interweave';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -264,14 +265,9 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
     return (
       <React.Fragment>
         {update.userCanSeeUpdate && (
-          <Container
-            mb={2}
-            pl={[0, 60]}
-            fontSize="14px"
-            color="#4B4E52"
-            css={{ wordBreak: 'break-word' }}
-            dangerouslySetInnerHTML={{ __html: update.summary }}
-          />
+          <Container mb={2} pl={[0, 60]} fontSize="14px" color="#4B4E52" css={{ wordBreak: 'break-word' }}>
+            <Markup noWrap content={update.summary} />
+          </Container>
         )}
         {!update.userCanSeeUpdate && !isReloadingData && (
           <PrivateUpdateMesgBox type="info" data-cy="mesgBox">
