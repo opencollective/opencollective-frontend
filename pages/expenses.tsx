@@ -115,6 +115,10 @@ export const expensesPageQuery = gql`
         # We add that for hasFeature
         isHost
         isActive
+        host {
+          id
+          ...ExpenseHostFields
+        }
       }
 
       ... on Event {
