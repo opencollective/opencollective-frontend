@@ -2209,6 +2209,7 @@
   "NewContributionFlow.ProtectTransactionTitle": "Nós protegemos sua transação:",
   "NewContributionFlow.step.contributeAsGuest": "Contribuir como convidado",
   "NewContributionFlow.Success.CTA.Join.Content": "Crie uma conta e mostre todas as suas contribuições.",
+  "NewContributionFlow.Success.CTA.Newsletter.Header": "Subscribe to the Open{nbsp}Collective newsletter",
   "NewContributionFlow.Success.CTA.Read.Content": "Open Collective visa promover transparência e sustentabilidade em comunidades ao redor do mundo. Veja como você pode participar.",
   "NewContributionFlow.Success.CTA.SignIn.Content": "Entre com sua conta da Open Collective para editar seu perfil e gerenciar suas contribuições.",
   "NewContributionFlow.Success.DiscoverMore": "Discover more Collectives like {collective}",

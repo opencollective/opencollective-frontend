@@ -2209,6 +2209,7 @@
   "NewContributionFlow.ProtectTransactionTitle": "We protect your transaction:",
   "NewContributionFlow.step.contributeAsGuest": "תרומה כאורח",
   "NewContributionFlow.Success.CTA.Join.Content": "יצירת חשבון כדי לצפות בכל התרומות.",
+  "NewContributionFlow.Success.CTA.Newsletter.Header": "Subscribe to the Open{nbsp}Collective newsletter",
   "NewContributionFlow.Success.CTA.Read.Content": "מטרת OpenCollective להגביא שקיפות וקיימות בקהילות ברחבי העולם. גם אתם יכולים.",
   "NewContributionFlow.Success.CTA.SignIn.Content": "Sign in with your Open Collective account to edit your profile and manage your contributions.",
   "NewContributionFlow.Success.DiscoverMore": "לעוד קבוצות כמו {collective}",

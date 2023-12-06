@@ -2209,6 +2209,7 @@
   "NewContributionFlow.ProtectTransactionTitle": "거래는 안전하게 처리돼요",
   "NewContributionFlow.step.contributeAsGuest": "Contribute as a guest",
   "NewContributionFlow.Success.CTA.Join.Content": "계정에 가입하면 내 모든 기여 현황을 표시할 수 있어요",
+  "NewContributionFlow.Success.CTA.Newsletter.Header": "Subscribe to the Open{nbsp}Collective newsletter",
   "NewContributionFlow.Success.CTA.Read.Content": "Open Collective는 전세계의 지역 사회의 투명성과 지속 가능성을 촉진하는 것을 목표로 하고 있습니다. 여러분들이 어떻게 참여할 수 있는지 확인해보세요.",
   "NewContributionFlow.Success.CTA.SignIn.Content": "Open Collective 계정에 로그인하여 프로필을 관리하고 기여를 관리하세요",
   "NewContributionFlow.Success.DiscoverMore": "Discover more Collectives like {collective}",
