@@ -12,8 +12,7 @@ import { getErrorFromGraphqlException, i18nGraphqlException } from '../lib/error
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import {
   AccountReferenceInput,
-  AccountWithHost,
-  Order,
+  EditPaymentMethodModalQuery,
   PaymentMethod,
   SetupIntentInput,
 } from '../lib/graphql/types/v2/graphql';
@@ -339,11 +338,15 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
     type: props.order?.paymentMethod?.type,
   });
 
-  const query = useQuery<{ order: Order & { toAccount: AccountWithHost } }>(
+  const query = useQuery<EditPaymentMethodModalQuery>(
     gql`
       query EditPaymentMethodModal($order: OrderReferenceInput!) {
         order(order: $order) {
           id
+          totalAmount {
+            currency
+            valueInCents
+          }
           fromAccount {
             id
             slug
@@ -537,7 +540,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
             value={option}
             onChange={setOption}
             order={order}
-            host={order?.toAccount?.host}
+            host={order.toAccount && 'host' in order.toAccount ? order.toAccount.host : null}
             account={order?.fromAccount}
           />
         )}

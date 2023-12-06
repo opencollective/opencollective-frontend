@@ -60,7 +60,6 @@ export default function useSetupIntent({
 
       const { setupIntentClientSecret, stripeAccountPublishableSecret, stripeAccount } =
         createSetupIntentResp.data?.createSetupIntent ?? {};
-
       const stripe = window.Stripe(stripeAccountPublishableSecret, stripeAccount ? { stripeAccount } : {});
       setStripe(stripe);
 

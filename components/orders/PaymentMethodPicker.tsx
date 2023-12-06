@@ -18,6 +18,7 @@ import {
   Order,
   PaymentMethod,
   PaymentMethodLegacyType,
+  PaymentMethodPickerQuery,
   PaymentMethodService,
   PaymentMethodType,
 } from '../../lib/graphql/types/v2/graphql';
@@ -28,7 +29,7 @@ import {
   getPaymentMethodMetadata,
   isPaymentMethodDisabled,
 } from '../../lib/payment-method-utils';
-import { StripePaymentMethodsLabels } from '../../lib/stripe/payment-methods';
+import { isStripePaymentMethodEnabledForCurrency, StripePaymentMethodsLabels } from '../../lib/stripe/payment-methods';
 import useSetupIntent, { StripeSetupIntent } from '../../lib/stripe/useSetupIntent';
 
 import PayPal from '../icons/PayPal';
@@ -82,7 +83,7 @@ type PaymentMethodPickerProps = {
   onChange: (option: PaymentMethodOption) => void;
   host: Pick<Host, 'slug'>;
   account: Pick<Account, 'slug'>;
-  order?: Order;
+  order?: Pick<Order, 'id' | 'totalAmount'>;
 };
 
 export type PaymentMethodOption =
@@ -104,10 +105,7 @@ export type PaymentMethodOption =
 
 export default function PaymentMethodPicker(props: PaymentMethodPickerProps) {
   const [error, setError] = React.useState();
-  const query = useQuery<{
-    account: Pick<Account, 'id' | 'name' | 'paymentMethods'>;
-    host: Pick<Host, 'id' | 'paypalClientId' | 'supportedPaymentMethods'>;
-  }>(paymentMethodPickerQuery, {
+  const query = useQuery<PaymentMethodPickerQuery>(paymentMethodPickerQuery, {
     context: API_V2_CONTEXT,
     variables: {
       hostSlug: props.host?.slug,
@@ -127,6 +125,7 @@ export default function PaymentMethodPicker(props: PaymentMethodPickerProps) {
     return query.data.account.paymentMethods.filter(
       paymentMethodFilter({
         host: query.data.host,
+        currency: props.order?.totalAmount?.currency,
       }),
     );
   }, [query?.data?.host, query?.data?.account?.paymentMethods]);
@@ -152,6 +151,8 @@ export default function PaymentMethodPicker(props: PaymentMethodPickerProps) {
         <div className="flex flex-col gap-3">
           {hostHasStripe && (
             <StripeSetupPaymentMethodOption
+              amount={props.order?.totalAmount?.valueInCents}
+              currency={props.order?.totalAmount?.currency}
               onChange={onChange}
               checked={props.value.id === 'stripe-payment-element'}
               host={props.host}
@@ -209,6 +210,8 @@ type StripeSetupPaymentMethodOptionProps = {
   checked: boolean;
   host: Pick<Host, 'slug'>;
   account: Pick<Account, 'slug' | 'name'>;
+  currency: string;
+  amount: number;
   onError?: (err) => void;
 };
 
@@ -237,7 +240,11 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
     }
 
     const elements = stripe.elements({
-      clientSecret: setupIntent.client_secret,
+      mode: 'setup',
+      paymentMethodConfiguration:
+        (setupIntent as any).payment_method_configuration_details?.id ||
+        (setupIntent as any).payment_method_configuration_details?.parent,
+      currency: props.currency.toLowerCase(),
     });
 
     const paymentElement = elements.create('payment', {
@@ -254,7 +261,7 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
     });
 
     return [elements, paymentElement];
-  }, [stripe, setupIntent?.client_secret]);
+  }, [stripe, setupIntent]);
 
   React.useEffect(() => {
     paymentElement?.update({
@@ -303,16 +310,18 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
       return [];
     }
 
-    let types = setupIntent.payment_method_types.map(method => {
-      return intl.formatMessage(StripePaymentMethodsLabels[method]);
-    });
+    let types = setupIntent.payment_method_types
+      .filter(t => isStripePaymentMethodEnabledForCurrency(t, props.currency))
+      .map(method => {
+        return intl.formatMessage(StripePaymentMethodsLabels[method]);
+      });
 
     if (types.length > 3) {
       types = [...types.slice(0, 3), 'etc'];
     }
 
     return types;
-  }, [intl, setupIntent?.payment_method_types]);
+  }, [intl, setupIntent?.payment_method_types, props.currency]);
 
   return (
     <div>
@@ -397,6 +406,7 @@ type PaymentMethodFilterOptions = {
   host?: Pick<Host, 'id' | 'supportedPaymentMethods'>;
   paymentIntent?: Pick<PaymentIntent, 'payment_method_types'>;
   disabledMethodTypes?: PaymentMethodType[];
+  currency?: string;
 };
 
 function paymentMethodFilter(options: PaymentMethodFilterOptions): (pm: PaymentMethod) => boolean {
@@ -424,9 +434,17 @@ function paymentMethodFilter(options: PaymentMethodFilterOptions): (pm: PaymentM
         stripeAllowedTypes.push('credit_card');
       }
 
-      if (!stripeAllowedTypes.includes(pm.type)) {
+      if (!stripeAllowedTypes.includes(pm.type.toLowerCase())) {
         return false;
       }
+    }
+
+    if (
+      options.currency &&
+      pm.service === PaymentMethodService.STRIPE &&
+      !isStripePaymentMethodEnabledForCurrency(pm.type, options.currency)
+    ) {
+      return false;
     }
 
     if (disabledMethodTypes.length > 0) {
