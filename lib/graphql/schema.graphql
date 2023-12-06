@@ -36,7 +36,7 @@ interface CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -726,12 +726,11 @@ enum OrderStatus {
   PAID
   ERROR
   PROCESSING
+  REJECTED
   ACTIVE
   CANCELLED
   PENDING
   EXPIRED
-  PLEDGED
-  REJECTED
   DISPUTED
   REFUNDED
   IN_REVIEW
@@ -2134,7 +2133,7 @@ type Collective implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2398,7 +2397,7 @@ type Event implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2662,7 +2661,7 @@ type Fund implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2926,7 +2925,7 @@ type Organization implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3190,7 +3189,7 @@ type Project implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3481,7 +3480,7 @@ type Expense implements Transaction {
     fetchHostFee: Boolean = false
 
     """
-    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    Fetch PAYMENT_PROCESSOR_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchPaymentProcessorFee: Boolean = false
   ): Int
@@ -3671,7 +3670,7 @@ type Order implements Transaction {
     fetchHostFee: Boolean = false
 
     """
-    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    Fetch PAYMENT_PROCESSOR_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchPaymentProcessorFee: Boolean = false
   ): Int
@@ -3729,7 +3728,7 @@ type User implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3994,7 +3993,7 @@ type Vendor implements CollectiveInterface {
   """
   Defines if a collective is pledged
   """
-  isPledged: Boolean
+  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """

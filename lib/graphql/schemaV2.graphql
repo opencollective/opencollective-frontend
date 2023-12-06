@@ -1114,12 +1114,11 @@ enum OrderStatus {
   PAID
   ERROR
   PROCESSING
+  REJECTED
   ACTIVE
   CANCELLED
   PENDING
   EXPIRED
-  PLEDGED
-  REJECTED
   DISPUTED
   REFUNDED
   IN_REVIEW
@@ -1400,7 +1399,7 @@ type Expense {
   """
   The accounts who approved this expense
   """
-  approvedBy: [Account!]!
+  approvedBy: [Account]!
 
   """
   Whether this expense is on hold
