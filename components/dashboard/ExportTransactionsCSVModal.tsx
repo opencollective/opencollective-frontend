@@ -2,10 +2,26 @@ import React from 'react';
 import { flatten, isEmpty, omit } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import {
+  AVERAGE_TRANSACTIONS_PER_MINUTE,
+  CSV_VERSIONS,
+  CsvVersions,
+  DEFAULT_FIELDS,
+  DEFAULT_FIELDS_2024,
+  FIELD_GROUPS,
+  FIELD_GROUPS_2024,
+  FIELD_OPTIONS,
+  FieldGroupLabels,
+  FieldLabels,
+  FieldOptions,
+  HOST_OMITTED_FIELDS,
+} from '../../lib/csv';
+import { getEnvVar } from '../../lib/env-utils';
 import { HostReportsPageQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
+import { parseToBoolean } from '../../lib/utils';
 
 import MessageBox from '../MessageBox';
 import StyledInputField from '../StyledInputField';
@@ -26,220 +42,6 @@ import { Separator } from '../ui/Separator';
 
 import { Filterbar } from './filters/Filterbar';
 
-const AVERAGE_TRANSACTIONS_PER_MINUTE = 8240;
-// Fields that are not available when exporting transactions from the host dashboard
-const HOST_OMITTED_FIELDS = ['balance', 'hostSlug', 'hostName', 'hostType'];
-
-type CSVField =
-  | 'date'
-  | 'datetime'
-  | 'id'
-  | 'legacyId'
-  | 'shortId'
-  | 'shortGroup'
-  | 'group'
-  | 'description'
-  | 'type'
-  | 'kind'
-  | 'isRefund'
-  | 'isRefunded'
-  | 'refundId'
-  | 'shortRefundId'
-  | 'displayAmount'
-  | 'amount'
-  | 'paymentProcessorFee'
-  | 'platformFee'
-  | 'hostFee'
-  | 'netAmount'
-  | 'balance'
-  | 'currency'
-  | 'accountSlug'
-  | 'accountName'
-  | 'accountType'
-  | 'accountEmail'
-  | 'oppositeAccountSlug'
-  | 'oppositeAccountName'
-  | 'oppositeAccountType'
-  | 'oppositeAccountEmail'
-  | 'hostSlug'
-  | 'hostName'
-  | 'hostType'
-  | 'orderId'
-  | 'orderLegacyId'
-  | 'orderFrequency'
-  | 'orderProcessedDate'
-  | 'orderCustomData'
-  | 'paymentMethodService'
-  | 'paymentMethodType'
-  | 'expenseId'
-  | 'expenseLegacyId'
-  | 'expenseType'
-  | 'expenseTags'
-  | 'payoutMethodType'
-  | 'merchantId'
-  | 'orderMemo'
-  | 'taxAmount'
-  | 'taxType'
-  | 'taxRate'
-  | 'taxIdNumber';
-
-const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
-  transaction: [
-    'date',
-    'datetime',
-    'id',
-    'legacyId',
-    'shortId',
-    'shortGroup',
-    'group',
-    'description',
-    'type',
-    'kind',
-    'isRefund',
-    'isRefunded',
-    'refundId',
-    'shortRefundId',
-    'displayAmount',
-    'amount',
-    'paymentProcessorFee',
-    'netAmount',
-    'balance',
-    'currency',
-  ],
-  accounts: [
-    'accountSlug',
-    'accountName',
-    'accountType',
-    'accountEmail',
-    'oppositeAccountSlug',
-    'oppositeAccountName',
-    'oppositeAccountType',
-    'oppositeAccountEmail',
-    'hostSlug',
-    'hostName',
-    'hostType',
-  ],
-  order: [
-    'orderId',
-    'orderLegacyId',
-    'orderMemo',
-    'orderFrequency',
-    'orderProcessedDate',
-    'orderCustomData',
-    'paymentMethodService',
-    'paymentMethodType',
-  ],
-  expense: ['expenseId', 'expenseLegacyId', 'expenseType', 'expenseTags', 'payoutMethodType', 'merchantId'],
-  tax: ['taxAmount', 'taxType', 'taxRate', 'taxIdNumber'],
-  legacy: ['platformFee', 'hostFee'],
-};
-
-const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, React.ReactNode> = {
-  transaction: <FormattedMessage defaultMessage="Transaction" />,
-  accounts: <FormattedMessage defaultMessage="Account" />,
-  order: <FormattedMessage defaultMessage="Contribution" />,
-  expense: <FormattedMessage id="Expense" defaultMessage="Expense" />,
-  tax: <FormattedMessage defaultMessage="Tax" />,
-  legacy: <FormattedMessage id="Legacy/Deprecated" defaultMessage="Legacy/Deprecated" />,
-};
-
-const DEFAULT_FIELDS = [
-  'datetime',
-  'shortId',
-  'shortGroup',
-  'description',
-  'type',
-  'kind',
-  'isRefund',
-  'isRefunded',
-  'shortRefundId',
-  'displayAmount',
-  'amount',
-  'paymentProcessorFee',
-  'netAmount',
-  'balance',
-  'currency',
-  'accountSlug',
-  'accountName',
-  'oppositeAccountSlug',
-  'oppositeAccountName',
-  // Payment Method (for orders)
-  'paymentMethodService',
-  'paymentMethodType',
-  // Type and Payout Method (for expenses)
-  'expenseType',
-  'expenseTags',
-  'payoutMethodType',
-  // Extra fields
-  'merchantId',
-  'orderMemo',
-];
-
-const FieldLabels: Record<CSVField, React.ReactNode> = {
-  date: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
-  datetime: <FormattedMessage defaultMessage="Date & Time" />,
-  id: <FormattedMessage defaultMessage="Transaction ID" />,
-  legacyId: <FormattedMessage defaultMessage="Legacy Transaction ID" />,
-  shortId: <FormattedMessage defaultMessage="Short Transaction ID" />,
-  shortGroup: <FormattedMessage defaultMessage="Short Group ID" />,
-  group: <FormattedMessage defaultMessage="Group ID" />,
-  description: <FormattedMessage id="Fields.description" defaultMessage="Description" />,
-  type: <FormattedMessage id="transactions.type" defaultMessage="Type" />,
-  kind: <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />,
-  isRefund: <FormattedMessage defaultMessage="Is Refund" />,
-  isRefunded: <FormattedMessage defaultMessage="Is Refunded" />,
-  refundId: <FormattedMessage defaultMessage="Refund ID" />,
-  shortRefundId: <FormattedMessage defaultMessage="Short Refund ID" />,
-  displayAmount: <FormattedMessage defaultMessage="Display Amount" />,
-  amount: <FormattedMessage id="Fields.amount" defaultMessage="Amount" />,
-  paymentProcessorFee: <FormattedMessage defaultMessage="Payment Processor Fee" />,
-  platformFee: <FormattedMessage defaultMessage="Platform Fee" />,
-  hostFee: <FormattedMessage defaultMessage="Host Fee" />,
-  netAmount: <FormattedMessage defaultMessage="Net Amount" />,
-  balance: <FormattedMessage id="Balance" defaultMessage="Balance" />,
-  currency: <FormattedMessage id="Currency" defaultMessage="Currency" />,
-  accountSlug: <FormattedMessage defaultMessage="Account Handle" />,
-  accountName: <FormattedMessage defaultMessage="Account Name" />,
-  accountType: <FormattedMessage defaultMessage="Account Type" />,
-  accountEmail: <FormattedMessage defaultMessage="Account Email" />,
-  oppositeAccountSlug: <FormattedMessage defaultMessage="Opposite Account Handle" />,
-  oppositeAccountName: <FormattedMessage defaultMessage="Opposite Account Name" />,
-  oppositeAccountType: <FormattedMessage defaultMessage="Opposite Account Type" />,
-  oppositeAccountEmail: <FormattedMessage defaultMessage="Opposite Account Email" />,
-  hostSlug: <FormattedMessage defaultMessage="Host Handle" />,
-  hostName: <FormattedMessage defaultMessage="Host Name" />,
-  hostType: <FormattedMessage defaultMessage="Host Type" />,
-  orderId: <FormattedMessage defaultMessage="Contribution ID" />,
-  orderLegacyId: <FormattedMessage defaultMessage="Legacy Contribution ID" />,
-  orderFrequency: <FormattedMessage defaultMessage="Contribution Frequency" />,
-  orderMemo: <FormattedMessage defaultMessage="Contribution Memo" />,
-  orderProcessedDate: <FormattedMessage defaultMessage="Contribution Processed Date" />,
-  orderCustomData: <FormattedMessage defaultMessage="Contribution Custom Data" />,
-  paymentMethodService: <FormattedMessage defaultMessage="Payment Method Service" />,
-  paymentMethodType: <FormattedMessage defaultMessage="Payment Method Type" />,
-  expenseId: <FormattedMessage defaultMessage="Expense ID" />,
-  expenseLegacyId: <FormattedMessage defaultMessage="Legacy Expense ID" />,
-  expenseType: <FormattedMessage defaultMessage="Expense Type" />,
-  expenseTags: <FormattedMessage defaultMessage="Expense Tags" />,
-  payoutMethodType: <FormattedMessage defaultMessage="Payout Method Type" />,
-  merchantId: <FormattedMessage defaultMessage="Merchant ID" />,
-  taxAmount: <FormattedMessage defaultMessage="Tax Amount" />,
-  taxType: <FormattedMessage defaultMessage="Tax Type" />,
-  taxRate: <FormattedMessage defaultMessage="Tax Rate" />,
-  taxIdNumber: <FormattedMessage defaultMessage="Tax ID Number" />,
-};
-
-enum FIELD_OPTIONS {
-  DEFAULT = 'DEFAULT',
-  CUSTOM = 'CUSTOM',
-}
-
-const FieldOptionsLabels = {
-  [FIELD_OPTIONS.DEFAULT]: <FormattedMessage defaultMessage="Default" />,
-  [FIELD_OPTIONS.CUSTOM]: <FormattedMessage defaultMessage="Custom" />,
-};
-
-const FieldOptions = Object.keys(FIELD_OPTIONS).map(value => ({ value, label: FieldOptionsLabels[value] }));
 const env = process.env.OC_ENV;
 
 type ExportTransactionsCSVModalProps = {
@@ -262,6 +64,8 @@ const ExportTransactionsCSVModal = ({
   const isHostReport = Boolean(hostSlug);
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [fieldOption, setFieldOption] = React.useState(FieldOptions[0].value);
+  const [csvVersion, setCsvVersion] = React.useState(CsvVersions[0].value);
+  const [fieldGroups, setFieldGroups] = React.useState(FIELD_GROUPS);
   const [fields, setFields] = React.useState(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
 
   const {
@@ -286,6 +90,13 @@ const ExportTransactionsCSVModal = ({
     { defaultData: 0 },
   );
 
+  const handleCsvVersionsChange = ({ value }) => {
+    setCsvVersion(value);
+    const defaultFields = value === CSV_VERSIONS.VERSION_2024 ? DEFAULT_FIELDS_2024 : DEFAULT_FIELDS;
+    setFields(defaultFields.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
+    setFieldGroups(value === CSV_VERSIONS.VERSION_2024 ? FIELD_GROUPS_2024 : FIELD_GROUPS);
+  };
+
   const handleFieldOptionsChange = ({ value }) => {
     setFieldOption(value);
     if (value === FIELD_OPTIONS.DEFAULT) {
@@ -303,9 +114,9 @@ const ExportTransactionsCSVModal = ({
 
   const handleGroupSwitch = ({ name, checked }) => {
     if (checked) {
-      setFields({ ...fields, ...FIELD_GROUPS[name].reduce((obj, key) => ({ ...obj, [key]: true }), {}) });
+      setFields({ ...fields, ...fieldGroups[name].reduce((obj, key) => ({ ...obj, [key]: true }), {}) });
     } else {
-      setFields(omit(fields, FIELD_GROUPS[name]));
+      setFields(omit(fields, fieldGroups[name]));
     }
   };
 
@@ -353,6 +164,10 @@ const ExportTransactionsCSVModal = ({
       if (queryFilter.variables.dateTo) {
         url.searchParams.set('dateTo', queryFilter.variables.dateTo);
       }
+    }
+
+    if (csvVersion === CSV_VERSIONS.VERSION_2023) {
+      url.searchParams.set('flattenPaymentProcessorFee', '1');
     }
 
     if (!isEmpty(fields)) {
@@ -406,6 +221,34 @@ const ExportTransactionsCSVModal = ({
           <Filterbar {...queryFilter} filters={omit(queryFilter.filters, 'orderBy')} views={null} hideSeparator />
         </div>
 
+        {parseToBoolean(getEnvVar('LEDGER_SEPARATE_PAYMENT_PROCESSOR_FEES')) && (
+          <StyledInputField
+            label={<FormattedMessage defaultMessage="CSV Version" />}
+            labelFontWeight="500"
+            labelProps={{ fontSize: '16px', letterSpacing: '0px' }}
+            name="csvVersions"
+          >
+            {inputProps => (
+              <Select
+                onValueChange={value => handleCsvVersionsChange({ value })}
+                defaultValue={CsvVersions.find(option => option.value === csvVersion).value}
+                {...inputProps}
+              >
+                <SelectTrigger className="">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CsvVersions.map(option => (
+                    <SelectItem value={option.value} key={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </StyledInputField>
+        )}
+
         <StyledInputField
           label={<FormattedMessage defaultMessage="Exported Fields" />}
           labelFontWeight="500"
@@ -450,8 +293,8 @@ const ExportTransactionsCSVModal = ({
           <Collapsible open={fieldOption === FIELD_OPTIONS.CUSTOM}>
             <CollapsibleContent>
               <div className="flex flex-col gap-6">
-                {Object.keys(FIELD_GROUPS).map(group => {
-                  const isSelected = FIELD_GROUPS[group].every(f => fields[f]);
+                {Object.keys(fieldGroups).map(group => {
+                  const isSelected = fieldGroups[group].every(f => fields[f]);
                   return (
                     <div key={group}>
                       <div className="flex items-center">
@@ -475,7 +318,7 @@ const ExportTransactionsCSVModal = ({
                       </div>
 
                       <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                        {FIELD_GROUPS[group]
+                        {fieldGroups[group]
                           .filter(field => !(isHostReport && HOST_OMITTED_FIELDS.includes(field)))
                           .map(field => (
                             <div key={field} className="flex items-center space-x-2">

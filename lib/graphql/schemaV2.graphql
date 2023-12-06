@@ -1163,12 +1163,22 @@ interface Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Amount!
   netAmountInHostCurrency(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Amount!
   taxAmount: Amount!
 
@@ -1183,7 +1193,12 @@ interface Transaction {
     """
     fetchHostFee: Boolean = false
   ): Amount
-  paymentProcessorFee: Amount
+  paymentProcessorFee(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Amount
   host: Account
   account: Account
   oppositeAccount: Account
@@ -1384,7 +1399,7 @@ type Expense {
   """
   The accounts who approved this expense
   """
-  approvedBy: [Account!]!
+  approvedBy: [Account]!
 
   """
   Whether this expense is on hold
@@ -7555,12 +7570,22 @@ type Credit implements Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Amount!
   netAmountInHostCurrency(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Amount!
   taxAmount: Amount!
 
@@ -7579,7 +7604,12 @@ type Credit implements Transaction {
   """
   Payment Processor Fee (usually in host currency)
   """
-  paymentProcessorFee: Amount!
+  paymentProcessorFee(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Amount!
   host: Account
 
   """
@@ -7668,12 +7698,22 @@ type Debit implements Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Amount!
   netAmountInHostCurrency(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Amount!
   taxAmount: Amount!
 
@@ -7692,7 +7732,12 @@ type Debit implements Transaction {
   """
   Payment Processor Fee (usually in host currency)
   """
-  paymentProcessorFee: Amount!
+  paymentProcessorFee(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Amount!
   host: Account
 
   """

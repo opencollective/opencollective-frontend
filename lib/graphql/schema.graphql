@@ -3453,7 +3453,12 @@ type Expense implements Transaction {
   """
   Fee kept by the payment processor in the lowest unit of the currency of the host (ie. in cents)
   """
-  paymentProcessorFeeInHostCurrency: Int
+  paymentProcessorFeeInHostCurrency(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Int
 
   """
   The amount paid in tax (for example VAT) for this transaction
@@ -3473,6 +3478,11 @@ type Expense implements Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Int
   amountInHostCurrency: Int
   host: User
@@ -3553,6 +3563,11 @@ interface Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatibility.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Int
   amountInHostCurrency: Int
 
@@ -3566,7 +3581,12 @@ interface Transaction {
     fetchHostFee: Boolean = false
   ): Int
   platformFeeInHostCurrency: Int
-  paymentProcessorFeeInHostCurrency: Int
+  paymentProcessorFeeInHostCurrency(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Int
   taxAmount: Int
   taxInfo: TaxInfo
   createdByUser: UserDetails
@@ -3623,7 +3643,12 @@ type Order implements Transaction {
   """
   Fee kept by the payment processor in the lowest unit of the currency of the host (ie. in cents)
   """
-  paymentProcessorFeeInHostCurrency: Int
+  paymentProcessorFeeInHostCurrency(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Int
 
   """
   The amount paid in tax (for example VAT) for this transaction
@@ -3643,6 +3668,11 @@ type Order implements Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Int
   amountInHostCurrency: Int
   host: User

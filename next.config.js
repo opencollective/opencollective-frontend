@@ -55,6 +55,7 @@ const nextConfig = {
         CAPTCHA_PROVIDER: 'HCAPTCHA',
         SENTRY_TRACES_SAMPLE_RATE: null,
         OC_APPLICATION: null,
+        LEDGER_SEPARATE_PAYMENT_PROCESSOR_FEES: false,
       }),
     );
 

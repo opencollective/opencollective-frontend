@@ -44,6 +44,7 @@ const defaults = {
   WISE_ENVIRONMENT: 'sandbox',
   API_PROXY: true,
   SENTRY_TRACES_SAMPLE_RATE: null,
+  LEDGER_SEPARATE_PAYMENT_PROCESSOR_FEES: false,
 };
 
 if ((process.env.OC_ENV || process.env.NODE_ENV || 'production') === 'production') {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Info } from '@styled-icons/feather/Info';
@@ -120,6 +120,9 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
   const hostFeeTransaction = transaction.relatedTransactions?.find(
     t => t.kind === TransactionKind.HOST_FEE && t.type === TransactionTypes.CREDIT,
   );
+  const paymentProcessorFeeTransaction = transaction.relatedTransactions?.find(
+    t => t.kind === TransactionKind.PAYMENT_PROCESSOR_FEE && t.type === TransactionTypes.CREDIT,
+  );
   const paymentProcessorCover = transaction.relatedTransactions?.find(
     t => t.kind === TransactionKind.PAYMENT_PROCESSOR_COVER && t.type === TransactionTypes.CREDIT,
   );
@@ -152,24 +155,47 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
               isRefund,
               paymentProcessorCover,
             })}
-            {['CONTRIBUTION', 'ADDED_FUNDS', 'EXPENSE'].includes(transaction.kind) && hostFeeTransaction && (
-              <React.Fragment>
-                <br />
-                <FormattedMessage
-                  id="TransactionDetails.HostFee"
-                  defaultMessage="This transaction includes {amount} host fees"
-                  values={{
-                    amount: (
-                      <FormattedMoneyAmount
-                        amount={hostFeeTransaction.netAmount.valueInCents}
-                        currency={hostFeeTransaction.netAmount.currency}
-                        showCurrencyCode={false}
-                        amountStyles={null}
-                      />
-                    ),
-                  }}
-                />
-              </React.Fragment>
+            {['CONTRIBUTION', 'ADDED_FUNDS', 'EXPENSE'].includes(transaction.kind) && (
+              <Fragment>
+                {paymentProcessorFeeTransaction && (
+                  <Fragment>
+                    <br />
+                    <FormattedMessage
+                      id="TransactionDetails.PaymentProcessorFee"
+                      defaultMessage="This transaction includes {amount} payment processor fees"
+                      values={{
+                        amount: (
+                          <FormattedMoneyAmount
+                            amount={paymentProcessorFeeTransaction.netAmount.valueInCents}
+                            currency={paymentProcessorFeeTransaction.netAmount.currency}
+                            showCurrencyCode={false}
+                            amountStyles={null}
+                          />
+                        ),
+                      }}
+                    />
+                  </Fragment>
+                )}
+                {hostFeeTransaction && (
+                  <Fragment>
+                    <br />
+                    <FormattedMessage
+                      id="TransactionDetails.HostFee"
+                      defaultMessage="This transaction includes {amount} host fees"
+                      values={{
+                        amount: (
+                          <FormattedMoneyAmount
+                            amount={hostFeeTransaction.netAmount.valueInCents}
+                            currency={hostFeeTransaction.netAmount.currency}
+                            showCurrencyCode={false}
+                            amountStyles={null}
+                          />
+                        ),
+                      }}
+                    />
+                  </Fragment>
+                )}
+              </Fragment>
             )}
           </DetailDescription>
           {order?.memo && (
