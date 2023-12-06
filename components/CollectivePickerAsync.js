@@ -48,8 +48,12 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
         isActive
         isArchived
         isHost
-        isTrustedHost
-        isTwoFactorAuthEnabled
+        ... on User {
+          isTwoFactorAuthEnabled
+        }
+        ... on Organization {
+          isTrustedHost
+        }
       }
     }
   }

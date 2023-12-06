@@ -15,7 +15,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
 import { require2FAForAdmins } from '../../lib/policies';
 import { flattenObjectDeep } from '../../lib/utils';
 import { checkRequiresAddress } from './lib/utils';
@@ -189,6 +189,65 @@ const getPayeeOptions = (intl, payoutProfiles) => {
   return payeeOptions;
 };
 
+const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
+  query CollectivePickerSearchQuery(
+    $term: String!
+    $types: [TypeOfCollective]
+    $limit: Int
+    $hostCollectiveIds: [Int]
+    $parentCollectiveIds: [Int]
+    $skipGuests: Boolean
+    $includeArchived: Boolean
+    $includeVendorsForHostId: Int
+  ) {
+    search(
+      term: $term
+      types: $types
+      limit: $limit
+      hostCollectiveIds: $hostCollectiveIds
+      parentCollectiveIds: $parentCollectiveIds
+      skipGuests: $skipGuests
+      includeArchived: $includeArchived
+      includeVendorsForHostId: $includeVendorsForHostId
+    ) {
+      id
+      collectives {
+        id
+        type
+        slug
+        name
+        currency
+        location {
+          id
+          address
+          country
+        }
+        imageUrl(height: 64)
+        hostFeePercent
+        isActive
+        isArchived
+        isHost
+        payoutMethods {
+          id
+          type
+          name
+          data
+          isSaved
+        }
+        ... on User {
+          isTwoFactorAuthEnabled
+        }
+        ... on Organization {
+          isTrustedHost
+        }
+        ... on Vendor {
+          hasPayoutMethod
+        }
+      }
+    }
+  }
+`;
+
 const expenseFormPayeeStepQuery = gql`
   query ExpenseFormPayee($collectiveSlug: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
@@ -207,6 +266,7 @@ const expenseFormPayeeStepQuery = gql`
               type
               description
               imageUrl(height: 64)
+              hasPayoutMethod
               payoutMethods {
                 id
                 type
@@ -269,7 +329,7 @@ const ExpenseFormPayeeStep = ({
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
 
-  const vendors = get(data, 'account.host.vendors.nodes', []);
+  const vendors = get(data, 'account.host.vendors.nodes', []).filter(v => v.hasPayoutMethod);
   const payeeOptions = React.useMemo(
     () => getPayeeOptions(intl, [...payoutProfiles, ...vendors]),
     [payoutProfiles, vendors],
@@ -326,6 +386,8 @@ const ExpenseFormPayeeStep = ({
           includeVendorsForHostId={collective.host?.legacyId || undefined}
           addLoggedInUserAsAdmin
           excludeAdminFields
+          searchQuery={collectivePickerSearchQuery}
+          filterResults={collectives => collectives.filter(c => c.type !== CollectiveType.VENDOR || c.hasPayoutMethod)}
           loading={loading}
         />
       )
