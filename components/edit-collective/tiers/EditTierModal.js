@@ -483,7 +483,9 @@ function FormFields({ collective, values, hideTypeSelect }) {
                         as={Link}
                         openInNewTab
                         href={{
-                          pathname: `${getCollectivePageRoute(collective)}/contribute/${values.slug}-${values.id}`,
+                          pathname: `${getCollectivePageRoute(collective)}/contribute/${values.slug}-${
+                            values.legacyId
+                          }`,
                         }}
                       >
                         <span>{msg}</span>
@@ -539,6 +541,7 @@ FormFields.propTypes = {
   }),
   values: PropTypes.shape({
     id: PropTypes.string,
+    legacyId: PropTypes.number,
     slug: PropTypes.string,
     type: PropTypes.string,
     amountType: PropTypes.string,
@@ -786,7 +789,7 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
   const initialValues = React.useMemo(() => {
     if (isEditing) {
       return {
-        ...omit(tier, ['__typename', 'endsAt', 'slug', 'legacyId', 'customFields', 'availableQuantity']),
+        ...omit(tier, ['__typename', 'endsAt', 'customFields', 'availableQuantity']),
         amount: omit(tier.amount, '__typename'),
         interval: getIntervalFromContributionFrequency(tier.frequency),
         goal: omit(tier.goal, '__typename'),
@@ -875,7 +878,7 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
         validate={values => requireFields(values, getRequiredFields(values))}
         onSubmit={async values => {
           const tier = {
-            ...omit(values, ['interval']),
+            ...omit(values, ['interval', 'legacyId', 'slug']),
             frequency: getGQLV2FrequencyFromInterval(values.interval),
             maxQuantity: parseInt(values.maxQuantity),
             goal: !isNil(values?.goal?.valueInCents) ? values.goal : null,
