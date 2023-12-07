@@ -41,6 +41,7 @@ const UpdateSearchFilter = ({ searchTerm, onChange }) => {
           id="update-filter-search"
           placeholder={formatMessage(messages.searchFilterPlaceholder)}
           height="38px"
+          maxWidth={'100%'}
           defaultValue={searchTerm}
           onSubmit={onChange}
         />
