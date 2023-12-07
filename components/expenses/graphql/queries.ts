@@ -25,6 +25,10 @@ export const expensePageQuery = gql`
         id
         stats {
           id
+          totalPaidExpenses(dateFrom: $totalPaidExpensesDateFrom) {
+            valueInCents
+            currency
+          }
           totalPaidInvoices: totalPaidExpenses(expenseType: [INVOICE], dateFrom: $totalPaidExpensesDateFrom) {
             valueInCents
             currency

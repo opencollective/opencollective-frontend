@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { getCollectivePageRoute } from '../lib/url-helpers';
+import { cn } from '../lib/utils';
 
+import { AccountHoverCard } from './AccountHoverCard';
 import Link from './Link';
 
 /**
@@ -16,6 +18,9 @@ const LinkCollective = ({
   title = undefined,
   noTitle = false,
   children = undefined,
+  withHoverCard = false,
+  className = undefined,
+  hoverCardProps = undefined,
   ...props
 }) => {
   if (!collective || collective.isIncognito) {
@@ -36,11 +41,23 @@ const LinkCollective = ({
   if (type === 'USER' && (!name || isIncognito || !slug)) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   }
-  return (
-    <Link href={getCollectivePageRoute(collective)} title={noTitle ? null : title || name} target={target} {...props}>
+  const link = (
+    <Link
+      href={getCollectivePageRoute(collective)}
+      title={noTitle || withHoverCard ? null : title || name}
+      target={target}
+      className={cn('hover:underline', className)}
+      {...props}
+    >
       {children || name || slug}
     </Link>
   );
+
+  if (withHoverCard) {
+    return <AccountHoverCard {...hoverCardProps} account={collective} trigger={<span>{link}</span>} />;
+  }
+
+  return link;
 };
 
 LinkCollective.propTypes = {
@@ -61,6 +78,10 @@ LinkCollective.propTypes = {
   target: PropTypes.string,
   /** Set this to true to remove the `title` attribute from the link */
   noTitle: PropTypes.bool,
+  className: PropTypes.string,
+  /** If true, will display a hover card on mouse over */
+  withHoverCard: PropTypes.bool,
+  hoverCardProps: PropTypes.object,
 };
 
 export default LinkCollective;

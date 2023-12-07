@@ -1,5 +1,6 @@
 import { gql } from '@apollo/client';
 
+import { accountHoverCardFields } from '../../AccountHoverCard';
 import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
 
 export const loggedInAccountExpensePayoutFieldsFragment = gql`
@@ -256,6 +257,9 @@ export const expensePageExpenseFieldsFragment = gql`
       type
       isAdmin
       isActive
+      description
+      imageUrl
+      ...AccountHoverCardFields
       location {
         id
         address
@@ -274,6 +278,7 @@ export const expensePageExpenseFieldsFragment = gql`
         isApproved
         host {
           id
+          slug
           # For Expenses across hosts
           payoutMethods {
             id
@@ -304,6 +309,7 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       type
       imageUrl
+      ...AccountHoverCardFields
     }
     host {
       id
@@ -324,13 +330,15 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       type
       imageUrl
+      ...AccountHoverCardFields
     }
     approvedBy {
       id
       type
       slug
       name
-      imageUrl(height: 80)
+      imageUrl
+      ...AccountHoverCardFields
     }
     account {
       id
@@ -388,6 +396,7 @@ export const expensePageExpenseFieldsFragment = gql`
         }
         host {
           id
+          slug
           legacyId
           ...ExpenseHostFields
           transferwise {
@@ -430,6 +439,7 @@ export const expensePageExpenseFieldsFragment = gql`
           imageUrl
         }
       }
+      ...AccountHoverCardFields
     }
     payoutMethod {
       id
@@ -473,12 +483,23 @@ export const expensePageExpenseFieldsFragment = gql`
       type
       createdAt
       data
+      account {
+        id
+        slug
+        ... on AccountWithHost {
+          host {
+            id
+            slug
+          }
+        }
+      }
       individual {
         id
         type
         slug
         name
         imageUrl
+        ...AccountHoverCardFields
       }
       transaction {
         id
@@ -551,6 +572,7 @@ export const expensePageExpenseFieldsFragment = gql`
   ${expenseHostFields}
   ${collectiveNavbarFieldsFragment}
   ${accountingCategoryFields}
+  ${accountHoverCardFields}
 `;
 
 export const expensesListFieldsFragment = gql`
@@ -605,6 +627,7 @@ export const expensesListFieldsFragment = gql`
       createdAt
       currency
       type
+      imageUrl
       stats {
         id
         balanceWithBlockedFunds {
@@ -624,6 +647,7 @@ export const expensesListFieldsFragment = gql`
           slug
         }
       }
+      ...AccountHoverCardFields
     }
     permissions {
       id
@@ -658,10 +682,9 @@ export const expensesListFieldsFragment = gql`
       type
       slug
       name
-      imageUrl(height: 80)
+      imageUrl
       hasImage
       isAdmin
-
       # For Collectives, Funds, Events and Projects
       ... on AccountWithHost {
         isApproved
@@ -676,15 +699,18 @@ export const expensesListFieldsFragment = gql`
           id
         }
       }
+      ...AccountHoverCardFields
     }
     createdByAccount {
       id
       type
       slug
       name
+      ...AccountHoverCardFields
     }
   }
   ${accountingCategoryFields}
+  ${accountHoverCardFields}
 `;
 
 export const expensesListAdminFieldsFragment = gql`

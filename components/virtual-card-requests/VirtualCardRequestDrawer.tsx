@@ -7,6 +7,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { VirtualCardRequest, VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
+import { accountHoverCardFields } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';
 import { Drawer, DrawerActions, DrawerHeader } from '../Drawer';
@@ -39,6 +40,7 @@ const virtualCardRequestQuery = gql`
         name
         slug
         imageUrl
+        ...AccountHoverCardFields
       }
       assignee {
         id
@@ -46,6 +48,7 @@ const virtualCardRequestQuery = gql`
         email
         slug
         imageUrl
+        ...AccountHoverCardFields
       }
       host {
         id
@@ -55,6 +58,7 @@ const virtualCardRequestQuery = gql`
       }
     }
   }
+  ${accountHoverCardFields}
 `;
 
 const RejectVirtualCardRequestMutation = gql`
@@ -194,6 +198,7 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
                   <LinkCollective
                     collective={virtualCardRequest.account}
                     className="flex items-center gap-2 font-medium hover:underline"
+                    withHoverCard
                   >
                     <Avatar collective={virtualCardRequest.account} radius={24} /> {virtualCardRequest.account.name}
                   </LinkCollective>
@@ -205,6 +210,8 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
                   <LinkCollective
                     collective={virtualCardRequest.assignee}
                     className="flex items-center gap-2 font-medium hover:underline"
+                    withHoverCard
+                    hoverCardProps={{ includeAdminMembership: { accountSlug: virtualCardRequest.account.slug } }}
                   >
                     <Avatar collective={virtualCardRequest.assignee} radius={24} /> {virtualCardRequest.assignee.name}
                   </LinkCollective>

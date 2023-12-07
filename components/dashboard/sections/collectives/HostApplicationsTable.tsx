@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { HostApplication, HostApplicationStatus } from '../../../../lib/graphql/types/v2/graphql';
 
+import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import { DataTable } from '../../../DataTable';
 import DateTime from '../../../DateTime';
@@ -53,10 +54,15 @@ export const columns: ColumnDef<HostApplication>[] = [
       const account = cell.getValue() as HostApplication['account'];
 
       return (
-        <div className="flex items-center gap-2 truncate" id={`application-${account.legacyId}`}>
-          <Avatar collective={account} radius={24} />
-          <span className="truncate">{account.name}</span>
-        </div>
+        <AccountHoverCard
+          account={account}
+          trigger={
+            <div className="flex items-center gap-2 truncate" id={`application-${account.legacyId}`}>
+              <Avatar collective={account} radius={24} />
+              <span className="truncate">{account.name}</span>
+            </div>
+          }
+        />
       );
     },
   },
@@ -70,7 +76,15 @@ export const columns: ColumnDef<HostApplication>[] = [
       return (
         <div className="flex items-center -space-x-1">
           {admins.nodes.slice(0, 3).map(admin => (
-            <Avatar key={admin.id} collective={admin.account} radius={24} />
+            <AccountHoverCard
+              key={admin.id}
+              account={admin.account}
+              trigger={
+                <span>
+                  <Avatar collective={admin.account} radius={24} />
+                </span>
+              }
+            />
           ))}
           {admins.totalCount > 3 && <div className="pl-2 text-slate-600">+{admins.totalCount - 3}</div>}
         </div>

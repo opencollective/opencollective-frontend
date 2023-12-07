@@ -12,6 +12,7 @@ import {
 import { useWindowResize } from '../../lib/hooks/useWindowResize';
 import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
+import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import { DataTable } from '../DataTable';
 import DateTime from '../DateTime';
@@ -40,10 +41,15 @@ export const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
     cell: ({ cell }: CellContext<GraphQLVirtualCard, Account>) => {
       const account = cell.getValue();
       return (
-        <div className="flex items-center gap-2">
-          <Avatar collective={account} radius={24} />
-          <span className="min-w-0 flex-1 truncate">{account.name}</span>
-        </div>
+        <AccountHoverCard
+          account={account}
+          trigger={
+            <div className="flex items-center gap-2">
+              <Avatar collective={account} radius={24} />
+              <span className="min-w-0 flex-1 truncate">{account.name}</span>
+            </div>
+          }
+        />
       );
     },
   },

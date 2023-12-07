@@ -16,6 +16,7 @@ import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles } from './lib/items';
 
+import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -52,10 +53,10 @@ export const SummaryHeader = styled(H1)`
 
 const CreatedByUserLink = ({ account }) => {
   return (
-    <LinkCollective collective={account}>
-      <Span color="black.800" fontWeight={500} textDecoration="none">
+    <LinkCollective collective={account} noTitle>
+      <span className="font-medium text-foreground underline hover:text-primary">
         {account ? account.name : <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />}
-      </Span>
+      </span>
     </LinkCollective>
   );
 };
@@ -99,7 +100,6 @@ const ExpenseSummary = ({
   const expenseTaxes = expense?.taxes?.length > 0 ? expense.taxes : expense?.draft?.taxes || [];
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
-
   const { LoggedInUser } = useLoggedInUser();
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
@@ -212,15 +212,42 @@ const ExpenseSummary = ({
                   id="Expense.RequestedBy"
                   defaultMessage="Invited by {name}"
                   values={{
-                    name: <CreatedByUserLink account={createdByAccount} />,
-                    date: new Date(expense.createdAt),
+                    name: (
+                      <AccountHoverCard
+                        account={createdByAccount}
+                        includeAdminMembership={{
+                          accountSlug: expense.account?.slug,
+                          hostSlug: host?.slug,
+                        }}
+                        trigger={
+                          <span>
+                            <CreatedByUserLink account={createdByAccount} />
+                          </span>
+                        }
+                      />
+                    ),
                   }}
                 />
               ) : (
                 <FormattedMessage
                   id="Expense.SubmittedBy"
                   defaultMessage="Submitted by {name}"
-                  values={{ name: <CreatedByUserLink account={createdByAccount} /> }}
+                  values={{
+                    name: (
+                      <AccountHoverCard
+                        account={createdByAccount}
+                        includeAdminMembership={{
+                          accountSlug: expense.account?.slug,
+                          hostSlug: host?.slug,
+                        }}
+                        trigger={
+                          <span>
+                            <CreatedByUserLink account={createdByAccount} />
+                          </span>
+                        }
+                      />
+                    ),
+                  }}
                 />
               )}
               {expense.approvedBy?.length > 0 && (
@@ -230,7 +257,20 @@ const ExpenseSummary = ({
                     id="Expense.ApprovedBy"
                     defaultMessage="Approved by {name}"
                     values={{
-                      name: <CreatedByUserLink account={expense.approvedBy.find(Boolean)} />,
+                      name: (
+                        <AccountHoverCard
+                          account={expense.approvedBy.find(Boolean)}
+                          includeAdminMembership={{
+                            accountSlug: expense.account.slug,
+                            hostSlug: host?.slug,
+                          }}
+                          trigger={
+                            <span>
+                              <CreatedByUserLink account={expense.approvedBy.find(Boolean)} />
+                            </span>
+                          }
+                        />
+                      ),
                     }}
                   />
                 </React.Fragment>
@@ -465,6 +505,7 @@ ExpenseSummary.propTypes = {
     amountInAccountCurrency: AmountPropTypeShape,
     account: PropTypes.shape({
       id: PropTypes.string.isRequired,
+      slug: PropTypes.string.isRequired,
       host: PropTypes.shape({
         id: PropTypes.string.isRequired,
       }),
