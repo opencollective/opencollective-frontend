@@ -2757,6 +2757,7 @@
   "SE0Wpk": "I agree with the <TOSLink>terms of service</TOSLink> of Open Collective",
   "Seanpx": "Required",
   "Search": "検索",
+  "search.clear": "検索をクリア",
   "search.placeholder": "検索...",
   "searchFilter.host": "財務ホスト",
   "SearchFor": "「{entity}」を検索",

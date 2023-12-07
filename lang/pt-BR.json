@@ -2757,6 +2757,7 @@
   "SE0Wpk": "Concordo com os termos de serviço <TOSLink></TOSLink> da Open Collective",
   "Seanpx": "Required",
   "Search": "Buscar",
+  "search.clear": "Limpar pesquisa",
   "search.placeholder": "Buscar...",
   "searchFilter.host": "Administradores Fiscais",
   "SearchFor": "Buscar por {entity}",

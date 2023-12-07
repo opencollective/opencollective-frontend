@@ -2757,6 +2757,7 @@
   "SE0Wpk": "Open Collective의 <TOSLink>이용약관</TOSLink>에 동의합니다",
   "Seanpx": "Required",
   "Search": "검색",
+  "search.clear": "검색 지우기",
   "search.placeholder": "검색...",
   "searchFilter.host": "재정 호스트",
   "SearchFor": "{entity} 검색",
