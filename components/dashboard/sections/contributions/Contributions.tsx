@@ -305,7 +305,7 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
       count: metadata?.account?.[ContributionsTab.RECURRING].totalCount,
       filter: {
         type: OrderTypeFilter.RECURRING,
-        status: [OrderStatus.ACTIVE],
+        status: [OrderStatus.ACTIVE, OrderStatus.ERROR],
       },
     },
     {
