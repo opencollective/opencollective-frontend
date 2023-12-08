@@ -78,6 +78,10 @@ const accountOrdersQuery = gql`
           slug
           name
           imageUrl
+          isIncognito
+          ... on Individual {
+            isGuest
+          }
           ...AccountHoverCardFields
         }
         pendingContributionData {

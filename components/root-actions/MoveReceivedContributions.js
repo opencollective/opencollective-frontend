@@ -42,6 +42,9 @@ const moveOrdersMutation = gql`
         slug
         isIncognito
         imageUrl(height: 48)
+        ... on Individual {
+          isGuest
+        }
       }
       toAccount {
         id

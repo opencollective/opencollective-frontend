@@ -17,6 +17,9 @@ export const workspaceHomeQuery = gql`
           type
           isIncognito
           imageUrl(height: 48)
+          ... on Individual {
+            isGuest
+          }
         }
         host {
           id
@@ -31,6 +34,9 @@ export const workspaceHomeQuery = gql`
           type
           isIncognito
           imageUrl(height: 48)
+          ... on Individual {
+            isGuest
+          }
           ... on AccountWithParent {
             parent {
               id

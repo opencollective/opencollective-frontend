@@ -47,6 +47,10 @@ export const confirmContributionFieldsFragment = gql`
       type
       imageUrl
       hasImage
+      isIncognito
+      ... on Individual {
+        isGuest
+      }
     }
     toAccount {
       id
