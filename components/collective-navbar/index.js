@@ -79,7 +79,7 @@ const NavBarContainerGlobalStyle = createGlobalStyle`
 const NavbarContentContainer = styled(Container)`
   background: white;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
 `;
 
 const AvatarBox = styled(Box)`
@@ -593,7 +593,7 @@ const CollectiveNavbar = ({
           {!onlyInfos && (
             <Container
               display={['block', 'flex']}
-              width="100%"
+              width="auto"
               justifyContent="space-between"
               flexDirection={['column', 'row']}
             >
