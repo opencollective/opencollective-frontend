@@ -27,9 +27,9 @@ export const accountHoverCardFields = gql`
     type
     description
     imageUrl
+    isHost
     ... on Individual {
       isGuest
-      emails
     }
     ... on AccountWithHost {
       host {
@@ -38,6 +38,7 @@ export const accountHoverCardFields = gql`
       }
       approvedAt
     }
+
     ... on AccountWithParent {
       parent {
         id
@@ -140,6 +141,7 @@ const getInfoItems = (account): InfoItemProps[] => {
       ),
     },
     account?.host &&
+      !account.isHost &&
       account?.approvedAt && {
         Icon: Building,
         info: (

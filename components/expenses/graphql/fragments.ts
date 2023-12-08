@@ -725,6 +725,18 @@ export const expensesListAdminFieldsFragment = gql`
         }
       }
     }
+    createdByAccount {
+      id
+      ... on Individual {
+        emails
+      }
+    }
+    payee {
+      id
+      ... on Individual {
+        emails
+      }
+    }
     payoutMethod {
       id
       type
