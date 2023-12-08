@@ -592,6 +592,8 @@
   "collective.hostAccount.modal.description": "Um Anfitrião Fiscal é uma entidade jurídica (empresa ou indivíduo) que detém fundos das Coletividades na sua conta bancária, e pode gerar faturas e recibos de Contribuidores Financeiros.{br}Pense num Anfitrião Fiscal como uma organização guarda-chuva para as suas Coletividades.",
   "collective.hostFeePercent.description": "Comissão sobre as contribuições financeiras para as Coletividades que fiscalmente hospeda.",
   "collective.hostFeePercent.warning": "Open Collective will charge 15% of your Host Fee revenue as its Platform Fee.",
+  "collective.hostFeePercentPendingContributions.description": "Default host fee set when creating pending contributions.",
+  "collective.hostFeePercentPendingContributions.title": "Host fee for Pending Contributions",
   "collective.image.label": "Imagem de Perfil",
   "collective.isArchived": "{name} foi arquivado.",
   "collective.isArchived.description": "{name} has been archived and is no longer active.",

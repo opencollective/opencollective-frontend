@@ -592,6 +592,8 @@
   "collective.hostAccount.modal.description": "Um administrador fiscal é uma entidade jurídica (empresa ou indivíduo) que detém fundos de Coletivos em sua conta bancária e pode gerar faturas e recibos para contribuidores financeiros.{br}Pense em um administrador fiscal como uma organização guarda-chuva para seus Coletivos.",
   "collective.hostFeePercent.description": "Taxa sobre contribuições financeiras para Coletivos que você hospeda fiscalmente.",
   "collective.hostFeePercent.warning": "O Coletivo Aberto irá cobrar 15% da sua receita de Taxa de Administração como sua Taxa de Plataforma.",
+  "collective.hostFeePercentPendingContributions.description": "Default host fee set when creating pending contributions.",
+  "collective.hostFeePercentPendingContributions.title": "Host fee for Pending Contributions",
   "collective.image.label": "Foto de Perfil",
   "collective.isArchived": "{name} foi arquivado.",
   "collective.isArchived.description": "{name} foi arquivado e não está mais ativo.",

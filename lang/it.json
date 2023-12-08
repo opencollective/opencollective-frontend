@@ -592,6 +592,8 @@
   "collective.hostAccount.modal.description": "Un gestore fiscale, o Host, è un soggetto (una persona giuridica o un individuo) che detiene i fondi di un Collettivo sul suo conto bancario, e può generare fatture e ricevute per i Collaboratori Finanziari.{br}Puoi pensare ad un Host come ad una società ombrello per Collettivi.",
   "collective.hostFeePercent.description": "Fee on financial contributions to Collectives you fiscally host.",
   "collective.hostFeePercent.warning": "Open Collective will charge 15% of your Host Fee revenue as its Platform Fee.",
+  "collective.hostFeePercentPendingContributions.description": "Default host fee set when creating pending contributions.",
+  "collective.hostFeePercentPendingContributions.title": "Host fee for Pending Contributions",
   "collective.image.label": "Avatar",
   "collective.isArchived": "{name} è stato archiviato.",
   "collective.isArchived.description": "{name} è stato archiviato, e non è più attivo.",

@@ -592,6 +592,8 @@
   "collective.hostAccount.modal.description": "Fiškálny hostiteľ je právnická osoba (spoločnosť alebo jednotlivec), ktorá má na svojom bankovom účte prostriedky kolektívu a môže vytvárať faktúry a potvrdenia pre finančných prispievateľov.{br}Predstavte si fiškálneho hostiteľa ako zastrešujúcu organizáciu pre svoje kolektívy.",
   "collective.hostFeePercent.description": "Poplatok za finančné príspevky kolektívom, ktorým poskytujete fiškálne zázemie.",
   "collective.hostFeePercent.warning": "Open Collective si účtuje 15 % z vášho Poplatku Hostiteľa ako Poplatok Platformy.",
+  "collective.hostFeePercentPendingContributions.description": "Default host fee set when creating pending contributions.",
+  "collective.hostFeePercentPendingContributions.title": "Host fee for Pending Contributions",
   "collective.image.label": "Avatar",
   "collective.isArchived": "{name} bolo archivované.",
   "collective.isArchived.description": "{name} bolo archivované a už nie je aktívne.",

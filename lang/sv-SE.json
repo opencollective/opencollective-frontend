@@ -592,6 +592,8 @@
   "collective.hostAccount.modal.description": "En finansiell värd är en juridisk person (företag eller privatperson) som innehar kollektivets pengar på sitt bankkonto, och skapar fakturor och kvitton.{br}En värd är som en paraplyorganisation för sina kollektiv.",
   "collective.hostFeePercent.description": "Avgift för ekonomiska bidrag till kollektiv du är värd för.",
   "collective.hostFeePercent.warning": "Open Collective debiterar 15% av intäkterna från ditt värdskap som plattformsavgift.",
+  "collective.hostFeePercentPendingContributions.description": "Default host fee set when creating pending contributions.",
+  "collective.hostFeePercentPendingContributions.title": "Host fee for Pending Contributions",
   "collective.image.label": "Profilbild",
   "collective.isArchived": "{name} har arkiverats.",
   "collective.isArchived.description": "{name} har arkiverats och är inte längre aktiv.",

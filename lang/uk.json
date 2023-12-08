@@ -592,6 +592,8 @@
   "collective.hostAccount.modal.description": "Фіскальний агент — це юридична особа (компанія або індивідуальна), яка зберігає кошти колективів на своєму банківському рахунку й може генерувати рахунки-фактури та квитанції для фінансових помічників.{br}Ви можете вважати фіскальний агент організацією-парасолькою для його колективів.",
   "collective.hostFeePercent.description": "Комісія з фінансових внесків колективам, для яких ви фіскальний вузол.",
   "collective.hostFeePercent.warning": "Open Collective стягує 15% від вашого доходу як хосту в якості плати за платформу.",
+  "collective.hostFeePercentPendingContributions.description": "Default host fee set when creating pending contributions.",
+  "collective.hostFeePercentPendingContributions.title": "Host fee for Pending Contributions",
   "collective.image.label": "Аватар",
   "collective.isArchived": "{name} архівовано.",
   "collective.isArchived.description": "{name} заархівовано й він більше не активний.",

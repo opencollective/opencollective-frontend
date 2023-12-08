@@ -592,6 +592,8 @@
   "collective.hostAccount.modal.description": "Un hôte fiscal est une entité juridique (entreprise ou individu) qui détient des fonds collectifs dans son compte bancaire et peut générer des factures et des reçus pour les contributeurs financiers.{br} Pensez à un hôte fiscal comme une organisation faîtière pour ses collectifs.",
   "collective.hostFeePercent.description": "Frais sur les contributions financières aux collectifs que vous hébergez fiscalement.",
   "collective.hostFeePercent.warning": "Open Collective facturera 15% des revenus de votre hôte en tant que frais de plate-forme.",
+  "collective.hostFeePercentPendingContributions.description": "Default host fee set when creating pending contributions.",
+  "collective.hostFeePercentPendingContributions.title": "Host fee for Pending Contributions",
   "collective.image.label": "Avatar",
   "collective.isArchived": "{name} a été archivé.",
   "collective.isArchived.description": "{name} a été archivé et n'est plus actif.",

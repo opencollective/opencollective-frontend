@@ -592,6 +592,8 @@
   "collective.hostAccount.modal.description": "财务托管方是在其银行账户中持有集体资金的合法实体（公司或个人）。并且能够为财务贡献者提供发票和收据。{br}你可以把财政托管方想象成为针对集体的伞式组织。",
   "collective.hostFeePercent.description": "财务贡献者给集体的财务托管的费用",
   "collective.hostFeePercent.warning": "Open Collective 将收取你15%的主机费用作为平台费用。",
+  "collective.hostFeePercentPendingContributions.description": "Default host fee set when creating pending contributions.",
+  "collective.hostFeePercentPendingContributions.title": "Host fee for Pending Contributions",
   "collective.image.label": "头像",
   "collective.isArchived": "{name} 已存档。",
   "collective.isArchived.description": "{name} 已被归档且不再活跃。",

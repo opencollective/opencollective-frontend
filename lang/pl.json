@@ -592,6 +592,8 @@
   "collective.hostAccount.modal.description": "Gospodarz podatkowy to legalna jednostka (firma lub osoba fizyczna), która posiada środki na swoim koncie bankowym i może generować faktury lub rachunki dla osób wnoszących wkład finansowy.{br}Pomyśl o gospodarzu podatkowym jako organizacja nadrzędnej dla swoich wspólników.",
   "collective.hostFeePercent.description": "Opłata od wkładów finansowych na rzecz Zbiórek, których jest się gospodarzem finansowym.",
   "collective.hostFeePercent.warning": "Otwarty Collective będzie pobierać 15% przychodów z opłat za gospodarstwo jako opłatę platformową.",
+  "collective.hostFeePercentPendingContributions.description": "Default host fee set when creating pending contributions.",
+  "collective.hostFeePercentPendingContributions.title": "Host fee for Pending Contributions",
   "collective.image.label": "Awatar",
   "collective.isArchived": "{name} został zarchiwizowany.",
   "collective.isArchived.description": "{name} został zarchiwizowany i nie jest już aktywny.",

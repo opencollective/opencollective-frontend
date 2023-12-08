@@ -592,6 +592,8 @@
   "collective.hostAccount.modal.description": "ארגון מארח זה ישות חוקית (עמותה, למשל) שמנהלת את כספי הקבוצה בחשבון הבנק שלה, יכולה ליצור דרישות תשלום וקבלות לתורמים.{br} אפשר להתייחס לארגון מארח כארגון-גג לקבוצות.",
   "collective.hostFeePercent.description": "תקורה או עמלה על הכנסות כספיות לקבוצות שהארגון שלך מארח.",
   "collective.hostFeePercent.warning": "OpenCollective גובה 15% מעמלות הארגון / התקורה, עבור השימוש בפלטפורמה.",
+  "collective.hostFeePercentPendingContributions.description": "Default host fee set when creating pending contributions.",
+  "collective.hostFeePercentPendingContributions.title": "Host fee for Pending Contributions",
   "collective.image.label": "תמונת משתמש",
   "collective.isArchived": "העברת את {name} לארכיון.",
   "collective.isArchived.description": "{name} עבר לארכיון ואינו פעיל יותר.",

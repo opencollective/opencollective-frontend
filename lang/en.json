@@ -592,6 +592,8 @@
   "collective.hostAccount.modal.description": "A Fiscal Host is a legal entity (company or individual) who holds Collective funds in their bank account, and can generate invoices and receipts for Financial Contributors.{br}Think of a Fiscal Host as an umbrella organization for its Collectives.",
   "collective.hostFeePercent.description": "Fee on financial contributions to Collectives you fiscally host.",
   "collective.hostFeePercent.warning": "Open Collective will charge 15% of your Host Fee revenue as its Platform Fee.",
+  "collective.hostFeePercentPendingContributions.description": "Default host fee set when creating pending contributions.",
+  "collective.hostFeePercentPendingContributions.title": "Host fee for Pending Contributions",
   "collective.image.label": "Avatar",
   "collective.isArchived": "{name} has been archived.",
   "collective.isArchived.description": "{name} has been archived and is no longer active.",

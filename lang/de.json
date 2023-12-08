@@ -592,6 +592,8 @@
   "collective.hostAccount.modal.description": "Ein Fiscal Host ist eine juristische Person (Unternehmen oder Einzelperson), die Kollektivgelder auf ihrem Bankkonto hält und Rechnungen und Quittungen für Finanzbeitragszahler erstellen kann.{br}Stellen Sie sich einen Fiscal Host als Dachorganisation für seine Kollektive vor.",
   "collective.hostFeePercent.description": "Gebühr für finanzielle Beiträge an Kollektive, die Sie steuerlich beherbergen.",
   "collective.hostFeePercent.warning": "Open Collective berechnet 15 % Ihrer Einnahmen aus Hostgebühren als Plattformgebühr.",
+  "collective.hostFeePercentPendingContributions.description": "Default host fee set when creating pending contributions.",
+  "collective.hostFeePercentPendingContributions.title": "Host fee for Pending Contributions",
   "collective.image.label": "Avatar",
   "collective.isArchived": "{name} wurde archiviert.",
   "collective.isArchived.description": "{name} wurde archiviert und ist nicht mehr aktiv.",
