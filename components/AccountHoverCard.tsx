@@ -28,6 +28,7 @@ export const accountHoverCardFields = gql`
     description
     imageUrl
     ... on Individual {
+      isGuest
       emails
     }
     ... on AccountWithHost {

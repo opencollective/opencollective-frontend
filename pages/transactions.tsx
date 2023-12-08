@@ -73,6 +73,9 @@ const processingOrderFragment = gql`
       slug
       isIncognito
       type
+      ... on Individual {
+        isGuest
+      }
     }
     toAccount {
       id

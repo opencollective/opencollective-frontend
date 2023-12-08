@@ -73,7 +73,9 @@ const hostOrdersQuery = gql`
           name
           imageUrl
           type
+          isIncognito
           ... on Individual {
+            isGuest
             emails
           }
           ...AccountHoverCardFields
