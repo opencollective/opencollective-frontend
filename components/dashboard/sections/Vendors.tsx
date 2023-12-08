@@ -82,7 +82,8 @@ const dashboardVendorsQuery = gql`
           }
           supportedPayoutMethods
           isTrustedHost
-          vendors(searchTerm: $searchTerm, isArchived: $isArchived, limit: $limit, offset: $offset) {
+          vendors(searchTerm: $searchTerm, isArchived: $isArchived, limit: $limit, offset: $offset)
+            @skip(if: $includePotentialVendors) {
             totalCount
             offset
             limit
@@ -102,25 +103,6 @@ const dashboardVendorsQuery = gql`
               imageUrl(height: 96)
               isArchived
               createdAt
-              orders {
-                totalCount
-              }
-              expenses(status: PAID, direction: SUBMITTED) {
-                totalCount
-              }
-              members(role: ADMIN, includeInherited: true) {
-                nodes {
-                  id
-                  role
-                  account {
-                    id
-                    name
-                    slug
-                    type
-                    imageUrl(height: 64)
-                  }
-                }
-              }
             }
           }
         }
