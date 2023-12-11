@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import { HostedCollectiveTypes } from '../../../lib/constants/collectives';
 import { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
-import { integer } from '../../../lib/filters/schemas';
+import { integer, isMulti } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { HostDashboardHostedCollectivesQueryVariables, HostFeeStructure } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
@@ -35,7 +35,7 @@ const schema = z.object({
   searchTerm: searchFilter.schema,
   orderBy: orderByFilter.schema,
   hostFeesStructure: z.nativeEnum(HostFeeStructure).optional(),
-  type: z.nativeEnum(HostedCollectiveTypes).optional(),
+  type: isMulti(z.nativeEnum(HostedCollectiveTypes)).optional(),
 });
 
 const toVariables: FiltersToVariables<z.infer<typeof schema>, HostDashboardHostedCollectivesQueryVariables> = {
@@ -66,6 +66,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
           label: formatCollectiveType(intl, value),
           value,
         }))}
+        isMulti
         {...props}
       />
     ),
