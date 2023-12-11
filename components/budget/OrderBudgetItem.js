@@ -113,8 +113,8 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
                   id="Order.fromTo"
                   defaultMessage="for {account} from {contributor}"
                   values={{
-                    contributor: <LinkCollective collective={order.fromAccount} />,
-                    account: <LinkCollective collective={order.toAccount} />,
+                    contributor: <LinkCollective collective={order.fromAccount} withHoverCard />,
+                    account: <LinkCollective collective={order.toAccount} withHoverCard />,
                   }}
                 />
 

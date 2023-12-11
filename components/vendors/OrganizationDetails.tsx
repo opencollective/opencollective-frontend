@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
@@ -17,6 +17,37 @@ import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 import { vendorFieldFragment } from './queries';
+
+const loadOrganizationDetailsQuery = gql`
+  query OrganizationDetails($organizationSlug: String!) {
+    account(slug: $organizationSlug) {
+      id
+      type
+      name
+      slug
+      createdAt
+      orders {
+        totalCount
+      }
+      expenses(status: PAID, direction: SUBMITTED) {
+        totalCount
+      }
+      members(role: ADMIN, includeInherited: true) {
+        nodes {
+          id
+          role
+          account {
+            id
+            name
+            slug
+            type
+            imageUrl(height: 64)
+          }
+        }
+      }
+    }
+  }
+`;
 
 const convertOrganizationMutation = gql`
   mutation ConvertOrganizationToVendor($organization: AccountReferenceInput!, $host: AccountReferenceInput!) {
@@ -45,6 +76,10 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
   const drawerActionsContainer = useDrawerActionsContainer();
   const { toast } = useToast();
   const intl = useIntl();
+  const { data } = useQuery(loadOrganizationDetailsQuery, {
+    variables: { organizationSlug: organization.slug },
+    context: API_V2_CONTEXT,
+  });
   const [displayConvertToVendor, setDisplayConvertToVendor] = React.useState(false);
   const [convertOrganizationToVendor] = useMutation(convertOrganizationMutation, {
     context: API_V2_CONTEXT,
@@ -63,7 +98,8 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
     return;
   };
 
-  const admins = organization.members?.nodes.map(m => m.account) || [];
+  const admins = data?.account?.members?.nodes.map(m => m.account) || [];
+  const activity = data?.account;
   const dashboardLink = `dashboard/${host.slug}`;
   return (
     <div>
@@ -80,6 +116,7 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
           <FormattedDate value={organization.createdAt} dateStyle="medium" />
         </HeaderInfo>
       </div>
+
       <div className="flex justify-stretch">
         {admins && (
           <div className="mt-4 flex flex-1 flex-col">
@@ -96,17 +133,19 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
             </div>
           </div>
         )}
-        <div className="mt-4 flex flex-1 flex-col gap-1">
-          <SectionTitle>
-            <FormattedMessage defaultMessage="Activity" />
-          </SectionTitle>
-          <Link href={`${dashboardLink}/host-expenses?searchTerm=%40${organization.slug}`} className="text-sm">
-            {organization.expenses.totalCount} <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-          </Link>
-          <Link href={`${dashboardLink}/orders?searchTerm=%40${organization.slug}`} className="text-sm">
-            {organization.orders.totalCount} <FormattedMessage id="Contributions" defaultMessage="Contributions" />
-          </Link>
-        </div>
+        {activity && (
+          <div className="mt-4 flex flex-1 flex-col gap-1">
+            <SectionTitle>
+              <FormattedMessage defaultMessage="Activity" />
+            </SectionTitle>
+            <Link href={`${dashboardLink}/host-expenses?searchTerm=%40${organization.slug}`} className="text-sm">
+              {activity.expenses.totalCount} <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+            </Link>
+            <Link href={`${dashboardLink}/orders?searchTerm=%40${organization.slug}`} className="text-sm">
+              {activity.orders.totalCount} <FormattedMessage id="Contributions" defaultMessage="Contributions" />
+            </Link>
+          </div>
+        )}
       </div>
       {drawerActionsContainer &&
         createPortal(

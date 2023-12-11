@@ -14,6 +14,7 @@ import { i18nHasMissingReceipts } from '../../../lib/i18n/receipts-filter';
 import { sortSelectOptions } from '../../../lib/utils';
 import { VirtualCardStatusI18n } from '../../../lib/virtual-cards/constants';
 
+import { accountHoverCardFields } from '../../AccountHoverCard';
 import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal';
 import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';
 import { getI18nLink } from '../../I18nFormatters';
@@ -29,7 +30,7 @@ import { amountFilter } from '../filters/AmountFilter';
 import ComboSelectFilter from '../filters/ComboSelectFilter';
 import { dateFilter } from '../filters/DateFilter';
 import { Filterbar } from '../filters/Filterbar';
-import { accountFieldsFragment, accountHoverCardFragment, AccountRenderer } from '../filters/HostedAccountFilter';
+import { AccountRenderer } from '../filters/HostedAccountFilter';
 import { orderByFilter } from '../filters/OrderFilter';
 import { searchFilter } from '../filters/SearchFilter';
 import { DashboardSectionProps } from '../types';
@@ -44,15 +45,12 @@ const hostedVirtualCardAccountsQuery = gql`
         offset
         nodes {
           id
-          __typename
-          ...AccountFields
           ...AccountHoverCardFields
         }
       }
     }
   }
-  ${accountFieldsFragment}
-  ${accountHoverCardFragment}
+  ${accountHoverCardFields}
 `;
 
 const hostVirtualCardsMetadataQuery = gql`
@@ -126,6 +124,7 @@ const hostVirtualCardsQuery = gql`
             name
             slug
             imageUrl
+            ...AccountHoverCardFields
           }
           assignee {
             id
@@ -133,11 +132,13 @@ const hostVirtualCardsQuery = gql`
             email
             slug
             imageUrl
+            ...AccountHoverCardFields
           }
         }
       }
     }
   }
+  ${accountHoverCardFields}
 `;
 
 const schema = z.object({
@@ -199,7 +200,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>, FilterMeta> = {
           loading={loading}
           options={accounts.map(account => ({
             value: account.slug,
-            label: <AccountRenderer account={account} withHoverCard />,
+            label: <AccountRenderer account={account} inOptionsList />,
           }))}
           {...props}
         />

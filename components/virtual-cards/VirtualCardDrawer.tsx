@@ -7,6 +7,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { VirtualCard as GraphQLVirtualCard, VirtualCardStatus } from '../../lib/graphql/types/v2/graphql';
 import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
+import { accountHoverCardFields } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';
 import { Drawer, DrawerActions, DrawerHeader } from '../Drawer';
@@ -54,6 +55,7 @@ const virtualCardQuery = gql`
         name
         slug
         imageUrl
+        ...AccountHoverCardFields
       }
       assignee {
         id
@@ -61,6 +63,7 @@ const virtualCardQuery = gql`
         email
         slug
         imageUrl
+        ...AccountHoverCardFields
       }
       host {
         id
@@ -71,6 +74,7 @@ const virtualCardQuery = gql`
       }
     }
   }
+  ${accountHoverCardFields}
 `;
 
 export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
@@ -143,6 +147,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
                   <LinkCollective
                     collective={virtualCard.account}
                     className="flex items-center gap-2 font-medium hover:underline"
+                    withHoverCard
                   >
                     <Avatar collective={virtualCard.account} radius={24} /> {virtualCard.account.name}
                   </LinkCollective>
@@ -155,6 +160,8 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
                   <LinkCollective
                     collective={virtualCard.assignee}
                     className="flex items-center gap-2 font-medium hover:underline"
+                    withHoverCard
+                    hoverCardProps={{ includeAdminMembership: { accountSlug: virtualCard.account.slug } }}
                   >
                     <Avatar collective={virtualCard.assignee} radius={24} /> {virtualCard.assignee.name}
                   </LinkCollective>

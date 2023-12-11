@@ -21,6 +21,10 @@ const mergeAccountsMutation = gql`
         id
         name
         slug
+        isIncognito
+        ... on Individual {
+          isGuest
+        }
       }
     }
   }

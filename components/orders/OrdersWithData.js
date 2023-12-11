@@ -11,6 +11,7 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 
+import { accountHoverCardFields } from '../AccountHoverCard';
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import { confirmContributionFieldsFragment } from '../ContributionConfirmationModal';
 import { Box, Flex } from '../Grid';
@@ -77,6 +78,11 @@ const accountOrdersQuery = gql`
           slug
           name
           imageUrl
+          isIncognito
+          ... on Individual {
+            isGuest
+          }
+          ...AccountHoverCardFields
         }
         pendingContributionData {
           expectedAt
@@ -97,6 +103,7 @@ const accountOrdersQuery = gql`
           ... on AccountWithHost {
             bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
           }
+          ...AccountHoverCardFields
         }
         permissions {
           id
@@ -107,6 +114,7 @@ const accountOrdersQuery = gql`
     }
   }
   ${confirmContributionFieldsFragment}
+  ${accountHoverCardFields}
 `;
 
 const ORDERS_PER_PAGE = 15;

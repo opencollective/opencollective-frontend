@@ -94,11 +94,14 @@ const ExpensesList = ({
 
   return (
     <StyledCard>
-      <ExpenseDrawer
-        openExpenseLegacyId={openExpenseLegacyId}
-        handleClose={() => setOpenExpenseLegacyId(null)}
-        initialExpenseValues={expenseInDrawer}
-      />
+      {useDrawer && (
+        <ExpenseDrawer
+          openExpenseLegacyId={openExpenseLegacyId}
+          handleClose={() => setOpenExpenseLegacyId(null)}
+          initialExpenseValues={expenseInDrawer}
+        />
+      )}
+
       {isLoading ? (
         [...new Array(nbPlaceholders)].map((_, idx) => (
           // eslint-disable-next-line react/no-array-index-key

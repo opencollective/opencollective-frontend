@@ -1916,7 +1916,7 @@ type CollectiveSearchResults {
   A unique identifier for this search (for caching)
   """
   id: String
-  collectives: [Collective]
+  collectives: [CollectiveInterface]
   limit: Int
   offset: Int
   total: Int
@@ -4217,6 +4217,11 @@ type Vendor implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  Returns whether this account has any payout methods saved
+  """
+  hasPayoutMethod: Boolean
 }
 
 """
