@@ -4,6 +4,7 @@ import { CardElement, Elements } from '@stripe/react-stripe-js';
 import { Add } from '@styled-icons/material/Add';
 import clsx from 'clsx';
 import { get, merge, pick } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { PAYMENT_METHOD_TYPE } from '../../../lib/constants/payment-methods';
@@ -95,6 +96,7 @@ type ManagePaymentMethodsProps = {
 };
 
 export default function ManagePaymentMethods(props: ManagePaymentMethodsProps) {
+  const router = useRouter();
   const query = useQuery<ManagePaymentMethodsQuery, ManagePaymentMethodsQueryVariables>(managePaymentMethodsQuery, {
     context: API_V2_CONTEXT,
     variables: {
@@ -128,6 +130,13 @@ export default function ManagePaymentMethods(props: ManagePaymentMethodsProps) {
     return [ordered, someNeedsConfirmation];
   }, [query.data?.account?.paymentMethods]);
 
+  const isOrderConfirmationRedirect = router.query.successType === 'payment';
+  const dismissOrderConfirmationMessage = React.useCallback(() => {
+    const newUrl = new URL(router.asPath, window.location.origin);
+    newUrl.searchParams.delete('successType');
+    router.replace(newUrl.toString(), undefined, { shallow: true });
+  }, [router]);
+
   if (query.loading) {
     return <Loading />;
   }
@@ -138,6 +147,19 @@ export default function ManagePaymentMethods(props: ManagePaymentMethodsProps) {
 
   return (
     <div className="flex flex-col gap-3">
+      {isOrderConfirmationRedirect && (
+        <MessageBox type="success" display="flex" alignItems="center" withIcon mb={3}>
+          <div className="flex items-center justify-between">
+            <FormattedMessage
+              id="Order.Confirm.Success"
+              defaultMessage="Your payment method has now been confirmed and the payment successfully went through."
+            />
+            <StyledButton buttonSize="tiny" onClick={dismissOrderConfirmationMessage}>
+              <FormattedMessage defaultMessage="Dismiss" />
+            </StyledButton>
+          </div>
+        </MessageBox>
+      )}
       {hasPaymentMethodsToConfirm && (
         <MessageBox type="warning" withIcon mb={3}>
           <FormattedMessage defaultMessage="You need to confirm at least one of your payment methods." />
