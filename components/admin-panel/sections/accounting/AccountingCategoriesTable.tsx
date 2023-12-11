@@ -5,6 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useWarnIfUnsavedChanges from '../../../../lib/hooks/warnIfUnsavedChanges';
 
@@ -37,6 +38,7 @@ const accountingCategoriesQuery = gql`
           code
           name
           friendlyName
+          expensesTypes
         }
       }
     }
@@ -59,6 +61,7 @@ const editAccountingCategoryMutation = gql`
               code
               name
               friendlyName
+              expensesTypes
             }
           }
         }
@@ -110,6 +113,26 @@ const columns = [
     header: () => <FormattedMessage id="AccountingCategory.friendlyName" defaultMessage="Friendly name" />,
     cell: EditableCell,
     meta: { placeholderPath: 'name', maxLength: 255 },
+  },
+  {
+    accessorKey: 'expensesTypes',
+    header: () => <FormattedMessage defaultMessage="Expense types" />,
+    cell: ({ getValue }) => {
+      const types = getValue() as ExpenseType[];
+      if (!types) {
+        return null;
+      }
+
+      return (
+        <span className="flex flex-wrap gap-2">
+          {types.map(type => (
+            <span key={type} className="rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+              {type}
+            </span>
+          ))}
+        </span>
+      );
+    },
   },
   {
     accessorKey: 'actions',

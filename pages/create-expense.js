@@ -31,6 +31,7 @@ import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseRecurringForm from '../components/expenses/ExpenseRecurringForm';
 import ExpenseSummary, { SummaryHeader } from '../components/expenses/ExpenseSummary';
 import {
+  accountingCategoryFields,
   expensePageExpenseFieldsFragment,
   loggedInAccountExpensePayoutFieldsFragment,
 } from '../components/expenses/graphql/fragments';
@@ -515,9 +516,7 @@ const hostFieldsFragment = gql`
     accountingCategories {
       nodes {
         id
-        name
-        friendlyName
-        code
+        ...AccountingCategoryFields
       }
     }
     policies {
@@ -530,6 +529,7 @@ const hostFieldsFragment = gql`
     supportedPayoutMethods
     isTrustedHost
   }
+  ${accountingCategoryFields}
 `;
 
 const createExpensePageQuery = gql`

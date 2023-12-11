@@ -729,6 +729,7 @@ const ExpenseFormBody = ({
                                 error={Boolean(meta.error)}
                                 allowNone={!isHostAdmin}
                                 showCode={isHostAdmin}
+                                expenseType={values.type}
                               />
                               {meta.error && meta.touched && (
                                 <Span color="red.500" fontSize="12px" mt="4px">

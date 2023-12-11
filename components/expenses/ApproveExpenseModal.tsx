@@ -59,6 +59,7 @@ export default function ApproveExpenseModal({ onClose, onConfirm, host, expense 
           id="confirm-expense-category"
           onChange={setSelectedCategory}
           host={host}
+          expenseType={expense.type}
           selectedCategory={selectedCategory}
           allowNone={false}
         />

@@ -48,6 +48,7 @@ const AdminAccountingCategoryPill = ({
     <ExpenseCategorySelect
       id="expense-summary-category-select"
       host={host}
+      expenseType={expense.type}
       allowNone={allowNone}
       selectedCategory={expense.accountingCategory}
       submitterCategory={expense.valuesByRole?.submitter?.accountingCategory}
