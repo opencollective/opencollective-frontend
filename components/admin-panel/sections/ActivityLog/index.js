@@ -71,6 +71,10 @@ const activityLogQuery = gql`
           name
           slug
           type
+          isIncognito
+          ... on Individual {
+            isGuest
+          }
         }
         host {
           id
@@ -83,6 +87,10 @@ const activityLogQuery = gql`
           name
           slug
           type
+          isIncognito
+          ... on Individual {
+            isGuest
+          }
           ... on AccountWithParent {
             parent {
               id
@@ -131,6 +139,8 @@ const activityLogQuery = gql`
           name
           type
           imageUrl(height: 48)
+          isIncognito
+          isGuest
         }
       }
     }

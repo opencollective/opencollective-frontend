@@ -12,6 +12,7 @@ import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../lib/url-helpers';
 
+import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -92,7 +93,7 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
                 amountStyles={null}
               />
             ),
-            currentYear: <Span>{currentYear}</Span>,
+            currentYear: <span>{currentYear}</span>,
           }}
         />
       )}
@@ -136,19 +137,27 @@ const ExpenseSummaryAdditionalInformation = ({
       {collective && (
         <PrivateInfoColumn data-cy="expense-summary-collective">
           <PrivateInfoColumnHeader>{formatCollectiveType(intl, collective.type)}</PrivateInfoColumnHeader>
-          <LinkCollective collective={collective}>
-            <Flex alignItems="center">
-              <Avatar collective={collective} radius={24} />
-              <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
-                <Span color="black.800" fontSize="14px" fontWeight="700">
-                  {formatAccountName(collective.name, collective.legalName)}
-                </Span>
-                <Span color="black.900" fontSize="13px">
-                  @{collective.slug}
-                </Span>
-              </Flex>
-            </Flex>
-          </LinkCollective>
+          <AccountHoverCard
+            account={collective}
+            trigger={
+              <span>
+                <LinkCollective collective={collective} noTitle>
+                  <Flex alignItems="center">
+                    <Avatar collective={collective} radius={24} />
+                    <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
+                      <Span color="black.800" fontSize="14px" fontWeight="700">
+                        {formatAccountName(collective.name, collective.legalName)}
+                      </Span>
+                      <Span color="black.900" fontSize="13px">
+                        @{collective.slug}
+                      </Span>
+                    </Flex>
+                  </Flex>
+                </LinkCollective>
+              </span>
+            }
+          />
+
           {collective.stats.balanceWithBlockedFunds && (
             <Container mt={2} fontSize="14px" color="black.700">
               <Container fontWeight="700">
@@ -197,34 +206,45 @@ const ExpenseSummaryAdditionalInformation = ({
             <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
           )}
         </PrivateInfoColumnHeader>
-        <LinkCollective collective={payee}>
-          <Flex alignItems="center" fontSize="14px">
-            {!payee.slug ? (
-              <Avatar
-                name={payee.organization?.name || payee.name}
-                radius={24}
-                backgroundColor="blue.100"
-                color="blue.400"
-              />
-            ) : (
-              <Avatar collective={payee} radius={24} />
-            )}
-            <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
-              <Span color="black.900" fontWeight="bold">
-                {formatAccountName(
-                  payee.organization?.name || payee.name,
-                  payee.organization?.legalName || payee.legalName,
-                )}
-              </Span>
-              {payee.type !== CollectiveType.VENDOR && (payee.organization?.slug || payee.slug) && (
-                <Span color="black.900" fontSize="13px">
-                  @{payee.organization?.slug || payee.slug}
-                </Span>
-              )}
-            </Flex>
-            {payeeStats && <PayeeTotalPayoutSumTooltip stats={payeeStats} />}
-          </Flex>
-        </LinkCollective>
+        <AccountHoverCard
+          account={payee}
+          includeAdminMembership={{
+            accountSlug: collective?.slug,
+            hostSlug: host?.slug,
+          }}
+          trigger={
+            <span>
+              <LinkCollective collective={payee} noTitle>
+                <Flex alignItems="center" fontSize="14px">
+                  {!payee.slug ? (
+                    <Avatar
+                      name={payee.organization?.name || payee.name}
+                      radius={24}
+                      backgroundColor="blue.100"
+                      color="blue.400"
+                    />
+                  ) : (
+                    <Avatar collective={payee} radius={24} />
+                  )}
+                  <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
+                    <Span color="black.900" fontWeight="bold">
+                      {formatAccountName(
+                        payee.organization?.name || payee.name,
+                        payee.organization?.legalName || payee.legalName,
+                      )}
+                    </Span>
+                    {payee.type !== CollectiveType.VENDOR && (payee.organization?.slug || payee.slug) && (
+                      <Span color="black.900" fontSize="13px">
+                        @{payee.organization?.slug || payee.slug}
+                      </Span>
+                    )}
+                  </Flex>
+                  {payeeStats && <PayeeTotalPayoutSumTooltip stats={payeeStats} />}
+                </Flex>
+              </LinkCollective>
+            </span>
+          }
+        />
 
         {payeeLocation && isInvoice && (
           <Container whiteSpace="pre-wrap" color="black.700" fontSize="14px" lineHeight="16px" mt={2}>

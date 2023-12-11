@@ -10985,6 +10985,11 @@ type Vendor implements Account & AccountWithContributions {
   vendorInfo: VendorInfo
 
   """
+  Returns whether this account has any payout methods saved
+  """
+  hasPayoutMethod: Boolean
+
+  """
   The account who created this order
   """
   createdByAccount: Account

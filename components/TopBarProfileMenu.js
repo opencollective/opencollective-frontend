@@ -286,7 +286,7 @@ class TopBarProfileMenu extends React.Component {
         position="absolute"
         right={[0, 16]}
         top={[69, 75]}
-        zIndex={999}
+        zIndex={1001}
         data-cy="user-menu"
         css={{ overflow: 'hidden' }}
       >

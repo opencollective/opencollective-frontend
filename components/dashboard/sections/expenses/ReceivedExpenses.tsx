@@ -62,7 +62,7 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
         <ComboSelectFilter
           options={meta.childrenAccounts.map(account => ({
             value: account.slug,
-            label: <AccountRenderer account={account} />,
+            label: <AccountRenderer account={account} inOptionsList />,
           }))}
           {...props}
         />

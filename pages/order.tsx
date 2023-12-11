@@ -107,6 +107,9 @@ const orderPageQuery = gql`
           name
           imageUrl
           isIncognito
+          ... on Individual {
+            isGuest
+          }
         }
         account {
           id
@@ -114,7 +117,6 @@ const orderPageQuery = gql`
           type
           name
           imageUrl
-          isIncognito
         }
       }
     }

@@ -33,6 +33,7 @@ export default function Agreement({ agreement, openFileViewer = undefined }: Agr
             <LinkCollective
               collective={agreement.account}
               className="flex items-center gap-2 truncate font-medium text-slate-700 hover:text-slate-700 hover:underline"
+              withHoverCard
             >
               <Avatar collective={agreement.account} radius={24} />
               {agreement.account.name}
@@ -46,6 +47,8 @@ export default function Agreement({ agreement, openFileViewer = undefined }: Agr
             <LinkCollective
               collective={agreement.createdBy}
               className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
+              withHoverCard
+              hoverCardProps={{ includeAdminMembership: { accountSlug: agreement.account.slug } }}
             >
               <Avatar collective={agreement.createdBy} radius={24} />
               {agreement.createdBy.name}

@@ -1,5 +1,7 @@
 import { gql } from '@apollo/client';
 
+import { accountHoverCardFields } from '../../AccountHoverCard';
+
 export const transactionsQueryCollectionFragment = gql`
   fragment TransactionsQueryCollectionFragment on TransactionCollection {
     totalCount
@@ -76,6 +78,7 @@ export const transactionsQueryCollectionFragment = gql`
           hostFeePercent
           platformFeePercent
         }
+        ...AccountHoverCardFields
       }
       fromAccount {
         id
@@ -102,6 +105,7 @@ export const transactionsQueryCollectionFragment = gql`
           hostFeePercent
           platformFeePercent
         }
+        ...AccountHoverCardFields
       }
       host {
         id
@@ -183,4 +187,5 @@ export const transactionsQueryCollectionFragment = gql`
       }
     }
   }
+  ${accountHoverCardFields}
 `;

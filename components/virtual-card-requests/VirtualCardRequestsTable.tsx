@@ -9,6 +9,7 @@ import { Account, VirtualCardRequest, VirtualCardRequestStatus } from '../../lib
 import { useWindowResize } from '../../lib/hooks/useWindowResize';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
+import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import { DataTable } from '../DataTable';
 import DateTime from '../DateTime';
@@ -134,10 +135,15 @@ export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
     cell: ({ cell }: CellContext<VirtualCardRequest, Account>) => {
       const account = cell.getValue();
       return (
-        <div className="flex items-center gap-2 truncate">
-          <Avatar collective={account} radius={24} />
-          <span className="truncate">{account.name}</span>
-        </div>
+        <AccountHoverCard
+          account={account}
+          trigger={
+            <div className="flex items-center gap-2 truncate">
+              <Avatar collective={account} radius={24} />
+              <span className="truncate">{account.name}</span>
+            </div>
+          }
+        />
       );
     },
   },
@@ -146,13 +152,20 @@ export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
     meta: { className: 'w-36' },
 
     header: () => <FormattedMessage defaultMessage="Assignee" />,
-    cell: ({ cell }: CellContext<VirtualCardRequest, Account>) => {
+    cell: ({ cell, row }: CellContext<VirtualCardRequest, Account>) => {
       const assignee = cell.getValue();
+      const virtualCardRequest = row.original;
       return (
-        <div className="flex items-center gap-2 truncate">
-          <Avatar collective={assignee} radius={24} />
-          <span className="truncate">{assignee.name}</span>
-        </div>
+        <AccountHoverCard
+          account={assignee}
+          includeAdminMembership={{ accountSlug: virtualCardRequest.account.slug }}
+          trigger={
+            <div className="flex items-center gap-2 truncate">
+              <Avatar collective={assignee} radius={24} />
+              <span className="truncate">{assignee.name}</span>
+            </div>
+          }
+        />
       );
     },
   },

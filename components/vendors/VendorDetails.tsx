@@ -67,7 +67,13 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
         <HeaderInfo>
           <FormattedMessage id="Agreement.createdBy" defaultMessage="Created by" />
           <React.Fragment>
-            <LinkCollective collective={vendor.createdByAccount}>{vendor.createdByAccount.name}</LinkCollective>
+            <LinkCollective
+              collective={vendor.createdByAccount}
+              withHoverCard
+              hoverCardProps={{ includeAdminMembership: { hostSlug: host.slug } }}
+            >
+              {vendor.createdByAccount.name}
+            </LinkCollective>
           </React.Fragment>
         </HeaderInfo>
       </div>
