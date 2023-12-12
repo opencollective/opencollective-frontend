@@ -153,6 +153,7 @@ const createPendingContributionModalCollectiveQuery = gql`
         }
       }
       ... on AccountWithHost {
+        bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
         host {
           id
           legacyId
@@ -293,6 +294,9 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
 
   React.useEffect(() => {
     setFieldValue('amount.currency', data?.account?.currency || host.currency);
+    if (formik.touched.hostFeePercent !== true) {
+      setFieldValue('hostFeePercent', data?.account?.bankTransfersHostFeePercent || host.hostFeePercent);
+    }
   }, [data?.account]);
 
   React.useEffect(() => {
