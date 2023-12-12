@@ -266,6 +266,14 @@ export function gql(source: "\n  query VirtualCardPolicies($slug: String) {\n   
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query ManagePaymentMethods($accountSlug: String!) {\n    account(slug: $accountSlug) {\n      id\n      legacyId\n      type\n      slug\n      name\n      currency\n      isHost\n      settings\n      paymentMethods(type: [CREDITCARD, US_BANK_ACCOUNT, SEPA_DEBIT, BACS_DEBIT, GIFTCARD, PREPAID]) {\n        id\n        ...PaymentMethodFields\n      }\n    }\n  }\n\n  fragment PaymentMethodFields on PaymentMethod {\n    id\n    legacyId\n    name\n    data\n    service\n    type\n    balance {\n      valueInCents\n      currency\n    }\n    expiryDate\n    monthlyLimit {\n      valueInCents\n    }\n    account {\n      id\n      slug\n      name\n    }\n    recurringContributions: orders(\n      onlyActiveSubscriptions: true\n      status: [ACTIVE, ERROR, PENDING, REQUIRE_CLIENT_CONFIRMATION]\n    ) {\n      totalCount\n      nodes {\n        id\n        legacyId\n        needsConfirmation\n      }\n    }\n  }\n"): typeof import('./graphql').ManagePaymentMethodsDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n      mutation ConfirmOrder($order: OrderReferenceInput!) {\n        confirmOrder(order: $order) {\n          order {\n            id\n            status\n            transactions {\n              id\n            }\n            fromAccount {\n              id\n              slug\n            }\n          }\n          stripeError {\n            message\n            account\n            response\n          }\n        }\n      }\n    "): typeof import('./graphql').ConfirmOrderDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  fragment MemberFields on Member {\n    id\n    role\n    since\n    createdAt\n    description\n    inherited\n    account {\n      id\n      name\n      slug\n      type\n      imageUrl(height: 64)\n      ... on Individual {\n        email\n      }\n    }\n  }\n"): typeof import('./graphql').MemberFieldsFragmentDoc;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
