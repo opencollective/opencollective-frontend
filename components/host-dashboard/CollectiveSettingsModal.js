@@ -179,7 +179,7 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
                         type="number"
                         min="0"
                         max="100"
-                        maxWidth={90}
+                        maxWidth={120}
                         appendProps={{ color: 'black.600' }}
                         fontWeight="normal"
                         value={isNaN(hostFeePercent) ? '' : hostFeePercent}
