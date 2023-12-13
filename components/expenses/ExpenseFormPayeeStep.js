@@ -228,7 +228,7 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
         isArchived
         isHost
         payoutMethods {
-          id
+          legacyId: id
           type
           name
           data
