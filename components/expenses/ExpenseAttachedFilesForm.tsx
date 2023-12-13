@@ -54,7 +54,7 @@ const ExpenseAttachedFilesForm = ({
             }}
           />
           &nbsp;
-          <PrivateInfoIcon color="#969BA3" size={12} />
+          <PrivateInfoIcon className="text-muted-foreground" />
         </Span>
         <StyledHr flex="1" borderColor="black.300" mx={2} />
         {files?.length > 0 && (

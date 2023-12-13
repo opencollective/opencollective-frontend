@@ -239,14 +239,12 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   </Span>
                 </ItemTitleWrapper>
                 {isOwnUserProfile && transaction.fromAccount?.isIncognito && (
-                  <Span ml={1} css={{ verticalAlign: 'text-bottom' }}>
-                    <PrivateInfoIcon color="#969BA3">
-                      <FormattedMessage
-                        id="PrivateTransaction"
-                        defaultMessage="This incognito transaction is only visible to you"
-                      />
-                    </PrivateInfoIcon>
-                  </Span>
+                  <PrivateInfoIcon className="ml-1 align-bottom text-muted-foreground">
+                    <FormattedMessage
+                      id="PrivateTransaction"
+                      defaultMessage="This incognito transaction is only visible to you"
+                    />
+                  </PrivateInfoIcon>
                 )}
               </Container>
               <P mt="4px" fontSize="12px" lineHeight="20px" color="black.700" data-cy="transaction-details">

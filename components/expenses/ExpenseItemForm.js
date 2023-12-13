@@ -121,7 +121,7 @@ const AttachmentLabel = () => (
   <Span fontSize="13px" whiteSpace="nowrap">
     <FormattedMessage id="Expense.Attachment" defaultMessage="Attachment" />
     &nbsp;&nbsp;
-    <PrivateInfoIcon color="#969BA3" />
+    <PrivateInfoIcon />
   </Span>
 );
 

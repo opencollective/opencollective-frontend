@@ -12,7 +12,7 @@ import { P, Span } from './Text';
 const PrivateIconWithSpace = () => (
   <React.Fragment>
     &nbsp;
-    <PrivateInfoIcon tooltipProps={{ containerVerticalAlign: 'text-top' }} />
+    <PrivateInfoIcon />
   </React.Fragment>
 );
 

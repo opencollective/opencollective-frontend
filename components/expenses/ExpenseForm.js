@@ -617,7 +617,7 @@ const ExpenseFormBody = ({
                   {formatMessage(msg.stepPayee)}
                 </Span>
                 <Box ml={2}>
-                  <PrivateInfoIcon size={12} color="#969BA3" tooltipProps={{ display: 'flex' }} />
+                  <PrivateInfoIcon size={12} className="text-muted-foreground" />
                 </Box>
                 <StyledHr flex="1" borderColor="black.300" mx={2} />
               </Flex>
