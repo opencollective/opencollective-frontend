@@ -91,9 +91,8 @@ const createVirtualCardMutation = gql`
   }
 `;
 
-// TODO : refactor this mutation
 const collectiveMembersQuery = gql`
-  query CollectiveMembers($slug: String!) {
+  query VirtualCardCollectiveMembers($slug: String!) {
     account(slug: $slug) {
       id
       members(role: ADMIN) {
@@ -129,7 +128,7 @@ export const virtualCardsAssignedToCollectiveQuery = gql`
   }
 `;
 
-const VirtualCardPoliciesQuery = gql`
+const virtualCardPoliciesQuery = gql`
   query VirtualCardPolicies($slug: String) {
     account(slug: $slug) {
       id
@@ -185,7 +184,7 @@ export default function EditVirtualCardModal({
 }: EditVirtualCardModalProps) {
   const { toast } = useToast();
 
-  const { data: policyData, loading: isLoadingPolicy } = useQuery(VirtualCardPoliciesQuery, {
+  const { data: policyData, loading: isLoadingPolicy } = useQuery(virtualCardPoliciesQuery, {
     context: API_V2_CONTEXT,
     variables: {
       slug: host.slug,

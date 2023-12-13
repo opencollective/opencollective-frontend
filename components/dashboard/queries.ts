@@ -2,8 +2,8 @@ import { gql } from '../../lib/graphql/helpers';
 
 import { collectiveNavbarFieldsFragment } from '../collective-page/graphql/fragments';
 
-export const adminPanelQuery = gql`
-  query AdminPanel($slug: String!) {
+export const dashboardQuery = gql`
+  query Dashboard($slug: String!) {
     account(slug: $slug) {
       id
       legacyId

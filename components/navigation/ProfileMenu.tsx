@@ -35,7 +35,7 @@ import { DrawerMenu } from './DrawerMenu';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
 
 const memberInvitationsCountQuery = gql`
-  query MemberInvitationsCount($memberAccount: AccountReferenceInput!) {
+  query ProfileMenuMemberInvitationsCount($memberAccount: AccountReferenceInput!) {
     memberInvitations(memberAccount: $memberAccount) {
       id
     }

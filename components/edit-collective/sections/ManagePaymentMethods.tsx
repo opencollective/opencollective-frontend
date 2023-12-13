@@ -12,7 +12,7 @@ import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gql, gqlV1 } from '../../../lib/graphql/helpers';
 import {
   Account,
-  ConfirmOrderMutation,
+  ManagePaymentMethodsConfirmOrderMutation,
   ManagePaymentMethodsQuery,
   ManagePaymentMethodsQueryVariables,
 } from '../../../lib/graphql/types/v2/graphql';
@@ -209,9 +209,9 @@ function PaymentMethodItem(props: PaymentMethodItemProps) {
     return props.paymentMethod?.recurringContributions?.nodes?.find(o => o.needsConfirmation);
   }, [props.paymentMethod?.recurringContributions?.nodes]);
 
-  const [confirmOrder] = useMutation<ConfirmOrderMutation>(
+  const [confirmOrder] = useMutation<ManagePaymentMethodsConfirmOrderMutation>(
     gql`
-      mutation ConfirmOrder($order: OrderReferenceInput!) {
+      mutation ManagePaymentMethodsConfirmOrder($order: OrderReferenceInput!) {
         confirmOrder(order: $order) {
           order {
             id

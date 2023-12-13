@@ -26,7 +26,7 @@ import VirtualCardsTable from '../../virtual-cards/VirtualCardsTable';
 import VirtualCardFilters from '../../VirtualCardFilters';
 
 const hostVirtualCardsQuery = gql`
-  query HostedVirtualCards(
+  query AdminPanelHostedVirtualCards(
     $slug: String
     $limit: Int!
     $offset: Int!

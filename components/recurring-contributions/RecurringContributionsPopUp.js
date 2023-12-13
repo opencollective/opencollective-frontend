@@ -74,7 +74,7 @@ const i18nReasons = defineMessages({
 
 // GraphQL
 const cancelRecurringContributionMutation = gql`
-  mutation CancelRecurringContribution($order: OrderReferenceInput!, $reason: String!, $reasonCode: String!) {
+  mutation RecurringContributionsPopUpCancel($order: OrderReferenceInput!, $reason: String!, $reasonCode: String!) {
     cancelOrder(order: $order, reason: $reason, reasonCode: $reasonCode) {
       id
       status

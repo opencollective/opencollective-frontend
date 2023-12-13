@@ -31,7 +31,7 @@ import { P, Span } from './Text';
 import { withUser } from './UserProvider';
 
 const memberInvitationsCountQuery = gql`
-  query MemberInvitationsCount($memberAccount: AccountReferenceInput!) {
+  query TopBarProfileMenuMemberInvitationsCount($memberAccount: AccountReferenceInput!) {
     memberInvitations(memberAccount: $memberAccount) {
       id
     }

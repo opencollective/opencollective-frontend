@@ -26,7 +26,7 @@ import { useToast } from '../../ui/useToast';
 import SettingsSectionTitle from './SettingsSectionTitle';
 
 const accountQuery = gql`
-  query Account($slug: String) {
+  query SecurityAccount($slug: String) {
     account(slug: $slug) {
       id
       slug

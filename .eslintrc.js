@@ -114,6 +114,7 @@ const graphqlConfig = {
     '@graphql-eslint/no-deprecated': 'warn',
     '@graphql-eslint/fields-on-correct-type': 'error',
     '@graphql-eslint/no-duplicate-fields': 'error',
+    '@graphql-eslint/unique-operation-name': 'error',
     '@graphql-eslint/naming-convention': [
       'error',
       {

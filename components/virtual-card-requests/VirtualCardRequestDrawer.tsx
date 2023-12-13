@@ -22,7 +22,7 @@ import { useToast } from '../ui/useToast';
 import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const virtualCardRequestQuery = gql`
-  query VirtualCardRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {
+  query VirtualCardDrawerRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {
     virtualCardRequest(virtualCardRequest: $virtualCardRequest) {
       id
       purpose
@@ -62,7 +62,7 @@ const virtualCardRequestQuery = gql`
 `;
 
 const RejectVirtualCardRequestMutation = gql`
-  mutation RejectVirtualCardRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {
+  mutation VirtualCardDrawerRejectRequest($virtualCardRequest: VirtualCardRequestReferenceInput!) {
     rejectVirtualCardRequest(virtualCardRequest: $virtualCardRequest) {
       id
       status

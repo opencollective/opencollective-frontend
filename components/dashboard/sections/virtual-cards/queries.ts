@@ -5,6 +5,7 @@ export const accountVirtualCardsQuery = gql`
     $slug: String
     $limit: Int!
     $offset: Int!
+    $state: String
     $status: [VirtualCardStatus]
     $merchantAccount: AccountReferenceInput
     $dateFrom: DateTime
@@ -34,6 +35,7 @@ export const accountVirtualCardsQuery = gql`
       virtualCards(
         limit: $limit
         offset: $offset
+        state: $state
         status: $status
         merchantAccount: $merchantAccount
         dateFrom: $dateFrom

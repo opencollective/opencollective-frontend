@@ -165,7 +165,7 @@ const createCollectiveMutation = gql`
 `;
 
 const tagStatsQuery = gql`
-  query TagStats($host: AccountReferenceInput) {
+  query CreateCollectiveTagStats($host: AccountReferenceInput) {
     tagStats(limit: 6, host: $host) {
       nodes {
         id

@@ -17,7 +17,7 @@ import {
   HOST_OMITTED_FIELDS,
 } from '../../lib/csv';
 import { getEnvVar } from '../../lib/env-utils';
-import { HostReportsPageQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
+import { HostDashboardReportsQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
@@ -47,7 +47,7 @@ const env = process.env.OC_ENV;
 type ExportTransactionsCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
-  queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsPageQueryVariables>;
+  queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostDashboardReportsQueryVariables>;
   accountSlug?: string;
   hostSlug?: string;
   trigger: React.ReactNode;

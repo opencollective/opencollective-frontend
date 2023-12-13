@@ -16,7 +16,7 @@ import SettingsSectionTitle from './SettingsSectionTitle';
 class SendingMoney extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    editCollectiveSettings: PropTypes.func.isRequired,
+    editCollectiveSendingMoney: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -30,7 +30,7 @@ class SendingMoney extends React.Component {
   togglePaypal = async () => {
     try {
       this.setState({ isSubmitting: true });
-      await this.props.editCollectiveSettings({
+      await this.props.editCollectiveSendingMoney({
         variables: {
           id: this.props.collective.id,
           settings: {
@@ -111,8 +111,8 @@ class SendingMoney extends React.Component {
   }
 }
 
-const addEditCollectiveSettingsMutation = graphql(editCollectiveSettingsMutation, {
-  name: 'editCollectiveSettings',
+const addEditCollectiveSendingMoneyMutation = graphql(editCollectiveSettingsMutation, {
+  name: 'editCollectiveSendingMoney',
 });
 
-export default injectIntl(addEditCollectiveSettingsMutation(SendingMoney));
+export default injectIntl(addEditCollectiveSendingMoneyMutation(SendingMoney));

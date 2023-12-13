@@ -9,7 +9,7 @@ import { defaultBackgroundImage } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { editCollectivePageMutation } from '../../../lib/graphql/v1/mutations';
-import { editCollectivePageQuery } from '../../../lib/graphql/v1/queries';
+import { editCollectiveQuery } from '../../../lib/graphql/v1/queries';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import SettingsForm from '../../edit-collective/Form';
@@ -24,7 +24,7 @@ const AccountSettings = ({ account, section }) => {
   const [state, setState] = React.useState({ status: undefined, result: undefined });
   const { toast } = useToast();
 
-  const { data, loading } = useQuery(editCollectivePageQuery, {
+  const { data, loading } = useQuery(editCollectiveQuery, {
     variables: { slug: account.slug },
     fetchPolicy: 'network-only',
     skip: !LoggedInUser,

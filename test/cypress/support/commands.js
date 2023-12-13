@@ -136,9 +136,9 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
   return signinRequest(user, null).then(response => {
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQuery(token, {
-      operationName: 'CreateCollective',
+      operationName: 'CypressCreateCollective',
       query: gqlV1/* GraphQL */ `
-        mutation CreateCollective($collective: CollectiveInputType!) {
+        mutation CypressCreateCollective($collective: CollectiveInputType!) {
           createCollective(collective: $collective) {
             id
             slug
@@ -164,9 +164,9 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
 Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserEmail) => {
   return signinRequestAndReturnToken({ email: userEmail }).then(token => {
     return graphqlQuery(token, {
-      operationName: 'EditCollective',
+      operationName: 'CypressEditCollective',
       query: gqlV1/* GraphQL */ `
-        mutation EditCollective($collective: CollectiveInputType!) {
+        mutation CypressEditCollective($collective: CollectiveInputType!) {
           editCollective(collective: $collective) {
             id
             slug
@@ -223,9 +223,9 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
 
   return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
     return graphqlQueryV2(token, {
-      operationName: 'CreateExpense',
+      operationName: 'CypressCreateExpense',
       query: gql`
-        mutation CreateExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
+        mutation CypressCreateExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
           createExpense(expense: $expense, account: $account) {
             id
             legacyId
@@ -259,9 +259,9 @@ Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEma
   return signinRequest({ email: userEmail }, null).then(response => {
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQuery(token, {
-      operationName: 'CreateCollectiveWithHost',
+      operationName: 'CypressCreateCollectiveWithHost',
       query: gqlV1/* GraphQL */ `
-        mutation CreateCollectiveWithHost($collective: CollectiveInputType!) {
+        mutation CypressCreateCollectiveWithHost($collective: CollectiveInputType!) {
           createCollectiveFromGithub(collective: $collective) {
             id
             slug
@@ -289,9 +289,9 @@ Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, colle
   return signinRequest({ email: userEmail }, null).then(response => {
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQueryV2(token, {
-      operationName: 'CreateProject',
+      operationName: 'CypressCreateProject',
       query: gql`
-        mutation CreateProject($project: ProjectCreateInput!, $parent: AccountReferenceInput) {
+        mutation CypressCreateProject($project: ProjectCreateInput!, $parent: AccountReferenceInput) {
           createProject(project: $project, parent: $parent) {
             id
             name
@@ -491,9 +491,9 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
   return signinRequestAndReturnToken({ email: userEmail, slug: userSlug }, null).then(token => {
     authToken = token;
     return graphqlQueryV2(authToken, {
-      operationName: 'AccountHasTwoFactorAuth',
+      operationName: 'CypressAccountHasTwoFactorAuth',
       query: gql`
-        query AccountHasTwoFactorAuth($slug: String) {
+        query CypressAccountHasTwoFactorAuth($slug: String) {
           individual(slug: $slug) {
             id
             slug
@@ -515,9 +515,9 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
         const token = secret;
 
         return graphqlQueryV2(authToken, {
-          operationName: 'AddTwoFactorAuthToIndividual',
+          operationName: 'CypressAddTwoFactorAuthToIndividual',
           query: gql`
-            mutation AddTwoFactorAuthToIndividual($account: AccountReferenceInput!, $token: String!) {
+            mutation CypressAddTwoFactorAuthToIndividual($account: AccountReferenceInput!, $token: String!) {
               addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
                 account {
                   id
@@ -573,9 +573,9 @@ Cypress.Commands.add(
     return signinRequest(user, null).then(response => {
       const token = getTokenFromRedirectUrl(response.body.redirect);
       return graphqlQueryV2(token, {
-        operationName: 'CreateCollective',
+        operationName: 'CypressCreateCollective',
         query: gql`
-          mutation CreateCollective(
+          mutation CypressCreateCollective(
             $collective: CollectiveCreateInput!
             $host: AccountReferenceInput!
             $testPayload: JSON
