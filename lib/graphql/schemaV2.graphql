@@ -11503,6 +11503,11 @@ type Query {
     includeArchived: Boolean
 
     """
+    Included collectives which are archived
+    """
+    skipGuests: Boolean = true
+
+    """
     Only return "active" accounts with Financial Contributions enabled if true.
     """
     isActive: Boolean
@@ -11521,6 +11526,11 @@ type Query {
     Host hosting the account
     """
     host: [AccountReferenceInput]
+
+    """
+    Host hosting the account
+    """
+    parent: [AccountReferenceInput]
 
     """
     Only return accounts that match these account types (COLLECTIVE, FUND, EVENT, PROJECT, ORGANIZATION or INDIVIDUAL)
@@ -11884,6 +11894,11 @@ type Query {
     Included collectives which are archived
     """
     includeArchived: Boolean
+
+    """
+    Included collectives which are archived
+    """
+    skipGuests: Boolean = true
 
     """
     Only return "active" accounts with Financial Contributions enabled if true.
