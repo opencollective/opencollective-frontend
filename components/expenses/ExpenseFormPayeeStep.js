@@ -16,13 +16,12 @@ import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { expenseFormPayeeStepCollectivePickerSearchQuery } from '../../lib/graphql/v1/queries';
 import { require2FAForAdmins } from '../../lib/policies';
 import { flattenObjectDeep } from '../../lib/utils';
 import { checkRequiresAddress } from './lib/utils';
 
 import CollectivePicker, { CUSTOM_OPTIONS_POSITION, FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
-import CollectivePickerAsync from '../CollectivePickerAsync';
+import CollectivePickerAsync from '../CollectivePickerAsyncV2';
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
@@ -190,6 +189,64 @@ const getPayeeOptions = (intl, payoutProfiles) => {
   return payeeOptions;
 };
 
+const collectivePickerSearchQuery = gql`
+  query ExpenseFormCollectivePickerV2Search(
+    $term: String!
+    $types: [AccountType]
+    $limit: Int
+    $hosts: [AccountReferenceInput]
+    $parents: [AccountReferenceInput]
+    $skipGuests: Boolean
+    $includeArchived: Boolean
+    $includeVendorsForHost: AccountReferenceInput
+  ) {
+    accounts(
+      searchTerm: $term
+      type: $types
+      limit: $limit
+      host: $hosts
+      parent: $parents
+      skipGuests: $skipGuests
+      includeArchived: $includeArchived
+      includeVendorsForHost: $includeVendorsForHost
+    ) {
+      nodes {
+        id
+        type
+        slug
+        name
+        currency
+        location {
+          id
+          address
+          country
+        }
+        imageUrl(height: 64)
+        isActive
+        isArchived
+        isHost
+        ... on Individual {
+          hasTwoFactorAuth
+        }
+        ... on Host {
+          isTrustedHost
+          hostFeePercent
+        }
+        ... on Vendor {
+          hasPayoutMethod
+        }
+        payoutMethods {
+          id
+          type
+          name
+          data
+          isSaved
+        }
+      }
+    }
+  }
+`;
+
 const expenseFormPayeeStepQuery = gql`
   query ExpenseFormPayee($collectiveSlug: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
@@ -325,10 +382,10 @@ const ExpenseFormPayeeStep = ({
           invitable
           onInvite={onInvite}
           LoggedInUser={loggedInAccount}
-          includeVendorsForHostId={collective.host?.legacyId || undefined}
+          includeVendorsForHost={pick(collective.host, ['id'])}
           addLoggedInUserAsAdmin
           excludeAdminFields
-          searchQuery={expenseFormPayeeStepCollectivePickerSearchQuery}
+          searchQuery={collectivePickerSearchQuery}
           filterResults={collectives => collectives.filter(c => c.type !== CollectiveType.VENDOR || c.hasPayoutMethod)}
           loading={loading}
         />
