@@ -23,7 +23,7 @@ import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/erro
 import { isPastEvent } from '../../lib/events';
 import { Experiment, isExperimentEnabled } from '../../lib/experiments/experiments';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
+import { addCreateCollectiveMutation } from '../../lib/graphql/v1/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { confirmPayment } from '../../lib/stripe/confirm-payment';

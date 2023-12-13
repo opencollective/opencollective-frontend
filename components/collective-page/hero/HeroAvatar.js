@@ -11,6 +11,7 @@ import styled, { css } from 'styled-components';
 import { upload } from '../../../lib/api';
 import { isIndividualAccount } from '../../../lib/collective.lib';
 import { AVATAR_HEIGHT_RANGE, AVATAR_WIDTH_RANGE } from '../../../lib/constants/collectives';
+import { editCollectiveAvatarMutation } from '../../../lib/graphql/v1/mutations';
 import { getAvatarBorderRadius } from '../../../lib/image-utils';
 
 import Avatar from '../../Avatar';
@@ -22,7 +23,6 @@ import StyledButton from '../../StyledButton';
 import { DROPZONE_ACCEPT_IMAGES } from '../../StyledDropzone';
 import { P, Span } from '../../Text';
 import { useToast } from '../../ui/useToast';
-import { editCollectiveAvatarMutation } from '../graphql/mutations';
 
 const AVATAR_SIZE = 128;
 

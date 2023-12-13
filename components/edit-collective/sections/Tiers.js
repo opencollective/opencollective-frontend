@@ -7,6 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { collectiveSettingsQuery } from '../../../lib/graphql/v1/queries';
 import { sortTiersForCollective } from '../../../lib/tier-utils';
 
 import AdminContributeCardsContainer from '../../contribute-cards/AdminContributeCardsContainer';
@@ -22,8 +23,6 @@ import StyledLink from '../../StyledLink';
 import { P, Span, Strong } from '../../Text';
 import { editAccountSettingsMutation } from '../mutations';
 import { listTierQuery } from '../tiers/EditTierModal';
-
-import { collectiveSettingsV1Query } from './EditCollectivePage';
 
 const getSortedContributeCards = (collective, tiers, intl) => {
   const sortedTiers = sortTiersForCollective(collective, tiers);
@@ -120,7 +119,7 @@ const Tiers = ({ collective }) => {
               </P>
               <Mutation
                 mutation={editAccountSettingsMutation}
-                refetchQueries={[{ query: collectiveSettingsV1Query, variables: { slug: collective.slug } }]}
+                refetchQueries={[{ query: collectiveSettingsQuery, variables: { slug: collective.slug } }]}
                 awaitRefetchQueries
               >
                 {(editSettings, { loading }) => (

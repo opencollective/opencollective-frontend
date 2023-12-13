@@ -1,13 +1,4 @@
-import { gql, gqlV1 } from '../../lib/graphql/helpers';
-
-export const editCollectiveSettingsMutation = gqlV1/* GraphQL */ `
-  mutation EditCollectiveSettings($id: Int!, $settings: JSON) {
-    editCollective(collective: { id: $id, settings: $settings }) {
-      id
-      settings
-    }
-  }
-`;
+import { gql } from '../../lib/graphql/helpers';
 
 export const editAccountSettingsMutation = gql`
   mutation EditAccountSetting($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
