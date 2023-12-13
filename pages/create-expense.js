@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { omit, pick } from 'lodash';
 import { withRouter } from 'next/router';
@@ -13,7 +12,7 @@ import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import FormPersister from '../lib/form-persister';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import UrlQueryHelper from '../lib/UrlQueryHelper';
 import { compose, parseToBoolean } from '../lib/utils';

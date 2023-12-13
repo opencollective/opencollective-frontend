@@ -1,10 +1,10 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { CellContext, ColumnDef } from '@tanstack/react-table';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { Account, VirtualCardRequest, VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
 import { useWindowResize } from '../../lib/hooks/useWindowResize';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType, IGNORED_TAGS } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
 import AboutOurFees from '../components/ocf-host-application/AboutOurFees';
 import ApplicationForm from '../components/ocf-host-application/ApplicationForm';

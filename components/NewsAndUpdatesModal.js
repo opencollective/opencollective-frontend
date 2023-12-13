@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/Dialog';
 import { Separator } from './ui/Separator';

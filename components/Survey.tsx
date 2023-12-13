@@ -1,10 +1,10 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import ReactAnimateHeight from 'react-animate-height';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
 import { Button } from './ui/Button';
@@ -17,7 +17,7 @@ export enum SURVEY_KEY {
 }
 
 const sendSurveyResponseMutation = gql`
-  mutation sendSurveyResponse(
+  mutation SendSurveyResponse(
     $surveyKey: String!
     $responseId: String!
     $score: Int!

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { CardElement } from '@stripe/react-stripe-js';
@@ -23,7 +22,7 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { isPastEvent } from '../../lib/events';
 import { Experiment, isExperimentEnabled } from '../../lib/experiments/experiments';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';

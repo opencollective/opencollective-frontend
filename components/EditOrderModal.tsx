@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
 import { get, startCase } from 'lodash';
 import { useRouter } from 'next/router';
@@ -9,7 +9,7 @@ import { PAYMENT_METHOD_SERVICE } from '../lib/constants/payment-methods';
 import { formatCurrency } from '../lib/currency-utils';
 import { getIntervalFromContributionFrequency } from '../lib/date-utils';
 import { getErrorFromGraphqlException, i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import {
   AccountReferenceInput,
   EditPaymentMethodModalQuery,

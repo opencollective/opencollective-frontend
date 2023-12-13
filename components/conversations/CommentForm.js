@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Lock } from '@styled-icons/material/Lock';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
@@ -9,7 +9,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import commentTypes from '../../lib/constants/commentTypes';
 import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import ContainerOverlay from '../ContainerOverlay';

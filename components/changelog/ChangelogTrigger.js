@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep } from 'lodash';
 import { Megaphone } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql, gqlV1 } from '../../lib/graphql/helpers';
 
 import { WebsiteName } from '../I18nFormatters';
 import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
@@ -64,7 +64,7 @@ ChangelogTrigger.propTypes = {
 };
 
 const setChangelogViewDateMutation = gql`
-  mutation SetChangelogViewDateMutation($changelogViewDate: DateTime!) {
+  mutation SetChangelogViewDate($changelogViewDate: DateTime!) {
     setChangelogViewDate(changelogViewDate: $changelogViewDate) {
       id
       hasSeenLatestChangelogEntry

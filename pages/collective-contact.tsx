@@ -1,11 +1,11 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
 import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { Account } from '../lib/graphql/types/v2/graphql';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';

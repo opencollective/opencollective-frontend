@@ -1,12 +1,12 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { compact, flatten } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 
 import Avatar from '../../../Avatar';
 import { Box, Flex } from '../../../Grid';
@@ -39,7 +39,7 @@ const NecessaryNotificationsList = styled.ul`
 `;
 
 const userActivitySubscriptionsQuery = gql`
-  query ActivitySubscriptionsSettingsQuery($slug: String!) {
+  query ActivitySubscriptionsSettings($slug: String!) {
     account(slug: $slug) {
       id
       ... on Individual {

@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { CardElement } from '@stripe/react-stripe-js';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
 import { themeGet } from '@styled-system/theme-get';
@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 import { PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import { getPaymentMethodIcon, getPaymentMethodMetadata } from '../../lib/payment-method-utils';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';

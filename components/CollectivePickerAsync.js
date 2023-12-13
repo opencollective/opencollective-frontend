@@ -11,7 +11,7 @@ import formatCollectiveType from '../lib/i18n/collective-type';
 import CollectivePicker from './CollectivePicker';
 
 const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
-  query CollectivePickerSearchQuery(
+  query CollectivePickerSearch(
     $term: String!
     $types: [TypeOfCollective]
     $limit: Int

@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ActivityClasses, ActivityTypes } from '../../../../lib/constants/activities';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 
 import { Box, Flex } from '../../../Grid';
@@ -16,7 +16,7 @@ import { useToast } from '../../../ui/useToast';
 import { accountActivitySubscriptionsFragment } from './fragments';
 
 const refetchEmailNotificationQuery = gql`
-  query NotificationsSettingsRefetchQuery($id: String!) {
+  query NotificationsSettingsRefetch($id: String!) {
     account(id: $id) {
       id
       ...AccountActivitySubscriptionsFields

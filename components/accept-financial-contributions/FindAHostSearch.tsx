@@ -1,9 +1,9 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { take } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { Account, Host } from '../../lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from '../Grid';
@@ -27,7 +27,7 @@ function useNonEmptyResultCache<T extends { hosts: { nodes: unknown[] } }>(data:
 }
 
 const FindAFiscalHostQuery = gql`
-  query FindAFiscalHostQuery(
+  query FindAFiscalHost(
     $tags: [String]
     $limit: Int
     $offset: Int

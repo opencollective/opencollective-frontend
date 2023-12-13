@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { parseDateInterval } from '../../../../lib/date-utils';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 
 import Container from '../../../Container';
 import { Box } from '../../../Grid';

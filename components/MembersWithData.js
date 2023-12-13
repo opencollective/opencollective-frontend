@@ -139,7 +139,7 @@ class MembersWithData extends React.Component {
 const membersQuery = gqlV1/* GraphQL */ `
   query Members(
     $collectiveSlug: String!
-    $TierId: Int
+    $tierId: Int
     $role: String
     $type: String
     $limit: Int
@@ -190,7 +190,7 @@ export const addMembersData = graphql(membersQuery, {
   options: props => ({
     variables: {
       collectiveSlug: props.collective.slug,
-      TierId: props.tier && props.tier.id,
+      tierId: props.tier && props.tier.id,
       offset: 0,
       type: props.type,
       role: props.memberRole,

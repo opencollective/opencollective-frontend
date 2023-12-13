@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 import {
@@ -81,7 +81,7 @@ export const accountExpensesQuery = gql`
 `;
 
 export const accountExpensesMetadataQuery = gql`
-  query AccountExpensesMetadataQuery($accountSlug: String!) {
+  query AccountExpensesMetadata($accountSlug: String!) {
     account(slug: $accountSlug) {
       id
       slug

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { omit } from 'lodash';
 import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { HostedCollectiveTypes } from '../../../lib/constants/collectives';
 import { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { HostDashboardHostedCollectivesQueryVariables, HostFeeStructure } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../lib/i18n/collective-type';

@@ -1,6 +1,6 @@
 import React, { Fragment, MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -17,7 +17,7 @@ import {
 import CreatableSelect from 'react-select/creatable';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import colors from '../lib/theme/colors';
 
 import { Flex } from './Grid';

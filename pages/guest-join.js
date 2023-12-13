@@ -1,12 +1,12 @@
 import React, { Fragment } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { PaperPlane } from '@styled-icons/boxicons-regular/PaperPlane';
 import { Email } from '@styled-icons/material/Email';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled, { useTheme } from 'styled-components';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { getAllGuestEmails } from '../lib/guest-accounts';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 

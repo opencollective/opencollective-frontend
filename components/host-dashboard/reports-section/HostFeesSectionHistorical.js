@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { get, groupBy } from 'lodash';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { i18nTransactionSettlementStatus } from '../../../lib/i18n/transaction';
 
 import { ChartWrapper } from '../../ChartWrapper';

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { Field, useFormikContext } from 'formik';
 import { get, kebabCase, partition, set } from 'lodash';
@@ -9,7 +9,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { formatCurrency } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import { I18nSupportLink } from '../I18nFormatters';

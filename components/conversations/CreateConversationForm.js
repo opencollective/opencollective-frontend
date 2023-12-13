@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -8,7 +8,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import FormPersister from '../../lib/form-persister';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
 import { Box, Flex } from '../Grid';

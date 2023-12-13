@@ -1,10 +1,10 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql, gqlV1 } from '../lib/graphql/helpers';
 import { Collective } from '../lib/graphql/types/v2/graphql';
 
 import { toast } from './ui/useToast';
@@ -15,13 +15,9 @@ import StyledButton from './StyledButton';
 import StyledInputFormikField from './StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 
-const editTagsMutation = gqlV1`
-  mutation editCollective(
-    $collective: CollectiveInputType!
-  ) {
-    editCollective(
-      collective: $collective
-    ) {
+const editTagsMutation = gqlV1/* GraphQL */ `
+  mutation EditTags($collective: CollectiveInputType!) {
+    editCollective(collective: $collective) {
       id
       tags
     }
@@ -29,7 +25,7 @@ const editTagsMutation = gqlV1`
 `;
 
 const tagStatsQuery = gql`
-  query tagStats($host: AccountReferenceInput) {
+  query TagStats($host: AccountReferenceInput) {
     tagStats(host: $host, limit: 5) {
       nodes {
         id

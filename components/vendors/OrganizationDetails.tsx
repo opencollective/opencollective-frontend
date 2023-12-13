@@ -1,10 +1,10 @@
 import React, { PropsWithChildren } from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { elementFromClass } from '../../lib/react-utils';
 
 import Avatar from '../Avatar';
@@ -18,7 +18,7 @@ import { useToast } from '../ui/useToast';
 
 import { vendorFieldFragment } from './queries';
 
-const loadOrganizationDetailsQuery = gql`
+const organizationDetailsQuery = gql`
   query OrganizationDetails($organizationSlug: String!) {
     account(slug: $organizationSlug) {
       id
@@ -76,7 +76,7 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
   const drawerActionsContainer = useDrawerActionsContainer();
   const { toast } = useToast();
   const intl = useIntl();
-  const { data } = useQuery(loadOrganizationDetailsQuery, {
+  const { data } = useQuery(organizationDetailsQuery, {
     variables: { organizationSlug: organization.slug },
     context: API_V2_CONTEXT,
   });

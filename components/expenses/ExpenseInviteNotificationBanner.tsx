@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { checkUserExistence, signin } from '../../lib/api';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { getWebsiteUrl } from '../../lib/utils';
 

@@ -1,12 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { formatCurrency } from '../lib/currency-utils';
-import { API_V2_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql, gqlV1 } from '../lib/graphql/helpers';
 import { compose } from '../lib/utils';
 
 import { toast } from './ui/useToast';

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { gql } from '@apollo/client';
 import { get, pick } from 'lodash';
 import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
@@ -7,7 +6,7 @@ import { useRouter } from 'next/router';
 import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
 import { ERROR } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { stripHTML } from '../lib/html';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
@@ -60,7 +59,6 @@ const updatePageQuery = gql`
       ... on Collective {
         isApproved
       }
-      type
       ... on AccountWithParent {
         parent {
           id

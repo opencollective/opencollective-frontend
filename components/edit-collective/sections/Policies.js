@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
 import { cloneDeep, filter, get, isEmpty, set, size } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -8,7 +8,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { DEFAULT_SUPPORTED_EXPENSE_TYPES } from '../../../lib/expenses';
-import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql, gqlV1 } from '../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { stripHTML } from '../../../lib/html';
 import { PREVIEW_FEATURE_KEYS } from '../../../lib/preview-features';
@@ -47,7 +47,7 @@ const updateFilterCategoriesMutation = gql`
 `;
 
 const editCollectiveMutation = gqlV1/* GraphQL */ `
-  mutation EditCollectiveMutation($collective: CollectiveInputType!) {
+  mutation EditCollective($collective: CollectiveInputType!) {
     editCollective(collective: $collective) {
       id
       type

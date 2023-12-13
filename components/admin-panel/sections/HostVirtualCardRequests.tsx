@@ -1,9 +1,9 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { identity, toLower, toUpper } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { Account, Host, VirtualCardRequestCollection } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/deprecated/useQueryFilter';
 

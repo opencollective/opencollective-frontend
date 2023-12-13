@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import dayjs from 'dayjs';
@@ -11,7 +11,7 @@ import styled from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields, verifyEmailPattern } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { CreatePendingContributionModalQuery, OrderPageQuery } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../lib/i18n/collective-type';
@@ -138,11 +138,9 @@ const createPendingContributionModalCollectiveQuery = gql`
           currency
           settings
           imageUrl
-          currency
           ... on AccountWithContributions {
             tiers {
               nodes {
-                id
                 id
                 slug
                 legacyId

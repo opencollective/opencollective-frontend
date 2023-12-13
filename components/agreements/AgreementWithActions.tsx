@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Check } from '@styled-icons/feather/Check';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { Link as IconLink } from '@styled-icons/feather/Link';
@@ -9,7 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import useClipboard from '../../lib/hooks/useClipboard';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';

@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { gql } from '@apollo/client';
 import { omit } from 'lodash';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
@@ -7,7 +6,7 @@ import styled from 'styled-components';
 import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
 import { CollectiveType } from '../lib/constants/collectives';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 

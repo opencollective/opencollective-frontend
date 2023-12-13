@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { ExternalLink } from '@styled-icons/feather/ExternalLink';
 import { Formik } from 'formik';
 import { get, pick } from 'lodash';
@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import { margin } from 'styled-system';
 
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Box } from '../../Grid';

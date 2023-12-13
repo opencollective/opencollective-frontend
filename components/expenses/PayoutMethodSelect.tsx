@@ -1,5 +1,4 @@
 import React from 'react';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Times as RemoveIcon } from '@styled-icons/fa-solid/Times';
 import { get, groupBy, isEmpty, truncate } from 'lodash';
@@ -9,7 +8,7 @@ import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-i
 import { AccountTypesWithHost } from '../../lib/constants/collectives';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
 import ConfirmationModal from '../ConfirmationModal';

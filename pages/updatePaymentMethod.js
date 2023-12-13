@@ -107,7 +107,7 @@ class UpdatePaymentPage extends React.Component {
         const paymentMethod = stripeTokenToPaymentMethod(token);
         const res = await this.props.replaceCreditCard({
           variables: {
-            CollectiveId: this.props.LoggedInUser.collective.id,
+            collectiveId: this.props.LoggedInUser.collective.id,
             ...paymentMethod,
             id: parseInt(this.props.paymentMethodId),
           },
@@ -337,12 +337,12 @@ class UpdatePaymentPage extends React.Component {
 const replaceCreditCardMutation = gqlV1/* GraphQL */ `
   mutation ReplaceCreditCard(
     $id: Int!
-    $CollectiveId: Int!
+    $collectiveId: Int!
     $name: String!
     $token: String!
     $data: StripeCreditCardDataInputType!
   ) {
-    replaceCreditCard(CollectiveId: $CollectiveId, name: $name, token: $token, data: $data, id: $id) {
+    replaceCreditCard(CollectiveId: $collectiveId, name: $name, token: $token, data: $data, id: $id) {
       id
       data
       createdAt

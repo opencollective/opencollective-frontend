@@ -1,10 +1,10 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { cloneDeep, get, isEqual, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useWarnIfUnsavedChanges from '../../../../lib/hooks/warnIfUnsavedChanges';
 
@@ -26,7 +26,7 @@ type AccountingCategoriesTableMeta = {
 };
 
 const accountingCategoriesQuery = gql`
-  query AdminAccountingCategoriesQuery($hostSlug: String!) {
+  query AdminAccountingCategories($hostSlug: String!) {
     host(slug: $hostSlug) {
       id
       slug

@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { omitBy } from 'lodash';
 import { PlusIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage } from 'react-intl';
@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
 import { boolean, isMulti, limit, offset } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { Currency, HostedVirtualCardsQueryVariables, VirtualCardStatus } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { i18nHasMissingReceipts } from '../../../lib/i18n/receipts-filter';

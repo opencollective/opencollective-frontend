@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
 import { cloneDeep, pick } from 'lodash';
 import { Download, Pencil, Trash, Upload, X } from 'lucide-react';
@@ -9,7 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyEmailPattern, verifyURLPattern } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { DashboardVendorsQuery, UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
 import { useImageUploader } from '../../lib/hooks/useImageUploader';
 import { elementFromClass } from '../../lib/react-utils';

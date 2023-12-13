@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { useFormik } from 'formik';
 import { debounce } from 'lodash';
@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../../lib/constants/roles';
 import { graphqlAmountValueInCents } from '../../lib/currency-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { Account, VirtualCard, VirtualCardLimitInterval, VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import {
@@ -34,7 +34,7 @@ import { useToast } from '../ui/useToast';
 import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const editVirtualCardMutation = gql`
-  mutation editVirtualCard(
+  mutation EditVirtualCard(
     $virtualCard: VirtualCardReferenceInput!
     $name: String!
     $limitAmount: AmountInput
@@ -63,7 +63,7 @@ const editVirtualCardMutation = gql`
 `;
 
 const createVirtualCardMutation = gql`
-  mutation createVirtualCard(
+  mutation CreateVirtualCard(
     $name: String!
     $limitAmount: AmountInput!
     $limitInterval: VirtualCardLimitInterval!

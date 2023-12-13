@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { isEmpty, startCase } from 'lodash';
 import { AlertTriangle } from 'lucide-react';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
@@ -8,7 +8,7 @@ import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 import { isIndividualAccount } from '../../lib/collective.lib';
 import dayjs from '../../lib/dayjs';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
