@@ -353,7 +353,7 @@ const ExpenseSummary = ({
                     />
                   </Box>
                 )}
-                <Flex justifyContent="space-between" alignItems="baseline" flex="1">
+                <Flex justifyContent="space-between" alignItems="flex-start" flex="1">
                   <Flex flexDirection="column" justifyContent="center" flexGrow="1">
                     {attachment.description ? (
                       <HTMLContent
