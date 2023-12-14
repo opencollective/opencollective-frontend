@@ -132,7 +132,7 @@ const getOptions = (
 
   // Show all categories to host admins, but only the ones that match the expense type to other users
   if (!isHostAdmin) {
-    remove(allHostCategories, category => !category.expensesTypes?.includes(expenseType));
+    remove(allHostCategories, category => category.expensesTypes && !category.expensesTypes.includes(expenseType));
   }
 
   allHostCategories.forEach(category => {

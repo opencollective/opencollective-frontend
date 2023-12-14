@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { cloneDeep, get, isEqual, omit, pick } from 'lodash';
+import { cloneDeep, get, isEqual, omit, pick, uniq } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
@@ -104,8 +104,6 @@ const ExpensesTypesCell = ({ cell, getValue, row, column, table }) => {
   const allExpenseTypes = Object.values(omit(ExpenseType, 'FUNDING_REQUEST'));
   const getOption = value => {
     if (value === null) {
-      return { value, label: intl.formatMessage({ defaultMessage: 'None' }) };
-    } else if (isEqual(value, [])) {
       return { value, label: intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' }) };
     } else {
       return { value, label: i18nExpenseType(intl, value) };
@@ -113,17 +111,15 @@ const ExpensesTypesCell = ({ cell, getValue, row, column, table }) => {
   };
 
   // Build options list
-  const options = React.useMemo(() => [null, [], ...allExpenseTypes].map(getOption), [value]);
+  const options = React.useMemo(() => [null, ...allExpenseTypes].map(getOption), [value]);
 
   // View for accountants
   if (table.options.meta.disabled) {
     return (
       <p>
         {value === null
-          ? intl.formatMessage({ defaultMessage: 'None' })
-          : isEqual(value, [])
-            ? intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' })
-            : value.map(value => i18nExpenseType(intl, value)).join(', ')}
+          ? intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' })
+          : value.map(value => i18nExpenseType(intl, value)).join(', ')}
       </p>
     );
   }
@@ -136,20 +132,12 @@ const ExpensesTypesCell = ({ cell, getValue, row, column, table }) => {
       options={options}
       isClearable={false}
       value={Array.isArray(value) ? value.map(getOption) : null}
-      placeholder={
-        value === null
-          ? intl.formatMessage({ defaultMessage: 'None' })
-          : intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' })
-      }
+      placeholder={intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' })}
       onChange={options => {
-        const specialOption = options.find(option => option.value === null || isEqual(option.value, []));
-        if (specialOption) {
-          // Selecting "All" or "None"
-          setValue(specialOption.value);
-        } else if (options.length === allExpenseTypes.length) {
-          setValue([]);
+        if (!options?.length || options.find(option => option.value === null)) {
+          setValue(null);
         } else {
-          setValue(options.map(option => option.value).sort());
+          setValue(uniq(options.map(option => option.value).sort()));
         }
       }}
     />
@@ -207,7 +195,7 @@ const columns = [
   },
 ];
 
-const DEFAULT_CATEGORY = { code: '', name: '', friendlyName: '' };
+const DEFAULT_CATEGORY = { code: '', name: '', friendlyName: '', expensesTypes: null };
 
 export const AccountingCategoriesTable = ({ hostSlug }: AccountingCategoriesTableProps) => {
   const intl = useIntl();
