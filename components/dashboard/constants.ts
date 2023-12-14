@@ -11,6 +11,7 @@ export const SECTIONS = {
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   HOST_VIRTUAL_CARD_REQUESTS: 'host-virtual-card-requests',
   HOST_APPLICATIONS: 'host-applications',
+  CONTRIBUTORS: 'contributors',
   INCOMING_CONTRIBUTIONS: 'incoming-contributions',
   OUTGOING_CONTRIBUTIONS: 'outgoing-contributions',
   EXPENSES: 'expenses',
@@ -224,6 +225,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.NOTIFICATIONS]: {
     id: 'NotificationsSettings.Title',
     defaultMessage: 'Notification Settings',
+  },
+  [ALL_SECTIONS.CONTRIBUTORS]: {
+    id: 'Contributors',
+    defaultMessage: 'Contributors',
   },
   [ALL_SECTIONS.OUTGOING_CONTRIBUTIONS]: {
     id: 'OutgoingContributions',

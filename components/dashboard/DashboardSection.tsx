@@ -19,6 +19,7 @@ import HostApplications from './sections/collectives/HostApplications';
 import HostFinancialContributions from './sections/contributions/HostFinancialContributions';
 import IncomingContributions from './sections/contributions/IncomingContributions';
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
+import Contributors from './sections/Contributors';
 import HostExpenses from './sections/expenses/HostDashboardExpenses';
 import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
 import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
@@ -49,6 +50,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.OVERVIEW]: Overview,
   [SECTIONS.EXPENSES]: ReceivedExpenses,
   [SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
+  [SECTIONS.CONTRIBUTORS]: Contributors,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
   [SECTIONS.TRANSACTIONS]: Transactions,

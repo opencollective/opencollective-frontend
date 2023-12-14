@@ -3,6 +3,7 @@ import { get } from 'lodash';
 import {
   ArrowRightLeft,
   BarChart2,
+  BookUserIcon,
   Building,
   Coins,
   CreditCard,
@@ -104,6 +105,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
       label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
       Icon: Coins,
+    },
+    {
+      if: !isIndividual,
+      section: ALL_SECTIONS.CONTRIBUTORS,
+      label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
+      Icon: BookUserIcon,
     },
     {
       if: !isIndividual,
