@@ -17,7 +17,7 @@ const updateExpenseItemWithUploadResult = (
   itemIdx: number,
 ): boolean => {
   const itemPath = `items[${itemIdx}]`;
-  const itemValues: ExpenseItemFormValues = get(formValues, itemPath) || newExpenseItem();
+  const itemValues: ExpenseItemFormValues = get(formValues, itemPath) || newExpenseItem({}, formValues.currency);
 
   // Set item URL
   const fileUrl = uploadResult.file?.url;

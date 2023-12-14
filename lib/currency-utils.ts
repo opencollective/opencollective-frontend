@@ -104,8 +104,13 @@ export function formatCurrency(
   }
 }
 
-export const formatValueAsCurrency = (value: Amount, options: Options): string =>
-  formatCurrency(value.valueInCents || value.value * 100, value.currency, options);
+export const formatValueAsCurrency = (value: Amount, options: Options): string => {
+  if (!value) {
+    return '--.--';
+  }
+
+  return formatCurrency(value.valueInCents || value.value * 100, value.currency, options);
+};
 
 export const floatAmountToCents = (floatAmount: number | null): number | null => {
   if (isNaN(floatAmount) || floatAmount === null) {

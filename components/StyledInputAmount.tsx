@@ -10,7 +10,6 @@ import { cn } from '../lib/utils';
 import { Separator } from './ui/Separator';
 import { StyledCurrencyPicker } from './StyledCurrencyPicker';
 import StyledInput from './StyledInput';
-import StyledInputGroup from './StyledInputGroup';
 
 const formatCurrencyName = (currency, currencyDisplay) => {
   if (currencyDisplay === 'SYMBOL') {
@@ -181,9 +180,8 @@ const StyledInputAmount = ({
 }) => {
   const [rawValue, setRawValue] = React.useState(value || defaultValue || '');
   const isControlled = !isUndefined(value);
-  const hasMin = !isUndefined(min);
   const curValue = isControlled ? getValue(value, rawValue, isEmpty) : undefined;
-  const minAmount = hasMin ? min / 100 : min;
+  const minAmount = min / 100;
   const disabled = props.disabled || loadingExchangeRate;
   const canUseExchangeRate = Boolean(!loadingExchangeRate && exchangeRate && exchangeRate.fromCurrency === currency);
   const minWidth = useAmountInputMinWidth(curValue, max);
@@ -244,7 +242,7 @@ const StyledInputAmount = ({
           style={{ minWidth }}
           name={name}
           min={minAmount}
-          max={isUndefined(max) ? max : max / 100}
+          max={max / 100}
           error={props.error || (showErrorIfEmpty && getError(curValue, minAmount, props.required))}
           defaultValue={isUndefined(defaultValue) ? undefined : defaultValue / 100}
           value={curValue}
@@ -294,38 +292,6 @@ const StyledInputAmount = ({
       )}
     </div>
   );
-};
-
-StyledInputAmount.propTypes = {
-  /** The currency (eg. `USD`, `EUR`...) */
-  currency: PropTypes.string,
-  /** Gets passed the new currency. Only when hasCurrencyPicker is true */
-  onCurrencyChange: PropTypes.func,
-  /** Gets passed the amount in cents as first param, and the event as second param. */
-  onChange: PropTypes.func,
-  /** OnChange function */
-  onBlur: PropTypes.func,
-  /** Minimum amount (in CENTS) */
-  min: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** Maximum amount (in CENTS) */
-  max: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** Value */
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** Currency style. If hasCurrencyPicker is true, `CODE` will be enforced. */
-  currencyDisplay: PropTypes.oneOf(['SYMBOL', 'CODE', 'FULL']),
-  /** Number of decimals */
-  precision: PropTypes.number,
-  /** A special prop to force the empty state */
-  isEmpty: PropTypes.bool,
-  /** To enable the currency picker */
-  hasCurrencyPicker: PropTypes.bool,
-  /** A list of currencies presented in the currency picker */
-  availableCurrencies: PropTypes.arrayOf(PropTypes.string),
-  exchangeRate: PropTypes.object,
-  minFxRate: PropTypes.number,
-  maxFxRate: PropTypes.number,
-  /** Accept all PropTypes from `StyledInputGroup` */
-  ...StyledInputGroup.propTypes,
 };
 
 export default StyledInputAmount;

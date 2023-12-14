@@ -258,11 +258,14 @@ describe('Expense flow', () => {
         .should('contain', 'Acquired on: August 1, 2023');
 
       // Play with the FX rate: value too high
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').click();
+      cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip').should('not.exist');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}{backspace}');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}100').blur();
-      cy.get('input[name="items[0].amountV2"]').should('have.value', '65'); // This one doesn't change
-      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '100');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '100.00');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'min', '64.35');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'max', '78.65');
+      cy.get('input[name="items[0].amountV2"]').should('have.value', '65'); // This one doesn't change
       cy.getByDataCy('items[0].amountV2-exchange-rate').should('contain', '1 USD = 1.5384615 EUR');
       cy.getByDataCy('items[0].amountV2-exchange-rate').realHover();
       cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip')
@@ -274,7 +277,9 @@ describe('Expense flow', () => {
         );
 
       // With a values that's too low, but still accepted
-      cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}64.88');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').click();
+      cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip').should('not.exist');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}64.88').blur();
       cy.get('input[name="items[0].amountV2"]').should('have.value', '65'); // This one doesn't change
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '64.88');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'min', '64.35');
@@ -288,9 +293,11 @@ describe('Expense flow', () => {
 
       // Add another item with custom values
       cy.getByDataCy('expense-add-item-btn').click();
+      cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip').should('not.exist');
       cy.getByDataCy('items[1].amountV2-amount-currency-picker').should('contain', 'EUR'); // Currency is inherited from expense by default
       cy.get('input[name="items[1].description"]').type('A second item');
-      cy.get('input[name="items[1].amountV2"]').type('{selectall}100').blur();
+      cy.get('input[name="items[1].amountV2"]').type('{selectall}100');
+      cy.get('input[name="items[1].amountV2"]').blur();
       cy.getByDataCy('items[1].url-dropzone').selectFile(getReceiptFixture({ fileName: 'receipt2.jpg' }), {
         action: 'drag-drop',
       });
@@ -345,6 +352,7 @@ describe('Expense flow', () => {
       });
       cy.get('[data-cy="attachment-url-field"] [data-loading=true]').should('have.length', 1);
       cy.get('[data-cy="attachment-url-field"] [data-loading=true]').should('have.length', 0);
+      cy.contains('[data-cy="attachment-url-field"]', 'Replace');
       cy.get('input[name="items[2].description"]').type('A third item');
       cy.get('input[name="items[2].amountV2"]').type('{selectall}100');
       cy.getByDataCy('items[2].amountV2-amount-currency-picker').click();

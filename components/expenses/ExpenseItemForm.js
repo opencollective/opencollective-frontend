@@ -570,14 +570,10 @@ ExpenseItemForm.propTypes = {
   isOptional: PropTypes.bool,
   /** Whether the OCR feature is enabled */
   hasOCRFeature: PropTypes.bool,
-  /** Whether this item is the first in the list */
-  hasMultiCurrency: PropTypes.bool,
   /** True if description is HTML */
   isRichText: PropTypes.bool,
   /** Called when an attachment upload fails */
   onUploadError: PropTypes.func.isRequired,
-  /** For multi-currency expenses */
-  availableCurrencies: PropTypes.arrayOf(PropTypes.string),
   /** Is it an invoice */
   isInvoice: PropTypes.bool,
   /** the item data. TODO: Rename to "item" */

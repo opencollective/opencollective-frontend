@@ -64,7 +64,7 @@ export const StyledCurrencyPicker = ({
       data-cy="currency-picker"
       placeholder="----"
       error={!value}
-      isSearchable={availableCurrencies?.length > 10}
+      isSearchable={availableCurrencies.length > 10}
       options={currencyOptions}
       value={!value ? null : { value, label: getSelectedCurrencyLabel(value) }}
       onChange={({ value }) => onChange(value)}

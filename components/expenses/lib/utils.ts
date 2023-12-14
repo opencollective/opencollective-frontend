@@ -93,7 +93,7 @@ export const computeExpenseAmounts = (expenseCurrency: string, items: ExpenseIte
   const hasTaxes = Boolean(activeTaxes.length);
   const areAllTaxesValid = !hasTaxes || activeTaxes.every(tax => isTaxRateValid(tax.rate));
   const totalInvoiced = !areAllItemsValid ? null : sumItemsAmounts(expenseCurrency, items);
-  const allTaxes = sumBy(activeTaxes || [], tax => getTaxAmount(totalInvoiced, tax));
+  const allTaxes = sumBy(activeTaxes, tax => getTaxAmount(totalInvoiced, tax));
   const totalAmount = areAllItemsValid && areAllTaxesValid ? totalInvoiced + allTaxes : null;
   return { hasTaxes, totalInvoiced, totalAmount };
 };
@@ -123,18 +123,18 @@ export const getSupportedCurrencies = (collective, payoutMethod) => {
     !isFeatureEnabled(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES) ||
     payoutMethod?.type === PayoutMethodType.ACCOUNT_BALANCE
   ) {
-    return [collective?.currency];
+    return [collective.currency];
   }
 
   const isPayPal = payoutMethod?.type === PayoutMethodType.PAYPAL;
   if (isPayPal) {
-    const defaultCurrency = PayPalSupportedCurrencies.includes(collective?.currency) ? collective.currency : 'USD';
+    const defaultCurrency = PayPalSupportedCurrencies.includes(collective.currency) ? collective.currency : 'USD';
     return uniq([defaultCurrency, ...PayPalSupportedCurrencies]);
   } else if (payoutMethod?.type === PayoutMethodType.OTHER) {
-    return Currency.includes(collective?.currency) ? uniq([collective?.currency, ...Currency]) : Currency;
+    return Currency.includes(collective.currency) ? uniq([collective.currency, ...Currency]) : Currency;
   } else {
     return uniq(
-      [collective?.currency, collective?.host?.currency, payoutMethod?.currency, payoutMethod?.data?.currency].filter(
+      [collective.currency, collective.host?.currency, payoutMethod?.currency, payoutMethod?.data?.currency].filter(
         Boolean,
       ),
     );

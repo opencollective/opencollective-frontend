@@ -25,7 +25,7 @@ import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseItemForm from './ExpenseItemForm';
 
 /** Converts a list of filenames to expense item objects */
-const filesListToItems = files => files.map(({ url }) => newExpenseItem({ url }));
+const filesListToItems = (files, expenseCurrency) => files.map(({ url }) => newExpenseItem({ url }, expenseCurrency));
 
 class ExpenseFormItems extends React.PureComponent {
   static propTypes = {
@@ -73,7 +73,7 @@ class ExpenseFormItems extends React.PureComponent {
   addDefaultItem() {
     const { values } = this.props.form;
     if (isEmpty(values.items)) {
-      this.props.push(newExpenseItem());
+      this.props.push(newExpenseItem({}, values.currency));
     }
   }
 
@@ -183,7 +183,9 @@ class ExpenseFormItems extends React.PureComponent {
               if (hasOCRFeature) {
                 this.props.form.setFieldValue(
                   'items',
-                  files.map(file => newExpenseItem({ __isUploading: true, __file: file, __fromInput: 'multi' })),
+                  files.map(file =>
+                    newExpenseItem({ __isUploading: true, __file: file, __fromInput: 'multi' }, values.currency),
+                  ),
                 );
               }
             }}
