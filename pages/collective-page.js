@@ -6,6 +6,7 @@ import { createGlobalStyle } from 'styled-components';
 
 import { getCollectivePageMetadata } from '../lib/collective.lib';
 import { generateNotFoundError } from '../lib/errors';
+import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { ssrGraphQLQuery } from '../lib/graphql/with-ssr-query';
 import { getRequestIntl } from '../lib/i18n/request';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
@@ -14,6 +15,10 @@ import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
 import { preloadCollectivePageGraphqlQueries } from '../components/collective-page/graphql/preload';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../components/collective-page/graphql/queries';
+import {
+  collectivePageQuery as collectivePageQueryV2,
+  convertCollectivePageToGraphqlV1,
+} from '../components/collective-page/graphql/v2/queries';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
@@ -86,6 +91,7 @@ class CollectivePage extends React.Component {
       loading: PropTypes.bool,
       error: PropTypes.any,
       previousData: PropTypes.object,
+      account: PropTypes.object,
       Collective: PropTypes.shape({
         name: PropTypes.string,
         type: PropTypes.string.isRequired,
@@ -137,7 +143,10 @@ class CollectivePage extends React.Component {
   render() {
     const { slug, data, LoggedInUser, status, step, mode, action } = this.props;
     const { showOnboardingModal } = this.state;
-    const collective = data?.Collective || data?.previousData?.Collective;
+    const collective =
+      data?.account || data?.previousData?.account
+        ? convertCollectivePageToGraphqlV1(data?.account || data?.previousData?.account)
+        : data?.Collective || data?.previousData?.Collective;
     const loading = data?.loading && !collective;
     if (!loading) {
       if (!data || data.error) {
@@ -221,8 +230,11 @@ class CollectivePage extends React.Component {
   }
 }
 
+const GRAPHQL_V2 = true;
+
 const addCollectivePageData = ssrGraphQLQuery({
-  query: collectivePageQuery,
+  query: GRAPHQL_V2 ? collectivePageQueryV2 : collectivePageQuery,
+  context: GRAPHQL_V2 ? API_V2_CONTEXT : null,
   getVariablesFromProps: ({ slug }) => getCollectivePageQueryVariables(slug),
   useLegacyDataStructure: true,
   preload: (client, result) => preloadCollectivePageGraphqlQueries(client, result?.data?.Collective),
