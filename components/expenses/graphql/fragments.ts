@@ -103,12 +103,13 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
   }
 `;
 
-const accountingCategoryFields = gql`
+export const accountingCategoryFields = gql`
   fragment AccountingCategoryFields on AccountingCategory {
     id
     name
     friendlyName
     code
+    expensesTypes
   }
 `;
 

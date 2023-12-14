@@ -383,6 +383,11 @@ interface Account {
     hasOrder: Boolean
 
     """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
+
+    """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
     """
     includeRegularTransactions: Boolean! = true
@@ -1572,6 +1577,11 @@ type AccountingCategory {
   The account this category belongs to
   """
   account: Host!
+
+  """
+  If meant for expenses, the types of expenses this category applies to
+  """
+  expensesTypes: [ExpenseType]
 }
 
 """
@@ -1818,6 +1828,11 @@ type Host implements Account & AccountWithContributions {
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -6342,6 +6357,11 @@ type Bot implements Account {
     hasOrder: Boolean
 
     """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
+
+    """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
     """
     includeRegularTransactions: Boolean! = true
@@ -6989,6 +7009,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -8039,6 +8064,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     hasOrder: Boolean
 
     """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
+
+    """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
     """
     includeRegularTransactions: Boolean! = true
@@ -8908,6 +8938,11 @@ type Individual implements Account {
     hasOrder: Boolean
 
     """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
+
+    """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
     """
     includeRegularTransactions: Boolean! = true
@@ -9763,6 +9798,11 @@ type Organization implements Account & AccountWithContributions {
     hasOrder: Boolean
 
     """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
+
+    """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
     """
     includeRegularTransactions: Boolean! = true
@@ -10531,6 +10571,11 @@ type Vendor implements Account & AccountWithContributions {
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -11821,6 +11866,11 @@ type Query {
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -13614,6 +13664,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     hasOrder: Boolean
 
     """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
+
+    """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
     """
     includeRegularTransactions: Boolean! = true
@@ -14371,6 +14426,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -16773,6 +16833,11 @@ input AccountingCategoryInput {
   A friendly name for non-accountants (i.e. expense submitters and collective admins)
   """
   friendlyName: String
+
+  """
+  If meant for expenses, the types of expenses this category applies to
+  """
+  expensesTypes: [ExpenseType]
 }
 
 """
@@ -17022,6 +17087,7 @@ input ExpenseCreateInput {
 
 input PayoutMethodInput {
   id: String
+  legacyId: Int
   data: JSON
   name: String
   isSaved: Boolean

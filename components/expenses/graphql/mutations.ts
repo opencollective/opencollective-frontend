@@ -1,6 +1,6 @@
 import { gql } from '../../../lib/graphql/helpers';
 
-import { expensePageExpenseFieldsFragment } from './fragments';
+import { accountingCategoryFields, expensePageExpenseFieldsFragment } from './fragments';
 
 export const editExpenseMutation = gql`
   mutation EditExpense($expense: ExpenseUpdateInput!, $draftKey: String) {
@@ -19,10 +19,9 @@ export const editExpenseCategoryMutation = gql`
       id
       accountingCategory {
         id
-        name
-        friendlyName
-        code
+        ...AccountingCategoryFields
       }
     }
   }
+  ${accountingCategoryFields}
 `;

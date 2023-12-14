@@ -1,9 +1,10 @@
 import React from 'react';
-import { get, isUndefined, pick, size } from 'lodash';
+import { get, isUndefined, pick, remove, size } from 'lodash';
 import { ChevronDown } from 'lucide-react';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
-import { AccountingCategory, Host } from '../../lib/graphql/types/v2/graphql';
+import { AccountingCategory, ExpenseType, Host } from '../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { cn } from '../../lib/utils';
 
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/Command';
@@ -11,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 
 type ExpenseCategorySelectProps = {
   host: Host;
+  expenseType: ExpenseType;
   selectedCategory: AccountingCategory | undefined | null;
   submitterCategory?: AccountingCategory;
   accountAdminCategory?: AccountingCategory;
@@ -118,15 +120,22 @@ const getCategoryLabel = (
 const getOptions = (
   intl: IntlShape,
   host: Host,
+  expenseType: ExpenseType,
   showCode: boolean,
   allowNone: boolean,
   submitterCategory: AccountingCategory | null,
   accountAdminCategory: AccountingCategory | null,
+  isHostAdmin: boolean,
 ): OptionsMap => {
-  const hostCategories = get(host, 'accountingCategories.nodes', []);
+  const allHostCategories = [...get(host, 'accountingCategories.nodes', [])];
   const categoriesById: OptionsMap = {};
 
-  hostCategories.forEach(category => {
+  // Show all categories to host admins, but only the ones that match the expense type to other users
+  if (!isHostAdmin) {
+    remove(allHostCategories, category => !category.expensesTypes?.includes(expenseType));
+  }
+
+  allHostCategories.forEach(category => {
     categoriesById[category.id] = {
       value: category,
       label: getCategoryLabel(intl, category, showCode, submitterCategory, accountAdminCategory),
@@ -148,6 +157,7 @@ const getOptions = (
 
 const ExpenseCategorySelect = ({
   host,
+  expenseType,
   selectedCategory,
   submitterCategory,
   accountAdminCategory,
@@ -160,9 +170,12 @@ const ExpenseCategorySelect = ({
 }: ExpenseCategorySelectProps) => {
   const intl = useIntl();
   const [isOpen, setOpen] = React.useState(false);
+  const { LoggedInUser } = useLoggedInUser();
+  const isHostAdmin = Boolean(LoggedInUser?.isAdminOfCollective(host));
   const options = React.useMemo(
-    () => getOptions(intl, host, showCode, allowNone, submitterCategory, accountAdminCategory),
-    [host, allowNone, showCode, submitterCategory, accountAdminCategory],
+    () =>
+      getOptions(intl, host, expenseType, showCode, allowNone, submitterCategory, accountAdminCategory, isHostAdmin),
+    [host, expenseType, allowNone, showCode, submitterCategory, accountAdminCategory, isHostAdmin],
   );
 
   return (
