@@ -1,16 +1,18 @@
 import React from 'react';
-import { useMutation, useQuery } from '@apollo/client';
-import { cloneDeep, get, isEqual, pick } from 'lodash';
+import { gql, useMutation, useQuery } from '@apollo/client';
+import { cloneDeep, get, isEqual, omit, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useWarnIfUnsavedChanges from '../../../../lib/hooks/warnIfUnsavedChanges';
+import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
 import { DataTable } from '../../../DataTable';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import StyledSelect from '../../../StyledSelect';
 import { Button } from '../../../ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
@@ -95,6 +97,65 @@ const EditableCell = ({ getValue, row, column, table }) => {
   );
 };
 
+const ExpensesTypesCell = ({ cell, getValue, row, column, table }) => {
+  const intl = useIntl();
+  const value = getValue() as ExpenseType[] | null;
+  const setValue = value => table.options.meta.update(row.index, column.id, value);
+  const allExpenseTypes = Object.values(omit(ExpenseType, 'FUNDING_REQUEST'));
+  const getOption = value => {
+    if (value === null) {
+      return { value, label: intl.formatMessage({ defaultMessage: 'None' }) };
+    } else if (isEqual(value, [])) {
+      return { value, label: intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' }) };
+    } else {
+      return { value, label: i18nExpenseType(intl, value) };
+    }
+  };
+
+  // Build options list
+  const options = React.useMemo(() => [null, [], ...allExpenseTypes].map(getOption), [value]);
+
+  // View for accountants
+  if (table.options.meta.disabled) {
+    return (
+      <p>
+        {value === null
+          ? intl.formatMessage({ defaultMessage: 'None' })
+          : isEqual(value, [])
+            ? intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' })
+            : value.map(value => i18nExpenseType(intl, value)).join(', ')}
+      </p>
+    );
+  }
+
+  return (
+    <StyledSelect
+      isMulti
+      minWidth={200}
+      inputId={`${cell.id}-input`}
+      options={options}
+      isClearable={false}
+      value={Array.isArray(value) ? value.map(getOption) : null}
+      placeholder={
+        value === null
+          ? intl.formatMessage({ defaultMessage: 'None' })
+          : intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' })
+      }
+      onChange={options => {
+        const specialOption = options.find(option => option.value === null || isEqual(option.value, []));
+        if (specialOption) {
+          // Selecting "All" or "None"
+          setValue(specialOption.value);
+        } else if (options.length === allExpenseTypes.length) {
+          setValue([]);
+        } else {
+          setValue(options.map(option => option.value).sort());
+        }
+      }}
+    />
+  );
+};
+
 const columns = [
   {
     accessorKey: 'code',
@@ -116,23 +177,8 @@ const columns = [
   },
   {
     accessorKey: 'expensesTypes',
+    cell: ExpensesTypesCell,
     header: () => <FormattedMessage defaultMessage="Expense types" />,
-    cell: ({ getValue }) => {
-      const types = getValue() as ExpenseType[];
-      if (!types) {
-        return null;
-      }
-
-      return (
-        <span className="flex flex-wrap gap-2">
-          {types.map(type => (
-            <span key={type} className="rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-              {type}
-            </span>
-          ))}
-        </span>
-      );
-    },
   },
   {
     accessorKey: 'actions',
@@ -207,7 +253,8 @@ export const AccountingCategoriesTable = ({ hostSlug }: AccountingCategoriesTabl
       onSubmit={async e => {
         e.preventDefault();
         try {
-          const cleanCategories = categories.map(category => pick(category, ['id', 'code', 'name', 'friendlyName']));
+          const editableFields = ['code', 'name', 'friendlyName', 'expensesTypes'];
+          const cleanCategories = categories.map(category => pick(category, ['id', ...editableFields]));
           await editAccountingCategories({ variables: { categories: cleanCategories } });
           toast({ variant: 'success', message: intl.formatMessage({ id: 'saved', defaultMessage: 'Saved' }) });
         } catch (e) {
