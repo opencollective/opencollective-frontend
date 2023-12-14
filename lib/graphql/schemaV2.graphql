@@ -260,6 +260,11 @@ interface Account {
     email: EmailAddress
 
     """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+
+    """
     Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
     """
     accountType: [AccountType]
@@ -892,6 +897,39 @@ enum MemberRole {
 A field whose value conforms to the standard internet email address format as specified in RFC822: https://www.w3.org/Protocols/rfc822/.
 """
 scalar EmailAddress
+
+"""
+Input to order results chronologically
+"""
+input ChronologicalOrderInput {
+  """
+  Field to chronologically order by.
+  """
+  field: DateTimeField! = CREATED_AT
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection! = DESC
+}
+
+"""
+All possible DateTime fields for a resource
+"""
+enum DateTimeField {
+  """
+  The creation time of a resource
+  """
+  CREATED_AT
+}
+
+"""
+Possible directions in which to order a list of items
+"""
+enum OrderDirection {
+  ASC
+  DESC
+}
 
 """
 An invitation to join the members of a collective
@@ -2722,39 +2760,6 @@ type Contributor {
   A public message from contributors to describe their contributions
   """
   publicMessage: String
-}
-
-"""
-Input to order results chronologically
-"""
-input ChronologicalOrderInput {
-  """
-  Field to chronologically order by.
-  """
-  field: DateTimeField! = CREATED_AT
-
-  """
-  Ordering direction.
-  """
-  direction: OrderDirection! = DESC
-}
-
-"""
-All possible DateTime fields for a resource
-"""
-enum DateTimeField {
-  """
-  The creation time of a resource
-  """
-  CREATED_AT
-}
-
-"""
-Possible directions in which to order a list of items
-"""
-enum OrderDirection {
-  ASC
-  DESC
 }
 
 input AccountReferenceInput {

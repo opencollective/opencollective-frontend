@@ -42,6 +42,14 @@ export function gql(source: "\n  query TagStats($host: AccountReferenceInput) {\
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n      mutation FollowAccount($accountSlug: String!) {\n        followAccount(account: { slug: $accountSlug }) {\n          member {\n            id\n          }\n        }\n      }\n    "): typeof import('./graphql').FollowAccountDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n      mutation UnfollowAccount($accountSlug: String!) {\n        unfollowAccount(account: { slug: $accountSlug }) {\n          member {\n            id\n          }\n        }\n      }\n    "): typeof import('./graphql').UnfollowAccountDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query PaypalPlan(\n    $account: AccountReferenceInput!\n    $tier: TierReferenceInput\n    $amount: AmountInput!\n    $frequency: ContributionFrequency!\n  ) {\n    paypalPlan(account: $account, tier: $tier, amount: $amount, frequency: $frequency) {\n      id\n    }\n  }\n"): typeof import('./graphql').PaypalPlanDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
