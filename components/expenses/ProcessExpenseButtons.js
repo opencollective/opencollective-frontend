@@ -328,6 +328,7 @@ const ProcessExpenseButtons = ({
         <ApproveExpenseModal
           expense={expense}
           host={host}
+          account={collective}
           onConfirm={() => triggerAction('APPROVE')}
           onClose={() => {
             setShowApproveExpenseModal(false);

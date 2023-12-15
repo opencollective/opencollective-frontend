@@ -190,6 +190,7 @@ const ExpenseSummary = ({
           <React.Fragment>
             <AccountingCategoryPill
               host={host}
+              account={expense.account}
               expense={expense}
               canEdit={Boolean(expense.permissions?.canEditAccountingCategory)}
               allowNone={!isLoggedInUserExpenseHostAdmin}

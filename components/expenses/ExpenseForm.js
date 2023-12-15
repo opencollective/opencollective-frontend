@@ -752,7 +752,7 @@ const ExpenseFormBody = ({
                       lineHeight="26px"
                       fontWeight="bold"
                     >
-                      <FormattedMessage defaultMessage="Set Expense Category" />
+                      <FormattedMessage defaultMessage="Expense Category" />
                     </Label>
                     <div className="mt-2 flex">
                       <div className="basis-[300px]">
@@ -762,12 +762,15 @@ const ExpenseFormBody = ({
                               <ExpenseCategorySelect
                                 id="ExpenseCategoryInput"
                                 host={host}
+                                account={collective}
                                 selectedCategory={values.accountingCategory}
                                 onChange={value => formik.setFieldValue('accountingCategory', value)}
                                 error={Boolean(meta.error)}
                                 allowNone={!isHostAdmin}
                                 showCode={isHostAdmin}
                                 expenseType={values.type}
+                                expenseValues={values}
+                                predictionStyle="full"
                               />
                               {meta.error && meta.touched && (
                                 <Span color="red.500" fontSize="12px" mt="4px">
