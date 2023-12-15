@@ -17,7 +17,7 @@ import { preloadCollectivePageGraphqlQueries } from '../components/collective-pa
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../components/collective-page/graphql/queries';
 import {
   collectivePageQuery as collectivePageQueryV2,
-  convertCollectivePageToGraphqlV1,
+  convertCollectiveToGraphqlV1,
 } from '../components/collective-page/graphql/v2/queries';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import ErrorPage from '../components/ErrorPage';
@@ -145,7 +145,7 @@ class CollectivePage extends React.Component {
     const { showOnboardingModal } = this.state;
     const collective =
       data?.account || data?.previousData?.account
-        ? convertCollectivePageToGraphqlV1(data?.account || data?.previousData?.account)
+        ? convertCollectiveToGraphqlV1(data?.account || data?.previousData?.account)
         : data?.Collective || data?.previousData?.Collective;
     const loading = data?.loading && !collective;
     if (!loading) {

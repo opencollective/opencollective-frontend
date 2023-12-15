@@ -1,10 +1,12 @@
+import { isNil } from 'lodash';
+
 import { gql } from '../../../../lib/graphql/helpers';
 
 /**
  * Fields fetched for contributors
  */
 const contributorsFieldsFragment = gql`
-  fragment ContributorsFields on Contributor {
+  fragment ContributorsFieldsV2 on Contributor {
     id
     name
     roles
@@ -27,41 +29,10 @@ const contributorsFieldsFragment = gql`
 `;
 
 /**
- * Fields fetched for contributors
- */
-const membersFieldsFragment = gql`
-  fragment MembersFields on Member {
-    id
-    role
-    account {
-      name
-      imageUrl
-    }
-    # name
-    # roles
-    # isAdmin
-    # isCore
-    # isBacker
-    since
-    # image
-    description
-    # collectiveSlug
-    # totalAmountDonated
-    # type
-    publicMessage
-    # isIncognito
-    # TODO
-    # isGuest
-    # tiersIds
-    # collectiveId
-  }
-`;
-
-/**
  * Fields fetched for all possible collective page features
  */
 const collectiveNavbarFieldsFragment = gql`
-  fragment NavbarFields on CollectiveFeatures {
+  fragment NavbarFieldsV2 on CollectiveFeatures {
     id
     ABOUT
     CONNECTED_ACCOUNTS
@@ -85,7 +56,7 @@ const collectiveNavbarFieldsFragment = gql`
 `;
 
 const contributeCardContributorFieldsFragment = gql`
-  fragment ContributeCardContributorFields on Contributor {
+  fragment ContributeCardContributorFieldsV2 on Contributor {
     id
     image(height: 64)
     collectiveSlug
@@ -96,119 +67,176 @@ const contributeCardContributorFieldsFragment = gql`
   }
 `;
 
+/*
+  tier: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    legacyId: PropTypes.number,
+    slug: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    currency: PropTypes.string,
+    useStandalonePage: PropTypes.bool,
+    interval: PropTypes.string,
+    amountType: PropTypes.string,
+    endsAt: PropTypes.string,
+    button: PropTypes.string,
+    goal: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
+    minimumAmount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
+    amount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
+    maxQuantity: PropTypes.number,
+    availableQuantity: PropTypes.number,
+    stats: PropTypes.shape({
+      totalRecurringDonations: PropTypes.number,
+      totalDonated: PropTypes.number,
+      contributors: PropTypes.object,
+      availableQuantity: PropTypes.number,
+    }),
+    contributors: PropTypes.arrayOf(PropTypes.object),
+  }),
+  */
+
 const contributeCardTierFieldsFragment = gql`
-  fragment ContributeCardTierFields on Tier {
+  fragment ContributeCardTierFieldsV2 on Tier {
     id
-    name
+    legacyId
     slug
+    name
     description
+    currency
     useStandalonePage
+    interval # deprecated
+    # frequency
+    amountType
+    endsAt
+    button
     goal {
       value
-      # valueInCents
-      currency
-    }
-    interval
-    # currency
-    amount {
-      value
+      valueInCents
       currency
     }
     minimumAmount {
       value
+      valueInCents
       currency
     }
-    button
-    amountType
-    endsAt
-    type
+    amount {
+      value
+      valueInCents
+      currency
+    }
     maxQuantity
+    availableQuantity
+    type
     stats {
       id
+      totalAmountReceived {
+        valueInCents
+      }
+      recurringAmount {
+        valueInCents
+      }
       # TODO
-      # availableQuantity
-      # totalDonated
       # totalRecurringDonations
+      # totalDonated
       # contributors {
       #   id
       #   all
       #   users
       #   organizations
       # }
+      # availableQuantity
     }
     contributors(limit: $nbContributorsPerContributeCard) {
       nodes {
         id
-        ...ContributeCardContributorFields
+        ...ContributeCardContributorFieldsV2
       }
     }
   }
   ${contributeCardContributorFieldsFragment}
 `;
+
+/*
+events: PropTypes.arrayOf(
+  PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    contributors: PropTypes.arrayOf(PropTypes.object),
+  }),
+),
+event: PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  name: PropTypes.string.isRequired,
+  slug: PropTypes.string.isRequired,
+  backgroundImageUrl: PropTypes.string,
+  startsAt: PropTypes.string,
+  endsAt: PropTypes.string,
+  description: PropTypes.string,
+  contributors: PropTypes.arrayOf(PropTypes.object),
+  stats: PropTypes.shape({
+    backers: PropTypes.object,
+  }).isRequired,
+}),
+*/
 
 const contributeCardEventFieldsFragment = gql`
-  fragment ContributeCardEventFields on Event {
+  fragment ContributeCardEventFieldsV2 on Event {
     id
-    slug
+    legacyId
     name
-    description
-    # image
-    imageUrl
-    isActive
+    slug
+    backgroundImageUrl(height: 208)
     startsAt
     endsAt
-    backgroundImageUrl(height: 208)
-    tiers {
-      nodes {
-        id
-        type
-      }
-    }
+    description
     contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER, ATTENDEE]) {
+      totalCount
       nodes {
         id
-        ...ContributeCardContributorFields
+        ...ContributeCardContributorFieldsV2
       }
     }
-    # stats {
-    #   id
-    #   backers {
-    #     id
-    #     all
-    #     users
-    #     organizations
-    #   }
-    # }
   }
   ${contributeCardContributorFieldsFragment}
 `;
 
+/*
+projects: PropTypes.arrayOf(
+  PropTypes.shape({
+    id: PropTypes.number,
+    isActive: PropTypes.bool,
+    contributors: PropTypes.arrayOf(PropTypes.object),
+  }),
+),
+project: PropTypes.shape({
+  name: PropTypes.string.isRequired,
+  slug: PropTypes.string.isRequired,
+  description: PropTypes.string,
+  backgroundImageUrl: PropTypes.string,
+  contributors: PropTypes.arrayOf(PropTypes.object),
+  stats: PropTypes.shape({
+    backers: PropTypes.object,
+  }).isRequired,
+  isArchived: PropTypes.bool,
+}),
+*/
+
 const contributeCardProjectFieldsFragment = gql`
-  fragment ContributeCardProjectFields on Project {
+  fragment ContributeCardProjectFieldsV2 on Project {
     id
-    slug
+    legacyId
     name
+    slug
     description
-    # image
-    imageUrl
-    isActive
-    isArchived
     backgroundImageUrl(height: 208)
     contributors(limit: $nbContributorsPerContributeCard, roles: [BACKER]) {
+      totalCount
       nodes {
         id
-        ...ContributeCardContributorFields
+        ...ContributeCardContributorFieldsV2
       }
     }
-    # stats {
-    #   id
-    #   backers {
-    #     id
-    #     all
-    #     users
-    #     organizations
-    #   }
-    # }
+    isArchived
+    isActive
   }
   ${contributeCardContributorFieldsFragment}
 `;
@@ -217,6 +245,7 @@ export const collectivePageQuery = gql`
   query CollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     account(slug: $slug, throwIfMissing: false) {
       id
+      legacyId
       slug
       name
       description
@@ -248,62 +277,31 @@ export const collectivePageQuery = gql`
         }
       }
 
-      # image
       imageUrl(height: 256)
 
-      # canContact
-      supportedExpenseTypes
       features {
         id
-        ...NavbarFields
+        ...NavbarFieldsV2
       }
-      # ordersFromCollective: orders(filter: OUTGOING, onlySubscriptions: true) {
-      #   id
-      #   isSubscriptionActive
-      # }
-
-      # memberOf(onlyActiveCollectives: true, limit: 1) {
-      #   id
-      # }
 
       stats {
         id
         balance {
-          value
-          currency
-        }
-        balanceWithBlockedFunds: balance(withBlockedFunds: true) {
-          value
-          currency
+          valueInCents
         }
         yearlyBudget {
-          value
-          currency
+          valueInCents
         }
-        # updates
-        activeRecurringContributions
-        totalAmountReceived(periodInMonths: 12) {
-          value
-          currency
+      }
+
+      memberOf(limit: 1) {
+        nodes {
+          id
         }
-        totalAmountRaised: totalAmountReceived {
-          value
-          currency
-        }
-        totalNetAmountRaised: totalAmountReceived(net: true) {
-          value
-          currency
-        }
-        # backers {
-        #   id
-        #   all
-        #   users
-        #   organizations
-        # }
-        # transactions {
-        #   id
-        #   all
-        # }
+      }
+
+      updates(limit: 0) {
+        totalCount
       }
 
       connectedTo: memberOf(role: CONNECTED_ACCOUNT, limit: 1) {
@@ -318,27 +316,17 @@ export const collectivePageQuery = gql`
         }
       }
 
-      coreContributors: members(role: [ADMIN, MEMBER]) {
-        nodes {
-          id
-          # ...ContributorsFields
-          ...MembersFields
-        }
-      }
-
-      # events(includePastEvents: true, includeInactive: true) {
-
       events: childrenAccounts(accountType: EVENT) {
         nodes {
           id
-          ...ContributeCardEventFields
+          ...ContributeCardEventFieldsV2
         }
       }
 
       projects: childrenAccounts(accountType: PROJECT) {
         nodes {
           id
-          ...ContributeCardProjectFields
+          ...ContributeCardProjectFieldsV2
         }
       }
 
@@ -351,26 +339,25 @@ export const collectivePageQuery = gql`
       connectedCollectives: members(role: CONNECTED_ACCOUNT) {
         nodes {
           id
-          collective: account {
+          account {
             id
+            legacyId
             slug
             name
             type
             description
             backgroundImageUrl(height: 208)
-            stats {
-              id
-              # backers {
-              #   id
-              #   all
-              #   users
-              #   organizations
-              # }
+
+            ... on AccountWithContributions {
+              allBackers: totalFinancialContributors
+
+              contributors(limit: $nbContributorsPerContributeCard) {
+                nodes {
+                  id
+                  ...ContributeCardContributorFieldsV2
+                }
+              }
             }
-            # contributors(limit: $nbContributorsPerContributeCard) {
-            #   id
-            #   ...ContributeCardContributorFields
-            # }
           }
         }
       }
@@ -379,16 +366,26 @@ export const collectivePageQuery = gql`
         tiers {
           nodes {
             id
-            ...ContributeCardTierFields
+            ...ContributeCardTierFieldsV2
           }
         }
 
         financialContributors: contributors(roles: [BACKER], limit: 150) {
+          totalCount
           nodes {
             id
-            ...ContributorsFields
+            ...ContributorsFieldsV2
           }
         }
+
+        coreContributors: contributors(roles: [ADMIN, MEMBER], limit: 99) {
+          nodes {
+            id
+            ...ContributorsFieldsV2
+          }
+        }
+
+        allBackers: totalFinancialContributors
       }
 
       ... on AccountWithParent {
@@ -396,15 +393,18 @@ export const collectivePageQuery = gql`
           id
           name
           slug
-          # image
+          type
           imageUrl
           backgroundImageUrl
           twitterHandle
-          type
-          # coreContributors: contributors(roles: [ADMIN, MEMBER]) {
-          #   id
-          #   ...ContributorsFields
-          # }
+          ... on AccountWithContributions {
+            coreContributors: contributors(roles: [ADMIN, MEMBER], limit: 99) {
+              nodes {
+                id
+                ...ContributorsFieldsV2
+              }
+            }
+          }
         }
       }
 
@@ -439,14 +439,12 @@ export const collectivePageQuery = gql`
 
       ... on Individual {
         isGuest
+        # TODO
         # company
       }
 
       ... on Host {
-        plan {
-          id
-          hostedCollectives
-        }
+        hostFeePercent
         canApply: isOpenToApplications
       }
 
@@ -462,53 +460,62 @@ export const collectivePageQuery = gql`
           lat
           long
         }
-        # privateInstructions
-        # orders {
-        #   nodes {
-        #     id
-        #     createdAt
-        #     quantity
-        #     publicMessage
-        #     fromCollective {
-        #       id
-        #       type
-        #       name
-        #       company
-        #       image
-        #       isIncognito
-        #       imageUrl
-        #       slug
-        #       twitterHandle
-        #       description
-        #       ... on User {
-        #         email
-        #       }
-        #     }
-        #     tier {
-        #       id
-        #       name
-        #       type
-        #     }
-        #   }
-        # }
+        orders {
+          nodes {
+            id
+            createdAt
+            fromAccount {
+              id
+              legacyId
+              name
+              type
+              imageUrl
+              isIncognito
+              description
+            }
+            tier {
+              id
+              name
+            }
+          }
+        }
       }
     }
   }
 
   ${contributorsFieldsFragment}
-  ${membersFieldsFragment}
   ${collectiveNavbarFieldsFragment}
   ${contributeCardTierFieldsFragment}
   ${contributeCardEventFieldsFragment}
   ${contributeCardProjectFieldsFragment}
 `;
 
-export const convertCollectivePageToGraphqlV1 = account => {
+export const convertCollectiveToGraphqlV1 = account => {
   const collective = { ...account };
 
-  collective.parentCollective = collective.parent;
+  collective.id = collective.legacyId;
 
-  // GraphQL V2 nodes
+  if (collective.parent) {
+    collective.parentCollective = convertCollectiveToGraphqlV1(collective.parent);
+  }
+
+  collective.stats = { ...(collective.stats || {}) };
+  const allBackers = collective.allBackers ?? collective.contributors?.totalCount;
+  if (!isNil(allBackers)) {
+    collective.stats = { ...collective.stats, backers: { all: allBackers } };
+  }
+
+  collective.stats.balance = collective.stats.balance?.valueInCents;
+  collective.stats.yearlyBudget = collective.stats.yearlyBudget?.valueInCents;
+
+  if (collective.updates) {
+    collective.stats.updates = collective.updates.totalCount;
+    delete collective.updates;
+  }
+
+  collective.canContact = collective.permissions?.contact?.allowed || false;
+
+  collective.contributors = collective.contributors?.nodes || [];
   collective.coreContributors = collective.coreContributors?.nodes || [];
   collective.financialContributors = collective.financialContributors?.nodes || [];
   collective.tiers = collective.tiers?.nodes || [];
@@ -517,11 +524,54 @@ export const convertCollectivePageToGraphqlV1 = account => {
   collective.connectedTo = collective.connectedTo?.nodes || [];
   collective.admins = collective.admins?.nodes || [];
   collective.connectedCollectives = collective.connectedCollectives?.nodes || [];
+  collective.orders = collective.orders?.nodes || [];
+  collective.memberOf = collective.memberOf?.nodes || [];
 
-  // Old stats
-  collective.stats = { backers: { all: 0, users: 0, organizations: 0 } };
+  collective.tiers = collective.tiers.map(tier => {
+    const tierData = { ...tier };
+    tierData.id = tierData.legacyId;
+    tierData.currency = tierData.amount.currency;
+    tierData.amount = tierData.amount?.valueInCents;
+    tierData.minimumAmount = tierData.minimumAmount?.valueInCents;
+    tierData.contributors = tierData.contributors?.nodes || [];
+    tierData.totalDonated = tierData.totalAmountReceived?.valueInCents;
+    tierData.totalRecurringDonations = tierData.recurringAmount?.valueInCents;
+    return tierData;
+  });
 
-  collective.canContact = collective.permissions?.contact?.allowed || false;
+  collective.events = collective.events.map(event => {
+    return convertCollectiveToGraphqlV1(event);
+    // const eventData = { ...event };
+    // eventData.id = eventData.legacyId;
+    // eventData.stats = { backers: { all: eventData.contributors.totalCount } };
+    // eventData.contributors = eventData.contributors?.nodes || [];
+    // eventData.orders = eventData.orders?.nodes || [];
+    // return eventData;
+  });
+
+  collective.projects = collective.projects.map(project => {
+    return convertCollectiveToGraphqlV1(project);
+    // const projectData = { ...project };
+    // projectData.id = projectData.legacyId;
+    // projectData.stats = { backers: { all: projectData.contributors.totalCount } };
+    // projectData.contributors = projectData.contributors?.nodes || [];
+    // return projectData;
+  });
+
+  collective.coreContributors = collective.coreContributors.map(contributor => {
+    const contributorData = { ...contributor };
+    return contributorData;
+  });
+
+  collective.orders = collective.orders.map(order => {
+    return { ...order, fromCollective: { ...order.fromAccount, id: order.fromAccount.legacyId } };
+  });
+
+  collective.connectedCollectives = collective.connectedCollectives.map(cc => {
+    const ccData = { ...cc };
+    ccData.collective = convertCollectiveToGraphqlV1(ccData.account);
+    return ccData;
+  });
 
   return collective;
 };
