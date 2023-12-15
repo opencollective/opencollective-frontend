@@ -437,6 +437,7 @@ const ExpenseItemForm = ({
                           {...field}
                           py="7px"
                           width="100%"
+                          minHeight="39px"
                           value={typeof field.value === 'string' ? field.value.split('T')[0] : field.value}
                         />
                       </WithOCRComparisonWarning>
@@ -570,8 +571,6 @@ const ExpenseItemForm = ({
 
 ExpenseItemForm.propTypes = {
   collective: PropTypes.object,
-  /** ReactHookForm key */
-  name: PropTypes.string.isRequired,
   /** Called when clicking on remove */
   onRemove: PropTypes.func,
   /** A map of errors for this object */
