@@ -38,6 +38,7 @@ export function DataTable<TData, TValue>({
   rowHasIndicator,
   footer,
   tableRef,
+  compact,
   ...tableProps
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
@@ -73,7 +74,7 @@ export function DataTable<TData, TValue>({
             <TableRow key={rowIdx}>
               {table.getAllFlatColumns().map(column => (
                 // eslint-disable-next-line react/no-array-index-key
-                <TableCell key={column.id} fullWidth={tableProps.fullWidth} compact={tableProps.compact}>
+                <TableCell key={column.id} fullWidth={tableProps.fullWidth} compact={compact}>
                   <div className="w-1/2">
                     <Skeleton className="h-4 rounded-lg" />
                   </div>
@@ -102,7 +103,7 @@ export function DataTable<TData, TValue>({
                     key={cell.id}
                     className={columnMeta['className']}
                     fullWidth={tableProps.fullWidth}
-                    compact={tableProps.compact}
+                    compact={compact}
                     {...(rowHasIndicator && {
                       withIndicator: true,
                       'data-state': rowHasIndicator(row) && 'indicated',
@@ -116,7 +117,7 @@ export function DataTable<TData, TValue>({
           ))
         ) : (
           <TableRow highlightOnHover={false}>
-            <TableCell colSpan={columns.length} compact={tableProps.compact}>
+            <TableCell colSpan={columns.length} compact={compact}>
               <p className="p-4 text-center text-slate-500">
                 {emptyMessage ? emptyMessage() : <FormattedMessage defaultMessage="No data" />}
               </p>
