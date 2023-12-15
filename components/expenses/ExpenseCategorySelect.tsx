@@ -117,6 +117,17 @@ const getCategoryLabel = (
   );
 };
 
+/**
+ * Returns true if the category is supported for the given expense type. Host admins can select any category.
+ */
+export const isSupportedExpenseCategory = (
+  expenseType: ExpenseType,
+  category: AccountingCategory,
+  isHostAdmin: boolean,
+) => {
+  return isHostAdmin || !category?.expensesTypes || category.expensesTypes.includes(expenseType);
+};
+
 const getOptions = (
   intl: IntlShape,
   host: Host,
@@ -127,15 +138,13 @@ const getOptions = (
   accountAdminCategory: AccountingCategory | null,
   isHostAdmin: boolean,
 ): OptionsMap => {
-  const allHostCategories = [...get(host, 'accountingCategories.nodes', [])];
+  const categories = [...get(host, 'accountingCategories.nodes', [])];
   const categoriesById: OptionsMap = {};
 
   // Show all categories to host admins, but only the ones that match the expense type to other users
-  if (!isHostAdmin) {
-    remove(allHostCategories, category => category.expensesTypes && !category.expensesTypes.includes(expenseType));
-  }
+  remove(categories, category => !isSupportedExpenseCategory(expenseType, category, isHostAdmin));
 
-  allHostCategories.forEach(category => {
+  categories.forEach(category => {
     categoriesById[category.id] = {
       value: category,
       label: getCategoryLabel(intl, category, showCode, submitterCategory, accountAdminCategory),

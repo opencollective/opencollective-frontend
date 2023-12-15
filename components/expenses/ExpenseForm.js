@@ -41,7 +41,7 @@ import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
-import ExpenseCategorySelect from './ExpenseCategorySelect';
+import ExpenseCategorySelect, { isSupportedExpenseCategory } from './ExpenseCategorySelect';
 import ExpenseFormItems from './ExpenseFormItems';
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
@@ -410,6 +410,11 @@ const ExpenseFormBody = ({
       if (values.taxes?.length && !values.taxes[0].isDisabled && values.type !== expenseTypes.INVOICE) {
         formik.setFieldValue('taxes', [{ ...values.taxes[0], isDisabled: true }]);
       }
+    }
+
+    // Reset the accounting category (if not supported by the new expense type)
+    if (values.accountingCategory && !isSupportedExpenseCategory(values.type, values.accountingCategory, isHostAdmin)) {
+      formik.setFieldValue('accountingCategory', undefined);
     }
   }, [values.type]);
 
