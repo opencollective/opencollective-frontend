@@ -1,3 +1,4 @@
+// This is the "legacy" version of the transactions page in Dashboard, will likely be replaced by the new version in /components/dashboard/sections/transactions
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { uniq } from 'lodash';

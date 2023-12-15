@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { Skeleton } from './ui/Skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/Table';
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -13,11 +14,15 @@ interface DataTableProps<TData, TValue> {
   emptyMessage?: () => React.ReactNode;
   nbPlaceholders?: number;
   onClickRow?: (row: Row<TData>) => void;
+  onHoverRow?: (row: Row<TData>) => void;
+  rowHasIndicator?: (row: Row<TData>) => boolean;
   className?: string;
   innerClassName?: string;
   mobileTableView?: boolean;
+  fullWidth?: boolean;
   footer?: React.ReactNode;
   tableRef?: React.Ref<HTMLTableElement>;
+  compact?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -29,6 +34,8 @@ export function DataTable<TData, TValue>({
   hideHeader,
   nbPlaceholders = 10,
   onClickRow,
+  onHoverRow,
+  rowHasIndicator,
   footer,
   tableRef,
   ...tableProps
@@ -43,13 +50,13 @@ export function DataTable<TData, TValue>({
   return (
     <Table {...tableProps} ref={tableRef}>
       {!hideHeader && (
-        <TableHeader>
+        <TableHeader className="relative">
           {table.getHeaderGroups().map(headerGroup => (
             <TableRow key={headerGroup.id} highlightOnHover={false}>
               {headerGroup.headers.map(header => {
                 const columnMeta = header.column.columnDef.meta || {};
                 return (
-                  <TableHead key={header.id} className={columnMeta['className']}>
+                  <TableHead key={header.id} className={columnMeta['className']} fullWidth={tableProps.fullWidth}>
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 );
@@ -66,7 +73,7 @@ export function DataTable<TData, TValue>({
             <TableRow key={rowIdx}>
               {table.getAllFlatColumns().map(column => (
                 // eslint-disable-next-line react/no-array-index-key
-                <TableCell key={column.id}>
+                <TableCell key={column.id} fullWidth={tableProps.fullWidth} compact={tableProps.compact}>
                   <div className="w-1/2">
                     <Skeleton className="h-4 rounded-lg" />
                   </div>
@@ -83,11 +90,24 @@ export function DataTable<TData, TValue>({
                 onClick: () => onClickRow(row),
                 className: 'cursor-pointer',
               })}
+              {...(onHoverRow && {
+                onMouseEnter: () => onHoverRow(row),
+                onMouseLeave: () => onHoverRow(null),
+              })}
             >
               {row.getVisibleCells().map(cell => {
                 const columnMeta = cell.column.columnDef.meta || {};
                 return (
-                  <TableCell key={cell.id} className={columnMeta['className']}>
+                  <TableCell
+                    key={cell.id}
+                    className={columnMeta['className']}
+                    fullWidth={tableProps.fullWidth}
+                    compact={tableProps.compact}
+                    {...(rowHasIndicator && {
+                      withIndicator: true,
+                      'data-state': rowHasIndicator(row) && 'indicated',
+                    })}
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 );
@@ -96,7 +116,7 @@ export function DataTable<TData, TValue>({
           ))
         ) : (
           <TableRow highlightOnHover={false}>
-            <TableCell colSpan={columns.length}>
+            <TableCell colSpan={columns.length} compact={tableProps.compact}>
               <p className="p-4 text-center text-slate-500">
                 {emptyMessage ? emptyMessage() : <FormattedMessage defaultMessage="No data" />}
               </p>

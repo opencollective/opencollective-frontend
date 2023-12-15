@@ -131,32 +131,36 @@ const ExportTransactionsCSVModal = ({
       if (queryFilter.values.account) {
         url.searchParams.set('account', queryFilter.values.account);
       }
-    } else {
-      url.searchParams.set('includeGiftCardTransactions', '1');
-      url.searchParams.set('includeIncognitoTransactions', '1');
-      url.searchParams.set('includeChildrenTransactions', '1');
-
-      if (queryFilter.values.kind) {
-        url.searchParams.set('kind', queryFilter.values.kind.join(','));
-      }
-
-      if (queryFilter.values.amount) {
-        const toAmountStr = ({ gte, lte }) => (lte ? `${gte}-${lte}` : `${gte}+`);
-        url.searchParams.set('amount', toAmountStr(queryFilter.values.amount));
-      }
-
-      if (queryFilter.values.paymentMethodType) {
-        url.searchParams.set('paymentMethodType', queryFilter.values.paymentMethodType.join(','));
-      }
-
-      if (queryFilter.values.type) {
-        url.searchParams.set('type', queryFilter.values.type);
-      }
-
-      if (queryFilter.values.searchTerm) {
-        url.searchParams.set('searchTerm', queryFilter.values.searchTerm);
+      if (queryFilter.values.excludeHost) {
+        url.searchParams.set('includeHost', '0');
       }
     }
+
+    url.searchParams.set('includeGiftCardTransactions', '1');
+    url.searchParams.set('includeIncognitoTransactions', '1');
+    url.searchParams.set('includeChildrenTransactions', '1');
+
+    if (queryFilter.values.kind) {
+      url.searchParams.set('kind', queryFilter.values.kind.join(','));
+    }
+
+    if (queryFilter.values.amount) {
+      const toAmountStr = ({ gte, lte }) => (lte ? `${gte}-${lte}` : `${gte}+`);
+      url.searchParams.set('amount', toAmountStr(queryFilter.values.amount));
+    }
+
+    if (queryFilter.values.paymentMethodType) {
+      url.searchParams.set('paymentMethodType', queryFilter.values.paymentMethodType.join(','));
+    }
+
+    if (queryFilter.values.type) {
+      url.searchParams.set('type', queryFilter.values.type);
+    }
+
+    if (queryFilter.values.searchTerm) {
+      url.searchParams.set('searchTerm', queryFilter.values.searchTerm);
+    }
+
     if (queryFilter.values.date) {
       if (queryFilter.variables.dateFrom) {
         url.searchParams.set('dateFrom', queryFilter.variables.dateFrom);
