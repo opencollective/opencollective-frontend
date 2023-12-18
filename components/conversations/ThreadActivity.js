@@ -138,6 +138,14 @@ const ACTIVITIES_INFO = {
       id: 'Expense.Activity.Processing',
       defaultMessage: 'Expense processing',
     }),
+    renderDetails: ({ estimatedDelivery, reference }) =>
+      estimatedDelivery &&
+      reference && (
+        <FormattedMessage
+          defaultMessage="Estimated delivery: {estimatedDelivery, date, medium} {estimatedDelivery, time, short}. Reference: {reference}."
+          values={{ estimatedDelivery: new Date(estimatedDelivery), reference }}
+        />
+      ),
   },
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT: {
     type: 'info',
@@ -230,7 +238,10 @@ const ThreadActivity = ({ activity }) => {
   const theme = useTheme();
   const activityColors = getActivityColors(activity.type, theme);
   const message = ACTIVITIES_INFO[activity.type]?.message;
-  const details = activity.data?.message || activity.data?.error?.message;
+  const details =
+    ACTIVITIES_INFO[activity.type]?.renderDetails?.(activity?.data) ||
+    activity.data?.message ||
+    activity.data?.error?.message;
   const DataRenderer = ACTIVITIES_INFO[activity.type]?.DataRenderer;
 
   return (
