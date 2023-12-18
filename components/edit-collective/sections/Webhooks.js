@@ -9,6 +9,7 @@ import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { isURL } from 'validator';
 
+import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { WebhookEvents, WebhookEventsList } from '../../../lib/constants/notificationEvents';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
@@ -70,39 +71,57 @@ class Webhooks extends React.Component {
     return value ? value.trim().replace(/https?:\/\//, '') : '';
   };
 
-  getEventTypes = memoizeOne((collectiveType, isHost) => {
+  getEventTypes = memoizeOne(collective => {
     const removeList = [];
 
-    if (collectiveType !== CollectiveType.COLLECTIVE) {
+    // Features
+    const canReceiveExpenses = isFeatureEnabled(collective, FEATURES.RECEIVE_EXPENSES);
+    const canReceiveContributions = isFeatureEnabled(collective, FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS);
+    const canUseVirtualCards = isFeatureEnabled(collective, FEATURES.VIRTUAL_CARDS);
+    const canUseUpdates = isFeatureEnabled(collective, FEATURES.UPDATES);
+
+    if (!canReceiveExpenses) {
       removeList.push(
-        'collective.comment.created',
+        'collective.expense.created',
         'collective.expense.deleted',
         'collective.expense.updated',
         'collective.expense.rejected',
         'collective.expense.approved',
         'collective.expense.paid',
-        'collective.monthly',
-        'collective.transaction.paid',
-        'virtualcard.purchase',
       );
     }
-    if (collectiveType !== CollectiveType.ORGANIZATION) {
-      removeList.push('organization.collective.created', 'user.created');
+    if (!canReceiveContributions) {
+      removeList.push('collective.member.created', 'subscription.canceled');
     }
-    if (collectiveType !== CollectiveType.EVENT) {
-      removeList.push('ticket.confirmed');
+    if (!canUseVirtualCards) {
+      removeList.push('virtualcard.purchase');
     }
-    if (!isHost) {
-      removeList.push('collective.apply', 'collective.approved', 'collective.created');
+    if (!canUseUpdates) {
+      removeList.push('collective.update.created', 'collective.update.published');
+    }
+    if (!canReceiveExpenses && !canReceiveContributions && !canUseUpdates) {
+      removeList.push('collective.comment.created');
     }
 
-    if ([CollectiveType.USER, CollectiveType.ORGANIZATION].includes(collectiveType) && !isHost) {
-      removeList.push(
-        'collective.update.created',
-        'collective.update.published',
-        'collective.expense.created',
-        'collective.transaction.created',
-      );
+    // Collective type
+    if (collective.type !== CollectiveType.COLLECTIVE) {
+      removeList.push('collective.monthly');
+    }
+    if (collective.type !== CollectiveType.ORGANIZATION) {
+      removeList.push('organization.collective.created', 'user.created');
+    }
+    if (collective.type === CollectiveType.EVENT) {
+      removeList.push('subscription.canceled'); // No recurring contributions for events
+    } else {
+      removeList.push('ticket.confirmed');
+    }
+
+    // Host
+    if (!collective.isHost) {
+      removeList.push('collective.apply', 'collective.approved', 'collective.created');
+    }
+    if ([CollectiveType.USER, CollectiveType.ORGANIZATION].includes(collective.type) && !collective.isHost) {
+      removeList.push('collective.transaction.created');
     }
 
     return difference(WebhookEventsList, removeList);
@@ -207,7 +226,7 @@ class Webhooks extends React.Component {
                 minWidth={300}
                 isSearchable={false}
                 inputId="event-type-select"
-                options={this.getEventTypes(data.Collective.type, data.Collective.isHost).map(eventType => ({
+                options={this.getEventTypes(data.Collective).map(eventType => ({
                   label: i18nWebhookEventType(intl, eventType),
                   value: eventType,
                 }))}
@@ -339,6 +358,12 @@ const editCollectiveWebhooksQuery = gqlV1/* GraphQL */ `
       type
       slug
       isHost
+      features {
+        RECEIVE_EXPENSES
+        VIRTUAL_CARDS
+        RECEIVE_FINANCIAL_CONTRIBUTIONS
+        UPDATES
+      }
       notifications(channel: "webhook") {
         id
         type
