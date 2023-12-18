@@ -7,7 +7,7 @@ import { FEATURES, isFeatureEnabled } from '../lib/allowed-features';
 import { convertDateToApiUtc } from '../lib/date-utils';
 import dayjs from '../lib/dayjs';
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
+import { addCreateCollectiveMutation } from '../lib/graphql/v1/mutations';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import Footer from './navigation/Footer';

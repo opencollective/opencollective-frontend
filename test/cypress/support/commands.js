@@ -1,5 +1,5 @@
 import { API_V2_CONTEXT, fakeTag as gql, fakeTag as gqlV1 } from '../../../lib/graphql/helpers';
-import { loggedInUserQuery } from '../../../lib/graphql/queries';
+import { loggedInUserQuery } from '../../../lib/graphql/v1/queries';
 
 import { CreditCards } from '../../stripe-helpers';
 

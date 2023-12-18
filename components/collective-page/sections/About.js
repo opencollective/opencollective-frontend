@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
+import { editCollectiveLongDescriptionMutation } from '../../../lib/graphql/v1/mutations';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
@@ -14,7 +15,6 @@ import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
-import { editCollectiveLongDescriptionMutation } from '../graphql/mutations';
 
 // Dynamically load RichTextEditor to download it only if user can edit the page
 const RichTextEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;

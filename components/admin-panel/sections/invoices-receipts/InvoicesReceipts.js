@@ -7,8 +7,8 @@ import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
+import { editCollectiveSettingsMutation } from '../../../../lib/graphql/v1/mutations';
 
-import { editCollectiveSettingsMutation } from '../../../collective-page/graphql/mutations';
 import Container from '../../../Container';
 import SettingsSectionTitle from '../../../edit-collective/sections/SettingsSectionTitle';
 import { Box, Flex } from '../../../Grid';

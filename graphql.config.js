@@ -18,7 +18,7 @@ module.exports = {
       schema: 'lib/graphql/schema.graphql',
       documents: [
         // The following documents only use gqlV1
-        //  grep -rl " gqlV1/" ./components ./lib ./pages | xargs grep -rL "gql\`" | sort
+        // grep -rl " gqlV1/" ./components ./lib ./pages | xargs grep -rL "gql\`" | sort
         'components/CollectivePickerAsync.js',
         'components/CreateCollectiveMiniForm.tsx',
         'components/CreateGiftCardsForm.js',
@@ -34,15 +34,15 @@ module.exports = {
         'components/edit-collective/EditUserEmailForm.js',
         'components/edit-collective/actions/Archive.js',
         'components/edit-collective/actions/Delete.js',
-        'components/edit-collective/sections/CollectiveGoals.js',
         'components/edit-collective/sections/FiscalHosting.js',
         'components/edit-collective/sections/GiftCards.js',
         'components/edit-collective/sections/PaymentReceipts.js',
-        'components/edit-collective/sections/SendingMoney.js',
         'components/edit-collective/sections/Webhooks.js',
         'components/tier-page/graphql/queries.js',
         'components/tier-page/index.js',
-        'lib/graphql/mutations.js',
+        'lib/graphql/v1/fragments.js',
+        'lib/graphql/v1/mutations.js',
+        'lib/graphql/v1/queries.js',
         'pages/confirmEmail.js',
         'pages/contribute.js',
         'pages/redeem.js',
@@ -50,20 +50,7 @@ module.exports = {
         'pages/updatePaymentMethod.js',
         // The following documents use gql and gqlV1 at the same time, gqlV1 will not be linted
         // grep -rl " gqlV1/" ./components ./lib ./pages | xargs grep -rl "gql\`" | sort
-        // TODO: move gqlV1 queries and mutations to a dedicated file
-        // components/EditTagsModal.tsx
-        // components/SendMoneyToCollectiveBtn.js
-        // components/changelog/ChangelogTrigger.js
-        // components/collective-page/graphql/mutations.js
-        // components/edit-collective/mutations.js
-        // components/edit-collective/sections/EditCollectivePage.js
-        // components/edit-collective/sections/PaymentMethods.js
-        // components/edit-collective/sections/Policies.js
-        // components/expenses/ExpenseFormPayeeStep.js
-        // components/onboarding-modal/OnboardingModal.js
-        // components/root-actions/UnhostAccountForm.js
-        // lib/graphql/queries.js
-        // pages/banner-iframe.js
+        // No file anymore and it should stay like that!
       ],
       extensions: {
         endpoints: {

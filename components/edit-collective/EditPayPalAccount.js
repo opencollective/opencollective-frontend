@@ -6,7 +6,7 @@ import { trim } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { editCollectivePageQuery } from '../../lib/graphql/queries';
+import { editCollectivePageQuery } from '../../lib/graphql/v1/queries';
 
 import { getI18nLink, I18nSignInLink } from '../I18nFormatters';
 import StyledButton from '../StyledButton';

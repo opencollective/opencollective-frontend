@@ -15,7 +15,8 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT, gql, gqlV1 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { expenseFormPayeeStepCollectivePickerSearchQuery } from '../../lib/graphql/v1/queries';
 import { require2FAForAdmins } from '../../lib/policies';
 import { flattenObjectDeep } from '../../lib/utils';
 import { checkRequiresAddress } from './lib/utils';
@@ -189,65 +190,6 @@ const getPayeeOptions = (intl, payoutProfiles) => {
   return payeeOptions;
 };
 
-const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
-  query CollectivePickerSearch(
-    $term: String!
-    $types: [TypeOfCollective]
-    $limit: Int
-    $hostCollectiveIds: [Int]
-    $parentCollectiveIds: [Int]
-    $skipGuests: Boolean
-    $includeArchived: Boolean
-    $includeVendorsForHostId: Int
-  ) {
-    search(
-      term: $term
-      types: $types
-      limit: $limit
-      hostCollectiveIds: $hostCollectiveIds
-      parentCollectiveIds: $parentCollectiveIds
-      skipGuests: $skipGuests
-      includeArchived: $includeArchived
-      includeVendorsForHostId: $includeVendorsForHostId
-    ) {
-      id
-      collectives {
-        id
-        type
-        slug
-        name
-        currency
-        location {
-          id
-          address
-          country
-        }
-        imageUrl(height: 64)
-        hostFeePercent
-        isActive
-        isArchived
-        isHost
-        payoutMethods {
-          legacyId: id
-          type
-          name
-          data
-          isSaved
-        }
-        ... on User {
-          isTwoFactorAuthEnabled
-        }
-        ... on Organization {
-          isTrustedHost
-        }
-        ... on Vendor {
-          hasPayoutMethod
-        }
-      }
-    }
-  }
-`;
-
 const expenseFormPayeeStepQuery = gql`
   query ExpenseFormPayee($collectiveSlug: String!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
@@ -386,7 +328,7 @@ const ExpenseFormPayeeStep = ({
           includeVendorsForHostId={collective.host?.legacyId || undefined}
           addLoggedInUserAsAdmin
           excludeAdminFields
-          searchQuery={collectivePickerSearchQuery}
+          searchQuery={expenseFormPayeeStepCollectivePickerSearchQuery}
           filterResults={collectives => collectives.filter(c => c.type !== CollectiveType.VENDOR || c.hasPayoutMethod)}
           loading={loading}
         />

@@ -8,8 +8,8 @@ import { FormattedMessage } from 'react-intl';
 import { defaultBackgroundImage } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { editCollectiveMutation } from '../../../lib/graphql/mutations';
-import { editCollectivePageQuery } from '../../../lib/graphql/queries';
+import { editCollectivePageMutation } from '../../../lib/graphql/v1/mutations';
+import { editCollectivePageQuery } from '../../../lib/graphql/v1/queries';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import SettingsForm from '../../edit-collective/Form';
@@ -30,7 +30,7 @@ const AccountSettings = ({ account, section }) => {
     skip: !LoggedInUser,
   });
   const collective = data?.Collective;
-  const [editCollective] = useMutation(editCollectiveMutation);
+  const [editCollective] = useMutation(editCollectivePageMutation);
 
   const handleEditCollective = async updatedCollective => {
     const collective = { ...updatedCollective };

@@ -4,8 +4,9 @@ import { Form, Formik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gql, gqlV1 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { Collective } from '../lib/graphql/types/v2/graphql';
+import { editTagsMutation } from '../lib/graphql/v1/mutations';
 
 import { toast } from './ui/useToast';
 import CollectiveTagsInput from './CollectiveTagsInput';
@@ -14,15 +15,6 @@ import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledInputFormikField from './StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
-
-const editTagsMutation = gqlV1/* GraphQL */ `
-  mutation EditTags($collective: CollectiveInputType!) {
-    editCollective(collective: $collective) {
-      id
-      tags
-    }
-  }
-`;
 
 const tagStatsQuery = gql`
   query TagStats($host: AccountReferenceInput) {

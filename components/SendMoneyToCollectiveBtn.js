@@ -5,7 +5,8 @@ import { get, pick } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { formatCurrency } from '../lib/currency-utils';
-import { API_V2_CONTEXT, gql, gqlV1 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { collectiveBalanceFragment } from '../lib/graphql/v1/fragments';
 import { compose } from '../lib/utils';
 
 import { toast } from './ui/useToast';
@@ -165,13 +166,6 @@ const addPaymentMethodsData = graphql(paymentMethodsQuery, {
     return !props.LoggedInUser;
   },
 });
-
-const collectiveBalanceFragment = gqlV1/* GraphQL */ `
-  fragment StatFieldsFragment on CollectiveStatsType {
-    id
-    balance
-  }
-`;
 
 const sendMoneyToCollectiveMutation = gql`
   mutation SendMoneyToCollective($order: OrderCreateInput!) {
