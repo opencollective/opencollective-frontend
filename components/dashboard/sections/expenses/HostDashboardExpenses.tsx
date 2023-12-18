@@ -270,7 +270,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             expenses={paginatedExpenses.nodes}
             view="admin"
             onProcess={(expense, cache) => {
-              queryFilter.hasFilters && onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData });
+              onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData });
             }}
             useDrawer
             openExpenseLegacyId={Number(router.query.openExpenseId)}
