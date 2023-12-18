@@ -91,7 +91,7 @@ const validateRequiredInput = (intl, input, required) =>
 const Input = ({ input, getFieldName, disabled, currency, loading, refetch, formik, host }) => {
   const intl = useIntl();
   const isAccountHolderName = input.key === 'accountHolderName';
-  const fieldName = isAccountHolderName ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
+  const fieldName = isAccountHolderName ? getFieldName(input.key) : getFieldName(`details.${input.key}`);
   const required = disabled ? false : input.required;
   const submitted = Boolean(formik.submitCount);
   let validate = validateRequiredInput(intl, input, required);
@@ -209,7 +209,7 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
                   value={options.find(c => c.value === get(formik.values, field.name)) || null}
                   onChange={({ value }) => {
                     formik.setFieldValue(field.name, value);
-                    if (input.refreshRequirementsOnChange) {
+                    if (input.refreshRequirementsOnChange && refetch) {
                       refetch({
                         slug: host ? host.slug : WISE_PLATFORM_COLLECTIVE_SLUG,
                         currency,
@@ -242,7 +242,7 @@ Input.propTypes = {
   input: PropTypes.object.isRequired,
 };
 
-const FieldGroup = ({ field, ...props }) => {
+export const FieldGroup = ({ field, ...props }) => {
   return (
     <Box flex="1">
       {field.group.map(input => (
@@ -387,7 +387,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
               disabled={disabled}
               field={field}
               formik={formik}
-              getFieldName={getFieldName}
+              getFieldName={string => getFieldName(`data.${string}`)}
               host={host}
               key={kebabCase(field.name)}
               loading={loading}
@@ -419,7 +419,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
               disabled={disabled}
               field={field}
               formik={formik}
-              getFieldName={getFieldName}
+              getFieldName={string => getFieldName(`data.${string}`)}
               host={host}
               key={kebabCase(field.name)}
               loading={loading}
