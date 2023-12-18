@@ -165,35 +165,13 @@ const addFundsAccountQuery = gql`
       slug
       currency
       settings
-      ... on Organization {
-        tiers {
-          nodes {
-            id
-            ...AddFundsTierFields
-          }
-        }
-      }
+
       ... on AccountWithParent {
         parent {
           id
         }
       }
-      ... on Host {
-        id
-        type
-        slug
-        name
-        settings
-        plan {
-          id
-          hostFees
-        }
-        policies {
-          id
-          REQUIRE_2FA_FOR_ADMINS
-        }
-        isTrustedHost
-      }
+
       ... on AccountWithHost {
         addedFundsHostFeePercent: hostFeePercent(paymentMethodType: HOST)
         host {
@@ -224,6 +202,7 @@ const addFundsAccountQuery = gql`
           }
         }
       }
+
       ... on AccountWithContributions {
         tiers {
           nodes {
@@ -319,7 +298,7 @@ const AddFundsModal = ({ collective, ...props }) => {
   });
   const account = data?.account;
   const currency = account?.currency;
-  const host = account?.isHost ? account : account?.host;
+  const host = account?.host;
   const applicableTax = getApplicableTaxType(collective, host);
 
   const [submitAddFunds, { error: fundError }] = useMutation(addFundsMutation, {

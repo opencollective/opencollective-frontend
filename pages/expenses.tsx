@@ -72,6 +72,7 @@ export const expensesPageQuery = gql`
       currency
       isArchived
       isActive
+      isHost
       settings
       createdAt
       supportedExpenseTypes
@@ -107,16 +108,6 @@ export const expensesPageQuery = gql`
           imageUrl
           backgroundImageUrl
           twitterHandle
-        }
-      }
-
-      ... on Organization {
-        # We add that for hasFeature
-        isHost
-        isActive
-        host {
-          id
-          ...ExpenseHostFields
         }
       }
 

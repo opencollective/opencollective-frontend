@@ -75,14 +75,6 @@ export const managedOrderFragment = gql`
           supportedPaymentMethods
         }
       }
-      ... on Organization {
-        host {
-          id
-          slug
-          paypalClientId
-          supportedPaymentMethods
-        }
-      }
       ...AccountHoverCardFields
     }
     platformTipAmount {

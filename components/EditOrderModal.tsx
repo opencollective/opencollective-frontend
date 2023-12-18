@@ -362,14 +362,6 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
                 supportedPaymentMethods
               }
             }
-            ... on Organization {
-              host {
-                id
-                slug
-                paypalClientId
-                supportedPaymentMethods
-              }
-            }
           }
         }
       }

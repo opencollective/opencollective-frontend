@@ -51,7 +51,8 @@ const userActivitySubscriptionsQuery = gql`
           account {
             id
             ...AccountActivitySubscriptionsFields
-            ... on Organization {
+            # TODO: refactor me to remove use of the "host" property
+            ... on Host {
               host {
                 id
                 totalHostedCollectives

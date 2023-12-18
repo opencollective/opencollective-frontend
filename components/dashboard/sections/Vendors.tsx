@@ -55,9 +55,10 @@ const dashboardVendorsQuery = gql`
     $limit: Int
     $offset: Int
   ) {
+    # TODO: replace that with a much simpler "host" root query, may lead to typescript issues
     account(slug: $slug) {
       id
-      ... on Organization {
+      ... on Host {
         host {
           id
           name

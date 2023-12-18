@@ -66,12 +66,6 @@ export const confirmContributionFieldsFragment = gql`
           settings
         }
       }
-      ... on Organization {
-        host {
-          id
-          settings
-        }
-      }
     }
     createdByAccount {
       id

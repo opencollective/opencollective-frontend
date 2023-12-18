@@ -1587,7 +1587,7 @@ type AccountingCategory {
 """
 This represents an Host account
 """
-type Host implements Account & AccountWithContributions {
+type Host implements Account & AccountWithHost & AccountWithContributions {
   id: String!
   legacyId: Int!
 
@@ -1646,9 +1646,9 @@ type Host implements Account & AccountWithContributions {
   isFrozen: Boolean!
 
   """
-  Returns whether the account accepts financial contributions.
+  Returns whether it's active: can accept financial contributions and pay expenses.
   """
-  isActive: Boolean
+  isActive: Boolean!
 
   """
   Returns whether the account is setup to Host collectives.
@@ -2238,6 +2238,51 @@ type Host implements Account & AccountWithContributions {
   ): WebhookCollection!
 
   """
+  Returns the Fiscal Host
+  """
+  host: Host
+
+  """
+  Describe how the host charges the collective
+  """
+  hostFeesStructure: HostFeeStructure
+
+  """
+  Fees percentage that the host takes for this collective
+  """
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  How much platform fees are charged for this account
+  """
+  platformFeePercent: Float!
+
+  """
+  Date of approval by the Fiscal Host.
+  """
+  approvedAt: DateTime
+
+  """
+  Returns whether it's approved by the Fiscal Host
+  """
+  isApproved: Boolean!
+
+  """
+  Returns agreements this account has with its host, or null if not enough permissions.
+  """
+  hostAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 30
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AgreementCollection
+
+  """
   Number of unique financial contributors.
   """
   totalFinancialContributors(
@@ -2275,11 +2320,6 @@ type Host implements Account & AccountWithContributions {
   ): ContributorCollection!
 
   """
-  How much platform fees are charged for this account
-  """
-  platformFeePercent: Float!
-
-  """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
@@ -2289,7 +2329,6 @@ type Host implements Account & AccountWithContributions {
   List of accounting categories for this host
   """
   accountingCategories: AccountingCategoryCollection!
-  hostFeePercent: Float
   totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
   totalHostedAccounts: Int
   isOpenToApplications: Boolean
@@ -2579,6 +2618,159 @@ type Host implements Account & AccountWithContributions {
 }
 
 """
+An account that can be hosted by a Host
+"""
+interface AccountWithHost {
+  """
+  Returns the Fiscal Host
+  """
+  host: Host
+
+  """
+  Describe how the host charges the collective
+  """
+  hostFeesStructure: HostFeeStructure
+
+  """
+  Fees percentage that the host takes for this collective
+  """
+  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Fees percentage that the platform takes for this collective
+  """
+  platformFeePercent: Float
+
+  """
+  Date of approval by the Fiscal Host.
+  """
+  approvedAt: DateTime
+
+  """
+  Returns whether it's approved by the Fiscal Host
+  """
+  isApproved: Boolean!
+
+  """
+  Returns whether it's active: can accept financial contributions and pay expenses.
+  """
+  isActive: Boolean!
+
+  """
+  Returns agreements this account has with its host, or null if not enough permissions.
+  """
+  hostAgreements(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 30
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+  ): AgreementCollection
+}
+
+"""
+All supported expense types
+"""
+enum HostFeeStructure {
+  """
+  Use global host fees
+  """
+  DEFAULT
+
+  """
+  Custom fee for this Collective only
+  """
+  CUSTOM_FEE
+
+  """
+  Set a monthly retainer for this Collective
+  """
+  MONTHLY_RETAINER
+}
+
+enum PaymentMethodService {
+  PAYPAL
+  STRIPE
+  OPENCOLLECTIVE
+  PREPAID
+  THEGIVINGBLOCK
+}
+
+enum PaymentMethodType {
+  alipay @deprecated(reason: "Please use uppercase values")
+  creditcard @deprecated(reason: "Please use uppercase values")
+  prepaid @deprecated(reason: "Please use uppercase values")
+  payment @deprecated(reason: "Please use uppercase values")
+  subscription @deprecated(reason: "Please use uppercase values")
+  collective @deprecated(reason: "Please use uppercase values")
+  host @deprecated(reason: "Please use uppercase values")
+  adaptive @deprecated(reason: "Please use uppercase values")
+  giftcard @deprecated(reason: "Please use uppercase values")
+  manual @deprecated(reason: "Please use uppercase values")
+  crypto @deprecated(reason: "Please use uppercase values")
+  paymentintent @deprecated(reason: "Please use uppercase values")
+  us_bank_account @deprecated(reason: "Please use uppercase values")
+  sepa_debit @deprecated(reason: "Please use uppercase values")
+  bacs_debit @deprecated(reason: "Please use uppercase values")
+  bancontact @deprecated(reason: "Please use uppercase values")
+  link @deprecated(reason: "Please use uppercase values")
+  ALIPAY
+  CREDITCARD
+  PREPAID
+  PAYMENT
+  SUBSCRIPTION
+  COLLECTIVE
+  HOST
+  ADAPTIVE
+  GIFTCARD
+  MANUAL
+  CRYPTO
+  PAYMENT_INTENT
+  US_BANK_ACCOUNT
+  SEPA_DEBIT
+  BACS_DEBIT
+  BANCONTACT
+  LINK
+}
+
+"""
+A collection of "Agreement"
+"""
+type AgreementCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Agreement!]
+}
+
+"""
+An agreement
+"""
+type Agreement {
+  id: String
+  title: String!
+
+  """
+  Additional notes about the agreement for the host admins
+  """
+  notes: String
+
+  """
+  The time of creation of this agreement
+  """
+  createdAt: DateTime!
+  createdBy: Account
+  account: Account!
+  host: Host!
+  expiresAt: DateTime
+  attachment: FileInfo
+}
+
+"""
 An account that can receive financial contributions
 """
 interface AccountWithContributions {
@@ -2794,26 +2986,6 @@ type MemberOfCollectionRoles {
 }
 
 """
-All supported expense types
-"""
-enum HostFeeStructure {
-  """
-  Use global host fees
-  """
-  DEFAULT
-
-  """
-  Custom fee for this Collective only
-  """
-  CUSTOM_FEE
-
-  """
-  Set a monthly retainer for this Collective
-  """
-  MONTHLY_RETAINER
-}
-
-"""
 Input to order results
 """
 input OrderByInput {
@@ -2857,43 +3029,6 @@ type TransactionCollection implements Collection {
   The types of payment methods used in this collection, regardless of the pagination
   """
   paymentMethodTypes: [PaymentMethodType]!
-}
-
-enum PaymentMethodType {
-  alipay @deprecated(reason: "Please use uppercase values")
-  creditcard @deprecated(reason: "Please use uppercase values")
-  prepaid @deprecated(reason: "Please use uppercase values")
-  payment @deprecated(reason: "Please use uppercase values")
-  subscription @deprecated(reason: "Please use uppercase values")
-  collective @deprecated(reason: "Please use uppercase values")
-  host @deprecated(reason: "Please use uppercase values")
-  adaptive @deprecated(reason: "Please use uppercase values")
-  giftcard @deprecated(reason: "Please use uppercase values")
-  manual @deprecated(reason: "Please use uppercase values")
-  crypto @deprecated(reason: "Please use uppercase values")
-  paymentintent @deprecated(reason: "Please use uppercase values")
-  us_bank_account @deprecated(reason: "Please use uppercase values")
-  sepa_debit @deprecated(reason: "Please use uppercase values")
-  bacs_debit @deprecated(reason: "Please use uppercase values")
-  bancontact @deprecated(reason: "Please use uppercase values")
-  link @deprecated(reason: "Please use uppercase values")
-  ALIPAY
-  CREDITCARD
-  PREPAID
-  PAYMENT
-  SUBSCRIPTION
-  COLLECTIVE
-  HOST
-  ADAPTIVE
-  GIFTCARD
-  MANUAL
-  CRYPTO
-  PAYMENT_INTENT
-  US_BANK_ACCOUNT
-  SEPA_DEBIT
-  BACS_DEBIT
-  BANCONTACT
-  LINK
 }
 
 input VirtualCardReferenceInput {
@@ -3979,14 +4114,6 @@ type PaymentMethod {
     """
     onlyActiveSubscriptions: Boolean
   ): OrderCollection
-}
-
-enum PaymentMethodService {
-  PAYPAL
-  STRIPE
-  OPENCOLLECTIVE
-  PREPAID
-  THEGIVINGBLOCK
 }
 
 enum PaymentMethodLegacyType {
@@ -5533,39 +5660,6 @@ type ExpenseStats {
   Number of grants
   """
   grantsCount: Int!
-}
-
-"""
-A collection of "Agreement"
-"""
-type AgreementCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Agreement!]
-}
-
-"""
-An agreement
-"""
-type Agreement {
-  id: String
-  title: String!
-
-  """
-  Additional notes about the agreement for the host admins
-  """
-  notes: String
-
-  """
-  The time of creation of this agreement
-  """
-  createdAt: DateTime!
-  createdBy: Account
-  account: Account!
-  host: Host!
-  expiresAt: DateTime
-  attachment: FileInfo
 }
 
 """
@@ -7505,61 +7599,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
-}
-
-"""
-An account that can be hosted by a Host
-"""
-interface AccountWithHost {
-  """
-  Returns the Fiscal Host
-  """
-  host: Host
-
-  """
-  Describe how the host charges the collective
-  """
-  hostFeesStructure: HostFeeStructure
-
-  """
-  Fees percentage that the host takes for this collective
-  """
-  hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
-
-  """
-  Fees percentage that the platform takes for this collective
-  """
-  platformFeePercent: Float
-
-  """
-  Date of approval by the Fiscal Host.
-  """
-  approvedAt: DateTime
-
-  """
-  Returns whether it's approved by the Fiscal Host
-  """
-  isApproved: Boolean!
-
-  """
-  Returns whether it's active: can accept financial contributions and pay expenses.
-  """
-  isActive: Boolean!
-
-  """
-  Returns agreements this account has with its host, or null if not enough permissions.
-  """
-  hostAgreements(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 30
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-  ): AgreementCollection
 }
 
 """
