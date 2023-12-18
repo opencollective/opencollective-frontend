@@ -349,7 +349,7 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
       slug: accountSlug,
       filter: direction || 'OUTGOING',
       includeIncognito: true,
-      minAmount: 1,
+      minAmount: 0,
       ...queryFilter.variables,
     },
     context: API_V2_CONTEXT,
