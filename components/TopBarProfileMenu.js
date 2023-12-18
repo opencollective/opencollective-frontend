@@ -22,7 +22,7 @@ import Link from './Link';
 import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
 import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
-import PreviewFeaturesModal from './PreviewFeaturesModal';
+import { withPreviewFeatures } from './PreviewFeaturesProvider';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
@@ -70,21 +70,32 @@ const UserAccountLinks = ({
   LoggedInUser,
   isMobileView,
   logOutHandler,
-  setShowPreviewFeaturesModal,
+  setShowPreviewFeatures,
+  closeProfileMenu,
 }) => {
   const useDashboard = LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
   const hasAvailablePreviewFeatures = LoggedInUser?.getAvailablePreviewFeatures()?.length > 0;
 
+  const handleNewsAndUpdatesClick = () => {
+    setShowNewsAndUpdates(true);
+    closeProfileMenu();
+  };
+
+  const handlePreviewFeaturesClick = () => {
+    setShowPreviewFeatures(true);
+    closeProfileMenu();
+  };
+
   return (
     <Box>
-      <UserMenuLinkEntry as={Span} isMobileMenuLink={isMobileView} onClick={() => setShowNewsAndUpdates(true)}>
+      <UserMenuLinkEntry as={Span} isMobileMenuLink={isMobileView} onClick={handleNewsAndUpdatesClick}>
         <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
       </UserMenuLinkEntry>
       {hasAvailablePreviewFeatures && (
         <UserMenuLinkEntry
           as="button"
           isMobileMenuLink={isMobileView}
-          onClick={() => setShowPreviewFeaturesModal(true)}
+          onClick={handlePreviewFeaturesClick}
           display="flex"
           alignItems="center"
           gridGap={2}
@@ -195,7 +206,8 @@ UserAccountLinks.propTypes = {
   logOutHandler: PropTypes.func,
   profileMenuLink: PropTypes.bool,
   isMobileView: PropTypes.bool,
-  setShowPreviewFeaturesModal: PropTypes.func,
+  setShowPreviewFeatures: PropTypes.func,
+  closeProfileMenu: PropTypes.func,
 };
 
 /**
@@ -207,17 +219,18 @@ class TopBarProfileMenu extends React.Component {
     logout: PropTypes.func,
     loadingLoggedInUser: PropTypes.bool,
     setShowNewsAndUpdates: PropTypes.func,
+    setShowPreviewFeatures: PropTypes.func,
   };
 
   constructor(props) {
     super(props);
-    this.state = { showProfileMenu: false, showPreviewFeaturesModal: false, loading: true, showUserAccount: false };
+    this.state = { showProfileMenu: false, loading: true, showUserAccount: false };
   }
 
   componentDidMount() {
     const main = document.querySelector('main');
     main.addEventListener('keydown', this.handleKeyPress);
-    main.addEventListener('click', this.onClickOutside);
+    main.addEventListener('click', this.closeProfileMenu);
     if (
       !getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN) &&
       !getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN)
@@ -234,7 +247,7 @@ class TopBarProfileMenu extends React.Component {
 
   componentWillUnmount() {
     const main = document.querySelector('main');
-    main.removeEventListener('click', this.onClickOutside);
+    main.removeEventListener('click', this.closeProfileMenu);
     main.removeEventListener('keydown', this.handleKeyPress);
   }
 
@@ -254,13 +267,13 @@ class TopBarProfileMenu extends React.Component {
     this.setState({ status: 'loggedout' });
   };
 
-  onClickOutside = () => {
+  closeProfileMenu = () => {
     this.setState({ showProfileMenu: false, showUserAccount: false });
   };
 
   toggleProfileMenu = e => {
     this.setState(state => ({ showProfileMenu: !state.showProfileMenu, showUserAccount: false }));
-    // don't propagate to onClickOutside
+    // don't propagate to closeProfileMenu
     e.nativeEvent.stopImmediatePropagation();
   };
 
@@ -270,8 +283,8 @@ class TopBarProfileMenu extends React.Component {
   };
 
   renderProfileMenu() {
-    const { LoggedInUser, setShowNewsAndUpdates } = this.props;
-    const { showUserAccount, showPreviewFeaturesModal } = this.state;
+    const { LoggedInUser, setShowNewsAndUpdates, setShowPreviewFeatures } = this.props;
+    const { showUserAccount } = this.state;
 
     return (
       <Container
@@ -358,7 +371,8 @@ class TopBarProfileMenu extends React.Component {
                       LoggedInUser={LoggedInUser}
                       setShowNewsAndUpdates={setShowNewsAndUpdates}
                       logOutHandler={this.logout}
-                      setShowPreviewFeaturesModal={show => this.setState({ showPreviewFeaturesModal: show })}
+                      setShowPreviewFeatures={setShowPreviewFeatures}
+                      closeProfileMenu={this.closeProfileMenu}
                     />
                   </Box>
                 </Hide>
@@ -443,17 +457,13 @@ class TopBarProfileMenu extends React.Component {
                   LoggedInUser={LoggedInUser}
                   setShowNewsAndUpdates={setShowNewsAndUpdates}
                   logOutHandler={this.logout}
-                  setShowPreviewFeaturesModal={show => this.setState({ showPreviewFeaturesModal: show })}
+                  setShowPreviewFeatures={setShowPreviewFeatures}
+                  closeProfileMenu={this.closeProfileMenu}
                 />
               </Box>
             </Hide>
           )}
         </Flex>
-
-        <PreviewFeaturesModal
-          open={showPreviewFeaturesModal}
-          setOpen={open => this.setState({ showPreviewFeaturesModal: open })}
-        />
       </Container>
     );
   }
@@ -522,4 +532,4 @@ class TopBarProfileMenu extends React.Component {
   }
 }
 
-export default withNewsAndUpdates(withUser(TopBarProfileMenu));
+export default withPreviewFeatures(withNewsAndUpdates(withUser(TopBarProfileMenu)));
