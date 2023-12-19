@@ -125,7 +125,7 @@
     "react-swipeable": "7.0.1",
     "react-text-mask": "5.5.0",
     "react-window": "1.8.10",
-    "redis": "4.6.11",
+    "redis": "4.6.12",
     "sanitize-html": "2.11.0",
     "slugify": "1.6.6",
     "spdx-license-list": "6.8.0",
