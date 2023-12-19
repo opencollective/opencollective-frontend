@@ -46,14 +46,6 @@ export const contributionFlowAccountFieldsFragment = gql`
       id
       RECEIVE_FINANCIAL_CONTRIBUTIONS
     }
-    ... on Organization {
-      platformFeePercent
-      platformContributionAvailable
-      host {
-        id
-        ...ContributionFlowHostFields
-      }
-    }
     ... on AccountWithContributions {
       contributionPolicy
       platformFeePercent
@@ -181,12 +173,6 @@ export const orderSuccessFragment = gql`
         }
       }
       ... on AccountWithHost {
-        host {
-          id
-          ...OrderSuccessHostFragment
-        }
-      }
-      ... on Organization {
         host {
           id
           ...OrderSuccessHostFragment

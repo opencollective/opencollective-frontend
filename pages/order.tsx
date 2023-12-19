@@ -173,15 +173,6 @@ const orderPageQuery = gql`
           backgroundImageUrl
         }
       }
-      ... on Organization {
-        host {
-          id
-          name
-          slug
-          imageUrl
-          backgroundImageUrl
-        }
-      }
     }
   }
 

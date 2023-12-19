@@ -728,14 +728,6 @@ export const listTierQuery = gql`
           }
         }
       }
-      ... on Organization {
-        tiers {
-          nodes {
-            id
-            ...EditTiersFields
-          }
-        }
-      }
     }
   }
   ${editTiersFieldsFragment}

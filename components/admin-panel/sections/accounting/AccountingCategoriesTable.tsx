@@ -51,20 +51,18 @@ const accountingCategoriesQuery = gql`
 const editAccountingCategoryMutation = gql`
   mutation EditAccountingCategories($hostSlug: String!, $categories: [AccountingCategoryInput!]!) {
     editAccountingCategories(account: { slug: $hostSlug }, categories: $categories) {
-      id
-      ... on Organization {
-        host {
-          id
-          slug
-          accountingCategories {
-            totalCount
-            nodes {
-              id
-              code
-              name
-              friendlyName
-              expensesTypes
-            }
+      # TODO: can editAccountingCategories return explicitely an "host" instead?
+      ... on Host {
+        id
+        slug
+        accountingCategories {
+          totalCount
+          nodes {
+            id
+            code
+            name
+            friendlyName
+            expensesTypes
           }
         }
       }
@@ -205,7 +203,7 @@ export const AccountingCategoriesTable = ({ hostSlug }: AccountingCategoriesTabl
   const { LoggedInUser } = useLoggedInUser();
   const graphQLParams = { context: API_V2_CONTEXT, variables: { hostSlug } };
   const { data, error, loading } = useQuery(accountingCategoriesQuery, graphQLParams);
-  const categoriesFromData = get(data, 'host.accountingCategories.nodes', []);
+  const categoriesFromData = get(data, 'accountingCategories.nodes', []);
   const [categories, setCategories] = React.useState(categoriesFromData);
   const [editAccountingCategories, { loading: submitting }] = useMutation(
     editAccountingCategoryMutation,

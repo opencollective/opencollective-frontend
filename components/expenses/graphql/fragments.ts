@@ -62,18 +62,6 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
               }
             }
           }
-          ... on Organization {
-            host {
-              id
-              payoutMethods {
-                id
-                type
-                name
-                data
-                isSaved
-              }
-            }
-          }
           location {
             id
             address
@@ -273,7 +261,7 @@ export const expensePageExpenseFieldsFragment = gql`
         isSaved
       }
 
-      # For Collectives, Funds, Events and Projects
+      # For Collectives, Funds, Events Projects, and Hosts
       ... on AccountWithHost {
         isApproved
         host {
@@ -287,13 +275,6 @@ export const expensePageExpenseFieldsFragment = gql`
             data
             isSaved
           }
-        }
-      }
-
-      # For Fiscal Hosts
-      ... on Organization {
-        host {
-          id
         }
       }
     }
@@ -685,16 +666,9 @@ export const expensesListFieldsFragment = gql`
       imageUrl
       hasImage
       isAdmin
-      # For Collectives, Funds, Events and Projects
+      # For Collectives, Funds, Events, Projects, and Hosts
       ... on AccountWithHost {
         isApproved
-        host {
-          id
-        }
-      }
-
-      # For Fiscal Hosts
-      ... on Organization {
         host {
           id
         }

@@ -63,13 +63,16 @@ export const searchQuery = gql`
             valueInCents
           }
         }
-        ... on Organization {
+
+        # TODO: what is this needed for?
+        ... on Host {
           host {
             id
             hostFeePercent
             totalHostedCollectives
           }
         }
+
         ... on AccountWithParent {
           parent {
             id
