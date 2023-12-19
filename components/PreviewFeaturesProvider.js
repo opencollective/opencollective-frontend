@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 
 export const PreviewFeaturesContext = React.createContext({
@@ -8,10 +8,13 @@ export const PreviewFeaturesContext = React.createContext({
 const PreviewFeaturesProvider = ({ children }) => {
   const [showPreviewFeatures, setShowPreviewFeatures] = useState(false);
 
-  const context = {
-    showPreviewFeatures,
-    setShowPreviewFeatures,
-  };
+  const context = useMemo(
+    () => ({
+      showPreviewFeatures,
+      setShowPreviewFeatures,
+    }),
+    [showPreviewFeatures, setShowPreviewFeatures],
+  );
 
   return <PreviewFeaturesContext.Provider value={context}>{children}</PreviewFeaturesContext.Provider>;
 };
