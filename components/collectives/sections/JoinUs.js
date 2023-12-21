@@ -126,7 +126,7 @@ const JoinUs = ({ page }) => (
         >
           <FormattedMessage id="home.joinUsSection.title" defaultMessage="Join the movement" />
         </H1>
-        <Box my={(null, null, null, null, 3)} width={['288px', '438px', null, '335px']}>
+        <Box my={[null, null, null, null, 3]} width={['288px', '438px', null, '335px']}>
           <SectionSubtitle
             fontSize={['20px', null, null, '24px']}
             lineHeight={['28px', null, null, '32px']}
