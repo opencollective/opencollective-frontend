@@ -94,7 +94,7 @@ const CustomFieldSelect = ({
   translate: (value: string) => string;
   value: any;
 }) => {
-  const options = customField.options?.map(option => ({ ...option, label: translate(option.label) }));
+  const options = customField.options?.map(option => ({ ...option, label: translate(option.label) })) || [];
   return (
     <StyledSelect
       inputId={fieldProps.id}

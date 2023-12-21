@@ -454,7 +454,7 @@ CollectivePicker.propTypes = {
   /** If true, a permanent option to create a collective will be displayed in the select */
   creatable: PropTypes.oneOfType([PropTypes.bool, PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType)))]),
   /** If creatable is true, this will be used to render the "Create new ..." */
-  renderNewCollectiveOption: PropTypes.node,
+  renderNewCollectiveOption: PropTypes.func,
   /** If true, a permanent option to invite a new user will be displayed in the select */
   invitable: PropTypes.bool,
   onInvite: PropTypes.func,

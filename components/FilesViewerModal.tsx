@@ -274,7 +274,7 @@ export default function FilesViewerModal({ onClose, parentTitle, files, openFile
                   </Span>
                 ) : null}
 
-                <Span>{selectedItem.name}</Span>
+                <Span>{selectedItem?.name}</Span>
               </Span>
             </Box>
             <Flex alignItems="center" gridGap={2}>
