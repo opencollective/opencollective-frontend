@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
-import { UploadedFileKind, UploadFileResult } from '../lib/graphql/types/v2/graphql';
+import { OcrParsingOptionsInput, UploadedFileKind, UploadFileResult } from '../lib/graphql/types/v2/graphql';
 import { useGraphQLFileUploader } from '../lib/hooks/useGraphQLFileUploader';
 import { useImageUploader } from '../lib/hooks/useImageUploader';
 
@@ -106,6 +106,7 @@ const StyledDropzone = ({
   isMulti = true,
   useGraphQL = false,
   parseDocument = false,
+  parsingOptions = {},
   onGraphQLSuccess = undefined,
   UploadingComponent = undefined,
   kind,
@@ -133,7 +134,7 @@ const StyledDropzone = ({
       if (collectFilesOnly) {
         onSuccess?.(acceptedFiles, fileRejections);
       } else if (useGraphQL) {
-        uploadFileWithGraphQL(acceptedFiles.map(file => ({ file, kind, parseDocument })));
+        uploadFileWithGraphQL(acceptedFiles.map(file => ({ file, kind, parseDocument, parsingOptions })));
       } else {
         uploadFiles(acceptedFiles, fileRejections);
       }
@@ -294,6 +295,7 @@ type StyledDropzoneProps = {
   useGraphQL?: boolean;
   onGraphQLSuccess?: (uploadResults: UploadFileResult[]) => void;
   parseDocument?: boolean;
+  parsingOptions?: OcrParsingOptionsInput;
   UploadingComponent?: React.ComponentType;
 } & (
   | {

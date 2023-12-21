@@ -5478,6 +5478,58 @@ input AmountInput {
   The value in cents
   """
   valueInCents: Int
+
+  """
+  If the amount was generated from a currency conversion, this field can be used to provide details about the conversion
+  """
+  exchangeRate: CurrencyExchangeRateInput
+}
+
+"""
+Fields for a currency exchange rate
+"""
+input CurrencyExchangeRateInput {
+  """
+  Where does the FX rate comes from
+  """
+  source: CurrencyExchangeRateSourceType!
+  fromCurrency: Currency!
+  toCurrency: Currency!
+
+  """
+  Date of the FX rate
+  """
+  date: DateTime!
+
+  """
+  Exchange rate value as a float (e.g 1.15 or 0.86)
+  """
+  value: Float!
+}
+
+"""
+Where does the FX rate come from
+"""
+enum CurrencyExchangeRateSourceType {
+  """
+  Open Collective internal system, relying on caching and 3rd party APIs
+  """
+  OPENCOLLECTIVE
+
+  """
+  PayPal API
+  """
+  PAYPAL
+
+  """
+  Wise API
+  """
+  WISE
+
+  """
+  User-provided exchange rate
+  """
+  USER
 }
 
 """
@@ -5654,7 +5706,17 @@ type ExpenseItem {
   """
   Amount of this item
   """
-  amount: Int!
+  amount: Int! @deprecated(reason: "Please use `amountV2`")
+
+  """
+  Amount of this item
+  """
+  amountV2: Amount!
+
+  """
+  If the item currency is different than the expense currency, this field will expose the average exchange rate for this date as recorded by Open Collective. Used to decide whether the value in `amountV2.exchangeRate` looks correct.
+  """
+  referenceExchangeRate: CurrencyExchangeRate
 
   """
   The date on which the item was created
@@ -5681,6 +5743,33 @@ type ExpenseItem {
   The file associated with this item (if any)
   """
   file: FileInfo
+}
+
+"""
+Fields for a currency fx rate
+"""
+type CurrencyExchangeRate {
+  """
+  Exchange rate value as a scalar (e.g 1.15 or 0.86)
+  """
+  value: Float!
+
+  """
+  Where does the FX rate comes from
+  """
+  source: CurrencyExchangeRateSourceType!
+  fromCurrency: Currency!
+  toCurrency: Currency!
+
+  """
+  Date of the FX rate
+  """
+  date: DateTime!
+
+  """
+  Is the FX rate approximate or a fixed value?
+  """
+  isApproximate: Boolean!
 }
 
 """
@@ -6062,53 +6151,6 @@ type Amount {
   If the amount was generated from a currency conversion, this field contains details about the conversion
   """
   exchangeRate: CurrencyExchangeRate
-}
-
-"""
-Fields for a currency fx rate
-"""
-type CurrencyExchangeRate {
-  """
-  Exchange rate value as a scalar (e.g 1.15 or 0.86)
-  """
-  value: Float!
-
-  """
-  Where does the FX rate comes from
-  """
-  source: CurrencyExchangeRateSourceType!
-  fromCurrency: Currency!
-  toCurrency: Currency!
-
-  """
-  Date of the FX rate
-  """
-  date: DateTime!
-
-  """
-  Is the FX rate approximate or a fixed value?
-  """
-  isApproximate: Boolean!
-}
-
-"""
-Where does the FX rate come from
-"""
-enum CurrencyExchangeRateSourceType {
-  """
-  Open Collective internal system, relying on caching and 3rd party APIs
-  """
-  OPENCOLLECTIVE
-
-  """
-  PayPal API
-  """
-  PAYPAL
-
-  """
-  Wise API
-  """
-  WISE
 }
 
 """
@@ -11316,6 +11358,16 @@ type Query {
     """
     id: String!
   ): Conversation
+
+  """
+  Get exchange rates from Open Collective
+  """
+  currencyExchangeRate(
+    """
+    Requests for currency exchange rates
+    """
+    requests: [CurrencyExchangeRateRequest!]!
+  ): [CurrencyExchangeRate!]!
   event(
     """
     The public id identifying the Event (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -13394,6 +13446,26 @@ enum ActivityAndClassesType {
   VIRTUAL_CARDS
   FUND_EVENTS
   REPORTS
+}
+
+"""
+Request for a currency exchange rate
+"""
+input CurrencyExchangeRateRequest {
+  """
+  Currency to convert from
+  """
+  fromCurrency: Currency!
+
+  """
+  Currency to convert to
+  """
+  toCurrency: Currency!
+
+  """
+  Date of the exchange rate. Defaults to now.
+  """
+  date: DateTime
 }
 
 input ExpenseReferenceInput {
@@ -17098,7 +17170,12 @@ input ExpenseItemCreateInput {
   """
   Amount in cents
   """
-  amount: Int!
+  amount: Int @deprecated(reason: "Please use `amountV2`")
+
+  """
+  Amount
+  """
+  amountV2: AmountInput
 
   """
   What is this item about?
@@ -17271,7 +17348,12 @@ input ExpenseItemInput {
   """
   Amount in cents
   """
-  amount: Int
+  amount: Int @deprecated(reason: "Please use `amountV2`")
+
+  """
+  Amount
+  """
+  amountV2: AmountInput
 
   """
   What is this item about?
@@ -18269,6 +18351,11 @@ input UploadFileInput {
   Whether to run OCR on the document. Note that this feature is only available to selected accounts.
   """
   parseDocument: Boolean! = false
+
+  """
+  If `parseDocument` is true, you can use this field to pass options to the OCR parser.
+  """
+  parsingOptions: OCRParsingOptionsInput = null
 }
 
 """
@@ -18290,6 +18377,16 @@ enum UploadedFileKind {
   TIER_LONG_DESCRIPTION
   ACCOUNT_CUSTOM_EMAIL
   AGREEMENT_ATTACHMENT
+}
+
+"""
+To configure the OCR parsing
+"""
+input OCRParsingOptionsInput {
+  """
+  The currency that you'd like to use for the amounts
+  """
+  currency: Currency = null
 }
 
 input VirtualCardInput {

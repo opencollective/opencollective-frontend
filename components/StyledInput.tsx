@@ -60,6 +60,22 @@ const StyledInput = styled.input`
     }
   }}
 
+  ${props =>
+    props.hideSpinners &&
+    css`
+      ::-webkit-inner-spin-button,
+      ::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: textfield;
+        margin: 0;
+      }
+
+      &[type='number'] {
+        appearance: none;
+        -moz-appearance: textfield;
+      }
+    `}
+
   &[type=radio] {
     cursor: pointer;
   }

@@ -462,7 +462,7 @@ export default function EditVirtualCardModal({
               <React.Fragment>
                 <Flex mt={3} width="100%" alignItems="flex-start" justifyContent="space-between">
                   <StyledInputField
-                    flexGrow={1}
+                    flex="1 1 60%"
                     labelFontSize="13px"
                     labelFontWeight="bold"
                     label={

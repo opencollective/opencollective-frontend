@@ -40,7 +40,7 @@ const getColor = ({ error, success }) => {
   return 'black.800';
 };
 
-const getBgColor = ({ error, focused, success }) => {
+const getBgColor = ({ error, focused, success, defaultBg = 'black.50' }) => {
   if (focused) {
     return 'primary.100';
   }
@@ -53,7 +53,7 @@ const getBgColor = ({ error, focused, success }) => {
     return 'green.100';
   }
 
-  return 'black.50';
+  return defaultBg;
 };
 
 const getBorderColor = ({ error, focused, success }) => {
@@ -156,7 +156,7 @@ const StyledInputGroup = ({
             color={getColor({ error, success })}
             fontSize="14px"
             {...appendProps}
-            bg={getBgColor({ error, focused, success })}
+            bg={getBgColor({ error, focused, success, defaultBg: appendProps?.bg })}
           >
             {append}
           </Container>
