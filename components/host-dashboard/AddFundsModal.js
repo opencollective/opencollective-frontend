@@ -327,7 +327,7 @@ const AddFundsModal = ({ collective, ...props }) => {
     refetchQueries: [
       {
         context: API_V2_CONTEXT,
-        query: getBudgetSectionQuery(true, false, false),
+        query: getBudgetSectionQuery(true, false),
         variables: getBudgetSectionQueryVariables(collective.slug, false),
       },
       { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
@@ -336,11 +336,7 @@ const AddFundsModal = ({ collective, ...props }) => {
   });
 
   const tiersNodes = get(data, 'account.tiers.nodes');
-  const accountSettings = get(data, 'account.settings');
-  const tiersOptions = React.useMemo(
-    () => getTiersOptions(intl, tiersNodes, accountSettings),
-    [tiersNodes, accountSettings],
-  );
+  const tiersOptions = React.useMemo(() => getTiersOptions(intl, tiersNodes), [tiersNodes]);
 
   // No modal if logged-out
   if (!LoggedInUser) {

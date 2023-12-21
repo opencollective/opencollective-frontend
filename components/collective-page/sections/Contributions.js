@@ -326,7 +326,7 @@ const SectionContributions = ({ collective }) => {
   const { account, memberOf } = data?.account || {};
   const { hostedAccounts, connectedAccounts } = staticData?.account || {};
   const isOrganization = account?.type === CollectiveType.ORGANIZATION;
-  const availableFilters = getAvailableFilters(memberOf?.roles || [], account);
+  const availableFilters = getAvailableFilters(memberOf?.roles || []);
   const membersLeft = memberOf && memberOf.totalCount - memberOf.nodes.length;
   return (
     <Box pb={4}>
