@@ -120,6 +120,9 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
   const hostFeeTransaction = transaction.relatedTransactions?.find(
     t => t.kind === TransactionKind.HOST_FEE && t.type === TransactionTypes.CREDIT,
   );
+  const taxTransaction = transaction.relatedTransactions?.find(
+    t => t.kind === TransactionKind.TAX && t.type === TransactionTypes.CREDIT,
+  );
   const paymentProcessorFeeTransaction = transaction.relatedTransactions?.find(
     t => t.kind === TransactionKind.PAYMENT_PROCESSOR_FEE && t.type === TransactionTypes.CREDIT,
   );
@@ -187,6 +190,26 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                           <FormattedMoneyAmount
                             amount={hostFeeTransaction.netAmount.valueInCents}
                             currency={hostFeeTransaction.netAmount.currency}
+                            showCurrencyCode={false}
+                            amountStyles={null}
+                          />
+                        ),
+                      }}
+                    />
+                  </Fragment>
+                )}
+                {taxTransaction && (
+                  <Fragment>
+                    <br />
+                    <FormattedMessage
+                      id="TransactionDetails.Tax"
+                      defaultMessage="This transaction includes {amount} {taxName}"
+                      values={{
+                        taxName: taxTransaction.taxInfo?.name || 'Tax',
+                        amount: (
+                          <FormattedMoneyAmount
+                            amount={taxTransaction.netAmount.valueInCents}
+                            currency={taxTransaction.netAmount.currency}
                             showCurrencyCode={false}
                             amountStyles={null}
                           />

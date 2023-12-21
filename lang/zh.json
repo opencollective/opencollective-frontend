@@ -3072,6 +3072,7 @@
   "transaction.usingGiftCardFrom": "使用 {collective} 的 {giftCard}",
   "TransactionDetails.HostFee": "此交易包括 {amount} 托管费。",
   "TransactionDetails.PaymentProcessorFee": "This transaction includes {amount} payment processor fees",
+  "TransactionDetails.Tax": "This transaction includes {amount} {taxName}",
   "transactions.displayPendingContributions": "显示待确定贡献",
   "Transactions.DownloadCSV.Description": "Use the filters to define the transactions you would like to download.",
   "transactions.downloadcsvbutton": "下载 CSV",

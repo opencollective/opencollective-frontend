@@ -3072,6 +3072,7 @@
   "transaction.usingGiftCardFrom": "שימוש ב{giftCard} מאת {collective}",
   "TransactionDetails.HostFee": "בפעולה זו יש תקורות ארגון בסך {amount}",
   "TransactionDetails.PaymentProcessorFee": "This transaction includes {amount} payment processor fees",
+  "TransactionDetails.Tax": "This transaction includes {amount} {taxName}",
   "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "שימוש בפליטרים כדי להגדיר את כל התנועות שברצונך להוריד.",
   "transactions.downloadcsvbutton": "הורדה כקובץ CSV",

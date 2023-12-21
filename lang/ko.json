@@ -3072,6 +3072,7 @@
   "transaction.usingGiftCardFrom": "using a {giftCard} from {collective}",
   "TransactionDetails.HostFee": "이 거래에 호스트 수수료 {amount} 포함됨",
   "TransactionDetails.PaymentProcessorFee": "This transaction includes {amount} payment processor fees",
+  "TransactionDetails.Tax": "This transaction includes {amount} {taxName}",
   "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "Use the filters to define the transactions you would like to download.",
   "transactions.downloadcsvbutton": "CSV 다운로드",

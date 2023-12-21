@@ -3072,6 +3072,7 @@
   "transaction.usingGiftCardFrom": "použitím karty {giftCard} od kolektívu {collective}",
   "TransactionDetails.HostFee": "Táto transakcia zahŕňa čiastku {amount} poplatkov hostiteľa",
   "TransactionDetails.PaymentProcessorFee": "This transaction includes {amount} payment processor fees",
+  "TransactionDetails.Tax": "This transaction includes {amount} {taxName}",
   "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "Pomocou filtrov definujte transakcie, ktoré si želáte prevziať.",
   "transactions.downloadcsvbutton": "Prevziať CSV",
