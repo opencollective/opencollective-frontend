@@ -110,7 +110,7 @@ const PreviewFeaturesModal = ({ open, setOpen }: { open: boolean; setOpen: (open
           </DialogDescription>
         </DialogHeader>
         {previewFeatures
-          ?.filter(f => !f.dependsOn)
+          .filter(f => !f.dependsOn)
           .map(feature => {
             const dependentFeatures = previewFeatures.filter(f => f.dependsOn === feature.key);
             return <PreviewFeatureCard key={feature.key} feature={feature} dependentFeatures={dependentFeatures} />;

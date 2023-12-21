@@ -95,7 +95,7 @@ export function DateRangeInput({ value, onChange }) {
         >
           <Calendar
             mode="range"
-            defaultMonth={dateRange?.from}
+            defaultMonth={dateRange.from}
             selected={dateRange}
             onSelect={calendarOnSelect}
             numberOfMonths={1}

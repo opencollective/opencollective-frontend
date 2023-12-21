@@ -97,7 +97,7 @@ const start = id =>
     });
   });
 
-if (workers && workers > 1) {
+if (workers > 1) {
   throng({ worker: start, count: workers });
 } else {
   start(1);

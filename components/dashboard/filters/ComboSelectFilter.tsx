@@ -136,7 +136,7 @@ function ComboSelectFilter({
 
         <CommandGroup>
           {creatable && input && (
-            <SelectItem isSelected={selected?.some(v => v === input)} value={input} label={input} onSelect={onSelect} />
+            <SelectItem isSelected={selected.some(v => v === input)} value={input} label={input} onSelect={onSelect} />
           )}
 
           {searchFunc &&

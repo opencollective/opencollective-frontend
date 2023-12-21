@@ -610,7 +610,7 @@ function Expense(props) {
             <ExpenseForm
               collective={collective}
               host={host}
-              loading={loading || loadingLoggedInUser || isRefetchingDataForUser}
+              loading={isRefetchingDataForUser}
               expense={editedExpense || expense}
               originalExpense={expense}
               expensesTags={suggestedTags}

@@ -126,7 +126,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
                 <TimelineItem />
                 <TimelineItem />
               </React.Fragment>
-            ) : !activities ? (
+            ) : !activities.length ? (
               <MessageBox type="info" withIcon>
                 <FormattedMessage defaultMessage="No activity yet" />
               </MessageBox>

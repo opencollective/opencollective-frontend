@@ -350,7 +350,7 @@ const AddFundsModal = ({ collective, ...props }) => {
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const receiptTemplates = host?.settings?.invoice?.templates;
   const recommendedVendors = host?.vendors?.nodes || [];
-  const defaultSources = [...(recommendedVendors || []), host];
+  const defaultSources = [...recommendedVendors, host];
   const defaultSourcesOptions = map(groupBy(defaultSources, 'type'), (accounts, type) => {
     return {
       label: formatCollectiveType(intl, type, accounts.length),

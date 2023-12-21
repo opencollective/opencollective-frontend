@@ -339,7 +339,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   }
 
   const recommendedVendors = collective?.host?.vendors?.nodes || [];
-  const defaultSources = [...(recommendedVendors || []), host];
+  const defaultSources = [...recommendedVendors, host];
   const defaultSourcesOptions = map(groupBy(defaultSources, 'type'), (accounts, type) => {
     return {
       label: formatCollectiveType(intl, type, accounts.length),
@@ -799,11 +799,12 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     </Form>
   );
 };
+
 type CreatePendingContributionModalProps = {
   hostSlug: string;
   edit?: Partial<OrderPageQuery['order']>;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess: () => void;
 };
 
 const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePendingContributionModalProps) => {
@@ -924,7 +925,7 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
               });
             }
 
-            props?.onSuccess?.();
+            props.onSuccess();
             handleClose();
           }}
         >
