@@ -283,7 +283,6 @@ export function TransactionDrawer({
       [CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP].includes(transaction?.kind) &&
       transaction?.paymentMethod);
 
-  transaction?.permissions.canReject && !transaction?.isRejected;
   const showRefundButton = showActions && transaction?.permissions.canRefund && !transaction?.isRefunded;
   const showRejectButton = showActions && transaction?.permissions.canReject && !transaction?.isRejected;
   const showDownloadInvoiceButton =
