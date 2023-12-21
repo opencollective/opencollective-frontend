@@ -129,7 +129,7 @@ export default class IntlDocument extends Document {
       'CAPTCHA_ENABLED',
       'CAPTCHA_PROVIDER',
       'DISABLE_MOCK_UPLOADS',
-      'LEDGER_SEPARATE_PAYMENT_PROCESSOR_FEES',
+      'LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES',
     ]);
   }
 

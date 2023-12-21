@@ -49,7 +49,7 @@ const transactionQuery = gql`
         valueInCents
         currency
       }
-      paymentProcessorFee {
+      paymentProcessorFee(fetchPaymentProcessorFee: true) {
         valueInCents
         currency
       }
@@ -61,7 +61,7 @@ const transactionQuery = gql`
         valueInCents
         currency
       }
-      taxAmount {
+      taxAmount(fetchTax: true) {
         valueInCents
         currency
       }
