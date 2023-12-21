@@ -3071,6 +3071,7 @@
   "transaction.usingGiftCardFrom": "utilizar una {giftCard} de {collective}",
   "TransactionDetails.HostFee": "Esta transacción incluye {amount} Tarifas de Anfitrión",
   "TransactionDetails.PaymentProcessorFee": "This transaction includes {amount} payment processor fees",
+  "TransactionDetails.Tax": "This transaction includes {amount} {taxName}",
   "transactions.displayPendingContributions": "Mostrar contribuciones pendientes",
   "Transactions.DownloadCSV.Description": "Utiliza los filtros para definir las transacciones que quieres descargar.",
   "transactions.downloadcsvbutton": "Descargar CSV",

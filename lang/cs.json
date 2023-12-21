@@ -3071,6 +3071,7 @@
   "transaction.usingGiftCardFrom": "using a {giftCard} from {collective}",
   "TransactionDetails.HostFee": "Tato transakce obsahuje poplatek hostitele {amount}",
   "TransactionDetails.PaymentProcessorFee": "This transaction includes {amount} payment processor fees",
+  "TransactionDetails.Tax": "This transaction includes {amount} {taxName}",
   "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "Use the filters to define the transactions you would like to download.",
   "transactions.downloadcsvbutton": "Download CSV",

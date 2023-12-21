@@ -3071,6 +3071,7 @@
   "transaction.usingGiftCardFrom": "usando um {giftCard} de {collective}",
   "TransactionDetails.HostFee": "This transaction includes {amount} host fees",
   "TransactionDetails.PaymentProcessorFee": "This transaction includes {amount} payment processor fees",
+  "TransactionDetails.Tax": "This transaction includes {amount} {taxName}",
   "transactions.displayPendingContributions": "Display pending contributions",
   "Transactions.DownloadCSV.Description": "Use the filters to define the transactions you would like to download.",
   "transactions.downloadcsvbutton": "Baixar em CSV",
