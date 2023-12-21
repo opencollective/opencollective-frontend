@@ -271,7 +271,7 @@ class CreateExpensePage extends React.Component {
       const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
       await this.props.router.push({
         pathname: `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
-        query: pick(this.props.router.query, ['ocr']),
+        query: pick(this.props.router.query, ['ocr', 'mockImageUpload']),
       });
       toast({
         variant: 'success',

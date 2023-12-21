@@ -249,6 +249,7 @@
     "cross-env": "^7.0.3",
     "css-loader": "^6.8.1",
     "cypress": "^13.6.0",
+    "cypress-real-events": "^1.11.0",
     "cz-conventional-changelog": "^3.3.0",
     "esbuild": "0.19.10",
     "eslint": "^8.54.0",

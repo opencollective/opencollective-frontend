@@ -1,12 +1,10 @@
 import React from 'react';
 import { FormikProps } from 'formik';
-import { first, uniqBy } from 'lodash';
+import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { Account, UploadFileResult } from '../../lib/graphql/types/v2/graphql';
+import { Account } from '../../lib/graphql/types/v2/graphql';
 import { attachmentDropzoneParams } from './lib/attachments';
-import { expenseItemIsTouched } from './lib/items';
-import { updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import { Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
@@ -19,24 +17,13 @@ import AddNewAttachedFilesButton from './AddNewAttachedFilesButton';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 
 const ExpenseAttachedFilesForm = ({
-  collective,
   form,
   disabled,
   defaultValue,
   title,
   description,
-  hasOCRFeature = false,
 }: ExpenseAttachedFilesFormProps) => {
   const [files, setFiles] = React.useState(uniqBy(defaultValue, 'url'));
-  const onGraphQLUploadSuccess = (uploadResults: UploadFileResult[]) => {
-    const existingFiles = form.values.attachedFiles || [];
-    setFiles([...existingFiles, ...uploadResults.map(result => result.file)]);
-
-    // Invoices have a default empty item. If it's not touched, we overwrite it with the OCR result
-    const firstItem = first(form.values.items);
-    const itemIdxToReplace = firstItem && !expenseItemIsTouched(firstItem) ? 0 : undefined;
-    updateExpenseFormWithUploadResult(collective, form, uploadResults, [itemIdxToReplace]);
-  };
 
   return (
     <div>
@@ -65,9 +52,6 @@ const ExpenseAttachedFilesForm = ({
               setFiles(uploadedFiles);
               form.setFieldValue('attachedFiles', uploadedFiles);
             }}
-            useGraphQL={hasOCRFeature}
-            parseDocument={hasOCRFeature}
-            onGraphQLSuccess={onGraphQLUploadSuccess}
           />
         )}
       </Flex>
@@ -96,9 +80,6 @@ const ExpenseAttachedFilesForm = ({
             setFiles(uploadedFiles);
             form.setFieldValue('attachedFiles', uploadedFiles);
           }}
-          useGraphQL={hasOCRFeature}
-          parseDocument={hasOCRFeature}
-          onGraphQLSuccess={onGraphQLUploadSuccess}
         />
       )}
     </div>
