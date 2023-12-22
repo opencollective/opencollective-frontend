@@ -21,5 +21,5 @@ const experiments: Record<Experiment, ExperimentConfig> = {
 };
 
 export function isExperimentEnabled(experiment: Experiment, loggedInUser?: LoggedInUser): boolean {
-  return experiments?.[experiment]?.enabled(loggedInUser);
+  return experiments[experiment]?.enabled(loggedInUser);
 }

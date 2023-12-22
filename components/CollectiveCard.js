@@ -311,7 +311,7 @@ class CollectiveCard extends React.Component {
                 </div>
               </StatsWrapper>
             )}
-            {!hideRoles && roles && roles.size > 0 && (
+            {!hideRoles && roles.size > 0 && (
               <MembershipWrapper>
                 <Container
                   minHeight="13px"

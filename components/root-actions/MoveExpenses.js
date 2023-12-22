@@ -117,7 +117,7 @@ export default function MoveExpenses() {
         mt={4}
         width="100%"
         buttonStyle="primary"
-        disabled={!selectedExpenses.length === 0 || !destinationAccount}
+        disabled={selectedExpenses.length === 0 || !destinationAccount}
         onClick={() => setIsConfirmationModelOpen(true)}
       >
         {callToAction}

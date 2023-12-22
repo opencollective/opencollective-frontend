@@ -645,20 +645,18 @@ const CollectiveNavbar = ({
                     LoggedInUser={LoggedInUser}
                   />
                 )}
-                {!onlyInfos && (
-                  <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
-                    {isExpanded ? (
-                      <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
-                    ) : (
-                      <ExpandMenuIcon
-                        onClick={() => {
-                          mainContainerRef.current?.scrollIntoView(true);
-                          setExpanded(!isExpanded);
-                        }}
-                      />
-                    )}
-                  </Container>
-                )}
+                <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
+                  {isExpanded ? (
+                    <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                  ) : (
+                    <ExpandMenuIcon
+                      onClick={() => {
+                        mainContainerRef.current?.scrollIntoView(true);
+                        setExpanded(!isExpanded);
+                      }}
+                    />
+                  )}
+                </Container>
               </Container>
             </Container>
           )}

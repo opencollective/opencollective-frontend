@@ -342,7 +342,7 @@ const SectionContributions = ({ collective }) => {
             </H3>
           )}
         </ContainerSectionContent>
-        {availableFilters?.length > 1 && (
+        {availableFilters.length > 1 && (
           <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
             <StyledFilters
               filters={availableFilters}

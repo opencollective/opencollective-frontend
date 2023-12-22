@@ -109,7 +109,7 @@ const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?
           'tierId',
         ];
         const operationName = body.operationName || 'anonymous GraphQL query';
-        const variables = pick(body.variables, pickList) || {};
+        const variables = pick(body.variables || {}, pickList);
         // eslint-disable-next-line no-console
         console.log(
           '-> Fetched',

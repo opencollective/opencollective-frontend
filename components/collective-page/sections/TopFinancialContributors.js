@@ -16,7 +16,7 @@ const SectionTopFinancialContributors = ({ collective, financialContributors }) 
   const isEvent = collective.type === CollectiveType.EVENT;
   const [topOrganizations, topIndividuals] = getTopContributors(financialContributors);
 
-  if (isEvent || (!topOrganizations?.length && !topIndividuals?.length)) {
+  if (isEvent || (!topOrganizations.length && !topIndividuals.length)) {
     return null;
   }
 

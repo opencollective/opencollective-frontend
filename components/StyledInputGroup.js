@@ -138,13 +138,13 @@ const StyledInputGroup = ({
           {...inputProps}
           onFocus={e => {
             setFocus(true);
-            if (inputProps && inputProps.onFocus) {
+            if (inputProps.onFocus) {
               inputProps.onFocus(e);
             }
           }}
           onBlur={e => {
             setFocus(false);
-            if (inputProps && inputProps.onBlur) {
+            if (inputProps.onBlur) {
               inputProps.onBlur(e);
             }
           }}

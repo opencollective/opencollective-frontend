@@ -375,7 +375,7 @@ class TopBarProfileMenu extends React.Component {
                 <Hide lg md sm>
                   <Box height="90vh" p={3} overflowY="auto">
                     <Flex alignItems="center">
-                      {showUserAccount ? (
+                      <React.Fragment>
                         <P
                           color="black.700"
                           fontSize="12px"
@@ -384,26 +384,11 @@ class TopBarProfileMenu extends React.Component {
                           pr={2}
                           textTransform="uppercase"
                           whiteSpace="nowrap"
-                          onClick={this.toggleAccountInfo}
                         >
-                          ← <FormattedMessage id="Back" defaultMessage="Back" />
+                          <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
                         </P>
-                      ) : (
-                        <React.Fragment>
-                          <P
-                            color="black.700"
-                            fontSize="12px"
-                            fontWeight="500"
-                            letterSpacing="0.06em"
-                            pr={2}
-                            textTransform="uppercase"
-                            whiteSpace="nowrap"
-                          >
-                            <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
-                          </P>
-                          <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-                        </React.Fragment>
-                      )}
+                        <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+                      </React.Fragment>
                     </Flex>
                     <Flex
                       py={3}
@@ -425,7 +410,7 @@ class TopBarProfileMenu extends React.Component {
                           </P>
                         </Box>
                       </Flex>
-                      {!showUserAccount ? <ChevronRight size={20} color="#76777A" /> : ''}
+                      <ChevronRight size={20} color="#76777A" />
                     </Flex>
                     <ProfileMenuMemberships user={LoggedInUser} />
                   </Box>
