@@ -36,7 +36,7 @@ const JoinTheMovement = () => (
             <FormattedMessage id="e2c.joinTheMovement" defaultMessage="Join the movement and support us" />
           </H1>
         </Box>
-        <Box my={(null, null, null, null, 3)} width={['288px', '438px', null, '335px', '400px']}>
+        <Box my={[null, null, null, null, 3]} width={['288px', '438px', null, '335px', '400px']}>
           <SectionSubtitle
             fontSize={['20px', null, null, '24px']}
             lineHeight={['28px', null, null, '32px']}
