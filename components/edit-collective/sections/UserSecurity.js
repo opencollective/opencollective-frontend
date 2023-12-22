@@ -244,7 +244,7 @@ class UserSecurity extends React.Component {
       <Flex flexDirection="column">
         {this.renderPasswordManagement()}
 
-        <H3 fontSize="18px" fontWeight="700" mb={3}>
+        <H3 id="TwoFactorAuth" fontSize="18px" fontWeight="700" mb={3}>
           <FormattedMessage id="TwoFactorAuth" defaultMessage="Two-factor authentication" />
         </H3>
         <TwoFactorAuthenticationSettings individual={account} userTwoFactorAuthenticationMethods={twoFactorMethods} />
