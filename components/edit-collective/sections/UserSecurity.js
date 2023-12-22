@@ -60,6 +60,13 @@ class UserSecurity extends React.Component {
     this.setPassword = this.setPassword.bind(this);
   }
 
+  componentDidUpdate() {
+    if (window.location.hash) {
+      const section = document.querySelector(window.location.hash);
+      section.scrollIntoView();
+    }
+  }
+
   async setPassword() {
     const { password, passwordKey, currentPassword, passwordScore } = this.state;
 
@@ -244,7 +251,7 @@ class UserSecurity extends React.Component {
       <Flex flexDirection="column">
         {this.renderPasswordManagement()}
 
-        <H3 id="TwoFactorAuth" fontSize="18px" fontWeight="700" mb={3}>
+        <H3 id="two-factor-auth" fontSize="18px" fontWeight="700" mb={3}>
           <FormattedMessage id="TwoFactorAuth" defaultMessage="Two-factor authentication" />
         </H3>
         <TwoFactorAuthenticationSettings individual={account} userTwoFactorAuthenticationMethods={twoFactorMethods} />
