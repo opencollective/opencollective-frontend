@@ -247,7 +247,7 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
                     : props.onChange(PlatformTipOption.FIFTEEN_PERCENT, 0.15 * props.amount)
                 }
                 label={
-                  <span className="text-base">
+                  <span className="text-sm">
                     <FormattedMessage defaultMessage="I don't want to contribute to Open Collective" />
                   </span>
                 }
