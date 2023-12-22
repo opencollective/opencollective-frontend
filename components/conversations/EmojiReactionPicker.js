@@ -152,12 +152,12 @@ const EmojiReactionPicker = ({ comment, update }) => {
         if (comment) {
           return action({
             variables: { emoji: emoji, comment: { id: comment.id } },
-            optimisticResponse: getOptimisticResponse(comment, emoji, !isSelected, true),
+            optimisticResponse: getOptimisticResponse(comment, emoji, !isSelected),
           });
         } else if (update) {
           return action({
             variables: { emoji: emoji, update: { id: update.id } },
-            optimisticResponse: getOptimisticResponse(update, emoji, !isSelected, false),
+            optimisticResponse: getOptimisticResponse(update, emoji, !isSelected),
           });
         }
       },

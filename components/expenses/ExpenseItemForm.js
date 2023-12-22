@@ -288,6 +288,8 @@ const useExpenseItemExchangeRate = (form, itemPath) => {
   return { loading };
 };
 
+const UploadAnimation = () => <Lottie animationData={ScanningAnimationJSON} loop autoPlay />;
+
 /**
  * Form for a single attachment. Must be used with Formik.
  */
@@ -322,12 +324,16 @@ const ExpenseItemForm = ({
   const exchangeRate = get(form.values, `${itemPath}.amountV2.exchangeRate`);
   const referenceExchangeRate = get(form.values, `${itemPath}.referenceExchangeRate`);
 
+  // Store a ref to the form to make sure we can always access the latest values in async callbacks
+  const formRef = React.useRef(form);
+  formRef.current = form;
+
   return (
     <Box mb={18} data-cy="expense-attachment-form">
       <Flex flexWrap="wrap" gap="32px" mt={2}>
         {requireFile && (
           <Field name={getFieldName('url')}>
-            {({ field, form, meta }) => {
+            {({ field, meta }) => {
               const hasValidUrl = field.value && isURL(field.value);
               return (
                 <StyledInputField
@@ -347,23 +353,25 @@ const ExpenseItemForm = ({
                     error={
                       meta.error?.type === ERROR.FORM_FIELD_REQUIRED ? formatMessage(msg.receiptRequired) : meta.error
                     }
-                    onSuccess={({ url }) => form.setFieldValue(itemPath, { ...attachment, url, __isUploading: false })}
+                    onSuccess={({ url }) =>
+                      formRef.current.setFieldValue(itemPath, { ...attachment, url, __isUploading: false })
+                    }
                     mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=${attachmentKey}`}
                     fontSize="13px"
                     size={[84, 112]}
                     value={hasValidUrl && field.value}
                     onReject={(...args) => {
-                      form.setFieldValue(itemPath, { ...attachment, __isUploading: false });
+                      formRef.current.setFieldValue(itemPath, { ...attachment, __isUploading: false });
                       onUploadError(...args);
                     }}
                     useGraphQL={hasOCRFeature}
                     parseDocument={hasOCRFeature}
                     parsingOptions={{ currency: form.values.currency }}
                     onGraphQLSuccess={uploadResults => {
-                      updateExpenseFormWithUploadResult(collective, form, uploadResults, [itemIdx]);
+                      updateExpenseFormWithUploadResult(collective, formRef.current, uploadResults, [itemIdx]);
                     }}
                     isLoading={isLoading}
-                    UploadingComponent={() => <Lottie animationData={ScanningAnimationJSON} loop autoPlay />}
+                    UploadingComponent={UploadAnimation}
                     onDrop={() => form.setFieldValue(itemPath, { ...attachment, __isUploading: true })}
                   />
                 </StyledInputField>
@@ -528,7 +536,13 @@ const ExpenseItemForm = ({
                   <FormattedMessage defaultMessage="Expense category" />
                 </P>
                 <div className="flex max-h-[38px] grow items-center">
-                  <AccountingCategoryPill expense={form.values} host={collective.host} canEdit={false} showEmpty />
+                  <AccountingCategoryPill
+                    expense={form.values}
+                    host={collective.host}
+                    account={collective}
+                    canEdit={false}
+                    showEmpty
+                  />
                 </div>
               </Container>
             )}

@@ -4,8 +4,13 @@ const baseConfig = {
   env: {
     jest: true,
   },
-  extends: ['opencollective', 'plugin:styled-components-a11y/recommended', 'plugin:import/typescript'],
-  plugins: ['@typescript-eslint/eslint-plugin', 'react-hooks', 'simple-import-sort', 'formatjs'],
+  extends: [
+    'opencollective',
+    'plugin:styled-components-a11y/recommended',
+    'plugin:import/typescript',
+    'plugin:react-hooks/recommended',
+  ],
+  plugins: ['@typescript-eslint/eslint-plugin', 'simple-import-sort', 'formatjs'],
   rules: {
     'no-console': 'error',
     'require-atomic-updates': 'off',
@@ -51,7 +56,6 @@ const baseConfig = {
         message: 'describe.only should only be used for debugging purposes and is not allowed in production code',
       },
     ],
-    'react-hooks/rules-of-hooks': ['error'],
     'react/jsx-fragments': ['error', 'element'],
     // We can be stricter with these rules
     // because we don't have any occurences anymore
