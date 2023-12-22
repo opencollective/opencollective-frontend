@@ -211,7 +211,7 @@ export const useContributeOptions = (order, tiers, tiersLoading, disableCustomCo
     return getContributeOptions(intl, order, tiers, disableCustomContributions);
   }, [intl, order, tiers, disableCustomContributions]);
 
-  if (!contributeOptions.length === 0) {
+  if (contributeOptions.length === 0) {
     throw new Error('Could not compute at least one contribution option.');
   }
 

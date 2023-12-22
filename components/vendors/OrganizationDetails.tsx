@@ -118,7 +118,7 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
       </div>
 
       <div className="flex justify-stretch">
-        {admins && (
+        {admins.length > 0 && (
           <div className="mt-4 flex flex-1 flex-col">
             <SectionTitle>
               <FormattedMessage id="Admins" defaultMessage="Admins" />

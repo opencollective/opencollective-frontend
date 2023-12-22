@@ -530,7 +530,7 @@ class ContributionFlow extends React.Component {
       paymentMethod.paypalInfo = pick(stepPayment.paymentMethod.paypalInfo, paypalFields);
       // Define the right type (doesn't matter that much today, but make it future proof)
       if (paymentMethod.paypalInfo.subscriptionId) {
-        paymentMethod.type === PAYMENT_METHOD_TYPE.SUBSCRIPTION;
+        paymentMethod.type = PAYMENT_METHOD_TYPE.SUBSCRIPTION;
       }
     }
 
@@ -803,7 +803,7 @@ class ContributionFlow extends React.Component {
       steps.push({
         name: 'summary',
         label: intl.formatMessage(STEP_LABELS.summary),
-        isCompleted: noPaymentRequired || get(stepSummary, 'isReady', false),
+        isCompleted: get(stepSummary, 'isReady', false),
       });
     }
 

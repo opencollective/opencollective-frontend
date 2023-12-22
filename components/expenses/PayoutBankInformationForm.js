@@ -316,7 +316,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   }
 
   const transactionTypeValues = data.host.transferwise.requiredFields.map(rf => ({
-    label: CUSTOM_METHOD_LABEL_BY_CURRENCY?.[currency]?.requiredFields?.options?.[rf.type] || rf.title,
+    label: CUSTOM_METHOD_LABEL_BY_CURRENCY[currency]?.requiredFields?.options?.[rf.type] || rf.title,
     value: rf.type,
   }));
   // Some currencies offer different methods for the transaction
@@ -333,7 +333,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   const submitted = Boolean(formik.submitCount);
 
   const transactionMethodLabel =
-    CUSTOM_METHOD_LABEL_BY_CURRENCY?.[currency]?.requiredFields?.label ||
+    CUSTOM_METHOD_LABEL_BY_CURRENCY[currency]?.requiredFields?.label ||
     intl.formatMessage({
       id: 'PayoutBankInformationForm.TransactionMethod',
 

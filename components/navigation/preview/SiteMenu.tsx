@@ -38,7 +38,7 @@ export default function SiteMenu() {
           <Flex flex={1} flexDirection="column" overflowY="auto">
             <Flex flexDirection="column" py={2}>
               {LoggedInUser ? (
-                <DrawerMenuItem href={LoggedInUser ? '/dashboard' : '/'} onClick={onClose}>
+                <DrawerMenuItem href={'/dashboard'} onClick={onClose}>
                   <Flex alignItems="center" gridGap={2}>
                     <LayoutDashboard size={16} /> <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
                   </Flex>
