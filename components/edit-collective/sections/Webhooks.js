@@ -351,8 +351,8 @@ class Webhooks extends React.Component {
   }
 }
 
-const editCollectiveWebhooksQuery = gqlV1/* GraphQL */ `
-  query EditCollectiveWebhooks($collectiveSlug: String) {
+const collectiveWebhooksQuery = gqlV1/* GraphQL */ `
+  query CollectiveWebhooks($collectiveSlug: String) {
     Collective(slug: $collectiveSlug) {
       id
       type
@@ -385,20 +385,20 @@ const editCollectiveWebhooksMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-const addEditCollectiveWebhooksData = graphql(editCollectiveWebhooksQuery);
+const addEditCollectiveWebhooksData = graphql(collectiveWebhooksQuery);
 
-const editEditCollectiveWebhooksMutation = graphql(editCollectiveWebhooksMutation, {
+const addEditCollectiveWebhooksMutation = graphql(editCollectiveWebhooksMutation, {
   props: ({ mutate, ownProps }) => ({
     editWebhooks: variables =>
       mutate({
         variables,
         update: (cache, { data: { editWebhooks } }) => {
           const { Collective } = cache.readQuery({
-            query: editCollectiveWebhooksQuery,
+            query: collectiveWebhooksQuery,
             variables: { collectiveSlug: ownProps.collectiveSlug },
           });
           cache.writeQuery({
-            query: editCollectiveWebhooksQuery,
+            query: collectiveWebhooksQuery,
             data: { Collective: { ...Collective, notifications: editWebhooks } },
           });
         },
@@ -406,6 +406,6 @@ const editEditCollectiveWebhooksMutation = graphql(editCollectiveWebhooksMutatio
   }),
 });
 
-const addGraphql = compose(addEditCollectiveWebhooksData, editEditCollectiveWebhooksMutation);
+const addGraphql = compose(addEditCollectiveWebhooksData, addEditCollectiveWebhooksMutation);
 
 export default injectIntl(addGraphql(Webhooks));

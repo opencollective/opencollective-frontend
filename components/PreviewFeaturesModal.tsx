@@ -11,8 +11,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Switch } from './ui/Switch';
 import Link from './Link';
 
-const editAccountSettingsMutation = gql`
-  mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
+const editAccountPreviewFeaturesMutation = gql`
+  mutation EditAccountPreviewFeatures($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
       id
       settings
@@ -32,14 +32,14 @@ const PreviewFeatureCard = ({
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [isChecked, setIsChecked] = React.useState(LoggedInUser.hasPreviewFeatureEnabled(feature.key));
   const [loading, setLoading] = React.useState(false);
-  const [submitEditSettings] = useMutation(editAccountSettingsMutation, {
+  const [editAccountPreviewFeatures] = useMutation(editAccountPreviewFeaturesMutation, {
     context: API_V2_CONTEXT,
   });
 
   const togglePreviewFeature = async (featureKey, checked) => {
     setIsChecked(checked);
     setLoading(true);
-    await submitEditSettings({
+    await editAccountPreviewFeatures({
       variables: {
         account: { slug: LoggedInUser.collective.slug },
         key: `earlyAccess.${featureKey}`,

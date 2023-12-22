@@ -19,7 +19,7 @@ import DashboardSection from '../components/dashboard/DashboardSection';
 import { getMenuItems } from '../components/dashboard/Menu';
 import DashboardTopBar from '../components/dashboard/preview/DashboardTopBar';
 import SubMenu from '../components/dashboard/preview/SubMenu';
-import { adminPanelQuery } from '../components/dashboard/queries';
+import { dashboardQuery } from '../components/dashboard/queries';
 import AdminPanelSideBar from '../components/dashboard/SideBar';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
@@ -130,7 +130,7 @@ const DashboardPage = () => {
   const defaultSlug = lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
   const activeSlug = slug || defaultSlug;
 
-  const { data, loading } = useQuery(adminPanelQuery, {
+  const { data, loading } = useQuery(dashboardQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: activeSlug },
     skip: !activeSlug || !LoggedInUser,

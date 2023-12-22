@@ -162,7 +162,7 @@ class EditConnectedAccount extends React.Component {
    * This unfortunately refetches the entire settings query, see https://github.com/opencollective/opencollective/issues/1451
    */
   refetchConnectedAccounts = () => {
-    return this.props.client.refetchQueries({ include: ['EditCollectivePage'] });
+    return this.props.client.refetchQueries({ include: ['EditCollective'] });
   };
 
   render() {

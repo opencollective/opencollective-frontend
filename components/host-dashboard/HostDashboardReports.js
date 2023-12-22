@@ -8,10 +8,11 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { simpleDateToISOString } from '../../lib/date-utils';
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
+import { hostDashboardReportsQuery } from '../dashboard/sections/HostDashboardReports.tsx';
 import PeriodFilter from '../filters/PeriodFilter';
 import { Box, Flex, Grid } from '../Grid';
 import MessageBox from '../MessageBox';
@@ -28,98 +29,6 @@ import HostFeesSection from './reports-section/HostFeesSection';
 import PlatformTipsCollected from './reports-section/PlatformTipsCollected';
 import TotalMoneyManagedSection from './reports-section/TotalMoneyManagedSection';
 import TransactionsOverviewSection from './reports-section/TransactionsOverviewSection';
-
-const hostReportPageQuery = gql`
-  query HostReportsPage(
-    $hostSlug: String!
-    $account: [AccountReferenceInput!]
-    $dateFrom: DateTime
-    $dateTo: DateTime
-  ) {
-    host(slug: $hostSlug) {
-      id
-      legacyId
-      slug
-      name
-      currency
-      isHost
-      isActive
-      type
-      createdAt
-      hostFeePercent
-      isTrustedHost
-      stats {
-        id
-        balance(dateTo: $dateTo) {
-          valueInCents
-          currency
-        }
-      }
-      contributionStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
-        contributionsCount
-        oneTimeContributionsCount
-        recurringContributionsCount
-        dailyAverageIncomeAmount {
-          valueInCents
-        }
-      }
-      expenseStats(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
-        expensesCount
-        dailyAverageAmount {
-          valueInCents
-        }
-        invoicesCount
-        reimbursementsCount
-        grantsCount
-      }
-      hostMetrics(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
-        hostFees {
-          valueInCents
-          currency
-        }
-        hostFeeShare {
-          valueInCents
-          currency
-        }
-        platformTips {
-          valueInCents
-          currency
-        }
-        pendingPlatformTips {
-          valueInCents
-          currency
-        }
-        totalMoneyManaged {
-          valueInCents
-          currency
-        }
-      }
-      hostMetricsTimeSeries(account: $account, dateFrom: $dateFrom, dateTo: $dateTo) {
-        timeUnit
-        totalReceived {
-          timeUnit
-          nodes {
-            date
-            kind
-            amount {
-              value
-            }
-          }
-        }
-        totalSpent {
-          timeUnit
-          nodes {
-            date
-            kind
-            amount {
-              value
-            }
-          }
-        }
-      }
-    }
-  }
-`;
 
 const SectionTitle = ({ children, hint = null }) => (
   <Flex alignItems="center" justifyContent="space-between" mb={22}>
@@ -172,7 +81,7 @@ const HostDashboardReports = ({ accountSlug: hostSlug }) => {
       ? simpleDateToISOString(dateInterval?.to, true, dateInterval?.timezoneType)
       : null;
   const variables = { hostSlug, account: collectives, dateFrom, dateTo };
-  const { data, error, loading } = useQuery(hostReportPageQuery, { variables, context: API_V2_CONTEXT });
+  const { data, error, loading } = useQuery(hostDashboardReportsQuery, { variables, context: API_V2_CONTEXT });
   const host = data?.host;
 
   if (!loading) {

@@ -9,7 +9,7 @@ import { HostedCollectiveTypes } from '../../../lib/constants/collectives';
 import { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import { HostDashboardHostedCollectivesQueryVariables, HostFeeStructure } from '../../../lib/graphql/types/v2/graphql';
+import { DashboardHostedCollectivesQueryVariables, HostFeeStructure } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../lib/i18n/collective-type';
 import { formatHostFeeStructure } from '../../../lib/i18n/host-fee-structure';
@@ -38,7 +38,7 @@ const schema = z.object({
   type: isMulti(z.nativeEnum(HostedCollectiveTypes)).optional(),
 });
 
-const toVariables: FiltersToVariables<z.infer<typeof schema>, HostDashboardHostedCollectivesQueryVariables> = {
+const toVariables: FiltersToVariables<z.infer<typeof schema>, DashboardHostedCollectivesQueryVariables> = {
   orderBy: orderByFilter.toVariables,
 };
 
@@ -77,7 +77,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
 // TODO: This query is using `legacyId` for host and member.account to interface with the
 // legacy `AddFundsForm`. Once the new add funds form will be implemented, we can remove these fields.
 const hostedCollectivesQuery = gql`
-  query HostDashboardHostedCollectives(
+  query DashboardHostedCollectives(
     $hostSlug: String!
     $limit: Int!
     $offset: Int!

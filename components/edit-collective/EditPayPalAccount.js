@@ -6,7 +6,7 @@ import { trim } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { editCollectivePageQuery } from '../../lib/graphql/v1/queries';
+import { editCollectiveQuery } from '../../lib/graphql/v1/queries';
 
 import { getI18nLink, I18nSignInLink } from '../I18nFormatters';
 import StyledButton from '../StyledButton';
@@ -30,7 +30,7 @@ const EditPayPalAccount = props => {
   const isReceiving = props.variation === 'RECEIVING';
   const mutationOptions = {
     context: API_V2_CONTEXT,
-    refetchQueries: [{ query: editCollectivePageQuery, variables: { slug: props.collective.slug } }],
+    refetchQueries: [{ query: editCollectiveQuery, variables: { slug: props.collective.slug } }],
     awaitRefetchQueries: true,
   };
   const [connectedAccount, setConnectedAccount] = React.useState(props.connectedAccount);

@@ -8,7 +8,11 @@ import { z } from 'zod';
 import { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
 import { boolean, isMulti, limit, offset } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import { Currency, HostedVirtualCardsQueryVariables, VirtualCardStatus } from '../../../lib/graphql/types/v2/graphql';
+import {
+  Currency,
+  DashboardHostedVirtualCardsQueryVariables,
+  VirtualCardStatus,
+} from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { i18nHasMissingReceipts } from '../../../lib/i18n/receipts-filter';
 import { sortSelectOptions } from '../../../lib/utils';
@@ -64,7 +68,7 @@ const hostVirtualCardsMetadataQuery = gql`
 `;
 
 const hostVirtualCardsQuery = gql`
-  query HostedVirtualCards(
+  query DashboardHostedVirtualCards(
     $slug: String
     $limit: Int!
     $offset: Int!
@@ -158,7 +162,7 @@ type FilterMeta = {
   currency?: Currency;
 };
 
-const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedVirtualCardsQueryVariables, FilterMeta> = {
+const toVariables: FiltersToVariables<z.infer<typeof schema>, DashboardHostedVirtualCardsQueryVariables, FilterMeta> = {
   orderBy: orderByFilter.toVariables,
   date: dateFilter.toVariables,
   amount: (value, key, meta) => {

@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { MinusCircle } from '@styled-icons/boxicons-regular/MinusCircle';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { rejectTransactionMutation } from '../../../../lib/graphql/mutations';
 
 import ConfirmationModal from '../../../ConfirmationModal';
 import { Box, Flex } from '../../../Grid';
@@ -13,14 +14,6 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import TransactionRejectMessageForm from '../../../transactions/TransactionRejectMessageForm';
 import { Button } from '../../../ui/Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
-
-export const rejectTransactionMutation = gql`
-  mutation RejectTransaction($transaction: TransactionReferenceInput!, $message: String) {
-    rejectTransaction(transaction: $transaction, message: $message) {
-      id
-    }
-  }
-`;
 
 const TransactionRejectButton = props => {
   const [rejectTransaction, { error: mutationError }] = useMutation(rejectTransactionMutation, {

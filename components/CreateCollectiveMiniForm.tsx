@@ -132,7 +132,7 @@ const prepareMutationVariables = collective => {
 };
 
 const createCollectiveMutation = gqlV1/* GraphQL */ `
-  mutation CreateCollective($collective: CollectiveInputType!) {
+  mutation CreateCollectiveMiniForm($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
       id
       name

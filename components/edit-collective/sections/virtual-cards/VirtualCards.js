@@ -7,9 +7,10 @@ import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import { parseDateInterval } from '../../../../lib/date-utils';
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
 import Collapse from '../../../Collapse';
+import { accountVirtualCardsQuery } from '../../../dashboard/sections/virtual-cards/queries';
 import { Box, Flex, Grid } from '../../../Grid';
 import HTMLContent from '../../../HTMLContent';
 import { getI18nLink } from '../../../I18nFormatters';
@@ -20,94 +21,6 @@ import VirtualCard from '../../VirtualCard';
 
 import VirtualCardFilters from './VirtualCardFilters';
 
-export const virtualCardsQuery = gql`
-  query AccountVirtualCards(
-    $slug: String
-    $limit: Int!
-    $offset: Int!
-    $state: String
-    $merchantAccount: AccountReferenceInput
-    $dateFrom: DateTime
-    $dateTo: DateTime
-  ) {
-    account(slug: $slug) {
-      id
-      legacyId
-      slug
-      type
-      name
-      imageUrl
-      currency
-      ... on AccountWithHost {
-        isApproved
-        host {
-          legacyId
-          slug
-          id
-          type
-          name
-          imageUrl
-          settings
-          currency
-        }
-      }
-      virtualCards(
-        limit: $limit
-        offset: $offset
-        state: $state
-        merchantAccount: $merchantAccount
-        dateFrom: $dateFrom
-        dateTo: $dateTo
-      ) {
-        totalCount
-        limit
-        offset
-        nodes {
-          id
-          name
-          last4
-          data
-          currency
-          provider
-          privateData
-          createdAt
-          spendingLimitAmount
-          spendingLimitInterval
-          spendingLimitRenewsOn
-          remainingLimit
-          account {
-            id
-            slug
-            name
-            imageUrl
-          }
-          assignee {
-            id
-            name
-            slug
-            imageUrl
-          }
-        }
-      }
-      virtualCardMerchants {
-        nodes {
-          id
-          type
-          slug
-          name
-          currency
-          location {
-            id
-            address
-            country
-          }
-          imageUrl(height: 64)
-        }
-      }
-    }
-  }
-`;
-
 const VIRTUAL_CARDS_PER_PAGE = 6;
 
 const VirtualCards = ({ accountSlug, isDashboard }) => {
@@ -116,7 +29,7 @@ const VirtualCards = ({ accountSlug, isDashboard }) => {
   const offset = parseInt(routerQuery.offset) || 0;
   const { state, merchant, period } = routerQuery;
   const { from: dateFrom, to: dateTo } = parseDateInterval(period);
-  const { loading, data } = useQuery(virtualCardsQuery, {
+  const { loading, data } = useQuery(accountVirtualCardsQuery, {
     context: API_V2_CONTEXT,
     variables: {
       slug: accountSlug,

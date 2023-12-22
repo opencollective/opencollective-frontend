@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 import { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import { HostReportsPageQueryVariables } from '../../../lib/graphql/types/v2/graphql';
+import { HostDashboardReportsQueryVariables } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
 import Container from '../../Container';
@@ -33,8 +33,8 @@ import { Filterbar } from '../filters/Filterbar';
 import { hostedAccountFilter } from '../filters/HostedAccountFilter';
 import { DashboardSectionProps } from '../types';
 
-const hostReportPageQuery = gql`
-  query HostReportsPage(
+export const hostDashboardReportsQuery = gql`
+  query HostDashboardReports(
     $hostSlug: String!
     $account: [AccountReferenceInput!]
     $dateFrom: DateTime
@@ -157,7 +157,7 @@ type FilterMeta = {
   hostSlug: string;
 };
 
-const toVariables: FiltersToVariables<FilterValues, HostReportsPageQueryVariables, FilterMeta> = {
+const toVariables: FiltersToVariables<FilterValues, HostDashboardReportsQueryVariables, FilterMeta> = {
   date: dateFilter.toVariables,
   account: hostedAccountFilter.toVariables,
 };
@@ -186,7 +186,7 @@ const HostDashboardReports = ({ accountSlug: hostSlug }: DashboardSectionProps) 
     meta: { hostSlug },
   });
 
-  const { data, error, loading } = useQuery(hostReportPageQuery, {
+  const { data, error, loading } = useQuery(hostDashboardReportsQuery, {
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
   });
