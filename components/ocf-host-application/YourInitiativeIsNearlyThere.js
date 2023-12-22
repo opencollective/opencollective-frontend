@@ -43,7 +43,7 @@ const YourInitiativeIsNearlyThere = () => (
         alignItems="center"
         justifyContent="center"
         width={['288px', '360px']}
-        height={['128px', '160px']}
+        height="160px"
         mb="24px"
       >
         <NextIllustration
