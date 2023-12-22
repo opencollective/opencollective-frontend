@@ -536,7 +536,13 @@ const ExpenseItemForm = ({
                   <FormattedMessage defaultMessage="Expense category" />
                 </P>
                 <div className="flex max-h-[38px] grow items-center">
-                  <AccountingCategoryPill expense={form.values} host={collective.host} canEdit={false} showEmpty />
+                  <AccountingCategoryPill
+                    expense={form.values}
+                    host={collective.host}
+                    account={collective}
+                    canEdit={false}
+                    showEmpty
+                  />
                 </div>
               </Container>
             )}
