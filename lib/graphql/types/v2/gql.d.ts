@@ -134,10 +134,6 @@ export function gql(source: "\n  query IsUserFollowingConversation($id: String!)
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  fragment UpdateListFragment on UpdateCollection {\n    totalCount\n    offset\n    limit\n    nodes {\n      id\n      slug\n      title\n      summary\n      createdAt\n      publishedAt\n      isPrivate\n      userCanSeeUpdate\n      fromAccount {\n        id\n        type\n        name\n        slug\n        imageUrl\n      }\n    }\n  }\n"): typeof import('./graphql').UpdateListFragmentFragmentDoc;
-  /**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function gql(source: "\n  query ExpenseTags($searchTerm: String, $host: AccountReferenceInput, $account: AccountReferenceInput) {\n    expenseTagStats(tagSearchTerm: $searchTerm, host: $host, account: $account) {\n      nodes {\n        id\n        tag\n      }\n    }\n  }\n"): typeof import('./graphql').ExpenseTagsDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.

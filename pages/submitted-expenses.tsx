@@ -23,8 +23,8 @@ import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
+import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import { Dimensions } from '../components/collective-page/_constants';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
@@ -334,7 +334,7 @@ const submittedExpensesPageQuery = gql`
   }
 
   ${expensesListFieldsFragment}
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
   ${expenseHostFields}
 `;
 
@@ -364,4 +364,6 @@ const addExpensesPageData = graphql<SubmittedExpensesPageProps>(submittedExpense
   },
 });
 
+// ignore unused exports default
+// next.js export
 export default injectIntl(addExpensesPageData(withUser(withRouter(SubmittedExpensesPage))));

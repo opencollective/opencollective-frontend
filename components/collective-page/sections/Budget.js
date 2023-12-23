@@ -97,7 +97,7 @@ const budgetSectionAccountFieldsFragment = gql`
   }
 `;
 
-export const budgetSectionQuery = gql`
+const budgetSectionQuery = gql`
   query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind], $heavyAccount: Boolean!) {
     transactions(
       account: { slug: $slug }
@@ -131,7 +131,7 @@ export const budgetSectionQuery = gql`
   ${budgetSectionAccountFieldsFragment}
 `;
 
-export const budgetSectionForIndividualQuery = gql`
+const budgetSectionForIndividualQuery = gql`
   query BudgetSectionForIndividual($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
     transactions(
       account: { slug: $slug }
@@ -175,7 +175,7 @@ export const budgetSectionForIndividualQuery = gql`
   ${expenseHostFields}
 `;
 
-export const budgetSectionWithHostQuery = gql`
+const budgetSectionWithHostQuery = gql`
   query BudgetSectionWithHost($slug: String!, $limit: Int!, $kind: [TransactionKind], $heavyAccount: Boolean!) {
     transactions(
       account: { slug: $slug }

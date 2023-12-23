@@ -26,7 +26,7 @@ const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => 
 
 const WISE_PLATFORM_COLLECTIVE_SLUG = process.env.WISE_PLATFORM_COLLECTIVE_SLUG || process.env.TW_API_COLLECTIVE_SLUG;
 
-export const msg = defineMessages({
+const msg = defineMessages({
   currency: {
     id: 'Currency',
     defaultMessage: 'Currency',

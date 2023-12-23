@@ -29,7 +29,7 @@ const MenuWrapper = styled(Flex)`
   z-index: ${props => props.zindex || 3000};
 `;
 
-export const MenuBackdrop = styled.div`
+const MenuBackdrop = styled.div`
   position: fixed;
   top: 0;
   left: 0;

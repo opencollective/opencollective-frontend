@@ -36,6 +36,8 @@ class CreateEventPage extends React.Component {
   }
 }
 
-export const addLegacyCollectiveData = graphql(legacyCollectiveQuery);
+const addLegacyCollectiveData = graphql(legacyCollectiveQuery);
 
+// ignore unused exports default
+// next.js export
 export default withUser(addLegacyCollectiveData(CreateEventPage));

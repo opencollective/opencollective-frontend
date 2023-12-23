@@ -1,6 +1,6 @@
 import { gql } from '../../lib/graphql/helpers';
 
-import { collectiveNavbarFieldsFragment } from '../collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '../collective-navbar/fragments';
 
 export const adminPanelQuery = gql`
   query AdminPanel($slug: String!) {
@@ -64,5 +64,5 @@ export const adminPanelQuery = gql`
       }
     }
   }
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
 `;

@@ -46,6 +46,8 @@ export const HomePage = () => {
   );
 };
 
+// ignore unused exports getServerSideProps
+// next.js export
 export const getServerSideProps = async ({ req, res }) => {
   if (res && req) {
     const { locale } = getRequestIntl(req);
@@ -63,4 +65,6 @@ export const getServerSideProps = async ({ req, res }) => {
   return { props: { skipDataFromTree } };
 };
 
+// ignore unused exports default
+// next.js export
 export default HomePage;

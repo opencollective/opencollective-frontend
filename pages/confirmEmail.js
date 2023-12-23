@@ -123,8 +123,10 @@ const confirmUserEmailMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-export const addConfirmUserEmailMutation = graphql(confirmUserEmailMutation, {
+const addConfirmUserEmailMutation = graphql(confirmUserEmailMutation, {
   name: 'confirmUserEmail',
 });
 
+// ignore unused exports default
+// next.js export
 export default withUser(addConfirmUserEmailMutation(ConfirmEmailPage));

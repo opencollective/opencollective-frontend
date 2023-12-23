@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 
-export const NewsAndUpdatesContext = React.createContext({
+const NewsAndUpdatesContext = React.createContext({
   setShowNewsAndUpdates: () => {},
 });
 

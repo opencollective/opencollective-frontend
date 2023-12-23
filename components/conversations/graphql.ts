@@ -83,28 +83,3 @@ export const isUserFollowingConversationQuery = gql`
     }
   }
 `;
-
-export const updateListFragment = gql`
-  fragment UpdateListFragment on UpdateCollection {
-    totalCount
-    offset
-    limit
-    nodes {
-      id
-      slug
-      title
-      summary
-      createdAt
-      publishedAt
-      isPrivate
-      userCanSeeUpdate
-      fromAccount {
-        id
-        type
-        name
-        slug
-        imageUrl
-      }
-    }
-  }
-`;

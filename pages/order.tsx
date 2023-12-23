@@ -18,7 +18,7 @@ import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import Container from '../components/Container';
 import { confirmContributionFieldsFragment } from '../components/ContributionConfirmationModal';
 import DateTime from '../components/DateTime';
@@ -187,7 +187,7 @@ const orderPageQuery = gql`
     }
   }
 
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
   ${confirmContributionFieldsFragment}
 `;
 
@@ -201,6 +201,8 @@ const contributionPageQueryHelper = getSSRQueryHelpers<{ legacyId: number; colle
   }),
 });
 
+// ignore unused exports getServerSideProps
+// next.js export
 export const getServerSideProps: GetServerSideProps = contributionPageQueryHelper.getServerSideProps;
 
 const messages = defineMessages({
@@ -320,6 +322,8 @@ const getTransactionsToDisplay = (account, transactions) => {
   return [...accountTransactions, ...tipTransactionsToDisplay];
 };
 
+// ignore unused exports default
+// next.js export
 export default function OrderPage(props) {
   const { LoggedInUser } = useLoggedInUser();
   const prevLoggedInUser = usePrevious(LoggedInUser);

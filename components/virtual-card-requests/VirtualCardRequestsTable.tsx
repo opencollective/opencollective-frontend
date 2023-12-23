@@ -126,7 +126,7 @@ type VirtualCardRequestsTableMeta = {
   intl: IntlShape;
 };
 
-export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
+const tableColumns: ColumnDef<VirtualCardRequest>[] = [
   {
     accessorKey: 'account',
     header: () => <FormattedMessage defaultMessage="Account" />,

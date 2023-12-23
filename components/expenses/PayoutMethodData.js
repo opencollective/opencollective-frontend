@@ -23,22 +23,6 @@ const renderObject = object =>
     ];
   }, []);
 
-/**
- * @returns boolean: True if the payout method has displayable data
- */
-export const payoutMethodHasData = payoutMethod => {
-  switch (payoutMethod?.type) {
-    case PayoutMethodType.PAYPAL:
-      return Boolean(get(payoutMethod, 'data.email'));
-    case PayoutMethodType.OTHER:
-      return Boolean(get(payoutMethod, 'data.content'));
-    case PayoutMethodType.BANK_ACCOUNT:
-      return Boolean(get(payoutMethod, 'data.details'));
-    default:
-      return false;
-  }
-};
-
 const PRIVATE_DATA_PLACEHOLDER = '********';
 
 const getPmData = (payoutMethod, field, isLoading) => {

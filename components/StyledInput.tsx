@@ -136,13 +136,6 @@ StyledInput.defaultProps = {
   fontSize: '14px',
 };
 
-export const TextInput = styled(StyledInput)``;
-
-TextInput.defaultProps = {
-  ...StyledInput.defaultProps,
-  type: 'text',
-};
-
 export const SubmitInput = styled(StyledInput)`
   ${buttonStyle};
   ${buttonSize};

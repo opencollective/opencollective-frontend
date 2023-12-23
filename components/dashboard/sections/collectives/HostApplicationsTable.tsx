@@ -45,7 +45,7 @@ const StatusTag = ({ status }: { status: HostApplicationStatus }) => {
   }
 };
 
-export const columns: ColumnDef<HostApplication>[] = [
+const columns: ColumnDef<HostApplication>[] = [
   {
     accessorKey: 'account',
     header: () => <FormattedMessage defaultMessage="Account" />,

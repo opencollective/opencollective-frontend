@@ -544,9 +544,7 @@ class SearchPage extends React.Component {
   }
 }
 
-export { SearchPage as MockSearchPage };
-
-export const searchPageQuery = gql`
+const searchPageQuery = gql`
   query SearchPage(
     $term: String!
     $type: [AccountType]
@@ -630,7 +628,7 @@ export const searchPageQuery = gql`
   }
 `;
 
-export const addSearchPageData = graphql(searchPageQuery, {
+const addSearchPageData = graphql(searchPageQuery, {
   options: props => ({
     context: API_V2_CONTEXT,
     variables: {
@@ -646,4 +644,6 @@ export const addSearchPageData = graphql(searchPageQuery, {
   }),
 });
 
+// ignore unused exports default
+// next.js export
 export default injectIntl(withRouter(addSearchPageData(SearchPage)));

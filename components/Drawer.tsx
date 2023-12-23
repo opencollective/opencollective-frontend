@@ -7,7 +7,7 @@ import { createGlobalStyle } from 'styled-components';
 import { Sheet, SheetContent } from './ui/Sheet';
 import StyledRoundButton from './StyledRoundButton';
 
-export const DrawerActionsContext = createContext(null);
+const DrawerActionsContext = createContext(null);
 
 export const useDrawerActionsContainer = () => useContext(DrawerActionsContext);
 

@@ -232,4 +232,6 @@ const addCollectivePageData = ssrGraphQLQuery({
   preload: (client, result) => preloadCollectivePageGraphqlQueries(client, result?.data?.Collective),
 });
 
+// ignore unused exports default
+// next.js export
 export default withRouter(withUser(addCollectivePageData(CollectivePage)));

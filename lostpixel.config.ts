@@ -1,6 +1,9 @@
 // eslint-disable-next-line node/no-unpublished-import
 import { CustomProjectConfig } from 'lost-pixel';
 
+// ignore unused exports config
+// config file
+
 export const config: Partial<CustomProjectConfig> = {
   storybookShots: {
     storybookUrl: './storybook-static',

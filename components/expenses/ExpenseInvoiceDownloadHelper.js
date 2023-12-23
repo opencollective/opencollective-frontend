@@ -18,17 +18,17 @@ const getPrettyDate = expense => {
   return `-${utc.split('T')[0]}`;
 };
 
-export const getExpenseInvoiceFilename = (collective, expense) => {
+const getExpenseInvoiceFilename = (collective, expense) => {
   const prettyDate = getPrettyDate(expense);
   return `Expense-${expense.legacyId}-${collective?.slug}-invoice${prettyDate}.pdf`;
 };
 
-export const generateInvoiceBlob = async expense => {
+const generateInvoiceBlob = async expense => {
   const invoiceUrl = expenseInvoiceUrl(expense.id);
   return fetchFromPDFService(invoiceUrl);
 };
 
-export const downloadExpenseInvoice = async (collective, expense, { setLoading, isLoading, onError }) => {
+const downloadExpenseInvoice = async (collective, expense, { setLoading, isLoading, onError }) => {
   if (isLoading) {
     return false;
   }
@@ -46,7 +46,7 @@ export const downloadExpenseInvoice = async (collective, expense, { setLoading, 
   }
 };
 
-export const useExpenseInvoiceDownloadHelper = ({ expense, collective, onError, disablePreview }) => {
+const useExpenseInvoiceDownloadHelper = ({ expense, collective, onError, disablePreview }) => {
   const [isLoading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
   const { toast } = useToast();

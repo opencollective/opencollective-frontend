@@ -20,7 +20,7 @@ import { Skeleton } from '../../../ui/Skeleton';
 
 import { collectiveBalanceQuery } from './queries';
 
-export function CollapsibleAccountsList({ accounts, label }) {
+function CollapsibleAccountsList({ accounts, label }) {
   const totalBalance = accounts.reduce((acc, child) => acc + child.stats.balance.valueInCents, 0);
   return (
     <div className="rounded-xl border bg-background">

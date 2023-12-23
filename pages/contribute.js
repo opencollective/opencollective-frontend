@@ -472,4 +472,6 @@ const addContributePageData = ssrGraphQLQuery({
   }),
 });
 
+// ignore unused exports default
+// next.js export
 export default withUser(addContributePageData(ContributePage));

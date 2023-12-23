@@ -69,6 +69,8 @@ const tierPageQueryHelpers = getSSRQueryHelpers<{ tierId: number }, TierPageProp
   }),
 });
 
+// ignore unused exports getServerSideProps
+// next.js export
 export const getServerSideProps = tierPageQueryHelpers.getServerSideProps;
 
 /**
@@ -118,4 +120,6 @@ const TierPage = (pageProps: InferGetServerSidePropsType<typeof getServerSidePro
   );
 };
 
+// ignore unused exports default
+// next.js export
 export default TierPage;

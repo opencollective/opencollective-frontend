@@ -660,4 +660,6 @@ const addHoc = compose(
   injectIntl,
 );
 
+// ignore unused exports default
+// next.js export
 export default addHoc(CreateExpensePage);

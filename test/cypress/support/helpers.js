@@ -1,3 +1,6 @@
+// ignore unused exports repeatIt, repeatDescribe
+// will these be used in the future?
+
 import { flatten } from 'lodash';
 
 /** Helper to loop on specific test */

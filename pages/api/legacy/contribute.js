@@ -1,5 +1,7 @@
 import path from 'path';
 
+// ignore unused exports default
+// next.js export
 export default function handler(req, res) {
   const color = req.query.color === 'blue' ? 'blue' : 'white';
   const verb = ['donate', 'contribute'].includes(req.query.verb) ? req.query.verb : 'contribute';

@@ -62,7 +62,7 @@ const formatDateLabel = ({ startDate, index, timeUnit }): string => {
   }
 };
 
-export const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expanded }): ApexOptions => ({
+const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expanded }): ApexOptions => ({
   chart: {
     toolbar: { show: false },
     zoom: { enabled: false },

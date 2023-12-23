@@ -241,4 +241,6 @@ const addRedeemedPageData = graphql(redeemedPageQuery, {
   skip: props => !props.collectiveSlug,
 });
 
+// ignore unused exports default
+// next.js export
 export default withUser(withData(addRedeemedPageData(RedeemedPage)));

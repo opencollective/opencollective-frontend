@@ -24,7 +24,7 @@ import { useToast } from '../ui/useToast';
 import { banAccountsMutation } from './BanAccounts';
 import BanAccountsSummary from './BanAccountsSummary';
 
-export const searchQuery = gql`
+const searchQuery = gql`
   query BanAccountSearch($term: String!, $offset: Int) {
     accounts(
       searchTerm: $term

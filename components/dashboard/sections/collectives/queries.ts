@@ -2,7 +2,7 @@ import { gql } from '../../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 
-export const processApplicationAccountFields = gql`
+const processApplicationAccountFields = gql`
   fragment ProcessHostApplicationFields on AccountWithHost {
     isActive
     approvedAt
@@ -126,7 +126,7 @@ export const processApplicationMutation = gql`
   ${processApplicationAccountFields}
 `;
 
-export const hostedCollectiveFields = gql`
+const hostedCollectiveFields = gql`
   fragment HostedCollectiveFields on Account {
     id
     legacyId

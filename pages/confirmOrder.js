@@ -116,7 +116,7 @@ class ConfirmOrderPage extends React.Component {
   }
 }
 
-export const confirmOrderMutation = gql`
+const confirmOrderMutation = gql`
   mutation ConfirmOrder($order: OrderReferenceInput!) {
     confirmOrder(order: $order) {
       order {
@@ -144,4 +144,6 @@ const addConfirmOrderMutation = graphql(confirmOrderMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
+// ignore unused exports default
+// next.js export
 export default withUser(addConfirmOrderMutation(withRouter(ConfirmOrderPage)));

@@ -38,7 +38,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 import { ExpenseAccountingCategoryPill } from './ExpenseAccountingCategoryPill';
 import { ExpenseItemDescriptionHint } from './ItemDescriptionHint';
 
-export const msg = defineMessages({
+const msg = defineMessages({
   previewImgAlt: {
     id: 'ExpenseReceiptImagePreview.Alt',
     defaultMessage: 'Expense receipt preview',

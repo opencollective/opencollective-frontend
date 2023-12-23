@@ -100,4 +100,6 @@ ConfirmCollectiveDeletion.propTypes = {
   logout: PropTypes.func,
 };
 
+// ignore unused exports default
+// next.js export
 export default withUser(ConfirmCollectiveDeletion);

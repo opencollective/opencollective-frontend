@@ -124,7 +124,7 @@ const getSuccessToast = (intl, action, collective, result): Toast => {
   }
 };
 
-export function HostApplication({
+function HostApplication({
   host,
   application,
   onClose,

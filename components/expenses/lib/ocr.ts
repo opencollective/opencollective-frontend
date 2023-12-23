@@ -129,7 +129,7 @@ type FieldsWithOCRSupport = 'description' | 'incurredAt' | 'amountV2';
 
 type ExpenseItemFields = Extract<keyof ExpenseItemFormValues, FieldsWithOCRSupport>;
 
-export const ITEM_OCR_FIELD_MAPPING: Record<ExpenseItemFields, string> = {
+const ITEM_OCR_FIELD_MAPPING: Record<ExpenseItemFields, string> = {
   incurredAt: '__parsingResult.date',
   description: '__parsingResult.description',
   amountV2: '__parsingResult.amount',

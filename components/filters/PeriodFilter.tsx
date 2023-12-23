@@ -47,7 +47,7 @@ export const getIntervalFromValue = value => {
  * Update `interval` with a new value for `from` or `to` and return the updated interval
  * as a new object.
  */
-export const getNewInterval = (interval, changeField, newValue) => {
+const getNewInterval = (interval, changeField, newValue) => {
   const newInterval = { ...interval };
   newInterval[changeField] = newValue;
   return newInterval;
@@ -57,7 +57,7 @@ export const getNewInterval = (interval, changeField, newValue) => {
  * Date is locally stored as '2020-01-01'. We need to force the time to make sure it's not modified
  * by timezones when parsed.
  */
-export const parseDateForDateRange = (dateStr, isEndOfDay) => {
+const parseDateForDateRange = (dateStr, isEndOfDay) => {
   if (!dateStr) {
     return null;
   } else if (!isEndOfDay) {
@@ -68,6 +68,7 @@ export const parseDateForDateRange = (dateStr, isEndOfDay) => {
 };
 
 const UTC_LABEL = defineMessage({ defaultMessage: 'Coordinated Universal Time' });
+
 const getTimeZoneTypeName = (intl, timezone) => {
   if (timezone === 'local') {
     try {

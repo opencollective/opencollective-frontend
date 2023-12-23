@@ -150,4 +150,6 @@ ConfirmGuestPage.getInitialProps = ({ req: { query } }) => {
   return { token: query.token, email: query.email };
 };
 
+// ignore unused exports default
+// next.js export
 export default ConfirmGuestPage;

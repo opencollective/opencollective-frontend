@@ -80,7 +80,7 @@ const renderOptions = (value: DateFilterValueType, setValue: (val: DateFilterVal
   }
 };
 
-export default function DateFilter({
+function DateFilter({
   value,
   onChange,
 }: {

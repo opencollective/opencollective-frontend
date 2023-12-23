@@ -48,7 +48,7 @@ const TopAvatarsContainer = styled.div`
   gap: 28px;
 `;
 
-export const SCOPES_INFO = {
+const SCOPES_INFO = {
   email: {
     label: <FormattedMessage defaultMessage="Access your email address." />,
     icon: <Mail size={16} />,

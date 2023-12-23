@@ -1,7 +1,7 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import { omit } from 'lodash';
-import { defineMessages, IntlShape, useIntl } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 
 import { AccountingCategoryKind, ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
@@ -64,16 +64,6 @@ export const AccountingCategoryKindI18n = defineMessages({
     defaultMessage: 'Contributions',
   },
 });
-
-export function mapKindToOption(
-  intl: IntlShape,
-  kind: AccountingCategoryKind,
-): { value: AccountingCategoryKind; label: string } {
-  return {
-    value: kind,
-    label: intl.formatMessage(AccountingCategoryKindI18n[kind]),
-  };
-}
 
 type AccountingCategoryFormProps = {
   formik: ReturnType<typeof useFormik<FormValues>>;

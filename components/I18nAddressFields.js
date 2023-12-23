@@ -127,7 +127,7 @@ ZoneSelect.propTypes = {
   onChange: PropTypes.func,
 };
 
-export const FormikLocationFieldRenderer = ({ name, label, required, prefix, info }) => {
+const FormikLocationFieldRenderer = ({ name, label, required, prefix, info }) => {
   const validate = required ? value => (value ? undefined : `${label} is required`) : undefined;
   return (
     <Field key={name} name={`${prefix}.${name}`} validate={validate}>

@@ -159,8 +159,8 @@ const GroupHeading = ({ children, ...props }: GroupHeadingProps) => (
 /**
  * A map to override the default components of react-select
  */
-export const customComponents = { SelectContainer, Option, MultiValue, GroupHeading, ValueContainer };
-export const searchableCustomComponents = { ...customComponents, DropdownIndicator: DropdownSearchIndicator };
+const customComponents = { SelectContainer, Option, MultiValue, GroupHeading, ValueContainer };
+const searchableCustomComponents = { ...customComponents, DropdownIndicator: DropdownSearchIndicator };
 
 const getComponents = (components, useSearchIcon) => {
   const baseComponents = useSearchIcon ? searchableCustomComponents : customComponents;

@@ -4,6 +4,8 @@ import { FormattedMessage } from 'react-intl';
 import Link from './Link';
 import StyledLink from './StyledLink';
 
+// ignore unused exports
+
 // eslint-disable-next-line react/display-name
 export const getI18nLink = linkProps => chunks => (
   <StyledLink {...linkProps}>{linkProps?.children || chunks}</StyledLink>

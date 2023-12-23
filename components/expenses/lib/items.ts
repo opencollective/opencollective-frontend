@@ -48,13 +48,6 @@ export const newExpenseItem = (attrs = {}, expenseCurrency: string): ExpenseItem
   amountV2: getExpenseItemAmountV2FromNewAttrs(attrs, expenseCurrency),
 });
 
-/**
- * Returns true if the item has been touched by the user
- */
-export const expenseItemIsTouched = (item: ExpenseItemFormValues): boolean => {
-  return Boolean(item.incurredAt || item.description || item.amountV2 || item.url);
-};
-
 /** Helper to add a new item to the form */
 export const addNewExpenseItem = (
   formik: FormikProps<ExpenseFormValues>,

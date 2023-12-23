@@ -12,7 +12,7 @@ import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
 import { useToast } from '../ui/useToast';
 
-export const editAccountTypeMutation = gql`
+const editAccountTypeMutation = gql`
   mutation EditAccountType($account: AccountReferenceInput!) {
     editAccountType(account: $account) {
       id

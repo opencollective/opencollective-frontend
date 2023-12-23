@@ -1,3 +1,5 @@
+// ignore unused exports
+
 /**
  * Shared dimensions between collective page's components
  */

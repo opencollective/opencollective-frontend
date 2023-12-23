@@ -52,4 +52,4 @@ function Badge({ className, type, size, round, ...props }: BadgeProps) {
   return <div className={cn(badgeVariants({ type, size, round }), className)} {...props} />;
 }
 
-export { Badge, badgeVariants };
+export { Badge };

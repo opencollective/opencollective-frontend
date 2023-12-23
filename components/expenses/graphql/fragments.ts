@@ -1,7 +1,7 @@
 import { gql } from '../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../AccountHoverCard';
-import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '../../collective-navbar/fragments';
 
 export const loggedInAccountExpensePayoutFieldsFragment = gql`
   fragment LoggedInAccountExpensePayoutFields on Individual {
@@ -613,7 +613,7 @@ export const expensePageExpenseFieldsFragment = gql`
   }
 
   ${expenseHostFields}
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
   ${accountingCategoryFields}
   ${accountHoverCardFields}
   ${expenseValuesByRoleFragment}

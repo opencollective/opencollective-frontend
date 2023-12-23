@@ -24,7 +24,8 @@ const InBetweenDate = BaseDate.extend({
   gte: SimpleDateString,
   lte: SimpleDateString,
 });
-export const LegacyPeriod = z
+
+const LegacyPeriod = z
   .string()
   .regex(/^(?<from>[^→]+)(→(?<to>.+?(?=~UTC|$)))?(~(?<timezoneType>UTC))?$/)
   .transform(str => {

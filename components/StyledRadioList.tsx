@@ -14,7 +14,7 @@ import { Box } from './Grid';
  * @param {array|object} options: an options iterable
  * @param {string|function} keyGetter: a key to get value from, or an extract func
  */
-export const getKeyExtractor = (options, keyGetter) => {
+const getKeyExtractor = (options, keyGetter) => {
   if (typeof keyGetter === 'function') {
     return item => keyGetter(item).toString();
   } else if (typeof keyGetter === 'string') {
@@ -48,7 +48,7 @@ const RadioInput = styled.input`
  *  JSON representation of the item will be used. This can have very bad performances
  *  impact, so we should avoid using it.
  */
-export const getItems = (options, keyGetter) => {
+const getItems = (options, keyGetter) => {
   const keyExtractor = getKeyExtractor(options, keyGetter);
 
   return Object.keys(options).reduce(

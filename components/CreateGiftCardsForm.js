@@ -74,9 +74,6 @@ InlineField.propTypes = {
   isLabelClickable: PropTypes.bool,
 };
 
-/** Entry title */
-export const Title = styled.summary``;
-
 const DeliverTypeRadioSelector = styled(Flex)`
   justify-content: space-evenly;
   align-items: center;
@@ -647,7 +644,7 @@ class CreateGiftCardsForm extends Component {
  * gift cards, as a gift card cannot be used as a source payment method
  * for another payment method.
  */
-export const collectiveSourcePaymentMethodsQuery = gqlV1/* GraphQL */ `
+const collectiveSourcePaymentMethodsQuery = gqlV1/* GraphQL */ `
   query CollectiveSourcePaymentMethods($id: Int) {
     Collective(id: $id) {
       id

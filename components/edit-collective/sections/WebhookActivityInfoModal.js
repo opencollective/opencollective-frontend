@@ -88,7 +88,7 @@ const getFakeExpenseEventActivity = type => {
   });
 };
 
-export const getFakeMember = () => ({
+const getFakeMember = () => ({
   role: 'BACKER',
   description: null,
   since: '2022-07-18T10:30:14.985Z',

@@ -131,4 +131,6 @@ const Welcome = () => {
   );
 };
 
+// ignore unused exports default
+// next.js export
 export default Welcome;

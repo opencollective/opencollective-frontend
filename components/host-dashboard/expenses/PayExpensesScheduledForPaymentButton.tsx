@@ -14,7 +14,7 @@ import Loading from '../../Loading';
 import StyledButton from '../../StyledButton';
 import { useToast } from '../../ui/useToast';
 
-export const scheduledExpensesQuery = gql`
+const scheduledExpensesQuery = gql`
   query ExpensesScheduledForPayment($hostSlug: String!) {
     expenses(host: { slug: $hostSlug }, status: SCHEDULED_FOR_PAYMENT, payoutMethodType: BANK_ACCOUNT) {
       totalCount

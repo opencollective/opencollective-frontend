@@ -21,7 +21,7 @@ interface AgreementMeta extends TableMeta<Agreement> {
   onFilePreview: (agreement: Agreement) => void;
 }
 
-export const columns: ColumnDef<Agreement>[] = [
+const columns: ColumnDef<Agreement>[] = [
   {
     accessorKey: 'account',
     header: () => <FormattedMessage defaultMessage="Account" />,

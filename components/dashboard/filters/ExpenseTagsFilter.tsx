@@ -21,7 +21,7 @@ export const expenseTagFilter: FilterConfig<ExpenseTagFilterValue> = {
   },
 };
 
-export const expenseTagsQuery = gql`
+const expenseTagsQuery = gql`
   query ExpenseTags($searchTerm: String, $host: AccountReferenceInput, $account: AccountReferenceInput) {
     expenseTagStats(tagSearchTerm: $searchTerm, host: $host, account: $account) {
       nodes {
@@ -32,7 +32,7 @@ export const expenseTagsQuery = gql`
   }
 `;
 
-export default function ExpenseTagsFilter({
+function ExpenseTagsFilter({
   meta: { expenseTags, hostSlug, accountSlug },
   ...props
 }: FilterComponentProps<ExpenseTagFilterValue, { accountSlug?: string; hostSlug?: string; expenseTags?: string[] }>) {
