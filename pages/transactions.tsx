@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
+import { loggedInUserCanAccessFinancialData } from '../lib/collective';
 import { CollectiveType } from '../lib/constants/collectives';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';

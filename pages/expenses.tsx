@@ -6,7 +6,7 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { getCollectivePageMetadata, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
+import { getCollectivePageMetadata, loggedInUserCanAccessFinancialData } from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';

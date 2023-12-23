@@ -3,7 +3,7 @@ import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import { find, get, isEmpty, pick, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
-import { canContributeRecurring, getCollectivePageMetadata } from '../../lib/collective.lib';
+import { canContributeRecurring, getCollectivePageMetadata } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import INTERVALS from '../../lib/constants/intervals';
 import {

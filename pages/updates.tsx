@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
+import { shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';

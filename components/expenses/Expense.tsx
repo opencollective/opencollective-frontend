@@ -10,7 +10,7 @@ import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { getCollectiveTypeForUrl, getSuggestedTags } from '../../lib/collective.lib';
+import { getCollectiveTypeForUrl, getSuggestedTags } from '../../lib/collective';
 import CommentType from '../../lib/constants/commentTypes';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';

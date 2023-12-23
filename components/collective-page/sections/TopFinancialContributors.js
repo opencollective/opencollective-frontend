@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { getTopContributors } from '../../../lib/collective.lib';
+import { getTopContributors } from '../../../lib/collective';
 import { CollectiveType } from '../../../lib/constants/collectives';
 
 import ContainerSectionContent from '../ContainerSectionContent';

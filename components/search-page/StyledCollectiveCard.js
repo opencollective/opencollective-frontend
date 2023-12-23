@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getCollectiveMainTag } from '../../lib/collective.lib';
+import { getCollectiveMainTag } from '../../lib/collective';
 import { IGNORED_TAGS } from '../../lib/constants/collectives';
 import { getCountryDisplayName, getFlagEmoji } from '../../lib/i18n/countries';
 
