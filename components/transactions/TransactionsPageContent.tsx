@@ -4,7 +4,7 @@ import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { isNil, omit, omitBy, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { isIndividualAccount } from '../../lib/collective.lib';
+import { isIndividualAccount } from '../../lib/collective';
 import roles from '../../lib/constants/roles';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { parseDateInterval } from '../../lib/date-utils';

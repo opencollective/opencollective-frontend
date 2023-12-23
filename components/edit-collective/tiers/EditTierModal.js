@@ -7,7 +7,7 @@ import { isNil, omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getLegacyIdForCollective } from '../../../lib/collective.lib';
+import { getLegacyIdForCollective } from '../../../lib/collective';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';

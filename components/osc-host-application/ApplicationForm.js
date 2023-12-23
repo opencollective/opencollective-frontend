@@ -8,7 +8,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import spdxLicenses from 'spdx-license-list';
 
-import { suggestSlug } from '../../lib/collective.lib';
+import { suggestSlug } from '../../lib/collective';
 import { OPENSOURCE_COLLECTIVE_ID } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import {

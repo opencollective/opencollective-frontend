@@ -6,7 +6,7 @@ import { NextRouter, withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-intl';
 import styled from 'styled-components';
 
-import { getCollectivePageMetadata, getSuggestedTags, isIndividualAccount } from '../lib/collective.lib';
+import { getCollectivePageMetadata, getSuggestedTags, isIndividualAccount } from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
