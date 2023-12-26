@@ -5,11 +5,16 @@ import styled from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 
-import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Image from '../Image';
 import StyledCard from '../StyledCard';
 import { P } from '../Text';
+
+import grantIllustration from '../../public/static/images/grant.gif';
+import grantAnimation from '../../public/static/images/grant-animation.gif';
+import invoiceIllustration from '../../public/static/images/invoice-animation.gif';
+import invoiceIllustrationStatic from '../../public/static/images/invoice-animation-static.jpg';
+import receiptIllustration from '../../public/static/images/receipt-animation.gif';
+import receiptIllustrationStatic from '../../public/static/images/receipt-animation-static.jpg';
 
 const ExpenseTypeLabels = defineMessages({
   [expenseTypes.INVOICE]: {
@@ -41,14 +46,15 @@ const ExpenseTypeDescription = defineMessages({
   },
 });
 
-const TypeIllustration = styled(Container)`
+const TypeIllustration = styled.img.attrs({ alt: '' })`
+  width: 48px;
+  height: 48px;
+`;
+
+const StaticTypeIllustration = styled(TypeIllustration)`
   position: absolute;
   background: white;
 `;
-
-const StaticTypeIllustration = styled(TypeIllustration)``;
-
-const AnimatedTypeIllustration = styled(TypeIllustration)``;
 
 const ExpenseTypeOptionContainer = styled.label`
   display: flex;
@@ -71,35 +77,30 @@ const ExpenseTypeOptionContainer = styled.label`
     margin-right: 4px;
   }
 
-  // Animate gif on hover by hiding the static illustration
+  // Animate gif on hover by hidding the static illustration
   &:hover {
     ${StaticTypeIllustration} {
-      display: none;
-    }
-  }
-  &:not(:hover) {
-    ${AnimatedTypeIllustration} {
-      display: none;
+      opacity: 0;
     }
   }
 `;
 
 const illustrations = {
-  [expenseTypes.INVOICE]: '/static/images/invoice-animation.gif',
-  [expenseTypes.RECEIPT]: '/static/images/receipt-animation.gif',
-  [expenseTypes.GRANT]: '/static/images/grant-animation.gif',
+  [expenseTypes.INVOICE]: invoiceIllustration,
+  [expenseTypes.RECEIPT]: receiptIllustration,
+  [expenseTypes.GRANT]: grantAnimation,
 };
 
 const staticIllustrations = {
-  [expenseTypes.INVOICE]: '/static/images/invoice-animation-static.jpg',
-  [expenseTypes.RECEIPT]: '/static/images/receipt-animation-static.jpg',
-  [expenseTypes.GRANT]: '/static/images/grant.gif',
+  [expenseTypes.INVOICE]: invoiceIllustrationStatic,
+  [expenseTypes.RECEIPT]: receiptIllustrationStatic,
+  [expenseTypes.GRANT]: grantIllustration,
 };
 
 const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
   const { formatMessage } = useIntl();
-  const illustrationSrc = illustrations[type] || '/static/images/receipt-animation.gif';
-  const staticIllustrationSrc = staticIllustrations[type] || '/static/images/receipt-animation-static.jpg';
+  const illustrationSrc = illustrations[type] || receiptIllustration;
+  const staticIllustrationSrc = staticIllustrations[type] || receiptIllustrationStatic;
   return (
     <ExpenseTypeOptionContainer data-cy={`radio-expense-type-${type}`}>
       <Box alignSelf={['center', 'baseline', null, 'center']}>
