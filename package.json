@@ -177,7 +177,7 @@
     "langs:update-progress": "babel-node scripts/update-translation-progress.js && prettier --write lib/constants/locales.js",
     "lint": "eslint . --ignore-path .gitignore --ext .js,.jsx,.ts,.tsx,.graphql",
     "lint:fix": "npm run lint -- --fix",
-    "lint:quiet": "npm run lint -- --quiet",
+    "lint:quiet": "npx cross-env NODE_OPTIONS=--trace-deprecation npm run lint -- --quiet",
     "prettier": "prettier \"*.@(js|ts|tsx|json|md)\" \"@(components|lib|pages|scripts|server|test|stories)/**/*.@(js|ts|tsx|json|md|mdx)\"",
     "prettier:check": "npm run prettier -- --check",
     "prettier:write": "npm run prettier -- --write",
