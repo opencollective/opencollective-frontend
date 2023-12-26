@@ -135,6 +135,7 @@ const CURRENCY_PICKER_STYLES = {
   control: {
     border: 'none',
     background: '#F7F8FA',
+    minHeight: '37px', // 39px - 2px border
   },
   menu: {
     width: '280px',
