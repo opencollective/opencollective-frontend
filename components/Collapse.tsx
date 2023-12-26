@@ -101,8 +101,8 @@ const Collapse = ({ children, title, buttonSize, defaultIsOpen, ...props }) => {
           <div>
             <div>{title}</div>
             <CollapseBtn size={buttonSize} ml={3}>
-              <ChevronUp size="80%" data-item="chevron-up" />
-              <ChevronDown size="80%" data-item="chevron-down" />
+              <ChevronUp size="60%" data-item="chevron-up" />
+              <ChevronDown size="60%" data-item="chevron-down" />
             </CollapseBtn>
           </div>
         </summary>

@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { pick } from 'lodash';
+import { AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -24,7 +25,8 @@ import StyledInputFormikField from '../StyledInputFormikField';
 import StyledLink from '../StyledLink';
 import StyledSelect from '../StyledSelect';
 import { H3, H4, P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { Checkbox } from '../ui/Checkbox';
+import { useToast } from '../ui/useToast';
 import WarnIfUnsavedChanges from '../WarnIfUnsavedChanges';
 
 import DeletePersonalTokenModal from './DeletePersonalTokenModal';
@@ -36,12 +38,13 @@ const personalTokenSettingsFragment = gql`
     name
     scope
     expiresAt
+    preAuthorize2FA
     token
   }
 `;
 
 const personalTokenQuery = gql`
-  query PersonalTokenQuery($id: String!) {
+  query PersonalToken($id: String!) {
     personalToken(id: $id) {
       id
       ...PersonalTokenSettings
@@ -87,7 +90,7 @@ const LABEL_STYLES = { fontWeight: 700, fontSize: '16px', lineHeight: '24px' };
 const PersonalTokenSettings = ({ backPath, id }) => {
   const intl = useIntl();
   const router = useRouter();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const { data, loading, error } = useQuery(personalTokenQuery, { variables: { id }, context: API_V2_CONTEXT });
   const [updateToken] = useMutation(updatePersonalTokenMutation, { context: API_V2_CONTEXT });
@@ -111,18 +114,31 @@ const PersonalTokenSettings = ({ backPath, id }) => {
             </H3>
             <StyledHr ml={2} flex="1" borderColor="black.400" />
           </Flex>
-          <StyledCard maxWidth="600px" p={3} my={4}>
+          <StyledCard maxWidth="600px" p={3} mt={4}>
             <H4 fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb="20px">
               <FormattedMessage defaultMessage="Personal Token" />
             </H4>
             <Flex flexWrap="wrap" justifyContent="space-between">
-              <Flex flexDirection="column" width="100%">
-                <CodeContainer data-cy="personalToken-token" fontSize="14px" color="black.800" css={{}}>
-                  {data.personalToken.token}
-                </CodeContainer>
+              <Flex flexDirection="column" width="100%" data-cy="personalToken-token">
+                <ObfuscatedClientSecret secret={data.personalToken.token} />
               </Flex>
             </Flex>
           </StyledCard>
+          <P mb={4} mt="10px" fontSize={12} color="black.700" letter-spacing="-0.4px">
+            {intl.formatMessage(
+              {
+                id: 'token.docs',
+                defaultMessage:
+                  'Pass this code as Personal-Token HTTP header or personalToken query parameter in the URL. <Link>More info</Link>.',
+              },
+              {
+                Link: getI18nLink({
+                  href: 'https://docs.opencollective.com/help/developers/personal-tokens',
+                  openInNewTab: true,
+                }),
+              },
+            )}
+          </P>
           <Formik
             initialValues={{
               ...data.personalToken,
@@ -133,7 +149,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
             validate={values => validatePersonalTokenValues(intl, values)}
             onSubmit={async (values, { resetForm }) => {
               try {
-                const filteredValue = pick(values, ['name', 'scope', 'expiresAt']);
+                const filteredValue = pick(values, ['name', 'scope', 'expiresAt', 'preAuthorize2FA']);
                 const personalToken = {
                   ...filteredValue,
                   id,
@@ -141,8 +157,8 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                   expiresAt: filteredValue.expiresAt ? filteredValue.expiresAt : null,
                 };
                 const result = await updateToken({ variables: { personalToken } });
-                addToast({
-                  type: TOAST_TYPE.SUCCESS,
+                toast({
+                  variant: 'success',
                   message: intl.formatMessage(
                     { defaultMessage: 'Personal token "{name}" updated' },
                     { name: result.data.updatePersonalToken.name },
@@ -155,7 +171,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                   },
                 });
               } catch (e) {
-                addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+                toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }
             }}
           >
@@ -209,6 +225,35 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                       data-cy="personal-token-scope"
                     />
                   )}
+                </StyledInputFormikField>
+
+                <StyledInputFormikField
+                  name="preAuthorize2FA"
+                  mt={20}
+                  labelProps={LABEL_STYLES}
+                  label={
+                    <div className="flex items-center">
+                      <AlertTriangle className="mr-2 inline-block" size={16} />
+                      <span>
+                        {intl.formatMessage({ id: 'token.advancedPrivileges', defaultMessage: 'Advanced privileges' })}
+                      </span>
+                    </div>
+                  }
+                >
+                  {({ form, field }) => {
+                    return (
+                      <div className="my-1 flex items-center">
+                        <Checkbox
+                          id="preAuthorize2FA-checkbox"
+                          checked={field.value}
+                          onCheckedChange={value => form.setFieldValue(field.name, value)}
+                        />
+                        <label htmlFor="preAuthorize2FA-checkbox" className="ml-2 text-xs font-normal leading-none">
+                          <FormattedMessage defaultMessage="Allow this token to directly use operations that would normally require 2FA" />
+                        </label>
+                      </div>
+                    );
+                  }}
                 </StyledInputFormikField>
 
                 <StyledInputFormikField

@@ -62,7 +62,7 @@ class Updates extends React.Component {
 
     return (
       <div className="Updates">
-        <Container position="relative" border="1px solid #e6e8eb" borderRadius={5}>
+        <Container position="relative" border="1px solid #e6e8eb" borderRadius={5} data-cy="updatesList">
           {this.state.loading && (
             <LoadingContainer>
               <FormattedMessage id="loading" defaultMessage="loading" />
@@ -85,7 +85,7 @@ class Updates extends React.Component {
           )}
         </Container>
         {showLoadMore && (
-          <Container margin="1rem" textAlign="center">
+          <Container margin="0.65rem" textAlign="center">
             <StyledButton onClick={this.fetchMore} textTransform="capitalize">
               {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
               {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}

@@ -1,6 +1,6 @@
 import React, { Fragment, MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -17,7 +17,7 @@ import {
 import CreatableSelect from 'react-select/creatable';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import colors from '../lib/theme/colors';
 
 import { Flex } from './Grid';
@@ -188,7 +188,7 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
             placeholder={intl.formatMessage({ id: 'collective.tags.input.placeholder', defaultMessage: '+ Add tags' })}
             isMulti
             value={selected}
-            menuPortalTarget={document.body}
+            menuPortalTarget={typeof document === 'undefined' ? null : document.body}
             components={{
               MultiValue,
               SelectContainer,
@@ -207,8 +207,10 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
             onChange={(selectedOptions: TagOption[]) => setSelected(selectedOptions)}
             styles={{
               menuPortal: styles => ({ ...styles, zIndex: 9999 }),
-              control: (baseStyles, state) => ({
-                ...baseStyles,
+              menu: styles => ({ ...styles, fontSize: '14px' }),
+              control: (styles, state) => ({
+                ...styles,
+                fontSize: '14px',
                 boxShadow: `inset 0px 2px 2px ${colors.primary[50]}`,
                 borderColor: state.isFocused ? colors.primary[500] : colors.black[300],
                 '&:hover': {
@@ -236,7 +238,7 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
       <AnimateHeight height={suggestedTags?.length > 0 ? 'auto' : 0}>
         <Flex mt={2} gap={'6px'} flexWrap="wrap" alignItems={'center'}>
           {suggestedTags && (
-            <Span color="black.600" mr={1}>
+            <Span color="black.600" mr={1} fontSize="12px">
               <FormattedMessage defaultMessage="Popular tags:" />
             </Span>
           )}

@@ -39,3 +39,13 @@ next-env.d.ts
 # Frontend components build files
 scripts/publish-components/.tmp
 .rollup.cache
+
+# Sentry
+.sentryclirc
+
+# pdfjs worker - copied from node_modules by webpack (see next.config.js)
+public/static/scripts/pdf.worker.min.js
+
+# pdfjs character maps - copied from node_modules by webpack (see next.config.js)
+public/static/cmaps
+.vercel

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { BarChart } from '@styled-icons/material/BarChart';
 import { FormatListBulleted } from '@styled-icons/material/FormatListBulleted';
 import { PieChart } from '@styled-icons/material/PieChart';
@@ -11,7 +11,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { alignSeries, extractSeriesFromTimeSeries } from '../../../../lib/charts';
 import { formatCurrency } from '../../../../lib/currency-utils';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
 import { Box, Flex } from '../../../Grid';
@@ -34,8 +34,14 @@ import {
   TagMarker,
 } from './common';
 
-const budgetSectionExpenseQuery = gql`
-  query BudgetSectionExpenseQuery($slug: String!, $from: DateTime, $to: DateTime) {
+const makeLabel = (intl, label) => {
+  return label === 'OTHERS_COMBINED'
+    ? intl.formatMessage({ id: 'Tags.OthersCombined', defaultMessage: 'Others Combined' })
+    : label;
+};
+
+export const budgetSectionExpenseQuery = gql`
+  query BudgetSectionExpense($slug: String!, $from: DateTime, $to: DateTime) {
     account(slug: $slug) {
       id
       currency
@@ -65,6 +71,7 @@ const budgetSectionExpenseQuery = gql`
     }
   }
 `;
+
 const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
   const [tmpDateInterval, setTmpDateInterval] = React.useState(defaultTimeInterval);
   const [graphType, setGraphType] = React.useState(GRAPH_TYPES.LIST);
@@ -98,16 +105,16 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
             disabled={loading}
           />
           <GraphTypeButton active={graphType === GRAPH_TYPES.LIST} onClick={() => setGraphType(GRAPH_TYPES.LIST)}>
-            <FormatListBulleted />
+            <FormatListBulleted size="18px" />
           </GraphTypeButton>
           <GraphTypeButton active={graphType === GRAPH_TYPES.TIME} onClick={() => setGraphType(GRAPH_TYPES.TIME)}>
-            <Timeline />
+            <Timeline size="18px" />
           </GraphTypeButton>
           <GraphTypeButton active={graphType === GRAPH_TYPES.BAR} onClick={() => setGraphType(GRAPH_TYPES.BAR)}>
-            <BarChart />
+            <BarChart size="18px" />
           </GraphTypeButton>
           <GraphTypeButton active={graphType === GRAPH_TYPES.PIE} onClick={() => setGraphType(GRAPH_TYPES.PIE)}>
-            <PieChart />
+            <PieChart size="18px" />
           </GraphTypeButton>
         </Flex>
       </Flex>
@@ -155,10 +162,10 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
                 />,
               ]}
               rows={data?.account?.stats.expensesTags.map((expenseTag, i) =>
-                makeBudgetTableRow(expenseTag.id + expenseTag.count, [
+                makeBudgetTableRow(expenseTag.label + expenseTag.count, [
                   <React.Fragment key={expenseTag.label}>
                     <TagMarker color={COLORS[i % COLORS.length]} />
-                    {expenseTag.label}
+                    {makeLabel(intl, expenseTag.label)}
                   </React.Fragment>,
                   expenseTag.count,
                   formatCurrency(expenseTag.amount.valueInCents, expenseTag.amount.currency),
@@ -206,7 +213,9 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
                 width="100%"
                 height="300px"
                 options={{
-                  labels: data?.account?.stats.expensesTags.map(expenseTag => capitalize(expenseTag.label)),
+                  labels: data?.account?.stats.expensesTags.map(expenseTag =>
+                    capitalize(makeLabel(intl, expenseTag.label)),
+                  ),
                   colors: COLORS,
                   chart: {
                     id: 'chart-budget-expenses-pie',

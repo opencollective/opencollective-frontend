@@ -7,10 +7,10 @@ import { truncate } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import expenseStatus from '../../lib/constants/expense-status';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nTransactionKind, i18nTransactionType } from '../../lib/i18n/transaction';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -45,7 +45,8 @@ export const getDisplayedAmount = (transaction, collective) => {
   const isCredit = transaction.type === TransactionTypes.CREDIT;
   const hasOrder = transaction.order !== null;
   const isExpense = transaction.kind === TransactionKind.EXPENSE;
-  const isSelf = transaction.fromAccount.slug === collective.slug;
+
+  const isSelf = transaction.fromAccount?.slug === collective.slug;
   const isProcessingOrPending =
     hasOrder && [ORDER_STATUS.PROCESSING, ORDER_STATUS.PENDING].includes(transaction.order?.status);
 
@@ -92,7 +93,7 @@ const ItemTitleWrapper = ({ expense, order, children }) => {
         <StyledLink
           as={Link}
           underlineOnHover
-          href={`${getCollectivePageRoute(order.toAccount)}/orders/${order.legacyId}`}
+          href={`${getCollectivePageRoute(order.toAccount)}/contributions/${order.legacyId}`}
         >
           {children}
         </StyledLink>
@@ -136,7 +137,7 @@ const getExpenseStatusTag = (expense, isRefund, isRefunded) => {
   } else if (isRefund) {
     expenseStatusLabel = 'COMPLETED';
   } else {
-    expenseStatusLabel = expense?.status || expenseStatus.PAID;
+    expenseStatusLabel = expense?.status || ExpenseStatus.PAID;
   }
   return (
     <ExpenseStatusTag
@@ -217,7 +218,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
         <Flex flexWrap="wrap" justifyContent="space-between">
           <Flex flex="1" minWidth="60%" mr={3}>
             <Box mr={3}>
-              <LinkCollective collective={avatarCollective}>
+              <LinkCollective collective={avatarCollective} withHoverCard>
                 <Avatar collective={avatarCollective} radius={40} />
               </LinkCollective>
             </Box>
@@ -238,14 +239,12 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   </Span>
                 </ItemTitleWrapper>
                 {isOwnUserProfile && transaction.fromAccount?.isIncognito && (
-                  <Span ml={1} css={{ verticalAlign: 'text-bottom' }}>
-                    <PrivateInfoIcon color="#969BA3">
-                      <FormattedMessage
-                        id="PrivateTransaction"
-                        defaultMessage="This incognito transaction is only visible to you"
-                      />
-                    </PrivateInfoIcon>
-                  </Span>
+                  <PrivateInfoIcon className="ml-1 align-bottom text-muted-foreground">
+                    <FormattedMessage
+                      id="PrivateTransaction"
+                      defaultMessage="This incognito transaction is only visible to you"
+                    />
+                  </PrivateInfoIcon>
                 )}
               </Container>
               <P mt="4px" fontSize="12px" lineHeight="20px" color="black.700" data-cy="transaction-details">
@@ -256,7 +255,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                     <FormattedMessage
                       id="Transaction.from"
                       defaultMessage="from {name}"
-                      values={{ name: <StyledLink as={LinkCollective} collective={fromAccount} /> }}
+                      values={{ name: <StyledLink as={LinkCollective} withHoverCard collective={fromAccount} /> }}
                     />
                     &nbsp;
                   </Fragment>
@@ -265,7 +264,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   <FormattedMessage
                     id="Transaction.to"
                     defaultMessage="to {name}"
-                    values={{ name: <StyledLink as={LinkCollective} collective={toAccount} /> }}
+                    values={{ name: <StyledLink as={LinkCollective} withHoverCard collective={toAccount} /> }}
                   />
                 }
                 {giftCardEmitterAccount && (
@@ -276,7 +275,9 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                       defaultMessage="using a {giftCard} from {collective}"
                       values={{
                         giftCard: <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" />,
-                        collective: <StyledLink as={LinkCollective} collective={giftCardEmitterAccount} />,
+                        collective: (
+                          <StyledLink as={LinkCollective} withHoverCard collective={giftCardEmitterAccount} />
+                        ),
                       }}
                     />
                   </React.Fragment>

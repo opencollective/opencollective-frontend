@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { BarChart } from '@styled-icons/material/BarChart';
 import { FormatListBulleted } from '@styled-icons/material/FormatListBulleted';
 import { PieChart } from '@styled-icons/material/PieChart';
@@ -11,7 +11,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { alignSeries, extractSeriesFromTimeSeries } from '../../../../lib/charts';
 import { formatCurrency } from '../../../../lib/currency-utils';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
 import { Box, Flex } from '../../../Grid';
@@ -34,8 +34,8 @@ import {
   TagMarker,
 } from './common';
 
-const budgetSectionContributionsQuery = gql`
-  query BudgetSectionContributionsQuery($slug: String!, $from: DateTime, $to: DateTime) {
+export const budgetSectionContributionsQuery = gql`
+  query BudgetSectionContributions($slug: String!, $from: DateTime, $to: DateTime) {
     account(slug: $slug) {
       id
       currency
@@ -98,16 +98,16 @@ const ContributionsBudget = ({ collective, defaultTimeInterval, ...props }) => {
             disabled={loading}
           />
           <GraphTypeButton active={graphType === GRAPH_TYPES.LIST} onClick={() => setGraphType(GRAPH_TYPES.LIST)}>
-            <FormatListBulleted />
+            <FormatListBulleted size="18px" />
           </GraphTypeButton>
           <GraphTypeButton active={graphType === GRAPH_TYPES.TIME} onClick={() => setGraphType(GRAPH_TYPES.TIME)}>
-            <Timeline />
+            <Timeline size="18px" />
           </GraphTypeButton>
           <GraphTypeButton active={graphType === GRAPH_TYPES.BAR} onClick={() => setGraphType(GRAPH_TYPES.BAR)}>
-            <BarChart />
+            <BarChart size="18px" />
           </GraphTypeButton>
           <GraphTypeButton active={graphType === GRAPH_TYPES.PIE} onClick={() => setGraphType(GRAPH_TYPES.PIE)}>
-            <PieChart />
+            <PieChart size="18px" />
           </GraphTypeButton>
         </Flex>
       </Flex>

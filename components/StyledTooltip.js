@@ -110,6 +110,8 @@ const REACT_POPPER_MODIFIERS = [
           case 'top':
           case 'bottom':
             return [0, 3];
+          case 'right':
+            return [0, 8];
           default:
             return [];
         }
@@ -118,13 +120,19 @@ const REACT_POPPER_MODIFIERS = [
   },
 ];
 
-const TooltipContent = ({ place, content, onMouseEnter, onMouseLeave }) => {
+const TooltipContent = ({ place, content, onMouseEnter, onMouseLeave, noArrow }) => {
   return ReactDOM.createPortal(
     <Popper placement={place} modifiers={REACT_POPPER_MODIFIERS}>
       {({ ref, style, placement, arrowProps }) => (
-        <StyledTooltipContainer ref={ref} style={style} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+        <StyledTooltipContainer
+          ref={ref}
+          style={style}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+          data-cy="tooltip-content"
+        >
           {typeof content === 'function' ? content() : content}
-          <Arrow ref={arrowProps.ref} data-placement={placement} style={arrowProps.style} />
+          {!noArrow && <Arrow ref={arrowProps.ref} data-placement={placement} style={arrowProps.style} />}
         </StyledTooltipContainer>
       )}
     </Popper>,
@@ -153,6 +161,8 @@ class StyledTooltip extends React.Component {
     delayHide: PropTypes.number,
     /** If true, children will be rendered directly, without any tooltip. Useful to build conditional tooltips */
     noTooltip: PropTypes.bool,
+    /** If true, the arrow will be hidden */
+    noArrow: PropTypes.bool,
     /** The component that will be used as a container for the children */
     childrenContainer: PropTypes.any,
     /** The trigger. Either:
@@ -214,6 +224,7 @@ class StyledTooltip extends React.Component {
         verticalAlign={this.props.containerVerticalAlign}
         lineHeight={this.props.containerLineHeight}
         cursor={this.props.containerCursor}
+        data-cy="tooltip-trigger"
       >
         {this.props.children}
       </ChildrenContainer>
@@ -237,6 +248,7 @@ class StyledTooltip extends React.Component {
               content={this.props.content}
               onMouseEnter={this.onMouseEnter}
               onMouseLeave={this.onMouseLeave}
+              noArrow={this.props.noArrow}
             />
           )}
         </Manager>

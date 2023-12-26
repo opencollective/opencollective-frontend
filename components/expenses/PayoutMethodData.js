@@ -17,7 +17,7 @@ const renderObject = object =>
     }
     return [
       ...acc,
-      <P key={key} fontSize="11px" lineHeight="18px">
+      <P key={key} fontSize="14px" lineHeight="18px">
         <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: startCase(key) }} /> {value}
       </P>,
     ];
@@ -64,13 +64,13 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
       return (
         <div>
           {showLabel && (
-            <Container fontSize="11px" fontWeight="500" mb={2}>
+            <Container fontSize="14px" fontWeight="700" mb={2}>
               <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" />
               &nbsp;&nbsp;
-              <PrivateInfoIcon color="#969BA3" />
+              <PrivateInfoIcon />
             </Container>
           )}
-          <Container fontSize="11px" color="black.700">
+          <Container fontSize="14px" color="black.700">
             {getPmData(payoutMethod, 'email', isLoading)}
           </Container>
         </div>
@@ -79,13 +79,13 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
       return (
         <div>
           {showLabel && (
-            <Container fontSize="11px" fontWeight="500" mb={2}>
+            <Container fontSize="14px" fontWeight="700" mb={2}>
               <FormattedMessage id="Details" defaultMessage="Details" />
               &nbsp;&nbsp;
-              <PrivateInfoIcon color="#969BA3" />
+              <PrivateInfoIcon />
             </Container>
           )}
-          <Container fontSize="11px" color="black.700">
+          <Container fontSize="14px" color="black.700">
             {getPmData(payoutMethod, 'content', isLoading)}
           </Container>
         </div>
@@ -94,14 +94,14 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
       return (
         <div>
           {showLabel && (
-            <Container fontSize="11px" fontWeight="500" mb={2}>
+            <Container fontSize="14px" fontWeight="700" mb={2}>
               <FormattedMessage id="Details" defaultMessage="Details" />
               &nbsp;&nbsp;
-              <PrivateInfoIcon color="#969BA3" />
+              <PrivateInfoIcon />
             </Container>
           )}
           {payoutMethod.data ? (
-            <Container fontSize="11px" color="black.700">
+            <Container fontSize="14px" color="black.700">
               <FormattedMessage
                 id="BankInfo.Type"
                 defaultMessage="Type: {type}"

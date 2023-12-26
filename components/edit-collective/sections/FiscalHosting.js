@@ -20,6 +20,8 @@ const activateCollectiveAsHostMutation = gqlV1/* GraphQL */ `
     activateCollectiveAsHost(id: $id) {
       id
       currency
+      isActive
+      isDeletable
       isHost
       plan {
         id
@@ -34,6 +36,8 @@ const deactivateCollectiveAsHostMutation = gqlV1/* GraphQL */ `
     deactivateCollectiveAsHost(id: $id) {
       id
       currency
+      isActive
+      isDeletable
       isHost
       plan {
         id
@@ -179,7 +183,11 @@ const FiscalHosting = ({ collective }) => {
   useKeyboardShortcut({ callback: handlePrimaryBtnClick, keyMatch: ENTER_KEY });
 
   return (
-    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start">
+    <Container display="flex" flexDirection="column" width={1} alignItems="flex-start" mb={50}>
+      <SettingsSectionTitle>
+        <FormattedMessage id="editCollective.fiscalHosting" defaultMessage="Fiscal Hosting" />
+      </SettingsSectionTitle>
+
       {!isHostAccount && (
         <P>
           <FormattedMessage
@@ -189,12 +197,6 @@ const FiscalHosting = ({ collective }) => {
             }
           />
         </P>
-      )}
-
-      {isHostAccount && (
-        <SettingsSectionTitle>
-          <FormattedMessage id="host.deactivate" defaultMessage="Deactivate as Host" />
-        </SettingsSectionTitle>
       )}
 
       {isHostAccount && (
@@ -256,7 +258,7 @@ const FiscalHosting = ({ collective }) => {
             )}
           </ModalHeader>
           <ModalBody>
-            <P mb="1rem">
+            <P mb="0.65rem">
               <FormattedMessage
                 id="collective.hostAccount.modal.description"
                 defaultMessage={

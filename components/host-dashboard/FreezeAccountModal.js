@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import { collectivePageQuery } from '../collective-page/graphql/queries';
 import { Flex } from '../Grid';
@@ -12,7 +12,7 @@ import StyledButton from '../StyledButton';
 import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../StyledModal';
 import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const editAccountFreezeStatusMutation = gql`
   mutation EditAccountFreezeStatus($account: AccountReferenceInput!, $action: AccountFreezeAction!, $message: String) {
@@ -31,7 +31,7 @@ const editAccountFreezeStatusMutation = gql`
 
 const FreezeAccountModal = ({ collective, ...props }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [message, setMessage] = useState('');
   const isUnfreezing = collective.isFrozen;
   const [editAccountFreezeStatus, { loading }] = useMutation(editAccountFreezeStatusMutation, {
@@ -134,8 +134,8 @@ const FreezeAccountModal = ({ collective, ...props }) => {
                   awaitRefetchQueries: true,
                 });
                 const successMsgArgs = { accountName: collective.name, accountSlug: collective.slug };
-                addToast({
-                  type: TOAST_TYPE.SUCCESS,
+                toast({
+                  variant: 'success',
                   message: isUnfreezing
                     ? intl.formatMessage(
                         { defaultMessage: '{accountName} (@{accountSlug}) has been unfrozen' },
@@ -146,9 +146,9 @@ const FreezeAccountModal = ({ collective, ...props }) => {
                         successMsgArgs,
                       ),
                 });
-                props?.onClose();
+                props.onClose();
               } catch (e) {
-                addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+                toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }
             }}
           >

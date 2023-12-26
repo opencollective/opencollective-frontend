@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective.lib';
+import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { getCollectiveTypeKey, isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 
@@ -43,7 +43,6 @@ const OrganizationSettingsMenuLinks = ({ collective, isAccountantOnly }) => {
           <MenuLink collective={collective} section={COLLECTIVE_SECTIONS.ACTIVITY_LOG} />
           <MenuLink collective={collective} section={FISCAL_HOST_SECTIONS.SECURITY} />
           <MenuLink collective={collective} section={ALL_SECTIONS.ADVANCED} />
-          {!isHostAccount(collective) && <MenuLink collective={collective} section={ALL_SECTIONS.FISCAL_HOSTING} />}
         </React.Fragment>
       )}
     </React.Fragment>
@@ -72,18 +71,23 @@ const Menu = ({ collective, isAccountantOnly }) => {
           <MenuSectionHeader>
             <FormattedMessage id="HostDashboard" defaultMessage="Host Dashboard" />
           </MenuSectionHeader>
-          <MenuLink collective={collective} section={HOST_SECTIONS.EXPENSES} if={!isAccountantOnly} />
-          <MenuLink collective={collective} section={HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS} if={!isAccountantOnly} />
+          <MenuLink collective={collective} section={HOST_SECTIONS.EXPENSES} />
+          <MenuLink collective={collective} section={HOST_SECTIONS.FINANCIAL_CONTRIBUTIONS} />
           <MenuLink
             collective={collective}
             section={HOST_DASHBOARD_SECTIONS.PENDING_CONTRIBUTIONS}
             if={!isAccountantOnly}
           />
-          <MenuLink collective={collective} section={HOST_SECTIONS.PENDING_APPLICATIONS} if={!isAccountantOnly} />
+          <MenuLink collective={collective} section={HOST_SECTIONS.HOST_APPLICATIONS} if={!isAccountantOnly} />
           <MenuLink collective={collective} section={HOST_SECTIONS.HOSTED_COLLECTIVES} if={!isAccountantOnly} />
           <MenuLink
             collective={collective}
             section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARDS}
+            if={!isAccountantOnly && hasFeature(collective, FEATURES.VIRTUAL_CARDS)}
+          />
+          <MenuLink
+            collective={collective}
+            section={HOST_DASHBOARD_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS}
             if={!isAccountantOnly && hasFeature(collective, FEATURES.VIRTUAL_CARDS)}
           />
           <MenuLink collective={collective} section={HOST_SECTIONS.REPORTS} isBeta />
@@ -99,7 +103,7 @@ const Menu = ({ collective, isAccountantOnly }) => {
             if={isType(collective, ORGANIZATION) && isHost}
           >
             <OrganizationSettingsMenuLinks collective={collective} isAccountantOnly={isAccountantOnly} />
-            <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} />
+            <MenuLink collective={collective} section={ORG_BUDGET_SECTIONS.TIERS} if={!isAccountantOnly} />
           </SubMenu>
           <SubMenu
             label={<FormattedMessage id="AdminPanel.FiscalHostSettings" defaultMessage="Fiscal Host Settings" />}

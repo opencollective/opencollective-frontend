@@ -9,16 +9,12 @@ const notFoundURL = `/${notFoundSlug}`;
 // });
 
 describe('the NotFound page when logged out', () => {
-  before(() => {
+  beforeEach(() => {
     cy.visit(notFoundURL, { failOnStatusCode: false });
   });
 
   it('show the proper error message', () => {
-    cy.get('[data-cy="not-found"]').contains('Not found');
-  });
-
-  it('has a nice comforting little buddy', () => {
-    cy.get('[data-cy="not-found"]').should('contain', `¯\\_(ツ)_/¯`);
+    cy.get('[data-cy="not-found"]').contains('Page not found');
   });
 
   it('includes a button to search for the collective', () => {
@@ -40,7 +36,7 @@ describe('the NotFound page when logged in', () => {
   });
 
   it('has the user properly logged in', () => {
-    cy.getByDataCy('not-found').contains('Not found');
+    cy.getByDataCy('not-found').contains('Page not found');
     cy.getByDataCy('user-menu-trigger').click();
     cy.getByDataCy('user-menu').should('be.visible').contains('Test User Admin');
   });

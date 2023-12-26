@@ -62,6 +62,7 @@ const CollaborateWithMoney = () => {
         <Box width={['206px']}>
           <NextIllustration
             src="/static/images/new-home/collaborate-withMoney-illustration.png"
+            alt="Collaborate with money illustration"
             width={239}
             height={257}
           />

@@ -22,7 +22,7 @@ import { confirm, pickByPatterns } from './helpers';
 // Define program options
 const program = new Command()
   .description('Helper publish Frontend components to the NPM registry')
-  .argument('<version>', 'Version number to publish')
+  .argument('[version]', 'Version number to publish')
   .option('--build-only', 'If set, the package will be build but not published')
   .parse();
 
@@ -114,10 +114,11 @@ const main = async () => {
   await bundle.close();
 
   // ==== 1. Generate `package.json` ====
+  const version = program.args[0];
   console.log('Generating `package.json`...');
   const packageJSON = {
     name: '@opencollective/frontend-components',
-    version: program.args[0],
+    version: version || 'Unpublished',
     private: false,
     repository: basePackageJSON.repository,
     engines: basePackageJSON.engines,
@@ -136,6 +137,10 @@ const main = async () => {
 
   // ==== 4. Publish ====
   if (!options['buildOnly']) {
+    if (!version) {
+      throw new Error('You must specify a version number to publish the components');
+    }
+
     // Dry run
     execSync(`npm publish ${tmpDir} --access public --dry-run`, { stdio: 'inherit' });
 

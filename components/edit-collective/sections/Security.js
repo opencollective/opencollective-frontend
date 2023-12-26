@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { ExternalLink } from '@styled-icons/feather/ExternalLink';
 import { Formik } from 'formik';
 import { get, pick } from 'lodash';
@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import { margin } from 'styled-system';
 
 import { i18nGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Box } from '../../Grid';
@@ -21,7 +21,7 @@ import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputField from '../../StyledInputField';
 import StyledLink from '../../StyledLink';
 import { H4, P, Span } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { useToast } from '../../ui/useToast';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
@@ -35,6 +35,7 @@ const accountQuery = gql`
       settings
       currency
       policies {
+        id
         REQUIRE_2FA_FOR_ADMINS
       }
     }
@@ -54,6 +55,7 @@ const updateSecuritySettingsMutation = gql`
     setPolicies(account: $account, policies: { REQUIRE_2FA_FOR_ADMINS: $require2FAForAdmins }) {
       id
       policies {
+        id
         REQUIRE_2FA_FOR_ADMINS
       }
     }
@@ -87,7 +89,7 @@ const getInitialValues = account => {
 
 const Security = ({ collective }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const { data, loading } = useQuery(accountQuery, { variables: { slug: collective.slug }, context: API_V2_CONTEXT });
   const [updateSecuritySettings, { loading: submitting }] = useMutation(updateSecuritySettingsMutation, {
     context: API_V2_CONTEXT,
@@ -104,13 +106,13 @@ const Security = ({ collective }) => {
       onSubmit={async values => {
         try {
           await updateSecuritySettings({ variables: { account: pick(data.account, ['id']), ...values } });
-          addToast({
-            type: TOAST_TYPE.SUCCESS,
+          toast({
+            variant: 'success',
             message: <FormattedMessage id="Settings.Updated" defaultMessage="Settings updated." />,
           });
         } catch (error) {
-          addToast({
-            type: TOAST_TYPE.ERROR,
+          toast({
+            variant: 'error',
             title: <FormattedMessage id="Settings.Updated.Fail" defaultMessage="Update failed." />,
             message: i18nGraphqlException(intl, error),
           });
@@ -188,7 +190,6 @@ const Security = ({ collective }) => {
                       value={values.payoutsTwoFactorAuth.rollingLimit}
                       onChange={value => setFieldValue('payoutsTwoFactorAuth.rollingLimit', value)}
                       min={100}
-                      precision={2}
                       disabled={!values.payoutsTwoFactorAuth.enabled}
                       px="2px"
                       placeholder={intl.formatMessage({

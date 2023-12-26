@@ -4,6 +4,7 @@ import { set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
+import Captcha, { isCaptchaEnabled } from '../Captcha';
 import Container from '../Container';
 import { Flex } from '../Grid';
 import I18nFormatters, { getI18nLink } from '../I18nFormatters';
@@ -16,16 +17,23 @@ import StyledInputLocation from '../StyledInputLocation';
 import { P, Span } from '../Text';
 
 import StepProfileInfoMessage from './StepProfileInfoMessage';
-import { contributionRequiresAddress, getTotalAmount } from './utils';
+import { contributionRequiresAddress, contributionRequiresLegalName } from './utils';
 
-export const validateGuestProfile = (stepProfile, stepDetails) => {
-  if (contributionRequiresAddress(stepDetails)) {
-    const { name, legalName } = stepProfile;
+export const validateGuestProfile = (stepProfile, stepDetails, tier) => {
+  if (contributionRequiresAddress(stepDetails, tier)) {
     const location = stepProfile.location || {};
-    const hasNameOrLegalName = name || legalName;
-    if (!hasNameOrLegalName || !location.country || !(location.address || location.structured)) {
+    if (!location.country || !(location.address || location.structured)) {
       return false;
     }
+  }
+  if (contributionRequiresLegalName(stepDetails, tier)) {
+    if (!stepProfile.name && !stepProfile.legalName) {
+      return false;
+    }
+  }
+
+  if (isCaptchaEnabled() && !stepProfile.captcha) {
+    return false;
   }
 
   if (!stepProfile.email || !isEmail(stepProfile.email)) {
@@ -40,8 +48,7 @@ const getSignInLinkQueryParams = email => {
   return email ? { ...params, email } : params;
 };
 
-const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInClick }) => {
-  const totalAmount = getTotalAmount(stepDetails);
+const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInClick, tier }) => {
   const dispatchChange = (field, value) => onChange({ stepProfile: set({ ...data, isGuest: true }, field, value) });
   const dispatchGenericEvent = e => dispatchChange(e.target.name, e.target.value);
 
@@ -111,7 +118,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
         labelFontSize="16px"
         labelFontWeight="700"
         isPrivate
-        required={totalAmount >= 25000 && !data?.name}
+        required={contributionRequiresLegalName(stepDetails, tier) && !data?.name}
         mt={20}
         hint={
           <FormattedMessage defaultMessage="If different from your display name. Not public. Important for receipts, invoices, payments, and official documentation." />
@@ -127,14 +134,19 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
           />
         )}
       </StyledInputField>
-      {contributionRequiresAddress(stepDetails) && (
+      {isCaptchaEnabled() && (
+        <Flex mt="18px" justifyContent="center">
+          <Captcha onVerify={result => dispatchChange('captcha', result)} />
+        </Flex>
+      )}
+      {contributionRequiresAddress(stepDetails, tier) && (
         <React.Fragment>
           <Flex alignItems="center" my="14px">
             <P fontSize="24px" lineHeight="32px" fontWeight="500" mr={2}>
               <FormattedMessage id="collective.address.label" defaultMessage="Address" />
             </P>
             <Span mr={2} lineHeight="0">
-              <PrivateInfoIcon size="14px" tooltipProps={{ containerLineHeight: '0' }} />
+              <PrivateInfoIcon className="text-muted-foreground" />
             </Span>
             <StyledHr my="18px" borderColor="black.300" width="100%" />
           </Flex>
@@ -169,6 +181,7 @@ StepProfileGuestForm.propTypes = {
   defaultEmail: PropTypes.string,
   defaultName: PropTypes.string,
   isEmbed: PropTypes.bool,
+  tier: PropTypes.object,
 };
 
 export default StepProfileGuestForm;

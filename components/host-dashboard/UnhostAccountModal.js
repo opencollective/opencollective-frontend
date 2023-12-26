@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import MessageBox from '../MessageBox';
@@ -14,7 +14,7 @@ import StyledLink from '../StyledLink';
 import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../StyledModal';
 import StyledTextarea from '../StyledTextarea';
 import { Label, P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const unhostAccountMutation = gql`
   mutation UnhostAccount($account: AccountReferenceInput!, $message: String) {
@@ -33,7 +33,7 @@ const unhostAccountMutation = gql`
 
 const UnhostAccountModal = ({ collective, host, ...props }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [message, setMessage] = useState('');
   const [unhostAccount, { loading }] = useMutation(unhostAccountMutation, {
     context: API_V2_CONTEXT,
@@ -120,16 +120,16 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
               try {
                 await unhostAccount();
                 const successMsgArgs = { accountName: collective.name, accountSlug: collective.slug };
-                addToast({
-                  type: TOAST_TYPE.SUCCESS,
+                toast({
+                  variant: 'success',
                   message: intl.formatMessage(
                     { defaultMessage: '{accountName} (@{accountSlug}) has been un-hosted' },
                     successMsgArgs,
                   ),
                 });
-                props?.onClose();
+                props.onClose();
               } catch (e) {
-                addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+                toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }
             }}
           >

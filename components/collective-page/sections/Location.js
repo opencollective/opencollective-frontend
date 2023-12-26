@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { isEmptyCollectiveLocation } from '../../../lib/collective.lib';
+import { isEmptyCollectiveLocation } from '../../../lib/collective';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import Container from '../../Container';
@@ -13,7 +13,7 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
 const isEmptyOnlineLocation = event => {
-  return event.location?.name === 'Online' && !event.location.address && !event.privateInstructions;
+  return event.location?.name === 'Online' && !event.location.url && !event.privateInstructions;
 };
 
 const Location = ({ collective: event, refetch }) => {

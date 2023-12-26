@@ -10,18 +10,18 @@ import { gqlV1 } from '../lib/graphql/helpers';
 import withData from '../lib/withData';
 
 import Body from '../components/Body';
-import CollectivesWithData from '../components/CollectivesWithData';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
-import Footer from '../components/Footer';
 import HappyBackground from '../components/gift-cards/HappyBackground';
 import GiftCard from '../components/GiftCard';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
+import Link from '../components/Link';
 import LoadingPlaceholder from '../components/LoadingPlaceholder';
 import MessageBox from '../components/MessageBox';
-import SearchForm from '../components/SearchForm';
-import { H1, H5, P } from '../components/Text';
+import Footer from '../components/navigation/Footer';
+import StyledButton from '../components/StyledButton';
+import { H1, H5 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
 const redeemedPaymentMethodQuery = gqlV1/* GraphQL */ `
@@ -61,11 +61,6 @@ const Subtitle = styled(H5)`
   text-align: center;
   ${fontSize};
   ${maxWidth};
-`;
-
-const SearchFormContainer = styled(Box)`
-  margin: 64px auto 32px;
-  text-align: center;
 `;
 
 class RedeemedPage extends React.Component {
@@ -143,11 +138,11 @@ class RedeemedPage extends React.Component {
     } else {
       return (
         <div>
-          <Title fontSize={['3rem', null, '4rem']}>
+          <Title fontSize={['1.9rem', null, '2.5rem']}>
             <FormattedMessage id="redeemed.success" defaultMessage="Gift Card Redeemed!" /> 🎉
           </Title>
           <Flex flexWrap="wrap" maxWidth={750} m="0 auto" alignItems="center">
-            <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+            <Subtitle fontSize={['0.95rem', null, '1.25rem']} maxWidth={['90%', '640px']}>
               <Box>
                 <FormattedMessage
                   id="redeemed.subtitle.line1"
@@ -180,7 +175,6 @@ class RedeemedPage extends React.Component {
     const { amount, collective, currency, expiryDate, loading } = this.state;
     const error = this.getError();
     const emitter = this.state.emitter || (data && data.Collective);
-    const recommendedCollectives = get(emitter, 'settings.recommendedCollectives');
 
     return (
       <div className="RedeemedPage">
@@ -215,69 +209,11 @@ class RedeemedPage extends React.Component {
                 </Container>
               )}
 
-              {recommendedCollectives && (
-                <Box my={5}>
-                  <H5 textAlign={'center'}>
-                    <FormattedMessage
-                      id="redeemed.collective-recommendations"
-                      defaultMessage="Collectives recommended by {emitter}"
-                      values={{ emitter: emitter.name }}
-                    />
-                  </H5>
-                  <Container maxWidth="1200px">
-                    <CollectivesWithData
-                      slugs={recommendedCollectives}
-                      orderBy="name"
-                      orderDirection="ASC"
-                      limit={12}
-                    />
-                  </Container>
-                </Box>
-              )}
-
-              <Box width={['320px', '640px']}>
-                <SearchFormContainer>
-                  <Box mb={3}>
-                    <H5 textAlign="center">
-                      <FormattedMessage
-                        id="redeemed.findCollectives"
-                        defaultMessage="Find open collectives to support."
-                      />
-                    </H5>
-                  </Box>
-                  <SearchForm fontSize="1.4rem" />
-                </SearchFormContainer>
-              </Box>
-
-              <Box width={['320px', '640px']} my={3}>
-                <P color="#76777A" textAlign="center">
-                  <FormattedMessage
-                    id="redeemed.backyourstack"
-                    defaultMessage="or discover the open source projects that your organization is depending on and that need funding on {link}"
-                    values={{
-                      link: <a href="https://backyourstack.com">BackYourStack.com</a>,
-                    }}
-                  />
-                </P>
-              </Box>
-
-              <P color="#76777A" textAlign="center">
-                <FormattedMessage
-                  id="redeemed.suggestions"
-                  defaultMessage="or you can choose from these awesome collectives that are doing great work:"
-                />
-              </P>
-
-              <Box mb={5}>
-                <Container maxWidth="1200px">
-                  <CollectivesWithData
-                    HostCollectiveId={11004} // hard-coded to only show open source projects
-                    orderBy="balance"
-                    orderDirection="DESC"
-                    limit={12}
-                  />
-                </Container>
-              </Box>
+              <Link href="/search">
+                <StyledButton buttonStyle="primary" buttonSize="large" my={5}>
+                  <FormattedMessage defaultMessage="Discover Collectives to Support" />
+                </StyledButton>
+              </Link>
             </Flex>
           </Body>
         </CollectiveThemeProvider>

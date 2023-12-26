@@ -34,7 +34,7 @@ const TotalAmountLine = styled(AmountLine)`
  */
 const ExpenseAmountBreakdown = ({ items, currency, taxes, expenseTotalAmount }) => {
   const intl = useIntl();
-  const { hasTaxes, totalInvoiced, totalAmount } = computeExpenseAmounts(items, taxes);
+  const { hasTaxes, totalInvoiced, totalAmount } = computeExpenseAmounts(currency, items, taxes);
   return (
     <Container textAlign="right">
       {hasTaxes && (
@@ -77,12 +77,12 @@ const ExpenseAmountBreakdown = ({ items, currency, taxes, expenseTotalAmount }) 
           {intl.formatMessage({ id: 'TotalAmount', defaultMessage: 'Total amount' })}
         </Span>
         &nbsp;
-        <Span color="black.500" fontSize="16px" letterSpacing={0} data-cy="expense-items-total-amount">
+        <Span fontSize="16px" letterSpacing={0} data-cy="expense-items-total-amount">
           <FormattedMoneyAmount
             amount={expenseTotalAmount ?? totalAmount}
             precision={2}
             currency={currency}
-            showCurrencyCode={false}
+            showCurrencyCode={true}
           />
         </Span>
       </TotalAmountLine>

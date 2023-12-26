@@ -1,17 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
 import ExpenseTypeTag from './expenses/ExpenseTypeTag';
+import { useToast } from './ui/useToast';
 import { Flex } from './Grid';
 import StyledInputTags from './StyledInputTags';
 import StyledTag from './StyledTag';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const setTagsMutation = gql`
   mutation SetTags($order: OrderReferenceInput, $expense: ExpenseReferenceInput, $tags: [String!]!) {
@@ -34,7 +34,7 @@ const setTagsMutation = gql`
 const TagsForAdmins = ({ expense, order, suggestedTags }) => {
   const [setTags, { loading }] = useMutation(setTagsMutation, { context: API_V2_CONTEXT });
   const tagList = expense?.tags || order?.tags;
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   return (
     <StyledInputTags
@@ -46,7 +46,7 @@ const TagsForAdmins = ({ expense, order, suggestedTags }) => {
           const referencedObject = expense ? { expense: { id: expense.id } } : { order: { id: order.id } };
           await setTags({ variables: { ...referencedObject, tags: tags.map(tag => tag.value) } });
         } catch (e) {
-          addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
         }
       }}
     />

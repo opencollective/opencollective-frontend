@@ -2,7 +2,7 @@ import React, { createRef, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Clear } from '@styled-icons/material/Clear';
 import { themeGet } from '@styled-system/theme-get';
-import { get } from 'lodash';
+import { get, isNil, omitBy } from 'lodash';
 import Geosuggest from 'react-geosuggest';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -24,7 +24,7 @@ const ClearIcon = styled(Clear)`
 const GeoSuggestItem = styled(Geosuggest)`
   .geosuggest {
     font-size: 18px;
-    font-size: 1rem;
+    font-size: 0.65rem;
     position: relative;
     text-align: left;
   }
@@ -84,8 +84,12 @@ const GeoSuggestItem = styled(Geosuggest)`
     list-style: none;
     margin-top: 1px;
     z-index: 5;
-    -webkit-transition: max-height 0.2s, border 0.2s;
-    transition: max-height 0.2s, border 0.2s;
+    -webkit-transition:
+      max-height 0.2s,
+      border 0.2s;
+    transition:
+      max-height 0.2s,
+      border 0.2s;
   }
   .geosuggest__suggests--hidden {
     max-height: 0;
@@ -151,16 +155,30 @@ class InputTypeLocation extends React.Component {
       return this.props.onChange(location);
     }
 
-    const countryComponent = value.gmaps['address_components'].find(c => c.types.includes('country'));
+    const country = value.gmaps['address_components'].find(c => c.types.includes('country'))?.['short_name'];
+
+    /* Use ADR microformat field `adr_address` because of more consistent formatting and since
+       it also includes a single field for street address (with house number in the correct place depending on locality) */
+    const adrAddress = value.gmaps['adr_address'];
+    const parser = new DOMParser();
+    const adrAddressDoc = parser.parseFromString(adrAddress, 'text/html');
+    const structured = {
+      address1: adrAddressDoc.querySelector('.street-address')?.textContent,
+      address2: adrAddressDoc.querySelector('.extended-address')?.textContent,
+      postalCode: adrAddressDoc.querySelector('.postal-code')?.textContent,
+      city: adrAddressDoc.querySelector('.locality')?.textContent,
+      zone: adrAddressDoc.querySelector('.region')?.textContent,
+    };
+
     const location = {
       // Remove country from address
       address: this.removeCountryFromAddress(value.gmaps.formatted_address),
       // Keep only the first part for location name
       name: value.label && value.label.replace(/,.+/, ''),
-      // Normally returned addresses always have a country, this is just defensive
-      country: countryComponent ? countryComponent['short_name'] : null,
+      country,
       lat: value.location.lat,
       long: value.location.lng,
+      structured: omitBy(structured, isNil),
     };
 
     this.setState({ value: location });
@@ -174,7 +192,6 @@ class InputTypeLocation extends React.Component {
   render() {
     const options = this.props.options || {};
     const autoCompleteNotAvailable = !this.isAutocompleteServiceAvailable();
-
     return (
       <div>
         {autoCompleteNotAvailable ? (

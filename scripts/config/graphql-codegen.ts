@@ -18,6 +18,10 @@ const config: CodegenConfig = {
       },
     },
   },
+  pluckConfig: {
+    globalGqlIdentifierName: 'gql',
+    gqlMagicComment: 'GraphQLV2',
+  },
 };
 
 export default config;

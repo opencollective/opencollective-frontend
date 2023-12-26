@@ -22,8 +22,7 @@ const GoalContainer = styled.div`
   transition: width 3s;
   height: 25px;
   color: ${props => props.theme.colors.black[700]};
-  border-right: 1px solid
-    ${props => (props.goal.isReached ? getProgressColor(props.theme) : getEmptyProgressColor(props.theme))};
+  border-right: 1px solid ${props => (props.goal.isReached ? getProgressColor(props.theme) : getEmptyProgressColor())};
   width: ${props => `${props.goal.progress * 100}%`};
   z-index: ${props => (['balance', 'yearlyBudget'].includes(props.goal.slug) ? 310 : (20 - props.index) * 10)};
   transition: ${props =>
@@ -33,7 +32,7 @@ const GoalContainer = styled.div`
 
   .caption {
     display: inline-block;
-    padding: 1rem 0.5rem 1rem 0.5rem;
+    padding: 0.65rem 0.3rem 0.65rem 0.3rem;
     font-size: 13px;
     line-height: 15px;
   }
@@ -74,12 +73,12 @@ const GoalContainer = styled.div`
   ${props =>
     props.goal.position === 'above' &&
     css`
-      border-bottom: 4px solid ${getEmptyProgressColor(props.theme)};
+      border-bottom: 4px solid ${getEmptyProgressColor()};
       top: auto;
       bottom: 76px;
 
       .caption {
-        margin-top: -5.5rem;
+        margin-top: -3.45rem;
       }
     `}
 
@@ -88,7 +87,7 @@ const GoalContainer = styled.div`
       if (props.goal.position === 'below') {
         return css`
           height: 50px;
-          padding-top: 4rem;
+          padding-top: 2.5rem;
           border-right-style: dotted;
           border-right-color: ${props.theme.colors.primary[300]};
         `;
@@ -122,15 +121,15 @@ const GoalContainer = styled.div`
 const BarContainer = styled.div`
   position: relative;
   width: 100%;
-  margin: 6rem auto 1rem;
+  margin: 3.75rem auto 0.65rem;
   min-height: 80px;
 
   .withGoals {
-    margin-top: 10rem;
+    margin-top: 6.25rem;
   }
 
   .max-level-above-1 {
-    margin-top: 15rem;
+    margin-top: 9.4rem;
   }
 
   @media (max-width: 1400px) {

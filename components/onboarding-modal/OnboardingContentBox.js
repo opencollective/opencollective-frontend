@@ -45,8 +45,9 @@ class OnboardingContentBox extends React.Component {
   }
 
   componentDidMount() {
+    const member = this.props.LoggedInUser.memberOf.filter(member => member.collective.id === this.props.collective.id);
     this.setState({
-      admins: [],
+      admins: [{ role: 'ADMIN', member: this.props.LoggedInUser.collective, id: member[0].id }],
     });
   }
 
@@ -113,9 +114,15 @@ class OnboardingContentBox extends React.Component {
               {this.props.memberInvitations.map(admin => (
                 <OnboardingProfileCard key={admin.memberAccount.id} collective={admin.memberAccount} isPending />
               ))}
-              {admins.map(admin => (
-                <OnboardingProfileCard key={admin.member.id} collective={admin.member} removeAdmin={this.removeAdmin} />
-              ))}
+              {admins
+                .filter(admin => admin.member.id !== this.props.LoggedInUser.collective.id)
+                .map(admin => (
+                  <OnboardingProfileCard
+                    key={admin.member.id}
+                    collective={admin.member}
+                    removeAdmin={this.removeAdmin}
+                  />
+                ))}
             </Flex>
             <Flex px={3} width="100%">
               <P my={2} fontSize="12px" textTransform="uppercase" color="black.700">
@@ -133,6 +140,7 @@ class OnboardingContentBox extends React.Component {
                 collective={null}
                 types={['USER']}
                 data-cy="admin-picker"
+                menuPortalTarget={null}
                 onChange={option => {
                   // only assign admins if they are not in the list already
                   const duplicates = admins.filter(admin => admin.member.id === option.value.id);

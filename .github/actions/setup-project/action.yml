@@ -8,13 +8,10 @@ runs:
   using: 'composite'
   steps:
     - name: Setup node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version-file: 'package.json'
-
-    - name: Force NPM version (this step can be moved once Vercel defaults to node 18.14)
-      shell: bash
-      run: npm install -g npm@8.19.2
+        cache: 'npm'
 
     - name: Restore node_modules
       uses: actions/cache@v3
@@ -22,16 +19,6 @@ runs:
       with:
         path: node_modules
         key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}-${{ inputs.CACHE_VERSION }}
-
-    - name: Restore .npm cache
-      if: steps.node-modules.outputs.cache-hit != 'true'
-      uses: actions/cache@v3
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}-${{ inputs.CACHE_VERSION }}
-        restore-keys: |
-          ${{ runner.os }}-npm-cache-${{ hashFiles('package-lock.json') }}-${{ inputs.CACHE_VERSION }}
-          ${{ runner.os }}-npm-cache-
 
     - name: Install dependencies
       shell: bash

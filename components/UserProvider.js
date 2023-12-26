@@ -1,12 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withApollo } from '@apollo/client/react/hoc';
-import { isEqual } from 'lodash';
-import Router from 'next/router';
+import { decodeJwt } from 'jose';
+import { get, isEqual } from 'lodash';
+import Router, { withRouter } from 'next/router';
+import { injectIntl } from 'react-intl';
 
+import { createError, ERROR, formatErrorMessage } from '../lib/errors';
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
-import { LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
+import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
+import { withTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+
+import { toast } from './ui/useToast';
 
 export const UserContext = React.createContext({
   loadingLoggedInUser: true,
@@ -20,10 +26,14 @@ export const UserContext = React.createContext({
 class UserProvider extends React.Component {
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired,
+    toast: PropTypes.func,
+    twoFactorAuthPrompt: PropTypes.object,
+    router: PropTypes.object,
     token: PropTypes.string,
     client: PropTypes.object,
     loadingLoggedInUser: PropTypes.bool,
     children: PropTypes.node,
+    intl: PropTypes.object,
     /**
      * If not used inside of NextJS (ie. in styleguide), the code that checks if we are
      * on `/signin` that uses `Router` will crash. Setting this prop bypass this behavior.
@@ -35,7 +45,6 @@ class UserProvider extends React.Component {
     loadingLoggedInUser: true,
     LoggedInUser: null,
     errorLoggedInUser: null,
-    enforceTwoFactorAuthForLoggedInUser: null,
   };
 
   async componentDidMount() {
@@ -70,46 +79,114 @@ class UserProvider extends React.Component {
     }
   };
 
-  logout = async () => {
+  logout = async ({ redirect, skipQueryRefetch } = {}) => {
     removeFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    await this.props.client.resetStore();
+    removeFromLocalStorage(LOCAL_STORAGE_KEYS.LAST_DASHBOARD_SLUG);
+    removeFromLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE);
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
+    // Clear the Apollo store without automatically refetching queries
+    await this.props.client.clearStore();
+
+    // By default, we refetch all queries to make sure we don't display stale data
+    if (!skipQueryRefetch) {
+      await this.props.client.reFetchObservableQueries();
+    }
+    // Otherwise we refetch only the LoggedInUser query to make the API clear the rootRedirect cookie
+    else {
+      await this.props.client.refetchQueries({
+        include: ['LoggedInUser'],
+      });
+    }
+
+    if (redirect) {
+      this.props.router.push({
+        pathname: redirect,
+      });
+    }
   };
 
-  login = async (token, options = {}) => {
-    const { getLoggedInUser } = this.props;
-    const { twoFactorAuthenticatorCode, recoveryCode } = options;
+  login = async token => {
+    const { getLoggedInUser, twoFactorAuthPrompt, intl } = this.props;
+
     try {
-      const LoggedInUser = token
-        ? await getLoggedInUser({ token, twoFactorAuthenticatorCode, recoveryCode })
-        : await getLoggedInUser();
+      const LoggedInUser = token ? await getLoggedInUser({ token }) : await getLoggedInUser();
       this.setState({
         loadingLoggedInUser: false,
         errorLoggedInUser: null,
         LoggedInUser,
-        enforceTwoFactorAuthForLoggedInUser: false,
       });
       return LoggedInUser;
     } catch (error) {
-      // If token from localStorage is invalid or expired, delete it
-      if (!token && ['Invalid token', 'Expired token'].includes(error.message)) {
+      // Malformed tokens are detected and removed by the frontend in `lib/hooks/withLoggedInUser.js` (search for "malformed")
+      // Invalid tokens are ignored in the API, the user is treated as unauthenticated (see `parseJwt` in `server/middleware/authentication.js`)
+      // There can therefore only be two types of errors here:
+      // - Network/server errors: we'll display a message
+      // - Expired tokens: we'll logout the user with a "Your session has expired. Please sign-in again." message
+      const errorType = get(error, 'networkError.result.error.type');
+
+      // For expired tokens, we directly logout & show a toast as we want to make sure it gets
+      // displayed not matter what page the user is on.
+      if (!token && errorType === 'jwt_expired') {
         this.logout();
+        this.setState({ loadingLoggedInUser: false });
+        const message = formatErrorMessage(intl, createError(ERROR.JWT_EXPIRED));
+        toast({ variant: 'error', message });
+        return null;
       }
 
-      // Store the error
-      this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
       if (error.message.includes('Two-factor authentication is enabled')) {
-        this.setState({ enforceTwoFactorAuthForLoggedInUser: true });
-        throw new Error(error.message);
-      }
-      if (error.type === 'too_many_requests') {
-        this.setState({ enforceTwoFactorAuthForLoggedInUser: false });
-        throw new Error(error.message);
-      }
-      // We don't want to catch "Two-factor authentication code failed. Please try again" here
-      if (error.type === 'unauthorized' && error.message.includes('Cannot use this token')) {
-        this.setState({ enforceTwoFactorAuthForLoggedInUser: false });
-        throw new Error(error.message);
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          try {
+            const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
+            const decodedToken = decodeJwt(token);
+
+            const result = await twoFactorAuthPrompt.open({
+              supportedMethods: decodedToken.supported2FAMethods,
+              authenticationOptions: decodedToken.authenticationOptions,
+              isRequired: true,
+              allowRecovery: true,
+            });
+
+            const LoggedInUser = await getLoggedInUser({
+              token: getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN),
+              twoFactorAuthenticatorCode: result.code,
+              twoFactorAuthenticationType: result.type,
+            });
+            if (result.type === 'recovery_code') {
+              this.props.router.replace({
+                pathname: '/[slug]/admin/user-security',
+                query: { slug: LoggedInUser.collective.slug },
+              });
+            } else {
+              this.setState({
+                loadingLoggedInUser: false,
+                errorLoggedInUser: null,
+                LoggedInUser,
+              });
+            }
+            removeFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
+
+            return LoggedInUser;
+          } catch (e) {
+            this.setState({ loadingLoggedInUser: false, errorLoggedInUser: e.message });
+            toast({
+              variant: 'error',
+              message: e.message,
+            });
+
+            // stop trying to get the code.
+            if (
+              e.type === 'too_many_requests' ||
+              (e.type === 'unauthorized' && e.message.includes('Cannot use this token'))
+            ) {
+              throw new Error(e.message);
+            }
+          }
+        }
+      } else {
+        // Store the error
+        this.setState({ loadingLoggedInUser: false, errorLoggedInUser: error.message });
       }
     }
   };
@@ -158,6 +235,8 @@ const withUser = WrappedComponent => {
   return WithUser;
 };
 
-export default withApollo(withLoggedInUser(UserProvider));
+export default injectIntl(
+  withApollo(withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(injectIntl(UserProvider))))),
+);
 
 export { UserConsumer, withUser };

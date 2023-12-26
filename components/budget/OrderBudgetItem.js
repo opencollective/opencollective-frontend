@@ -84,7 +84,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
             <LoadingPlaceholder height={60} />
           ) : (
             <Box>
-              <StyledLink as={Link} href={`${getCollectivePageRoute(order.toAccount)}/orders/${order.legacyId}`}>
+              <StyledLink as={Link} href={`${getCollectivePageRoute(order.toAccount)}/contributions/${order.legacyId}`}>
                 <AutosizeText
                   value={order.description}
                   maxLength={255}
@@ -101,7 +101,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
                       textDecoration="none"
                       color="black.900"
                       fontSize={fontSize}
-                      data-cy="expense-title"
+                      data-cy="contribution-title"
                     >
                       {value}
                     </H3>
@@ -113,8 +113,8 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
                   id="Order.fromTo"
                   defaultMessage="for {account} from {contributor}"
                   values={{
-                    contributor: <LinkCollective collective={order.fromAccount} />,
-                    account: <LinkCollective collective={order.toAccount} />,
+                    contributor: <LinkCollective collective={order.fromAccount} withHoverCard />,
+                    account: <LinkCollective collective={order.toAccount} withHoverCard />,
                   }}
                 />
 
@@ -170,7 +170,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
           ) : (
             <Flex>
               <StyledTag variant="rounded-left" fontSize="10px" fontWeight="500" mr={1} textTransform="uppercase">
-                <FormattedMessage id="Order" defaultMessage="Order" /> #{order.legacyId}
+                <FormattedMessage defaultMessage="Contribution" /> #{order.legacyId}
               </StyledTag>
               <OrderStatusTag status={order.status} />
             </Flex>
@@ -206,7 +206,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
                   <DetailColumnHeader>
                     <StyledTooltip
                       content={
-                        <FormattedMessage defaultMessage="External reference code for this order. This is usually a reference number from the contributor accounting system." />
+                        <FormattedMessage defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system." />
                       }
                       containerCursor="default"
                     >

@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
+import { flexbox } from 'styled-system';
 
 import useGlobalBlur from '../lib/hooks/useGlobalBlur';
 import useKeyBoardShortcut, { ESCAPE_KEY } from '../lib/hooks/useKeyboardKey';
@@ -7,7 +8,6 @@ import useKeyBoardShortcut, { ESCAPE_KEY } from '../lib/hooks/useKeyboardKey';
 export const DropdownContent = styled.div`
   display: none;
   position: absolute;
-  z-index: 1;
   max-width: 320px;
   z-index: 1000000;
   border-radius: 4px;
@@ -120,6 +120,7 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
     </div>
   );
 })`
+  ${flexbox}
   ${props =>
     props.trigger === 'hover'
       ? css`

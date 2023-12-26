@@ -3,22 +3,18 @@ import { RouterContext } from 'next/dist/shared/lib/router-context';
 import { IntlProvider } from 'react-intl';
 import theme from '../lib/theme';
 import { ApolloProvider } from '@apollo/client';
-import * as nextImage from 'next/image';
 
 import UserProvider from '../components/UserProvider';
 import { initClient } from '../lib/apollo-client';
 import { withDesign } from 'storybook-addon-designs';
 
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
-import { WithNextRouter } from 'storybook-addon-next-router/dist/decorators';
-import ToastProvider from '../components/ToastProvider';
-
-Object.defineProperty(nextImage, 'default', {
-  configurable: true,
-  value: props => <img {...props} />,
-});
+import { TooltipProvider } from '../components/ui/Tooltip';
+import { Toaster } from '../components/ui/Toaster';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
@@ -33,14 +29,14 @@ export const decorators = [
       <ThemeProvider theme={theme}>
         <IntlProvider locale="en">
           <UserProvider>
-            <ToastProvider>
+            <TooltipProvider>
               <Story />
-            </ToastProvider>
+              <Toaster />
+            </TooltipProvider>
           </UserProvider>
         </IntlProvider>
       </ThemeProvider>
     </ApolloProvider>
   ),
   withDesign,
-  WithNextRouter,
 ];

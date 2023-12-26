@@ -2,7 +2,7 @@ describe('New host page', () => {
   /**
    * About section is already tested in `04-collective.test.js`
    */
-  before(() => {
+  beforeEach(() => {
     cy.visit('/opensource');
   });
 

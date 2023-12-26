@@ -6,8 +6,8 @@ import languages from '../lib/constants/locales';
 import { loadScriptAsync } from '../lib/utils';
 
 import Body from '../components/Body';
-import Footer from '../components/Footer';
 import Header from '../components/Header';
+import Footer from '../components/navigation/Footer';
 import { withUser } from '../components/UserProvider';
 
 import giftCardPageStyle from '!css-loader!../public/gift-cards-page/stylesheets/style.css'; // eslint-disable-line
@@ -83,6 +83,7 @@ class MarketingPage extends React.Component {
         <div>
           <Header LoggedInUser={LoggedInUser} />
           <Body>
+            {/* We control the pages content, since it's defined in markdown files we host in this codebase */}
             <style type="text/css" dangerouslySetInnerHTML={{ __html: style }} />
             <div className={className} dangerouslySetInnerHTML={{ __html: html }} />
           </Body>

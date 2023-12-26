@@ -16,6 +16,7 @@ const LOCALE_ALIASES = {
   'es-ES': 'es',
   'pt-PT': 'pt',
   sk: 'sk-SK',
+  'zh-CN': 'zh',
 };
 
 if (!TOKEN) {
@@ -66,4 +67,4 @@ export async function main() {
   fs.writeFileSync(filePath, newContent);
 }
 
-main(process.argv[2], process.argv[3]);
+main();

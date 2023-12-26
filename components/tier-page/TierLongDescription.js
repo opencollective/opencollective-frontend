@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { NAVBAR_HEIGHT } from '../collective-navbar';
-import HTMLContent, { isEmptyValue } from '../HTMLContent';
+import HTMLContent, { isEmptyHTMLValue } from '../HTMLContent';
 import InlineEditField from '../InlineEditField';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
@@ -28,7 +28,7 @@ const TierLongDescription = ({ tier, editMutation, canEdit }) => {
               kind="TIER_LONG_DESCRIPTION"
             />
           );
-        } else if (isEmptyValue(tier.longDescription)) {
+        } else if (isEmptyHTMLValue(tier.longDescription)) {
           return !canEdit ? null : (
             <StyledButton buttonSize="large" onClick={enableEditor} data-cy="Btn-Add-longDescription">
               <FormattedMessage id="TierPage.AddLongDescription" defaultMessage="Add a rich description" />

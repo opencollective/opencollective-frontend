@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { omitBy } from 'lodash';
 import { defineMessage, useIntl } from 'react-intl';
 
-import { isIndividualAccount } from '../../../../lib/collective.lib';
+import { isIndividualAccount } from '../../../../lib/collective';
 import { ActivityTypes } from '../../../../lib/constants/activities';
 import { ActivityTypeI18n } from '../../../../lib/i18n/activities';
 
@@ -12,7 +12,13 @@ import { StyledSelectFilter } from '../../../StyledSelectFilter';
 const ActivityCategories = {
   HOST: {
     title: defineMessage({ id: 'Member.Role.HOST', defaultMessage: 'Host' }),
-    activities: ['COLLECTIVE_APPLY', 'COLLECTIVE_APPROVED', 'COLLECTIVE_REJECTED', 'COLLECTIVE_CREATED_GITHUB'],
+    activities: [
+      'COLLECTIVE_APPLY',
+      'COLLECTIVE_APPROVED',
+      'COLLECTIVE_REJECTED',
+      'COLLECTIVE_CREATED_GITHUB',
+      'COLLECTIVE_UNHOSTED',
+    ],
   },
   EXPENSES: {
     title: defineMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),

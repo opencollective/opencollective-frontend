@@ -17,7 +17,8 @@ import ContributorsGridBackgroundSVG from '../../../public/static/images/collect
 
 /** Main contributors container with the bubbles background */
 const MainContainer = styled(Container)`
-  background: linear-gradient(
+  background:
+    linear-gradient(
       0deg,
       rgba(255, 255, 255, 1) 0,
       rgba(255, 255, 255, 0) 75px,
@@ -120,7 +121,9 @@ export default class SectionContributors extends React.PureComponent {
               id="CollectivePage.OurContributors"
               defaultMessage="Our contributors {count}"
               values={{
-                count: <Span color="black.600">{stats.backers.all + coreContributors.length}</Span>,
+                count: (
+                  <Span color="black.600">{stats.backers.all + coreContributors.filter(c => !c.isBacker).length}</Span>
+                ),
               }}
             />
           </H3>

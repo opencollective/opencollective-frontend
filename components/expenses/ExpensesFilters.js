@@ -1,14 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { isNil } from 'lodash';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import expenseStatus from '../../lib/constants/expense-status';
 import { encodeDateInterval } from '../../lib/date-utils';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 
 import AmountFilter from '../budget/filters/AmountFilter';
 import PeriodFilter from '../filters/PeriodFilter';
 import { Flex } from '../Grid';
+import { StyledSelectFilter } from '../StyledSelectFilter';
 
 import ExpensesOrder from './filters/ExpensesOrder';
 import ExpensesPayoutTypeFilter from './filters/ExpensesPayoutTypeFilter';
@@ -29,22 +31,70 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
+const I18nMessages = defineMessages({
+  ALL: { id: 'VirtualCard.AllTypes', defaultMessage: 'All' },
+  HAS_RECEIPTS: { id: 'VirtualCard.WithReceiptsFilter', defaultMessage: 'Has receipts' },
+  HAS_NO_RECEIPTS: { id: 'VirtualCard.WithoutReceiptsFilter', defaultMessage: 'Has no receipts' },
+});
+
 const ExpensesFilters = ({
   collective,
   filters,
   onChange,
-  ignoredExpenseStatus,
+  explicitAllForStatus = false,
   showOrderFilter = true,
   wrap = true,
+  displayOnHoldPseudoStatus = false,
+  showChargeHasReceiptFilter = false,
+  ...props
 }) => {
+  const intl = useIntl();
   const getFilterProps = (name, valueModifier) => ({
     inputId: `expenses-filter-${name}`,
     value: filters?.[name],
     onChange: value => {
       const preparedValue = valueModifier ? valueModifier(value) : value;
-      onChange({ ...filters, [name]: value === 'ALL' ? null : preparedValue });
+      const shouldNullValue = value === 'ALL' && !(explicitAllForStatus && name === 'status');
+      onChange({ ...filters, [name]: shouldNullValue ? null : preparedValue });
     },
   });
+
+  const chargeHasReceiptFilterValue = React.useMemo(
+    () =>
+      isNil(props.chargeHasReceiptFilter)
+        ? {
+            value: null,
+            label: intl.formatMessage(I18nMessages.ALL),
+          }
+        : props.chargeHasReceiptFilter === true
+          ? {
+              value: true,
+              label: intl.formatMessage(I18nMessages.HAS_RECEIPTS),
+            }
+          : {
+              value: false,
+              label: intl.formatMessage(I18nMessages.HAS_NO_RECEIPTS),
+            },
+    [intl, props.chargeHasReceiptFilter],
+  );
+
+  const chargeHasReceiptFilterOptions = React.useMemo(
+    () => [
+      {
+        value: null,
+        label: intl.formatMessage(I18nMessages.ALL),
+      },
+      {
+        value: true,
+        label: intl.formatMessage(I18nMessages.HAS_RECEIPTS),
+      },
+      {
+        value: false,
+        label: intl.formatMessage(I18nMessages.HAS_NO_RECEIPTS),
+      },
+    ],
+    [intl],
+  );
 
   return (
     <Flex flexWrap={['wrap', null, wrap ? 'wrap' : 'nowrap']} gap="18px">
@@ -76,7 +126,11 @@ const ExpensesFilters = ({
         <FilterLabel htmlFor="expenses-filter-status">
           <FormattedMessage id="expense.status" defaultMessage="Status" />
         </FilterLabel>
-        <ExpensesStatusFilter {...getFilterProps('status')} ignoredExpenseStatus={ignoredExpenseStatus} />
+        <ExpensesStatusFilter
+          {...getFilterProps('status')}
+          ignoredExpenseStatus={props.ignoredExpenseStatus}
+          displayOnHoldPseudoStatus={displayOnHoldPseudoStatus}
+        />
       </FilterContainer>
       {showOrderFilter && (
         <FilterContainer>
@@ -84,6 +138,19 @@ const ExpensesFilters = ({
             <FormattedMessage id="expense.order" defaultMessage="Order" />
           </FilterLabel>
           <ExpensesOrder {...getFilterProps('orderBy')} />
+        </FilterContainer>
+      )}
+      {showChargeHasReceiptFilter && (
+        <FilterContainer>
+          <FilterLabel htmlFor="expenses-charge-has-receipts">
+            <FormattedMessage id="expenses.chargeHasReceiptsFilter" defaultMessage="Charge Receipts" />
+          </FilterLabel>
+          <StyledSelectFilter
+            inputId="expenses-charge-has-receipts"
+            onChange={newValue => props.onChargeHasReceiptFilterChange(newValue.value)}
+            value={chargeHasReceiptFilterValue}
+            options={chargeHasReceiptFilterOptions}
+          />
         </FilterContainer>
       )}
     </Flex>
@@ -94,12 +161,17 @@ ExpensesFilters.propTypes = {
   onChange: PropTypes.func,
   filters: PropTypes.object,
   showOrderFilter: PropTypes.bool,
+  explicitAllForStatus: PropTypes.bool,
   collective: PropTypes.shape({
     currency: PropTypes.string.isRequired,
     createdAt: PropTypes.string,
   }).isRequired,
   wrap: PropTypes.bool,
-  ignoredExpenseStatus: PropTypes.arrayOf(PropTypes.oneOf(Object.values(expenseStatus))),
+  ignoredExpenseStatus: PropTypes.arrayOf(PropTypes.oneOf(Object.values(ExpenseStatus))),
+  displayOnHoldPseudoStatus: PropTypes.bool,
+  showChargeHasReceiptFilter: PropTypes.bool,
+  chargeHasReceiptFilter: PropTypes.bool,
+  onChargeHasReceiptFilterChange: PropTypes.func,
 };
 
 export default React.memo(ExpensesFilters);

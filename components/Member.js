@@ -19,7 +19,7 @@ const MemberContainer = styled.div`
   position: relative;
 
   .USER {
-    margin: 0.5rem 0.25rem;
+    margin: 0.3rem 0.15rem;
   }
 
   .small {
@@ -33,7 +33,7 @@ const MemberContainer = styled.div`
   .ORGANIZATION,
   .COLLECTIVE {
     width: 200px;
-    margin: 1rem;
+    margin: 0.65rem;
   }
 `;
 
@@ -79,8 +79,8 @@ class Member extends React.Component {
     const tierName = membership.tier
       ? singular(membership.tier.name)
       : this.messages[membership.role]
-      ? intl.formatMessage(this.messages[membership.role])
-      : membership.role;
+        ? intl.formatMessage(this.messages[membership.role])
+        : membership.role;
     let memberSinceStr = '';
     if (tierName) {
       memberSinceStr += capitalize(tierName);
@@ -120,16 +120,16 @@ ${totalDonationsStr}`;
             <LinkCollective collective={this.props.member.member} target="_top" title={title}>
               <Flex mt={2}>
                 <Avatar collective={member} radius={45} className="noFrame" />
-                <Container padding="1rem" paddingTop="0" textAlign="left" overflow="hidden" display="none">
-                  <Container fontSize="1.7rem">{name}</Container>
-                  <Container fontSize="1.4rem" color="black.600">
+                <Container padding="0.65rem" paddingTop="0" textAlign="left" overflow="hidden" display="none">
+                  <Container fontSize="1.05rem">{name}</Container>
+                  <Container fontSize="0.85rem" color="black.600">
                     {firstSentence(description || member.description, 64)}
                   </Container>
-                  <Container className="since" fontSize="1.4rem">
+                  <Container className="since" fontSize="0.85rem">
                     {memberSinceStr}
                   </Container>
                   {totalDonationsStr && (
-                    <Container className="totalDonations" fontSize="1.4rem" color="black.600">
+                    <Container className="totalDonations" fontSize="0.85rem" color="black.600">
                       {totalDonationsStr}
                     </Container>
                   )}

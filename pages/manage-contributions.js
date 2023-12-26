@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { css } from '@styled-system/css';
-import { groupBy, isEmpty, mapValues, orderBy, uniqBy } from 'lodash';
+import { flatten, groupBy, isEmpty, mapValues, orderBy, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -98,9 +98,11 @@ class ManageContributionsPage extends React.Component {
   getAdministratedAccounts = memoizeOne(loggedInUser => {
     // Personal profile already includes incognito contributions
     const adminMemberships = loggedInUser?.memberOf?.filter(m => m.role === 'ADMIN' && !m.collective.isIncognito);
-    const uniqMemberships = uniqBy(adminMemberships, 'collective.id');
-    const groupedMemberships = groupBy(uniqMemberships, 'collective.type');
-    return mapValues(groupedMemberships, memberships => orderBy(memberships, 'collective.name'));
+    const adminAccounts = adminMemberships?.map(m => m.collective) || [];
+    const childrenAdminAccounts = flatten(adminAccounts.map(c => c.children));
+    const uniqAccounts = uniqBy([...adminAccounts, ...childrenAdminAccounts], 'id');
+    const groupedAccounts = groupBy(uniqAccounts, 'type');
+    return mapValues(groupedAccounts, accounts => orderBy(accounts, 'name'));
   });
 
   render() {
@@ -156,7 +158,7 @@ class ManageContributionsPage extends React.Component {
                         <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" />
                       </Span>
                     </MenuEntry>
-                    {Object.entries(groupedAdminOf).map(([collectiveType, members]) => (
+                    {Object.entries(groupedAdminOf).map(([collectiveType, accounts]) => (
                       <div key={collectiveType}>
                         <Flex alignItems="center" px={2} mt={3} mb={2}>
                           <Span fontWeight="bold" color="black.700" fontSize="14px">
@@ -164,16 +166,16 @@ class ManageContributionsPage extends React.Component {
                           </Span>
                           <StyledHr ml={2} width="100%" borderColor="black.300" />
                         </Flex>
-                        {members.map(m => (
+                        {accounts.map(account => (
                           <MenuEntry
-                            key={m.id}
-                            href={`/${m.collective.slug}/manage-contributions`}
-                            title={m.collective.name}
-                            $isActive={slug === m.collective.slug}
+                            key={account.id}
+                            href={`/${account.slug}/manage-contributions`}
+                            title={account.name}
+                            $isActive={slug === account.slug}
                           >
-                            <Avatar collective={m.collective} size={32} />
+                            <Avatar collective={account} size={32} />
                             <Span ml={3} truncateOverflow>
-                              {m.collective.name}
+                              {account.name}
                             </Span>
                           </MenuEntry>
                         ))}

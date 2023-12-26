@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
+import { pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import FormPersister from '../../lib/form-persister';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
 import { Box, Flex } from '../Grid';
@@ -20,8 +21,8 @@ import StyledInputTags from '../StyledInputTags';
 import { H4, P } from '../Text';
 
 const createConversationMutation = gql`
-  mutation CreateConversation($title: String!, $html: String!, $CollectiveId: String!, $tags: [String]) {
-    createConversation(title: $title, html: $html, CollectiveId: $CollectiveId, tags: $tags) {
+  mutation CreateConversation($title: String!, $html: String!, $account: AccountReferenceInput!, $tags: [String]) {
+    createConversation(title: $title, html: $html, account: $account, tags: $tags) {
       id
       slug
       title
@@ -71,7 +72,7 @@ const validate = values => {
  */
 const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuccess, disabled, loading }) => {
   const intl = useIntl();
-  const { id: collectiveId, slug: collectiveSlug } = collective;
+  const { slug: collectiveSlug } = collective;
   const { formatMessage } = useIntl();
   const [createConversation, { error: submitError }] = useMutation(createConversationMutation, mutationOptions);
   const [formPersister] = React.useState(new FormPersister());
@@ -85,7 +86,8 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
     },
     validate,
     onSubmit: async values => {
-      const response = await createConversation({ variables: { ...values, CollectiveId: collectiveId } });
+      const account = pick(collective, ['id']);
+      const response = await createConversation({ variables: { ...values, account } });
       formPersister.clearValues();
       return onSuccess(response.data.createConversation);
     },
@@ -110,6 +112,15 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
       formPersister.saveValues({ html: values.html, tags: values.tags, title: values.title });
     }
   }, [values.title, values.html, values.tags]);
+
+  const onChangeTags = useCallback(
+    options =>
+      setFieldValue(
+        'tags',
+        options.map(el => el.value),
+      ),
+    [setFieldValue],
+  );
 
   return (
     <form onSubmit={handleSubmit}>
@@ -180,11 +191,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
                   {...getFieldProps('tags')}
                   maxWidth={300}
                   suggestedTags={suggestedTags}
-                  onChange={options => {
-                    const tags = [];
-                    options && options.length > 0 ? options.map(option => tags.push(option.value)) : [];
-                    setFieldValue('tags', tags);
-                  }}
+                  onChange={onChangeTags}
                 />
               )}
             </Box>

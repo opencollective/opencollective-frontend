@@ -1,14 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getCollectivePageMetadata } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
@@ -56,7 +55,7 @@ class CreateConversationPage extends React.Component {
         type: PropTypes.string.isRequired,
         twitterHandle: PropTypes.string,
         imageUrl: PropTypes.string,
-        conversationsTags: PropTypes.arrayOf(PropTypes.string),
+        conversationsTags: PropTypes.arrayOf(PropTypes.shape({ tag: PropTypes.string })),
       }),
     }).isRequired, // from withData
   };
@@ -152,7 +151,6 @@ const createConversationPageQuery = gql`
       settings
       imageUrl
       twitterHandle
-      imageUrl
       backgroundImageUrl
       ... on AccountWithParent {
         parent {

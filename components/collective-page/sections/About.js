@@ -4,19 +4,19 @@ import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
+import { editCollectiveLongDescriptionMutation } from '../../../lib/graphql/v1/mutations';
 
 import Container from '../../Container';
 import { Flex } from '../../Grid';
-import HTMLContent, { isEmptyValue } from '../../HTMLContent';
+import HTMLContent, { isEmptyHTMLValue } from '../../HTMLContent';
 import InlineEditField from '../../InlineEditField';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import { Span } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
-import { editCollectiveLongDescriptionMutation } from '../graphql/mutations';
 
-// Dynamicly load RichTextEditor to download it only if user can edit the page
+// Dynamically load RichTextEditor to download it only if user can edit the page
 const RichTextEditorLoadingPlaceholder = () => <LoadingPlaceholder height={400} />;
 const RichTextEditor = dynamic(() => import('../../RichTextEditor'), {
   loading: RichTextEditorLoadingPlaceholder,
@@ -34,7 +34,7 @@ const messages = defineMessages({
  * About section category with editable description
  */
 const SectionAbout = ({ collective, canEdit, intl }) => {
-  const isEmptyDescription = isEmptyValue(collective.longDescription);
+  const isEmptyDescription = isEmptyHTMLValue(collective.longDescription);
   const isCollective = collective.type === CollectiveType.COLLECTIVE;
   const isFund = collective.type === CollectiveType.FUND;
   canEdit = collective.isArchived ? false : canEdit;
@@ -49,10 +49,10 @@ const SectionAbout = ({ collective, canEdit, intl }) => {
           canEdit={canEdit}
           topEdit={-20}
           showEditIcon={!isEmptyDescription}
-          formatBeforeSubmit={v => (isEmptyValue(v) ? null : v)}
+          formatBeforeSubmit={v => (isEmptyHTMLValue(v) ? null : v)}
           prepareVariables={(collective, longDescription) => ({
             id: collective.id,
-            longDescription: isEmptyValue(longDescription) ? null : longDescription,
+            longDescription: isEmptyHTMLValue(longDescription) ? null : longDescription,
           })}
         >
           {({ isEditing, value, setValue, enableEditor, setUploading }) => {

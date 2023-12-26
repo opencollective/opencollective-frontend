@@ -8,7 +8,7 @@ import UploadedFilePreview from '../../components/UploadedFilePreview';
 <Canvas>
   <Story name="Without URL">
     {() => {
-      return <UploadedFilePreview />;
+      return <UploadedFilePreview url="https://d.pr/free/i/OlQVIb+" />;
     }}
   </Story>
 </Canvas>
@@ -18,7 +18,7 @@ import UploadedFilePreview from '../../components/UploadedFilePreview';
 <Canvas>
   <Story name="Loading">
     {() => {
-      return <UploadedFilePreview isLoading />;
+      return <UploadedFilePreview url="https://d.pr/free/i/OlQVIb+" isLoading />;
     }}
   </Story>
 </Canvas>
@@ -28,7 +28,7 @@ import UploadedFilePreview from '../../components/UploadedFilePreview';
 <Canvas>
   <Story name="Private">
     {() => {
-      return <UploadedFilePreview isPrivate />;
+      return <UploadedFilePreview url="https://d.pr/free/i/OlQVIb+" isPrivate />;
     }}
   </Story>
 </Canvas>
@@ -38,7 +38,7 @@ import UploadedFilePreview from '../../components/UploadedFilePreview';
 <Canvas>
   <Story name="Download with onClick">
     {() => {
-      return <UploadedFilePreview onClick={console.log} />;
+      return <UploadedFilePreview url="https://d.pr/free/i/OlQVIb+" onClick={console.log} />;
     }}
   </Story>
 </Canvas>

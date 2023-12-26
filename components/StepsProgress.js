@@ -67,7 +67,9 @@ const Bubble = styled(Flex)`
   cursor: default;
   color: #c4c7cc;
   background: ${themeGet('colors.white.full')};
-  transition: box-shadow 0.3s, background 0.3s;
+  transition:
+    box-shadow 0.3s,
+    background 0.3s;
   z-index: 2;
 
   ${props =>

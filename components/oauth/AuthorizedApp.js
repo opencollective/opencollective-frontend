@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
+import { isEmpty, startCase } from 'lodash';
+import { AlertTriangle } from 'lucide-react';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 
-import { isIndividualAccount } from '../../lib/collective.lib';
+import { isIndividualAccount } from '../../lib/collective';
 import dayjs from '../../lib/dayjs';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -16,7 +18,9 @@ import LinkCollective from '../LinkCollective';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { Badge } from '../ui/Badge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
+import { useToast } from '../ui/useToast';
 
 const revokeAuthorizationMutation = gql`
   mutation RevokeAuthorization($id: String!) {
@@ -28,7 +32,7 @@ const revokeAuthorizationMutation = gql`
 
 export const AuthorizedApp = ({ authorization, onRevoke }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [revokeAuthorization, { loading }] = useMutation(revokeAuthorizationMutation, {
     context: API_V2_CONTEXT,
     onCompleted: onRevoke,
@@ -43,13 +47,27 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
       mb={3}
       flexWrap="wrap"
     >
-      <Flex alignItems="center">
+      <Flex alignItems="center" flexBasis={[null, null, '80%']}>
         <Avatar collective={authorization.application.account} size={64} />
         <Box ml={24}>
-          <P fontWeight="800" fontSize="15px">
-            {authorization.application.name}
-          </P>
-          <Container display="flex" alignItems="center" flexWrap="wrap" fontSize="12px" mt={2} color="black.700">
+          <div className="mb-2 flex items-center gap-2">
+            <P fontWeight="800" fontSize="15px">
+              {authorization.application.name}
+            </P>
+            {Boolean(authorization.preAuthorize2FA) && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <Badge type="warning" className="flex items-center gap-1 text-xs">
+                    <AlertTriangle size={12} /> <FormattedMessage defaultMessage="Extended permissions" />
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <FormattedMessage defaultMessage="This application can directly perform critical operations that would normally require 2FA." />
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+          <Container display="flex" alignItems="center" flexWrap="wrap" fontSize="12px" color="black.700">
             <time dateTime={authorization.createdAt} title={generateDateTitle(intl, new Date(authorization.createdAt))}>
               <FormattedMessage defaultMessage="Connected on {date, date, simple}" values={{ date: new Date() }} />
             </time>
@@ -94,9 +112,31 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
               </Flex>
             )}
           </Container>
+          {!isEmpty(authorization.scope) && (
+            <p className="mt-1 text-xs font-normal text-neutral-600">
+              <FormattedMessage
+                id="withColon"
+                defaultMessage="{item}:"
+                values={{
+                  item: (
+                    <FormattedMessage
+                      defaultMessage="{count,plural,one {Scope} other {Scopes}}"
+                      values={{ count: authorization.scope.length }}
+                    />
+                  ),
+                }}
+              />{' '}
+              {authorization.scope.sort().map((scope, index) => (
+                <React.Fragment key={scope}>
+                  <code>{startCase(scope)}</code>
+                  {index !== authorization.scope.length - 1 && ', '}
+                </React.Fragment>
+              ))}
+            </p>
+          )}
         </Box>
       </Flex>
-      <Container ml={2} textAlign="center" mt={2} width={['100%', 'auto']}>
+      <Container ml={2} textAlign="center" mt={2}>
         <StyledButton
           data-cy="oauth-app-revoke-btn"
           buttonSize="small"
@@ -106,15 +146,15 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
           onClick={async () => {
             try {
               await revokeAuthorization({ variables: { id: authorization.id } });
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 message: intl.formatMessage(
                   { defaultMessage: `Authorization for {appName} revoked` },
                   { appName: authorization.application.name },
                 ),
               });
             } catch (e) {
-              addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+              toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
             }
           }}
         >
@@ -130,6 +170,8 @@ AuthorizedApp.propTypes = {
     id: PropTypes.string.isRequired,
     createdAt: PropTypes.string.isRequired,
     lastUsedAt: PropTypes.string.isRequired,
+    preAuthorize2FA: PropTypes.bool,
+    scope: PropTypes.arrayOf(PropTypes.string.isRequired),
     account: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,

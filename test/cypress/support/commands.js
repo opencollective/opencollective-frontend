@@ -1,16 +1,11 @@
-import 'cypress-file-upload';
-import './third-party-commands';
-
-// import gql from 'fake-tag'; // eslint-disable-line
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { loggedInUserQuery } from '../../../lib/graphql/queries';
+import { API_V2_CONTEXT, fakeTag as gql, fakeTag as gqlV1 } from '../../../lib/graphql/helpers';
+import { loggedInUserQuery } from '../../../lib/graphql/v1/queries';
 
 import { CreditCards } from '../../stripe-helpers';
 
 import { defaultTestUserEmail } from './data';
 import { randomEmail, randomSlug } from './faker';
-
-// const gqlV1 = gql;
+import generateToken from './token';
 
 /**
  * Login with an existing account. If not provided in `params`, the email used for
@@ -141,9 +136,9 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
   return signinRequest(user, null).then(response => {
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQuery(token, {
-      operationName: 'createCollective',
-      query: /* GraphQL */ `
-        mutation createCollective($collective: CollectiveInputType!) {
+      operationName: 'CreateCollective',
+      query: gqlV1/* GraphQL */ `
+        mutation CreateCollective($collective: CollectiveInputType!) {
           createCollective(collective: $collective) {
             id
             slug
@@ -170,7 +165,7 @@ Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserE
   return signinRequestAndReturnToken({ email: userEmail }).then(token => {
     return graphqlQuery(token, {
       operationName: 'EditCollective',
-      query: /* GraphQL */ `
+      query: gqlV1/* GraphQL */ `
         mutation EditCollective($collective: CollectiveInputType!) {
           editCollective(collective: $collective) {
             id
@@ -195,19 +190,23 @@ Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserE
  * Create a collective. Admin will be the user designated by `email`. If not
  * provided, the email used will default to `defaultTestUserEmail`.
  */
-Cypress.Commands.add('createHostedCollectiveV2', ({ email = defaultTestUserEmail, testPayload } = {}) => {
-  return cy.createCollectiveV2({
-    email,
-    testPayload,
-    host: { slug: 'opensource' },
-    collective: {
-      repositoryUrl: 'https://github.com/opencollective',
-    },
-    applicationData: {
-      useGithubValidation: true,
-    },
-  });
-});
+Cypress.Commands.add(
+  'createHostedCollectiveV2',
+  ({ email = defaultTestUserEmail, hostSlug = 'opensource', testPayload, ...attributes } = {}) => {
+    return cy.createCollectiveV2({
+      ...attributes,
+      email,
+      testPayload,
+      host: { slug: hostSlug },
+      collective: {
+        repositoryUrl: 'https://github.com/opencollective',
+      },
+      applicationData: {
+        useGithubValidation: true,
+      },
+    });
+  },
+);
 
 /**
  * Create a expense.
@@ -224,9 +223,9 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
 
   return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
     return graphqlQueryV2(token, {
-      operationName: 'createExpense',
-      query: /* GraphQL */ `
-        mutation createExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
+      operationName: 'CreateExpense',
+      query: gql`
+        mutation CreateExpense($expense: ExpenseCreateInput!, $account: AccountReferenceInput!) {
           createExpense(expense: $expense, account: $account) {
             id
             legacyId
@@ -261,7 +260,7 @@ Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEma
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQuery(token, {
       operationName: 'CreateCollectiveWithHost',
-      query: /* GraphQL */ `
+      query: gqlV1/* GraphQL */ `
         mutation CreateCollectiveWithHost($collective: CollectiveInputType!) {
           createCollectiveFromGithub(collective: $collective) {
             id
@@ -291,7 +290,7 @@ Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, colle
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return graphqlQueryV2(token, {
       operationName: 'CreateProject',
-      query: /* GraphQL */ `
+      query: gql`
         mutation CreateProject($project: ProjectCreateInput!, $parent: AccountReferenceInput) {
           createProject(project: $project, parent: $parent) {
             id
@@ -339,36 +338,36 @@ Cypress.Commands.add('fillStripeInput', fillStripeInput);
  *
  * @param {boolean} approve: Set to false to reject
  */
-Cypress.Commands.add('complete3dSecure', (approve = true) => {
+Cypress.Commands.add('complete3dSecure', (approve = true, { version = 1 } = {}) => {
   const iframeSelector = 'iframe[name^="__privateStripeFrame"]';
   const targetBtn = approve ? '#test-source-authorize-3ds' : '#test-source-fail-3ds';
 
   cy.get(iframeSelector)
     .should($stripeFrame => {
       const frameContent = $stripeFrame.contents();
-      const challengeFrame = frameContent.find('body iframe#challengeFrame');
-      expect(challengeFrame).to.exist;
 
-      const acsFrame = challengeFrame.contents().find('iframe[name="acsFrame"]');
-      expect(acsFrame).to.exist;
+      let buttonsFrame = frameContent.find('body iframe#challengeFrame');
+      expect(buttonsFrame).to.exist;
 
-      const frameBody = acsFrame.contents().find('body');
-      expect(frameBody).to.exist;
+      // With 3DSecure v2, the buttons are stored directly in the iframe. With v1, there is an extra iframe.
+      if (version === 1) {
+        const acsFrame = buttonsFrame.contents().find('iframe[name="acsFrame"]');
+        expect(acsFrame).to.exist;
+        buttonsFrame = acsFrame;
+      }
 
-      expect(frameBody.find(targetBtn)).to.exist;
+      const challengeFrameBody = buttonsFrame.contents().find('body');
+      expect(challengeFrameBody).to.exist;
+      expect(challengeFrameBody.find(targetBtn)).to.exist;
     })
     .then($iframe => {
-      const btn = cy.wrap(
-        $iframe
-          .contents()
-          .find('body iframe#challengeFrame')
-          .contents()
-          .find('iframe[name="acsFrame"]')
-          .contents()
-          .find('body')
-          .find(targetBtn),
-      );
+      const $challengeFrameContent = $iframe.contents().find('body iframe#challengeFrame').contents();
+      let $btnContainer = $challengeFrameContent;
+      if (version === 1) {
+        $btnContainer = $btnContainer.find('iframe[name="acsFrame"]').contents();
+      }
 
+      const btn = cy.wrap($btnContainer.find('body').find(targetBtn));
       btn.click();
     });
 });
@@ -414,10 +413,10 @@ Cypress.Commands.add('checkStepsProgress', ({ enabled = [], disabled = [] }) => 
   Array.isArray(disabled) ? disabled.forEach(isDisabled) : isDisabled(disabled);
 });
 
-Cypress.Commands.add('checkToast', ({ type, message }) => {
+Cypress.Commands.add('checkToast', ({ variant, message }) => {
   const $toast = cy.contains('[data-cy="toast-notification"]', message);
-  if (type) {
-    $toast.should('have.attr', 'data-type', type);
+  if (variant) {
+    $toast.should('have.attr', 'data-variant', variant);
   }
 });
 
@@ -432,6 +431,10 @@ Cypress.Commands.add('assertLoggedIn', user => {
     cy.contains('[data-cy="user-menu"]', user.email);
     cy.getByDataCy('user-menu-trigger').click(); // To close the menu
   }
+});
+
+Cypress.Commands.add('generateToken', async expiresIn => {
+  return await generateToken(expiresIn);
 });
 
 /**
@@ -489,13 +492,9 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
     authToken = token;
     return graphqlQueryV2(authToken, {
       operationName: 'AccountHasTwoFactorAuth',
-      query: /* GraphQL */ `
+      query: gql`
         query AccountHasTwoFactorAuth($slug: String) {
           individual(slug: $slug) {
-            id
-            slug
-            name
-            type
             id
             slug
             name
@@ -517,7 +516,7 @@ Cypress.Commands.add('enableTwoFactorAuth', ({ userEmail = defaultTestUserEmail,
 
         return graphqlQueryV2(authToken, {
           operationName: 'AddTwoFactorAuthToIndividual',
-          query: /* GraphQL */ `
+          query: gql`
             mutation AddTwoFactorAuthToIndividual($account: AccountReferenceInput!, $token: String!) {
               addTwoFactorAuthTokenToIndividual(account: $account, token: $token) {
                 account {
@@ -574,9 +573,9 @@ Cypress.Commands.add(
     return signinRequest(user, null).then(response => {
       const token = getTokenFromRedirectUrl(response.body.redirect);
       return graphqlQueryV2(token, {
-        operationName: 'createCollective',
-        query: /* GraphQL */ `
-          mutation createCollective(
+        operationName: 'CreateCollective',
+        query: gql`
+          mutation CreateCollective(
             $collective: CollectiveCreateInput!
             $host: AccountReferenceInput!
             $testPayload: JSON

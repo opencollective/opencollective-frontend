@@ -1,27 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { get, isNil } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { capitalize } from '../lib/utils';
 
+import SocialLinksFormField from './edit-collective/SocialLinksFormField';
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
+import { Switch } from './ui/Switch';
 import CollectiveTagsInput from './CollectiveTagsInput';
 import { Box, Flex } from './Grid';
-import InputSwitch from './InputSwitch';
-import InputTypeCountry from './InputTypeCountry';
 import InputTypeLocation from './InputTypeLocation';
 import StyledButton from './StyledButton';
 import StyledCheckbox from './StyledCheckbox';
 import StyledInputGroup from './StyledInputGroup';
+import StyledInputLocation from './StyledInputLocation';
 import StyledInputTags from './StyledInputTags';
 import StyledSelect from './StyledSelect';
 import StyledTextarea from './StyledTextarea';
 import TimezonePicker from './TimezonePicker';
 
 const Label = ({ label, isPrivate }) => (
-  <label>
-    {label}&nbsp;{isPrivate && <PrivateInfoIcon tooltipProps={{ containerVerticalAlign: 'text-bottom' }} />}
+  <label className="text-sm font-bold">
+    {label}&nbsp;{isPrivate && <PrivateInfoIcon />}
   </label>
 );
 
@@ -83,7 +85,7 @@ function FieldGroup({ label, help, pre, post, after, button, className, isPrivat
           />
           {button && <StyledButton>{button}</StyledButton>}
         </Box>
-        {help && <HelpBlock>{help}</HelpBlock>}
+        {help && <HelpBlock mt={1}>{help}</HelpBlock>}
       </Flex>
     );
   }
@@ -117,7 +119,7 @@ const InputFieldContainer = styled.div`
 
 const HelpBlock = styled(Box)`
   color: #737373;
-  font-size: 1.2rem;
+  font-size: 0.75rem;
 `;
 
 /**
@@ -163,6 +165,7 @@ class InputField extends React.Component {
     focus: PropTypes.bool,
     help: PropTypes.string,
     error: PropTypes.string,
+    formModified: PropTypes.bool,
   };
 
   constructor(props) {
@@ -396,48 +399,38 @@ class InputField extends React.Component {
         );
         break;
 
-      case 'country':
+      case 'address':
         this.input = (
-          <div>
-            {horizontal && (
-              <Flex flexWrap="wrap" p={1}>
-                <Box width={[1, 2 / 12]}>
-                  <label>{capitalize(field.label)}</label>
-                </Box>
-                <Box width={[1, 10 / 12]}>
-                  <InputTypeCountry
-                    name={field.name}
-                    inputId={field.name}
-                    value={field.value}
-                    defaultValue={field.defaultValue}
-                    onChange={this.handleChange}
-                  />
-                </Box>
-              </Flex>
+          <Flex flexWrap="wrap" p={1}>
+            {field.label && (
+              <Box width={1}>
+                <Label label={capitalize(field.label)} isPrivate={field.isPrivate} />
+              </Box>
             )}
-            {!horizontal && (
-              <Flex flexWrap="wrap" p={1}>
-                {field.label && (
-                  <Box width={1}>
-                    <label>{`${capitalize(field.label)}`}</label>
-                  </Box>
-                )}
-                <Box width={1}>
-                  <InputTypeCountry
-                    name={field.name}
-                    inputId={field.name}
-                    value={field.value}
-                    defaultValue={field.defaultValue}
-                    onChange={this.handleChange}
-                  />
-                  {field.description && <HelpBlock>{field.description}</HelpBlock>}
-                </Box>
-              </Flex>
-            )}
-          </div>
+            <Box width={1}>
+              <StyledInputLocation
+                location={this.state.value || field.defaultValue}
+                onChange={event => this.handleChange(event)}
+              />
+              {field.description && <HelpBlock>{field.description}</HelpBlock>}
+            </Box>
+          </Flex>
         );
         break;
-
+      case 'socialLinks':
+        this.input = (
+          <Box p={1}>
+            <Box my="5px" fontWeight={700}>
+              <FormattedMessage defaultMessage="Social Links" />
+            </Box>
+            <SocialLinksFormField
+              value={this.state.value || field.defaultValue}
+              onChange={event => this.handleChange(event)}
+              touched={field.formModified}
+            />
+          </Box>
+        );
+        break;
       case 'currency':
         value = value || field.defaultValue;
         value = typeof value === 'number' ? value / 100 : '';
@@ -633,10 +626,10 @@ class InputField extends React.Component {
                   </Box>
                 )}
                 <Box width={[1, 10 / 12]}>
-                  <InputSwitch
+                  <Switch
                     name={field.name}
                     defaultChecked={field.defaultValue}
-                    onChange={event => this.handleChange(event.target.checked)}
+                    onCheckedChange={checked => this.handleChange(checked)}
                   />
                   {field.description && <HelpBlock>{field.description}</HelpBlock>}
                 </Box>
@@ -646,10 +639,10 @@ class InputField extends React.Component {
               <React.Fragment>
                 {field.label && <label>{capitalize(field.label)}</label>}
                 <div className="switch">
-                  <InputSwitch
+                  <Switch
                     name={field.name}
                     defaultChecked={field.defaultValue}
-                    onChange={event => this.handleChange(event.target.checked)}
+                    onCheckedChange={checked => this.handleChange(checked)}
                   />
                   {field.description && <HelpBlock>{field.description}</HelpBlock>}
                 </div>

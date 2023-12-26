@@ -5,8 +5,9 @@ import Link from './Link';
 import StyledLink from './StyledLink';
 
 // eslint-disable-next-line react/display-name
-export const getI18nLink = linkProps => chunks =>
-  <StyledLink {...linkProps}>{linkProps?.children || chunks}</StyledLink>;
+export const getI18nLink = linkProps => chunks => (
+  <StyledLink {...linkProps}>{linkProps?.children || chunks}</StyledLink>
+);
 export const I18nBold = chunks => <strong>{chunks}</strong>;
 export const I18nItalic = chunks => <i>{chunks}</i>;
 export const I18nCode = chunks => <code>{chunks}</code>;
@@ -18,21 +19,28 @@ export const I18nSupportLink = chunks => (
   </StyledLink>
 );
 export const I18nSignInLink = chunks => (
-  <Link href={{ pathname: '/signin', query: { next: typeof window !== 'undefined' ? window.location.pathname : '' } }}>
+  <StyledLink
+    as={Link}
+    href={{ pathname: '/signin', query: { next: typeof window !== 'undefined' ? window.location.pathname : '' } }}
+  >
     {chunks}
-  </Link>
+  </StyledLink>
 );
 
 export const I18nTOSLink = msg => (
-  <Link href="/tos">
+  <StyledLink as={Link} href="/tos">
     <span>{msg}</span>
-  </Link>
+  </StyledLink>
 );
 export const I18nPrivacyLink = msg => (
-  <Link href="/privacypolicy">
+  <StyledLink as={Link} href="/privacypolicy">
     <span>{msg}</span>
-  </Link>
+  </StyledLink>
 );
+
+export const I18nWithColumn = item => <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item }} />;
+
+export const WebsiteName = 'Open Collective';
 
 const I18nFormatters = {
   strong: I18nBold,
@@ -43,6 +51,7 @@ const I18nFormatters = {
   SignInLink: I18nSignInLink,
   TOSLink: I18nTOSLink,
   PrivacyPolicyLink: I18nPrivacyLink,
+  WebsiteName,
 };
 
 export default I18nFormatters;

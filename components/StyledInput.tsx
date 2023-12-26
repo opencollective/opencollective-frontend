@@ -42,6 +42,7 @@ const StyledInput = styled.input`
   border-style: ${props => (props.bare ? 'none' : 'solid')};
   box-sizing: border-box;
   outline: none;
+  max-width: none;
 
   ${props => {
     if (props.withOutline) {
@@ -58,6 +59,22 @@ const StyledInput = styled.input`
           `;
     }
   }}
+
+  ${props =>
+    props.hideSpinners &&
+    css`
+      ::-webkit-inner-spin-button,
+      ::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: textfield;
+        margin: 0;
+      }
+
+      &[type='number'] {
+        appearance: none;
+        -moz-appearance: textfield;
+      }
+    `}
 
   &[type=radio] {
     cursor: pointer;

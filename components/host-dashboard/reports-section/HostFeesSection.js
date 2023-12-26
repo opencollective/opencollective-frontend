@@ -29,7 +29,7 @@ const getValuesToDisplay = (isLoading, host, locale) => {
   }
 };
 
-const HostFeesSection = ({ host, collectives, isLoading }) => {
+const HostFeesSection = ({ host, isLoading }) => {
   const [showHostFeeChart, setShowHostFeeChart] = useState(false);
   const { locale } = useIntl();
   const valuesToDisplay = getValuesToDisplay(isLoading, host, locale);
@@ -114,7 +114,7 @@ const HostFeesSection = ({ host, collectives, isLoading }) => {
         </Container>
       </Flex>
       {showHostFeeChart && isLoading && <LoadingPlaceholder height={250} />}
-      {showHostFeeChart && !isLoading && <HostFeesSectionHistorical collectives={collectives} hostSlug={host.slug} />}
+      {showHostFeeChart && !isLoading && <HostFeesSectionHistorical hostSlug={host.slug} />}
     </React.Fragment>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { pick } from 'lodash';
 import { useRouter } from 'next/router';
@@ -8,11 +8,13 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
@@ -22,7 +24,7 @@ import StyledInputFormikField from '../StyledInputFormikField';
 import StyledLink from '../StyledLink';
 import StyledTextarea from '../StyledTextarea';
 import { H3, H4, P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 import WarnIfUnsavedChanges from '../WarnIfUnsavedChanges';
 
 import DeleteOAuthApplicationModal from './DeleteOAuthApplicationModal';
@@ -33,6 +35,7 @@ const applicationSettingsFragment = gql`
     id
     name
     description
+    preAuthorize2FA
     redirectUri
     clientId
     clientSecret
@@ -40,7 +43,7 @@ const applicationSettingsFragment = gql`
 `;
 
 const applicationQuery = gql`
-  query OAuthApplicationQuery($id: String!) {
+  query OAuthApplication($id: String!) {
     application(id: $id) {
       id
       ...ApplicationSettings
@@ -86,7 +89,7 @@ const LABEL_STYLES = { fontWeight: 700, fontSize: '16px', lineHeight: '24px' };
 const OAuthApplicationSettings = ({ backPath, id }) => {
   const intl = useIntl();
   const router = useRouter();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const { data, loading, error } = useQuery(applicationQuery, { variables: { id }, context: API_V2_CONTEXT });
   const [updateApplication] = useMutation(updateApplicationMutation, { context: API_V2_CONTEXT });
@@ -109,7 +112,12 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
             </H3>
             <StyledHr ml={2} flex="1" borderColor="black.400" />
           </Flex>
-          <StyledCard maxWidth="600px" p={3} my={4}>
+          {data.application.preAuthorize2FA && (
+            <MessageBox type="warning" withIcon mt={16}>
+              <FormattedMessage defaultMessage="This application can directly perform critical operations that would normally require 2FA." />
+            </MessageBox>
+          )}
+          <StyledCard maxWidth="600px" p={3} mt={4}>
             <H4 fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb="20px">
               <FormattedMessage defaultMessage="Client ID and client secret" />
             </H4>
@@ -130,6 +138,21 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
               </Flex>
             </Flex>
           </StyledCard>
+          <P mb={4} mt="10px" fontSize={12} color="black.700" letter-spacing="-0.4px">
+            {intl.formatMessage(
+              {
+                id: 'oauth.docs',
+                defaultMessage:
+                  'Explore <Link>our documentation</Link> for guidance on authorizing OAuth applications.',
+              },
+              {
+                Link: getI18nLink({
+                  href: 'https://docs.opencollective.com/help/developers/oauth',
+                  openInNewTab: true,
+                }),
+              },
+            )}
+          </P>
           <Formik
             initialValues={data.application}
             validate={values => validateOauthApplicationValues(intl, values)}
@@ -138,8 +161,8 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
                 const filteredValues = pick(values, ['name', 'description', 'redirectUri']);
                 const applicationInput = { id: data.application.id, ...filteredValues };
                 const result = await updateApplication({ variables: { application: applicationInput } });
-                addToast({
-                  type: TOAST_TYPE.SUCCESS,
+                toast({
+                  variant: 'success',
                   message: intl.formatMessage(
                     { defaultMessage: 'Application "{name}" updated' },
                     { name: result.data.updateApplication.name },
@@ -147,7 +170,7 @@ const OAuthApplicationSettings = ({ backPath, id }) => {
                 });
                 resetForm({ values: result.data.updateApplication });
               } catch (e) {
-                addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+                toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }
             }}
           >

@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
-import { isEmpty } from 'lodash';
+import { filter, isEmpty, range, some } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import { v4 as uuid } from 'uuid';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { toIsoDateStr } from '../../lib/date-utils';
 import { formatErrorMessage } from '../../lib/errors';
 import { i18nTaxType } from '../../lib/i18n/taxes';
-import { attachmentDropzoneParams, attachmentRequiresFile } from './lib/attachments';
+import { attachmentDropzoneParams } from './lib/attachments';
+import { expenseItemsMustHaveFiles, newExpenseItem } from './lib/items';
+import { compareItemOCRValues, itemHasOCR, updateExpenseFormWithUploadResult } from './lib/ocr';
 
 import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
@@ -17,42 +17,26 @@ import MessageBox from '../MessageBox';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
+import { TaxesFormikFields } from '../taxes/TaxesFormikFields';
 import { P, Span } from '../Text';
+import { toast } from '../ui/useToast';
 
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
-import ExpenseGSTFormikFields from './ExpenseGSTFormikFields';
 import ExpenseItemForm from './ExpenseItemForm';
-import ExpenseVATFormikFields from './ExpenseVATFormikFields';
-
-/** Init a new expense item with default attributes */
-const newExpenseItem = attrs => ({
-  id: uuid(), // we generate it here to properly key lists, but it won't be submitted to API
-  incurredAt: toIsoDateStr(new Date()),
-  description: '',
-  amount: null,
-  url: '',
-  __isNew: true,
-  ...attrs,
-});
 
 /** Converts a list of filenames to expense item objects */
-const filesListToItems = files => files.map(({ url }) => newExpenseItem({ url }));
-
-/** Helper to add a new item to the form */
-export const addNewExpenseItem = (formik, defaultValues) => {
-  formik.setFieldValue('items', [...(formik.values.items || []), newExpenseItem(defaultValues)]);
-};
+const filesListToItems = (files, expenseCurrency) => files.map(({ url }) => newExpenseItem({ url }, expenseCurrency));
 
 class ExpenseFormItems extends React.PureComponent {
   static propTypes = {
     collective: PropTypes.object,
-    availableCurrencies: PropTypes.arrayOf(PropTypes.string),
     /** @ignore from injectIntl */
     intl: PropTypes.object,
     /** Array helper as provided by formik */
     push: PropTypes.func.isRequired,
     /** Array helper as provided by formik */
     remove: PropTypes.func.isRequired,
+    hasOCRFeature: PropTypes.bool,
     /** Formik */
     form: PropTypes.shape({
       values: PropTypes.object.isRequired,
@@ -62,8 +46,6 @@ class ExpenseFormItems extends React.PureComponent {
       setFieldTouched: PropTypes.func,
     }).isRequired,
   };
-
-  state = { uploadErrors: null };
 
   componentDidMount() {
     const { values } = this.props.form;
@@ -75,12 +57,13 @@ class ExpenseFormItems extends React.PureComponent {
   componentDidUpdate(oldProps) {
     const { values, touched } = this.props.form;
 
+    // Add or remove the default item when changing the expense type
     if (oldProps.form.values.type !== values.type) {
       if ([expenseTypes.INVOICE, expenseTypes.GRANT].includes(values.type)) {
         this.addDefaultItem();
       } else if (!touched.items && values.items?.length === 1) {
         const firstItem = values.items[0];
-        if (!firstItem.url && !firstItem.description && !firstItem.amount) {
+        if (!firstItem.url && !firstItem.description && !firstItem.amountV2?.valueInCents) {
           this.props.remove(0);
         }
       }
@@ -90,7 +73,7 @@ class ExpenseFormItems extends React.PureComponent {
   addDefaultItem() {
     const { values } = this.props.form;
     if (isEmpty(values.items)) {
-      this.props.push(newExpenseItem());
+      this.props.push(newExpenseItem({}, values.currency));
     }
   }
 
@@ -101,35 +84,22 @@ class ExpenseFormItems extends React.PureComponent {
     }
   };
 
-  renderErrors() {
-    const { uploadErrors } = this.state;
-    if (!uploadErrors?.length) {
-      return null;
-    } else {
-      return (
-        <MessageBox type="error" withIcon mb={2}>
-          <strong>
-            <FormattedMessage
-              id="FilesUploadFailed"
-              defaultMessage="{count, plural, one {The file} other {# files}} failed to upload"
-              values={{ count: uploadErrors.length }}
-            />
-          </strong>
-          <P mt={1} pl={22}>
-            {formatErrorMessage(this.props.intl, uploadErrors[0]?.message)}
-          </P>
-        </MessageBox>
-      );
+  reportErrors(errors) {
+    if (errors?.length) {
+      const firstMessage = typeof errors[0] === 'string' ? errors[0] : errors[0].message;
+      toast({
+        variant: 'error',
+        title: (
+          <FormattedMessage
+            id="FilesUploadFailed"
+            defaultMessage="{count, plural, one {The file} other {# files}} failed to upload"
+            values={{ count: errors.length }}
+          />
+        ),
+        message: formatErrorMessage(this.props.intl, firstMessage),
+      });
     }
   }
-
-  onCurrencyChange = async newCurrency => {
-    /* If we are calling setFieldValue in response to a field change and has validations
-     * we should set the field to touched; https://github.com/jaredpalmer/formik/issues/2059
-     */
-    await this.props.form.setFieldValue('currency', newCurrency);
-    this.props.form.setFieldTouched('currency', true);
-  };
 
   getApplicableTaxType() {
     const { collective, form } = this.props;
@@ -139,17 +109,6 @@ class ExpenseFormItems extends React.PureComponent {
       } else if (accountHasGST(collective.host || collective)) {
         return TaxType.GST;
       }
-    }
-  }
-
-  renderTaxFormFields(taxType, isOptional) {
-    switch (taxType) {
-      case TaxType.VAT:
-        return <ExpenseVATFormikFields formik={this.props.form} isOptional={isOptional} />;
-      case TaxType.GST:
-        return <ExpenseGSTFormikFields formik={this.props.form} isOptional={isOptional} />;
-      default:
-        return `Tax not supported: ${taxType}`;
     }
   }
 
@@ -168,27 +127,72 @@ class ExpenseFormItems extends React.PureComponent {
     }
   }
 
+  getUploadingItemsIndexes() {
+    const { items } = this.props.form.values;
+    return filter(range(items.length), index => items[index].__isUploading);
+  }
+
+  getItemsOCRComparisons(items) {
+    return items.reduce((comparisons, item) => {
+      comparisons[item.id] = compareItemOCRValues(item);
+      return comparisons;
+    }, {});
+  }
+
+  removeMultiUploadingItems() {
+    const isMultiUploadingItem = item => item.__isUploading && item.__fromInput === 'multi';
+    const otherItems = this.props.form.values.items.filter(item => !isMultiUploadingItem(item));
+    this.props.form.setFieldValue('items', otherItems);
+  }
+
   render() {
-    const { availableCurrencies } = this.props;
+    const { hasOCRFeature, collective } = this.props;
     const { values, errors, setFieldValue } = this.props.form;
-    const requireFile = attachmentRequiresFile(values.type);
+    const requireFile = expenseItemsMustHaveFiles(values.type);
     const isGrant = values.type === expenseTypes.GRANT;
+    const isInvoice = values.type === expenseTypes.INVOICE;
     const isCreditCardCharge = values.type === expenseTypes.CHARGE;
     const items = values.items || [];
     const hasItems = items.length > 0;
+    const itemsWithOCR = items.filter(itemHasOCR);
+    const itemsOCRComparisons = this.getItemsOCRComparisons(itemsWithOCR);
+    const ocrMismatchWarningFields = ['amountV2', 'incurredAt'];
+    const hasOCRWarnings = some(itemsOCRComparisons, comparison =>
+      some(comparison, (value, field) => ocrMismatchWarningFields.includes(field) && value.hasMismatch),
+    );
 
     if (!hasItems && requireFile) {
       return (
         <React.Fragment>
-          {this.renderErrors()}
           <StyledDropzone
             {...attachmentDropzoneParams}
             kind="EXPENSE_ITEM"
             data-cy="expense-multi-attachments-dropzone"
             onSuccess={files => filesListToItems(files).map(this.props.push)}
-            onReject={uploadErrors => this.setState({ uploadErrors })}
+            onReject={uploadErrors => {
+              this.reportErrors(uploadErrors);
+              this.removeMultiUploadingItems();
+            }}
             mockImageGenerator={index => `https://loremflickr.com/120/120/invoice?lock=${index}`}
             mb={3}
+            useGraphQL={hasOCRFeature}
+            parseDocument={hasOCRFeature}
+            parsingOptions={{ currency: values.currency }}
+            onDrop={files => {
+              // Insert dummy items to display the loading states when uploading through GraphQL
+              if (hasOCRFeature) {
+                this.props.form.setFieldValue(
+                  'items',
+                  files.map(file =>
+                    newExpenseItem({ __isUploading: true, __file: file, __fromInput: 'multi' }, values.currency),
+                  ),
+                );
+              }
+            }}
+            onGraphQLSuccess={uploadResults => {
+              const indexesToUpdate = this.getUploadingItemsIndexes();
+              updateExpenseFormWithUploadResult(collective, this.props.form, uploadResults, indexesToUpdate);
+            }}
           >
             <P color="black.700" mt={1} px={2}>
               <FormattedMessage
@@ -207,27 +211,34 @@ class ExpenseFormItems extends React.PureComponent {
     const hasTaxFields = this.hasTaxFields(taxType);
     return (
       <Box>
-        {this.renderErrors()}
         {items.map((attachment, index) => (
           <ExpenseItemForm
             key={`item-${attachment.id}`}
             attachment={attachment}
-            currency={values.currency}
-            name={`items[${index}]`}
+            itemIdx={index}
             errors={errors}
             onRemove={onRemove}
             requireFile={requireFile}
             requireDate={!isGrant}
             isRichText={isGrant}
-            onUploadError={e => this.setState({ uploadErrors: [e] })}
+            onUploadError={e => this.reportErrors([e])}
             isOptional={values.payee?.isInvite}
             editOnlyDescriptiveInfo={isCreditCardCharge}
-            hasMultiCurrency={!index && availableCurrencies?.length > 1} // Only display currency picker for the first item
-            availableCurrencies={availableCurrencies}
-            onCurrencyChange={async value => await this.onCurrencyChange(value)}
-            isLastItem={index === items.length - 1}
+            isInvoice={isInvoice}
+            hasOCRFeature={hasOCRFeature}
+            collective={collective}
+            ocrComparison={itemsOCRComparisons[attachment.id]}
           />
         ))}
+        {/** Do not display OCR warnings for OCR charges since date/amount can't be changed */}
+        {!isCreditCardCharge && itemsWithOCR.length > 0 && (
+          <MessageBox type={hasOCRWarnings ? 'warning' : 'info'} withIcon mt={3}>
+            <FormattedMessage
+              defaultMessage="Please verify the {count,plural,one{date and amount} other{dates and amounts}} before proceeding."
+              values={{ count: itemsWithOCR.length }}
+            />
+          </MessageBox>
+        )}
         {taxType && (
           <div>
             <Flex alignItems="center" mt={24}>
@@ -262,7 +273,14 @@ class ExpenseFormItems extends React.PureComponent {
         {taxType && !hasTaxFields && <StyledHr borderColor="black.300" borderStyle="dotted" mb={24} mt={24} />}
         <Flex justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" mt={24}>
           <Box flexBasis={['100%', null, null, '50%']} mb={3}>
-            {hasTaxFields && this.renderTaxFormFields(taxType, Boolean(values.payee?.isInvite))}
+            {hasTaxFields && (
+              <TaxesFormikFields
+                taxType={taxType}
+                formik={this.props.form}
+                formikValuePath="taxes.0"
+                isOptional={Boolean(values.payee?.isInvite)}
+              />
+            )}
           </Box>
           <Box mb={3} ml={[0, null, null, 4]} flexBasis={['100%', null, null, 'auto']}>
             <ExpenseAmountBreakdown currency={values.currency} items={items} taxes={values.taxes} />

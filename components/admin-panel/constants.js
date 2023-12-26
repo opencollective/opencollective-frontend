@@ -16,6 +16,8 @@ export const HOST_DASHBOARD_SECTIONS = {
   PENDING_CONTRIBUTIONS: 'pending-contributions',
   HOSTED_COLLECTIVES: 'hosted-collectives',
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
+  HOST_VIRTUAL_CARD_REQUESTS: 'host-virtual-card-requests',
+  HOST_APPLICATIONS: 'host-applications',
   PENDING_APPLICATIONS: 'pending-applications',
 };
 
@@ -86,7 +88,12 @@ export const ALL_SECTIONS = {
   ...HOST_DASHBOARD_SECTIONS,
 };
 
-export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [ALL_SECTIONS.REPORTS, ALL_SECTIONS.PAYMENT_RECEIPTS];
+export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
+  ALL_SECTIONS.REPORTS,
+  ALL_SECTIONS.PAYMENT_RECEIPTS,
+  ALL_SECTIONS.EXPENSES,
+  ALL_SECTIONS.FINANCIAL_CONTRIBUTIONS,
+];
 
 export const PAGE_TITLES = defineMessages({
   [USER]: { id: 'AdminPanel.UserSettings', defaultMessage: 'User Settings' },
@@ -113,9 +120,9 @@ export const SECTION_LABELS = defineMessages({
     id: 'PendingContributions',
     defaultMessage: 'Pending Contributions',
   },
-  [ALL_SECTIONS.PENDING_APPLICATIONS]: {
-    id: 'AdminPanel.Menu.PendingApplications',
-    defaultMessage: 'Pending Applications',
+  [ALL_SECTIONS.HOST_APPLICATIONS]: {
+    id: 'HostDashboard.HostApplications',
+    defaultMessage: 'Applications',
   },
   [ALL_SECTIONS.OVERVIEW]: {
     id: 'AdminPanel.Menu.Overview',
@@ -237,6 +244,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.HOST_VIRTUAL_CARDS]: {
     id: 'VirtualCards.Title',
     defaultMessage: 'Virtual Cards',
+  },
+  [ALL_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: {
+    id: 'VirtualCardRequests.Title',
+    defaultMessage: 'Virtual Card Requests',
   },
   [ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS]: {
     id: 'VirtualCardsSettings.Title',

@@ -105,26 +105,18 @@ const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
       <Box alignSelf={['center', 'baseline', null, 'center']}>
         <input type="radio" name={name} value={type} checked={isChecked} onChange={onChange} />
       </Box>
-      <Box mx={2} size={48} alignSelf="center" display={['block', 'none', null, 'block']}>
-        <StaticTypeIllustration>
-          <Image src={staticIllustrationSrc} height={48} width={48} />
-        </StaticTypeIllustration>
-        <AnimatedTypeIllustration>
-          <Image src={illustrationSrc} height={48} width={48} />
-        </AnimatedTypeIllustration>
+      <Box flexShrink={0} mx={2} size={48} alignSelf="center" display={['block', 'none', null, 'block']}>
+        <StaticTypeIllustration src={staticIllustrationSrc} />
+        <TypeIllustration src={illustrationSrc} />
       </Box>
       <Box>
         <P fontSize="16px" fontWeight="bold" mb={2}>
           {formatMessage(ExpenseTypeLabels[type])}
         </P>
         <Flex alignItems="center">
-          <Box mr={1} size={48} alignSelf="center" display={['none', 'block', null, 'none']}>
-            <StaticTypeIllustration>
-              <Image src={staticIllustrationSrc} height={48} width={48} />
-            </StaticTypeIllustration>
-            <AnimatedTypeIllustration>
-              <Image src={illustrationSrc} height={48} width={48} />
-            </AnimatedTypeIllustration>
+          <Box flexShrink={0} mr={1} size={48} alignSelf="center" display={['none', 'block', null, 'none']}>
+            <StaticTypeIllustration src={staticIllustrationSrc} />
+            <TypeIllustration src={illustrationSrc} />
           </Box>
           <P fontSize="12px" color="black.600" fontWeight="normal">
             {formatMessage(ExpenseTypeDescription[type])}

@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -43,7 +43,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -59,7 +59,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -75,7 +75,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -91,30 +91,27 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup project
         uses: ./.github/actions/setup-project
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - name: Restore .next cache
+      - name: Restore NextJS build cache
         uses: actions/cache@v3
         with:
           path: .next/cache
-          key: ${{ runner.os }}-next-cache-${{ github.sha }}
+          # Generate a new cache whenever packages or source files change
+          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          # If source files changed but packages didn't, rebuild from a prior cache
           restore-keys: |
-            ${{ runner.os }}-next-cache-${{ github.sha }}
-            ${{ runner.os }}-next-cache-
-
-      - name: Cache build
-        uses: actions/cache@v3
-        with:
-          path: .next
-          key: ${{ runner.os }}-next-build-${{ github.sha }}
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-
 
       - name: Build
-        run: npm run build
+        run: PRESERVE_NEXT_CACHE=true npm run build
 
   test:
     runs-on: ubuntu-latest
@@ -123,7 +120,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -138,7 +135,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -146,3 +143,24 @@ jobs:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
       - run: npm run type:check
+
+  build-components:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - run: npm run build:components
+
+  e2e:
+    if: github.ref_name != 'i18n/crowdin'
+    needs: build
+    uses: ./.github/workflows/e2e.yml
+    secrets: inherit

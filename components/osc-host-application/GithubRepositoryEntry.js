@@ -20,7 +20,7 @@ const RepositoryEntry = ({ radio, value }) => {
             <Github size={40} />
           </Span>
           <Flex flexDirection="column" flex="1">
-            <P fontWeight={500} fontSize="1.4rem">
+            <P fontWeight={500} fontSize="0.85rem">
               {value.full_name}
             </P>
             <Flex justifyContent="space-between" flexGrow="1">
@@ -28,7 +28,7 @@ const RepositoryEntry = ({ radio, value }) => {
                 textTransform="uppercase"
                 fontWeight={600}
                 color="black.500"
-                fontSize="1rem"
+                fontSize="0.65rem"
                 mt={2}
                 letterSpacing="0.4px"
               >
@@ -36,7 +36,7 @@ const RepositoryEntry = ({ radio, value }) => {
               </P>
               <Box display={['block', null, 'none']} ml={3} mr={1}>
                 <Flex gap={4} color="black.600" mt={1} alignItems="center">
-                  <P fontWeight={600} fontSize="1.2rem" lineHeight="1.4rem">
+                  <P fontWeight={600} fontSize="0.75rem" lineHeight="0.85rem">
                     {value.stargazers_count}
                   </P>
                   <Star size={12} />
@@ -47,7 +47,7 @@ const RepositoryEntry = ({ radio, value }) => {
         </Flex>
         <Box display={['none', null, 'block']}>
           <Flex gap={4} color="black.600" mt={1}>
-            <P fontWeight={600} fontSize="1.2rem" lineHeight="1.4rem">
+            <P fontWeight={600} fontSize="0.75rem" lineHeight="0.85rem">
               {value.stargazers_count}
             </P>
             <Star size={12} />
@@ -55,7 +55,7 @@ const RepositoryEntry = ({ radio, value }) => {
         </Box>
       </Container>
       {value.description && (
-        <P color="black.700" fontSize="1.2rem" lineHeight="1.8rem" fontWeight="400" width={1} ml={4} mt={3} px={2}>
+        <P color="black.700" fontSize="0.75rem" lineHeight="1.15rem" fontWeight="400" width={1} ml={4} mt={3} px={2}>
           {value.description}
         </P>
       )}

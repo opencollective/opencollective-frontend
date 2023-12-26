@@ -1,15 +1,24 @@
+/**
+ * @deprecated Will be replaced by `components/navigation/TopBar` when Workspace moves out of preview feature
+ */
+
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronUp } from '@styled-icons/boxicons-regular/ChevronUp';
 import { Bars as MenuIcon } from '@styled-icons/fa-solid/Bars';
 import { debounce } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import theme from '../lib/theme';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
+import DynamicTopBar from './navigation/preview/TopBar';
+import NewTopBar from './navigation/TopBar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Hide from './Hide';
@@ -26,7 +35,7 @@ import TopBarProfileMenu from './TopBarProfileMenu';
 
 const NavList = styled(Flex)`
   list-style: none;
-  min-width: 20rem;
+  min-width: 12.5rem;
   text-align: right;
   align-items: center;
 `;
@@ -67,17 +76,36 @@ const NavItem = styled(StyledLink)`
   }
 `;
 
-const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
+const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, navTitle }) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const ref = useRef();
-
+  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
+  const router = useRouter();
   // We debounce this function to avoid conflicts between the menu button and TopBarMobileMenu useGlobalBlur hook.
   const debouncedSetShowMobileMenu = debounce(setShowMobileMenu);
 
   const toggleMobileMenu = () => {
     debouncedSetShowMobileMenu(state => !state);
   };
+
+  const isRouteActive = route => {
+    const regex = new RegExp(`^${route}(/.*)?$`);
+    return regex.test(router.asPath);
+  };
+
+  const onDashboardRoute = isRouteActive('/dashboard');
+
+  const useDashboard =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) ||
+    (onDashboardRoute && !LoggedInUser && loadingLoggedInUser);
+
+  if (useDashboard) {
+    if (LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR)) {
+      return <DynamicTopBar {...{ account, navTitle }} />;
+    }
+    return <NewTopBar {...{ account }} />;
+  }
 
   return (
     <Flex
@@ -86,12 +114,12 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
       alignItems="center"
       flexDirection="row"
       justifyContent="space-around"
-      css={{ height: theme.sizes.navbarHeight, background: 'white' }}
+      css={{ height: theme.sizes.navbarHeight, background: 'white', borderBottom: '1px solid rgb(232, 233, 235)' }}
       ref={ref}
     >
       <Link href="/">
         <Flex alignItems="center">
-          <Image width="36" height="36" src="/static/images/opencollective-icon.png" alt="Open Collective" />
+          <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />
           <Hide xs sm md>
             <Box mx={2}>
               <Image height={21} width={141} src="/static/images/logotype.svg" alt="Open Collective" />
@@ -241,16 +269,14 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu }) => {
             </Flex>
           </NavButton>
         )}
-        {showSearchModal && <SearchModal onClose={() => setShowSearchModal(false)} />}
+        <SearchModal open={showSearchModal} setOpen={setShowSearchModal} />
       </Flex>
 
       {showProfileAndChangelogMenu && (
         <React.Fragment>
-          <Container mr={3}>
-            <Hide xs>
-              <ChangelogTrigger />
-            </Hide>
-          </Container>
+          <div className="mr-2 hidden sm:block">
+            <ChangelogTrigger />
+          </div>
           <TopBarProfileMenu />
         </React.Fragment>
       )}
@@ -270,6 +296,8 @@ TopBar.propTypes = {
   showSearch: PropTypes.bool,
   showProfileAndChangelogMenu: PropTypes.bool,
   menuItems: PropTypes.object,
+  account: PropTypes.object,
+  navTitle: PropTypes.string,
 };
 
 TopBar.defaultProps = {

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronRight } from '@styled-icons/boxicons-regular/ChevronRight';
@@ -9,11 +8,11 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
-import { getSettingsRoute } from '../lib/url-helpers';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
+import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
 
-import ChangelogTrigger from './changelog/ChangelogTrigger';
 import Avatar from './Avatar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -23,6 +22,7 @@ import Link from './Link';
 import ListItem from './ListItem';
 import LoginBtn from './LoginBtn';
 import { withNewsAndUpdates } from './NewsAndUpdatesProvider';
+import PreviewFeaturesModal from './PreviewFeaturesModal';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
@@ -65,16 +65,49 @@ UserMenuLinkEntry.propTypes = {
   isMobileMenuLink: PropTypes.bool,
 };
 
-const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, logOutHandler }) => {
+const UserAccountLinks = ({
+  setShowNewsAndUpdates,
+  LoggedInUser,
+  isMobileView,
+  logOutHandler,
+  setShowPreviewFeaturesModal,
+}) => {
+  const useDashboard = LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
+  const hasAvailablePreviewFeatures = LoggedInUser?.getAvailablePreviewFeatures()?.length > 0;
+
   return (
     <Box>
       <UserMenuLinkEntry as={Span} isMobileMenuLink={isMobileView} onClick={() => setShowNewsAndUpdates(true)}>
         <FormattedMessage id="menu.newsAndUpdates" defaultMessage="News and Updates" />
       </UserMenuLinkEntry>
+      {hasAvailablePreviewFeatures && (
+        <UserMenuLinkEntry
+          as="button"
+          isMobileMenuLink={isMobileView}
+          onClick={() => setShowPreviewFeaturesModal(true)}
+          display="flex"
+          alignItems="center"
+          gridGap={2}
+        >
+          <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />{' '}
+          <Span
+            fontSize="12px"
+            ml={1}
+            style={{ borderRadius: 20 }}
+            display="inline-block"
+            px="6px"
+            bg="primary.200"
+            color="black.800"
+          >
+            <FormattedMessage defaultMessage="New!" />
+          </Span>
+        </UserMenuLinkEntry>
+      )}
       <Query
         query={memberInvitationsCountQuery}
         variables={{ memberAccount: { slug: LoggedInUser.collective.slug } }}
         context={API_V2_CONTEXT}
+        errorPolicy="all"
       >
         {({ data, loading }) =>
           loading === false && data && data.memberInvitations && data.memberInvitations.length > 0 ? (
@@ -88,19 +121,45 @@ const UserAccountLinks = ({ setShowNewsAndUpdates, LoggedInUser, isMobileView, l
           ) : null
         }
       </Query>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={getSettingsRoute(LoggedInUser.collective)}>
+      <UserMenuLinkEntry
+        isMobileMenuLink={isMobileView}
+        href={
+          useDashboard ? getDashboardRoute(LoggedInUser.collective, 'info') : getSettingsRoute(LoggedInUser.collective)
+        }
+      >
         <FormattedMessage id="Settings" defaultMessage="Settings" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/manage-contributions`}>
+      <UserMenuLinkEntry
+        isMobileMenuLink={isMobileView}
+        href={
+          useDashboard
+            ? getDashboardRoute(LoggedInUser.collective, 'manage-contributions')
+            : `/${LoggedInUser.collective.slug}/manage-contributions`
+        }
+      >
         <FormattedMessage id="menu.subscriptions" defaultMessage="Manage Contributions" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/submitted-expenses`}>
+      <UserMenuLinkEntry
+        isMobileMenuLink={isMobileView}
+        href={
+          useDashboard
+            ? getDashboardRoute(LoggedInUser.collective, 'expenses')
+            : `/${LoggedInUser.collective.slug}/submitted-expenses`
+        }
+      >
         <FormattedMessage id="home.feature.manageExpenses" defaultMessage="Manage Expenses" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={`/${LoggedInUser.collective.slug}/transactions`}>
+      <UserMenuLinkEntry
+        isMobileMenuLink={isMobileView}
+        href={
+          useDashboard
+            ? getDashboardRoute(LoggedInUser.collective, 'transactions')
+            : `/${LoggedInUser.collective.slug}/transactions`
+        }
+      >
         <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
       </UserMenuLinkEntry>
-      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href="/applications">
+      <UserMenuLinkEntry isMobileMenuLink={isMobileView} href={'/applications'}>
         <FormattedMessage id="menu.applications" defaultMessage="Applications" />
       </UserMenuLinkEntry>
       <UserMenuLinkEntry isMobileMenuLink={isMobileView} as="a" href="/help">
@@ -136,8 +195,12 @@ UserAccountLinks.propTypes = {
   logOutHandler: PropTypes.func,
   profileMenuLink: PropTypes.bool,
   isMobileView: PropTypes.bool,
+  setShowPreviewFeaturesModal: PropTypes.func,
 };
 
+/**
+ * @deprecated Will be replaced by `components/navigation/ProfileMenu` when Workspace moves out of preview feature
+ */
 class TopBarProfileMenu extends React.Component {
   static propTypes = {
     LoggedInUser: PropTypes.object,
@@ -148,14 +211,17 @@ class TopBarProfileMenu extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { showProfileMenu: false, loading: true, showUserAccount: false };
+    this.state = { showProfileMenu: false, showPreviewFeaturesModal: false, loading: true, showUserAccount: false };
   }
 
   componentDidMount() {
     const main = document.querySelector('main');
     main.addEventListener('keydown', this.handleKeyPress);
     main.addEventListener('click', this.onClickOutside);
-    if (!getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN)) {
+    if (
+      !getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN) &&
+      !getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN)
+    ) {
       this.setState({ loading: false });
     }
   }
@@ -205,7 +271,7 @@ class TopBarProfileMenu extends React.Component {
 
   renderProfileMenu() {
     const { LoggedInUser, setShowNewsAndUpdates } = this.props;
-    const { showUserAccount } = this.state;
+    const { showUserAccount, showPreviewFeaturesModal } = this.state;
 
     return (
       <Container
@@ -219,7 +285,7 @@ class TopBarProfileMenu extends React.Component {
         position="absolute"
         right={[0, 16]}
         top={[69, 75]}
-        zIndex={3000}
+        zIndex={1001}
         data-cy="user-menu"
         css={{ overflow: 'hidden' }}
       >
@@ -243,7 +309,7 @@ class TopBarProfileMenu extends React.Component {
                 </Flex>
                 <Flex py={3} mt={1} alignItems="center" justifyContent="space-between">
                   <Flex>
-                    <Avatar collective={LoggedInUser.collective} radius={40} mr={2} />
+                    <Avatar collective={LoggedInUser.collective} radius={36} mr={2} />
                     <Box>
                       <P color="black.800" fontWeight="500" fontSize="14px" lineHeight="20px">
                         {LoggedInUser.collective.name}
@@ -292,6 +358,7 @@ class TopBarProfileMenu extends React.Component {
                       LoggedInUser={LoggedInUser}
                       setShowNewsAndUpdates={setShowNewsAndUpdates}
                       logOutHandler={this.logout}
+                      setShowPreviewFeaturesModal={show => this.setState({ showPreviewFeaturesModal: show })}
                     />
                   </Box>
                 </Hide>
@@ -308,7 +375,7 @@ class TopBarProfileMenu extends React.Component {
                 <Hide lg md sm>
                   <Box height="90vh" p={3} overflowY="auto">
                     <Flex alignItems="center">
-                      {showUserAccount ? (
+                      <React.Fragment>
                         <P
                           color="black.700"
                           fontSize="12px"
@@ -317,26 +384,11 @@ class TopBarProfileMenu extends React.Component {
                           pr={2}
                           textTransform="uppercase"
                           whiteSpace="nowrap"
-                          onClick={this.toggleAccountInfo}
                         >
-                          ← <FormattedMessage id="Back" defaultMessage="Back" />
+                          <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
                         </P>
-                      ) : (
-                        <React.Fragment>
-                          <P
-                            color="black.700"
-                            fontSize="12px"
-                            fontWeight="500"
-                            letterSpacing="0.06em"
-                            pr={2}
-                            textTransform="uppercase"
-                            whiteSpace="nowrap"
-                          >
-                            <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
-                          </P>
-                          <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-                        </React.Fragment>
-                      )}
+                        <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+                      </React.Fragment>
                     </Flex>
                     <Flex
                       py={3}
@@ -358,7 +410,7 @@ class TopBarProfileMenu extends React.Component {
                           </P>
                         </Box>
                       </Flex>
-                      {!showUserAccount ? <ChevronRight size={20} color="#76777A" /> : ''}
+                      <ChevronRight size={20} color="#76777A" />
                     </Flex>
                     <ProfileMenuMemberships user={LoggedInUser} />
                   </Box>
@@ -376,11 +428,17 @@ class TopBarProfileMenu extends React.Component {
                   LoggedInUser={LoggedInUser}
                   setShowNewsAndUpdates={setShowNewsAndUpdates}
                   logOutHandler={this.logout}
+                  setShowPreviewFeaturesModal={show => this.setState({ showPreviewFeaturesModal: show })}
                 />
               </Box>
             </Hide>
           )}
         </Flex>
+
+        <PreviewFeaturesModal
+          open={showPreviewFeaturesModal}
+          setOpen={open => this.setState({ showPreviewFeaturesModal: open })}
+        />
       </Container>
     );
   }
@@ -391,19 +449,15 @@ class TopBarProfileMenu extends React.Component {
 
     return (
       <React.Fragment>
-        <StyledProfileButton isBorderless onClick={this.toggleProfileMenu}>
+        <StyledProfileButton height={32} isBorderless onClick={this.toggleProfileMenu}>
           <Flex alignItems="center" data-cy="user-menu-trigger">
-            <Avatar collective={get(LoggedInUser, 'collective')} radius="40px" mr={2} />
+            <Avatar collective={get(LoggedInUser, 'collective')} radius={32} mr={2} />
             <Hide xs>
               <ChevronDown color="#4E5052" size="1.5em" cursor="pointer" />
             </Hide>
           </Flex>
         </StyledProfileButton>
-        <Hide sm md lg>
-          <Container position="absolute" mx={27} my={-47}>
-            <ChangelogTrigger height="24px" width="24px" backgroundSize="9.49px 13.5px" />
-          </Container>
-        </Hide>
+
         {showProfileMenu && (
           <React.Fragment>
             <HideGlobalScroll />
@@ -430,16 +484,16 @@ class TopBarProfileMenu extends React.Component {
     }
 
     return (
-      <div className="LoginTopBarProfileButton">
+      <div className="h-8">
         {status === 'loading' && (
-          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
+          <P color="#D5DAE0" fontSize="0.85rem" px={3} py={2} display="inline-block">
             <FormattedMessage id="loading" defaultMessage="loading" />
             &hellip;
           </P>
         )}
 
         {status === 'loggingout' && (
-          <P color="#D5DAE0" fontSize="1.4rem" px={3} py={2} display="inline-block">
+          <P color="#D5DAE0" fontSize="0.85rem" px={3} py={2} display="inline-block">
             <FormattedMessage id="loggingout" defaultMessage="logging out" />
             &hellip;
           </P>

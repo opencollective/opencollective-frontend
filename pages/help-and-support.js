@@ -9,7 +9,7 @@ import ContactUsSuccess from '../components/help-and-support/ContactUsSuccess';
 import HowCanWeHelp from '../components/help-and-support/HowCanWeHelpSection';
 import HowOCWorks from '../components/help-and-support/HowOCWorksSection';
 import NeedHelp from '../components/help-and-support/NeedHelpSection';
-// import SearchTopics from '../components/help-and-support/SearchTopicsSection';
+import SearchTopics from '../components/help-and-support/SearchTopicsSection';
 import WeAreHereIfYouWantToTalk from '../components/help-and-support/WeAreHereSection';
 import Link from '../components/Link';
 import Page from '../components/Page';
@@ -17,6 +17,9 @@ import StyledButton from '../components/StyledButton';
 import StyledLink from '../components/StyledLink';
 
 const messages = defineMessages({
+  pageTitle: {
+    defaultMessage: 'Help & Support',
+  },
   defaultTitle: {
     id: 'OC.helpAndSupport',
     defaultMessage: 'How can we help?',
@@ -72,13 +75,13 @@ const HelpAndSupport = ({ action, formConfirmation }) => {
   const { formatMessage } = useIntl();
 
   return (
-    <Page description={formatMessage(messages.defaultTitle)}>
+    <Page navTitle={formatMessage(messages.pageTitle)} description={formatMessage(messages.defaultTitle)}>
       {action === 'contact' ? (
         renderFormContent(formConfirmation)
       ) : (
         <React.Fragment>
           <HowCanWeHelp />
-          {/* <SearchTopics />*/}
+          <SearchTopics />
           <BrowseTopics />
           <HowOCWorks />
           <WeAreHereIfYouWantToTalk />

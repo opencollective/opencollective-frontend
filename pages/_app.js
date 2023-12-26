@@ -1,20 +1,25 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { ApolloProvider } from '@apollo/client';
+import { polyfill as PolyfillInterweaveSSR } from 'interweave-ssr';
 import App from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
-import { createIntl, createIntlCache, RawIntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
+import { getIntlProps } from '../lib/i18n/request';
 import theme from '../lib/theme';
-import withData from '../lib/withData';
+import defaultColors from '../lib/theme/colors';
 
+import DefaultPaletteStyle from '../components/DefaultPaletteStyle';
 import StripeProviderSSR from '../components/StripeProvider';
 import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
+import { Toaster } from '../components/ui/Toaster';
 import UserProvider from '../components/UserProvider';
 
+import 'react-pdf/dist/esm/Page/TextLayer.css';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
@@ -29,26 +34,23 @@ Router.onRouteChangeComplete = () => NProgress.done();
 
 Router.onRouteChangeError = () => NProgress.done();
 
+import memoizeOne from 'memoize-one';
+
+import { APOLLO_STATE_PROP_NAME, initClient } from '../lib/apollo-client';
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
+import { withTwoFactorAuthentication } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import sentryLib from '../server/sentry';
 
 import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
-import GlobalToasts from '../components/GlobalToasts';
+import IntlProvider from '../components/intl/IntlProvider';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
-import ToastProvider from '../components/ToastProvider';
+import { TooltipProvider } from '../components/ui/Tooltip';
 
-// Use JSDOM on server-side so that react-intl can render rich messages
-// See https://github.com/formatjs/react-intl/blob/c736c2e6c6096b1d5ad1fb6be85fa374891d0a6c/docs/Getting-Started.md#domparser
-if (!process.browser) {
-  global.DOMParser = new (require('jsdom').JSDOM)().window.DOMParser;
-}
-
-// This is optional but highly recommended
-// since it prevents memory leak
-const cache = createIntlCache();
+PolyfillInterweaveSSR();
 
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
+    twoFactorAuthContext: PropTypes.object,
     pageProps: PropTypes.object.isRequired,
     scripts: PropTypes.object.isRequired,
     locale: PropTypes.string,
@@ -61,10 +63,7 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   static async getInitialProps({ Component, ctx, client }) {
-    // Get the `locale` and `messages` from the request object on the server.
-    // In the browser, use the same values that the server serialized.
-    const { locale, messages } = ctx?.req || window.__NEXT_DATA__.props;
-    const props = { pageProps: {}, scripts: {}, locale, messages };
+    const props = { pageProps: { skipDataFromTree: true }, scripts: {}, ...getIntlProps(ctx) };
 
     try {
       if (Component.getInitialProps) {
@@ -120,31 +119,36 @@ class OpenCollectiveFrontendApp extends App {
     });
   }
 
+  getApolloClient = memoizeOne(pageProps => {
+    return initClient({
+      initialState: pageProps[APOLLO_STATE_PROP_NAME],
+      twoFactorAuthContext: this.props.twoFactorAuthContext,
+    });
+  });
+
   render() {
-    const { client, Component, pageProps, scripts, locale, messages } = this.props;
-
-    const intl = createIntl({ locale: locale || 'en', defaultLocale: 'en', messages }, cache);
-
+    const { Component, pageProps, scripts, locale } = this.props;
     return (
       <Fragment>
-        <ApolloProvider client={client}>
+        <ApolloProvider client={this.getApolloClient(pageProps)}>
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
-              <RawIntlProvider value={intl}>
-                <UserProvider>
-                  <NewsAndUpdatesProvider>
-                    <ToastProvider>
+              <IntlProvider locale={locale}>
+                <TooltipProvider delayDuration={500} skipDelayDuration={100}>
+                  <UserProvider>
+                    <NewsAndUpdatesProvider>
                       <Component {...pageProps} />
-                      <GlobalToasts />
+                      <Toaster />
                       <GlobalNewsAndUpdates />
                       <TwoFactorAuthenticationModal />
-                    </ToastProvider>
-                  </NewsAndUpdatesProvider>
-                </UserProvider>
-              </RawIntlProvider>
+                    </NewsAndUpdatesProvider>
+                  </UserProvider>
+                </TooltipProvider>
+              </IntlProvider>
             </StripeProviderSSR>
           </ThemeProvider>
         </ApolloProvider>
+        <DefaultPaletteStyle palette={defaultColors.primary} />
         {Object.keys(scripts).map(key => (
           <script key={key} type="text/javascript" src={scripts[key]} />
         ))}
@@ -153,4 +157,4 @@ class OpenCollectiveFrontendApp extends App {
   }
 }
 
-export default withData(OpenCollectiveFrontendApp);
+export default withTwoFactorAuthentication(OpenCollectiveFrontendApp);

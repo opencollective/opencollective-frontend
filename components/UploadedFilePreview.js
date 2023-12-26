@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Download } from '@styled-icons/feather/Download';
 import { FileText } from '@styled-icons/feather/FileText';
-import { endsWith, max } from 'lodash';
+import { max } from 'lodash';
 import { FormattedMessage } from 'react-intl';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { imagePreview } from '../lib/image-utils';
+import { getFileExtensionFromUrl } from '../lib/url-helpers';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import Container from './Container';
@@ -67,32 +68,21 @@ const CardContainer = styled(Container)`
 
 const MainContainer = styled(Container)`
   text-align: center;
-  ${props =>
-    props.hasOnClick &&
-    css`
-      cursor: pointer;
-      &:hover ${CardContainer} {
-        ${FileTextIcon} {
-          opacity: 0.25;
-        }
-        ${DownloadIcon} {
-          opacity: 1;
-          animation: ${fadeInDown} 0.3s;
-        }
-      }
-    `}
+  cursor: pointer;
+  &:hover ${CardContainer} {
+    ${FileTextIcon} {
+      opacity: 0.25;
+    }
+    ${DownloadIcon} {
+      opacity: 1;
+      animation: ${fadeInDown} 0.3s;
+    }
+  }
 `;
 
 const FileName = styled(P)`
   overflow: hidden;
   text-overflow: ellipsis;
-`;
-
-const PrivateIconContainer = styled.div`
-  text-align: center;
-  svg {
-    max-height: 32px;
-  }
 `;
 
 const formatFileSize = sizeInBytes => {
@@ -112,21 +102,23 @@ const formatFileSize = sizeInBytes => {
  * Supports images and PDFs.
  */
 const UploadedFilePreview = ({
-  isPrivate,
-  isLoading,
-  isDownloading,
+  isPrivate = false,
+  isLoading = false,
+  isDownloading = false,
   url,
-  size,
-  maxHeight,
-  alt,
-  fileName,
-  fileSize,
-  showFileName,
-  border,
+  size = 88,
+  maxHeight = undefined,
+  alt = 'Uploaded file preview',
+  fileName = undefined,
+  fileSize = undefined,
+  showFileName = undefined,
+  border = '1px solid #dcdee0',
+  openFileViewer = undefined,
   ...props
 }) => {
   let content = null;
-  const isText = endsWith(url, 'csv') || endsWith(url, 'txt') || endsWith(url, 'pdf');
+  const fileExtension = getFileExtensionFromUrl(url);
+  const isText = ['csv', 'txt'].includes(fileExtension);
 
   if (isLoading) {
     content = <LoadingPlaceholder borderRadius={8} />;
@@ -134,7 +126,7 @@ const UploadedFilePreview = ({
     content = <StyledSpinner size="50%" />;
   } else if (isPrivate) {
     content = (
-      <PrivateInfoIcon color="#dcdee0" size="60%" tooltipProps={{ childrenContainer: PrivateIconContainer }}>
+      <PrivateInfoIcon size="60%" className="mx-auto text-slate-200">
         <FormattedMessage id="Attachment.Private" defaultMessage="This attachment is private" />
       </PrivateInfoIcon>
     );
@@ -154,16 +146,24 @@ const UploadedFilePreview = ({
     content = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt || fileName} />;
   }
 
+  const getContainerAttributes = () => {
+    if (isPrivate) {
+      return { as: 'div' };
+    } else if (isText || !openFileViewer) {
+      return { href: url, openInNewTab: true, as: url.startsWith('/') ? Link : StyledLink };
+    } else {
+      return {
+        as: 'div',
+        onClick: e => {
+          e.stopPropagation();
+          openFileViewer(url);
+        },
+      };
+    }
+  };
+
   return (
-    <MainContainer
-      {...props}
-      hasOnClick={Boolean(url || props.onClick)}
-      maxWidth={size}
-      as={url ? Link : 'div'}
-      href={url}
-      title={fileName}
-      openInNewTab
-    >
+    <MainContainer color="black.700" {...props} maxWidth={size} {...getContainerAttributes()}>
       <CardContainer size={size} maxHeight={maxHeight} title={fileName} border={border}>
         {content}
       </CardContainer>
@@ -172,11 +172,11 @@ const UploadedFilePreview = ({
           {isLoading ? (
             <LoadingPlaceholder height={12} />
           ) : fileName ? (
-            <FileName fontSize="13px" color="black.700" fontWeight="700">
+            <FileName fontSize="13px" fontWeight="700">
               {fileName}
             </FileName>
           ) : (
-            <P fontStyle="italic" fontSize="13px" color="black.700">
+            <P fontStyle="italic" fontSize="13px">
               <FormattedMessage id="File.NoFilename" defaultMessage="No filename" />
             </P>
           )}
@@ -204,12 +204,7 @@ UploadedFilePreview.propTypes = {
   border: PropTypes.string,
   size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   maxHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-};
-
-UploadedFilePreview.defaultProps = {
-  size: 88,
-  border: '1px solid #dcdee0',
-  alt: 'Uploaded file preview',
+  openFileViewer: PropTypes.func,
 };
 
 export default UploadedFilePreview;

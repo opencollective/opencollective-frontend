@@ -2,7 +2,7 @@
 
 exports[`Currency currency format with separators 1`] = `
 <span
-  className="Text__P-sc-1gblpeb-0-span jMMJaM"
+  className="Text__P-sc-1gblpeb-0-span fqsOKq"
   fontSize="inherit"
   letterSpacing="-0.4px"
 >
@@ -13,7 +13,7 @@ exports[`Currency currency format with separators 1`] = `
 
 exports[`Currency currency format with separators 2`] = `
 <span
-  className="Text__P-sc-1gblpeb-0-span jMMJaM"
+  className="Text__P-sc-1gblpeb-0-span fqsOKq"
   fontSize="inherit"
   letterSpacing="-0.4px"
 >
@@ -24,7 +24,7 @@ exports[`Currency currency format with separators 2`] = `
 
 exports[`Currency currency format with separators 3`] = `
 <span
-  className="Text__P-sc-1gblpeb-0-span jMMJaM"
+  className="Text__P-sc-1gblpeb-0-span fqsOKq"
   fontSize="inherit"
   letterSpacing="-0.4px"
 >
@@ -35,7 +35,7 @@ exports[`Currency currency format with separators 3`] = `
 
 exports[`Currency renders default options 1`] = `
 <span
-  className="Text__P-sc-1gblpeb-0-span jMMJaM"
+  className="Text__P-sc-1gblpeb-0-span fqsOKq"
   fontSize="inherit"
   letterSpacing="-0.4px"
 >
@@ -45,7 +45,7 @@ exports[`Currency renders default options 1`] = `
 
 exports[`Currency renders default options 2`] = `
 <span
-  className="Text__P-sc-1gblpeb-0-span jMMJaM"
+  className="Text__P-sc-1gblpeb-0-span fqsOKq"
   fontSize="inherit"
   letterSpacing="-0.4px"
 >

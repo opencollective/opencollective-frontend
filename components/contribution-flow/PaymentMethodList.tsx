@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Elements } from '@stripe/react-stripe-js';
 import { StripeElementsOptions } from '@stripe/stripe-js';
 import { themeGet } from '@styled-system/theme-get';
@@ -7,8 +7,8 @@ import { get, isEmpty, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Account, Host, Individual, PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { Account, CaptchaInput, Host, Individual, PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getStripe } from '../../lib/stripe';
 import usePaymentIntent from '../../lib/stripe/usePaymentIntent';
@@ -22,7 +22,12 @@ import StyledRadioList from '../StyledRadioList';
 import { P } from '../Text';
 
 import { PayWithStripeForm } from './PayWithStripe';
-import { generatePaymentMethodOptions, NEW_CREDIT_CARD_KEY, STRIPE_PAYMENT_ELEMENT_KEY } from './utils';
+import {
+  generatePaymentMethodOptions,
+  getGuestInfoFromStepProfile,
+  NEW_CREDIT_CARD_KEY,
+  STRIPE_PAYMENT_ELEMENT_KEY,
+} from './utils';
 
 const paymentMethodsQuery = gql`
   query ContributionFlowPaymentMethods($slug: String) {
@@ -93,7 +98,10 @@ const PaymentMethodBox = styled.div<{ index: number; disabled: boolean }>`
 type PaymentMethodListProps = {
   host: Host;
   toAccount: Account;
-  fromAccount?: Individual;
+  stepProfile: Pick<Individual, 'name' | 'legalName' | 'email' | 'location' | 'slug' | 'id' | 'type'> & {
+    isGuest?: boolean;
+    captcha?: CaptchaInput;
+  };
   disabledPaymentMethodTypes: string[];
   stepSummary: object;
   stepDetails: { amount: number; currency: string; interval?: string };
@@ -114,21 +122,22 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     data: paymentMethodsData,
     error: paymentMethodsError,
   } = useQuery(paymentMethodsQuery, {
-    variables: { slug: props.fromAccount.slug },
+    variables: { slug: props.stepProfile.slug },
     context: API_V2_CONTEXT,
-    skip: !props.fromAccount.slug,
+    skip: !props.stepProfile.slug,
     fetchPolicy: 'no-cache',
   });
 
   const hostSupportedPaymentMethods = props.host?.supportedPaymentMethods ?? [];
-  const [paymentIntent, stripe, loadingPaymentIntent] = usePaymentIntent({
+  const [paymentIntent, stripe, loadingPaymentIntent, paymentIntentCreateError] = usePaymentIntent({
     skip: !hostSupportedPaymentMethods.includes(PaymentMethodLegacyType.PAYMENT_INTENT),
     amount: { valueInCents: props.stepDetails.amount, currency: props.stepDetails.currency },
-    fromAccount: props.fromAccount.isGuest
+    fromAccount: props.stepProfile.isGuest
       ? undefined
-      : typeof props.fromAccount.id === 'string'
-      ? { id: props.fromAccount.id }
-      : { legacyId: props.fromAccount.id },
+      : typeof props.stepProfile.id === 'string'
+        ? { id: props.stepProfile.id }
+        : { legacyId: props.stepProfile.id },
+    guestInfo: props.stepProfile.isGuest ? getGuestInfoFromStepProfile(props.stepProfile) : undefined,
     toAccount: pick(props.toAccount, 'id'),
   });
 
@@ -136,7 +145,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     return generatePaymentMethodOptions(
       intl,
       paymentMethodsData?.account?.paymentMethods ?? [],
-      props.fromAccount,
+      props.stepProfile,
       props.stepDetails,
       props.stepSummary,
       props.toAccount,
@@ -146,7 +155,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     ) as any[];
   }, [
     paymentMethodsData?.account?.paymentMethods,
-    props.fromAccount,
+    props.stepProfile,
     props.stepDetails,
     props.stepSummary,
     props.toAccount,
@@ -204,6 +213,17 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     return <MessageBoxGraphqlError error={error} />;
   }
 
+  if (paymentIntentCreateError?.message === 'You need to provide a valid captcha token') {
+    return (
+      <MessageBox type="warning" withIcon>
+        <FormattedMessage
+          id="NewContribute.completeCaptchToContinue"
+          defaultMessage="Complete the captcha form to continue"
+        />
+      </MessageBox>
+    );
+  }
+
   if (isEmpty(paymentMethodOptions)) {
     return (
       <MessageBox type="warning" withIcon>
@@ -253,14 +273,14 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
               <Elements stripe={getStripe()}>
                 <NewCreditCardForm
                   name={NEW_CREDIT_CARD_KEY}
-                  profileType={props.fromAccount?.type}
+                  profileType={props.stepProfile?.type}
                   hidePostalCode={props.hideCreditCardPostalCode}
                   onReady={props.onNewCardFormReady}
                   useLegacyCallback={false}
                   onChange={paymentMethod => setNewPaymentMethod(NEW_CREDIT_CARD_KEY, paymentMethod)}
                   error={get(props.stepPayment, 'paymentMethod?.stripeData?.error?.message')}
-                  defaultIsSaved={!props.fromAccount?.isGuest}
-                  hasSaveCheckBox={!props.fromAccount?.isGuest}
+                  defaultIsSaved={!props.stepProfile?.isGuest}
+                  hasSaveCheckBox={!props.stepProfile?.isGuest}
                 />
               </Elements>
             </Box>
@@ -274,15 +294,14 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
             <Box my={3}>
               <PayWithStripeForm
                 bilingDetails={{
-                  name: props.fromAccount?.name,
-                  email: LoggedInUser?.email ?? props?.fromAccount?.email,
+                  name: props.stepProfile?.name,
+                  email: LoggedInUser?.email ?? props?.stepProfile?.email,
                 }}
-                stepDetails={props.stepDetails}
                 paymentIntentId={paymentIntent.id}
                 paymentIntentClientSecret={paymentIntent.client_secret}
                 onChange={props.onChange}
-                defaultIsSaved={!props.fromAccount?.isGuest}
-                hasSaveCheckBox={!props.fromAccount?.isGuest}
+                defaultIsSaved={!props.stepProfile?.isGuest}
+                hasSaveCheckBox={!props.stepProfile?.isGuest}
               />
             </Box>
           )}

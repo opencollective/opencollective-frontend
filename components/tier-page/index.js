@@ -116,6 +116,7 @@ class TierPage extends Component {
     tier: PropTypes.shape({
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       interval: PropTypes.string,
       currency: PropTypes.string,
@@ -503,7 +504,13 @@ class TierPage extends Component {
                     minWidth={128}
                     data-cy="ContributeBtn"
                   >
-                    {tier.button ? tier.button : <FormattedMessage id="Contribute" defaultMessage="Contribute" />}
+                    {tier.button ? (
+                      tier.button
+                    ) : tier.type === 'TICKET' ? (
+                      <FormattedMessage id="ContributeCard.BtnEvent" defaultMessage="RSVP" />
+                    ) : (
+                      <FormattedMessage id="Contribute" defaultMessage="Contribute" />
+                    )}
                   </StyledButton>
                 </Link>
               )}

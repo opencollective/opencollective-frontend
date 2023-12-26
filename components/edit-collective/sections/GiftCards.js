@@ -182,7 +182,7 @@ class GiftCards extends React.Component {
             {paymentMethods.map(v => (
               <div key={v.id}>
                 <GiftCardDetails giftCard={v} collectiveSlug={this.props.collectiveSlug} />
-                {v !== lastGiftCard && <hr />}
+                {v !== lastGiftCard && <hr className="my-5" />}
               </div>
             ))}
             {total > limit && (
@@ -208,8 +208,8 @@ const getIsConfirmedFromFilter = filter => {
 
 /** A query to get the gift cards created by a collective. Must be authenticated. */
 const giftCardsQuery = gqlV1/* GraphQL */ `
-  query EditCollectiveGiftCards($CollectiveId: Int, $isConfirmed: Boolean, $limit: Int, $offset: Int, $batch: String) {
-    Collective(id: $CollectiveId) {
+  query EditCollectiveGiftCards($collectiveId: Int, $isConfirmed: Boolean, $limit: Int, $offset: Int, $batch: String) {
+    Collective(id: $collectiveId) {
       id
       giftCardsBatches {
         id
@@ -234,9 +234,7 @@ const giftCardsQuery = gqlV1/* GraphQL */ `
           balance
           expiryDate
           isConfirmed
-          data
           createdAt
-          expiryDate
           description
           collective {
             id
@@ -252,7 +250,7 @@ const giftCardsQuery = gqlV1/* GraphQL */ `
 `;
 
 const getGiftCardsVariablesFromProps = ({ collectiveId, router, limit }) => ({
-  CollectiveId: collectiveId,
+  collectiveId,
   isConfirmed: getIsConfirmedFromFilter(router.query.filter),
   batch: router.query.batch === NOT_BATCHED_KEY ? null : router.query.batch,
   offset: Number(router.query.offset) || 0,

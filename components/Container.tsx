@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { CSSProp } from 'styled-components';
 import {
   background,
   BackgroundProps,
@@ -15,6 +15,8 @@ import {
   PositionProps,
   shadow,
   ShadowProps,
+  size,
+  SizeProps,
   space,
   SpaceProps,
   typography,
@@ -34,11 +36,14 @@ import {
   PointerEventsProps,
   whiteSpace,
   WhiteSpaceProps,
+  wordBreak,
+  WordBreakProps,
 } from '../lib/styled-system-custom-properties';
 
-type ContainerProps = FlexboxProps &
+export type ContainerProps = FlexboxProps &
   BackgroundProps &
   BorderProps &
+  LayoutProps &
   ShadowProps &
   ClearProps &
   ColorProps &
@@ -47,12 +52,14 @@ type ContainerProps = FlexboxProps &
   OverflowProps &
   PointerEventsProps &
   PositionProps &
-  LayoutProps &
   SpaceProps &
   TypographyProps &
   WhiteSpaceProps &
+  SizeProps &
+  WordBreakProps &
   React.HTMLProps<HTMLDivElement> & {
     clearfix?: boolean;
+    css?: CSSProp;
   };
 
 const Container = styled.div<ContainerProps>`
@@ -71,8 +78,10 @@ const Container = styled.div<ContainerProps>`
   ${position}
   ${layout}
   ${space}
+  ${size}
   ${typography}
   ${whiteSpace}
+  ${wordBreak}
   ${props =>
     props.clearfix &&
     `

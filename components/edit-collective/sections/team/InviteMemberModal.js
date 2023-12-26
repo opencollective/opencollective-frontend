@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { i18nGraphqlException } from '../../../../lib/errors';
+import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
 import Container from '../../../Container';
@@ -14,7 +15,7 @@ import MessageBox from '../../../MessageBox';
 import StyledButton from '../../../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
 import { P } from '../../../Text';
-import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
+import { useToast } from '../../../ui/useToast';
 
 import MemberForm from './MemberForm';
 import { teamSectionQuery } from './queries';
@@ -45,7 +46,7 @@ export const inviteMemberMutation = gql`
 const InviteMemberModal = props => {
   const { intl, collective, membersIds, cancelHandler } = props;
 
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [member, setMember] = React.useState(null);
   const mutationOptions = {
@@ -91,16 +92,17 @@ const InviteMemberModal = props => {
         },
       });
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: <FormattedMessage id="editTeam.member.invite.success" defaultMessage="Member invited successfully." />,
       });
 
       cancelHandler();
     } catch (error) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
-        message: <FormattedMessage id="editTeam.member.invite.error" defaultMessage="Failed to invite member." />,
+      toast({
+        variant: 'error',
+        title: <FormattedMessage id="editTeam.member.invite.error" defaultMessage="Failed to invite member." />,
+        message: i18nGraphqlException(intl, error),
       });
     }
   };
@@ -113,7 +115,7 @@ const InviteMemberModal = props => {
 
   return (
     <Container>
-      <StyledModal width={688} onClose={cancelHandler}>
+      <StyledModal width={688} onClose={cancelHandler} trapFocus>
         <ModalHeader mb={4}>
           <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
         </ModalHeader>
@@ -139,6 +141,7 @@ const InviteMemberModal = props => {
               types={[CollectiveType.USER]}
               filterResults={collectives => collectives.filter(c => !membersIds.includes(c.id))}
               data-cy="member-collective-picker"
+              menuPortalTarget={null}
             />
           </Flex>
           <MemberForm

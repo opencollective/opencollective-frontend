@@ -1,5 +1,5 @@
 describe('Discover Page', () => {
-  before(() => {
+  beforeEach(() => {
     cy.visit('/search');
   });
 
@@ -10,7 +10,7 @@ describe('Discover Page', () => {
       cy.get('[data-cy=search-banner] input').should(
         'have.attr',
         'placeholder',
-        'Search by name, slug, tag, description...',
+        'Search by name, handle, tag, description...',
       );
     });
   });

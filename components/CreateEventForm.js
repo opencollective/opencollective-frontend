@@ -38,7 +38,7 @@ class CreateEventForm extends React.Component {
     };
 
     this.messages = defineMessages({
-      'slug.label': { id: 'collective.slug.label', defaultMessage: 'url' },
+      'slug.label': { id: 'account.slug.label', defaultMessage: 'Handle' },
       'type.label': { id: 'event.type.label', defaultMessage: 'Type' },
       'name.label': { id: 'Fields.name', defaultMessage: 'Name' },
       'amount.label': { id: 'Fields.amount', defaultMessage: 'Amount' },
@@ -249,7 +249,7 @@ class CreateEventForm extends React.Component {
             )}
           </div>
         </Container>
-        <Container margin="5rem auto 1rem" textAlign="center">
+        <Container margin="3.15rem auto 0.65rem" textAlign="center">
           <StyledButton
             buttonStyle="primary"
             onClick={this.handleSubmit}

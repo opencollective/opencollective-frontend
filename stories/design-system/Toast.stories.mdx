@@ -1,6 +1,12 @@
 import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
-import Toast from '../../components/Toast';
-import { TOAST_TYPE } from '../../components/ToastProvider';
+import {
+  Toast,
+  ToastProvider,
+  ToastViewport,
+  ToastClose,
+  ToastTitle,
+  ToastDescription,
+} from '../../components/ui/Toast';
 import PayPalIcon from '../../components/icons/PayPal';
 import theme from '../../lib/theme';
 
@@ -8,22 +14,20 @@ import theme from '../../lib/theme';
   title="Design system/Toast"
   component={Toast}
   argTypes={{
-    variant: { options: ['light', 'dark'], defaultValue: 'dark', control: { type: 'radio' } },
+    variant: { options: ['success', 'error', 'default'], defaultValue: 'default', control: { type: 'radio' } },
     timeLeft: { defaultValue: 10000, control: { type: 'range', min: 0, max: 60000, step: 1000 } },
-    toast: {
-      defaultValue: {
-        id: 'Test',
-        type: 'ERROR',
-        title: 'A toast title',
-        createdAt: Date.now(),
-        message: (
-          <p style={{ margin: 0 }}>
-            A toast message that can have <a href="https://opencollective.com">links</a> or <i>text formatting</i> --
-            it's pretty flexible!
-          </p>
-        ),
-      },
-    },
+  }}
+  args={{
+    timeLeft: 10000,
+    variant: 'default',
+    title: 'A toast title',
+    createdAt: Date.now(),
+    message: (
+      <p style={{ margin: 0 }}>
+        A toast message that can have <a href="https://opencollective.com">links</a> or <i>text formatting</i> -- it's
+        pretty flexible!
+      </p>
+    ),
   }}
 />
 
@@ -31,7 +35,23 @@ import theme from '../../lib/theme';
 
 ## Default
 
-export const DefaultStory = props => <Toast {...props} />;
+export const DefaultStory = ({title, message, action, ...props}) => (
+  <ToastProvider>
+      <Toast {...props}>
+            <div className="flex gap-2">
+              <div className="grid gap-1">
+                {title && <ToastTitle>{title}</ToastTitle>}
+                {message && <ToastDescription>{message}</ToastDescription>}
+              </div>
+            </div>
+
+            {action}
+            <ToastClose />
+          </Toast>
+    <ToastViewport />
+
+  </ToastProvider>
+);
 
 <Story name="Default">{DefaultStory.bind({})}</Story>
 
@@ -41,30 +61,29 @@ export const DefaultStory = props => <Toast {...props} />;
 
 <Canvas>
   <Story name="All types" parameters={{ controls: false }}>
-    {props => {
-      return Object.keys(TOAST_TYPE).map(type => (
-        <div key={type} style={{ marginBottom: '12px' }}>
-          <Toast {...props} toast={{ ...props.toast, type }} />
-        </div>
-      ));
+    {({title, message, action, ...props}) => {
+      return (
+        <ToastProvider>
+          {['default', 'success', 'error'].map(type => (
+             <Toast {...props} variant={type}>
+              <div className="flex gap-2">
+                <div className="grid gap-1">
+                  {title && <ToastTitle>{title}</ToastTitle>}
+                  {message && <ToastDescription>{message}</ToastDescription>}
+                </div>
+              </div>
+
+            {action}
+            <ToastClose />
+          </Toast>
+          ))}
+          <ToastViewport />
+
+        </ToastProvider>
+      );
     }}
+
   </Story>
 </Canvas>
 
 <ArgsTable story="All types" />
-
-# Custom icon
-
-export const CustomIconStory = props => (
-  <Toast
-    {...props}
-    toast={{
-      ...props.toast,
-      icon: <PayPalIcon size={14} />,
-    }}
-  />
-);
-
-<Story name="Custom icon">{CustomIconStory.bind()}</Story>
-
-<ArgsTable story="Custom icon" />

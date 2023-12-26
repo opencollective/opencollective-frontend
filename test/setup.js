@@ -1,9 +1,10 @@
 import '../env';
 import 'raf/polyfill';
 
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import Enzyme from 'enzyme';
+import registerRequireContextHook from 'babel-plugin-require-context-hook/register';
 import jsdom from 'jsdom';
+
+registerRequireContextHook();
 
 const { JSDOM } = jsdom;
 const url = 'http://localhost';
@@ -27,5 +28,3 @@ function copyProps(src, target) {
   Object.defineProperties(target, props);
 }
 copyProps(document.defaultView, global);
-
-Enzyme.configure({ adapter: new Adapter() });

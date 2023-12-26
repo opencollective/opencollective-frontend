@@ -1,3 +1,7 @@
+/**
+ * @deprecated Will be replaced by `components/navigation/ProfileMenuMemberships.tsx` when Workspace moves out of preview features
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Plus } from '@styled-icons/boxicons-regular/Plus';
@@ -8,7 +12,8 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { isPastEvent } from '../lib/events';
-import { getSettingsRoute } from '../lib/url-helpers';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
+import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
 
 import Avatar from './Avatar';
 import Collapse from './Collapse';
@@ -55,7 +60,11 @@ const MembershipLine = ({ user, membership }) => {
       {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
         <StyledLink
           as={Link}
-          href={getSettingsRoute(membership.collective)}
+          href={
+            user?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
+              ? getDashboardRoute(membership.collective)
+              : getSettingsRoute(membership.collective)
+          }
           ml={1}
           color="black.500"
           title={intl.formatMessage({ id: 'AdminPanel.button', defaultMessage: 'Admin' })}
@@ -100,7 +109,7 @@ const filterArchivedMemberships = memberships => {
 
 const filterMemberships = memberships => {
   const filteredMemberships = memberships.filter(m => {
-    if (m.role === 'BACKER' || m.collective.isArchived) {
+    if (!['ADMIN', 'ACCOUNTANT', 'HOST'].includes(m.role) || m.collective.isArchived) {
       return false;
     } else if (m.collective.type === 'EVENT' && isPastEvent(m.collective)) {
       return false;

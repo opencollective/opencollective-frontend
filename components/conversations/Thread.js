@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Lock } from '@styled-icons/material/Lock';
 import { FormattedMessage } from 'react-intl';
 import styled, { css, withTheme } from 'styled-components';
+
+import commentTypes from '../../lib/constants/commentTypes';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -16,6 +19,11 @@ const CommentIcon = styled(CommentIconLib).attrs({
   size: 16,
   color: '#9a9a9a',
 })``;
+
+const NoteIcon = styled(Lock).attrs(props => ({
+  size: 16,
+  color: props.theme.colors.blue[400],
+}))``;
 
 const ItemContainer = styled.div`
   width: 100%;
@@ -32,7 +40,16 @@ const ItemContainer = styled.div`
 /**
  * A thread is meant to display comments and activities in a chronological order.
  */
-const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasMore, fetchMore }) => {
+const Thread = ({
+  collective,
+  items,
+  onCommentDeleted,
+  LoggedInUser,
+  theme,
+  hasMore,
+  fetchMore,
+  getClickedComment,
+}) => {
   const [loading, setLoading] = React.useState(false);
 
   if (!items || items.length === 0) {
@@ -51,15 +68,18 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
     <div data-cy="thread">
       {items.map((item, idx) => {
         switch (item.__typename) {
-          case 'Comment':
+          case 'Comment': {
+            const isPrivateNote = item.type === commentTypes.PRIVATE_NOTE;
             return (
               <Box key={`comment-${item.id}`}>
                 <Flex>
                   <Flex flexDirection="column" alignItems="center" width="40px">
-                    <Box my={2}>
-                      <CommentIcon />
-                    </Box>
-                    <Container width="1px" height="100%" background="#E8E9EB" />
+                    <Box my={2}>{isPrivateNote ? <NoteIcon /> : <CommentIcon />}</Box>
+                    <Container
+                      width="1px"
+                      height="100%"
+                      background={isPrivateNote ? theme.colors.blue[400] : '#E8E9EB'}
+                    />
                   </Flex>
                   <ItemContainer isLast={idx + 1 === items.length}>
                     <Comment
@@ -69,11 +89,13 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
                       canReply={Boolean(LoggedInUser)}
                       onDelete={onCommentDeleted}
                       reactions={item.reactions}
+                      onReplyClick={getClickedComment}
                     />
                   </ItemContainer>
                 </Flex>
               </Box>
             );
+          }
           case 'Activity':
             return !isSupportedActivity(item) ? null : (
               <Box key={`activity-${item.id}`}>
@@ -92,9 +114,9 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
             return null;
         }
       })}
-      <hr />
+      <hr className="my-5" />
       {hasMore && fetchMore && (
-        <Container margin="1rem">
+        <Container margin="0.65rem">
           <StyledButton onClick={handleLoadMore} loading={loading} textTransform="capitalize">
             <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
           </StyledButton>
@@ -126,6 +148,7 @@ Thread.propTypes = {
   LoggedInUser: PropTypes.object,
   /** @ignore from withTheme */
   theme: PropTypes.object,
+  getClickedComment: PropTypes.func,
 };
 
 export default React.memo(withUser(withTheme(Thread)));

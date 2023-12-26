@@ -1,14 +1,22 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
+import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { useFormik } from 'formik';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
+import {
+  VirtualCardLimitIntervalDescriptionsI18n,
+  VirtualCardLimitIntervalI18n,
+} from '../../lib/virtual-cards/constants';
 
 import Container from '../Container';
-import { Box } from '../Grid';
+import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
+import { getI18nLink } from '../I18nFormatters';
+import Link from '../Link';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
@@ -17,45 +25,69 @@ import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import StyledSelect from '../StyledSelect';
 import StyledTextarea from '../StyledTextarea';
 import { P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
+import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
 const initialValues = {
   agreement: false,
   notes: undefined,
-  budget: undefined,
   purpose: undefined,
+  spendingLimitAmount: undefined,
+  spendingLimitInterval: VirtualCardLimitInterval.MONTHLY,
 };
 
 const requestVirtualCardMutation = gql`
-  mutation requestVirtualCard($notes: String, $purpose: String, $budget: Int, $account: AccountReferenceInput!) {
-    requestVirtualCard(notes: $notes, purpose: $purpose, budget: $budget, account: $account)
+  mutation RequestVirtualCard(
+    $notes: String
+    $purpose: String
+    $spendingLimitAmount: AmountInput!
+    $spendingLimitInterval: VirtualCardLimitInterval!
+    $account: AccountReferenceInput!
+  ) {
+    requestVirtualCard(
+      notes: $notes
+      purpose: $purpose
+      spendingLimitAmount: $spendingLimitAmount
+      spendingLimitInterval: $spendingLimitInterval
+      account: $account
+    )
   }
 `;
 
 const RequestVirtualCardModal = props => {
   const hasPolicy = Boolean(props.host?.settings?.virtualcards?.policy);
+  const intl = useIntl();
 
-  const { addToast } = useToasts();
+  const virtualCardLimitOptions = Object.keys(VirtualCardLimitInterval).map(interval => ({
+    value: interval,
+    label: intl.formatMessage(VirtualCardLimitIntervalI18n[interval]),
+  }));
+
+  const { toast } = useToast();
   const [requestNewVirtualCard, { loading: isCreating, error: createError }] = useMutation(requestVirtualCardMutation, {
     context: API_V2_CONTEXT,
   });
   const formik = useFormik({
     initialValues: { ...initialValues, collective: props.collective },
     async onSubmit(values) {
-      const { collective, notes, purpose, budget } = values;
+      const { collective, notes, purpose, spendingLimitAmount, spendingLimitInterval } = values;
       await requestNewVirtualCard({
         variables: {
           notes,
           purpose,
-          budget,
           account: typeof collective.id === 'string' ? { id: collective.id } : { legacyId: collective.id },
+          spendingLimitAmount: {
+            valueInCents: spendingLimitAmount,
+          },
+          spendingLimitInterval,
         },
       });
       props.onSuccess?.();
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: <FormattedMessage id="Collective.VirtualCards.RequestCard.Success" defaultMessage="Card requested!" />,
       });
       props.onClose?.();
@@ -79,6 +111,8 @@ const RequestVirtualCardModal = props => {
     formik.setErrors({});
     props.onClose?.();
   };
+
+  const currency = props.host?.currency || props.collective?.currency;
 
   return (
     <StyledModal width="382px" onClose={handleClose} trapFocus {...props}>
@@ -106,33 +140,9 @@ const RequestVirtualCardModal = props => {
           )}
           <StyledHr borderColor="black.300" my={3} />
           <StyledInputField
-            labelFontSize="13px"
-            label={
-              <FormattedMessage
-                id="Collective.VirtualCards.RequestCard.MonthlyBudget"
-                defaultMessage="Monthly Budget"
-              />
-            }
-            htmlFor="budget"
-            error={formik.touched.budget && formik.errors.budget}
-            labelFontWeight="500"
-          >
-            {inputProps => (
-              <StyledInputAmount
-                {...inputProps}
-                currency="USD"
-                name="budget"
-                id="budget"
-                onChange={value => formik.setFieldValue('budget', value)}
-                value={formik.values.budget}
-                disabled={isCreating}
-              />
-            )}
-          </StyledInputField>
-          <StyledInputField
             mt={3}
             labelFontSize="13px"
-            label={<FormattedMessage id="Collective.VirtualCards.RequestCard.Purpose" defaultMessage="Purpose" />}
+            label={<FormattedMessage id="Fields.purpose" defaultMessage="Purpose" />}
             htmlFor="purpose"
             error={formik.touched.purpose && formik.errors.purpose}
             labelFontWeight="500"
@@ -177,6 +187,74 @@ const RequestVirtualCardModal = props => {
               />
             )}
           </StyledInputField>
+          <Flex mt={3} width="100%" alignItems="flex-start" justifyContent="space-between">
+            <StyledInputField
+              flexGrow={1}
+              labelFontSize="13px"
+              labelFontWeight="bold"
+              label={
+                <FormattedMessage
+                  defaultMessage="Limit Interval <link>(Read More)</link>"
+                  values={{
+                    link: getI18nLink({
+                      as: Link,
+                      openInNewTab: true,
+                      href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
+                    }),
+                  }}
+                />
+              }
+              htmlFor="spendingLimitInterval"
+            >
+              {inputProps => (
+                <StyledSelect
+                  {...inputProps}
+                  inputId="spendingLimitInterval"
+                  data-cy="spendingLimitInterval"
+                  error={formik.touched.limitAmount && Boolean(formik.errors.limitAmount)}
+                  onBlur={() => formik.setFieldTouched('spendingLimitInterval', true)}
+                  onChange={({ value }) => formik.setFieldValue('spendingLimitInterval', value)}
+                  disabled={isCreating}
+                  options={virtualCardLimitOptions}
+                  value={virtualCardLimitOptions.find(option => option.value === formik.values.spendingLimitInterval)}
+                />
+              )}
+            </StyledInputField>
+            <StyledInputField
+              ml={3}
+              labelFontSize="13px"
+              labelFontWeight="bold"
+              label={<FormattedMessage defaultMessage="Card Limit" />}
+              htmlFor="spendingLimitAmount"
+            >
+              {inputProps => (
+                <StyledInputAmount
+                  {...inputProps}
+                  id="spendingLimitAmount"
+                  placeholder="0.00"
+                  error={formik.touched.spendingLimitAmount && Boolean(formik.errors.spendingLimitAmount)}
+                  currency={currency}
+                  prepend={currency}
+                  onChange={value => formik.setFieldValue('spendingLimitAmount', value)}
+                  value={formik.values.spendingLimitAmount}
+                  disabled={isCreating}
+                />
+              )}
+            </StyledInputField>
+          </Flex>
+          <Box pt={2}>
+            <Span ml={1}>
+              {intl.formatMessage(VirtualCardLimitIntervalDescriptionsI18n[formik.values.spendingLimitInterval])}
+            </Span>
+          </Box>
+          {formik.touched.spendingLimitAmount && formik.errors.spendingLimitAmount && (
+            <Box pt={2}>
+              <ExclamationCircle color="#E03F6A" size={16} />
+              <Span ml={1} color="black.700" fontSize="14px">
+                {formik.errors.spendingLimitAmount}
+              </Span>
+            </Box>
+          )}
           <Box mt={3}>
             <StyledCheckbox
               name="tos"
@@ -194,6 +272,9 @@ const RequestVirtualCardModal = props => {
               onChange={({ checked }) => formik.setFieldValue('agreement', checked)}
               error={formik.touched.agreement && formik.errors.agreement}
             />
+          </Box>
+          <Box mt={3}>
+            <StripeVirtualCardComplianceStatement />
           </Box>
           {createError && (
             <Box mt={3}>
@@ -232,6 +313,7 @@ RequestVirtualCardModal.propTypes = {
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     type: PropTypes.string,
     name: PropTypes.string,
+    currency: PropTypes.string,
     imageUrl: PropTypes.string,
     settings: PropTypes.shape({
       virtualcards: PropTypes.shape({
@@ -246,6 +328,7 @@ RequestVirtualCardModal.propTypes = {
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     type: PropTypes.string,
     name: PropTypes.string,
+    currency: PropTypes.string,
     imageUrl: PropTypes.string,
   }),
 };

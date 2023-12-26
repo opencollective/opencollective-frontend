@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
 import { CaretUp } from '@styled-icons/fa-solid/CaretUp';
+import { Markup } from 'interweave';
+import { merge, pick } from 'lodash';
 import { getLuminance } from 'polished';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -12,7 +14,7 @@ import { space, typography } from 'styled-system';
  * editor. This function tries to detect this and returns true if there's no real
  * text, image or iframe contents.
  */
-export const isEmptyValue = value => {
+export const isEmptyHTMLValue = value => {
   if (!value) {
     return true;
   } else if (value.length > 50) {
@@ -39,6 +41,9 @@ const ReadFullLink = styled.a`
 
 const InlineDisplayBox = styled.div`
   overflow-y: hidden;
+  p {
+    margin: 1em 0;
+  }
   ${props => props.maxHeight && `max-height: ${props.maxHeight + 20}px;`}
 `;
 
@@ -55,14 +60,14 @@ const CollapsedDisplayBox = styled.div`
  * just willing to take the styles, for example to match the content displayed in the
  * editor with how it's rendered on the page.
  *
- * ⚠️ Be careful! This component will pass content to `dangerouslySetInnerHTML` so
- * always ensure `content` is properly sanitized!
+ * ⚠️ Be careful! Though this component uses Markup from interweave as a double-safety mechanism to sanitize the input,
+ * always ensure `content` is properly sanitized in the API (using `api/server/lib/sanitize-html.ts`)
  */
 const HTMLContent = styled(
   ({
     content,
     collapsable = false,
-    maxHeight,
+    maxHeight = undefined,
     maxCollapsedHeight = 20,
     collapsePadding = 1,
     hideViewMoreLink = false,
@@ -86,13 +91,32 @@ const HTMLContent = styled(
 
     return (
       <div>
-        <DisplayBox
-          ref={contentRef}
-          maxHeight={maxHeight}
-          maxCollapsedHeight={maxCollapsedHeight}
-          dangerouslySetInnerHTML={{ __html: content }}
-          {...props}
-        />
+        <DisplayBox ref={contentRef} maxHeight={maxHeight} maxCollapsedHeight={maxCollapsedHeight} {...props}>
+          {/* See api/server/lib/sanitize-html.ts */}
+          <Markup
+            noWrap
+            content={content}
+            allowAttributes
+            transform={node => {
+              // Allow some iframes
+              if (node.tagName === 'iframe') {
+                const src = node.getAttribute('src');
+                const parsedUrl = new URL(src);
+                const hostname = parsedUrl.hostname;
+                if (['youtube-nocookie.com', 'www.youtube-nocookie.com', 'anchor.fm'].includes(hostname)) {
+                  const attributes = merge({}, ...node.attributes.map(({ name, value }) => ({ [name]: value })));
+                  return (
+                    <iframe
+                      {...pick(attributes, ['width', 'height', 'frameborder', 'allowfullscreen'])}
+                      title={attributes.title || 'Embed content'}
+                      src={src}
+                    />
+                  );
+                }
+              }
+            }}
+          />
+        </DisplayBox>
         {!isOpen && isCollapsed && !hideViewMoreLink && (
           <ReadFullLink
             onClick={() => setOpen(true)}
@@ -206,6 +230,19 @@ const HTMLContent = styled(
     padding: 16px;
     font-family: monospace;
     overflow-x: auto;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  ul li,
+  ol li {
+    margin-left: 1.5em;
   }
 
   ${typography}

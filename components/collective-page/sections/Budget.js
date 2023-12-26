@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { get, orderBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { isIndividualAccount } from '../../../lib/collective.lib';
+import { isIndividualAccount } from '../../../lib/collective';
 import { TransactionKind } from '../../../lib/constants/transactions';
 import { EMPTY_ARRAY } from '../../../lib/constants/utils';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import { DebitItem } from '../../budget/DebitCreditList';
@@ -82,6 +82,10 @@ export const budgetSectionQuery = gql`
       nodes {
         id
         ...ExpensesListFieldsFragment
+        host {
+          id
+          ...ExpenseHostFields
+        }
       }
     }
     account(slug: $slug) {
@@ -91,6 +95,7 @@ export const budgetSectionQuery = gql`
   }
   ${transactionsQueryCollectionFragment}
   ${expensesListFieldsFragment}
+  ${expenseHostFields}
   ${budgetSectionAccountFieldsFragment}
 `;
 
@@ -110,6 +115,10 @@ export const budgetSectionForIndividualQuery = gql`
       nodes {
         id
         ...ExpensesListFieldsFragment
+        host {
+          id
+          ...ExpenseHostFields
+        }
       }
     }
     account(slug: $slug) {
@@ -131,14 +140,11 @@ export const budgetSectionForIndividualQuery = gql`
   }
   ${transactionsQueryCollectionFragment}
   ${expensesListFieldsFragment}
+  ${expenseHostFields}
 `;
 
 export const budgetSectionWithHostQuery = gql`
-  query BudgetSectionWithHost($slug: String!, $hostSlug: String!, $limit: Int!, $kind: [TransactionKind]) {
-    host(slug: $hostSlug) {
-      id
-      ...ExpenseHostFields
-    }
+  query BudgetSectionWithHost($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
     transactions(
       account: { slug: $slug }
       limit: $limit
@@ -159,6 +165,12 @@ export const budgetSectionWithHostQuery = gql`
     account(slug: $slug) {
       id
       ...BudgetSectionAccountFields
+      ... on AccountWithHost {
+        host {
+          id
+          ...ExpenseHostFields
+        }
+      }
     }
   }
   ${transactionsQueryCollectionFragment}
@@ -177,12 +189,11 @@ export const getBudgetSectionQuery = (hasHost, isIndividual) => {
   }
 };
 
-// Any change here should be reflected in API's `server/graphql/cache.js`
-export const getBudgetSectionQueryVariables = (collectiveSlug, hostSlug, isIndividual) => {
+export const getBudgetSectionQueryVariables = (collectiveSlug, isIndividual) => {
   if (isIndividual) {
     return { slug: collectiveSlug, limit: 3, kind: getDefaultKinds().filter(kind => kind !== TransactionKind.EXPENSE) };
   } else {
-    return { slug: collectiveSlug, hostSlug, limit: 3, kind: getDefaultKinds() };
+    return { slug: collectiveSlug, limit: 3, kind: getDefaultKinds() };
   }
 };
 
@@ -286,7 +297,7 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
   const [filter, setFilter] = React.useState('all');
   const isIndividual = isIndividualAccount(collective) && !collective.isHost;
   const budgetQueryResult = useQuery(getBudgetSectionQuery(Boolean(collective.host), isIndividual), {
-    variables: getBudgetSectionQueryVariables(collective.slug, collective.host?.slug, isIndividual),
+    variables: getBudgetSectionQueryVariables(collective.slug, isIndividual),
     context: API_V2_CONTEXT,
   });
   const { data, refetch } = budgetQueryResult;
@@ -337,7 +348,7 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
             {isLoading ? (
               <LoadingPlaceholder height={300} />
             ) : !allItems.length ? (
-              <Container textAlign="center" py={94} px={2}>
+              <div className="flex flex-col items-center justify-center px-1 py-[94px] text-center">
                 <Image src="/static/images/empty-jars.png" alt="Empty jars" width={125} height={125} />
                 <P fontWeight="500" fontSize="20px" lineHeight="28px">
                   <FormattedMessage id="Budget.Empty" defaultMessage="There are no transactions yet." />
@@ -348,7 +359,7 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
                     defaultMessage="Come back to this section once there is at least one transaction!"
                   />
                 </P>
-              </Container>
+              </div>
             ) : (
               allItems.map((item, idx) => {
                 return (
@@ -359,7 +370,12 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
                   >
                     {item.__typename === 'Expense' ? (
                       <DebitItem>
-                        <ExpenseBudgetItem expense={item} host={data?.host} showAmountSign showProcessActions />
+                        <ExpenseBudgetItem
+                          expense={item}
+                          host={item.host || data.account.host}
+                          showAmountSign
+                          showProcessActions
+                        />
                       </DebitItem>
                     ) : (
                       <TransactionItem

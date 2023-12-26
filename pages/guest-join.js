@@ -1,12 +1,12 @@
 import React, { Fragment } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { PaperPlane } from '@styled-icons/boxicons-regular/PaperPlane';
 import { Email } from '@styled-icons/material/Email';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled, { useTheme } from 'styled-components';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { getAllGuestEmails } from '../lib/guest-accounts';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
@@ -100,7 +100,7 @@ const JoinAsGuest = () => {
             <P mt={2} fontSize="14px" lineHeight="20px">
               <FormattedMessage
                 id="guestJoin.contactSupport"
-                defaultMessage="Please contact <SupportLink>support</SupportLink> to get more info on the procedure to claim your account. Please attach this order id to your request: {orderId}"
+                defaultMessage="Please contact <SupportLink>support</SupportLink> to get more info on the procedure to claim your account. Please attach this contribution id to your request: {orderId}"
                 values={{ SupportLink: I18nSupportLink, orderId: <code>{query.OrderId}</code> }}
               />
             </P>
@@ -192,7 +192,7 @@ const JoinAsGuest = () => {
 
 const JoinGuestPage = () => {
   const intl = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
+  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
 
   return (
     <Page title={intl.formatMessage(MESSAGES.pageTitle, { service: 'Open Collective' })}>
@@ -204,7 +204,7 @@ const JoinGuestPage = () => {
         alignItems="center"
         background="linear-gradient(180deg, #EBF4FF, #FFFFFF)"
       >
-        {LoggedInUser ? (
+        {loadingLoggedInUser ? (
           <Loading />
         ) : LoggedInUser ? (
           <MessageBox type="warning" withIcon maxWidth={550}>

@@ -5,21 +5,23 @@ import StepDetails from '../../components/contribution-flow/StepDetails';
 import { webpackCollective } from '../mocks/collectives';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-const stripePromise = loadStripe('storybookStripeId');
 
 <Meta title="Contribution Flow/StepPayment" component={StepPayment} />
 
-export const DefaultStory = props => (
-  <Elements stripe={stripePromise}>
-    <StepPayment
-      stepProfile={StepProfile}
-      stepDetails={StepDetails}
-      collective={webpackCollective}
-      onChange={console.log}
-      {...props}
-    />
-  </Elements>
-);
+export const DefaultStory = props => {
+  const stripePromise = loadStripe('storybookStripeId');
+  return (
+    <Elements stripe={stripePromise}>
+      <StepPayment
+        stepProfile={StepProfile}
+        stepDetails={StepDetails}
+        collective={webpackCollective}
+        onChange={console.log}
+        {...props}
+      />
+    </Elements>
+  );
+};
 
 <Story name="Default">{DefaultStory.bind({})}</Story>
 

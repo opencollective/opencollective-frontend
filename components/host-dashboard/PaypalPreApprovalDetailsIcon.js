@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import StyledTooltip from '../StyledTooltip';
 
-const getPaypalExpiryInfo = paymentMethod => {
+export const getPaypalExpiryInfo = paymentMethod => {
   const timeBeforeExpiry = new Date(paymentMethod.expiryDate) - new Date();
   const twoWeeks = 1000 * 60 * 60 * 24 * 14;
   if (timeBeforeExpiry <= 0) {

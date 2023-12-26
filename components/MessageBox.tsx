@@ -43,6 +43,7 @@ type MessageProps = BordersProps &
 type MessageBoxProps = MessageProps & {
   isLoading?: boolean;
   withIcon?: boolean;
+  className?: string;
   children: React.ReactNode;
 };
 
@@ -113,7 +114,7 @@ const MessageBox = ({ type = 'white', withIcon = false, isLoading, children, ...
           </Box>
         )}
 
-        <Box>{children}</Box>
+        <Box flex={1}>{children}</Box>
       </Flex>
     </Message>
   );

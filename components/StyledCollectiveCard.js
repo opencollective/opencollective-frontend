@@ -4,16 +4,18 @@ import { get } from 'lodash';
 import { injectIntl, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getCollectiveMainTag } from '../lib/collective.lib';
+import { getCollectiveMainTag } from '../lib/collective';
+import { getCountryDisplayName, getFlagEmoji } from '../lib/i18n/countries';
 
 import Avatar from './Avatar';
 import Container from './Container';
+import { Box, Flex } from './Grid';
 import I18nCollectiveTags from './I18nCollectiveTags';
 import LinkCollective from './LinkCollective';
 import StyledCard from './StyledCard';
 import StyledLink from './StyledLink';
 import StyledTag from './StyledTag';
-import { P } from './Text';
+import { P, Span } from './Text';
 
 const MaskSVG = props => (
   <svg
@@ -164,7 +166,7 @@ const StyledCollectiveCard = ({
       >
         <StyledBackgroundMask />
       </Container>
-      <Container position="relative">
+      <Container position="relative" {...props.bodyProps}>
         <Container height={74} px={3} pt={26} style={{ filter: collective.isFrozen ? 'grayscale(1)' : undefined }}>
           <Container borderRadius={borderRadius} background="white" width={48} border="3px solid white">
             <CollectiveContainer useLink={useLink} collective={collective}>
@@ -172,7 +174,13 @@ const StyledCollectiveCard = ({
             </CollectiveContainer>
           </Container>
         </Container>
-        <Container display="flex" flexDirection="column" justifyContent="space-between" height={bodyHeight}>
+        <Container
+          display="flex"
+          flexDirection="column"
+          justifyContent="space-between"
+          height={bodyHeight}
+          {...props.childrenContainerProps}
+        >
           <Container p={3}>
             <CollectiveContainer useLink={useLink} collective={collective}>
               <P mt={3} fontSize="16px" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
@@ -186,19 +194,29 @@ const StyledCollectiveCard = ({
                 </StyledLink>
               </P>
             )}
-            {collective.isFrozen ? (
-              <StyledTag display="inline-block" variant="rounded-right" my={2}>
-                <I18nCollectiveTags tags={intl.formatMessage({ defaultMessage: 'This Collective is frozen' })} />
-              </StyledTag>
-            ) : tag === undefined ? (
-              <StyledTag display="inline-block" variant="rounded-right" my={2}>
-                <I18nCollectiveTags
-                  tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
-                />
-              </StyledTag>
-            ) : (
-              tag
-            )}
+
+            <Flex my={2} alignItems="center">
+              {collective.location?.country && (
+                <Box mr={1}>
+                  {getFlagEmoji(collective.location?.country)}
+                  <Span ml={1}></Span>
+                  {getCountryDisplayName(intl, collective.location?.country)}
+                </Box>
+              )}
+              {collective.isFrozen ? (
+                <StyledTag display="inline-block" variant="rounded-right">
+                  <I18nCollectiveTags tags={intl.formatMessage({ defaultMessage: 'This Collective is frozen' })} />
+                </StyledTag>
+              ) : tag === undefined ? (
+                <StyledTag display="inline-block" variant="rounded-right">
+                  <I18nCollectiveTags
+                    tags={getCollectiveMainTag(get(collective, 'host.id'), collective.tags, collective.type)}
+                  />
+                </StyledTag>
+              ) : (
+                tag
+              )}
+            </Flex>
           </Container>
           {children}
         </Container>
@@ -233,11 +251,16 @@ StyledCollectiveCard.propTypes = {
     parent: PropTypes.shape({
       backgroundImageUrl: PropTypes.string,
     }),
+    location: PropTypes.shape({
+      country: PropTypes.string,
+    }),
     isFrozen: PropTypes.bool,
   }).isRequired,
   borderRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   showWebsite: PropTypes.bool,
   useLink: PropTypes.bool,
+  childrenContainerProps: PropTypes.object,
+  bodyProps: PropTypes.object,
 };
 
 StyledCollectiveCard.defaultProps = {

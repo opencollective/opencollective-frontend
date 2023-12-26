@@ -76,7 +76,7 @@ export const filterContributors = (contributors, filter) => {
   }
 
   if (filter === CONTRIBUTOR_FILTERS.FINANCIAL) {
-    return contributors.filter(c => c.isBacker || c.isFundraiser);
+    return contributors.filter(c => c.isBacker);
   } else if (filter === CONTRIBUTOR_FILTERS.CORE) {
     return contributors.filter(c => c.isCore || c.isAdmin);
   } else {

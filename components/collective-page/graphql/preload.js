@@ -1,4 +1,4 @@
-import { isIndividualAccount } from '../../../lib/collective.lib';
+import { isIndividualAccount } from '../../../lib/collective';
 import { getFilteredSectionsForCollective, getSectionsNames } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
@@ -9,20 +9,16 @@ import {
   totalCollectiveContributionsQuery,
 } from '../hero/HeroTotalCollectiveContributionsWithData';
 import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../sections/Budget';
+import { budgetSectionContributionsQuery } from '../sections/Budget/ContributionsBudget';
+import { budgetSectionExpenseQuery } from '../sections/Budget/ExpenseBudget';
 import { conversationsSectionQuery, getConversationsSectionQueryVariables } from '../sections/Conversations';
 import { getRecurringContributionsSectionQueryVariables } from '../sections/RecurringContributions';
 import { getTransactionsSectionQueryVariables, transactionsSectionQuery } from '../sections/Transactions';
 import { getUpdatesSectionQueryVariables, updatesSectionQuery } from '../sections/Updates';
 
-import { collectivePageQuery, getCollectivePageQueryVariables } from './queries';
-
-export const preloadCollectivePageGraphqlQueries = async (slug, client) => {
-  const result = await client.query({
-    query: collectivePageQuery,
-    variables: getCollectivePageQueryVariables(slug),
-  });
-  const collective = result?.data?.Collective;
+export const preloadCollectivePageGraphqlQueries = async (client, collective) => {
   if (collective) {
+    const { slug } = collective;
     const sections = getFilteredSectionsForCollective(collective);
     const sectionsNames = getSectionsNames(sections);
     const queries = [];
@@ -31,10 +27,28 @@ export const preloadCollectivePageGraphqlQueries = async (slug, client) => {
       queries.push(
         client.query({
           query: getBudgetSectionQuery(Boolean(collective.host), isIndividual),
-          variables: getBudgetSectionQueryVariables(slug, collective.host?.slug, isIndividual),
+          variables: getBudgetSectionQueryVariables(slug, isIndividual),
           context: API_V2_CONTEXT,
         }),
       );
+      // V2
+      const budget = sections.find(el => el.name === 'BUDGET')?.sections.find(el => el.name === 'budget');
+      if (budget?.version === 2) {
+        queries.push(
+          client.query({
+            query: budgetSectionExpenseQuery,
+            variables: { slug, from: null, to: null },
+            context: API_V2_CONTEXT,
+          }),
+        );
+        queries.push(
+          client.query({
+            query: budgetSectionContributionsQuery,
+            variables: { slug, from: null, to: null },
+            context: API_V2_CONTEXT,
+          }),
+        );
+      }
     }
 
     if (sectionsNames.includes('transactions')) {
@@ -60,6 +74,7 @@ export const preloadCollectivePageGraphqlQueries = async (slug, client) => {
         client.query({
           query: updatesSectionQuery,
           variables: getUpdatesSectionQueryVariables(slug),
+          context: API_V2_CONTEXT,
         }),
       );
     }

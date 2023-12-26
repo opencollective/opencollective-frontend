@@ -1,13 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { isHostAccount } from '../lib/collective.lib';
+import { isHostAccount } from '../lib/collective';
 import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 import { AdminPanelContext } from '../components/admin-panel/AdminPanelContext';
 import AdminPanelSection from '../components/admin-panel/AdminPanelSection';
@@ -15,10 +17,12 @@ import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/
 import { adminPanelQuery } from '../components/admin-panel/queries';
 import AdminPanelSideBar from '../components/admin-panel/SideBar';
 import AdminPanelTopBar from '../components/admin-panel/TopBar';
+import AuthenticatedPage from '../components/AuthenticatedPage';
+import Container from '../components/Container';
 import { Flex, Grid } from '../components/Grid';
+import LoadingGrid from '../components/LoadingGrid';
 import MessageBox from '../components/MessageBox';
 import NotificationBar from '../components/NotificationBar';
-import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 
@@ -44,15 +48,12 @@ const messages = defineMessages({
 const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return ALL_SECTIONS.INFO;
-  }
-
-  const isAdmin = loggedInUser?.isAdminOfCollective(account);
-  const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
-  const isAccountantOnly = !isAdmin && isAccountant;
-  if (isHostAccount(account)) {
-    return isAccountantOnly ? ALL_SECTIONS.REPORTS : ALL_SECTIONS.EXPENSES;
+  } else if (isHostAccount(account)) {
+    return ALL_SECTIONS.EXPENSES;
   } else {
-    return isAccountantOnly ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.INFO;
+    const isAdmin = loggedInUser?.isAdminOfCollective(account);
+    const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
+    return !isAdmin && isAccountant ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.INFO;
   }
 };
 
@@ -96,16 +97,24 @@ function getBlocker(LoggedInUser, account, section) {
   }
 }
 
-const getIsAccountantOnly = (LoggedInUser, account) => {
-  return LoggedInUser && !LoggedInUser.isAdminOfCollective(account) && LoggedInUser.hasRole(roles.ACCOUNTANT, account);
-};
-
-const AdminPanelPage = () => {
-  const router = useRouter();
-  const { slug, section, subpath } = router.query;
+const AdminPanelPage = ({ slug, section, subpath }) => {
   const intl = useIntl();
+  const router = useRouter();
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const { data, loading } = useQuery(adminPanelQuery, { context: API_V2_CONTEXT, variables: { slug } });
+  const needsRedirectToWorkspace =
+    LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
+
+  // Redirect to the new dashboard if the user has the feature flag enabled
+  React.useEffect(() => {
+    if (needsRedirectToWorkspace) {
+      let url = section ? `/dashboard/${slug}/${section}` : `/dashboard/${slug}`;
+      if (subpath) {
+        url += `/${subpath.join('/')}`;
+      }
+      router.replace(!window.location.search ? url : `${url}${window.location.search}`);
+    }
+  }, [LoggedInUser]);
 
   const account = data?.account;
   const notification = getNotification(intl, account);
@@ -118,7 +127,7 @@ const AdminPanelPage = () => {
 
   return (
     <AdminPanelContext.Provider value={{ selectedSection }}>
-      <Page noRobots collective={account} title={account ? `${account.name} - ${titleBase}` : titleBase}>
+      <AuthenticatedPage noRobots collective={account} title={account ? `${account.name} - ${titleBase}` : titleBase}>
         {!blocker && (
           <AdminPanelTopBar
             isLoading={isLoading}
@@ -136,6 +145,10 @@ const AdminPanelPage = () => {
             </MessageBox>
             {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
           </Flex>
+        ) : needsRedirectToWorkspace ? (
+          <Container display="flex" justifyContent="center" py={[5, null, 6]} px={2}>
+            <LoadingGrid />
+          </Container>
         ) : (
           <Grid
             gridTemplateColumns={['1fr', null, '208px 1fr']}
@@ -152,7 +165,7 @@ const AdminPanelPage = () => {
               collective={account}
               selectedSection={selectedSection}
               display={['none', null, 'block']}
-              isAccountantOnly={getIsAccountantOnly(LoggedInUser, account)}
+              isAccountantOnly={LoggedInUser?.isAccountantOnly(account)}
             />
             {require2FAForAdmins(account) && LoggedInUser && !LoggedInUser.hasTwoFactorAuth ? (
               <TwoFactorAuthRequiredMessage mt={[null, null, '64px']} />
@@ -166,14 +179,23 @@ const AdminPanelPage = () => {
             )}
           </Grid>
         )}
-      </Page>
+      </AuthenticatedPage>
     </AdminPanelContext.Provider>
   );
 };
 
-AdminPanelPage.getInitialProps = () => {
+AdminPanelPage.propTypes = {
+  slug: PropTypes.string,
+  section: PropTypes.string,
+  subpath: PropTypes.string,
+};
+
+AdminPanelPage.getInitialProps = async ({ query: { slug, section = null, subpath = null } }) => {
   return {
-    scripts: { googleMaps: true }, // TODO: This should be enabled only for events
+    slug,
+    section,
+    subpath,
+    scripts: { googleMaps: true }, // To enable location autocomplete
   };
 };
 

@@ -9,10 +9,19 @@ const scrollToSection = section => {
 };
 
 const uploadImage = ({ dropzone, fileName }) => {
-  cy.fixture(`./images/${fileName}`).then(fileContent => {
-    const mimeType = 'image/'.concat(fileName.includes('.png') ? 'png' : 'jpeg');
-    cy.get(dropzone).upload({ fileContent, fileName, mimeType });
-  });
+  const mimeType = 'image/'.concat(fileName.includes('.png') ? 'png' : 'jpeg');
+  cy.get(dropzone).selectFile(
+    {
+      contents: `test/cypress/fixtures/images/${fileName}`,
+      mimeType,
+      fileName,
+    },
+    {
+      action: 'drag-drop',
+      force: true,
+    },
+  );
+
   cy.wait(900);
 };
 
@@ -166,7 +175,7 @@ describe('Collective page', () => {
 });
 
 describe('Collective page with euro currency', () => {
-  before(() => {
+  beforeEach(() => {
     cy.visit('/brusselstogether');
   });
 

@@ -40,6 +40,10 @@ const CreateNewMessages = defineMessages({
     id: 'Organization.CreateNew',
     defaultMessage: 'Create new Organization',
   },
+  [CollectiveType.VENDOR]: {
+    id: 'Vendor.CreateNew',
+    defaultMessage: 'Create new Vendor',
+  },
 });
 
 const msg = defineMessages({
@@ -118,12 +122,16 @@ const prepareMutationVariables = collective => {
   } else if (collective.type === CollectiveType.ORGANIZATION) {
     collective.members.forEach(member => (member.role = roles.ADMIN));
     return { collective: pick(collective, ['name', 'legalName', 'type', 'website', 'members', ...locationFields]) };
+  } else if (collective.type === CollectiveType.VENDOR) {
+    return {
+      collective: pick(collective, ['name', 'legalName', 'type', 'website', 'ParentCollectiveId']),
+    };
   } else {
     return { collective: pick(collective, ['name', 'type', 'website', ...locationFields]) };
   }
 };
 
-const createCollectiveMutation = gqlV1`
+const createCollectiveMutation = gqlV1/* GraphQL */ `
   mutation CreateCollective($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
       id
@@ -150,7 +158,7 @@ const createCollectiveMutation = gqlV1`
   }
 `;
 
-const createUserMutation = gqlV1`
+const createUserMutation = gqlV1/* GraphQL */ `
   mutation CreateUser($user: UserInputType!) {
     createUser(user: $user, throwIfExists: false, sendSignInLink: false) {
       user {
@@ -191,10 +199,12 @@ const CreateCollectiveMiniForm = ({
   optionalFields,
   email = '',
   name = '',
+  otherInitialValues = {},
 }) => {
   const isUser = type === CollectiveType.USER;
   const isCollective = type === CollectiveType.COLLECTIVE;
   const isOrganization = type === CollectiveType.ORGANIZATION;
+  const isVendor = type === CollectiveType.VENDOR;
   const noAdminFields = isOrganization && excludeAdminFields;
   const mutation = isUser ? createUserMutation : createCollectiveMutation;
   const [createCollective, { error: submitError }] = useMutation(mutation);
@@ -202,6 +212,7 @@ const CreateCollectiveMiniForm = ({
   const { formatMessage } = intl;
 
   const initialValues = {
+    ...otherInitialValues,
     members: [{ member: { email, name } }],
     email,
     name,
@@ -216,9 +227,11 @@ const CreateCollectiveMiniForm = ({
         errors.members = [{ member: { email: formatMessage(msg.invalidEmail) } }];
       }
       if (!get(values, 'members[0].member.name')) {
-        errors.members
-          ? (errors.members[0].member.name = formatMessage(msg.invalidName))
-          : [{ member: { name: formatMessage(msg.invalidName) } }];
+        if (!errors.members) {
+          errors.members = [{ member: { name: formatMessage(msg.invalidName) } }];
+        } else {
+          errors.members[0].member.name = formatMessage(msg.invalidName);
+        }
       }
     } else if (isUser) {
       if (!values.email || !isValidEmail(values.email)) {
@@ -320,14 +333,14 @@ const CreateCollectiveMiniForm = ({
                       isUser
                         ? 'e.g., Jane Doe, Frank Zappa'
                         : isCollective
-                        ? 'e.g., Webpack, Babel'
-                        : 'e.g., AirBnb, TripleByte'
+                          ? 'e.g., Webpack, Babel'
+                          : 'e.g., AirBnb, TripleByte'
                     }
                     data-cy="mini-form-name-field"
                   />
                 )}
               </StyledInputField>
-              {(isUser || isOrganization) && (
+              {(isUser || isOrganization || isVendor) && (
                 <StyledInputField
                   name="legalName"
                   htmlFor="legalName"
@@ -356,7 +369,7 @@ const CreateCollectiveMiniForm = ({
                   )}
                 </StyledInputField>
               )}
-              {!isUser && (
+              {!(isUser || isVendor) && (
                 <StyledInputField
                   name="website"
                   htmlFor="website"
@@ -459,6 +472,8 @@ CreateCollectiveMiniForm.propTypes = {
   name: PropTypes.string,
   /** A list of optional fields to include in the form */
   optionalFields: PropTypes.arrayOf(PropTypes.oneOf(['location.address', 'location.country'])),
+  /** Any other initial values to pass to the form */
+  otherInitialValues: PropTypes.object,
 };
 
 export default withUser(CreateCollectiveMiniForm);

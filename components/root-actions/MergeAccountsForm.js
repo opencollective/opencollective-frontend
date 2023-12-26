@@ -1,9 +1,9 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
@@ -11,7 +11,7 @@ import { Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const mergeAccountsMutation = gql`
   mutation MergeAccounts($fromAccount: AccountReferenceInput!, $toAccount: AccountReferenceInput!, $dryRun: Boolean!) {
@@ -21,6 +21,10 @@ const mergeAccountsMutation = gql`
         id
         name
         slug
+        isIncognito
+        ... on Individual {
+          isGuest
+        }
       }
     }
   }
@@ -31,7 +35,7 @@ const MergeAccountsForm = () => {
   const [mergeSummary, setMergeSummary] = React.useState(false);
   const [fromAccount, setFromAccount] = React.useState(null);
   const [toAccount, setToAccount] = React.useState(null);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const isValid = fromAccount && toAccount;
   const intl = useIntl();
   const mergeCTA = getMergeCTA(fromAccount, toAccount);
@@ -51,8 +55,8 @@ const MergeAccountsForm = () => {
         setMergeSummary(resultMessage);
       } else {
         const successMessage = `@${fromAccount.slug} has been merged into @${toAccount.slug}`;
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
+        toast({
+          variant: 'success',
           message: !resultMessage ? successMessage : `${successMessage}\n${resultMessage}`,
         });
 
@@ -62,9 +66,8 @@ const MergeAccountsForm = () => {
         setToAccount(null);
       }
     } catch (e) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
-        variant: 'light',
+      toast({
+        variant: 'error',
         message: i18nGraphqlException(intl, e),
       });
     }

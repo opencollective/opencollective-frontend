@@ -98,6 +98,9 @@ const messages = defineMessages({
 });
 
 const getNotification = (intl, status, collective, host, LoggedInUser, refetch) => {
+  const numberOfAdmins = collective.parentCollective
+    ? collective.parentCollective.coreContributors?.filter(c => c.isAdmin)?.length + collective.admins.length
+    : collective.admins.length;
   if (status === 'collectiveCreated') {
     switch (collective.type) {
       case CollectiveType.ORGANIZATION:
@@ -157,7 +160,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
       type: 'warning',
       inline: true,
     };
-  } else if (!collective.isApproved && collective.host && collective.type === CollectiveType.COLLECTIVE) {
+  } else if (!collective.isApproved && collective.host) {
     return {
       title: intl.formatMessage(messages.approvalPending),
       description: intl.formatMessage(messages.approvalPendingDescription, { host: collective.host.name }),
@@ -170,7 +173,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
     LoggedInUser?.isAdminOfCollectiveOrHost(collective) &&
     collective.isApproved &&
     host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze &&
-    host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > collective?.admins?.length &&
+    host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > numberOfAdmins &&
     collective?.features?.RECEIVE_FINANCIAL_CONTRIBUTIONS === 'DISABLED'
   ) {
     return {

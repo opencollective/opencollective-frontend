@@ -107,7 +107,7 @@ class UpdatePaymentPage extends React.Component {
         const paymentMethod = stripeTokenToPaymentMethod(token);
         const res = await this.props.replaceCreditCard({
           variables: {
-            CollectiveId: this.props.LoggedInUser.collective.id,
+            collectiveId: this.props.LoggedInUser.collective.id,
             ...paymentMethod,
             id: parseInt(this.props.paymentMethodId),
           },
@@ -194,14 +194,14 @@ class UpdatePaymentPage extends React.Component {
 
     const orders = data.PaymentMethod?.orders || [];
     const hasForm = showCreditCardForm && Boolean(data.PaymentMethod);
-    const contributingAccount = orders?.[0]?.fromCollective || LoggedInUser.collective;
+    const contributingAccount = orders[0]?.fromCollective || LoggedInUser.collective;
     return (
       <div className="UpdatedPaymentMethodPage">
         <Page>
           <Flex alignItems="center" flexDirection="column">
             <HappyBackground>
               <Box mt={5}>
-                <H1 color="white.full" fontSize={['3rem', null, '4rem']} textAlign="center">
+                <H1 color="white.full" fontSize={['1.9rem', null, '2.5rem']} textAlign="center">
                   <FormattedMessage id="updatePaymentMethod.title" defaultMessage="Update Payment Method" />
                 </H1>
               </Box>
@@ -209,7 +209,7 @@ class UpdatePaymentPage extends React.Component {
               {Boolean(data.PaymentMethod) && (
                 <React.Fragment>
                   <Box mt={3}>
-                    <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+                    <Subtitle fontSize={['0.95rem', null, '1.25rem']} maxWidth={['90%', '640px']}>
                       <Box>
                         <FormattedMessage
                           id="updatePaymentMethod.subtitle.line"
@@ -220,7 +220,7 @@ class UpdatePaymentPage extends React.Component {
                   </Box>
 
                   <Box mt={3}>
-                    <Subtitle fontSize={['1.5rem', null, '2rem']} maxWidth={['90%', '640px']}>
+                    <Subtitle fontSize={['0.95rem', null, '1.25rem']} maxWidth={['90%', '640px']}>
                       <Box alignItems="left">
                         <AlignedBullets>
                           {orders.map(order => {
@@ -337,12 +337,12 @@ class UpdatePaymentPage extends React.Component {
 const replaceCreditCardMutation = gqlV1/* GraphQL */ `
   mutation ReplaceCreditCard(
     $id: Int!
-    $CollectiveId: Int!
+    $collectiveId: Int!
     $name: String!
     $token: String!
     $data: StripeCreditCardDataInputType!
   ) {
-    replaceCreditCard(CollectiveId: $CollectiveId, name: $name, token: $token, data: $data, id: $id) {
+    replaceCreditCard(CollectiveId: $collectiveId, name: $name, token: $token, data: $data, id: $id) {
       id
       data
       createdAt

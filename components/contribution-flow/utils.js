@@ -1,9 +1,9 @@
 import React from 'react';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
-import { find, get, isEmpty, sortBy, uniqBy } from 'lodash';
+import { find, get, isEmpty, pick, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
-import { canContributeRecurring, getCollectivePageMetadata } from '../../lib/collective.lib';
+import { canContributeRecurring, getCollectivePageMetadata } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import INTERVALS from '../../lib/constants/intervals';
 import {
@@ -12,6 +12,7 @@ import {
   PAYMENT_METHOD_TYPE,
 } from '../../lib/constants/payment-methods';
 import roles from '../../lib/constants/roles';
+import { TierTypes } from '../../lib/constants/tiers-types';
 import { PaymentMethodService, PaymentMethodType } from '../../lib/graphql/types/v2/graphql';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
@@ -28,8 +29,11 @@ export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
 export const STRIPE_PAYMENT_ELEMENT_KEY = 'stripe-payment-element';
 const PAYPAL_MAX_AMOUNT = 999999999; // See MAX_VALUE_EXCEEDED https://developer.paypal.com/api/rest/reference/orders/v2/errors/#link-createorder
 
-const memberCanBeUsedToContribute = (member, account) => {
+const memberCanBeUsedToContribute = (member, account, canUseIncognito) => {
   if (member.role !== roles.ADMIN) {
+    return false;
+  } else if (!canUseIncognito && member.collective.isIncognito) {
+    // Incognito can't be used to contribute if not allowed
     return false;
   } else if (
     [CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(member.collective.type) &&
@@ -42,11 +46,21 @@ const memberCanBeUsedToContribute = (member, account) => {
   }
 };
 
-export const getContributeProfiles = (loggedInUser, collective) => {
+/*
+ **Cannot use contributions for events and "Tickets" tiers, because we need the ticket holder's identity
+ */
+export const canUseIncognitoForContribution = tier => {
+  return !tier || tier.type !== 'TICKET';
+};
+
+export const getContributeProfiles = (loggedInUser, collective, tier) => {
   if (!loggedInUser) {
     return [];
   } else {
-    const filteredMembers = loggedInUser.memberOf.filter(member => memberCanBeUsedToContribute(member, collective));
+    const canUseIncognito = canUseIncognitoForContribution(tier);
+    const filteredMembers = loggedInUser.memberOf.filter(member =>
+      memberCanBeUsedToContribute(member, collective, canUseIncognito),
+    );
     const personalProfile = { email: loggedInUser.email, image: loggedInUser.image, ...loggedInUser.collective };
     const contributorProfiles = [personalProfile];
     filteredMembers.forEach(member => {
@@ -249,7 +263,11 @@ export const generatePaymentMethodOptions = (
     }
 
     // Manual (bank transfer)
-    if (hostHasManual && INTERVALS.oneTime && !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)) {
+    if (
+      hostHasManual &&
+      stepDetails.interval === INTERVALS.oneTime &&
+      !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.MANUAL)
+    ) {
       uniquePMs.push({
         key: 'manual',
         title: get(collective, 'host.settings.paymentMethods.manual.title', null) || (
@@ -276,11 +294,11 @@ export const generatePaymentMethodOptions = (
   return uniquePMs;
 };
 
-export const getTotalAmount = (stepDetails, stepSummary = null, isCrypto = false) => {
+export const getTotalAmount = (stepDetails, stepSummary = null) => {
   const quantity = get(stepDetails, 'quantity', 1);
-  const amount = isCrypto ? get(stepDetails, 'cryptoAmount', 0) : get(stepDetails, 'amount', 0);
+  const amount = get(stepDetails, 'amount', 0);
   const taxAmount = get(stepSummary, 'amount', 0);
-  const platformFeeAmount = !isCrypto ? get(stepDetails, 'platformTip', 0) : 0;
+  const platformFeeAmount = get(stepDetails, 'platformTip', 0);
   return quantity * amount + platformFeeAmount + taxAmount;
 };
 
@@ -362,13 +380,24 @@ const getTotalYearlyAmount = stepDetails => {
 /**
  * Whether this contribution requires us to collect the address of the user
  */
-export const contributionRequiresAddress = stepDetails => {
-  return stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 5000e2;
+export const contributionRequiresAddress = (stepDetails, tier) => {
+  return Boolean(
+    (stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 5000e2) || // Above $5000/year
+      tier?.requireAddress, // Or if enforced by the tier
+  );
 };
 
 /**
  * Whether this contribution requires us to collect the address and legal name of the user
  */
-export const contributionRequiresLegalName = stepDetails => {
-  return stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 500e2;
+export const contributionRequiresLegalName = (stepDetails, tier) => {
+  return Boolean(
+    (stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 250e2) || // Above $250/year
+      tier?.requireAddress || // Or if enforced by the tier, a valid address requires a legal name
+      tier?.type === TierTypes.TICKET,
+  );
 };
+
+export function getGuestInfoFromStepProfile(stepProfile) {
+  return pick(stepProfile, ['email', 'name', 'legalName', 'location', 'captcha']);
+}

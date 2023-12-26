@@ -1,5 +1,4 @@
 import React from 'react';
-import { gql } from '@apollo/client';
 import { DataValue, graphql } from '@apollo/client/react/hoc';
 import { has, omit, omitBy } from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -7,14 +6,17 @@ import { NextRouter, withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-intl';
 import styled from 'styled-components';
 
-import { getCollectivePageMetadata, getSuggestedTags, isIndividualAccount } from '../lib/collective.lib';
-import expenseStatus from '../lib/constants/expense-status';
+import { getCollectivePageMetadata, getSuggestedTags, isIndividualAccount } from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { SubmittedExpensesPageQuery, SubmittedExpensesPageQueryVariables } from '../lib/graphql/types/v2/graphql';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import {
+  ExpenseStatus,
+  SubmittedExpensesPageQuery,
+  SubmittedExpensesPageQueryVariables,
+} from '../lib/graphql/types/v2/graphql';
 import LoggedInUser from '../lib/LoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
@@ -51,7 +53,7 @@ const messages = defineMessages({
 const SearchFormContainer = styled(Box)`
   width: 100%;
   max-width: 278px;
-  min-width: 10rem;
+  min-width: 6.25rem;
 `;
 
 const EXPENSES_PER_PAGE = 10;
@@ -73,7 +75,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
         offset: parseInt(query.offset) || undefined,
         limit: parseInt(query.limit) || undefined,
         type: has(expenseTypes, query.type) ? query.type : undefined,
-        status: has(expenseStatus, query.status) || query.status === 'READY_TO_PAY' ? query.status : undefined,
+        status: has(ExpenseStatus, query.status) || query.status === 'READY_TO_PAY' ? query.status : undefined,
         payout: has(PayoutMethodType, query.payout) ? query.payout : undefined,
         period: query.period,
         amount: query.amount,
@@ -149,6 +151,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
 
   render() {
     const { collectiveSlug, data, query } = this.props;
+    const searchTerm = Array.isArray(query.searchTerm) ? query.searchTerm[0] : query.searchTerm;
     const hasFilters = this.hasFilter(query);
     const pageUrl = `${getCollectivePageCanonicalURL(data.account)}/submitted-expenses`;
 
@@ -181,7 +184,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
                   <Box mx="auto" />
                   <SearchFormContainer p={2}>
                     <SearchBar
-                      defaultValue={query.searchTerm}
+                      defaultValue={searchTerm}
                       onSubmit={searchTerm => this.handleSearch(searchTerm, data.account)}
                       placeholder={undefined}
                     />

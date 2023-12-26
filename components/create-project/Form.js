@@ -5,7 +5,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { suggestSlug } from '../../lib/collective.lib';
+import { suggestSlug } from '../../lib/collective';
 
 import CollectiveNavbar from '../collective-navbar';
 import NextIllustration from '../collectives/HomeNextIllustration';
@@ -34,7 +34,7 @@ const placeholders = {
 
 const messages = defineMessages({
   nameLabel: { id: 'createProject.form.nameLabel', defaultMessage: 'Project name' },
-  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
+  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your profile URL' },
   descriptionLabel: {
     id: 'createProject.form.descriptionLabel',
     defaultMessage: "What's the purpose of your Project?",
@@ -231,8 +231,8 @@ class CreateProjectForm extends React.Component {
               <NextIllustration
                 display={['block', 'none']}
                 src="/static/images/create-collective/mobileForm.png"
-                width="320px"
-                height="200px"
+                width={320}
+                height={200}
               />
             </Flex>
           </ContainerWithImage>

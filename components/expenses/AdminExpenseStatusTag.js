@@ -6,7 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
 
-import expenseStatus from '../../lib/constants/expense-status';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useKeyboardKey, { ESCAPE_KEY } from '../../lib/hooks/useKeyboardKey';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
@@ -16,8 +16,8 @@ import StyledButton from '../StyledButton';
 import StyledSpinner from '../StyledSpinner';
 import StyledTag from '../StyledTag';
 
+import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import { getExpenseStatusMsgType } from './ExpenseStatusTag';
-import MarkExpenseAsIncompleteModal from './MarkExpenseAsIncompleteModal';
 import ProcessExpenseButtons, { ButtonLabel } from './ProcessExpenseButtons';
 
 const ExpenseStatusTag = styled(StyledTag)`
@@ -80,9 +80,10 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
   const wrapperRef = React.useRef();
   const [showPopup, setShowPopup] = React.useState(false);
   const [isClosable, setClosable] = React.useState(true);
-  const [showMarkAsIncompleteModal, setMarkAsIncompleteModal] = React.useState(false);
-  const hideProcessExpenseButtons = expense?.status === expenseStatus.APPROVED;
+  const [processModal, setProcessModal] = React.useState(false);
+  const hideProcessExpenseButtons = expense?.status === ExpenseStatus.APPROVED;
   const buttonProps = { px: 2, py: 2, isBorderless: true, width: '100%', textAlign: 'left' };
+  const status = expense.onHold ? 'ON_HOLD' : expense.status;
 
   const onClick = () => {
     setShowPopup(true);
@@ -111,13 +112,9 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
         <Reference>
           {({ ref }) => (
             <Box ref={ref} onClick={onClick}>
-              <ExpenseStatusTag
-                type={getExpenseStatusMsgType(expense.status)}
-                data-cy="admin-expense-status-msg"
-                {...props}
-              >
+              <ExpenseStatusTag type={getExpenseStatusMsgType(status)} data-cy="admin-expense-status-msg" {...props}>
                 <Flex>
-                  {i18nExpenseStatus(intl, expense.status)}
+                  {i18nExpenseStatus(intl, status)}
                   <ChevronDownIcon />
                 </Flex>
               </ExpenseStatusTag>
@@ -140,17 +137,42 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
                         permissions={expense.permissions}
                         onModalToggle={isOpen => setClosable(!isOpen)}
                         onSuccess={() => setShowPopup(false)}
+                        displaySecurityChecks={false}
                       />
                     )}
                     {expense?.permissions?.canMarkAsIncomplete && (
                       <StyledButton
                         {...buttonProps}
                         onClick={() => {
-                          setMarkAsIncompleteModal(true);
+                          setProcessModal('MARK_AS_INCOMPLETE');
                         }}
                       >
                         <ButtonLabel>
                           <FormattedMessage id="actions.markAsIncomplete" defaultMessage="Mark as Incomplete" />
+                        </ButtonLabel>
+                      </StyledButton>
+                    )}
+                    {expense.permissions?.canHold && (
+                      <StyledButton
+                        {...buttonProps}
+                        onClick={() => {
+                          setProcessModal('HOLD');
+                        }}
+                      >
+                        <ButtonLabel>
+                          <FormattedMessage id="actions.hold" defaultMessage="Put On Hold" />
+                        </ButtonLabel>
+                      </StyledButton>
+                    )}
+                    {expense.permissions?.canRelease && (
+                      <StyledButton
+                        {...buttonProps}
+                        onClick={() => {
+                          setProcessModal('RELEASE');
+                        }}
+                      >
+                        <ButtonLabel>
+                          <FormattedMessage id="actions.release" defaultMessage="Release Hold" />
                         </ButtonLabel>
                       </StyledButton>
                     )}
@@ -162,8 +184,8 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
             document.body,
           )}
       </Manager>
-      {showMarkAsIncompleteModal && (
-        <MarkExpenseAsIncompleteModal expense={expense} onClose={() => setMarkAsIncompleteModal(false)} />
+      {processModal && (
+        <ConfirmProcessExpenseModal type={processModal} expense={expense} onClose={() => setProcessModal(false)} />
       )}
     </React.Fragment>
   );

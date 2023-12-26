@@ -1,17 +1,17 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { formatCurrency } from '../lib/currency-utils';
-import { API_V2_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { collectiveBalanceFragment } from '../lib/graphql/v1/fragments';
 import { compose } from '../lib/utils';
 
+import { toast } from './ui/useToast';
 import { Flex } from './Grid';
 import StyledButton from './StyledButton';
-import { TOAST_TYPE, withToasts } from './ToastProvider';
 
 class SendMoneyToCollectiveBtn extends React.Component {
   static propTypes = {
@@ -27,7 +27,6 @@ class SendMoneyToCollectiveBtn extends React.Component {
     confirmTransfer: PropTypes.func,
     isTransferApproved: PropTypes.bool,
     customButton: PropTypes.function,
-    addToast: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -49,8 +48,8 @@ class SendMoneyToCollectiveBtn extends React.Component {
     }
     const paymentMethods = get(data, 'account.paymentMethods');
     if (!paymentMethods || paymentMethods.length === 0) {
-      this.props.addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: <FormattedMessage defaultMessage="We couldn't find a payment method to make this transaction" />,
       });
       return;
@@ -78,8 +77,8 @@ class SendMoneyToCollectiveBtn extends React.Component {
           });
         },
       });
-      this.props.addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: (
           <FormattedMessage
             defaultMessage="Balance sent to {toCollectiveName}"
@@ -90,8 +89,8 @@ class SendMoneyToCollectiveBtn extends React.Component {
       this.setState({ loading: false });
     } catch (e) {
       this.setState({ loading: false });
-      this.props.addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: e.message,
       });
     }
@@ -168,13 +167,6 @@ const addPaymentMethodsData = graphql(paymentMethodsQuery, {
   },
 });
 
-const collectiveBalanceFragment = gqlV1/* GraphQL */ `
-  fragment StatFieldsFragment on CollectiveStatsType {
-    id
-    balance
-  }
-`;
-
 const sendMoneyToCollectiveMutation = gql`
   mutation SendMoneyToCollective($order: OrderCreateInput!) {
     createOrder(order: $order) {
@@ -201,4 +193,4 @@ const addSendMoneyToCollectiveMutation = graphql(sendMoneyToCollectiveMutation, 
 
 const addGraphql = compose(addPaymentMethodsData, addSendMoneyToCollectiveMutation);
 
-export default addGraphql(withToasts(injectIntl(SendMoneyToCollectiveBtn)));
+export default addGraphql(injectIntl(SendMoneyToCollectiveBtn));

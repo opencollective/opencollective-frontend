@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle';
 import { useRouter } from 'next/router';
+import { useIntl } from 'react-intl';
 import slugify from 'slugify';
 import styled, { css } from 'styled-components';
 
@@ -10,6 +11,7 @@ import { Box, Grid } from '../components/Grid';
 import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import AccountSettings from '../components/root-actions/AccountSettings';
+import AccountType from '../components/root-actions/AccountType';
 import BanAccounts from '../components/root-actions/BanAccounts';
 import BanAccountsWithSearch from '../components/root-actions/BanAccountsWithSearch';
 import ClearCacheForAccountForm from '../components/root-actions/ClearCacheForAccountForm';
@@ -18,11 +20,12 @@ import MergeAccountsForm from '../components/root-actions/MergeAccountsForm';
 import MoveAuthoredContributions from '../components/root-actions/MoveAuthoredContributions';
 import MoveExpenses from '../components/root-actions/MoveExpenses';
 import MoveReceivedContributions from '../components/root-actions/MoveReceivedContributions';
+import RecurringContributions from '../components/root-actions/RecurringContributions';
 import RootActivityLog from '../components/root-actions/RootActivityLog';
 import UnhostAccountForm from '../components/root-actions/UnhostAccountForm';
 import StyledCard from '../components/StyledCard';
 import StyledHr from '../components/StyledHr';
-import { H1, H2, H3, P, Span } from '../components/Text';
+import { H2, H3, P, Span } from '../components/Text';
 
 const GRID_TEMPLATE_COLUMNS = ['1fr', 'minmax(220px, 1fr) 6fr'];
 
@@ -41,6 +44,17 @@ const MENU = [
   },
   { id: 'Unhost account', Component: UnhostAccountForm },
   { id: 'Account Settings', Component: AccountSettings },
+  {
+    id: 'Account Type',
+    Component: AccountType,
+    description: `This tool is meant to convert a User account to an Organization type. The organization account will have the fields copied from the initial user account. Please notify the user to go through and update the organization account details after this is done. The location data for the user (if exists) will become public for the organization.`,
+  },
+  {
+    id: 'Recurring Contributions',
+    Component: RecurringContributions,
+    description: `This tool is designed to help root admins to update recurring contributions of users`,
+    useCard: false,
+  },
   { id: 'Activity Log', Component: RootActivityLog, useCard: false },
   {
     id: 'Contributions & Expenses',
@@ -49,15 +63,12 @@ const MENU = [
   {
     id: 'Move authored contributions',
     Component: MoveAuthoredContributions,
-    description: `This tool is meant to edit the account that authored one or more contributions.
-    It can be used to mark contributions as "Incognito" by picking the contributor's incognito profile in "Move to".
-    The payment methods used for the contributions are re-affected to the new profile, so make sure they have the permission to use them.`,
+    description: `This tool is meant to edit the account that authored one or more contributions. It can be used to mark contributions as "Incognito" by picking the contributor's incognito profile in "Move to". The payment methods used for the contributions are re-affected to the new profile, so make sure they have the permission to use them.`,
   },
   {
     id: 'Move received contributions',
     Component: MoveReceivedContributions,
-    description: `This tool is meant to edit the account that received a contribution.
-    Use it to move contributions to different tiers, sub-projects, events, etc.`,
+    description: `This tool is meant to edit the account that received a contribution. Use it to move contributions to different tiers, sub-projects, events, etc.`,
   },
   {
     id: 'Move expenses',
@@ -114,23 +125,23 @@ const MenuEntry = styled.div`
       cursor: default;
       background: #f9f9f9;
       border-bottom: 1px solid #eaeaea;
-      box-shadow: 0px -3px 6px #eaeaea;
+      box-shadow: 0px 3px 6px #eaeaea;
     `}
 `;
 
 const RootActionsPage = () => {
   const router = useRouter();
+  const intl = useIntl();
   const selectedMenuEntry = MENU.find(m => m.slug === router.query.section) || MENU[1];
   const showHiddenActions = Boolean(router.query.showHiddenActions);
   return (
-    <AuthenticatedPage disableSignup rootOnly>
-      <Container maxWidth="1000px" m="0 auto" mt={4} borderBottom="1px solid #e5e5e5">
-        <H1 textAlign="left" fontSize="32px" py={2} pl={2}>
-          Root actions
-        </H1>
-      </Container>
-      <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth="1000px" m="0 auto" mb={5}>
-        <Container borderRight="1px solid #e5e5e5">
+    <AuthenticatedPage
+      disableSignup
+      rootOnly
+      navTitle={intl.formatMessage({ id: 'RootActions', defaultMessage: 'Root Actions' })}
+    >
+      <Grid gridTemplateColumns={GRID_TEMPLATE_COLUMNS} maxWidth={1400} m="0 auto">
+        <Container borderRight="1px solid #e5e5e5" fontSize="14px">
           {MENU.filter(e => showHiddenActions || !e.isHidden).map(menuEntry =>
             menuEntry.type === 'category' ? (
               <MenuEntry key={menuEntry.id} title={menuEntry.title || menuEntry.id} $type="category">

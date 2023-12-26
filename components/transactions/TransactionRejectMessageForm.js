@@ -49,7 +49,7 @@ const TransactionRejectMessageForm = ({ message, onChange }) => {
 };
 
 TransactionRejectMessageForm.propTypes = {
-  message: PropTypes.object,
+  message: PropTypes.string,
   onChange: PropTypes.func,
 };
 

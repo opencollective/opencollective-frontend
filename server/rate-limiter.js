@@ -1,10 +1,7 @@
-const expressLimiter = require('express-limiter');
-const redis = require('redis');
-
+const expressLimiter = require('./express-limiter');
 const logger = require('./logger');
 const { parseToBooleanDefaultFalse } = require('./utils');
-
-const redisServerUrl = process.env.REDIS_URL;
+const { createRedisClient } = require('./redis');
 
 const enabled = parseToBooleanDefaultFalse(process.env.RATE_LIMITING_ENABLED);
 const simulate = parseToBooleanDefaultFalse(process.env.RATE_LIMITING_SIMULATE);
@@ -14,16 +11,15 @@ const total = Number(process.env.RATE_LIMITING_TOTAL) || 20;
 const expire = Number(process.env.RATE_LIMITING_EXPIRE) || 60;
 
 const load = async app => {
-  if (!enabled || !redisServerUrl) {
+  if (!enabled) {
     return;
   }
 
-  const redisOptions = {};
-  if (redisServerUrl.includes('rediss://')) {
-    redisOptions.tls = { rejectUnauthorized: false };
+  const redisClient = await createRedisClient();
+  if (!redisClient) {
+    logger.warn(`redisClient not available, rate-limiter disabled`);
+    return;
   }
-  const client = redis.createClient(redisServerUrl, redisOptions);
-  const rateLimiter = expressLimiter(app, client);
 
   const whitelist = req =>
     req.url.match(/^\/_/) || req.url.match(/^\/static/) || req.url.match(/^\/api/) || req.url.match(/^\/favicon\.ico/)
@@ -54,7 +50,7 @@ const load = async app => {
     res.status(429).send(message);
   };
 
-  rateLimiter({
+  const expressLimiterOptions = {
     path: '*',
     method: 'all',
     total: total,
@@ -62,7 +58,9 @@ const load = async app => {
     whitelist,
     lookup,
     onRateLimited,
-  });
+  };
+
+  app.use(expressLimiter(redisClient)(expressLimiterOptions));
 };
 
 module.exports = load;

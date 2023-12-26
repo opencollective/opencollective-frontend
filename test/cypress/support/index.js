@@ -12,10 +12,11 @@
 // You can read more here:
 // https://on.cypress.io/configuration
 // ***********************************************************
-
 import '@cypress/code-coverage/support';
+import 'cypress-real-events';
 // Import commands.js using ES2015 syntax:
 import './commands';
+import './typed-commands';
 
 // See https://github.com/opencollective/opencollective/issues/2676
 Cypress.on('uncaught:exception', err => {
@@ -31,6 +32,7 @@ Cypress.on('uncaught:exception', err => {
     // TODO: ideally we should go over these tests and remove these exceptions from occurring
     err.message.includes('S3 service object not initialized') ||
     err.message.includes('Invariant Violation: 19') ||
+    err.message.includes('Invariant Violation: 21') ||
     err.message.includes('No collective found with slug') ||
     err.message.includes('Please provide a slug or an id')
   ) {

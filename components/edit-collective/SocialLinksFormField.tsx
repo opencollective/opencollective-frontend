@@ -71,7 +71,7 @@ export default function SocialLinksFormField({ value = [], touched, onChange }: 
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <Flex width="100%" flexDirection="column">
+      <Flex width="100%" flexDirection="column" data-cy="social-link-inputs">
         <SortableContext items={items.map(item => item.sortId)} strategy={verticalListSortingStrategy}>
           {items.map(socialLink => {
             return (
@@ -190,6 +190,10 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
     {
       value: SocialLinkType.TIKTOK.toString(),
       label: 'TikTok',
+    },
+    {
+      value: SocialLinkType.TWITCH.toString(),
+      label: 'Twitch',
     },
   ];
 
@@ -314,6 +318,7 @@ const knownSocialLinkDomains = [
   { type: SocialLinkType.SLACK, regexp: /^(https:\/\/)?[^.]+.?slack.com/ },
   { type: SocialLinkType.TIKTOK, regexp: /^(https:\/\/)?(www\.)?tiktok.com/ },
   { type: SocialLinkType.TUMBLR, regexp: /^(https:\/\/)?[^.]+\.?tumblr.com/ },
+  { type: SocialLinkType.TWITCH, regexp: /^(https:\/\/)?(www\.)?twitch.tv/ },
   { type: SocialLinkType.TWITTER, regexp: /^(https:\/\/)?twitter.com/ },
   { type: SocialLinkType.YOUTUBE, regexp: /^(https:\/\/)?(www\.)?youtube.com/ },
 ];

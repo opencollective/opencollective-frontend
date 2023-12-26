@@ -9,136 +9,136 @@ const retriesConfig3DSecure = { retries: { runMode: 2, openMode: 0 } };
 describe('Contribution Flow: Donate', () => {
   it('Can donate as new user', () => {
     const userParams = { name: 'Donate Tester' };
-    cy.signup({ user: userParams, redirect: donateRoute, visitParams }).then(() => {
-      // Mock clock so we can check next contribution date in a consistent way
-      cy.clock(Date.parse('2042/05/25'));
+    cy.signup({ user: userParams, redirect: donateRoute, visitParams });
 
-      // ---- Step Details ----
-      // Has default amount selected
-      cy.get('#amount button.selected').should('exist');
+    // Mock clock so we can check next contribution date in a consistent way
+    cy.clock(Date.parse('2042/05/25'));
 
-      // Change amount
-      cy.getByDataCy('amount-picker-btn-other').click();
-      cy.get('input[type=number][name=custom-amount]').type('{selectall}1337');
-      cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
-      cy.contains('[data-cy="progress-step-details"]', '$1,337.00');
+    // ---- Step Details ----
+    // Has default amount selected
+    cy.get('#amount button.selected').should('exist');
 
-      // Change frequency - monthly
-      cy.contains('#interval button', 'Monthly').click();
-      cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
-      cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / mo.');
-      cy.contains("Today's charge");
-      // next charge in 2 months time, first day, because it was made on or after 15th.
-      cy.contains('the next charge will be on July 1, 2042');
+    // Change amount
+    cy.getByDataCy('amount-picker-btn-other').click();
+    cy.get('input[type=number][name=custom-amount]').type('{selectall}1337');
+    cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
+    cy.contains('[data-cy="progress-step-details"]', '$1,337.00');
 
-      // Change frequency - yearly
-      cy.contains('#interval button', 'Yearly').click();
-      cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
-      cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / yr.');
-      cy.contains("Today's charge");
-      cy.contains('the next charge will be on May 1, 2043');
+    // Change frequency - monthly
+    cy.contains('#interval button', 'Monthly').click();
+    cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
+    cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / mo.');
+    cy.contains("Today's charge");
+    // next charge in 2 months time, first day, because it was made on or after 15th.
+    cy.contains('the next charge will be on July 1, 2042');
 
-      cy.get('button[data-cy="cf-next-step"]').click();
+    // Change frequency - yearly
+    cy.contains('#interval button', 'Yearly').click();
+    cy.tick(1000); // Update details is debounced, we need to tick the clock to trigger update
+    cy.contains('[data-cy="progress-step-details"]', '$1,337.00 USD / yr.');
+    cy.contains("Today's charge");
+    cy.contains('the next charge will be on May 1, 2043');
 
-      // ---- Step profile ----
-      cy.checkStepsProgress({ enabled: ['profile', 'details'], disabled: 'payment' });
+    cy.get('button[data-cy="cf-next-step"]').click();
 
-      // Personal account must be the first entry, and it must be checked
-      const userName = userParams.name;
-      cy.contains('[data-cy="contribute-profile-picker"]', userName);
-      cy.contains('[data-cy="contribute-profile-picker"]', 'Personal');
-      cy.getByDataCy('contribute-profile-picker').click();
-      cy.contains('[data-cy="select-option"]:first', userName);
-      cy.contains('[data-cy="select-option"]:first', 'Personal');
-      cy.get('body').type('{esc}');
+    // ---- Step profile ----
+    cy.checkStepsProgress({ enabled: ['profile', 'details'], disabled: 'payment' });
 
-      // User profile is shown on step, all other steps must be disabled
-      cy.getByDataCy(`progress-step-profile`).contains(userName);
-      cy.get('button[data-cy="cf-next-step"]').click();
+    // Personal account must be the first entry, and it must be checked
+    const userName = userParams.name;
+    cy.contains('[data-cy="contribute-profile-picker"]', userName);
+    cy.contains('[data-cy="contribute-profile-picker"]', 'Personal');
+    cy.getByDataCy('contribute-profile-picker').click();
+    cy.contains('[data-cy="select-option"]:first', userName);
+    cy.contains('[data-cy="select-option"]:first', 'Personal');
+    cy.get('body').type('{esc}');
 
-      // ---- Step Payment ----
-      cy.checkStepsProgress({ enabled: ['profile', 'details', 'payment'] });
-      // As this is a new account, not payment method is configured yet so
-      // we should have the credit card form selected by default.
-      cy.get('input[type=checkbox][name=save]').should('be.checked');
-      cy.wait(1000); // Wait for stripe to be loaded
+    // User profile is shown on step, all other steps must be disabled
+    cy.getByDataCy(`progress-step-profile`).contains(userName);
+    cy.get('button[data-cy="cf-next-step"]').click();
 
-      // Ensure we display errors
-      cy.fillStripeInput({ card: { creditCardNumber: 123 } });
-      cy.contains('button', 'Contribute $1,337').click();
-      cy.contains('Credit card ZIP code and CVC are required');
+    // ---- Step Payment ----
+    cy.checkStepsProgress({ enabled: ['profile', 'details', 'payment'] });
+    // As this is a new account, not payment method is configured yet so
+    // we should have the credit card form selected by default.
+    cy.get('input[type=checkbox][name=save]').should('be.checked');
+    cy.wait(1000); // Wait for stripe to be loaded
 
-      // Submit with valid credit card
-      cy.fillStripeInput();
-      cy.contains('button', 'Contribute $1,337').click();
+    // Ensure we display errors
+    cy.fillStripeInput({ card: { creditCardNumber: 123 } });
+    cy.contains('button', 'Contribute $1,337').click();
+    cy.contains('Credit card ZIP code and CVC are required');
 
-      // ---- Final: Success ----
-      cy.getByDataCy('order-success', { timeout: 20000 }).contains('$1,337.00 USD / year');
-      cy.contains(`You are now supporting APEX.`);
+    // Submit with valid credit card
+    cy.fillStripeInput();
+    cy.contains('button', 'Contribute $1,337').click();
 
-      // ---- Let's go back ---
-      cy.go('back');
+    // ---- Final: Success ----
+    cy.getByDataCy('order-success', { timeout: 20000 }).contains('$1,337.00 USD / year');
+    cy.contains(`You are now supporting APEX.`);
 
-      // We're back on the payment step
-      // Previous credit card should be added to the account
-      cy.contains('#PaymentMethod label:first', 'VISA ****');
-      cy.get('#PaymentMethod label:first input[type=radio]').should('be.checked');
+    // ---- Let's go back ---
+    cy.go('back');
 
-      // Submit a new order with existing card
-      cy.contains('button', 'Contribute $1,337').click();
-      cy.getByDataCy('order-success', { timeout: 20000 }).contains('Thank you!');
-    });
+    // We're back on the payment step
+    // Previous credit card should be added to the account
+    cy.contains('#PaymentMethod label:first', 'VISA ****');
+    cy.get('#PaymentMethod label:first input[type=radio]').should('be.checked');
+
+    // Submit a new order with existing card
+    cy.contains('button', 'Contribute $1,337').click();
+    cy.getByDataCy('order-success', { timeout: 20000 }).contains('Thank you!');
   });
 
   it('Can donate as new organization', () => {
-    cy.signup({ redirect: donateRoute, visitParams }).then(() => {
-      cy.get('#amount > :nth-child(3)').click();
-      cy.get('button[data-cy="cf-next-step"]:not([disabled])').click();
-      cy.getByDataCy('contribute-profile-picker').click();
-      cy.contains('[data-cy="select-option"]', 'Create Organization').click();
+    cy.signup({ redirect: donateRoute, visitParams });
 
-      // Fill form
-      cy.getByDataCy('create-collective-mini-form').as('createOrgForm');
-      cy.get('@createOrgForm').find('input[name=name]').type('Evil Corp');
-      cy.get('@createOrgForm').find('input[name=website]').type('https://www.youtube.com/watch?v=oHg5SJYRHA0');
-      cy.get('@createOrgForm').find('button[type=submit]').click();
-      cy.contains('[data-cy="contribute-profile-picker"]', 'Evil Corp');
+    cy.get('#amount > :nth-child(3)').click();
+    cy.get('button[data-cy="cf-next-step"]:not([disabled])').click();
+    cy.getByDataCy('contribute-profile-picker').click();
+    cy.contains('[data-cy="select-option"]', 'Create Organization').click();
 
-      // Name must be shown on step
-      cy.getByDataCy('progress-step-profile').contains('Evil Corp');
+    // Fill form
+    cy.getByDataCy('create-collective-mini-form').as('createOrgForm');
+    cy.get('@createOrgForm').find('input[name=name]').type('Evil Corp');
+    cy.get('@createOrgForm').find('input[name=website]').type('https://www.youtube.com/watch?v=oHg5SJYRHA0');
+    cy.get('@createOrgForm').find('button[type=submit]').click();
+    cy.contains('[data-cy="contribute-profile-picker"]', 'Evil Corp');
 
-      // Submit form
-      cy.get('button[data-cy="cf-next-step"]:not([disabled])').click();
-      cy.wait(2000);
-      cy.fillStripeInput();
-      cy.contains('button', 'Contribute $20').click();
+    // Name must be shown on step
+    cy.getByDataCy('progress-step-profile').contains('Evil Corp');
 
-      // ---- Final: Success ----
-      cy.getByDataCy('order-success', { timeout: 20000 }).contains('$20.00 USD');
-      cy.contains('You are now supporting APEX.');
-    });
+    // Submit form
+    cy.get('button[data-cy="cf-next-step"]:not([disabled])').click();
+    cy.wait(2000);
+    cy.fillStripeInput();
+    cy.contains('button', 'Contribute $20').click();
+
+    // ---- Final: Success ----
+    cy.getByDataCy('order-success', { timeout: 20000 }).contains('$20.00 USD');
+    cy.contains('You are now supporting APEX.');
   });
 
   it('Forces params if given in URL', () => {
-    cy.signup({ redirect: `${donateRoute}/42/year`, visitParams }).then(() => {
-      cy.clock(Date.parse('2042/05/25'));
-      cy.contains('the next charge will be on May 1, 2043');
-      cy.get('button[data-cy="cf-next-step"]').click();
-      cy.checkStepsProgress({ enabled: ['details', 'profile'] });
-      cy.get('button[data-cy="cf-next-step"]').click();
-      cy.wait(2000); // Wait for stripe to be loaded
-      cy.fillStripeInput();
+    cy.signup({ redirect: `${donateRoute}/42/year`, visitParams });
 
-      // Should display the contribution details
-      cy.contains('[data-cy="progress-step-details"]', '$42.00 USD / yr.');
+    cy.clock(Date.parse('2042/05/25'));
+    cy.contains('the next charge will be on May 1, 2043');
+    cy.get('button[data-cy="cf-next-step"]').click();
+    cy.checkStepsProgress({ enabled: ['details', 'profile'] });
+    cy.get('button[data-cy="cf-next-step"]').click();
+    cy.wait(2000); // Wait for stripe to be loaded
+    cy.fillStripeInput();
 
-      // Submit order
-      cy.contains('button', 'Contribute $42').click();
+    // Should display the contribution details
+    cy.contains('[data-cy="progress-step-details"]', '$42.00 USD / yr.');
 
-      // Check success page
-      cy.getByDataCy('order-success', { timeout: 20000 }).contains('$42.00 USD / year');
-      cy.contains('You are now supporting APEX.');
-    });
+    // Submit order
+    cy.contains('button', 'Contribute $42').click();
+
+    // Check success page
+    cy.getByDataCy('order-success', { timeout: 20000 }).contains('$42.00 USD / year');
+    cy.contains('You are now supporting APEX.');
   });
 
   it('works with 3D secure', retriesConfig3DSecure, () => {
@@ -147,23 +147,23 @@ describe('Contribution Flow: Donate', () => {
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.checkStepsProgress({ enabled: ['details', 'profile', 'payment'] });
     cy.wait(3000); // Wait for stripe to be loaded
-    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
+    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE_2 });
     cy.contains('button', 'Contribute $42').click();
     cy.wait(8000); // Wait for order to be submitted and popup to appear
 
     // Rejecting the validation should produce an error
-    cy.complete3dSecure(false);
+    cy.complete3dSecure(false, { version: 2 });
     cy.contains('We are unable to authenticate your payment method.');
 
     // Refill stripe input to avoid using the same token twice
-    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE });
+    cy.fillStripeInput({ card: CreditCards.CARD_3D_SECURE_2 });
 
     // Re-trigger the popup
     cy.contains('button', 'Contribute $42').click();
 
     // Approving the validation should create the order
     cy.wait(8000); // Wait for order to be submitted and popup to appear
-    cy.complete3dSecure(true);
+    cy.complete3dSecure(true, { version: 2 });
     cy.getByDataCy('order-success', { timeout: 20000 });
     cy.contains('You are now supporting APEX.');
   });

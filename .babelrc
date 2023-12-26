@@ -15,7 +15,24 @@
   "plugins": [
     "babel-plugin-react-docgen",
     "babel-plugin-styled-components",
-    "lodash",
+    [
+      "import",
+      {
+        "libraryName": "lodash",
+        "libraryDirectory": "",
+        "camel2DashComponentName": false
+      },
+      "lodash"
+    ],
+    [
+      "import",
+      {
+        "libraryName": "validator",
+        "libraryDirectory": "lib",
+        "camel2DashComponentName": false
+      },
+      "validator"
+    ],
     [
       "babel-plugin-formatjs",
       {
@@ -27,6 +44,9 @@
   "env": {
     "development": {
       "compact": false
+    },
+    "jest": {
+      "plugins": ["require-context-hook"]
     },
     "e2e": {
       "plugins": ["istanbul"]

@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
+import { uniqWith } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 import CollectiveRoles from '../../../lib/constants/roles';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
@@ -261,9 +262,9 @@ const contributionsSectionQuery = gql`
                 backgroundImageUrl(height: 200)
               }
             }
-            # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
-            backers: members(role: [BACKER], limit: 1) {
-              totalCount
+            stats {
+              id
+              contributorsCount
             }
           }
         }
@@ -325,7 +326,7 @@ const SectionContributions = ({ collective }) => {
   const { account, memberOf } = data?.account || {};
   const { hostedAccounts, connectedAccounts } = staticData?.account || {};
   const isOrganization = account?.type === CollectiveType.ORGANIZATION;
-  const availableFilters = getAvailableFilters(memberOf?.roles || [], account);
+  const availableFilters = getAvailableFilters(memberOf?.roles || []);
   const membersLeft = memberOf && memberOf.totalCount - memberOf.nodes.length;
   return (
     <Box pb={4}>
@@ -341,7 +342,7 @@ const SectionContributions = ({ collective }) => {
             </H3>
           )}
         </ContainerSectionContent>
-        {availableFilters?.length > 1 && (
+        {availableFilters.length > 1 && (
           <Box mt={4} mx="auto" maxWidth={Dimensions.MAX_SECTION_WIDTH}>
             <StyledFilters
               filters={availableFilters}
@@ -364,7 +365,10 @@ const SectionContributions = ({ collective }) => {
         >
           <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
             {(!loading || (isLoadingMore && loading)) &&
-              memberOf?.nodes.map(membership => (
+              uniqWith(
+                memberOf?.nodes,
+                (member1, member2) => member1.role === member2.role && member1?.account.id === member2?.account.id,
+              ).map(membership => (
                 <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
                   <StyledMembershipCard membership={membership} />
                 </MembershipCardContainer>

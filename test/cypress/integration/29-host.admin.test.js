@@ -1,6 +1,6 @@
 import { Sections } from '../../../components/collective-page/_constants';
 
-import { randomSlug } from '../support/faker';
+import { randomSlug, randStr } from '../support/faker';
 
 const scrollToSection = section => {
   // Wait for collective page to load before disabling smooth scroll
@@ -30,9 +30,11 @@ describe('host dashboard', () => {
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
       cy.login({ redirect: '/brusselstogetherasbl/admin' });
-      cy.get('[data-cy="menu-item-pending-applications"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
+      cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
-      cy.contains(`[data-cy="host-application"]`, 'Approved');
+      cy.contains(`[data-cy="host-application-header-${collectiveSlug}"]`, 'Approved');
     });
   });
 
@@ -51,9 +53,12 @@ describe('host dashboard', () => {
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
       cy.login({ redirect: '/brusselstogetherasbl/admin' });
-      cy.get('[data-cy="menu-item-pending-applications"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
+      cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
-      cy.contains(`[data-cy="host-application"]`, 'Approved');
+      cy.contains(`[data-cy="host-application-header-${collectiveSlug}"]`, 'Approved');
+      cy.get(`[data-cy="close-drawer"]`).click();
       cy.getByDataCy('menu-item-hosted-collectives').click();
       cy.getByDataCy(`${collectiveSlug}-collective-card`).within(() => {
         cy.get('button[title="More options"]').click();
@@ -78,9 +83,12 @@ describe('host dashboard', () => {
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
       cy.login({ redirect: '/brusselstogetherasbl/admin' });
-      cy.get('[data-cy="menu-item-pending-applications"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
+      cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
-      cy.contains(`[data-cy="host-application"]`, 'Approved');
+      cy.contains(`[data-cy="host-application-header-${collectiveSlug}"]`, 'Approved');
+      cy.get('[data-cy="close-drawer"]').click();
       cy.getByDataCy('menu-item-hosted-collectives').click();
       cy.getByDataCy(`${collectiveSlug}-collective-card`).within(() => {
         cy.get('[data-cy="hosted-collective-add-funds-btn"]').click();
@@ -89,7 +97,7 @@ describe('host dashboard', () => {
       cy.get('[data-cy="add-funds-amount"]').type('20');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
       cy.get('[data-cy="add-funds-source"]').type(collectiveSlug);
-      cy.contains(`@${collectiveSlug}`).click();
+      cy.contains(`@brusselstogetherasbl`).click();
       cy.get('[data-cy="add-funds-submit-btn"]').click();
       cy.contains('button', 'Finish').click();
       cy.contains('button', 'Finish').should('not.exist');
@@ -118,68 +126,112 @@ describe('host dashboard', () => {
   });
 
   describe('Pending `Contributions', () => {
-    it('Create new pending contribution', () => {
+    it('Create new pending contribution, edit it and mark it as paid', () => {
+      // Create contribution
       cy.login({ redirect: '/brusselstogetherasbl/admin/pending-contributions' });
       cy.get('[data-cy="create-pending-contribution"]:first').click();
       cy.get('[data-cy="create-pending-contribution-to"]:first').type('Veganizer');
-      cy.wait(2000);
       cy.contains('[data-cy=select-option]', 'Veganizer BXL').click();
       cy.get('[data-cy="create-pending-contribution-child"]:first').click();
       cy.contains('[data-cy=select-option]', 'None').click();
       cy.get('[data-cy="create-pending-contribution-source"]:first').type('Xavier');
-      cy.wait(2000);
       cy.contains('[data-cy=select-option]', 'Xavier').click();
       cy.get('[data-cy="create-pending-contribution-contact-name"]:first').type('Xavier');
       cy.get('[data-cy="create-pending-contribution-fromAccountInfo-email"').type('yourname@yourhost.com');
       cy.get('[data-cy="create-pending-contribution-amount"]:first').type('500');
+      cy.get('input#CreatePendingContribution-hostFeePercent').type('5'); // 5%
       cy.get('[data-cy="create-pending-contribution-expectedAt"]:first').click();
       cy.contains('[data-cy=select-option]', '1 month').click();
+      const description = `Generous donation ${randStr()}`;
+      cy.getByDataCy('create-pending-contribution-description').type(description);
       cy.get('[data-cy="create-pending-contribution-submit-btn"]:first').click();
-      cy.wait(2000);
-      cy.get('[data-cy="expense-title"]:first').click();
-      cy.contains('[data-cy="expense-description"]', 'Financial contribution to Veganizer BXL');
-      cy.get('[data-cy="MARK_AS_EXPIRED-button"]:first').click();
-      cy.get('[data-cy="confirmation-modal-continue"]:first').click();
-      cy.contains('[data-cy="order-status-msg"]', 'Expired');
-      cy.get('[data-cy="MARK_AS_PAID-button"]:first').click();
-      cy.get('[data-cy="payment-processor-fee"]').clear().type('4');
-      cy.get('[data-cy="platform-tip"]').clear().type('10');
-      cy.get('[data-cy="host-fee-percent"]').clear().type('9');
+      cy.contains('[data-cy="order-PENDING"]:first', description).as('createdContribution');
+      cy.get('@createdContribution').should('contain', 'Pending');
+      cy.get('@createdContribution').should('contain', 'for Veganizer BXL from Xavier');
+      cy.get('@createdContribution').should('contain', '€500.00');
+
+      // Go to contribution page
+      cy.get('@createdContribution').find('[data-cy=contribution-title]').click();
+      cy.getByDataCy('contribution-page-content'); // Wait for page to be loaded
+
+      // Mark as expired
+      cy.getByDataCy('MARK_AS_EXPIRED-button').click();
+      cy.get('[data-cy="MARK_AS_EXPIRED-confirmation-modal"] [data-cy="confirmation-modal-continue"]').click();
+      cy.checkToast({ variant: 'success', message: 'The contribution has been marked as expired' });
+      cy.contains('[data-cy=order-status-msg]', 'Expired');
+
+      // Mark as paid
+      cy.getByDataCy('MARK_AS_PAID-button').click();
+      cy.getByDataCy('payment-processor-fee').clear().type('4');
+      cy.getByDataCy('platform-tip').clear().type('10');
+      cy.getByDataCy('host-fee-percent').clear().type('9');
       cy.getByDataCy('order-confirmation-modal-submit').click();
-      cy.contains('span', '€490.00');
-      cy.contains('span', '-€44.10');
-      cy.contains('[data-cy="order-status-msg"]:first', 'Paid');
+      cy.contains('[data-cy="order-status-msg"]', 'Paid');
+
+      // Check transactions
+      cy.get('[data-cy=transaction-details-wrapper]:nth-child(1)')
+        .should('contain', description)
+        .should('contain', '€490.00')
+        .should('contain', 'Received by Veganizer BXL')
+        .should('contain', '-€4.00 EUR (Payment Processor Fee)');
+
+      cy.get('[data-cy=transaction-details-wrapper]:nth-child(2)')
+        .should('contain', 'Host Fee')
+        .should('contain', '-€44.10 EUR')
+        .should('contain', 'Paid by Veganizer BXL');
+
+      cy.get('[data-cy=transaction-details-wrapper]:nth-child(3)')
+        .should('contain', 'Financial contribution to Open Collective')
+        .should('contain', '-€10.00 EUR')
+        .should('contain', 'Paid by Xavier Damma');
     });
   });
 
   describe('expenses tab', () => {
-    let expense;
-
     before(() => {
       // 207 - BrusselsTogether
       cy.createExpense({
         userEmail: user.email,
         account: { legacyId: 207 },
         payee: { legacyId: user.CollectiveId },
-      }).then(e => (expense = e));
+      }).as('expense');
     });
 
-    it('Process expense', () => {
-      cy.login({ redirect: '/brusselstogetherasbl/admin/expenses' });
-      cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
+    it('Process host expense', () => {
+      cy.get('@expense').then(expense => {
+        cy.login({ redirect: `/brusselstogether/expenses/${expense.legacyId}` });
+      });
 
       // Defaults to pending, approve it
-      cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Pending');
-      cy.get('@currentExpense').find('[data-cy="approve-button"]').click();
-      cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Approved');
+      cy.contains('More actions').click();
+      cy.contains('Approve').click();
+      cy.getByDataCy('expense-status-msg').contains('Approved');
+
+      cy.visit('/brusselstogetherasbl/admin/expenses?status=ALL');
+      cy.get('@expense').then(expense => {
+        cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
+      });
 
       // Unapprove
-      cy.get('@currentExpense').find('[data-cy="unapprove-button"]').click();
+      cy.get('@currentExpense').find('[data-cy="request-re-approval-button"]').click();
+      cy.contains('Confirm and request re-approval').click();
       cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Pending');
 
       // Approve
-      cy.get('@currentExpense').find('[data-cy="approve-button"]').click();
-      cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Approved');
+
+      cy.get('@expense').then(expense => {
+        cy.login({ redirect: `/brusselstogether/expenses/${expense.legacyId}` });
+      });
+
+      // Defaults to pending, approve it
+      cy.contains('More actions').click();
+      cy.contains('Approve').click();
+      cy.getByDataCy('expense-status-msg').contains('Approved');
+
+      cy.visit('/brusselstogetherasbl/admin/expenses?status=ALL');
+      cy.get('@expense').then(expense => {
+        cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
+      });
 
       // Security Check
       cy.get('@currentExpense').find('[data-cy="pay-button"]').click();
@@ -202,12 +254,9 @@ describe('host dashboard', () => {
       cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Approved');
 
       // Unapprove
-      cy.get('@currentExpense').find('[data-cy="unapprove-button"]').click();
+      cy.get('@currentExpense').find('[data-cy="request-re-approval-button"]').click({ force: true });
+      cy.contains('Confirm and request re-approval').click();
       cy.get('@currentExpense').find('[data-cy="expense-status-msg"]').contains('Pending');
-
-      // Reject
-      cy.get('@currentExpense').find('[data-cy="reject-button"]').click();
-      cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Rejected');
     });
   });
 

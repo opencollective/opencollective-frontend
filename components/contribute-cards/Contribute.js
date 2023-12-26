@@ -30,7 +30,10 @@ const StyledContributeCard = styled.div`
   border-radius: ${CONTRIBUTE_CARD_BORDER_RADIUS}px;
   border: 1px solid #dcdee0;
   background: white;
-  transition: border-color 0.2s, box-shadow 0.2s, opacity 0.2s; // Opacity for DragNDrop
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    opacity 0.2s; // Opacity for DragNDrop
 
   &:hover {
     /* Primitives / OC Blue */
@@ -83,15 +86,18 @@ const Description = styled.div`
   color: #4e5052;
 `;
 
+const MissingCTAExplanation = styled(Description)`
+  flex: 0;
+  font-style: italic;
+  font-size: 12px;
+  padding-bottom: 4px;
+`;
+
 /** Translations */
 const I18nContributionType = defineMessages({
   [ContributionTypes.FINANCIAL_CUSTOM]: {
     id: 'ContributionType.Custom',
     defaultMessage: 'Custom contribution',
-  },
-  [ContributionTypes.FINANCIAL_CRYPTO]: {
-    id: 'ContributionType.Crypto',
-    defaultMessage: 'Crypto contribution',
   },
   [ContributionTypes.FINANCIAL_ONE_TIME]: {
     id: 'ContributionType.OneTime',
@@ -171,6 +177,18 @@ const getFooterHeading = type => {
   }
 };
 
+const getFooterMessage = type => {
+  switch (type) {
+    case ContributionTypes.TICKET:
+    case ContributionTypes.EVENT_PARTICIPATE:
+      return <FormattedMessage defaultMessage="Be the first one to attend!" />;
+    case ContributionTypes.EVENT_PASSED:
+      return <FormattedMessage defaultMessage="No attendees" />;
+    default:
+      return <FormattedMessage defaultMessage="Be the first one to contribute!" />;
+  }
+};
+
 const getCTAButtonStyle = type => {
   if (type === ContributionTypes.TICKET) {
     return 'secondary';
@@ -200,6 +218,7 @@ const ContributeCard = ({
   onClickEdit,
   tier,
   isPreview,
+  missingCTAMsg,
   ...props
 }) => {
   const totalContributors = (stats && stats.all) || (contributors && contributors.length) || 0;
@@ -231,37 +250,50 @@ const ContributeCard = ({
             {title}
           </Container>
           <Description data-cy="contribute-description">{children}</Description>
+          {(hideCTA || disableCTA) && missingCTAMsg && <MissingCTAExplanation>{missingCTAMsg}</MissingCTAExplanation>}
         </Flex>
         <Box>
           {!disableCTA && !hideCTA && (
             <Link href={route}>
-              <StyledButton buttonStyle={getCTAButtonStyle(type)} width={1} mb={2} mt={3} data-cy="contribute-btn">
+              <StyledButton
+                buttonStyle={getCTAButtonStyle(type)}
+                width={1}
+                mb={2}
+                mt={3}
+                truncateOverflow
+                data-cy="contribute-btn"
+              >
                 {buttonText || getContributeCTA(type)}
               </StyledButton>
             </Link>
           )}
           {!hideContributors && (
             <Box mt={3} height={60}>
-              {contributors && contributors.length > 0 && (
-                <React.Fragment>
-                  <Flex alignItems="center" mt={3} mb={2}>
-                    <P
-                      color="black.700"
-                      fontSize="12px"
-                      lineHeight="16px"
-                      fontWeight="500"
-                      letterSpacing="0.06em"
-                      pr={2}
-                      textTransform="uppercase"
-                      whiteSpace="nowrap"
-                    >
-                      {getFooterHeading(type)}
-                    </P>
-                    <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-                  </Flex>
-                  <Flex>
-                    {contributors.slice(0, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD).map(contributor => (
-                      <Box key={contributor.id} mx={1}>
+              <React.Fragment>
+                <Flex alignItems="center" mt={3} mb={2}>
+                  <P
+                    color="black.700"
+                    fontSize="12px"
+                    lineHeight="16px"
+                    fontWeight="500"
+                    letterSpacing="0.06em"
+                    pr={2}
+                    textTransform="uppercase"
+                    whiteSpace="nowrap"
+                  >
+                    {getFooterHeading(type)}
+                  </P>
+                  <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+                </Flex>
+              </React.Fragment>
+              {totalContributors === 0 ? (
+                <div className="pt-2 text-sm text-slate-600">{getFooterMessage(type)}</div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  {contributors &&
+                    contributors.length > 0 &&
+                    contributors.slice(0, MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD).map(contributor => (
+                      <Box key={contributor.id}>
                         {contributor.collectiveSlug ? (
                           <Link href={`/${contributor.collectiveSlug}`} title={contributor.name}>
                             <ContributorAvatar contributor={contributor} radius={32} />
@@ -271,13 +303,12 @@ const ContributeCard = ({
                         )}
                       </Box>
                     ))}
-                    {totalContributors > MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD && (
-                      <Container ml={2} pt="0.7em" fontSize="11px" fontWeight="bold" color="black.600">
-                        + {totalContributors - MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD}
-                      </Container>
-                    )}
-                  </Flex>
-                </React.Fragment>
+                  {totalContributors > MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD && (
+                    <div className="text-xs text-slate-600">
+                      + {totalContributors - MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD}
+                    </div>
+                  )}
+                </div>
               )}
             </Box>
           )}
@@ -337,6 +368,7 @@ ContributeCard.propTypes = {
   collective: PropTypes.object,
   isPreview: PropTypes.bool,
   onClickEdit: PropTypes.func,
+  missingCTAMsg: PropTypes.string,
 };
 
 export default injectIntl(ContributeCard);

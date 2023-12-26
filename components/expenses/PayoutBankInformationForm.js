@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { Field, useFormikContext } from 'formik';
 import { get, kebabCase, partition, set } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { createError, ERROR } from '../../lib/errors';
+import { formatFormErrorMessage } from '../../lib/form-utils';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import { I18nSupportLink } from '../I18nFormatters';
@@ -22,12 +24,16 @@ import { P, Span } from '../Text';
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
 const formatTransferWiseSelectOptions = values => values.map(({ key, name }) => ({ label: name, value: key }));
 
-const TW_API_COLLECTIVE_SLUG = process.env.TW_API_COLLECTIVE_SLUG;
+const WISE_PLATFORM_COLLECTIVE_SLUG = process.env.WISE_PLATFORM_COLLECTIVE_SLUG || process.env.TW_API_COLLECTIVE_SLUG;
 
 export const msg = defineMessages({
   currency: {
     id: 'Currency',
     defaultMessage: 'Currency',
+  },
+  fieldRequired: {
+    id: 'FieldRequired',
+    defaultMessage: '{name} is required.',
   },
 });
 
@@ -48,6 +54,8 @@ const requiredFieldsQuery = gql`
               type
               required
               example
+              minLength
+              maxLength
               validationRegexp
               refreshRequirementsOnChange
               valuesAllowed {
@@ -77,20 +85,33 @@ const CUSTOM_METHOD_LABEL_BY_CURRENCY = {
   },
 };
 
+const validateRequiredInput = (intl, input, required) =>
+  required ? value => (value ? undefined : intl.formatMessage(msg.fieldRequired, { name: input.name })) : undefined;
+
 const Input = ({ input, getFieldName, disabled, currency, loading, refetch, formik, host }) => {
+  const intl = useIntl();
   const isAccountHolderName = input.key === 'accountHolderName';
   const fieldName = isAccountHolderName ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
   const required = disabled ? false : input.required;
-  let validate = required ? value => (value ? undefined : `${input.name} is required`) : undefined;
+  const submitted = Boolean(formik.submitCount);
+  let validate = validateRequiredInput(intl, input, required);
   if (input.type === 'text') {
-    if (input.validationRegexp) {
+    if (input.validationRegexp || input.minLength || input.maxLength) {
       validate = value => {
-        const matches = new RegExp(input.validationRegexp).test(value);
-        // TODO(intl): This should be internationalized, ideally with `formatFormErrorMessage`
         if (!value && required) {
-          return `${input.name} is required`;
-        } else if (!matches && value) {
-          return input.validationError || `Invalid ${input.name}`;
+          return formatFormErrorMessage(intl, createError(ERROR.FORM_FIELD_REQUIRED));
+        }
+        if (input.validationRegexp) {
+          const matches = new RegExp(input.validationRegexp).test(value);
+          if (!matches && value) {
+            return input.validationError || formatFormErrorMessage(intl, createError(ERROR.FORM_FIELD_PATTERN));
+          }
+        }
+        if (value && input.minLength && value.length < input.minLength) {
+          return input.validationError || formatFormErrorMessage(intl, createError(ERROR.FORM_FIELD_MIN_LENGTH));
+        }
+        if (value && input.maxLength && value.length > input.maxLength) {
+          return input.validationError || formatFormErrorMessage(intl, createError(ERROR.FORM_FIELD_MAX_LENGTH));
         }
       };
     }
@@ -103,7 +124,7 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
               labelFontSize="13px"
               required={required}
               hideOptionalLabel={disabled}
-              error={(meta.touched || disabled) && meta.error}
+              error={(meta.touched || disabled || submitted) && meta.error}
               hint={input.hint}
             >
               {() => {
@@ -113,9 +134,11 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
                     <StyledInput
                       {...field}
                       placeholder={input.example}
-                      error={(meta.touched || disabled) && meta.error}
+                      error={(meta.touched || disabled || submitted) && meta.error}
                       disabled={disabled}
                       width="100%"
+                      maxLength={input.maxLength}
+                      minLength={input.minLength}
                       value={inputValue || ''}
                     />
                     {isAccountHolderName && inputValue && inputValue.match(/^[^\s]{1}\b/) && (
@@ -144,14 +167,14 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
               labelFontSize="13px"
               required={required}
               hideOptionalLabel={disabled}
-              error={(meta.touched || disabled) && meta.error}
+              error={(meta.touched || disabled || submitted) && meta.error}
               hint={input.hint}
             >
               {() => (
                 <StyledInput
                   {...field}
                   type="date"
-                  error={(meta.touched || disabled) && meta.error}
+                  error={(meta.touched || disabled || submitted) && meta.error}
                   disabled={disabled}
                   width="100%"
                   value={get(formik.values, field.name) || ''}
@@ -173,13 +196,13 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
               labelFontSize="13px"
               required={required}
               hideOptionalLabel={disabled}
-              error={(meta.touched || disabled) && meta.error}
+              error={(meta.touched || disabled || submitted) && meta.error}
             >
               {() => (
                 <StyledSelect
                   inputId={field.name}
                   disabled={disabled}
-                  error={(meta.touched || disabled) && meta.error}
+                  error={(meta.touched || disabled || submitted) && meta.error}
                   isLoading={loading && !options.length}
                   name={field.name}
                   options={options}
@@ -188,7 +211,7 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
                     formik.setFieldValue(field.name, value);
                     if (input.refreshRequirementsOnChange) {
                       refetch({
-                        slug: host ? host.slug : TW_API_COLLECTIVE_SLUG,
+                        slug: host ? host.slug : WISE_PLATFORM_COLLECTIVE_SLUG,
                         currency,
                         accountDetails: get(set({ ...formik.values }, field.name, value), getFieldName('data')),
                       });
@@ -243,6 +266,7 @@ FieldGroup.propTypes = {
 };
 
 const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
+  const intl = useIntl();
   const { loading, error, data, refetch } = useQuery(requiredFieldsQuery, {
     context: API_V2_CONTEXT,
     // A) If `fixedCurrency` was passed in PayoutBankInformationForm (2) (3)
@@ -250,7 +274,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     // B) If `host` is set, we expect to be in 2 cases:
     //      * The Collective Host has Wise configured and we should be able to fetch `requiredFields` from it
     //      * The Collective Host doesn't have Wise configured and `host` is already switched to the Platform account
-    variables: { slug: host ? host.slug : TW_API_COLLECTIVE_SLUG, currency },
+    variables: { slug: host ? host.slug : WISE_PLATFORM_COLLECTIVE_SLUG, currency },
   });
 
   // Make sure we load the form data on initial load. Otherwise certain form fields such
@@ -292,7 +316,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   }
 
   const transactionTypeValues = data.host.transferwise.requiredFields.map(rf => ({
-    label: CUSTOM_METHOD_LABEL_BY_CURRENCY?.[currency]?.requiredFields?.options?.[rf.type] || rf.title,
+    label: CUSTOM_METHOD_LABEL_BY_CURRENCY[currency]?.requiredFields?.options?.[rf.type] || rf.title,
     value: rf.type,
   }));
   // Some currencies offer different methods for the transaction
@@ -306,21 +330,27 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
 
   const transactionMethodFieldName = getFieldName('data.type');
   const transactionMethod = get(formik.values, transactionMethodFieldName);
+  const submitted = Boolean(formik.submitCount);
+
+  const transactionMethodLabel =
+    CUSTOM_METHOD_LABEL_BY_CURRENCY[currency]?.requiredFields?.label ||
+    intl.formatMessage({
+      id: 'PayoutBankInformationForm.TransactionMethod',
+
+      defaultMessage: 'Transaction Method',
+    });
 
   return (
     <Flex flexDirection="column">
-      <Field name={getFieldName('data.type')}>
-        {({ field }) => (
+      <Field
+        name={getFieldName('data.type')}
+        validate={validateRequiredInput(intl, { name: transactionMethodLabel }, !disabled)}
+      >
+        {({ field, meta }) => (
           <StyledInputField
             name={field.name}
-            label={
-              CUSTOM_METHOD_LABEL_BY_CURRENCY?.[currency]?.requiredFields?.label || (
-                <FormattedMessage
-                  id="PayoutBankInformationForm.TransactionMethod"
-                  defaultMessage="Transaction Method"
-                />
-              )
-            }
+            label={transactionMethodLabel}
+            error={(meta.touched || disabled || submitted) && meta.error}
             labelFontSize="13px"
             mt={3}
             mb={2}
@@ -337,6 +367,8 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
                 options={transactionTypeValues}
                 value={transactionTypeValues.find(method => method.value === availableMethods?.type) || null}
                 disabled={disabled}
+                error={(meta.touched || disabled || submitted) && meta.error}
+                required
               />
             )}
           </StyledInputField>
@@ -443,7 +475,7 @@ const availableCurrenciesQuery = gql`
 const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, ignoreBlockedCurrencies, optional }) => {
   const { data, loading } = useQuery(availableCurrenciesQuery, {
     context: API_V2_CONTEXT,
-    variables: { slug: TW_API_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
+    variables: { slug: WISE_PLATFORM_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
     // Skip fetching/loading if the currency is fixed (2) (3)
     // Or if availableCurrencies is already available. Expense Flow + Host with Wise configured (1)
     skip: Boolean(fixedCurrency || host?.transferwise?.availableCurrencies),
@@ -473,7 +505,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
     return (
       <MessageBox fontSize="12px" type="warning">
         <FormattedMessage
-          defaultMessage="An error ocurred while preparing the form for bank accounts. Please contact <I18nSupportLink>support</I18nSupportLink>"
+          defaultMessage="An error occurred while preparing the form for bank accounts. Please contact <I18nSupportLink>support</I18nSupportLink>"
           values={{ I18nSupportLink }}
         />
       </MessageBox>

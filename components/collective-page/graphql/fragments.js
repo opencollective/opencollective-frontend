@@ -1,29 +1,4 @@
-import { gql } from '@apollo/client';
-
 import { gqlV1 } from '../../../lib/graphql/helpers';
-
-/**
- * Fields fetched for updates
- */
-export const updatesFieldsFragment = gqlV1/* GraphQL */ `
-  fragment UpdatesFields on UpdateType {
-    id
-    slug
-    title
-    summary
-    createdAt
-    publishedAt
-    isPrivate
-    userCanSeeUpdate
-    fromCollective {
-      id
-      type
-      name
-      slug
-      imageUrl
-    }
-  }
-`;
 
 /**
  * Fields fetched for contributors
@@ -64,7 +39,6 @@ export const collectiveNavbarFieldsFragment = gqlV1/* GraphQL */ `
     PROJECTS
     USE_EXPENSES
     RECEIVE_EXPENSES
-    USE_EXPENSES
     COLLECTIVE_GOALS
     TOP_FINANCIAL_CONTRIBUTORS
     CONVERSATIONS
@@ -183,85 +157,4 @@ export const contributeCardProjectFieldsFragment = gqlV1/* GraphQL */ `
     }
   }
   ${contributeCardContributorFieldsFragment}
-`;
-
-export const processingOrderFragment = gql`
-  fragment ProcessingOrderFields on Order {
-    id
-    legacyId
-    nextChargeDate
-    paymentMethod {
-      id
-      service
-      name
-      type
-      expiryDate
-      data
-      balance {
-        value
-        valueInCents
-        currency
-      }
-    }
-    amount {
-      value
-      valueInCents
-      currency
-    }
-    totalAmount {
-      value
-      valueInCents
-      currency
-    }
-    status
-    description
-    createdAt
-    frequency
-    tier {
-      id
-      name
-    }
-    totalDonations {
-      value
-      valueInCents
-      currency
-    }
-    fromAccount {
-      id
-      name
-      slug
-      isIncognito
-      type
-    }
-    toAccount {
-      id
-      slug
-      name
-      type
-      description
-      tags
-      imageUrl
-      settings
-      ... on AccountWithHost {
-        host {
-          id
-          slug
-          paypalClientId
-          supportedPaymentMethods
-        }
-      }
-      ... on Organization {
-        host {
-          id
-          slug
-          paypalClientId
-          supportedPaymentMethods
-        }
-      }
-    }
-    platformTipAmount {
-      value
-      valueInCents
-    }
-  }
 `;

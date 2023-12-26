@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
+import { getWebsiteUrl } from '../lib/utils';
+
 import SettingsSectionTitle from './edit-collective/sections/SettingsSectionTitle';
 import Container from './Container';
 import { Box } from './Grid';
@@ -13,7 +15,7 @@ import { Label, Strong } from './Text';
 const ParameterColumnHeader = styled.th`
   font-size: 12px;
   font-weight: bold;
-  padding: 0.1rem 1rem 0.1rem 0;
+  padding: 0.05rem 0.65rem 0.05rem 0;
 `;
 
 class ExportImages extends React.Component {
@@ -28,7 +30,7 @@ class ExportImages extends React.Component {
 
   render() {
     const { collective } = this.props;
-
+    const websiteUrl = getWebsiteUrl();
     if (collective.tiers.length === 0) {
       return <div />;
     }
@@ -41,8 +43,8 @@ class ExportImages extends React.Component {
         images: [
           {
             name: 'Tier badge',
-            url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${encodedTierName}&color=brightgreen`,
-            code: `<img alt="open collective badge" src="https://opencollective.com/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${encodedTierName}&color=brightgreen" />`,
+            url: `${websiteUrl}/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${encodedTierName}&color=brightgreen`,
+            code: `<img alt="open collective badge" src="${websiteUrl}/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${encodedTierName}&color=brightgreen" />`,
             options: [
               {
                 name: 'label',
@@ -58,8 +60,8 @@ class ExportImages extends React.Component {
           },
           {
             name: 'Financial contributors widget',
-            url: `https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36`,
-            code: `<object type="image/svg+xml" data="https://opencollective.com/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36&width=600"></object>`,
+            url: `${websiteUrl}/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36`,
+            code: `<object type="image/svg+xml" data="${websiteUrl}/${collective.slug}/tiers/${tier.slug}.svg?avatarHeight=36&width=600"></object>`,
             options: [
               {
                 name: 'width',
@@ -171,15 +173,11 @@ class ExportImages extends React.Component {
           <FormattedMessage id="ExportImages.AllFinancial" defaultMessage="All financial contributors badge" />
         </SettingsSectionTitle>
         <Box mb={2}>
-          <StyledLink
-            fontSize="14px"
-            openInNewTab
-            href={`https://opencollective.com/${collective.slug}/tiers/badge.svg`}
-          >
-            {`https://opencollective.com/${collective.slug}/tiers/badge.svg`}
+          <StyledLink fontSize="14px" openInNewTab href={`${websiteUrl}/${collective.slug}/tiers/badge.svg`}>
+            {`${websiteUrl}/${collective.slug}/tiers/badge.svg`}
           </StyledLink>
         </Box>
-        <img alt="open collective badge" src={`https://opencollective.com/${collective.slug}/tiers/badge.svg`} />
+        <img alt="open collective badge" src={`${websiteUrl}/${collective.slug}/tiers/badge.svg`} />
       </div>
     );
   }

@@ -140,7 +140,7 @@ class HeroEventDetails extends React.Component {
           </HeroNote>
         )}
 
-        {location.name && (
+        {location?.name && (
           <HeroNote>
             <MapPin size={16} />
             <Link href="#section-location">

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
+import { Calendar, Store, TestTube2 } from 'lucide-react';
 import styled from 'styled-components';
 import { border, BorderProps, color, layout, space } from 'styled-system';
 
@@ -10,6 +11,11 @@ import { getAvatarBorderRadius, getCollectiveImage } from '../lib/image-utils';
 import { Flex, FlexProps } from './Grid';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
+
+const COLLECTIVE_TYPE_ICON = {
+  [CollectiveType.EVENT]: Calendar,
+  [CollectiveType.PROJECT]: TestTube2,
+};
 
 type StyledAvatarProps = FlexProps &
   BorderProps & {
@@ -46,14 +52,29 @@ const StyledAvatar = styled(Flex).attrs<StyledAvatarProps>(props => ({
   ${layout}
 `;
 
+/**
+ * Returns the max avatar height multiplied by 2 (for retina screens)
+ */
+const getImageHeightFromRadius = (radius: string | number | string[] | number[]): number | undefined => {
+  const normalizeValue = (value: string | number) => (typeof value === 'string' ? parseInt(value, 10) : value);
+  if (Array.isArray(radius)) {
+    return !radius.length ? undefined : Math.max(...radius.map(normalizeValue)) * 2;
+  } else {
+    return normalizeValue(radius) * 2;
+  }
+};
+
 const Avatar = ({
   collective = null,
   src = undefined,
   type = 'USER',
   radius = 42,
   name = undefined,
+  useIcon = false,
+  children = null,
   ...styleProps
 }) => {
+  let child = children;
   // Use collective object instead of props
   if (collective) {
     type = collective.type;
@@ -62,15 +83,32 @@ const Avatar = ({
       src = defaultImage.ANONYMOUS;
     } else if (collective.isGuest && shouldUseDefaultGuestAvatar(collective.name)) {
       src = defaultImage.GUEST;
-    } else if (type === 'VENDOR') {
-      src = defaultImage.ORGANIZATION;
+    } else if (type === 'VENDOR' && collective.hasImage !== true) {
+      const iconSize = 2 * Math.round((radius * 0.6) / 2);
+      const padding = (radius - iconSize) / 2;
+      child = (
+        <div className="rounded-sm bg-slate-100  text-slate-300" style={{ padding }}>
+          <Store size={iconSize} />
+        </div>
+      );
+    } else if (useIcon) {
+      const Icon = COLLECTIVE_TYPE_ICON[type];
+      if (Icon) {
+        child = <Icon size={radius} />;
+      }
     } else {
-      src = getCollectiveImage(collective);
+      src = getCollectiveImage(collective, { height: getImageHeightFromRadius(radius) });
+    }
+
+    if (!src && !child) {
+      if ((type === 'USER' || type === 'INDIVIDUAL') && name) {
+        child = <span>{getInitials(name)}</span>;
+      }
     }
   }
   return (
     <StyledAvatar size={radius} type={type} src={src} title={name} {...styleProps}>
-      {!src && (type === 'USER' || type === 'INDIVIDUAL') && name && <span>{getInitials(name)}</span>}
+      {child}
     </StyledAvatar>
   );
 };
@@ -91,7 +129,10 @@ Avatar.propTypes = {
   src: PropTypes.string,
   /** Collective type */
   type: PropTypes.oneOf(Object.keys(CollectiveType)),
-  /** Avatar size */
+  /**
+   Avatar size.
+   TODO: This prop name is confusing. It's not a radius, it's a diameter. We should call it "size"
+   */
   radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   /** Duration to transition size. Disabled if 0, null or undefined */
   animationDuration: PropTypes.number,
@@ -99,6 +140,8 @@ Avatar.propTypes = {
   backgroundSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /* Color of the background */
   backgroundColor: PropTypes.string,
+  /* If true, will display a default icon instead of image */
+  useIcon: PropTypes.bool,
 };
 
 const shouldUseDefaultGuestAvatar = name => {

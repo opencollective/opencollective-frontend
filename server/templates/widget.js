@@ -18,11 +18,20 @@
     const widget = data.id.substr(0, data.id.indexOf('-'));
     for (let i = 0; i < window.OC.widgets[widget].length; i++) {
       if (window.OC.widgets[widget][i].id === data.id) {
-        window.OC.widgets[widget][i].iframe.height = data.height + 10;
         window.OC.widgets[widget][i].loading.style.display = 'none';
+        window.OC.widgets[widget][i].iframe.height = data.height + 10;
+        window.OC.widgets[widget][i].onResize();
         return;
       }
     }
+  });
+  window.addEventListener('resize', () => {
+    if (!window.OC || !window.OC.widgets) {
+      return;
+    }
+
+    const allWidgets = Object.values(window.OC.widgets).flat();
+    allWidgets.forEach(widget => widget.onResize());
   });
 
   function css(selector, property) {
@@ -64,6 +73,10 @@
       );
     };
 
+    this.onResize = () => {
+      this.iframe.width = this.getContainerWidth();
+    };
+
     this.getAttributes = () => {
       const attributes = {};
       [].slice.call(this.anchor.attributes).forEach(attr => {
@@ -78,6 +91,7 @@
 
     const attributes = this.getAttributes();
     const limit = attributes.limit || 10;
+    const useNewFormat = attributes['data-use-new-format'] || false;
     const width = attributes.width || this.getContainerWidth();
     const height = attributes.height || 0;
     this.loading = document.createElement('div');
@@ -88,7 +102,7 @@
     this.loading.appendChild(this.logo);
     this.iframe = document.createElement('iframe');
     this.iframe.id = this.id;
-    this.iframe.src = `{{host}}/${collectiveSlug}/${widget}.html?limit=${limit}&id=${this.id}&style=${style}`;
+    this.iframe.src = `{{host}}/${collectiveSlug}/${widget}.html?limit=${limit}&id=${this.id}&style=${style}&useNewFormat=${useNewFormat}`;
     this.iframe.width = width;
     this.iframe.height = height;
     this.iframe.frameBorder = 0;

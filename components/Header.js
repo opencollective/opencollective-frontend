@@ -27,6 +27,7 @@ class Header extends React.Component {
     css: PropTypes.string,
     className: PropTypes.string,
     title: PropTypes.string,
+    navTitle: PropTypes.string,
     metaTitle: PropTypes.string,
     showSearch: PropTypes.bool,
     showProfileAndChangelogMenu: PropTypes.bool,
@@ -37,6 +38,7 @@ class Header extends React.Component {
     /** @ignore from injectIntl */
     intl: PropTypes.object,
     LoggedInUser: PropTypes.object,
+    loading: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -120,9 +122,12 @@ class Header extends React.Component {
         <div id="top" />
         {withTopBar && (
           <TopBar
+            account={this.props.collective}
             showSearch={this.props.showSearch}
             menuItems={this.props.menuItems}
             showProfileAndChangelogMenu={this.props.showProfileAndChangelogMenu}
+            navTitle={this.props.navTitle}
+            loading={this.props.loading}
           />
         )}
         <GlobalWarnings collective={this.props.collective} />

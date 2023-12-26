@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { countryData, getEmojiByCountryCode } from 'country-currency-emoji-flags';
+import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
 import { isUndefined, orderBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import fetchGeoLocation from '../lib/geolocation_api';
+import { CountryIso } from '../lib/graphql/types/v2/graphql';
 import { getIntlDisplayNames } from '../lib/i18n';
 
 import { Flex } from './Grid';
@@ -72,7 +73,7 @@ class InputTypeCountry extends Component {
   }
 
   getOptions = memoizeOne(locale => {
-    const options = Object.keys(countryData).map(code => {
+    const options = Object.keys(CountryIso).map(code => {
       return {
         value: code,
         country: this.countryNames.of(code),

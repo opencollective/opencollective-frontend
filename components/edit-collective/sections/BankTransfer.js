@@ -1,19 +1,20 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
 import { Formik } from 'formik';
 import { findLast, get, omit } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS, PayoutMethodType } from '../../../lib/constants/payout-method';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../../lib/payment-method-utils';
 
 import ConfirmationModal from '../../ConfirmationModal';
 import Container from '../../Container';
 import PayoutBankInformationForm from '../../expenses/PayoutBankInformationForm';
 import { Box, Flex } from '../../Grid';
+import { WebsiteName } from '../../I18nFormatters';
 import Image from '../../Image';
 import Loading from '../../Loading';
 import StyledButton from '../../StyledButton';
@@ -240,7 +241,8 @@ const BankTransfer = props => {
                 <P mr={2}>
                   <FormattedMessage
                     id="paymentMethod.manual.edit.description"
-                    defaultMessage='Contributors can choose "Bank Transfer" as a payment method at checkout and instructions will be automatically emailed to them. Once received, you can mark the transaction as confirmed to credit the budget on Open Collective.'
+                    defaultMessage='Contributors can choose "Bank Transfer" as a payment method at checkout and instructions will be automatically emailed to them. Once received, you can mark the transaction as confirmed to credit the budget on {WebsiteName}.'
+                    values={{ WebsiteName }}
                   />
                 </P>
                 <Image alt="" src="/static/images/ManualPaymentMethod-BankTransfer.png" width={350} height={168} />

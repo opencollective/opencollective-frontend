@@ -1,5 +1,5 @@
 const createOrderPage = '/contribution-flow';
-const contributionFlowSteps = '/details|profile|payment|checkout|summary|success';
+const contributionFlowSteps = '/details|profile|payment|summary|success';
 
 exports.REWRITES = [
   {
@@ -127,6 +127,19 @@ exports.REWRITES = [
     destination: '/create-project',
   },
   {
+    source: '/dashboard',
+    destination: '/dashboard',
+  },
+  { source: '/workspace', destination: '/dashboard' },
+  {
+    source: '/dashboard/:slug/:section?/:subpath*',
+    destination: '/dashboard',
+  },
+  {
+    source: '/workspace/:slug/:section?/:subpath*',
+    destination: '/dashboard',
+  },
+  {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',
     destination: '/admin-panel',
   },
@@ -164,7 +177,7 @@ exports.REWRITES = [
     destination: '/order',
   },
   {
-    source: '/:collectiveSlug?/orders/:id([0-9]+)/confirm',
+    source: '/:collectiveSlug?/(orders|contributions)/:id([0-9]+)/confirm',
     destination: '/confirmOrder',
   },
   {
@@ -198,11 +211,11 @@ exports.REWRITES = [
   },
   // Embed
   {
-    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:paymentFlow(crypto)?/:step(${contributionFlowSteps})?`,
+    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
     destination: '/embed/contribution-flow',
   },
   {
-    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:step(${contributionFlowSteps})?`,
+    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:action(checkout)?/:step(${contributionFlowSteps})?`,
     destination: '/embed/contribution-flow',
   },
   // Tier page
@@ -224,6 +237,19 @@ exports.REWRITES = [
     source: '/:collectiveSlug/conversations/:slug?-:id([a-z0-9]+)',
     destination: '/conversation',
   },
+  // Legacy Banners/Widgets/Buttons
+  {
+    source: '/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png',
+    destination: '/api/legacy/contribute',
+  },
+  {
+    source: '/:collectiveSlug/:verb(contribute|donate)/button.js',
+    destination: '/api/legacy/button',
+  },
+  {
+    source: '/:collectiveSlug/:widget(widget|events|collectives|banner).js',
+    destination: '/api/legacy/widget',
+  },
   // Contribute Flow
   // ---------------
   // Legacy create order route. Deprectated on 2019-02-12
@@ -238,7 +264,7 @@ exports.REWRITES = [
   },
   // New Routes -> New flow
   {
-    source: `/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:paymentFlow(crypto)?/:step(${contributionFlowSteps})?`,
+    source: `/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
   {
@@ -255,15 +281,6 @@ exports.REWRITES = [
   {
     source: `/:collectiveSlug/:verb(events|projects)/:eventSlug/order/:tierId/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
-  },
-  // Pledges
-  {
-    source: `/pledges/new`,
-    destination: '/createPledge',
-  },
-  {
-    source: `/:slug/pledges/new`,
-    destination: '/createPledge',
   },
   // Marketing Pages
   {
@@ -301,6 +318,10 @@ exports.REWRITES = [
   // set `useFileSystemPublicRoutes` to true (default) in `next.config.js`
   {
     source: '/',
+    destination: '/home',
+  },
+  {
+    source: '/home',
     destination: '/home',
   },
   {
@@ -342,6 +363,11 @@ exports.REWRITES = [
   {
     source: '/applications',
     destination: '/applications',
+  },
+  // Robots.txt
+  {
+    source: '/robots.txt',
+    destination: '/api/robots',
   },
   // Collective
   // ----------

@@ -1,9 +1,9 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
@@ -12,7 +12,7 @@ import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import BanAccountsSummary from './BanAccountsSummary';
 
@@ -43,7 +43,7 @@ const BanAccount = () => {
   const [includeAssociatedAccounts, setIncludeAssociatedAccounts] = React.useState(true);
   const [dryRunData, setDryRunData] = React.useState(null);
   const [_banAccounts, { loading }] = useMutation(banAccountsMutation, { context: API_V2_CONTEXT });
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const isValid = Boolean(selectedAccountsOptions?.length);
   const banAccounts = (dryRun = true) =>
@@ -59,7 +59,13 @@ const BanAccount = () => {
     <div>
       <StyledInputField htmlFor="ban-accounts-picker" label="Account" flex="1 1">
         {({ id }) => (
-          <CollectivePickerAsync inputId={id} onChange={setSelectedAccountsOptions} isMulti skipGuests={false} />
+          <CollectivePickerAsync
+            inputId={id}
+            onChange={setSelectedAccountsOptions}
+            isMulti
+            skipGuests={false}
+            includeArchived
+          />
         )}
       </StyledInputField>
 
@@ -85,8 +91,8 @@ const BanAccount = () => {
             const result = await banAccounts(true);
             setDryRunData(result.data.banAccount);
           } catch (e) {
-            addToast({
-              type: TOAST_TYPE.ERROR,
+            toast({
+              variant: 'error',
               message: i18nGraphqlException(intl, e),
             });
           }
@@ -105,14 +111,14 @@ const BanAccount = () => {
             try {
               const result = await banAccounts(false);
               setDryRunData(null);
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 title: `Successfully banned ${result.data.banAccount.accounts.length} accounts`,
                 message: <P whiteSpace="pre-wrap">{result.data.banAccount.message}</P>,
               });
             } catch (e) {
-              addToast({
-                type: TOAST_TYPE.ERROR,
+              toast({
+                variant: 'error',
                 message: i18nGraphqlException(intl, e),
               });
             }

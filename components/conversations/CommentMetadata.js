@@ -16,7 +16,14 @@ export const CommentMetadata = ({ comment }) => {
         </LinkCollective>
       </Box>
       <Flex flexDirection="column">
-        <LinkCollective collective={comment.fromAccount}>
+        <LinkCollective
+          collective={comment.fromAccount}
+          withHoverCard
+          hoverCardProps={{
+            hoverCardContentProps: { side: 'top' },
+            includeAdminMembership: { accountSlug: comment.account?.slug, hostSlug: comment.account?.host?.slug },
+          }}
+        >
           <P color="black.800" fontWeight="500" lineHeight="22px" truncateOverflow>
             {comment.fromAccount.name}
           </P>
@@ -41,5 +48,11 @@ CommentMetadata.propTypes = {
       type: PropTypes.string.isRequired,
     }).isRequired,
     createdAt: PropTypes.string.isRequired,
+    account: PropTypes.shape({
+      slug: PropTypes.string,
+      host: PropTypes.shape({
+        slug: PropTypes.string,
+      }),
+    }),
   }).isRequired,
 };

@@ -4,9 +4,9 @@ import { get } from 'lodash';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getCollectiveMainTag } from '../../lib/collective.lib';
+import { getCollectiveMainTag } from '../../lib/collective';
 import { IGNORED_TAGS } from '../../lib/constants/collectives';
-import { getIntlDisplayNames } from '../../lib/i18n';
+import { getCountryDisplayName, getFlagEmoji } from '../../lib/i18n/countries';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -15,7 +15,7 @@ import LinkCollective from '../LinkCollective';
 import StyledCard from '../StyledCard';
 import StyledLink from '../StyledLink';
 import StyledTag from '../StyledTag';
-import { P, Span } from '../Text';
+import { P } from '../Text';
 
 const MaskSVG = props => (
   <svg
@@ -130,14 +130,6 @@ const CollectiveContainer = ({ useLink, collective, children }) => {
   }
 };
 
-const getFlagEmoji = countryCode => {
-  const codePoints = countryCode
-    .toUpperCase()
-    .split('')
-    .map(char => 127397 + char.charCodeAt());
-  return String.fromCodePoint(...codePoints);
-};
-
 CollectiveContainer.propTypes = {
   useLink: PropTypes.bool,
   collective: PropTypes.object.isRequired,
@@ -160,10 +152,9 @@ const StyledCollectiveCard = ({
   ...props
 }) => {
   const intl = useIntl();
-  const regionNames = getIntlDisplayNames(intl.locale, 'region');
   const collectiveCountry = collective.location?.country || collective.parent?.location?.country;
   const countryString = collectiveCountry
-    ? `${getFlagEmoji(collectiveCountry)} ${regionNames.of(collectiveCountry)}`
+    ? `${getFlagEmoji(collectiveCountry)} ${getCountryDisplayName(intl.locale, collectiveCountry)}`
     : null;
 
   return (
@@ -186,7 +177,7 @@ const StyledCollectiveCard = ({
           </Container>
         </Container>
         <Container display="flex" flexDirection="column" justifyContent="space-between" height={bodyHeight}>
-          <Container p={3} pb={0}>
+          <div className="flex flex-col space-y-3 p-4 pb-0">
             <CollectiveContainer useLink={useLink} collective={collective}>
               <P mt={3} fontSize="16px" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
                 {collective.name}
@@ -199,32 +190,32 @@ const StyledCollectiveCard = ({
                 </StyledLink>
               </P>
             )}
-            <Container>
+            <div className="flex flex-wrap items-center gap-2">
               {tag === undefined ? (
-                <StyledTag display="inline-block" variant="rounded-right" my={2} backgroundColor="blue.50">
+                <StyledTag variant="rounded-right" backgroundColor="blue.50">
                   <I18nCollectiveTags tags={getCollectiveMainTag(null, null, collective.type)} />
                 </StyledTag>
               ) : (
                 tag
               )}
               {countryString && (
-                <Span ml={2} fontSize="12px" color="black.700" fontWeight={400}>
+                <Container fontSize="12px" color="black.700" fontWeight={400}>
                   {countryString}
-                </Span>
+                </Container>
               )}
-            </Container>
-            <Container>
+            </div>
+            <div className="flex flex-wrap gap-2">
               {collective.tags &&
                 collective.tags
                   .filter(tag => !IGNORED_TAGS.includes(tag))
                   .slice(0, 4)
                   .map(tag => (
-                    <StyledTag key={tag} display="inline-block" variant="rounded-right" m={1}>
+                    <StyledTag key={tag} variant="rounded-right">
                       {tag}
                     </StyledTag>
                   ))}
-            </Container>
-          </Container>
+            </div>
+          </div>
           {children}
         </Container>
       </Container>

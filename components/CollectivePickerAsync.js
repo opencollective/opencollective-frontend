@@ -11,7 +11,7 @@ import formatCollectiveType from '../lib/i18n/collective-type';
 import CollectivePicker from './CollectivePicker';
 
 const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
-  query CollectivePickerSearchQuery(
+  query CollectivePickerSearch(
     $term: String!
     $types: [TypeOfCollective]
     $limit: Int
@@ -19,6 +19,7 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
     $parentCollectiveIds: [Int]
     $skipGuests: Boolean
     $includeArchived: Boolean
+    $includeVendorsForHostId: Int
   ) {
     search(
       term: $term
@@ -28,6 +29,7 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
       parentCollectiveIds: $parentCollectiveIds
       skipGuests: $skipGuests
       includeArchived: $includeArchived
+      includeVendorsForHostId: $includeVendorsForHostId
     ) {
       id
       collectives {
@@ -46,8 +48,12 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
         isActive
         isArchived
         isHost
-        isTrustedHost
-        isTwoFactorAuthEnabled
+        ... on User {
+          isTwoFactorAuthEnabled
+        }
+        ... on Organization {
+          isTrustedHost
+        }
       }
     }
   }
@@ -126,6 +132,7 @@ const CollectivePickerAsync = ({
   isLoading = false,
   skipGuests = true,
   includeArchived = false,
+  includeVendorsForHostId = undefined,
   ...props
 }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
@@ -147,6 +154,7 @@ const CollectivePickerAsync = ({
         parentCollectiveIds,
         skipGuests,
         includeArchived,
+        includeVendorsForHostId,
       });
     }
   }, [types, limit, hostCollectiveIds, parentCollectiveIds, term]);
@@ -193,7 +201,7 @@ CollectivePickerAsync.propTypes = {
   /** If true, results won't be cached (Apollo "network-only" mode) */
   noCache: PropTypes.bool,
   /** Query to use for the search. Override to add custom fields */
-  searchQuery: PropTypes.any.isRequired,
+  searchQuery: PropTypes.any,
   /** Custom options that are displayed when the field is empty */
   emptyCustomOptions: PropTypes.any,
   /** Function to filter results returned by the API */
@@ -206,6 +214,8 @@ CollectivePickerAsync.propTypes = {
   onInvite: PropTypes.func,
   /** Include archived collectives **/
   includeArchived: PropTypes.bool,
+  /** Include vendors for the given host id**/
+  includeVendorsForHostId: PropTypes.number,
 };
 
 export default CollectivePickerAsync;

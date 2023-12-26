@@ -1,25 +1,26 @@
 import React from 'react';
-import { gql, useLazyQuery } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
-import { isEmpty, orderBy, toNumber } from 'lodash';
+import { isEmpty, orderBy, partition, round, toNumber } from 'lodash';
 import { GetServerSideProps } from 'next';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { initClient } from '../lib/apollo-client';
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getSSRQueryHelpers } from '../lib/apollo-client';
+import { getCollectivePageMetadata } from '../lib/collective';
 import dayjs from '../lib/dayjs';
-import { formatErrorMessage } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { Account, AccountWithHost, OrderPageQuery, OrderPageQueryVariables } from '../lib/graphql/types/v2/graphql';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { Account, AccountWithHost } from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { usePrevious } from '../lib/hooks/usePrevious';
 import { i18nPaymentMethodProviderType } from '../lib/i18n/payment-method-provider-type';
+import { i18nTaxType } from '../lib/i18n/taxes';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
+import { confirmContributionFieldsFragment } from '../components/ContributionConfirmationModal';
 import DateTime from '../components/DateTime';
 import FormattedMoneyAmount from '../components/FormattedMoneyAmount';
 import { Box, Flex, Grid } from '../components/Grid';
@@ -27,7 +28,7 @@ import CreatePendingOrderModal from '../components/host-dashboard/CreatePendingO
 import HTMLContent from '../components/HTMLContent';
 import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
 import LinkCollective from '../components/LinkCollective';
-import MessageBox from '../components/MessageBox';
+import MessageBoxGraphqlError from '../components/MessageBoxGraphqlError';
 import OrderStatusTag from '../components/orders/OrderStatusTag';
 import ProcessOrderButtons, { hasProcessButtons } from '../components/orders/ProcessOrderButtons';
 import Page from '../components/Page';
@@ -42,6 +43,8 @@ import Tags from '../components/Tags';
 import { H1, H4, H5, P, Span } from '../components/Text';
 import { getDisplayedAmount } from '../components/transactions/TransactionItem';
 
+import Custom404 from './404';
+
 const orderPageQuery = gql`
   query OrderPage($legacyId: Int!, $collectiveSlug: String!) {
     order(order: { legacyId: $legacyId }) {
@@ -50,57 +53,18 @@ const orderPageQuery = gql`
       status
       description
       tags
-      totalAmount {
-        valueInCents
-        currency
-      }
-      amount {
-        valueInCents
-        currency
-      }
+      ...ConfirmContributionFields
       paymentMethod {
         id
         type
       }
       createdAt
       processedAt
-      hostFeePercent
-      pendingContributionData {
-        expectedAt
-        paymentMethod
-        ponumber
-        memo
-        fromAccountInfo {
-          name
-          email
-        }
-      }
-      memo
-      fromAccount {
-        id
-        slug
-        name
-        imageUrl
-      }
-      toAccount {
-        id
-        slug
-        name
-        imageUrl
-        ... on AccountWithHost {
-          bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
-        }
-      }
-      createdByAccount {
-        id
-        slug
-        name
-        imageUrl
-      }
       permissions {
         id
         canMarkAsExpired
         canMarkAsPaid
+        canSetTags
         canEdit
       }
       transactions {
@@ -122,6 +86,15 @@ const orderPageQuery = gql`
           valueInCents
           currency
         }
+        taxAmount {
+          valueInCents
+          currency
+        }
+        taxInfo {
+          id
+          type
+          rate
+        }
         paymentProcessorFee {
           valueInCents
           currency
@@ -129,12 +102,18 @@ const orderPageQuery = gql`
         fromAccount {
           id
           slug
+          type
           name
           imageUrl
+          isIncognito
+          ... on Individual {
+            isGuest
+          }
         }
         account {
           id
           slug
+          type
           name
           imageUrl
         }
@@ -146,6 +125,7 @@ const orderPageQuery = gql`
       slug
       name
       type
+      isHost
       imageUrl
       backgroundImageUrl
       isActive
@@ -178,6 +158,7 @@ const orderPageQuery = gql`
         parent {
           id
           slug
+          name
           imageUrl
           backgroundImageUrl
           twitterHandle
@@ -190,28 +171,34 @@ const orderPageQuery = gql`
           slug
           imageUrl
           backgroundImageUrl
-          twitterHandle
+        }
+      }
+      ... on Organization {
+        host {
+          id
+          name
+          slug
+          imageUrl
+          backgroundImageUrl
         }
       }
     }
   }
 
   ${collectiveNavbarFieldsFragment}
+  ${confirmContributionFieldsFragment}
 `;
 
-export const getServerSideProps: GetServerSideProps = async context => {
-  const { collectiveSlug, OrderId } = context.query as { collectiveSlug: string; OrderId: string };
-  const client = initClient();
-  const { data, error } = await client.query<OrderPageQuery, OrderPageQueryVariables>({
-    query: orderPageQuery,
-    variables: { legacyId: toNumber(OrderId), collectiveSlug },
-    context: API_V2_CONTEXT,
-    fetchPolicy: 'network-only',
-  });
-  return {
-    props: { query: context.query, ...data, error: error || null }, // will be passed to the page component as props
-  };
-};
+const contributionPageQueryHelper = getSSRQueryHelpers<{ legacyId: number; collectiveSlug: string }>({
+  query: orderPageQuery,
+  context: API_V2_CONTEXT,
+  getVariablesFromContext: ({ query }) => ({
+    legacyId: toNumber(query.OrderId),
+    collectiveSlug: query.collectiveSlug as string,
+  }),
+});
+
+export const getServerSideProps: GetServerSideProps = contributionPageQueryHelper.getServerSideProps;
 
 const messages = defineMessages({
   title: {
@@ -267,7 +254,12 @@ const TransactionDetails = ({
   children: [React.ReactNode, React.ReactNode, React.ReactNode?, React.ReactNode?];
   [key: string]: any;
 }) => (
-  <TransactionDetailsWrapper {...props} alignItems="center" justifyContent="space-between">
+  <TransactionDetailsWrapper
+    data-cy="transaction-details-wrapper"
+    {...props}
+    alignItems="center"
+    justifyContent="space-between"
+  >
     <Box>
       <Box fontWeight="400" fontSize="14px" lineHeight="20px" color="black.900">
         {title}
@@ -307,45 +299,65 @@ const OverdueTag = styled.span`
   border-radius: 4px;
 `;
 
-export default function OrderPage(props: OrderPageQuery & { error: any }) {
+const getTransactionsToDisplay = (account, transactions) => {
+  if (!transactions?.length) {
+    return [];
+  }
+
+  const isTipTransaction = t => ['PLATFORM_TIP', 'PLATFORM_TIP_DEBT'].includes(t.kind);
+  const isOwnAccount = t => t.account.id === account.id;
+
+  const [tipTransactions, otherTransactions] = partition(transactions, isTipTransaction);
+  const accountTransactions = otherTransactions.filter(t => t.account.id === account.id);
+  let tipTransactionsToDisplay = tipTransactions.filter(isOwnAccount);
+  if (tipTransactionsToDisplay.length === 0 && tipTransactions.length > 0) {
+    tipTransactionsToDisplay = tipTransactions.filter(t => t.kind === 'PLATFORM_TIP' && t.type === 'DEBIT');
+  }
+
+  return [...accountTransactions, ...tipTransactionsToDisplay];
+};
+
+export default function OrderPage(props) {
   const { LoggedInUser } = useLoggedInUser();
-  const [fetchData, query] = useLazyQuery<OrderPageQuery, OrderPageQueryVariables>(orderPageQuery, {
-    variables: { legacyId: toNumber(props.order.legacyId), collectiveSlug: props.account.slug },
-    context: API_V2_CONTEXT,
-  });
+  const prevLoggedInUser = usePrevious(LoggedInUser);
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
+  const queryResult = contributionPageQueryHelper.useQuery(props);
+  const variables = contributionPageQueryHelper.getVariablesFromPageProps(props);
+  const baseMetadata = getCollectivePageMetadata(queryResult.data?.account);
 
-  const baseMetadata = getCollectivePageMetadata(props?.account);
-
-  const data = query?.data || props;
-  const account = data.account as Account & AccountWithHost;
-  const order = data.order;
-  const error = query?.error || props.error;
+  const data = queryResult?.data;
+  const account = data?.account as Account & AccountWithHost;
+  const order = data?.order;
+  const error = queryResult?.error;
 
   const isPending = order?.status === 'PENDING';
   const isOverdue =
     isPending &&
-    order.pendingContributionData?.expectedAt &&
-    dayjs().isAfter(dayjs(order.pendingContributionData.expectedAt));
+    order?.pendingContributionData?.expectedAt &&
+    dayjs().isAfter(dayjs(order?.pendingContributionData.expectedAt));
   const intl = useIntl();
 
+  // Refetch when users logs in
   React.useEffect(() => {
-    if (LoggedInUser) {
-      fetchData();
+    if (!prevLoggedInUser && LoggedInUser) {
+      queryResult.refetch();
     }
-  }, [LoggedInUser]);
+  }, [LoggedInUser, prevLoggedInUser]);
 
-  const accountTransactions = order?.transactions?.filter(t => t.account.id === account.id);
+  if (!order || order.toAccount?.slug !== variables.collectiveSlug) {
+    return <Custom404 />;
+  }
 
+  const displayedTransactions = getTransactionsToDisplay(account, order.transactions);
   return (
     <Page
       collective={account}
-      canonicalURL={`${getCollectivePageCanonicalURL(account)}/orders`}
+      canonicalURL={`${getCollectivePageCanonicalURL(account)}/contributions/${order.legacyId}`}
       {...baseMetadata}
       title={intl.formatMessage(messages.title, { title: order.description, id: order.legacyId })}
     >
       <CollectiveNavbar collective={account} isLoading={!account} selectedCategory={NAVBAR_CATEGORIES.BUDGET} />
-      <Flex justifyContent="center">
+      <Flex justifyContent="center" data-cy="contribution-page-content">
         <Flex
           maxWidth="1200px"
           py={[0, 5]}
@@ -356,11 +368,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
           justifyContent={'space-between'}
         >
           <Box flex="1 0" flexBasis={['initial', null, null, '832px']} width="100%" mr={[null, 2, 3, 4]}>
-            {error && (
-              <MessageBox type="error" withIcon m={4}>
-                {formatErrorMessage(intl, error)}
-              </MessageBox>
-            )}
+            {error && <MessageBoxGraphqlError error={error} my={4} />}
             <SummaryHeader fontWeight="700" fontSize="24px" lineHeight="32px">
               <FormattedMessage
                 id="PendingContributionSummary"
@@ -380,11 +388,11 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                 flexDirection={['column-reverse', 'row']}
                 alignItems={['stretch', 'center']}
                 justifyContent="space-between"
-                data-cy="expense-title"
+                data-cy="contribution-title"
                 mb={1}
               >
                 <Box mr={[0, 2]}>
-                  <H4 fontWeight="500" data-cy="expense-description">
+                  <H4 fontWeight="500" data-cy="contribution-description">
                     {order.description}
                   </H4>
                 </Box>
@@ -401,9 +409,9 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                   textTransform="uppercase"
                   closeButtonProps={undefined}
                 >
-                  <FormattedMessage id="Order" defaultMessage="Order" /> #{order.legacyId}
+                  <FormattedMessage defaultMessage="Contribution" /> #{order.legacyId}
                 </StyledTag>
-                <Tags order={order} canEdit />
+                <Tags order={order} canEdit={order.permissions.canSetTags} />
               </Flex>
               <Flex alignItems="center" mt={1}>
                 <P mt="5px" fontSize="12px" color="black.600">
@@ -423,7 +431,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                   <OrderDetails>
                     <StyledTooltip
                       content={
-                        <FormattedMessage defaultMessage="External reference code for this order. This is usually a reference number from the contributor accounting system." />
+                        <FormattedMessage defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system." />
                       }
                       containerCursor="default"
                     >
@@ -508,39 +516,70 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                 {isPending ? (
                   <React.Fragment>
                     <TransactionDetails>
-                      <FormattedMessage defaultMessage="Expected Amount" />
+                      <FormattedMessage defaultMessage="Expected Total Amount" />
                       <FormattedMoneyAmount
-                        currency={order.amount.currency}
+                        currency={order.totalAmount.currency}
                         precision={2}
-                        amount={order.amount.valueInCents}
+                        amount={order.totalAmount.valueInCents}
                       />
 
                       <FormattedMessage defaultMessage="Payment Fees not Considered" />
                       <FormattedMessage
+                        id="contribution.createdAt"
                         defaultMessage="Created on {date}"
                         values={{
                           date: <DateTime value={order.createdAt} dateStyle={'medium'} timeStyle="short" />,
                         }}
                       />
                     </TransactionDetails>
-                    <TransactionDetails>
-                      <FormattedMessage defaultMessage="Expected Host Fees" />
-                      <FormattedMoneyAmount
-                        currency={order.amount.currency}
-                        precision={2}
-                        amount={order.amount.valueInCents * (order.hostFeePercent / -100)}
-                      />
-                      <React.Fragment></React.Fragment>
-                      <FormattedMessage defaultMessage="Based on default host fees, can be changed at settling time" />
-                    </TransactionDetails>
+                    {Boolean(order.taxAmount?.valueInCents) && (
+                      <TransactionDetails>
+                        <FormattedMessage
+                          defaultMessage="Expected {taxType} ({rate}%)"
+                          values={{
+                            taxType: i18nTaxType(intl, order.tax?.type || 'Tax', 'long'),
+                            rate: order.tax?.rate * 100,
+                          }}
+                        />
+                        <FormattedMoneyAmount
+                          currency={order.amount.currency}
+                          precision={2}
+                          amount={-order.taxAmount.valueInCents}
+                        />
+                      </TransactionDetails>
+                    )}
+                    {Boolean(order.hostFeePercent) && (
+                      <TransactionDetails>
+                        <FormattedMessage defaultMessage="Expected Host Fees" />
+                        <FormattedMoneyAmount
+                          currency={order.amount.currency}
+                          precision={2}
+                          amount={
+                            (order.amount.valueInCents - (order.taxAmount?.valueInCents || 0)) *
+                            (order.hostFeePercent / -100)
+                          }
+                        />
+                        <FormattedMessage defaultMessage="Based on default host fees, can be changed at settling time" />
+                      </TransactionDetails>
+                    )}
+                    {Boolean(order.platformTipAmount?.valueInCents) && (
+                      <TransactionDetails>
+                        <FormattedMessage defaultMessage="Expected Platform Tip" />
+                        <FormattedMoneyAmount
+                          currency={order.platformTipAmount.currency}
+                          amount={-order.platformTipAmount.valueInCents}
+                        />
+                      </TransactionDetails>
+                    )}
                   </React.Fragment>
                 ) : (
-                  orderBy(accountTransactions, ['legacyId'], ['desc']).map(transaction => {
+                  orderBy(displayedTransactions, ['legacyId'], ['desc']).map(transaction => {
                     const displayedAmount = getDisplayedAmount(transaction, account);
                     const displayPaymentFees =
                       transaction.type === 'CREDIT' &&
                       transaction.netAmount?.valueInCents !== displayedAmount.valueInCents &&
                       transaction.paymentProcessorFee?.valueInCents !== 0;
+
                     return (
                       <TransactionDetails key={transaction.id}>
                         <span>{transaction.description}</span>
@@ -549,22 +588,36 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                           precision={2}
                           amount={displayedAmount.valueInCents}
                         />
-                        {displayPaymentFees && (
-                          <Span>
-                            <FormattedMessage
-                              defaultMessage="{value} (Payment Processor Fee)"
-                              values={{
-                                value: (
-                                  <FormattedMoneyAmount
-                                    currency={transaction.paymentProcessorFee.currency}
-                                    amount={transaction.paymentProcessorFee.valueInCents}
-                                    amountStyles={{}}
-                                  />
-                                ),
-                              }}
-                            />
-                          </Span>
-                        )}
+                        <div>
+                          {Boolean(transaction.taxAmount?.valueInCents) && (
+                            <Span display="block">
+                              <FormattedMoneyAmount
+                                currency={transaction.taxAmount.currency}
+                                precision={2}
+                                amount={transaction.taxAmount.valueInCents}
+                                amountStyles={null}
+                              />{' '}
+                              ({round(transaction.taxInfo.rate * 100, 2)}%{' '}
+                              {i18nTaxType(intl, transaction.taxInfo.type, 'long')})
+                            </Span>
+                          )}
+                          {displayPaymentFees && (
+                            <Span display="block">
+                              <FormattedMessage
+                                defaultMessage="{value} (Payment Processor Fee)"
+                                values={{
+                                  value: (
+                                    <FormattedMoneyAmount
+                                      currency={transaction.paymentProcessorFee.currency}
+                                      amount={transaction.paymentProcessorFee.valueInCents}
+                                      amountStyles={null}
+                                    />
+                                  ),
+                                }}
+                              />
+                            </Span>
+                          )}
+                        </div>
                         <span>
                           <FormattedMessage
                             defaultMessage="{type, select, CREDIT {Received by} DEBIT {Paid by} other {}} {account} on {date}"
@@ -605,9 +658,9 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                           </StyledButton>
                           {showCreatePendingOrderModal && (
                             <CreatePendingOrderModal
-                              host={account.host}
+                              hostSlug={account.host.slug}
                               onClose={() => setShowCreatePendingOrderModal(false)}
-                              onSuccess={() => query.refetch()}
+                              onSuccess={() => queryResult.refetch()}
                               edit={order}
                             />
                           )}{' '}
@@ -618,7 +671,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                       <ProcessOrderButtons
                         order={order}
                         permissions={order.permissions}
-                        onSuccess={() => query.refetch()}
+                        onSuccess={() => queryResult.refetch()}
                       />
                     </ButtonsContainer>
                   </Flex>
@@ -635,14 +688,7 @@ export default function OrderPage(props: OrderPageQuery & { error: any }) {
                 <Span fontSize="12px" color="black.700" fontWeight="bold">
                   <FormattedMessage id="Expense.PrivateNote" defaultMessage="Private note" />
                   &nbsp;&nbsp;
-                  <PrivateInfoIcon
-                    color="#969BA3"
-                    size={undefined}
-                    tooltipProps={undefined}
-                    withoutTooltip={undefined}
-                    // eslint-disable-next-line react/no-children-prop
-                    children={undefined}
-                  />
+                  <PrivateInfoIcon className="text-muted-foreground" size={12} />
                 </Span>
                 <HTMLContent color="black.700" mt={1} fontSize="13px" content={order.memo} />
               </Box>

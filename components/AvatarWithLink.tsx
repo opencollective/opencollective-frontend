@@ -8,8 +8,8 @@ import Avatar from './Avatar';
 import LinkCollective from './LinkCollective';
 
 type AvatarWithLinkProps = {
-  account: Account;
-  secondaryAccount: Account | null;
+  account: Pick<Account, 'name' | 'type' | 'isIncognito' | 'slug' | 'imageUrl'>;
+  secondaryAccount?: Partial<Account> | null;
   /** The size in pixels */
   size: number;
 };
@@ -55,7 +55,7 @@ export const AvatarWithLink = ({ account, secondaryAccount, size }: AvatarWithLi
         {mainAvatar}
         <SecondaryAvatarContainer borderRadius={getAvatarBorderRadius(secondaryAccount.type)}>
           <LinkCollective collective={secondaryAccount}>
-            <Avatar collective={secondaryAccount} radius={size / 2.5} />
+            <Avatar collective={secondaryAccount} radius={size / 2} />
           </LinkCollective>
         </SecondaryAvatarContainer>
       </DualAvatarContainer>

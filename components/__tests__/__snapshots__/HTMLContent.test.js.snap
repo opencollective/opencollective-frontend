@@ -1,0 +1,385 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HTMLContent cannot inject malicious content 1`] = `
+.c0 {
+  overflow-y: hidden;
+}
+
+.c0 p {
+  margin: 1em 0;
+}
+
+.c1 {
+  width: 100%;
+  line-height: 1.75em;
+  overflow-wrap: break-word;
+  font-size: 14px;
+}
+
+.c1 h1,
+.c1 h2,
+.c1 h3 {
+  margin: 0;
+  font-weight: normal;
+  text-align: left;
+}
+
+.c1 h3 {
+  font-size: 1.25em;
+  margin-bottom: 0.25em;
+}
+
+.c1 figure {
+  margin: 0;
+}
+
+.c1 figure[data-trix-content-type='--embed-iframe-video'] {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+}
+
+.c1 figure[data-trix-content-type='--embed-iframe-video'] iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.c1 figure[data-trix-content-type='--embed-iframe-anchorFm'] iframe {
+  min-height: 300px;
+}
+
+.c1 img {
+  max-width: 100%;
+}
+
+.c1 .ql-align-center {
+  text-align: center;
+}
+
+.c1 .ql-align-right {
+  text-align: right;
+}
+
+.c1 .ql-align-left {
+  text-align: left;
+}
+
+.c1 blockquote {
+  font-size: 1em;
+  border-left: 5px solid #e9e9e9;
+  background: white;
+  color: #757677;
+  margin: 0;
+  padding: 16px;
+}
+
+.c1 pre {
+  font-size: 0.85em;
+  background: #f6f8fa;
+  color: #333;
+  border: none;
+  padding: 16px;
+  font-family: monospace;
+  overflow-x: auto;
+}
+
+.c1 ul {
+  list-style-type: disc;
+}
+
+.c1 ol {
+  list-style-type: decimal;
+}
+
+.c1 ul li,
+.c1 ol li {
+  margin-left: 1.5em;
+}
+
+.c1 a {
+  color: #297EFF;
+}
+
+.c1 a:hover {
+  color: #5CA3FF;
+}
+
+<div>
+  <div
+    className="c0 c1"
+    fontSize="14px"
+  >
+    
+          
+    <div>
+      
+            Script:
+            
+      
+
+            Iframe:
+            
+      
+
+            Normal string:
+            A 
+      <strong>
+        short
+      </strong>
+       string
+
+            Another script:
+            A 
+    </div>
+  </div>
+</div>
+`;
+
+exports[`HTMLContent handles broken HTML 1`] = `
+.c0 {
+  overflow-y: hidden;
+}
+
+.c0 p {
+  margin: 1em 0;
+}
+
+.c1 {
+  width: 100%;
+  line-height: 1.75em;
+  overflow-wrap: break-word;
+  font-size: 14px;
+}
+
+.c1 h1,
+.c1 h2,
+.c1 h3 {
+  margin: 0;
+  font-weight: normal;
+  text-align: left;
+}
+
+.c1 h3 {
+  font-size: 1.25em;
+  margin-bottom: 0.25em;
+}
+
+.c1 figure {
+  margin: 0;
+}
+
+.c1 figure[data-trix-content-type='--embed-iframe-video'] {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+}
+
+.c1 figure[data-trix-content-type='--embed-iframe-video'] iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.c1 figure[data-trix-content-type='--embed-iframe-anchorFm'] iframe {
+  min-height: 300px;
+}
+
+.c1 img {
+  max-width: 100%;
+}
+
+.c1 .ql-align-center {
+  text-align: center;
+}
+
+.c1 .ql-align-right {
+  text-align: right;
+}
+
+.c1 .ql-align-left {
+  text-align: left;
+}
+
+.c1 blockquote {
+  font-size: 1em;
+  border-left: 5px solid #e9e9e9;
+  background: white;
+  color: #757677;
+  margin: 0;
+  padding: 16px;
+}
+
+.c1 pre {
+  font-size: 0.85em;
+  background: #f6f8fa;
+  color: #333;
+  border: none;
+  padding: 16px;
+  font-family: monospace;
+  overflow-x: auto;
+}
+
+.c1 ul {
+  list-style-type: disc;
+}
+
+.c1 ol {
+  list-style-type: decimal;
+}
+
+.c1 ul li,
+.c1 ol li {
+  margin-left: 1.5em;
+}
+
+.c1 a {
+  color: #297EFF;
+}
+
+.c1 a:hover {
+  color: #5CA3FF;
+}
+
+<div>
+  <div
+    className="c0 c1"
+    fontSize="14px"
+  >
+    <p>
+      Broken 
+      <strong>
+        HTML
+      </strong>
+    </p>
+  </div>
+</div>
+`;
+
+exports[`HTMLContent renders simple HTML string 1`] = `
+.c0 {
+  overflow-y: hidden;
+}
+
+.c0 p {
+  margin: 1em 0;
+}
+
+.c1 {
+  width: 100%;
+  line-height: 1.75em;
+  overflow-wrap: break-word;
+  font-size: 14px;
+}
+
+.c1 h1,
+.c1 h2,
+.c1 h3 {
+  margin: 0;
+  font-weight: normal;
+  text-align: left;
+}
+
+.c1 h3 {
+  font-size: 1.25em;
+  margin-bottom: 0.25em;
+}
+
+.c1 figure {
+  margin: 0;
+}
+
+.c1 figure[data-trix-content-type='--embed-iframe-video'] {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+}
+
+.c1 figure[data-trix-content-type='--embed-iframe-video'] iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.c1 figure[data-trix-content-type='--embed-iframe-anchorFm'] iframe {
+  min-height: 300px;
+}
+
+.c1 img {
+  max-width: 100%;
+}
+
+.c1 .ql-align-center {
+  text-align: center;
+}
+
+.c1 .ql-align-right {
+  text-align: right;
+}
+
+.c1 .ql-align-left {
+  text-align: left;
+}
+
+.c1 blockquote {
+  font-size: 1em;
+  border-left: 5px solid #e9e9e9;
+  background: white;
+  color: #757677;
+  margin: 0;
+  padding: 16px;
+}
+
+.c1 pre {
+  font-size: 0.85em;
+  background: #f6f8fa;
+  color: #333;
+  border: none;
+  padding: 16px;
+  font-family: monospace;
+  overflow-x: auto;
+}
+
+.c1 ul {
+  list-style-type: disc;
+}
+
+.c1 ol {
+  list-style-type: decimal;
+}
+
+.c1 ul li,
+.c1 ol li {
+  margin-left: 1.5em;
+}
+
+.c1 a {
+  color: #297EFF;
+}
+
+.c1 a:hover {
+  color: #5CA3FF;
+}
+
+<div>
+  <div
+    className="c0 c1"
+    fontSize="14px"
+  >
+    A 
+    <strong>
+      short
+    </strong>
+     string
+  </div>
+</div>
+`;

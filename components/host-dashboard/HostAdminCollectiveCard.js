@@ -109,6 +109,7 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
               size={32}
               fontSize="16px"
               onClick={() => setCurrentModal('addFunds')}
+              disabled={collective.isFrozen}
               title={intl.formatMessage({ id: 'menu.addFunds', defaultMessage: 'Add Funds' })}
             >
               {getCurrencySymbol(collective.currency)}
@@ -119,7 +120,7 @@ const HostAdminCollectiveCard = ({ since, collective, host, ...props }) => {
               ml={2}
               size={32}
               onClick={() => setCurrentModal('accountSettings')}
-              title={intl.formatMessage({ defaultMessage: 'Account settings' })}
+              title={intl.formatMessage({ id: 'menu.account.settings', defaultMessage: 'Account settings' })}
             >
               <SliderAlt size={14} color="#9D9FA3" />
             </StyledRoundButton>

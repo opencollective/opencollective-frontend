@@ -1,7 +1,7 @@
 import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
-import FilesPreviewModal from '../../components/FilesPreviewModal';
+import FilesViewerModal from '../../components/FilesViewerModal';
 
-<Meta title="Design system/FilesPreviewModal" component={FilesPreviewModal} />
+<Meta title="Design system/FilesViewerModal" component={FilesViewerModal} />
 
 <Canvas>
   <Story name="Default">
@@ -11,7 +11,7 @@ import FilesPreviewModal from '../../components/FilesPreviewModal';
         <div>
           <button onClick={() => setOpen(true)}>Show modal</button>
           {isOpen && (
-            <FilesPreviewModal
+            <FilesViewerModal
               onClose={() => setOpen(false)}
               files={[
                 { url: 'https://loremflickr.com/600/600/invoice?lock=1' },

@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType, IGNORED_TAGS } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
 import ApplicationForm from '../components/osc-host-application/ApplicationForm';
 import ConnectGithub from '../components/osc-host-application/ConnectGithub';
 import TermsOfFiscalSponsorship from '../components/osc-host-application/TermsOfFiscalSponsorship';
 import YourInitiativeIsNearlyThere from '../components/osc-host-application/YourInitiativeIsNearlyThere';
 import Page from '../components/Page';
-import { TOAST_TYPE, useToasts } from '../components/ToastProvider';
+import { useToast } from '../components/ui/useToast';
 import { withUser } from '../components/UserProvider';
 
 const oscCollectiveApplicationQuery = gql`
@@ -21,6 +21,7 @@ const oscCollectiveApplicationQuery = gql`
     account(slug: $slug) {
       id
       slug
+      isActive
       description
       name
       type
@@ -41,6 +42,7 @@ const oscHostApplicationPageQuery = gql`
       id
       slug
       policies {
+        id
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
         }
@@ -63,6 +65,10 @@ const messages = defineMessages({
   'error.unauthorized.description': {
     id: 'error.unauthorized.description',
     defaultMessage: 'You have to be an admin of {name} to apply with this initiative.',
+  },
+  'error.existingHostApplication.description': {
+    id: 'error.existingHostApplication.description',
+    defaultMessage: 'This collective already has a pending application to {hostName}.',
   },
   'error.existingHost.description': {
     id: 'error.existingHost.description',
@@ -104,7 +110,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
 
   const intl = useIntl();
   const router = useRouter();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const step = router.query.step || 'intro';
   const collectiveSlug = router.query.collectiveSlug;
@@ -118,8 +124,8 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
     variables: { slug: collectiveSlug },
     skip: !(LoggedInUser && collectiveSlug && step === 'form'),
     onError: error => {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         title: intl.formatMessage(messages['error.title']),
         message: i18nGraphqlException(intl, error),
       });
@@ -131,17 +137,18 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
   const popularTags = hostData?.tagStats.nodes.map(({ tag }) => tag).filter(tag => !IGNORED_TAGS.includes(tag));
 
   React.useEffect(() => {
-    if (collectiveSlug && collective && (!canApplyWithCollective || hasHost)) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+    if (step === 'form' && collectiveSlug && collective && (!canApplyWithCollective || hasHost)) {
+      toast({
+        variant: 'error',
         title: intl.formatMessage(messages['error.title']),
         message: hasHost
-          ? intl.formatMessage(messages['error.existingHost.description'], {
-              hostName: collective.host.name,
-            })
-          : intl.formatMessage(messages['error.unauthorized.description'], {
-              name: collective.name,
-            }),
+          ? intl.formatMessage(
+              collective.isActive
+                ? messages['error.existingHost.description']
+                : messages['error.existingHostApplication.description'],
+              { hostName: collective.host.name },
+            )
+          : intl.formatMessage(messages['error.unauthorized.description'], { name: collective.name }),
       });
     }
   }, [collectiveSlug, collective]);

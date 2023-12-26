@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Donate Button Button links to /:collectiveSlug/donate" 1`] = `
+<a
+  href="https://opencollective.com/webpack/donate"
+  rel="noopener noreferrer"
+  target="_blank"
+>
+  <div
+    className="button__CollectButton-sc-1nnqnvf-0 gMgSeu"
+    color="white"
+  />
+</a>
+`;

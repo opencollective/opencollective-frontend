@@ -30,7 +30,6 @@ const FormattedMoneyAmount = ({
   amountStyles,
   showCurrencyCode,
   currencyCodeStyles,
-  isCrypto,
 }) => {
   if (!currency) {
     return <Span {...amountStyles}>{EMPTY_AMOUNT_PLACEHOLDER}</Span>;
@@ -54,9 +53,7 @@ const FormattedMoneyAmount = ({
   }
 
   const currencyCode = showCurrencyCode ? <Span {...currencyCodeStyles}>{currency}</Span> : '';
-  if (isCrypto) {
-    return <Span {...amountStyles}>{`${amount} ${currency}`}</Span>;
-  } else if (!interval || interval === INTERVALS.flexible || interval === INTERVALS.oneTime) {
+  if (!interval || interval === INTERVALS.flexible || interval === INTERVALS.oneTime) {
     return (
       <FormattedMessage
         id="Amount"
@@ -69,7 +66,7 @@ const FormattedMoneyAmount = ({
       <FormattedMessage
         id="AmountInterval"
         defaultMessage="{amount} {currencyCode} / {interval, select, month {mo.} year {yr.} other{}}"
-        values={{ amount: formattedAmount, interval: interval ?? '', currencyCode }}
+        values={{ amount: formattedAmount, interval, currencyCode }}
       />
     );
   } else {
@@ -77,7 +74,7 @@ const FormattedMoneyAmount = ({
       <FormattedMessage
         id="AmountIntervalLong"
         defaultMessage="{amount} {currencyCode} / {interval, select, month {month} year {year} other {}}"
-        values={{ amount: formattedAmount, interval: interval ?? '', currencyCode }}
+        values={{ amount: formattedAmount, interval, currencyCode }}
       />
     );
   }
@@ -102,7 +99,6 @@ FormattedMoneyAmount.propTypes = {
   amountStyles: PropTypes.object,
   currencyCodeStyles: PropTypes.object,
   formatWithSeparators: PropTypes.bool,
-  isCrypto: PropTypes.bool,
 };
 
 FormattedMoneyAmount.defaultProps = {

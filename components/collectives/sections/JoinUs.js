@@ -16,8 +16,8 @@ export const JoinUsWrapper = styled(Container)`
     props.page && props.page === 'becomeAHost'
       ? `url('/static/images/home/joinus-green-bg-sm.png')`
       : props.page && props.page === 'fiscalHosting'
-      ? `url('/static/images/home/fiscalhost-blue-bg-sm.png')`
-      : `url('/static/images/home/joinus-pink-bg-sm.png')`};
+        ? `url('/static/images/home/fiscalhost-blue-bg-sm.png')`
+        : `url('/static/images/home/joinus-pink-bg-sm.png')`};
   background-size: 100% 100%;
 
   a {
@@ -33,8 +33,8 @@ export const JoinUsWrapper = styled(Container)`
       props.page && props.page === 'becomeAHost'
         ? `url('/static/images/home/joinus-green-bg-md.png')`
         : props.page && props.page === 'fiscalHosting'
-        ? `url('/static/images/home/fiscalhost-blue-bg-md.png')`
-        : `url('/static/images/home/joinus-pink-bg-md.png')`};
+          ? `url('/static/images/home/fiscalhost-blue-bg-md.png')`
+          : `url('/static/images/home/joinus-pink-bg-md.png')`};
     background-size: 100% 100%;
   }
 
@@ -43,8 +43,8 @@ export const JoinUsWrapper = styled(Container)`
       props.page && props.page === 'becomeAHost'
         ? `url('/static/images/home/joinus-green-bg-lg.png')`
         : props.page && props.page === 'fiscalHosting'
-        ? `url('/static/images/home/fiscalhost-blue-bg-lg.png')`
-        : `url('/static/images/home/joinus-pink-bg-lg.png')`};
+          ? `url('/static/images/home/fiscalhost-blue-bg-lg.png')`
+          : `url('/static/images/home/joinus-pink-bg-lg.png')`};
     background-size: 100% 100%;
   }
 `;
@@ -126,7 +126,7 @@ const JoinUs = ({ page }) => (
         >
           <FormattedMessage id="home.joinUsSection.title" defaultMessage="Join the movement" />
         </H1>
-        <Box my={(null, null, null, null, 3)} width={['288px', '438px', null, '335px']}>
+        <Box my={[null, null, null, null, 3]} width={['288px', '438px', null, '335px']}>
           <SectionSubtitle
             fontSize={['20px', null, null, '24px']}
             lineHeight={['28px', null, null, '32px']}

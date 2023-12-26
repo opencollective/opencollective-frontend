@@ -1,7 +1,5 @@
 require('../env');
 
-const path = require('path');
-
 const next = require('next');
 const express = require('express');
 const helmet = require('helmet');
@@ -9,11 +7,9 @@ const cookieParser = require('cookie-parser');
 const cloudflareIps = require('cloudflare-ip/ips.json');
 const throng = require('throng');
 
-const intl = require('./intl');
 const logger = require('./logger');
 const loggerMiddleware = require('./logger-middleware');
 const routes = require('./routes');
-const { Sentry } = require('./sentry');
 const hyperwatch = require('./hyperwatch');
 const rateLimiter = require('./rate-limiter');
 const duplicateHandler = require('./duplicate-handler');
@@ -26,7 +22,7 @@ app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflar
 
 const dev = process.env.NODE_ENV === 'development';
 
-const nextApp = next({ dev, dir: path.dirname(__dirname) });
+const nextApp = next({ dev });
 
 const port = process.env.PORT;
 
@@ -35,21 +31,22 @@ const workers = process.env.WEB_CONCURRENCY || 1;
 const desiredServiceLevel = Number(process.env.SERVICE_LEVEL) || 100;
 
 const start = id =>
-  nextApp.prepare().then(() => {
+  nextApp.prepare().then(async () => {
     logger.info(
       `Starting with NODE_ENV=${process.env.NODE_ENV} OC_ENV=${process.env.OC_ENV} API_URL=${process.env.API_URL}`,
     );
+
+    app.all('/_next/webpack-hmr', (req, res) => {
+      nextApp.getRequestHandler(req, res);
+    });
 
     // Not much documentation on this,
     // but we should ensure this goes to the default Next.js handler
     app.get('/__nextjs_original-stack-frame', nextApp.getRequestHandler());
 
-    // app.buildId is only available after app.prepare(), hence why we setup here
-    app.use(Sentry.Handlers.requestHandler());
+    await hyperwatch(app);
 
-    hyperwatch(app);
-
-    rateLimiter(app);
+    await rateLimiter(app);
 
     if (parseToBooleanDefaultFalse(process.env.SERVICE_LIMITER)) {
       app.use(serviceLimiterMiddleware);
@@ -67,8 +64,6 @@ const start = id =>
 
     app.use(cookieParser());
 
-    app.use(intl.middleware());
-
     if (parseToBooleanDefaultFalse(process.env.DUPLICATE_HANDLER)) {
       app.use(
         duplicateHandler({
@@ -82,7 +77,6 @@ const start = id =>
     }
 
     app.use(routes(app, nextApp));
-    app.use(Sentry.Handlers.errorHandler());
     app.use(loggerMiddleware.errorLogger);
 
     app.listen(port, err => {
@@ -103,7 +97,7 @@ const start = id =>
     });
   });
 
-if (workers && workers > 1) {
+if (workers > 1) {
   throng({ worker: start, count: workers });
 } else {
   start(1);

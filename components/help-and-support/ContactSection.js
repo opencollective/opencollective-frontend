@@ -10,8 +10,11 @@ import { sendContactMessage } from '../../lib/api';
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { getCollectivePageCanonicalURL } from '../../lib/url-helpers';
 import { isValidEmail } from '../../lib/utils';
 
+import Captcha, { isCaptchaEnabled } from '../Captcha';
+import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 // import Link from '../Link';
@@ -24,41 +27,13 @@ import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
 import { P, Span } from '../Text';
 
-const validate = values => {
-  const errors = {};
-  const { name, topic, email, message, link } = values;
-
-  if (!name) {
-    errors.name = createError(ERROR.FORM_FIELD_REQUIRED);
-  }
-
-  if (!topic) {
-    errors.topic = createError(ERROR.FORM_FIELD_REQUIRED);
-  }
-
-  if (!email) {
-    errors.email = createError(ERROR.FORM_FIELD_REQUIRED);
-  } else if (!isValidEmail(email)) {
-    errors.email = createError(ERROR.FORM_FIELD_PATTERN);
-  }
-
-  if (link && !isURL(link)) {
-    errors.link = createError(ERROR.FORM_FIELD_PATTERN);
-  }
-
-  if (!message) {
-    errors.message = createError(ERROR.FORM_FIELD_REQUIRED);
-  }
-
-  return errors;
-};
-
 const ContactForm = () => {
   const intl = useIntl();
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const shouldDisplayCatcha = !LoggedInUser && isCaptchaEnabled();
   const { getFieldProps, handleSubmit, errors, touched, setFieldValue } = useFormik({
     initialValues: {
       name: '',
@@ -66,10 +41,53 @@ const ContactForm = () => {
       topic: '',
       message: '',
       link: '',
+      captcha: null,
+      relatedCollectives: [],
     },
-    validate,
+    validate: values => {
+      const errors = {};
+      const { name, topic, email, message, link, captcha } = values;
+
+      if (!name?.length) {
+        errors.name = createError(ERROR.FORM_FIELD_REQUIRED);
+      }
+
+      if (!topic?.length) {
+        errors.topic = createError(ERROR.FORM_FIELD_REQUIRED);
+      }
+
+      if (!email) {
+        errors.email = createError(ERROR.FORM_FIELD_REQUIRED);
+      } else if (!isValidEmail(email)) {
+        errors.email = createError(ERROR.FORM_FIELD_PATTERN);
+      }
+
+      if (link && !isURL(link)) {
+        errors.link = createError(ERROR.FORM_FIELD_PATTERN);
+      }
+
+      if (!message?.length) {
+        errors.message = createError(ERROR.FORM_FIELD_REQUIRED);
+      }
+
+      if (shouldDisplayCatcha && !captcha) {
+        errors.captcha = createError(ERROR.FORM_FIELD_REQUIRED);
+      }
+
+      return errors;
+    },
     onSubmit: values => {
       setIsSubmitting(true);
+      if (values.relatedCollectives.length === 0 && LoggedInUser) {
+        setFieldValue(
+          'relatedCollectives',
+          LoggedInUser.memberOf.map(member => {
+            if (member.role === 'ADMIN') {
+              return getCollectivePageCanonicalURL(member.collective);
+            }
+          }),
+        );
+      }
       sendContactMessage(values)
         .then(() => {
           setIsSubmitting(false);
@@ -86,6 +104,12 @@ const ContactForm = () => {
     if (LoggedInUser) {
       setFieldValue('name', LoggedInUser.collective.name);
       setFieldValue('email', LoggedInUser.email);
+      setFieldValue(
+        'relatedCollectives',
+        LoggedInUser.memberOf
+          .filter(member => member.role === 'ADMIN')
+          .map(member => getCollectivePageCanonicalURL(member.collective)),
+      );
     }
   }, [LoggedInUser]);
 
@@ -183,6 +207,36 @@ const ContactForm = () => {
               </StyledInputField>
             </Box>
             <Box mb="28px">
+              <StyledInputField
+                required={false}
+                label={<FormattedMessage defaultMessage="Enter related Collectives" />}
+                {...getFieldProps('relatedCollectives')}
+                labelFontWeight="700"
+                labelProps={{
+                  lineHeight: '24px',
+                  fontSize: '16px',
+                }}
+                error={touched.relatedCollectives && formatFormErrorMessage(intl, errors.relatedCollectives)}
+                hint={<FormattedMessage defaultMessage="Enter collectives related to your request." />}
+              >
+                {inputProps => (
+                  <CollectivePickerAsync
+                    {...inputProps}
+                    isMulti
+                    useCompactMode
+                    types={['COLLECTIVE', 'ORGANIZATION', 'EVENT', 'PROJECT', 'USER', 'FUND']}
+                    createCollectiveOptionalFields={['location.address', 'location.country']}
+                    onChange={value =>
+                      setFieldValue(
+                        'relatedCollectives',
+                        value.map(element => getCollectivePageCanonicalURL(element.value)),
+                      )
+                    }
+                  />
+                )}
+              </StyledInputField>
+            </Box>
+            <Box mb="28px">
               <P fontSize="16px" lineHeight="24px" fontWeight="700" mb="8px">
                 <FormattedMessage id="helpAndSupport.contactForm.message" defaultMessage="What's your message?" />
               </P>
@@ -192,7 +246,7 @@ const ContactForm = () => {
                 onChange={e => setFieldValue('message', e.target.value)}
                 withBorders
                 version="simplified"
-                editorMinHeight="20rem"
+                editorMinHeight="12.5rem"
               />
               <P mt="6px" fontSize="13px" lineHeight="20px" color="black.700">
                 <FormattedMessage
@@ -235,6 +289,12 @@ const ContactForm = () => {
                 )}
               </StyledInputField>
             </Box>
+            {shouldDisplayCatcha && (
+              <Box mb="28px">
+                <Captcha onVerify={result => setFieldValue('captcha', result)} />
+              </Box>
+            )}
+
             <Box
               display="flex"
               flexDirection={['column', 'row-reverse']}

@@ -4,7 +4,7 @@ import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import dayjs from 'dayjs';
-import { cloneDeep, find, get, set } from 'lodash';
+import { cloneDeep, find, get, isNil, set } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -44,7 +44,7 @@ import FiscalHosting from './sections/FiscalHosting';
 import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
 import HostVirtualCardsSettings from './sections/HostVirtualCardsSettings';
-import PaymentMethods from './sections/PaymentMethods';
+import ManagePaymentMethods from './sections/ManagePaymentMethods';
 import PaymentReceipts from './sections/PaymentReceipts';
 import Policies from './sections/Policies';
 import ReceivingMoney from './sections/ReceivingMoney';
@@ -57,7 +57,6 @@ import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
-import SocialLinksFormField from './SocialLinksFormField';
 
 const { COLLECTIVE, FUND, PROJECT, EVENT, ORGANIZATION, USER } = CollectiveType;
 
@@ -93,8 +92,8 @@ class EditCollectiveForm extends React.Component {
         defaultMessage: 'Create Event',
       },
       'slug.label': {
-        id: 'collective.changeUrl.label',
-        defaultMessage: 'URL slug',
+        id: 'account.slug.label',
+        defaultMessage: 'Handle',
       },
       'type.label': { id: 'collective.type.label', defaultMessage: 'Type' },
       'name.label': { id: 'Fields.displayName', defaultMessage: 'Display name' },
@@ -233,10 +232,6 @@ class EditCollectiveForm extends React.Component {
         id: 'collective.currency.placeholder',
         defaultMessage: 'Select currency',
       },
-      'address.label': {
-        id: 'collective.address.label',
-        defaultMessage: 'Address',
-      },
       'VAT.label': {
         id: 'EditCollective.VAT',
         defaultMessage: 'VAT settings',
@@ -308,11 +303,7 @@ class EditCollectiveForm extends React.Component {
     this.setState(state => {
       const collective = cloneDeep(state.collective);
 
-      // GraphQL schema has address embedded within location
-      // mutation expects { location: { address: '' } }
-      if (['address', 'country'].includes(fieldname)) {
-        collective.location[fieldname] = value;
-      } else if (fieldname === 'VAT') {
+      if (fieldname === 'VAT') {
         set(collective, 'settings.VAT.type', value);
       } else if (fieldname === 'VAT-number') {
         set(collective, 'settings.VAT.number', value);
@@ -372,6 +363,27 @@ class EditCollectiveForm extends React.Component {
       collective.tiers = [...collective.tiers, ...this.state.tickets];
     }
 
+    // Add a confirm if slug changed
+    if (collective.slug !== this.props.collective.slug) {
+      if (
+        !window.confirm(
+          this.props.intl.formatMessage(
+            {
+              defaultMessage:
+                'Changing the handle from @{previousHandle} to @{newHandle} will break all the links that you previously shared for this profile (i.e., {exampleUrl}). Do you really want to continue?',
+            },
+            {
+              previousHandle: this.props.collective.slug,
+              newHandle: collective.slug,
+              exampleUrl: `https://opencollective.com/${this.props.collective.slug}`,
+            },
+          ),
+        )
+      ) {
+        return;
+      }
+    }
+
     this.props.onSubmit(collective);
 
     this.setState({ modified: false });
@@ -380,8 +392,6 @@ class EditCollectiveForm extends React.Component {
   getFieldDefaultValue(field) {
     if (field.defaultValue !== undefined) {
       return field.defaultValue;
-    } else if (['address', 'country'].includes(field.name)) {
-      return get(this.state.collective.location, field.name);
     }
 
     return this.state.collective[field.name];
@@ -423,7 +433,7 @@ class EditCollectiveForm extends React.Component {
         );
 
       case ALL_SECTIONS.PAYMENT_METHODS:
-        return <PaymentMethods collectiveSlug={collective.slug} />;
+        return <ManagePaymentMethods account={collective} />;
 
       case ALL_SECTIONS.TIERS:
         return <Tiers collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
@@ -488,6 +498,7 @@ class EditCollectiveForm extends React.Component {
         return (
           <Box>
             {collective.type === USER && <EditUserEmailForm />}
+            {collective.type === ORGANIZATION && <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />}
             {[COLLECTIVE, FUND, PROJECT, EVENT].includes(collective.type) && (
               <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
             )}
@@ -499,7 +510,7 @@ class EditCollectiveForm extends React.Component {
       // Fiscal Hosts
 
       case ALL_SECTIONS.FISCAL_HOSTING:
-        return <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />;
+        return null;
 
       case ALL_SECTIONS.RECEIVING_MONEY:
         return <ReceivingMoney collective={collective} />;
@@ -540,7 +551,7 @@ class EditCollectiveForm extends React.Component {
         return <HostVirtualCardsSettings collective={collective} />;
 
       case ALL_SECTIONS.VIRTUAL_CARDS:
-        return <VirtualCards collective={collective} />;
+        return <VirtualCards collective={collective} accountSlug={collective.slug} />;
 
       default:
         return null;
@@ -555,34 +566,32 @@ class EditCollectiveForm extends React.Component {
     const taxes = getApplicableTaxesForCountry(country);
 
     if (taxes.includes(TaxType.VAT)) {
+      const vatType = get(collective, 'settings.VAT.type');
+      const vatNumber = get(collective, 'settings.VAT.number');
+
       const getVATOptions = () => {
         const options = [
-          {
-            value: '',
-            label: intl.formatMessage(this.messages['VAT.None']),
-          },
-          {
-            value: VAT_OPTIONS.HOST,
-            label: intl.formatMessage(this.messages['VAT.Host']),
-          },
+          { value: '', label: intl.formatMessage(this.messages['VAT.None']) },
+          { value: VAT_OPTIONS.OWN, label: intl.formatMessage(this.messages['VAT.Own']) },
         ];
 
-        return collective.isHost
-          ? options
-          : [
-              ...options,
-              {
-                value: VAT_OPTIONS.OWN,
-                label: intl.formatMessage(this.messages['VAT.Own']),
-              },
-            ];
+        // Show a "Host" VAT option (default) when not a fiscal host, nor self-hosted, or when it's already set
+        if (!collective.isHost || vatType === VAT_OPTIONS.HOST) {
+          options.push({
+            value: VAT_OPTIONS.HOST,
+            label: intl.formatMessage(this.messages['VAT.Host']),
+          });
+        }
+
+        return options;
       };
 
       fields.push(
         {
           name: 'VAT',
           type: 'select',
-          defaultValue: get(collective, 'settings.VAT.type') || VAT_OPTIONS.HOST,
+          // For hosted accounts, we default to `HOST` for VAT type
+          defaultValue: !isNil(vatType) ? vatType : !collective.isHost ? VAT_OPTIONS.HOST : '',
           when: () => {
             return collective.isHost || AccountTypesWithHost.includes(collective.type);
           },
@@ -592,15 +601,9 @@ class EditCollectiveForm extends React.Component {
           name: 'VAT-number',
           type: 'string',
           placeholder: 'FRXX999999999',
-          defaultValue: get(collective, 'settings.VAT.number'),
+          defaultValue: vatNumber,
           when: () => {
-            const { collective } = this.state;
-            if (collective.type === COLLECTIVE || collective.type === EVENT) {
-              // Collectives can set a VAT number if configured
-              return get(collective, 'settings.VAT.type') === VAT_OPTIONS.OWN;
-            } else {
-              return true;
-            }
+            return vatType !== VAT_OPTIONS.HOST || collective.isHost;
           },
         },
       );
@@ -667,21 +670,12 @@ class EditCollectiveForm extends React.Component {
           name: 'slug',
           pre: 'https://opencollective.com/',
           placeholder: '',
-          when: () => collective.type !== EVENT,
-        },
-        {
-          name: 'address',
-          placeholder: '',
           maxLength: 255,
-          type: 'textarea',
           when: () => collective.type !== EVENT,
-          // TODO: Use structured here to be consistent with other places
-        },
-        {
-          name: 'country',
-          type: 'country',
-          placeholder: 'Select country',
-          when: () => collective.type !== EVENT,
+          description: intl.formatMessage({
+            id: 'createCollective.form.slugLabel',
+            defaultMessage: 'Set your profile URL',
+          }),
         },
         {
           name: 'startsAt',
@@ -708,7 +702,7 @@ class EditCollectiveForm extends React.Component {
           name: 'location',
           placeholder: '',
           type: 'location',
-          when: () => collective.type === EVENT,
+          when: () => collective.type !== USER,
         },
         {
           name: 'privateInstructions',
@@ -737,7 +731,6 @@ class EditCollectiveForm extends React.Component {
           disabled:
             ([COLLECTIVE, FUND].includes(collective.type) && collective.isActive) || collective.isHost ? true : false,
         },
-        ...this.getApplicableTaxesFields(),
         {
           name: 'tags',
           maxLength: 128,
@@ -745,6 +738,18 @@ class EditCollectiveForm extends React.Component {
           placeholder: intl.formatMessage(this.messages['tags.input.placeholder']),
           when: () => ![EVENT, PROJECT, FUND].includes(collective.type),
         },
+        {
+          name: 'socialLinks',
+          type: 'socialLinks',
+          defaultValue: get(this.state.collective, 'socialLinks'),
+        },
+        {
+          name: 'location',
+          type: 'address',
+          when: () => collective.type === USER,
+          isPrivate: true,
+        },
+        ...this.getApplicableTaxesFields(),
       ],
       'fiscal-hosting': [
         {
@@ -844,26 +849,15 @@ class EditCollectiveForm extends React.Component {
                       min={field.min}
                       overflow="hidden"
                       required={field.required}
+                      formModified={this.state.modified}
                     />
                   ))}
-                  {section === 'info' && (
-                    <Box p={1}>
-                      <Box my="5px" fontWeight={700}>
-                        <FormattedMessage defaultMessage="Social Links" />
-                      </Box>
-                      <SocialLinksFormField
-                        value={this.state.collective?.socialLinks}
-                        touched={this.state.modified}
-                        onChange={value => this.handleChange('socialLinks', value)}
-                      />
-                    </Box>
-                  )}
                 </div>
               </div>
             )}
 
             {fields && fields.length > 0 && (
-              <Container className="actions" margin="5rem auto 1rem" textAlign="center">
+              <Container className="actions" margin="3.15rem auto 0.65rem" textAlign="center">
                 <StyledButton
                   buttonStyle="primary"
                   type="submit"
@@ -880,7 +874,7 @@ class EditCollectiveForm extends React.Component {
                   {submitBtnLabel}
                 </StyledButton>
 
-                <Container className="backToProfile" fontSize="1.3rem" margin="1rem">
+                <Container className="backToProfile" fontSize="0.8rem" margin="0.65rem">
                   <Link
                     data-cy="edit-collective-back-to-profile"
                     href={

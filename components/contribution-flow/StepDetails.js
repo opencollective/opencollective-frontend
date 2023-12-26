@@ -4,7 +4,10 @@ import { isEmpty, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { canContributeRecurring, hostIsTaxDeductibleInTheUs } from '../../lib/collective.lib';
+import { AnalyticsEvent } from '../../lib/analytics/events';
+import { track } from '../../lib/analytics/plausible';
+import { AnalyticsProperty } from '../../lib/analytics/properties';
+import { canContributeRecurring, hostIsTaxDeductibleInTheUs } from '../../lib/collective';
 import INTERVALS from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
@@ -26,43 +29,55 @@ import StyledInput from '../StyledInput';
 import { H5, P, Span } from '../Text';
 
 import ChangeTierWarningModal from './ChangeTierWarningModal';
+import CustomFields, { buildCustomFieldsConfig } from './CustomFields';
 import PlatformTipInput from './PlatformTipInput';
-import TierCustomFields from './TierCustomFields';
 import { getTotalAmount } from './utils';
 
-const getCustomFields = (collective, tier) => {
-  return [...(tier?.customFields || []), ...(collective.host?.settings?.contributionFlow?.customFields || [])];
-};
-
-const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router, isEmbed }) => {
+const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip, router, isEmbed }) => {
   const intl = useIntl();
-  const amount = data?.amount;
+  const amount = stepDetails?.amount;
   const currency = tier?.amount.currency || collective.currency;
   const presets = getTierPresets(tier, collective.type, currency);
   const getDefaultOtherAmountSelected = () => isNil(amount) || !presets?.includes(amount);
   const [isOtherAmountSelected, setOtherAmountSelected] = React.useState(getDefaultOtherAmountSelected);
   const [temporaryInterval, setTemporaryInterval] = React.useState(undefined);
   const { LoggedInUser } = useLoggedInUser();
+  const tierCustomFields = tier?.customFields;
+  const hostCustomFields = collective.host?.settings?.contributionFlow?.customFields;
+  const customFieldsConfig = React.useMemo(
+    () => buildCustomFieldsConfig(tierCustomFields, hostCustomFields),
+    [tierCustomFields, hostCustomFields],
+  );
 
   const minAmount = getTierMinAmount(tier, currency);
+  const noIntervalBecauseFreeContribution = minAmount === 0 && amount === 0;
+  const selectedInterval = noIntervalBecauseFreeContribution ? INTERVALS.oneTime : stepDetails?.interval;
   const hasQuantity = (tier?.type === TierTypes.TICKET && !tier.singleTicket) || tier?.type === TierTypes.PRODUCT;
   const isFixedContribution = tier?.amountType === AmountTypes.FIXED;
-  const customFields = getCustomFields(collective, tier);
-  const selectedInterval = data?.interval;
   const supportsRecurring = canContributeRecurring(collective, LoggedInUser) && (!tier || tier?.interval);
   const isFixedInterval = tier?.interval && tier.interval !== INTERVALS.flexible;
 
   const dispatchChange = (field, value) => {
-    onChange({ stepDetails: { ...data, [field]: value }, stepSummary: null });
+    // Assumption: we only have restrictions related to payment method types on recurring contributions
+    const stepPayment = field === 'interval' && value !== INTERVALS.oneTime ? null : stepPayment;
+    onChange({ stepDetails: { ...stepDetails, [field]: value }, stepPayment, stepSummary: null });
   };
 
   // If an interval has been set (either from the tier defaults, or form an URL param) and the
   // collective doesn't support it, we reset the interval
   React.useEffect(() => {
-    if (selectedInterval && !isFixedInterval && !supportsRecurring) {
+    if (selectedInterval && ((!isFixedInterval && !supportsRecurring) || amount === 0)) {
       dispatchChange('interval', INTERVALS.oneTime);
     }
-  }, [selectedInterval, isFixedInterval, supportsRecurring]);
+  }, [selectedInterval, isFixedInterval, supportsRecurring, amount]);
+
+  React.useEffect(() => {
+    track(AnalyticsEvent.CONTRIBUTION_STARTED, {
+      props: {
+        [AnalyticsProperty.CONTRIBUTION_STEP]: 'details',
+      },
+    });
+  }, []);
 
   return (
     <Box width={1}>
@@ -72,7 +87,11 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
         </Container>
       )}
 
-      {!isFixedInterval && supportsRecurring && (
+      {isFixedInterval ? (
+        <P fontSize="20px" fontWeight="500" color="black.800" mb={3}>
+          {i18nInterval(intl, tier.interval)}
+        </P>
+      ) : supportsRecurring ? (
         <StyledButtonSet
           id="interval"
           justifyContent="center"
@@ -83,6 +102,7 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
           buttonProps={{ px: 2, py: '5px' }}
           role="group"
           aria-label="Amount types"
+          disabled={noIntervalBecauseFreeContribution}
           onChange={interval => {
             if (tier && tier.interval !== INTERVALS.flexible) {
               setTemporaryInterval(interval);
@@ -97,14 +117,14 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
             </Span>
           )}
         </StyledButtonSet>
-      )}
+      ) : null}
 
       {!isFixedContribution ? (
         <Box mb="30px">
           <StyledAmountPicker
             currency={currency}
             presets={presets}
-            value={isOtherAmountSelected ? OTHER_AMOUNT_KEY : data?.amount}
+            value={isOtherAmountSelected ? OTHER_AMOUNT_KEY : stepDetails?.amount}
             onChange={value => {
               if (value === OTHER_AMOUNT_KEY) {
                 setOtherAmountSelected(true);
@@ -120,13 +140,29 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
                 name="custom-amount"
                 type="number"
                 currency={currency}
-                value={data?.amount}
+                value={stepDetails?.amount}
                 width={1}
                 min={minAmount}
                 currencyDisplay="full"
                 prependProps={{ color: 'black.500' }}
                 required
-                onChange={value => {
+                onChange={(value, event) => {
+                  // Increase/Decrease the amount by $0.5 instead of $0.01 when using the arrows
+                  // inputEvent.inputType is `insertReplacementText` when the value is changed using the arrows
+                  if (event.nativeEvent.inputType === 'insertReplacementText') {
+                    const previousValue = stepDetails?.amount;
+                    const isTopArrowClicked = value - previousValue === 1;
+                    const isBottomArrowClicked = value - previousValue === -1;
+                    // We use value in cents, 1 cent is already increased/decreased by the input field itself when arrow was clicked
+                    // so we need to increase/decrease the value by 49 cents to get the desired increament/decreament of $0.5
+                    const valueChange = 49;
+
+                    if (isTopArrowClicked) {
+                      value = Math.round((value + valueChange) / 50) * 50;
+                    } else if (isBottomArrowClicked) {
+                      value = Math.round((value - valueChange) / 50) * 50;
+                    }
+                  }
                   dispatchChange('amount', value);
                 }}
               />
@@ -152,7 +188,7 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
             defaultMessage="You’ll contribute {amount}{interval, select, month { monthly} year { yearly} other {}}."
             values={{
               interval: tier.interval ?? '',
-              amount: <FormattedMoneyAmount amount={getTotalAmount(data)} currency={currency} />,
+              amount: <FormattedMoneyAmount amount={getTotalAmount(stepDetails)} currency={currency} />,
             }}
           />
         </Box>
@@ -168,7 +204,7 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
             labelFontSize="16px"
             labelColor="black.800"
             labelProps={{ fontWeight: 500, lineHeight: '28px', mb: 1 }}
-            error={Boolean(tier.availableQuantity !== null && data?.quantity > tier.availableQuantity)}
+            error={Boolean(tier.availableQuantity !== null && stepDetails?.quantity > tier.availableQuantity)}
             data-cy="contribution-quantity"
             required
           >
@@ -196,7 +232,7 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
                   min={1}
                   step={1}
                   max={tier.availableQuantity}
-                  value={data?.quantity}
+                  value={stepDetails?.quantity}
                   maxWidth={80}
                   fontSize="15px"
                   minWidth={100}
@@ -226,22 +262,22 @@ const StepDetails = ({ onChange, data, collective, tier, showPlatformTip, router
         <Box mt={28}>
           <PlatformTipInput
             currency={currency}
-            amount={data?.amount}
-            value={data?.platformTip}
-            quantity={data?.quantity}
+            amount={stepDetails?.amount}
+            value={stepDetails?.platformTip}
+            quantity={stepDetails?.quantity}
             onChange={value => dispatchChange('platformTip', value)}
             isEmbed={isEmbed}
           />
         </Box>
       )}
-      {!isEmpty(customFields) && (
+      {!isEmpty(customFieldsConfig?.fields) && (
         <Box mt={28}>
           <H5 fontSize="20px" fontWeight="normal" color="black.800">
             <FormattedMessage id="OtherInfo" defaultMessage="Other information" />
           </H5>
-          <TierCustomFields
-            fields={customFields}
-            data={data?.customData}
+          <CustomFields
+            config={customFieldsConfig}
+            data={stepDetails?.customData}
             onChange={customData => dispatchChange('customData', customData)}
           />
         </Box>
@@ -266,7 +302,7 @@ StepDetails.propTypes = {
   showPlatformTip: PropTypes.bool,
   isEmbed: PropTypes.bool,
   LoggedInUser: PropTypes.object,
-  data: PropTypes.shape({
+  stepDetails: PropTypes.shape({
     amount: PropTypes.number,
     platformTip: PropTypes.number,
     quantity: PropTypes.number,

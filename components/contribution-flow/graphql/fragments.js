@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../lib/graphql/helpers';
 
 const contributionFlowHostFieldsFragment = gql`
   fragment ContributionFlowHostFields on Host {
@@ -38,7 +38,6 @@ export const contributionFlowAccountFieldsFragment = gql`
     backgroundImageUrl
     isHost
     isActive
-    settings
     location {
       id
       country
@@ -80,6 +79,7 @@ export const contributionFlowAccountFieldsFragment = gql`
       parent {
         id
         slug
+        name
         settings
         imageUrl
         backgroundImageUrl
@@ -150,6 +150,7 @@ export const orderSuccessFragment = gql`
       type
       slug
       imageUrl(height: 48)
+      isIncognito
       ... on Individual {
         isGuest
       }
@@ -165,11 +166,9 @@ export const orderSuccessFragment = gql`
       socialLinks {
         type
       }
-      ... on AccountWithContributions {
-        # limit: 1 as current best practice to avoid the API fetching entries it doesn't need
-        contributors(limit: 1, roles: [BACKER, ATTENDEE]) {
-          totalCount
-        }
+      stats {
+        id
+        contributorsCount
       }
       ... on AccountWithParent {
         parent {

@@ -11,13 +11,21 @@ import Select, {
   ValueContainerProps,
 } from 'react-select';
 import styled from 'styled-components';
-import { layout, LayoutProps, space, SpaceProps, typography, TypographyProps } from 'styled-system';
+import {
+  BorderProps,
+  BorderRadiusProps,
+  layout,
+  LayoutProps,
+  space,
+  SpaceProps,
+  typography,
+  TypographyProps,
+} from 'styled-system';
 
 import Container from './Container';
 import { Flex } from './Grid';
 import SearchIcon from './SearchIcon';
 import StyledHr from './StyledHr';
-import { ModalReferenceContext } from './StyledModal';
 import StyledTag from './StyledTag';
 import { P } from './Text';
 
@@ -36,7 +44,6 @@ const Messages = defineMessages({
   },
 });
 
-/* eslint-disable react/prop-types */
 const Option = ({ innerProps, ...props }: OptionProps & { 'data-cy': string }) => (
   <ReactSelectComponents.Option
     {...props}
@@ -188,15 +195,13 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     selectTheme,
     noOptionsMessage = () => intl.formatMessage(Messages.noOptions),
     options,
+    fontSize,
   }) => {
     isSearchable = isSearchable ?? options?.length > 8;
-    // If a StyledSelect is rendered within a modal, make sure we use the modal as the portal target
-    const modalRef = React.useContext(ModalReferenceContext);
-
     return {
       isSearchable,
       menuPortalTarget:
-        menuPortalTarget === null || typeof document === 'undefined' ? undefined : modalRef?.current || document.body,
+        menuPortalTarget || (menuPortalTarget === null || typeof document === 'undefined' ? undefined : document.body),
       isDisabled: disabled || isDisabled,
       placeholder: placeholder || intl.formatMessage(Messages.placeholder),
       loadingMessage: () => intl.formatMessage(Messages.loading),
@@ -205,6 +210,13 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
       instanceId: instanceId ? instanceId : inputId,
       theme: selectTheme,
       styles: {
+        valueContainer: baseStyles => {
+          if (styles?.valueContainer) {
+            return { ...baseStyles, ...styles.valueContainer };
+          } else {
+            return baseStyles;
+          }
+        },
         control: (baseStyles, state) => {
           const customStyles: Record<string, unknown> = { borderColor: theme.colors.black[300] };
 
@@ -226,6 +238,10 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
             customStyles.cursor = 'pointer';
           }
 
+          if (fontSize) {
+            customStyles.fontSize = fontSize;
+          }
+
           if (typeof styles?.control === 'function') {
             return styles.control({ ...baseStyles, ...customStyles }, state);
           } else {
@@ -245,6 +261,10 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
             customStyles.backgroundColor = theme.colors.primary[100];
           } else {
             customStyles['&:hover'] = { backgroundColor: theme.colors.primary[100] };
+          }
+
+          if (fontSize) {
+            customStyles.fontSize = fontSize;
           }
 
           return { ...baseStyles, ...customStyles, ...styles?.option };
@@ -289,6 +309,13 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
           ...baseStyles,
           zIndex: 99999,
         }),
+        input: baseStyles => {
+          if (styles?.input) {
+            return { ...baseStyles, ...styles.input };
+          } else {
+            return baseStyles;
+          }
+        },
       },
     };
   },
@@ -298,28 +325,42 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
   ${space}
 `;
 
-type StyledSelectCustomComponent = Select &
-  React.ExoticComponent<
-    LayoutProps &
-      TypographyProps &
-      SpaceProps & {
-        intl: IntlShape;
-        /** Alias for isDisabled */
-        inputId: string;
-        disabled?: boolean;
-        useSearchIcon?: boolean;
-        hideDropdownIndicator?: boolean;
-        hideMenu?: boolean;
-        error?: boolean;
-        style?: Record<string, unknown>;
-        onBlur?: Function;
-        onChange?: Function;
-        isLoading?: boolean;
-        isSearchable?: boolean;
-        options?: any;
-        value?: any;
-      }
-  >;
+export type StyledSelectProps = LayoutProps &
+  TypographyProps &
+  BorderProps &
+  BorderRadiusProps &
+  SpaceProps & {
+    intl: IntlShape;
+    /** Alias for isDisabled */
+    inputId: string;
+    name?: string;
+    placeholder?: React.ReactNode;
+    disabled?: boolean;
+    required?: boolean;
+    useSearchIcon?: boolean;
+    hideDropdownIndicator?: boolean;
+    hideMenu?: boolean;
+    error?: boolean;
+    style?: Record<string, unknown>;
+    styles?: Record<string, unknown>;
+    onBlur?: Function;
+    onChange?: Function;
+    formatOptionLabel?: Function;
+    isLoading?: boolean;
+    isSearchable?: boolean;
+    isClearable?: boolean;
+    options?: any;
+    value?: any;
+    defaultValue?: any;
+    menuPlacement?: 'auto' | 'bottom' | 'top';
+    components?: Record<string, React.ReactNode | React.Component | React.FunctionComponent>;
+    closeMenuOnSelect?: boolean;
+    hideSelectedOptions?: boolean;
+    isMulti?: boolean;
+    onInputChange?: Function;
+  };
+
+type StyledSelectCustomComponent = Select & React.ExoticComponent<StyledSelectProps>;
 
 const StyledSelect: StyledSelectCustomComponent = makeStyledSelect(Select);
 
@@ -336,6 +377,7 @@ StyledSelect['propTypes'] = {
   placeholder: PropTypes.node,
   /** Whether the component is disabled */
   disabled: PropTypes.bool,
+  required: PropTypes.bool,
   /** Alias for `disabled` */
   isDisabled: PropTypes.bool,
   /** Rendered when there's no option to show */
@@ -359,6 +401,7 @@ StyledSelect['propTypes'] = {
   menuPortalTarget: PropTypes.any,
   /** Compact mode for rending multiple selections correctly **/
   useCompactMode: PropTypes.bool,
+  name: PropTypes.string,
 };
 
 StyledSelect['defaultProps'] = {

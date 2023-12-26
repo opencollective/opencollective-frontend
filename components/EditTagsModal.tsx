@@ -1,35 +1,23 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { Collective } from '../lib/graphql/types/v2/graphql';
+import { editTagsMutation } from '../lib/graphql/v1/mutations';
 
+import { toast } from './ui/useToast';
 import CollectiveTagsInput from './CollectiveTagsInput';
 import { Flex } from './Grid';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledInputFormikField from './StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
-
-const editTagsMutation = gqlV1`
-  mutation editCollective(
-    $collective: CollectiveInputType!
-  ) {
-    editCollective(
-      collective: $collective
-    ) {
-      id
-      tags
-    }
-  }
-`;
 
 const tagStatsQuery = gql`
-  query tagStats($host: AccountReferenceInput) {
+  query TagStats($host: AccountReferenceInput) {
     tagStats(host: $host, limit: 5) {
       nodes {
         id
@@ -45,7 +33,6 @@ export type EditTagsModalProps = {
 };
 
 export default function EditTagsModal({ collective, onClose }: EditTagsModalProps) {
-  const { addToast } = useToasts();
   const [editTags, { loading }] = useMutation(editTagsMutation);
 
   const { data: { tagStats } = { tagStats: null } } = useQuery(tagStatsQuery, {
@@ -69,8 +56,8 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
 
       await editTags({ variables });
     } catch (e) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: (
           <FormattedMessage
             defaultMessage="Error submiting form: {error}"
@@ -82,8 +69,8 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
       });
       return;
     }
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
+    toast({
+      variant: 'success',
       message: <FormattedMessage defaultMessage="Successfully updated tags" />,
     });
     handleClose();

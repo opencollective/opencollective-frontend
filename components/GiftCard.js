@@ -9,6 +9,7 @@ import CollectiveCard from './gift-cards/CollectiveCard';
 import Container from './Container';
 import Currency from './Currency';
 import { Box, Flex } from './Grid';
+import { WebsiteName } from './I18nFormatters';
 import Link from './Link';
 import { P, Span } from './Text';
 
@@ -84,9 +85,10 @@ class GiftCard extends React.Component {
           <Text fontSize={['12px', '14px']}>
             <FormattedMessage
               id="giftcard.user.text"
-              defaultMessage="Contribute on Open Collective with this Gift Card, courtesy of {emitter}."
+              defaultMessage="Contribute on {WebsiteName} with this Gift Card, courtesy of {emitter}."
               values={{
                 emitter: <WhiteLink href={`/${emitter.slug}`}>{emitter.name}</WhiteLink>,
+                WebsiteName,
               }}
             />
           </Text>
@@ -128,11 +130,11 @@ class GiftCard extends React.Component {
         )}
         <Container position="absolute" right={['8px', '12px']} bottom={['8px', '12px']}>
           <Flex alignItems="top" className="AmountCurrency">
-            <Span fontWeight="bold" fontSize="4rem" lineHeight="4rem" color="#313233">
+            <Span fontWeight="bold" fontSize="2.5rem" lineHeight="2.5rem" color="#313233">
               <Currency value={amount} currency={currency} precision={0} />
             </Span>
             <Box ml={1}>
-              <Span color="#9D9FA3" fontSize="1.6rem" className="currency">
+              <Span color="#9D9FA3" fontSize="1rem" className="currency">
                 {currency}
               </Span>
             </Box>

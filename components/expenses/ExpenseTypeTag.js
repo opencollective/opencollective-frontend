@@ -10,7 +10,7 @@ import StyledTag from '../StyledTag';
 
 const ExpenseTypeTag = ({ type, legacyId, isLoading, ...props }) => {
   const intl = useIntl();
-  return isLoading ? (
+  return !type && !legacyId && isLoading ? (
     <LoadingPlaceholder height={24} width={73} borderRadius="12px 2px 2px 12px" />
   ) : (
     <StyledTag

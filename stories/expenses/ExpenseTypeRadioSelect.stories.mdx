@@ -14,6 +14,9 @@ import expenseTypes from '../../lib/constants/expenseTypes';
       control: { type: 'radio' },
     },
   }}
+  args={{
+    supportedExpenseTypes: [expenseTypes.RECEIPT, expenseTypes.INVOICE, expenseTypes.GRANT],
+  }}
   parameters={{
     actions: {
       handles: ['onChange'],

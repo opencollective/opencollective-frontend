@@ -2,17 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Support } from '@styled-icons/boxicons-regular/Support';
 import { Redo } from '@styled-icons/fa-solid/Redo';
+import copy from 'copy-to-clipboard';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { ERROR } from '../lib/errors';
 
+import Footer from './navigation/Footer';
 import Body from './Body';
 import Container from './Container';
-import Footer from './Footer';
-import { Flex } from './Grid';
+import { ErrorFallbackLinks } from './ErrorFallbackLinks';
+import { Box, Flex } from './Grid';
 import Header from './Header';
+import Image from './Image';
 import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
@@ -44,6 +47,8 @@ class ErrorPage extends React.Component {
     data: PropTypes.object, // we can pass the data object of Apollo to detect and handle GraphQL errors
     router: PropTypes.object,
   };
+
+  state = { copied: false };
 
   getErrorComponent() {
     const { error, data, loading, log = true } = this.props;
@@ -101,19 +106,25 @@ class ErrorPage extends React.Component {
 
   networkError() {
     return (
-      <Flex flexDirection="column" alignItems="center" px={2} py={6}>
-        <H1 fontSize={30} textAlign="center">
-          <FormattedMessage id="page.error.networkError" defaultMessage="Open Collective is momentarily unreachable" />
-          &nbsp; 🙀
+      <Flex data-cy="not-found" flexDirection="column" alignItems="center" p={2}>
+        <Image src="/static/images/unexpected-error.png" alt="" width={624} height={403} />
+        <H1 textAlign="center" mt={3} fontSize="40px" fontWeight="700">
+          <FormattedMessage defaultMessage="Network error" />
         </H1>
-        <Flex mt={3}>
-          <P textAlign="center">
+        <Box maxWidth={550}>
+          <P my="24px" fontSize="20px" fontWeight="500" color="black.800" textAlign="center">
             <FormattedMessage
-              id="page.error.networkError.description"
-              defaultMessage="Don't worry! One of our engineers is probably already on it 👩🏻‍💻👨🏿‍💻. Please try again later. Thank you for your patience 🙏 (and sorry for the inconvenience!)"
+              id="Error.Network"
+              defaultMessage="A network error occurred, please check your connectivity or try again later"
             />
           </P>
-        </Flex>
+        </Box>
+        <Box>
+          <P fontSize="16px" fontWeight="500" color="black.800" mb="16px" textAlign="center">
+            <FormattedMessage defaultMessage="Here are some helpful links instead:" />
+          </P>
+          <ErrorFallbackLinks />
+        </Box>
       </Flex>
     );
   }
@@ -123,45 +134,85 @@ class ErrorPage extends React.Component {
     const stackTrace = get(this.props, 'data.error.stack');
     const expandError = process.env.OC_ENV !== 'production';
     const fontSize = ['ci', 'e2e', 'test'].includes(process.env.OC_ENV) ? 22 : 13;
-
+    const toBase64 = str => Buffer.from(str).toString('base64');
+    const formatStacktrace = () => (process.env.OC_ENV === 'production' ? toBase64(stackTrace) : stackTrace);
     return (
-      <Flex flexDirection="column" alignItems="center" px={2} py={[4, 6]}>
-        <H1 fontSize={30} textAlign="center">
-          <FormattedMessage id="error.unexpected" defaultMessage="Oops, an unexpected error seems to have occurred" />
-          &nbsp; 🤕
+      <Flex data-cy="not-found" flexDirection="column" alignItems="center" p={2}>
+        <Image src="/static/images/unexpected-error.png" alt="" width={624} height={403} />
+        <H1 textAlign="center" mt={3} fontSize="40px" fontWeight="700">
+          <FormattedMessage defaultMessage="Unexpected error" />
         </H1>
-        <Flex mt={5} flexWrap="wrap" alignItems="center" justifyContent="center">
-          <StyledLink my={2} as={Link} href="/contact" mx={2} buttonStyle="standard" buttonSize="large">
-            <Support size="1em" /> <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
-          </StyledLink>
-          <StyledButton my={2} mx={2} buttonSize="large" onClick={() => location.reload()}>
-            <Redo size="0.8em" /> <FormattedMessage id="error.reload" defaultMessage="Reload the page" />
-          </StyledButton>
-        </Flex>
-        {(stackTrace || message) && (
-          <Container mt={5} maxWidth={1200}>
-            <details open={expandError}>
-              <summary style={{ textAlign: 'center', marginBottom: 12 }}>
-                <FormattedMessage id="error.details" defaultMessage="Error details" />
-              </summary>
-              <Container p={3}>
-                {message && (
-                  <React.Fragment>
-                    <strong>Message</strong>
-                    <pre style={{ whiteSpace: 'pre-wrap', fontSize }}>{message}</pre>
-                    <br />
-                  </React.Fragment>
-                )}
-                {stackTrace && (
-                  <React.Fragment>
-                    <strong>Trace</strong>
-                    <pre style={{ whiteSpace: 'pre-wrap', fontSize }}>{stackTrace}</pre>
-                  </React.Fragment>
-                )}
-              </Container>
-            </details>
-          </Container>
-        )}
+        <P my="24px" fontSize="20px" fontWeight="500" color="black.800" textAlign="center">
+          <FormattedMessage defaultMessage="Something went wrong, please refresh or try something else" />
+        </P>
+        <Box>
+          <Flex mt={5} flexWrap="wrap" alignItems="center" justifyContent="center">
+            <StyledLink my={2} as={Link} href="/contact" mx={2} buttonStyle="standard" buttonSize="large">
+              <Support size="1em" /> <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
+            </StyledLink>
+            <StyledButton my={2} mx={2} buttonSize="large" onClick={() => location.reload()}>
+              <Redo size="0.8em" /> <FormattedMessage id="error.reload" defaultMessage="Reload the page" />
+            </StyledButton>
+          </Flex>
+          {(stackTrace || message) && (
+            <Container mt={5} maxWidth={800}>
+              <details open={expandError}>
+                <summary style={{ textAlign: 'center', marginBottom: 12 }}>
+                  <FormattedMessage id="error.details" defaultMessage="Error details" />
+                </summary>
+                <Container p={3}>
+                  {message && (
+                    <React.Fragment>
+                      <P fontWeight="bold" mb={1}>
+                        <FormattedMessage id="Contact.Message" defaultMessage="Message" />
+                      </P>
+                      <pre style={{ whiteSpace: 'pre-wrap', fontSize }}>{message}</pre>
+                      <br />
+                    </React.Fragment>
+                  )}
+                  {stackTrace && (
+                    <React.Fragment>
+                      <P fontWeight="bold" mb={1}>
+                        <FormattedMessage id="Details" defaultMessage="Details" />
+                      </P>
+                      <Flex justifyContent="space-between" alignItems="center" mb={2}>
+                        <FormattedMessage defaultMessage="Please share these details when contacting support" />
+                        <StyledButton
+                          buttonSize="tiny"
+                          onClick={() => {
+                            const formattedMessage = `Error: ${message}`;
+                            const formattedDetails = `Details: ${formatStacktrace()}`;
+                            copy(`${formattedMessage}\n${formattedDetails}`);
+                            this.setState({ copiedErrorMessage: true });
+                            setTimeout(() => this.setState({ copiedErrorMessage: false }), 2000);
+                          }}
+                        >
+                          {this.state.copiedErrorMessage ? (
+                            <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />
+                          ) : (
+                            <FormattedMessage id="Clipboard.CopyShort" defaultMessage="Copy" />
+                          )}
+                        </StyledButton>
+                      </Flex>
+                      <P
+                        as="pre"
+                        whiteSpace="pre-wrap"
+                        fontSize={fontSize}
+                        css={{
+                          userSelect: 'all',
+                          maxHeight: 400,
+                          overflowY: 'auto',
+                        }}
+                      >
+                        {formatStacktrace()}
+                      </P>
+                    </React.Fragment>
+                  )}
+                </Container>
+              </details>
+            </Container>
+          )}
+        </Box>
       </Flex>
     );
   }

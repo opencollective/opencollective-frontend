@@ -34,6 +34,10 @@ const CollectiveTypesI18n = defineMessages({
     id: 'collective.types.user',
     defaultMessage: '{n, plural, one {person} other {people}}',
   },
+  [CollectiveType.VENDOR]: {
+    id: 'CollectiveType.Vendor',
+    defaultMessage: '{count, plural, one {Vendor} other {Vendors}}',
+  },
 });
 
 const Messages = defineMessages({
@@ -66,7 +70,7 @@ export const DefaultCollectiveLabel = ({ value: collective }) => (
         {truncate(collective.name, { length: 40 })}
       </Span>
       <Span fontSize="11px" lineHeight="13px" color="black.500">
-        {collective.slug ? `@${collective.slug}` : collective.email || ''}
+        {collective.slug && collective.type !== 'VENDOR' ? `@${collective.slug}` : collective.email || ''}
       </Span>
     </CollectiveLabelTextContainer>
   </Flex>
@@ -93,9 +97,9 @@ export const CUSTOM_OPTIONS_POSITION = {
   BOTTOM: 'BOTTOM',
 };
 
-const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
+const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, VENDOR } = CollectiveType;
 
-const sortedAccountTypes = ['INDIVIDUAL', USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT];
+const sortedAccountTypes = [VENDOR, 'INDIVIDUAL', USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT];
 
 /**
  * An overset og `StyledSelect` specialized to display, filter and pick a collective from a given list.
@@ -152,7 +156,8 @@ class CollectivePicker extends React.PureComponent {
     return sortedActiveTypes.map(type => {
       const sectionI18n = CollectiveTypesI18n[type];
       const sortedCollectives = sortFunc(collectivesByTypes[type]);
-      const sectionLabel = sectionI18n ? intl.formatMessage(sectionI18n, { n: sortedCollectives.length }) : type;
+      const i18nParams = { count: sortedCollectives.length, n: sortedCollectives.length };
+      const sectionLabel = sectionI18n ? intl.formatMessage(sectionI18n, i18nParams) : type;
       return {
         label: sectionLabel || '',
         options: sortedCollectives.map(this.buildCollectiveOption),
@@ -269,6 +274,7 @@ class CollectivePicker extends React.PureComponent {
       inputId,
       intl,
       collectives,
+      creatable,
       customOptions,
       formatOptionLabel,
       getDefaultOptions,
@@ -322,7 +328,10 @@ class CollectivePicker extends React.PureComponent {
                     return renderNewCollectiveOption ? (
                       renderNewCollectiveOption()
                     ) : (
-                      <CollectiveTypePicker onChange={this.setCreateFormCollectiveType} types={option.types || types} />
+                      <CollectiveTypePicker
+                        onChange={this.setCreateFormCollectiveType}
+                        types={option.types || (typeof creatable === 'object' ? creatable : types)}
+                      />
                     );
                   } else if (option[FLAG_INVITE_NEW]) {
                     return (
@@ -385,6 +394,11 @@ class CollectivePicker extends React.PureComponent {
                             showCreatedCollective: true,
                           }));
                         }}
+                        otherInitialValues={
+                          createFormCollectiveType === CollectiveType.VENDOR
+                            ? { ParentCollectiveId: this.props.HostCollectiveId }
+                            : {}
+                        }
                         {...prefillValue}
                       />
                     )}
@@ -392,7 +406,10 @@ class CollectivePicker extends React.PureComponent {
                 </div>
               )}
             </Popper>,
-            document.body,
+            // When `menuPortalTarget` us explicitly set to `null`, we render the menu in the body
+            // without using a portal to body. This addresses a focus issue when rendered in modals
+            // where the create collective form cannot be focused because it's outside the modal.
+            props.menuPortalTarget === null ? this.containerRef?.current : document.body,
           )}
       </Manager>
     );
@@ -435,7 +452,7 @@ CollectivePicker.propTypes = {
   /** Whether we should group collectives by type */
   groupByType: PropTypes.bool,
   /** If true, a permanent option to create a collective will be displayed in the select */
-  creatable: PropTypes.bool,
+  creatable: PropTypes.oneOfType([PropTypes.bool, PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType)))]),
   /** If creatable is true, this will be used to render the "Create new ..." */
   renderNewCollectiveOption: PropTypes.node,
   /** If true, a permanent option to invite a new user will be displayed in the select */
@@ -468,6 +485,7 @@ CollectivePicker.propTypes = {
   createCollectiveOptionalFields: PropTypes.array,
   /** StyledSelect pass-through property */
   styles: PropTypes.object,
+  HostCollectiveId: PropTypes.number,
 };
 
 CollectivePicker.defaultProps = {

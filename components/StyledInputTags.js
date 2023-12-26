@@ -4,6 +4,7 @@ import { Plus } from '@styled-icons/fa-solid/Plus';
 import { Times } from '@styled-icons/fa-solid/Times';
 import { PriceTags } from '@styled-icons/icomoon/PriceTags';
 import { uniqBy } from 'lodash';
+import { createPortal } from 'react-dom';
 import { defineMessages, useIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled, { css } from 'styled-components';
@@ -76,6 +77,7 @@ const Input = styled.input`
 const InputWrapper = styled(Box)`
   position: sticky;
   top: 0;
+  z-index: 9; // To make sure tags are not appearing over the input
   padding: 12px 16px;
   background-color: inherit;
   :not(:only-child) {
@@ -147,6 +149,7 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
   const { formatMessage } = useIntl();
   const inputRef = React.useRef();
   const wrapperRef = React.useRef();
+  const popperRef = React.useRef();
   const scrollerRef = React.useRef();
   const [isOpen, setOpen] = React.useState(false);
   const [tags, setTags] = React.useState(getOptions(value || defaultValue));
@@ -182,9 +185,16 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
     }
   };
 
+  // Setup popper to close with next call useGlobalBlur
+  useGlobalBlur(popperRef, outside => {
+    if (outside) {
+      popperRef.current = null;
+    }
+  });
+
   // Close when clicking outside
   useGlobalBlur(wrapperRef, outside => {
-    if (outside) {
+    if (outside && !popperRef.current) {
       handleClose();
     }
   });
@@ -231,106 +241,114 @@ const StyledInputTags = ({ suggestedTags, value, onChange, renderUpdatedTags, de
             </Flex>
           )}
         </Reference>
-        {isOpen && (
-          <Popper placement="bottom">
-            {({ placement, ref, style }) => (
-              <div
-                data-placement={placement}
-                ref={ref}
-                style={{
-                  ...style,
-                  zIndex: 9999,
-                }}
-              >
-                <StyledCard
-                  m={1}
-                  overflow="auto"
-                  overflowY="auto"
-                  {...props}
-                  ref={scrollerRef}
-                  boxShadow="0px 4px 10px #C4C7CC"
+        {isOpen &&
+          createPortal(
+            <Popper placement="bottom">
+              {({ placement, ref, style }) => (
+                <div
+                  data-placement={placement}
+                  ref={tagList => {
+                    ref(tagList);
+                    popperRef.current = tagList;
+                  }}
+                  style={{
+                    ...style,
+                    zIndex: 9999,
+                  }}
                 >
-                  <InputWrapper color="black.400">
-                    <TagIcon size="16px" />
-                    <Input
-                      data-cy="styled-input-tags-input"
-                      disabled={disabled}
-                      placeholder={formatMessage(messages.placeholder)}
-                      ref={inputRef}
-                      value={inputValue}
-                      onChange={e => setInputValue(e.target.value)}
-                      onBlur={() => {
-                        if (!availableSuggestedTags?.length) {
-                          handleClose();
-                        }
-                      }}
-                      onKeyPress={e => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          const newTag = e.target.value.trim();
-                          if (!newTag) {
-                            return;
+                  <StyledCard
+                    m={1}
+                    overflow="auto"
+                    overflowY="auto"
+                    {...props}
+                    ref={scrollerRef}
+                    boxShadow="0px 4px 10px #C4C7CC"
+                  >
+                    <InputWrapper color="black.400">
+                      <TagIcon size="16px" />
+                      <Input
+                        data-cy="styled-input-tags-input"
+                        disabled={disabled}
+                        placeholder={formatMessage(messages.placeholder)}
+                        ref={inputRef}
+                        value={inputValue}
+                        onChange={e => setInputValue(e.target.value)}
+                        onBlur={() => {
+                          if (!availableSuggestedTags?.length) {
+                            handleClose();
                           }
+                        }}
+                        onKeyPress={e => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const newTag = e.target.value.trim();
+                            if (!newTag) {
+                              return;
+                            }
 
-                          addTag(newTag);
-                          setInputValue('');
-                          if (!renderUpdatedTags) {
-                            // Wait until new tag renders, otherwise we'll scroll to the second-last tag
-                            requestAnimationFrame(() => scrollerRef.current?.scrollTo(0, Number.MAX_SAFE_INTEGER), 30);
+                            addTag(newTag);
+                            setInputValue('');
+                            if (!renderUpdatedTags) {
+                              // Wait until new tag renders, otherwise we'll scroll to the second-last tag
+                              requestAnimationFrame(
+                                () => scrollerRef.current?.scrollTo(0, Number.MAX_SAFE_INTEGER),
+                                30,
+                              );
+                            }
                           }
-                        }
-                      }}
-                    />
-                  </InputWrapper>
-                  {(suggestedTags?.length || tags?.length) > 0 && (
-                    <Box flexGrow="1">
-                      {!availableSuggestedTags?.length
-                        ? null
-                        : availableSuggestedTags.map(st => (
-                            <TagWrapper key={st} px="16px" py="8px" backgroundColor="blue.50">
-                              <StyledTag type="info" variant="rounded-right">
-                                {st}
-                              </StyledTag>
-                              <AddTagButton
-                                data-cy={`styled-input-tags-add-suggestion-${st}`}
+                        }}
+                      />
+                    </InputWrapper>
+                    {(suggestedTags?.length || tags?.length) > 0 && (
+                      <Box flexGrow="1">
+                        {!availableSuggestedTags?.length
+                          ? null
+                          : availableSuggestedTags.map(st => (
+                              <TagWrapper key={st} px="16px" py="8px" backgroundColor="blue.50">
+                                <StyledTag type="info" variant="rounded-right">
+                                  {st}
+                                </StyledTag>
+                                <AddTagButton
+                                  data-cy={`styled-input-tags-add-suggestion-${st}`}
+                                  disabled={disabled}
+                                  onClick={() => {
+                                    addTag(st);
+                                    // When adding the last suggested tag, focus the input
+                                    setTimeout(() => inputRef?.current?.focus(), 50);
+                                  }}
+                                  onBlur={() => {
+                                    if (st === suggestedTags[suggestedTags.length - 1]) {
+                                      handleToggleInput();
+                                    }
+                                  }}
+                                >
+                                  <Plus size="10px" />
+                                </AddTagButton>
+                              </TagWrapper>
+                            ))}
+                        {!renderUpdatedTags &&
+                          tags.map(tag => (
+                            <TagWrapper key={tag.value} px="16px" py="8px" autoFocus>
+                              <StyledTag variant="rounded-right">{tag.label}</StyledTag>
+                              <DeleteTagButton
+                                data-cy={`styled-input-tags-remove-${tag.value}`}
                                 disabled={disabled}
                                 onClick={() => {
-                                  addTag(st);
-                                  // When adding the last suggested tag, focus the input
-                                  setTimeout(() => inputRef?.current?.focus(), 50);
-                                }}
-                                onBlur={() => {
-                                  if (st === suggestedTags[suggestedTags.length - 1]) {
-                                    handleToggleInput();
-                                  }
+                                  removeTag(tag.value);
                                 }}
                               >
-                                <Plus size="10px" />
-                              </AddTagButton>
+                                <Times size="10px" />
+                              </DeleteTagButton>
                             </TagWrapper>
                           ))}
-                      {!renderUpdatedTags &&
-                        tags.map(tag => (
-                          <TagWrapper key={tag.value} px="16px" py="8px" autoFocus>
-                            <StyledTag variant="rounded-right">{tag.label}</StyledTag>
-                            <DeleteTagButton
-                              data-cy={`styled-input-tags-remove-${tag.value}`}
-                              disabled={disabled}
-                              onClick={() => {
-                                removeTag(tag.value);
-                              }}
-                            >
-                              <Times size="10px" />
-                            </DeleteTagButton>
-                          </TagWrapper>
-                        ))}
-                    </Box>
-                  )}
-                </StyledCard>
-              </div>
-            )}
-          </Popper>
-        )}
+                      </Box>
+                    )}
+                  </StyledCard>
+                </div>
+              )}
+            </Popper>,
+            document.body,
+          )}
       </Flex>
     </Manager>
   );

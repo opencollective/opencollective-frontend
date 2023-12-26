@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { graphql } from '@apollo/client/react/hoc';
 import { partition } from 'lodash';
@@ -9,7 +8,10 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { collectiveBannerIframeQuery } from '../lib/graphql/v1/queries';
+import { getRequestIntl } from '../lib/i18n/request';
+import { parseToBoolean } from '../lib/utils';
 
 import TopContributors from '../components/collective-page/TopContributors';
 import { Box, Flex } from '../components/Grid';
@@ -75,6 +77,8 @@ const ContributeButton = styled.div`
 `;
 
 const IFrameContainer = styled.div`
+  display: block;
+  height: 100%;
   overflow: hidden;
 
   @font-face {
@@ -207,52 +211,57 @@ class BannerIframe extends React.Component {
   static getInitialProps({ query: { collectiveSlug, id, style, useNewFormat }, req, res }) {
     // Allow to be embedded as Iframe everywhere
     if (res) {
+      const { locale } = getRequestIntl(req);
       res.removeHeader('X-Frame-Options');
-      if (req && (req.language || req.locale === 'en')) {
-        res.set('Cache-Control', 'public, s-maxage=7200');
+      if (locale === 'en') {
+        res.setHeader('Cache-Control', 'public, s-maxage=7200');
       }
     }
 
-    return { collectiveSlug, id, style, useNewFormat: Boolean(useNewFormat) };
+    return { collectiveSlug, id, style, useNewFormat: parseToBoolean(useNewFormat) };
   }
 
   static propTypes = {
     collectiveSlug: PropTypes.string, // from getInitialProps, for addCollectiveBannerIframeData
     id: PropTypes.string, // from getInitialProps
-    style: PropTypes.object, // from getInitialProps
+    style: PropTypes.string, // from getInitialProps
     data: PropTypes.object.isRequired, // from withData
     useNewFormat: PropTypes.bool,
   };
 
-  constructor(props) {
-    super(props);
-    this.onChange = this.onChange.bind(this);
-  }
-
   componentDidMount() {
-    this.onChange();
+    this.onSizeUpdate();
+    window.addEventListener('resize', this.onSizeUpdate);
+    this.updateSizeInterval = setInterval(this.onSizeUpdate, 1000);
   }
 
   componentDidUpdate() {
-    this.onChange();
+    this.onSizeUpdate();
   }
 
-  onChange = () => {
-    this.height = this.node && this.node.offsetHeight;
-    this.sendMessageToParentWindow();
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onSizeUpdate);
+    clearInterval(this.updateSizeInterval);
+  }
+
+  onSizeUpdate = () => {
+    // Wait for the render to be completed by the browser
+    if (typeof window !== 'undefined') {
+      window.requestAnimationFrame(() => {
+        const { height, width } = this.node?.getBoundingClientRect() || {};
+        if (height && width) {
+          this.sendMessageToParentWindow(height, width);
+        }
+      });
+    }
   };
 
-  sendMessageToParentWindow = () => {
+  sendMessageToParentWindow = (height, width) => {
     if (!window.parent) {
       return;
     }
-    if (!this.height) {
-      return;
-    }
-    const message = `oc-${JSON.stringify({
-      id: this.props.id,
-      height: this.height,
-    })}`;
+
+    const message = `oc-${JSON.stringify({ id: this.props.id, height, width })}`;
     window.parent.postMessage(message, '*');
   };
 
@@ -263,38 +272,41 @@ class BannerIframe extends React.Component {
 
   renderNewFormat = () => {
     return (
-      <Query
-        query={topContributorsQuery}
-        variables={{ collectiveSlug: this.props.collectiveSlug }}
-        context={API_V2_CONTEXT}
-      >
-        {({ data, error, loading }) =>
-          loading ? (
-            <Loading />
-          ) : error ? (
-            <MessageBoxGraphqlError error={error} />
-          ) : (
-            <Box>
-              <Flex flexDirection="column" alignItems="center" mb={3}>
-                <H3 fontSize="18px" lineHeight="28px">
-                  <FormattedMessage
-                    id="NewContributionFlow.Join"
-                    defaultMessage="Join {numberOfContributors} other fellow contributors"
-                    values={{ numberOfContributors: data.account.contributors.totalCount }}
-                  />
-                </H3>
-                <StyledLink openInNewTab href={`https://opencollective.com/${this.props.collectiveSlug}`}>
-                  <FormattedMessage
-                    id="widget.contributeOnOpenCollective"
-                    defaultMessage="Contribute on Open Collective"
-                  />
-                </StyledLink>
-              </Flex>
-              {this.renderTopContributors(data.account)}
-            </Box>
-          )
-        }
-      </Query>
+      <div ref={node => (this.node = node)}>
+        <Query
+          query={topContributorsQuery}
+          variables={{ collectiveSlug: this.props.collectiveSlug }}
+          context={API_V2_CONTEXT}
+          onCompleted={this.onSizeUpdate}
+        >
+          {({ data, error, loading }) =>
+            loading ? (
+              <Loading />
+            ) : error ? (
+              <MessageBoxGraphqlError error={error} />
+            ) : (
+              <Box>
+                <Flex flexDirection="column" alignItems="center" mb={3}>
+                  <H3 fontSize="18px" lineHeight="28px">
+                    <FormattedMessage
+                      id="NewContributionFlow.Join"
+                      defaultMessage="Join {numberOfContributors} other fellow contributors"
+                      values={{ numberOfContributors: data.account.contributors.totalCount }}
+                    />
+                  </H3>
+                  <StyledLink openInNewTab href={`https://opencollective.com/${this.props.collectiveSlug}`}>
+                    <FormattedMessage
+                      id="widget.contributeOnOpenCollective"
+                      defaultMessage="Contribute on Open Collective"
+                    />
+                  </StyledLink>
+                </Flex>
+                {this.renderTopContributors(data.account)}
+              </Box>
+            )
+          }
+        </Query>
+      </div>
     );
   };
 
@@ -335,7 +347,6 @@ class BannerIframe extends React.Component {
       <IFrameContainer linkColor={style} ref={node => (this.node = node)}>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,900" />
           <title>{`${collectiveSlug} collectives`}</title>
         </Head>
         {backers.organizations + backers.collectives + backers.users === 0 && (
@@ -373,7 +384,7 @@ class BannerIframe extends React.Component {
             </div>
             <MembersWithData
               collective={collective}
-              onChange={this.onChange}
+              onChange={this.onSizeUpdate}
               type="ORGANIZATION,COLLECTIVE"
               memberRole="BACKER"
               limit={100}
@@ -407,7 +418,7 @@ class BannerIframe extends React.Component {
             </div>
             <MembersWithData
               collective={collective}
-              onChange={this.onChange}
+              onChange={this.onSizeUpdate}
               type="USER"
               memberRole="BACKER"
               limit={100}
@@ -420,26 +431,10 @@ class BannerIframe extends React.Component {
   }
 }
 
-const collectiveBannerIframeQuery = gqlV1/* GraphQL */ `
-  query CollectiveBannerIframe($collectiveSlug: String) {
-    Collective(slug: $collectiveSlug) {
-      id
-      name
-      slug
-      currency
-      stats {
-        id
-        backers {
-          id
-          users
-          organizations
-          collectives
-        }
-      }
-    }
-  }
-`;
-
-export const addCollectiveBannerIframeData = graphql(collectiveBannerIframeQuery);
+export const addCollectiveBannerIframeData = graphql(collectiveBannerIframeQuery, {
+  options({ collectiveSlug, useNewFormat }) {
+    return { skip: !collectiveSlug || useNewFormat };
+  },
+});
 
 export default addCollectiveBannerIframeData(BannerIframe);

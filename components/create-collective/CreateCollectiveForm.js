@@ -7,7 +7,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { suggestSlug } from '../../lib/collective.lib';
+import { suggestSlug } from '../../lib/collective';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
 import withData from '../../lib/withData';
 
@@ -18,6 +18,7 @@ import CollectiveTagsInput from '../CollectiveTagsInput';
 import Container from '../Container';
 import { Box, Flex, Grid } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
+import InputTypeLocation from '../InputTypeLocation';
 import MessageBox from '../MessageBox';
 import OnboardingProfileCard from '../onboarding-modal/OnboardingProfileCard';
 import StyledButton from '../StyledButton';
@@ -52,13 +53,15 @@ const placeholders = {
 
 const messages = defineMessages({
   nameLabel: { id: 'createCollective.form.nameLabel', defaultMessage: 'Collective name' },
-  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
+  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your profile URL' },
   suggestedLabel: { id: 'createCollective.form.suggestedLabel', defaultMessage: 'Suggested' },
   descriptionLabel: {
     id: 'createCollective.form.descriptionLabel',
     defaultMessage: 'What does your Collective do?',
   },
   tagsLabel: { id: 'Tags', defaultMessage: 'Tags' },
+  locationLabel: { id: 'SectionLocation.Title', defaultMessage: 'Location' },
+  locationPlaceholder: { id: 'createCollective.form.locationPlaceholder', defaultMessage: 'Where are you based?' },
   descriptionHint: {
     id: 'createCollective.form.descriptionHint',
     defaultMessage: 'Write a short description (150 characters max)',
@@ -69,7 +72,7 @@ const messages = defineMessages({
   },
   errorSlugHyphen: {
     id: 'createCollective.form.error.slug.hyphen',
-    defaultMessage: 'Collective slug URL cannot start or end with a hyphen',
+    defaultMessage: 'Collective handle cannot start or end with a hyphen',
   },
 });
 
@@ -104,6 +107,8 @@ class CreateCollectiveForm extends React.Component {
       name: '',
       description: '',
       slug: '',
+      tags: [],
+      location: null,
       message: '',
       tos: false,
       hostTos: false,
@@ -131,8 +136,8 @@ class CreateCollectiveForm extends React.Component {
     };
 
     const submit = values => {
-      const { description, name, slug, message, tags, inviteMembers } = values;
-      this.props.onSubmit({ collective: { name, description, slug, tags }, message, inviteMembers });
+      const { description, name, slug, message, tags, location, inviteMembers } = values;
+      this.props.onSubmit({ collective: { name, description, slug, tags, location }, message, inviteMembers });
     };
 
     return (
@@ -353,6 +358,26 @@ class CreateCollectiveForm extends React.Component {
                         </Box>
                       )}
                       <StyledInputFormikField
+                        name="location"
+                        htmlFor="location"
+                        labelProps={LABEL_STYLES}
+                        label={intl.formatMessage(messages.locationLabel)}
+                        value={values.location}
+                        required
+                        mt={3}
+                        mb={2}
+                      >
+                        {({ field }) => (
+                          <InputTypeLocation
+                            {...field}
+                            onChange={value => {
+                              setFieldValue('location', value);
+                            }}
+                            placeholder={intl.formatMessage(messages.locationPlaceholder)}
+                          />
+                        )}
+                      </StyledInputFormikField>
+                      <StyledInputFormikField
                         name="tags"
                         htmlFor="tags"
                         labelProps={LABEL_STYLES}
@@ -382,6 +407,7 @@ class CreateCollectiveForm extends React.Component {
                           defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world."
                         />
                       </MessageBox>
+
                       {host && (
                         <StyledInputFormikField
                           name="message"
@@ -399,7 +425,14 @@ class CreateCollectiveForm extends React.Component {
                           }
                         >
                           {({ field }) => (
-                            <StyledTextarea {...field} width="100%" minHeight={76} maxLength={3000} showCount />
+                            <StyledTextarea
+                              {...field}
+                              width="100%"
+                              minHeight={76}
+                              maxLength={3000}
+                              showCount
+                              fontSize="14px"
+                            />
                           )}
                         </StyledInputFormikField>
                       )}
@@ -419,7 +452,7 @@ class CreateCollectiveForm extends React.Component {
                                   defaultMessage="I agree with the {toslink} of Open Collective."
                                   values={{
                                     toslink: (
-                                      <StyledLink href="/tos" openInNewTab>
+                                      <StyledLink href="/tos" openInNewTab onClick={e => e.stopPropagation()}>
                                         <FormattedMessage id="tos" defaultMessage="terms of service" />
                                       </StyledLink>
                                     ),
@@ -477,7 +510,7 @@ class CreateCollectiveForm extends React.Component {
                 }}
               </Formik>
               <Container justifyContent="center" mb={4} display={['flex', 'none']}>
-                <NextIllustration src="/static/images/create-collective/mobileForm.png" width="320px" height="200px" />
+                <NextIllustration src="/static/images/create-collective/mobileForm.png" width={320} height={200} />
               </Container>
             </ContainerWithImage>
           </Flex>

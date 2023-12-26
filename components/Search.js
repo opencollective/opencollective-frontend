@@ -1,62 +1,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 
-import { Box, Flex } from './Grid';
-import Link from './Link';
+import { Dialog, DialogContent } from './ui/Dialog';
 import SearchForm from './SearchForm';
-import StyledLink from './StyledLink';
-import StyledLinkButton from './StyledLinkButton';
-import StyledModal, { CloseIcon, ModalBody } from './StyledModal';
-import { Span } from './Text';
-
 /*
  * A modal that appears on top of the page containing a search field.
  */
-const SearchModal = ({ onClose }) => {
+const SearchModal = ({ open, setOpen }) => {
   const intl = useIntl();
+  const onClose = () => setOpen(false);
   return (
-    <StyledModal
-      position="absolute"
-      top={0}
-      style={{ borderRadius: 0 }}
-      maxWidth="100%"
-      width="100%"
-      height="128px"
-      onClose={onClose}
-      overflow="hidden"
-    >
-      <ModalBody>
-        <Flex height="48px" alignItems="center" flexDirection="column">
-          <Flex>
-            <SearchForm
-              autoFocus
-              width={['180px', '248px', '536px']}
-              borderRadius="100px"
-              fontSize="12px"
-              placeholder={intl.formatMessage({ defaultMessage: 'Search for Collectives, organizations, and more...' })}
-              showSearchButton
-              searchButtonStyles={{ width: '32px', height: '32px' }}
-            />
-            <Span mt="12px" ml={['10px', '25px']}>
-              <StyledLinkButton onClick={onClose}>
-                <CloseIcon style={{ width: '14px', height: '14px' }} />
-              </StyledLinkButton>
-            </Span>
-          </Flex>
-          <Box pt="16px" fontSize="13px">
-            <StyledLink as={Link} href="/search">
-              <FormattedMessage id="home.discoverCollectives" defaultMessage="Discover Collectives" />
-            </StyledLink>
-          </Box>
-        </Flex>
-      </ModalBody>
-    </StyledModal>
+    <Dialog open={open} onOpenChange={open => setOpen(open)}>
+      <DialogContent className="overflow-hidden px-0 py-12 sm:rounded-full sm:py-0 sm:pr-8">
+        <SearchForm
+          autoFocus
+          borderColor="transparent"
+          overflow="hidden"
+          fontSize="14px"
+          height="48px"
+          placeholder={intl.formatMessage({ defaultMessage: 'Search for Collectives, organizations, and more...' })}
+          showSearchButton
+          searchButtonStyles={{ width: '32px', height: '32px' }}
+          closeSearchModal={onClose}
+        />
+      </DialogContent>
+    </Dialog>
   );
 };
 
 SearchModal.propTypes = {
-  onClose: PropTypes.func,
+  setOpen: PropTypes.func,
+  open: PropTypes.bool,
 };
 
 export default SearchModal;

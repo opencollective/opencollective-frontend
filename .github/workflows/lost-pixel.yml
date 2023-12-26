@@ -1,0 +1,25 @@
+name: 'Lost Pixel'
+
+on: [push]
+
+jobs:
+  lost-pixel-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - name: Build Storybook
+        run: npm run styleguide:build
+
+      - name: Lost Pixel
+        uses: lost-pixel/lost-pixel@v3.8.2
+        env:
+          LOST_PIXEL_API_KEY: ${{ secrets.LOST_PIXEL_API_KEY }}
+          LOST_PIXEL_PROJECT_ID: ${{ secrets.LOST_PIXEL_PROJECT_ID }}

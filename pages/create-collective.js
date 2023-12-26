@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
 import CreateCollective from '../components/create-collective';
 import ErrorPage from '../components/ErrorPage';
@@ -23,6 +23,7 @@ const createCollectiveHostQuery = gql`
       isOpenToApplications
       termsUrl
       policies {
+        id
         COLLECTIVE_MINIMUM_ADMINS {
           numberOfAdmins
         }
@@ -54,6 +55,12 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
       <CreateCollective host={data && data.host} />
     </Page>
   );
+};
+
+CreateCollectivePage.getInitialProps = () => {
+  return {
+    scripts: { googleMaps: true }, // To enable location autocomplete
+  };
 };
 
 CreateCollectivePage.propTypes = {

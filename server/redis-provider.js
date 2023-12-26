@@ -1,24 +1,20 @@
-const Promise = require('bluebird');
-const redis = require('redis');
-
 const logger = require('./logger');
+const { createRedisClient } = require('./redis');
 
-const asyncRedis = Promise.promisifyAll(redis);
-
-const redisProvider = ({ serverUrl }) => {
-  const redisOptions = {};
-  if (serverUrl.includes('rediss://')) {
-    redisOptions.tls = { rejectUnauthorized: false };
+const redisProvider = async () => {
+  const redisClient = await createRedisClient();
+  if (!redisClient) {
+    logger.warn(`redis client not available, redisProvider in compatibility mode`);
   }
-  const client = asyncRedis.createClient(serverUrl, redisOptions);
+
   return {
-    clear: async () => client.flushallAsync(),
-    del: async key => client.delAsync(key),
-    get: async key => {
-      const value = await client.getAsync(key);
+    clear: async () => redisClient?.flushAll(),
+    delete: async key => redisClient?.del(key),
+    get: async (key, { unserialize = JSON.parse } = {}) => {
+      const value = await redisClient?.get(key);
       if (value) {
         try {
-          return JSON.parse(value);
+          return unserialize(value);
         } catch (err) {
           logger.error(`redisProvider: Invalid JSON`);
           logger.error(value);
@@ -28,15 +24,15 @@ const redisProvider = ({ serverUrl }) => {
       }
     },
     has: async key => {
-      const value = await client.getAsync(key);
+      const value = await redisClient?.get(key);
       return value !== null;
     },
-    set: async (key, value, ttlInSeconds) => {
+    set: async (key, value, expirationInSeconds, { serialize = JSON.stringify } = {}) => {
       if (value !== undefined) {
-        if (ttlInSeconds) {
-          return client.setexAsync(key, ttlInSeconds, JSON.stringify(value));
+        if (expirationInSeconds) {
+          return redisClient?.set(key, serialize(value), { EX: expirationInSeconds });
         } else {
-          return client.setAsync(key, JSON.stringify(value));
+          return redisClient?.set(key, serialize(value));
         }
       }
     },

@@ -6,20 +6,21 @@ import { ORDER_STATUS } from '../../../lib/constants/order-status';
 
 import OrdersWithData from '../../orders/OrdersWithData';
 
-const FinancialContributions = ({ hostSlug }) => {
+const FinancialContributions = ({ accountSlug }) => {
   return (
     <OrdersWithData
       status={ORDER_STATUS.PENDING}
-      accountSlug={hostSlug}
+      accountSlug={accountSlug}
       title={<FormattedMessage id="PendingContributions" defaultMessage="Pending Contributions" />}
       showPlatformTip
       canCreatePendingOrder
+      showDisputesWarning
     />
   );
 };
 
 FinancialContributions.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
+  accountSlug: PropTypes.string.isRequired,
 };
 
 export default FinancialContributions;

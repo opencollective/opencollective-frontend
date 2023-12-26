@@ -1,14 +1,14 @@
 import React from 'react';
-import { ApolloError, gql, useApolloClient } from '@apollo/client';
+import { ApolloError, useApolloClient } from '@apollo/client';
 import type { PaymentIntent, Stripe } from '@stripe/stripe-js';
 
-import { API_V2_CONTEXT } from '../graphql/helpers';
-import { AccountReferenceInput } from '../graphql/types/v2/graphql';
+import { API_V2_CONTEXT, gql } from '../graphql/helpers';
+import { AccountReferenceInput, GuestInfoInput } from '../graphql/types/v2/graphql';
 import { loadScriptAsync } from '../utils';
 
 const createPaymentIntentMutation = gql`
-  mutation CreatePaymentIntent($paymentIntent: PaymentIntentInput!) {
-    createPaymentIntent(paymentIntent: $paymentIntent) {
+  mutation CreatePaymentIntent($paymentIntent: PaymentIntentInput!, $guestInfo: GuestInfoInput) {
+    createPaymentIntent(paymentIntent: $paymentIntent, guestInfo: $guestInfo) {
       id
       paymentIntentClientSecret
       stripeAccount
@@ -20,6 +20,7 @@ const createPaymentIntentMutation = gql`
 type UsePaymentIntentOptions = {
   amount: { valueInCents: number; currency: string };
   fromAccount?: AccountReferenceInput;
+  guestInfo?: GuestInfoInput;
   toAccount: AccountReferenceInput;
   skip?: boolean;
 };
@@ -29,6 +30,7 @@ type StripePaymentIntent = PaymentIntent & { stripeAccount: string };
 export default function usePaymentIntent({
   amount,
   fromAccount,
+  guestInfo,
   toAccount,
   skip,
 }: UsePaymentIntentOptions): [StripePaymentIntent, Stripe, boolean, Error] {
@@ -53,6 +55,7 @@ export default function usePaymentIntent({
             fromAccount,
             toAccount,
           },
+          guestInfo,
         },
         errorPolicy: 'all',
       });
@@ -97,7 +100,7 @@ export default function usePaymentIntent({
       setPaymentIntent(null);
       setStripe(null);
     };
-  }, [skip]);
+  }, [skip, guestInfo?.captcha?.token]);
 
   return [paymentIntent, stripe, loading, error];
 }

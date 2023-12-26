@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { clamp, isBoolean, isNil, round } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import { HOST_FEE_STRUCTURE } from '../../lib/constants/host-fee-structure';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { i18nExpenseType } from '../../lib/i18n/expense';
 
 import { ALL_SECTIONS } from '../admin-panel/constants';
@@ -21,7 +21,7 @@ import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../S
 import StyledRadioList from '../StyledRadioList';
 import StyledSelect from '../StyledSelect';
 import { Label, P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const OPTION_LABELS = defineMessages({
   [HOST_FEE_STRUCTURE.DEFAULT]: {
@@ -78,8 +78,8 @@ const DISPLAYED_EXPENSE_TYPES = [EXPENSE_TYPE.INVOICE, EXPENSE_TYPE.RECEIPT, EXP
 
 const EXPENSE_TYPE_OPTIONS = [
   { value: null, label: <FormattedMessage defaultMessage="Use global host settings" /> },
-  { value: true, label: <FormattedMessage defaultMessage="Enabled" /> },
-  { value: false, label: <FormattedMessage defaultMessage="Disabled" /> },
+  { value: true, label: <FormattedMessage id="ExpenseType.Enabled" defaultMessage="Enabled" /> },
+  { value: false, label: <FormattedMessage id="ExpenseType.Disabled" defaultMessage="Disabled" /> },
 ];
 
 const EXPENSE_TYPE_SELECT_STYLES = {
@@ -88,7 +88,7 @@ const EXPENSE_TYPE_SELECT_STYLES = {
 
 const CollectiveSettingsModal = ({ host, collective, ...props }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [hostFeePercent, setHostFeePercent] = useState(getDefaultFee(collective, host));
   const [selectedOption, setSelectedOption] = useState(
     hostFeePercent === host.hostFeePercent ? HOST_FEE_STRUCTURE.DEFAULT : HOST_FEE_STRUCTURE.CUSTOM_FEE,
@@ -179,7 +179,7 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
                         type="number"
                         min="0"
                         max="100"
-                        maxWidth={90}
+                        maxWidth={120}
                         appendProps={{ color: 'black.600' }}
                         fontWeight="normal"
                         value={isNaN(hostFeePercent) ? '' : hostFeePercent}
@@ -218,9 +218,9 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
                   },
                 });
 
-                props?.onClose();
+                props.onClose();
               } catch (e) {
-                addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+                toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }
             }}
           >
@@ -236,7 +236,7 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
 };
 
 CollectiveSettingsModal.propTypes = {
-  onClose: PropTypes.func,
+  onClose: PropTypes.func.isRequired,
   collective: PropTypes.shape({
     id: PropTypes.string,
     hostFeePercent: PropTypes.number,

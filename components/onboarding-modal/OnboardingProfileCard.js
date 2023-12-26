@@ -14,7 +14,6 @@ const Admin = styled(StyledTag).attrs({ variant: 'rounded-right' })``;
 class OnboardingProfileCard extends React.Component {
   static propTypes = {
     collective: PropTypes.object,
-    adminCollective: PropTypes.object,
     removeAdmin: PropTypes.func,
     isPending: PropTypes.bool,
   };

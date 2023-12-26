@@ -8,13 +8,13 @@ import { FormattedMessage } from 'react-intl';
 import { defaultBackgroundImage } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { editCollectiveMutation } from '../../../lib/graphql/mutations';
-import { editCollectivePageQuery } from '../../../lib/graphql/queries';
+import { editCollectivePageMutation } from '../../../lib/graphql/v1/mutations';
+import { editCollectivePageQuery } from '../../../lib/graphql/v1/queries';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import SettingsForm from '../../edit-collective/Form';
 import Loading from '../../Loading';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { useToast } from '../../ui/useToast';
 import { ALL_SECTIONS } from '../constants';
 import { adminPanelQuery } from '../queries';
 
@@ -22,7 +22,7 @@ const AccountSettings = ({ account, section }) => {
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const router = useRouter();
   const [state, setState] = React.useState({ status: undefined, result: undefined });
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const { data, loading } = useQuery(editCollectivePageQuery, {
     variables: { slug: account.slug },
@@ -30,7 +30,7 @@ const AccountSettings = ({ account, section }) => {
     skip: !LoggedInUser,
   });
   const collective = data?.Collective;
-  const [editCollective] = useMutation(editCollectiveMutation);
+  const [editCollective] = useMutation(editCollectivePageMutation);
 
   const handleEditCollective = async updatedCollective => {
     const collective = { ...updatedCollective };
@@ -114,7 +114,14 @@ const AccountSettings = ({ account, section }) => {
     if (collective.location === null) {
       CollectiveInputType.location = null;
     } else {
-      CollectiveInputType.location = pick(collective.location, ['name', 'address', 'lat', 'long', 'country']);
+      CollectiveInputType.location = pick(collective.location, [
+        'name',
+        'address',
+        'lat',
+        'long',
+        'country',
+        'structured',
+      ]);
     }
     setState({ ...state, status: 'loading' });
     try {
@@ -140,16 +147,16 @@ const AccountSettings = ({ account, section }) => {
           setState({ ...state, status: null });
         }, 3000);
       }
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: <FormattedMessage id="Settings.Updated" defaultMessage="Settings updated." />,
       });
     } catch (err) {
-      const errorMsg = getErrorFromGraphqlException(err)?.message || (
+      const errorMsg = getErrorFromGraphqlException(err).message || (
         <FormattedMessage id="Settings.Updated.Fail" defaultMessage="Update failed." />
       );
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: errorMsg,
       });
       setState({ ...state, status: null, result: { error: errorMsg } });

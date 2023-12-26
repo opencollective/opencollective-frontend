@@ -9,8 +9,9 @@ import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { isURL } from 'validator';
 
+import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { WebhookEventsList } from '../../../lib/constants/notificationEvents';
+import { WebhookEvents, WebhookEventsList } from '../../../lib/constants/notificationEvents';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { gqlV1 } from '../../../lib/graphql/helpers';
 import { i18nWebhookEventType } from '../../../lib/i18n/webhook-event-type';
@@ -70,33 +71,57 @@ class Webhooks extends React.Component {
     return value ? value.trim().replace(/https?:\/\//, '') : '';
   };
 
-  getEventTypes = memoizeOne((collectiveType, isHost) => {
+  getEventTypes = memoizeOne(collective => {
     const removeList = [];
 
-    if (collectiveType !== CollectiveType.COLLECTIVE) {
+    // Features
+    const canReceiveExpenses = isFeatureEnabled(collective, FEATURES.RECEIVE_EXPENSES);
+    const canReceiveContributions = isFeatureEnabled(collective, FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS);
+    const canUseVirtualCards = isFeatureEnabled(collective, FEATURES.VIRTUAL_CARDS);
+    const canUseUpdates = isFeatureEnabled(collective, FEATURES.UPDATES);
+
+    if (!canReceiveExpenses) {
       removeList.push(
-        'collective.comment.created',
         'collective.expense.created',
         'collective.expense.deleted',
         'collective.expense.updated',
         'collective.expense.rejected',
         'collective.expense.approved',
         'collective.expense.paid',
-        'collective.monthly',
-        'collective.transaction.created',
-        'collective.transaction.paid',
-        'collective.update.created',
-        'collective.update.published',
       );
     }
-    if (collectiveType !== CollectiveType.ORGANIZATION) {
+    if (!canReceiveContributions) {
+      removeList.push('collective.member.created', 'subscription.canceled');
+    }
+    if (!canUseVirtualCards) {
+      removeList.push('virtualcard.purchase');
+    }
+    if (!canUseUpdates) {
+      removeList.push('collective.update.created', 'collective.update.published');
+    }
+    if (!canReceiveExpenses && !canReceiveContributions && !canUseUpdates) {
+      removeList.push('collective.comment.created');
+    }
+
+    // Collective type
+    if (collective.type !== CollectiveType.COLLECTIVE) {
+      removeList.push('collective.monthly');
+    }
+    if (collective.type !== CollectiveType.ORGANIZATION) {
       removeList.push('organization.collective.created', 'user.created');
     }
-    if (collectiveType !== CollectiveType.EVENT) {
+    if (collective.type === CollectiveType.EVENT) {
+      removeList.push('subscription.canceled'); // No recurring contributions for events
+    } else {
       removeList.push('ticket.confirmed');
     }
-    if (!isHost) {
+
+    // Host
+    if (!collective.isHost) {
       removeList.push('collective.apply', 'collective.approved', 'collective.created');
+    }
+    if ([CollectiveType.USER, CollectiveType.ORGANIZATION].includes(collective.type) && !collective.isHost) {
+      removeList.push('collective.transaction.created');
     }
 
     return difference(WebhookEventsList, removeList);
@@ -201,7 +226,7 @@ class Webhooks extends React.Component {
                 minWidth={300}
                 isSearchable={false}
                 inputId="event-type-select"
-                options={this.getEventTypes(data.Collective.type, data.Collective.isHost).map(eventType => ({
+                options={this.getEventTypes(data.Collective).map(eventType => ({
                   label: i18nWebhookEventType(intl, eventType),
                   value: eventType,
                 }))}
@@ -221,6 +246,17 @@ class Webhooks extends React.Component {
               )}
             </Flex>
           </Box>
+          {data.Collective.isHost &&
+            [WebhookEvents.COLLECTIVE_EXPENSE_CREATED, WebhookEvents.COLLECTIVE_TRANSACTION_CREATED].includes(
+              webhook.type,
+            ) && (
+              <MessageBox type="warning" mt={2} withIcon>
+                <FormattedMessage
+                  defaultMessage="This event will only be triggered when the activity occurs on {host}'s account, not on its hosted initiatives."
+                  values={{ host: this.props.collectiveSlug }}
+                />
+              </MessageBox>
+            )}
           {this.state.moreInfoModal && (
             <WebhookActivityInfoModal
               activity={this.state.moreInfoModal}
@@ -322,6 +358,12 @@ const editCollectiveWebhooksQuery = gqlV1/* GraphQL */ `
       type
       slug
       isHost
+      features {
+        RECEIVE_EXPENSES
+        VIRTUAL_CARDS
+        RECEIVE_FINANCIAL_CONTRIBUTIONS
+        UPDATES
+      }
       notifications(channel: "webhook") {
         id
         type

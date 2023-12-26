@@ -17,8 +17,8 @@ const ContactCollectiveBtn = ({ children, collective, LoggedInUser }) => {
           isOpenCollective
             ? router.push('/help')
             : LoggedInUser
-            ? setShowModal(true)
-            : router.push(`/${collective.slug}/contact`),
+              ? setShowModal(true)
+              : router.push(`/${collective.slug}/contact`),
       })}
       {showModal && <ContactCollectiveModal collective={collective} onClose={() => setShowModal(null)} />}
     </Fragment>

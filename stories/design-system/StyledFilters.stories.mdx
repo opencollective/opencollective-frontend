@@ -9,6 +9,9 @@ import StyledFilters from '../../components/StyledFilters';
     selected: { control: { disable: true } },
     onChange: { action: 'onChange' },
   }}
+  args={{
+    filters: ['Option 1', 'Option 2', 'Option 3'],
+  }}
 />
 
 # StyledFilters
@@ -23,3 +26,12 @@ export const DefaultStory = props => {
 <Story name="Default">{DefaultStory.bind({})}</Story>
 
 <ArgsTable story="Default" />
+
+## MultiSelect
+
+export const MultiSelectStory = props => {
+  const [selected, setSelected] = React.useState([]);
+  return <StyledFilters {...props} selected={selected} onChange={setSelected} />;
+};
+
+<Story name="MultiSelect">{MultiSelectStory.bind({})}</Story>

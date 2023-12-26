@@ -9,18 +9,13 @@ import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-m
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
-import { compose } from '../lib/utils';
 
 import Container from '../components/Container';
-import { PAYMENT_FLOW } from '../components/contribution-flow/constants';
 import ContributionBlocker, {
   CONTRIBUTION_BLOCKER,
   getContributionBlocker,
 } from '../components/contribution-flow/ContributionBlocker';
-import {
-  contributionFlowAccountQuery,
-  contributionFlowAccountWithTierQuery,
-} from '../components/contribution-flow/graphql/queries';
+import { contributionFlowAccountQuery } from '../components/contribution-flow/graphql/queries';
 import ContributionFlowContainer from '../components/contribution-flow/index';
 import { getContributionFlowMetadata } from '../components/contribution-flow/utils';
 import ErrorPage from '../components/ErrorPage';
@@ -36,7 +31,6 @@ class NewContributionFlowPage extends React.Component {
       // Route parameters
       collectiveSlug: query.eventSlug || query.collectiveSlug,
       tierId: parseInt(query.tierId) || null,
-      paymentFlow: query.paymentFlow,
       // Query parameters
       error: query.error,
     };
@@ -44,7 +38,6 @@ class NewContributionFlowPage extends React.Component {
 
   static propTypes = {
     collectiveSlug: PropTypes.string.isRequired,
-    paymentFlow: PropTypes.string,
     tierId: PropTypes.number,
     error: PropTypes.string,
     data: PropTypes.shape({
@@ -90,9 +83,8 @@ class NewContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, paymentFlow, LoggedInUser, error } = this.props;
+    const { data = {}, LoggedInUser, error } = this.props;
     const { account, tier } = data;
-    const isCrypto = paymentFlow === PAYMENT_FLOW.CRYPTO;
 
     if (data.loading) {
       return (
@@ -102,13 +94,7 @@ class NewContributionFlowPage extends React.Component {
       );
     }
 
-    const contributionBlocker = getContributionBlocker(
-      LoggedInUser,
-      account,
-      tier,
-      Boolean(this.props.tierId),
-      isCrypto,
-    );
+    const contributionBlocker = getContributionBlocker(LoggedInUser, account, tier, Boolean(this.props.tierId));
 
     if (contributionBlocker) {
       if (contributionBlocker.reason === CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION) {
@@ -116,15 +102,7 @@ class NewContributionFlowPage extends React.Component {
       }
       return <ContributionBlocker blocker={contributionBlocker} account={account} />;
     } else {
-      return (
-        <ContributionFlowContainer
-          collective={account}
-          host={account.host}
-          tier={tier}
-          paymentFlow={paymentFlow}
-          error={error}
-        />
-      );
+      return <ContributionFlowContainer collective={account} host={account.host} tier={tier} error={error} />;
     }
   }
 
@@ -144,6 +122,7 @@ class NewContributionFlowPage extends React.Component {
         showFooter={false}
         menuItemsV2={{ solutions: false, product: false, company: false, docs: false }}
         showSearch={false}
+        collective={data.account}
       >
         {this.renderPageContent()}
       </Page>
@@ -151,22 +130,11 @@ class NewContributionFlowPage extends React.Component {
   }
 }
 
-const addAccountData = graphql(contributionFlowAccountQuery, {
-  skip: props => Boolean(props.tierId),
+const addContributionFlowData = graphql(contributionFlowAccountQuery, {
   options: props => ({
-    variables: { collectiveSlug: props.collectiveSlug },
+    variables: { collectiveSlug: props.collectiveSlug, tierId: props.tierId, includeTier: Boolean(props.tierId) },
     context: API_V2_CONTEXT,
   }),
 });
 
-const addAccountWithTierData = graphql(contributionFlowAccountWithTierQuery, {
-  skip: props => !props.tierId,
-  options: props => ({
-    variables: { collectiveSlug: props.collectiveSlug, tier: { legacyId: props.tierId } },
-    context: API_V2_CONTEXT,
-  }),
-});
-
-const addGraphql = compose(addAccountData, addAccountWithTierData);
-
-export default addGraphql(withUser(injectIntl(withStripeLoader(withRouter(NewContributionFlowPage)))));
+export default addContributionFlowData(withUser(injectIntl(withStripeLoader(withRouter(NewContributionFlowPage)))));

@@ -4,8 +4,7 @@ describe('event.createOrder page', () => {
   let collective = null;
 
   const createEvent = name => {
-    // Create event
-    cy.visit(`${collective.slug}/events/new`);
+    cy.login({ redirect: `${collective.slug}/events/new` });
     cy.get('.inputs input[name="name"]').type(name);
     cy.get('.inputs .startsAt input[type="datetime-local"]')
       .clear()
@@ -31,11 +30,11 @@ describe('event.createOrder page', () => {
 
     // Create Ticket
     cy.contains('a', 'Create Ticket').click();
-    cy.get('[data-cy="admin-panel-container"] [data-cy="create-contribute-tier"]').click();
+    cy.get('[data-cy="admin-panel-container"] [data-cy="create-ticket"]').click();
     cy.get('[data-cy=name]').type('Free ticket');
     cy.get('input[data-cy=amount]').type('0');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
     cy.getByDataCy('menu-account-avatar-link').click();
 
     // Go to the contribution flow
@@ -56,11 +55,11 @@ describe('event.createOrder page', () => {
 
     // Create Ticket
     cy.contains('a', 'Create Ticket').click();
-    cy.get('[data-cy="admin-panel-container"] [data-cy="create-contribute-tier"]').click();
+    cy.get('[data-cy="admin-panel-container"] [data-cy="create-ticket"]').click();
     cy.get('[data-cy=name]').type('Paying Ticket');
     cy.get('input[data-cy=amount]').type('10');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
     cy.getByDataCy('menu-account-avatar-link').click();
 
     // Go to the contribution flow
@@ -86,14 +85,14 @@ describe('event.createOrder page', () => {
 
     // Create Ticket
     cy.contains('a', 'Create Ticket').click();
-    cy.get('[data-cy="admin-panel-container"] [data-cy="create-contribute-tier"]').click();
+    cy.get('[data-cy="admin-panel-container"] [data-cy="create-ticket"]').click();
     cy.get('[data-cy=name]').type('Flexible Paying Ticket');
     cy.get('[data-cy=amountType]').click();
     cy.contains('[data-cy=select-option]', 'Flexible').click();
     cy.get('input[data-cy=amount]').type('10');
     cy.get('input[data-cy=minimumAmount]').type('5');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
     cy.getByDataCy('menu-account-avatar-link').click();
 
     // Go to the contribution flow
@@ -128,11 +127,11 @@ describe('event.createOrder page', () => {
     cy.contains('a', 'Create Ticket').click();
 
     // Create tickets
-    cy.get('[data-cy="admin-panel-container"] [data-cy="create-contribute-tier"]').click();
+    cy.get('[data-cy="admin-panel-container"] [data-cy="create-ticket"]').click();
     cy.get('[data-cy=name]').type('Ticket with VAT');
     cy.get('input[data-cy=amount]').type('10');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Ticket created.' });
+    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
     cy.getByDataCy('menu-account-avatar-link').click();
 
     // Go to the contribution flow

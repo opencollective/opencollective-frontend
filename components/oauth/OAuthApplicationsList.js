@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, NetworkStatus, useQuery } from '@apollo/client';
+import { NetworkStatus, useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { getOauthAppSettingsRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
@@ -22,7 +22,7 @@ import StyledLink from '../StyledLink';
 import { H3, P } from '../Text';
 
 const applicationsQuery = gql`
-  query ApplicationsQuery($slug: String!, $limit: Int, $offset: Int) {
+  query Applications($slug: String!, $limit: Int, $offset: Int) {
     account(slug: $slug) {
       id
       name
@@ -85,7 +85,7 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
           <StyledCard p="24px">
             <Flex>
               <Flex flex="0 0 64px" height="64px" justifyContent="center" alignItems="center">
-                <Image src="/static/icons/apps.png" width="52px" height="52px" alt="" />
+                <Image src="/static/icons/apps.png" width={52} height={52} alt="" />
               </Flex>
               <Flex flexDirection="column" ml={3}>
                 <P fontSize="14px" fontWeight="700" lineHeight="20px" mb="12px">

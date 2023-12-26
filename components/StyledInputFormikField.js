@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field } from 'formik';
+import { pickBy } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import { isOCError } from '../lib/errors';
@@ -22,6 +23,7 @@ const StyledInputFormikField = ({
   flex = undefined,
   width = undefined,
   display = undefined,
+  flexGrow = undefined,
   ...props
 }) => {
   const intl = useIntl();
@@ -29,32 +31,38 @@ const StyledInputFormikField = ({
   const htmlFor = props.htmlFor || `input-${name}`;
   return (
     <FieldComponent name={name} validate={validate}>
-      {({ field, form, meta }) => (
-        <Container flex={flex} width={width} display={display}>
-          <StyledInputField error={Boolean(meta.error)} {...props} htmlFor={htmlFor}>
-            <React.Fragment>
-              {children({
-                form,
-                meta,
-                field: {
-                  ...field,
-                  name: name || htmlFor,
-                  id: htmlFor,
-                  type: props.inputType,
-                  disabled: props.disabled,
-                  required: props.required,
-                  error: Boolean(meta.touched && meta.error),
-                },
-              })}
-              {meta.touched && meta.error && (
-                <P display="block" color="red.500" pt={2} fontSize="10px">
-                  {isOCError(meta.error) ? formatFormErrorMessage(intl, meta.error) : meta.error}
-                </P>
-              )}
-            </React.Fragment>
-          </StyledInputField>
-        </Container>
-      )}
+      {({ field, form, meta }) => {
+        const showError = Boolean(meta.error && (meta.touched || form.submitCount));
+        return (
+          <Container flex={flex} width={width} display={display} flexGrow={flexGrow}>
+            <StyledInputField error={Boolean(meta.error)} {...props} name={name} htmlFor={htmlFor}>
+              <React.Fragment>
+                {children({
+                  form,
+                  meta,
+                  field: pickBy(
+                    {
+                      ...field,
+                      name: name || htmlFor,
+                      id: htmlFor,
+                      type: props.inputType,
+                      disabled: props.disabled,
+                      required: props.required,
+                      error: showError,
+                    },
+                    value => value !== undefined,
+                  ),
+                })}
+                {showError && (
+                  <P display="block" color="red.500" pt={2} fontSize="10px">
+                    {isOCError(meta.error) ? formatFormErrorMessage(intl, meta.error) : meta.error}
+                  </P>
+                )}
+              </React.Fragment>
+            </StyledInputField>
+          </Container>
+        );
+      }}
     </FieldComponent>
   );
 };
@@ -76,6 +84,7 @@ StyledInputFormikField.propTypes = {
   flex: PropTypes.any,
   display: PropTypes.any,
   width: PropTypes.any,
+  flexGrow: PropTypes.any,
 };
 
 export default StyledInputFormikField;

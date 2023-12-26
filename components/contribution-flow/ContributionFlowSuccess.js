@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Facebook } from '@styled-icons/fa-brands/Facebook';
 import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
@@ -11,25 +10,36 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { AnalyticsEvent } from '../../lib/analytics/events';
+import { track } from '../../lib/analytics/plausible';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
-import { facebookShareURL, getCollectivePageRoute, mastodonShareURL, tweetURL } from '../../lib/url-helpers';
+import {
+  facebookShareURL,
+  followOrderRedirectUrl,
+  getCollectivePageRoute,
+  mastodonShareURL,
+  tweetURL,
+} from '../../lib/url-helpers';
 import { getWebsiteUrl } from '../../lib/utils';
 
 import Container from '../../components/Container';
+import { Box, Flex } from '../../components/Grid';
 import I18nFormatters, { getI18nLink, I18nBold } from '../../components/I18nFormatters';
+import Image from '../../components/Image';
 import Loading from '../../components/Loading';
 import MessageBox from '../../components/MessageBox';
 import StyledLink from '../../components/StyledLink';
+import { withUser } from '../../components/UserProvider';
 
+import { isValidExternalRedirect } from '../../pages/external-redirect';
 import { formatAccountDetails } from '../edit-collective/utils';
-import { Box, Flex } from '../Grid';
-import Image from '../Image';
 import Link from '../Link';
+import { Survey, SURVEY_KEY } from '../Survey';
 import { H3, P } from '../Text';
-import { withUser } from '../UserProvider';
+import { toast } from '../ui/useToast';
 
 import { orderSuccessFragment } from './graphql/fragments';
 import PublicMessageForm from './ContributionFlowPublicMessage';
@@ -122,6 +132,30 @@ class ContributionFlowSuccess extends React.Component {
     isEmbed: PropTypes.bool,
     data: PropTypes.object,
   };
+
+  componentDidMount() {
+    track(AnalyticsEvent.CONTRIBUTION_SUCCESS);
+    if (this.props.LoggedInUser) {
+      toast({
+        message: <Survey surveyKey={SURVEY_KEY.CONTRIBUTION_COMPLETED} />,
+        duration: 20000,
+      });
+    }
+  }
+
+  componentDidUpdate() {
+    const {
+      router: { query: queryParams },
+      data: { order },
+    } = this.props;
+    if (order && queryParams.redirect) {
+      if (isValidExternalRedirect(queryParams.redirect)) {
+        followOrderRedirectUrl(this.props.router, this.props.collective, order, queryParams.redirect, {
+          shouldRedirectParent: queryParams.shouldRedirectParent,
+        });
+      }
+    }
+  }
 
   renderCallsToAction = () => {
     const { LoggedInUser, data, isEmbed, router } = this.props;
@@ -242,7 +276,7 @@ class ContributionFlowSuccess extends React.Component {
       return (
         <Flex justifyContent="center" py={[5, 6]}>
           <MessageBox type="warning" withIcon>
-            <FormattedMessage id="Order.NotFound" defaultMessage="This order doesn't exist" />
+            <FormattedMessage id="Order.NotFound" defaultMessage="This contribution doesn't exist" />
           </MessageBox>
         </Flex>
       );

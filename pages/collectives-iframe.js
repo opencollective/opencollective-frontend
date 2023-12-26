@@ -12,7 +12,7 @@ const CollectivesIframeContainer = styled.div`
     padding: 0;
     margin: 0;
     font-weight: 300;
-    font-size: 1rem;
+    font-size: 0.65rem;
     line-height: 1.5;
     overflow-x: hidden;
   }
@@ -27,12 +27,12 @@ const CollectivesIframeContainer = styled.div`
   }
 
   .title .action {
-    font-size: 0.8rem;
+    font-size: 0.5rem;
   }
 
   h2 {
     font-size: 20px;
-    margin-right: 1rem;
+    margin-right: 0.65rem;
     margin-bottom: 0;
   }
 

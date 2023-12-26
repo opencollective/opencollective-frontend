@@ -1,18 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
 import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
 import ContributionConfirmationModal from '../ContributionConfirmationModal';
 import StyledButton from '../StyledButton';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const processPendingOrderMutation = gql`
   mutation ProcessPendingOrder($id: String!, $action: ProcessOrderAction!) {
@@ -47,7 +47,7 @@ export const hasProcessButtons = permissions => {
  */
 const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [selectedAction, setSelectedAction] = React.useState(null);
   const mutationOptions = { context: API_V2_CONTEXT };
   const [processOrder, { loading }] = useMutation(processPendingOrderMutation, mutationOptions);
@@ -56,7 +56,7 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
 
   const triggerAction = async action => {
     // Prevent submitting the action if another one is being submitted at the same time
-    if (loading) {
+    if (loading && selectedAction === action) {
       return;
     }
 
@@ -66,7 +66,7 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
       await processOrder({ variables: { id: order.id, action } });
       onSuccess?.();
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   };
 
@@ -112,8 +112,18 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
       )}
       {hasConfirm && (
         <ConfirmationModal
+          data-cy={`${selectedAction}-confirmation-modal`}
           onClose={() => setConfirm(false)}
-          continueHandler={() => triggerAction(selectedAction)}
+          continueHandler={() =>
+            triggerAction(selectedAction).then(() => {
+              if (selectedAction === 'MARK_AS_EXPIRED') {
+                toast({
+                  variant: 'success',
+                  message: intl.formatMessage({ defaultMessage: 'The contribution has been marked as expired' }),
+                });
+              }
+            })
+          }
           isDanger={selectedAction === 'MARK_AS_EXPIRED'}
           isSuccess={selectedAction === 'MARK_AS_PAID'}
           continueLabel={
@@ -123,9 +133,9 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
           }
           header={
             selectedAction === 'MARK_AS_PAID' ? (
-              <FormattedMessage id="Order.MarkPaidConfirm" defaultMessage="Mark this order as paid?" />
+              <FormattedMessage id="Order.MarkPaidConfirm" defaultMessage="Mark this contribution as paid?" />
             ) : (
-              <FormattedMessage id="Order.MarkExpiredConfirm" defaultMessage="Mark this order as expired?" />
+              <FormattedMessage id="Order.MarkExpiredConfirm" defaultMessage="Mark this contribution as expired?" />
             )
           }
         >

@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { isEmpty, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import { Box, Flex, Grid } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -13,8 +13,6 @@ import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
-import StyledHr from '../StyledHr';
-import { H1 } from '../Text';
 
 import HostAdminCollectiveCard from './HostAdminCollectiveCard';
 import HostAdminCollectiveFilters, { COLLECTIVE_FILTER } from './HostAdminCollectiveFilters';
@@ -129,7 +127,7 @@ const updateQuery = (router, newParams) => {
   return router.push({ pathname, query });
 };
 
-const HostDashboardHostedCollectives = ({ hostSlug }) => {
+const HostDashboardHostedCollectives = ({ accountSlug: hostSlug }) => {
   const router = useRouter() || {};
   const query = router.query;
   const hasFilters = React.useMemo(() => checkIfQueryHasFilters(query), [query]);
@@ -140,20 +138,18 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
 
   const hostedMemberships = data?.host?.memberOf;
   return (
-    <Box maxWidth={1000} m="0 auto" px={2}>
-      <Flex alignItems="center" mb={24} flexWrap="wrap">
-        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
+    <Box maxWidth={1024} m="0 auto">
+      <div className="flex flex-wrap justify-between gap-4">
+        <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />
-        </H1>
-        <Box mx="auto" />
-        <Box p={2}>
-          <SearchBar
-            defaultValue={query.searchTerm}
-            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-          />
-        </Box>
-      </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" />
+        </h1>
+        <SearchBar
+          height={40}
+          defaultValue={query.searchTerm}
+          onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
+        />
+      </div>
+      <hr className="my-5" />
       <Box mb={34}>
         {data?.host ? (
           <HostAdminCollectiveFilters
@@ -208,8 +204,7 @@ const HostDashboardHostedCollectives = ({ hostSlug }) => {
 };
 
 HostDashboardHostedCollectives.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
-  router: PropTypes.object,
+  accountSlug: PropTypes.string.isRequired,
 };
 
 export default HostDashboardHostedCollectives;

@@ -37,7 +37,7 @@ const Wrapper = styled(Flex)<WrapperProps>`
 
 type ModalProps = SpaceProps & LayoutProps & BackgroundProps;
 
-const Modal = styled(Container).attrs((props: ModalProps) => ({
+export const Modal = styled(Container).attrs((props: ModalProps) => ({
   maxWidth: props.maxWidth || '95%',
   maxHeight: props.maxHeight || '97%',
 }))<ModalProps>`
@@ -57,7 +57,7 @@ const Modal = styled(Container).attrs((props: ModalProps) => ({
 
 Modal.defaultProps = {
   background: 'white',
-  padding: '20px',
+  padding: '24px',
 };
 
 const GlobalModalStyle = createGlobalStyle`
@@ -66,7 +66,7 @@ const GlobalModalStyle = createGlobalStyle`
   }
 `;
 
-export const ModalOverlay = styled.div`
+export const ModalOverlay = styled.button`
   position: fixed;
   top: 0;
   left: 0;
@@ -178,7 +178,7 @@ CollectiveModalHeader.propTypes = {
   collective: PropTypes.shape({
     name: PropTypes.string,
   }),
-  customText: PropTypes.string,
+  customText: PropTypes.node,
 };
 
 CollectiveModalHeader.displayName = 'Header';
@@ -205,15 +205,14 @@ ModalFooter.propTypes = {
 };
 
 ModalFooter.defaultProps = {
-  dividerMargin: '2rem 0',
+  dividerMargin: '1.25rem 0',
   showDivider: true,
 };
 
 const DefaultTrapContainer = props => {
-  return <FocusTrap focusTrapOptions={{ clickOutsideDeactivates: true }} {...props} />;
+  return <FocusTrap focusTrapOptions={{ allowOutsideClick: true }} {...props} />;
 };
 
-export const ModalReferenceContext = React.createContext(null);
 /**
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
  * a styled `Container`.
@@ -225,12 +224,16 @@ const StyledModal = ({
   hasUnsavedChanges = undefined,
   trapFocus = false,
   ignoreEscapeKey = false,
+  preventClose = false,
   ...props
 }) => {
   const intl = useIntl();
   const modalRef = React.useRef(null);
   const TrapContainer = trapFocus ? DefaultTrapContainer : React.Fragment;
   const closeHandler = React.useCallback(() => {
+    if (preventClose) {
+      return;
+    }
     if (
       hasUnsavedChanges &&
       !confirm(intl.formatMessage({ defaultMessage: 'You have unsaved changes. Are you sure you want to close this?' }))
@@ -239,7 +242,7 @@ const StyledModal = ({
     }
 
     onClose();
-  }, [hasUnsavedChanges, onClose]);
+  }, [hasUnsavedChanges, onClose, preventClose]);
 
   const onEscape = React.useCallback(() => {
     if (!ignoreEscapeKey) {
@@ -258,14 +261,12 @@ const StyledModal = ({
         <Wrapper>
           <TrapContainer>
             <Modal ref={modalRef} {...props}>
-              <ModalReferenceContext.Provider value={modalRef}>
-                {React.Children.map(children, child => {
-                  if (child?.type?.displayName === 'Header') {
-                    return React.cloneElement(child, { onClose: closeHandler });
-                  }
-                  return child;
-                })}
-              </ModalReferenceContext.Provider>
+              {React.Children.map(children, child => {
+                if (child?.type?.displayName === 'Header') {
+                  return React.cloneElement(child, { onClose: closeHandler });
+                }
+                return child;
+              })}
             </Modal>
           </TrapContainer>
         </Wrapper>
@@ -277,30 +278,27 @@ const StyledModal = ({
       <React.Fragment>
         <GlobalModalStyle />
         {hasUnsavedChanges && <WarnIfUnsavedChanges hasUnsavedChanges />}
-        <Wrapper zindex={props.zindex}>
+        <Wrapper
+          zindex={props.zindex}
+          onKeyDown={event => {
+            if (event.key === 'Escape') {
+              event.preventDefault();
+              event.stopPropagation();
+              onEscape();
+            }
+          }}
+        >
           <TrapContainer>
             <Modal ref={modalRef} {...props}>
-              <ModalReferenceContext.Provider value={modalRef}>
-                {React.Children.map(children, child => {
-                  if (child?.type?.displayName === 'Header') {
-                    return React.cloneElement(child, { onClose: closeHandler });
-                  }
-                  return child;
-                })}
-              </ModalReferenceContext.Provider>
+              {React.Children.map(children, child => {
+                if (child?.type?.displayName === 'Header') {
+                  return React.cloneElement(child, { onClose: closeHandler });
+                }
+                return child;
+              })}
             </Modal>
           </TrapContainer>
-          <ModalOverlay
-            role="button"
-            tabIndex={0}
-            onClick={closeHandler}
-            onKeyDown={event => {
-              if (event.key === 'Escape') {
-                event.preventDefault();
-                onEscape();
-              }
-            }}
-          />
+          <ModalOverlay tabIndex={0} onClick={closeHandler} />
         </Wrapper>
       </React.Fragment>,
       document.body,

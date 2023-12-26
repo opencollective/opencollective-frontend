@@ -127,9 +127,9 @@ const messages = defineMessages({
     defaultMessage: 'Funder coalitions',
   },
   'fiscalHosting.founderCoalition.description': {
-    id: 'fiscalHosting.distributeCollaboration.description',
+    id: 'fiscalHosting.founderCoalition.description',
     defaultMessage:
-      'Like an open source software project, which isn’t owned by anyone and wants resources held in common.',
+      'Of foundations or other funders, joining to support an impact area, who need money to sit in a neutral space.',
   },
   'fiscalHosting.companiesGivingBack': {
     id: 'fiscalHosting.companiesGivingBack',

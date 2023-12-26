@@ -1,4 +1,4 @@
-import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
 import TwoFactorAuthenticationModal from '../../components/two-factor-authentication/TwoFactorAuthenticationModal';
 import TwoFactorAuthenticationPromptButton from './TwoFactorAuthenticationPromptButton';
 import TwoFactorAuthProvider, {
@@ -32,6 +32,18 @@ export const DefaultStory = props => <TwoFactorAuthenticationModal {...props} />
 <Canvas>
   <Story name="Modal">
     <TwoFactorAuthContext.Provider value={{ prompt: { isOpen: true, supportedMethods: ['totp'] } }}>
+      <TwoFactorAuthenticationModal />
+    </TwoFactorAuthContext.Provider>
+  </Story>
+</Canvas>
+
+## Methods
+
+<Canvas>
+  <Story name="Methods">
+    <TwoFactorAuthContext.Provider
+      value={{ prompt: { isOpen: true, supportedMethods: ['totp', 'webauthn', 'recovery_code'] } }}
+    >
       <TwoFactorAuthenticationModal />
     </TwoFactorAuthContext.Provider>
   </Story>

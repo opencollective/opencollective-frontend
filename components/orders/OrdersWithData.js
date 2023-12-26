@@ -1,19 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { parseDateInterval } from '../../lib/date-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 
+import { accountHoverCardFields } from '../AccountHoverCard';
 import { parseAmountRange } from '../budget/filters/AmountFilter';
+import { confirmContributionFieldsFragment } from '../ContributionConfirmationModal';
 import { Box, Flex } from '../Grid';
 import CreatePendingOrderModal from '../host-dashboard/CreatePendingOrderModal';
+import { DisputedContributionsWarning } from '../host-dashboard/DisputedContributionsWarning';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
@@ -21,8 +24,6 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import StyledButton from '../StyledButton';
-import StyledHr from '../StyledHr';
-import { H1 } from '../Text';
 
 import OrdersFilters from './OrdersFilters';
 import OrdersList from './OrdersList';
@@ -45,6 +46,7 @@ const accountOrdersQuery = gql`
       currency
       legacyId
       name
+      isHost
     }
     orders(
       account: { slug: $accountSlug }
@@ -66,14 +68,7 @@ const accountOrdersQuery = gql`
         description
         createdAt
         status
-        amount {
-          valueInCents
-          currency
-        }
-        platformTipAmount {
-          valueInCents
-          currency
-        }
+        ...ConfirmContributionFields
         paymentMethod {
           id
           providerType
@@ -83,6 +78,11 @@ const accountOrdersQuery = gql`
           slug
           name
           imageUrl
+          isIncognito
+          ... on Individual {
+            isGuest
+          }
+          ...AccountHoverCardFields
         }
         pendingContributionData {
           expectedAt
@@ -103,6 +103,7 @@ const accountOrdersQuery = gql`
           ... on AccountWithHost {
             bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
           }
+          ...AccountHoverCardFields
         }
         permissions {
           id
@@ -112,6 +113,8 @@ const accountOrdersQuery = gql`
       }
     }
   }
+  ${confirmContributionFieldsFragment}
+  ${accountHoverCardFields}
 `;
 
 const ORDERS_PER_PAGE = 15;
@@ -127,7 +130,7 @@ const getVariablesFromQuery = (query, forcedStatus) => {
   return {
     offset: parseInt(query.offset) || 0,
     limit: parseInt(query.limit) || ORDERS_PER_PAGE,
-    status: searchTerm ? null : forcedStatus ? forcedStatus : isValidStatus(query.status) ? query.status : null,
+    status: forcedStatus ? forcedStatus : isValidStatus(query.status) ? query.status : null,
     minAmount: amountRange[0] && amountRange[0] * 100,
     maxAmount: amountRange[1] && amountRange[1] * 100,
     dateFrom,
@@ -176,6 +179,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
   const queryVariables = { accountSlug, ...getVariablesFromQuery(router.query, status) };
   const queryParams = { variables: queryVariables, context: API_V2_CONTEXT };
   const { data, error, loading, variables, refetch } = useQuery(accountOrdersQuery, queryParams);
+
   const { LoggedInUser } = useLoggedInUser();
   const prevLoggedInUser = usePrevious(LoggedInUser);
   const isHostAdmin = LoggedInUser?.isAdminOfCollective(data?.account);
@@ -188,21 +192,20 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
   }, [LoggedInUser]);
 
   return (
-    <Box maxWidth={1000} width="100%" m="0 auto" px={2}>
-      <Flex mb={24} alignItems="center" flexWrap="wrap">
-        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
+    <Box maxWidth={1000} width="100%" m="0 auto">
+      <div className="flex flex-wrap justify-between gap-4">
+        <h1 className="text-2xl font-bold leading-10 tracking-tight">
           {title || <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
-        </H1>
-        <Box mx="auto" />
-        <Box p={2}>
-          <SearchBar
-            defaultValue={router.query.searchTerm}
-            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-            placeholder={intl.formatMessage(messages.searchPlaceholder)}
-          />
-        </Box>
-      </Flex>
-      <StyledHr mb={26} borderWidth="0.5px" borderColor="black.300" />
+        </h1>
+
+        <SearchBar
+          height="40px"
+          defaultValue={router.query.searchTerm}
+          onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
+          placeholder={intl.formatMessage(messages.searchPlaceholder)}
+        />
+      </div>
+      <hr className="my-5" />
       <Flex mb={34}>
         <Box flexGrow="1" mr="18px">
           {data?.account ? (
@@ -227,11 +230,12 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
               mt="17px"
               data-cy="create-pending-contribution"
             >
-              Create +
+              <FormattedMessage id="create" defaultMessage="Create" />
+              &nbsp;+
             </StyledButton>
             {showCreatePendingOrderModal && (
               <CreatePendingOrderModal
-                host={data.account}
+                hostSlug={data.account.slug}
                 onClose={() => setShowCreatePendingOrderModal(false)}
                 onSuccess={() => refetch()}
               />
@@ -239,6 +243,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
           </React.Fragment>
         )}
       </Flex>
+      {Boolean(data?.account?.isHost && isHostAdmin) && <DisputedContributionsWarning hostSlug={accountSlug} />}
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : !loading && !data.orders?.nodes.length ? (
@@ -258,7 +263,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
               }}
             />
           ) : (
-            <FormattedMessage id="orders.empty" defaultMessage="No orders" />
+            <FormattedMessage id="orders.empty" defaultMessage="No contribution" />
           )}
         </MessageBox>
       ) : (

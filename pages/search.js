@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular/ShareAlt';
 import copy from 'copy-to-clipboard';
@@ -10,7 +9,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
 
@@ -33,7 +32,7 @@ import { fadeIn } from '../components/StyledKeyframes';
 import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import StyledTag from '../components/StyledTag';
 import { H1, P, Span } from '../components/Text';
-import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
+import { toast } from '../components/ui/useToast';
 
 const CollectiveCardContainer = styled.div`
   animation: ${fadeIn} 0.2s;
@@ -88,7 +87,7 @@ const I18nFilters = defineMessages({
 const SearchFormContainer = styled(Box)`
   height: 58px;
   width: 608px;
-  min-width: 10rem;
+  min-width: 6.25rem;
 `;
 
 const FilterLabel = styled.label`
@@ -164,7 +163,6 @@ class SearchPage extends React.Component {
     router: PropTypes.object, // from next.js
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object,
-    addToast: PropTypes.func.isRequired, // from withToasts
     isHost: PropTypes.bool,
     type: PropTypes.array,
   };
@@ -271,8 +269,8 @@ class SearchPage extends React.Component {
 
   handleCopy = () => {
     copy(window.location.href);
-    this.props.addToast({
-      type: TOAST_TYPE.SUCCESS,
+    toast({
+      variant: 'success',
       message: <FormattedMessage defaultMessage="Search Result Copied!" />,
     });
   };
@@ -299,7 +297,7 @@ class SearchPage extends React.Component {
     const selectedTypeFilter = this.props.isHost ? 'HOST' : this.props.type.length === 1 ? this.props.type[0] : 'ALL';
 
     return (
-      <Page title="Search" showSearch={false}>
+      <Page navTitle={intl.formatMessage({ defaultMessage: 'Explore', id: 'Explore' })} showSearch={false}>
         <Container
           backgroundImage="url(/static/images/home/fiscalhost-blue-bg-lg.png)"
           style={{ transform: 'rotate(180deg)' }}
@@ -320,7 +318,7 @@ class SearchPage extends React.Component {
                 borderRadius="100px"
                 fontSize="16px"
                 height="58px"
-                placeholder={intl.formatMessage({ defaultMessage: 'Search by name, slug, tag, description...' })}
+                placeholder={intl.formatMessage({ defaultMessage: 'Search by name, handle, tag, description...' })}
                 value={this.state.term}
                 onChange={value => this.setState({ term: value })}
                 onSubmit={this.refetch}
@@ -581,6 +579,7 @@ export const searchPageQuery = gql`
         currency
         stats {
           id
+          contributorsCount
           totalAmountReceived(useCache: true) {
             currency
             valueInCents
@@ -607,9 +606,6 @@ export const searchPageQuery = gql`
               country
             }
           }
-        }
-        backers: members(role: BACKER) {
-          totalCount
         }
       }
       limit
@@ -642,4 +638,4 @@ export const addSearchPageData = graphql(searchPageQuery, {
   }),
 });
 
-export default withToasts(injectIntl(withRouter(addSearchPageData(SearchPage))));
+export default injectIntl(withRouter(addSearchPageData(SearchPage)));

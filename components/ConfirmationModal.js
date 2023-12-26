@@ -41,18 +41,18 @@ export const CONFIRMATION_MODAL_TERMINATE = { __CONFIRMATION_MODAL_TERMINATE: tr
  * confirmation purpose.
  */
 const ConfirmationModal = ({
-  header,
-  body,
-  children,
+  header = undefined,
+  body = undefined,
+  children = undefined,
   onClose,
-  type,
-  isDanger,
-  isSuccess,
-  cancelLabel,
-  continueLabel,
-  cancelHandler,
+  type = 'confirm',
+  isDanger = undefined,
+  isSuccess = undefined,
+  cancelLabel = undefined,
+  continueLabel = undefined,
+  cancelHandler = onClose,
   continueHandler,
-  disableSubmit,
+  disableSubmit = undefined,
   ...props
 }) => {
   const [submitting, setSubmitting] = React.useState(false);
@@ -69,7 +69,7 @@ const ConfirmationModal = ({
             my={1}
             autoFocus
             minWidth={140}
-            onClick={cancelHandler || onClose}
+            onClick={cancelHandler}
             disabled={submitting}
             data-cy="confirmation-modal-cancel"
           >

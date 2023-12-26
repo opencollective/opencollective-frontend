@@ -34,7 +34,7 @@ const getProfileInfo = (stepProfile, profiles) => {
   }
 };
 
-const StepProfileLoggedInForm = ({ profiles, onChange, collective, data, stepDetails }) => {
+const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, stepDetails }) => {
   const profileInfo = getProfileInfo(data, profiles);
   const isContributingFromSameHost = data?.host?.id === collective.host.legacyId;
 
@@ -43,11 +43,12 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, data, stepDet
       <Box mb={4}>
         <ContributeProfilePicker
           profiles={profiles}
+          tier={tier}
           selectedProfile={data}
           onChange={profile => onChange({ stepProfile: profile, stepPayment: null })}
         />
       </Box>
-      {!isContributingFromSameHost && contributionRequiresLegalName(stepDetails) && (
+      {!isContributingFromSameHost && contributionRequiresLegalName(stepDetails, tier) && (
         <React.Fragment>
           {!data?.isIncognito && (
             <StyledInputField
@@ -92,14 +93,14 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, data, stepDet
           </StyledInputField>
         </React.Fragment>
       )}
-      {!isContributingFromSameHost && contributionRequiresAddress(stepDetails) && (
+      {!isContributingFromSameHost && contributionRequiresAddress(stepDetails, tier) && (
         <React.Fragment>
           <Flex alignItems="center" my="14px">
             <P fontSize="24px" lineHeight="32px" fontWeight="500" mr={2}>
               <FormattedMessage id="collective.address.label" defaultMessage="Address" />
             </P>
             <Span mr={2} lineHeight="0">
-              <PrivateInfoIcon size="14px" tooltipProps={{ containerLineHeight: '0' }} />
+              <PrivateInfoIcon />
             </Span>
             <StyledHr my="18px" borderColor="black.300" width="100%" />
           </Flex>
@@ -120,6 +121,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, data, stepDet
 StepProfileLoggedInForm.propTypes = {
   data: PropTypes.object,
   stepDetails: PropTypes.object,
+  tier: PropTypes.object,
   onChange: PropTypes.func,
   profiles: PropTypes.arrayOf(PropTypes.object),
   collective: PropTypes.shape({

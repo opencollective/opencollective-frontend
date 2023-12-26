@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
+import { WebsiteName } from './I18nFormatters';
 import Image from './Image';
 import Link from './Link';
 import StyledButton from './StyledButton';
@@ -51,11 +52,14 @@ export default class SignIn extends React.Component {
     showSubHeading: PropTypes.bool,
     /** Show/hide Open Collective Logo **/
     showOCLogo: PropTypes.bool,
+    /** whether the input needs to be auto-focused */
+    autoFocus: PropTypes.bool,
   };
 
   static defaultProps = {
     showSubHeading: true,
     showOCLogo: true,
+    autoFocus: true,
   };
 
   constructor(props) {
@@ -213,7 +217,7 @@ export default class SignIn extends React.Component {
                       this.setState({ error: event.target.validationMessage });
                     }}
                     placeholder="e.g., yourname@yourhost.com"
-                    autoFocus
+                    autoFocus={this.props.autoFocus}
                     required
                     value={email}
                     type="email"
@@ -339,8 +343,8 @@ export default class SignIn extends React.Component {
               fontWeight={400}
             >
               <FormattedMessage
-                defaultMessage="{email} does not exist on Open Collective. Would you like to create an account with this email?"
-                values={{ email: <strong>{email}</strong> }}
+                defaultMessage="{email} does not exist on {WebsiteName}. Would you like to create an account with this email?"
+                values={{ email: <strong>{email}</strong>, WebsiteName }}
               />{' '}
               <Box mt="24px">
                 <Span mr="40px">

@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { ArrowBack } from '@styled-icons/boxicons-regular/ArrowBack';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 import { compose } from '../lib/utils';
@@ -18,32 +17,34 @@ import { getUpdatesSectionQueryVariables, updatesSectionQuery } from '../compone
 import Container from '../components/Container';
 import EditUpdateForm from '../components/EditUpdateForm';
 import ErrorPage from '../components/ErrorPage';
-import Footer from '../components/Footer';
 import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
+import Footer from '../components/navigation/Footer';
 import StyledButton from '../components/StyledButton';
 import StyledButtonSet from '../components/StyledButtonSet';
 import { H1 } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-import { getUpdatesVariables, updatesQuery } from './updates';
+import { getUpdatesVariables, updatesPageQuery } from './updates';
 
 const BackButtonWrapper = styled(Container)`
   position: relative;
   color: #71757a;
-  margin-right: 62px;
-  margin-left: 20px;
-  @media (max-width: 600px) {
-    margin-left: 0;
-  }
 `;
 
 const CreateUpdateWrapper = styled(Flex)`
-  @media (max-width: 600px) {
+  max-width: 1400px;
+  margin: 32px auto;
+  grid-gap: 64px;
+  padding: 0 16px;
+  align-items: baseline;
+  @media (max-width: 830px) {
     flex-direction: column;
+    grid-gap: 32px;
+    padding: 0 8px;
   }
 `;
 
@@ -106,11 +107,15 @@ class CreateUpdatePage extends React.Component {
         variables: { update },
         refetchQueries: [
           {
-            query: updatesQuery,
+            query: updatesPageQuery,
             context: API_V2_CONTEXT,
             variables: getUpdatesVariables(this.props.slug),
           },
-          { query: updatesSectionQuery, variables: getUpdatesSectionQueryVariables(this.props.slug, true) },
+          {
+            query: updatesSectionQuery,
+            context: API_V2_CONTEXT,
+            variables: getUpdatesSectionQueryVariables(this.props.slug, true),
+          },
         ],
       });
       this.setState({ isModified: false });
@@ -153,13 +158,13 @@ class CreateUpdatePage extends React.Component {
           {loadingLoggedInUser ? (
             <Loading />
           ) : (
-            <CreateUpdateWrapper className="content" mt={4} alignItems="baseline">
+            <CreateUpdateWrapper>
               <BackButtonWrapper>
                 <Link href={`/${collective.slug}/updates`}>
                   <Container display="flex" color="#71757A" fontSize="14px" alignItems="center">
                     <ArrowBack size={18} />
                     <Box as="span" mx={2}>
-                      Back
+                      <FormattedMessage id="Back" defaultMessage="Back" />
                     </Box>
                   </Container>
                 </Link>

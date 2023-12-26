@@ -1,7 +1,9 @@
 # Open Collective Frontend
 
-[![Dependency Status](https://david-dm.org/opencollective/opencollective-frontend/status.svg)](https://david-dm.org/opencollective/opencollective-frontend)
+![GitHub](https://img.shields.io/github/license/opencollective/opencollective-frontend)
 [![Crowdin](https://d322cqt584bo4o.cloudfront.net/opencollective/localized.svg)](https://crowdin.com/project/opencollective)
+![React Version](https://img.shields.io/github/package-json/dependency-version/opencollective/opencollective-frontend/react)
+![Next.JS Version](https://img.shields.io/github/package-json/dependency-version/opencollective/opencollective-frontend/next)
 
 <p align="center">
   <a href="https://github.com/opencollective/opencollective-frontend">
@@ -17,7 +19,7 @@ If you see a step below that could be improved (or is outdated), please update t
 
 ### Prerequisite
 
-1. Make sure you have Node.js version 18.x and NPM version 8.x.
+1. Make sure you have Node.js version 20.x and NPM version >=9.0.0.
 
 - We recommend using [nvm](https://github.com/creationix/nvm): `nvm install && nvm use`.
 
@@ -120,6 +122,6 @@ If you have any questions, ping us on Slack
 
 ## Thanks
 
-<a href="https://www.chromatic.com/"><img src="https://user-images.githubusercontent.com/321738/84662277-e3db4f80-af1b-11ea-88f5-91d67a5e59f6.png" width="153" height="30" alt="Chromatic" /></a>
+<a href="https://www.lost-pixel.com/"><img src="https://user-images.githubusercontent.com/29632358/168112844-77e76a0d-b96f-4bc8-b753-cd39f4afd428.png" width="100" height="100" alt="Lost Pixel" /></a>
 
-Thanks to [Chromatic](https://www.chromatic.com/) for providing the visual testing platform that helps us review UI changes and catch visual regressions.
+Thanks to [Lost Pixel](https://www.lost-pixel.com/) for providing the visual testing platform that helps us review UI changes and catch visual regressions.

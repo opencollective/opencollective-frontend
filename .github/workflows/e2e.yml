@@ -1,9 +1,7 @@
 name: E2E
 
 on:
-  push:
-    branches-ignore:
-      - 'i18n/crowdin'
+  workflow_call:
 
 env:
   TZ: UTC
@@ -31,14 +29,19 @@ env:
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   STRIPE_WEBHOOK_KEY: ${{ secrets.STRIPE_WEBHOOK_KEY }}
   STRIPE_WEBHOOK_SIGNING_SECRET: ${{ secrets.STRIPE_WEBHOOK_SIGNING_SECRET }}
+  AWS_KEY: ${{ secrets.AWS_KEY }}
+  AWS_SECRET: ${{ secrets.AWS_SECRET }}
 
 jobs:
   e2e:
+    if: github.ref_name != 'i18n/crowdin'
+
     runs-on: ubuntu-latest
 
     timeout-minutes: 30
 
     strategy:
+      fail-fast: false
       matrix:
         files: ['0*.js', '1*.js', '2*.js', '3*.js']
 
@@ -49,7 +52,7 @@ jobs:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: postgres:13.9
+        image: postgres:13.13
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
@@ -60,9 +63,6 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-      - name: Hack sources.list
-        run: sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu/|http://mirror.arizona.edu/ubuntu/|g' /etc/apt/sources.list
-
       - name: Update apt
         run: sudo apt-get update || exit 0
 
@@ -82,32 +82,19 @@ jobs:
           sudo tar xzvf /tmp/stripe_1.13.9_linux_x86_64.tar.gz -C /bin/
 
       - name: Checkout (frontend)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: 'package.json'
-
-      - name: Force NPM version (this step can be moved once Vercel defaults to node 18.14)
-        shell: bash
-        run: npm install -g npm@8.19.2
-
-      # Npm cache
-
-      - name: Restore .npm cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-cache-${{ github.sha }}
-          restore-keys: |
-            - ${{ runner.os }}-npm-cache-${{ github.sha }}
-            - ${{ runner.os }}-npm-cache-
+          cache: 'npm'
 
       # Checkouts
 
       - name: Set REF in env, removing the `refs/` part
-        run: echo "MATCHING_BRANCH_REF=$(echo $GITHUB_REF | sed 's|refs/||')" >> $GITHUB_ENV
+        run: |
+          echo "MATCHING_BRANCH_REF=${GITHUB_HEAD_REF-${GITHUB_REF##*/}}" >> $GITHUB_ENV
 
       - name: Check matching branch (api)
         id: check-matching-branch
@@ -116,28 +103,28 @@ jobs:
           route: GET /repos/{owner}/{repo}/git/ref/{ref}
           owner: opencollective
           repo: opencollective-api
-          ref: ${{ env.MATCHING_BRANCH_REF }}
+          ref: heads/${{ env.MATCHING_BRANCH_REF }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
       - name: Checkout (api - matching branch)
         if: steps.check-matching-branch.outputs.status == 200
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
-          ref: ${{ github.ref }}
+          ref: ${{ env.MATCHING_BRANCH_REF }}
 
       - name: Checkout (api - main)
         if: steps.check-matching-branch.outputs.status != 200
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
 
       - name: Checkout (images)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: opencollective/opencollective-images
           path: opencollective-images
@@ -230,12 +217,13 @@ jobs:
         run: ./scripts/run_e2e_tests.sh
         env:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
-
-      - name: Archive test screenshots
+      - name: Archive test recordings
         uses: actions/upload-artifact@v3
         with:
-          name: screenshots
-          path: test/cypress/screenshots
+          name: cypress-recordings
+          path: |
+            test/cypress/screenshots
+            test/cypress/videos
         if: ${{ failure() }}
 
       - name: Report Coverage

@@ -5,7 +5,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import Container from './Container';
 import { Box, Flex } from './Grid';
-import { getI18nLink } from './I18nFormatters';
+import { getI18nLink, WebsiteName } from './I18nFormatters';
 import Image from './Image';
 import Link from './Link';
 import MessageBox from './MessageBox';
@@ -193,7 +193,7 @@ const CreateProfile = ({
 
   return (
     <React.Fragment>
-      <Container textAlign="center">
+      <Flex flexDirection="column" alignItems="center" textAlign="center">
         {isOAuth ? (
           <React.Fragment>
             <Flex justifyContent="center" mb={40}>
@@ -209,9 +209,7 @@ const CreateProfile = ({
             </Flex>
           </React.Fragment>
         ) : (
-          <Box>
-            <Image src="/static/images/oc-logo-watercolor-256.png" height={96} width={96} />
-          </Box>
+          <Image src="/static/images/oc-logo-watercolor-256.png" height={96} width={96} />
         )}
         <Box pt="48px" fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
           {isOAuth ? (
@@ -227,7 +225,7 @@ const CreateProfile = ({
             <FormattedMessage defaultMessage="Set up your personal details to continue" />
           )}
         </Box>
-      </Container>
+      </Flex>
       <Box
         as="form"
         onSubmit={event => {
@@ -331,8 +329,8 @@ const CreateProfile = ({
           <MessageBox type="warning" mt="24px">
             <Box fontSize="14px" fontWeight={400} lineHeight="20px">
               <FormattedMessage
-                defaultMessage="{email} is already registered on Open Collective. Would you like to Sign In instead?"
-                values={{ email: <strong>{email}</strong> }}
+                defaultMessage="{email} is already registered on {WebsiteName}. Would you like to Sign In instead?"
+                values={{ email: <strong>{email}</strong>, WebsiteName }}
               />
               <Box mt="8px">
                 <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting} asLink>

@@ -51,7 +51,7 @@ const PERIOD_FILTER_SELECT_STYLES = {
   option: { fontSize: '12px' },
 };
 
-const getSelectedPeriodOptionFromInterval = ({ from, to }) => {
+export const getSelectedPeriodOptionFromInterval = ({ from, to }) => {
   const isSameDay = (dayjsDate, otherDate) => (!dayjsDate && !otherDate) || dayjsDate?.isSame(otherDate, 'day');
   const preset = Object.keys(PERIOD_FILTER_PRESETS).find(preset => {
     const presetDetails = PERIOD_FILTER_PRESETS[preset];
@@ -68,7 +68,15 @@ const getSelectedPeriodOptionFromInterval = ({ from, to }) => {
 
 const periodSelectThemeBuilder = theme => ({ ...theme, spacing: { ...theme.spacing, controlHeight: 28 } });
 
-const PeriodFilterPresetsSelect = ({ onChange, interval, inputId, formatDateFn }) => {
+const PeriodFilterPresetsSelect = ({
+  onChange,
+  interval,
+  inputId,
+  formatDateFn = stripTime,
+  SelectComponent = StyledSelectFilter,
+  styles = PERIOD_FILTER_SELECT_STYLES,
+  ...selectProps
+}) => {
   const intl = useIntl();
   const selectedOption = React.useMemo(() => getSelectedPeriodOptionFromInterval(interval), [interval]);
   const options = React.useMemo(() => {
@@ -79,12 +87,13 @@ const PeriodFilterPresetsSelect = ({ onChange, interval, inputId, formatDateFn }
   }, [intl]);
 
   return (
-    <StyledSelectFilter
+    <SelectComponent
+      {...selectProps}
       inputId={inputId}
       value={selectedOption}
       options={options}
       selectTheme={periodSelectThemeBuilder}
-      styles={PERIOD_FILTER_SELECT_STYLES}
+      styles={styles}
       onChange={({ value }) => {
         if (value === 'custom') {
           return interval;
@@ -105,10 +114,9 @@ PeriodFilterPresetsSelect.propTypes = {
     to: PropTypes.string,
   }).isRequired,
   formatDateFn: PropTypes.func,
-};
-
-PeriodFilterPresetsSelect.defaultProps = {
-  formatDateFn: stripTime,
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  SelectComponent: PropTypes.elementType.isRequired,
+  styles: PropTypes.object,
 };
 
 export default PeriodFilterPresetsSelect;

@@ -1,10 +1,10 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import Body from '../components/Body';
 import ErrorPage from '../components/ErrorPage';
-import Footer from '../components/Footer';
 import Header from '../components/Header';
+import Footer from '../components/navigation/Footer';
 
 import { withUser } from './UserProvider';
 
@@ -16,6 +16,7 @@ const Page = ({
   loadingLoggedInUser,
   LoggedInUser,
   title,
+  navTitle,
   metaTitle,
   noRobots,
   twitterHandle,
@@ -25,18 +26,19 @@ const Page = ({
   menuItems,
   showFooter = true,
   showProfileAndChangelogMenu = true,
+  loading,
 }) => {
   if (data.error) {
     return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
   }
 
   const childProps = { LoggedInUser, loadingLoggedInUser };
-
   return (
-    <Fragment>
+    <div>
       <Header
         showSearch={showSearch}
         title={title}
+        navTitle={navTitle}
         noRobots={noRobots}
         twitterHandle={twitterHandle}
         description={description}
@@ -47,10 +49,11 @@ const Page = ({
         menuItems={menuItems}
         LoggedInUser={LoggedInUser}
         showProfileAndChangelogMenu={showProfileAndChangelogMenu}
+        loading={loading}
       />
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       {showFooter && <Footer />}
-    </Fragment>
+    </div>
   );
 };
 
@@ -69,12 +72,14 @@ Page.propTypes = {
   showSearch: PropTypes.bool,
   noRobots: PropTypes.bool,
   title: PropTypes.string,
+  navTitle: PropTypes.string,
   metaTitle: PropTypes.string,
   twitterHandle: PropTypes.string,
   collective: PropTypes.object,
   menuItems: PropTypes.object,
   showFooter: PropTypes.bool,
   showProfileAndChangelogMenu: PropTypes.bool,
+  loading: PropTypes.bool,
 };
 
 Page.defaultProps = {

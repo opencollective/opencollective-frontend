@@ -1,25 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import StyledButton from '../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const deleteVirtualCardMutation = gql`
-  mutation deleteVirtualCard($virtualCard: VirtualCardReferenceInput!) {
+  mutation DeleteVirtualCard($virtualCard: VirtualCardReferenceInput!) {
     deleteVirtualCard(virtualCard: $virtualCard)
   }
 `;
 
 const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefetchQuery, ...modalProps }) => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const refetchOptions = onDeleteRefetchQuery
     ? {
@@ -43,8 +43,8 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefet
           },
         });
       } catch (e) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: (
             <FormattedMessage
               defaultMessage="Error deleting virtual card: {error}"

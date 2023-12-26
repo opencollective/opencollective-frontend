@@ -4,8 +4,9 @@ import { Field, Form, Formik } from 'formik';
 import { trim } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import slugify from 'slugify';
 import { isURL } from 'validator';
+
+import { suggestSlug } from '../lib/collective';
 
 import { BackButton } from './create-collective/CreateCollectiveForm';
 import OnboardingProfileCard from './onboarding-modal/OnboardingProfileCard';
@@ -26,7 +27,7 @@ import { withUser } from './UserProvider';
 const orgMessages = defineMessages({
   nameLabel: { id: 'Organization.Name', defaultMessage: 'Organization name' },
   legalNameLabel: { id: 'LegalName', defaultMessage: 'Legal Name' },
-  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your URL' },
+  slugLabel: { id: 'createCollective.form.slugLabel', defaultMessage: 'Set your profile URL' },
   descriptionPlaceholder: {
     id: 'create.collective.placeholder',
     defaultMessage: 'Making the world a better place',
@@ -55,7 +56,7 @@ const orgMessages = defineMessages({
   },
   errorSlugHyphen: {
     id: 'createOrg.form.error.slug.hyphen',
-    defaultMessage: 'Organization URL slug cannot start or end with a hyphen (-)',
+    defaultMessage: 'Organization handle cannot start or end with a hyphen (-)',
   },
   errorWebsite: {
     id: 'createOrg.form.error.website',
@@ -136,17 +137,9 @@ const CreateOrganizationForm = props => {
       <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange={true}>
         {formik => {
           const { values, handleSubmit, errors, touched, setFieldValue } = formik;
-          const suggestedSlug = value => {
-            const slugOptions = {
-              replacement: '-',
-              lower: true,
-              strict: true,
-            };
-            return trim(slugify(value, slugOptions), '-');
-          };
           const handleSlugChange = e => {
             if (!touched.slug) {
-              setFieldValue('slug', suggestedSlug(e.target.value));
+              setFieldValue('slug', suggestSlug(e.target.value));
             }
           };
           return (

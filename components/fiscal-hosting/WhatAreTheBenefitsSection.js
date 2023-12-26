@@ -132,7 +132,6 @@ const WhatAreTheBenefits = () => {
           <NextIllustration
             width={288}
             height={238}
-            layout="fixed"
             src={'/static/images/fiscal-hosting/money-management-xs.png'}
             alt="Money management"
           />

@@ -2,7 +2,54 @@ import { defineMessages, MessageDescriptor } from 'react-intl';
 
 import { ActivityTypes } from '../constants/activities';
 
+export const ActivityTimelineMessageI18n = defineMessages({
+  COLLECTIVE_EXPENSE_APPROVED: {
+    defaultMessage: '<Individual></Individual> approved <Expense>{expenseDescription}</Expense>',
+  },
+  COLLECTIVE_EXPENSE_ERROR: {
+    defaultMessage: '<FromAccount></FromAccount> expense <Expense>{expenseDescription}</Expense> payment failed',
+  },
+  COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE: {
+    defaultMessage: '<Individual></Individual> marked <Expense>{expenseDescription}</Expense> as incomplete',
+  },
+  COLLECTIVE_EXPENSE_PAID: {
+    defaultMessage: '<Individual></Individual> paid <Expense>{expenseDescription}</Expense>',
+  },
+  COLLECTIVE_EXPENSE_REJECTED: {
+    defaultMessage: '<Individual></Individual> rejected <Expense>{expenseDescription}</Expense>',
+  },
+  COLLECTIVE_EXPENSE_UNAPPROVED: {
+    defaultMessage: '<Individual></Individual> unapproved <Expense>{expenseDescription}</Expense>',
+  },
+  COLLECTIVE_EXPENSE_UPDATED: {
+    defaultMessage: '<Individual></Individual> updated <Expense>{expenseDescription}</Expense>',
+  },
+  EXPENSE_COMMENT_CREATED: {
+    defaultMessage: '<Individual></Individual> commented on <Expense>{expenseDescription}</Expense>',
+  },
+  COLLECTIVE_EXPENSE_INVITE_DRAFTED: {
+    defaultMessage:
+      '<Individual></Individual> drafted an <Expense>{expenseDescription}</Expense> on <Account></Account>',
+  },
+  COLLECTIVE_EXPENSE_RECURRING_DRAFTED: {
+    defaultMessage:
+      '<Individual></Individual> recurring <Expense>{expenseDescription}</Expense> expense drafted on <Account></Account>',
+  },
+  COLLECTIVE_UPDATE_PUBLISHED: {
+    defaultMessage: '<Individual></Individual> published a new update on <Account></Account>',
+  },
+  ORDER_PAYMENT_FAILED: {
+    defaultMessage: '<Individual></Individual> contribution to <Account></Account> failed',
+  },
+  PAYMENT_FAILED: {
+    defaultMessage: '<Individual></Individual> payment for <Order>contribution</Order> to <Account></Account> failed',
+  },
+});
+
 export const ActivityDescriptionI18n = defineMessages({
+  ACCOUNTING_CATEGORIES_EDITED: {
+    defaultMessage: 'Chart of account edited',
+  },
   // Collective creation & applications
   COLLECTIVE_CREATED: {
     defaultMessage:
@@ -26,6 +73,9 @@ export const ActivityDescriptionI18n = defineMessages({
   COLLECTIVE_APPROVED: {
     defaultMessage: '<Account></Account> application approved',
   },
+  COLLECTIVE_UNHOSTED: {
+    defaultMessage: '<Account></Account> unhosted',
+  },
   // Freezing collectives
   COLLECTIVE_FROZEN: {
     defaultMessage: '<Account></Account> frozen',
@@ -42,7 +92,7 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: 'New comment on update',
   },
   EXPENSE_COMMENT_CREATED: {
-    defaultMessage: 'New comment on <Expense>expense</Expense>',
+    defaultMessage: 'New comment on expense <Expense>{expenseDescription}</Expense>',
   },
   // TODO: Link conversation
   CONVERSATION_COMMENT_CREATED: {
@@ -54,74 +104,86 @@ export const ActivityDescriptionI18n = defineMessages({
   },
   // Expenses
   COLLECTIVE_EXPENSE_CREATED: {
-    defaultMessage: 'New <Expense>expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
+    defaultMessage:
+      'Expense <Expense>{expenseDescription}</Expense> created from <FromAccount></FromAccount> to <Account></Account>',
   },
   COLLECTIVE_EXPENSE_DELETED: {
     defaultMessage: 'Expense deleted',
   },
   COLLECTIVE_EXPENSE_UPDATED: {
-    defaultMessage: '<Expense>Expense</Expense> from <FromAccount></FromAccount> to <Account></Account> updated',
+    defaultMessage:
+      'Expense <Expense>{expenseDescription}</Expense> from <FromAccount></FromAccount> to <Account></Account> updated',
   },
   COLLECTIVE_EXPENSE_REJECTED: {
-    defaultMessage: 'Rejected <Expense>expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
+    defaultMessage:
+      'Rejected expense <Expense>{expenseDescription}</Expense> from <FromAccount></FromAccount> to <Account></Account>',
   },
   COLLECTIVE_EXPENSE_APPROVED: {
-    defaultMessage: 'Approved <Expense>expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
+    defaultMessage:
+      'Approved expense <Expense>{expenseDescription}</Expense> from <FromAccount></FromAccount> to <Account></Account>',
   },
   COLLECTIVE_EXPENSE_UNAPPROVED: {
-    defaultMessage: 'Unapproved <Expense>expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
+    defaultMessage:
+      'Unapproved expense <Expense>{expenseDescription}</Expense> from <FromAccount></FromAccount> to <Account></Account>',
   },
   COLLECTIVE_EXPENSE_MOVED: {
-    defaultMessage: '<Expense>Expense</Expense> moved from <FromAccount></FromAccount> to <Account></Account>',
+    defaultMessage:
+      'Expense <Expense>{expenseDescription}</Expense> moved from <FromAccount></FromAccount> to <Account></Account>',
   },
   COLLECTIVE_EXPENSE_PAID: {
-    defaultMessage: 'Paid <Expense>expense</Expense> from <FromAccount></FromAccount> to <Account></Account>',
+    defaultMessage:
+      'Paid expense <Expense>{expenseDescription}</Expense> from <FromAccount></FromAccount> to <Account></Account>',
   },
   COLLECTIVE_EXPENSE_MARKED_AS_UNPAID: {
-    defaultMessage: 'Marked <Expense>expense</Expense> as unpaid',
+    defaultMessage: 'Marked expense <Expense>{expenseDescription}</Expense> as unpaid',
   },
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM: {
-    defaultMessage: 'Marked <Expense>expense</Expense> as SPAM',
+    defaultMessage: 'Marked expense <Expense>{expenseDescription}</Expense> as SPAM',
   },
   COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE: {
-    defaultMessage: 'Marked <Expense>expense</Expense> as incomplete',
+    defaultMessage: 'Marked expense <Expense>{expenseDescription}</Expense> as incomplete',
   },
   COLLECTIVE_EXPENSE_PROCESSING: {
-    defaultMessage: '<Expense>Expense</Expense> processing',
+    defaultMessage: 'Expense <Expense>{expenseDescription}</Expense> is being processed',
   },
   COLLECTIVE_EXPENSE_SCHEDULED_FOR_PAYMENT: {
-    defaultMessage: '<Expense>Expense</Expense> scheduled for payment',
+    defaultMessage: 'Expense <Expense>{expenseDescription}</Expense> scheduled for payment',
   },
   COLLECTIVE_EXPENSE_ERROR: {
-    defaultMessage: '<Expense>Expense</Expense> payment failed',
+    defaultMessage: 'Expense <Expense>{expenseDescription}</Expense> payment failed',
   },
   COLLECTIVE_EXPENSE_INVITE_DRAFTED: {
-    defaultMessage: 'Invited someone to submit <Expense>expense</Expense> to <Account></Account>',
+    defaultMessage: 'Invited someone to submit expense <Expense>{expenseDescription}</Expense> to <Account></Account>',
   },
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED: {
     defaultMessage: 'New draft created for <Expense>recurring expense</Expense> on <Account></Account>',
   },
   COLLECTIVE_EXPENSE_MISSING_RECEIPT: {
-    defaultMessage: 'Notified admins about a missing receipt for <Expense>expense</Expense> on <Account></Account>',
+    defaultMessage:
+      'Notified admins about a missing receipt for expense <Expense>{expenseDescription}</Expense> on <Account></Account>',
+  },
+  COLLECTIVE_EXPENSE_PUT_ON_HOLD: {
+    defaultMessage: 'Put expense <Expense>{expenseDescription}</Expense> on hold',
+  },
+  COLLECTIVE_EXPENSE_RELEASED_FROM_HOLD: {
+    defaultMessage: 'Released hold on expense <Expense>{expenseDescription}</Expense>',
   },
   TAXFORM_REQUEST: {
     defaultMessage: 'Tax form request sent to <Account></Account>',
   },
   // Members
   COLLECTIVE_MEMBER_CREATED: {
-    defaultMessage: '<FromAccount></FromAccount> joined <Account></Account> as a <MemberRole></MemberRole>',
+    defaultMessage: '<FromAccount></FromAccount> joined <Account></Account> as <MemberRole></MemberRole>',
   },
   COLLECTIVE_MEMBER_INVITED: {
-    defaultMessage:
-      '<FromAccount></FromAccount> was invited to join <Account></Account> as a <MemberRole></MemberRole>',
+    defaultMessage: '<FromAccount></FromAccount> was invited to join <Account></Account> as <MemberRole></MemberRole>',
   },
   COLLECTIVE_CORE_MEMBER_INVITED: {
-    defaultMessage:
-      '<FromAccount></FromAccount> was invited to join <Account></Account> as a <MemberRole></MemberRole>',
+    defaultMessage: '<FromAccount></FromAccount> was invited to join <Account></Account> as <MemberRole></MemberRole>',
   },
   COLLECTIVE_CORE_MEMBER_INVITATION_DECLINED: {
     defaultMessage:
-      '<FromAccount></FromAccount> declined the invitation to join <Account></Account> as a <MemberRole></MemberRole>',
+      '<FromAccount></FromAccount> declined the invitation to join <Account></Account> as <MemberRole></MemberRole>',
   },
   COLLECTIVE_CORE_MEMBER_ADDED: {
     defaultMessage:
@@ -142,7 +204,7 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: 'New update drafted on <Account></Account>',
   },
   COLLECTIVE_UPDATE_PUBLISHED: {
-    defaultMessage: 'Update published on <Account></Account>',
+    defaultMessage: 'Update published on <Account></Account>: {updateTitle}',
   },
   // Contact
   COLLECTIVE_CONTACT: {
@@ -166,7 +228,7 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: 'Requested a virtual card for <Account></Account>',
   },
   VIRTUAL_CARD_PURCHASE: {
-    defaultMessage: 'New <Expense>purchase</Expense> with virtual card',
+    defaultMessage: 'New purchase <Expense>{expenseDescription}</Expense> with virtual card',
   },
   VIRTUAL_CARD_CHARGE_DECLINED: {
     defaultMessage: 'Virtual card charge declined on <Account></Account>',
@@ -237,11 +299,14 @@ export const ActivityDescriptionI18n = defineMessages({
   USER_PASSWORD_SET: {
     defaultMessage: 'Changed password',
   },
-  TWO_FACTOR_CODE_ADDED: {
+  TWO_FACTOR_METHOD_ADDED: {
     defaultMessage: 'Two factor authentication added',
   },
-  TWO_FACTOR_CODE_DELETED: {
+  TWO_FACTOR_METHOD_DELETED: {
     defaultMessage: 'Two factor authentication removed',
+  },
+  TWO_FACTOR_CODE_REQUESTED: {
+    defaultMessage: 'Two factor authentication code requested',
   },
   // Gift cards
   USER_CARD_CLAIMED: {
@@ -259,6 +324,12 @@ export const ActivityDescriptionI18n = defineMessages({
   },
   DEACTIVATED_COLLECTIVE_AS_HOST: {
     defaultMessage: 'Deactivated <Account></Account> as a host',
+  },
+  VENDOR_EDITED: {
+    defaultMessage: 'Vendor <Vendor></Vendor> edited',
+  },
+  VENDOR_CREATED: {
+    defaultMessage: 'Vendor <Vendor></Vendor> created',
   },
 });
 
@@ -288,6 +359,9 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
   COLLECTIVE_CREATED: {
     id: 'WebhookEvents.COLLECTIVE_CREATED',
     defaultMessage: 'Collective created',
+  },
+  COLLECTIVE_UNHOSTED: {
+    defaultMessage: 'Collective unhosted',
   },
   ORGANIZATION_COLLECTIVE_CREATED: {
     defaultMessage: 'Organization created',
@@ -466,10 +540,10 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
     defaultMessage: 'New pending contribution',
   },
   ORDER_THANKYOU: {
-    defaultMessage: 'New order',
+    defaultMessage: 'New contribution',
   },
   ORDERS_SUSPICIOUS: {
-    defaultMessage: 'Suspicious order',
+    defaultMessage: 'Suspicious contribution',
   },
   ACTIVATED_COLLECTIVE_AS_HOST: {
     defaultMessage: 'Activated as host',

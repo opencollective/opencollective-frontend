@@ -1,6 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Check } from '@styled-icons/fa-solid/Check';
+import { difference, has } from 'lodash';
+import {
+  AlertTriangle,
+  ArrowRightLeft,
+  Coins,
+  CreditCard,
+  Mail,
+  MessagesSquare,
+  Network,
+  Newspaper,
+  Receipt,
+  Users,
+  Webhook,
+} from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -10,7 +24,7 @@ import { ERROR, formatErrorType } from '../../lib/errors';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
-import Avatar from '../Avatar';
+import Avatar, { IncognitoAvatar } from '../Avatar';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import Image from '../Image';
@@ -20,6 +34,7 @@ import MessageBox from '../MessageBox';
 import RadialIconContainer from '../RadialIconContainer';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
+import StyledLinkButton from '../StyledLinkButton';
 import { P } from '../Text';
 
 const TopAvatarsContainer = styled.div`
@@ -33,39 +48,50 @@ const TopAvatarsContainer = styled.div`
   gap: 28px;
 `;
 
-const SCOPES = {
+export const SCOPES_INFO = {
   email: {
     label: <FormattedMessage defaultMessage="Access your email address." />,
+    icon: <Mail size={16} />,
   },
   incognito: {
     label: <FormattedMessage defaultMessage="Access your incognito account." />,
+    icon: <IncognitoAvatar size={32} />,
   },
   account: {
     label: <FormattedMessage defaultMessage="Manage your account, collectives and organizations." />,
+    icon: <Users size={16} />,
   },
   expenses: {
     label: <FormattedMessage defaultMessage="Create and manage expenses, payout methods." />,
+    icon: <Receipt size={16} />,
   },
   orders: {
     label: <FormattedMessage defaultMessage="Create and manage contributions, payment methods." />,
+    icon: <Coins size={16} />,
   },
   transactions: {
     label: <FormattedMessage defaultMessage="Refund and reject recorded transactions." />,
+    icon: <ArrowRightLeft size={16} />,
   },
   virtualCards: {
     label: <FormattedMessage defaultMessage="Create and manage virtual cards." />,
+    icon: <CreditCard size={16} />,
   },
   updates: {
     label: <FormattedMessage defaultMessage="Create and manage updates." />,
+    icon: <Newspaper size={16} />,
   },
   conversations: {
     label: <FormattedMessage defaultMessage="Create and manage conversations." />,
+    icon: <MessagesSquare size={16} />,
   },
   webhooks: {
     label: <FormattedMessage defaultMessage="Create and manage webhooks." />,
+    icon: <Webhook size={16} />,
   },
   host: {
     label: <FormattedMessage defaultMessage="Administrate fiscal hosts." />,
+    icon: <Network size={16} />,
   },
   /* We disable those scopes for now */
   /*
@@ -81,7 +107,7 @@ const SCOPES = {
   */
 };
 
-const fetchAuthorize = (application, redirectUri = null, state = null, scope = null) => {
+const fetchAuthorize = (application, redirectUri = null, state = null, scopes = null) => {
   const authorizeParams = new URLSearchParams({
     /* eslint-disable camelcase */
     response_type: 'code',
@@ -91,8 +117,8 @@ const fetchAuthorize = (application, redirectUri = null, state = null, scope = n
     /* eslint-enable camelcase */
   });
 
-  if (scope) {
-    authorizeParams.set('scope', scope);
+  if (scopes && scopes.length > 0) {
+    authorizeParams.set('scope', scopes.join(','));
   }
 
   return fetch(`/api/oauth/authorize?${authorizeParams.toString()}`, {
@@ -105,11 +131,21 @@ const fetchAuthorize = (application, redirectUri = null, state = null, scope = n
   });
 };
 
+const prepareScopes = scopes => {
+  return (
+    scopes
+      ?.split(',')
+      .filter(scope => has(SCOPES_INFO, scope))
+      .sort() || []
+  );
+};
+
 export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove, state, scope }) => {
-  const { LoggedInUser } = useLoggedInUser();
+  const { LoggedInUser, logout } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
   const [isRedirecting, setRedirecting] = React.useState(autoApprove);
+  const filteredScopes = prepareScopes(scope);
   const {
     call: callAuthorize,
     loading,
@@ -117,7 +153,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
   } = useAsyncCall(async () => {
     let response = null;
     try {
-      response = await fetchAuthorize(application, redirectUri, state, scope);
+      response = await fetchAuthorize(application, redirectUri, state, filteredScopes);
     } catch {
       setRedirecting(false); // To show errors with autoApprove
       throw formatErrorType(intl, ERROR.NETWORK);
@@ -144,9 +180,6 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
       callAuthorize();
     }
   }, []);
-
-  const requestedScopes = scope?.split(',').filter(scope => SCOPES[scope]);
-  const filteredScopes = Object.entries(SCOPES).filter(([scope]) => requestedScopes && requestedScopes.includes(scope));
 
   return (
     <Container position="relative" mt="48px" width="100%">
@@ -188,18 +221,50 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
                     values={{ service: 'Open Collective' }}
                   />{' '}
                   <br />
-                  <strong>({LoggedInUser.collective.name})</strong>
+                  <p className="mt-1 text-sm">
+                    <strong>
+                      {LoggedInUser.collective.name || LoggedInUser.collective.legalName} (@
+                      {LoggedInUser.collective.slug})
+                    </strong>
+                    {'. '}
+                    <FormattedMessage
+                      defaultMessage="Not you? <SignOutLink>Sign out</SignOutLink> to switch profile."
+                      values={{
+                        SignOutLink: msg => (
+                          <StyledLinkButton onClick={logout} type="button">
+                            {msg}
+                          </StyledLinkButton>
+                        ),
+                      }}
+                    />
+                  </p>
                 </P>
               </Flex>
-              {filteredScopes.map(([scope, { label }]) => (
-                <Flex key={scope} alignItems="center" mt={26}>
-                  <Image src="/static/images/stars-exchange-rounded.png" width={32} height={32} />
+              {Boolean(application.preAuthorize2FA) && (
+                <Flex alignItems="center" mt={26}>
+                  <div className="flex h-[32px] w-[32px] flex-none items-center justify-center rounded-full bg-neutral-100 ">
+                    <AlertTriangle size={18} className="text-red-600" />
+                  </div>
                   <P fontSize="16px" color="black.700" ml={3}>
-                    {label}
+                    <FormattedMessage defaultMessage="Directly perform critical operations that would normally require 2FA." />
+                  </P>
+                </Flex>
+              )}
+              {filteredScopes.map(scope => (
+                <Flex key={scope} alignItems="center" mt={26}>
+                  {SCOPES_INFO[scope].icon ? (
+                    <div className="flex h-[32px] w-[32px] flex-none items-center justify-center rounded-full bg-neutral-100 ">
+                      {SCOPES_INFO[scope].icon}
+                    </div>
+                  ) : (
+                    <Image src="/static/images/stars-exchange-rounded.png" width={32} height={32} />
+                  )}
+                  <P fontSize="16px" color="black.700" ml={3}>
+                    {SCOPES_INFO[scope].label}
                   </P>
                 </Flex>
               ))}
-              {filteredScopes.length > 0 && (
+              {difference(filteredScopes, ['email']).length > 0 && (
                 <MessageBox type="info" mt={40} fontSize="13px">
                   <FormattedMessage defaultMessage="These permissions are granted to all the accounts you're administrating, including your personal profile." />
                 </MessageBox>
@@ -215,7 +280,18 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
       </StyledCard>
       {!isRedirecting && (
         <Flex mt={24} justifyContent="center" gap="24px" flexWrap="wrap">
-          <StyledButton minWidth={175} onClick={() => window.history.back()} disabled={loading}>
+          <StyledButton
+            minWidth={175}
+            disabled={loading}
+            onClick={() => {
+              // If we're on the first page of the history, close the window. Otherwise, go back.
+              if (window.history.length === 0) {
+                window.close();
+              } else {
+                window.history.back();
+              }
+            }}
+          >
             <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
           </StyledButton>
           <StyledButton minWidth={175} buttonStyle="primary" loading={loading} onClick={callAuthorize}>
@@ -232,6 +308,7 @@ ApplicationApproveScreen.propTypes = {
     name: PropTypes.string,
     clientId: PropTypes.string.isRequired,
     redirectUri: PropTypes.string.isRequired,
+    preAuthorize2FA: PropTypes.bool.isRequired,
     account: PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,

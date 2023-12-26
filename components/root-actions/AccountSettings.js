@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
@@ -12,7 +12,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledInputField from '../StyledInputField';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 export const editAccountFlagsMutation = gql`
   mutation EditAccountFlags(
@@ -34,7 +34,7 @@ export const editAccountFlagsMutation = gql`
 `;
 
 const AccountSettings = () => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const [selectedAccountOption, setSelectedAccountOption] = React.useState([]);
   const [archivedFlag, setArchivedFlag] = React.useState();
@@ -51,7 +51,7 @@ const AccountSettings = () => {
 
   return (
     <React.Fragment>
-      <StyledInputField htmlFor="ban-accounts-picker" label="Account" flex="1 1">
+      <StyledInputField htmlFor="accounts-picker" label="Account" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync
             inputId={id}
@@ -157,15 +157,15 @@ const AccountSettings = () => {
                     isTwoFactorAuthEnabled: twoFactorEnabledFlag,
                   },
                 });
-                addToast({
-                  type: TOAST_TYPE.SUCCESS,
+                toast({
+                  variant: 'success',
                   title: 'Success',
                   message: 'Account flags saved',
                 });
                 setEnableSave(false);
               } catch (e) {
-                addToast({
-                  type: TOAST_TYPE.ERROR,
+                toast({
+                  variant: 'error',
                   message: i18nGraphqlException(intl, e),
                 });
               }

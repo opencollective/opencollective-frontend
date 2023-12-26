@@ -6,7 +6,7 @@ import { get, isEmpty, omit } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { suggestSlug } from '../../lib/collective.lib';
+import { suggestSlug } from '../../lib/collective';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage, requireFields, verifyEmailPattern } from '../../lib/form-utils';
@@ -76,11 +76,11 @@ const msg = defineMessages({
   },
   orgSlugLabel: {
     id: 'createCollective.form.slugLabel',
-    defaultMessage: 'Set your URL',
+    defaultMessage: 'Set your profile URL',
   },
   orgSlugErrorTaken: {
     id: 'createCollective.form.error.slug.taken',
-    defaultMessage: 'URL already taken',
+    defaultMessage: 'Profile URL already taken',
   },
   orgWebsiteLabel: {
     id: 'createOrg.form.websiteLabel',

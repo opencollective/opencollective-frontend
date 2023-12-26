@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Question } from '@styled-icons/remix-line/Question';
+import dayjs from 'dayjs';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { simpleDateToISOString } from '../../lib/date-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
@@ -20,7 +21,7 @@ import { PERIOD_FILTER_PRESETS } from '../PeriodFilterPresetsSelect';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import StyledTooltip from '../StyledTooltip';
-import { H1, H2 } from '../Text';
+import { H2 } from '../Text';
 
 import HostCSVDownloadButton from './reports-section/HostCSVDownloadButton';
 import HostFeesSection from './reports-section/HostFeesSection';
@@ -80,19 +81,11 @@ const hostReportPageQuery = gql`
           valueInCents
           currency
         }
-        pendingPlatformFees {
-          valueInCents
-          currency
-        }
         platformTips {
           valueInCents
           currency
         }
         pendingPlatformTips {
-          valueInCents
-          currency
-        }
-        pendingHostFeeShare {
           valueInCents
           currency
         }
@@ -157,7 +150,7 @@ const FilterLabel = styled.label`
 `;
 
 const prepareCollectivesForFilter = collectives => {
-  return !collectives?.length ? null : collectives.map(collective => ({ legacyId: collective.value.id }));
+  return !collectives?.length ? null : collectives.map(({ value }) => ({ legacyId: value.id, slug: value.slug }));
 };
 
 const getDefaultDateInterval = () => {
@@ -169,11 +162,15 @@ const getDefaultDateInterval = () => {
   };
 };
 
-const HostDashboardReports = ({ hostSlug }) => {
+const HostDashboardReports = ({ accountSlug: hostSlug }) => {
   const [dateInterval, setDateInterval] = React.useState(getDefaultDateInterval);
   const [collectives, setCollectives] = React.useState(null);
   const dateFrom = simpleDateToISOString(dateInterval?.from, false, dateInterval?.timezoneType);
-  const dateTo = simpleDateToISOString(dateInterval?.to, true, dateInterval?.timezoneType);
+  const dateTo =
+    // Not useful to pass today or a future date, can end up deoptimizing the API call
+    dateInterval?.to && dayjs(dateInterval?.to).isBefore(dayjs().startOf('day'))
+      ? simpleDateToISOString(dateInterval?.to, true, dateInterval?.timezoneType)
+      : null;
   const variables = { hostSlug, account: collectives, dateFrom, dateTo };
   const { data, error, loading } = useQuery(hostReportPageQuery, { variables, context: API_V2_CONTEXT });
   const host = data?.host;
@@ -193,13 +190,10 @@ const HostDashboardReports = ({ hostSlug }) => {
   }
 
   return (
-    <Box m="0 auto" px={2}>
-      <Flex alignItems="center" mb={24} flexWrap="wrap">
-        <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
-          <FormattedMessage id="Reports" defaultMessage="Reports" />
-        </H1>
-        <Box mx="auto" />
-      </Flex>
+    <Box m="0 auto">
+      <h1 className="text-2xl font-bold leading-10 tracking-tight">
+        <FormattedMessage id="Reports" defaultMessage="Reports" />
+      </h1>
       <Container
         position={['relative', 'sticky']}
         top="0"
@@ -286,7 +280,7 @@ const HostDashboardReports = ({ hostSlug }) => {
 };
 
 HostDashboardReports.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
+  accountSlug: PropTypes.string.isRequired,
 };
 
 export default HostDashboardReports;

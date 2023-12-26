@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
 import dynamic from 'next/dynamic';
 import { withRouter } from 'next/router';
 import { createGlobalStyle } from 'styled-components';
 
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getCollectivePageMetadata } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
+import { ssrGraphQLQuery } from '../lib/graphql/with-ssr-query';
+import { getRequestIntl } from '../lib/i18n/request';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import CollectivePageContent from '../components/collective-page';
@@ -14,19 +15,12 @@ import CollectiveNotificationBar from '../components/collective-page/CollectiveN
 import { preloadCollectivePageGraphqlQueries } from '../components/collective-page/graphql/preload';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../components/collective-page/graphql/queries';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
-import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
 import Custom404 from './404';
-
-/** A page rendered when collective is pledged and not active yet */
-const PledgedCollectivePage = dynamic(
-  () => import(/* webpackChunkName: 'PledgedCollectivePage' */ '../components/PledgedCollectivePage'),
-  { loading: Loading },
-);
 
 /** A page rendered when collective is incognito */
 const IncognitoUserCollective = dynamic(
@@ -57,20 +51,20 @@ const GlobalStyles = createGlobalStyle`
  * to render `components/collective-page` with everything needed.
  */
 class CollectivePage extends React.Component {
-  static async getInitialProps({ client, req, res, query: { slug, status, step, mode, action } }) {
-    if (res && req && (req.language || req.locale === 'en')) {
-      res.set('Cache-Control', 'public, s-maxage=300');
+  static getInitialProps(ctx) {
+    const {
+      req,
+      res,
+      query: { slug, status, step, mode, action },
+    } = ctx;
+    if (res && req) {
+      const { locale } = getRequestIntl(req);
+      if (locale === 'en') {
+        res.setHeader('Cache-Control', 'public, s-maxage=300');
+      }
     }
 
-    let skipDataFromTree = false;
-
-    // If on server side
-    if (req) {
-      await preloadCollectivePageGraphqlQueries(slug, client);
-      skipDataFromTree = true;
-    }
-
-    return { slug, status, step, mode, skipDataFromTree, action };
+    return { slug, status, step, mode, action };
   }
 
   static propTypes = {
@@ -91,7 +85,7 @@ class CollectivePage extends React.Component {
     data: PropTypes.shape({
       loading: PropTypes.bool,
       error: PropTypes.any,
-      account: PropTypes.object,
+      previousData: PropTypes.object,
       Collective: PropTypes.shape({
         name: PropTypes.string,
         type: PropTypes.string.isRequired,
@@ -102,7 +96,6 @@ class CollectivePage extends React.Component {
         isArchived: PropTypes.bool,
         isHost: PropTypes.bool,
         isActive: PropTypes.bool,
-        isPledged: PropTypes.bool,
         isIncognito: PropTypes.bool,
         isGuest: PropTypes.bool,
         parentCollective: PropTypes.shape({ slug: PropTypes.string, image: PropTypes.string }),
@@ -144,27 +137,22 @@ class CollectivePage extends React.Component {
   render() {
     const { slug, data, LoggedInUser, status, step, mode, action } = this.props;
     const { showOnboardingModal } = this.state;
-
-    const loading = data.loading && !data.Collective;
-
+    const collective = data?.Collective || data?.previousData?.Collective;
+    const loading = data?.loading && !collective;
     if (!loading) {
       if (!data || data.error) {
         return <ErrorPage data={data} />;
-      } else if (!data.Collective) {
+      } else if (!collective || collective.type === 'VENDOR') {
         return <ErrorPage error={generateNotFoundError(slug)} log={false} />;
-      } else if (data.Collective.isPledged && !data.Collective.isActive) {
-        return <PledgedCollectivePage collective={data.Collective} />;
-      } else if (data.Collective.isIncognito) {
-        return <IncognitoUserCollective collective={data.Collective} />;
-      } else if (data.Collective.isGuest) {
-        return <GuestUserProfile account={data.Collective} />;
+      } else if (collective.isIncognito) {
+        return <IncognitoUserCollective collective={collective} />;
+      } else if (collective.isGuest) {
+        return <GuestUserProfile account={collective} />;
       }
     }
 
-    const collective = data && data.Collective;
-
     // Don't allow /collective/apply
-    if (action === 'apply' && !collective?.isHost) {
+    if (action === 'apply' && collective && !collective.isHost) {
       return <Custom404 />;
     }
 
@@ -173,12 +161,13 @@ class CollectivePage extends React.Component {
         collective={collective}
         canonicalURL={getCollectivePageCanonicalURL(collective)}
         {...getCollectivePageMetadata(collective)}
+        loading={loading}
       >
         <GlobalStyles />
         {loading ? (
-          <Container py={[5, 6]}>
+          <div className="py-16 sm:py-32">
             <Loading />
-          </Container>
+          </div>
         ) : (
           <React.Fragment>
             <CollectiveNotificationBar
@@ -232,10 +221,11 @@ class CollectivePage extends React.Component {
   }
 }
 
-const addCollectivePageData = graphql(collectivePageQuery, {
-  options: props => ({
-    variables: getCollectivePageQueryVariables(props.slug),
-  }),
+const addCollectivePageData = ssrGraphQLQuery({
+  query: collectivePageQuery,
+  getVariablesFromProps: ({ slug }) => getCollectivePageQueryVariables(slug),
+  useLegacyDataStructure: true,
+  preload: (client, result) => preloadCollectivePageGraphqlQueries(client, result?.data?.Collective),
 });
 
 export default withRouter(withUser(addCollectivePageData(CollectivePage)));

@@ -7,14 +7,14 @@ import { FEATURES, isFeatureEnabled } from '../lib/allowed-features';
 import { convertDateToApiUtc } from '../lib/date-utils';
 import dayjs from '../lib/dayjs';
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { addCreateCollectiveMutation } from '../lib/graphql/mutations';
+import { addCreateCollectiveMutation } from '../lib/graphql/v1/mutations';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 
+import Footer from './navigation/Footer';
 import Body from './Body';
 import CollectiveNavbar from './collective-navbar';
 import Container from './Container';
 import CreateEventForm from './CreateEventForm';
-import Footer from './Footer';
 import Header from './Header';
 import { getI18nLink } from './I18nFormatters';
 import Link from './Link';
@@ -110,7 +110,7 @@ class CreateEvent extends React.Component {
         <Body>
           <CollectiveNavbar collective={collective} isAdmin={isAdmin} />
 
-          <div className="content">
+          <div className="p-3 sm:p-8">
             {!isAdmin ? (
               <Container margin="0 auto" textAlign="center">
                 <p>
@@ -147,7 +147,7 @@ class CreateEvent extends React.Component {
                   onChange={this.resetError}
                   loading={this.state.status === 'loading' || this.state.result.success}
                 />
-                <Container textAlign="center" marginBottom="5rem">
+                <Container textAlign="center" marginBottom="3.15rem">
                   <Container style={{ color: 'green' }}>{this.state.result.success}</Container>
                   <Container style={{ color: 'red' }}>{this.state.result.error}</Container>
                 </Container>

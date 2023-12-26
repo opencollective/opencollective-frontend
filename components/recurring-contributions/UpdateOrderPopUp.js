@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { first, get, last, startCase } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -12,7 +12,7 @@ import { AmountTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { getIntervalFromContributionFrequency } from '../../lib/date-utils';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { DEFAULT_MINIMUM_AMOUNT, DEFAULT_PRESETS } from '../../lib/tier-utils';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -26,7 +26,7 @@ import StyledInputAmount from '../StyledInputAmount';
 import StyledRadioList from '../StyledRadioList';
 import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import { getSubscriptionStartDate } from './AddPaymentMethod';
 
@@ -64,7 +64,7 @@ const updateOrderMutation = gql`
   }
 `;
 
-const tiersQuery = gql`
+export const tiersQuery = gql`
   query UpdateOrderPopUpTiers($slug: String!) {
     account(slug: $slug) {
       id
@@ -101,8 +101,8 @@ const tiersQuery = gql`
 // TODO: internationalize me
 const OTHER_LABEL = 'Other';
 
-const useUpdateOrder = ({ contribution, onSuccess }) => {
-  const { addToast } = useToasts();
+export const useUpdateOrder = ({ contribution, onSuccess }) => {
+  const { toast } = useToast();
   const [submitUpdateOrder, { loading }] = useMutation(updateOrderMutation, { context: API_V2_CONTEXT });
   return {
     isSubmittingOrder: loading,
@@ -117,11 +117,12 @@ const useUpdateOrder = ({ contribution, onSuccess }) => {
             },
             tier: {
               id: selectedTier?.id || null,
+              isCustom: !selectedTier,
             },
           },
         });
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
+        toast({
+          variant: 'success',
           message: (
             <FormattedMessage
               id="subscription.createSuccessUpdated"
@@ -133,7 +134,7 @@ const useUpdateOrder = ({ contribution, onSuccess }) => {
         onSuccess();
       } catch (error) {
         const errorMsg = getErrorFromGraphqlException(error).message;
-        addToast({ type: TOAST_TYPE.ERROR, message: errorMsg });
+        toast({ variant: 'error', message: errorMsg });
         return false;
       }
     },
@@ -198,7 +199,7 @@ const geSelectedContributeOption = (contribution, tiersOptions) => {
   }
 };
 
-const useContributeOptions = (order, tiers, tiersLoading, disableCustomContributions) => {
+export const useContributeOptions = (order, tiers, tiersLoading, disableCustomContributions) => {
   const intl = useIntl();
   const [loading, setLoading] = useState(true);
   const [selectedContributeOption, setSelectedContributeOption] = useState(null);
@@ -210,7 +211,7 @@ const useContributeOptions = (order, tiers, tiersLoading, disableCustomContribut
     return getContributeOptions(intl, order, tiers, disableCustomContributions);
   }, [intl, order, tiers, disableCustomContributions]);
 
-  if (!contributeOptions.length === 0) {
+  if (contributeOptions.length === 0) {
     throw new Error('Could not compute at least one contribution option.');
   }
 
@@ -254,7 +255,7 @@ const useContributeOptions = (order, tiers, tiersLoading, disableCustomContribut
   };
 };
 
-const ContributionInterval = ({ tier, contribution }) => {
+export const ContributionInterval = ({ tier, contribution }) => {
   const isActiveTier = contribution.tier?.id && contribution.tier.id === tier.id;
   let interval = null;
 
@@ -305,7 +306,7 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
 
   // state management
   const { locale } = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const { isSubmittingOrder, updateOrder } = useUpdateOrder({ contribution, onSuccess: onCloseEdit });
   const tiers = get(data, 'account.tiers.nodes', null);
   const disableCustomContributions = get(data, 'account.settings.disableCustomContributions', false);
@@ -399,7 +400,6 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
                               value={inputAmountValue}
                               onChange={setInputAmountValue}
                               min={DEFAULT_MINIMUM_AMOUNT}
-                              precision={2}
                               px="2px"
                             />
                           </Box>
@@ -456,7 +456,7 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
             tier={selectedTier}
             style={{ height: 25, size: 'small' }}
             subscriptionStartDate={getSubscriptionStartDate(contribution)}
-            onError={e => addToast({ type: TOAST_TYPE.ERROR, title: e.message })}
+            onError={e => toast({ variant: 'error', title: e.message })}
             onSuccess={({ subscriptionId }) =>
               updateOrder(selectedTier, selectedAmountOption, inputAmountValue, subscriptionId)
             }

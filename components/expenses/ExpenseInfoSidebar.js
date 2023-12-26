@@ -51,12 +51,12 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
                 precision={CurrencyPrecision.DEFAULT}
               />
               {host && (
-                <P fontSize="11px" color="black.600" mt={2}>
+                <P fontSize="11px" color="black.700" mt={2}>
                   <Span
                     fontSize="9px"
                     fontWeight="600"
                     textTransform="uppercase"
-                    color="black.500"
+                    color="black.700"
                     letterSpacing="0.06em"
                   >
                     <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />

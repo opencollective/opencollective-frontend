@@ -16,7 +16,7 @@ import SectionTitle from '../SectionTitle';
 const StyledAdminActions = styled.div`
   text-align: center;
   text-transform: uppercase;
-  font-size: 1.3rem;
+  font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.05rem;
   ul {
@@ -30,7 +30,7 @@ const StyledAdminActions = styled.div`
     list-style: none;
 
     li {
-      margin: 0 2rem;
+      margin: 0 1.25rem;
     }
   }
 `;

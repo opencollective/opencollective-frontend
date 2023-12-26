@@ -1,0 +1,77 @@
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import { Toaster } from '../../components/ui/Toaster';
+import { toast } from '../../components/ui/useToast';
+import theme from '../../lib/theme';
+
+<Meta
+  title="Design system/Toaster"
+  component={Toaster}
+  argTypes={{
+    variant: { options: ['success', 'error', 'default'], defaultValue: 'default', control: { type: 'radio' } },
+    duration: { defaultValue: 60000, control: { type: 'range', min: 3000, max: 60000, step: 1000 } },
+    toast: {
+      defaultValue: {
+        variant: 'error',
+        title: 'A toast title',
+        createdAt: Date.now(),
+        message: (
+          <p>
+            A toast message that can have <a href="https://opencollective.com">links</a> or <i>text formatting</i> --
+            it's pretty flexible!
+          </p>
+        ),
+      },
+    },
+  }}
+  args={{
+    toast: {
+      variant: 'error',
+      title: 'A toast title',
+      createdAt: Date.now(),
+      message: (
+        <p>
+          A toast message that can have <a href="https://opencollective.com">links</a> or <i>text formatting</i> -- it's
+          pretty flexible!
+        </p>
+      ),
+    },
+  }}
+/>
+
+## Default
+
+export const DefaultStory = ({ toast: defaultToast, variant, type, duration }) => (
+  <div className="flex flex-col gap-2">
+    <button
+      onClick={() => {
+        const toastProps = { ...defaultToast, variant, type, duration };
+        console.log({ toastProps });
+        toast({ ...defaultToast, variant, type, duration });
+      }}
+    >
+      Add toast
+    </button>
+    <button
+      onClick={() => {
+        const toastProps = { ...defaultToast, variant, type, duration };
+        console.log({ toastProps });
+        toast({ ...defaultToast, variant: 'success', type, duration });
+      }}
+    >
+      Add success toast
+    </button>
+    <button
+      onClick={() => {
+        const toastProps = { ...defaultToast, variant, type, duration };
+        console.log({ toastProps });
+        toast({ ...defaultToast, variant: 'error', type, duration });
+      }}
+    >
+      Add error toast
+    </button>
+  </div>
+);
+
+<Story name="Default">{DefaultStory.bind({})}</Story>
+
+<ArgsTable story="Default" />

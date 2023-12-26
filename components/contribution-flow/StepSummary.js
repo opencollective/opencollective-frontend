@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   checkVATNumberFormat,
+  getGstPercentage,
   getVatOriginCountry,
   getVatPercentage,
-  GST_RATE_PERCENT,
   TaxType,
 } from '@opencollective/taxes';
 import { Close } from '@styled-icons/material/Close';
@@ -37,22 +37,21 @@ const ClickableLabel = styled(Container).attrs({
 
 /** Add missing fields to taxInfo and calculate tax amount */
 const prepareTaxInfo = (taxes, userTaxInfo, amount, quantity, taxPercentage, hasForm) => {
-  const isCountryRequired = taxes[0]?.type === TaxType.VAT;
   return {
     ...userTaxInfo,
     taxType: taxes[0]?.type,
     percentage: taxPercentage,
     amount: Math.round(amount * quantity * (taxPercentage / 100)),
-    isReady: Boolean(!hasForm && (!amount || !isCountryRequired || get(userTaxInfo, 'countryISO'))),
+    isReady: Boolean(!hasForm && amount && get(userTaxInfo, 'countryISO')),
   };
 };
 
-const getTaxPercentageForProfile = (taxes, tierType, hostCountry, collectiveCountry, profile) => {
+const getTaxPercentageForProfile = (taxes, tierType, hostCountry, collectiveCountry, newTaxInfo) => {
   if (taxes.some(({ type }) => type === TaxType.VAT)) {
     const originCountry = getVatOriginCountry(tierType, hostCountry, collectiveCountry);
-    return getVatPercentage(tierType, originCountry, get(profile, 'countryISO'), get(profile, 'number'));
+    return getVatPercentage(tierType, originCountry, get(newTaxInfo, 'countryISO'), get(newTaxInfo, 'number'));
   } else if (taxes.some(({ type }) => type === TaxType.GST)) {
-    return GST_RATE_PERCENT;
+    return getGstPercentage(tierType, hostCountry, get(newTaxInfo, 'countryISO'));
   } else {
     return 0;
   }
@@ -226,6 +225,56 @@ VATInputs.propTypes = {
   Label: PropTypes.node,
 };
 
+const GSTInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChange }) => {
+  const gstShortLabel = <FormattedMessage id="tax.gstShort" defaultMessage="GST" />;
+  return (
+    <AmountLine my={3}>
+      <Flex flexDirection="column" width="100%">
+        <Flex alignItems="center" flexWrap="wrap">
+          <Label mr={2} flex="0 1 30px">
+            {gstShortLabel}
+          </Label>
+          <Box flex="1 1 auto">
+            <InputTypeCountry
+              inputId="step-summary-location"
+              minWidth={100}
+              maxWidth={190}
+              maxMenuHeight={150}
+              value={taxInfo.countryISO}
+              error={!taxInfo.countryISO}
+              styles={COUNTRY_SELECT_STYLES}
+              fontSize="12px"
+              autoDetect
+              onChange={code =>
+                dispatchChange({
+                  countryISO: code,
+                  number: null,
+                })
+              }
+            />
+          </Box>
+        </Flex>
+      </Flex>
+      <Amount pt={2} ml={2} data-cy="GST-amount">
+        <FormattedMoneyAmount
+          amount={taxInfo.amount}
+          currency={currency}
+          amountStyles={{ color: 'black.700', fontWeight: 400 }}
+        />
+      </Amount>
+    </AmountLine>
+  );
+};
+
+GSTInputs.propTypes = {
+  taxInfo: PropTypes.object,
+  currency: PropTypes.string,
+  dispatchChange: PropTypes.func,
+  AmountLine: PropTypes.node,
+  Amount: PropTypes.node,
+  Label: PropTypes.node,
+};
+
 /**
  * Breakdowns a total amount to show the user where the money goes.
  */
@@ -234,7 +283,7 @@ const StepSummary = ({
   stepDetails,
   collective,
   stepPayment,
-  isCrypto,
+
   applyTaxes,
   taxes,
   data,
@@ -244,13 +293,22 @@ const StepSummary = ({
   const { amount, quantity } = stepDetails;
   const tierType = tier?.type;
   const hostCountry = get(collective.host, 'location.country');
-  const collectiveCountry = collective.location.country || get(collective.parent, 'location.country');
-  const currency = isCrypto ? stepDetails.currency.value : tier?.amount.currency || collective.currency;
+  const collectiveCountry = collective.location?.country || get(collective.parent, 'location.country');
+  const currency = tier?.amount.currency || collective.currency;
 
   const [formState, setFormState] = useState({ isEnabled: false, error: false });
   const taxPercentage = getTaxPercentageForProfile(taxes, tierType, hostCountry, collectiveCountry, data);
   const taxInfo = prepareTaxInfo(taxes, data, amount, quantity, taxPercentage, formState.isEnabled);
-  const hasCustomTaxRenderer = taxInfo?.taxType === TaxType.VAT && applyTaxes && amount > 0;
+
+  // Set a tax renderer component
+  let TaxRenderer = null;
+  if (applyTaxes && amount > 0 && taxInfo.taxType) {
+    if (taxInfo.taxType === TaxType.VAT) {
+      TaxRenderer = VATInputs;
+    } else if (taxInfo.taxType === TaxType.GST) {
+      TaxRenderer = GSTInputs;
+    }
+  }
 
   // Helper to prepare onChange data
   const dispatchChange = (newValues, hasFormParam) => {
@@ -285,23 +343,21 @@ const StepSummary = ({
         stepSummary={data}
         stepPayment={stepPayment}
         currency={currency}
-        isCrypto={isCrypto}
         tier={tier}
         renderTax={
-          !hasCustomTaxRenderer
-            ? null
-            : ({ Amount, Label, AmountLine }) => (
-                <VATInputs
-                  currency={currency}
-                  dispatchChange={dispatchChange}
-                  setFormState={setFormState}
-                  formState={formState}
-                  taxInfo={taxInfo}
-                  Amount={Amount}
-                  Label={Label}
-                  AmountLine={AmountLine}
-                />
-              )
+          TaxRenderer &&
+          (({ Amount, Label, AmountLine }) => (
+            <TaxRenderer
+              currency={currency}
+              dispatchChange={dispatchChange}
+              setFormState={setFormState}
+              formState={formState}
+              taxInfo={taxInfo}
+              Amount={Amount}
+              Label={Label}
+              AmountLine={AmountLine}
+            />
+          ))
         }
       />
     </Box>
@@ -314,10 +370,6 @@ StepSummary.propTypes = {
     amount: PropTypes.number.isRequired,
     /** Number of items to order */
     quantity: PropTypes.number,
-    /** Currency of the order (for crypto flow) */
-    currency: {
-      value: PropTypes.string,
-    },
   }),
   stepProfile: PropTypes.shape({
     location: PropTypes.shape({
@@ -377,7 +429,6 @@ StepSummary.propTypes = {
   /** Called with the step info as `{countryCode, taxInfoNumber, isValid}`  */
   onChange: PropTypes.func.isRequired,
   taxes: PropTypes.arrayOf(PropTypes.oneOf(Object.values(TaxType))),
-  isCrypto: PropTypes.bool,
 };
 
 export default StepSummary;

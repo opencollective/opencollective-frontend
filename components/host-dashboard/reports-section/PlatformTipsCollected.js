@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Image from 'next/image';
 import { FormattedMessage } from 'react-intl';
 
 import Container from '../../Container';
 import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../../FormattedMoneyAmount';
 import { Box, Flex } from '../../Grid';
+import Image from '../../Image';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import { P, Span } from '../../Text';
 

@@ -110,7 +110,7 @@ class MembersWithData extends React.Component {
           flexDirection="row"
           justifyContent="center"
           overflow="hidden"
-          margin="1rem 0"
+          margin="0.65rem 0"
         >
           {members.map(member => (
             <Member
@@ -124,7 +124,7 @@ class MembersWithData extends React.Component {
           ))}
         </Container>
         {members.length % 10 === 0 && members.length >= limit && (
-          <Container margin="1rem" textAlign="center">
+          <Container margin="0.65rem" textAlign="center">
             <StyledButton onClick={this.fetchMore}>
               {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
               {!this.state.loading && <FormattedMessage id="loadMore" defaultMessage="load more" />}
@@ -137,18 +137,9 @@ class MembersWithData extends React.Component {
 }
 
 const membersQuery = gqlV1/* GraphQL */ `
-  query Members(
-    $collectiveSlug: String!
-    $TierId: Int
-    $role: String
-    $type: String
-    $limit: Int
-    $offset: Int
-    $orderBy: String
-  ) {
+  query Members($collectiveSlug: String!, $role: String, $type: String, $limit: Int, $offset: Int, $orderBy: String) {
     allMembers(
       collectiveSlug: $collectiveSlug
-      TierId: $TierId
       role: $role
       type: $type
       limit: $limit
@@ -190,7 +181,6 @@ export const addMembersData = graphql(membersQuery, {
   options: props => ({
     variables: {
       collectiveSlug: props.collective.slug,
-      TierId: props.tier && props.tier.id,
       offset: 0,
       type: props.type,
       role: props.memberRole,

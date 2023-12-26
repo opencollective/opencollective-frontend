@@ -1,10 +1,9 @@
 import React from 'react';
-import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { FormattedMessage } from 'react-intl';
 
 import { getErrorFromGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';

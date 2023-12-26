@@ -2,12 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import Container from './Container';
+import { cn } from '../lib/utils';
+
 import Link from './Link';
-import StyledLink from './StyledLink';
 import StyledSpinner from './StyledSpinner';
 import { withUser } from './UserProvider';
-
 /**
  * A user login button with proper redirect function.
  * If user is currently loggin in, button will be disabled and will show a spinner.
@@ -37,31 +36,23 @@ class LoginBtn extends React.Component {
     }
   }
 
-  renderContent() {
-    if (this.props.loadingLoggedInUser) {
-      return <StyledSpinner size="1em" />;
-    }
-
-    return this.props.children || <FormattedMessage id="signIn" defaultMessage="Sign In" />;
-  }
-
   render() {
-    const buttonProps = this.props.asLink
-      ? { display: 'inline' }
-      : {
-          border: '1px solid #D5DAE0',
-          borderRadius: '20px',
-          color: 'primary.700',
-          display: 'inline-block',
-          fontSize: '1.4rem',
-          px: 3,
-          py: 2,
-        };
     return (
-      <Link href={{ pathname: '/signin', query: { next: this.redirectAfterSignin } }}>
-        <StyledLink as={Container} {...buttonProps}>
-          {this.renderContent()}
-        </StyledLink>
+      <Link
+        href={{ pathname: '/signin', query: { next: this.redirectAfterSignin } }}
+        className={cn(
+          'text-primary hover:text-primary/80',
+          this.props.loadingLoggedInUser ? 'h-8 w-8' : 'h-8 px-4',
+          this.props.asLink
+            ? 'inline'
+            : 'inline-flex items-center justify-center whitespace-nowrap rounded-full border text-sm',
+        )}
+      >
+        {this.props.loadingLoggedInUser ? (
+          <StyledSpinner size="1em" />
+        ) : (
+          this.props.children || <FormattedMessage id="signIn" defaultMessage="Sign In" />
+        )}
       </Link>
     );
   }

@@ -35,6 +35,7 @@ describe('Onboarding modal', () => {
     cy.get('[data-cy="profile-card"]').children().should('have.length', 1);
     cy.get('[data-cy="step-forward-button"]').click();
     // Add Github, Twitter, and website links
+    cy.getByDataCy('social-link-inputs');
     cy.focused().type('https://opencollective.com/testCollective');
     cy.contains('Add social link').click();
     cy.focused().type('https://twitter.com/testCollective');

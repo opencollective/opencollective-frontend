@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -38,7 +38,7 @@ export const I18nFilters = defineMessages({
   },
   [FILTERS.CANCELLED]: {
     id: 'Subscriptions.Cancelled',
-    defaultMessage: 'Cancelled',
+    defaultMessage: 'Canceled',
   },
 });
 
@@ -47,7 +47,11 @@ const CollectiveCardContainer = styled.div`
 `;
 
 const filterContributions = (contributions, filterName) => {
-  const isActive = ({ status }) => status === ORDER_STATUS.ACTIVE || status === ORDER_STATUS.ERROR;
+  const isActive = ({ status }) =>
+    status === ORDER_STATUS.ACTIVE ||
+    status === ORDER_STATUS.ERROR ||
+    status === ORDER_STATUS.PROCESSING ||
+    status === ORDER_STATUS.NEW;
   const isInactive = ({ status }) => status === ORDER_STATUS.CANCELLED || status === ORDER_STATUS.REJECTED;
   switch (filterName) {
     case FILTERS.ACTIVE:
@@ -69,18 +73,25 @@ const RecurringContributionsContainer = ({
   LoggedInUser,
   isLoading,
   displayFilters,
+  filter: outsideFilter,
   ...props
 }) => {
-  const isAdmin = Boolean(LoggedInUser?.isAdminOfCollective(account));
+  const isAdminOrRoot = Boolean(LoggedInUser?.isAdminOfCollective(account) || LoggedInUser?.isRoot);
   const intl = useIntl();
   const [editingContributionId, setEditingContributionId] = React.useState();
-  const [filter, setFilter] = React.useState(FILTERS.ACTIVE);
+  const [filter, setFilter] = React.useState(outsideFilter ?? FILTERS.ACTIVE);
   const displayedRecurringContributions = React.useMemo(() => {
     const filteredContributions = filterContributions(recurringContributions?.nodes || [], filter);
-    return isAdmin
+    return isAdminOrRoot
       ? filteredContributions
       : filteredContributions.filter(contrib => contrib.status !== ORDER_STATUS.ERROR);
-  }, [recurringContributions, filter, isAdmin]);
+  }, [recurringContributions, filter, isAdminOrRoot]);
+
+  useEffect(() => {
+    if (outsideFilter) {
+      setFilter(outsideFilter);
+    }
+  }, [outsideFilter]);
 
   // Reset edit when changing filters and contribution is not in the list anymore
   React.useEffect(() => {
@@ -97,7 +108,7 @@ const RecurringContributionsContainer = ({
   ]);
 
   if (isLoading) {
-    return <LoadingPlaceholder maxHeight="400px" mt={3} />;
+    return <LoadingPlaceholder height="400px" mt={3} />;
   }
 
   return (
@@ -125,12 +136,12 @@ const RecurringContributionsContainer = ({
                 contribution={contribution}
                 position="relative"
                 account={account}
-                isAdmin={isAdmin}
+                isAdmin={isAdminOrRoot}
                 isEditing={contribution.id === editingContributionId}
-                canEdit={isAdmin && !editingContributionId}
+                canEdit={isAdminOrRoot && !editingContributionId}
                 onEdit={() => setEditingContributionId(contribution.id)}
                 onCloseEdit={() => setEditingContributionId(null)}
-                showPaymentMethod={isAdmin}
+                showPaymentMethod={isAdminOrRoot}
                 data-cy="recurring-contribution-card"
               />
             </CollectiveCardContainer>
@@ -162,6 +173,7 @@ RecurringContributionsContainer.propTypes = {
   LoggedInUser: PropTypes.object,
   displayFilters: PropTypes.bool,
   isLoading: PropTypes.bool,
+  filter: PropTypes.oneOf(Object.values(FILTERS)),
 };
 
 export default withUser(RecurringContributionsContainer);

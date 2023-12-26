@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql } from '@apollo/client/react/hoc';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getCollectivePageMetadata } from '../lib/collective';
 import { TierTypes } from '../lib/constants/tiers-types';
 import { sortEvents } from '../lib/events';
 import { gqlV1 } from '../lib/graphql/helpers';
+import { ssrGraphQLQuery } from '../lib/graphql/with-ssr-query';
 import { sortTiersForCollective } from '../lib/tier-utils';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 import { getWebsiteUrl } from '../lib/utils';
@@ -21,19 +21,17 @@ import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../components/contribute-cards/constants';
 import ContributeCollective from '../components/contribute-cards/ContributeCollective';
-import ContributeCrypto from '../components/contribute-cards/ContributeCrypto';
 import ContributeCustom from '../components/contribute-cards/ContributeCustom';
 import ContributeEvent from '../components/contribute-cards/ContributeEvent';
 import ContributeProject from '../components/contribute-cards/ContributeProject';
 import ContributeTier from '../components/contribute-cards/ContributeTier';
-import { PAYMENT_FLOW } from '../components/contribution-flow/constants';
 import ErrorPage from '../components/ErrorPage';
-import Footer from '../components/Footer';
 import { Box, Flex, Grid } from '../components/Grid';
 import Header from '../components/Header';
 import Link from '../components/Link';
 import Loading from '../components/Loading';
 import MessageBox from '../components/MessageBox';
+import Footer from '../components/navigation/Footer';
 import StyledButton from '../components/StyledButton';
 import { H2, P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
@@ -54,7 +52,7 @@ const CardsContainer = styled(Grid).attrs({
   }
 `;
 
-class TiersPage extends React.Component {
+class ContributePage extends React.Component {
   static getInitialProps({ query: { collectiveSlug, verb } }) {
     return { slug: collectiveSlug, verb };
   }
@@ -62,7 +60,6 @@ class TiersPage extends React.Component {
   static propTypes = {
     slug: PropTypes.string, // from getInitialProps, for addContributePageData
     verb: PropTypes.string, // from getInitialProps
-    query: PropTypes.object, // from getInitialProps
     data: PropTypes.object.isRequired, // from withData
     LoggedInUser: PropTypes.object,
   };
@@ -71,9 +68,26 @@ class TiersPage extends React.Component {
     return contributors.filter(c => c.isBacker && (c.tiersIds.length === 0 || c.tiersIds[0] === null));
   });
 
-  hasContributors = memoizeOne((contributors, events) => {
-    const hasFinancial = contributors.find(c => c.isBacker);
-    return hasFinancial || events.find(event => event.contributors.length > 0);
+  hasContributors = memoizeOne((collective, verb) => {
+    const hasFinancial = collective.contributors.some(c => c.isBacker);
+    const hasEventContributors = collective.events?.some(event => event.contributors.length > 0);
+    const hasProjectContributors = collective.projects?.some(project => project.contributors.length > 0);
+    const hasConnectedCollectiveContributors = collective.connectedCollectives?.some(
+      connectedCollective => connectedCollective.collective.contributors.length > 0,
+    );
+
+    switch (verb) {
+      case 'events':
+        return hasEventContributors;
+      case 'projects':
+        return hasProjectContributors;
+      case 'connected-collectives':
+        return hasConnectedCollectiveContributors;
+      case 'tiers':
+        return hasFinancial;
+      default:
+        return hasFinancial || hasEventContributors || hasProjectContributors;
+    }
   });
 
   getPageMetadata(collective) {
@@ -98,7 +112,7 @@ class TiersPage extends React.Component {
 
     const waysToContribute = [];
     const canContribute = collective.isActive && collective.host;
-    const hasContributors = this.hasContributors(collective.contributors, collective.events);
+    const hasContributors = this.hasContributors(collective, verb);
     const showAll = verb === 'contribute';
 
     // Financial contributions
@@ -115,15 +129,6 @@ class TiersPage extends React.Component {
               collective: collective,
               contributors: this.getFinancialContributorsWithoutTier(collective.contributors),
               stats: collective.stats.backers,
-            },
-          });
-        } else if (tier === PAYMENT_FLOW.CRYPTO) {
-          waysToContribute.push({
-            ContributeCardComponent: ContributeCrypto,
-            key: 'contribute-tier-crypto',
-            props: {
-              hideContributors: true,
-              collective: collective,
             },
           });
         } else {
@@ -261,7 +266,7 @@ class TiersPage extends React.Component {
     const { title, subtitle } = this.getTitle(verb, collectiveName);
     return (
       <div>
-        <Header LoggedInUser={LoggedInUser} {...this.getPageMetadata(collective)} />
+        <Header LoggedInUser={LoggedInUser} {...this.getPageMetadata(collective)} collective={collective} />
         <Body>
           {data.loading ? (
             <Loading />
@@ -341,7 +346,14 @@ class TiersPage extends React.Component {
 }
 
 const contributePageQuery = gqlV1/* GraphQL */ `
-  query ContributePage($slug: String!, $nbContributorsPerContributeCard: Int) {
+  query ContributePage(
+    $slug: String!
+    $nbContributorsPerContributeCard: Int
+    $includeTiers: Boolean!
+    $includeEvents: Boolean!
+    $includeProjects: Boolean!
+    $includeConnectedCollectives: Boolean!
+  ) {
     Collective(slug: $slug) {
       id
       slug
@@ -396,19 +408,19 @@ const contributePageQuery = gqlV1/* GraphQL */ `
         isIncognito
         tiersIds
       }
-      tiers {
+      tiers @include(if: $includeTiers) {
         id
         ...ContributeCardTierFields
       }
-      events(includePastEvents: true, includeInactive: true) {
+      events(includePastEvents: true, includeInactive: true) @include(if: $includeEvents) {
         id
         ...ContributeCardEventFields
       }
-      projects {
+      projects @include(if: $includeProjects) {
         id
         ...ContributeCardProjectFields
       }
-      connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
+      connectedCollectives: members(role: "CONNECTED_COLLECTIVE") @include(if: $includeConnectedCollectives) {
         id
         collective: member {
           id
@@ -439,15 +451,17 @@ const contributePageQuery = gqlV1/* GraphQL */ `
   ${fragments.contributeCardEventFieldsFragment}
   ${fragments.contributeCardProjectFieldsFragment}
 `;
-/* eslint-enable graphql/template-strings */
 
-const addContributePageData = graphql(contributePageQuery, {
-  options: props => ({
-    variables: {
-      slug: props.slug,
-      nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
-    },
+const addContributePageData = ssrGraphQLQuery({
+  query: contributePageQuery,
+  getVariablesFromProps: props => ({
+    slug: props.slug,
+    nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+    includeTiers: ['contribute', 'tiers'].includes(props.verb),
+    includeEvents: ['contribute', 'events'].includes(props.verb),
+    includeProjects: ['contribute', 'projects'].includes(props.verb),
+    includeConnectedCollectives: ['contribute', 'connected-collectives'].includes(props.verb),
   }),
 });
 
-export default withUser(addContributePageData(TiersPage));
+export default withUser(addContributePageData(ContributePage));

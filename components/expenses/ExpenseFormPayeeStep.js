@@ -1,29 +1,28 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { FastField, Field } from 'formik';
 import { first, get, groupBy, isEmpty, omit, pick } from 'lodash';
+import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { compareNames } from '../../lib/collective.lib';
+import { compareNames } from '../../lib/collective';
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { expenseFormPayeeStepCollectivePickerSearchQuery } from '../../lib/graphql/v1/queries';
 import { require2FAForAdmins } from '../../lib/policies';
 import { flattenObjectDeep } from '../../lib/utils';
 import { checkRequiresAddress } from './lib/utils';
 
-import CollectivePicker, {
-  CUSTOM_OPTIONS_POSITION,
-  FLAG_COLLECTIVE_PICKER_COLLECTIVE,
-  FLAG_NEW_COLLECTIVE,
-} from '../CollectivePicker';
+import CollectivePicker, { CUSTOM_OPTIONS_POSITION, FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
-import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
@@ -39,7 +38,7 @@ import { TwoFactorAuthRequiredMessage } from '../TwoFactorAuthRequiredMessage';
 import PayoutMethodForm, { validatePayoutMethod } from './PayoutMethodForm';
 import PayoutMethodSelect from './PayoutMethodSelect';
 
-const { INDIVIDUAL, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
+const { INDIVIDUAL, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, VENDOR } = CollectiveType;
 
 const msg = defineMessages({
   payeeLabel: {
@@ -139,53 +138,51 @@ const refreshPayoutProfile = (formik, payoutProfiles) => {
   formik.setValues({ ...formik.values, draft: omit(formik.values.draft, ['payee']), payee });
 };
 
+const sortProfiles = profiles => {
+  return profiles?.sort((a, b) => a.slug.localeCompare(b.slug)) || [];
+};
+
 const getPayeeOptions = (intl, payoutProfiles) => {
-  const profileOptions = payoutProfiles.map(value => ({
-    value,
-    label: value.name,
-    [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
-  }));
-
-  const profilesByType = groupBy(profileOptions, p => p.value.type);
-
-  const myself = profilesByType[INDIVIDUAL] || [];
-  const myOrganizations = profilesByType[ORGANIZATION] || [];
-
-  myOrganizations.push({
-    label: null,
-    value: null,
-    isDisabled: true,
-    [FLAG_NEW_COLLECTIVE]: true,
-    types: [CollectiveType.ORGANIZATION],
-    __background__: 'white',
-  });
+  const profilesByType = groupBy(payoutProfiles, p => p.type);
+  const getOption = profile => ({ value: profile, label: profile.name, [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true });
+  const getProfileOptions = type => sortProfiles(profilesByType[type]).map(getOption);
 
   const payeeOptions = [
-    { options: myself, label: intl.formatMessage({ defaultMessage: 'Myself' }) },
-    { options: myOrganizations, label: intl.formatMessage({ id: 'organization', defaultMessage: 'My Organizations' }) },
+    {
+      label: intl.formatMessage({ defaultMessage: 'Myself' }),
+      options: getProfileOptions(INDIVIDUAL),
+    },
+    {
+      label: intl.formatMessage({ defaultMessage: 'Vendors' }),
+      options: getProfileOptions(VENDOR),
+    },
+    {
+      label: intl.formatMessage({ id: 'organization', defaultMessage: 'My Organizations' }),
+      options: getProfileOptions(ORGANIZATION),
+    },
   ];
 
   if (profilesByType[COLLECTIVE]?.length) {
     payeeOptions.push({
-      options: profilesByType[COLLECTIVE],
+      options: getProfileOptions(COLLECTIVE),
       label: intl.formatMessage({ id: 'collective', defaultMessage: 'My Collectives' }),
     });
   }
   if (profilesByType[FUND]?.length) {
     payeeOptions.push({
-      options: profilesByType[FUND],
+      options: getProfileOptions(FUND),
       label: intl.formatMessage({ id: 'funds', defaultMessage: 'My Funds' }),
     });
   }
   if (profilesByType[PROJECT]?.length) {
     payeeOptions.push({
-      options: profilesByType[PROJECT],
+      options: getProfileOptions(PROJECT),
       label: intl.formatMessage({ defaultMessage: 'My Projects' }),
     });
   }
   if (profilesByType[EVENT]?.length) {
     payeeOptions.push({
-      options: profilesByType[EVENT],
+      options: getProfileOptions(EVENT),
       label: intl.formatMessage({ id: 'events', defaultMessage: 'My Events' }),
     });
   }
@@ -193,10 +190,44 @@ const getPayeeOptions = (intl, payoutProfiles) => {
   return payeeOptions;
 };
 
+const expenseFormPayeeStepQuery = gql`
+  query ExpenseFormPayee($collectiveSlug: String!) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
+      id
+      slug
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+          legacyId
+          vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
+            nodes {
+              id
+              slug
+              name
+              type
+              description
+              imageUrl(height: 64)
+              hasPayoutMethod
+              payoutMethods {
+                id
+                type
+                name
+                data
+                isSaved
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 const checkStepOneCompleted = (values, isOnBehalf, isMissing2FA) => {
   if (isMissing2FA) {
     return false;
-  } else if (isOnBehalf) {
+  } else if (isOnBehalf || values.payee?.type === VENDOR) {
     return Boolean(values.payee);
   } else if (!isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod)))) {
     return false; // There are some errors in the form
@@ -219,13 +250,17 @@ const ExpenseFormPayeeStep = ({
   isOnBehalf,
   loggedInAccount,
   editingExpense,
-  resetDefaultStep,
-  formPersister,
-  getDefaultExpense,
+  handleClearPayeeStep,
+  drawerActionsContainer,
+  disablePayee,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, errors } = formik;
+  const { data, loading } = useQuery(expenseFormPayeeStepQuery, {
+    context: API_V2_CONTEXT,
+    variables: { collectiveSlug: collective.slug },
+  });
   const isMissing2FA = require2FAForAdmins(values.payee) && !loggedInAccount?.hasTwoFactorAuth;
   const stepOneCompleted = checkStepOneCompleted(values, isOnBehalf, isMissing2FA);
   const allPayoutMethods = React.useMemo(
@@ -233,11 +268,16 @@ const ExpenseFormPayeeStep = ({
     [values.payee, loggedInAccount],
   );
 
-  const [showResetModal, setShowResetModal] = React.useState(false);
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
-  const payeeOptions = React.useMemo(() => getPayeeOptions(intl, payoutProfiles), [payoutProfiles]);
+
+  const vendors = get(data, 'account.host.vendors.nodes', []).filter(v => v.hasPayoutMethod);
+  const payeeOptions = React.useMemo(
+    () => getPayeeOptions(intl, [...payoutProfiles, ...vendors]),
+    [payoutProfiles, vendors],
+  );
   const requiresAddress = checkRequiresAddress(values);
+  const requiresPayoutMethod = !isOnBehalf && values.payee?.type !== VENDOR;
   const canInvite = !values?.status;
 
   const collectivePick = canInvite
@@ -250,21 +290,22 @@ const ExpenseFormPayeeStep = ({
           onChange={({ value }) => {
             if (value) {
               const existingProfile = payoutProfiles.find(p => p.slug === value.slug);
+              const isVendor = value.type === VENDOR;
               const isNewlyCreatedProfile = value.members?.some(
                 m => m.role === 'ADMIN' && m.member.slug === loggedInAccount.slug,
               );
 
               const payee = existingProfile || {
-                ...pick(value, ['id', 'name', 'slug', 'email', 'type']),
-                isInvite: !isNewlyCreatedProfile,
+                ...pick(value, ['id', 'name', 'slug', 'email', 'type', 'payoutMethods']),
+                isInvite: !isNewlyCreatedProfile && !isVendor,
               };
 
-              if (isNewlyCreatedProfile) {
+              if (isNewlyCreatedProfile && !isVendor) {
                 payee.payoutMethods = [];
               }
 
               formik.setFieldValue('payee', payee);
-              formik.setFieldValue('payoutMethod', null);
+              formik.setFieldValue('payoutMethod', isVendor ? first(payee.payoutMethods) || null : null);
               setLocationFromPayee(formik, payee);
               onChange(payee);
             }
@@ -280,11 +321,16 @@ const ExpenseFormPayeeStep = ({
           emptyCustomOptions={payeeOptions}
           customOptionsPosition={CUSTOM_OPTIONS_POSITION.BOTTOM}
           getDefaultOptions={build => values.payee && build(values.payee)}
+          disabled={disablePayee}
           invitable
           onInvite={onInvite}
           LoggedInUser={loggedInAccount}
+          includeVendorsForHostId={collective.host?.legacyId || undefined}
           addLoggedInUserAsAdmin
           excludeAdminFields
+          searchQuery={expenseFormPayeeStepCollectivePickerSearchQuery}
+          filterResults={collectives => collectives.filter(c => c.type !== CollectiveType.VENDOR || c.hasPayoutMethod)}
+          loading={loading}
         />
       )
     : ({ id }) => (
@@ -294,6 +340,7 @@ const ExpenseFormPayeeStep = ({
           getDefaultOptions={build => values.payee && build(values.payee)}
           data-cy="select-expense-payee"
           isSearchable
+          disabled={disablePayee}
           collective={values.payee}
           onChange={({ value }) => {
             formik.setFieldValue('payee', value);
@@ -301,8 +348,67 @@ const ExpenseFormPayeeStep = ({
             setLocationFromPayee(formik, value);
             onChange(value);
           }}
+          loading={loading}
         />
       );
+
+  const actionButtons = (
+    <Flex flex={1} gridGap={[2, 3]} flexWrap="wrap">
+      {onCancel && (
+        <StyledButton
+          type="button"
+          width={['100%', 'auto']}
+          whiteSpace="nowrap"
+          data-cy="expense-cancel"
+          onClick={() => {
+            onCancel?.();
+          }}
+        >
+          <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+        </StyledButton>
+      )}
+      <StyledButton
+        type="button"
+        width={['100%', 'auto']}
+        whiteSpace="nowrap"
+        data-cy="expense-next"
+        buttonStyle="primary"
+        disabled={!stepOneCompleted}
+        onClick={async () => {
+          const allErrors = await formik.validateForm();
+          // Get the relevant errors for the payee step, ignores data.currency in the because it is related to expense amount.
+          const errors = omit(pick(allErrors, ['payee', 'payoutMethod', 'payeeLocation']), [
+            'payoutMethod.data.currency',
+          ]);
+          if (isEmpty(flattenObjectDeep(errors))) {
+            onNext?.(formik.values);
+          } else {
+            // We use set touched here to display errors on fields that are not dirty.
+            // eslint-disable-next-line no-console
+            console.log('ExpenseFormPayeeStep > Validation failed', errors);
+            formik.setTouched(errors);
+            formik.setErrors(errors);
+          }
+        }}
+      >
+        <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
+        &nbsp;→
+      </StyledButton>
+
+      <StyledButton
+        type="button"
+        buttonStyle="borderless"
+        width={['100%', 'auto']}
+        color="red.500"
+        whiteSpace="nowrap"
+        onClick={handleClearPayeeStep}
+        marginLeft={'auto'}
+      >
+        <Undo size={11} />
+        <Span mx={1}>{formatMessage(editingExpense ? msg.cancelEditExpense : msg.clearExpenseForm)}</Span>
+      </StyledButton>
+    </Flex>
+  );
 
   return (
     <Fragment>
@@ -381,6 +487,7 @@ const ExpenseFormPayeeStep = ({
                       name={field.name}
                       label={formatMessage(msg.invoiceInfo)}
                       labelFontSize="13px"
+                      fontSize="14px"
                       required={false}
                       mt={3}
                     >
@@ -400,7 +507,7 @@ const ExpenseFormPayeeStep = ({
             </React.Fragment>
           )}
         </Box>
-        {!isOnBehalf && (
+        {requiresPayoutMethod && (
           <Box flexGrow="1" flexBasis="50%" display={values.payee ? 'block' : 'none'}>
             <Field name="payoutMethod">
               {({ field }) => (
@@ -454,106 +561,16 @@ const ExpenseFormPayeeStep = ({
 
       {isMissing2FA && <TwoFactorAuthRequiredMessage mt={4} />}
 
-      {values.payee && !isMissing2FA && (
-        <Fragment>
-          <StyledHr flex="1" mt={4} borderColor="black.300" />
-          <Flex mt={3} flexWrap="wrap">
-            {onCancel && (
-              <StyledButton
-                type="button"
-                width={['100%', 'auto']}
-                mx={[2, 0]}
-                mr={[null, 3]}
-                mt={2}
-                whiteSpace="nowrap"
-                data-cy="expense-cancel"
-                onClick={() => {
-                  onCancel?.();
-                }}
-              >
-                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </StyledButton>
-            )}
-            <StyledButton
-              type="button"
-              width={['100%', 'auto']}
-              mx={[2, 0]}
-              mr={[null, 3]}
-              mt={2}
-              whiteSpace="nowrap"
-              data-cy="expense-next"
-              buttonStyle="primary"
-              disabled={!stepOneCompleted}
-              onClick={async () => {
-                const allErrors = await formik.validateForm();
-                // Get the relevant errors for the payee step, ignores data.currency in the because it is related to expense amount.
-                const errors = omit(pick(allErrors, ['payee', 'payoutMethod', 'payeeLocation']), [
-                  'payoutMethod.data.currency',
-                ]);
-                if (isEmpty(flattenObjectDeep(errors))) {
-                  onNext?.();
-                } else {
-                  // We use set touched here to display errors on fields that are not dirty.
-                  // eslint-disable-next-line no-console
-                  console.log('ExpenseFormPayeeStep > Validation failed', errors);
-                  formik.setTouched(errors);
-                  formik.setErrors(errors);
-                }
-              }}
-            >
-              <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
-              &nbsp;→
-            </StyledButton>
-            <StyledHr flex="1" borderColor="white.full" mx={2} />
-            {showResetModal ? (
-              <ConfirmationModal
-                onClose={() => setShowResetModal(false)}
-                header={editingExpense ? formatMessage(msg.cancelEditExpense) : formatMessage(msg.clearExpenseForm)}
-                body={
-                  editingExpense
-                    ? formatMessage(msg.confirmCancelEditExpense)
-                    : formatMessage(msg.confirmClearExpenseForm)
-                }
-                continueHandler={() => {
-                  if (editingExpense) {
-                    onCancel();
-                  } else {
-                    resetDefaultStep();
-                    formik.resetForm({ values: getDefaultExpense(collective) });
-                    if (formPersister) {
-                      formPersister.clearValues();
-                      window.scrollTo(0, 0);
-                    }
-                  }
-                  setShowResetModal(false);
-                }}
-                {...(editingExpense && {
-                  continueLabel: formatMessage({ defaultMessage: 'Yes, cancel editing' }),
-                  cancelLabel: formatMessage({ defaultMessage: 'No, continue editing' }),
-                })}
-              />
-            ) : (
-              <Flex float="right">
-                <StyledButton
-                  type="button"
-                  buttonStyle="borderless"
-                  width={['100%', 'auto']}
-                  color="red.500"
-                  mt={1}
-                  mx={[2, 0]}
-                  mr={[null, 3]}
-                  whiteSpace="nowrap"
-                  onClick={() => setShowResetModal(true)}
-                  float="right"
-                >
-                  <Undo size={11} />
-                  <Span mx={1}>{formatMessage(editingExpense ? msg.cancelEditExpense : msg.clearExpenseForm)}</Span>
-                </StyledButton>
-              </Flex>
-            )}
-          </Flex>
-        </Fragment>
-      )}
+      {values.payee &&
+        !isMissing2FA &&
+        (drawerActionsContainer ? (
+          createPortal(actionButtons, drawerActionsContainer)
+        ) : (
+          <Fragment>
+            <StyledHr flex="1" mt={4} mb={3} borderColor="black.300" />
+            {actionButtons}
+          </Fragment>
+        ))}
     </Fragment>
   );
 };
@@ -561,9 +578,6 @@ const ExpenseFormPayeeStep = ({
 ExpenseFormPayeeStep.propTypes = {
   formik: PropTypes.object,
   editingExpense: PropTypes.bool,
-  resetDefaultStep: PropTypes.func,
-  formPersister: PropTypes.object,
-  getDefaultExpense: PropTypes.func,
   payoutProfiles: PropTypes.array,
   onCancel: PropTypes.func,
   handleClearPayeeStep: PropTypes.func,
@@ -571,17 +585,20 @@ ExpenseFormPayeeStep.propTypes = {
   onInvite: PropTypes.func,
   onChange: PropTypes.func,
   isOnBehalf: PropTypes.bool,
+  disablePayee: PropTypes.bool,
   loggedInAccount: PropTypes.object,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
     host: PropTypes.shape({
+      legacyId: PropTypes.number,
       transferwise: PropTypes.shape({
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
     }),
     settings: PropTypes.object,
   }).isRequired,
+  drawerActionsContainer: PropTypes.object,
 };
 
 export default ExpenseFormPayeeStep;

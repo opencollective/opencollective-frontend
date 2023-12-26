@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../../lib/graphql/helpers';
 
 const memberFieldsFragment = gql`
   fragment MemberFields on Member {
@@ -25,7 +25,11 @@ export const teamSectionQuery = gql`
   query TeamSection($collectiveSlug: String!, $account: AccountReferenceInput!) {
     account(slug: $collectiveSlug) {
       id
+      legacyId
+      slug
       isFrozen
+      type
+      imageUrl(height: 256)
       ... on AccountWithParent {
         parent {
           id
@@ -42,6 +46,14 @@ export const teamSectionQuery = gql`
           features {
             id
             CONTACT_FORM
+          }
+          policies {
+            id
+            COLLECTIVE_MINIMUM_ADMINS {
+              numberOfAdmins
+              applies
+              freeze
+            }
           }
         }
       }

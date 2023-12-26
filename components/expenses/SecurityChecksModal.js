@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ShieldFillCheck } from '@styled-icons/bootstrap/ShieldFillCheck';
-import { ShieldFillExclamation } from '@styled-icons/bootstrap/ShieldFillExclamation';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
 import { compact, find, first, uniq, upperCase } from 'lodash';
+import { ShieldAlert, ShieldCheck } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -119,7 +118,7 @@ const SecurityChecksModal = ({ expense, onClose, onConfirm, ...modalProps }) => 
   const [scope, setScope] = React.useState();
 
   return (
-    <StyledModal onClose={onClose} width="680px" data-cy="security-check-modal" {...modalProps}>
+    <StyledModal trapFocus onClose={onClose} width="680px" data-cy="security-check-modal" {...modalProps}>
       <ModalHeader onClose={onClose}>
         <Box>
           <H1 color="black.900" fontSize="20px" lineHeight="28px">
@@ -215,7 +214,7 @@ export const SecurityChecksButton = ({ expense, ...buttonProps }) => {
   const [hasModal, setHasModal] = React.useState(false);
   const highRiskChecks = expense?.securityChecks?.filter(check => check.level === 'HIGH').length || 0;
   const higherRisk = first(compact(LEVEL_ORDER.map(level => find(expense?.securityChecks, { level }))));
-  const ShieldIcon = highRiskChecks ? ShieldFillExclamation : ShieldFillCheck;
+  const ShieldIcon = highRiskChecks ? ShieldAlert : ShieldCheck;
 
   return (
     <React.Fragment>

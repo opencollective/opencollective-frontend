@@ -3,8 +3,12 @@
  */
 export const LOCAL_STORAGE_KEYS = {
   ACCESS_TOKEN: 'accessToken',
+  TWO_FACTOR_AUTH_TOKEN: 'twoFactorAuthToken',
   GUEST_TOKENS: 'guestTokens',
   HOST_DASHBOARD_FILTER_PREFERENCES: 'hostDashBoardFilterPreferences',
+  LAST_DASHBOARD_SLUG: 'lastDashboardSlug',
+  DASHBOARD_NAVIGATION_STATE: 'DashboardNavigationState',
+  PREFERRED_TWO_FACTOR_METHOD: 'preferredTwoFactorMethod',
 };
 
 // The below helpers use a try-catch to gracefully fallback in these scenarios:

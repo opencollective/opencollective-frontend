@@ -1,22 +1,23 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { compact, flatten } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 
 import Avatar from '../../../Avatar';
 import { Box, Flex } from '../../../Grid';
-import InputSwitch from '../../../InputSwitch';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
+import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledButton from '../../../StyledButton';
 import StyledCard from '../../../StyledCard';
 import StyledHr from '../../../StyledHr';
 import StyledTag from '../../../StyledTag';
 import { P, Span } from '../../../Text';
+import { Switch } from '../../../ui/Switch';
 
 import CollectiveSettings from './CollectiveSettings';
 import { accountActivitySubscriptionsFragment } from './fragments';
@@ -38,8 +39,8 @@ const NecessaryNotificationsList = styled.ul`
 `;
 
 const userActivitySubscriptionsQuery = gql`
-  query ActivitySubscriptionsSettingsQuery($id: String!) {
-    account(id: $id) {
+  query ActivitySubscriptionsSettings($slug: String!) {
+    account(slug: $slug) {
       id
       ... on Individual {
         newsletterOptIn
@@ -177,9 +178,9 @@ GroupSettings.propTypes = {
   title: PropTypes.node,
 };
 
-const NotificationsSettings = ({ account, subpath }) => {
-  const { data, loading } = useQuery(userActivitySubscriptionsQuery, {
-    variables: { id: account.id },
+const NotificationsSettings = ({ accountSlug, subpath }) => {
+  const { data, loading, error } = useQuery(userActivitySubscriptionsQuery, {
+    variables: { slug: accountSlug },
     context: API_V2_CONTEXT,
   });
   const [setNewsletterOptIn, { loading: setNewsletterOptInLoading }] = useMutation(setNewsletterOptInMutation, {
@@ -187,9 +188,9 @@ const NotificationsSettings = ({ account, subpath }) => {
   });
 
   const accounts = data?.account.memberOf.nodes.map(member => member.account) || [];
-  const hosts = accounts?.filter(a => !!a.host);
-  const orgs = accounts?.filter(a => a.type === 'ORGANIZATION' && !a.host);
-  const collectives = accounts?.filter(a => a.type === 'COLLECTIVE');
+  const hosts = accounts.filter(a => !!a.host);
+  const orgs = accounts.filter(a => a.type === 'ORGANIZATION' && !a.host);
+  const collectives = accounts.filter(a => a.type === 'COLLECTIVE');
 
   const backedAccounts =
     data?.account.backerOf.nodes
@@ -252,6 +253,7 @@ const NotificationsSettings = ({ account, subpath }) => {
           defaultMessage="We will always let you know about important changes, but you can customize other settings here. Manage email notifications for your individual profile as well as the collectives and organizations you are part of."
         />
       </P>
+      {error && <MessageBoxGraphqlError error={error} my={4} />}
       <StyledCard mt={4} p="24px">
         <P fontSize="18px" fontWeight="700" lineHeight="26px">
           <FormattedMessage
@@ -414,11 +416,11 @@ const NotificationsSettings = ({ account, subpath }) => {
                     defaultMessage="Receive the Open Collective newsletter (monthly)"
                   />
                 </P>
-                <InputSwitch
+                <Switch
                   name={`newsletter-switch`}
                   checked={data?.account?.newsletterOptIn}
-                  isLoading={setNewsletterOptInLoading}
-                  onChange={event => setNewsletterOptIn({ variables: { newsletterOptIn: event.target.checked } })}
+                  isDisabled={setNewsletterOptInLoading}
+                  onCheckedChange={checked => setNewsletterOptIn({ variables: { newsletterOptIn: checked } })}
                 />
               </Flex>
               <StyledHr width="100%" mt={3} borderStyle="dashed" />
@@ -446,9 +448,7 @@ const NotificationsSettings = ({ account, subpath }) => {
 };
 
 NotificationsSettings.propTypes = {
-  account: PropTypes.shape({
-    id: PropTypes.string,
-  }),
+  accountSlug: PropTypes.string.isRequired,
   subpath: PropTypes.arrayOf(PropTypes.string),
 };
 
