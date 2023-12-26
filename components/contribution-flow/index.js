@@ -12,7 +12,7 @@ import styled from 'styled-components';
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
 import { AnalyticsProperty } from '../../lib/analytics/properties';
-import { getCollectiveTypeForUrl } from '../../lib/collective.lib';
+import { getCollectiveTypeForUrl } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';

@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { withRouter } from 'next/router';
 import { createGlobalStyle } from 'styled-components';
 
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getCollectivePageMetadata } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
 import { ssrGraphQLQuery } from '../lib/graphql/with-ssr-query';
 import { getRequestIntl } from '../lib/i18n/request';

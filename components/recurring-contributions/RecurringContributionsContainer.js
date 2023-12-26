@@ -16,8 +16,6 @@ import { withUser } from '../UserProvider';
 
 import RecurringContributionsCard from './RecurringContributionsCard';
 
-import EmptyCollectivesSectionImageSVG from '../collective-page/images/EmptyCollectivesSectionImage.svg';
-
 export const FILTERS = {
   ACTIVE: 'ACTIVE',
   MONTHLY: 'MONTHLY',
@@ -151,7 +149,12 @@ const RecurringContributionsContainer = ({
         </Grid>
       ) : (
         <Flex flexDirection="column" alignItems="center" py={4}>
-          <Image src={EmptyCollectivesSectionImageSVG} alt="" width={309} height={200} />
+          <Image
+            src="/static/images/collective-page/EmptyCollectivesSectionImage.svg"
+            alt=""
+            width={309}
+            height={200}
+          />
           <P color="black.600" fontSize="16px" mt={5}>
             <FormattedMessage
               id="RecurringContributions.none"

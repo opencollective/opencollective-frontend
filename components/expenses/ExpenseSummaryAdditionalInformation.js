@@ -4,7 +4,7 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { formatAccountName } from '../../lib/collective.lib';
+import { formatAccountName } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payout-method';
