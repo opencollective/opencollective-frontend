@@ -58,7 +58,7 @@ const BaseTag = ({ status, ...props }) => {
 };
 
 BaseTag.propTypes = {
-  status: PropTypes.oneOf([...Object.values(ExpenseStatus), 'COMPLETED']),
+  status: PropTypes.oneOf([...Object.values(ExpenseStatus), 'COMPLETED', 'REFUNDED']),
 };
 
 /**
