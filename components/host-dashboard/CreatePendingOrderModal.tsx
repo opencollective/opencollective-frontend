@@ -591,7 +591,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               </Field>
             </Box>
           )}
-          {(true || canAddHostFee) && (
+          {canAddHostFee && (
             <Field
               name="hostFeePercent"
               htmlFor="CreatePendingContribution-hostFeePercent"
