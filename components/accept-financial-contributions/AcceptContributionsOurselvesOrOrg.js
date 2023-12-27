@@ -5,12 +5,12 @@ import { PlusCircle } from '@styled-icons/boxicons-regular/PlusCircle';
 import { Form, Formik } from 'formik';
 import { uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS } from '../../lib/constants/payout-method';
-import { getErrorFromGraphqlException } from '../../lib/errors';
+import { getErrorFromGraphqlException, i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { compose } from '../../lib/utils';
 
@@ -23,10 +23,10 @@ import PayoutBankInformationForm from '../expenses/PayoutBankInformationForm';
 import FinancialContributionsFAQ from '../faqs/FinancialContributionsFAQ';
 import { Box, Flex } from '../Grid';
 import Image from '../Image';
-import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { H1, H2, P } from '../Text';
+import { toast } from '../ui/useToast';
 import { withUser } from '../UserProvider';
 
 import StripeOrBankAccountPicker from './StripeOrBankAccountPicker';
@@ -72,6 +72,7 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
     refetchLoggedInUser: PropTypes.func,
     createPayoutMethod: PropTypes.func,
     applyToHost: PropTypes.func.isRequired,
+    intl: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -157,8 +158,8 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
   };
 
   render() {
-    const { collective, router, LoggedInUser } = this.props;
-    const { error, miniForm, organization, loading } = this.state;
+    const { collective, router, LoggedInUser, intl } = this.props;
+    const { miniForm, organization, loading } = this.state;
 
     // Get and filter orgs LoggedInUser is part of
     const memberships = uniqBy(
@@ -199,8 +200,8 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
         );
         window.scrollTo(0, 0);
       } catch (e) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
         this.setState({ loading: false });
-        this.setState({ error: e });
       }
     };
 
@@ -359,14 +360,6 @@ class AcceptContributionsOurselvesOrOrg extends React.Component {
                             />
                           </Box>
 
-                          {error && (
-                            <Flex>
-                              <MessageBox type="error" flexGrow={1} withIcon mt={3}>
-                                {error.message}
-                              </MessageBox>
-                            </Flex>
-                          )}
-
                           <Flex justifyContent={'center'} mt={3}>
                             <StyledButton
                               fontSize="13px"
@@ -473,6 +466,7 @@ const inject = compose(
   addApplyToHostMutation,
   addEditBankAccountMutation,
   addCreatePayoutMethodMutation,
+  injectIntl,
 );
 
 export default inject(AcceptContributionsOurselvesOrOrg);
