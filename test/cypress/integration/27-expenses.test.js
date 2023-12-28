@@ -722,6 +722,7 @@ describe('Expense flow', () => {
   describe('Actions on expense', () => {
     let collective;
     let user;
+    let expense;
     let expenseUrl;
 
     before(() => {
@@ -734,14 +735,31 @@ describe('Expense flow', () => {
 
     beforeEach(() => {
       cy.createExpense({
+        type: 'INVOICE',
         userEmail: user.email,
         account: { legacyId: collective.id },
         payee: { legacyId: user.CollectiveId },
-      }).then(expense => (expenseUrl = `/${collective.slug}/expenses/${expense.legacyId}`));
+        description: 'Expense for E2E tests',
+      }).then(createdExpense => {
+        expense = createdExpense;
+        expenseUrl = `/${collective.slug}/expenses/${expense.legacyId}`;
+      });
+    });
+
+    it('Downloads PDF', () => {
+      cy.login({ email: user.email, redirect: expenseUrl });
+      cy.getByDataCy('more-actions').click();
+      cy.getByDataCy('download-expense-invoice-btn').click({ force: true });
+      const date = new Date(expense.createdAt).toISOString().split('T')[0];
+      const filename = `Expense-${expense.legacyId}-${collective.slug}-invoice-${date}.pdf`;
+      cy.getDownloadedPDFContent(filename)
+        .should('contain', `Expense	#${expense.legacyId}:	Expense	for	E2E	tests`)
+        .should('contain', 'Collective:	Test	Collective')
+        .should('contain', '$10.00');
     });
 
     it('Approve, unapprove, reject and pay actions on expense', () => {
-      cy.visit(expenseUrl);
+      cy.login({ email: user.email, redirect: expenseUrl });
       cy.get('[data-cy="expense-status-msg"]').contains('Pending');
       cy.getByDataCy('approve-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Approved');
