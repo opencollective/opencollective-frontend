@@ -81,7 +81,7 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
   };
 
   return (
-    <StyledModal flexGrow={1} maxWidth="500px" onClose={handleClose} trapFocus>
+    <StyledModal maxWidth="500px" onClose={handleClose}>
       <Formik initialValues={initialValues} onSubmit={submit}>
         {formik => (
           <Form onSubmit={formik.handleSubmit}>

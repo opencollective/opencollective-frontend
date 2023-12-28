@@ -172,7 +172,6 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
           setAgreementDrawerOpen(false);
           refetch(variables);
         }}
-        onFilePreview={() => setAgreementFilePreview(agreementInDrawer)}
       />
       {agreementFilePreview && (
         <FilesViewerModal

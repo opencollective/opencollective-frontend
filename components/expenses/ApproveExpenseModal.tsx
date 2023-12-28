@@ -34,7 +34,6 @@ export default function ApproveExpenseModal({
   return (
     <ConfirmationModal
       onClose={onClose}
-      trapFocus={false}
       header={<FormattedMessage defaultMessage="Approve Expense" />}
       maxWidth={384}
       disableSubmit={!selectedCategory}
