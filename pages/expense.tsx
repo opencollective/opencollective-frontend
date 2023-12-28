@@ -95,8 +95,8 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
   });
 
   const { collectiveSlug, edit, draftKey } = props;
-  const data = queryResult?.data;
-  const error = queryResult?.error;
+  const data = queryResult.data;
+  const error = queryResult.error;
   const { refetch, fetchMore, startPolling, stopPolling } = queryResult;
   if (!queryResult.loading) {
     if (!data || error) {
