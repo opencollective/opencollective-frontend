@@ -249,7 +249,7 @@ jobs:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
 
       - name: Archive test recordings
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-recordings
           path: |
@@ -258,7 +258,7 @@ jobs:
         if: ${{ failure() }}
 
       - name: Archive download folder
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: downloads
           path: test/cypress/downloads
