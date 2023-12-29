@@ -49,12 +49,11 @@ class SectionEvents extends React.PureComponent {
 
   render() {
     const { collective, events, isAdmin } = this.props;
-    const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
-
     if (!events?.length && !isAdmin) {
       return null;
     }
 
+    const hasNoContributorForEvents = !events.find(event => event.contributors.length > 0);
     return (
       <Box pb={4} mt={2}>
         <ContainerSectionContent>
@@ -93,7 +92,7 @@ class SectionEvents extends React.PureComponent {
             </Box>
           )}
         </HorizontalScroller>
-        {Boolean(events?.length > 6) && (
+        {Boolean(events.length > 6) && (
           <ContainerSectionContent>
             <Link href={`/${collective.slug}/events`}>
               <StyledButton mt={4} width={1} buttonSize="small" fontSize="14px">
