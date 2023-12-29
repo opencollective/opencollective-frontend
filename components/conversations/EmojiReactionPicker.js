@@ -214,13 +214,13 @@ const EmojiReactionPicker = ({ comment, update }) => {
 
 EmojiReactionPicker.propTypes = {
   comment: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    id: PropTypes.string,
     html: PropTypes.string,
     createdAt: PropTypes.string,
     userReactions: PropTypes.array,
   }),
   update: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    id: PropTypes.string,
     html: PropTypes.string,
     createdAt: PropTypes.string,
     fromAccount: PropTypes.shape({

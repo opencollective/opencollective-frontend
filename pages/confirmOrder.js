@@ -39,13 +39,13 @@ class ConfirmOrderPage extends React.Component {
 
   componentDidMount() {
     if (!this.props.loadingLoggedInUser && this.props.LoggedInUser) {
-      return this.triggerRequest();
+      this.triggerRequest();
     }
   }
 
   componentDidUpdate() {
     if (!this.state.isRequestSent && !this.props.loadingLoggedInUser && this.props.LoggedInUser) {
-      return this.triggerRequest();
+      this.triggerRequest();
     }
   }
 
