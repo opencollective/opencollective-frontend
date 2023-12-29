@@ -71,7 +71,7 @@
     "cookie-parser": "1.4.6",
     "copy-to-clipboard": "3.3.3",
     "copy-webpack-plugin": "11.0.0",
-    "country-currency-emoji-flags": "1.0.11",
+    "country-currency-emoji-flags": "1.1.1",
     "currency-symbol-map": "5.1.0",
     "date-fns": "2.30.0",
     "dayjs": "1.11.10",
