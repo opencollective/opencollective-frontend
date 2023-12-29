@@ -133,7 +133,7 @@ const UserAccountLinks = ({
         isMobileMenuLink={isMobileView}
         href={
           useDashboard
-            ? getDashboardRoute(LoggedInUser.collective, 'manage-contributions')
+            ? getDashboardRoute(LoggedInUser.collective, 'outgoing-contributions')
             : `/${LoggedInUser.collective.slug}/manage-contributions`
         }
       >

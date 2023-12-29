@@ -398,7 +398,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
         <Link
           href={
             LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-              ? getDashboardRoute(collective, 'manage-contributions')
+              ? getDashboardRoute(collective, 'outgoing-contributions')
               : `${getCollectivePageRoute(collective)}/manage-contributions`
           }
         >
