@@ -366,6 +366,10 @@ const contributePageQuery = gqlV1/* GraphQL */ `
       isHost
       backgroundImageUrl
       imageUrl
+      location {
+        id
+        country
+      }
       parentCollective {
         id
         name
@@ -382,6 +386,10 @@ const contributePageQuery = gqlV1/* GraphQL */ `
         name
         slug
         type
+        location {
+          id
+          country
+        }
       }
       stats {
         id
