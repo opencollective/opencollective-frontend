@@ -166,7 +166,7 @@ class EditUpdateForm extends React.Component {
                     onChange={isPrivate => this.handleChange('isPrivate', isPrivate.checked)}
                   />
                   <Container ml="25px" fontSize="12px" color="#71757A" mt={1}>
-                    <FormattedMessage defaultMessage="Check this to limit access to the content of this update to contributors only" />
+                    <FormattedMessage defaultMessage="Check this to limit access to the content of this update to the target audience only" />
                   </Container>
                 </Box>
               )}
