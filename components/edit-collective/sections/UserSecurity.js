@@ -58,12 +58,12 @@ class UserSecurity extends React.Component {
     };
 
     this.setPassword = this.setPassword.bind(this);
-    this.componentMounted = false;
+    this.hasTriggeredScroll = false;
   }
 
   componentDidUpdate() {
-    if (window.location.hash && !this.componentMounted) {
-      this.componentMounted = true;
+    if (window.location.hash && !this.hasTriggeredScroll && !this.props.data.loading) {
+      this.hasTriggeredScroll = true;
       const section = document.querySelector(window.location.hash);
       section.scrollIntoView();
     }
