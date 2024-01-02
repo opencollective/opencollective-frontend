@@ -23,7 +23,7 @@ import TimezonePicker from './TimezonePicker';
 
 const Label = ({ label, isPrivate }) => (
   <label className="text-sm font-bold">
-    {label}&nbsp;{isPrivate && <PrivateInfoIcon tooltipProps={{ containerVerticalAlign: 'text-bottom' }} />}
+    {label}&nbsp;{isPrivate && <PrivateInfoIcon />}
   </label>
 );
 

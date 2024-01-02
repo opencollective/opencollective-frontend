@@ -7,6 +7,7 @@ export enum PREVIEW_FEATURE_KEYS {
   EXPENSE_OCR = 'EXPENSE_OCR',
   EXPENSE_CATEGORIZATION = 'EXPENSE_CATEGORIZATION',
   DYNAMIC_TOP_BAR = 'DYNAMIC_TOP_BAR',
+  NEW_TRANSACTION_PAGE = 'NEW_TRANSACTION_PAGE',
 }
 
 export type PreviewFeature = {
@@ -60,5 +61,11 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     closedBetaAccessFor: ['foundation', 'opensource', 'europe'],
     alwaysEnableInDev: true,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.NEW_TRANSACTION_PAGE,
+    title: 'New Transactions page',
+    description: 'Improved Transactions page in Dashboard',
+    publicBeta: true,
   },
 ];

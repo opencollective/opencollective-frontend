@@ -33,6 +33,24 @@ enum StripePaymentMethod {
   wechat_pay = 'wechat_pay',
 }
 
+export const RestrictedCurrencyByStripePaymentMethod: Partial<Record<StripePaymentMethod, string[]>> = {
+  [StripePaymentMethod.bacs_debit]: ['gbp'],
+  [StripePaymentMethod.bancontact]: ['eur'],
+  [StripePaymentMethod.sepa_debit]: ['eur'],
+  [StripePaymentMethod.ideal]: ['eur'],
+  [StripePaymentMethod.sofort]: ['eur'],
+  [StripePaymentMethod.us_bank_account]: ['usd'],
+};
+
+export function isStripePaymentMethodEnabledForCurrency(paymentMethod, currency: string): boolean {
+  const allowedCurrencyList = RestrictedCurrencyByStripePaymentMethod[paymentMethod.toLowerCase()];
+  if (!allowedCurrencyList) {
+    return true;
+  }
+
+  return allowedCurrencyList.includes(currency.toLowerCase());
+}
+
 export const StripePaymentMethodsLabels = defineMessages<StripePaymentMethod>({
   [StripePaymentMethod.acss_debit]: { id: 'Stripe.PaymentMethod.Label.acss_debit', defaultMessage: 'ACSS Debit' },
   [StripePaymentMethod.afterpay_clearpay]: {

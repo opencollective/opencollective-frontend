@@ -1,6 +1,7 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 
+import { ZERO_DECIMAL_CURRENCIES } from '../lib/constants/currency';
 import { formatCurrency, getCurrencySymbol } from '../lib/currency-utils';
 import { Currency as CurrencyEnum } from '../lib/graphql/types/v2/graphql';
 
@@ -29,6 +30,8 @@ const Currency = ({ value, currency, formatWithSeparators = false, precision = 0
   } else if (precision < 2 && value < 100) {
     // Force precision if number is < $1 to never display $0 for small amounts
     precision = 2;
+  } else if (ZERO_DECIMAL_CURRENCIES.includes(currency)) {
+    precision = 0;
   }
 
   if (formatWithSeparators) {

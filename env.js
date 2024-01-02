@@ -26,6 +26,7 @@ const defaults = {
   WEBSITE_URL: 'http://localhost:3000',
   REST_URL: 'https://rest-staging.opencollective.com',
   PDF_SERVICE_URL: 'https://pdf-staging.opencollective.com',
+  ML_SERVICE_URL: 'https://ml.opencollective.com',
   DISABLE_MOCK_UPLOADS: false,
   PAYPAL_ENVIRONMENT: 'sandbox',
   STRIPE_KEY: 'pk_test_VgSB4VSg2wb5LdAkz7p38Gw8',
@@ -44,6 +45,7 @@ const defaults = {
   WISE_ENVIRONMENT: 'sandbox',
   API_PROXY: true,
   SENTRY_TRACES_SAMPLE_RATE: null,
+  LEDGER_SEPARATE_PAYMENT_PROCESSOR_FEES: false,
 };
 
 if ((process.env.OC_ENV || process.env.NODE_ENV || 'production') === 'production') {

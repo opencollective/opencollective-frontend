@@ -1,11 +1,11 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { FilterComponentConfigs, FiltersToVariables, Views } from '../../../lib/filters/filter-types';
 import { isMulti, limit, offset } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import {
   Account,
   Host,
@@ -17,6 +17,7 @@ import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { i18nVirtualCardRequestStatus } from '../../../lib/i18n/virtual-card-request';
 import { sortSelectOptions } from '../../../lib/utils';
 
+import { accountHoverCardFields } from '../../AccountHoverCard';
 import { Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
@@ -123,6 +124,7 @@ const hostVirtualCardRequestsQuery = gql`
           name
           slug
           imageUrl
+          ...AccountHoverCardFields
         }
         host {
           id
@@ -136,10 +138,12 @@ const hostVirtualCardRequestsQuery = gql`
           email
           slug
           imageUrl
+          ...AccountHoverCardFields
         }
       }
     }
   }
+  ${accountHoverCardFields}
 `;
 
 export default function HostVirtualCardRequests({ accountSlug: hostSlug }: DashboardSectionProps) {

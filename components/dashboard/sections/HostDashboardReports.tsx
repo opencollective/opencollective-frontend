@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Question } from '@styled-icons/remix-line/Question';
 import dayjs from 'dayjs';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { HostReportsPageQueryVariables } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 

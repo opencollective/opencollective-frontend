@@ -1,4 +1,6 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../../lib/graphql/helpers';
+
+import { accountHoverCardFields } from '../../../AccountHoverCard';
 
 export const processApplicationAccountFields = gql`
   fragment ProcessHostApplicationFields on AccountWithHost {
@@ -68,7 +70,7 @@ export const hostApplicationsQuery = gql`
             website
             description
             type
-            imageUrl(height: 96)
+            imageUrl
             createdAt
             ... on AccountWithHost {
               ...ProcessHostApplicationFields
@@ -86,16 +88,19 @@ export const hostApplicationsQuery = gql`
                   type
                   slug
                   name
-                  imageUrl(height: 48)
+                  imageUrl
+                  ...AccountHoverCardFields
                 }
               }
             }
+            ...AccountHoverCardFields
           }
         }
       }
     }
   }
   ${processApplicationAccountFields}
+  ${accountHoverCardFields}
 `;
 
 export const processApplicationMutation = gql`

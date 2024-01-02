@@ -1,15 +1,15 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { cloneDeep, omit, pick } from 'lodash';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { getAccountReferenceInput } from '../../lib/collective.lib';
+import { getAccountReferenceInput } from '../../lib/collective';
 import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { Agreement } from '../../lib/graphql/types/v2/graphql';
 
 import AttachedFilesForm from '../attached-files/AttachedFilesForm';

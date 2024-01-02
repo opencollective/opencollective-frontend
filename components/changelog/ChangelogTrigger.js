@@ -1,19 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep } from 'lodash';
 import { Megaphone } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { changelogTriggerLoggedInUserQuery } from '../../lib/graphql/v1/queries';
 
 import { WebsiteName } from '../I18nFormatters';
 import { withNewsAndUpdates } from '../NewsAndUpdatesProvider';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
-  const { data } = useQuery(loggedInUserQuery, { fetchPolicy: 'cache-only' });
+  const { data } = useQuery(changelogTriggerLoggedInUserQuery, { fetchPolicy: 'cache-only' });
   const LoggedInUser = data?.LoggedInUser;
   const hasSeenNewUpdates = LoggedInUser?.hasSeenLatestChangelogEntry;
 
@@ -22,9 +23,9 @@ const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
     setChangelogViewDate({
       variables: { changelogViewDate: new Date() },
       update: store => {
-        const data = cloneDeep(store.readQuery({ query: loggedInUserQuery }));
+        const data = cloneDeep(store.readQuery({ query: changelogTriggerLoggedInUserQuery }));
         data.LoggedInUser.hasSeenLatestChangelogEntry = true;
-        store.writeQuery({ query: loggedInUserQuery, data });
+        store.writeQuery({ query: changelogTriggerLoggedInUserQuery, data });
       },
     });
   };
@@ -64,17 +65,8 @@ ChangelogTrigger.propTypes = {
 };
 
 const setChangelogViewDateMutation = gql`
-  mutation SetChangelogViewDateMutation($changelogViewDate: DateTime!) {
+  mutation SetChangelogViewDate($changelogViewDate: DateTime!) {
     setChangelogViewDate(changelogViewDate: $changelogViewDate) {
-      id
-      hasSeenLatestChangelogEntry
-    }
-  }
-`;
-
-const loggedInUserQuery = gqlV1/* GraphQL */ `
-  query LoggedInUser {
-    LoggedInUser {
       id
       hasSeenLatestChangelogEntry
     }

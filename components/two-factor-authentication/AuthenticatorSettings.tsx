@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { CheckCircle2Icon, CircleIcon, PlusIcon } from 'lucide-react';
 import QRCode from 'qrcode.react';
@@ -8,7 +8,7 @@ import speakeasy from 'speakeasy';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { Individual, TwoFactorMethod, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from '../Grid';
@@ -71,7 +71,7 @@ const Code = styled.code`
 `;
 
 const AddAuthenticatorAppToIndividualMutation = gql`
-  mutation addAuthenticatorAppToIndividual($account: AccountReferenceInput!, $token: String!) {
+  mutation AddAuthenticatorAppToIndividual($account: AccountReferenceInput!, $token: String!) {
     addTwoFactorAuthTokenToIndividual(account: $account, token: $token, type: TOTP) {
       account {
         id

@@ -4,7 +4,7 @@ import { themeGet } from '@styled-system/theme-get';
 import { includes } from 'lodash';
 import { MessageSquare } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { FormattedDate, FormattedMessage } from 'react-intl';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -15,7 +15,9 @@ import { AmountPropTypeShape } from '../../lib/prop-types';
 import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles } from './lib/items';
+import { getExpenseExchangeRateWarningOrError } from './lib/utils';
 
+import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -52,10 +54,10 @@ export const SummaryHeader = styled(H1)`
 
 const CreatedByUserLink = ({ account }) => {
   return (
-    <LinkCollective collective={account}>
-      <Span color="black.800" fontWeight={500} textDecoration="none">
+    <LinkCollective collective={account} noTitle>
+      <span className="font-medium text-foreground underline hover:text-primary">
         {account ? account.name : <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />}
-      </Span>
+      </span>
     </LinkCollective>
   );
 };
@@ -88,6 +90,7 @@ const ExpenseSummary = ({
   openFileViewer,
   ...props
 }) => {
+  const intl = useIntl();
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
   const isGrant = expense?.type === expenseTypes.GRANT;
@@ -99,7 +102,6 @@ const ExpenseSummary = ({
   const expenseTaxes = expense?.taxes?.length > 0 ? expense.taxes : expense?.draft?.taxes || [];
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
-
   const { LoggedInUser } = useLoggedInUser();
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
@@ -188,6 +190,7 @@ const ExpenseSummary = ({
           <React.Fragment>
             <AccountingCategoryPill
               host={host}
+              account={expense.account}
               expense={expense}
               canEdit={Boolean(expense.permissions?.canEditAccountingCategory)}
               allowNone={!isLoggedInUserExpenseHostAdmin}
@@ -212,15 +215,42 @@ const ExpenseSummary = ({
                   id="Expense.RequestedBy"
                   defaultMessage="Invited by {name}"
                   values={{
-                    name: <CreatedByUserLink account={createdByAccount} />,
-                    date: new Date(expense.createdAt),
+                    name: (
+                      <AccountHoverCard
+                        account={createdByAccount}
+                        includeAdminMembership={{
+                          accountSlug: expense.account?.slug,
+                          hostSlug: host?.slug,
+                        }}
+                        trigger={
+                          <span>
+                            <CreatedByUserLink account={createdByAccount} />
+                          </span>
+                        }
+                      />
+                    ),
                   }}
                 />
               ) : (
                 <FormattedMessage
                   id="Expense.SubmittedBy"
                   defaultMessage="Submitted by {name}"
-                  values={{ name: <CreatedByUserLink account={createdByAccount} /> }}
+                  values={{
+                    name: (
+                      <AccountHoverCard
+                        account={createdByAccount}
+                        includeAdminMembership={{
+                          accountSlug: expense.account?.slug,
+                          hostSlug: host?.slug,
+                        }}
+                        trigger={
+                          <span>
+                            <CreatedByUserLink account={createdByAccount} />
+                          </span>
+                        }
+                      />
+                    ),
+                  }}
                 />
               )}
               {expense.approvedBy?.length > 0 && (
@@ -230,7 +260,20 @@ const ExpenseSummary = ({
                     id="Expense.ApprovedBy"
                     defaultMessage="Approved by {name}"
                     values={{
-                      name: <CreatedByUserLink account={expense.approvedBy.find(Boolean)} />,
+                      name: (
+                        <AccountHoverCard
+                          account={expense.approvedBy.find(Boolean)}
+                          includeAdminMembership={{
+                            accountSlug: expense.account.slug,
+                            hostSlug: host?.slug,
+                          }}
+                          trigger={
+                            <span>
+                              <CreatedByUserLink account={expense.approvedBy.find(Boolean)} />
+                            </span>
+                          }
+                        />
+                      ),
                     }}
                   />
                 </React.Fragment>
@@ -300,7 +343,7 @@ const ExpenseSummary = ({
         <div data-cy="expense-summary-items">
           {expenseItems.map((attachment, attachmentIdx) => (
             <React.Fragment key={attachment.id || attachmentIdx}>
-              <Flex my={24} flexWrap="wrap">
+              <Flex my={24} flexWrap="wrap" data-cy="expense-summary-item">
                 {attachment.url && expenseItemsMustHaveFiles(expense.type) && (
                   <Box mr={3} mb={3} width={['100%', 'auto']}>
                     <UploadedFilePreview
@@ -313,7 +356,7 @@ const ExpenseSummary = ({
                     />
                   </Box>
                 )}
-                <Flex justifyContent="space-between" alignItems="baseline" flex="1">
+                <Flex justifyContent="space-between" alignItems="flex-start" flex="1">
                   <Flex flexDirection="column" justifyContent="center" flexGrow="1">
                     {attachment.description ? (
                       <HTMLContent
@@ -344,14 +387,44 @@ const ExpenseSummary = ({
                       </Span>
                     )}
                   </Flex>
-                  <P fontSize={15} color="black.600" mt={2} textAlign="right" ml={3}>
-                    <FormattedMoneyAmount
-                      amount={attachment.amount}
-                      currency={expense.currency}
-                      amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontWeight: '500' }}
-                      precision={2}
-                    />
-                  </P>
+                  <Container
+                    fontSize={15}
+                    color="black.600"
+                    mt={2}
+                    textAlign="right"
+                    ml={3}
+                    data-cy="expense-summary-item-amount"
+                  >
+                    {attachment.amountV2?.exchangeRate ? (
+                      <div>
+                        <FormattedMoneyAmount
+                          amount={Math.round(attachment.amountV2.valueInCents * attachment.amountV2.exchangeRate.value)}
+                          currency={expense.currency}
+                          amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontWeight: '500' }}
+                          precision={2}
+                        />
+                        <div className="mt-[2px] text-xs">
+                          <AmountWithExchangeRateInfo
+                            amount={attachment.amountV2}
+                            invertIconPosition
+                            amountStyles={{ letterSpacing: 0 }}
+                            {...getExpenseExchangeRateWarningOrError(
+                              intl,
+                              attachment.amountV2.exchangeRate,
+                              attachment.referenceExchangeRate,
+                            )}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <FormattedMoneyAmount
+                        amount={attachment.amountV2?.valueInCents || attachment.amount}
+                        currency={attachment.amountV2?.currency || expense.currency}
+                        amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontWeight: '500' }}
+                        precision={2}
+                      />
+                    )}
+                  </Container>
                 </Flex>
               </Flex>
               <StyledHr borderStyle="dotted" />
@@ -465,6 +538,7 @@ ExpenseSummary.propTypes = {
     amountInAccountCurrency: AmountPropTypeShape,
     account: PropTypes.shape({
       id: PropTypes.string.isRequired,
+      slug: PropTypes.string.isRequired,
       host: PropTypes.shape({
         id: PropTypes.string.isRequired,
       }),

@@ -237,9 +237,9 @@ class CreateGiftCardsForm extends Component {
 
       this.setState({ submitting: true });
       const variables = {
-        CollectiveId: this.props.collectiveId,
+        collectiveId: this.props.collectiveId,
         amount: values.amount,
-        PaymentMethodId: paymentMethod.id,
+        paymentMethodId: paymentMethod.id,
         expiryDate: values.expiryDate,
         batch: values.batch,
         ...limitations,
@@ -692,10 +692,10 @@ const addCollectiveSourcePaymentMethodsQuery = graphql(collectiveSourcePaymentMe
 
 const createGiftCardsMutation = gqlV1/* GraphQL */ `
   mutation CreateGiftCards(
-    $CollectiveId: Int!
+    $collectiveId: Int!
     $numberOfGiftCards: Int
     $emails: [String]
-    $PaymentMethodId: Int
+    $paymentMethodId: Int
     $amount: Int
     $monthlyLimitPerMember: Int
     $description: String
@@ -709,8 +709,8 @@ const createGiftCardsMutation = gqlV1/* GraphQL */ `
     createGiftCards(
       amount: $amount
       monthlyLimitPerMember: $monthlyLimitPerMember
-      CollectiveId: $CollectiveId
-      PaymentMethodId: $PaymentMethodId
+      CollectiveId: $collectiveId
+      PaymentMethodId: $paymentMethodId
       description: $description
       expiryDate: $expiryDate
       currency: $currency

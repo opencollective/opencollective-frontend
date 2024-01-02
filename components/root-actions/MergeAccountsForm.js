@@ -1,9 +1,9 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
@@ -21,6 +21,10 @@ const mergeAccountsMutation = gql`
         id
         name
         slug
+        isIncognito
+        ... on Individual {
+          isGuest
+        }
       }
     }
   }
@@ -117,7 +121,7 @@ const MergeAccountsForm = () => {
           continueLabel="Merge profiles"
           header={mergeCTA}
           continueHandler={() => mergeAccounts(false)}
-          cancelHandler={() => setMergeSummary(false)}
+          onClose={() => setMergeSummary(false)}
         >
           <P whiteSpace="pre-wrap" lineHeight="24px">
             {mergeSummary}

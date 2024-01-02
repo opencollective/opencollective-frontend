@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { getStripe } from '../lib/stripe';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
@@ -40,13 +39,13 @@ class ConfirmOrderPage extends React.Component {
 
   componentDidMount() {
     if (!this.props.loadingLoggedInUser && this.props.LoggedInUser) {
-      return this.triggerRequest();
+      this.triggerRequest();
     }
   }
 
   componentDidUpdate() {
     if (!this.state.isRequestSent && !this.props.loadingLoggedInUser && this.props.LoggedInUser) {
-      return this.triggerRequest();
+      this.triggerRequest();
     }
   }
 

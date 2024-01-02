@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
 import { AnalyticsProperty } from '../../lib/analytics/properties';
-import { canContributeRecurring, hostIsTaxDeductibleInTheUs } from '../../lib/collective.lib';
+import { canContributeRecurring, hostIsTaxDeductibleInTheUs } from '../../lib/collective';
 import INTERVALS from '../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';

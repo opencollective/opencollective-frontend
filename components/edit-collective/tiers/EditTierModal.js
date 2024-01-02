@@ -1,20 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
 import { isNil, omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getLegacyIdForCollective } from '../../../lib/collective.lib';
+import { getLegacyIdForCollective } from '../../../lib/collective';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { getIntervalFromContributionFrequency } from '../../../lib/date-utils';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { requireFields } from '../../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
@@ -483,7 +483,9 @@ function FormFields({ collective, values, hideTypeSelect }) {
                         as={Link}
                         openInNewTab
                         href={{
-                          pathname: `${getCollectivePageRoute(collective)}/contribute/${values.slug}-${values.id}`,
+                          pathname: `${getCollectivePageRoute(collective)}/contribute/${values.slug}-${
+                            values.legacyId
+                          }`,
                         }}
                       >
                         <span>{msg}</span>
@@ -539,6 +541,7 @@ FormFields.propTypes = {
   }),
   values: PropTypes.shape({
     id: PropTypes.string,
+    legacyId: PropTypes.number,
     slug: PropTypes.string,
     type: PropTypes.string,
     amountType: PropTypes.string,
@@ -710,7 +713,6 @@ export const editTiersFieldsFragment = gql`
     type
     useStandalonePage
     singleTicket
-    invoiceTemplate
   }
 `;
 
@@ -786,7 +788,7 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
   const initialValues = React.useMemo(() => {
     if (isEditing) {
       return {
-        ...omit(tier, ['__typename', 'endsAt', 'slug', 'legacyId', 'customFields', 'availableQuantity']),
+        ...omit(tier, ['__typename', 'endsAt', 'customFields', 'availableQuantity']),
         amount: omit(tier.amount, '__typename'),
         interval: getIntervalFromContributionFrequency(tier.frequency),
         goal: omit(tier.goal, '__typename'),
@@ -875,7 +877,7 @@ export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }
         validate={values => requireFields(values, getRequiredFields(values))}
         onSubmit={async values => {
           const tier = {
-            ...omit(values, ['interval']),
+            ...omit(values, ['interval', 'legacyId', 'slug']),
             frequency: getGQLV2FrequencyFromInterval(values.interval),
             maxQuantity: parseInt(values.maxQuantity),
             goal: !isNil(values?.goal?.valueInCents) ? values.goal : null,

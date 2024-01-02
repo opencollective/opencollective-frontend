@@ -1,4 +1,4 @@
-import { isIndividualAccount } from '../../../lib/collective.lib';
+import { isIndividualAccount } from '../../../lib/collective';
 import { getFilteredSectionsForCollective, getSectionsNames } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';

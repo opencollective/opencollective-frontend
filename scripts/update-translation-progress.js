@@ -67,4 +67,4 @@ export async function main() {
   fs.writeFileSync(filePath, newContent);
 }
 
-main(process.argv[2], process.argv[3]);
+main();

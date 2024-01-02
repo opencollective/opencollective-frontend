@@ -1,11 +1,12 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { compact, toNumber } from 'lodash';
+import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { Views } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
@@ -122,7 +123,7 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
     cell: ({ cell }) => {
       const toAccount = cell.getValue();
       return (
-        <LinkCollective collective={toAccount} className="hover:underline">
+        <LinkCollective collective={toAccount} className="hover:underline" withHoverCard>
           <div className="flex max-w-[200px] items-center">
             <Avatar size={24} collective={toAccount} mr={2} />
             <Span as="span" truncateOverflow>
@@ -139,7 +140,7 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
     cell: ({ cell }) => {
       const fromAccount = cell.getValue();
       return (
-        <LinkCollective collective={fromAccount} className="hover:underline">
+        <LinkCollective collective={fromAccount} className="hover:underline" withHoverCard>
           <div className="flex max-w-[200px] items-center">
             <Avatar size={24} collective={fromAccount} mr={2} />
             <Span as="span" truncateOverflow>
@@ -278,6 +279,7 @@ type ContributionsProps = DashboardSectionProps & {
 
 const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
   const intl = useIntl();
+  const router = useRouter();
   const {
     data: metadata,
     loading: metadataLoading,
@@ -303,7 +305,7 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
       count: metadata?.account?.[ContributionsTab.RECURRING].totalCount,
       filter: {
         type: OrderTypeFilter.RECURRING,
-        status: [OrderStatus.ACTIVE],
+        status: [OrderStatus.ACTIVE, OrderStatus.ERROR],
       },
     },
     {
@@ -347,14 +349,14 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
       slug: accountSlug,
       filter: direction || 'OUTGOING',
       includeIncognito: true,
-      minAmount: 1,
       ...queryFilter.variables,
     },
     context: API_V2_CONTEXT,
   });
+
   const [editOrder, setEditOrder] = React.useState<{ order?: { id: string }; action: EditOrderActions }>({
-    order: null,
-    action: null,
+    order: router.query.orderId ? { id: router.query.orderId as string } : null,
+    action: (router.query.action as EditOrderActions) ?? null,
   });
 
   const selectedOrders = data?.account?.orders.nodes || [];

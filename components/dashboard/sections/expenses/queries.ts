@@ -1,11 +1,11 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../../lib/graphql/helpers';
 
+import { accountHoverCardFields } from '../../../AccountHoverCard';
 import {
   expenseHostFields,
   expensesListAdminFieldsFragment,
   expensesListFieldsFragment,
 } from '../../../expenses/graphql/fragments';
-import { accountFieldsFragment, accountHoverCardFragment } from '../../filters/HostedAccountFilter';
 
 export const accountExpensesQuery = gql`
   query AccountExpenses(
@@ -81,7 +81,7 @@ export const accountExpensesQuery = gql`
 `;
 
 export const accountExpensesMetadataQuery = gql`
-  query AccountExpensesMetadataQuery($accountSlug: String!) {
+  query AccountExpensesMetadata($accountSlug: String!) {
     account(slug: $accountSlug) {
       id
       slug
@@ -266,8 +266,6 @@ export const hostDashboardMetadataQuery = gql`
     hostedAccounts: accounts(host: { slug: $hostSlug }, orderBy: { field: ACTIVITY, direction: DESC }) {
       nodes {
         id
-        __typename
-        ...AccountFields
         ...AccountHoverCardFields
       }
     }
@@ -280,8 +278,7 @@ export const hostDashboardMetadataQuery = gql`
     }
   }
 
-  ${accountFieldsFragment}
-  ${accountHoverCardFragment}
+  ${accountHoverCardFields}
   ${expenseHostFields}
   ${hostInfoCardFields}
 `;

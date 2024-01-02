@@ -16,6 +16,7 @@ import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-categories';
 
+import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
 import { AvatarWithLink } from '../AvatarWithLink';
@@ -144,10 +145,23 @@ const ExpenseBudgetItem = ({
             {isLoading ? (
               <LoadingPlaceholder width={40} height={40} />
             ) : (
-              <AvatarWithLink
-                size={40}
+              <AccountHoverCard
                 account={featuredProfile}
-                secondaryAccount={featuredProfile.id === expense.createdByAccount.id ? null : expense.createdByAccount}
+                includeAdminMembership={{
+                  accountSlug: expense.account?.slug,
+                  hostSlug: host?.slug,
+                }}
+                trigger={
+                  <span>
+                    <AvatarWithLink
+                      size={40}
+                      account={featuredProfile}
+                      secondaryAccount={
+                        featuredProfile.id === expense.createdByAccount.id ? null : expense.createdByAccount
+                      }
+                    />
+                  </span>
+                }
               />
             )}
           </Box>
@@ -211,6 +225,7 @@ const ExpenseBudgetItem = ({
                   <AccountingCategoryPill
                     expense={expense}
                     host={host}
+                    account={expense.account}
                     canEdit={get(expense, 'permissions.canEditAccountingCategory', false)}
                     allowNone={!isLoggedInUserExpenseHostAdmin}
                     showCodeInSelect={isLoggedInUserExpenseHostAdmin}
@@ -218,18 +233,51 @@ const ExpenseBudgetItem = ({
                 </div>
               )}
 
-              <P mt="5px" fontSize="12px" color="black.700">
+              <div className="mt-1 text-xs text-slate-700">
                 {isAdminView ? (
-                  <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.account} />
+                  <AccountHoverCard
+                    account={expense.account}
+                    trigger={
+                      <span>
+                        <LinkCollective noTitle className="text-primary hover:underline" collective={expense.account} />
+                      </span>
+                    }
+                  />
                 ) : (
                   <FormattedMessage
                     defaultMessage="from {payee} to {account}"
                     values={{
                       payee: (
-                        <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.payee} />
+                        <AccountHoverCard
+                          account={expense.payee}
+                          includeAdminMembership={{
+                            accountSlug: expense.account?.slug,
+                            hostSlug: host?.slug,
+                          }}
+                          trigger={
+                            <span>
+                              <LinkCollective
+                                noTitle
+                                className="text-primary hover:underline"
+                                collective={expense.payee}
+                              />
+                            </span>
+                          }
+                        />
                       ),
                       account: (
-                        <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.account} />
+                        <AccountHoverCard
+                          account={expense.account}
+                          trigger={
+                            <span>
+                              <LinkCollective
+                                noTitle
+                                className="text-primary hover:underline"
+                                collective={expense.account}
+                              />
+                            </span>
+                          }
+                        />
                       ),
                     }}
                   />
@@ -266,7 +314,7 @@ const ExpenseBudgetItem = ({
                     )}
                   </React.Fragment>
                 )}
-              </P>
+              </div>
             </Box>
           )}
         </Flex>

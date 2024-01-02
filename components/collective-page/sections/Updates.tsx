@@ -1,11 +1,11 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Lock } from '@styled-icons/fa-solid/Lock';
 import { get, isEmpty } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { Account, Update } from '../../../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import { formatDate } from '../../../lib/utils';
@@ -36,7 +36,6 @@ export const updatesSectionQuery = gql`
       id
       updates(limit: 3, onlyPublishedUpdates: $onlyPublishedUpdates) {
         nodes {
-          id
           id
           slug
           title

@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -7,7 +7,7 @@ import { useToast } from '../../components/ui/useToast';
 
 import { canUseMockImageUpload, mockImageUpload } from '../api';
 import { i18nGraphqlException } from '../errors';
-import { API_V2_CONTEXT } from '../graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../graphql/helpers';
 import { UploadedFileKind, UploadFileResult } from '../graphql/types/v2/graphql';
 
 const uploadFileMutation = gql`
@@ -30,6 +30,14 @@ const uploadFileMutation = gql`
           amount {
             valueInCents
             currency
+            exchangeRate {
+              value
+              fromCurrency
+              toCurrency
+              date
+              source
+              isApproximate
+            }
           }
           items {
             description

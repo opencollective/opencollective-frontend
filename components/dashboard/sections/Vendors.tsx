@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { isEmpty, pick } from 'lodash';
 import { Archive, MoreHorizontal, Pencil, PlusIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { HELP_MESSAGE } from '../../../lib/constants/dismissable-help-message';
 import { FilterComponentConfigs, Views } from '../../../lib/filters/filter-types';
 import { boolean, limit, offset } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { DashboardVendorsQuery } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
@@ -82,7 +82,8 @@ const dashboardVendorsQuery = gql`
           }
           supportedPayoutMethods
           isTrustedHost
-          vendors(searchTerm: $searchTerm, isArchived: $isArchived, limit: $limit, offset: $offset) {
+          vendors(searchTerm: $searchTerm, isArchived: $isArchived, limit: $limit, offset: $offset)
+            @skip(if: $includePotentialVendors) {
             totalCount
             offset
             limit
@@ -102,25 +103,6 @@ const dashboardVendorsQuery = gql`
               imageUrl(height: 96)
               isArchived
               createdAt
-              orders {
-                totalCount
-              }
-              expenses(status: PAID, direction: SUBMITTED) {
-                totalCount
-              }
-              members(role: ADMIN, includeInherited: true) {
-                nodes {
-                  id
-                  role
-                  account {
-                    id
-                    name
-                    slug
-                    type
-                    imageUrl(height: 64)
-                  }
-                }
-              }
             }
           }
         }

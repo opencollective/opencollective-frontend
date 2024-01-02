@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../../lib/graphql/helpers';
 
 export const workspaceHomeQuery = gql`
   query WorkspaceHome($slug: String!, $limit: Int, $dateTo: DateTime, $classes: [ActivityClassType!]) {
@@ -17,6 +17,9 @@ export const workspaceHomeQuery = gql`
           type
           isIncognito
           imageUrl(height: 48)
+          ... on Individual {
+            isGuest
+          }
         }
         host {
           id
@@ -31,6 +34,9 @@ export const workspaceHomeQuery = gql`
           type
           isIncognito
           imageUrl(height: 48)
+          ... on Individual {
+            isGuest
+          }
           ... on AccountWithParent {
             parent {
               id

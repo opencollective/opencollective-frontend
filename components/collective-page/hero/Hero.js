@@ -410,7 +410,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                           values={{
                             fee: (
                               <DefinedTerm term={Terms.PLATFORM_FEE} color="black.700">
-                                {collective.platformFeePercent || 0}%
+                                {collective.platformFeePercent}%
                               </DefinedTerm>
                             ),
                           }}

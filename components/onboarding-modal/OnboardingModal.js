@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
 import { map, omit } from 'lodash';
@@ -10,8 +9,9 @@ import styled, { css } from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
+import { editCollectiveContactMutation, editCollectiveMembersMutation } from '../../lib/graphql/v1/mutations';
 import { compose, isValidUrl } from '../../lib/utils';
 
 import Container from '../../components/Container';
@@ -391,39 +391,9 @@ class OnboardingModal extends React.Component {
   }
 }
 
-// GraphQL for editing Collective admins info
-const editCollectiveMembersMutation = gqlV1/* GraphQL */ `
-  mutation EditCollectiveMembers($collectiveId: Int!, $members: [MemberInputType!]!) {
-    editCoreContributors(collectiveId: $collectiveId, members: $members) {
-      id
-      members(roles: ["ADMIN"]) {
-        id
-        role
-        member {
-          id
-          name
-        }
-      }
-    }
-  }
-`;
-
 export const addEditCollectiveMembersMutation = graphql(editCollectiveMembersMutation, {
   name: 'editCollectiveMembers',
 });
-
-// GraphQL for editing Collective contact info
-const editCollectiveContactMutation = gqlV1/* GraphQL */ `
-  mutation EditCollectiveContact($collective: CollectiveInputType!) {
-    editCollective(collective: $collective) {
-      id
-      socialLinks {
-        type
-        url
-      }
-    }
-  }
-`;
 
 const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, {
   name: 'editCollectiveContact',
@@ -431,7 +401,7 @@ const addEditCollectiveContactMutation = graphql(editCollectiveContactMutation, 
 
 const addMemberInvitationQuery = graphql(
   gql`
-    query MemberInvitationsQuery($slug: String!) {
+    query MemberInvitations($slug: String!) {
       memberInvitations(account: { slug: $slug }, role: [ADMIN]) {
         id
         role

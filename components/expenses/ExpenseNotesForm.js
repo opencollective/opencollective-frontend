@@ -20,7 +20,7 @@ const PrivateNoteLabel = () => {
     <Span color="black.700">
       <FormattedMessage id="ExpenseSummary.addNotesLabel" defaultMessage="Add notes" />
       &nbsp;&nbsp;
-      <PrivateInfoIcon color="#969BA3" />
+      <PrivateInfoIcon />
     </Span>
   );
 };

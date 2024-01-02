@@ -1,11 +1,11 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { omit } from 'lodash';
 import { FormattedDate, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
@@ -22,7 +22,7 @@ import { P, Span } from '../Text';
 import { useToast } from '../ui/useToast';
 
 const moveExpensesMutation = gql`
-  mutation MoveExpensesMutation($destinationAccount: AccountReferenceInput!, $expenses: [ExpenseReferenceInput!]!) {
+  mutation MoveExpenses($destinationAccount: AccountReferenceInput!, $expenses: [ExpenseReferenceInput!]!) {
     moveExpenses(destinationAccount: $destinationAccount, expenses: $expenses) {
       id
     }
@@ -117,7 +117,7 @@ export default function MoveExpenses() {
         mt={4}
         width="100%"
         buttonStyle="primary"
-        disabled={!selectedExpenses.length === 0 || !destinationAccount}
+        disabled={selectedExpenses.length === 0 || !destinationAccount}
         onClick={() => setIsConfirmationModelOpen(true)}
       >
         {callToAction}

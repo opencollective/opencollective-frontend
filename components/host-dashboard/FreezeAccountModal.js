@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import { collectivePageQuery } from '../collective-page/graphql/queries';
 import { Flex } from '../Grid';
@@ -146,7 +146,7 @@ const FreezeAccountModal = ({ collective, ...props }) => {
                         successMsgArgs,
                       ),
                 });
-                props?.onClose();
+                props.onClose();
               } catch (e) {
                 toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }

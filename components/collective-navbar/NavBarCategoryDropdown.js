@@ -9,17 +9,13 @@ import { getSectionsCategoryDetails, SECTIONS_CATEGORY_ICON } from '../../lib/co
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Image from '../Image';
 import Link from '../Link';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 
 import { NAVBAR_CATEGORIES } from './constants';
-
-const IconIllustration = styled.img.attrs({ alt: '' })`
-  width: 32px;
-  height: 32px;
-`;
 
 const CategoryContainer = styled(Container).attrs({ px: [1, 3, 0] })`
   display: block;
@@ -151,7 +147,7 @@ export const NavBarCategory = ({ category, collective }) => {
   return (
     <Flex>
       <Flex alignItems="center" mr={2}>
-        <IconIllustration src={categoryDetails.img || SECTIONS_CATEGORY_ICON.CONTRIBUTE} />
+        <Image width={32} height={32} alt="" src={categoryDetails.img || SECTIONS_CATEGORY_ICON.CONTRIBUTE} />
       </Flex>
       <Flex alignItems="center">
         <Span

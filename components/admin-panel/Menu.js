@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective.lib';
+import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { getCollectiveTypeKey, isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 

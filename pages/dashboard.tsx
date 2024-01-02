@@ -4,7 +4,7 @@ import { clsx } from 'clsx';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { isHostAccount, isIndividualAccount } from '../lib/collective.lib';
+import { isHostAccount, isIndividualAccount } from '../lib/collective';
 import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLocalStorage from '../lib/hooks/useLocalStorage';
@@ -210,7 +210,7 @@ const DashboardPage = () => {
                   </Link>
                 )}
               </MessageBox>
-              {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
+              {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
             </div>
           ) : !useDynamicTopBar ? (
             <div
@@ -241,9 +241,12 @@ const DashboardPage = () => {
                 <div
                   className={clsx(
                     'mx-auto grid w-full max-w-screen-2xl grid-cols-1 justify-center px-3 md:px-6',
-                    subMenu
-                      ? 'lg:grid-cols-[minmax(200px,1fr)_minmax(0,1024px)_minmax(0,1fr)]'
-                      : 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1024px)_minmax(0,1fr)]',
+                    ['host-transactions', 'transactions'].includes(selectedSection) && // TODO: fix better support for wider pages
+                      LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_TRANSACTION_PAGE)
+                      ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1536px)_minmax(0,1fr)]'
+                      : subMenu
+                        ? 'lg:grid-cols-[minmax(200px,1fr)_minmax(0,1024px)_minmax(0,1fr)]'
+                        : 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1024px)_minmax(0,1fr)]',
                   )}
                 >
                   {subMenu ? (

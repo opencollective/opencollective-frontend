@@ -1,15 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { omit } from 'lodash';
 import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
+import { HostedCollectiveTypes } from '../../../lib/constants/collectives';
 import { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
-import { integer } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { integer, isMulti } from '../../../lib/filters/schemas';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { HostDashboardHostedCollectivesQueryVariables, HostFeeStructure } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
+import formatCollectiveType from '../../../lib/i18n/collective-type';
 import { formatHostFeeStructure } from '../../../lib/i18n/host-fee-structure';
 
 import { Flex, Grid } from '../../Grid';
@@ -33,6 +35,7 @@ const schema = z.object({
   searchTerm: searchFilter.schema,
   orderBy: orderByFilter.schema,
   hostFeesStructure: z.nativeEnum(HostFeeStructure).optional(),
+  type: isMulti(z.nativeEnum(HostedCollectiveTypes)).optional(),
 });
 
 const toVariables: FiltersToVariables<z.infer<typeof schema>, HostDashboardHostedCollectivesQueryVariables> = {
@@ -55,6 +58,20 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
     ),
     valueRenderer: ({ value, intl }) => formatHostFeeStructure(intl, value),
   },
+  type: {
+    labelMsg: defineMessage({ id: 'Type', defaultMessage: 'Type' }),
+    Component: ({ intl, ...props }) => (
+      <ComboSelectFilter
+        options={Object.values(HostedCollectiveTypes).map(value => ({
+          label: formatCollectiveType(intl, value),
+          value,
+        }))}
+        isMulti
+        {...props}
+      />
+    ),
+    valueRenderer: ({ value, intl }) => formatCollectiveType(intl, value),
+  },
 };
 
 // TODO: This query is using `legacyId` for host and member.account to interface with the
@@ -67,6 +84,7 @@ const hostedCollectivesQuery = gql`
     $orderBy: OrderByInput
     $hostFeesStructure: HostFeeStructure
     $searchTerm: String
+    $type: [AccountType]
   ) {
     host(slug: $hostSlug) {
       id
@@ -90,6 +108,7 @@ const hostedCollectivesQuery = gql`
         orderBy: $orderBy
         hostFeesStructure: $hostFeesStructure
         searchTerm: $searchTerm
+        accountType: $type
         isApproved: true
       ) {
         offset

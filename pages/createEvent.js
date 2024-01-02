@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 
-import { legacyCollectiveQuery } from '../lib/graphql/queries';
+import { legacyCollectiveQuery } from '../lib/graphql/v1/queries';
 
 import CreateEvent from '../components/CreateEvent';
 import ErrorPage from '../components/ErrorPage';

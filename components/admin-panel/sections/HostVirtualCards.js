@@ -1,17 +1,18 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { isNil, omit, toLower, toUpper } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import useQueryFilter, {
   AmountRangeFilter,
   BooleanFilter,
   DateRangeFilter,
 } from '../../../lib/hooks/deprecated/useQueryFilter';
 
+import { accountHoverCardFields } from '../../AccountHoverCard';
 import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal';
 import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';
 import { Box, Flex } from '../../Grid';
@@ -83,6 +84,7 @@ const hostVirtualCardsQuery = gql`
             name
             slug
             imageUrl
+            ...AccountHoverCardFields
           }
           assignee {
             id
@@ -90,6 +92,7 @@ const hostVirtualCardsQuery = gql`
             email
             slug
             imageUrl
+            ...AccountHoverCardFields
           }
         }
       }
@@ -116,6 +119,7 @@ const hostVirtualCardsQuery = gql`
       }
     }
   }
+  ${accountHoverCardFields}
 `;
 
 const VIRTUAL_CARDS_PER_PAGE = 20;

@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { FastField, Field } from 'formik';
@@ -8,14 +8,15 @@ import { first, get, groupBy, isEmpty, omit, pick } from 'lodash';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { compareNames } from '../../lib/collective.lib';
+import { compareNames } from '../../lib/collective';
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { expenseFormPayeeStepCollectivePickerSearchQuery } from '../../lib/graphql/v1/queries';
 import { require2FAForAdmins } from '../../lib/policies';
 import { flattenObjectDeep } from '../../lib/utils';
 import { checkRequiresAddress } from './lib/utils';
@@ -207,6 +208,7 @@ const expenseFormPayeeStepQuery = gql`
               type
               description
               imageUrl(height: 64)
+              hasPayoutMethod
               payoutMethods {
                 id
                 type
@@ -269,7 +271,7 @@ const ExpenseFormPayeeStep = ({
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
 
-  const vendors = get(data, 'account.host.vendors.nodes', []);
+  const vendors = get(data, 'account.host.vendors.nodes', []).filter(v => v.hasPayoutMethod);
   const payeeOptions = React.useMemo(
     () => getPayeeOptions(intl, [...payoutProfiles, ...vendors]),
     [payoutProfiles, vendors],
@@ -326,6 +328,8 @@ const ExpenseFormPayeeStep = ({
           includeVendorsForHostId={collective.host?.legacyId || undefined}
           addLoggedInUserAsAdmin
           excludeAdminFields
+          searchQuery={expenseFormPayeeStepCollectivePickerSearchQuery}
+          filterResults={collectives => collectives.filter(c => c.type !== CollectiveType.VENDOR || c.hasPayoutMethod)}
           loading={loading}
         />
       )

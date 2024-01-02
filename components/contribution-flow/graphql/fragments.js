@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../lib/graphql/helpers';
 
 const contributionFlowHostFieldsFragment = gql`
   fragment ContributionFlowHostFields on Host {
@@ -38,7 +38,6 @@ export const contributionFlowAccountFieldsFragment = gql`
     backgroundImageUrl
     isHost
     isActive
-    settings
     location {
       id
       country
@@ -151,6 +150,7 @@ export const orderSuccessFragment = gql`
       type
       slug
       imageUrl(height: 48)
+      isIncognito
       ... on Individual {
         isGuest
       }

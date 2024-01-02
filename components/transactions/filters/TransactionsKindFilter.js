@@ -23,7 +23,7 @@ const optionsToQueryString = options => {
   if (!options || options.length === size(TransactionKind)) {
     return null;
   } else {
-    return !options ? null : options.map(({ value }) => value).join(',');
+    return options.map(({ value }) => value).join(',');
   }
 };
 

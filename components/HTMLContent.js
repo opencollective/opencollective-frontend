@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
 import { CaretUp } from '@styled-icons/fa-solid/CaretUp';
+import { Markup } from 'interweave';
+import { merge, pick } from 'lodash';
 import { getLuminance } from 'polished';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -58,14 +60,14 @@ const CollapsedDisplayBox = styled.div`
  * just willing to take the styles, for example to match the content displayed in the
  * editor with how it's rendered on the page.
  *
- * ⚠️ Be careful! This component will pass content to `dangerouslySetInnerHTML` so
- * always ensure `content` is properly sanitized!
+ * ⚠️ Be careful! Though this component uses Markup from interweave as a double-safety mechanism to sanitize the input,
+ * always ensure `content` is properly sanitized in the API (using `api/server/lib/sanitize-html.ts`)
  */
 const HTMLContent = styled(
   ({
     content,
     collapsable = false,
-    maxHeight,
+    maxHeight = undefined,
     maxCollapsedHeight = 20,
     collapsePadding = 1,
     hideViewMoreLink = false,
@@ -89,13 +91,32 @@ const HTMLContent = styled(
 
     return (
       <div>
-        <DisplayBox
-          ref={contentRef}
-          maxHeight={maxHeight}
-          maxCollapsedHeight={maxCollapsedHeight}
-          dangerouslySetInnerHTML={{ __html: content }}
-          {...props}
-        />
+        <DisplayBox ref={contentRef} maxHeight={maxHeight} maxCollapsedHeight={maxCollapsedHeight} {...props}>
+          {/* See api/server/lib/sanitize-html.ts */}
+          <Markup
+            noWrap
+            content={content}
+            allowAttributes
+            transform={node => {
+              // Allow some iframes
+              if (node.tagName === 'iframe') {
+                const src = node.getAttribute('src');
+                const parsedUrl = new URL(src);
+                const hostname = parsedUrl.hostname;
+                if (['youtube-nocookie.com', 'www.youtube-nocookie.com', 'anchor.fm'].includes(hostname)) {
+                  const attributes = merge({}, ...node.attributes.map(({ name, value }) => ({ [name]: value })));
+                  return (
+                    <iframe
+                      {...pick(attributes, ['width', 'height', 'frameborder', 'allowfullscreen'])}
+                      title={attributes.title || 'Embed content'}
+                      src={src}
+                    />
+                  );
+                }
+              }
+            }}
+          />
+        </DisplayBox>
         {!isOpen && isCollapsed && !hideViewMoreLink && (
           <ReadFullLink
             onClick={() => setOpen(true)}

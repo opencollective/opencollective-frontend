@@ -11,6 +11,7 @@ import styled from 'styled-components';
 
 import { upload } from '../../../lib/api';
 import { formatErrorMessage, getErrorFromXhrUpload, i18nGraphqlException } from '../../../lib/errors';
+import { editCollectiveBackgroundMutation } from '../../../lib/graphql/v1/mutations';
 import { useElementSize } from '../../../lib/hooks/useElementSize';
 import { mergeRefs } from '../../../lib/react-utils';
 
@@ -23,7 +24,6 @@ import StyledInputSlider from '../../StyledInputSlider';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { Span } from '../../Text';
 import { useToast } from '../../ui/useToast';
-import { editCollectiveBackgroundMutation } from '../graphql/mutations';
 
 import {
   BASE_HERO_HEIGHT,
@@ -157,7 +157,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                             }
                             style={{
                               imageStyle: { minHeight: '0', minWidth: '0', maxHeight: 'none', maxWidth: 'none' },
-                              containerStyle: { cursor: hasImage ? 'move' : 'auto' },
+                              containerStyle: { cursor: 'move' },
                             }}
                           />
                         </StyledHeroBackground>

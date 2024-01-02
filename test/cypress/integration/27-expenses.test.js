@@ -66,8 +66,8 @@ describe('Expense flow', () => {
 
       // Fill info for first attachment
       cy.get('input[name="items[0].description"]').type('Fancy restaurant');
-      cy.get('input[name="items[0].amount"]').type('{selectall}183');
-      cy.getByDataCy('currency-picker').click();
+      cy.get('input[name="items[0].amountV2"]').type('{selectall}183');
+      cy.getByDataCy('expense-currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.get('input:invalid').should('have.length', 4); // Missing attachment description, amount, and dates
       cy.getByDataCy('expense-items-total-amount').should('contain', '--.--'); // amount for second item is missing
@@ -77,7 +77,7 @@ describe('Expense flow', () => {
 
       // Fill missing info & submit
       cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
-      cy.get('input[name="items[1].amount"]').type('{selectall}92.50');
+      cy.get('input[name="items[1].amountV2"]').type('{selectall}92.50');
       cy.getByDataCy('expense-items-total-amount').should('contain', '$275.50');
       cy.get('input:invalid').should('have.length', 2);
       cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
@@ -107,11 +107,11 @@ describe('Expense flow', () => {
       cy.getByDataCy('expense-next').click();
       cy.get('textarea[name="description"]').type(' edited');
       cy.get('input[name="items[0].description"]').type(' but not too expensive');
-      cy.get('input[name="items[0].amount"]').type('{selectall}111');
+      cy.get('input[name="items[0].amountV2"]').type('{selectall}111');
       // Add new item
       cy.getByDataCy('expense-add-item-btn').click();
       cy.get('input[name="items[2].description"]').type('Some more delicious stuff');
-      cy.get('input[name="items[2].amount"]').type('{selectall}34');
+      cy.get('input[name="items[2].amountV2"]').type('{selectall}34');
       cy.get('input[name="items[2].incurredAt"]').type('2021-01-01');
       cy.getByDataCy('items[2].url-dropzone').selectFile(getReceiptFixture({ fileName: 'receipt2.jpg' }), {
         action: 'drag-drop',
@@ -123,7 +123,7 @@ describe('Expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('expense-next').click();
-      cy.getByDataCy('currency-picker').click();
+      cy.getByDataCy('expense-currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.get('[data-cy="attachment-url-field"] [data-loading=true]').should('have.length', 0);
       cy.getByDataCy('expense-summary-btn').click();
@@ -171,9 +171,9 @@ describe('Expense flow', () => {
 
       // Check date, amount
       cy.get('input[name="items[0].incurredAt"]').should('have.value', '2023-08-01');
-      cy.get('input[name="items[0].amount"]').should('have.value', '65');
+      cy.get('input[name="items[0].amountV2"]').should('have.value', '65');
       cy.get('input[name="items[1].incurredAt"]').should('have.value', '2023-08-01');
-      cy.get('input[name="items[1].amount"]').should('have.value', '65');
+      cy.get('input[name="items[1].amountV2"]').should('have.value', '65');
 
       // Set descriptions
       cy.get('input[name="items[0].description"]').type('A custom description');
@@ -186,7 +186,7 @@ describe('Expense flow', () => {
       cy.getByDataCy('expense-add-item-btn').click();
       cy.getByDataCy('expense-attachment-form').should('have.length', 3);
       cy.get('input[name="items[2].description"]').type('A third item');
-      cy.get('input[name="items[2].amount"]').type('{selectall}100');
+      cy.get('input[name="items[2].amountV2"]').type('{selectall}100');
       cy.get('input[name="items[2].incurredAt"]').type('2021-01-01');
       cy.getByDataCy('items[2].url-dropzone').selectFile(getReceiptFixture({ fileName: 'receipt2.jpg' }), {
         action: 'drag-drop',
@@ -198,13 +198,13 @@ describe('Expense flow', () => {
 
       // Values should not be overriden
       cy.get('input[name="items[2].description"]').should('have.value', 'A third item');
-      cy.get('input[name="items[2].amount"]').should('have.value', '100.00');
+      cy.get('input[name="items[2].amountV2"]').should('have.value', '100.00');
       cy.get('input[name="items[2].incurredAt"]').should('have.value', '2021-01-01');
 
       // Check mismatch warnings
       cy.contains('Please verify the dates and amounts before proceeding.');
       cy.get('[data-cy="expense-attachment-form"]:eq(2) [data-cy="mismatch-warning"]').should('have.length', 2);
-      cy.get('input[name="items[1].amount"]').type('{selectall}7').blur();
+      cy.get('input[name="items[1].amountV2"]').type('{selectall}7').blur();
       cy.get('[data-cy="expense-attachment-form"]:eq(1) [data-cy="mismatch-warning"]').should('have.length', 1);
 
       // Confirm mismatches on the final step
@@ -219,6 +219,152 @@ describe('Expense flow', () => {
       cy.contains('[data-cy="expense-summary-items"]', 'A custom description');
       cy.contains('[data-cy="expense-summary-items"]', 'TestMerchant invoice');
       cy.contains('[data-cy="expense-summary-items"]', 'A third item');
+    });
+
+    it('can play with the exchange rate', () => {
+      cy.login({
+        email: user.email,
+        redirect: encodeURIComponent(`/${collective.slug}/expenses/new?ocr=true&mockImageUpload=false`), // Add query param to enable OCR and disable mock image upload (since they don't have OCR)
+      });
+      cy.getByDataCy('radio-expense-type-RECEIPT').click();
+      cy.getByDataCy('payout-method-select').click();
+      cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+      cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
+      cy.getByDataCy('expense-next').click();
+      cy.get('textarea[name="description"]').type('An Expense with multi-currencies on items + OCR');
+
+      // Set the expense currency to EUR
+      cy.getByDataCy('expense-currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'Euro').click();
+
+      // Upload a file to the multi-files dropzone
+      cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
+        [getReceiptFixture({ fileName: 'receipt0.jpg' })], // A receipt in USD
+        { action: 'drag-drop' },
+      );
+
+      // Check date, amount match the return from OCR
+      cy.get('input[name="items[0].description"]').type('A custom description');
+      cy.get('input[name="items[0].incurredAt"]').should('have.value', '2023-08-01');
+      cy.getByDataCy('items[0].amountV2-amount-currency-picker').should('contain', 'USD');
+      cy.get('input[name="items[0].amountV2"]').should('have.value', '65');
+      cy.getByDataCy('items[0].amountV2-amount-converted').should('contain', '= EUR 🇪🇺');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '71.50');
+      cy.getByDataCy('items[0].amountV2-exchange-rate').should('contain', '1 USD = ~1.1 EUR');
+      cy.getByDataCy('items[0].amountV2-exchange-rate').realHover();
+      cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip')
+        .should('contain', '1 USD = 1.1 EUR')
+        .should('contain', 'Source: Open Collective')
+        .should('contain', 'Acquired on: August 1, 2023');
+
+      // Play with the FX rate: value too high
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').click();
+      cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip').should('not.exist');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}{backspace}');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}100').blur();
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '100.00');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'min', '64.35');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'max', '78.65');
+      cy.get('input[name="items[0].amountV2"]').should('have.value', '65'); // This one doesn't change
+      cy.getByDataCy('items[0].amountV2-exchange-rate').should('contain', '1 USD = 1.5384615 EUR');
+      cy.getByDataCy('items[0].amountV2-exchange-rate').realHover();
+      cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip')
+        .should('contain', '1 USD = 1.5384615 EUR')
+        .should('contain', 'Source: User')
+        .should(
+          'contain',
+          "This exchange rate is too different from the one in our records (1.1) for that date and won't be accepted.",
+        );
+
+      // With a values that's too low, but still accepted
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').click();
+      cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip').should('not.exist');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}64.88').blur();
+      cy.get('input[name="items[0].amountV2"]').should('have.value', '65'); // This one doesn't change
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '64.88');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'min', '64.35');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'max', '78.65');
+      cy.getByDataCy('items[0].amountV2-exchange-rate').should('contain', '1 USD = 0.9981539 EUR');
+      cy.getByDataCy('items[0].amountV2-exchange-rate').realHover();
+      cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip')
+        .should('contain', '1 USD = 0.9981539 EUR')
+        .should('contain', 'Source: User')
+        .should('contain', 'This exchange rate looks very different from the one in our records (1.1) for this date.');
+
+      // Add another item with custom values
+      cy.getByDataCy('expense-add-item-btn').click();
+      cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip').should('not.exist');
+      cy.getByDataCy('items[1].amountV2-amount-currency-picker').should('contain', 'EUR'); // Currency is inherited from expense by default
+      cy.get('input[name="items[1].description"]').type('A second item');
+      cy.get('input[name="items[1].amountV2"]').type('{selectall}100');
+      cy.get('input[name="items[1].amountV2"]').blur();
+      cy.getByDataCy('items[1].url-dropzone').selectFile(getReceiptFixture({ fileName: 'receipt2.jpg' }), {
+        action: 'drag-drop',
+      });
+      cy.getByDataCy('items[1].amountV2-amount-currency-picker').should('contain', 'EUR'); // Amount/currency shouldn't change
+      cy.get('input[name="items[1].amountV2"]').should('have.value', '100.00');
+      cy.get('[data-cy="mismatch-warning"]').should('have.length', 1); // But there should be warning about mismatch
+      cy.get('[data-cy="mismatch-warning"] button').realHover();
+      cy.get('[data-cy="mismatch-warning-tooltip"]').should(
+        'contain',
+        'This currency does not match the one scanned from the document (USD)',
+      );
+      // Check what happens when we change the currency to USD
+      cy.getByDataCy('items[1].amountV2-amount-currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+      cy.get('[data-cy="mismatch-warning"] button').realHover();
+      cy.get('[data-cy="mismatch-warning-tooltip"]').should(
+        'contain',
+        'The amount does not match the one scanned from the document (USD $65.00)',
+      );
+      // Go back to EUR and make sure all amounts are correct
+      cy.getByDataCy('items[1].amountV2-amount-currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'Euro').click();
+      cy.get('input[name="items[1].amountV2"]').should('have.value', '100.00');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '€164.88');
+
+      // Submit!
+      cy.getByDataCy('expense-summary-btn').click();
+      cy.contains('label[for="confirm-expense-ocr-values"]', 'I have confirmed the date and amount.').click();
+      cy.getByDataCy('submit-expense-btn').click();
+
+      // Check submitted
+      cy.contains('[data-cy="toast-notification"]', 'Expense submitted');
+      cy.contains('[data-cy="expense-items-total-amount"]', '€164.88');
+      cy.getByDataCy('expense-items-total-amount').should('contain', '€164.88');
+      cy.get('[data-cy="expense-summary-item-amount"]:eq(0)').should('contain', '€64.88 EUR');
+      cy.get('[data-cy="expense-summary-item-amount"]:eq(0)').should('contain', '$65.00 USD');
+      // Warning should be on the summary page
+      cy.get('[data-cy="expense-summary-item-amount"] [data-cy="tooltip-trigger"]').realHover();
+      cy.getByDataCy('tooltip-content')
+        .should('contain', '1 USD = 0.9981539 EUR')
+        .should('contain', 'Source: User')
+        .should('contain', 'This exchange rate looks very different from the one in our records (1.1) for this date.');
+
+      // Edit
+      cy.getByDataCy('more-actions').click();
+      cy.getByDataCy('edit-expense-btn').click({ force: true });
+      cy.getByDataCy('expense-next').click();
+      cy.getByDataCy('expense-add-item-btn').click();
+      cy.getByDataCy('expense-attachment-form').should('have.length', 3);
+      cy.getByDataCy('items[2].url-dropzone').selectFile(getReceiptFixture({ fileName: 'receipt2.jpg' }), {
+        action: 'drag-drop',
+      });
+      cy.get('[data-cy="attachment-url-field"] [data-loading=true]').should('have.length', 1);
+      cy.get('[data-cy="attachment-url-field"] [data-loading=true]').should('have.length', 0);
+      cy.contains('[data-cy="attachment-url-field"]', 'Replace');
+      cy.get('input[name="items[2].description"]').type('A third item');
+      cy.get('input[name="items[2].amountV2"]').type('{selectall}100');
+      cy.getByDataCy('items[2].amountV2-amount-currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'AED').click(); // FX rate will still default to 1.1 => 110€
+      cy.getByDataCy('expense-items-total-amount').should('contain', '€274.88');
+      cy.getByDataCy('expense-summary-btn').click();
+      cy.contains('label[for="confirm-expense-ocr-values"]', 'I have confirmed the date and amount.').click();
+      cy.getByDataCy('save-expense-btn').click();
+      cy.getByDataCy('save-expense-btn').should('not.exist'); // wait for form to be submitted
+
+      // Check submitted
+      cy.contains('[data-cy="expense-items-total-amount"]', '€274.88');
     });
 
     // This can happen if you start with an invoice then switch to receipts
@@ -240,9 +386,9 @@ describe('Expense flow', () => {
       // Fill the form with valid data
       cy.get('textarea[name="description"]').type('March invoice');
       cy.get('input[name="items[0].description"]').type('Peeling potatoes');
-      cy.getByDataCy('currency-picker').click();
+      cy.getByDataCy('expense-currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
-      cy.get('input[name="items[0].amount"]').type('{selectall}4200');
+      cy.get('input[name="items[0].amountV2"]').type('{selectall}4200');
       cy.get('input[name="items[0].incurredAt"]').type('2021-03-01');
 
       // Switch to receipt and acknowledge error
@@ -264,7 +410,7 @@ describe('Expense flow', () => {
 
         cy.get('textarea[name="description"]').type('Service Invoice');
         cy.get('input[name="items[0].description"]').type('Item 1');
-        cy.get('input[name="items[0].amount"]').type('{selectall}4200');
+        cy.get('input[name="items[0].amountV2"]').type('{selectall}4200');
         cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
 
         cy.getByDataCy('expense-summary-btn').click();
@@ -284,11 +430,11 @@ describe('Expense flow', () => {
         cy.get('textarea[name="invoiceInfo"]').type('VAT ES 123123');
         cy.getByDataCy('expense-next').click();
         cy.get('textarea[name="description"]').type('{selectall}Edited Service Invoice');
-        cy.get('input[name="items[0].amount"]').type('{selectall}420');
+        cy.get('input[name="items[0].amountV2"]').type('{selectall}420');
 
         cy.getByDataCy('expense-summary-btn').click();
         cy.getByDataCy('save-expense-btn').click();
-        cy.wait(500);
+        cy.getByDataCy('save-expense-btn').should('not.exist'); // wait for form to be submitted
 
         cy.getByDataCy('expense-status-msg').should('contain', 'Draft');
         cy.getByDataCy('expense-description').should('contain', 'Edited Service Invoice');
@@ -307,7 +453,7 @@ describe('Expense flow', () => {
         cy.get('[data-cy="expense-next"]').click();
 
         cy.get('textarea[name="description"]').type('Service Invoice');
-        cy.get('input[name="items[0].amount"]').type('{selectall}4200');
+        cy.get('input[name="items[0].amountV2"]').type('{selectall}4200');
         cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
 
         cy.getByDataCy('expense-summary-btn').click();
@@ -348,8 +494,9 @@ describe('Expense flow', () => {
         cy.getByDataCy('expense-next').click();
 
         cy.get('input[name="items[0].description"]').type('That service');
-        cy.getByDataCy('currency-picker').click();
+        cy.getByDataCy('expense-currency-picker').click();
         cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+        cy.get('input[name="items[0].amountV2"]').type('{selectall}4200');
         cy.getByDataCy('expense-summary-btn').click();
         cy.get('[data-cy="checkbox-tos"] [data-cy="custom-checkbox"]').click();
         cy.getByDataCy('save-expense-btn').click();
@@ -387,7 +534,7 @@ describe('Expense flow', () => {
         cy.get('[data-cy="expense-next"]').click();
 
         cy.get('textarea[name="description"]').type('Service Invoice');
-        cy.get('input[name="items[0].amount"]').type('{selectall}4200');
+        cy.get('input[name="items[0].amountV2"]').type('{selectall}4200');
         cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
 
         cy.getByDataCy('expense-summary-btn').click();
@@ -429,8 +576,9 @@ describe('Expense flow', () => {
         cy.getByDataCy('expense-next').click();
 
         cy.get('input[name="items[0].description"]').type('That service');
-        cy.getByDataCy('currency-picker').click();
+        cy.getByDataCy('expense-currency-picker').click();
         cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+        cy.get('input[name="items[0].amountV2"]').type('{selectall}4200');
         cy.getByDataCy('expense-summary-btn').click();
         cy.get('[data-cy="checkbox-tos"] [data-cy="custom-checkbox"]').click();
         cy.getByDataCy('save-expense-btn').click();
@@ -485,13 +633,13 @@ describe('Expense flow', () => {
       // Fill details
       cy.get('textarea[name="description"]').type('Brussels January team retreat');
       cy.get('input[name="items[0].description"]').type('TShirts');
-      cy.get('input[name="items[0].amount"]').type('{selectall}112');
+      cy.get('input[name="items[0].amountV2"]').type('{selectall}112');
       cy.get('input[name="items[0].incurredAt"]').type('2021-01-01');
-      cy.getByDataCy('currency-picker').click();
+      cy.getByDataCy('expense-currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.getByDataCy('expense-add-item-btn').click();
       cy.get('input[name="items[1].description"]').type('Potatoes for the giant raclette');
-      cy.get('input[name="items[1].amount"]').type('{selectall}75.5');
+      cy.get('input[name="items[1].amountV2"]').type('{selectall}75.5');
       cy.get('input[name="items[1].incurredAt"]').type('2021-01-01');
 
       // Need to fill in the tax rate before we can go next
@@ -530,11 +678,11 @@ describe('Expense flow', () => {
       cy.getByDataCy('expense-next').click();
 
       // Add new item
-      cy.getByDataCy('currency-picker').click();
+      cy.getByDataCy('expense-currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.getByDataCy('expense-add-item-btn').click();
       cy.get('input[name="items[2].description"]').type('Some more delicious stuff');
-      cy.get('input[name="items[2].amount"]').type('{selectall}34');
+      cy.get('input[name="items[2].amountV2"]').type('{selectall}34');
       cy.get('input[name="items[2].incurredAt"]').type('2021-01-01');
       cy.getByDataCy('expense-invoiced-amount').should('contain', '$221.50');
       cy.getByDataCy('tax-VAT-expense-amount-line').should('contain', '$12.18');
@@ -559,7 +707,7 @@ describe('Expense flow', () => {
 
       // Disable VAT
       cy.getByDataCy('checkbox-tax-VAT').click();
-      cy.getByDataCy('currency-picker').click();
+      cy.getByDataCy('expense-currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.getByDataCy('expense-summary-btn').click();
       cy.getByDataCy('save-expense-btn').click();
@@ -574,6 +722,7 @@ describe('Expense flow', () => {
   describe('Actions on expense', () => {
     let collective;
     let user;
+    let expense;
     let expenseUrl;
 
     before(() => {
@@ -586,14 +735,31 @@ describe('Expense flow', () => {
 
     beforeEach(() => {
       cy.createExpense({
+        type: 'INVOICE',
         userEmail: user.email,
         account: { legacyId: collective.id },
         payee: { legacyId: user.CollectiveId },
-      }).then(expense => (expenseUrl = `/${collective.slug}/expenses/${expense.legacyId}`));
+        description: 'Expense for E2E tests',
+      }).then(createdExpense => {
+        expense = createdExpense;
+        expenseUrl = `/${collective.slug}/expenses/${expense.legacyId}`;
+      });
+    });
+
+    it('Downloads PDF', () => {
+      cy.login({ email: user.email, redirect: expenseUrl });
+      cy.getByDataCy('more-actions').click();
+      cy.getByDataCy('download-expense-invoice-btn').click({ force: true });
+      const date = new Date(expense.createdAt).toISOString().split('T')[0];
+      const filename = `Expense-${expense.legacyId}-${collective.slug}-invoice-${date}.pdf`;
+      cy.getDownloadedPDFContent(filename)
+        .should('contain', `Expense	#${expense.legacyId}:	Expense	for	E2E	tests`)
+        .should('contain', 'Collective:	Test	Collective')
+        .should('contain', '$10.00');
     });
 
     it('Approve, unapprove, reject and pay actions on expense', () => {
-      cy.visit(expenseUrl);
+      cy.login({ email: user.email, redirect: expenseUrl });
       cy.get('[data-cy="expense-status-msg"]').contains('Pending');
       cy.getByDataCy('approve-button').click();
       cy.get('[data-cy="expense-status-msg"]').contains('Approved');

@@ -301,12 +301,12 @@ type OrderType {
   """
   total amount for this order (doesn't include recurring transactions)
   """
-  totalAmount: Int
+  totalAmount: Float
 
   """
   The amount paid in tax (for example VAT) for this order
   """
-  taxAmount: Int
+  taxAmount: Float
 
   """
   frequency of the subscription if any (could be either null, 'month' or 'year')
@@ -390,7 +390,7 @@ Subscription model
 """
 type Subscription {
   id: Int
-  amount: Int
+  amount: Float
   currency: String
   interval: String
   stripeSubscriptionId: String
@@ -411,7 +411,7 @@ type StatsOrderType {
   """
   total amount of all the transactions for this order (includes past recurring transactions)
   """
-  totalTransactions: Int
+  totalTransactions: Float
 }
 
 """
@@ -439,14 +439,14 @@ type Tier {
   """
   videoUrl: String
   button: String
-  amount: Int
-  minimumAmount: Int
+  amount: Float
+  minimumAmount: Float
   amountType: String
   currency: String
   interval: String
-  presets: [Int]
+  presets: [Float]
   maxQuantity: Int
-  goal: Int
+  goal: Float
   customFields: [JSON]
   startsAt: DateString
   endsAt: DateString
@@ -612,12 +612,12 @@ type TierStatsType {
   """
   Total amount donated for this tier, in cents.
   """
-  totalDonated: Int
+  totalDonated: Float
 
   """
   How much money is given for this tier for each tier.interval (monthly/yearly). For flexible tiers, this amount is a monthly average of contributions amount, taking into account both yearly and monthly subscriptions.
   """
-  totalRecurringDonations: Int
+  totalRecurringDonations: Float
 
   """
   total number of people/organizations in this tier
@@ -685,13 +685,13 @@ type PaymentMethodType {
   name: String
   description: String
   primary: Boolean
-  monthlyLimitPerMember: Int
-  initialBalance: Int
+  monthlyLimitPerMember: Float
+  initialBalance: Float
 
   """
   Returns the balance in the currency of this paymentMethod
   """
-  balance: Int
+  balance: Float
   collective: CollectiveInterface
   emitter: CollectiveInterface
   limitedToTags: JSON
@@ -745,12 +745,12 @@ type StatsMemberType {
   """
   total amount donated directly by this member
   """
-  directDonations: Int
+  directDonations: Float
 
   """
   total amount donated by this member either directly or using a gift card it has emitted
   """
-  totalDonations: Int
+  totalDonations: Float
 }
 
 """
@@ -879,7 +879,7 @@ This represents an Expense
 type ExpenseType {
   id: Int
   idV2: String
-  amount: Int
+  amount: Float
   currency: String
   createdAt: DateString
   updatedAt: DateString
@@ -1901,6 +1901,11 @@ enum CurrencyExchangeRateSourceType {
   Wise API
   """
   WISE
+
+  """
+  User-provided exchange rate
+  """
+  USER
 }
 
 type EXPENSE_CATEGORIZATION {
@@ -1916,7 +1921,7 @@ type CollectiveSearchResults {
   A unique identifier for this search (for caching)
   """
   id: String
-  collectives: [Collective]
+  collectives: [CollectiveInterface]
   limit: Int
   offset: Int
   total: Int
@@ -1931,12 +1936,12 @@ type CollectiveStatsType {
   """
   Amount of money in cents in the currency of the collective currently available to spend
   """
-  balanceWithBlockedFunds: Int
+  balanceWithBlockedFunds: Float
 
   """
   Amount of money in cents in the currency of the collective.
   """
-  balance: Int
+  balance: Float
 
   """
   Breakdown of all backers of this collective
@@ -1971,12 +1976,12 @@ type CollectiveStatsType {
   """
   Average amount spent per month based on the last 90 days
   """
-  monthlySpending: Int
+  monthlySpending: Float
 
   """
   Total amount spent
   """
-  totalAmountSpent: Int
+  totalAmountSpent: Float
 
   """
   Total amount received
@@ -1989,13 +1994,13 @@ type CollectiveStatsType {
     Computes contributions from the last x months. Cannot be used with startDate/endDate
     """
     periodInMonths: Int
-  ): Int
+  ): Float
 
   """
   Total net amount received
   """
-  totalNetAmountReceived: Int
-  yearlyBudget: Int
+  totalNetAmountReceived: Float
+  yearlyBudget: Float
   activeRecurringContributions: JSON
 }
 
@@ -3426,7 +3431,7 @@ type Expense implements Transaction {
   uuid: String
   type: String
   kind: String
-  amount: Int
+  amount: Float
   currency: String
   hostCurrency: String
 
@@ -3443,22 +3448,27 @@ type Expense implements Transaction {
     Fetch HOST_FEE transaction for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
-  ): Int
+  ): Float
 
   """
   Fee kept by the Open Collective Platform in the lowest unit of the currency of the host (ie. in cents)
   """
-  platformFeeInHostCurrency: Int
+  platformFeeInHostCurrency: Float
 
   """
   Fee kept by the payment processor in the lowest unit of the currency of the host (ie. in cents)
   """
-  paymentProcessorFeeInHostCurrency: Int
+  paymentProcessorFeeInHostCurrency(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Float
 
   """
   The amount paid in tax (for example VAT) for this transaction
   """
-  taxAmount: Int
+  taxAmount: Float
 
   """
   If taxAmount is set, this field will contain more info about the tax
@@ -3473,8 +3483,13 @@ type Expense implements Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
-  ): Int
-  amountInHostCurrency: Int
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Float
+  amountInHostCurrency: Float
   host: User
   createdByUser: UserDetails
   fromCollective: CollectiveInterface
@@ -3540,7 +3555,7 @@ interface Transaction {
   id: Int
   idV2: String
   uuid: String
-  amount: Int
+  amount: Float
   currency: String
   hostCurrency: String
   hostCurrencyFxRate: Float
@@ -3553,8 +3568,13 @@ interface Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatibility.
     """
     fetchHostFee: Boolean = false
-  ): Int
-  amountInHostCurrency: Int
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Float
+  amountInHostCurrency: Float
 
   """
   Fee kept by the host in the lowest unit of the currency of the host (ie. in cents)
@@ -3564,10 +3584,15 @@ interface Transaction {
     Fetch HOST_FEE transaction for retro-compatibility.
     """
     fetchHostFee: Boolean = false
-  ): Int
-  platformFeeInHostCurrency: Int
-  paymentProcessorFeeInHostCurrency: Int
-  taxAmount: Int
+  ): Float
+  platformFeeInHostCurrency: Float
+  paymentProcessorFeeInHostCurrency(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Float
+  taxAmount: Float
   taxInfo: TaxInfo
   createdByUser: UserDetails
   host: CollectiveInterface
@@ -3596,7 +3621,7 @@ type Order implements Transaction {
   uuid: String
   type: String
   kind: String
-  amount: Int
+  amount: Float
   currency: String
   hostCurrency: String
 
@@ -3613,22 +3638,27 @@ type Order implements Transaction {
     Fetch HOST_FEE transaction for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
-  ): Int
+  ): Float
 
   """
   Fee kept by the Open Collective Platform in the lowest unit of the currency of the host (ie. in cents)
   """
-  platformFeeInHostCurrency: Int
+  platformFeeInHostCurrency: Float
 
   """
   Fee kept by the payment processor in the lowest unit of the currency of the host (ie. in cents)
   """
-  paymentProcessorFeeInHostCurrency: Int
+  paymentProcessorFeeInHostCurrency(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Float
 
   """
   The amount paid in tax (for example VAT) for this transaction
   """
-  taxAmount: Int
+  taxAmount: Float
 
   """
   If taxAmount is set, this field will contain more info about the tax
@@ -3643,8 +3673,13 @@ type Order implements Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
-  ): Int
-  amountInHostCurrency: Int
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Float
+  amountInHostCurrency: Float
   host: User
   createdByUser: UserDetails
   fromCollective: CollectiveInterface
@@ -4187,6 +4222,11 @@ type Vendor implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  Returns whether this account has any payout methods saved
+  """
+  hasPayoutMethod: Boolean
 }
 
 """
@@ -4353,7 +4393,7 @@ type InvoiceType {
   """
   day: Int
   totalAmount: Int @deprecated(reason: "2021-09-09: Not used, so we stop computing it.")
-  totalTransactions: Int
+  totalTransactions: Float
   currency: String @deprecated(reason: "2021-09-09: Not used, so we stop returning it.")
   host: CollectiveInterface
   fromCollective: CollectiveInterface

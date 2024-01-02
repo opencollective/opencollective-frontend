@@ -1,5 +1,4 @@
 import React from 'react';
-import { gql } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { isEmpty, orderBy, partition, round, toNumber } from 'lodash';
 import { GetServerSideProps } from 'next';
@@ -7,9 +6,9 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getCollectivePageMetadata } from '../lib/collective';
 import dayjs from '../lib/dayjs';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { Account, AccountWithHost } from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../lib/hooks/usePrevious';
@@ -107,6 +106,9 @@ const orderPageQuery = gql`
           name
           imageUrl
           isIncognito
+          ... on Individual {
+            isGuest
+          }
         }
         account {
           id
@@ -114,7 +116,6 @@ const orderPageQuery = gql`
           type
           name
           imageUrl
-          isIncognito
         }
       }
     }
@@ -324,10 +325,10 @@ export default function OrderPage(props) {
   const variables = contributionPageQueryHelper.getVariablesFromPageProps(props);
   const baseMetadata = getCollectivePageMetadata(queryResult.data?.account);
 
-  const data = queryResult?.data;
+  const data = queryResult.data;
   const account = data?.account as Account & AccountWithHost;
   const order = data?.order;
-  const error = queryResult?.error;
+  const error = queryResult.error;
 
   const isPending = order?.status === 'PENDING';
   const isOverdue =
@@ -641,7 +642,7 @@ export default function OrderPage(props) {
                     mt="8px"
                   >
                     <ButtonsContainer flexDirection={['column', 'row']}>
-                      {order?.permissions?.canEdit && (
+                      {order.permissions.canEdit && (
                         <React.Fragment>
                           <StyledButton
                             data-cy="edit-order-button"
@@ -687,14 +688,7 @@ export default function OrderPage(props) {
                 <Span fontSize="12px" color="black.700" fontWeight="bold">
                   <FormattedMessage id="Expense.PrivateNote" defaultMessage="Private note" />
                   &nbsp;&nbsp;
-                  <PrivateInfoIcon
-                    color="#969BA3"
-                    size={undefined}
-                    tooltipProps={undefined}
-                    withoutTooltip={undefined}
-                    // eslint-disable-next-line react/no-children-prop
-                    children={undefined}
-                  />
+                  <PrivateInfoIcon className="text-muted-foreground" size={12} />
                 </Span>
                 <HTMLContent color="black.700" mt={1} fontSize="13px" content={order.memo} />
               </Box>
@@ -712,9 +706,7 @@ export default function OrderPage(props) {
                   <FormattedMessage
                     id="CollectiveBalance"
                     defaultMessage="{type, select, COLLECTIVE {Collective balance} EVENT {Event balance} ORGANIZATION {Organization balance} FUND {Fund balance} PROJECT {Project balance} other {Account balance}}"
-                    values={{
-                      type: account?.type || '', // collective can be null when it's loading
-                    }}
+                    values={{ type: account.type || '' }}
                   />
                 </H5>
                 <Container
@@ -743,19 +735,7 @@ export default function OrderPage(props) {
                           <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
                         </Span>
                         <br />
-                        <LinkCollective collective={account.host}>
-                          {account?.isActive ? (
-                            account.host.name
-                          ) : (
-                            <FormattedMessage
-                              id="Fiscalhost.pending"
-                              defaultMessage="{host} (pending)"
-                              values={{
-                                host: account.host.name,
-                              }}
-                            />
-                          )}
-                        </LinkCollective>
+                        <LinkCollective collective={account.host} />
                       </P>
                     )}
                   </Box>

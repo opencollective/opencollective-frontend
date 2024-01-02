@@ -260,6 +260,11 @@ interface Account {
     email: EmailAddress
 
     """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: ASC }
+
+    """
     Type of accounts (BOT/COLLECTIVE/EVENT/ORGANIZATION/INDIVIDUAL)
     """
     accountType: [AccountType]
@@ -378,9 +383,29 @@ interface Account {
     hasExpense: Boolean
 
     """
+    Only return transactions with this Expense attached
+    """
+    expense: ExpenseReferenceInput
+
+    """
+    Only return transactions that have an Expense of one of these expense types attached
+    """
+    expenseType: [ExpenseType]
+
+    """
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Only return transactions for this order.
+    """
+    order: OrderReferenceInput
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -889,6 +914,39 @@ A field whose value conforms to the standard internet email address format as sp
 scalar EmailAddress
 
 """
+Input to order results chronologically
+"""
+input ChronologicalOrderInput {
+  """
+  Field to chronologically order by.
+  """
+  field: DateTimeField! = CREATED_AT
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection! = DESC
+}
+
+"""
+All possible DateTime fields for a resource
+"""
+enum DateTimeField {
+  """
+  The creation time of a resource
+  """
+  CREATED_AT
+}
+
+"""
+Possible directions in which to order a list of items
+"""
+enum OrderDirection {
+  ASC
+  DESC
+}
+
+"""
 An invitation to join the members of a collective
 """
 type MemberInvitation {
@@ -1163,12 +1221,22 @@ interface Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Amount!
   netAmountInHostCurrency(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Amount!
   taxAmount: Amount!
 
@@ -1183,7 +1251,12 @@ interface Transaction {
     """
     fetchHostFee: Boolean = false
   ): Amount
-  paymentProcessorFee: Amount
+  paymentProcessorFee(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Amount
   host: Account
   account: Account
   oppositeAccount: Account
@@ -1384,7 +1457,7 @@ type Expense {
   """
   The accounts who approved this expense
   """
-  approvedBy: [Account!]!
+  approvedBy: [Account]!
 
   """
   Whether this expense is on hold
@@ -1557,6 +1630,11 @@ type AccountingCategory {
   The account this category belongs to
   """
   account: Host!
+
+  """
+  If meant for expenses, the types of expenses this category applies to
+  """
+  expensesTypes: [ExpenseType]
 }
 
 """
@@ -1800,9 +1878,29 @@ type Host implements Account & AccountWithContributions {
     hasExpense: Boolean
 
     """
+    Only return transactions with this Expense attached
+    """
+    expense: ExpenseReferenceInput
+
+    """
+    Only return transactions that have an Expense of one of these expense types attached
+    """
+    expenseType: [ExpenseType]
+
+    """
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Only return transactions for this order.
+    """
+    order: OrderReferenceInput
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -2694,39 +2792,6 @@ type Contributor {
   publicMessage: String
 }
 
-"""
-Input to order results chronologically
-"""
-input ChronologicalOrderInput {
-  """
-  Field to chronologically order by.
-  """
-  field: DateTimeField! = CREATED_AT
-
-  """
-  Ordering direction.
-  """
-  direction: OrderDirection! = DESC
-}
-
-"""
-All possible DateTime fields for a resource
-"""
-enum DateTimeField {
-  """
-  The creation time of a resource
-  """
-  CREATED_AT
-}
-
-"""
-Possible directions in which to order a list of items
-"""
-enum OrderDirection {
-  ASC
-  DESC
-}
-
 input AccountReferenceInput {
   """
   The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -2864,6 +2929,70 @@ enum PaymentMethodType {
   BACS_DEBIT
   BANCONTACT
   LINK
+}
+
+input ExpenseReferenceInput {
+  """
+  The public id identifying the expense (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the expense (ie: 580)
+  """
+  legacyId: Int
+}
+
+"""
+All supported expense types
+"""
+enum ExpenseType {
+  """
+  Invoice: Charge for your time or get paid in advance.
+  """
+  INVOICE
+
+  """
+  Receipt: Get paid back for a purchase already made.
+  """
+  RECEIPT
+
+  """
+  Funding Request: Request funding for a project or initiative.
+  """
+  FUNDING_REQUEST
+
+  """
+  Grant: Request funding for a project or initiative.
+  """
+  GRANT
+
+  """
+  Unclassified expense
+  """
+  UNCLASSIFIED
+
+  """
+  Credit Card Charge: Payment done using an issued (virtual) credit card issued by your Fiscal Host.
+  """
+  CHARGE
+
+  """
+  Settlement: expense generated by Open Collective to collect money owed by Fiscal Hosts.
+  """
+  SETTLEMENT
+}
+
+input OrderReferenceInput {
+  """
+  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The legacy public id identifying the order (ie: 4242)
+  """
+  legacyId: Int
 }
 
 input VirtualCardReferenceInput {
@@ -3617,46 +3746,6 @@ enum ExpenseStatusFilter {
   Only expenses that are on hold
   """
   ON_HOLD
-}
-
-"""
-All supported expense types
-"""
-enum ExpenseType {
-  """
-  Invoice: Charge for your time or get paid in advance.
-  """
-  INVOICE
-
-  """
-  Receipt: Get paid back for a purchase already made.
-  """
-  RECEIPT
-
-  """
-  Funding Request: Request funding for a project or initiative.
-  """
-  FUNDING_REQUEST
-
-  """
-  Grant: Request funding for a project or initiative.
-  """
-  GRANT
-
-  """
-  Unclassified expense
-  """
-  UNCLASSIFIED
-
-  """
-  Credit Card Charge: Payment done using an issued (virtual) credit card issued by your Fiscal Host.
-  """
-  CHARGE
-
-  """
-  Settlement: expense generated by Open Collective to collect money owed by Fiscal Hosts.
-  """
-  SETTLEMENT
 }
 
 enum PayoutMethodType {
@@ -5448,6 +5537,58 @@ input AmountInput {
   The value in cents
   """
   valueInCents: Int
+
+  """
+  If the amount was generated from a currency conversion, this field can be used to provide details about the conversion
+  """
+  exchangeRate: CurrencyExchangeRateInput
+}
+
+"""
+Fields for a currency exchange rate
+"""
+input CurrencyExchangeRateInput {
+  """
+  Where does the FX rate comes from
+  """
+  source: CurrencyExchangeRateSourceType!
+  fromCurrency: Currency!
+  toCurrency: Currency!
+
+  """
+  Date of the FX rate
+  """
+  date: DateTime!
+
+  """
+  Exchange rate value as a float (e.g 1.15 or 0.86)
+  """
+  value: Float!
+}
+
+"""
+Where does the FX rate come from
+"""
+enum CurrencyExchangeRateSourceType {
+  """
+  Open Collective internal system, relying on caching and 3rd party APIs
+  """
+  OPENCOLLECTIVE
+
+  """
+  PayPal API
+  """
+  PAYPAL
+
+  """
+  Wise API
+  """
+  WISE
+
+  """
+  User-provided exchange rate
+  """
+  USER
 }
 
 """
@@ -5624,7 +5765,17 @@ type ExpenseItem {
   """
   Amount of this item
   """
-  amount: Int!
+  amount: Int! @deprecated(reason: "Please use `amountV2`")
+
+  """
+  Amount of this item
+  """
+  amountV2: Amount!
+
+  """
+  If the item currency is different than the expense currency, this field will expose the average exchange rate for this date as recorded by Open Collective. Used to decide whether the value in `amountV2.exchangeRate` looks correct.
+  """
+  referenceExchangeRate: CurrencyExchangeRate
 
   """
   The date on which the item was created
@@ -5651,6 +5802,33 @@ type ExpenseItem {
   The file associated with this item (if any)
   """
   file: FileInfo
+}
+
+"""
+Fields for a currency fx rate
+"""
+type CurrencyExchangeRate {
+  """
+  Exchange rate value as a scalar (e.g 1.15 or 0.86)
+  """
+  value: Float!
+
+  """
+  Where does the FX rate comes from
+  """
+  source: CurrencyExchangeRateSourceType!
+  fromCurrency: Currency!
+  toCurrency: Currency!
+
+  """
+  Date of the FX rate
+  """
+  date: DateTime!
+
+  """
+  Is the FX rate approximate or a fixed value?
+  """
+  isApproximate: Boolean!
 }
 
 """
@@ -6035,53 +6213,6 @@ type Amount {
 }
 
 """
-Fields for a currency fx rate
-"""
-type CurrencyExchangeRate {
-  """
-  Exchange rate value as a scalar (e.g 1.15 or 0.86)
-  """
-  value: Float!
-
-  """
-  Where does the FX rate comes from
-  """
-  source: CurrencyExchangeRateSourceType!
-  fromCurrency: Currency!
-  toCurrency: Currency!
-
-  """
-  Date of the FX rate
-  """
-  date: DateTime!
-
-  """
-  Is the FX rate approximate or a fixed value?
-  """
-  isApproximate: Boolean!
-}
-
-"""
-Where does the FX rate come from
-"""
-enum CurrencyExchangeRateSourceType {
-  """
-  Open Collective internal system, relying on caching and 3rd party APIs
-  """
-  OPENCOLLECTIVE
-
-  """
-  PayPal API
-  """
-  PAYPAL
-
-  """
-  Wise API
-  """
-  WISE
-}
-
-"""
 This represents a Bot account
 """
 type Bot implements Account {
@@ -6322,9 +6453,29 @@ type Bot implements Account {
     hasExpense: Boolean
 
     """
+    Only return transactions with this Expense attached
+    """
+    expense: ExpenseReferenceInput
+
+    """
+    Only return transactions that have an Expense of one of these expense types attached
+    """
+    expenseType: [ExpenseType]
+
+    """
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Only return transactions for this order.
+    """
+    order: OrderReferenceInput
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -6971,9 +7122,29 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     hasExpense: Boolean
 
     """
+    Only return transactions with this Expense attached
+    """
+    expense: ExpenseReferenceInput
+
+    """
+    Only return transactions that have an Expense of one of these expense types attached
+    """
+    expenseType: [ExpenseType]
+
+    """
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Only return transactions for this order.
+    """
+    order: OrderReferenceInput
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -7555,12 +7726,22 @@ type Credit implements Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Amount!
   netAmountInHostCurrency(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Amount!
   taxAmount: Amount!
 
@@ -7579,7 +7760,12 @@ type Credit implements Transaction {
   """
   Payment Processor Fee (usually in host currency)
   """
-  paymentProcessorFee: Amount!
+  paymentProcessorFee(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Amount!
   host: Account
 
   """
@@ -7668,12 +7854,22 @@ type Debit implements Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Amount!
   netAmountInHostCurrency(
     """
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
   ): Amount!
   taxAmount: Amount!
 
@@ -7692,7 +7888,12 @@ type Debit implements Transaction {
   """
   Payment Processor Fee (usually in host currency)
   """
-  paymentProcessorFee: Amount!
+  paymentProcessorFee(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Amount!
   host: Account
 
   """
@@ -7989,9 +8190,29 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     hasExpense: Boolean
 
     """
+    Only return transactions with this Expense attached
+    """
+    expense: ExpenseReferenceInput
+
+    """
+    Only return transactions that have an Expense of one of these expense types attached
+    """
+    expenseType: [ExpenseType]
+
+    """
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Only return transactions for this order.
+    """
+    order: OrderReferenceInput
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -8858,9 +9079,29 @@ type Individual implements Account {
     hasExpense: Boolean
 
     """
+    Only return transactions with this Expense attached
+    """
+    expense: ExpenseReferenceInput
+
+    """
+    Only return transactions that have an Expense of one of these expense types attached
+    """
+    expenseType: [ExpenseType]
+
+    """
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Only return transactions for this order.
+    """
+    order: OrderReferenceInput
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -9713,9 +9954,29 @@ type Organization implements Account & AccountWithContributions {
     hasExpense: Boolean
 
     """
+    Only return transactions with this Expense attached
+    """
+    expense: ExpenseReferenceInput
+
+    """
+    Only return transactions that have an Expense of one of these expense types attached
+    """
+    expenseType: [ExpenseType]
+
+    """
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Only return transactions for this order.
+    """
+    order: OrderReferenceInput
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -10483,9 +10744,29 @@ type Vendor implements Account & AccountWithContributions {
     hasExpense: Boolean
 
     """
+    Only return transactions with this Expense attached
+    """
+    expense: ExpenseReferenceInput
+
+    """
+    Only return transactions that have an Expense of one of these expense types attached
+    """
+    expenseType: [ExpenseType]
+
+    """
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Only return transactions for this order.
+    """
+    order: OrderReferenceInput
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -10940,6 +11221,11 @@ type Vendor implements Account & AccountWithContributions {
   vendorInfo: VendorInfo
 
   """
+  Returns whether this account has any payout methods saved
+  """
+  hasPayoutMethod: Boolean
+
+  """
   The account who created this order
   """
   createdByAccount: Account
@@ -11221,6 +11507,16 @@ type Query {
     """
     id: String!
   ): Conversation
+
+  """
+  Get exchange rates from Open Collective
+  """
+  currencyExchangeRate(
+    """
+    Requests for currency exchange rates
+    """
+    requests: [CurrencyExchangeRateRequest!]!
+  ): [CurrencyExchangeRate!]!
   event(
     """
     The public id identifying the Event (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -11768,9 +12064,29 @@ type Query {
     hasExpense: Boolean
 
     """
+    Only return transactions with this Expense attached
+    """
+    expense: ExpenseReferenceInput
+
+    """
+    Only return transactions that have an Expense of one of these expense types attached
+    """
+    expenseType: [ExpenseType]
+
+    """
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Only return transactions for this order.
+    """
+    order: OrderReferenceInput
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -13296,16 +13612,24 @@ enum ActivityAndClassesType {
   REPORTS
 }
 
-input ExpenseReferenceInput {
+"""
+Request for a currency exchange rate
+"""
+input CurrencyExchangeRateRequest {
   """
-  The public id identifying the expense (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  Currency to convert from
   """
-  id: String
+  fromCurrency: Currency!
 
   """
-  The internal id of the expense (ie: 580)
+  Currency to convert to
   """
-  legacyId: Int
+  toCurrency: Currency!
+
+  """
+  Date of the exchange rate. Defaults to now.
+  """
+  date: DateTime
 }
 
 """
@@ -13559,9 +13883,29 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     hasExpense: Boolean
 
     """
+    Only return transactions with this Expense attached
+    """
+    expense: ExpenseReferenceInput
+
+    """
+    Only return transactions that have an Expense of one of these expense types attached
+    """
+    expenseType: [ExpenseType]
+
+    """
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Only return transactions for this order.
+    """
+    order: OrderReferenceInput
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -14065,18 +14409,6 @@ type HostCollection implements Collection {
   nodes: [Host]
 }
 
-input OrderReferenceInput {
-  """
-  The public id identifying the order (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String
-
-  """
-  The legacy public id identifying the order (ie: 4242)
-  """
-  legacyId: Int
-}
-
 """
 This represents an Project account
 """
@@ -14318,9 +14650,29 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     hasExpense: Boolean
 
     """
+    Only return transactions with this Expense attached
+    """
+    expense: ExpenseReferenceInput
+
+    """
+    Only return transactions that have an Expense of one of these expense types attached
+    """
+    expenseType: [ExpenseType]
+
+    """
     Only return transactions with an Order attached
     """
     hasOrder: Boolean
+
+    """
+    Only return transactions for this order.
+    """
+    order: OrderReferenceInput
+
+    """
+    Used when filtering with the `host` argument to determine whether to include transactions on the fiscal host account (and children)
+    """
+    includeHost: Boolean! = true
 
     """
     Whether to include regular transactions from the account (turn false if you only want Incognito or Gift Card transactions)
@@ -15886,6 +16238,16 @@ type Mutation {
   confirmCreditCard(paymentMethod: PaymentMethodReferenceInput!): CreditCardWithStripeError!
 
   """
+  Creates a Stripe setup intent
+  """
+  createSetupIntent(host: AccountReferenceInput!, account: AccountReferenceInput!): SetupIntent!
+
+  """
+  Adds a Stripe payment method
+  """
+  addStripePaymentMethodFromSetupIntent(setupIntent: SetupIntentInput!, account: AccountReferenceInput!): PaymentMethod!
+
+  """
   Create a new Payout Method to get paid through the platform. Scope: "expenses".
   """
   createPayoutMethod(
@@ -16713,6 +17075,11 @@ input AccountingCategoryInput {
   A friendly name for non-accountants (i.e. expense submitters and collective admins)
   """
   friendlyName: String
+
+  """
+  If meant for expenses, the types of expenses this category applies to
+  """
+  expensesTypes: [ExpenseType]
 }
 
 """
@@ -16962,6 +17329,7 @@ input ExpenseCreateInput {
 
 input PayoutMethodInput {
   id: String
+  legacyId: Int
   data: JSON
   name: String
   isSaved: Boolean
@@ -16972,7 +17340,12 @@ input ExpenseItemCreateInput {
   """
   Amount in cents
   """
-  amount: Int!
+  amount: Int @deprecated(reason: "Please use `amountV2`")
+
+  """
+  Amount
+  """
+  amountV2: AmountInput
 
   """
   What is this item about?
@@ -17145,7 +17518,12 @@ input ExpenseItemInput {
   """
   Amount in cents
   """
-  amount: Int
+  amount: Int @deprecated(reason: "Please use `amountV2`")
+
+  """
+  Amount
+  """
+  amountV2: AmountInput
 
   """
   What is this item about?
@@ -17986,6 +18364,24 @@ type CreditCardWithStripeError {
   stripeError: StripeError
 }
 
+"""
+A Stripe setup intent
+"""
+type SetupIntent {
+  id: String!
+  setupIntentClientSecret: String!
+  stripeAccount: String!
+  stripeAccountPublishableSecret: String!
+}
+
+"""
+A Stripe setup intent
+"""
+input SetupIntentInput {
+  id: String!
+  stripeAccount: String!
+}
+
 enum AccountCacheType {
   CLOUDFLARE
   GRAPHQL_QUERIES
@@ -18125,6 +18521,11 @@ input UploadFileInput {
   Whether to run OCR on the document. Note that this feature is only available to selected accounts.
   """
   parseDocument: Boolean! = false
+
+  """
+  If `parseDocument` is true, you can use this field to pass options to the OCR parser.
+  """
+  parsingOptions: OCRParsingOptionsInput = null
 }
 
 """
@@ -18146,6 +18547,16 @@ enum UploadedFileKind {
   TIER_LONG_DESCRIPTION
   ACCOUNT_CUSTOM_EMAIL
   AGREEMENT_ATTACHMENT
+}
+
+"""
+To configure the OCR parsing
+"""
+input OCRParsingOptionsInput {
+  """
+  The currency that you'd like to use for the amounts
+  """
+  currency: Currency = null
 }
 
 input VirtualCardInput {
