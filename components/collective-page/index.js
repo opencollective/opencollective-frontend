@@ -124,7 +124,7 @@ class CollectivePage extends Component {
     // Update the state only if necessary
     if (this.state.isFixed !== isFixed || this.state.selectedCategory !== selectedCategory) {
       this.setState({ isFixed, selectedCategory });
-    } else if (!selectedCategory && categories?.length) {
+    } else if (!selectedCategory && categories.length) {
       // Select first category by default
       this.setState({ isFixed, selectedCategory: categories[0].name });
     }

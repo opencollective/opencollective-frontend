@@ -18,6 +18,7 @@ import { isUndefined, omitBy, pick } from 'lodash';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFactorAuthenticationApolloLink';
+import { getErrorFromGraphqlException, isNotFoundGraphQLException } from './errors';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from './local-storage';
 import { parseToBoolean } from './utils';
 
@@ -28,6 +29,7 @@ const INTERNAL_API_V2_URL = process.env.INTERNAL_API_V2_URL;
 const INTERNAL_API_V1_OPERATION_NAMES = process.env.INTERNAL_API_V1_OPERATION_NAMES;
 const INTERNAL_API_V2_OPERATION_NAMES = process.env.INTERNAL_API_V2_OPERATION_NAMES;
 export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__' as const;
+export const APOLLO_ERROR_PROP_NAME = '__APOLLO_ERROR__' as const;
 export const APOLLO_VARIABLES_PROP_NAME = '__APOLLO_VARIABLES__' as const;
 
 const getBaseApiUrl = (apiVersion, internal = false) => {
@@ -288,6 +290,7 @@ export function initClient({ initialState, twoFactorAuthContext }: any = {}): Re
 type SSRQueryHelperProps<TVariables> = {
   [APOLLO_STATE_PROP_NAME]: NormalizedCacheObject;
   [APOLLO_VARIABLES_PROP_NAME]: Partial<TVariables>;
+  [APOLLO_ERROR_PROP_NAME]: any;
 };
 
 /**
@@ -298,10 +301,12 @@ export function getSSRQueryHelpers<TVariables, TProps = {}>({
   query,
   getVariablesFromContext = undefined,
   getPropsFromContext = undefined,
+  skipClientIfSSRThrows404 = false,
   ...queryOptions
 }: QueryOptions<TVariables> & {
   getPropsFromContext?: (context: GetServerSidePropsContext) => TProps;
   getVariablesFromContext?: (context: GetServerSidePropsContext, props: Partial<TProps>) => TVariables;
+  skipClientIfSSRThrows404?: boolean;
 }) {
   type ServerSideProps = TProps & SSRQueryHelperProps<TVariables>;
   return {
@@ -311,21 +316,38 @@ export function getSSRQueryHelpers<TVariables, TProps = {}>({
       const props = (getPropsFromContext && getPropsFromContext(context)) || {};
       const variables = (getVariablesFromContext && getVariablesFromContext(context, props)) || {};
       const client = initClient();
-      await client.query({ query, variables, ...queryOptions }); // No handling the result here, we just want to make sure the query is in the cache
+      let error;
+
+      try {
+        await client.query({ query, variables, ...queryOptions }); // Not handling the result here, we just want to make sure the query result is in the cache
+      } catch (e) {
+        error = e;
+      }
+
       return {
         props: {
           ...omitBy<TProps>(props, isUndefined),
           [APOLLO_STATE_PROP_NAME]: client.cache.extract(),
           [APOLLO_VARIABLES_PROP_NAME]: omitBy<TVariables>(variables, isUndefined) as Partial<TVariables>,
+          [APOLLO_ERROR_PROP_NAME]: !error ? null : JSON.parse(JSON.stringify(error)),
         } as ServerSideProps,
       };
     },
     useQuery: (pageProps: ServerSideProps) => {
       const variables = pageProps[APOLLO_VARIABLES_PROP_NAME] as TVariables;
-      return useQuery(query, { variables, ...queryOptions });
+      let skip = false;
+      if (skipClientIfSSRThrows404) {
+        const ssrError = pageProps[APOLLO_ERROR_PROP_NAME];
+        skip = ssrError && isNotFoundGraphQLException(ssrError);
+      }
+
+      return useQuery(query, { variables, skip, ...queryOptions });
     },
     getVariablesFromPageProps: (pageProps: ServerSideProps): Partial<TVariables> => {
       return pageProps[APOLLO_VARIABLES_PROP_NAME];
+    },
+    getSSRErrorFromPageProps: (pageProps: ServerSideProps): any => {
+      return pageProps[APOLLO_ERROR_PROP_NAME] && getErrorFromGraphqlException(pageProps[APOLLO_ERROR_PROP_NAME]);
     },
   };
 }

@@ -320,14 +320,20 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
             {showDownloadInvoiceButton && (
               <StyledButton
                 buttonSize="small"
+                data-loading={loadingInvoice}
                 loading={loadingInvoice}
-                onClick={downloadInvoiceWith({ transactionUuid: uuid, toCollectiveSlug: toAccount.slug })}
+                onClick={downloadInvoiceWith({
+                  transactionUuid: uuid,
+                  toCollectiveSlug: toAccount.slug,
+                  createdAt: transaction.createdAt,
+                })}
                 minWidth={140}
                 background="transparent"
                 textTransform="capitalize"
                 ml={2}
                 mb={2}
                 px="unset"
+                data-cy="download-transaction-receipt-btn"
               >
                 {expense && <FormattedMessage id="DownloadInvoice" defaultMessage="Download invoice" />}
                 {order && <FormattedMessage id="DownloadReceipt" defaultMessage="Download receipt" />}

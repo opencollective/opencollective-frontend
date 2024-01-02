@@ -58,7 +58,7 @@ const BaseTag = ({ status, ...props }) => {
 };
 
 BaseTag.propTypes = {
-  status: PropTypes.oneOf([...Object.values(ExpenseStatus), 'COMPLETED']),
+  status: PropTypes.oneOf([...Object.values(ExpenseStatus), 'COMPLETED', 'REFUNDED']),
 };
 
 /**
@@ -119,7 +119,7 @@ const ExpenseStatusTag = ({ status, showTaxFormTag, showTaxFormMsg, ...props }) 
 };
 
 ExpenseStatusTag.propTypes = {
-  status: PropTypes.oneOf(Object.values(ExpenseStatus)),
+  status: PropTypes.oneOf([...Object.values(ExpenseStatus), 'COMPLETED', 'REFUNDED']),
   showTaxFormMsg: PropTypes.bool,
   showTaxFormTag: PropTypes.bool,
 };

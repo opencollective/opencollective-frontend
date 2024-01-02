@@ -257,23 +257,6 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
 OrderBudgetItem.propTypes = {
   isLoading: PropTypes.bool,
   showAmountSign: PropTypes.bool,
-  onDelete: PropTypes.func,
-  onProcess: PropTypes.func,
-  showProcessActions: PropTypes.bool,
-  view: PropTypes.oneOf(['public', 'admin']),
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string,
-    stats: PropTypes.shape({
-      balance: PropTypes.shape({
-        valueInCents: PropTypes.number,
-      }),
-    }),
-    parent: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-    }),
-  }),
-  host: PropTypes.object,
   order: PropTypes.shape({
     id: PropTypes.string,
     legacyId: PropTypes.number,
