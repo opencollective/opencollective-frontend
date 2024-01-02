@@ -3395,7 +3395,7 @@
   "x7D8vH": "Veuillez mentionner la raison pour laquelle cette dépense a été marquée comme incomplète. La raison sera partagée avec l'utilisateur et sera également publiée sous forme de commentaire sous la dépense.",
   "X8Pa2K": "{ count, plural, one {Collectif hébergé} other {Collectifs hébergés}}",
   "x92ME7": "Nom de l'Hôte",
-  "x9TypM": "Since {date}",
+  "x9TypM": "Depuis {date}",
   "XfsYgz": "À propos de la confidentialité",
   "XhMMHL": "Aucune application autorisée pour le moment. Vous pouvez créer votre propre application OAuth à partir de la section <ForDevelopersLink>Pour les développeurs</ForDevelopersLink>.",
   "XhoJIl": "{type, select, CREDIT {Reçu par} DEBIT {Payé par} other {}} {account} le {date}",
