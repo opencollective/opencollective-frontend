@@ -69,7 +69,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     header: () => <FormattedMessage id="Team" defaultMessage="Team" />,
     cell: ({ row }) => {
       const account = row.original;
-      const admins = account.members?.nodes;
+      const admins = account.members?.nodes || [];
       return (
         <div className="flex gap-[-4px]">
           {admins.map(admin => (

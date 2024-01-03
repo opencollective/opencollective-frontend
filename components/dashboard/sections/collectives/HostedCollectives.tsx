@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { compact, isString, omit } from 'lodash';
 import { useRouter } from 'next/router';
@@ -58,29 +58,32 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   searchTerm: searchFilter.filter,
   hostFeesStructure: {
     labelMsg: defineMessage({ id: 'FeeStructure', defaultMessage: 'Fee structure' }),
-    Component: ({ intl, ...props }) => (
-      <ComboSelectFilter
-        options={Object.values(omit(HostFeeStructure, HostFeeStructure.MONTHLY_RETAINER)).map(value => ({
-          label: formatHostFeeStructure(intl, value),
-          value,
-        }))}
-        {...props}
-      />
-    ),
+    Component: ({ intl, ...props }) => {
+      const options = useMemo(
+        () =>
+          Object.values(omit(HostFeeStructure, HostFeeStructure.MONTHLY_RETAINER)).map(value => ({
+            label: formatHostFeeStructure(intl, value),
+            value,
+          })),
+        [intl],
+      );
+      return <ComboSelectFilter options={options} {...props} />;
+    },
     valueRenderer: ({ value, intl }) => formatHostFeeStructure(intl, value),
   },
   type: {
     labelMsg: defineMessage({ id: 'Type', defaultMessage: 'Type' }),
-    Component: ({ intl, ...props }) => (
-      <ComboSelectFilter
-        options={Object.values(HostedCollectiveTypes).map(value => ({
-          label: formatCollectiveType(intl, value),
-          value,
-        }))}
-        isMulti
-        {...props}
-      />
-    ),
+    Component: ({ intl, ...props }) => {
+      const options = useMemo(
+        () =>
+          Object.values(HostedCollectiveTypes).map(value => ({
+            label: formatCollectiveType(intl, value),
+            value,
+          })),
+        [intl],
+      );
+      return <ComboSelectFilter options={options} isMulti {...props} />;
+    },
     valueRenderer: ({ value, intl }) => formatCollectiveType(intl, value),
   },
   isFrozen: {
@@ -162,7 +165,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
         shallow: true,
       },
     );
-  }, [showCollectiveOverview]);
+  }, [showCollectiveOverview, router]);
 
   const handleEdit = () => {
     refetchMetadata();
