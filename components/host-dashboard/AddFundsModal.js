@@ -431,6 +431,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                 description: resultOrder.description,
                 processedAt: resultOrder.processedAt,
               });
+              props.onSuccess?.();
             } else {
               handleClose();
             }
@@ -862,6 +863,7 @@ AddFundsModal.propTypes = {
     policies: PropTypes.object,
   }).isRequired,
   onClose: PropTypes.func,
+  onSuccess: PropTypes.func,
 };
 
 export default AddFundsModal;

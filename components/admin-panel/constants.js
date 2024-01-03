@@ -200,7 +200,7 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Fiscal Hosting',
   },
   [ALL_SECTIONS.TEAM]: {
-    id: 'ContributorsFilter.Core',
+    id: 'Team',
     defaultMessage: 'Team',
   },
   [ALL_SECTIONS.PAYMENT_METHODS]: {

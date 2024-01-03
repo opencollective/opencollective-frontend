@@ -16,6 +16,7 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 
 import HostApplications from './sections/collectives/HostApplications';
+import HostedCollectives from './sections/collectives/HostedCollectives';
 import HostFinancialContributions from './sections/contributions/HostFinancialContributions';
 import IncomingContributions from './sections/contributions/IncomingContributions';
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
@@ -23,7 +24,6 @@ import HostExpenses from './sections/expenses/HostDashboardExpenses';
 import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
 import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
 import HostDashboardAgreements from './sections/HostDashboardAgreements';
-import HostDashboardHostedCollectives from './sections/HostDashboardHostedCollectives';
 import HostDashboardReports from './sections/HostDashboardReports';
 import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
 import HostVirtualCards from './sections/HostVirtualCards';
@@ -37,7 +37,7 @@ import { LEGACY_SECTIONS, LEGACY_SETTINGS_SECTIONS, SECTION_LABELS, SECTIONS, SE
 import DashboardHeader from './DashboardHeader';
 
 const DASHBOARD_COMPONENTS = {
-  [SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
+  [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,
   [SECTIONS.CHART_OF_ACCOUNTS]: HostAdminAccountingSection,
   [SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: HostFinancialContributions,
   [SECTIONS.HOST_EXPENSES]: HostExpenses,
