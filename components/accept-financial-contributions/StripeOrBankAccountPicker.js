@@ -9,6 +9,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { connectAccount } from '../../lib/api';
+import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
@@ -18,6 +19,7 @@ import Link from '../Link';
 import Loading from '../Loading';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
+import { toast } from '../ui/useToast';
 
 const ImageSizingContainer = styled(Container)`
   @media screen and (min-width: 52em) {
@@ -73,14 +75,8 @@ class StripeOrBankAccountPicker extends React.Component {
 
   connectStripe = async () => {
     const service = 'stripe';
-    try {
-      const json = await connectAccount(this.props.host.id, service);
-      window.location.href = json.redirectUrl;
-    } catch (err) {
-      // TODO: this should be reported to the user
-      // eslint-disable-next-line no-console
-      console.error(`>>> /api/connected-accounts/${service} error`, err);
-    }
+    const json = await connectAccount(this.props.host.id, service);
+    window.location.href = json.redirectUrl;
   };
 
   render() {
@@ -139,8 +135,15 @@ class StripeOrBankAccountPicker extends React.Component {
                     mb={3}
                     minWidth={'145px'}
                     onClick={async () => {
-                      await addHost(collective, host);
-                      this.connectStripe();
+                      try {
+                        await addHost(collective, host);
+                        await this.connectStripe();
+                      } catch (e) {
+                        toast({
+                          variant: 'error',
+                          message: i18nGraphqlException(intl, e),
+                        });
+                      }
                     }}
                   >
                     <FormattedMessage defaultMessage="Connect {service}" values={{ service: 'Stripe' }} />

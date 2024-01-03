@@ -210,7 +210,7 @@ const DashboardPage = () => {
                   </Link>
                 )}
               </MessageBox>
-              {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
+              {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
             </div>
           ) : !useDynamicTopBar ? (
             <div

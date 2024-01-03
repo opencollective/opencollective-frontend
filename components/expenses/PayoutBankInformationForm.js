@@ -311,7 +311,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     } else {
       // eslint-disable-next-line no-console
       console.warn('Could not fetch requiredFields through Wise.');
-      return;
+      return null;
     }
   }
 
