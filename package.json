@@ -251,7 +251,7 @@
     "cypress": "^13.6.0",
     "cypress-real-events": "^1.11.0",
     "cz-conventional-changelog": "^3.3.0",
-    "esbuild": "0.19.10",
+    "esbuild": "0.19.11",
     "eslint": "^8.54.0",
     "eslint-config-opencollective": "^3.0.3",
     "eslint-plugin-babel": "^5.3.1",
