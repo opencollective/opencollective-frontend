@@ -9,7 +9,7 @@ const Table = React.forwardRef<
 >(({ className, innerClassName, mobileTableView, fullWidth, ...props }, ref) => (
   <div
     className={cn(
-      'overflow-auto',
+      'table-auto overflow-auto',
       mobileTableView || fullWidth
         ? '-mx-3 border-b border-t 2xl:mx-0 2xl:rounded-xl 2xl:border'
         : 'w-full rounded-xl border',
