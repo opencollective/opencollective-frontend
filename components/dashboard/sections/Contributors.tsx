@@ -277,7 +277,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   const error = metadataError || queryError;
 
   const columns = React.useMemo(
-    () => getColumns({ intl, activeViewId: queryFilter.activeViewId }) || [],
+    () => getColumns({ intl, activeViewId: queryFilter.activeViewId }),
     [intl, queryFilter.activeViewId],
   );
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
