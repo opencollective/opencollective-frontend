@@ -170,7 +170,7 @@ export const MoreActionsMenu = ({
             <React.Fragment>
               <DropdownMenuItem className="cursor-pointer" onClick={() => openCollectiveDetails(collective)}>
                 <Eye className="mr-2" size="16" />
-                <FormattedMessage defaultMessage="View Details" />
+                <FormattedMessage id="viewDetails" defaultMessage="View Details" />
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </React.Fragment>
