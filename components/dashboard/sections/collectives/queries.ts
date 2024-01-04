@@ -226,16 +226,16 @@ export const hostedCollectivesMetadataQuery = gql`
   query HostedCollectivesMetadata($hostSlug: String!) {
     host(slug: $hostSlug) {
       id
-      all: memberOf(role: HOST, limit: 1, accountType: [COLLECTIVE, FUND]) {
+      all: hostedAccounts(limit: 1, accountType: [COLLECTIVE, FUND]) {
         totalCount
       }
-      active: memberOf(role: HOST, limit: 1, accountType: [COLLECTIVE, FUND], isFrozen: false) {
+      active: hostedAccounts(limit: 1, accountType: [COLLECTIVE, FUND], isFrozen: false) {
         totalCount
       }
-      frozen: memberOf(role: HOST, limit: 1, isFrozen: true) {
+      frozen: hostedAccounts(limit: 1, isFrozen: true) {
         totalCount
       }
-      unhosted: memberOf(role: HOST, limit: 1, isDeleted: true) {
+      unhosted: hostedAccounts(limit: 1, accountType: [COLLECTIVE, FUND], isUnhosted: true) {
         totalCount
       }
     }
@@ -249,13 +249,12 @@ export const hostedCollectivesQuery = gql`
     $hostSlug: String!
     $limit: Int!
     $offset: Int!
-    $orderBy: OrderByInput
     $hostFeesStructure: HostFeeStructure
     $searchTerm: String
     $type: [AccountType]
     $isApproved: Boolean
     $isFrozen: Boolean
-    $isDeleted: Boolean
+    $isUnhosted: Boolean
   ) {
     host(slug: $hostSlug) {
       id
@@ -272,28 +271,22 @@ export const hostedCollectivesQuery = gql`
         hostFees
         hostFeeSharePercent
       }
-      memberOf(
-        role: HOST
+      hostedAccounts(
         limit: $limit
         offset: $offset
-        orderBy: $orderBy
-        hostFeesStructure: $hostFeesStructure
         searchTerm: $searchTerm
+        hostFeesStructure: $hostFeesStructure
         accountType: $type
         isApproved: $isApproved
         isFrozen: $isFrozen
-        isDeleted: $isDeleted
+        isUnhosted: $isUnhosted
       ) {
         offset
         limit
         totalCount
         nodes {
           id
-          createdAt
-          account {
-            id
-            ...HostedCollectiveFields
-          }
+          ...HostedCollectiveFields
         }
       }
     }

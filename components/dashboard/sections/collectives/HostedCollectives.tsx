@@ -46,7 +46,7 @@ const schema = z.object({
   type: isMulti(z.nativeEnum(HostedCollectiveTypes)).optional(),
   isApproved: boolean.optional(),
   isFrozen: boolean.optional(),
-  isDeleted: boolean.optional(),
+  isUnhosted: boolean.optional(),
 });
 
 const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedCollectivesQueryVariables> = {
@@ -92,7 +92,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   isApproved: {
     labelMsg: defineMessage({ defaultMessage: 'Approved' }),
   },
-  isDeleted: {
+  isUnhosted: {
     labelMsg: defineMessage({ defaultMessage: 'Unhosted' }),
   },
 };
@@ -135,7 +135,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
     {
       id: 'unhosted',
       label: intl.formatMessage({ defaultMessage: 'Unhosted' }),
-      filter: { isDeleted: true, type: [CollectiveType.COLLECTIVE, CollectiveType.FUND] },
+      filter: { isUnhosted: true, type: [CollectiveType.COLLECTIVE, CollectiveType.FUND] },
       count: metadata?.host?.unhosted?.totalCount,
     },
   ];
@@ -165,20 +165,22 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
         shallow: true,
       },
     );
-  }, [showCollectiveOverview, router]);
+    // We don't want to use router as a dependency here because useQueryFilter will cause undesired re-renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showCollectiveOverview]);
 
   const handleEdit = () => {
     refetchMetadata();
     refetch();
   };
 
-  const hostedMemberships = data?.host?.memberOf;
+  const hostedAccounts = data?.host?.hostedAccounts;
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />} />
       <Filterbar {...queryFilter} />
       {error && <MessageBoxGraphqlError error={error} mb={2} />}
-      {!error && !loading && !hostedMemberships?.nodes.length ? (
+      {!error && !loading && !hostedAccounts?.nodes.length ? (
         <EmptyResults
           hasFilters={queryFilter.hasFilters}
           entityType="COLLECTIVES"
@@ -190,7 +192,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
             data-cy="transactions-table"
             innerClassName="text-xs text-muted-foreground"
             columns={[cols.collective, cols.team, cols.fee, cols.hostedSince, cols.balance, cols.actions]}
-            data={hostedMemberships?.nodes?.map(membership => membership.account) || []}
+            data={hostedAccounts?.nodes || []}
             loading={loading}
             mobileTableView
             compact
@@ -198,7 +200,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
           />
           <Flex mt={5} justifyContent="center">
             <Pagination
-              total={hostedMemberships?.totalCount}
+              total={hostedAccounts?.totalCount}
               limit={variables.limit}
               offset={variables.offset}
               ignoredQueryParams={ROUTE_PARAMS}
