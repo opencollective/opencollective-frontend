@@ -208,7 +208,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
             loading={loading}
             mobileTableView
             compact
-            meta={{ intl, onEdit: handleEdit, host: data?.host }}
+            meta={{ intl, openCollectiveDetails: handleDrawer, onEdit: handleEdit, host: data?.host }}
             onClickRow={row => handleDrawer(row.original)}
           />
           <Flex mt={5} justifyContent="center">

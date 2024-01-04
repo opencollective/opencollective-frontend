@@ -1,7 +1,7 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { groupBy, mapValues, toPairs } from 'lodash';
-import { Banknote, FilePlus2, Mail, MoreHorizontal, Pause, Unlink } from 'lucide-react';
+import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Unlink } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
 
@@ -43,7 +43,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
         <div className="flex items-center">
           <Avatar collective={collective} radius={48} className="mr-4" />
           <div className="flex flex-col items-start">
-            <div className="font-medium text-foreground">{collective.name}</div>
+            <div className="text-foreground">{collective.name}</div>
             <div className="text-xs">{secondLine}</div>
           </div>
         </div>
@@ -53,7 +53,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
   childCollective: {
     accessorKey: 'collective',
     header: () => <FormattedMessage id="Fields.name" defaultMessage="Name" />,
-    cell: ({ row, }) => {
+    cell: ({ row }) => {
       const collective = row.original;
       return <div className="text-sm">{collective.name}</div>;
     },
@@ -130,11 +130,11 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     header: '',
     cell: ({ row, table }) => {
       const collective = row.original;
-      const { onEdit, host } = table.options.meta as any;
+      const { onEdit, host, openCollectiveDetails } = table.options.meta as any;
       return (
         host?.id === collective.host?.id && (
           <div className="flex flex-1 items-center justify-end">
-            <MoreActionsMenu collective={collective} onEdit={onEdit}>
+            <MoreActionsMenu collective={collective} onEdit={onEdit} openCollectiveDetails={openCollectiveDetails}>
               <TableActionsButton className="h-8 w-8">
                 <MoreHorizontal className="relative h-3 w-3" aria-hidden="true" />
               </TableActionsButton>
@@ -150,10 +150,12 @@ export const MoreActionsMenu = ({
   collective,
   children,
   onEdit,
+  openCollectiveDetails,
 }: {
   collective: HostedCollectiveFieldsFragment & Partial<AccountWithHost>;
   children: React.ReactNode;
   onEdit?: () => void;
+  openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
 }) => {
   const [openModal, setOpenModal] = React.useState<
     null | 'ADD_FUNDS' | 'FREEZE' | 'UNHOST' | 'ADD_AGREEMENT' | 'CONTACT'
@@ -164,6 +166,15 @@ export const MoreActionsMenu = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
         <DropdownMenuContent className="min-w-[240px]" align="end">
+          {openCollectiveDetails && (
+            <React.Fragment>
+              <DropdownMenuItem className="cursor-pointer" onClick={() => openCollectiveDetails(collective)}>
+                <Eye className="mr-2" size="16" />
+                <FormattedMessage defaultMessage="View Details" />
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </React.Fragment>
+          )}
           <DropdownMenuItem className="cursor-pointer" onClick={() => setOpenModal('ADD_FUNDS')}>
             <Banknote className="mr-2" size="16" />
             <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
