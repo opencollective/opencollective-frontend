@@ -299,7 +299,7 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
 type PayExpenseModalProps = {
   expense: Expense;
   collective: Pick<Account, 'currency'>;
-  host: Pick<Host, 'plan' | 'slug' | 'currency' | 'transferwise'>;
+  host: Pick<Host, 'plan' | 'slug' | 'currency' | 'transferwise' | 'settings'>;
   onClose: () => void;
   onSubmit: (values: any) => Promise<void>;
   error?: any;
@@ -344,7 +344,7 @@ const PayExpenseModal = ({
   const amounts = calculateAmounts({
     formik,
     expense,
-    quote: quoteQuery?.data?.expense?.quote,
+    quote: quoteQuery.data?.expense?.quote,
     host,
     feesPayer: formik.values.feesPayer,
   });

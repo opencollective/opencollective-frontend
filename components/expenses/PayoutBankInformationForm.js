@@ -233,12 +233,12 @@ Input.propTypes = {
   disabled: PropTypes.bool,
   loading: PropTypes.bool,
   host: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
+    slug: PropTypes.string,
   }),
-  currency: PropTypes.string.isRequired,
+  currency: PropTypes.string,
   formik: PropTypes.object.isRequired,
   getFieldName: PropTypes.func.isRequired,
-  refetch: PropTypes.func.isRequired,
+  refetch: PropTypes.func,
   input: PropTypes.object.isRequired,
 };
 
@@ -256,12 +256,12 @@ FieldGroup.propTypes = {
   disabled: PropTypes.bool,
   loading: PropTypes.bool,
   host: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
+    slug: PropTypes.string,
   }),
-  currency: PropTypes.string.isRequired,
+  currency: PropTypes.string,
   formik: PropTypes.object.isRequired,
   getFieldName: PropTypes.func.isRequired,
-  refetch: PropTypes.func.isRequired,
+  refetch: PropTypes.func,
   field: PropTypes.object.isRequired,
 };
 

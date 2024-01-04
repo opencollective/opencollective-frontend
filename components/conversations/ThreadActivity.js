@@ -239,7 +239,7 @@ const ThreadActivity = ({ activity }) => {
   const activityColors = getActivityColors(activity.type, theme);
   const message = ACTIVITIES_INFO[activity.type]?.message;
   const details =
-    ACTIVITIES_INFO[activity.type]?.renderDetails?.(activity?.data) ||
+    ACTIVITIES_INFO[activity.type]?.renderDetails?.(activity.data) ||
     activity.data?.message ||
     activity.data?.error?.message;
   const DataRenderer = ACTIVITIES_INFO[activity.type]?.DataRenderer;
