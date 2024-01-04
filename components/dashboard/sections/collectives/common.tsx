@@ -43,7 +43,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
         <div className="flex items-center">
           <Avatar collective={collective} radius={48} className="mr-4" />
           <div className="flex flex-col items-start">
-            <div className="text-foreground">{collective.name}</div>
+            <div className="text-sm text-foreground">{collective.name}</div>
             <div className="text-xs">{secondLine}</div>
           </div>
         </div>
