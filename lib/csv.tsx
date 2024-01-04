@@ -115,8 +115,8 @@ export const FIELD_GROUPS_2024: Record<string, readonly CSVField[]> = {
   accounts: FIELD_GROUPS.accounts,
   order: FIELD_GROUPS.order,
   expense: FIELD_GROUPS.expense,
-  tax: FIELD_GROUPS.tax,
-  legacy: [...FIELD_GROUPS.legacy, 'paymentProcessorFee'],
+  tax: FIELD_GROUPS.tax.filter(field => field !== 'taxAmount'),
+  legacy: [...FIELD_GROUPS.legacy, 'paymentProcessorFee', 'taxAmount'],
 };
 
 export const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, React.ReactNode> = {
@@ -234,8 +234,12 @@ export enum CSV_VERSIONS {
 }
 
 const CsvVersionsLabels = {
-  [CSV_VERSIONS.VERSION_2023]: <FormattedMessage defaultMessage="Version 2023 (Payment Processor Fees as column)" />,
-  [CSV_VERSIONS.VERSION_2024]: <FormattedMessage defaultMessage="Version 2024 (Payment Processor Fees as row)" />,
+  [CSV_VERSIONS.VERSION_2023]: (
+    <FormattedMessage defaultMessage="Version 2023 (Payment Processor Fees and Taxes as column)" />
+  ),
+  [CSV_VERSIONS.VERSION_2024]: (
+    <FormattedMessage defaultMessage="Version 2024 (Payment Processor Fees and Taxes as row)" />
+  ),
 };
 
 export const CsvVersions = Object.keys(CSV_VERSIONS).map(value => ({ value, label: CsvVersionsLabels[value] }));

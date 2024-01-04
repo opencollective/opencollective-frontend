@@ -229,6 +229,7 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
           createExpense(expense: $expense, account: $account) {
             id
             legacyId
+            createdAt
             account {
               id
               slug
@@ -612,6 +613,16 @@ Cypress.Commands.add(
     });
   },
 );
+
+/**
+ * Wait for a file to be downloaded
+ */
+Cypress.Commands.add('getDownloadedPDFContent', (filename, options) => {
+  const downloadFolder = Cypress.config('downloadsFolder');
+  cy.readFile(`${downloadFolder}/${filename}`, null, options).then(pdfFileContent => {
+    cy.task('getTextFromPdfContent', pdfFileContent);
+  });
+});
 
 // ---- Private ----
 

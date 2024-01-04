@@ -100,7 +100,7 @@ class RedeemForm extends React.Component {
                 name="name"
                 type="name"
                 defaultValue={name}
-                disabled={LoggedInUser}
+                disabled={Boolean(LoggedInUser)}
                 onChange={value => this.handleChange('name', value)}
               />
               <InputField
@@ -108,7 +108,7 @@ class RedeemForm extends React.Component {
                 name="email"
                 type="email"
                 defaultValue={email}
-                disabled={LoggedInUser}
+                disabled={Boolean(LoggedInUser)}
                 onChange={value => this.handleChange('email', value)}
               />
             </React.Fragment>

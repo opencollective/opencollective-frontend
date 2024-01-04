@@ -13,8 +13,9 @@ import { pickBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { getContributeRoute } from '../../lib/collective.lib';
-import { getCollectivePageRoute, getSettingsRoute } from '../../lib/url-helpers';
+import { getContributeRoute } from '../../lib/collective';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
+import { getCollectivePageRoute, getDashboardRoute, getSettingsRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -250,7 +251,14 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasManageSubscriptions && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS}>
-                        <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/manage-contributions`}>
+                        <StyledLink
+                          as={Link}
+                          href={
+                            LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
+                              ? getDashboardRoute(collective, 'outgoing-contributions')
+                              : `${getCollectivePageRoute(collective)}/manage-contributions`
+                          }
+                        >
                           <Container p={ITEM_PADDING}>
                             <Stack size="20px" />
                             <span>

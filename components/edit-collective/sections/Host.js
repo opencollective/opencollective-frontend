@@ -347,7 +347,7 @@ class Host extends React.Component {
     }
 
     const connectedAccounts = groupBy(collective.connectedAccounts, 'service');
-    const stripeAccount = connectedAccounts && connectedAccounts['stripe'] && connectedAccounts['stripe'][0];
+    const stripeAccount = connectedAccounts['stripe']?.[0];
 
     return (
       <EditCollectiveHostSection>

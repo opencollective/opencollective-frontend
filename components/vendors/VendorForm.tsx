@@ -128,39 +128,37 @@ const VendorAvatar = ({ value, name, radius, minSize, maxSize, onSuccess, onReje
       ) : (
         <Avatar src={value} type="VENDOR" radius={radius}>
           {value ? (
-            !isDragActive && (
-              <div className="flex gap-2">
-                <EditAvatarButton
-                  type="button"
-                  className="hidden group-focus-within:block group-hover:block"
-                  onClick={onClick}
-                  title={intl.formatMessage(
-                    {
-                      id: 'HeroAvatar.Edit',
-                      defaultMessage: 'Edit {imgType, select, AVATAR {avatar} other {logo}}',
-                    },
-                    { imgType: 'LOGO' },
-                  )}
-                >
-                  <Pencil size={16} />
-                </EditAvatarButton>
+            <div className="flex gap-2">
+              <EditAvatarButton
+                type="button"
+                className="hidden group-focus-within:block group-hover:block"
+                onClick={onClick}
+                title={intl.formatMessage(
+                  {
+                    id: 'HeroAvatar.Edit',
+                    defaultMessage: 'Edit {imgType, select, AVATAR {avatar} other {logo}}',
+                  },
+                  { imgType: 'LOGO' },
+                )}
+              >
+                <Pencil size={16} />
+              </EditAvatarButton>
 
-                <EditAvatarButton
-                  type="button"
-                  className="hidden group-focus-within:block group-hover:block"
-                  onClick={() => onSuccess({ url: null })}
-                  title={intl.formatMessage(
-                    {
-                      id: 'HeroAvatar.Remove',
-                      defaultMessage: 'Remove {imgType, select, AVATAR {avatar} other {logo}}',
-                    },
-                    { imgType: 'LOGO' },
-                  )}
-                >
-                  <Trash size={16} />
-                </EditAvatarButton>
-              </div>
-            )
+              <EditAvatarButton
+                type="button"
+                className="hidden group-focus-within:block group-hover:block"
+                onClick={() => onSuccess({ url: null })}
+                title={intl.formatMessage(
+                  {
+                    id: 'HeroAvatar.Remove',
+                    defaultMessage: 'Remove {imgType, select, AVATAR {avatar} other {logo}}',
+                  },
+                  { imgType: 'LOGO' },
+                )}
+              >
+                <Trash size={16} />
+              </EditAvatarButton>
+            </div>
           ) : (
             <Upload size={24} />
           )}

@@ -192,7 +192,7 @@ const JoinAsGuest = () => {
 
 const JoinGuestPage = () => {
   const intl = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
+  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
 
   return (
     <Page title={intl.formatMessage(MESSAGES.pageTitle, { service: 'Open Collective' })}>
@@ -204,7 +204,7 @@ const JoinGuestPage = () => {
         alignItems="center"
         background="linear-gradient(180deg, #EBF4FF, #FFFFFF)"
       >
-        {LoggedInUser ? (
+        {loadingLoggedInUser ? (
           <Loading />
         ) : LoggedInUser ? (
           <MessageBox type="warning" withIcon maxWidth={550}>

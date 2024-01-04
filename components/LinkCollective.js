@@ -23,7 +23,7 @@ const LinkCollective = ({
   hoverCardProps = undefined,
   ...props
 }) => {
-  if (!collective || collective.isIncognito) {
+  if (!collective || collective.isIncognito || (collective.type === 'USER' && (!collective.name || !collective.slug))) {
     return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
   } else if (collective.isGuest) {
     if (children) {
@@ -37,10 +37,7 @@ const LinkCollective = ({
     return children || collective.name;
   }
 
-  const { type, slug, name, isIncognito } = collective;
-  if (type === 'USER' && (!name || isIncognito || !slug)) {
-    return children || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />;
-  }
+  const { slug, name } = collective;
   const link = (
     <Link
       href={getCollectivePageRoute(collective)}

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import { defineMessages, injectIntl } from 'react-intl';
 
 import Footer from './navigation/Footer';
@@ -18,7 +17,6 @@ class IncognitoUserCollective extends React.Component {
 
   constructor(props) {
     super(props);
-    this.classNames = ['UserCollectivePage'];
     this.messages = defineMessages({
       'incognito.title': { id: 'UserCollective.incognito.title', defaultMessage: 'Incognito user' },
       'incognito.description': {
@@ -32,7 +30,7 @@ class IncognitoUserCollective extends React.Component {
     const { intl, collective } = this.props;
 
     return (
-      <div className={classNames('UserCollectivePage')}>
+      <div className="UserCollectivePage">
         <Header
           title={intl.formatMessage(this.messages['incognito.title'])}
           description={intl.formatMessage(this.messages['incognito.description'])}

@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { border } from 'styled-system';
 
-import { isIndividualAccount } from '../../lib/collective.lib';
+import { isIndividualAccount } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { formatCurrency, getCurrencySymbol } from '../../lib/currency-utils';
 import { AmountPropTypeShape } from '../../lib/prop-types';

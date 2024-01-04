@@ -332,7 +332,7 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
                 aria-expanded={open}
                 className={clsx(
                   'group h-8 justify-between gap-1.5 whitespace-nowrap rounded-full border-transparent px-2 ',
-                  parentAccount ? 'max-w-[14rem]' : 'w-auto',
+                  'max-w-[14rem]',
                 )}
               >
                 <Link href={getDashboardRoute(parentAccount)}>

@@ -13,7 +13,7 @@ import { Dimensions } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
-import ContributorsGridBackgroundSVG from '../images/ContributorsGridBackground.svg';
+import ContributorsGridBackgroundSVG from '../../../public/static/images/collective-page/ContributorsGridBackground.svg';
 
 /** Main contributors container with the bubbles background */
 const MainContainer = styled(Container)`

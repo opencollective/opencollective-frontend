@@ -5,7 +5,7 @@ import { cloneDeep, omit, pick } from 'lodash';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { getAccountReferenceInput } from '../../lib/collective.lib';
+import { getAccountReferenceInput } from '../../lib/collective';
 import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields } from '../../lib/form-utils';

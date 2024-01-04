@@ -2,7 +2,7 @@ import React from 'react';
 import Dropzone, { FileRejection } from 'react-dropzone';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { UploadFileResult } from '../../lib/graphql/types/v2/graphql';
+import { OcrParsingOptionsInput, UploadFileResult } from '../../lib/graphql/types/v2/graphql';
 import { useGraphQLFileUploader } from '../../lib/hooks/useGraphQLFileUploader';
 import { getMessageForRejectedDropzoneFiles, useImageUploader } from '../../lib/hooks/useImageUploader';
 import { attachmentDropzoneParams } from './lib/attachments';
@@ -14,9 +14,10 @@ const AddNewAttachedFilesButton = ({
   disabled,
   mockImageGenerator,
   onSuccess,
-  parseDocument,
-  useGraphQL,
-  onGraphQLSuccess,
+  parseDocument = false,
+  parsingOptions = null,
+  useGraphQL = false,
+  onGraphQLSuccess = undefined,
 }: AddNewAttachedFilesButtonProps) => {
   const kind = 'EXPENSE_ATTACHED_FILE';
   const intl = useIntl();
@@ -41,7 +42,7 @@ const AddNewAttachedFilesButton = ({
           message: getMessageForRejectedDropzoneFiles(intl, fileRejections, attachmentDropzoneParams.accept),
         });
       } else if (useGraphQL) {
-        uploadFileWithGraphQL(acceptedFiles.map(file => ({ file, kind, parseDocument })));
+        uploadFileWithGraphQL(acceptedFiles.map(file => ({ file, kind, parseDocument, parsingOptions })));
       } else {
         uploadFiles(acceptedFiles, fileRejections);
       }
@@ -75,9 +76,10 @@ type AddNewAttachedFilesButtonProps = {
   disabled?: boolean;
   onSuccess: (newFiles: Array<{ url: string }>) => void;
   mockImageGenerator?: () => string;
-  useGraphQL: boolean;
-  parseDocument: boolean;
-  onGraphQLSuccess: (uploadResults: UploadFileResult[]) => void;
+  useGraphQL?: boolean;
+  parseDocument?: boolean;
+  parsingOptions?: OcrParsingOptionsInput;
+  onGraphQLSuccess?: (uploadResults: UploadFileResult[]) => void;
 };
 
 export default AddNewAttachedFilesButton;

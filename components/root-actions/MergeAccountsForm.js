@@ -121,7 +121,7 @@ const MergeAccountsForm = () => {
           continueLabel="Merge profiles"
           header={mergeCTA}
           continueHandler={() => mergeAccounts(false)}
-          cancelHandler={() => setMergeSummary(false)}
+          onClose={() => setMergeSummary(false)}
         >
           <P whiteSpace="pre-wrap" lineHeight="24px">
             {mergeSummary}

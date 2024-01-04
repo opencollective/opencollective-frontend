@@ -1,7 +1,7 @@
 import { defineMessages } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { isIndividualAccount } from '../../lib/collective.lib';
+import { isIndividualAccount } from '../../lib/collective';
 import { hasSection } from '../../lib/collective-sections';
 import i18nCollectivePageSection from '../../lib/i18n-collective-page-section';
 import { getCollectivePageRoute } from '../../lib/url-helpers';

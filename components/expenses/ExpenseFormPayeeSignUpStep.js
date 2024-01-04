@@ -7,7 +7,7 @@ import { debounce, isEmpty, omit, pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { suggestSlug } from '../../lib/collective.lib';
+import { suggestSlug } from '../../lib/collective';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';

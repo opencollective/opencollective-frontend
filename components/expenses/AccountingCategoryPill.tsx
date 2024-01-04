@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { AccountingCategory, Expense, Host } from '../../lib/graphql/types/v2/graphql';
+import { Account, AccountingCategory, Expense, Host } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
 
 import StyledSpinner from '../StyledSpinner';
@@ -18,6 +18,7 @@ import ExpenseCategorySelect from './ExpenseCategorySelect';
 type AccountingCategoryPillProps = {
   expense: Expense;
   canEdit: boolean;
+  account: Account;
   host: Host;
   /** Whether to allow the user to select "I don't know" */
   allowNone?: boolean;
@@ -37,6 +38,7 @@ const getCategoryLabel = (category: AccountingCategory) => {
 
 const AdminAccountingCategoryPill = ({
   expense,
+  account,
   host,
   allowNone,
   showCodeInSelect,
@@ -48,12 +50,14 @@ const AdminAccountingCategoryPill = ({
     <ExpenseCategorySelect
       id="expense-summary-category-select"
       host={host}
+      account={account}
       expenseType={expense.type}
+      expenseValues={expense}
       allowNone={allowNone}
       selectedCategory={expense.accountingCategory}
-      submitterCategory={expense.valuesByRole?.submitter?.accountingCategory}
-      accountAdminCategory={expense.valuesByRole?.accountAdmin?.accountingCategory}
+      valuesByRole={expense.valuesByRole}
       showCode={showCodeInSelect}
+      predictionStyle="inline"
       onChange={async selectedCategory => {
         try {
           await editExpense({
@@ -78,6 +82,7 @@ const AdminAccountingCategoryPill = ({
 export const AccountingCategoryPill = ({
   expense,
   host,
+  account,
   canEdit,
   allowNone,
   showCodeInSelect = false,
@@ -88,6 +93,7 @@ export const AccountingCategoryPill = ({
     return (
       <AdminAccountingCategoryPill
         expense={expense}
+        account={account}
         host={host}
         allowNone={allowNone}
         showCodeInSelect={showCodeInSelect}

@@ -22,6 +22,10 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
         type
         url
       }
+      location {
+        id
+        country
+      }
       tags
       company
       type
@@ -100,6 +104,10 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
         name
         slug
         type
+        location {
+          id
+          country
+        }
         settings
         plan {
           id

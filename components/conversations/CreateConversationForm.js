@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
@@ -113,6 +113,15 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
     }
   }, [values.title, values.html, values.tags]);
 
+  const onChangeTags = useCallback(
+    options =>
+      setFieldValue(
+        'tags',
+        options.map(el => el.value),
+      ),
+    [setFieldValue],
+  );
+
   return (
     <form onSubmit={handleSubmit}>
       <Flex flexWrap="wrap">
@@ -182,11 +191,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
                   {...getFieldProps('tags')}
                   maxWidth={300}
                   suggestedTags={suggestedTags}
-                  onChange={options => {
-                    const tags = [];
-                    options && options.length > 0 ? options.map(option => tags.push(option.value)) : [];
-                    setFieldValue('tags', tags);
-                  }}
+                  onChange={onChangeTags}
                 />
               )}
             </Box>

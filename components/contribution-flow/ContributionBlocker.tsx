@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { FEATURES } from '../../lib/allowed-features';
-import { canContributeRecurring } from '../../lib/collective.lib';
+import { canContributeRecurring } from '../../lib/collective';
 import { isTierExpired } from '../../lib/tier-utils';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 

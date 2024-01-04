@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { checkUserExistence, signin } from '../../lib/api';
 import { i18nGraphqlException } from '../../lib/errors';
@@ -12,13 +11,12 @@ import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { getWebsiteUrl } from '../../lib/utils';
 
 import { Flex } from '../Grid';
+import Image from '../Image';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledLink from '../StyledLink';
 import { H4, P } from '../Text';
 import { useToast } from '../ui/useToast';
-
-import pidgeon from '../../public/static/images/pidgeon.png';
 
 const resendDraftExpenseInviteMutation = gql`
   mutation ResendDraftExpenseInvite($expense: ExpenseReferenceInput!) {
@@ -26,11 +24,6 @@ const resendDraftExpenseInviteMutation = gql`
       id
     }
   }
-`;
-
-const PidgeonIllustration = styled.img.attrs({ src: pidgeon })`
-  width: 132px;
-  height: 132px;
 `;
 
 const ResendDraftInviteButton = ({ expense }) => {
@@ -118,7 +111,7 @@ const ExpenseInviteNotificationBanner = props => {
   return (
     <StyledCard py={3} px="26px" mb={4} borderStyle={'solid'} data-cy="expense-draft-banner">
       <Flex flexDirection={['column', null, 'row']} alignItems="center">
-        <PidgeonIllustration alt="" />
+        <Image alt="" src="/static/images/pidgeon.png" width={132} height={132} />
         <Flex ml={[0, 2]} maxWidth="448px" flexDirection="column">
           <H4 mb="10px" fontWeight="500">
             {props.createdUser ? (

@@ -210,6 +210,13 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
       instanceId: instanceId ? instanceId : inputId,
       theme: selectTheme,
       styles: {
+        valueContainer: baseStyles => {
+          if (styles?.valueContainer) {
+            return { ...baseStyles, ...styles.valueContainer };
+          } else {
+            return baseStyles;
+          }
+        },
         control: (baseStyles, state) => {
           const customStyles: Record<string, unknown> = { borderColor: theme.colors.black[300] };
 
@@ -302,6 +309,13 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
           ...baseStyles,
           zIndex: 99999,
         }),
+        input: baseStyles => {
+          if (styles?.input) {
+            return { ...baseStyles, ...styles.input };
+          } else {
+            return baseStyles;
+          }
+        },
       },
     };
   },
@@ -343,6 +357,7 @@ export type StyledSelectProps = LayoutProps &
     closeMenuOnSelect?: boolean;
     hideSelectedOptions?: boolean;
     isMulti?: boolean;
+    onInputChange?: Function;
   };
 
 type StyledSelectCustomComponent = Select & React.ExoticComponent<StyledSelectProps>;

@@ -7,7 +7,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { itemHasOCR } from '../components/expenses/lib/ocr';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { expenseSubmissionAllowed, getCollectivePageMetadata, getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { expenseSubmissionAllowed, getCollectivePageMetadata, getCollectiveTypeForUrl } from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
@@ -271,7 +271,7 @@ class CreateExpensePage extends React.Component {
       const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
       await this.props.router.push({
         pathname: `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
-        query: pick(this.props.router.query, ['ocr']),
+        query: pick(this.props.router.query, ['ocr', 'mockImageUpload']),
       });
       toast({
         variant: 'success',

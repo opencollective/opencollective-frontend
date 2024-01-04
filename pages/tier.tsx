@@ -4,7 +4,7 @@ import { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getCollectivePageMetadata } from '../lib/collective';
 import { CollectiveType } from '../lib/constants/collectives';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../lib/url-helpers';
@@ -78,7 +78,7 @@ export const getServerSideProps = tierPageQueryHelpers.getServerSideProps;
 const TierPage = (pageProps: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
-  const { tierId, tierSlug, redirect } = pageProps;
+  const { collectiveSlug, tierId, tierSlug, redirect } = pageProps;
   const { data, error, loading } = tierPageQueryHelpers.useQuery(pageProps);
   const collective = data?.Tier?.collective;
 
@@ -88,9 +88,15 @@ const TierPage = (pageProps: InferGetServerSidePropsType<typeof getServerSidePro
     }
   }, [collective]);
 
-  return !data?.Tier || !data.Tier.collective || error ? (
-    <ErrorPage data={error || data} />
-  ) : (
+  if (!loading) {
+    if (error) {
+      return <ErrorPage data={data} error={error} />;
+    } else if (!data?.Tier || !collective || collectiveSlug !== collective.slug) {
+      return <ErrorPage data={data} error={{ type: 'NOT_FOUND' }} />;
+    }
+  }
+
+  return (
     <Page collective={collective} {...getPageMetaData(pageProps, data)}>
       {loading ? (
         <div className="py-16 sm:py-32">
