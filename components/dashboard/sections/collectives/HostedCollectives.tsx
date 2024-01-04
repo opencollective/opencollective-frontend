@@ -111,6 +111,19 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
     context: API_V2_CONTEXT,
   });
 
+  const pushSubpath = subpath => {
+    router.push(
+      {
+        pathname: compact([router.pathname, router.query.slug, router.query.section, subpath]).join('/'),
+        query: omit(router.query, ['slug', 'section', 'subpath']),
+      },
+      undefined,
+      {
+        shallow: true,
+      },
+    );
+  };
+
   const views = [
     {
       id: 'all',
@@ -154,20 +167,19 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   });
 
   useEffect(() => {
-    const id = typeof showCollectiveOverview === 'string' ? showCollectiveOverview : showCollectiveOverview?.id;
-    router.replace(
-      {
-        pathname: compact([router.pathname, router.query.slug, router.query.section, id]).join('/'),
-        query: omit(router.query, ['slug', 'section', 'subpath']),
-      },
-      undefined,
-      {
-        shallow: true,
-      },
-    );
-    // We don't want to use router as a dependency here because useQueryFilter will cause undesired re-renders
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showCollectiveOverview]);
+    if (subpath[0] !== ((showCollectiveOverview as Collective)?.id || showCollectiveOverview)) {
+      handleDrawer(subpath[0] || null);
+    }
+  }, [subpath]);
+
+  const handleDrawer = (collective: Collective | string | null) => {
+    if (collective) {
+      pushSubpath(typeof collective === 'string' ? collective : collective.id);
+    } else {
+      pushSubpath(null);
+    }
+    setShowCollectiveOverview(collective);
+  };
 
   const handleEdit = () => {
     refetchMetadata();
@@ -196,7 +208,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
             loading={loading}
             mobileTableView
             compact
-            meta={{ intl, openCollectiveDetails: setShowCollectiveOverview, onEdit: handleEdit, host: data?.host }}
+            meta={{ intl, openCollectiveDetails: handleDrawer, onEdit: handleEdit, host: data?.host }}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination
@@ -211,7 +223,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
 
       <Drawer
         open={Boolean(showCollectiveOverview)}
-        onClose={() => setShowCollectiveOverview(null)}
+        onClose={() => handleDrawer(null)}
         className={'max-w-2xl'}
         showActionsContainer
         showCloseButton
@@ -221,8 +233,8 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
             collective={isString(showCollectiveOverview) ? null : showCollectiveOverview}
             collectiveId={isString(showCollectiveOverview) ? showCollectiveOverview : null}
             host={data?.host}
-            onCancel={() => setShowCollectiveOverview(null)}
-            openCollectiveDetails={setShowCollectiveOverview}
+            onCancel={() => handleDrawer(null)}
+            openCollectiveDetails={handleDrawer}
             loading={loading}
             onEdit={handleEdit}
           />
