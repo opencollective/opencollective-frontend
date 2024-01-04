@@ -887,6 +887,7 @@ class ContributionFlow extends React.Component {
     const currency = tier?.amount.currency || collective.currency;
     const currentStepName = this.getCurrentStepName();
 
+    console.log({ currentStepName });
     if (currentStepName === STEPS.SUCCESS) {
       return <ContributionFlowSuccess collective={collective} />;
     }
