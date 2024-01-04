@@ -16,7 +16,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { display } from 'styled-system';
 
-import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
+import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective';
 import { getFilteredSectionsForCollective, isSectionEnabled } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
@@ -398,7 +398,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
         <Link
           href={
             LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-              ? getDashboardRoute(collective, 'manage-contributions')
+              ? getDashboardRoute(collective, 'outgoing-contributions')
               : `${getCollectivePageRoute(collective)}/manage-contributions`
           }
         >
@@ -645,20 +645,18 @@ const CollectiveNavbar = ({
                     LoggedInUser={LoggedInUser}
                   />
                 )}
-                {!onlyInfos && (
-                  <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
-                    {isExpanded ? (
-                      <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
-                    ) : (
-                      <ExpandMenuIcon
-                        onClick={() => {
-                          mainContainerRef.current?.scrollIntoView(true);
-                          setExpanded(!isExpanded);
-                        }}
-                      />
-                    )}
-                  </Container>
-                )}
+                <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
+                  {isExpanded ? (
+                    <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                  ) : (
+                    <ExpandMenuIcon
+                      onClick={() => {
+                        mainContainerRef.current?.scrollIntoView(true);
+                        setExpanded(!isExpanded);
+                      }}
+                    />
+                  )}
+                </Container>
               </Container>
             </Container>
           )}

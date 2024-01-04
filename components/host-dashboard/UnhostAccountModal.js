@@ -127,7 +127,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
                     successMsgArgs,
                   ),
                 });
-                props?.onClose();
+                props.onClose();
               } catch (e) {
                 toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }

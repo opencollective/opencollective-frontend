@@ -168,6 +168,28 @@ export const expenseHostFields = gql`
   ${accountingCategoryFields}
 `;
 
+export const expenseValuesByRoleFragment = gql`
+  fragment ExpenseValuesByRoleFragment on ExpenseValuesByRole {
+    id
+    submitter {
+      accountingCategory {
+        ...AccountingCategoryFields
+      }
+    }
+    accountAdmin {
+      accountingCategory {
+        ...AccountingCategoryFields
+      }
+    }
+    hostAdmin {
+      accountingCategory {
+        ...AccountingCategoryFields
+      }
+    }
+  }
+  ${accountingCategoryFields}
+`;
+
 export const expensePageExpenseFieldsFragment = gql`
   fragment ExpensePageExpenseFields on Expense {
     id
@@ -187,18 +209,7 @@ export const expensePageExpenseFieldsFragment = gql`
     }
     valuesByRole {
       id
-      submitter {
-        accountingCategory {
-          id
-          ...AccountingCategoryFields
-        }
-      }
-      accountAdmin {
-        accountingCategory {
-          id
-          ...AccountingCategoryFields
-        }
-      }
+      ...ExpenseValuesByRoleFragment
     }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
@@ -221,6 +232,22 @@ export const expensePageExpenseFieldsFragment = gql`
       incurredAt
       description
       amount
+      amountV2 {
+        valueInCents
+        currency
+        exchangeRate {
+          date
+          value
+          source
+          fromCurrency
+          toCurrency
+        }
+      }
+      referenceExchangeRate {
+        value
+        fromCurrency
+        toCurrency
+      }
       url
       file {
         id
@@ -573,6 +600,7 @@ export const expensePageExpenseFieldsFragment = gql`
   ${collectiveNavbarFieldsFragment}
   ${accountingCategoryFields}
   ${accountHoverCardFields}
+  ${expenseValuesByRoleFragment}
 `;
 
 export const expensesListFieldsFragment = gql`
@@ -593,18 +621,7 @@ export const expensesListFieldsFragment = gql`
     }
     valuesByRole {
       id
-      submitter {
-        accountingCategory {
-          id
-          ...AccountingCategoryFields
-        }
-      }
-      accountAdmin {
-        accountingCategory {
-          id
-          ...AccountingCategoryFields
-        }
-      }
+      ...ExpenseValuesByRoleFragment
     }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
@@ -710,6 +727,7 @@ export const expensesListFieldsFragment = gql`
     }
   }
   ${accountingCategoryFields}
+  ${expenseValuesByRoleFragment}
   ${accountHoverCardFields}
 `;
 

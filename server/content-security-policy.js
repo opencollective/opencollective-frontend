@@ -34,6 +34,7 @@ const COMMON_DIRECTIVES = {
     process.env.API_URL,
     process.env.PDF_SERVICE_URL,
     process.env.REST_URL,
+    process.env.ML_SERVICE_URL,
     'wtfismyip.com',
     '*.paypal.com',
     '*.paypalobjects.com',

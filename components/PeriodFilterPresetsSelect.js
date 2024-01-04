@@ -115,7 +115,7 @@ PeriodFilterPresetsSelect.propTypes = {
   }).isRequired,
   formatDateFn: PropTypes.func,
   width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  SelectComponent: PropTypes.elementType.isRequired,
+  SelectComponent: PropTypes.elementType,
   styles: PropTypes.object,
 };
 

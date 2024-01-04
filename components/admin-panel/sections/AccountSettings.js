@@ -152,7 +152,7 @@ const AccountSettings = ({ account, section }) => {
         message: <FormattedMessage id="Settings.Updated" defaultMessage="Settings updated." />,
       });
     } catch (err) {
-      const errorMsg = getErrorFromGraphqlException(err)?.message || (
+      const errorMsg = getErrorFromGraphqlException(err).message || (
         <FormattedMessage id="Settings.Updated.Fail" defaultMessage="Update failed." />
       );
       toast({

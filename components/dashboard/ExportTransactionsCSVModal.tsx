@@ -225,7 +225,7 @@ const ExportTransactionsCSVModal = ({
           <Filterbar {...queryFilter} filters={omit(queryFilter.filters, 'orderBy')} views={null} hideSeparator />
         </div>
 
-        {parseToBoolean(getEnvVar('LEDGER_SEPARATE_PAYMENT_PROCESSOR_FEES')) && (
+        {parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES')) && (
           <StyledInputField
             label={<FormattedMessage defaultMessage="CSV Version" />}
             labelFontWeight="500"

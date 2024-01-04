@@ -194,7 +194,7 @@ class UpdatePaymentPage extends React.Component {
 
     const orders = data.PaymentMethod?.orders || [];
     const hasForm = showCreditCardForm && Boolean(data.PaymentMethod);
-    const contributingAccount = orders?.[0]?.fromCollective || LoggedInUser.collective;
+    const contributingAccount = orders[0]?.fromCollective || LoggedInUser.collective;
     return (
       <div className="UpdatedPaymentMethodPage">
         <Page>

@@ -5,6 +5,7 @@ node_modules
 npm-debug.log.*
 ./report.*.json
 *.log
+logs
 yarn.lock
 .DS_Store
 build
@@ -12,6 +13,7 @@ coverage
 .nyc_output
 test/cypress/screenshots
 test/cypress/videos
+test/cypress/downloads
 dist
 stage
 *.swp

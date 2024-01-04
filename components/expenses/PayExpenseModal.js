@@ -469,12 +469,12 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
                   <LoadingPlaceholder height="16px" />
                 ) : (
                   <FormattedMoneyAmount
-                    amount={amounts.paymentProcessorFee?.valueInCents}
-                    currency={amounts.paymentProcessorFee?.currency}
+                    amount={amounts.paymentProcessorFee.valueInCents}
+                    currency={amounts.paymentProcessorFee.currency}
                     currencyCodeStyles={{ color: 'black.500' }}
                     amountStyles={{
-                      fontWeight: amounts.paymentProcessorFee ? 500 : 400,
-                      color: amounts.paymentProcessorFee ? 'black.900' : 'black.400',
+                      fontWeight: 500,
+                      color: 'black.900',
                     }}
                   />
                 )}
@@ -501,7 +501,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error, 
               )}
             </Amount>
           </AmountLine>
-          {amounts?.effectiveRate ? (
+          {amounts.effectiveRate ? (
             <AmountLine py={0}>
               <Label color="black.600" fontWeight="500">
                 <FormattedMessage defaultMessage="Currency exchange rate" />

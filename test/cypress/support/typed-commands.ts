@@ -21,7 +21,7 @@ Cypress.Commands.add('retryChain', function <
     try {
       assert(subject);
     } catch (e) {
-      if (attempts >= options.maxAttempts ?? 10) {
+      if (attempts >= (options.maxAttempts ?? 10)) {
         throw e;
       }
       cy.wait(options.wait ?? 1000);

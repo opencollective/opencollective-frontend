@@ -9,7 +9,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { upload } from '../../../lib/api';
-import { isIndividualAccount } from '../../../lib/collective.lib';
+import { isIndividualAccount } from '../../../lib/collective';
 import { AVATAR_HEIGHT_RANGE, AVATAR_WIDTH_RANGE } from '../../../lib/constants/collectives';
 import { editCollectiveAvatarMutation } from '../../../lib/graphql/v1/mutations';
 import { getAvatarBorderRadius } from '../../../lib/image-utils';

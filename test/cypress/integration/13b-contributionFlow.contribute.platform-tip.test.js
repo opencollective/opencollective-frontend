@@ -26,6 +26,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
     cy.getByDataCy('ContributionSummary-TodaysCharge').should('contain', '$57.50 USD');
 
     // Switch to the 10% percentage preset
+    cy.contains('Edit').click();
     cy.contains('[data-cy="platform-tip-options"] button', '10%').click();
     cy.contains('[data-cy="platform-tip-options"] button', '10%').should('have.class', 'selected');
     cy.getByDataCy('ContributionSummary-Tip').should('contain', '$5.00 USD');
@@ -82,7 +83,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
       });
 
     // ---- Opt out ----
-    cy.contains('[data-cy="platform-tip-options"] button', 'No thank you').click();
+    cy.contains(`I don't want to contribute to Open Collective`).click();
 
     // Removes the tip
     cy.getByDataCy('ContributionSummary-Tip').should('not.exist');

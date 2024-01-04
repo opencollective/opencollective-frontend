@@ -227,9 +227,11 @@ const CreateCollectiveMiniForm = ({
         errors.members = [{ member: { email: formatMessage(msg.invalidEmail) } }];
       }
       if (!get(values, 'members[0].member.name')) {
-        errors.members
-          ? (errors.members[0].member.name = formatMessage(msg.invalidName))
-          : [{ member: { name: formatMessage(msg.invalidName) } }];
+        if (!errors.members) {
+          errors.members = [{ member: { name: formatMessage(msg.invalidName) } }];
+        } else {
+          errors.members[0].member.name = formatMessage(msg.invalidName);
+        }
       }
     } else if (isUser) {
       if (!values.email || !isValidEmail(values.email)) {

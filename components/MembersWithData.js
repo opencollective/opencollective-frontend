@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import classNames from 'classnames';
+import clsx from 'clsx';
 import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -116,7 +116,7 @@ class MembersWithData extends React.Component {
             <Member
               key={member.id}
               member={member}
-              className={classNames(this.props.className, size)}
+              className={clsx(this.props.className, size)}
               collective={collective}
               viewMode={viewMode}
               LoggedInUser={LoggedInUser}

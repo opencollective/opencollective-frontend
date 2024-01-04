@@ -49,7 +49,7 @@ const transactionQuery = gql`
         valueInCents
         currency
       }
-      paymentProcessorFee {
+      paymentProcessorFee(fetchPaymentProcessorFee: true) {
         valueInCents
         currency
       }
@@ -61,7 +61,7 @@ const transactionQuery = gql`
         valueInCents
         currency
       }
-      taxAmount {
+      taxAmount(fetchTax: true) {
         valueInCents
         currency
       }
@@ -283,7 +283,6 @@ export function TransactionDrawer({
       [CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP].includes(transaction?.kind) &&
       transaction?.paymentMethod);
 
-  transaction?.permissions.canReject && !transaction?.isRejected;
   const showRefundButton = showActions && transaction?.permissions.canRefund && !transaction?.isRefunded;
   const showRejectButton = showActions && transaction?.permissions.canReject && !transaction?.isRejected;
   const showDownloadInvoiceButton =

@@ -6,7 +6,7 @@ import { NextRouter, withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-intl';
 import styled from 'styled-components';
 
-import { getCollectivePageMetadata, getSuggestedTags, isIndividualAccount } from '../lib/collective.lib';
+import { getCollectivePageMetadata, getSuggestedTags, isIndividualAccount } from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
@@ -205,7 +205,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
                   )}
                 </Box>
                 <Box mt={['16px', '46px']}>
-                  {!data?.loading && !data.expenses?.nodes.length ? (
+                  {!data.loading && !data.expenses?.nodes.length ? (
                     <MessageBox type="info" withIcon data-cy="zero-expense-message">
                       {hasFilters ? (
                         <FormattedMessage
@@ -226,7 +226,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
                   ) : (
                     <React.Fragment>
                       <ExpensesList
-                        isLoading={Boolean(data?.loading)}
+                        isLoading={Boolean(data.loading)}
                         collective={data.account}
                         expenses={data.expenses?.nodes}
                         nbPlaceholders={data.variables.limit}

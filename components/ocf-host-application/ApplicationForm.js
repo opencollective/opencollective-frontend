@@ -10,7 +10,7 @@ import { get, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { suggestSlug } from '../../lib/collective.lib';
+import { suggestSlug } from '../../lib/collective';
 import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../lib/constants/collectives';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
@@ -397,7 +397,7 @@ const ApplicationForm = ({
                               {({ field }) => (
                                 <StyledInputGroup
                                   prepend="opencollective.com/"
-                                  type="url"
+                                  type="text"
                                   placeholder="agora"
                                   {...field}
                                   onChange={e => setFieldValue('collective.slug', e.target.value)}

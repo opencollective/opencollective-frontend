@@ -188,9 +188,9 @@ const NotificationsSettings = ({ accountSlug, subpath }) => {
   });
 
   const accounts = data?.account.memberOf.nodes.map(member => member.account) || [];
-  const hosts = accounts?.filter(a => !!a.host);
-  const orgs = accounts?.filter(a => a.type === 'ORGANIZATION' && !a.host);
-  const collectives = accounts?.filter(a => a.type === 'COLLECTIVE');
+  const hosts = accounts.filter(a => !!a.host);
+  const orgs = accounts.filter(a => a.type === 'ORGANIZATION' && !a.host);
+  const collectives = accounts.filter(a => a.type === 'COLLECTIVE');
 
   const backedAccounts =
     data?.account.backerOf.nodes

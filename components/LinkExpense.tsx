@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { getCollectiveTypeForUrl } from '../lib/collective';
 
 import Link from './Link';
 

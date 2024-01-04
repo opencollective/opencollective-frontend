@@ -157,7 +157,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                             }
                             style={{
                               imageStyle: { minHeight: '0', minWidth: '0', maxHeight: 'none', maxWidth: 'none' },
-                              containerStyle: { cursor: hasImage ? 'move' : 'auto' },
+                              containerStyle: { cursor: 'move' },
                             }}
                           />
                         </StyledHeroBackground>

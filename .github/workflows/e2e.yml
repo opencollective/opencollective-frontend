@@ -8,6 +8,8 @@ env:
   OC_ENV: ci
   NODE_ENV: test
   WEBSITE_URL: http://localhost:3000
+  IMAGES_URL: http://localhost:3001
+  PDF_SERVICE_URL: http://localhost:3002
   API_URL: http://localhost:3060
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
   CI: true
@@ -15,7 +17,6 @@ env:
   E2E_TEST: 1
   PGHOST: localhost
   PGUSER: postgres
-  IMAGES_URL: http://localhost:3001
   CYPRESS_RECORD: false
   CYPRESS_VIDEO: false
   CYPRESS_VIDEO_UPLOAD_ON_PASSES: false
@@ -25,6 +26,7 @@ env:
   FRONTEND_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend
   API_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-api
   IMAGES_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-images
+  PDF_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-pdf
   TERM: xterm
   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   STRIPE_WEBHOOK_KEY: ${{ secrets.STRIPE_WEBHOOK_KEY }}
@@ -129,6 +131,12 @@ jobs:
           repository: opencollective/opencollective-images
           path: opencollective-images
 
+      - name: Checkout (PDF)
+        uses: actions/checkout@v4
+        with:
+          repository: opencollective/opencollective-pdf
+          path: opencollective-pdf
+
       # Prepare API
 
       - name: Restore node_modules (api)
@@ -163,6 +171,24 @@ jobs:
 
       - name: Build (images)
         working-directory: opencollective-images
+        run: npm run build
+
+      # Prepare PDF
+
+      - name: Restore node_modules (pdf)
+        uses: actions/cache@v3
+        id: pdf-node-modules
+        with:
+          path: opencollective-pdf/node_modules
+          key: ${{ runner.os }}-pdf-node-modules-${{ hashFiles('opencollective-pdf/package-lock.json') }}
+
+      - name: Install dependencies (pdf)
+        working-directory: opencollective-pdf
+        if: steps.pdf-node-modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Build (pdf)
+        working-directory: opencollective-pdf
         run: npm run build
 
       # Prepare Frontend
@@ -210,13 +236,18 @@ jobs:
         if: steps.next-build.outputs.cache-hit != 'true'
         run: npm run build
 
+      # Seed DB
+
       - name: Setup DB
         run: ./scripts/setup_db.sh
+
+      # Run tests
 
       - name: Run E2E with Cypress
         run: ./scripts/run_e2e_tests.sh
         env:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
+
       - name: Archive test recordings
         uses: actions/upload-artifact@v3
         with:
@@ -224,6 +255,13 @@ jobs:
           path: |
             test/cypress/screenshots
             test/cypress/videos
+        if: ${{ failure() }}
+
+      - name: Archive download folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: downloads
+          path: test/cypress/downloads
         if: ${{ failure() }}
 
       - name: Report Coverage

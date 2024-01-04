@@ -19,6 +19,17 @@ export function WhyPlatformTipModal(props: WhyPlatformTipModalProps) {
         </Flex>
       </ModalHeader>
       <ModalBody>
+        <div className="relative">
+          <Image
+            alt="Open Collective Team"
+            src="/static/images/oc-team-2023.png"
+            width="440"
+            height="293"
+            style={{
+              borderRadius: '25px',
+            }}
+          />
+        </div>
         <P mt={3} fontSize="16px" lineHeight="24px">
           <FormattedMessage
             defaultMessage="At Open Collective, we work every day to make sure that our platform is a safe and simple place for collectives to grow.<br></br>This includes introducing new and exciting features, fixing bugs, and making sure that it works the way our users expect.<br></br>Your platform tip will go towards helping us maintain that work - and ensuring that collectives all over the world have access to the tools they need to make communities better, and make change happen."
@@ -33,7 +44,7 @@ export function WhyPlatformTipModal(props: WhyPlatformTipModalProps) {
           />
         </P>
         <P mt={3} fontSize="16px" lineHeight="24px" fontWeight="800">
-          <FormattedMessage defaultMessage="Consider adding a tip to your contribution today?" />
+          <FormattedMessage defaultMessage="Collectives use Open Collective's crowdfunding technology for free! We have a 0% platform fee on incoming funds." />
         </P>
       </ModalBody>
     </StyledModal>

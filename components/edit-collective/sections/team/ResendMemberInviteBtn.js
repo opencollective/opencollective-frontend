@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { getLegacyIdForCollective } from '../../../../lib/collective.lib';
+import { getLegacyIdForCollective } from '../../../../lib/collective';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 

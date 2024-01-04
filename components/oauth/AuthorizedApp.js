@@ -5,7 +5,7 @@ import { isEmpty, startCase } from 'lodash';
 import { AlertTriangle } from 'lucide-react';
 import { FormattedMessage, FormattedRelativeTime, useIntl } from 'react-intl';
 
-import { isIndividualAccount } from '../../lib/collective.lib';
+import { isIndividualAccount } from '../../lib/collective';
 import dayjs from '../../lib/dayjs';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';

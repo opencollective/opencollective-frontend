@@ -4,7 +4,7 @@ import { clsx } from 'clsx';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { isHostAccount, isIndividualAccount } from '../lib/collective.lib';
+import { isHostAccount, isIndividualAccount } from '../lib/collective';
 import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLocalStorage from '../lib/hooks/useLocalStorage';
@@ -210,7 +210,7 @@ const DashboardPage = () => {
                   </Link>
                 )}
               </MessageBox>
-              {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
+              {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
             </div>
           ) : !useDynamicTopBar ? (
             <div

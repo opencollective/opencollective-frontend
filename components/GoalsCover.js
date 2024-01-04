@@ -22,8 +22,7 @@ const GoalContainer = styled.div`
   transition: width 3s;
   height: 25px;
   color: ${props => props.theme.colors.black[700]};
-  border-right: 1px solid
-    ${props => (props.goal.isReached ? getProgressColor(props.theme) : getEmptyProgressColor(props.theme))};
+  border-right: 1px solid ${props => (props.goal.isReached ? getProgressColor(props.theme) : getEmptyProgressColor())};
   width: ${props => `${props.goal.progress * 100}%`};
   z-index: ${props => (['balance', 'yearlyBudget'].includes(props.goal.slug) ? 310 : (20 - props.index) * 10)};
   transition: ${props =>
@@ -74,7 +73,7 @@ const GoalContainer = styled.div`
   ${props =>
     props.goal.position === 'above' &&
     css`
-      border-bottom: 4px solid ${getEmptyProgressColor(props.theme)};
+      border-bottom: 4px solid ${getEmptyProgressColor()};
       top: auto;
       bottom: 76px;
 
