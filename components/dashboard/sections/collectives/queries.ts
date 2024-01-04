@@ -249,6 +249,7 @@ export const hostedCollectivesQuery = gql`
     $hostSlug: String!
     $limit: Int!
     $offset: Int!
+    $orderBy: OrderByInput
     $hostFeesStructure: HostFeeStructure
     $searchTerm: String
     $type: [AccountType]
@@ -277,6 +278,7 @@ export const hostedCollectivesQuery = gql`
         searchTerm: $searchTerm
         hostFeesStructure: $hostFeesStructure
         accountType: $type
+        orderBy: $orderBy
         isApproved: $isApproved
         isFrozen: $isFrozen
         isUnhosted: $isUnhosted
