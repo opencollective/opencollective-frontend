@@ -133,7 +133,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const collective = row.original;
       const { onEdit, host } = table.options.meta as any;
       return (
-        host.id === collective.host?.id && (
+        host?.id === collective.host?.id && (
           <div className="row flex w-min items-center self-end">
             <MoreActionsMenu collective={collective} onEdit={onEdit}>
               <TableActionsButton className="h-8 w-8">

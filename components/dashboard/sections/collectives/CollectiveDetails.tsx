@@ -298,7 +298,7 @@ const CollectiveDetails = ({
     skip: Boolean(c),
   });
   const collective = c || data?.account;
-  const isHostedCollective = collective?.host?.id === host.id;
+  const isHostedCollective = collective?.host?.id === host?.id;
   const isLoading = loading || loadingCollectiveInfo;
 
   const children = groupBy(collective?.childrenAccounts?.nodes, 'type');
@@ -339,8 +339,13 @@ const CollectiveDetails = ({
       ) : (
         <React.Fragment>
           <SectionTitle>
-            <Avatar collective={collective} radius={48} />
-            {collective.name}
+            <LinkCollective
+              collective={collective}
+              className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
+            >
+              <Avatar collective={collective} radius={48} />
+              {collective.name}
+            </LinkCollective>
           </SectionTitle>
           <InfoList className="sm:grid-cols-2">
             <InfoListItem
