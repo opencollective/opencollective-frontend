@@ -9,22 +9,27 @@ import { ExpenseFormValues, ExpenseItemFormValues } from '../types/FormValues';
 /**
  * When building expenses from drafts, amounts are returned in the database format.
  */
-const getAmountV2FromNewAttrs = (attrs, expenseCurrency: string): ExpenseItemFormValues['amountV2'] | undefined => {
+export const getExpenseItemAmountV2FromNewAttrs = (
+  attrs,
+  expenseCurrency: string,
+): ExpenseItemFormValues['amountV2'] | undefined => {
   if (attrs['amountV2']) {
     return attrs['amountV2'];
   } else if (attrs['amount']) {
     return {
-      value: attrs['amount'],
+      valueInCents: attrs['amount'],
+      value: attrs['amount'] / 100,
       currency: attrs['currency'] || expenseCurrency,
-      exchangeRate: attrs['expenseCurrencyFxRate']
-        ? {
-            value: attrs['expenseCurrencyFxRate'],
-            source: attrs['expenseCurrencyFxRateSource'],
-            fromCurrency: attrs['currency'],
-            toCurrency: attrs['currency'],
-            date: attrs['incurredAt'],
-          }
-        : null,
+      exchangeRate:
+        attrs['expenseCurrencyFxRate'] && attrs['expenseCurrencyFxRate'] !== 1
+          ? {
+              value: attrs['expenseCurrencyFxRate'],
+              source: attrs['expenseCurrencyFxRateSource'],
+              fromCurrency: attrs['currency'],
+              toCurrency: attrs['currency'],
+              date: attrs['incurredAt'],
+            }
+          : null,
     };
   }
 };
@@ -40,7 +45,7 @@ export const newExpenseItem = (attrs = {}, expenseCurrency: string): ExpenseItem
   __isNew: true,
   __isUploading: false,
   ...omit(attrs, ['amount', 'amountV2']),
-  amountV2: getAmountV2FromNewAttrs(attrs, expenseCurrency),
+  amountV2: getExpenseItemAmountV2FromNewAttrs(attrs, expenseCurrency),
 });
 
 /**
