@@ -121,7 +121,10 @@ export const prepareExpenseItemForSubmit = (expenseData, item) => {
   const incurredAtFullDate = item.incurredAt || new Date().toISOString().split('T')[0];
   const incurredAt = standardizeIncurredAt(incurredAtFullDate);
   return {
+    id: item.__isNew ? undefined : item.id, // Omit item's ids that were created for keying purposes
     incurredAt,
+    description: item.description,
+    url: expenseItemsMustHaveFiles(expenseData.type) ? item.url : null, // never submit URLs for invoices or requests
     amountV2: {
       ...pick(item.amountV2, ['valueInCents', 'currency']),
       exchangeRate: item.amountV2.exchangeRate && {
@@ -129,11 +132,6 @@ export const prepareExpenseItemForSubmit = (expenseData, item) => {
         date: item.amountV2.exchangeRate.date || incurredAt,
       },
     },
-    ...pick(item, [
-      ...(item.__isNew ? [] : ['id']), // Omit item's ids that were created for keying purposes
-      ...(expenseItemsMustHaveFiles(expenseData.type) ? ['url'] : []), // never submit URLs for invoices or requests
-      'description',
-    ]),
   };
 };
 

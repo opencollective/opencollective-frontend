@@ -160,7 +160,7 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Chart of Accounts',
   },
   [ALL_SECTIONS.TEAM]: {
-    id: 'ContributorsFilter.Core',
+    id: 'Team',
     defaultMessage: 'Team',
   },
   [ALL_SECTIONS.PAYMENT_METHODS]: {
