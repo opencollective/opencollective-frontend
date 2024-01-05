@@ -202,13 +202,14 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
         <React.Fragment>
           <DataTable
             data-cy="transactions-table"
-            innerClassName="text-xs text-muted-foreground"
+            innerClassName="text-muted-foreground"
             columns={[cols.collective, cols.team, cols.fee, cols.hostedSince, cols.balance, cols.actions]}
             data={hostedAccounts?.nodes || []}
             loading={loading}
             mobileTableView
             compact
             meta={{ intl, openCollectiveDetails: handleDrawer, onEdit: handleEdit, host: data?.host }}
+            onClickRow={row => handleDrawer(row.original)}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

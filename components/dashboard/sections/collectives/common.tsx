@@ -1,7 +1,7 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { groupBy, mapValues, toPairs } from 'lodash';
-import { Banknote, FilePlus2, Mail, MoreHorizontal, Pause, Unlink } from 'lucide-react';
+import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Unlink } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
 
@@ -31,9 +31,8 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'collective',
     header: () => <FormattedMessage id="Collective" defaultMessage="Collective" />,
     cell: ({ row, table }) => {
-      const { intl, openCollectiveDetails } = table.options.meta as {
+      const { intl } = table.options.meta as {
         intl: IntlShape;
-        openCollectiveDetails: (c: HostedCollectiveFieldsFragment) => void;
       };
       const collective = row.original;
       const children = mapValues(groupBy(collective.childrenAccounts?.nodes, 'type'), 'length');
@@ -41,27 +40,22 @@ export const cols: Record<string, ColumnDef<any, any>> = {
         .map(([type, count]) => count && `${count} ${formatCollectiveType(intl, type, count)}`)
         .join(', ');
       return (
-        <button onClick={() => openCollectiveDetails?.(collective)} className="flex items-center">
+        <div className="flex items-center">
           <Avatar collective={collective} radius={48} className="mr-4" />
           <div className="flex flex-col items-start">
-            <div className="text-sm">{collective.name}</div>
-            <div>{secondLine}</div>
+            <div className="text-sm text-foreground">{collective.name}</div>
+            <div className="text-xs">{secondLine}</div>
           </div>
-        </button>
+        </div>
       );
     },
   },
   childCollective: {
     accessorKey: 'collective',
     header: () => <FormattedMessage id="Fields.name" defaultMessage="Name" />,
-    cell: ({ row, table }) => {
+    cell: ({ row }) => {
       const collective = row.original;
-      const { openCollectiveDetails } = table.options.meta as any;
-      return (
-        <button onClick={() => openCollectiveDetails?.(collective)} className="text-sm">
-          {collective.name}
-        </button>
-      );
+      return <div className="text-sm">{collective.name}</div>;
     },
   },
   team: {
@@ -120,8 +114,13 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     cell: ({ row }) => {
       const balance = row.original.stats.balance;
       return (
-        <div className="text-sm">
-          <FormattedMoneyAmount amount={balance.valueInCents} currency={balance.currency} showCurrencyCode={false} />
+        <div className="font-medium text-foreground">
+          <FormattedMoneyAmount
+            amount={balance.valueInCents}
+            currency={balance.currency}
+            showCurrencyCode={false}
+            amountStyles={{}}
+          />
         </div>
       );
     },
@@ -131,11 +130,11 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     header: '',
     cell: ({ row, table }) => {
       const collective = row.original;
-      const { onEdit, host } = table.options.meta as any;
+      const { onEdit, host, openCollectiveDetails } = table.options.meta as any;
       return (
         host?.id === collective.host?.id && (
-          <div className="row flex w-min items-center self-end">
-            <MoreActionsMenu collective={collective} onEdit={onEdit}>
+          <div className="flex flex-1 items-center justify-end">
+            <MoreActionsMenu collective={collective} onEdit={onEdit} openCollectiveDetails={openCollectiveDetails}>
               <TableActionsButton className="h-8 w-8">
                 <MoreHorizontal className="relative h-3 w-3" aria-hidden="true" />
               </TableActionsButton>
@@ -151,10 +150,12 @@ export const MoreActionsMenu = ({
   collective,
   children,
   onEdit,
+  openCollectiveDetails,
 }: {
   collective: HostedCollectiveFieldsFragment & Partial<AccountWithHost>;
   children: React.ReactNode;
   onEdit?: () => void;
+  openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
 }) => {
   const [openModal, setOpenModal] = React.useState<
     null | 'ADD_FUNDS' | 'FREEZE' | 'UNHOST' | 'ADD_AGREEMENT' | 'CONTACT'
@@ -164,7 +165,16 @@ export const MoreActionsMenu = ({
     <React.Fragment>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-        <DropdownMenuContent className="min-w-[240px]">
+        <DropdownMenuContent className="min-w-[240px]" align="end">
+          {openCollectiveDetails && (
+            <React.Fragment>
+              <DropdownMenuItem className="cursor-pointer" onClick={() => openCollectiveDetails(collective)}>
+                <Eye className="mr-2" size="16" />
+                <FormattedMessage id="viewDetails" defaultMessage="View Details" />
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </React.Fragment>
+          )}
           <DropdownMenuItem className="cursor-pointer" onClick={() => setOpenModal('ADD_FUNDS')}>
             <Banknote className="mr-2" size="16" />
             <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
