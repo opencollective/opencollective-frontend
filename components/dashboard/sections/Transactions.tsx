@@ -200,7 +200,7 @@ const Transactions = ({ accountSlug }: DashboardSectionProps) => {
                 open={displayExportCSVModal}
                 setOpen={setDisplayExportCSVModal}
                 queryFilter={queryFilter}
-                accountSlug={accountSlug}
+                account={{ slug: accountSlug }}
                 trigger={
                   <DropdownMenuItem
                     onSelect={event => {

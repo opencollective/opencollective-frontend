@@ -1,6 +1,8 @@
 import React from 'react';
-import { flatten, isEmpty, omit } from 'lodash';
+import { gql, useMutation, useQuery } from '@apollo/client';
+import { flatten, isEmpty, keys, omit, xor } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+import slugify from 'slugify';
 
 import {
   AVERAGE_TRANSACTIONS_PER_MINUTE,
@@ -17,7 +19,12 @@ import {
   HOST_OMITTED_FIELDS,
 } from '../../lib/csv';
 import { getEnvVar } from '../../lib/env-utils';
-import { HostReportsPageQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import {
+  Account,
+  HostReportsPageQueryVariables,
+  TransactionsPageQueryVariables,
+} from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
@@ -37,6 +44,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../ui/Dialog';
+import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Separator } from '../ui/Separator';
 
@@ -44,29 +52,58 @@ import { Filterbar } from './filters/Filterbar';
 
 const env = process.env.OC_ENV;
 
+const getAccountSettingsQuery = gql`
+  query GetAccountSettings($slug: String!) {
+    account(slug: $slug) {
+      id
+      settings
+    }
+  }
+`;
+
+const editAccountSettingsMutation = gql`
+  mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
+    editAccountSetting(account: $account, key: $key, value: $value) {
+      id
+      settings
+    }
+  }
+`;
+
 type ExportTransactionsCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
   queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsPageQueryVariables>;
-  accountSlug?: string;
-  hostSlug?: string;
+  account?: Pick<Account, 'slug'>;
+  isHostReport?: boolean;
   trigger: React.ReactNode;
 };
 
 const ExportTransactionsCSVModal = ({
   open,
   setOpen,
-  accountSlug,
-  hostSlug,
+  account,
   trigger,
   queryFilter,
+  isHostReport,
 }: ExportTransactionsCSVModalProps) => {
-  const isHostReport = Boolean(hostSlug);
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
-  const [fieldOption, setFieldOption] = React.useState(FieldOptions[0].value);
+  const [fieldSet, setFieldSet] = React.useState(FieldOptions[0].value);
   const [csvVersion, setCsvVersion] = React.useState(CsvVersions[0].value);
   const [fieldGroups, setFieldGroups] = React.useState(FIELD_GROUPS);
+  const [fieldSetName, setFieldSetName] = React.useState('');
   const [fields, setFields] = React.useState(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
+
+  const { data: accountSettings } = useQuery(getAccountSettingsQuery, {
+    context: API_V2_CONTEXT,
+    variables: { slug: account?.slug },
+  });
+
+  const [submitEditSettings, { loading: isSavingFieldSet }] = useMutation(editAccountSettingsMutation, {
+    context: API_V2_CONTEXT,
+    refetchQueries: ['GetAccountSettings'],
+    awaitRefetchQueries: true,
+  });
 
   const {
     loading: isFetchingRows,
@@ -90,6 +127,18 @@ const ExportTransactionsCSVModal = ({
     { defaultData: 0 },
   );
 
+  const fieldSetOptions: Array<{ value: string; label: string; fields?: Array<string> }> = React.useMemo(() => {
+    const customFields = accountSettings?.account?.settings?.exportedTransactionsFieldSets;
+    return [
+      ...FieldOptions,
+      ...keys(customFields).map(key => ({
+        value: key,
+        label: customFields[key].name,
+        fields: customFields[key].fields,
+      })),
+    ];
+  }, [accountSettings]);
+
   const handleCsvVersionsChange = ({ value }) => {
     setCsvVersion(value);
     const defaultFields = value === CSV_VERSIONS.VERSION_2024 ? DEFAULT_FIELDS_2024 : DEFAULT_FIELDS;
@@ -97,11 +146,28 @@ const ExportTransactionsCSVModal = ({
     setFieldGroups(value === CSV_VERSIONS.VERSION_2024 ? FIELD_GROUPS_2024 : FIELD_GROUPS);
   };
 
-  const handleFieldOptionsChange = ({ value }) => {
-    setFieldOption(value);
-    if (value === FIELD_OPTIONS.DEFAULT) {
-      setFields(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
-    }
+  const handeSaveFieldSet = async () => {
+    const key = slugify(fieldSetName, { lower: true });
+    await submitEditSettings({
+      variables: {
+        account: { slug: account?.slug },
+        key: `exportedTransactionsFieldSets.${key}`,
+        value: { name: fieldSetName, fields: Object.keys(fields) },
+      },
+    });
+    setFieldSet(key);
+  };
+
+  const handleDeleteFieldSet = async () => {
+    const key = fieldSet;
+    await submitEditSettings({
+      variables: {
+        account: { slug: account?.slug },
+        key: `exportedTransactionsFieldSets`,
+        value: omit(accountSettings?.account?.settings.exportedTransactionsFieldSets, [key]),
+      },
+    });
+    setFieldSet(FIELD_OPTIONS.CUSTOM);
   };
 
   const handleFieldSwitch = ({ name, checked }) => {
@@ -122,8 +188,8 @@ const ExportTransactionsCSVModal = ({
 
   const getUrl = () => {
     const url = isHostReport
-      ? new URL(`${process.env.REST_URL}/v2/${hostSlug}/hostTransactions.csv`)
-      : new URL(`${process.env.REST_URL}/v2/${accountSlug}/transactions.csv`);
+      ? new URL(`${process.env.REST_URL}/v2/${account?.slug}/hostTransactions.csv`)
+      : new URL(`${process.env.REST_URL}/v2/${account?.slug}/transactions.csv`);
 
     url.searchParams.set('fetchAll', '1');
 
@@ -182,10 +248,22 @@ const ExportTransactionsCSVModal = ({
   };
 
   React.useEffect(() => {
+    const selectedSet = fieldSetOptions.find(option => option.value === fieldSet);
+    if (selectedSet && selectedSet.fields) {
+      setFields(selectedSet.fields.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
+      setFieldSetName(selectedSet.label);
+    } else if (fieldSet === FIELD_OPTIONS.DEFAULT) {
+      setFields(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
+    } else {
+      setFieldSetName('');
+    }
+  }, [fieldSetOptions, fieldSet]);
+
+  React.useEffect(() => {
     if (open) {
       fetchRows();
     }
-  }, [queryFilter.values, accountSlug, hostSlug, open]);
+  }, [queryFilter.values, account, open]);
 
   React.useEffect(() => {
     const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
@@ -198,7 +276,16 @@ const ExportTransactionsCSVModal = ({
             `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
     }
     setDownloadUrl(getUrl());
-  }, [fields, queryFilter.values, accountSlug, hostSlug]);
+  }, [fields, queryFilter.values, account]);
+
+  const isEditingExistingSet = React.useMemo(() => {
+    return (
+      fieldSetOptions.some(option => option.value === fieldSet) &&
+      fieldSet !== FIELD_OPTIONS.DEFAULT &&
+      fieldSet !== FIELD_OPTIONS.CUSTOM &&
+      xor(fieldSetOptions.find(option => option.value === fieldSet).fields, keys(fields)).length > 0
+    );
+  }, [fields, fieldSet]);
 
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
   const disabled = exportedRows > 100e3 || isFetchingRows;
@@ -206,7 +293,7 @@ const ExportTransactionsCSVModal = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="md:max-w-2xl">
         <DialogHeader>
           <DialogTitle>
             <FormattedMessage id="ExportTransactionsCSVModal.Title" defaultMessage="Export Transactions" />
@@ -218,6 +305,7 @@ const ExportTransactionsCSVModal = ({
             />
           </DialogDescription>
         </DialogHeader>
+
         <div>
           <p className="mb-2 font-medium">
             <FormattedMessage defaultMessage="Filters" />
@@ -254,7 +342,7 @@ const ExportTransactionsCSVModal = ({
         )}
 
         <StyledInputField
-          label={<FormattedMessage defaultMessage="Exported Fields" />}
+          label={<FormattedMessage defaultMessage="Exported Fields Set" />}
           labelFontWeight="500"
           labelProps={{ fontSize: '16px', letterSpacing: '0px' }}
           name="fieldOptions"
@@ -262,15 +350,15 @@ const ExportTransactionsCSVModal = ({
           {inputProps => {
             return (
               <Select
-                onValueChange={value => handleFieldOptionsChange({ value })}
-                defaultValue={FieldOptions.find(option => option.value === fieldOption).value}
+                onValueChange={value => setFieldSet(value)}
+                value={fieldSetOptions.find(option => option.value === fieldSet)?.value || FIELD_OPTIONS.CUSTOM}
                 {...inputProps}
               >
                 <SelectTrigger className="">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {FieldOptions.map(option => (
+                  {fieldSetOptions.map(option => (
                     <SelectItem value={option.value} key={option.value}>
                       {option.label}
                     </SelectItem>
@@ -281,8 +369,21 @@ const ExportTransactionsCSVModal = ({
           }}
         </StyledInputField>
 
+        {fieldSet === FIELD_OPTIONS.CUSTOM && (
+          <StyledInputField
+            label={<FormattedMessage defaultMessage="Field Set Name" />}
+            labelFontWeight="500"
+            labelProps={{ fontSize: '16px', letterSpacing: '0px' }}
+            name="templateName"
+          >
+            {inputProps => {
+              return <Input {...inputProps} onChange={e => setFieldSetName(e.target.value)} value={fieldSetName} />;
+            }}
+          </StyledInputField>
+        )}
+
         <div>
-          <Collapsible open={fieldOption === FIELD_OPTIONS.DEFAULT}>
+          <Collapsible open={fieldSet === FIELD_OPTIONS.DEFAULT}>
             <CollapsibleContent>
               <MessageBox type="info" mt={3}>
                 {flatten(
@@ -294,7 +395,7 @@ const ExportTransactionsCSVModal = ({
               </MessageBox>
             </CollapsibleContent>
           </Collapsible>
-          <Collapsible open={fieldOption === FIELD_OPTIONS.CUSTOM}>
+          <Collapsible open={fieldSet !== FIELD_OPTIONS.DEFAULT}>
             <CollapsibleContent>
               <div className="flex flex-col gap-6">
                 {Object.keys(fieldGroups).map(group => {
@@ -321,7 +422,7 @@ const ExportTransactionsCSVModal = ({
                         </Button>
                       </div>
 
-                      <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
                         {fieldGroups[group]
                           .filter(field => !(isHostReport && HOST_OMITTED_FIELDS.includes(field)))
                           .map(field => (
@@ -368,7 +469,28 @@ const ExportTransactionsCSVModal = ({
             />
           </MessageBox>
         ) : null}
-        <DialogFooter>
+        <DialogFooter className="mt-2 gap-2 sm:justify-between">
+          <div>
+            {(fieldSet === FIELD_OPTIONS.CUSTOM || isEditingExistingSet) && (
+              <Button
+                variant="outline"
+                loading={isSavingFieldSet}
+                disabled={fieldSetName.length < 4}
+                onClick={handeSaveFieldSet}
+              >
+                {isEditingExistingSet ? (
+                  <FormattedMessage defaultMessage="Update Field Set" />
+                ) : (
+                  <FormattedMessage defaultMessage="Save Field Set" />
+                )}
+              </Button>
+            )}
+            {fieldSet !== FIELD_OPTIONS.DEFAULT && fieldSet !== FIELD_OPTIONS.CUSTOM && !isEditingExistingSet && (
+              <Button variant="destructive" loading={isSavingFieldSet} onClick={handleDeleteFieldSet}>
+                <FormattedMessage defaultMessage="Delete Field Set" />
+              </Button>
+            )}
+          </div>
           <Button asChild loading={isFetchingRows} disabled={disabled}>
             <a href={url} rel="noreferrer" target="_blank">
               <FormattedMessage defaultMessage="Export CSV" />

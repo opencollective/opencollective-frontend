@@ -150,7 +150,8 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
               open={displayExportCSVModal}
               setOpen={setDisplayExportCSVModal}
               queryFilter={queryFilter}
-              hostSlug={hostSlug}
+              account={{ slug: hostSlug }}
+              isHostReport
               trigger={
                 <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
                   <FormattedMessage defaultMessage="Export CSV" />
