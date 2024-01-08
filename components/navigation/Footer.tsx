@@ -1,8 +1,8 @@
 import React from 'react';
+import { SiX } from '@icons-pack/react-simple-icons';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
 import { Slack } from '@styled-icons/fa-brands/Slack';
-import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { ChevronDown, ExternalLink, Mail } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -33,7 +33,7 @@ const SocialLinks = ({ className }: { className?: string }) => {
   return (
     <div className={cn('flex items-center gap-1', className)}>
       <SocialLink href="https://twitter.com/opencollect" rel="me" aria-label="Open Collective Twitter link">
-        <Twitter size={16} />
+        <SiX size={16} />
       </SocialLink>
       <SocialLink
         href="https://mastodon.opencollective.com/@opencollective"

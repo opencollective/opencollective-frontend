@@ -1,4 +1,5 @@
 import React from 'react';
+import { SiX } from '@icons-pack/react-simple-icons';
 import { Discord } from '@styled-icons/fa-brands/Discord';
 import { Discourse } from '@styled-icons/fa-brands/Discourse';
 import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
@@ -13,7 +14,6 @@ import { Instagram } from '@styled-icons/feather/Instagram';
 import { Linkedin } from '@styled-icons/feather/Linkedin';
 import { Slack } from '@styled-icons/feather/Slack';
 import { Twitch } from '@styled-icons/feather/Twitch';
-import { Twitter } from '@styled-icons/feather/Twitter';
 import { Youtube } from '@styled-icons/feather/Youtube';
 import { Pixelfed } from '@styled-icons/remix-line/Pixelfed';
 
@@ -30,7 +30,7 @@ const SocialLinkIcon = {
   [SocialLinkType.INSTAGRAM]: Instagram,
   [SocialLinkType.MASTODON]: Mastodon,
   [SocialLinkType.MATTERMOST]: Globe,
-  [SocialLinkType.TWITTER]: Twitter,
+  [SocialLinkType.TWITTER]: SiX,
   [SocialLinkType.YOUTUBE]: Youtube,
   [SocialLinkType.TUMBLR]: Tumblr,
   [SocialLinkType.MEETUP]: Meetup,
