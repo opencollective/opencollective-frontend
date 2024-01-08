@@ -1226,6 +1226,11 @@ interface Transaction {
     Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
     """
     fetchPaymentProcessorFee: Boolean = false
+
+    """
+    Fetch TAX transaction for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
   ): Amount!
   netAmountInHostCurrency(
     """
@@ -1237,11 +1242,21 @@ interface Transaction {
     Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
     """
     fetchPaymentProcessorFee: Boolean = false
+
+    """
+    Fetch TAX transaction for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
   ): Amount!
-  taxAmount: Amount!
+  taxAmount(
+    """
+    Fetch TAX transaction for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
+  ): Amount!
 
   """
-  If taxAmount is set, this field will contain more info about the tax
+  If a tax is set, this field will contain more info about the tax
   """
   taxInfo: TaxInfo
   platformFee: Amount!
@@ -1331,6 +1346,7 @@ enum TransactionKind {
   PLATFORM_TIP
   PLATFORM_TIP_DEBT
   PREPAID_PAYMENT_METHOD
+  TAX
 }
 
 """
@@ -2643,6 +2659,47 @@ type Host implements Account & AccountWithContributions {
     The offset to use to fetch
     """
     offset: Int! = 0
+  ): AccountCollection!
+
+  """
+  Returns a list of accounts hosted by this host
+  """
+  hostedAccounts(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    accountType: [AccountType]
+
+    """
+    Filter on (un)approved collectives
+    """
+    isApproved: Boolean = true
+
+    """
+    Filter on frozen accounts
+    """
+    isFrozen: Boolean = false
+
+    """
+    Filter on unhosted accounts
+    """
+    isUnhosted: Boolean = false
+
+    """
+    Filters on the Host fees structure applied to this account
+    """
+    hostFeesStructure: HostFeeStructure
+
+    """
+    A term to search membership. Searches in collective tags, name, slug, members description and role.
+    """
+    searchTerm: String
   ): AccountCollection!
 }
 
@@ -7731,6 +7788,11 @@ type Credit implements Transaction {
     Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
     """
     fetchPaymentProcessorFee: Boolean = false
+
+    """
+    Fetch TAX transaction for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
   ): Amount!
   netAmountInHostCurrency(
     """
@@ -7742,11 +7804,21 @@ type Credit implements Transaction {
     Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
     """
     fetchPaymentProcessorFee: Boolean = false
+
+    """
+    Fetch TAX transaction for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
   ): Amount!
-  taxAmount: Amount!
+  taxAmount(
+    """
+    Fetch TAX transaction for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
+  ): Amount!
 
   """
-  If taxAmount is set, this field will contain more info about the tax
+  If a tax is set, this field will contain more info about the tax
   """
   taxInfo: TaxInfo
   platformFee: Amount!
@@ -7859,6 +7931,11 @@ type Debit implements Transaction {
     Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
     """
     fetchPaymentProcessorFee: Boolean = false
+
+    """
+    Fetch TAX transaction for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
   ): Amount!
   netAmountInHostCurrency(
     """
@@ -7870,11 +7947,21 @@ type Debit implements Transaction {
     Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
     """
     fetchPaymentProcessorFee: Boolean = false
+
+    """
+    Fetch TAX transaction for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
   ): Amount!
-  taxAmount: Amount!
+  taxAmount(
+    """
+    Fetch TAX transaction for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
+  ): Amount!
 
   """
-  If taxAmount is set, this field will contain more info about the tax
+  If a tax is set, this field will contain more info about the tax
   """
   taxInfo: TaxInfo
   platformFee: Amount!

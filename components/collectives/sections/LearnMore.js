@@ -95,7 +95,7 @@ const learningChannels = [
   {
     id: 'openCompany',
     name: 'Open Company',
-    link: 'https://drive.opencollective.com',
+    link: 'https://opencollective.com/opencollective',
     desktopItemOrder: 6,
   },
 ];

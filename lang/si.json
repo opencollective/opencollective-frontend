@@ -496,7 +496,7 @@
   "ContributorCard.Total": "Total contributions",
   "ContributorsCount": "{userCount, plural, =0 {} one {# individual } other {# individuals }} {both, plural, =0 {} other {and }}{orgCount, plural, =0 {} one {# organization} other {# organizations}} {totalCount, plural, one {has } other {have }} contributed",
   "ContributorsFilter.All": "All contributors",
-  "ContributorsFilter.Core": "Team",
+  "Team": "Team",
   "ContributorsFilter.Financial": "Financial contributors",
   "ContributorsFilter.Github": "Github contributors",
   "Conversation.created": "Conversation created",

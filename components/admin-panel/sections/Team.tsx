@@ -214,7 +214,7 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
 
   return (
     <React.Fragment>
-      <DashboardHeader title={<FormattedMessage id="ContributorsFilter.Core" defaultMessage="Team" />} />
+      <DashboardHeader title={<FormattedMessage id="Team" defaultMessage="Team" />} />
 
       {loading ? (
         <Loading />

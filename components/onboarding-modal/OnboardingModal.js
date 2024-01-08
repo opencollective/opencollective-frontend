@@ -5,7 +5,7 @@ import { Form, Formik } from 'formik';
 import { map, omit } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
@@ -17,13 +17,7 @@ import { compose, isValidUrl } from '../../lib/utils';
 import Container from '../../components/Container';
 import MessageBox from '../../components/MessageBox';
 import StyledButton from '../../components/StyledButton';
-import StyledModal, {
-  CloseIcon,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-} from '../../components/StyledModal';
+import StyledModal, { CloseIcon, ModalBody, ModalFooter, ModalHeader } from '../../components/StyledModal';
 import { H1, P } from '../../components/Text';
 
 import { Box, Flex } from '../Grid';
@@ -85,17 +79,6 @@ const ResponsiveModalFooter = styled(ModalFooter)`
   }
 `;
 
-const ResponsiveModalOverlay = styled(ModalOverlay)`
-  ${overlay =>
-    overlay.noOverlay &&
-    css`
-      display: none;
-    `}
-  @media screen and (max-width: 40em) {
-    display: none;
-  }
-`;
-
 const ModalWithImage = styled(ResponsiveModal)`
   @media screen and (min-width: 40em) {
     background: white url('/static/images/create-collective/onboardingSuccessIllustration.png');
@@ -147,7 +130,6 @@ class OnboardingModal extends React.Component {
       step: 0,
       members: [],
       error: null,
-      noOverlay: false,
     };
 
     this.messages = defineMessages({
@@ -234,7 +216,6 @@ class OnboardingModal extends React.Component {
   };
 
   onClose = () => {
-    this.setState({ noOverlay: true });
     this.props.setShowOnboardingModal(false);
     this.props.router.push(`/${this.props.collective.slug}`);
   };
@@ -253,7 +234,7 @@ class OnboardingModal extends React.Component {
 
   render() {
     const { collective, LoggedInUser, showOnboardingModal, mode, data } = this.props;
-    const { step, isSubmitting, error, noOverlay } = this.state;
+    const { step, isSubmitting, error } = this.state;
 
     return (
       <React.Fragment>
@@ -385,7 +366,6 @@ class OnboardingModal extends React.Component {
             )}
           </React.Fragment>
         )}
-        <ResponsiveModalOverlay onClick={this.onClose} noOverlay={noOverlay} />
       </React.Fragment>
     );
   }

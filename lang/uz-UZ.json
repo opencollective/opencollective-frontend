@@ -759,7 +759,7 @@
   "ContributionType.Ticket": "Ticket",
   "ContributionType.TierPassed": "Past tier",
   "ContributorsFilter.All": "All contributors",
-  "ContributorsFilter.Core": "Team",
+  "Team": "Team",
   "ContributorsFilter.Financial": "Financial contributors",
   "ContributorsFilter.Github": "Github contributors",
   "Conversation.created": "Conversation created",

@@ -3,7 +3,10 @@ import { URL } from 'url';
 import { pick } from 'lodash';
 
 export default async function handle(req, res) {
-  const apiUrl = new URL(`${process.env.API_URL}/connected-accounts/github/callback?api_key=${process.env.API_KEY}`);
+  const { service } = req.query;
+  const apiUrl = new URL(
+    `${process.env.API_URL}/connected-accounts/${service}/callback?api_key=${process.env.API_KEY}`,
+  );
   apiUrl.searchParams.set('code', req.query.code);
   apiUrl.searchParams.set('context', req.query.context);
   apiUrl.searchParams.set('access_token', req.query.access_token);

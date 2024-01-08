@@ -179,7 +179,7 @@ function Expense(props) {
   const prevState = usePrevious(state);
 
   useEffect(() => {
-    if (prevState?.status !== state.status) {
+    if (prevState && prevState.status !== state.status) {
       scrollToExpenseTop();
     }
   }, [state.status]);
@@ -695,6 +695,7 @@ function Expense(props) {
 
       {state.showFilesViewerModal && (
         <FilesViewerModal
+          allowOutsideInteraction
           files={files}
           parentTitle={intl.formatMessage(
             {

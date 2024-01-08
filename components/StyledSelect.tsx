@@ -209,6 +209,14 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
       components: getComponents(components, useSearchIcon),
       instanceId: instanceId ? instanceId : inputId,
       theme: selectTheme,
+      onBlur: (event: React.FocusEvent<HTMLInputElement>) => {
+        // Needed for Reect-select to work with Radix UI dialogs
+        // https://github.com/JedWatson/react-select/issues/5732#issuecomment-1742107647
+        const element = event.relatedTarget;
+        if (element && (element.tagName === 'A' || element.tagName === 'BUTTON' || element.tagName === 'INPUT')) {
+          (element as HTMLElement).focus();
+        }
+      },
       styles: {
         valueContainer: baseStyles => {
           if (styles?.valueContainer) {
@@ -308,6 +316,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
         menuPortal: baseStyles => ({
           ...baseStyles,
           zIndex: 99999,
+          pointerEvents: 'auto',
         }),
         input: baseStyles => {
           if (styles?.input) {

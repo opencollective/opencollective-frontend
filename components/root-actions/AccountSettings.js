@@ -110,7 +110,7 @@ const AccountSettings = () => {
               <Container pt={4}>
                 <MessageBox type="error">
                   <div>Some instructions on what to look when disabling 2FA for a user;</div>
-                  <ul>
+                  <ul className="list-disc">
                     <li>
                       If user has Twitter, GitHub or any other social accounts linked we can ask for a proof to be added
                       to them.
