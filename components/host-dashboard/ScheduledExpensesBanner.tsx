@@ -136,7 +136,6 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
       </MessageBox>
       {showConfirmationModal && (
         <ConfirmationModal
-          zindex={1000}
           header={<FormattedMessage id="expenses.scheduled.confirmation.title" defaultMessage="Pay Expenses Batch" />}
           body={
             <FormattedMessage

@@ -140,22 +140,23 @@ export const columns: ColumnDef<HostApplication>[] = [
       const application = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <TableActionsButton data-Cy={`${application.account.slug}-table-actions`} />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={e => {
-                e.stopPropagation();
-                openApplication(application);
-              }}
-              data-Cy={`${application.account.slug}-view-details`}
-            >
-              <FormattedMessage defaultMessage="View details" />
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        // Stop propagation since the row is clickable
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+        <div onClick={e => e.stopPropagation()}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <TableActionsButton data-cy={`${application.account.slug}-table-actions`} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => openApplication(application)}
+                data-cy={`${application.account.slug}-view-details`}
+              >
+                <FormattedMessage defaultMessage="View details" />
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       );
     },
   },

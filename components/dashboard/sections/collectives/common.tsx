@@ -2,7 +2,6 @@ import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { groupBy, mapValues, toPairs } from 'lodash';
 import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Unlink } from 'lucide-react';
-import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
@@ -133,7 +132,9 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const { onEdit, host, openCollectiveDetails } = table.options.meta as any;
       return (
         host?.id === collective.host?.id && (
-          <div className="flex flex-1 items-center justify-end">
+          // Stop propagation since the row is clickable
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+          <div className="flex flex-1 items-center justify-end" onClick={e => e.stopPropagation()}>
             <MoreActionsMenu collective={collective} onEdit={onEdit} openCollectiveDetails={openCollectiveDetails}>
               <TableActionsButton className="h-8 w-8">
                 <MoreHorizontal className="relative h-3 w-3" aria-hidden="true" />
@@ -201,35 +202,33 @@ export const MoreActionsMenu = ({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      {openModal &&
-        createPortal(
-          <React.Fragment>
-            {openModal === 'ADD_FUNDS' && (
-              <AddFundsModal collective={collective} onClose={() => setOpenModal(null)} onSuccess={onEdit} />
-            )}
-            {openModal === 'FREEZE' && (
-              <FreezeAccountModal collective={collective} onClose={() => setOpenModal(null)} onSuccess={onEdit} />
-            )}
-            {openModal === 'UNHOST' && (
-              <UnhostAccountModal collective={collective} host={collective.host} onClose={() => setOpenModal(null)} />
-            )}
-            {openModal === 'ADD_AGREEMENT' && (
-              <AddAgreementModal
-                account={collective}
-                hostLegacyId={collective.host.legacyId}
-                onClose={() => setOpenModal(null)}
-                onCreate={() => setOpenModal(null)}
-              />
-            )}
-            {openModal === 'CONTACT' && (
-              <ContactCollectiveModal
-                collective={{ ...collective, id: collective.legacyId }}
-                onClose={() => setOpenModal(null)}
-              />
-            )}
-          </React.Fragment>,
-          window.document.body,
-        )}
+      {openModal && (
+        <React.Fragment>
+          {openModal === 'ADD_FUNDS' && (
+            <AddFundsModal collective={collective} onClose={() => setOpenModal(null)} onSuccess={onEdit} />
+          )}
+          {openModal === 'FREEZE' && (
+            <FreezeAccountModal collective={collective} onClose={() => setOpenModal(null)} onSuccess={onEdit} />
+          )}
+          {openModal === 'UNHOST' && (
+            <UnhostAccountModal collective={collective} host={collective.host} onClose={() => setOpenModal(null)} />
+          )}
+          {openModal === 'ADD_AGREEMENT' && (
+            <AddAgreementModal
+              account={collective}
+              hostLegacyId={collective.host.legacyId}
+              onClose={() => setOpenModal(null)}
+              onCreate={() => setOpenModal(null)}
+            />
+          )}
+          {openModal === 'CONTACT' && (
+            <ContactCollectiveModal
+              collective={{ ...collective, id: collective.legacyId }}
+              onClose={() => setOpenModal(null)}
+            />
+          )}
+        </React.Fragment>
+      )}
     </React.Fragment>
   );
 };
