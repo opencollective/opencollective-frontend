@@ -154,6 +154,14 @@ export function gql(source: "\n  query VirtualCardFilter($id: String!) {\n    vi
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query DashboardContributorsMetadata($slug: String!) {\n    account(slug: $slug) {\n      id\n      legacyId\n      slug\n      name\n      type\n      settings\n      imageUrl\n      currency\n      ... on AccountWithParent {\n        parent {\n          id\n          slug\n        }\n      }\n      ALL: members(role: [BACKER, FOLLOWER]) {\n        totalCount\n      }\n      FOLLOWERS: members(role: [FOLLOWER]) {\n        totalCount\n      }\n      BACKERS: members(role: [BACKER]) {\n        totalCount\n      }\n    }\n  }\n"): typeof import('./graphql').DashboardContributorsMetadataDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query DashboardContributors(\n    $slug: String!\n    $offset: Int\n    $limit: Int\n    $role: [MemberRole!]\n    $orderBy: ChronologicalOrderInput\n    $email: EmailAddress\n  ) {\n    account(slug: $slug) {\n      id\n      members(role: $role, offset: $offset, limit: $limit, orderBy: $orderBy, email: $email) {\n        totalCount\n        nodes {\n          id\n          role\n          tier {\n            id\n            name\n          }\n          account {\n            id\n            slug\n            name\n          }\n          totalDonations {\n            currency\n            valueInCents\n          }\n          publicMessage\n          description\n          since\n          createdAt\n          updatedAt\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').DashboardContributorsDocument;
+  /**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query HostAgreements($hostSlug: String!, $limit: Int!, $offset: Int!, $account: [AccountReferenceInput]) {\n    host(slug: $hostSlug) {\n      id\n      legacyId\n      slug\n      hostedAccountAgreements(limit: $limit, offset: $offset, accounts: $account) {\n        totalCount\n        nodes {\n          id\n          ...AgreementViewFields\n        }\n      }\n    }\n  }\n  \n"): typeof import('./graphql').HostAgreementsDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
