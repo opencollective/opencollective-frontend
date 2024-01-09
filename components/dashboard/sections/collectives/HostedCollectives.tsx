@@ -102,8 +102,8 @@ const ROUTE_PARAMS = ['slug', 'section', 'view'];
 const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
   const router = useRouter();
-  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Collective | null | string>(
-    subpath[0] || null,
+  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Collective | undefined | string>(
+    subpath[0],
   );
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostedCollectivesMetadataQuery, {
     variables: { hostSlug },
@@ -168,15 +168,15 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
 
   useEffect(() => {
     if (subpath[0] !== ((showCollectiveOverview as Collective)?.id || showCollectiveOverview)) {
-      handleDrawer(subpath[0] || null);
+      handleDrawer(subpath[0]);
     }
-  }, [subpath]);
+  }, [subpath[0]]);
 
-  const handleDrawer = (collective: Collective | string | null) => {
+  const handleDrawer = (collective: Collective | string | undefined) => {
     if (collective) {
       pushSubpath(typeof collective === 'string' ? collective : collective.id);
     } else {
-      pushSubpath(null);
+      pushSubpath(undefined);
     }
     setShowCollectiveOverview(collective);
   };
