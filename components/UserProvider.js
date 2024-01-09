@@ -155,7 +155,7 @@ class UserProvider extends React.Component {
             });
             if (result.type === 'recovery_code') {
               this.props.router.replace({
-                pathname: '/[slug]/admin/user-security#two-factor-auth',
+                pathname: '/[slug]/admin/user-security',
                 query: { slug: LoggedInUser.collective.slug },
               });
             } else {
