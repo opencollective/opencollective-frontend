@@ -78,7 +78,27 @@ const validateTransferRequirementsQuery = gql`
   query ValidateTransferRequirements($id: String!, $details: JSON) {
     expense(expense: { id: $id }) {
       id
-      validateTransferRequirements(details: $details)
+      validateTransferRequirements(details: $details) {
+        type
+        fields {
+          name
+          group {
+            key
+            name
+            type
+            required
+            example
+            minLength
+            maxLength
+            validationRegexp
+            refreshRequirementsOnChange
+            valuesAllowed {
+              key
+              name
+            }
+          }
+        }
+      }
     }
   }
 `;
