@@ -1578,6 +1578,12 @@ type Expense {
   """
   requestedByAccount: Account
   quote: ExpenseQuote
+  validateTransferRequirements(
+    """
+    Details of the transfer
+    """
+    details: JSON
+  ): JSON
   recurringExpense: RecurringExpense
 
   """
@@ -17756,12 +17762,31 @@ input ProcessExpensePaymentParams {
   Who is responsible for paying any due fees.
   """
   feesPayer: FeesPayer = COLLECTIVE
+
+  """
+  Transfer details for fulfilling the expense
+  """
+  transfer: ProcessExpenseTransferParams
 }
 
 enum MarkAsUnPaidExpenseStatus {
   APPROVED
   INCOMPLETE
   ERROR
+}
+
+input ProcessExpenseTransferParams {
+  """
+  Wise transfer details
+  """
+  details: WiseTransferDetails
+}
+
+input WiseTransferDetails {
+  reference: String
+  transferPurpose: String
+  sourceOfFunds: String
+  transferNature: String
 }
 
 input ExpenseInviteDraftInput {
