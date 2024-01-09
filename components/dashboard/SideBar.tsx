@@ -69,7 +69,7 @@ const AdminPanelSideBar = ({
               </StyledRoundButton>
 
               <React.Fragment>
-                <DrawerMenu anchor="left" open={isMenuOpen} onClose={() => setMenuOpen(false)} p="16px">
+                <DrawerMenu anchor="left" open={isMenuOpen} onClose={() => setMenuOpen(false)} className="p-4">
                   {content}
                 </DrawerMenu>
               </React.Fragment>

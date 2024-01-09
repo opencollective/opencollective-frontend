@@ -3837,6 +3837,7 @@ export type Expense = {
   taxes: Array<Maybe<TaxInfo>>;
   /** Whether this expense is a receipt or an invoice */
   type: ExpenseType;
+  validateTransferRequirements?: Maybe<Scalars['JSON']>;
   /** If available, this field will contain a breakdown of the expense values depending on who edited it */
   valuesByRole?: Maybe<ExpenseValuesByRole>;
   /** The virtual card used to pay for this charge */
@@ -3855,6 +3856,12 @@ export type ExpenseCommentsArgs = {
   limit?: Scalars['Int'];
   offset?: Scalars['Int'];
   orderBy?: InputMaybe<ChronologicalOrderInput>;
+};
+
+
+/** This represents an Expense */
+export type ExpenseValidateTransferRequirementsArgs = {
+  details?: InputMaybe<Scalars['JSON']>;
 };
 
 /** Fields for an expense's attached file */
@@ -8250,6 +8257,13 @@ export type ProcessExpensePaymentParams = {
   shouldRefundPaymentProcessorFee?: InputMaybe<Scalars['Boolean']>;
   /** The total amount paid in host currency */
   totalAmountPaidInHostCurrency?: InputMaybe<Scalars['Int']>;
+  /** Transfer details for fulfilling the expense */
+  transfer?: InputMaybe<ProcessExpenseTransferParams>;
+};
+
+export type ProcessExpenseTransferParams = {
+  /** Wise transfer details */
+  details?: InputMaybe<WiseTransferDetails>;
 };
 
 /** Action taken for an account application to the host */
@@ -10487,6 +10501,13 @@ export type WebhookUpdateInput = {
   /** The legacy public id identifying the webhook (ie: 4242) */
   legacyId?: InputMaybe<Scalars['Int']>;
   webhookUrl: Scalars['URL'];
+};
+
+export type WiseTransferDetails = {
+  reference?: InputMaybe<Scalars['String']>;
+  sourceOfFunds?: InputMaybe<Scalars['String']>;
+  transferNature?: InputMaybe<Scalars['String']>;
+  transferPurpose?: InputMaybe<Scalars['String']>;
 };
 
 type AccountHoverCardFields_Bot_Fragment = { __typename?: 'Bot', id: string, name?: string | null, slug: string, type: AccountType, description?: string | null, imageUrl?: string | null, isHost: boolean };

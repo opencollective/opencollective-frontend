@@ -2,9 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import StyledInputField from '../StyledInputField';
-import StyledTextarea from '../StyledTextarea';
-
+import { Label } from '../ui/Label';
+import { Textarea } from '../ui/Textarea';
 const MESSAGE_MAX_LENGTH = 500;
 
 const messages = defineMessages({
@@ -16,34 +15,25 @@ const messages = defineMessages({
 
 const TransactionRejectMessageForm = ({ message, onChange }) => {
   const intl = useIntl();
-  const dispatchChange = e => {
-    onChange(e.target.value);
-  };
   return (
-    <div>
-      <StyledInputField
-        autoFocus
+    <div className="space-y-2">
+      <Label htmlFor="rejectionMessage">
+        <FormattedMessage
+          id="OptionalFieldLabel"
+          defaultMessage="{field} (optional)"
+          values={{ field: <FormattedMessage id="Contact.Message" defaultMessage="Message" /> }}
+        />
+      </Label>
+      <Textarea
+        resize="none"
+        id="rejectionMessage"
         name="rejectionMessage"
-        htmlFor="rejectionMessage"
-        label={<FormattedMessage id="Contact.Message" defaultMessage="Message" />}
-        required={false}
-        my={3}
-      >
-        {inputProps => (
-          <StyledTextarea
-            {...inputProps}
-            resize="none"
-            maxLength={MESSAGE_MAX_LENGTH}
-            minWidth={[290, 500]}
-            minHeight={100}
-            fontSize="14px"
-            width="100%"
-            placeholder={intl.formatMessage(messages.rejectionReason)}
-            value={message}
-            onChange={dispatchChange}
-          />
-        )}
-      </StyledInputField>
+        maxLength={MESSAGE_MAX_LENGTH}
+        showCount
+        placeholder={intl.formatMessage(messages.rejectionReason)}
+        value={message}
+        onChange={e => onChange(e.target.value)}
+      />
     </div>
   );
 };

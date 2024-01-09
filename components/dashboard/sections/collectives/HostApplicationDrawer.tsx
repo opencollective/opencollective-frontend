@@ -201,7 +201,7 @@ export function HostApplication({
       <div>
         <DrawerHeader
           onClose={onClose}
-          data-Cy={`host-application-header-${account.slug}`}
+          data-cy={`host-application-header-${account.slug}`}
           title={
             <FormattedMessage
               defaultMessage="Application <ApplicationId></ApplicationId> to <HostCollectiveName></HostCollectiveName>"
