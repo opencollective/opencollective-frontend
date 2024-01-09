@@ -64,7 +64,7 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
     setConfirm(false);
     try {
       await processOrder({ variables: { id: order.id, action } });
-      onSuccess?.();
+      await Promise.resolve(onSuccess?.());
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }

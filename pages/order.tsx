@@ -192,6 +192,7 @@ const orderPageQuery = gql`
 const contributionPageQueryHelper = getSSRQueryHelpers<{ legacyId: number; collectiveSlug: string }>({
   query: orderPageQuery,
   context: API_V2_CONTEXT,
+  fetchPolicy: 'network-only',
   getVariablesFromContext: ({ query }) => ({
     legacyId: toNumber(query.OrderId),
     collectiveSlug: query.collectiveSlug as string,
