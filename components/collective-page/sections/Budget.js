@@ -34,6 +34,20 @@ const budgetSectionAccountFieldsFragment = gql`
     id
     isHost
     type
+    ... on AccountWithHost {
+      host {
+        id
+        slug
+        name
+      }
+    }
+    ... on Organization {
+      host {
+        id
+        slug
+        name
+      }
+    }
     stats {
       id
       balance {

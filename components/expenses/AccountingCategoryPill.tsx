@@ -87,7 +87,7 @@ export const AccountingCategoryPill = ({
   allowNone,
   showCodeInSelect = false,
 }: AccountingCategoryPillProps) => {
-  if (!canEdit) {
+  if (!canEdit || !host) {
     return <div className={BADGE_CLASS}>{getCategoryLabel(expense.accountingCategory)}</div>;
   } else {
     return (

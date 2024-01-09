@@ -431,6 +431,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                 description: resultOrder.description,
                 processedAt: resultOrder.processedAt,
               });
+              props.onSuccess?.();
             } else {
               handleClose();
             }
@@ -726,12 +727,12 @@ const AddFundsModal = ({ collective, ...props }) => {
                 <Form>
                   <ModalBody data-cy="funds-added">
                     <Container>
-                      <h3>
+                      <h3 className="mt-4 text-xl  text-black">
                         <FormattedMessage id="AddFundsModal.FundsAdded" defaultMessage="Funds Added ✅" />
                       </h3>
-                      <Container pb={2}>
+                      <Container pb={2} mt={3}>
                         <FormattedMessage id="AddFundsModal.YouAdded" defaultMessage="You added:" />
-                        <ul>
+                        <ul className="mt-2 list-inside list-disc pl-3">
                           <li>
                             <strong>{`${fundDetails.fundAmount / 100} ${currency}`}</strong>
                           </li>
@@ -816,7 +817,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           )}
                         </ul>
                       </Container>
-                      <Container pb={2}>
+                      <Container pb={2} mt={2}>
                         <FormattedMessage id="AddFundsModal.NeedHelp" defaultMessage="Need Help?" />{' '}
                         <StyledLink href="/support" buttonStyle="standard" buttonSize="tiny">
                           <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
@@ -862,6 +863,7 @@ AddFundsModal.propTypes = {
     policies: PropTypes.object,
   }).isRequired,
   onClose: PropTypes.func,
+  onSuccess: PropTypes.func,
 };
 
 export default AddFundsModal;

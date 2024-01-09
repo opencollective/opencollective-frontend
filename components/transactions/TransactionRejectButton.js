@@ -109,7 +109,9 @@ const TransactionRejectButton = props => {
                     )}
                   </MessageBox>
                   {error && <MessageBoxGraphqlError mt="12px" error={error} />}
-                  <TransactionRejectMessageForm message={message} onChange={message => setMessage(message)} />
+                  <div className="mt-4 w-full">
+                    <TransactionRejectMessageForm message={message} onChange={message => setMessage(message)} />
+                  </div>
                 </Flex>
               </React.Fragment>
             }

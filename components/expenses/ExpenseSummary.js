@@ -14,7 +14,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
-import { expenseItemsMustHaveFiles } from './lib/items';
+import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
 import { getExpenseExchangeRateWarningOrError } from './lib/utils';
 
 import { AccountHoverCard } from '../AccountHoverCard';
@@ -68,6 +68,17 @@ CreatedByUserLink.propTypes = {
 
 const Spacer = () => <Span mx="6px">{'•'}</Span>;
 
+const prepareDraftItems = (items, expenseCurrency) => {
+  if (!items) {
+    return [];
+  }
+
+  return items.map(item => {
+    const amountV2 = getExpenseItemAmountV2FromNewAttrs(item, expenseCurrency);
+    return { ...item, amountV2 };
+  });
+};
+
 /**
  * Last step of the create expense flow, shows the summary of the expense with
  * the ability to submit it.
@@ -98,7 +109,8 @@ const ExpenseSummary = ({
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const createdByAccount =
     (isDraft ? expense?.requestedByAccount || expense?.createdByAccount : expense?.createdByAccount) || {};
-  const expenseItems = expense?.items?.length > 0 ? expense.items : expense?.draft?.items || [];
+  const expenseItems =
+    expense?.items?.length > 0 ? expense.items : prepareDraftItems(expense?.draft?.items, expense?.currency);
   const expenseTaxes = expense?.taxes?.length > 0 ? expense.taxes : expense?.draft?.taxes || [];
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
