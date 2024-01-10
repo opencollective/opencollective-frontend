@@ -162,7 +162,7 @@ const cols = {
       const kind = cell.getValue() as Transaction['kind'];
       const kindLabel = i18nTransactionKind(intl, kind);
       const isExpense = kind === 'EXPENSE';
-      const { isRefund, isRefunded, isInReview, isDisputed, expense } = row.original;
+      const { isRefund, isRefunded, isInReview, isDisputed, expense, isOrderRejected } = row.original;
 
       return (
         <div className="flex justify-between">
@@ -171,7 +171,7 @@ const cols = {
             {isExpense && expense.type && <Badge size="xs">{i18nExpenseType(intl, expense.type)}</Badge>}
           </div>
           <div>
-            {isRefunded && (
+            {isRefunded && !isOrderRejected && (
               <Badge size="xs" type={'warning'} className="items-center  gap-1">
                 <Undo size={12} />
                 <FormattedMessage defaultMessage="Refunded" />
@@ -186,6 +186,12 @@ const cols = {
               <Badge size="xs" type={'error'} className="items-center gap-1">
                 <AlertTriangle size={12} />
                 <FormattedMessage defaultMessage="Disputed" />
+              </Badge>
+            )}
+            {isOrderRejected && isRefunded && (
+              <Badge size="xs" type={'error'} className="items-center gap-1">
+                <AlertTriangle size={12} />
+                <FormattedMessage defaultMessage="Rejected" />
               </Badge>
             )}
             {isInReview && (
