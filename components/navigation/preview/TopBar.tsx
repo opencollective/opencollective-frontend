@@ -112,7 +112,7 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
   const parentCollective = account?.parentCollective || account?.parent;
   return (
     <Fragment>
-      <div className="border-b bg-white px-3 md:px-6" ref={ref}>
+      <div className="border-b bg-white px-3 xl:px-6" ref={ref}>
         <div className="flex h-16 items-center justify-between gap-1 py-4 md:gap-2">
           <div className="flex shrink-0 items-center gap-1.5 md:gap-3">
             <SiteMenu />

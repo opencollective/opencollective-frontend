@@ -111,7 +111,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const pageRoute = `/dashboard/${accountSlug}/expenses`;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage defaultMessage="Received Expenses" />}
         description={<FormattedMessage defaultMessage="Expenses submitted to your account." />}

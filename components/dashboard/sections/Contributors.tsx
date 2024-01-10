@@ -284,7 +284,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="Contributors" defaultMessage="Contributors" />} />
       <Filterbar {...queryFilter} />
 

@@ -213,7 +213,7 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
     data?.account?.childrenAccounts?.nodes?.filter(child => child.members?.nodes?.length > 0) || [];
 
   return (
-    <React.Fragment>
+    <div className="max-w-screen-lg">
       <DashboardHeader title={<FormattedMessage id="Team" defaultMessage="Team" />} />
 
       {loading ? (
@@ -337,7 +337,7 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
           )}
         </React.Fragment>
       )}
-    </React.Fragment>
+    </div>
   );
 };
 

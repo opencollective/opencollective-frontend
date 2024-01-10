@@ -1,6 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import DashboardHeader from '../../../dashboard/DashboardHeader';
 import { DashboardSectionProps } from '../../../dashboard/types';
 
 import { AccountingCategoriesTable } from './AccountingCategoriesTable';
@@ -10,10 +11,9 @@ import { AccountingCategoriesTable } from './AccountingCategoriesTable';
  */
 export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProps) => {
   return (
-    <div>
-      <h2 className="mb-6 text-2xl font-bold">
-        <FormattedMessage defaultMessage="Chart of Accounts" />
-      </h2>
+    <div className="flex max-w-screen-lg flex-col gap-4">
+      <DashboardHeader title={<FormattedMessage defaultMessage="Chart of Accounts" />} />
+
       <AccountingCategoriesTable hostSlug={accountSlug} />
     </div>
   );

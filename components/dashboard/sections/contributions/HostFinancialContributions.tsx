@@ -221,7 +221,7 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
   }, [LoggedInUser]);
 
   return (
-    <div className="flex w-full flex-col gap-4">
+    <div className="flex w-full max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
         description={<FormattedMessage defaultMessage="Contributions for Collectives you host." />}
