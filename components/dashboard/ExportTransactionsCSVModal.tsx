@@ -172,6 +172,7 @@ const ExportTransactionsCSVModal = ({
 
     if (csvVersion === CSV_VERSIONS.VERSION_2023) {
       url.searchParams.set('flattenPaymentProcessorFee', '1');
+      url.searchParams.set('flattenTax', '1');
     }
 
     if (!isEmpty(fields)) {
