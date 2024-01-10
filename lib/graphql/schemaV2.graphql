@@ -1583,7 +1583,7 @@ type Expense {
     Details of the transfer
     """
     details: JSON
-  ): JSON
+  ): [TransferWiseRequiredField]
   recurringExpense: RecurringExpense
 
   """
@@ -2690,7 +2690,7 @@ type Host implements Account & AccountWithContributions {
     """
     Filter on frozen accounts
     """
-    isFrozen: Boolean = false
+    isFrozen: Boolean
 
     """
     Filter on unhosted accounts
@@ -2706,6 +2706,11 @@ type Host implements Account & AccountWithContributions {
     A term to search membership. Searches in collective tags, name, slug, members description and role.
     """
     searchTerm: String
+
+    """
+    Order of the results
+    """
+    orderBy: OrderByInput
   ): AccountCollection!
 }
 
@@ -6043,6 +6048,37 @@ type ExpenseQuote {
   The date on which the item was created
   """
   estimatedDeliveryAt: DateTime
+}
+
+type TransferWiseRequiredField {
+  type: String
+  title: String
+  fields: [TransferWiseField]
+}
+
+type TransferWiseField {
+  name: String
+  group: [TransferWiseFieldGroup]
+}
+
+type TransferWiseFieldGroup {
+  key: String
+  name: String
+  type: String
+  required: Boolean
+  refreshRequirementsOnChange: Boolean
+  displayFormat: String
+  example: String
+  minLength: Int
+  maxLength: Int
+  validationRegexp: String
+  validationAsync: String
+  valuesAllowed: [TransferWiseFieldVatvkluesAllowed]
+}
+
+type TransferWiseFieldVatvkluesAllowed {
+  key: String
+  name: String
 }
 
 """
@@ -10558,37 +10594,6 @@ type TransferWise {
   """
   balances: [Amount]
   amountBatched: Amount
-}
-
-type TransferWiseRequiredField {
-  type: String
-  title: String
-  fields: [TransferWiseField]
-}
-
-type TransferWiseField {
-  name: String
-  group: [TransferWiseFieldGroup]
-}
-
-type TransferWiseFieldGroup {
-  key: String
-  name: String
-  type: String
-  required: Boolean
-  refreshRequirementsOnChange: Boolean
-  displayFormat: String
-  example: String
-  minLength: Int
-  maxLength: Int
-  validationRegexp: String
-  validationAsync: String
-  valuesAllowed: [TransferWiseFieldVatvkluesAllowed]
-}
-
-type TransferWiseFieldVatvkluesAllowed {
-  key: String
-  name: String
 }
 
 """
