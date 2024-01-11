@@ -12,8 +12,8 @@ import { AvatarWithLink } from '../../../AvatarWithLink';
 import DateTime from '../../../DateTime';
 import HTMLContent from '../../../HTMLContent';
 import Link from '../../../Link';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import StyledLink from '../../../StyledLink';
+import { Skeleton } from '../../../ui/Skeleton';
 
 dayjs.extend(relativeTime);
 
@@ -36,7 +36,7 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
     <div className="rounded-2xl border p-4 text-sm">
       <div className="flex flex-1 items-start gap-3">
         {isLoading ? (
-          <LoadingPlaceholder height={32} width={32} borderRadius="50%" />
+          <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
         ) : (
           <AvatarWithLink
             size={32}
@@ -45,7 +45,7 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
           />
         )}
         {isLoading ? (
-          <LoadingPlaceholder height={16} width={300} />
+          <Skeleton className="h-4 w-80" />
         ) : (
           <div className="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-1">
             <div className="text-foreground">

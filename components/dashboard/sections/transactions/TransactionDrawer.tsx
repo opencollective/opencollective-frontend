@@ -324,7 +324,7 @@ export function TransactionDrawer({
                         <FormattedMoneyAmount
                           amount={transaction?.netAmount.valueInCents}
                           currency={transaction?.netAmount.currency}
-                          precision="2"
+                          precision={2}
                           amountStyles={{ letterSpacing: 0 }}
                           showCurrencyCode={false}
                         />
@@ -534,7 +534,7 @@ export function TransactionDrawer({
                     <FormattedMoneyAmount
                       amount={transaction?.amount.valueInCents}
                       currency={transaction?.amount.currency}
-                      precision="2"
+                      precision={2}
                       amountStyles={{ letterSpacing: 0 }}
                       showCurrencyCode={false}
                     />
@@ -548,7 +548,7 @@ export function TransactionDrawer({
                         <FormattedMoneyAmount
                           amount={transaction?.paymentProcessorFee.valueInCents}
                           currency={transaction?.paymentProcessorFee.currency}
-                          precision="2"
+                          precision={2}
                           amountStyles={{ letterSpacing: 0 }}
                           showCurrencyCode={false}
                         />
@@ -562,7 +562,7 @@ export function TransactionDrawer({
                       <FormattedMoneyAmount
                         amount={transaction?.hostFee.valueInCents}
                         currency={transaction?.hostFee.currency}
-                        precision="2"
+                        precision={2}
                         amountStyles={{ letterSpacing: 0 }}
                         showCurrencyCode={false}
                       />
@@ -576,7 +576,7 @@ export function TransactionDrawer({
                       <FormattedMoneyAmount
                         amount={transaction?.taxAmount.valueInCents}
                         currency={transaction?.taxAmount.currency}
-                        precision="2"
+                        precision={2}
                         amountStyles={{ letterSpacing: 0 }}
                         showCurrencyCode={false}
                       />
@@ -590,7 +590,7 @@ export function TransactionDrawer({
                       <FormattedMoneyAmount
                         amount={transaction?.netAmount.valueInCents}
                         currency={transaction?.netAmount.currency}
-                        precision="2"
+                        precision={2}
                         amountStyles={{ letterSpacing: 0 }}
                         showCurrencyCode={false}
                       />

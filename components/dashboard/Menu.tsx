@@ -59,7 +59,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
 
   const items: MenuItem[] = [
     {
-      if: isIndividual,
+      if: isIndividual || (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW) && !isHost),
       section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
     },

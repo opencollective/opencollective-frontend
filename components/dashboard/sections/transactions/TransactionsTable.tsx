@@ -47,7 +47,7 @@ const cols = {
             <FormattedMoneyAmount
               amount={Math.abs(netAmount.valueInCents)}
               currency={netAmount.currency}
-              precision="2"
+              precision={2}
               amountStyles={{}}
               showCurrencyCode={false}
             />
@@ -70,7 +70,7 @@ const cols = {
             <FormattedMoneyAmount
               amount={Math.abs(netAmount.valueInCents)}
               currency={netAmount.currency}
-              precision="2"
+              precision={2}
               amountStyles={{}}
               showCurrencyCode={false}
             />
@@ -217,7 +217,7 @@ const cols = {
           <FormattedMoneyAmount
             amount={netAmount.valueInCents}
             currency={netAmount.currency}
-            precision="2"
+            precision={2}
             amountStyles={{ letterSpacing: 0 }}
             showCurrencyCode={false}
           />

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
+import { isIndividualAccount } from '../../lib/collective';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
@@ -28,7 +29,8 @@ import HostDashboardAgreements from './sections/HostDashboardAgreements';
 import HostDashboardReports from './sections/HostDashboardReports';
 import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
 import HostVirtualCards from './sections/HostVirtualCards';
-import Overview from './sections/Overview';
+import { CollectiveOverview } from './sections/Overview/CollectiveOverview';
+import IndividualOverview from './sections/Overview/IndividualOverview';
 import Transactions from './sections/Transactions';
 import AccountTransactions from './sections/transactions/AccountTransactions';
 import HostTransactions from './sections/transactions/HostTransactions';
@@ -47,7 +49,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.REPORTS]: HostDashboardReports,
   [SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
   [SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
-  [SECTIONS.OVERVIEW]: Overview,
+  [SECTIONS.OVERVIEW]: CollectiveOverview,
   [SECTIONS.EXPENSES]: ReceivedExpenses,
   [SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
   [SECTIONS.CONTRIBUTORS]: Contributors,
@@ -83,6 +85,9 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (DashboardComponent) {
     if (section === SECTIONS.TRANSACTIONS && useNewTransactionsPage) {
       DashboardComponent = AccountTransactions;
+    }
+    if (section === SECTIONS.OVERVIEW && isIndividualAccount(account)) {
+      DashboardComponent = IndividualOverview;
     }
     return (
       <div className="w-full">
