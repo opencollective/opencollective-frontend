@@ -7,6 +7,7 @@ import Router, { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
 
 import { createError, ERROR, formatErrorMessage } from '../lib/errors';
+import { loggedInUserQuery } from '../lib/graphql/v1/queries';
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
@@ -90,12 +91,9 @@ class UserProvider extends React.Component {
     // By default, we refetch all queries to make sure we don't display stale data
     if (!skipQueryRefetch) {
       await this.props.client.reFetchObservableQueries();
-    }
-    // Otherwise we refetch only the LoggedInUser query to make the API clear the rootRedirect cookie
-    else {
-      await this.props.client.refetchQueries({
-        include: ['LoggedInUser'],
-      });
+    } else {
+      // Send any request to API to clear rootRedirectDashboard cookie
+      await this.props.client.query({ query: loggedInUserQuery, fetchPolicy: 'network-only' });
     }
 
     if (redirect) {

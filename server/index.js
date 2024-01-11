@@ -21,10 +21,9 @@ const app = express();
 app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'].concat(cloudflareIps));
 
 const dev = process.env.NODE_ENV === 'development';
-
-const nextApp = next({ dev });
-
 const port = process.env.PORT;
+const hostname = process.env.HOSTNAME;
+const nextApp = next({ dev, hostname, port });
 
 const workers = process.env.WEB_CONCURRENCY || 1;
 

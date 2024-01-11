@@ -20,6 +20,7 @@ debug.enable(process.env.DEBUG);
 const defaults = {
   PORT: 3000,
   NODE_ENV: 'development',
+  HOSTNAME: 'localhost',
   API_KEY: '09u624Pc9F47zoGLlkg1TBSbOl2ydSAq',
   API_URL: 'https://api-staging.opencollective.com',
   IMAGES_URL: 'https://images-staging.opencollective.com',
