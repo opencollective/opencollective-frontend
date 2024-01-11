@@ -326,17 +326,6 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const tiersOptions = childAccount
     ? getTiersOptions(intl, childAccount?.tiers?.nodes || [])
     : getTiersOptions(intl, collective?.tiers?.nodes || []);
-  const receiptTemplates = host?.settings?.invoice?.templates;
-  const receiptTemplateTitles = [];
-  if (receiptTemplates?.default?.title?.length > 0) {
-    receiptTemplateTitles.push({
-      value: 'default',
-      label: receiptTemplates?.default?.title,
-    });
-  }
-  if (receiptTemplates?.alternative?.title?.length > 0) {
-    receiptTemplateTitles.push({ value: 'alternative', label: receiptTemplates?.alternative?.title });
-  }
 
   const recommendedVendors = collective?.host?.vendors?.nodes || [];
   const defaultSources = [...recommendedVendors, host];

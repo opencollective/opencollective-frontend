@@ -197,7 +197,7 @@ const ExportTransactionsCSVModal = ({
         <FormattedMessage id="ExportTransactionsCSVModal.Title" defaultMessage="Export Transactions" />
       </ModalHeader>
       <ModalBody>
-        {isHostReport && accounts?.length && (
+        {isHostReport && accounts?.length > 0 && (
           <MessageBox type="warning" withIcon mt={3}>
             <FormattedMessage
               id="ExportTransactionsCSVModal.FilteredCollectivesWarning"

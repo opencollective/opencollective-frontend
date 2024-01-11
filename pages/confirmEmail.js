@@ -33,13 +33,13 @@ class ConfirmEmailPage extends React.Component {
 
   componentDidMount() {
     if (!this.props.loadingLoggedInUser) {
-      return this.triggerEmailValidation();
+      this.triggerEmailValidation();
     }
   }
 
   componentDidUpdate() {
     if (!this.state.validationTriggered && !this.props.loadingLoggedInUser) {
-      return this.triggerEmailValidation();
+      this.triggerEmailValidation();
     }
   }
 

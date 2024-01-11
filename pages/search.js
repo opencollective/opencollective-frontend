@@ -169,7 +169,7 @@ class SearchPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.onClick = this.onClick.bind(this);
+
     const term = props.term;
     if (this.props.isHost) {
       this.state = { filter: 'HOST', term };
