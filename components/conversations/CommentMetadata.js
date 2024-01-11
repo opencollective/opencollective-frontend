@@ -25,7 +25,7 @@ export const CommentMetadata = ({ comment }) => {
           }}
         >
           <P color="black.800" fontWeight="500" lineHeight="22px" truncateOverflow>
-            {comment.fromAccount.name}
+            {comment.fromAccount?.name || <FormattedMessage id="profile.incognito" defaultMessage="Incognito" />}
           </P>
         </LinkCollective>
         <P fontSize="12px" color="black.600" truncateOverflow title={comment.createdAt}>
@@ -46,7 +46,7 @@ CommentMetadata.propTypes = {
       name: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
-    }).isRequired,
+    }),
     createdAt: PropTypes.string.isRequired,
     account: PropTypes.shape({
       slug: PropTypes.string,
