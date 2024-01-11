@@ -78,7 +78,6 @@
     "draft-js": "0.11.7",
     "express": "4.18.2",
     "express-basic-auth": "1.2.1",
-    "express-http-proxy": "2.0.0",
     "express-winston": "4.2.0",
     "express-ws": "5.0.2",
     "file-saver": "2.0.5",
