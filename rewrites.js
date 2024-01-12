@@ -11,6 +11,10 @@ exports.REWRITES = [
     destination: '/fiscal-hosting',
   },
   {
+    source: '/tax-form',
+    destination: '/tax-form',
+  },
+  {
     source: '/welcome',
     destination: '/welcome',
   },

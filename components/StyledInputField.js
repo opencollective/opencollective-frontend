@@ -40,11 +40,12 @@ const StyledInputField = ({
   required = undefined,
   inputType = undefined,
   labelFontSize = undefined,
-  labelFontWeight = 'normal',
+  labelFontWeight = '700',
   labelColor = 'black.800',
   labelProps = undefined,
   hideOptionalLabel = undefined,
   useRequiredLabel = undefined,
+  requiredIndicator = '*',
   isPrivate = undefined,
   helpText = undefined,
   flexDirection = undefined,
@@ -94,8 +95,17 @@ const StyledInputField = ({
                 {isPrivate && <PrivateIconWithSpace />}
               </Span>
             ) : displayRequiredLabel ? (
-              <Span color="black.700">
-                {labelContent} * {isPrivate && <PrivateIconWithSpace />}
+              <Span color="black.700" fontWeight={requiredIndicator === 'label' ? 'normal' : undefined}>
+                {requiredIndicator === 'label' ? (
+                  <FormattedMessage
+                    id="RequiredFieldLabel"
+                    defaultMessage="{field} (required)"
+                    values={{ field: labelContent }}
+                  />
+                ) : (
+                  <React.Fragment>{labelContent} *</React.Fragment>
+                )}{' '}
+                {isPrivate && <PrivateIconWithSpace />}
               </Span>
             ) : (
               <React.Fragment>
@@ -146,6 +156,8 @@ StyledInputField.propTypes = {
   error: PropTypes.any,
   /** text to display below the input when there's no error */
   hint: PropTypes.any,
+  /** Whether hints should appear above or below the input. Defaults to below. */
+  hintPosition: PropTypes.any,
   /** the label's 'for' attribute to be used as the 'name' and 'id' for the input */
   htmlFor: PropTypes.string,
   /** By default name is equal to htmlFor, but you can use this prop to override it */

@@ -13,6 +13,12 @@ export const RICH_ERROR_MESSAGES = defineMessages({
     id: 'FormError.maxLengthRich',
     defaultMessage: 'Please use fewer than {count} characters',
   },
+  min: {
+    defaultMessage: 'Value must be greater than or equal to {min}',
+  },
+  max: {
+    defaultMessage: 'Value must be less than or equal to {max}',
+  },
   notInRange: {
     defaultMessage: 'Value must be between {min} and {max}',
     id: 'f5QMcL',
