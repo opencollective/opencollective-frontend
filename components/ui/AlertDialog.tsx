@@ -33,9 +33,9 @@ const AlertDialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content> & {
     withBackdropBlur?: boolean;
   }
->(({ className, ...props }, ref) => (
+>(({ className, withBackdropBlur, ...props }, ref) => (
   <AlertDialogPortal>
-    <AlertDialogOverlay className={props.withBackdropBlur ? 'backdrop-blur-sm' : ''} />
+    <AlertDialogOverlay className={withBackdropBlur ? 'backdrop-blur-sm' : ''} />
     <AlertDialogPrimitive.Content
       ref={ref}
       className={cn(
