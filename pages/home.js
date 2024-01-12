@@ -1,5 +1,4 @@
 import React from 'react';
-import cookie from 'cookie';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { getRequestIntl } from '../lib/i18n/request';
@@ -48,17 +47,6 @@ const HomePage = () => {
 };
 
 export const getServerSideProps = async ({ req, res }) => {
-  const cookies = cookie.parse((req && req.headers.cookie) || '');
-  const redirectToDashboard = req.url === '/' && cookies.rootRedirect === 'dashboard';
-  if (redirectToDashboard) {
-    return {
-      redirect: {
-        destination: '/dashboard',
-        permanent: false,
-      },
-    };
-  }
-
   if (res && req) {
     const { locale } = getRequestIntl(req);
     if (locale === 'en') {
