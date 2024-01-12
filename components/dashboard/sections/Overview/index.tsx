@@ -20,6 +20,7 @@ import StyledButton from '../../../StyledButton';
 import { makeTruncatedValueAllSelectedLabelContainer, StyledSelectFilter } from '../../../StyledSelectFilter';
 import { H2 } from '../../../Text';
 import { Alert, AlertDescription, AlertTitle } from '../../../ui/Alert';
+import DashboardHeader from '../../DashboardHeader';
 import { DashboardSectionProps } from '../../types';
 
 import { workspaceHomeQuery } from './query';
@@ -68,20 +69,19 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
   }, [error, data]);
 
   return (
-    <div className="flex flex-col-reverse xl:flex-row">
+    <div className="flex max-w-screen-lg flex-col-reverse xl:flex-row">
       <div className="flex-1">
-        <h1 className="text-2xl font-bold leading-10 tracking-tight">
-          <FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />
-        </h1>
+        <DashboardHeader
+          title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
+          description={
+            <FormattedMessage
+              id="Dashboard.Home.Subtitle"
+              defaultMessage="The latest news and updates you need to know in Open Collective."
+            />
+          }
+        />
 
-        <p className="text-muted-foreground">
-          <FormattedMessage
-            id="Dashboard.Home.Subtitle"
-            defaultMessage="The latest news and updates you need to know in Open Collective."
-          />
-        </p>
-
-        <Flex flexDirection="column" mt="48px">
+        <Flex flexDirection="column" mt="36px">
           <Flex
             justifyContent="space-between"
             alignItems={[null, 'center']}

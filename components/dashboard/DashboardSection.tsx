@@ -93,7 +93,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
-      <div className="w-full">
+      <div className="w-full max-w-screen-lg">
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <AccountSettings account={account} section={section} />
@@ -105,19 +105,23 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   const SettingsComponent = SETTINGS_COMPONENTS[section];
   if (SettingsComponent) {
     return (
-      <div className="max-w-screen-md">
+      // <div className="flex max-w-screen-lg justify-center">
+      <div className="max-w-screen-md flex-1">
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
+      // </div>
     );
   }
 
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
-      <div className="max-w-screen-md">
+      // <div className="flex max-w-screen-lg justify-center">
+      <div className="max-w-screen-md flex-1">
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <AccountSettings account={account} section={section} />
       </div>
+      // </div>
     );
   }
 

@@ -214,14 +214,14 @@ const DashboardPage = () => {
             </div>
           ) : !useDynamicTopBar ? (
             <div
-              className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row md:px-6 lg:gap-12 lg:py-8"
+              className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row lg:gap-12 lg:py-8 xl:px-6"
               data-cy="admin-panel-container"
             >
               <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />
               {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
                 <TwoFactorAuthRequiredMessage className="lg:mt-16" />
               ) : (
-                <div className="max-w-[1000px] flex-1 px-1 sm:overflow-x-clip">
+                <div className="min-w-0 max-w-screen-xl flex-1">
                   <DashboardSection
                     section={selectedSection}
                     isLoading={isLoading}
@@ -240,7 +240,7 @@ const DashboardPage = () => {
               ) : (
                 <div
                   className={clsx(
-                    'mx-auto grid w-full max-w-screen-2xl grid-cols-1 justify-center px-3 md:px-6',
+                    'mx-auto grid w-full max-w-screen-2xl grid-cols-1 justify-center px-3 xl:px-6',
                     ['host-transactions', 'transactions'].includes(selectedSection) && // TODO: fix better support for wider pages
                       LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_TRANSACTION_PAGE)
                       ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1536px)_minmax(0,1fr)]'

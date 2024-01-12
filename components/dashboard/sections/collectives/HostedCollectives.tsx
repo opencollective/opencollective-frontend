@@ -188,7 +188,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
 
   const hostedAccounts = data?.host?.hostedAccounts;
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />} />
       <Filterbar {...queryFilter} />
       {error && <MessageBoxGraphqlError error={error} mb={2} />}

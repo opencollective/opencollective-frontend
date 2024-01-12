@@ -194,7 +194,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="Expenses" defaultMessage="Expenses" />} />
       {paypalPreApprovalError && (
         <MessageBox type="warning" mb={3} withIcon>
