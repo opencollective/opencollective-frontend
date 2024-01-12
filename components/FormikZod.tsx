@@ -41,6 +41,17 @@ type InputAttributesFromZodSchema = {
 type SupportedZodSchema<Values = any> = z.ZodSchema<Values> | ZodEffects<z.ZodSchema<Values>>;
 
 /**
+ * Some global configuration for the FormikZod component.
+ */
+type FormikZodConfig = {
+  /** Whether to show "(required)" on all `StyledInputFormikField` labels. */
+  useRequiredLabel?: boolean;
+  requiredIndicator?: 'label' | '*';
+  /** Whether hints should appear above or below the input. Defaults to below. */
+  hintPosition?: 'above' | 'below';
+};
+
+/**
  * @returns a Zod error map that uses the provided `intl` object to internationalize the error messages.
  */
 export const getCustomZodErrorMap =
@@ -52,9 +63,15 @@ export const getCustomZodErrorMap =
 
     let message = error.message;
     if (error.code === 'too_big') {
-      message = intl.formatMessage(RICH_ERROR_MESSAGES.maxLength, { count: error.maximum as number });
+      message =
+        error.type === 'number'
+          ? intl.formatMessage(RICH_ERROR_MESSAGES.max, { max: error.maximum as number })
+          : intl.formatMessage(RICH_ERROR_MESSAGES.maxLength, { count: error.maximum as number });
     } else if (error.code === 'too_small') {
-      message = intl.formatMessage(RICH_ERROR_MESSAGES.minLength, { count: error.minimum as number });
+      message =
+        error.type === 'number'
+          ? intl.formatMessage(RICH_ERROR_MESSAGES.min, { min: error.minimum as number })
+          : intl.formatMessage(RICH_ERROR_MESSAGES.minLength, { count: error.minimum as number });
     } else if (error.code === 'invalid_string') {
       message = intl.formatMessage(RICH_ERROR_MESSAGES.format);
     } else if (error.code === 'invalid_enum_value') {
@@ -235,9 +252,12 @@ export function getSchemaFromFormik(formik: FormikState<any>): SupportedZodSchem
 /**
  * A helper to create the status and validate functions (memoized).
  */
-function useFormikZodState<Values extends FormikValues = FormikValues>(schema: z.ZodSchema<Values>) {
+function useFormikZodState<Values extends FormikValues = FormikValues>(
+  schema: z.ZodSchema<Values>,
+  config?: FormikZodConfig,
+) {
   const intl = useIntl();
-  const status: FormikStatusWithSchema = React.useMemo(() => ({ schema }), [schema]);
+  const status: FormikStatusWithSchema = React.useMemo(() => ({ schema, config }), [schema, config]);
   const validate = React.useCallback(
     values => getErrorsObjectFromZodSchema<Values>(intl, schema, values),
     [intl, schema],
@@ -269,11 +289,13 @@ function useFormikZodStatusUpdater<Values extends FormikValues = FormikValues>(
  */
 export function useFormikZod<Values extends FormikValues = FormikValues>({
   schema,
+  config,
   ...props
 }: Omit<FormikConfig<Values>, 'initialStatus' | 'validate'> & {
   schema: SupportedZodSchema<Values>;
+  config?: FormikZodConfig;
 }) {
-  const { validate, status } = useFormikZodState(schema);
+  const { validate, status } = useFormikZodState(schema, config);
   const formik = useFormik<Values>({ ...props, initialStatus: status, validate });
   useFormikZodStatusUpdater(formik, status);
   return formik;
@@ -314,13 +336,15 @@ function FormikZodStatusHandler<Values extends FormikValues = FormikValues>({
  */
 export function FormikZod<Values extends FormikValues = FormikValues>({
   schema,
+  config,
   component,
   children,
   ...props
 }: Omit<React.ComponentProps<typeof Formik<Values>>, 'initialStatus' | 'validate' | 'render'> & {
   schema: SupportedZodSchema<Values>;
+  config?: FormikZodConfig;
 }) {
-  const { validate, status } = useFormikZodState(schema);
+  const { validate, status } = useFormikZodState(schema, config);
   const FormikWrapper = Formik<Values>;
   return (
     <FormikWrapper {...props} initialStatus={status} validate={validate}>

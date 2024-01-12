@@ -58,6 +58,7 @@ const StyledInputFormikField = ({
           <Container flex={flex} width={width} display={display} flexGrow={flexGrow}>
             <StyledInputField
               error={Boolean(meta.error)}
+              {...(form.status?.config || null)}
               {...props}
               htmlFor={htmlFor}
               name={fieldAttributes.name}

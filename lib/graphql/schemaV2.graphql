@@ -582,6 +582,7 @@ interface Account {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -2157,6 +2158,7 @@ type Host implements Account & AccountWithContributions {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -2402,6 +2404,16 @@ type Host implements Account & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -2462,6 +2474,16 @@ type Host implements Account & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 
   """
   List of accounting categories for this host
@@ -2859,6 +2881,16 @@ interface AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 }
 
 """
@@ -5374,6 +5406,8 @@ enum ActivityType {
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
   SUBSCRIPTION_PAUSED
+  SUBSCRIPTION_RESUMED
+  SUBSCRIPTION_READY_TO_BE_RESUMED
   TICKET_CONFIRMED
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
   ORDER_PENDING
@@ -5434,6 +5468,79 @@ enum ActivityClassType {
   VIRTUAL_CARDS
   FUND_EVENTS
   REPORTS
+}
+
+"""
+A legal document (e.g. W9, W8BEN, W8BEN-E)
+"""
+type LegalDocument {
+  """
+  Unique identifier for this legal document
+  """
+  id: String!
+
+  """
+  The year this legal document is for
+  """
+  year: Int!
+
+  """
+  The type of legal document
+  """
+  type: LegalDocumentType!
+
+  """
+  The status of the request for this legal document
+  """
+  status: LegalDocumentRequestStatus!
+
+  """
+  The service that provided this legal document
+  """
+  service: LegalDocumentService!
+
+  """
+  The date and time the request for this legal document was created
+  """
+  requestedAt: DateTime!
+
+  """
+  The date and time this legal document was last updated
+  """
+  updatedAt: DateTime!
+
+  """
+  The account this legal document is for
+  """
+  account: Account!
+}
+
+"""
+Type for a required legal document
+"""
+enum LegalDocumentType {
+  """
+  US tax form (W9, W8BEN, W8BEN-E)
+  """
+  US_TAX_FORM
+}
+
+"""
+Status for a legal document
+"""
+enum LegalDocumentRequestStatus {
+  NOT_REQUESTED
+  REQUESTED
+  RECEIVED
+  ERROR
+}
+
+"""
+Type for a required legal document
+"""
+enum LegalDocumentService {
+  DROPBOX_FORMS
+  OPENCOLLECTIVE
 }
 
 """
@@ -6218,16 +6325,6 @@ type ExpensePermissions {
 }
 
 """
-Type for a required legal document
-"""
-enum LegalDocumentType {
-  """
-  US tax form (W9)
-  """
-  US_TAX_FORM
-}
-
-"""
 Fields for an expense quote
 """
 type ExpenseQuote {
@@ -6430,6 +6527,11 @@ type OrderPermissions {
   Whether the current user can update the accounting category of this order
   """
   canUpdateAccountingCategory: Boolean!
+
+  """
+  If paused, whether the current user can resume this order
+  """
+  canResume: Boolean!
 }
 
 """
@@ -6953,6 +7055,7 @@ type Bot implements Account {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -7198,6 +7301,16 @@ type Bot implements Account {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7652,6 +7765,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -7897,6 +8011,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7997,6 +8121,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 }
 
 """
@@ -8782,6 +8916,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -9027,6 +9162,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9127,6 +9272,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 
   """
   The Account parenting this account
@@ -9701,6 +9856,7 @@ type Individual implements Account {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -9944,6 +10100,16 @@ type Individual implements Account {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10606,6 +10772,7 @@ type Organization implements Account & AccountWithContributions {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -10849,6 +11016,16 @@ type Organization implements Account & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10909,6 +11086,16 @@ type Organization implements Account & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
   """
@@ -11395,6 +11582,7 @@ type Vendor implements Account & AccountWithContributions {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -11640,6 +11828,16 @@ type Vendor implements Account & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11700,6 +11898,16 @@ type Vendor implements Account & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
   vendorInfo: VendorInfo
 
   """
@@ -12076,6 +12284,7 @@ type Query {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -12674,6 +12883,11 @@ type Query {
     """
     amount: AmountInput!
     frequency: ContributionFrequency!
+
+    """
+    The order for which the plan is created, if any
+    """
+    order: OrderReferenceInput
 
     """
     The tier you are contributing to
@@ -14052,6 +14266,8 @@ enum ActivityAndClassesType {
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
   SUBSCRIPTION_PAUSED
+  SUBSCRIPTION_RESUMED
+  SUBSCRIPTION_READY_TO_BE_RESUMED
   TICKET_CONFIRMED
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
   ORDER_PENDING
@@ -14581,6 +14797,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -14826,6 +15043,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -14926,6 +15153,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 }
 
 """
@@ -15378,6 +15615,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -15623,6 +15861,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -15723,6 +15971,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 
   """
   The Account parenting this account
@@ -16494,7 +16752,7 @@ type Mutation {
     account: AccountReferenceInput!
 
     """
-    An optional message to explain the reason for unhosting
+    An optional HTML message to provide additional context to the action
     """
     message: String
 
@@ -16533,6 +16791,26 @@ type Mutation {
     """
     currentPassword: String
   ): SetPasswordResponse!
+
+  """
+  Submit a legal document
+  """
+  submitLegalDocument(
+    """
+    The account the legal document is for
+    """
+    account: AccountReferenceInput!
+
+    """
+    The type of legal document
+    """
+    type: LegalDocumentType!
+
+    """
+    The form data for the legal document. Will be validated against the schema for the document type and encrypted.
+    """
+    formData: JSON!
+  ): LegalDocument!
 
   """
   Invite a new member to the Collective. Scope: "account".
@@ -16834,6 +17112,21 @@ type Mutation {
   To edit a pending order. Scope: "orders".
   """
   editPendingOrder(order: PendingOrderEditInput!): Order!
+
+  """
+  Starts or resumes the process of notifying contributors for their PAUSED contributions
+  """
+  startResumeOrdersProcess(
+    """
+    The account to start/resume the process for
+    """
+    account: AccountReferenceInput!
+
+    """
+    An optional message to send to contributors
+    """
+    message: String
+  ): Account!
 
   """
   Add a new payment method to be used with an Order. Scope: "orders".

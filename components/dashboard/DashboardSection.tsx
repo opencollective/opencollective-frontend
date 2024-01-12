@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
+import { cn } from '../../lib/utils';
 
 import Container from '../Container';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -30,6 +31,7 @@ import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
 import HostDashboardReports from './sections/reports/HostDashboardReports';
 import PreviewHostReports from './sections/reports/preview/HostReports';
+import { TaxInformationSettingsSection } from './sections/tax-information';
 import Team from './sections/Team';
 import AccountTransactions from './sections/transactions/AccountTransactions';
 import HostTransactions from './sections/transactions/HostTransactions';
@@ -64,7 +66,10 @@ const DASHBOARD_COMPONENTS = {
 const SETTINGS_COMPONENTS = {
   [SETTINGS_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
   [SETTINGS_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
+  [SETTINGS_SECTIONS.TAX_INFORMATION]: TaxInformationSettingsSection,
 };
+
+const SECTIONS_WITH_FULL_WIDTH = [SETTINGS_SECTIONS.TAX_INFORMATION];
 
 const DashboardSection = ({ account, isLoading, section, subpath }) => {
   const { LoggedInUser } = useLoggedInUser();
@@ -111,11 +116,10 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (SettingsComponent) {
     return (
       // <div className="flex max-w-screen-lg justify-center">
-      <div className="max-w-screen-md flex-1">
+      <div className={cn('flex-1', { 'max-w-screen-md': !SECTIONS_WITH_FULL_WIDTH.includes(section) })}>
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
-      // </div>
     );
   }
 

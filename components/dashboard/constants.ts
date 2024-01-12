@@ -26,6 +26,7 @@ export const SECTIONS = {
 export const SETTINGS_SECTIONS = {
   NOTIFICATIONS: 'notifications',
   INVOICES_RECEIPTS: 'invoices-receipts',
+  TAX_INFORMATION: 'tax-information',
 };
 
 // Sections using the AccountSettings component in /dashboard/DashboardSection
@@ -240,5 +241,8 @@ export const SECTION_LABELS = defineMessages({
   },
   [ALL_SECTIONS.VENDORS]: {
     defaultMessage: 'Vendors',
+  },
+  [ALL_SECTIONS.TAX_INFORMATION]: {
+    defaultMessage: 'Tax Information',
   },
 });
