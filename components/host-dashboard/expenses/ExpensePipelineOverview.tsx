@@ -130,7 +130,7 @@ export default function ExpensePipelineOverview(props: ExpensePipelineOverviewPr
   }
 
   return (
-    <div className={clsx('flex gap-4', props.className)}>
+    <div className={clsx('flex flex-col gap-4 sm:flex-row', props.className)}>
       <WiseStatus
         className="w-full"
         host={props.host}

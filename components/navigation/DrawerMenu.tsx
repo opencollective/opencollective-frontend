@@ -111,6 +111,9 @@ export const DrawerMenu = ({ onClose, open, anchor = 'right', children, classNam
         {...props}
       >
         {children}
+        <div className="absolute right-2 top-2">
+          <DrawerCloseButton onClick={onClose} />
+        </div>
       </SheetContent>
     </Sheet>
   );

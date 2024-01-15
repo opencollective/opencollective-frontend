@@ -47,7 +47,7 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
         {isLoading ? (
           <LoadingPlaceholder height={16} width={300} />
         ) : (
-          <div className="flex flex-1 items-center justify-between">
+          <div className="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-1">
             <div className="text-foreground">
               {intl.formatMessage(
                 ActivityTimelineMessageI18n[activity.type] || ActivityDescriptionI18n[activity.type],
