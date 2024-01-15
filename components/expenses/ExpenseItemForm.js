@@ -450,7 +450,7 @@ const ExpenseItemForm = ({
                 error={getError('amountV2')}
                 htmlFor={`${getFieldName('amountV2')}-amount`}
                 label={formatMessage(msg.amountLabel)}
-                required={!isOptional}
+                required
                 labelFontSize="13px"
                 inputType="number"
                 flexGrow={1}
