@@ -176,6 +176,13 @@ class Webhooks extends React.Component {
 
   renderWebhook = (webhook, index) => {
     const { intl, data } = this.props;
+    const hasTransactionCreatedType = webhook.type === WebhookEvents.COLLECTIVE_TRANSACTION_CREATED; // Only allow the "transaction.created" type if it's already used
+    const eventTypesOptions = this.getEventTypes(data.Collective)
+      .filter(eventType => hasTransactionCreatedType || eventType !== WebhookEvents.COLLECTIVE_TRANSACTION_CREATED)
+      .map(eventType => ({
+        label: i18nWebhookEventType(intl, eventType),
+        value: eventType,
+      }));
 
     return (
       <Flex
@@ -226,10 +233,7 @@ class Webhooks extends React.Component {
                 minWidth={300}
                 isSearchable={false}
                 inputId="event-type-select"
-                options={this.getEventTypes(data.Collective).map(eventType => ({
-                  label: i18nWebhookEventType(intl, eventType),
-                  value: eventType,
-                }))}
+                options={eventTypesOptions}
                 value={{ label: i18nWebhookEventType(intl, webhook.type), value: webhook.type }}
                 onChange={({ value }) => this.editWebhook(index, 'type', value)}
               />
