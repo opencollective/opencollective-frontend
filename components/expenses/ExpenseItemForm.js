@@ -147,7 +147,7 @@ const WithOCRComparisonWarning = ({ comparison, formatValue, children, mrClass =
   <div className="relative flex grow">
     {children}
     {Boolean(comparison?.hasMismatch) && (
-      <div className={cn('absolute right-0 top-0 mt-[10px]', mrClass)} data-cy="mismatch-warning">
+      <div className={cn('absolute right-0 top-0 mt-[9px]', mrClass)} data-cy="mismatch-warning">
         <Tooltip>
           <TooltipTrigger>
             <AlertTriangle size={16} color="#CB9C03" />
@@ -321,7 +321,7 @@ const ExpenseItemForm = ({
   const { loading: loadingExchangeRate } = useExpenseItemExchangeRate(form, itemPath);
   const exchangeRate = get(form.values, `${itemPath}.amountV2.exchangeRate`);
   const referenceExchangeRate = get(form.values, `${itemPath}.referenceExchangeRate`);
-
+  console.log(get(form.values, itemPath));
   // Store a ref to the form to make sure we can always access the latest values in async callbacks
   const formRef = React.useRef(form);
   formRef.current = form;
@@ -422,7 +422,7 @@ const ExpenseItemForm = ({
                 required={!isOptional}
                 label={formatMessage(msg.dateLabel)}
                 labelFontSize="13px"
-                flex="1 1 150px"
+                flex="1 1 170px"
                 mt={3}
                 disabled={editOnlyDescriptiveInfo}
               >

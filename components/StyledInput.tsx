@@ -26,7 +26,7 @@ const getBorderColor = ({ error, success }) => {
  */
 const StyledInput = styled.input`
   &:not([type='checkbox']):not([type='radio']):not([type='range']) {
-    min-height: 36px;
+    min-height: ${props => props.minHeight || '36px'};
   }
 
   ${background}
