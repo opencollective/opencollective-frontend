@@ -49,7 +49,7 @@ function OrderFilter({ onChange, value }: { onChange: (value: OrderFilterValue) 
   const Icon = value === 'CREATED_AT,DESC' ? ArrowDownNarrowWide : ArrowDownWideNarrow;
   return (
     <Select onValueChange={value => onChange(value as OrderFilterValue)} value={value}>
-      <Button size="sm" variant="outline" asChild className="max-w-[160px] rounded-full">
+      <Button size="sm" variant="outline" asChild className="w-fit rounded-full">
         <SelectTrigger>
           <div className="flex items-center gap-2 font-medium">
             <Icon className="-ml-0.5 h-5 w-5 text-slate-400" aria-hidden="true" />
