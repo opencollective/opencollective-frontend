@@ -220,6 +220,7 @@ function ContributionTimeline(props: OrderTimelineProps) {
         ActivityType.ORDER_PENDING_CREATED,
         ActivityType.ORDER_PENDING_RECEIVED,
         ActivityType.ORDER_PENDING,
+        ActivityType.ORDER_PROCESSED, // Covered by manually looking at the transactions below
       ]),
     )
     .map(a => {
