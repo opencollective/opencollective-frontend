@@ -321,7 +321,7 @@ const ExpenseItemForm = ({
   const { loading: loadingExchangeRate } = useExpenseItemExchangeRate(form, itemPath);
   const exchangeRate = get(form.values, `${itemPath}.amountV2.exchangeRate`);
   const referenceExchangeRate = get(form.values, `${itemPath}.referenceExchangeRate`);
-  console.log(get(form.values, itemPath));
+
   // Store a ref to the form to make sure we can always access the latest values in async callbacks
   const formRef = React.useRef(form);
   formRef.current = form;
