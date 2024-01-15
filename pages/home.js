@@ -23,7 +23,7 @@ const messages = defineMessages({
   },
 });
 
-const HomePage = () => {
+export const HomePage = () => {
   const { formatMessage } = useIntl();
 
   return (
