@@ -130,7 +130,12 @@ export const TaxesFormikFields = ({
 
   // If mounted, it means that the form is subject to taxType. Let's make sure we initialize taxes field accordingly
   React.useEffect(() => {
-    if (dispatchDefaultValueOnMount && taxType && currentTaxValue?.type !== taxType) {
+    const isForcedRate = !isOptional && !isNil(taxSpecificValues.forcedRate);
+    if (
+      dispatchDefaultValueOnMount &&
+      taxType &&
+      (currentTaxValue?.type !== taxType || (isForcedRate && taxSpecificValues.forcedRate !== currentTaxValue?.rate))
+    ) {
       dispatchChange(taxSpecificValues.forcedRate);
     }
   }, []);
