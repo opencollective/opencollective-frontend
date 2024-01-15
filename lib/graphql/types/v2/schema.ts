@@ -862,7 +862,7 @@ export type AccountingCategory = {
   /** The account this category belongs to */
   account: Host;
   /** If the category is applicable to the Host or Hosted Collectives */
-  appliesTo: AccountingCategoryAppliesTo;
+  appliesTo?: Maybe<AccountingCategoryAppliesTo>;
   /** The code of the accounting category */
   code: Scalars['String']['output'];
   /** The time of creation of this accounting category */
@@ -899,8 +899,8 @@ export type AccountingCategoryCollection = Collection & {
 
 /** Input for creating or updating an account category */
 export type AccountingCategoryInput = {
-  /** If the category is applicable to the Host or Hosted Collectives */
-  appliesTo?: AccountingCategoryAppliesTo;
+  /** If the category is applicable to the Host or Hosted Collectives, or both if null */
+  appliesTo?: InputMaybe<AccountingCategoryAppliesTo>;
   /** The code of the accounting category */
   code?: InputMaybe<Scalars['NonEmptyString']['input']>;
   /** If meant for expenses, the types of expenses this category applies to */
@@ -1059,10 +1059,10 @@ export enum ActivityAndClassesType {
   ORDER_PENDING_EXPIRED = 'ORDER_PENDING_EXPIRED',
   ORDER_PENDING_FOLLOWUP = 'ORDER_PENDING_FOLLOWUP',
   ORDER_PENDING_RECEIVED = 'ORDER_PENDING_RECEIVED',
+  ORDER_PROCESSED = 'ORDER_PROCESSED',
   ORDER_PROCESSING = 'ORDER_PROCESSING',
   ORDER_REVIEW_CLOSED = 'ORDER_REVIEW_CLOSED',
   ORDER_REVIEW_OPENED = 'ORDER_REVIEW_OPENED',
-  ORDER_THANKYOU = 'ORDER_THANKYOU',
   ORDER_UPDATED = 'ORDER_UPDATED',
   ORGANIZATION_COLLECTIVE_CREATED = 'ORGANIZATION_COLLECTIVE_CREATED',
   PAYMENT_CREDITCARD_CONFIRMATION = 'PAYMENT_CREDITCARD_CONFIRMATION',
@@ -1243,10 +1243,10 @@ export enum ActivityType {
   ORDER_PENDING_EXPIRED = 'ORDER_PENDING_EXPIRED',
   ORDER_PENDING_FOLLOWUP = 'ORDER_PENDING_FOLLOWUP',
   ORDER_PENDING_RECEIVED = 'ORDER_PENDING_RECEIVED',
+  ORDER_PROCESSED = 'ORDER_PROCESSED',
   ORDER_PROCESSING = 'ORDER_PROCESSING',
   ORDER_REVIEW_CLOSED = 'ORDER_REVIEW_CLOSED',
   ORDER_REVIEW_OPENED = 'ORDER_REVIEW_OPENED',
-  ORDER_THANKYOU = 'ORDER_THANKYOU',
   ORDER_UPDATED = 'ORDER_UPDATED',
   ORGANIZATION_COLLECTIVE_CREATED = 'ORGANIZATION_COLLECTIVE_CREATED',
   PAYMENT_CREDITCARD_CONFIRMATION = 'PAYMENT_CREDITCARD_CONFIRMATION',
