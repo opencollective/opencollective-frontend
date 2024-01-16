@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { Field, useFormikContext } from 'formik';
-import { get, kebabCase, partition, set } from 'lodash';
+import { compact, get, kebabCase, partition, set } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
@@ -213,7 +213,7 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
                       refetch({
                         slug: host ? host.slug : WISE_PLATFORM_COLLECTIVE_SLUG,
                         currency,
-                        accountDetails: get(set({ ...formik.values }, field.name, value), getFieldName('data')),
+                        accountDetails: get(set({ ...formik.values }, field.name, value), getFieldName('')),
                       });
                     }
                   }}
@@ -387,7 +387,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
               disabled={disabled}
               field={field}
               formik={formik}
-              getFieldName={string => getFieldName(`data.${string}`)}
+              getFieldName={string => getFieldName(compact(['data', string]).join('.'))}
               host={host}
               key={kebabCase(field.name)}
               loading={loading}
@@ -419,7 +419,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
               disabled={disabled}
               field={field}
               formik={formik}
-              getFieldName={string => getFieldName(`data.${string}`)}
+              getFieldName={string => getFieldName(compact(['data', string]).join('.'))}
               host={host}
               key={kebabCase(field.name)}
               loading={loading}
