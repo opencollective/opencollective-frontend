@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { flatten } from 'lodash';
-import { ArrowRight, X } from 'lucide-react';
+import { Megaphone, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -12,6 +12,7 @@ import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 
 import DismissibleMessage from '../../../DismissibleMessage';
 import ExpenseDrawer from '../../../expenses/ExpenseDrawer';
+import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';
 import { Flex } from '../../../Grid';
 import Image from '../../../Image';
 import MessageBox from '../../../MessageBox';
@@ -20,6 +21,7 @@ import StyledButton from '../../../StyledButton';
 import { makeTruncatedValueAllSelectedLabelContainer, StyledSelectFilter } from '../../../StyledSelectFilter';
 import { H2 } from '../../../Text';
 import { Alert, AlertDescription, AlertTitle } from '../../../ui/Alert';
+import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import { DashboardSectionProps } from '../../types';
 
@@ -46,6 +48,7 @@ const getFilterOptions = intl => [
 const Home = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
+  const [showFeedbackModal, setShowFeedbackModal] = React.useState(false);
   const filterOptions = React.useMemo(() => getFilterOptions(intl), [intl]);
   const [filters, setFilters] = React.useState(filterOptions);
   const [isTimelineBeingGenerated, setIsTimelineBeingGenerated] = React.useState(false);
@@ -185,22 +188,17 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
                 </div>
 
                 <AlertDescription className="mt-1 max-w-prose">
-                  <FormattedMessage
-                    id="Dashboard.Banner.Description"
-                    defaultMessage="We’ve created this space for you to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations."
-                  />
-                  <div className="mt-3 flex justify-between space-x-2">
-                    <a
-                      href="https://docs.google.com/forms/d/1-WGUCUF_i5HPS6AsN8kTfqofyt0q0HB-q7na4cQL788/viewform"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className=" group font-medium hover:underline"
-                    >
-                      <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />{' '}
-                      <ArrowRight className="inline-block group-hover:animate-arrow-right" size={16} />
-                    </a>
-                  </div>
+                  <p>
+                    <FormattedMessage
+                      id="Dashboard.Banner.Description"
+                      defaultMessage="We’ve created this space for you to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations."
+                    />
+                  </p>
                 </AlertDescription>
+                <Button variant="outline" className="mt-2 gap-2  xl:w-full" onClick={() => setShowFeedbackModal(true)}>
+                  <Megaphone size={16} />
+                  <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />
+                </Button>
               </div>
 
               <button
@@ -213,6 +211,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
           )}
         </DismissibleMessage>
       </div>
+      <FeedbackModal open={showFeedbackModal} setOpen={setShowFeedbackModal} feedbackKey={FEEDBACK_KEY.DASHBOARD} />
     </div>
   );
 };
