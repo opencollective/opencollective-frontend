@@ -31,7 +31,7 @@ const CollectiveTag = ({
 }) => {
   return (
     <div className="inline-block">
-      <div className="flex">
+      <div className="flex flex-wrap">
         <ResourceTag>
           <Avatar collective={collective} radius={14} display="inline-block" verticalAlign="middle" mr={1} mb="1px" />
           <LinkCollective collective={collective} openInNewTab={openInNewTab} />

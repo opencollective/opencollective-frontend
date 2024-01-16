@@ -126,19 +126,17 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
         />
       ) : (
         <React.Fragment>
-          <div className="min-w-[630px] overflow-x-auto">
-            <AgreementsTable
-              agreements={data?.host.hostedAccountAgreements}
-              loading={loading}
-              nbPlaceholders={NB_AGREEMENTS_DISPLAYED}
-              resetFilters={() => queryFilter.resetFilters({})}
-              onFilePreview={setAgreementFilePreview}
-              openAgreement={agreement => {
-                setAgreementDrawerOpen(true);
-                setAgreementInDrawer(agreement);
-              }}
-            />
-          </div>
+          <AgreementsTable
+            agreements={data?.host.hostedAccountAgreements}
+            loading={loading}
+            nbPlaceholders={NB_AGREEMENTS_DISPLAYED}
+            resetFilters={() => queryFilter.resetFilters({})}
+            onFilePreview={setAgreementFilePreview}
+            openAgreement={agreement => {
+              setAgreementDrawerOpen(true);
+              setAgreementInDrawer(agreement);
+            }}
+          />
 
           <Flex my={4} justifyContent="center">
             {hasPagination(data || previousData, variables) && (

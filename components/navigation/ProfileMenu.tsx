@@ -231,11 +231,9 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
         )}
       </Popover>
       {isMobile && (
-        <React.Fragment>
-          <DrawerMenu onClose={() => setMenuOpen(false)} open={isMenuOpen}>
-            {content}
-          </DrawerMenu>
-        </React.Fragment>
+        <DrawerMenu onClose={() => setMenuOpen(false)} open={isMenuOpen}>
+          {content}
+        </DrawerMenu>
       )}
     </React.Fragment>
   );

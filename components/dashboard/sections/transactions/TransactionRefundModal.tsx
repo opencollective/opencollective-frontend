@@ -13,10 +13,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '../../../ui/AlertDialog';
 import { Button } from '../../../ui/Button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { toast } from '../../../ui/useToast';
 
 export const refundTransactionMutation = gql`
@@ -27,11 +25,20 @@ export const refundTransactionMutation = gql`
   }
 `;
 
-const TransactionRefundButton = ({ id, onMutationSuccess }: { id: string; onMutationSuccess?: () => void }) => {
+const TransactionRefundModal = ({
+  open,
+  setOpen,
+  id,
+  onMutationSuccess,
+}: {
+  id: string;
+  onMutationSuccess?: () => void;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}) => {
   const [refundTransaction, { loading }] = useMutation(refundTransactionMutation, {
     context: API_V2_CONTEXT,
   });
-  const [open, setOpen] = React.useState(false);
   const handleRefundTransaction = async () => {
     try {
       await refundTransaction({ variables: { transaction: { id } } });
@@ -45,33 +52,13 @@ const TransactionRefundButton = ({ id, onMutationSuccess }: { id: string; onMuta
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <AlertDialogTrigger asChild>
-            <Button variant="outline" size="xs" className="gap-1">
-              <Undo2 size={16} />
-              <span>
-                <FormattedMessage id="Refund" defaultMessage="Refund" />
-              </span>
-            </Button>
-          </AlertDialogTrigger>
-        </TooltipTrigger>
-
-        <TooltipContent className="max-w-xs">
-          <FormattedMessage defaultMessage="Refunding will reimburse the full amount back to your contributor. They can contribute again in the future." />
-        </TooltipContent>
-      </Tooltip>
-
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
             <FormattedMessage defaultMessage="Are you sure you want to refund this transaction?" />
           </AlertDialogTitle>
           <AlertDialogDescription>
-            <FormattedMessage
-              id="transaction.refund.info"
-              defaultMessage="The contributor will be refunded the full amount."
-            />
+            <FormattedMessage defaultMessage="Refunding will reimburse the full amount back to your contributor. They can contribute again in the future." />
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -88,4 +75,4 @@ const TransactionRefundButton = ({ id, onMutationSuccess }: { id: string; onMuta
   );
 };
 
-export default TransactionRefundButton;
+export default TransactionRefundModal;
