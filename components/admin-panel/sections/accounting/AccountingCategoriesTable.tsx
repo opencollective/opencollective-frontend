@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { cloneDeep, get, isEqual, omit, pick, uniq } from 'lodash';
+import { cloneDeep, get, isEqual, omit, pick, set, uniq } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
@@ -242,7 +242,10 @@ export const AccountingCategoriesTable = ({ hostSlug }: AccountingCategoriesTabl
         e.preventDefault();
         try {
           const editableFields = ['code', 'name', 'friendlyName', 'expensesTypes'];
-          const cleanCategories = categories.map(category => pick(category, ['id', ...editableFields]));
+          const cleanCategories = categories
+            .map(category => pick(category, ['id', ...editableFields]))
+            .map(category => set(category, 'kind', 'EXPENSE')); // We only support expense categories for now, but the API expects a kind
+
           await editAccountingCategories({ variables: { categories: cleanCategories } });
           toast({ variant: 'success', message: intl.formatMessage({ id: 'saved', defaultMessage: 'Saved' }) });
         } catch (e) {

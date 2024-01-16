@@ -513,7 +513,7 @@ const hostFieldsFragment = gql`
       id
       availableCurrencies
     }
-    accountingCategories {
+    accountingCategories(kind: EXPENSE) {
       nodes {
         id
         ...AccountingCategoryFields
