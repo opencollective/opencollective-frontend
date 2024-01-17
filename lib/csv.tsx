@@ -7,6 +7,7 @@ export const AVERAGE_TRANSACTIONS_PER_MINUTE = 8240;
 export const HOST_OMITTED_FIELDS = ['balance', 'hostSlug', 'hostName', 'hostType'];
 
 type CSVField =
+  | 'accountingCategory'
   | 'date'
   | 'datetime'
   | 'id'
@@ -105,7 +106,15 @@ export const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
     'paymentMethodService',
     'paymentMethodType',
   ],
-  expense: ['expenseId', 'expenseLegacyId', 'expenseType', 'expenseTags', 'payoutMethodType', 'merchantId'],
+  expense: [
+    'accountingCategory',
+    'expenseId',
+    'expenseLegacyId',
+    'expenseType',
+    'expenseTags',
+    'payoutMethodType',
+    'merchantId',
+  ],
   tax: ['taxAmount', 'taxType', 'taxRate', 'taxIdNumber'],
   legacy: ['platformFee', 'hostFee'],
 };
@@ -163,6 +172,7 @@ export const DEFAULT_FIELDS = [
 export const DEFAULT_FIELDS_2024 = DEFAULT_FIELDS.filter(field => field !== 'paymentProcessorFee');
 
 export const FieldLabels: Record<CSVField, React.ReactNode> = {
+  accountingCategory: <FormattedMessage defaultMessage="Accounting Category" />,
   date: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
   datetime: <FormattedMessage defaultMessage="Date & Time" />,
   id: <FormattedMessage defaultMessage="Transaction ID" />,
