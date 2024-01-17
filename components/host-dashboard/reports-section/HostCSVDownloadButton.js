@@ -11,7 +11,7 @@ const HostCSVDownloadButton = ({ host, collectives, dateInterval }) => {
   return (
     <React.Fragment>
       <Button size="sm" variant="outline" className="" onClick={() => setDisplayModal(true)} disabled={!host}>
-        <FormattedMessage defaultMessage="Export CSV" />
+        <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
       </Button>
       {displayModal && (
         <ExportTransactionsCSVModal

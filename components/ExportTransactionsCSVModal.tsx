@@ -367,7 +367,7 @@ const ExportTransactionsCSVModal = ({
             href={disabled ? undefined : downloadUrl}
             disabled={disabled}
           >
-            <FormattedMessage defaultMessage="Export CSV" />
+            <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
           </StyledButton>
         </Flex>
       </ModalFooter>

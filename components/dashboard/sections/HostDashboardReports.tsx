@@ -217,7 +217,7 @@ const HostDashboardReports = ({ accountSlug: hostSlug }: DashboardSectionProps) 
             queryFilter={queryFilter}
             trigger={
               <Button size="sm" variant="outline">
-                <FormattedMessage defaultMessage="Export CSV" />
+                <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
               </Button>
             }
           />

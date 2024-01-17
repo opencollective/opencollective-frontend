@@ -208,7 +208,7 @@ const Transactions = ({ accountSlug }: DashboardSectionProps) => {
                       setDisplayExportCSVModal(true);
                     }}
                   >
-                    <FormattedMessage defaultMessage="Export CSV" />
+                    <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
                   </DropdownMenuItem>
                 }
               />

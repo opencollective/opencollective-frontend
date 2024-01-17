@@ -377,7 +377,7 @@ const ExportTransactionsCSVModal = ({
         <DialogFooter>
           <Button asChild loading={isFetchingRows} disabled={disabled}>
             <a href={url} rel="noreferrer" target="_blank">
-              <FormattedMessage defaultMessage="Export CSV" />
+              <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
             </a>
           </Button>
         </DialogFooter>

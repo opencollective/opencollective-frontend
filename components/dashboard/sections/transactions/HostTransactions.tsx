@@ -153,7 +153,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
               hostSlug={hostSlug}
               trigger={
                 <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
-                  <FormattedMessage defaultMessage="Export CSV" />
+                  <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
                 </Button>
               }
             />
