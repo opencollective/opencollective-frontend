@@ -359,6 +359,7 @@ const CollectiveDetails = ({
                   amount={collective.stats.balance.valueInCents}
                   currency={collective.stats.balance.currency}
                   showCurrencyCode={false}
+                  amountStyles={{}}
                 />
               }
             />
@@ -424,6 +425,7 @@ const CollectiveDetails = ({
                         mobileTableView
                         compact
                         meta={{ intl, openCollectiveDetails }}
+                        onClickRow={row => openCollectiveDetails(row.original)}
                         className="border-none"
                       />
                     }

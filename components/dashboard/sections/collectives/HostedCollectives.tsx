@@ -102,8 +102,8 @@ const ROUTE_PARAMS = ['slug', 'section', 'view'];
 const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
   const router = useRouter();
-  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Collective | null | string>(
-    subpath[0] || null,
+  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Collective | undefined | string>(
+    subpath[0],
   );
   const { data: metadata, refetch: refetchMetadata } = useQuery(hostedCollectivesMetadataQuery, {
     variables: { hostSlug },
@@ -168,15 +168,15 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
 
   useEffect(() => {
     if (subpath[0] !== ((showCollectiveOverview as Collective)?.id || showCollectiveOverview)) {
-      handleDrawer(subpath[0] || null);
+      handleDrawer(subpath[0]);
     }
-  }, [subpath]);
+  }, [subpath[0]]);
 
-  const handleDrawer = (collective: Collective | string | null) => {
+  const handleDrawer = (collective: Collective | string | undefined) => {
     if (collective) {
       pushSubpath(typeof collective === 'string' ? collective : collective.id);
     } else {
-      pushSubpath(null);
+      pushSubpath(undefined);
     }
     setShowCollectiveOverview(collective);
   };
@@ -188,7 +188,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
 
   const hostedAccounts = data?.host?.hostedAccounts;
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />} />
       <Filterbar {...queryFilter} />
       {error && <MessageBoxGraphqlError error={error} mb={2} />}
@@ -202,13 +202,14 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
         <React.Fragment>
           <DataTable
             data-cy="transactions-table"
-            innerClassName="text-xs text-muted-foreground"
+            innerClassName="text-muted-foreground"
             columns={[cols.collective, cols.team, cols.fee, cols.hostedSince, cols.balance, cols.actions]}
             data={hostedAccounts?.nodes || []}
             loading={loading}
             mobileTableView
             compact
             meta={{ intl, openCollectiveDetails: handleDrawer, onEdit: handleEdit, host: data?.host }}
+            onClickRow={row => handleDrawer(row.original)}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

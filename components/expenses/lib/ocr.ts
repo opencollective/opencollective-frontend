@@ -158,6 +158,9 @@ const compareItemOCRValue = (
         hasMismatch: hasCurrencyMismatch || hasAmountMismatch,
         ocrValue,
       };
+    } else if (field === 'incurredAt') {
+      const normalizeDateStr = dateStr => dateStr.split('T')[0];
+      return { hasMismatch: normalizeDateStr(ocrValue) !== normalizeDateStr(existingValue), ocrValue };
     } else {
       return { hasMismatch: existingValue !== ocrValue, ocrValue };
     }

@@ -105,7 +105,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     valueRenderer: ({ value, intl }) => i18nPayoutMethodType(intl, value),
   },
   chargeHasReceipts: {
-    labelMsg: defineMessage({ id: 'expenses.chargeHasReceiptsFilter', defaultMessage: 'Charge Receipts' }),
+    labelMsg: defineMessage({ id: 'expenses.chargeHasReceiptsFilter', defaultMessage: 'Virtual Card Charge Receipts' }),
     Component: ({ valueRenderer, intl, ...props }) => (
       <ComboSelectFilter
         options={[true, false].map(value => ({ value, label: valueRenderer({ value, intl }) }))}

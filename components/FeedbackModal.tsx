@@ -17,6 +17,7 @@ import { sendSurveyResponseMutation } from './Survey';
 export enum FEEDBACK_KEY {
   HOST_TRANSACTIONS = 'HOST_TRANSACTIONS',
   GENERAL_FEEDBACK = 'GENERAL_FEEDBACK',
+  DASHBOARD = 'DASHBOARD',
 }
 
 export function FeedbackModal({
@@ -96,7 +97,7 @@ export function FeedbackModal({
 
                   <DialogFooter>
                     <DialogClose asChild>
-                      <Button variant="ghost">
+                      <Button variant="outline">
                         <FormattedMessage id="Close" defaultMessage="Close" />
                       </Button>
                     </DialogClose>

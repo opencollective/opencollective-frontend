@@ -57,7 +57,7 @@ describe('Expense flow', () => {
       cy.getByDataCy('expense-summary-btn').should('be.disabled');
 
       // Upload 2 files to the multi-files dropzone
-      cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
+      cy.getByDataCy('expense-multi-items-dropzone').selectFile(
         [getReceiptFixture({ fileName: 'receipt0.jpg' }), getReceiptFixture()],
         { action: 'drag-drop' },
       );
@@ -155,7 +155,7 @@ describe('Expense flow', () => {
       cy.get('textarea[name="description"]').type('An Expense with OCR enabled');
 
       // Upload 2 files to the multi-files dropzone
-      cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
+      cy.getByDataCy('expense-multi-items-dropzone').selectFile(
         [getReceiptFixture({ fileName: 'receipt0.jpg' }), getReceiptFixture({ fileName: 'receipt1.jpg' })],
         { action: 'drag-drop' },
       );
@@ -238,7 +238,7 @@ describe('Expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'Euro').click();
 
       // Upload a file to the multi-files dropzone
-      cy.getByDataCy('expense-multi-attachments-dropzone').selectFile(
+      cy.getByDataCy('expense-multi-items-dropzone').selectFile(
         [getReceiptFixture({ fileName: 'receipt0.jpg' })], // A receipt in USD
         { action: 'drag-drop' },
       );

@@ -153,7 +153,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
   const applicableTax = getApplicableTaxType(order.toAccount, order.toAccount.host);
 
   return (
-    <StyledModal width="578px" onClose={onClose} trapFocus>
+    <StyledModal width="578px" onClose={onClose}>
       <CollectiveModalHeader
         collective={order.toAccount}
         customText={

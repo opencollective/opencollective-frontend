@@ -1,5 +1,5 @@
 import React from 'react';
-import { uniq } from 'lodash';
+import { omit, uniq } from 'lodash';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
@@ -7,11 +7,13 @@ import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filt
 import { integer, isMulti, isNullable, limit, offset } from '../../../../lib/filters/schemas';
 import {
   Currency,
+  ExpenseType,
   PaymentMethodType,
   TransactionKind,
   TransactionsTableQueryVariables,
   TransactionType,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nPaymentMethodType } from '../../../../lib/i18n/payment-method-type';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { sortSelectOptions } from '../../../../lib/utils';
@@ -36,6 +38,7 @@ export const schema = z.object({
   type: z.nativeEnum(TransactionType).optional(),
   paymentMethodType: isMulti(isNullable(z.nativeEnum(PaymentMethodType))).optional(),
   virtualCard: isMulti(z.string()).optional(),
+  expenseType: isMulti(z.nativeEnum(ExpenseType)).optional(),
   expenseId: integer.optional(),
   contributionId: integer.optional(),
   openTransactionId: z.string().optional(),
@@ -121,6 +124,20 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   group: {
     labelMsg: defineMessage({ defaultMessage: 'Transaction group' }),
     valueRenderer: ({ value }) => value.substring(0, 8),
+  },
+  expenseType: {
+    labelMsg: defineMessage({ defaultMessage: 'Expense type' }),
+
+    Component: ({ valueRenderer, intl, ...props }) => (
+      <ComboSelectFilter
+        isMulti
+        options={Object.values(omit(ExpenseType, ExpenseType.FUNDING_REQUEST))
+          .map(value => ({ label: valueRenderer({ value, intl }), value }))
+          .sort(sortSelectOptions)}
+        {...props}
+      />
+    ),
+    valueRenderer: ({ value, intl }) => i18nExpenseType(intl, value),
   },
   contributionId: {
     labelMsg: defineMessage({ defaultMessage: 'Contribution ID' }),

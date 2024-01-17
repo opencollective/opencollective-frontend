@@ -206,7 +206,7 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
   const loading = query.loading;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="VirtualCardRequests.Title" defaultMessage="Virtual Card Requests" />}
         description={

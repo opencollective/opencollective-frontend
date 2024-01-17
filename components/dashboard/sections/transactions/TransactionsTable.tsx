@@ -83,7 +83,7 @@ const cols = {
   account: {
     accessorKey: 'account',
     header: () => <FormattedMessage defaultMessage="Account" />,
-    meta: { className: 'w-48' },
+    meta: { className: 'w-32 2xl:w-48' },
     cell: ({ cell }) => {
       const account = cell.getValue() as Transaction['account'];
 
@@ -103,7 +103,7 @@ const cols = {
   oppositeAccount: {
     accessorKey: 'oppositeAccount',
     header: () => <FormattedMessage defaultMessage="Opposite account" />,
-    meta: { className: 'w-48' },
+    meta: { className: 'w-32 2xl:w-48' },
     cell: ({ cell }) => {
       const account = cell.getValue() as Transaction['oppositeAccount'];
       return (
@@ -155,7 +155,7 @@ const cols = {
   },
   kind: {
     accessorKey: 'kind',
-    meta: { className: 'lg:w-80 w-48' },
+    meta: { className: 'w-32 2xl:w-auto' },
     header: () => <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />,
     cell: ({ cell, table, row }) => {
       const { intl } = table.options.meta as { intl: any };

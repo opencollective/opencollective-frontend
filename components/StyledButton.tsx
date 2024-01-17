@@ -43,6 +43,7 @@ export type StyledButtonProps = BackgroundProps &
     type?: 'button' | 'submit' | 'reset';
     truncateOverflow?: boolean;
     as?: any;
+    'data-cy'?: string;
   };
 
 /**

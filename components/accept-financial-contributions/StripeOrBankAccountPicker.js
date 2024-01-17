@@ -134,11 +134,14 @@ class StripeOrBankAccountPicker extends React.Component {
                     mt={[2, 3]}
                     mb={3}
                     minWidth={'145px'}
+                    loading={buttonLoading}
                     onClick={async () => {
                       try {
+                        this.setState({ buttonLoading: true });
                         await addHost(collective, host);
                         await this.connectStripe();
                       } catch (e) {
+                        this.setState({ buttonLoading: false });
                         toast({
                           variant: 'error',
                           message: i18nGraphqlException(intl, e),

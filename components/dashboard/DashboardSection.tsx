@@ -20,6 +20,7 @@ import HostedCollectives from './sections/collectives/HostedCollectives';
 import HostFinancialContributions from './sections/contributions/HostFinancialContributions';
 import IncomingContributions from './sections/contributions/IncomingContributions';
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
+import Contributors from './sections/Contributors';
 import HostExpenses from './sections/expenses/HostDashboardExpenses';
 import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
 import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
@@ -49,6 +50,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.OVERVIEW]: Overview,
   [SECTIONS.EXPENSES]: ReceivedExpenses,
   [SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
+  [SECTIONS.CONTRIBUTORS]: Contributors,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
   [SECTIONS.TRANSACTIONS]: Transactions,
@@ -91,7 +93,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
-      <div className="w-full">
+      <div className="w-full max-w-screen-lg">
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <AccountSettings account={account} section={section} />
@@ -103,19 +105,23 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   const SettingsComponent = SETTINGS_COMPONENTS[section];
   if (SettingsComponent) {
     return (
-      <div className="max-w-screen-md">
+      // <div className="flex max-w-screen-lg justify-center">
+      <div className="max-w-screen-md flex-1">
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
+      // </div>
     );
   }
 
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
-      <div className="max-w-screen-md">
+      // <div className="flex max-w-screen-lg justify-center">
+      <div className="max-w-screen-md flex-1">
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <AccountSettings account={account} section={section} />
       </div>
+      // </div>
     );
   }
 

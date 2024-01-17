@@ -65,9 +65,13 @@ const ExportTransactionsCSVModal = ({
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [fieldOption, setFieldOption] = React.useState(FieldOptions[0].value);
   const [csvVersion, setCsvVersion] = React.useState(CsvVersions[0].value);
-  const [fieldGroups, setFieldGroups] = React.useState(FIELD_GROUPS);
+  // const [fieldGroups, setFieldGroups] = React.useState(FIELD_GROUPS);
   const [fields, setFields] = React.useState(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
   const [isValidDateInterval, setIsValidDateInterval] = React.useState(true);
+
+  const fieldGroups = parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES'))
+    ? FIELD_GROUPS_2024
+    : FIELD_GROUPS;
 
   const {
     loading: isFetchingRows,
@@ -95,7 +99,7 @@ const ExportTransactionsCSVModal = ({
     setCsvVersion(value);
     const defaultFields = value === CSV_VERSIONS.VERSION_2024 ? DEFAULT_FIELDS_2024 : DEFAULT_FIELDS;
     setFields(defaultFields.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
-    setFieldGroups(value === CSV_VERSIONS.VERSION_2024 ? FIELD_GROUPS_2024 : FIELD_GROUPS);
+    // setFieldGroups(value === CSV_VERSIONS.VERSION_2024 ? FIELD_GROUPS_2024 : FIELD_GROUPS);
   };
 
   const handleFieldOptionsChange = ({ value }) => {

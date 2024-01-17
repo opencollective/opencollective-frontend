@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Field } from 'formik';
-import { get, set } from 'lodash';
+import { compact, get, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
@@ -72,8 +72,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required }) => {
   const { formatMessage } = intl;
   const isNew = !payoutMethod.id;
 
-  const fixedPrefix = fieldsPrefix ? `${fieldsPrefix}.` : '';
-  const getFieldName = field => `${fixedPrefix}${field}`;
+  const getFieldName = field => compact([fieldsPrefix, field]).join('.');
 
   return (
     <Box>

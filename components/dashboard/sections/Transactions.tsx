@@ -179,7 +179,7 @@ const Transactions = ({ accountSlug }: DashboardSectionProps) => {
   const { transactions, account } = data || {};
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="menu.transactions" defaultMessage="Transactions" />}
         actions={

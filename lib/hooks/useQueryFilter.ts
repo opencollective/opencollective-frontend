@@ -44,7 +44,7 @@ export default function useQueryFilter<
   schema: S; // Schema for all query filters (both those which are available to the user in Query and those which are not)
   filters: FilterComponentConfigs<z.infer<S>, FilterMeta>; // Configuration of filters available to the user in the `Filter` component (used in this hook to determine `hasFilters` and `activeViewId`)
   toVariables?: Partial<FiltersToVariables<z.infer<S>, GQLQueryVars, FilterMeta>>;
-  defaultFilterValues?: Partial<z.infer<S>>; // Default values for filters, views[0].filter will be used if not set
+  defaultFilterValues?: Partial<z.infer<S>>; // Default valuFes for filters, views[0].filter will be used if not set
   meta?: FilterMeta;
   views?: Views<z.infer<S>>;
 }): useQueryFilterReturnType<S, GQLQueryVars> {

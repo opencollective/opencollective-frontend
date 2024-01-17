@@ -56,7 +56,10 @@ const AdminPanelSideBar = ({
 
   return (
     <div
-      className={cn('w-full flex-shrink-0 flex-grow-0 md:w-64', isMobile && 'sticky top-0 z-10 bg-white py-2.5')}
+      className={cn(
+        'w-full flex-shrink-0 flex-grow-0 md:w-52 xl:w-64',
+        isMobile && 'sticky top-0 z-10 bg-white py-2.5',
+      )}
       {...props}
     >
       <div className="sticky top-8">
@@ -69,7 +72,7 @@ const AdminPanelSideBar = ({
               </StyledRoundButton>
 
               <React.Fragment>
-                <DrawerMenu anchor="left" open={isMenuOpen} onClose={() => setMenuOpen(false)} p="16px">
+                <DrawerMenu anchor="left" open={isMenuOpen} onClose={() => setMenuOpen(false)} className="p-4 pt-10">
                   {content}
                 </DrawerMenu>
               </React.Fragment>

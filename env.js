@@ -20,6 +20,7 @@ debug.enable(process.env.DEBUG);
 const defaults = {
   PORT: 3000,
   NODE_ENV: 'development',
+  HOSTNAME: 'localhost',
   API_KEY: '09u624Pc9F47zoGLlkg1TBSbOl2ydSAq',
   API_URL: 'https://api-staging.opencollective.com',
   IMAGES_URL: 'https://images-staging.opencollective.com',
@@ -45,7 +46,7 @@ const defaults = {
   WISE_ENVIRONMENT: 'sandbox',
   API_PROXY: true,
   SENTRY_TRACES_SAMPLE_RATE: null,
-  LEDGER_SEPARATE_PAYMENT_PROCESSOR_FEES: false,
+  LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
 };
 
 if ((process.env.OC_ENV || process.env.NODE_ENV || 'production') === 'production') {

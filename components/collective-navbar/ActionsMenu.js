@@ -52,7 +52,7 @@ const MenuItem = styled('li')`
     letter-spacing: -0.4px;
     outline: none;
 
-    @media (max-width: 40em) {
+    @media (max-width: 39.938em) {
       font-size: 14px;
     }
 
@@ -121,7 +121,7 @@ const ActionsDropdown = styled(Dropdown)`
     }
   }
 
-  @media (max-width: 40em) {
+  @media (max-width: 39.938em) {
     ${DropdownArrow} {
       display: none !important;
     }
@@ -145,7 +145,7 @@ const ActionsDropdown = styled(Dropdown)`
   ${props =>
     props.$isHiddenOnNonMobile &&
     css`
-      @media screen and (min-width: 40em) {
+      @media screen and (min-width: 39.938em) {
         display: none;
       }
     `}
@@ -161,14 +161,14 @@ const StyledActionButton = styled(ActionButton).attrs({ isSecondary: true })`
     margin-right: 4px;
   }
 
-  @media (max-width: 40em) {
+  @media (max-width: 39.938em) {
     cursor: none;
     pointer-events: none;
   }
 `;
 
 const StyledChevronDown = styled(ChevronDown)`
-  @media (max-width: 40em) {
+  @media (max-width: 39.938em) {
     display: none;
   }
 `;

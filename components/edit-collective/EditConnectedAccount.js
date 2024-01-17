@@ -8,7 +8,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { connectAccount, connectAccountCallback, disconnectAccount } from '../../lib/api';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
-import { getWebsiteUrl, parseToBoolean } from '../../lib/utils';
+import { getWebsiteUrl, isValidUrl, parseToBoolean } from '../../lib/utils';
 
 import DateTime from '../DateTime';
 import { Box, Flex } from '../Grid';
@@ -104,7 +104,7 @@ class EditConnectedAccount extends React.Component {
     }
   }
 
-  connect = service => {
+  connect = async service => {
     const { collective, options } = this.props;
     this.setState({ isConnecting: true });
 
@@ -112,26 +112,34 @@ class EditConnectedAccount extends React.Component {
     if (service === 'github' || service === 'twitter') {
       const redirectUrl = `${getWebsiteUrl()}/api/connected-accounts/${service}/oauthUrl`;
       const redirectUrlParams = new URLSearchParams({ CollectiveId: collective.id });
-
       const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
       if (accessToken) {
-        redirectUrlParams.set('access_token', accessToken); // eslint-disable-line camelcase
+        redirectUrlParams.set('access_token', accessToken);
       }
 
       window.location.href = `${redirectUrl}?${redirectUrlParams.toString()}`;
-
       return;
     }
 
-    connectAccount(collective.id, service, options)
-      .then(json => {
-        return (window.location.href = json.redirectUrl);
-      })
-      .catch(err => {
-        // TODO: this should be reported to the user
-        // eslint-disable-next-line no-console
-        console.error(`>>> /api/connected-accounts/${service} error`, err);
+    try {
+      const json = await connectAccount(collective.id, service, options);
+      if (!json?.redirectUrl || !isValidUrl(json.redirectUrl)) {
+        throw new Error('Invalid redirect URL');
+      }
+
+      window.location.href = json.redirectUrl;
+    } catch (e) {
+      this.setState({ isConnecting: false });
+      Sentry.captureException(e);
+      toast({
+        variant: 'error',
+        title: this.props.intl.formatMessage(
+          { defaultMessage: 'Error while connecting {service} account' },
+          { service },
+        ),
+        message: e.message,
       });
+    }
   };
 
   disconnect = async service => {

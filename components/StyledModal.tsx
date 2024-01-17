@@ -1,39 +1,22 @@
+// @deprecated, use `components/ui/Dialog` instead
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Times } from '@styled-icons/fa-solid/Times';
 import propTypes from '@styled-system/prop-types';
 import { themeGet } from '@styled-system/theme-get';
-import FocusTrap from 'focus-trap-react';
-import { createPortal } from 'react-dom';
+import clsx from 'clsx';
+import { isNil, omitBy } from 'lodash';
 import { useIntl } from 'react-intl';
-import styled, { createGlobalStyle, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { background, BackgroundProps, LayoutProps, margin, overflow, space, SpaceProps } from 'styled-system';
 
-import useKeyBoardShortcut, { ESCAPE_KEY } from '../lib/hooks/useKeyboardKey';
-
+import { Dialog, DialogContent } from './ui/Dialog';
 import Avatar from './Avatar';
 import Container from './Container';
 import { Flex } from './Grid';
-import { fadeIn } from './StyledKeyframes';
 import StyledLinkButton from './StyledLinkButton';
 import { P, Span } from './Text';
 import WarnIfUnsavedChanges from './WarnIfUnsavedChanges';
-
-type WrapperProps = {
-  zindex?: number;
-};
-
-const Wrapper = styled(Flex)<WrapperProps>`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: ${props => props.zindex || 3000};
-
-  justify-content: center;
-  align-items: center;
-`;
 
 type ModalProps = SpaceProps & LayoutProps & BackgroundProps;
 
@@ -59,25 +42,6 @@ Modal.defaultProps = {
   background: 'white',
   padding: '24px',
 };
-
-const GlobalModalStyle = createGlobalStyle`
-  body {
-    overflow: hidden;
-  }
-`;
-
-export const ModalOverlay = styled.button`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 2500;
-  display: block;
-  animation: ${fadeIn} 0.25s;
-  will-change: opacity;
-`;
 
 const Header = styled(Container)`
   font-size: 20px;
@@ -209,10 +173,6 @@ ModalFooter.defaultProps = {
   showDivider: true,
 };
 
-const DefaultTrapContainer = props => {
-  return <FocusTrap focusTrapOptions={{ allowOutsideClick: true }} {...props} />;
-};
-
 /**
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
  * a styled `Container`.
@@ -220,16 +180,17 @@ const DefaultTrapContainer = props => {
 const StyledModal = ({
   children,
   onClose,
-  usePortal = true,
   hasUnsavedChanges = undefined,
-  trapFocus = false,
   ignoreEscapeKey = false,
   preventClose = false,
+  width = undefined,
+  height = undefined,
+  maxWidth = undefined,
+  maxHeight = undefined,
+  className = undefined,
   ...props
 }) => {
   const intl = useIntl();
-  const modalRef = React.useRef(null);
-  const TrapContainer = trapFocus ? DefaultTrapContainer : React.Fragment;
   const closeHandler = React.useCallback(() => {
     if (preventClose) {
       return;
@@ -244,68 +205,39 @@ const StyledModal = ({
     onClose();
   }, [hasUnsavedChanges, onClose, preventClose]);
 
-  const onEscape = React.useCallback(() => {
-    if (!ignoreEscapeKey) {
-      closeHandler();
-    }
-  }, [closeHandler]);
+  return (
+    <React.Fragment>
+      {hasUnsavedChanges && <WarnIfUnsavedChanges hasUnsavedChanges />}
 
-  // Closes the modal upon the `ESC` key press.
-  useKeyBoardShortcut({ callback: onEscape, keyMatch: ESCAPE_KEY });
-
-  if (usePortal === false) {
-    return (
-      <React.Fragment>
-        <GlobalModalStyle />
-        {hasUnsavedChanges && <WarnIfUnsavedChanges hasUnsavedChanges />}
-        <Wrapper>
-          <TrapContainer>
-            <Modal ref={modalRef} {...props}>
-              {React.Children.map(children, child => {
-                if (child?.type?.displayName === 'Header') {
-                  return React.cloneElement(child, { onClose: closeHandler });
-                }
-                return child;
-              })}
-            </Modal>
-          </TrapContainer>
-        </Wrapper>
-      </React.Fragment>
-    );
-  }
-  if (typeof document !== 'undefined') {
-    return createPortal(
-      <React.Fragment>
-        <GlobalModalStyle />
-        {hasUnsavedChanges && <WarnIfUnsavedChanges hasUnsavedChanges />}
-        <Wrapper
-          zindex={props.zindex}
-          onKeyDown={event => {
-            if (event.key === 'Escape') {
-              event.preventDefault();
-              event.stopPropagation();
-              onEscape();
+      <Dialog
+        open={true}
+        onOpenChange={open => {
+          if (!open) {
+            closeHandler();
+          }
+        }}
+      >
+        <DialogContent
+          hideCloseButton
+          onEscapeKeyDown={e => {
+            if (ignoreEscapeKey) {
+              e.preventDefault();
             }
           }}
+          style={omitBy({ width, height, maxWidth, maxHeight }, isNil)}
+          className={clsx('gap-0', className)}
+          {...props}
         >
-          <TrapContainer>
-            <Modal ref={modalRef} {...props}>
-              {React.Children.map(children, child => {
-                if (child?.type?.displayName === 'Header') {
-                  return React.cloneElement(child, { onClose: closeHandler });
-                }
-                return child;
-              })}
-            </Modal>
-          </TrapContainer>
-          <ModalOverlay tabIndex={0} onClick={closeHandler} />
-        </Wrapper>
-      </React.Fragment>,
-      document.body,
-    );
-  } else {
-    return null;
-  }
+          {React.Children.map(children, child => {
+            if (child?.type?.displayName === 'Header') {
+              return React.cloneElement(child, { onClose: closeHandler });
+            }
+            return child;
+          })}
+        </DialogContent>
+      </Dialog>
+    </React.Fragment>
+  );
 };
 
 StyledModal.propTypes = {
@@ -316,21 +248,15 @@ StyledModal.propTypes = {
   /** width of the modal component */
   maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** height of the modal component */
-  maxWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  maxHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** width of the modal component */
   minWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** height of the modal component */
   minWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** zindex of the modal component */
-  zindex: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** handles how the modal is closed */
   onClose: PropTypes.func.isRequired,
-  /** whether to render the modal at the root with a portal */
-  usePortal: PropTypes.bool,
   /** if true, a confirmation will be displayed if user tries to close the modal or leave the page */
   hasUnsavedChanges: PropTypes.bool,
-  /** set this to true if the modal contains a form or buttons */
-  trapFocus: PropTypes.bool,
   /** whether to ignore the escape key */
   ignoreEscapeKey: PropTypes.bool,
   /** children */
@@ -338,8 +264,6 @@ StyledModal.propTypes = {
 };
 
 StyledModal.defaultProps = {
-  usePortal: true,
-  trapFocus: false,
   hasUnsavedChanges: false,
 };
 

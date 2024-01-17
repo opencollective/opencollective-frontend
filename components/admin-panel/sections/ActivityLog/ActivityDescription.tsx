@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { capitalize } from 'lodash';
+import { CheckCircle, XCircle } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { Account } from '../../../../lib/graphql/types/v2/graphql';
@@ -10,6 +11,7 @@ import formatMemberRole from '../../../../lib/i18n/member-role';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
 import Avatar from '../../../Avatar';
+import FollowButton from '../../../FollowButton';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import LinkExpense from '../../../LinkExpense';
@@ -21,15 +23,40 @@ const ResourceTag = ({ children }) => (
 const CollectiveTag = ({
   collective,
   openInNewTab,
+  displayFollowButton,
 }: {
   collective: Pick<Account, 'slug' | 'name' | 'type' | 'imageUrl' | 'isIncognito'>;
   openInNewTab?: boolean;
+  displayFollowButton?: boolean;
 }) => {
   return (
-    <ResourceTag>
-      <Avatar collective={collective} radius={14} display="inline-block" verticalAlign="middle" mr={1} mb="1px" />
-      <LinkCollective collective={collective} openInNewTab={openInNewTab} />
-    </ResourceTag>
+    <div className="inline-block">
+      <div className="flex flex-wrap">
+        <ResourceTag>
+          <Avatar collective={collective} radius={14} display="inline-block" verticalAlign="middle" mr={1} mb="1px" />
+          <LinkCollective collective={collective} openInNewTab={openInNewTab} />
+        </ResourceTag>
+        {displayFollowButton && (
+          <FollowButton
+            buttonProps={{ buttonSize: 'tiny', isBorderless: true }}
+            account={collective}
+            followButtonStyle="secondary"
+            followLabel={
+              <React.Fragment>
+                <CheckCircle className="mr-[0.2rem]" size="1rem" />
+                <FormattedMessage defaultMessage="Follow collective" />
+              </React.Fragment>
+            }
+            unfollowLabel={
+              <React.Fragment>
+                <XCircle className="mr-[0.2rem]" size="1rem" />
+                <FormattedMessage defaultMessage="Unfollow collective" />
+              </React.Fragment>
+            }
+          />
+        )}
+      </div>
+    </div>
   );
 };
 
@@ -38,6 +65,7 @@ export const getActivityVariables = (
   activity,
   options?: {
     onClickExpense?: (id: number) => void;
+    displayFollowButton?: boolean;
   },
 ) => ({
   expenseDescription: activity.expense?.description,
@@ -49,7 +77,7 @@ export const getActivityVariables = (
     </span>
   ),
   FromAccount: () => <CollectiveTag collective={activity.fromAccount} />,
-  Account: () => <CollectiveTag collective={activity.account} />,
+  Account: () => <CollectiveTag collective={activity.account} displayFollowButton={options?.displayFollowButton} />,
   AccountType: () => formatCollectiveType(intl, activity.account?.type || 'COLLECTIVE'),
   AccountParent: () => <CollectiveTag collective={activity.account?.parent} />,
   Expense: msg =>

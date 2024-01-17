@@ -219,7 +219,7 @@ export default function UpdatePage(props: InferGetServerSidePropsType<typeof get
                 <Box display={['none', null, 'block']} flex="0 0" p={3}>
                   <CommentIcon size={24} color="lightgrey" />
                 </Box>
-                <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
+                <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']} p={1}>
                   <CommentForm
                     id="new-update"
                     replyingToComment={replyingToComment}

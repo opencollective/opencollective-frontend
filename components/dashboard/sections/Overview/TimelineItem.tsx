@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { WorkspaceHomeQuery } from '../../../../lib/graphql/types/v2/graphql';
+import { ActivityType, type WorkspaceHomeQuery } from '../../../../lib/graphql/types/v2/graphql';
 import { ActivityDescriptionI18n, ActivityTimelineMessageI18n } from '../../../../lib/i18n/activities';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
@@ -30,6 +30,8 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
 
   const isLoading = !activity;
   const isLastWeek = dayjs(activity?.createdAt).isAfter(dayjs().subtract(1, 'week'));
+
+  const displayFollowButton = activity?.type === ActivityType.COLLECTIVE_UPDATE_PUBLISHED;
   return (
     <div className="rounded-2xl border p-4 text-sm">
       <div className="flex flex-1 items-start gap-3">
@@ -45,15 +47,15 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
         {isLoading ? (
           <LoadingPlaceholder height={16} width={300} />
         ) : (
-          <div className="flex flex-1 flex-wrap items-center justify-between">
+          <div className="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-1">
             <div className="text-foreground">
               {intl.formatMessage(
                 ActivityTimelineMessageI18n[activity.type] || ActivityDescriptionI18n[activity.type],
-                getActivityVariables(intl, activity, { onClickExpense: openExpense }),
+                getActivityVariables(intl, activity, { onClickExpense: openExpense, displayFollowButton }),
               )}
             </div>
 
-            <div className="flex-1 whitespace-nowrap text-right text-muted-foreground">
+            <div className="self-start whitespace-nowrap text-muted-foreground">
               {isLastWeek ? (
                 dayjs(activity.createdAt).fromNow()
               ) : (

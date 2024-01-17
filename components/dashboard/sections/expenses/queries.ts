@@ -242,12 +242,8 @@ export const hostDashboardMetadataQuery = gql`
     ready_to_pay: expenses(host: { slug: $hostSlug }, limit: 0, status: READY_TO_PAY) @include(if: $getViewCounts) {
       totalCount
     }
-    scheduled_for_payment: expenses(
-      host: { slug: $hostSlug }
-      limit: 0
-      status: SCHEDULED_FOR_PAYMENT
-      payoutMethodType: BANK_ACCOUNT
-    ) @include(if: $getViewCounts) {
+    scheduled_for_payment: expenses(host: { slug: $hostSlug }, limit: 0, status: SCHEDULED_FOR_PAYMENT)
+      @include(if: $getViewCounts) {
       totalCount
     }
     on_hold: expenses(host: { slug: $hostSlug }, limit: 0, status: ON_HOLD) @include(if: $getViewCounts) {

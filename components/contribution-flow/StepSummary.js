@@ -70,7 +70,7 @@ const VATInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChang
     <AmountLine my={3}>
       <Flex flexDirection="column">
         <Flex alignItems="center" flexWrap="wrap">
-          <Label mr={2} flex="1 1 auto">
+          <Label mr={2} flex="1 1 auto" whiteSpace="nowrap">
             {vatShortLabel}
           </Label>
           <Box flex="1 1 180px">
@@ -231,7 +231,7 @@ const GSTInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChang
     <AmountLine my={3}>
       <Flex flexDirection="column" width="100%">
         <Flex alignItems="center" flexWrap="wrap">
-          <Label mr={2} flex="0 1 30px">
+          <Label mr={2} flex="0 1 30px" whiteSpace="nowrap">
             {gstShortLabel}
           </Label>
           <Box flex="1 1 auto">
