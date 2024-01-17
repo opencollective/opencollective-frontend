@@ -27,7 +27,7 @@ export function LanguageSwitcher() {
   const languageOptions = React.useMemo(generateLanguageOptions, []);
   const defaultLanguage = languageOptions.find(language => language.value === intl.locale) || languageOptions[0];
   return (
-    <div className="relative">
+    <div className="relative max-w-full">
       <Select onValueChange={value => localeContext.setLocale(value)} defaultValue={defaultLanguage.value}>
         <Tooltip>
           <label className="sr-only" htmlFor="language-options">

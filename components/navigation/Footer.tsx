@@ -61,7 +61,7 @@ const Footer = () => {
   if (LoggedInUser && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)) {
     return (
       <footer className="flex justify-center border-t px-6 py-12 md:px-8">
-        <div className="flex max-w-screen-xl flex-1 flex-col items-start gap-6 sm:flex-row md:flex-col">
+        <div className="flex w-full max-w-screen-xl flex-1 flex-col items-start gap-6 sm:flex-row md:flex-col">
           <div className="flex w-full flex-1 flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div className="flex flex-col items-start gap-4 md:flex-row md:items-center">
               <Link href="/home">
@@ -131,7 +131,7 @@ const Footer = () => {
     <footer className="flex-row border-t p-6 py-12">
       <div className="mx-auto flex w-full max-w-screen-xl flex-1 flex-col gap-8">
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <Link href="/">
               <Image
                 src="/static/images/opencollectivelogo-footer-n.svg"
