@@ -140,3 +140,7 @@ export const getSupportedCurrencies = (collective, payoutMethod) => {
     );
   }
 };
+
+export const expenseTypeSupportsItemCurrency = expenseType => {
+  return expenseType === expenseTypes.RECEIPT;
+};
