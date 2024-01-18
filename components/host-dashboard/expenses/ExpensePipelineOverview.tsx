@@ -203,7 +203,7 @@ function WiseStatus(props: WiseStatusProps) {
             <FormattedMoneyAmount
               showCurrencyCode={false}
               currency={props.host?.currency}
-              amount={props?.readyToPayAmount?.valueInCents}
+              amount={props.readyToPayAmount?.valueInCents}
               amountStyles={null}
             />
 
@@ -217,13 +217,13 @@ function WiseStatus(props: WiseStatusProps) {
         <div>
           <FormattedMessage
             defaultMessage="Total Batched ({count})"
-            values={{ count: props?.scheduledForPaymentCount ?? 0 }}
+            values={{ count: props.scheduledForPaymentCount ?? 0 }}
           />
           <div className="mt-2 flex gap-2 text-base text-slate-900">
             <FormattedMoneyAmount
               showCurrencyCode={false}
               currency={props.host?.currency}
-              amount={props?.host?.transferwise?.amountBatched?.valueInCents}
+              amount={props.host?.transferwise?.amountBatched?.valueInCents}
               amountStyles={null}
             />
 
@@ -254,7 +254,7 @@ function WiseStatus(props: WiseStatusProps) {
           </StyledButton>
         </StyledLink>
 
-        {props?.scheduledForPaymentAmount?.valueInCents > 0 &&
+        {props.scheduledForPaymentAmount?.valueInCents > 0 &&
           mainBalance?.valueInCents >= props?.scheduledForPaymentAmount?.valueInCents && (
             <PayExpensesScheduledForPaymentButton className="w-full" host={props.host} />
           )}
@@ -297,15 +297,15 @@ function PayPalStatus(props: PayPalStatusProps) {
       <div className="flex items-center justify-between text-xs text-slate-700">
         <FormattedMessage
           defaultMessage="{service} balance ({currency})"
-          values={{ service: 'PayPal', currency: props?.host?.paypalPreApproval?.balance?.currency }}
+          values={{ service: 'PayPal', currency: props.host.paypalPreApproval?.balance?.currency }}
         />
         <Paypal size={16} />
       </div>
       <div className="mt-2 flex-grow text-2xl font-bold  text-slate-900">
         <FormattedMoneyAmount
           showCurrencyCode={false}
-          currency={props?.host?.paypalPreApproval?.balance?.currency}
-          amount={props?.host?.paypalPreApproval?.balance?.valueInCents}
+          currency={props.host.paypalPreApproval?.balance?.currency}
+          amount={props.host.paypalPreApproval?.balance?.valueInCents}
         />
         <StyledTooltip content={message}>{icon}</StyledTooltip>
       </div>
@@ -315,7 +315,7 @@ function PayPalStatus(props: PayPalStatusProps) {
           <div className="mt-2 flex gap-2 text-base text-slate-900">
             <FormattedMoneyAmount
               showCurrencyCode={false}
-              currency={props.host?.currency}
+              currency={props.host.currency}
               amount={props?.readyToPayAmount?.valueInCents}
               amountStyles={null}
             />
@@ -335,7 +335,7 @@ function PayPalStatus(props: PayPalStatusProps) {
           <div className="mt-2 flex gap-2 text-base  text-slate-900">
             <FormattedMoneyAmount
               showCurrencyCode={false}
-              currency={props.host?.currency}
+              currency={props.host.currency}
               amount={props?.scheduledForPaymentAmount?.valueInCents}
               amountStyles={null}
             />
@@ -368,15 +368,15 @@ function StripeIssuingStatus(props: StripeIssuingStatusProps) {
       <div className="flex items-center justify-between text-xs text-slate-700">
         <FormattedMessage
           defaultMessage="{service} balance ({currency})"
-          values={{ service: 'Stripe Issuing', currency: props?.host?.stripe?.issuingBalance?.currency }}
+          values={{ service: 'Stripe Issuing', currency: props.host.stripe.issuingBalance.currency }}
         />
         <CcStripe />
       </div>
       <div className="mt-2 flex-grow text-2xl font-bold text-slate-900">
         <FormattedMoneyAmount
           showCurrencyCode={false}
-          currency={props?.host?.stripe?.issuingBalance?.currency}
-          amount={props?.host?.stripe?.issuingBalance?.valueInCents}
+          currency={props.host.stripe.issuingBalance.currency}
+          amount={props.host.stripe.issuingBalance.valueInCents}
         />
       </div>
       <div className="mt-2 flex justify-items-stretch gap-3">

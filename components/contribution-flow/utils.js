@@ -127,7 +127,7 @@ export const generatePaymentMethodOptions = (
 
       return (
         allowedStripeTypes.includes(paymentMethod.type.toLowerCase()) &&
-        (!paymentMethod?.data?.stripeAccount || paymentMethod?.data?.stripeAccount === paymentIntent.stripeAccount)
+        (!paymentMethod.data?.stripeAccount || paymentMethod.data?.stripeAccount === paymentIntent.stripeAccount)
       );
     });
   } else {
@@ -136,7 +136,7 @@ export const generatePaymentMethodOptions = (
         return true;
       }
 
-      return paymentMethod.type === PaymentMethodType.CREDITCARD && !paymentMethod?.data?.stripeAccount;
+      return paymentMethod.type === PaymentMethodType.CREDITCARD && !paymentMethod.data?.stripeAccount;
     });
   }
 

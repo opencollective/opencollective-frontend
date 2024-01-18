@@ -244,8 +244,8 @@ export const ActionsButton = props => {
                 <Link
                   href={
                     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-                      ? `/dashboard/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`
-                      : `/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`
+                      ? `/dashboard/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard.id}`
+                      : `/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard.id}`
                   }
                 >
                   <FormattedMessage defaultMessage="View transactions" />

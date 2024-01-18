@@ -29,15 +29,15 @@ const AccountType = () => {
   const [editAccountType, { loading }] = useMutation(editAccountTypeMutation, { context: API_V2_CONTEXT });
   const [isConfirmationModelOpen, setIsConfirmationModelOpen] = React.useState(false);
 
-  const callToAction = selectedAccountOption?.value
-    ? `Change ${selectedAccountOption?.value.slug} to Organization`
+  const callToAction = selectedAccountOption.value
+    ? `Change ${selectedAccountOption.value.slug} to Organization`
     : 'Change User to Organization';
 
   const changeAccountTypeToOrg = React.useCallback(async () => {
     try {
       await editAccountType({
         variables: {
-          account: { slug: selectedAccountOption?.value?.slug },
+          account: { slug: selectedAccountOption.value?.slug },
         },
       });
       toast({ variant: 'success', title: 'Account Type Successfully Changed', message: callToAction });
@@ -81,7 +81,7 @@ const AccountType = () => {
           continueHandler={changeAccountTypeToOrg}
           onClose={() => setIsConfirmationModelOpen(false)}
         >
-          <P>You&apos;re about to change {selectedAccountOption?.value.slug} to an Organization.</P>
+          <P>You&apos;re about to change {selectedAccountOption.value.slug} to an Organization.</P>
         </ConfirmationModal>
       )}
     </React.Fragment>

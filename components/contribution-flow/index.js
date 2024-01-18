@@ -350,13 +350,11 @@ class ContributionFlow extends React.Component {
     }
 
     if (
-      stepPayment?.paymentMethod?.service === PAYMENT_METHOD_SERVICE.STRIPE &&
-      (stepPayment?.key === STRIPE_PAYMENT_ELEMENT_KEY ||
-        stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.US_BANK_ACCOUNT ||
-        stepPayment.paymentMethod.type === PAYMENT_METHOD_TYPE.SEPA_DEBIT)
+      stepPayment.paymentMethod?.service === PAYMENT_METHOD_SERVICE.STRIPE &&
+      (stepPayment.key === STRIPE_PAYMENT_ELEMENT_KEY ||
+        stepPayment.paymentMethod?.type === PAYMENT_METHOD_TYPE.US_BANK_ACCOUNT ||
+        stepPayment.paymentMethod?.type === PAYMENT_METHOD_TYPE.SEPA_DEBIT)
     ) {
-      const { stripeData } = stepPayment;
-
       const baseRoute = this.props.collective.parent?.slug
         ? `${window.location.origin}/${this.props.collective.parent?.slug}/${getCollectiveTypeForUrl(
             this.props.collective,
@@ -375,11 +373,11 @@ class ContributionFlow extends React.Component {
       }
 
       try {
-        await confirmPayment(stripeData?.stripe, stripeData?.paymentIntentClientSecret, {
+        await confirmPayment(stepPayment.stripeData?.stripe, stepPayment.stripeData?.paymentIntentClientSecret, {
           returnUrl: returnUrl.href,
-          elements: stripeData?.elements,
-          type: stepPayment?.paymentMethod?.type,
-          paymentMethodId: stepPayment?.paymentMethod?.data?.stripePaymentMethodId,
+          elements: stepPayment.stripeData?.elements,
+          type: stepPayment.paymentMethod?.type,
+          paymentMethodId: stepPayment.paymentMethod?.data?.stripePaymentMethodId,
         });
         this.setState({ isSubmitted: true, isSubmitting: false });
         return this.handleSuccess(order);

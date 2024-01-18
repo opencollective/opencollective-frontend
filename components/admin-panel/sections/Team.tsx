@@ -242,7 +242,7 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
                     defaultMessage="Your host requires that Collectives have {numberOfAdmins, plural, one {# active administrator} other {# active administrators} }."
                     values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                   />
-                  {host?.policies?.COLLECTIVE_MINIMUM_ADMINS.freeze && (
+                  {host.policies?.COLLECTIVE_MINIMUM_ADMINS.freeze && (
                     <React.Fragment>
                       &nbsp;
                       <FormattedMessage

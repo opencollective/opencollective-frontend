@@ -94,7 +94,7 @@ function VirtualCardRequestDrawerActions({ virtualCardRequest }: { virtualCardRe
   }, [rejectRequestMutation, intl]);
   const loading = rejectRequestMutationResult.loading;
 
-  if (!virtualCardRequest || virtualCardRequest.status !== VirtualCardRequestStatus.PENDING) {
+  if (virtualCardRequest.status !== VirtualCardRequestStatus.PENDING) {
     return null;
   }
 
@@ -170,7 +170,7 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
         virtualCardRequest && (
           <React.Fragment>
             <DrawerHeader
-              title={virtualCardRequest?.purpose}
+              title={virtualCardRequest.purpose}
               statusTag={
                 <StyledTag
                   width="100px"
@@ -185,7 +185,7 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
                         : 'error'
                   }
                 >
-                  {virtualCardRequest?.status}
+                  {virtualCardRequest.status}
                 </StyledTag>
               }
               onClose={props.onClose}

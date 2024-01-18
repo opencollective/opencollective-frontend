@@ -48,7 +48,7 @@ export default function VirtualCardRequestCard(props: VirtualCardRequestCardProp
                 : 'error'
           }
         >
-          {virtualCardRequest?.status}
+          {virtualCardRequest.status}
         </StyledTag>
       </Flex>
       <Flex justifyContent="space-between">
