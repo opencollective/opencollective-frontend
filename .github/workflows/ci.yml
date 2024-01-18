@@ -35,7 +35,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run lint:quiet
+      - run: pnpm lint:quiet
 
   prettier:
     runs-on: ubuntu-latest
@@ -51,7 +51,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run prettier:check
+      - run: pnpm prettier:check
 
   depcheck:
     runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run depcheck
+      - run: pnpm depcheck
 
   find-unused-exports:
     runs-on: ubuntu-latest
@@ -99,7 +99,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run langs:check
+      - run: pnpm langs:check
 
   build:
     runs-on: ubuntu-latest
@@ -128,7 +128,7 @@ jobs:
             ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-
 
       - name: Build
-        run: PRESERVE_NEXT_CACHE=true npm run build
+        run: PRESERVE_NEXT_CACHE=true pnpm build
 
   test:
     runs-on: ubuntu-latest
@@ -144,7 +144,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run test:jest
+      - run: pnpm test:jest
 
   typescript:
     runs-on: ubuntu-latest
@@ -159,7 +159,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run type:check
+      - run: pnpm type:check
 
   build-components:
     runs-on: ubuntu-latest
@@ -174,7 +174,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run build:components
+      - run: pnpm build:components
 
   e2e:
     if: github.ref_name != 'i18n/crowdin'

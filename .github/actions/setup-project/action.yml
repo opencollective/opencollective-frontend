@@ -1,26 +1,22 @@
 name: Setup project
 description: Installs the right node version and dependencies
 inputs:
+  # NOTE: not used since moving to pnpm
   CACHE_VERSION:
     description: The cache version, to manually invalidate the dependencies cache
     required: true
 runs:
   using: 'composite'
   steps:
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+
     - name: Setup node
       uses: actions/setup-node@v4
       with:
         node-version-file: 'package.json'
-        cache: 'npm'
-
-    - name: Restore node_modules
-      uses: actions/cache@v4
-      id: node-modules
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}-${{ inputs.CACHE_VERSION }}
+        cache: 'pnpm'
 
     - name: Install dependencies
       shell: bash
-      if: steps.node-modules.outputs.cache-hit != 'true'
-      run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
+      run: CYPRESS_INSTALL_BINARY=0 pnpm install --shamefully-hoist

@@ -85,11 +85,14 @@ jobs:
       - name: Checkout (frontend)
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version-file: 'package.json'
-          cache: 'npm'
+          cache: 'pnpm'
 
       # Checkouts
 
@@ -123,6 +126,7 @@ jobs:
         with:
           repository: opencollective/opencollective-api
           path: opencollective-api
+          cache: 'pnpm'
 
       - name: Checkout (images)
         uses: actions/checkout@v4
@@ -138,21 +142,13 @@ jobs:
 
       # Prepare API
 
-      - name: Restore node_modules (api)
-        uses: actions/cache@v4
-        id: api-node-modules
-        with:
-          path: opencollective-api/node_modules
-          key: ${{ runner.os }}-api-node-modules-${{ hashFiles('opencollective-api/package-lock.json') }}
-
       - name: Install dependencies (api)
         working-directory: opencollective-api
-        if: steps.api-node-modules.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline --no-audit
+        run: pnpm install
 
       - name: Build (api)
         working-directory: opencollective-api
-        run: npm run build
+        run: pnpm build
 
       # Prepare Images
 
@@ -192,16 +188,8 @@ jobs:
 
       # Prepare Frontend
 
-      - name: Restore node_modules (frontend)
-        uses: actions/cache@v4
-        id: node-modules
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}-${{ secrets.CACHE_VERSION }}
-
       - name: Install dependencies (frontend)
-        if: steps.node-modules.outputs.cache-hit != 'true'
-        run: CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit
+        run: CYPRESS_INSTALL_BINARY=0 pnpm install
 
       - name: Restore Cypress
         uses: actions/cache@v4
@@ -233,7 +221,7 @@ jobs:
 
       - name: Build (frontend)
         if: steps.next-build.outputs.cache-hit != 'true'
-        run: npm run build
+        run: pnpm build
 
       # Seed DB
 
