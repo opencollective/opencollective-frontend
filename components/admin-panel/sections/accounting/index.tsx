@@ -143,7 +143,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     return result;
   }, [categories, queryFilter.values.orderBy, queryFilter.values.searchTerm]);
 
-  const isAdmin = Boolean(LoggedInUser?.isAdminOfCollective(query?.data?.host)); // Accountants can't edit accounting categories
+  const isAdmin = Boolean(LoggedInUser?.isAdminOfCollective(query.data?.host)); // Accountants can't edit accounting categories
 
   const [editAccountingCategories] = useMutation(editAccountingCategoryMutation, {
     context: API_V2_CONTEXT,
