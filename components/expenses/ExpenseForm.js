@@ -24,7 +24,12 @@ import { userMustSetAccountingCategory } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { addNewExpenseItem, newExpenseItem } from './lib/items';
 import { checkExpenseSupportsOCR, updateExpenseFormWithUploadResult } from './lib/ocr';
-import { checkRequiresAddress, getSupportedCurrencies, validateExpenseTaxes } from './lib/utils';
+import {
+  checkRequiresAddress,
+  expenseTypeSupportsItemCurrency,
+  getSupportedCurrencies,
+  validateExpenseTaxes,
+} from './lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
@@ -416,6 +421,14 @@ const ExpenseFormBody = ({
     // Reset the accounting category (if not supported by the new expense type)
     if (values.accountingCategory && !isSupportedExpenseCategory(values.type, values.accountingCategory, isHostAdmin)) {
       formik.setFieldValue('accountingCategory', undefined);
+    }
+
+    // If the new type does not support setting items currency, reset it
+    if (!expenseTypeSupportsItemCurrency(values.type)) {
+      const itemHasExpenseCurrency = item => !item.amountV2?.currency || item.amountV2?.currency === values.currency;
+      const resetItemAmount = item => ({ ...item, amount: null, amountV2: null });
+      const updatedItems = values.items.map(item => (itemHasExpenseCurrency(item) ? item : resetItemAmount(item)));
+      formik.setFieldValue('items', updatedItems);
     }
   }, [values.type]);
 
