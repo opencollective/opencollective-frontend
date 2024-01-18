@@ -93,9 +93,9 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
         </label>
 
         <p>
-          <div className="inline-block rounded-xl bg-slate-50 px-2 py-1 font-bold text-slate-800">
+          <span className="inline-block rounded-xl bg-slate-50 px-2 py-1 font-bold text-slate-800">
             {props.accountingCategory?.code}
-          </div>
+          </span>
         </p>
 
         <label className="mb-1 mt-4 text-base">

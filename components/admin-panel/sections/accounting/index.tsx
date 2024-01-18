@@ -116,8 +116,8 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   );
 
   const categories = React.useMemo(
-    () => query?.data?.host?.accountingCategories?.nodes || [],
-    [query?.data?.host?.accountingCategories?.nodes],
+    () => query.data?.host?.accountingCategories?.nodes || [],
+    [query.data?.host?.accountingCategories?.nodes],
   );
 
   const filteredCategories = React.useMemo(() => {
