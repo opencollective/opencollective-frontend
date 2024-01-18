@@ -4,11 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import {
   AVERAGE_TRANSACTIONS_PER_MINUTE,
-  CSV_VERSIONS,
-  CsvVersions,
   DEFAULT_FIELDS,
-  DEFAULT_FIELDS_2024,
-  FIELD_GROUPS,
   FIELD_GROUPS_2024,
   FIELD_OPTIONS,
   FieldGroupLabels,
@@ -37,8 +33,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../ui/Dialog';
+import { Label } from '../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Separator } from '../ui/Separator';
+import { Switch } from '../ui/Switch';
 
 import { Filterbar } from './filters/Filterbar';
 
@@ -65,13 +63,10 @@ const ExportTransactionsCSVModal = ({
 
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [fieldOption, setFieldOption] = React.useState(FieldOptions[0].value);
-  const [csvVersion, setCsvVersion] = React.useState(CsvVersions[0].value);
-  // const [fieldGroups, setFieldGroups] = React.useState(FIELD_GROUPS);
   const [fields, setFields] = React.useState(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
+  const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
 
-  const fieldGroups = parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES'))
-    ? FIELD_GROUPS_2024
-    : FIELD_GROUPS;
+  const fieldGroups = FIELD_GROUPS_2024;
 
   const {
     loading: isFetchingRows,
@@ -94,13 +89,6 @@ const ExportTransactionsCSVModal = ({
     },
     { defaultData: 0 },
   );
-
-  const handleCsvVersionsChange = ({ value }) => {
-    setCsvVersion(value);
-    const defaultFields = value === CSV_VERSIONS.VERSION_2024 ? DEFAULT_FIELDS_2024 : DEFAULT_FIELDS;
-    setFields(defaultFields.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
-    // setFieldGroups(value === CSV_VERSIONS.VERSION_2024 ? FIELD_GROUPS_2024 : FIELD_GROUPS);
-  };
 
   const handleFieldOptionsChange = ({ value }) => {
     setFieldOption(value);
@@ -175,7 +163,7 @@ const ExportTransactionsCSVModal = ({
       }
     }
 
-    if (csvVersion === CSV_VERSIONS.VERSION_2023) {
+    if (flattenTaxesAndPaymentProcessorFees) {
       url.searchParams.set('flattenPaymentProcessorFee', '1');
       url.searchParams.set('flattenTax', '1');
     }
@@ -230,34 +218,6 @@ const ExportTransactionsCSVModal = ({
           </p>
           <Filterbar {...queryFilter} filters={omit(queryFilter.filters, 'orderBy')} views={null} hideSeparator />
         </div>
-
-        {parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES')) && (
-          <StyledInputField
-            label={<FormattedMessage defaultMessage="CSV Version" />}
-            labelFontWeight="500"
-            labelProps={{ fontSize: '16px', letterSpacing: '0px' }}
-            name="csvVersions"
-          >
-            {inputProps => (
-              <Select
-                onValueChange={value => handleCsvVersionsChange({ value })}
-                defaultValue={CsvVersions.find(option => option.value === csvVersion).value}
-                {...inputProps}
-              >
-                <SelectTrigger className="">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CsvVersions.map(option => (
-                    <SelectItem value={option.value} key={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          </StyledInputField>
-        )}
 
         <StyledInputField
           label={<FormattedMessage defaultMessage="Exported Fields" />}
@@ -353,6 +313,23 @@ const ExportTransactionsCSVModal = ({
             </CollapsibleContent>
           </Collapsible>
         </div>
+
+        {parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES')) && (
+          <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label className="text-base">
+                <FormattedMessage defaultMessage="Separate transactions compatibility" />
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" />
+              </p>
+            </div>
+            <Switch
+              checked={flattenTaxesAndPaymentProcessorFees}
+              onCheckedChange={setFlattenTaxesAndPaymentProcessorFees}
+            />
+          </div>
+        )}
 
         {exportedRows > 100e3 ? (
           <MessageBox type="error" withIcon mt={3}>

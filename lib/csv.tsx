@@ -60,7 +60,7 @@ type CSVField =
   | 'taxRate'
   | 'taxIdNumber';
 
-export const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
+const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
   transaction: [
     'date',
     'datetime',
@@ -169,8 +169,6 @@ export const DEFAULT_FIELDS = [
   'orderMemo',
 ];
 
-export const DEFAULT_FIELDS_2024 = DEFAULT_FIELDS.filter(field => field !== 'paymentProcessorFee');
-
 export const FieldLabels: Record<CSVField, React.ReactNode> = {
   accountingCategory: <FormattedMessage defaultMessage="Accounting Category" />,
   date: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
@@ -237,19 +235,3 @@ const FieldOptionsLabels = {
 };
 
 export const FieldOptions = Object.keys(FIELD_OPTIONS).map(value => ({ value, label: FieldOptionsLabels[value] }));
-
-export enum CSV_VERSIONS {
-  VERSION_2023 = 'VERSION_2023',
-  VERSION_2024 = 'VERSION_2024',
-}
-
-const CsvVersionsLabels = {
-  [CSV_VERSIONS.VERSION_2023]: (
-    <FormattedMessage defaultMessage="Version 2023 (Payment Processor Fees and Taxes as column)" />
-  ),
-  [CSV_VERSIONS.VERSION_2024]: (
-    <FormattedMessage defaultMessage="Version 2024 (Payment Processor Fees and Taxes as row)" />
-  ),
-};
-
-export const CsvVersions = Object.keys(CSV_VERSIONS).map(value => ({ value, label: CsvVersionsLabels[value] }));
