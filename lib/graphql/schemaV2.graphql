@@ -1107,6 +1107,11 @@ type Order {
   permissions: OrderPermissions!
 
   """
+  The accounting category attached to this order
+  """
+  accountingCategory: AccountingCategory
+
+  """
   The list of activities (ie. approved, edited, etc) for this Order ordered by date ascending
   """
   activities: ActivityCollection!
@@ -1657,6 +1662,16 @@ type AccountingCategory {
   If meant for expenses, the types of expenses this category applies to
   """
   expensesTypes: [ExpenseType]
+
+  """
+  The time of creation of this accounting category
+  """
+  createdAt: DateTime!
+
+  """
+  The kind of transactions this category applies to
+  """
+  kind: AccountingCategoryKind
 }
 
 """
@@ -2378,7 +2393,12 @@ type Host implements Account & AccountWithContributions {
   """
   List of accounting categories for this host
   """
-  accountingCategories: AccountingCategoryCollection!
+  accountingCategories(
+    """
+    Filter accounting categories by kind
+    """
+    kind: [AccountingCategoryKind!]
+  ): AccountingCategoryCollection!
   hostFeePercent: Float
   totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
   totalHostedAccounts: Int
@@ -5290,6 +5310,12 @@ type AccountingCategoryCollection implements Collection {
   The Accounting Categories
   """
   nodes: [AccountingCategory!]!
+}
+
+enum AccountingCategoryKind {
+  ADDED_FUNDS
+  CONTRIBUTION
+  EXPENSE
 }
 
 """
@@ -15365,6 +15391,11 @@ type Mutation {
     The tax to apply to the order
     """
     tax: TaxInput
+
+    """
+    The accounting category of this order
+    """
+    accountingCategory: AccountingCategoryReferenceInput
   ): Order!
 
   """
@@ -16963,6 +16994,16 @@ enum TaxType {
   GST
 }
 
+"""
+Reference to an accounting category
+"""
+input AccountingCategoryReferenceInput {
+  """
+  The ID of the accounting category
+  """
+  id: NonEmptyString!
+}
+
 input CollectiveCreateInput {
   name: String!
   slug: String!
@@ -17158,6 +17199,7 @@ input AccountingCategoryInput {
   The ID of the accounting category to edit
   """
   id: NonEmptyString
+  kind: AccountingCategoryKind! = EXPENSE
 
   """
   The code of the accounting category
@@ -17496,16 +17538,6 @@ input ExpenseTaxInput {
   Tax identification number, if any
   """
   idNumber: String
-}
-
-"""
-Reference to an accounting category
-"""
-input AccountingCategoryReferenceInput {
-  """
-  The ID of the accounting category
-  """
-  id: NonEmptyString!
 }
 
 input RecurringExpenseInput {
@@ -18392,6 +18424,11 @@ input PendingOrderCreateInput {
   Custom Host fee percent for this order
   """
   hostFeePercent: Float
+
+  """
+  The accounting category of this order
+  """
+  accountingCategory: AccountingCategoryReferenceInput
 }
 
 """
@@ -18467,6 +18504,11 @@ input PendingOrderEditInput {
   Custom Host fee percent for this order
   """
   hostFeePercent: Float
+
+  """
+  The accounting category of this order
+  """
+  accountingCategory: AccountingCategoryReferenceInput
 }
 
 type CreditCardWithStripeError {
