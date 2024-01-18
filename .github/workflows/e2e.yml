@@ -28,7 +28,6 @@ env:
   IMAGES_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-images
   PDF_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-pdf
   TERM: xterm
-  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   STRIPE_WEBHOOK_KEY: ${{ secrets.STRIPE_WEBHOOK_KEY }}
   STRIPE_WEBHOOK_SIGNING_SECRET: ${{ secrets.STRIPE_WEBHOOK_SIGNING_SECRET }}
   AWS_KEY: ${{ secrets.AWS_KEY }}
@@ -264,5 +263,7 @@ jobs:
           path: test/cypress/downloads
         if: ${{ failure() }}
 
-      - name: Report Coverage
-        run: npm run test:coverage
+      - name: Report coverage
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
