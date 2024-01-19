@@ -6,7 +6,6 @@ import { Currency, PayPalSupportedCurrencies } from '../../../lib/constants/curr
 import expenseTypes from '../../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../../lib/constants/payout-method';
 import { diffExchangeRates } from '../../../lib/currency-utils';
-import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 
 import { validateTaxInput } from '../../taxes/TaxesFormikFields';
 import { ExpenseItemFormValues } from '../types/FormValues';
@@ -118,10 +117,10 @@ export const validateExpenseTaxes = (intl, taxes) => {
  * Returns the list of supported currencies for this expense / payout method.
  * The collective currency always comes first.
  */
-export const getSupportedCurrencies = (collective, payoutMethod, expenseType: ExpenseType, baseCurrency: string) => {
+export const getSupportedCurrencies = (collective, { payee, payoutMethod, type, currency }) => {
   // We don't allow changing the currency for virtual card charges
-  if (expenseType === expenseTypes.CHARGE) {
-    return [baseCurrency];
+  if (type === expenseTypes.CHARGE) {
+    return [currency];
   }
 
   // Multi-currency opt-out
@@ -131,6 +130,11 @@ export const getSupportedCurrencies = (collective, payoutMethod, expenseType: Ex
     payoutMethod?.type === PayoutMethodType.ACCOUNT_BALANCE
   ) {
     return [collective.currency];
+  }
+
+  // Allow any currency for invites
+  if (payee?.isInvite && !payoutMethod?.data?.currency) {
+    return Currency;
   }
 
   // Adapt based on payout method type
