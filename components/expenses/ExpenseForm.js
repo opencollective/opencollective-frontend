@@ -331,7 +331,7 @@ const ExpenseFormBody = ({
   const stepTwoCompleted = isInvite
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
-  const availableCurrencies = getSupportedCurrencies(collective, values.payoutMethod);
+  const availableCurrencies = getSupportedCurrencies(collective, values.payoutMethod, values.type, values.currency);
   const [step, setStep] = React.useState(() => getDefaultStep(defaultStep, stepOneCompleted, isCreditCardCharge));
   const [initWithOCR, setInitWithOCR] = React.useState(null);
 

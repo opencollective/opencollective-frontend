@@ -6,6 +6,7 @@ import { Currency, PayPalSupportedCurrencies } from '../../../lib/constants/curr
 import expenseTypes from '../../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../../lib/constants/payout-method';
 import { diffExchangeRates } from '../../../lib/currency-utils';
+import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 
 import { validateTaxInput } from '../../taxes/TaxesFormikFields';
 import { ExpenseItemFormValues } from '../types/FormValues';
@@ -117,7 +118,13 @@ export const validateExpenseTaxes = (intl, taxes) => {
  * Returns the list of supported currencies for this expense / payout method.
  * The collective currency always comes first.
  */
-export const getSupportedCurrencies = (collective, payoutMethod) => {
+export const getSupportedCurrencies = (collective, payoutMethod, expenseType: ExpenseType, baseCurrency: string) => {
+  // We don't allow changing the currency for virtual card charges
+  if (expenseType === expenseTypes.CHARGE) {
+    return [baseCurrency];
+  }
+
+  // Multi-currency opt-out
   if (
     !isFeatureEnabled(collective, FEATURES.MULTI_CURRENCY_EXPENSES) ||
     !isFeatureEnabled(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES) ||
@@ -126,6 +133,7 @@ export const getSupportedCurrencies = (collective, payoutMethod) => {
     return [collective.currency];
   }
 
+  // Adapt based on payout method type
   const isPayPal = payoutMethod?.type === PayoutMethodType.PAYPAL;
   if (isPayPal) {
     const defaultCurrency = PayPalSupportedCurrencies.includes(collective.currency) ? collective.currency : 'USD';
