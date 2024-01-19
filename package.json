@@ -241,7 +241,6 @@
     "babel-plugin-styled-components": "^2.1.4",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "circular-dependency-plugin": "^5.2.2",
-    "codecov": "^3.8.3",
     "commander": "^11.1.0",
     "commitizen": "^4.3.0",
     "cross-env": "^7.0.3",
