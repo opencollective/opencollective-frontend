@@ -120,7 +120,7 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
       <StyledInputField
         required={false}
         name="friendlyName"
-        label={intl.formatMessage({ defaultMessage: 'Friendly name' })}
+        label={intl.formatMessage({ id: 'AccountingCategory.friendlyName', defaultMessage: 'Friendly name' })}
         mt={3}
       >
         <StyledInput
