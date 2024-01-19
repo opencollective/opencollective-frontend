@@ -789,7 +789,7 @@ class EditCollectiveForm extends React.Component {
       ],
     };
 
-    Object.keys(this.fields).map(fieldname => {
+    for (const fieldname in this.fields) {
       this.fields[fieldname] = this.fields[fieldname].map(field => {
         if (this.messages[`${field.name}.label`]) {
           field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
@@ -809,7 +809,7 @@ class EditCollectiveForm extends React.Component {
 
         return field;
       });
-    });
+    }
 
     const fields = (this.fields[section] || []).filter(field => !field.when || field.when());
     return (
