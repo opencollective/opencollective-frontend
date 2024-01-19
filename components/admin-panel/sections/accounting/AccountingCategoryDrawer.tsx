@@ -82,7 +82,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
         {props.accountingCategory?.friendlyName && (
           <React.Fragment>
             <label className="mb-1 mt-4 text-base">
-              <FormattedMessage defaultMessage="Friendly name" />
+              <FormattedMessage id="AccountingCategory.friendlyName" defaultMessage="Friendly name" />
             </label>
             <p className="italic">{props.accountingCategory?.friendlyName}</p>
           </React.Fragment>

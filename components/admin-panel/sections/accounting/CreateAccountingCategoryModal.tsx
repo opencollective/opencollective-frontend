@@ -20,7 +20,7 @@ type CreateAccountingCategoryModalProps = {
 export function CreateAccountingCategoryModal(props: CreateAccountingCategoryModalProps) {
   const intl = useIntl();
   const { onCreate } = props;
-  const createFundCategoryPicker = React.useCallback(
+  const createAccountingCategory = React.useCallback(
     async (values: Pick<AccountingCategory, 'kind' | 'name' | 'friendlyName' | 'code' | 'expensesTypes'>) => {
       await onCreate(values);
     },
@@ -39,7 +39,7 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
       expensesTypes: null,
     },
     async onSubmit(values) {
-      await createFundCategoryPicker({
+      await createAccountingCategory({
         ...values,
         kind: values.kind ? values.kind.value : null,
         expensesTypes:

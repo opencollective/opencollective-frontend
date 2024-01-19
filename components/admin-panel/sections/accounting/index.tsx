@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { pick } from 'lodash';
 import { PlusIcon } from 'lucide-react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
@@ -17,7 +17,7 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import DashboardHeader from '../../../dashboard/DashboardHeader';
 import { Filterbar } from '../../../dashboard/filters/Filterbar';
-import { orderByFilter } from '../../../dashboard/filters/OrderFilter';
+import { buildOrderByFilter } from '../../../dashboard/filters/OrderFilter';
 import { searchFilter } from '../../../dashboard/filters/SearchFilter';
 import { DashboardSectionProps } from '../../../dashboard/types';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -80,6 +80,11 @@ function categoryToEditableFields(category: AccountingCategory) {
   return pick(category, ['id', ...editableFields]);
 }
 
+const orderByCodeFilter = buildOrderByFilter(z.enum(['CODE,DESC', 'CODE,ASC']).default('CODE,ASC'), {
+  'CODE,DESC': defineMessage({ defaultMessage: 'Code descending' }),
+  'CODE,ASC': defineMessage({ defaultMessage: 'Code ascending' }),
+});
+
 /**
  * The accounting sections lets host admins customize their chart of accounts.
  */
@@ -93,15 +98,15 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   const queryFilter = useQueryFilter({
     schema: z.object({
       searchTerm: searchFilter.schema,
-      orderBy: orderByFilter.schema,
+      orderBy: orderByCodeFilter.schema,
     }),
     filters: {
       searchTerm: searchFilter.filter,
-      orderBy: orderByFilter.filter,
+      orderBy: orderByCodeFilter.filter,
     },
     toVariables: {
       searchTerm: searchFilter.toVariables,
-      orderBy: orderByFilter.toVariables,
+      orderBy: orderByCodeFilter.toVariables,
     },
   });
 
@@ -130,13 +135,13 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
       });
     }
 
-    if (queryFilter.values.orderBy === 'CREATED_AT,DESC') {
+    if (queryFilter.values.orderBy === 'CODE,ASC') {
       result = result.toSorted((a, b) => {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        return a.code.localeCompare(b.code);
       });
     } else {
       result = result.toSorted((a, b) => {
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        return b.code.localeCompare(a.code);
       });
     }
 
