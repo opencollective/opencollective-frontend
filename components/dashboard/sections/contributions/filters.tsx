@@ -44,6 +44,7 @@ export const schema = z.object({
   amount: amountFilter.schema,
   status: isMulti(z.nativeEnum(OrderStatus)).optional(),
   type: z.nativeEnum(OrderTypeFilter).optional(),
+  paymentMethod: z.string().optional(),
 });
 
 export type FilterValues = z.infer<typeof schema>;
@@ -71,6 +72,13 @@ export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables
           frequency: ContributionFrequency.ONETIME,
         };
     }
+  },
+  paymentMethod: (value: string) => {
+    if (value) {
+      return { paymentMethod: { id: value } };
+    }
+
+    return null;
   },
 };
 
@@ -102,5 +110,8 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
       />
     ),
     valueRenderer: ({ value, intl }) => i18nOrderType(intl, value),
+  },
+  paymentMethod: {
+    labelMsg: defineMessage({ id: 'paymentmethod.label', defaultMessage: 'Payment Method' }),
   },
 };

@@ -100,7 +100,7 @@ jobs:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
       - name: Restore NextJS build cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .next/cache
           # Generate a new cache whenever packages or source files change

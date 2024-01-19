@@ -306,6 +306,7 @@ const ExpenseItemForm = ({
   isInvoice,
   hasOCRFeature,
   ocrComparison,
+  hasCurrencyPicker,
 }) => {
   const intl = useIntl();
   const form = useFormikContext();
@@ -478,7 +479,7 @@ const ExpenseItemForm = ({
                           min={isOptional ? undefined : 1}
                           maxWidth="100%"
                           placeholder="0.00"
-                          hasCurrencyPicker={true}
+                          hasCurrencyPicker={hasCurrencyPicker}
                           loadingExchangeRate={loadingExchangeRate}
                           exchangeRate={field.value?.exchangeRate}
                           minFxRate={referenceExchangeRate?.value * (1 - FX_RATE_ERROR_THRESHOLD) || undefined}
@@ -600,6 +601,7 @@ ExpenseItemForm.propTypes = {
   editOnlyDescriptiveInfo: PropTypes.bool,
   itemIdx: PropTypes.number.isRequired,
   ocrComparison: PropTypes.object,
+  hasCurrencyPicker: PropTypes.bool,
 };
 
 ExpenseItemForm.defaultProps = {

@@ -238,14 +238,17 @@ function AuthenticatorOption(props: {
         />
       </p>
       <VerificationInput
-        inputProps={{ id: '2fa-code-input', autoComplete: 'one-time-code', className: 'opacity-0' }}
+        inputProps={{
+          id: '2fa-code-input',
+          autoComplete: 'one-time-code',
+        }}
         validChars="0-9"
         placeholder=""
         autoFocus
         classNames={{
-          container: 'w-auto pl-6 pr-12 -mr-6', // negative margin to make space for password manager browser extension icon
+          container: 'ml-6 w-auto pr-12 -mr-6', // negative margin to make space for password manager browser extension icon
           character:
-            'rounded-md border border-input bg-background text-lg ring-offset-background items-center flex justify-center',
+            'z-10 pointer-events-none rounded-md border border-input bg-background text-lg ring-offset-background items-center flex justify-center',
           characterInactive: 'bg-muted',
           characterSelected: 'ring-ring ring-2 ring-offset-2 outline-none text-foreground',
         }}

@@ -100,7 +100,7 @@ const RequestVirtualCardModal = props => {
       if (!values.purpose) {
         errors.purpose = 'Required';
       }
-      if (!values.notes && values.notes?.lenght > 10) {
+      if (!values.notes && values.notes?.length > 10) {
         errors.notes = 'Required';
       }
       return errors;

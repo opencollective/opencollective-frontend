@@ -90,6 +90,7 @@ const dashboardContributionsQuery = gql`
     $includeIncognito: Boolean
     $minAmount: Int
     $maxAmount: Int
+    $paymentMethod: PaymentMethodReferenceInput
   ) {
     account(slug: $slug) {
       id
@@ -104,6 +105,7 @@ const dashboardContributionsQuery = gql`
         searchTerm: $searchTerm
         offset: $offset
         limit: $limit
+        paymentMethod: $paymentMethod
       ) {
         totalCount
         nodes {

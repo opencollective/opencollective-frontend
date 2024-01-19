@@ -14,10 +14,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '../../../ui/AlertDialog';
 import { Button } from '../../../ui/Button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { toast } from '../../../ui/useToast';
 
 export const rejectTransactionMutation = gql`
@@ -28,19 +26,22 @@ export const rejectTransactionMutation = gql`
   }
 `;
 
-const TransactionRejectButton = ({
+const TransactionRejectModal = ({
   id,
   onMutationSuccess,
   canRefund,
+  open,
+  setOpen,
 }: {
   id: string;
   onMutationSuccess?: () => void;
   canRefund?: boolean;
+  open: boolean;
+  setOpen: (open: boolean) => void;
 }) => {
   const [rejectTransaction, { loading }] = useMutation(rejectTransactionMutation, {
     context: API_V2_CONTEXT,
   });
-  const [open, setOpen] = React.useState(false);
   const [message, setMessage] = React.useState('');
 
   const handleRejectTransaction = async () => {
@@ -61,21 +62,6 @@ const TransactionRejectButton = ({
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <AlertDialogTrigger asChild>
-            <Button variant="outline" size="xs" className="gap-1">
-              <MinusCircle size={16} />
-              <FormattedMessage id="actions.reject" defaultMessage="Reject" />
-            </Button>
-          </AlertDialogTrigger>
-        </TooltipTrigger>
-
-        <TooltipContent className="max-w-xs">
-          <FormattedMessage defaultMessage="Rejecting prevents the contributor from contributing in the future and will reimburse the full amount back to them." />
-        </TooltipContent>
-      </Tooltip>
-
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
@@ -118,4 +104,4 @@ const TransactionRejectButton = ({
   );
 };
 
-export default TransactionRejectButton;
+export default TransactionRejectModal;

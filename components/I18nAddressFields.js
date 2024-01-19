@@ -299,7 +299,7 @@ const I18nAddressFields = ({
           label={fieldLabel}
           info={fieldInfo}
           value={value?.[fieldName]}
-          required={required === false ? false : !Object.keys(data?.optionalLabels).includes(fieldName)}
+          required={required === false ? false : !Object.keys(data?.optionalLabels || {}).includes(fieldName)}
           fieldProps={fieldProps}
           onChange={({ target: { name, value: fieldValue } }) =>
             onCountryChange(set(cloneDeep(value || {}), name, fieldValue))

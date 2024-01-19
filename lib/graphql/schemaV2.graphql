@@ -1664,6 +1664,11 @@ type AccountingCategory {
   expensesTypes: [ExpenseType]
 
   """
+  The time of creation of this accounting category
+  """
+  createdAt: DateTime!
+
+  """
   The kind of transactions this category applies to
   """
   kind: AccountingCategoryKind
@@ -17194,6 +17199,7 @@ input AccountingCategoryInput {
   The ID of the accounting category to edit
   """
   id: NonEmptyString
+  kind: AccountingCategoryKind! = EXPENSE
 
   """
   The code of the accounting category

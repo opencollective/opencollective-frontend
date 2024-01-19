@@ -10,6 +10,7 @@ import { i18nTaxType } from '../../lib/i18n/taxes';
 import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemsMustHaveFiles, newExpenseItem } from './lib/items';
 import { compareItemOCRValues, itemHasOCR, updateExpenseFormWithUploadResult } from './lib/ocr';
+import { expenseTypeSupportsItemCurrency } from './lib/utils';
 
 import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
@@ -152,6 +153,7 @@ class ExpenseFormItems extends React.PureComponent {
     const isGrant = values.type === expenseTypes.GRANT;
     const isInvoice = values.type === expenseTypes.INVOICE;
     const isCreditCardCharge = values.type === expenseTypes.CHARGE;
+    const itemsHaveCurrencyPicker = expenseTypeSupportsItemCurrency(values.type);
     const items = values.items || [];
     const hasItems = items.length > 0;
     const itemsWithOCR = items.filter(itemHasOCR);
@@ -228,6 +230,7 @@ class ExpenseFormItems extends React.PureComponent {
             hasOCRFeature={hasOCRFeature}
             collective={collective}
             ocrComparison={itemsOCRComparisons[attachment.id]}
+            hasCurrencyPicker={itemsHaveCurrencyPicker}
           />
         ))}
         {/** Do not display OCR warnings for OCR charges since date/amount can't be changed */}

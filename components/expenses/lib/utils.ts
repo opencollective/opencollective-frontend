@@ -117,7 +117,13 @@ export const validateExpenseTaxes = (intl, taxes) => {
  * Returns the list of supported currencies for this expense / payout method.
  * The collective currency always comes first.
  */
-export const getSupportedCurrencies = (collective, payoutMethod) => {
+export const getSupportedCurrencies = (collective, { payee, payoutMethod, type, currency }) => {
+  // We don't allow changing the currency for virtual card charges
+  if (type === expenseTypes.CHARGE) {
+    return [currency];
+  }
+
+  // Multi-currency opt-out
   if (
     !isFeatureEnabled(collective, FEATURES.MULTI_CURRENCY_EXPENSES) ||
     !isFeatureEnabled(collective.host, FEATURES.MULTI_CURRENCY_EXPENSES) ||
@@ -126,6 +132,12 @@ export const getSupportedCurrencies = (collective, payoutMethod) => {
     return [collective.currency];
   }
 
+  // Allow any currency for invites
+  if (payee?.isInvite && !payoutMethod?.data?.currency) {
+    return Currency;
+  }
+
+  // Adapt based on payout method type
   const isPayPal = payoutMethod?.type === PayoutMethodType.PAYPAL;
   if (isPayPal) {
     const defaultCurrency = PayPalSupportedCurrencies.includes(collective.currency) ? collective.currency : 'USD';
@@ -139,4 +151,8 @@ export const getSupportedCurrencies = (collective, payoutMethod) => {
       ),
     );
   }
+};
+
+export const expenseTypeSupportsItemCurrency = expenseType => {
+  return expenseType === expenseTypes.RECEIPT;
 };
