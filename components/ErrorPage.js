@@ -61,7 +61,7 @@ class ErrorPage extends React.Component {
       }
     }
 
-    if (get(data, 'error.networkError')) {
+    if (get(data, 'error.networkError') || get(error, 'networkError')) {
       return this.networkError();
     }
 
