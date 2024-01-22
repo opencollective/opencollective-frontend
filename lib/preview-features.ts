@@ -32,12 +32,12 @@ export const previewFeatures: PreviewFeature[] = [
     description:
       'A central space to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations.',
     publicBeta: true,
-    enabledByDefaultFor: ['opencollective'],
+    enabledByDefaultFor: ['*'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR,
     title: 'Dynamic top bar',
-    publicBeta: true,
+    publicBeta: false,
     dependsOn: PREVIEW_FEATURE_KEYS.DASHBOARD,
   },
   {
