@@ -5,10 +5,6 @@ import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-
 import { isEqual } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../../lib/constants/collectives';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-
 import ContributeCardsContainer from '../collective-page/ContributeCardsContainer';
 import EditTierModal from '../edit-collective/tiers/EditTierModal';
 
@@ -32,7 +28,6 @@ const AdminContributeCardsContainer = ({
   createNewType,
   onTierUpdate,
 }) => {
-  const { LoggedInUser } = useLoggedInUser();
   const [items, setItems] = React.useState(cards || []);
 
   // Reset items if the cards order have changed
@@ -68,13 +63,7 @@ const AdminContributeCardsContainer = ({
   }
 
   const [showTierModal, setShowTierModal] = React.useState(false);
-  const isEvent = collective.type === CollectiveType.EVENT;
-  const hasDashboard = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
-  const createContributionTierRoute = hasDashboard
-    ? `/dashboard/${collective.slug}/tiers`
-    : isEvent
-      ? `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/admin/tiers`
-      : `/${collective.slug}/admin/tiers`;
+  const createContributionTierRoute = `/dashboard/${collective.slug}/tiers`;
 
   const addNewMessage =
     createNewType === 'TICKET' ? (

@@ -43,14 +43,16 @@ describe('event.create.test.js', () => {
     cy.get('input[data-cy=amount]').type('15');
     cy.getByDataCy('confirm-btn').click();
     cy.checkToast({ variant: 'success', message: 'Ticket created.' });
-    cy.getByDataCy('menu-account-avatar-link').click();
+    cy.getByDataCy('public-profile-link').click();
 
     // Check collective page
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 2);
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier] [data-cy=amount]').contains(15);
     cy.get('#top').scrollIntoView();
     cy.get('[data-cy="edit-collective-btn"]:visible').click();
-    cy.wait(400);
+    cy.get('[data-cy="menu-item-Settings"]:visible').click();
+
+    // cy.wait(400);
     // edit event info
     cy.get('.inputs .inputField.name input').type(`{selectall}${updatedTitle}`);
     cy.wait(400);
@@ -72,13 +74,14 @@ describe('event.create.test.js', () => {
     cy.checkToast({ variant: 'success', message: 'Tier created.' });
     cy.wait(2000);
     // verify update
-    cy.getByDataCy('menu-account-avatar-link').click();
+    cy.getByDataCy('public-profile-link').click();
     cy.get('[data-cy=Tickets] [data-cy=contribute-card-tier]').should('have.length', 1);
     cy.wait(100);
     cy.get('[data-cy="financial-contributions"] [data-cy=contribute-card-tier]').should('have.length', 1);
     cy.get('h1[data-cy=collective-title]').contains(updatedTitle);
     // delete event tiers
     cy.get('[data-cy="edit-collective-btn"]:visible').click();
+    cy.getByDataCy('menu-item-Settings').click();
     cy.getByDataCy('menu-item-advanced').click();
     cy.contains('button', 'Delete this Event').click();
     cy.get('[data-cy=delete]').click();

@@ -2,7 +2,6 @@
  * A map of keys used for preview features.
  */
 export enum PREVIEW_FEATURE_KEYS {
-  DASHBOARD = 'dashboard',
   EXPENSE_CATEGORIZATION = 'EXPENSE_CATEGORIZATION',
   DYNAMIC_TOP_BAR = 'DYNAMIC_TOP_BAR',
   COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
@@ -25,19 +24,9 @@ export type PreviewFeature = {
  */
 export const previewFeatures: PreviewFeature[] = [
   {
-    key: PREVIEW_FEATURE_KEYS.DASHBOARD,
-    title: 'Dashboard',
-    description:
-      'A central space to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations.',
-    publicBeta: true,
-    enabledByDefaultFor: ['*'],
-    env: ['development', 'staging', 'production'],
-  },
-  {
     key: PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR,
     title: 'Dynamic top bar',
     publicBeta: false,
-    dependsOn: PREVIEW_FEATURE_KEYS.DASHBOARD,
   },
   {
     key: PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION,

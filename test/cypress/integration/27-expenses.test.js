@@ -801,6 +801,7 @@ describe('Expense flow', () => {
     it('Displays expense policy', () => {
       cy.login({ email: user.email, redirect: expenseUrl });
       cy.get('[data-cy="edit-collective-btn"]:visible').click();
+      cy.getByDataCy('menu-item-Settings').click();
       cy.getByDataCy('menu-item-policies').click();
       cy.getByDataCy('expense-policy-input').type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
@@ -811,7 +812,7 @@ describe('Expense flow', () => {
     });
 
     it('Projects inherit and display expense policy from parent collective', () => {
-      cy.login({ email: user.email, redirect: `/${collective.slug}/admin/policies` });
+      cy.login({ email: user.email, redirect: `/dashboard/${collective.slug}/policies` });
       cy.getByDataCy('expense-policy-input').type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
       cy.createProject({ userEmail: user.email, collective }).then(project => {
