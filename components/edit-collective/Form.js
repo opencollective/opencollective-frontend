@@ -16,12 +16,12 @@ import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
 import { isValidUrl } from '../../lib/utils';
 
-import { ALL_SECTIONS } from '../admin-panel/constants';
-import ActivityLog from '../admin-panel/sections/ActivityLog';
-import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
-import ForDevelopers from '../admin-panel/sections/ForDevelopers';
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
+import { ALL_SECTIONS } from '../dashboard/constants';
+import ActivityLog from '../dashboard/sections/ActivityLog';
+import AuthorizedApps from '../dashboard/sections/AuthorizedApps';
+import ForDevelopers from '../dashboard/sections/ForDevelopers';
 import { Box, Flex } from '../Grid';
 import { I18nSupportLink } from '../I18nFormatters';
 import InputField from '../InputField';

@@ -8,8 +8,8 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
 
 import Container from '../Container';
+import ScheduledExpensesBanner from '../dashboard/sections/expenses/ScheduledExpensesBanner';
 import { Box, Flex } from '../Grid';
-import ScheduledExpensesBanner from '../host-dashboard/ScheduledExpensesBanner';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';

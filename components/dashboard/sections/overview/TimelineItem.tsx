@@ -8,13 +8,13 @@ import { ActivityType, type TimelineQuery } from '../../../../lib/graphql/types/
 import { ActivityDescriptionI18n, ActivityTimelineMessageI18n } from '../../../../lib/i18n/activities';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
-import { getActivityVariables } from '../../../admin-panel/sections/ActivityLog/ActivityDescription';
 import { AvatarWithLink } from '../../../AvatarWithLink';
 import DateTime from '../../../DateTime';
 import HTMLContent from '../../../HTMLContent';
 import Link from '../../../Link';
 import StyledLink from '../../../StyledLink';
 import { Skeleton } from '../../../ui/Skeleton';
+import { getActivityVariables } from '../ActivityLog/ActivityDescription';
 
 dayjs.extend(relativeTime);
 

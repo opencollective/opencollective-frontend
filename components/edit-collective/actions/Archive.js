@@ -7,8 +7,8 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 
-import { adminPanelQuery } from '../../admin-panel/queries';
 import Container from '../../Container';
+import { adminPanelQuery } from '../../dashboard/queries';
 import { getI18nLink } from '../../I18nFormatters';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
