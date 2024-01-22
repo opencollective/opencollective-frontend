@@ -400,6 +400,7 @@ const Menu = ({ onRoute, menuItems }) => {
         Icon={Globe2}
         label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
         className="hover:bg-slate-50 hover:text-slate-700"
+        dataCy="public-profile-link"
         external
       />
       <div className="space-y-2">

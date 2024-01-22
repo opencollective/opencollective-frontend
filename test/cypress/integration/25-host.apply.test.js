@@ -28,7 +28,7 @@ describe('apply to host', () => {
     cy.get('[data-cy="collective-title"]', { timeout: 10000 }).contains('New collective');
     cy.url().then(currentUrl => {
       const collectiveId = currentUrl.match(/CollectiveId=([0-9]+)/)[1];
-      cy.login({ redirect: `/brusselstogetherasbl/admin/host-applications#application-${collectiveId}` });
+      cy.login({ redirect: `/dashboard/brusselstogetherasbl/host-applications#application-${collectiveId}` });
       cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();

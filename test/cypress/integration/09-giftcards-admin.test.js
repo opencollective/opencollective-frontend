@@ -9,7 +9,7 @@ describe('Gift cards admin', () => {
   });
 
   it('start with empty gift cards list', () => {
-    cy.login({ redirect: `/${collectiveSlug}/admin/gift-cards` });
+    cy.login({ redirect: `/dashboard/${collectiveSlug}/gift-cards` });
     cy.getByDataCy('gift-cards-list').contains('Create your first gift card!');
   });
 
@@ -18,7 +18,7 @@ describe('Gift cards admin', () => {
     const paginationSize = 15;
     const numberOfPages = Math.trunc(numberOfGiftCards / paginationSize + 1);
 
-    cy.login({ redirect: `/${collectiveSlug}/admin/gift-cards-create` });
+    cy.login({ redirect: `/dashboard/${collectiveSlug}/gift-cards-create` });
 
     // Fill form
     cy.get('#giftcard-amount').type('42');
@@ -54,7 +54,7 @@ describe('Gift cards admin', () => {
   });
 
   it('send gift cards by emails', () => {
-    cy.login({ redirect: `/${collectiveSlug}/admin/gift-cards-create` });
+    cy.login({ redirect: `/dashboard/${collectiveSlug}/gift-cards-create` });
 
     // Button should be disabled until we add emails
     checkSubmit(false, 'Create 0 gift cards');

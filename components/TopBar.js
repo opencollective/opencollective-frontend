@@ -32,7 +32,6 @@ import StyledButton from './StyledButton';
 import StyledLink from './StyledLink';
 import { Span } from './Text';
 import TopBarMobileMenu from './TopBarMobileMenu';
-import TopBarProfileMenu from './TopBarProfileMenu';
 
 const NavList = styled(Flex)`
   list-style: none;
@@ -95,15 +94,11 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
     return regex.test(router.asPath);
   };
 
-  const onDashboardRoute = isRouteActive('/dashboard');
-
-  const useDashboard = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
-  const dashboardTurnedOff = useDashboard === false;
-
   if (LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR)) {
     return <DynamicTopBar {...{ account, navTitle }} />;
   }
 
+  const onDashboardRoute = isRouteActive('/dashboard');
   const homeRoutes = [
     '/',
     '/home',
@@ -118,7 +113,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
   ];
   const onHomeRoute = homeRoutes.some(isRouteActive);
 
-  if (onDashboardRoute || (!onHomeRoute && LoggedInUser && !dashboardTurnedOff)) {
+  if (onDashboardRoute || (!onHomeRoute && LoggedInUser)) {
     return <NewTopBar {...{ account }} />;
   }
 
@@ -292,7 +287,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
           <div className="mr-2 hidden sm:block">
             <ChangelogTrigger />
           </div>
-          {useDashboard ? <ProfileMenu /> : <TopBarProfileMenu />}
+          <ProfileMenu />
         </React.Fragment>
       )}
       <Hide md lg>

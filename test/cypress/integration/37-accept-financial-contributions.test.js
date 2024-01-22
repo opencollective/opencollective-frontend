@@ -20,7 +20,7 @@ describe('Accept financial contributions flow', () => {
       cy.url().should('include', '/success');
       cy.getByDataCy('afc-success-host-settings-link')
         .should('have.attr', 'href')
-        .and('include', '/testuseradmin/admin/fiscal-hosting');
+        .and('include', '/dashboard/testuseradmin/fiscal-hosting');
     });
 
     it.skip('Knows if bank account info is already added and can self host', () => {
@@ -29,7 +29,7 @@ describe('Accept financial contributions flow', () => {
       cy.url().should('include', '/success');
       cy.getByDataCy('afc-success-host-tiers-link')
         .should('have.attr', 'href')
-        .and('include', `/${collectiveSlug}/admin/tiers`);
+        .and('include', `/dashboard/${collectiveSlug}/tiers`);
     });
   });
 
@@ -50,7 +50,7 @@ describe('Accept financial contributions flow', () => {
       cy.getByDataCy('afc-finish-button').click();
       cy.getByDataCy('afc-success-host-settings-link')
         .should('have.attr', 'href')
-        .and('include', '/brusselstogetherasbl/admin/fiscal-hosting');
+        .and('include', '/dashboard/brusselstogetherasbl/fiscal-hosting');
     });
 
     it.skip('Creates an org and then hosts with it', () => {
@@ -65,7 +65,7 @@ describe('Accept financial contributions flow', () => {
       cy.url().should('include', '/success');
       cy.getByDataCy('afc-success-host-settings-link')
         .should('have.attr', 'href')
-        .and('include', '/3-bees/admin/fiscal-hosting');
+        .and('include', '/dashboard/3-bees/fiscal-hosting');
     });
   });
 

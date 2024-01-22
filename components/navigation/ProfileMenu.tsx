@@ -50,6 +50,7 @@ const MenuItem = ({
   onClick,
   className,
   external,
+  ...props
 }: {
   Icon: LucideIcon;
   appending?: React.ReactNode;
@@ -74,14 +75,14 @@ const MenuItem = ({
   );
   if (onClick) {
     return (
-      <button onClick={onClick} className={classes}>
+      <button onClick={onClick} className={classes} {...props}>
         {content}
       </button>
     );
   }
   if (external) {
     return (
-      <a href={href} className={classes} target="_blank" rel="noreferrer">
+      <a href={href} className={classes} target="_blank" rel="noreferrer" {...props}>
         {content}
         <ExternalLink size={16} className="opacity-0 transition-opacity group-hover:opacity-100" />
       </a>
@@ -89,7 +90,7 @@ const MenuItem = ({
   }
 
   return (
-    <Link href={href} className={classes}>
+    <Link href={href} className={classes} {...props}>
       {content}
     </Link>
   );
@@ -225,7 +226,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
           </button>
         </PopoverTrigger>
         {!isMobile && (
-          <PopoverContent align="end" className="w-full max-w-lg overflow-hidden rounded-xl p-0">
+          <PopoverContent data-cy="user-menu" align="end" className="w-full max-w-lg overflow-hidden rounded-xl p-0">
             {content}
           </PopoverContent>
         )}
