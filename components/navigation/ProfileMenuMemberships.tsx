@@ -254,18 +254,12 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
   const archivedMemberships = filterArchivedMemberships(user.memberOf);
   const groupedMemberships = groupBy(memberships, m => m.collective.type);
   groupedMemberships.ARCHIVED = archivedMemberships;
-  const hasNoMemberships = isEmpty(memberships);
   const shouldDisplaySection = section => {
     return MENU_SECTIONS[section].emptyMessage || !isEmpty(groupedMemberships[section]);
   };
 
   return (
     <React.Fragment>
-      {hasNoMemberships && (
-        <P color="blue.900" fontSize="20px" lineHeight="28px" fontWeight="bold" mt="8px" mb="12px">
-          <FormattedMessage id="ProfileMenuMemberships.Empty" defaultMessage="Make the most out of Open Collective" />
-        </P>
-      )}
       {Object.keys(MENU_SECTIONS)
         .filter(shouldDisplaySection)
         .map((accountType, i) => {
