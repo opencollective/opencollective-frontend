@@ -168,7 +168,7 @@ const cols = {
         <div className="flex justify-between">
           <div className="flex items-center gap-1.5 truncate">
             <span className="truncate">{kindLabel}</span>
-            {isExpense && expense.type && <Badge size="xs">{i18nExpenseType(intl, expense.type)}</Badge>}
+            {isExpense && expense?.type && <Badge size="xs">{i18nExpenseType(intl, expense.type)}</Badge>}
           </div>
           <div>
             {isRefunded && (
