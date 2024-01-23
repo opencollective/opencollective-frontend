@@ -128,7 +128,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     views,
   });
 
-  const { data, error, loading, refetch } = useQuery(transactionsTableQuery, {
+  const { data, previousData, error, loading, refetch } = useQuery(transactionsTableQuery, {
     variables: {
       hostAccount: { slug: hostSlug },
       includeIncognitoTransactions: true,
@@ -186,7 +186,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
           <Flex mt={5} justifyContent="center">
             <Pagination
               route={`/dashboard/${hostSlug}/host-transactions`}
-              total={transactions?.totalCount}
+              total={(data || previousData)?.transactions?.totalCount}
               limit={queryFilter.values.limit}
               offset={queryFilter.values.offset}
               ignoredQueryParams={['collectiveSlug']}
