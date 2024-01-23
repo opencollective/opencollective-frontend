@@ -33,6 +33,7 @@ export const previewFeatures: PreviewFeature[] = [
       'A central space to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations.',
     publicBeta: true,
     enabledByDefaultFor: ['*'],
+    env: ['development', 'staging', 'production'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR,
