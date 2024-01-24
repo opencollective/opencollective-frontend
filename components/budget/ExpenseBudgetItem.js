@@ -440,7 +440,6 @@ const ExpenseBudgetItem = ({
                   </DetailColumnHeader>
                   <P fontSize="11px" mt="6px">
                     <StyledLink
-                      as={Link}
                       color="black.700"
                       href={`${getDashboardRoute(host, 'host-agreements')}?account=${expense.account.slug}`}
                     >

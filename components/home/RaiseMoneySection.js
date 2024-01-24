@@ -324,7 +324,7 @@ const RaiseMoney = () => {
                   defaultMessage="Operate under the umbrella of an established legal entity, so you don’t have to incorporate your own. A Host can take care of accounting, taxes, banking, and non-profit status."
                 />
               </P>
-              <LearnMoreLink as={Link} textDecoration="underline" color="black.800" href="/fiscal-hosting">
+              <LearnMoreLink textDecoration="underline" color="black.800" href="/fiscal-hosting">
                 <P mt="24px" fontSize="16px" lineHeight="24px" fontWeight="500">
                   <FormattedMessage defaultMessage="Learn more about fiscal hosting" id="yOzWJD" />
                 </P>
@@ -365,7 +365,7 @@ const RaiseMoney = () => {
                   defaultMessage="Manage your budget together. Transparency builds trust and accountability, and no individual has to take on all the responsibility."
                 />
               </P>
-              <LearnMoreLink as={Link} textDecoration="underline" color="black.800" href="/collectives">
+              <LearnMoreLink textDecoration="underline" color="black.800" href="/collectives">
                 <P mt="24px" fontSize="16px" lineHeight="24px" fontWeight="500">
                   <FormattedMessage defaultMessage="Learn more about creating a Collective" id="yKF8y5" />
                 </P>
@@ -406,7 +406,7 @@ const RaiseMoney = () => {
                   defaultMessage="Pay expenses, receive donations, manage grants, sell event tickets, get a virtual card linked to your balance, and more!"
                 />
               </P>
-              <LearnMoreLink as={Link} textDecoration="underline" color="black.800" href="/how-it-works">
+              <LearnMoreLink textDecoration="underline" color="black.800" href="/how-it-works">
                 <P mt="24px" fontSize="16px" lineHeight="24px" fontWeight="500">
                   <FormattedMessage defaultMessage="Learn more about how the platform works" id="sgLhGq" />
                 </P>

@@ -23,7 +23,6 @@ import DefinedTerm, { Terms } from '../DefinedTerm';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
-import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
@@ -75,11 +74,7 @@ const ItemTitleWrapper = ({ expense, order, children }) => {
         content={<FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />}
         delayHide={0}
       >
-        <StyledLink
-          as={Link}
-          underlineOnHover
-          href={`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`}
-        >
+        <StyledLink underlineOnHover href={`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`}>
           {children}
         </StyledLink>
       </StyledTooltip>
@@ -91,7 +86,6 @@ const ItemTitleWrapper = ({ expense, order, children }) => {
         delayHide={0}
       >
         <StyledLink
-          as={Link}
           underlineOnHover
           href={`${getCollectivePageRoute(order.toAccount)}/contributions/${order.legacyId}`}
         >

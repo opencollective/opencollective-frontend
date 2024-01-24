@@ -17,7 +17,6 @@ import { capitalize } from '../../lib/utils';
 import CollapsableText from '../CollapsableText';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
-import Link from '../Link';
 import StyledLink from '../StyledLink';
 import StyledProgressBar from '../StyledProgressBar';
 import StyledTooltip from '../StyledTooltip';
@@ -65,7 +64,6 @@ const TierTitle = ({ collective, tier }) => {
         content={() => <FormattedMessage id="ContributeTier.GoToPage" defaultMessage="Go to full details page" />}
       >
         <StyledLink
-          as={Link}
           href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.legacyId || tier.id}`}
           color="black.900"
           hoverColor="black.900"
@@ -161,7 +159,6 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
               <React.Fragment>
                 {truncate(description, { length: 150 })}{' '}
                 <StyledLink
-                  as={Link}
                   whiteSpace="nowrap"
                   href={
                     isPreview ? '#' : `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tierLegacyId}`

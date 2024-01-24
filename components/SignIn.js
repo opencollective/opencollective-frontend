@@ -7,7 +7,6 @@ import Container from './Container';
 import { Box, Flex } from './Grid';
 import { WebsiteName } from './I18nFormatters';
 import Image from './Image';
-import Link from './Link';
 import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
@@ -77,7 +76,6 @@ export default class SignIn extends React.Component {
     const { loading, onSecondaryAction } = this.props;
     return typeof onSecondaryAction === 'string' ? (
       <StyledLink
-        as={Link}
         href={onSecondaryAction}
         disabled={loading}
         fontSize="14px"

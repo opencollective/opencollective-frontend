@@ -6,8 +6,6 @@ import clsx from 'clsx';
 import { flatten, groupBy, uniqBy } from 'lodash';
 import { Check, ChevronsUpDown, PlusCircle, Star } from 'lucide-react';
 import memoizeOne from 'memoize-one';
-// eslint-disable-next-line no-restricted-imports -- components/Link does not currently accept a ref, whichis required when used 'asChild' of Button
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -21,6 +19,7 @@ import { VIEWPORTS } from '../../../lib/withViewport';
 
 import Avatar from '../../Avatar';
 import DividerIcon from '../../DividerIcon';
+import Link from '../../Link';
 import { Button } from '../../ui/Button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../../ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/Popover';

@@ -255,5 +255,6 @@ export const SECTION_LABELS = defineMessages({
   },
   [ALL_SECTIONS.TAX_INFORMATION]: {
     defaultMessage: 'Tax Information',
+    id: 'r/dTTe',
   },
 });

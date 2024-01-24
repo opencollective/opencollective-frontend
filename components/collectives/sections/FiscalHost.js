@@ -7,7 +7,6 @@ import { background, display } from 'styled-system';
 import Avatar from '../../Avatar';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
-import Link from '../../Link';
 import { SectionDescription, SectionTitle } from '../../marketing/Text';
 import StyledButton from '../../StyledButton';
 import StyledLink from '../../StyledLink';
@@ -204,7 +203,7 @@ const FiscalHost = () => {
                     flexDirection={[null, null, null, 'column']}
                     width={[1, null, null, '292px']}
                   >
-                    <CollectHostPageLink as={Link} href={host.collectivePageLink}>
+                    <CollectHostPageLink href={host.collectivePageLink}>
                       <H3 fontSize="20px" lineHeight="28px" letterSpacing="-0.6px">
                         {host.name}
                       </H3>
@@ -228,7 +227,6 @@ const FiscalHost = () => {
                       </Box>
                       <Box my={[3, null, null, 0]}>
                         <StyledLink
-                          as={Link}
                           href={`${host.collectivePageLink}/apply`}
                           whiteSpace="nowrap"
                           fontSize="14px"
@@ -253,7 +251,6 @@ const FiscalHost = () => {
             </Container>
             <Box my={2} alignSelf={[null, 'center', null, 'flex-start']}>
               <DiscoverLink
-                as={Link}
                 href="/search?isHost=true"
                 fontSize="15px"
                 lineHeight="23px"

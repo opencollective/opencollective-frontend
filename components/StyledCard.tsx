@@ -37,9 +37,9 @@ type StyledCardProps = BackgroundProps &
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
-const StyledCard = styled.div<StyledCardProps>(
-  compose(flexbox, typography, background, border, shadow, color, layout, position, space),
-);
+const StyledCard = styled.div.withConfig({
+  shouldForwardProp: (prop, defaultValidatorFn) => defaultValidatorFn(prop),
+})<StyledCardProps>(compose(flexbox, typography, background, border, shadow, color, layout, position, space));
 
 StyledCard.propTypes = {
   ...styledPropTypes.flexbox,

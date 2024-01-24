@@ -159,9 +159,7 @@ const Footer = () => {
                   !LoggedInUser || (LoggedInUser && !(item.href === '/create-account' || item.href === '/signin')) ? (
                     <li className="text-muted-foreground hover:text-foreground" key={item.href}>
                       {item.href[0] === '/' ? (
-                        <Link href={item.href} passHref legacyBehavior>
-                          {item.label}
-                        </Link>
+                        <Link href={item.href}>{item.label}</Link>
                       ) : (
                         <a href={item.href}>
                           {item.label} <ExternalLink className="inline-block" size={12} />

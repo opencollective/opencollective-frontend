@@ -9,7 +9,6 @@ import { getCollectivePageRoute } from '../../lib/url-helpers';
 import Newsletter from '../collectives/Newsletter';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Link from '../Link';
 import StyledLink from '../StyledLink';
 import { H3, P, Span } from '../Text';
 
@@ -107,7 +106,6 @@ const SuccessCTAWrapper = ({ type, orderId, email, account, ...props }) => {
     case SUCCESS_CTA_TYPE.JOIN:
       return (
         <StyledLink
-          as={Link}
           display="block"
           data-cy="join-opencollective-link"
           href={{ pathname: '/create-account/guest', query: { OrderId: orderId, email } }}
@@ -118,7 +116,6 @@ const SuccessCTAWrapper = ({ type, orderId, email, account, ...props }) => {
     case SUCCESS_CTA_TYPE.SIGN_IN:
       return (
         <StyledLink
-          as={Link}
           display="block"
           color="black.800"
           data-cy="success-signin-link"
@@ -129,7 +126,7 @@ const SuccessCTAWrapper = ({ type, orderId, email, account, ...props }) => {
     case SUCCESS_CTA_TYPE.BLOG:
       return <StyledLink href="https://blog.opencollective.com" openInNewTab color="black.800" {...props} />;
     case SUCCESS_CTA_TYPE.GO_TO_PROFILE:
-      return <StyledLink as={Link} href={getCollectivePageRoute(account)} color="black.800" {...props} />;
+      return <StyledLink href={getCollectivePageRoute(account)} color="black.800" {...props} />;
     default:
       return <React.Fragment {...props} />;
   }

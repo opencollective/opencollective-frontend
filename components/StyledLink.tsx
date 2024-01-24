@@ -19,6 +19,8 @@ import {
 import { textDecoration, whiteSpace } from '../lib/styled-system-custom-properties';
 import { ButtonSize, buttonSize, ButtonStyle, buttonStyle } from '../lib/theme/variants/button';
 
+import Link from './Link';
+
 type StyledLinkProps = BorderProps &
   LayoutProps &
   SpaceProps &
@@ -40,26 +42,30 @@ type StyledLinkProps = BorderProps &
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
-const StyledLink = styled.a.attrs<StyledLinkProps>(props => {
-  if (props.openInNewTab) {
-    return {
-      target: '_blank',
-      rel: 'noopener noreferrer',
-    };
-  }
-  if (props.openInNewTabNoFollow) {
-    return {
-      target: '_blank',
-      rel: 'noopener noreferrer nofollow',
-    };
-  }
-  if (props.openInNewTabNoFollowRelMe) {
-    return {
-      target: '_blank',
-      rel: 'noopener noreferrer nofollow me',
-    };
-  }
-})<StyledLinkProps>`
+const StyledLink = styled(Link)
+  .withConfig({
+    shouldForwardProp: (prop, defaultValidatorFn) => defaultValidatorFn(prop),
+  })
+  .attrs<StyledLinkProps>(props => {
+    if (props.openInNewTab) {
+      return {
+        target: '_blank',
+        rel: 'noopener noreferrer',
+      };
+    }
+    if (props.openInNewTabNoFollow) {
+      return {
+        target: '_blank',
+        rel: 'noopener noreferrer nofollow',
+      };
+    }
+    if (props.openInNewTabNoFollowRelMe) {
+      return {
+        target: '_blank',
+        rel: 'noopener noreferrer nofollow me',
+      };
+    }
+  })<StyledLinkProps>`
   cursor: pointer;
   text-decoration: none;
 

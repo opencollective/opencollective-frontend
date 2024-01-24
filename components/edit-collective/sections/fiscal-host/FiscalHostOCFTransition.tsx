@@ -394,21 +394,16 @@ export const FiscalHostOCFTransition = ({ collective }) => {
                 above: “{step2Label}”).
               </li>
               <li>
-                You can{' '}
-                <StyledLink as={Link} href={getDashboardRoute(collective, 'export')}>
-                  export a list
-                </StyledLink>{' '}
-                of your contributors and reach out to them personally
+                You can <StyledLink href={getDashboardRoute(collective, 'export')}>export a list</StyledLink> of your
+                contributors and reach out to them personally
               </li>
               <li>
                 When you leave Open Collective, an email will be sent to your contributors informing them of your exit.
               </li>
               <li>
                 We recommend you{' '}
-                <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/updates/new`}>
-                  send an update
-                </StyledLink>{' '}
-                to your contributors so they are aware of what’s happening.
+                <StyledLink href={`${getCollectivePageRoute(collective)}/updates/new`}>send an update</StyledLink> to
+                your contributors so they are aware of what’s happening.
               </li>
             </ul>
           </CollapsibleContent>

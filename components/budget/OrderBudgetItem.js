@@ -16,7 +16,6 @@ import Container from '../Container';
 import DateTime from '../DateTime';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
-import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCategoryPill';
@@ -85,7 +84,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign, ho
             <LoadingPlaceholder height={60} />
           ) : (
             <Box>
-              <StyledLink as={Link} href={`${getCollectivePageRoute(order.toAccount)}/contributions/${order.legacyId}`}>
+              <StyledLink href={`${getCollectivePageRoute(order.toAccount)}/contributions/${order.legacyId}`}>
                 <AutosizeText
                   value={order.description}
                   maxLength={255}

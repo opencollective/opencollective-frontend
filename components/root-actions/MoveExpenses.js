@@ -12,7 +12,6 @@ import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import ExpensesPickerAsync from '../ExpensesPickerAsync';
 import { Flex } from '../Grid';
-import Link from '../Link';
 import LinkExpense from '../LinkExpense';
 import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
@@ -131,7 +130,7 @@ export default function MoveExpenses() {
         >
           <P>
             You&apos;re about to move {selectedExpenses.length} expenses to{' '}
-            <StyledLink as={Link} href={`/${destinationAccount.slug}`} openInNewTab>
+            <StyledLink href={`/${destinationAccount.slug}`} openInNewTab>
               {destinationAccount.name}
             </StyledLink>
             .

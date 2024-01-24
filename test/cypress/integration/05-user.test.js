@@ -15,7 +15,7 @@ describe('New users profiles', () => {
 
   describe('Contributions section', () => {
     it('Shows contributions with date since and amount contributed', () => {
-      cy.get('a[href="#category-CONTRIBUTIONS"]').click();
+      cy.get('a[href="/xdamman#category-CONTRIBUTIONS"]').click();
       cy.wait(50);
       cy.hash().should('eq', '#category-CONTRIBUTIONS');
       cy.get('[data-cy=contribution-date-since]').first().contains('Admin since');
@@ -24,7 +24,7 @@ describe('New users profiles', () => {
 
     // Deactivating this due to lack of dummy date on our DB
     xit('Can load more', () => {
-      cy.get('a[href="#category-CONTRIBUTIONS"]').click();
+      cy.get('a[href="/xdamman#category-CONTRIBUTIONS"]').click();
       cy.wait(50);
       cy.get('[data-cy=collective-contribution]').its('length').should('eq', 15);
 

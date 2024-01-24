@@ -30,7 +30,7 @@ const MobileFooterBar = styled(Flex)`
   padding: 8px 16px;
 `;
 
-const MobileFooterLink = styled(Link)<{ isActive: boolean }>`
+const MobileFooterLink = styled(Link)<{ $isActive: boolean }>`
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -42,7 +42,7 @@ const MobileFooterLink = styled(Link)<{ isActive: boolean }>`
   color: ${props => props.theme.colors.black[700]};
 
   ${props =>
-    props.isActive &&
+    props.$isActive &&
     css`
       svg {
         color: ${props => props.theme.colors.primary[500]};
@@ -60,7 +60,7 @@ const MobileFooterIconContainer = styled(Box)`
   border-radius: 24px;
 `;
 
-const MainNavItem = styled(Link)<{ isActive: boolean }>`
+const MainNavItem = styled(Link)<{ $isActive: boolean }>`
   display: flex;
   align-items: center;
   gap: 8px;
@@ -98,7 +98,7 @@ const MainNavItem = styled(Link)<{ isActive: boolean }>`
     }
   `}
   font-weight: 500;
-  ${props => props.isActive && `background-color: #f1f5f9;`}
+  ${props => props.$isActive && `background-color: #f1f5f9;`}
 
   span {
     overflow: hidden;
@@ -113,14 +113,14 @@ const MobileFooterMenu = ({ onDashboardRoute, onSearchRoute }) => {
 
   return (
     <MobileFooterBar alignItems="center" justifyContent="center" gap="12px" style={{ bottom: `${bottom}px` }}>
-      <MobileFooterLink href="/dashboard" isActive={onDashboardRoute}>
+      <MobileFooterLink href="/dashboard" $isActive={onDashboardRoute}>
         <MobileFooterIconContainer className="icon-container">
           <Frame size={20} />
         </MobileFooterIconContainer>
         <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
       </MobileFooterLink>
 
-      <MobileFooterLink href="/search" isActive={onSearchRoute}>
+      <MobileFooterLink href="/search" $isActive={onSearchRoute}>
         <MobileFooterIconContainer className="icon-container">
           <Compass size={20} />
         </MobileFooterIconContainer>
@@ -184,10 +184,10 @@ const TopBar = ({ account }: TopBarProps) => {
           </Flex>
 
           <Flex flex={1} alignItems="center" gridGap={3} overflow={'hidden'}>
-            <MainNavItem href="/dashboard" isActive={onDashboardRoute}>
+            <MainNavItem href="/dashboard" $isActive={onDashboardRoute}>
               <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
             </MainNavItem>
-            <MainNavItem href="/search" isActive={onSearchRoute}>
+            <MainNavItem href="/search" $isActive={onSearchRoute}>
               <FormattedMessage id="Explore" defaultMessage="Explore" />
             </MainNavItem>
           </Flex>

@@ -1,7 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import Link from './Link';
 import StyledLink from './StyledLink';
 
 // ignore unused exports
@@ -20,13 +19,12 @@ export const I18nListItem = chunks => <li>{chunks}</li>;
 
 export const I18nUnderline = chunks => <u>{chunks}</u>;
 export const I18nSupportLink = chunks => (
-  <StyledLink as={Link} openInNewTab href="/contact">
+  <StyledLink openInNewTab href="/contact">
     {chunks.length ? chunks : <FormattedMessage defaultMessage="support" id="o42xrK" />}
   </StyledLink>
 );
 export const I18nSignInLink = chunks => (
   <StyledLink
-    as={Link}
     href={{ pathname: '/signin', query: { next: typeof window !== 'undefined' ? window.location.pathname : '' } }}
   >
     {chunks}
@@ -34,12 +32,12 @@ export const I18nSignInLink = chunks => (
 );
 
 export const I18nTOSLink = msg => (
-  <StyledLink as={Link} href="/tos">
+  <StyledLink href="/tos">
     <span>{msg}</span>
   </StyledLink>
 );
 export const I18nPrivacyLink = msg => (
-  <StyledLink as={Link} href="/privacypolicy">
+  <StyledLink href="/privacypolicy">
     <span>{msg}</span>
   </StyledLink>
 );

@@ -14,8 +14,6 @@ import {
   Undo2,
   X,
 } from 'lucide-react';
-// eslint-disable-next-line no-restricted-imports -- components/Link does not currently accept a ref, which is required when used 'asChild' of HoverCardTrigger
-import Link from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
@@ -30,6 +28,7 @@ import ExpenseBudgetItem from '../../../budget/ExpenseBudgetItem';
 import OrderBudgetItem from '../../../budget/OrderBudgetItem';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import Link from '../../../Link';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';

@@ -14,7 +14,6 @@ import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
-import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
@@ -102,7 +101,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
   return (
     <div data-cy="personal-token-settings">
       <P mt={3} mb={4}>
-        <StyledLink data-cy="go-back-link" as={Link} color="black.800" href={backPath}>
+        <StyledLink data-cy="go-back-link" color="black.800" href={backPath}>
           &larr; <FormattedMessage defaultMessage="Go back to all your tokens" id="3Sl9Fc" />
         </StyledLink>
       </P>

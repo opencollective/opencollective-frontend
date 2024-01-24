@@ -1,12 +1,11 @@
 import React from 'react';
 import clsx from 'clsx';
 import { MoreHorizontal } from 'lucide-react';
-// eslint-disable-next-line no-restricted-imports
-import Link from 'next/link';
 import { useInView } from 'react-intersection-observer';
 
 import { getDashboardRoute } from '../../../lib/url-helpers';
 
+import Link from '../../Link';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/DropdownMenu';
 import { DashboardContext } from '../DashboardContext';
 

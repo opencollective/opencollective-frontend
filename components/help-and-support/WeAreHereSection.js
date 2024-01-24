@@ -21,7 +21,7 @@ want to talk!"
     </Box>
     <Flex flexDirection={['column', 'row']} alignItems="center">
       <StyledCard
-        as={StyledLink}
+        as={Link}
         href="https://slack.opencollective.com/"
         borderWidth="0px"
         boxShadow={['0px 1px 4px 1px rgba(49, 50, 51, 0.1)', 'unset']}

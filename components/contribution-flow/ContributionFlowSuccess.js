@@ -360,7 +360,7 @@ class ContributionFlowSuccess extends React.Component {
                   {isEmbed ? (
                     <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
                   ) : (
-                    <StyledLink as={Link} color="black.800" href={getCollectivePageRoute(order.toAccount)}>
+                    <StyledLink color="black.800" href={getCollectivePageRoute(order.toAccount)}>
                       <ContributorCardWithTier width={250} height={380} contribution={order} my={2} useLink={false} />
                     </StyledLink>
                   )}

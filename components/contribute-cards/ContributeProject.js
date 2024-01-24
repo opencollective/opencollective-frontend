@@ -5,7 +5,6 @@ import { truncate } from 'lodash';
 import { ContributionTypes } from '../../lib/constants/contribution-types';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
-import Link from '../Link';
 import StyledLink from '../StyledLink';
 
 import Contribute from './Contribute';
@@ -23,7 +22,7 @@ const ContributeProject = ({ collective, project, ...props }) => {
       stats={project.stats.backers}
       image={project.backgroundImageUrl}
       title={
-        <StyledLink as={Link} color="black.800" href={`/${collective.slug}/projects/${project.slug}`}>
+        <StyledLink color="black.800" href={`/${collective.slug}/projects/${project.slug}`}>
           {project.name}
         </StyledLink>
       }

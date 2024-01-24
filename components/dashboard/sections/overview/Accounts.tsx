@@ -2,7 +2,6 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import { ChevronDown, MoreHorizontal } from 'lucide-react';
-import Link from 'next/link'; // eslint-disable-line no-restricted-imports
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
@@ -11,6 +10,7 @@ import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-h
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';

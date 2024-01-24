@@ -164,7 +164,6 @@ const SectionUpdates = ({ collective, isAdmin }) => {
                         />
                         {` `}
                         <StyledLink
-                          as={Link}
                           fontSize="12px"
                           href={`${getCollectivePageRoute(collective)}/updates/${update.slug}`}
                         >

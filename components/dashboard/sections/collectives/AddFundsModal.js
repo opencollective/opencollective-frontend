@@ -26,7 +26,6 @@ import CollectivePickerAsync from '../../../CollectivePickerAsync';
 import Container from '../../../Container';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Box, Flex } from '../../../Grid';
-import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -852,7 +851,6 @@ const AddFundsModal = ({ collective, ...props }) => {
                             <li>
                               <FormattedMessage defaultMessage="For the tier" id="h+1vQB" />{' '}
                               <StyledLink
-                                as={Link}
                                 openInNewTab
                                 href={`${getCollectivePageRoute(collective)}/contribute/${fundDetails.tier.slug}-${
                                   fundDetails.tier.legacyId
