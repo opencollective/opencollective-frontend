@@ -5,7 +5,7 @@ import { ChevronDown, ChevronsUpDown, ChevronUp, Plus } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { space } from 'styled-system';
+import { space, SpaceProps } from 'styled-system';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -19,7 +19,7 @@ import StyledHr from '../StyledHr';
 import StyledRoundButton from '../StyledRoundButton';
 import { P, Span } from '../Text';
 
-const StyledMenuEntry = styled(Link)`
+const StyledMenuEntry = styled(Link)<SpaceProps & { $isActive: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;

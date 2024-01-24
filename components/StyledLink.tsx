@@ -18,6 +18,7 @@ import {
 
 import { textDecoration, whiteSpace } from '../lib/styled-system-custom-properties';
 import { ButtonSize, buttonSize, ButtonStyle, buttonStyle } from '../lib/theme/variants/button';
+import { LinkProps } from 'next/link';
 
 type StyledLinkProps = BorderProps &
   LayoutProps &
@@ -33,7 +34,7 @@ type StyledLinkProps = BorderProps &
     truncateOverflow?: boolean;
     underlineOnHover?: boolean;
     hoverColor?: string;
-  };
+  } & ({ as: 'button'; role: 'button' } | { as?: any });
 
 /**
  * styled-component anchor tag using styled-system
