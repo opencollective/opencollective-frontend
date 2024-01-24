@@ -82,11 +82,11 @@ export function gql(source: "\n  query HostDashboardVirtualCardRequests(\n    $h
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query AdminAccountingCategories($hostSlug: String!) {\n    host(slug: $hostSlug) {\n      id\n      slug\n      accountingCategories {\n        totalCount\n        nodes {\n          id\n          code\n          name\n          friendlyName\n          expensesTypes\n          createdAt\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').AdminAccountingCategoriesDocument;
+export function gql(source: "\n  query AdminAccountingCategories($hostSlug: String!) {\n    host(slug: $hostSlug) {\n      id\n      slug\n      accountingCategories {\n        totalCount\n        nodes {\n          id\n          kind\n          code\n          name\n          friendlyName\n          expensesTypes\n          createdAt\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').AdminAccountingCategoriesDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation EditAccountingCategories($hostSlug: String!, $categories: [AccountingCategoryInput!]!) {\n    editAccountingCategories(account: { slug: $hostSlug }, categories: $categories) {\n      id\n      ... on Organization {\n        host {\n          id\n          slug\n          accountingCategories {\n            totalCount\n            nodes {\n              id\n              code\n              name\n              friendlyName\n              expensesTypes\n              createdAt\n            }\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').EditAccountingCategoriesDocument;
+export function gql(source: "\n  mutation EditAccountingCategories($hostSlug: String!, $categories: [AccountingCategoryInput!]!) {\n    editAccountingCategories(account: { slug: $hostSlug }, categories: $categories) {\n      id\n      ... on Organization {\n        host {\n          id\n          slug\n          accountingCategories {\n            totalCount\n            nodes {\n              id\n              kind\n              code\n              name\n              friendlyName\n              expensesTypes\n              createdAt\n            }\n          }\n        }\n      }\n    }\n  }\n"): typeof import('./graphql').EditAccountingCategoriesDocument;
   /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
