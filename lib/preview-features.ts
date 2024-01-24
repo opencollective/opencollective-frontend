@@ -8,6 +8,7 @@ export enum PREVIEW_FEATURE_KEYS {
   EXPENSE_CATEGORIZATION = 'EXPENSE_CATEGORIZATION',
   DYNAMIC_TOP_BAR = 'DYNAMIC_TOP_BAR',
   NEW_TRANSACTION_PAGE = 'NEW_TRANSACTION_PAGE',
+  COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
 }
 
 export type PreviewFeature = {
@@ -68,5 +69,14 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'New Transactions page',
     description: 'Improved Transactions page in Dashboard',
     publicBeta: true,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW,
+    title: 'Collective Overview',
+    description: 'Overview page for Collectives in Dashboard',
+    publicBeta: false,
+    alwaysEnableInDev: true,
+    enabledByDefaultFor: ['*'],
+    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
   },
 ];

@@ -25,7 +25,7 @@ import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import { DashboardSectionProps } from '../../types';
 
-import { workspaceHomeQuery } from './query';
+import { workspaceHomeQuery } from './queries';
 import TimelineItem from './TimelineItem';
 const PAGE_SIZE = 20;
 

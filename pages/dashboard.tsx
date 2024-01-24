@@ -51,7 +51,10 @@ const messages = defineMessages({
 const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return null;
-  } else if (isIndividualAccount(account)) {
+  } else if (
+    isIndividualAccount(account) ||
+    (!isHostAccount(account) && loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW))
+  ) {
     return ALL_SECTIONS.OVERVIEW;
   } else if (isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
@@ -241,7 +244,7 @@ const DashboardPage = () => {
                 <div
                   className={clsx(
                     'mx-auto grid w-full max-w-screen-2xl grid-cols-1 justify-center px-3 xl:px-6',
-                    ['host-transactions', 'transactions'].includes(selectedSection) && // TODO: fix better support for wider pages
+                    ['host-transactions', 'transactions', 'overview'].includes(selectedSection) && // TODO: fix better support for wider pages
                       LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_TRANSACTION_PAGE)
                       ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1536px)_minmax(0,1fr)]'
                       : subMenu
