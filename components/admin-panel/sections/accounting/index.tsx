@@ -16,6 +16,7 @@ import {
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
+import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../../ConfirmationModal';
 import DashboardHeader from '../../../dashboard/DashboardHeader';
 import { buildComboSelectFilter } from '../../../dashboard/filters/ComboSelectFilter';
 import { Filterbar } from '../../../dashboard/filters/Filterbar';
@@ -125,6 +126,8 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   const { toast } = useToast();
 
   const [isCreateCategoryModalOpen, setIsCreateCategoryModalOpen] = React.useState(false);
+  const [deleteCategoryConfirmation, setDeleteCategoryConfirmation] = React.useState(null);
+
   const queryFilter = useQueryFilter({
     schema: React.useMemo(
       () =>
@@ -230,12 +233,18 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     [intl, toast, editAccountingCategories],
   );
 
-  const onDelete = React.useCallback(
-    async deleted => {
-      await updateCategories(categories.filter(c => c.id !== deleted.id));
-    },
-    [updateCategories, categories],
-  );
+  const onDelete = React.useCallback(async toDelete => {
+    setDeleteCategoryConfirmation(toDelete);
+  }, []);
+
+  const onConfirmDelete = React.useCallback(async () => {
+    return await updateCategories(
+      categories.filter(c => c.id !== deleteCategoryConfirmation.id),
+      () => {
+        setDeleteCategoryConfirmation(null);
+      },
+    );
+  }, [updateCategories, categories, deleteCategoryConfirmation]);
 
   const onEdit = React.useCallback(
     async (edited: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>) => {
@@ -285,6 +294,28 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
       </div>
       {isCreateCategoryModalOpen && (
         <CreateAccountingCategoryModal onClose={() => setIsCreateCategoryModalOpen(false)} onCreate={onCreate} />
+      )}
+      {deleteCategoryConfirmation && (
+        <ConfirmationModal
+          isDanger
+          type="delete"
+          onClose={() => setDeleteCategoryConfirmation(null)}
+          header={<FormattedMessage defaultMessage="Are you sure you want to delete this accounting category?" />}
+          continueHandler={async () => {
+            await onConfirmDelete();
+            setDeleteCategoryConfirmation(null);
+            return CONFIRMATION_MODAL_TERMINATE;
+          }}
+        >
+          <div className="inline-block rounded-xl bg-slate-50 px-2 py-1 font-bold text-slate-800">
+            {deleteCategoryConfirmation.name}
+            {deleteCategoryConfirmation.friendlyName && (
+              <span className="font-normal italic text-slate-700">
+                &nbsp;·&nbsp;{deleteCategoryConfirmation.friendlyName}
+              </span>
+            )}
+          </div>
+        </ConfirmationModal>
       )}
     </React.Fragment>
   );
