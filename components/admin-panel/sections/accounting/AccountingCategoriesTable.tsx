@@ -45,7 +45,7 @@ const columns = [
   },
   {
     accessorKey: 'kind',
-    header: () => <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />,
+    header: () => <FormattedMessage defaultMessage="Applies to" />,
     cell: ({ cell }) => {
       return <FormattedMessage {...AccountingCategoryKindI18n[cell.getValue()]} />;
     },

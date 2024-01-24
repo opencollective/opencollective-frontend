@@ -40,15 +40,16 @@ export function useAccoutingCategoryFormik(opts: useAccoutingCategoryFormikOptio
 
 export const AccountingCategoryKindI18n = defineMessages({
   [AccountingCategoryKind.EXPENSE]: {
-    id: 'Expense',
-    defaultMessage: 'Expense',
+    id: 'Expenses',
+    defaultMessage: 'Expenses',
   },
   [AccountingCategoryKind.ADDED_FUNDS]: {
     id: 'AccountingCategory.Kind.ADDED_FUNDS',
     defaultMessage: 'Added Funds',
   },
   [AccountingCategoryKind.CONTRIBUTION]: {
-    defaultMessage: 'Contribution',
+    id: 'Contributions',
+    defaultMessage: 'Contributions',
   },
 });
 

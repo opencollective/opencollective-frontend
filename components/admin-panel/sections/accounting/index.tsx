@@ -9,6 +9,7 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import {
   AccountingCategory,
+  AccountingCategoryKind,
   AdminAccountingCategoriesQuery,
   AdminAccountingCategoriesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
@@ -16,6 +17,7 @@ import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import DashboardHeader from '../../../dashboard/DashboardHeader';
+import { buildComboSelectFilter } from '../../../dashboard/filters/ComboSelectFilter';
 import { Filterbar } from '../../../dashboard/filters/Filterbar';
 import { buildOrderByFilter } from '../../../dashboard/filters/OrderFilter';
 import { searchFilter } from '../../../dashboard/filters/SearchFilter';
@@ -25,6 +27,7 @@ import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 
 import { AccountingCategoriesTable } from './AccountingCategoriesTable';
+import { AccountingCategoryKindI18n } from './AccountingCategoryForm';
 import { CreateAccountingCategoryModal } from './CreateAccountingCategoryModal';
 
 const accountingCategoriesQuery = gql`
@@ -80,10 +83,25 @@ function categoryToEditableFields(category: AccountingCategory) {
   return pick(category, ['id', ...editableFields]);
 }
 
-const orderByCodeFilter = buildOrderByFilter(z.enum(['CODE,DESC', 'CODE,ASC']).default('CODE,ASC'), {
-  'CODE,DESC': defineMessage({ defaultMessage: 'Code descending' }),
-  'CODE,ASC': defineMessage({ defaultMessage: 'Code ascending' }),
-});
+const orderByCodeFilter = buildOrderByFilter(
+  z.enum(['CODE,DESC', 'CODE,ASC', 'NAME,DESC', 'NAME,ASC']).default('CODE,ASC'),
+  {
+    'CODE,DESC': defineMessage({ defaultMessage: 'Code descending' }),
+    'CODE,ASC': defineMessage({ defaultMessage: 'Code ascending' }),
+    'NAME,DESC': defineMessage({ defaultMessage: 'Name descending' }),
+    'NAME,ASC': defineMessage({ defaultMessage: 'Name ascending' }),
+  },
+);
+
+const appliesToFilter = buildComboSelectFilter(
+  z
+    .array(
+      z.enum([AccountingCategoryKind.ADDED_FUNDS, AccountingCategoryKind.CONTRIBUTION, AccountingCategoryKind.EXPENSE]),
+    )
+    .optional(),
+  defineMessage({ defaultMessage: 'Applies to' }),
+  AccountingCategoryKindI18n,
+);
 
 /**
  * The accounting sections lets host admins customize their chart of accounts.
@@ -94,19 +112,25 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   const { toast } = useToast();
 
   const [isCreateCategoryModalOpen, setIsCreateCategoryModalOpen] = React.useState(false);
-
   const queryFilter = useQueryFilter({
-    schema: z.object({
-      searchTerm: searchFilter.schema,
-      orderBy: orderByCodeFilter.schema,
-    }),
+    schema: React.useMemo(
+      () =>
+        z.object({
+          searchTerm: searchFilter.schema,
+          orderBy: orderByCodeFilter.schema,
+          appliesTo: appliesToFilter.schema,
+        }),
+      [],
+    ),
     filters: {
       searchTerm: searchFilter.filter,
       orderBy: orderByCodeFilter.filter,
+      appliesTo: appliesToFilter.filter,
     },
     toVariables: {
       searchTerm: searchFilter.toVariables,
       orderBy: orderByCodeFilter.toVariables,
+      appliesTo: appliesToFilter.toVariables,
     },
   });
 
@@ -125,28 +149,45 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     [query.data?.host?.accountingCategories?.nodes],
   );
 
+  const filterFn: (c: (typeof categories)[number]) => boolean = React.useMemo(() => {
+    if (!queryFilter.values.searchTerm && !queryFilter.values.appliesTo) {
+      return null;
+    }
+
+    const termRegExp = queryFilter.values.searchTerm && new RegExp(queryFilter.values.searchTerm, 'i');
+    return c => {
+      return (
+        (!termRegExp || termRegExp.test(c.code) || termRegExp.test(c.name) || termRegExp.test(c.friendlyName)) &&
+        (!queryFilter.values.appliesTo || queryFilter.values.appliesTo.includes(c.kind))
+      );
+    };
+  }, [queryFilter.values.searchTerm, queryFilter.values.appliesTo]);
+
+  const sortFn: (a: (typeof categories)[number], b: (typeof categories)[number]) => number = React.useMemo(() => {
+    return (a, b) => {
+      if (queryFilter.values.orderBy === 'CODE,ASC') {
+        return a.code.localeCompare(b.code);
+      } else if (queryFilter.values.orderBy === 'CODE,DESC') {
+        return b.code.localeCompare(a.code);
+      } else if (queryFilter.values.orderBy === 'NAME,ASC') {
+        return a.name.localeCompare(b.name);
+      } else if (queryFilter.values.orderBy === 'NAME,DESC') {
+        return b.name.localeCompare(a.name);
+      }
+    };
+  }, [queryFilter.values.orderBy]);
+
   const filteredCategories = React.useMemo(() => {
     let result = categories;
 
-    if (queryFilter.values.searchTerm) {
-      const termRegExp = new RegExp(queryFilter.values.searchTerm, 'i');
-      result = result.filter(c => {
-        return termRegExp.test(c.code) || termRegExp.test(c.name) || termRegExp.test(c.friendlyName);
-      });
+    if (filterFn) {
+      result = result.filter(filterFn);
     }
 
-    if (queryFilter.values.orderBy === 'CODE,ASC') {
-      result = result.toSorted((a, b) => {
-        return a.code.localeCompare(b.code);
-      });
-    } else {
-      result = result.toSorted((a, b) => {
-        return b.code.localeCompare(a.code);
-      });
-    }
+    result = result.toSorted(sortFn);
 
     return result;
-  }, [categories, queryFilter.values.orderBy, queryFilter.values.searchTerm]);
+  }, [categories, sortFn, filterFn]);
 
   const isAdmin = Boolean(LoggedInUser?.isAdminOfCollective(query.data?.host)); // Accountants can't edit accounting categories
 

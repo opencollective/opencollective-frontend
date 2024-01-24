@@ -67,7 +67,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
     <React.Fragment>
       <div>
         <label className="mb-1 text-base">
-          <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />
+          <FormattedMessage defaultMessage="Applies to" />
         </label>
         <p>
           {props.accountingCategory?.kind && (
