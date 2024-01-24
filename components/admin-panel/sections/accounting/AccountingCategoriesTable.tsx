@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { AccountingCategory } from '../../../../lib/graphql/types/v2/graphql';
+import { AccountingCategory, AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
 import { DataTable } from '../../../DataTable';
@@ -10,7 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { TableActionsButton } from '../../../ui/Table';
 
 import { AccountingCategoryDrawer } from './AccountingCategoryDrawer';
-import { AccountingCategoryKindI18n } from './AccountingCategoryForm';
+import { AccountingCategoryKindI18n, EditableAccountingCategoryFields } from './AccountingCategoryForm';
 
 type AccountingCategoriesTableMeta = {
   disabled?: boolean;
@@ -44,6 +44,13 @@ const columns = [
     },
   },
   {
+    accessorKey: 'hostOnly',
+    header: () => <FormattedMessage defaultMessage="Host Only" />,
+    cell: ({ cell }) => {
+      return cell.getValue() ? <FormattedMessage defaultMessage="Yes" /> : <FormattedMessage defaultMessage="No" />;
+    },
+  },
+  {
     accessorKey: 'kind',
     header: () => <FormattedMessage defaultMessage="Applies to" />,
     cell: ({ cell }) => {
@@ -53,7 +60,7 @@ const columns = [
   {
     accessorKey: 'expensesTypes',
     header: () => <FormattedMessage defaultMessage="Expense types" />,
-    cell: ({ cell }) => {
+    cell: ({ cell, row }) => {
       function CellContent() {
         const intl = useIntl();
         return cell.getValue() === null
@@ -62,6 +69,10 @@ const columns = [
               .getValue()
               .map(value => i18nExpenseType(intl, value))
               .join(', ');
+      }
+
+      if (row.original.kind !== AccountingCategoryKind.EXPENSE) {
+        return '-';
       }
 
       return <CellContent />;
@@ -96,14 +107,12 @@ const columns = [
 
 type AccountingCategoriesTableProps = {
   hostSlug: string;
-  accountingCategories: Pick<AccountingCategory, 'id' | 'kind' | 'name' | 'friendlyName' | 'code' | 'expensesTypes'>[];
+  accountingCategories: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>[];
   loading?: boolean;
   isFiltered?: boolean;
   isAdmin?: boolean;
   onDelete: (category: AccountingCategory) => void;
-  onEdit: (
-    category: Pick<AccountingCategory, 'id' | 'kind' | 'name' | 'friendlyName' | 'code' | 'expensesTypes'>,
-  ) => void;
+  onEdit: (category: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>) => void;
 };
 
 export function AccountingCategoriesTable(props: AccountingCategoriesTableProps) {

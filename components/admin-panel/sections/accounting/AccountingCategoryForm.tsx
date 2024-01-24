@@ -6,6 +6,7 @@ import { defineMessages, IntlShape, useIntl } from 'react-intl';
 import { AccountingCategoryKind, ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
+import RichTextEditor from '../../../RichTextEditor';
 import StyledInput from '../../../StyledInput';
 import StyledInputField from '../../../StyledInputField';
 import StyledSelect from '../../../StyledSelect';
@@ -16,7 +17,18 @@ type FormValues = {
   code: string;
   kind: { value: AccountingCategoryKind; label: string };
   expensesTypes?: { value: ExpenseType; label: string }[];
+  hostOnly?: { value: boolean; label: string };
+  instructions?: string;
 };
+
+export type EditableAccountingCategoryFields =
+  | 'kind'
+  | 'hostOnly'
+  | 'instructions'
+  | 'name'
+  | 'friendlyName'
+  | 'code'
+  | 'expensesTypes';
 
 type useAccoutingCategoryFormikOptions = {
   onSubmit: (values: FormValues) => void | Promise<void>;
@@ -90,6 +102,17 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
     label: i18nExpenseType(intl, t),
   }));
 
+  const hostOnlyOptions = [
+    {
+      value: false,
+      label: intl.formatMessage({ defaultMessage: 'No' }),
+    },
+    {
+      value: true,
+      label: intl.formatMessage({ defaultMessage: 'Yes' }),
+    },
+  ];
+
   return (
     <React.Fragment>
       <StyledInputField name="kind" required label={intl.formatMessage({ defaultMessage: 'Category kind' })} mt={3}>
@@ -104,6 +127,22 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
             props.formik.setFieldValue(
               'kind',
               accountingCategoryKindOptions.find(c => c.value === value),
+            )
+          }
+        />
+      </StyledInputField>
+      <StyledInputField name="hostOnly" required label={intl.formatMessage({ defaultMessage: 'Host only' })} mt={3}>
+        <StyledSelect
+          {...props.formik.getFieldProps('hostOnly')}
+          inputId="hostOnly"
+          options={hostOnlyOptions}
+          required
+          width="100%"
+          maxWidth={500}
+          onChange={({ value }) =>
+            props.formik.setFieldValue(
+              'hostOnly',
+              hostOnlyOptions.find(c => c.value === value),
             )
           }
         />
@@ -167,6 +206,25 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
           />
         </StyledInputField>
       )}
+      <StyledInputField
+        name="instructions"
+        required
+        label={intl.formatMessage({ defaultMessage: 'Instructions' })}
+        mt={3}
+      >
+        <RichTextEditor
+          {...props.formik.getFieldProps('instructions')}
+          kind="ACCOUNTING_CATEGORY_DESCRIPTION"
+          defaultValue={props.formik.values.instructions}
+          withBorders
+          showCount
+          version="simplified"
+          editorMinHeight="12.5rem"
+          editorMaxHeight={500}
+          onChange={e => props.formik.setFieldValue('instructions', e.target.value)}
+          fontSize="14px"
+        />
+      </StyledInputField>
     </React.Fragment>
   );
 }

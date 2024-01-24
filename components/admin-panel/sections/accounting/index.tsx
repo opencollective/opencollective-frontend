@@ -27,7 +27,7 @@ import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 
 import { AccountingCategoriesTable } from './AccountingCategoriesTable';
-import { AccountingCategoryKindI18n } from './AccountingCategoryForm';
+import { AccountingCategoryKindI18n, EditableAccountingCategoryFields } from './AccountingCategoryForm';
 import { CreateAccountingCategoryModal } from './CreateAccountingCategoryModal';
 
 const accountingCategoriesQuery = gql`
@@ -41,6 +41,8 @@ const accountingCategoriesQuery = gql`
           id
           kind
           code
+          hostOnly
+          instructions
           name
           friendlyName
           expensesTypes
@@ -67,6 +69,8 @@ const editAccountingCategoryMutation = gql`
               kind
               code
               name
+              hostOnly
+              instructions
               friendlyName
               expensesTypes
               createdAt
@@ -79,7 +83,7 @@ const editAccountingCategoryMutation = gql`
 `;
 
 function categoryToEditableFields(category: AccountingCategory) {
-  const editableFields = ['kind', 'code', 'name', 'friendlyName', 'expensesTypes'];
+  const editableFields = ['kind', 'code', 'name', 'friendlyName', 'expensesTypes', 'hostOnly', 'instructions'];
   return pick(category, ['id', ...editableFields]);
 }
 
@@ -103,6 +107,15 @@ const appliesToFilter = buildComboSelectFilter(
   AccountingCategoryKindI18n,
 );
 
+const hostOnlyFilter = buildComboSelectFilter(
+  z.enum(['yes', 'no']).optional(),
+  defineMessage({ defaultMessage: 'Host only' }),
+  {
+    ['yes']: defineMessage({ defaultMessage: 'Yes' }),
+    ['no']: defineMessage({ defaultMessage: 'No' }),
+  },
+);
+
 /**
  * The accounting sections lets host admins customize their chart of accounts.
  */
@@ -119,6 +132,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
           searchTerm: searchFilter.schema,
           orderBy: orderByCodeFilter.schema,
           appliesTo: appliesToFilter.schema,
+          hostOnly: hostOnlyFilter.schema,
         }),
       [],
     ),
@@ -126,11 +140,13 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
       searchTerm: searchFilter.filter,
       orderBy: orderByCodeFilter.filter,
       appliesTo: appliesToFilter.filter,
+      hostOnly: hostOnlyFilter.filter,
     },
     toVariables: {
       searchTerm: searchFilter.toVariables,
       orderBy: orderByCodeFilter.toVariables,
       appliesTo: appliesToFilter.toVariables,
+      hostOnly: v => v === 'yes',
     },
   });
 
@@ -150,7 +166,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   );
 
   const filterFn: (c: (typeof categories)[number]) => boolean = React.useMemo(() => {
-    if (!queryFilter.values.searchTerm && !queryFilter.values.appliesTo) {
+    if (!queryFilter.values.searchTerm && !queryFilter.values.appliesTo && !queryFilter.values.hostOnly) {
       return null;
     }
 
@@ -158,10 +174,11 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     return c => {
       return (
         (!termRegExp || termRegExp.test(c.code) || termRegExp.test(c.name) || termRegExp.test(c.friendlyName)) &&
-        (!queryFilter.values.appliesTo || queryFilter.values.appliesTo.includes(c.kind))
+        (!queryFilter.values.appliesTo || queryFilter.values.appliesTo.includes(c.kind)) &&
+        (!queryFilter.values.hostOnly || (queryFilter.values.hostOnly === 'yes') === c.hostOnly)
       );
     };
-  }, [queryFilter.values.searchTerm, queryFilter.values.appliesTo]);
+  }, [queryFilter.values]);
 
   const sortFn: (a: (typeof categories)[number], b: (typeof categories)[number]) => number = React.useMemo(() => {
     return (a, b) => {
@@ -221,16 +238,14 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
   );
 
   const onEdit = React.useCallback(
-    async (edited: Pick<AccountingCategory, 'id' | 'kind' | 'name' | 'friendlyName' | 'code' | 'expensesTypes'>) => {
+    async (edited: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>) => {
       await updateCategories([...categories.filter(c => c.id !== edited.id), edited]);
     },
     [updateCategories, categories],
   );
 
   const onCreate = React.useCallback(
-    async (
-      created: Pick<AccountingCategory, 'kind' | 'name' | 'friendlyName' | 'code' | 'expensesTypes'> & { id: never },
-    ) => {
+    async (created: Pick<AccountingCategory, EditableAccountingCategoryFields>) => {
       await updateCategories([...categories, created], () => setIsCreateCategoryModalOpen(false));
     },
     [updateCategories, categories],

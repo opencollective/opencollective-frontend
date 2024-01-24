@@ -33,6 +33,7 @@ import {
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
+import HTMLContent from '../HTMLContent';
 import { serializeAddress } from '../I18nAddressFields';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -798,6 +799,11 @@ const ExpenseFormBody = ({
                     <MessageBox type="info" fontSize="12px" mt="24px">
                       <FormattedMessage defaultMessage="Please make sure that all the expense items in this expense belong to the selected expense category. If needed, you may submit additional items in separate expenses with different expense categories." />
                     </MessageBox>
+                    {formik.values.accountingCategory?.instructions && (
+                      <MessageBox type="info" fontSize="12px" mt="24px">
+                        <HTMLContent content={formik.values.accountingCategory.instructions} />
+                      </MessageBox>
+                    )}
                   </div>
                 )}
                 {values.type === expenseTypes.INVOICE && (

@@ -3,9 +3,15 @@ import { get, isUndefined, pick, remove, size, throttle } from 'lodash';
 import { ChevronDown, Sparkles } from 'lucide-react';
 import { defineMessages, FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
-import { Account, AccountingCategory, Expense, ExpenseType, Host } from '../../lib/graphql/types/v2/graphql';
+import {
+  Account,
+  AccountingCategory,
+  AccountingCategoryKind,
+  Expense,
+  ExpenseType,
+  Host,
+} from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { fetchExpenseCategoryPredictions } from '../../lib/ml-service';
 import { cn } from '../../lib/utils';
 
@@ -133,12 +139,11 @@ const getCategoryLabel = (
 /**
  * Returns true if the category is supported for the given expense type. Host admins can select any category.
  */
-export const isSupportedExpenseCategory = (
-  expenseType: ExpenseType,
-  category: AccountingCategory,
-  isHostAdmin: boolean,
-) => {
-  return isHostAdmin || !category?.expensesTypes || category.expensesTypes.includes(expenseType);
+export const isSupportedExpenseCategory = (expenseType: ExpenseType, category: AccountingCategory) => {
+  return (
+    category.kind === AccountingCategoryKind.EXPENSE &&
+    (!category?.expensesTypes || category.expensesTypes.includes(expenseType))
+  );
 };
 
 const getOptions = (
@@ -148,13 +153,12 @@ const getOptions = (
   showCode: boolean,
   allowNone: boolean,
   valuesByRole: Expense['valuesByRole'],
-  isHostAdmin: boolean,
 ): OptionsMap => {
   const categories = [...get(host, 'accountingCategories.nodes', [])];
   const categoriesById: OptionsMap = {};
 
   // Show all categories to host admins, but only the ones that match the expense type to other users
-  remove(categories, category => !isSupportedExpenseCategory(expenseType, category, isHostAdmin));
+  remove(categories, category => !isSupportedExpenseCategory(expenseType, category));
 
   categories.forEach(category => {
     categoriesById[category.id] = {
@@ -269,14 +273,12 @@ const ExpenseCategorySelect = ({
 }: ExpenseCategorySelectProps) => {
   const intl = useIntl();
   const [isOpen, setOpen] = React.useState(false);
-  const { LoggedInUser } = useLoggedInUser();
-  const isHostAdmin = Boolean(LoggedInUser?.isAdminOfCollective(host));
   const usePredictions = host.slug === 'foundation' && (predictionStyle === 'full' || isOpen);
   const { predictions } = useExpenseCategoryPredictionService(usePredictions, host, account, expenseValues);
   const hasPredictions = Boolean(predictions?.length);
   const options = React.useMemo(
-    () => getOptions(intl, host, expenseType, showCode, allowNone, valuesByRole, isHostAdmin),
-    [host, expenseType, allowNone, showCode, valuesByRole, isHostAdmin],
+    () => getOptions(intl, host, expenseType, showCode, allowNone, valuesByRole),
+    [intl, host, expenseType, allowNone, showCode, valuesByRole],
   );
 
   return (

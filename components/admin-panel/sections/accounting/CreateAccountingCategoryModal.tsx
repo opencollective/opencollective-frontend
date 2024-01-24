@@ -9,19 +9,20 @@ import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../Style
 import {
   AccountingCategoryForm,
   AccountingCategoryKindI18n,
+  EditableAccountingCategoryFields,
   useAccoutingCategoryFormik,
 } from './AccountingCategoryForm';
 
 type CreateAccountingCategoryModalProps = {
   onClose: () => void;
-  onCreate: (category: Pick<AccountingCategory, 'name' | 'friendlyName' | 'code' | 'expensesTypes'>) => Promise<void>;
+  onCreate: (category: Pick<AccountingCategory, EditableAccountingCategoryFields>) => Promise<void>;
 };
 
 export function CreateAccountingCategoryModal(props: CreateAccountingCategoryModalProps) {
   const intl = useIntl();
   const { onCreate } = props;
   const createAccountingCategory = React.useCallback(
-    async (values: Pick<AccountingCategory, 'kind' | 'name' | 'friendlyName' | 'code' | 'expensesTypes'>) => {
+    async (values: Pick<AccountingCategory, EditableAccountingCategoryFields>) => {
       await onCreate(values);
     },
     [onCreate],
@@ -37,10 +38,15 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
         label: intl.formatMessage(AccountingCategoryKindI18n[AccountingCategoryKind.EXPENSE]),
       },
       expensesTypes: null,
+      hostOnly: {
+        value: false,
+        label: intl.formatMessage({ defaultMessage: 'No' }),
+      },
     },
     async onSubmit(values) {
       await createAccountingCategory({
         ...values,
+        hostOnly: values.hostOnly.value,
         kind: values.kind ? values.kind.value : null,
         expensesTypes:
           values.expensesTypes && values.expensesTypes.length > 0 ? values.expensesTypes.map(t => t.value) : null,

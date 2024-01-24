@@ -77,7 +77,7 @@ type RichTextEditorProps = RichTextEditorContainerProps & {
   videoEmbedEnabled?: boolean;
   'data-cy': string;
   /** Called when an image is being uploaded to set a boolean */
-  setUploading: (uploading: boolean) => void;
+  setUploading?: (uploading: boolean) => void;
 };
 
 const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
