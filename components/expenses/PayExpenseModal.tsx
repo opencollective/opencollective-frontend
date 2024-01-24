@@ -373,7 +373,7 @@ const PayExpenseModal = ({
   const amountWithoutTaxes = getAmountWithoutTaxes(expense.amount, expense.taxes);
   const paymentServiceOptions = React.useMemo(
     () => [
-      { value: null, label: <FormattedMessage id="NoSelection" defaultMessage="No selection" /> },
+      { value: null, label: <FormattedMessage id="Select.Placeholder" defaultMessage="No selection" /> },
       ...EXPENSE_PAYMENT_METHOD_SERVICES.map(service => ({
         value: service,
         label: i18nPaymentMethodService(service, intl),
@@ -525,11 +525,11 @@ const PayExpenseModal = ({
                   error={formik.errors.paymentMethodService}
                   required={false}
                   mt={3}
-                  label={<FormattedMessage id="PayExpense.PaymentMethodService" defaultMessage="Payment method" />}
+                  label={<FormattedMessage id="PayExpense.PaymentMethodService" defaultMessage="Payment service" />}
                   hint={
                     <FormattedMessage
                       id="PayExpense.paymentMethodService.Hint"
-                      defaultMessage="The payment method used to pay for this expense."
+                      defaultMessage="The payment service used to pay for this expense."
                     />
                   }
                 >
