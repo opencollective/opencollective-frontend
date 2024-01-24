@@ -1,9 +1,6 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { CardElement, Elements } from '@stripe/react-stripe-js';
-import { Add } from '@styled-icons/material/Add';
 import clsx from 'clsx';
-import { get, merge, pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -22,22 +19,15 @@ import {
   getPaymentMethodMetadata,
   isPaymentMethodDisabled,
 } from '../../../lib/payment-method-utils';
-import { getStripe, stripeTokenToPaymentMethod } from '../../../lib/stripe';
+import { getStripe } from '../../../lib/stripe';
 
 import ConfirmationModal from '../../ConfirmationModal';
-import { Box } from '../../Grid';
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
-import NewCreditCardForm from '../../NewCreditCardForm';
-import {
-  addCreditCardMutation,
-  confirmCreditCardMutation,
-} from '../../recurring-contributions/UpdatePaymentMethodPopUp';
 import StyledButton from '../../StyledButton';
 import StyledLink from '../../StyledLink';
 import StyledTooltip from '../../StyledTooltip';
-import { P, Span } from '../../Text';
 import { useToast } from '../../ui/useToast';
 
 const managePaymentMethodsQuery = gql`
@@ -169,7 +159,12 @@ export default function ManagePaymentMethods(props: ManagePaymentMethodsProps) {
       {orderedPaymentMethods.map(pm => {
         return <PaymentMethodItem key={pm.id} account={props.account} paymentMethod={pm} />;
       })}
-      <AddCreditCardButton className="mt-3" account={query.data?.account} />
+
+      {orderedPaymentMethods.length === 0 && (
+        <MessageBox type="info" withIcon mb={3}>
+          <FormattedMessage defaultMessage="No saved payment methods." />
+        </MessageBox>
+      )}
     </div>
   );
 }
@@ -370,130 +365,5 @@ function PaymentMethodItem(props: PaymentMethodItemProps) {
         ></ConfirmationModal>
       )}
     </React.Fragment>
-  );
-}
-
-type AddCreditCardButtonProps = {
-  className: string;
-  account: Pick<Account, 'id' | 'name'>;
-};
-
-function AddCreditCardButton(props: AddCreditCardButtonProps) {
-  const { toast } = useToast();
-  const intl = useIntl();
-  const [isAddingCard, setIsAddingCard] = React.useState(false);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [card, setCard] = React.useState(null);
-
-  const [addCreditCard] = useMutation(addCreditCardMutation, {
-    context: API_V2_CONTEXT,
-    refetchQueries: ['ManagePaymentMethods'],
-  });
-
-  const [confirmCreditCard] = useMutation(confirmCreditCardMutation, {
-    context: API_V2_CONTEXT,
-    refetchQueries: ['ManagePaymentMethods'],
-  });
-
-  const submitNewCard = React.useCallback(async () => {
-    try {
-      setIsSubmitting(true);
-
-      const cardElement = card.stripeElements.getElement(CardElement);
-      const { token, error } = await card.stripe.createToken(cardElement);
-      if (error) {
-        throw error;
-      }
-      const newStripePaymentMethod = stripeTokenToPaymentMethod(token);
-      const newCreditCardInfo = merge(newStripePaymentMethod.data, pick(newStripePaymentMethod, ['token']));
-      const res = await addCreditCard({
-        variables: {
-          creditCardInfo: newCreditCardInfo,
-          name: get(newStripePaymentMethod, 'name'),
-          account: { id: props.account.id },
-        },
-      });
-
-      const { paymentMethod, stripeError } = res.data.addCreditCard;
-      if (stripeError) {
-        const stripe = await getStripe();
-        const result = await stripe.handleCardSetup(stripeError.response.setupIntent.client_secret);
-        if (result.error) {
-          throw result.error;
-        } else {
-          await confirmCreditCard({ variables: { paymentMethod: { id: paymentMethod.id } } });
-        }
-      }
-      toast({
-        variant: 'success',
-        message: <FormattedMessage defaultMessage="Your payment method has been successfully added." />,
-      });
-    } catch (e) {
-      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
-    } finally {
-      setIsAddingCard(false);
-      setIsSubmitting(false);
-    }
-  }, [toast, intl, card, props.account, addCreditCard, confirmCreditCard]);
-
-  if (isAddingCard) {
-    return (
-      <div className="flex flex-wrap items-center rounded-s border px-3 py-1">
-        <P fontSize="14px" fontWeight="bold" mr={4}>
-          <FormattedMessage id="paymentMethod.add" defaultMessage="New Credit Card" />
-        </P>
-        <Box mr={2} css={{ flexGrow: 1 }}>
-          <Elements stripe={getStripe()}>
-            <NewCreditCardForm
-              hasSaveCheckBox={false}
-              // onChange={newCreditCardInfo => this.setState({ newCreditCardInfo, error: null })}
-              onChange={cardInfo => setCard(state => ({ ...state, cardInfo }))}
-              onReady={({ stripe, stripeElements }) => setCard(state => ({ ...state, stripe, stripeElements }))}
-            />
-          </Elements>
-        </Box>
-        <Box my={2}>
-          <StyledButton
-            mr={2}
-            buttonStyle="standard"
-            buttonSize="medium"
-            onClick={() => {
-              setIsAddingCard(false);
-              setCard(null);
-            }}
-            disabled={isSubmitting}
-          >
-            <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-          </StyledButton>
-          <StyledButton
-            buttonStyle="primary"
-            buttonSize="medium"
-            type="submit"
-            onClick={submitNewCard}
-            disabled={isSubmitting}
-            loading={isSubmitting}
-          >
-            <FormattedMessage id="save" defaultMessage="Save" />
-          </StyledButton>
-        </Box>
-      </div>
-    );
-  }
-
-  return (
-    <div className={clsx('flex flex-col', props.className)}>
-      <StyledButton mt={3} buttonStyle="standard" buttonSize="large" onClick={() => setIsAddingCard(true)}>
-        <Add size="1em" />
-        {'  '}
-        <FormattedMessage id="paymentMethods.creditcard.add" defaultMessage="Add a credit card" />
-      </StyledButton>
-      <Span fontSize="12px" mt={2} textAlign="center" color="black.600">
-        <FormattedMessage
-          id="paymentMethods.creditcard.add.info"
-          defaultMessage="For making contributions as {contributeAs}"
-          values={{ contributeAs: props.account?.name }}
-        />
-      </Span>
-    </div>
   );
 }
