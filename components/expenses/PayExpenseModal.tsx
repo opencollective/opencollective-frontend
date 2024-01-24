@@ -8,11 +8,13 @@ import styled from 'styled-components';
 import { border, BorderProps, color, space, SpaceProps, typography } from 'styled-system';
 
 import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
+import { EXPENSE_PAYMENT_METHOD_SERVICES } from '../../lib/constants/payment-methods';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { formatCurrency } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import type { Account, Expense, Host } from '../../lib/graphql/types/v2/graphql';
+import { i18nPaymentMethodService } from '../../lib/i18n/payment-method-service';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { getAmountWithoutTaxes, getTaxAmount } from './lib/utils';
@@ -27,6 +29,7 @@ import StyledCheckbox from '../StyledCheckbox';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
+import StyledSelect from '../StyledSelect';
 import StyledTooltip from '../StyledTooltip';
 import { H4, P, Span } from '../Text';
 import { withUser } from '../UserProvider';
@@ -117,7 +120,7 @@ const TransferDetailFields = ({ expense, setDisabled }: TransferDetailsFieldsPro
 
   useEffect(() => {
     setDisabled(loading);
-  }, [loading]);
+  }, [loading, setDisabled]);
 
   if (error) {
     return (
@@ -150,17 +153,23 @@ const getPayoutLabel = (intl, type) => {
   return i18nPayoutMethodType(intl, type, { aliasBankAccountToTransferWise: true });
 };
 
+const DEFAULT_PAYMENT_METHOD_SERVICE = {
+  [PayoutMethodType.PAYPAL]: 'PAYPAL',
+  [PayoutMethodType.BANK_ACCOUNT]: 'WISE',
+};
+
 const getPayoutOptionValue = (payoutMethod, isAuto, host) => {
   const payoutMethodType = payoutMethod?.type;
   if (payoutMethodType === PayoutMethodType.OTHER) {
-    return { forceManual: true, action: 'PAY' };
+    return { forceManual: true, action: 'PAY', paymentMethodService: null };
   } else if (payoutMethod?.data?.type === 'brazil') {
     // TODO: remove this when we implement the missing Brazilian TRANSFER NATURE field.
     return { forceManual: true, action: 'PAY' };
   } else if (payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !host.transferwise) {
-    return { forceManual: true, action: 'PAY' };
+    return { forceManual: true, action: 'PAY', paymentMethodService: 'WISE' };
   } else if (!isAuto) {
-    return { forceManual: true, action: 'PAY' };
+    const paymentMethodService = DEFAULT_PAYMENT_METHOD_SERVICE[payoutMethodType] || null;
+    return { forceManual: true, action: 'PAY', paymentMethodService };
   } else {
     const isPaypalPayouts =
       host.features[FEATURES.PAYPAL_PAYOUTS] === 'ACTIVE' &&
@@ -173,6 +182,7 @@ const getPayoutOptionValue = (payoutMethod, isAuto, host) => {
     return {
       forceManual: false,
       action: isPaypalPayouts || isWiseOTT ? 'SCHEDULE_FOR_PAYMENT' : 'PAY',
+      paymentMethodService: null,
     };
   }
 };
@@ -181,6 +191,7 @@ const DEFAULT_VALUES = Object.freeze({
   paymentProcessorFeeInHostCurrency: null,
   totalAmountPaidInHostCurrency: null,
   feesPayer: 'COLLECTIVE',
+  paymentMethodService: null,
 });
 
 const validate = values => {
@@ -360,6 +371,16 @@ const PayExpenseModal = ({
   });
 
   const amountWithoutTaxes = getAmountWithoutTaxes(expense.amount, expense.taxes);
+  const paymentServiceOptions = React.useMemo(
+    () => [
+      { value: null, label: <FormattedMessage id="NoSelection" defaultMessage="No selection" /> },
+      ...EXPENSE_PAYMENT_METHOD_SERVICES.map(service => ({
+        value: service,
+        label: i18nPaymentMethodService(service, intl),
+      })),
+    ],
+    [intl],
+  );
 
   const amounts = calculateAmounts({
     formik,
@@ -495,6 +516,34 @@ const PayExpenseModal = ({
                       min={0}
                       max={formik.values.totalAmountPaidInHostCurrency || 100000000}
                       onChange={value => formik.setFieldValue('paymentProcessorFeeInHostCurrency', value)}
+                    />
+                  )}
+                </StyledInputField>
+                <StyledInputField
+                  name="paymentMethodService"
+                  htmlFor="paymentMethodService"
+                  error={formik.errors.paymentMethodService}
+                  required={false}
+                  mt={3}
+                  label={<FormattedMessage id="PayExpense.PaymentMethodService" defaultMessage="Payment method" />}
+                  hint={
+                    <FormattedMessage
+                      id="PayExpense.paymentMethodService.Hint"
+                      defaultMessage="The payment method used to pay for this expense."
+                    />
+                  }
+                >
+                  {inputProps => (
+                    <StyledSelect
+                      options={paymentServiceOptions}
+                      minWidth={300}
+                      value={
+                        formik.values.paymentMethodService
+                          ? paymentServiceOptions.find(o => o.value === formik.values.paymentMethodService)
+                          : undefined
+                      }
+                      onChange={({ value }) => formik.setFieldValue('paymentMethodService', value)}
+                      {...inputProps}
                     />
                   )}
                 </StyledInputField>
