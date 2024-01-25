@@ -263,7 +263,7 @@
     "file-loader": "^6.2.0",
     "fs-extra": "^11.2.0",
     "html-loader": "^5.0.0",
-    "husky": "^4.3.8",
+    "husky": "^9.0.0",
     "jest": "^29.7.0",
     "jest-styled-components": "^7.2.0",
     "jsdoc-api": "^8.0.0",
