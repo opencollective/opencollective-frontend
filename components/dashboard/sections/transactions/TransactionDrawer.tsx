@@ -1,7 +1,19 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { isNil } from 'lodash';
-import { Check, Copy, Download, Eye, InfoIcon, MinusCircle, MoreHorizontal, Undo2, X } from 'lucide-react'; // eslint-disable-next-line no-restricted-imports -- components/Link does not currently accept a ref, whichis required when used 'asChild' of Button
+import {
+  AlertTriangle,
+  Check,
+  Copy,
+  Download,
+  Eye,
+  InfoIcon,
+  MinusCircle,
+  MoreHorizontal,
+  Undo,
+  Undo2,
+  X,
+} from 'lucide-react';
 // eslint-disable-next-line no-restricted-imports -- components/Link does not currently accept a ref, which is required when used 'asChild' of HoverCardTrigger
 import Link from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -285,7 +297,7 @@ export function TransactionDrawer({
       transaction?.paymentMethod);
 
   const showRefundButton = showActions && transaction?.permissions.canRefund && !transaction?.isRefunded;
-  const showRejectButton = showActions && transaction?.permissions.canReject && !transaction?.isRejected;
+  const showRejectButton = showActions && transaction?.permissions.canReject && !transaction?.isOrderRejected;
   const showDownloadInvoiceButton =
     showActions &&
     transaction?.permissions.canDownloadInvoice &&
@@ -333,12 +345,12 @@ export function TransactionDrawer({
                       <span className="text-muted-foreground">{transaction?.netAmount.currency}</span>
                     </div>
                   )}
-                  {transaction?.isRefunded && (
+                  {transaction?.isRefunded && !transaction?.isOrderRejected && (
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button onClick={() => setFilter('openTransactionId', transaction?.refundTransaction.id)}>
                           <Badge size="sm" type="warning" className="gap-1">
-                            <Undo2 size={16} />
+                            <Undo size={16} />
                             <FormattedMessage defaultMessage="Refunded" />
                           </Badge>
                         </button>
@@ -347,6 +359,33 @@ export function TransactionDrawer({
                       <TooltipContent>
                         <FormattedMessage
                           defaultMessage="Refunded on {date}"
+                          values={{
+                            date: (
+                              <DateTime
+                                dateStyle="medium"
+                                timeStyle="short"
+                                value={transaction?.refundTransaction?.createdAt}
+                              />
+                            ),
+                          }}
+                        />
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  {transaction?.isRefunded && transaction?.isOrderRejected && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button onClick={() => setFilter('openTransactionId', transaction?.refundTransaction.id)}>
+                          <Badge size="sm" type="error" className="gap-1">
+                            <AlertTriangle size={16} />
+                            <FormattedMessage defaultMessage="Rejected" />
+                          </Badge>
+                        </button>
+                      </TooltipTrigger>
+
+                      <TooltipContent>
+                        <FormattedMessage
+                          defaultMessage="Rejected and refunded on {date}"
                           values={{
                             date: (
                               <DateTime
