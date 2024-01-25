@@ -56,7 +56,7 @@ export function Metric({
       ) : (
         <div className="flex items-center gap-2">
           <span className="block text-2xl font-bold">
-            {amount ? (
+            {amount?.current ? (
               <FormattedMoneyAmount
                 amount={Math.abs(amount.current.valueInCents)}
                 currency={amount.current.currency}
@@ -65,7 +65,7 @@ export function Metric({
                 showCurrencyCode={false}
               />
             ) : (
-              count.current
+              count?.current
             )}
           </span>
 
