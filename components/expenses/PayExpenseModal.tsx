@@ -373,7 +373,7 @@ const PayExpenseModal = ({
   const amountWithoutTaxes = getAmountWithoutTaxes(expense.amount, expense.taxes);
   const paymentServiceOptions = React.useMemo(
     () => [
-      { value: null, label: <FormattedMessage id="Select.Placeholder" defaultMessage="No selection" /> },
+      { value: null, label: <FormattedMessage id="Other" defaultMessage="Other" /> },
       ...EXPENSE_PAYMENT_METHOD_SERVICES.map(service => ({
         value: service,
         label: i18nPaymentMethodService(service, intl),
