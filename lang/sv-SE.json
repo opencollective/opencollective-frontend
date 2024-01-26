@@ -1717,6 +1717,7 @@
   "HeroAvatar.Edit": "Redigera {imgType, select, AVATAR {avatar} other {logotyp}}",
   "HeroAvatar.Remove": "Ta bort {imgType, select, AVATAR {avatar} other {logotyp}}",
   "hfh76h": "Auktorisering för {appName} återkallad",
+  "hGGTXw": "Exported Fields Set",
   "HhwRys": "Password can't be the same as current password",
   "Hide": "Dölj",
   "HM2YJg": "Vill du skapa ett konto för din organisation?",

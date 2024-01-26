@@ -1717,6 +1717,7 @@
   "HeroAvatar.Edit": "Edit {imgType, select, AVATAR {avatar} other {logo}}",
   "HeroAvatar.Remove": "Remove {imgType, select, AVATAR {avatar} other {logo}}",
   "hfh76h": "Authorization for {appName} revoked",
+  "hGGTXw": "Exported Fields Set",
   "HhwRys": "Password can't be the same as current password",
   "Hide": "숨기기",
   "HM2YJg": "조직 계정은 어떻게 생성하죠?",

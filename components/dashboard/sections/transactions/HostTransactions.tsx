@@ -76,6 +76,7 @@ const hostTransactionsMetaDataQuery = gql`
       legacyId
       slug
       currency
+      settings
     }
   }
 `;
@@ -150,7 +151,8 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
               open={displayExportCSVModal}
               setOpen={setDisplayExportCSVModal}
               queryFilter={queryFilter}
-              hostSlug={hostSlug}
+              account={metaData?.host}
+              isHostReport
               trigger={
                 <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
                   <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
