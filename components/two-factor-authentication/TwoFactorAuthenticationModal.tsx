@@ -1,12 +1,18 @@
 import React from 'react';
 import * as simplewebauthn from '@simplewebauthn/browser';
+import { X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import VerificationInput from 'react-verification-input';
 
 import { createError, ERROR } from '../../lib/errors';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS, setLocalStorage } from '../../lib/local-storage';
+import {
+  getFromLocalStorage,
+  LOCAL_STORAGE_KEYS,
+  removeFromLocalStorage,
+  setLocalStorage,
+} from '../../lib/local-storage';
 import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import { getSettingsRoute } from '../../lib/url-helpers';
 
@@ -15,7 +21,6 @@ import Image from '../Image';
 import Link from '../Link';
 import {
   AlertDialog,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -52,8 +57,6 @@ export default function TwoFactorAuthenticationModal() {
       return method !== 'recovery_code' || prompt?.allowRecovery;
     });
   }, [prompt?.supportedMethods, prompt.allowRecovery]);
-
-  const cancellable = !prompt.isRequired;
 
   const [selectedMethod, setSelectedMethod] = React.useState(initialMethod(supportedMethods));
   const [twoFactorCode, setTwoFactorCode] = React.useState('');
@@ -92,6 +95,7 @@ export default function TwoFactorAuthenticationModal() {
     setConfirming(false);
     setSelectedMethod(null);
     prompt.rejectAuth(createError(ERROR.TWO_FACTOR_AUTH_CANCELED));
+    removeFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
   }, []);
 
   const confirm = React.useCallback(() => {
@@ -145,6 +149,12 @@ export default function TwoFactorAuthenticationModal() {
         </div>
 
         <AlertDialogHeader className="sm:text-center">
+          <Button onClick={cancel} variant="ghost" size="icon-xs" className="absolute right-1.5 top-1.5">
+            <X size={16} />
+            <span className="sr-only">
+              <FormattedMessage id="Close" defaultMessage="Close" />
+            </span>
+          </Button>
           <AlertDialogTitle>
             {supportedMethods.length === 0 ? (
               <FormattedMessage defaultMessage="You must configure 2FA to access this feature" />
@@ -200,11 +210,6 @@ export default function TwoFactorAuthenticationModal() {
                 </Button>
               )}
             </React.Fragment>
-          )}
-          {cancellable && (
-            <AlertDialogCancel disabled={confirming}>
-              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-            </AlertDialogCancel>
           )}
           <Button
             loading={confirming}
