@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
@@ -15,10 +16,12 @@ import { Balance } from './Balance';
 import { Metric } from './Metric';
 import { periodCompareFilter } from './PeriodCompareFilter';
 import { collectiveOverviewQuery } from './queries';
+import { Timeline } from './Timeline';
 import { TodoList } from './TodoList';
 
 export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
   const { account } = React.useContext(DashboardContext);
+  const router = useRouter();
   const queryFilter = useQueryFilter({
     schema: z.object({
       period: periodCompareFilter.schema,
@@ -33,7 +36,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
     },
   });
 
-  const { data, loading } = useQuery(collectiveOverviewQuery, {
+  const { data, loading, error } = useQuery(collectiveOverviewQuery, {
     variables: {
       slug: accountSlug,
       ...queryFilter.variables,
@@ -42,11 +45,14 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
     context: API_V2_CONTEXT,
   });
 
+  if (error) {
+    return <div>{error.message}</div>;
+  }
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
         <div className="order-1 flex flex-col gap-3 xl:col-span-2">
-          <DashboardHeader title={'Overview'} />
+          <DashboardHeader title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />} />
 
           <Filterbar hideSeparator {...queryFilter} />
           <hr />
@@ -72,19 +78,9 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
             />
           </div>
 
-          {/* <div className="mt-4">
-            <h3 className="mb-3 text-xl font-bold">
-              <FormattedMessage defaultMessage="Recent activity" />
-            </h3>
-
-            <div className="flex flex-col gap-3">
-              <TimelineItem />
-              <TimelineItem />
-              <TimelineItem />
-              <TimelineItem />
-              <TimelineItem />
-            </div>
-          </div> */}
+          <div className="mt-4">
+            <Timeline accountSlug={router.query?.as ?? accountSlug} />
+          </div>
         </div>
         <div className="order-first flex flex-col gap-4 md:order-last">
           <Balance

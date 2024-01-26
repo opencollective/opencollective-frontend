@@ -2,8 +2,8 @@ import { gql } from '../../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 
-export const workspaceHomeQuery = gql`
-  query WorkspaceHome($slug: String!, $limit: Int, $dateTo: DateTime, $classes: [ActivityClassType!]) {
+export const timelineQuery = gql`
+  query Timeline($slug: String!, $limit: Int, $dateTo: DateTime, $classes: [ActivityClassType!]) {
     account(slug: $slug) {
       id
       feed(limit: $limit, dateTo: $dateTo, classes: $classes) {
@@ -112,6 +112,7 @@ export const collectiveOverviewQuery = gql`
     $includeChildren: Boolean!
   ) {
     account(slug: $slug) {
+      id
       name
       imageUrl
       slug

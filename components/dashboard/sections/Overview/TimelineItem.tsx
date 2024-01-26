@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { ActivityType, type WorkspaceHomeQuery } from '../../../../lib/graphql/types/v2/graphql';
+import { ActivityType, type TimelineQuery } from '../../../../lib/graphql/types/v2/graphql';
 import { ActivityDescriptionI18n, ActivityTimelineMessageI18n } from '../../../../lib/i18n/activities';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
@@ -18,7 +18,7 @@ import { Skeleton } from '../../../ui/Skeleton';
 dayjs.extend(relativeTime);
 
 type ActivityListItemProps = {
-  activity?: WorkspaceHomeQuery['account']['feed'][0];
+  activity?: TimelineQuery['account']['feed'][0];
   isLast?: boolean;
   openExpense?: (legacyId: number) => void;
 };
