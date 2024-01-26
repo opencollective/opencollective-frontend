@@ -52,6 +52,7 @@ const hostReportPageQuery = gql`
       createdAt
       hostFeePercent
       isTrustedHost
+      settings
       stats {
         id
         balance(dateTo: $dateTo) {

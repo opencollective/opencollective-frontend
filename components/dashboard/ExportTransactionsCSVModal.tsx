@@ -1,5 +1,4 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
 import { flatten, isEmpty, keys, omit } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -14,7 +13,6 @@ import {
   HOST_OMITTED_FIELDS,
 } from '../../lib/csv';
 import { getEnvVar } from '../../lib/env-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import {
   Account,
   HostReportsPageQueryVariables,
@@ -48,20 +46,11 @@ import { Filterbar } from './filters/Filterbar';
 
 const env = process.env.OC_ENV;
 
-const getAccountSettingsQuery = gql`
-  query GetAccountSettings($slug: String!) {
-    account(slug: $slug) {
-      id
-      settings
-    }
-  }
-`;
-
 type ExportTransactionsCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
   queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsPageQueryVariables>;
-  account?: Pick<Account, 'slug'>;
+  account?: Pick<Account, 'slug' | 'settings'>;
   isHostReport?: boolean;
   trigger: React.ReactNode;
 };
@@ -79,11 +68,6 @@ const ExportTransactionsCSVModal = ({
   const [fields, setFields] = React.useState(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
   const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
   const fieldGroups = FIELD_GROUPS_2024;
-
-  const { data: accountSettings } = useQuery(getAccountSettingsQuery, {
-    context: API_V2_CONTEXT,
-    variables: { slug: account?.slug },
-  });
 
   const {
     loading: isFetchingRows,
@@ -108,7 +92,7 @@ const ExportTransactionsCSVModal = ({
   );
 
   const fieldSetOptions: Array<{ value: string; label: string; fields?: Array<string> }> = React.useMemo(() => {
-    const customFields = accountSettings?.account?.settings?.exportedTransactionsFieldSets;
+    const customFields = account?.settings?.exportedTransactionsFieldSets;
     return [
       ...FieldOptions,
       ...keys(customFields).map(key => ({
@@ -117,7 +101,7 @@ const ExportTransactionsCSVModal = ({
         fields: customFields[key].fields,
       })),
     ];
-  }, [accountSettings]);
+  }, [account]);
 
   const handleFieldSwitch = ({ name, checked }) => {
     if (checked) {
