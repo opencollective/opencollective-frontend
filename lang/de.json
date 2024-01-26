@@ -1717,6 +1717,7 @@
   "HeroAvatar.Edit": "Bearbeite {imgType, select, AVATAR {Avatar} other {Logo}}",
   "HeroAvatar.Remove": "Entferne {imgType, select, AVATAR {Avatar} other {Logo}}",
   "hfh76h": "Autorisierung für {appName} widerrufen",
+  "hGGTXw": "Exported Fields Set",
   "HhwRys": "Das neue Passwort kann nicht mit dem derzeitigen Passwort identisch sein",
   "Hide": "Verstecken",
   "HM2YJg": "Möchten Sie ein Konto für Ihre Organisation erstellen?",

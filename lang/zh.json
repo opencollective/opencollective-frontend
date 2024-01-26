@@ -1717,6 +1717,7 @@
   "HeroAvatar.Edit": "编辑{imgType, select, AVATAR {头像} other {标志}}",
   "HeroAvatar.Remove": "移除{imgType, select, AVATAR {头像} other {标志}}",
   "hfh76h": "已取消 {appName} 的授权",
+  "hGGTXw": "Exported Fields Set",
   "HhwRys": "Password can't be the same as current password",
   "Hide": "隐藏",
   "HM2YJg": "Do you want to create an account for your organization?",

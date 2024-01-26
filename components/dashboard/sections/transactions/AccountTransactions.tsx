@@ -78,7 +78,7 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
             open={displayExportCSVModal}
             setOpen={setDisplayExportCSVModal}
             queryFilter={queryFilter}
-            accountSlug={accountSlug}
+            account={{ slug: accountSlug }}
             trigger={
               <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
                 <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
