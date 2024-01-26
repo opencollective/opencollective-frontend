@@ -90,7 +90,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const [transactionInDrawer, setTransactionInDrawer] = React.useState(null);
 
-  const [layout, setLayout] = React.useState(TestLayout.DEBITCREDIT);
+  const [layout, setLayout] = React.useState(TestLayout.AMOUNT);
 
   const { data: metaData } = useQuery(hostTransactionsMetaDataQuery, {
     variables: { slug: hostSlug },
