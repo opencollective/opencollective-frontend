@@ -121,16 +121,7 @@ const cols = {
   },
   toFromAccount: {
     accessorKey: 'oppositeAccount',
-    header: () => (
-      <FormattedMessage
-        defaultMessage="{toIcon} To {divider} {fromIcon} From"
-        values={{
-          toIcon: <ArrowRight className="inline-block shrink-0" size={16} />,
-          divider: <span className="font-thin text-muted-foreground">/</span>,
-          fromIcon: <ArrowLeft className="inline-block shrink-0" size={16} />,
-        }}
-      />
-    ),
+    header: () => <FormattedMessage defaultMessage="Recipient/Sender" />,
     meta: { className: 'w-48' },
     cell: ({ cell, row }) => {
       const account = cell.getValue() as Transaction['oppositeAccount'];
