@@ -118,11 +118,17 @@ export const collectiveOverviewQuery = gql`
       slug
       ...AccountHoverCardFields
       stats {
-        totalBalance: balance(includeChildren: $includeChildren) {
+        balance(includeChildren: false) {
           currency
           valueInCents
         }
-        balance(includeChildren: false) @include(if: $includeChildren) {
+
+        totalBalance: balance(dateTo: $dateTo, includeChildren: $includeChildren) {
+          currency
+          valueInCents
+        }
+        totalBalanceComparison: balance(dateTo: $compareTo, includeChildren: $includeChildren)
+          @include(if: $includeComparison) {
           currency
           valueInCents
         }

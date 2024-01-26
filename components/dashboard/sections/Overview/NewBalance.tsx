@@ -19,9 +19,8 @@ import {
   DropdownMenuTrigger,
 } from '../../../ui/DropdownMenu';
 import { Skeleton } from '../../../ui/Skeleton';
-import clsx from 'clsx';
 
-export function Balance({ childrenAccounts, mainAccount, showTotalBalance, hideLabel, loading }) {
+export function Balance({ childrenAccounts, mainAccount, loading }) {
   const activeChildAccounts = childrenAccounts?.filter(child => !child.isArchived);
 
   const events = activeChildAccounts?.filter(
@@ -30,32 +29,27 @@ export function Balance({ childrenAccounts, mainAccount, showTotalBalance, hideL
   const projects = activeChildAccounts?.filter(child => child.type === 'PROJECT');
 
   return (
-    <div className="flex flex-col rounded-xl border">
-      {showTotalBalance && (
-        <div className="flex flex-col gap-1 p-3">
-          {!hideLabel && (
-            <div className="text-sm font-medium tracking-tight">
-              <FormattedMessage defaultMessage="Total Balance" />
-            </div>
-          )}
-
-          <div className="text-2xl font-bold">
-            {loading ? (
-              <Skeleton className="h-7 w-1/2" />
-            ) : (
-              <FormattedMoneyAmount
-                amount={mainAccount.stats.totalBalance.valueInCents}
-                currency={mainAccount.stats.totalBalance.currency}
-                precision={2}
-                amountStyles={{ letterSpacing: 0 }}
-              />
-            )}
-          </div>
+    <div className="rounded-xl border">
+      <div className="flex flex-col gap-1 p-3">
+        <div className="text-sm font-medium tracking-tight">
+          <FormattedMessage defaultMessage="Total balance" />
         </div>
-      )}
 
-      {activeChildAccounts?.length > 0 && (
-        <div className={clsx('flex flex-col gap-2 p-3', showTotalBalance && 'border-t')}>
+        <div className="text-2xl font-bold">
+          {loading ? (
+            <Skeleton className="h-7 w-1/2" />
+          ) : (
+            <FormattedMoneyAmount
+              amount={mainAccount.stats.totalBalance.valueInCents}
+              currency={mainAccount.stats.totalBalance.currency}
+              precision={2}
+              amountStyles={{ letterSpacing: 0 }}
+            />
+          )}
+        </div>
+      </div>
+      {/* {activeChildAccounts?.length > 0 && (
+        <div className="flex flex-col gap-2 border-t p-3">
           <span className="text-xs font-medium ">
             <FormattedMessage defaultMessage="Main account" />
           </span>
@@ -82,7 +76,7 @@ export function Balance({ childrenAccounts, mainAccount, showTotalBalance, hideL
             </React.Fragment>
           )}
         </div>
-      )}
+      )} */}
     </div>
   );
 }

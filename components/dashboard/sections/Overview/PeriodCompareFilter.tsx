@@ -168,7 +168,7 @@ const PeriodCompareFilter = ({
             <Button
               size="xs"
               variant="outline"
-              className="min-w-36 justify-between gap-0.5 rounded-full rounded-r-none pl-3 text-left font-normal"
+              className="min-w-36 justify-between gap-0.5  rounded-r-none text-left font-normal"
             >
               <SelectValue />
               <ChevronDown size={16} className="text-muted-foreground" />
@@ -191,11 +191,7 @@ const PeriodCompareFilter = ({
 
         <Popover>
           <PopoverTrigger asChild>
-            <Button
-              size="xs"
-              variant="outline"
-              className="gap-2 rounded-full rounded-l-none border-l-0 pr-3 font-normal"
-            >
+            <Button size="xs" variant="outline" className="gap-2  rounded-l-none border-l-0 font-normal">
               <CalendarIcon size={16} className="text-muted-foreground" />{' '}
               <span>{formatPeriod({ from: dateVariables.dateFrom, to: dateVariables.dateTo })}</span>
             </Button>
@@ -216,7 +212,7 @@ const PeriodCompareFilter = ({
             onValueChange={(compare: PeriodFilterCompare) => onChange({ ...value, compare })}
           >
             <SelectPrimitive.Trigger asChild>
-              <Button size="xs" variant="outline" className="gap-1 rounded-full font-normal">
+              <Button size="xs" variant="outline" className="gap-1 font-normal">
                 <span>{intl.formatMessage(i18nPeriodFilterCompare[value.compare])}</span>
 
                 <ChevronDown size={16} className="text-muted-foreground" />

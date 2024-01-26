@@ -8,6 +8,7 @@ import { Amount } from '../../../../lib/graphql/types/v2/graphql';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Badge } from '../../../ui/Badge';
 import { Skeleton } from '../../../ui/Skeleton';
+import { InfoTooltipIcon } from '../../../InfoTooltipIcon';
 
 function getPercentageDifference(current: number, previous?: number) {
   if (isNil(previous)) {
@@ -21,6 +22,7 @@ export function Metric({
   amount,
   label,
   loading,
+  helpLabel,
 }: {
   count?: {
     current: number;
@@ -31,6 +33,7 @@ export function Metric({
     comparison?: Amount;
   };
   label: React.ReactNode;
+  helpLabel?: React.ReactNode;
   loading?: boolean;
 }) {
   let value, comparisonValue;
@@ -45,8 +48,13 @@ export function Metric({
 
   return (
     <div className="flex flex-col gap-1 rounded-xl border p-3">
-      <div className="flex justify-between gap-1">
+      <div className="flex items-center gap-1">
         <span className="block text-sm font-medium tracking-tight">{label}</span>
+        {helpLabel && (
+          <InfoTooltipIcon size={14} className="">
+            {helpLabel}
+          </InfoTooltipIcon>
+        )}
       </div>
       {loading ? (
         <div className="flex flex-col gap-2">

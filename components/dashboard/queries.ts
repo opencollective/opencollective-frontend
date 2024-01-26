@@ -36,6 +36,9 @@ export const adminPanelQuery = gql`
           }
         }
       }
+      childrenAccounts(limit: 0) {
+        totalCount
+      }
       ... on AccountWithHost {
         hostFeePercent
         host {

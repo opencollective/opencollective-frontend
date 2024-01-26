@@ -6,16 +6,18 @@ import { CollectiveOverviewQuery } from '../../../../lib/graphql/types/v2/graphq
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 
 import Link from '../../../Link';
+import clsx from 'clsx';
 
-export const TodoList = ({ account }: { account: CollectiveOverviewQuery['account'] }) => {
+export const TodoList = ({ account, alt }: { account: CollectiveOverviewQuery['account']; alt?: boolean }) => {
   const pendingExpenseCount = account?.pendingExpenses.totalCount;
   if (!pendingExpenseCount) {
     return null;
   }
   return (
     <div className="">
-      <div className="rounded-xl border bg-slate-50 p-3 text-sm">
-        <div className="flex items-center gap-2 text-muted-foreground antialiased">
+      <div className={clsx('flex flex-col gap-1 rounded-xl border  p-3 text-sm', !alt && 'bg-slate-50')}>
+        {alt ? <div className="text-sm font-medium tracking-tight">To do</div> : null}
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Receipt size={16} />
           <span>
             <FormattedMessage
