@@ -1717,6 +1717,7 @@
   "HeroAvatar.Edit": "Edytuj {imgType, select, AVATAR {awatar} other {logo}}",
   "HeroAvatar.Remove": "Usuń {imgType, select, AVATAR {awatar} other {logo}}",
   "hfh76h": "Autoryzacja dla {appName} została cofnięta",
+  "hGGTXw": "Exported Fields Set",
   "HhwRys": "Hasło nie może być takie samo jak aktualne hasło",
   "Hide": "Ukryj",
   "HM2YJg": "Chcesz założyć konto dla swojej organizacji?",
