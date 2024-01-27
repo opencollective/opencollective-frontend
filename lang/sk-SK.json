@@ -1717,6 +1717,7 @@
   "HeroAvatar.Edit": "Upraviť {imgType, select, AVATAR {avatar} other {logo}}",
   "HeroAvatar.Remove": "Odstrániť {imgType, select, AVATAR {avatar} other {logo}}",
   "hfh76h": "Autorizácia pre {appName} zrušená",
+  "hGGTXw": "Exported Fields Set",
   "HhwRys": "Password can't be the same as current password",
   "Hide": "Skryť",
   "HM2YJg": "Prajete si vytvoriť účet pre vašu organizáciu?",
