@@ -1717,6 +1717,7 @@
   "HeroAvatar.Edit": "Editar {imgType, select, AVATAR {avatar} other {logotipo}}",
   "HeroAvatar.Remove": "Eliminar {imgType, select, AVATAR {avatar} other {logotipo}}",
   "hfh76h": "Autorización para {appName} revocada",
+  "hGGTXw": "Exported Fields Set",
   "HhwRys": "La contraseña nueva no puede ser igual que la contraseña actual",
   "Hide": "Ocultar",
   "HM2YJg": "¿Quieres crear una cuenta para tu organización?",
