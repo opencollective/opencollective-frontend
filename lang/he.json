@@ -1717,6 +1717,7 @@
   "HeroAvatar.Edit": "עריכת {imgType, select,AVATAR {תמונת פרופיל}other {לוגו}}",
   "HeroAvatar.Remove": "הסרת {imgType, select,AVATAR {תמונת פרופיל}other {לוגו}}",
   "hfh76h": "הוסר האישור לאפליקציה {appName}",
+  "hGGTXw": "Exported Fields Set",
   "HhwRys": "Password can't be the same as current password",
   "Hide": "הסתרה",
   "HM2YJg": "ברצונך ליצור חשבון לארגון שלך?",
