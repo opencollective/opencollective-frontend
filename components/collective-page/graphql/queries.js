@@ -4,8 +4,6 @@ import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/con
 
 import * as fragments from './fragments';
 
-// We have to disable the linter because it's not able to detect that `nbContributorsPerContributeCard` is used in fragments
-/* eslint-disable graphql/template-strings */
 export const collectivePageQuery = gqlV1/* GraphQL */ `
   query CollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug, throwIfMissing: false) {
@@ -23,6 +21,10 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       socialLinks {
         type
         url
+      }
+      location {
+        id
+        country
       }
       tags
       company
@@ -102,6 +104,10 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
         name
         slug
         type
+        location {
+          id
+          country
+        }
         settings
         plan {
           id
@@ -221,7 +227,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
   ${fragments.contributeCardEventFieldsFragment}
   ${fragments.contributeCardProjectFieldsFragment}
 `;
-/* eslint-enable graphql/template-strings */
 
 export const getCollectivePageQueryVariables = slug => {
   return {

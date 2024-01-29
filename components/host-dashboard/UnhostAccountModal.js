@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import MessageBox from '../MessageBox';
@@ -48,7 +48,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
   });
 
   return (
-    <StyledModal maxWidth={432} trapFocus {...props}>
+    <StyledModal maxWidth={432} {...props}>
       <CollectiveModalHeader collective={collective} mb={3} />
       <ModalBody>
         <div>
@@ -127,7 +127,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
                     successMsgArgs,
                   ),
                 });
-                props?.onClose();
+                props.onClose();
               } catch (e) {
                 toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }

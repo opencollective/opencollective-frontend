@@ -16,6 +16,7 @@ import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-categories';
 
+import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
 import { AvatarWithLink } from '../AvatarWithLink';
@@ -39,10 +40,10 @@ import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
-import StyledTooltip from '../StyledTooltip';
 import Tags from '../Tags';
 import { H3, P, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const DetailColumnHeader = styled.div`
   font-style: normal;
@@ -144,10 +145,23 @@ const ExpenseBudgetItem = ({
             {isLoading ? (
               <LoadingPlaceholder width={40} height={40} />
             ) : (
-              <AvatarWithLink
-                size={40}
+              <AccountHoverCard
                 account={featuredProfile}
-                secondaryAccount={featuredProfile.id === expense.createdByAccount.id ? null : expense.createdByAccount}
+                includeAdminMembership={{
+                  accountSlug: expense.account?.slug,
+                  hostSlug: host?.slug,
+                }}
+                trigger={
+                  <span>
+                    <AvatarWithLink
+                      size={40}
+                      account={featuredProfile}
+                      secondaryAccount={
+                        featuredProfile.id === expense.createdByAccount.id ? null : expense.createdByAccount
+                      }
+                    />
+                  </span>
+                }
               />
             )}
           </Box>
@@ -155,53 +169,56 @@ const ExpenseBudgetItem = ({
             <LoadingPlaceholder height={60} />
           ) : (
             <Box>
-              <StyledTooltip
-                content={
-                  useDrawer ? (
+              <Tooltip>
+                <TooltipContent>
+                  {useDrawer ? (
                     <FormattedMessage id="Expense.SeeDetails" defaultMessage="See expense details" />
                   ) : (
                     <FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />
-                  )
-                }
-                delayHide={0}
-              >
-                <StyledLink
-                  underlineOnHover
-                  {...(useDrawer
-                    ? {
-                        as: Link,
-                        href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
-                        onClick: expandExpense,
-                      }
-                    : {
-                        as: Link,
-                        href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
-                      })}
-                >
-                  <AutosizeText
-                    value={expense.description}
-                    maxLength={255}
-                    minFontSizeInPx={12}
-                    maxFontSizeInPx={16}
-                    lengthThreshold={72}
-                    mobileRatio={0.875}
-                    valueFormatter={toPx}
-                  >
-                    {({ value, fontSize }) => (
-                      <H3
-                        fontWeight="500"
-                        lineHeight="1.5em"
-                        textDecoration="none"
-                        color="black.900"
-                        fontSize={fontSize}
-                        data-cy="expense-title"
+                  )}
+                </TooltipContent>
+
+                <TooltipTrigger asChild>
+                  <span>
+                    <StyledLink
+                      underlineOnHover
+                      {...(useDrawer
+                        ? {
+                            as: Link,
+                            href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
+                            onClick: expandExpense,
+                          }
+                        : {
+                            as: Link,
+                            href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
+                          })}
+                    >
+                      <AutosizeText
+                        value={expense.description}
+                        maxLength={255}
+                        minFontSizeInPx={12}
+                        maxFontSizeInPx={16}
+                        lengthThreshold={72}
+                        mobileRatio={0.875}
+                        valueFormatter={toPx}
                       >
-                        {value}
-                      </H3>
-                    )}
-                  </AutosizeText>
-                </StyledLink>
-              </StyledTooltip>
+                        {({ value, fontSize }) => (
+                          <H3
+                            fontWeight="500"
+                            lineHeight="1.5em"
+                            textDecoration="none"
+                            color="black.900"
+                            fontSize={fontSize}
+                            data-cy="expense-title"
+                          >
+                            {value}
+                          </H3>
+                        )}
+                      </AutosizeText>
+                    </StyledLink>
+                  </span>
+                </TooltipTrigger>
+              </Tooltip>
 
               {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, expense.account, host) && (
                 <div className="flex items-center gap-1">
@@ -211,6 +228,7 @@ const ExpenseBudgetItem = ({
                   <AccountingCategoryPill
                     expense={expense}
                     host={host}
+                    account={expense.account}
                     canEdit={get(expense, 'permissions.canEditAccountingCategory', false)}
                     allowNone={!isLoggedInUserExpenseHostAdmin}
                     showCodeInSelect={isLoggedInUserExpenseHostAdmin}
@@ -218,18 +236,51 @@ const ExpenseBudgetItem = ({
                 </div>
               )}
 
-              <P mt="5px" fontSize="12px" color="black.700">
+              <div className="mt-1 text-xs text-slate-700">
                 {isAdminView ? (
-                  <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.account} />
+                  <AccountHoverCard
+                    account={expense.account}
+                    trigger={
+                      <span>
+                        <LinkCollective noTitle className="text-primary hover:underline" collective={expense.account} />
+                      </span>
+                    }
+                  />
                 ) : (
                   <FormattedMessage
                     defaultMessage="from {payee} to {account}"
                     values={{
                       payee: (
-                        <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.payee} />
+                        <AccountHoverCard
+                          account={expense.payee}
+                          includeAdminMembership={{
+                            accountSlug: expense.account?.slug,
+                            hostSlug: host?.slug,
+                          }}
+                          trigger={
+                            <span>
+                              <LinkCollective
+                                noTitle
+                                className="text-primary hover:underline"
+                                collective={expense.payee}
+                              />
+                            </span>
+                          }
+                        />
                       ),
                       account: (
-                        <LinkCollective className="text-blue-500 hover:text-slate-500" collective={expense.account} />
+                        <AccountHoverCard
+                          account={expense.account}
+                          trigger={
+                            <span>
+                              <LinkCollective
+                                noTitle
+                                className="text-primary hover:underline"
+                                collective={expense.account}
+                              />
+                            </span>
+                          }
+                        />
                       ),
                     }}
                   />
@@ -266,7 +317,7 @@ const ExpenseBudgetItem = ({
                     )}
                   </React.Fragment>
                 )}
-              </P>
+              </div>
             </Box>
           )}
         </Flex>
@@ -303,13 +354,14 @@ const ExpenseBudgetItem = ({
             <Flex>
               {(isAdminView || isSubmitterView) && pendingReceipt && (
                 <Box mr="1px">
-                  <StyledTooltip
-                    content={
+                  <Tooltip>
+                    <TooltipContent>
                       <FormattedMessage id="Expense.MissingReceipt" defaultMessage="Expense is missing its Receipt" />
-                    }
-                  >
-                    <AlertTriangle size={18} />
-                  </StyledTooltip>
+                    </TooltipContent>
+                    <TooltipTrigger>
+                      <AlertTriangle size={18} />
+                    </TooltipTrigger>
+                  </Tooltip>
                 </Box>
               )}
               {(isAdminView || isSubmitterView) && (

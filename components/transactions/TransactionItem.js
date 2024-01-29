@@ -218,7 +218,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
         <Flex flexWrap="wrap" justifyContent="space-between">
           <Flex flex="1" minWidth="60%" mr={3}>
             <Box mr={3}>
-              <LinkCollective collective={avatarCollective}>
+              <LinkCollective collective={avatarCollective} withHoverCard>
                 <Avatar collective={avatarCollective} radius={40} />
               </LinkCollective>
             </Box>
@@ -239,14 +239,12 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   </Span>
                 </ItemTitleWrapper>
                 {isOwnUserProfile && transaction.fromAccount?.isIncognito && (
-                  <Span ml={1} css={{ verticalAlign: 'text-bottom' }}>
-                    <PrivateInfoIcon color="#969BA3">
-                      <FormattedMessage
-                        id="PrivateTransaction"
-                        defaultMessage="This incognito transaction is only visible to you"
-                      />
-                    </PrivateInfoIcon>
-                  </Span>
+                  <PrivateInfoIcon className="ml-1 align-bottom text-muted-foreground">
+                    <FormattedMessage
+                      id="PrivateTransaction"
+                      defaultMessage="This incognito transaction is only visible to you"
+                    />
+                  </PrivateInfoIcon>
                 )}
               </Container>
               <P mt="4px" fontSize="12px" lineHeight="20px" color="black.700" data-cy="transaction-details">
@@ -257,7 +255,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                     <FormattedMessage
                       id="Transaction.from"
                       defaultMessage="from {name}"
-                      values={{ name: <StyledLink as={LinkCollective} collective={fromAccount} /> }}
+                      values={{ name: <StyledLink as={LinkCollective} withHoverCard collective={fromAccount} /> }}
                     />
                     &nbsp;
                   </Fragment>
@@ -266,7 +264,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                   <FormattedMessage
                     id="Transaction.to"
                     defaultMessage="to {name}"
-                    values={{ name: <StyledLink as={LinkCollective} collective={toAccount} /> }}
+                    values={{ name: <StyledLink as={LinkCollective} withHoverCard collective={toAccount} /> }}
                   />
                 }
                 {giftCardEmitterAccount && (
@@ -277,7 +275,9 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                       defaultMessage="using a {giftCard} from {collective}"
                       values={{
                         giftCard: <DefinedTerm term={Terms.GIFT_CARD} textTransform="lowercase" />,
-                        collective: <StyledLink as={LinkCollective} collective={giftCardEmitterAccount} />,
+                        collective: (
+                          <StyledLink as={LinkCollective} withHoverCard collective={giftCardEmitterAccount} />
+                        ),
                       }}
                     />
                   </React.Fragment>

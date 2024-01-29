@@ -36,6 +36,8 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     collectiveSlug: accountSlug,
     createdByAccount,
     fromAccount,
+    fetchHostForExpenses: true,
+    hasAmountInCreatedByAccountCurrency: true, // To generate the `amountInCreatedByAccountCurrency` field below
     ...queryFilter.variables,
   };
 
@@ -51,7 +53,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const pageRoute = `/dashboard/${accountSlug}/submitted-expenses`;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage defaultMessage="Submitted Expenses" />}
         description={<FormattedMessage defaultMessage="Expenses that you have submitted to other Collectives." />}
@@ -76,6 +78,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
             view={'submitter'}
             useDrawer
             openExpenseLegacyId={Number(router.query.openExpenseId)}
+            expenseFieldForTotalAmount="amountInCreatedByAccountCurrency"
             setOpenExpenseLegacyId={legacyId => {
               router.push(
                 {

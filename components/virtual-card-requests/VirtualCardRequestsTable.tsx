@@ -1,14 +1,15 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { CellContext, ColumnDef } from '@tanstack/react-table';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { Account, VirtualCardRequest, VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
 import { useWindowResize } from '../../lib/hooks/useWindowResize';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
+import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import { DataTable } from '../DataTable';
 import DateTime from '../DateTime';
@@ -134,10 +135,15 @@ export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
     cell: ({ cell }: CellContext<VirtualCardRequest, Account>) => {
       const account = cell.getValue();
       return (
-        <div className="flex items-center gap-2 truncate">
-          <Avatar collective={account} radius={24} />
-          <span className="truncate">{account.name}</span>
-        </div>
+        <AccountHoverCard
+          account={account}
+          trigger={
+            <div className="flex items-center gap-2 truncate">
+              <Avatar collective={account} radius={24} />
+              <span className="truncate">{account.name}</span>
+            </div>
+          }
+        />
       );
     },
   },
@@ -146,13 +152,20 @@ export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
     meta: { className: 'w-36' },
 
     header: () => <FormattedMessage defaultMessage="Assignee" />,
-    cell: ({ cell }: CellContext<VirtualCardRequest, Account>) => {
+    cell: ({ cell, row }: CellContext<VirtualCardRequest, Account>) => {
       const assignee = cell.getValue();
+      const virtualCardRequest = row.original;
       return (
-        <div className="flex items-center gap-2 truncate">
-          <Avatar collective={assignee} radius={24} />
-          <span className="truncate">{assignee.name}</span>
-        </div>
+        <AccountHoverCard
+          account={assignee}
+          includeAdminMembership={{ accountSlug: virtualCardRequest.account.slug }}
+          trigger={
+            <div className="flex items-center gap-2 truncate">
+              <Avatar collective={assignee} radius={24} />
+              <span className="truncate">{assignee.name}</span>
+            </div>
+          }
+        />
       );
     },
   },

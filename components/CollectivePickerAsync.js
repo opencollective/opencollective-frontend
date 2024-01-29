@@ -11,7 +11,7 @@ import formatCollectiveType from '../lib/i18n/collective-type';
 import CollectivePicker from './CollectivePicker';
 
 const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
-  query CollectivePickerSearchQuery(
+  query CollectivePickerSearch(
     $term: String!
     $types: [TypeOfCollective]
     $limit: Int
@@ -48,8 +48,12 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
         isActive
         isArchived
         isHost
-        isTrustedHost
-        isTwoFactorAuthEnabled
+        ... on User {
+          isTwoFactorAuthEnabled
+        }
+        ... on Organization {
+          isTrustedHost
+        }
       }
     }
   }
@@ -203,7 +207,7 @@ CollectivePickerAsync.propTypes = {
   /** Function to filter results returned by the API */
   filterResults: PropTypes.func,
   /** If true, a permanent option to create a collective will be displayed in the select */
-  creatable: PropTypes.bool,
+  creatable: PropTypes.oneOfType([PropTypes.bool, PropTypes.array]),
   /** If true, a permanent option to invite a new user will be displayed in the select */
   invitable: PropTypes.bool,
   skipGuests: PropTypes.bool,

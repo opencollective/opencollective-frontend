@@ -8,7 +8,7 @@ import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getAccountReferenceInput, isInternalHost } from '../../lib/collective.lib';
+import { getAccountReferenceInput, isInternalHost } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -24,7 +24,12 @@ import { userMustSetAccountingCategory } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { addNewExpenseItem, newExpenseItem } from './lib/items';
 import { checkExpenseSupportsOCR, updateExpenseFormWithUploadResult } from './lib/ocr';
-import { checkRequiresAddress, getSupportedCurrencies, validateExpenseTaxes } from './lib/utils';
+import {
+  checkRequiresAddress,
+  expenseTypeSupportsItemCurrency,
+  getSupportedCurrencies,
+  validateExpenseTaxes,
+} from './lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
@@ -34,6 +39,7 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
+import { StyledCurrencyPicker } from '../StyledCurrencyPicker';
 import StyledHr from '../StyledHr';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputTags from '../StyledInputTags';
@@ -41,7 +47,7 @@ import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
-import ExpenseCategorySelect from './ExpenseCategorySelect';
+import ExpenseCategorySelect, { isSupportedExpenseCategory } from './ExpenseCategorySelect';
 import ExpenseFormItems from './ExpenseFormItems';
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
@@ -325,7 +331,7 @@ const ExpenseFormBody = ({
   const stepTwoCompleted = isInvite
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
-  const availableCurrencies = getSupportedCurrencies(collective, values.payoutMethod);
+  const availableCurrencies = getSupportedCurrencies(collective, values);
   const [step, setStep] = React.useState(() => getDefaultStep(defaultStep, stepOneCompleted, isCreditCardCharge));
   const [initWithOCR, setInitWithOCR] = React.useState(null);
 
@@ -411,6 +417,19 @@ const ExpenseFormBody = ({
         formik.setFieldValue('taxes', [{ ...values.taxes[0], isDisabled: true }]);
       }
     }
+
+    // Reset the accounting category (if not supported by the new expense type)
+    if (values.accountingCategory && !isSupportedExpenseCategory(values.type, values.accountingCategory, isHostAdmin)) {
+      formik.setFieldValue('accountingCategory', undefined);
+    }
+
+    // If the new type does not support setting items currency, reset it
+    if (!expenseTypeSupportsItemCurrency(values.type)) {
+      const itemHasExpenseCurrency = item => !item.amountV2?.currency || item.amountV2?.currency === values.currency;
+      const resetItemAmount = item => ({ ...item, amount: null, amountV2: null });
+      const updatedItems = values.items.map(item => (itemHasExpenseCurrency(item) ? item : resetItemAmount(item)));
+      formik.setFieldValue('items', updatedItems);
+    }
   }, [values.type]);
 
   React.useEffect(() => {
@@ -422,7 +441,7 @@ const ExpenseFormBody = ({
   React.useEffect(() => {
     // If the currency is not supported anymore, we need to do something
     if (!loading && (!values.currency || !availableCurrencies.includes(values.currency))) {
-      const hasItemsWithAmounts = values.items.some(item => Boolean(item.amount));
+      const hasItemsWithAmounts = values.items.some(item => Boolean(item.amountV2?.valueInCents));
       if (!hasItemsWithAmounts) {
         // If no items have amounts yet, we can safely set the default currency
         formik.setFieldValue('currency', availableCurrencies[0]);
@@ -576,7 +595,7 @@ const ExpenseFormBody = ({
         )}
         &nbsp;→
       </StyledButton>
-      {errors.payoutMethod?.data?.currency && touched.items?.some?.(i => i.amount) && (
+      {errors.payoutMethod?.data?.currency && touched.items?.some?.(i => i.amountV2?.valueInCents) && (
         <Box mx={[2, 0]} mt={2} color="red.500" fontSize="12px" letterSpacing={0}>
           {errors.payoutMethod.data.currency.toString()}
         </Box>
@@ -617,7 +636,7 @@ const ExpenseFormBody = ({
                   {formatMessage(msg.stepPayee)}
                 </Span>
                 <Box ml={2}>
-                  <PrivateInfoIcon size={12} color="#969BA3" tooltipProps={{ display: 'flex' }} />
+                  <PrivateInfoIcon size={12} className="text-muted-foreground" />
                 </Box>
                 <StyledHr flex="1" borderColor="black.300" mx={2} />
               </Flex>
@@ -692,19 +711,51 @@ const ExpenseFormBody = ({
                 }
               />
               <HiddenFragment show={hasBaseFormFieldsCompleted || isInvite}>
-                <Flex alignItems="flex-start" mt="8px">
-                  <ExpenseTypeTag type={values.type} mr="4px" />
-                  <StyledInputTags
-                    suggestedTags={expensesTags}
-                    onChange={tags => {
-                      formik.setFieldValue(
-                        'tags',
-                        tags.map(t => t.value.toLowerCase()),
-                      );
-                    }}
-                    value={values.tags}
-                  />
-                </Flex>
+                <div className="mt-2 flex flex-wrap justify-between gap-3">
+                  {/* Tags */}
+                  <div>
+                    <Span color="black.900" fontSize="18px" lineHeight="26px" fontWeight="bold">
+                      <FormattedMessage defaultMessage="Tag you expense" />
+                    </Span>
+                    <Flex alignItems="flex-start" mt={2}>
+                      <ExpenseTypeTag type={values.type} mr="4px" />
+                      <StyledInputTags
+                        suggestedTags={expensesTags}
+                        onChange={tags => {
+                          formik.setFieldValue(
+                            'tags',
+                            tags.map(t => t.value.toLowerCase()),
+                          );
+                        }}
+                        value={values.tags}
+                      />
+                    </Flex>
+                  </div>
+                  {/* Currency */}
+                  <div>
+                    <Span color="black.900" fontSize="18px" lineHeight="26px" fontWeight="bold" mr={2}>
+                      <FormattedMessage defaultMessage="Expense Currency" />
+                    </Span>
+                    <div className="mt-2 flex">
+                      <div className="basis-[300px]">
+                        <StyledInputFormikField name="currency" lab>
+                          {({ field }) => (
+                            <StyledCurrencyPicker
+                              data-cy="expense-currency-picker"
+                              availableCurrencies={availableCurrencies}
+                              value={field.value}
+                              onChange={value => formik.setFieldValue('currency', value)}
+                              width="100%"
+                              maxWidth="160px"
+                              disabled={availableCurrencies.length < 2}
+                              styles={{ menu: { width: '280px' } }}
+                            />
+                          )}
+                        </StyledInputFormikField>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 {userMustSetAccountingCategory(LoggedInUser, collective, host) && (
                   <div className="mt-10">
                     <Label
@@ -714,7 +765,7 @@ const ExpenseFormBody = ({
                       lineHeight="26px"
                       fontWeight="bold"
                     >
-                      <FormattedMessage defaultMessage="Set Expense Category" />
+                      <FormattedMessage defaultMessage="Expense Category" />
                     </Label>
                     <div className="mt-2 flex">
                       <div className="basis-[300px]">
@@ -724,11 +775,15 @@ const ExpenseFormBody = ({
                               <ExpenseCategorySelect
                                 id="ExpenseCategoryInput"
                                 host={host}
+                                account={collective}
                                 selectedCategory={values.accountingCategory}
                                 onChange={value => formik.setFieldValue('accountingCategory', value)}
                                 error={Boolean(meta.error)}
                                 allowNone={!isHostAdmin}
                                 showCode={isHostAdmin}
+                                expenseType={values.type}
+                                expenseValues={values}
+                                predictionStyle="full"
                               />
                               {meta.error && meta.touched && (
                                 <Span color="red.500" fontSize="12px" mt="4px">
@@ -748,7 +803,6 @@ const ExpenseFormBody = ({
                 {values.type === expenseTypes.INVOICE && (
                   <Box my={40}>
                     <ExpenseAttachedFilesForm
-                      collective={collective}
                       title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
                       description={
                         <FormattedMessage
@@ -758,7 +812,6 @@ const ExpenseFormBody = ({
                       }
                       form={formik}
                       defaultValue={values.attachedFiles}
-                      hasOCRFeature={hasOCRFeature}
                     />
                   </Box>
                 )}
@@ -783,12 +836,7 @@ const ExpenseFormBody = ({
                 <Box>
                   <FieldArray name="items">
                     {fieldsArrayProps => (
-                      <ExpenseFormItems
-                        {...fieldsArrayProps}
-                        collective={collective}
-                        availableCurrencies={availableCurrencies}
-                        hasOCRFeature={hasOCRFeature}
-                      />
+                      <ExpenseFormItems {...fieldsArrayProps} collective={collective} hasOCRFeature={hasOCRFeature} />
                     )}
                   </FieldArray>
                 </Box>
@@ -796,7 +844,6 @@ const ExpenseFormBody = ({
                 {values.type === expenseTypes.GRANT && (
                   <Box my={40}>
                     <ExpenseAttachedFilesForm
-                      collective={collective}
                       title={<FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />}
                       description={
                         <FormattedMessage
@@ -806,7 +853,6 @@ const ExpenseFormBody = ({
                       }
                       form={formik}
                       defaultValue={values.attachedFiles}
-                      hasOCRFeature={hasOCRFeature}
                     />
                   </Box>
                 )}

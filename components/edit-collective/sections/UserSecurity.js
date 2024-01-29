@@ -1,11 +1,10 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { compose } from '../../../lib/utils';
 
 import Container from '../../Container';
@@ -59,6 +58,15 @@ class UserSecurity extends React.Component {
     };
 
     this.setPassword = this.setPassword.bind(this);
+    this.hasTriggeredScroll = false;
+  }
+
+  componentDidUpdate() {
+    if (window.location.hash && !this.hasTriggeredScroll && !this.props.data.loading) {
+      this.hasTriggeredScroll = true;
+      const section = document.querySelector(window.location.hash);
+      section.scrollIntoView();
+    }
   }
 
   async setPassword() {
@@ -245,7 +253,7 @@ class UserSecurity extends React.Component {
       <Flex flexDirection="column">
         {this.renderPasswordManagement()}
 
-        <H3 fontSize="18px" fontWeight="700" mb={3}>
+        <H3 id="two-factor-auth" fontSize="18px" fontWeight="700" mb={3}>
           <FormattedMessage id="TwoFactorAuth" defaultMessage="Two-factor authentication" />
         </H3>
         <TwoFactorAuthenticationSettings individual={account} userTwoFactorAuthenticationMethods={twoFactorMethods} />

@@ -12,7 +12,7 @@ import { P, Span } from './Text';
 const PrivateIconWithSpace = () => (
   <React.Fragment>
     &nbsp;
-    <PrivateInfoIcon tooltipProps={{ containerVerticalAlign: 'text-top' }} />
+    <PrivateInfoIcon />
   </React.Fragment>
 );
 
@@ -119,9 +119,9 @@ const StyledInputField = ({
           : children}
       </Flex>
       {error && typeof error === 'string' && (
-        <Box pt={2}>
+        <Box pt={2} lineHeight="1em">
           <ExclamationCircle color="#E03F6A" size={16} />
-          <Span ml={1} color="black.700" fontSize="14px" css={{ verticalAlign: 'middle' }}>
+          <Span ml={1} color="black.700" fontSize="0.9em" css={{ verticalAlign: 'middle' }}>
             {error}
           </Span>
         </Box>

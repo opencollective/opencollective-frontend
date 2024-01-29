@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { useFormik } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import {
   VirtualCardLimitIntervalDescriptionsI18n,
@@ -40,7 +40,7 @@ const initialValues = {
 };
 
 const requestVirtualCardMutation = gql`
-  mutation requestVirtualCard(
+  mutation RequestVirtualCard(
     $notes: String
     $purpose: String
     $spendingLimitAmount: AmountInput!
@@ -100,7 +100,7 @@ const RequestVirtualCardModal = props => {
       if (!values.purpose) {
         errors.purpose = 'Required';
       }
-      if (!values.notes && values.notes?.lenght > 10) {
+      if (!values.notes && values.notes?.length > 10) {
         errors.notes = 'Required';
       }
       return errors;

@@ -1,14 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getCollectivePageMetadata } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
@@ -84,7 +83,7 @@ class CreateConversationPage extends React.Component {
     const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, router } = this.props;
 
     if (!data.loading) {
-      if (!data || data.error) {
+      if (data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
@@ -93,7 +92,7 @@ class CreateConversationPage extends React.Component {
       }
     }
 
-    const collective = data && data.account;
+    const collective = data.account;
     return (
       <Page collective={collective} {...this.getPageMetaData(collective)}>
         {data.loading ? (
@@ -152,7 +151,6 @@ const createConversationPageQuery = gql`
       settings
       imageUrl
       twitterHandle
-      imageUrl
       backgroundImageUrl
       ... on AccountWithParent {
         parent {

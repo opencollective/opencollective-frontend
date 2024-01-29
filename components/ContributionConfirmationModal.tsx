@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { omit } from 'lodash';
@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getCurrentLocalDateStr } from '../lib/date-utils';
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { TaxInput } from '../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../lib/i18n/taxes';
 
@@ -47,6 +47,10 @@ export const confirmContributionFieldsFragment = gql`
       type
       imageUrl
       hasImage
+      isIncognito
+      ... on Individual {
+        isGuest
+      }
     }
     toAccount {
       id
@@ -149,7 +153,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
   const applicableTax = getApplicableTaxType(order.toAccount, order.toAccount.host);
 
   return (
-    <StyledModal width="578px" onClose={onClose} trapFocus>
+    <StyledModal width="578px" onClose={onClose}>
       <CollectiveModalHeader
         collective={order.toAccount}
         customText={

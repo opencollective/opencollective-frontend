@@ -4,7 +4,7 @@ import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { getSuggestedTags } from '../../lib/collective.lib';
+import { getSuggestedTags } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -170,7 +170,7 @@ const Expenses = props => {
               <ExpensesList
                 isLoading={loading}
                 collective={data?.account}
-                host={data?.account?.isHost ? data?.account : data?.account?.host}
+                host={data?.account?.host ?? (data?.account?.isHost ? data?.account : null)}
                 expenses={data?.expenses?.nodes}
                 nbPlaceholders={variables.limit}
                 suggestedTags={suggestedTags}

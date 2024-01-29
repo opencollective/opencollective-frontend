@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
@@ -11,7 +11,7 @@ import styled, { css } from 'styled-components';
 import { formatCurrency } from '../../lib/currency-utils';
 import { getCurrentLocalDateStr } from '../../lib/date-utils';
 import { requireFields } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 import { i18nTaxType } from '../../lib/i18n/taxes';
@@ -158,6 +158,7 @@ const addFundsAccountQuery = gql`
   query AddFundsAccount($slug: String!) {
     account(slug: $slug) {
       id
+      legacyId
       type
       isHost
       name
@@ -326,7 +327,7 @@ const AddFundsModal = ({ collective, ...props }) => {
     refetchQueries: [
       {
         context: API_V2_CONTEXT,
-        query: getBudgetSectionQuery(true, false, false),
+        query: getBudgetSectionQuery(true, false),
         variables: getBudgetSectionQueryVariables(collective.slug, false),
       },
       { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
@@ -335,11 +336,7 @@ const AddFundsModal = ({ collective, ...props }) => {
   });
 
   const tiersNodes = get(data, 'account.tiers.nodes');
-  const accountSettings = get(data, 'account.settings');
-  const tiersOptions = React.useMemo(
-    () => getTiersOptions(intl, tiersNodes, accountSettings),
-    [tiersNodes, accountSettings],
-  );
+  const tiersOptions = React.useMemo(() => getTiersOptions(intl, tiersNodes), [tiersNodes]);
 
   // No modal if logged-out
   if (!LoggedInUser) {
@@ -353,7 +350,7 @@ const AddFundsModal = ({ collective, ...props }) => {
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const receiptTemplates = host?.settings?.invoice?.templates;
   const recommendedVendors = host?.vendors?.nodes || [];
-  const defaultSources = [...(recommendedVendors || []), host];
+  const defaultSources = [...recommendedVendors, host];
   const defaultSourcesOptions = map(groupBy(defaultSources, 'type'), (accounts, type) => {
     return {
       label: formatCollectiveType(intl, type, accounts.length),
@@ -434,6 +431,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                 description: resultOrder.description,
                 processedAt: resultOrder.processedAt,
               });
+              props.onSuccess?.();
             } else {
               handleClose();
             }
@@ -729,12 +727,12 @@ const AddFundsModal = ({ collective, ...props }) => {
                 <Form>
                   <ModalBody data-cy="funds-added">
                     <Container>
-                      <h3>
+                      <h3 className="mt-4 text-xl  text-black">
                         <FormattedMessage id="AddFundsModal.FundsAdded" defaultMessage="Funds Added ✅" />
                       </h3>
-                      <Container pb={2}>
+                      <Container pb={2} mt={3}>
                         <FormattedMessage id="AddFundsModal.YouAdded" defaultMessage="You added:" />
-                        <ul>
+                        <ul className="mt-2 list-inside list-disc pl-3">
                           <li>
                             <strong>{`${fundDetails.fundAmount / 100} ${currency}`}</strong>
                           </li>
@@ -819,7 +817,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           )}
                         </ul>
                       </Container>
-                      <Container pb={2}>
+                      <Container pb={2} mt={2}>
                         <FormattedMessage id="AddFundsModal.NeedHelp" defaultMessage="Need Help?" />{' '}
                         <StyledLink href="/support" buttonStyle="standard" buttonSize="tiny">
                           <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
@@ -865,6 +863,7 @@ AddFundsModal.propTypes = {
     policies: PropTypes.object,
   }).isRequired,
   onClose: PropTypes.func,
+  onSuccess: PropTypes.func,
 };
 
 export default AddFundsModal;

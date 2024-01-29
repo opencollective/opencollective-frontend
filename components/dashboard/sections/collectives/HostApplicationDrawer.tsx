@@ -201,7 +201,7 @@ export function HostApplication({
       <div>
         <DrawerHeader
           onClose={onClose}
-          data-Cy={`host-application-header-${account.slug}`}
+          data-cy={`host-application-header-${account.slug}`}
           title={
             <FormattedMessage
               defaultMessage="Application <ApplicationId></ApplicationId> to <HostCollectiveName></HostCollectiveName>"
@@ -229,6 +229,7 @@ export function HostApplication({
               <LinkCollective
                 collective={application.account}
                 className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
+                withHoverCard
               >
                 <Avatar collective={application.account} radius={24} />
                 {application.account.name}
@@ -268,6 +269,8 @@ export function HostApplication({
                     <LinkCollective
                       collective={admin.account}
                       className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
+                      withHoverCard
+                      hoverCardProps={{ includeAdminMembership: { accountSlug: application.account.slug } }}
                     >
                       <Avatar collective={admin.account} radius={24} /> {admin.account.name}
                     </LinkCollective>

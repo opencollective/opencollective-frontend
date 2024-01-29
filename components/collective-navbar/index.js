@@ -1,6 +1,6 @@
 import React, { Fragment, useRef } from 'react';
 import { PropTypes } from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
@@ -16,13 +16,13 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { display } from 'styled-system';
 
-import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
+import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective';
 import { getFilteredSectionsForCollective, isSectionEnabled } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import roles from '../../lib/constants/roles';
 import { isSupportedExpenseType } from '../../lib/expenses';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
@@ -398,7 +398,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
         <Link
           href={
             LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-              ? getDashboardRoute(collective, 'manage-contributions')
+              ? getDashboardRoute(collective, 'outgoing-contributions')
               : `${getCollectivePageRoute(collective)}/manage-contributions`
           }
         >
@@ -645,20 +645,18 @@ const CollectiveNavbar = ({
                     LoggedInUser={LoggedInUser}
                   />
                 )}
-                {!onlyInfos && (
-                  <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
-                    {isExpanded ? (
-                      <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
-                    ) : (
-                      <ExpandMenuIcon
-                        onClick={() => {
-                          mainContainerRef.current?.scrollIntoView(true);
-                          setExpanded(!isExpanded);
-                        }}
-                      />
-                    )}
-                  </Container>
-                )}
+                <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
+                  {isExpanded ? (
+                    <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                  ) : (
+                    <ExpandMenuIcon
+                      onClick={() => {
+                        mainContainerRef.current?.scrollIntoView(true);
+                        setExpanded(!isExpanded);
+                      }}
+                    />
+                  )}
+                </Container>
               </Container>
             </Container>
           )}

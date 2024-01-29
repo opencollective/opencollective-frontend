@@ -20,6 +20,7 @@ import ContactCollectiveBtn from '../../ContactCollectiveBtn';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import EditTagsModal from '../../EditTagsModal';
+import FollowButton from '../../FollowButton';
 import { Box, Flex } from '../../Grid';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
 import Link from '../../Link';
@@ -187,6 +188,10 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                 <StyledLink key={company} as={UserCompany} mr={1} fontSize="20px" fontWeight={600} company={company} />
               ))}
           </Flex>
+          <div className="mt-2 flex">
+            <FollowButton buttonProps={{ buttonSize: 'tiny' }} account={collective} />
+          </div>
+
           {!isEvent && (
             <Fragment>
               {(isCollective || isFund || isProject) && (
@@ -410,7 +415,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                           values={{
                             fee: (
                               <DefinedTerm term={Terms.PLATFORM_FEE} color="black.700">
-                                {collective.platformFeePercent || 0}%
+                                {collective.platformFeePercent}%
                               </DefinedTerm>
                             ),
                           }}

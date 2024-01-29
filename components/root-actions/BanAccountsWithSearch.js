@@ -1,12 +1,12 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { truncate, uniqBy } from 'lodash';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { stripHTML } from '../../lib/html';
 
 import ConfirmationModal from '../ConfirmationModal';

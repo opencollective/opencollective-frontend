@@ -50,27 +50,25 @@ const AddPaymentMethod = ({ onStripeReady, onPaypalSuccess, setNewPaymentMethodI
             <FormattedMessage id="CreditCard" defaultMessage="Credit Card" />
           </StyledButton>
         )}
-        {host.paypalClientId && (
-          <PayWithPaypalButton
-            totalAmount={order.totalAmount.valueInCents}
-            currency={order.totalAmount.currency}
-            interval={getIntervalFromContributionFrequency(order.frequency)}
-            host={host}
-            collective={order.toAccount}
-            tier={order.tier}
-            style={{ height: 45, size: 'small' }}
-            subscriptionStartDate={getSubscriptionStartDate(order)}
-            isSubmitting={isSubmitting}
-            onError={e => toast({ variant: 'error', title: e.message })}
-            onSuccess={({ subscriptionId }) => {
-              onPaypalSuccess({
-                service: PAYMENT_METHOD_SERVICE.PAYPAL,
-                type: PAYMENT_METHOD_TYPE.SUBSCRIPTION,
-                paypalInfo: { subscriptionId },
-              });
-            }}
-          />
-        )}
+        <PayWithPaypalButton
+          totalAmount={order.totalAmount.valueInCents}
+          currency={order.totalAmount.currency}
+          interval={getIntervalFromContributionFrequency(order.frequency)}
+          host={host}
+          collective={order.toAccount}
+          tier={order.tier}
+          style={{ height: 45, size: 'small' }}
+          subscriptionStartDate={getSubscriptionStartDate(order)}
+          isSubmitting={isSubmitting}
+          onError={e => toast({ variant: 'error', title: e.message })}
+          onSuccess={({ subscriptionId }) => {
+            onPaypalSuccess({
+              service: PAYMENT_METHOD_SERVICE.PAYPAL,
+              type: PAYMENT_METHOD_TYPE.SUBSCRIPTION,
+              paypalInfo: { subscriptionId },
+            });
+          }}
+        />
       </Flex>
     );
   } else if (selectedProvider === STRIPE) {

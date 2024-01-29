@@ -34,23 +34,25 @@ const FooterLabel = styled.span`
 `;
 
 const ExpensesTotal = ({ collective, host, expenses, expenseFieldForTotalAmount }) => {
-  const { total, isApproximate } = React.useMemo(() => {
+  const { total, currency, isApproximate } = React.useMemo(() => {
     let isApproximate = false;
     let total = 0;
+    let currency = collective?.currency || host?.currency;
     for (const expense of expenses) {
       total += expense[expenseFieldForTotalAmount]?.valueInCents || expense.amount;
+      currency = currency || expense[expenseFieldForTotalAmount]?.currency;
       if (expense[expenseFieldForTotalAmount]?.exchangeRate?.isApproximate) {
         isApproximate = true;
       }
     }
 
-    return { total, isApproximate };
+    return { total, currency, isApproximate };
   }, [expenses]);
 
   return (
     <React.Fragment>
       {isApproximate && `~ `}
-      <FormattedMoneyAmount amount={total} currency={collective?.currency || host?.currency} precision={2} />
+      <FormattedMoneyAmount amount={total} currency={currency} precision={2} />
     </React.Fragment>
   );
 };
@@ -92,11 +94,14 @@ const ExpensesList = ({
 
   return (
     <StyledCard>
-      <ExpenseDrawer
-        openExpenseLegacyId={openExpenseLegacyId}
-        handleClose={() => setOpenExpenseLegacyId(null)}
-        initialExpenseValues={expenseInDrawer}
-      />
+      {useDrawer && (
+        <ExpenseDrawer
+          openExpenseLegacyId={openExpenseLegacyId}
+          handleClose={() => setOpenExpenseLegacyId(null)}
+          initialExpenseValues={expenseInDrawer}
+        />
+      )}
+
       {isLoading ? (
         [...new Array(nbPlaceholders)].map((_, idx) => (
           // eslint-disable-next-line react/no-array-index-key
@@ -111,7 +116,7 @@ const ExpensesList = ({
               <ExpenseBudgetItem
                 isInverted={isInverted}
                 expense={expense}
-                host={host}
+                host={host || expense.host}
                 showProcessActions
                 view={view}
                 onDelete={onDelete}
@@ -177,10 +182,8 @@ ExpensesList.propTypes = {
   /** Defines the field in `expense` that holds the amount. Useful to display the right one based on the context for multi-currency expenses. */
   expenseFieldForTotalAmount: PropTypes.string,
   collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    parent: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-    }),
+    slug: PropTypes.string,
+    parent: PropTypes.shape({ slug: PropTypes.string }),
     currency: PropTypes.string,
   }),
   expenses: PropTypes.arrayOf(
@@ -189,7 +192,6 @@ ExpensesList.propTypes = {
       legacyId: PropTypes.number.isRequired,
     }),
   ),
-  totalAmount: PropTypes.number,
   useDrawer: PropTypes.bool,
   setOpenExpenseLegacyId: PropTypes.func,
   openExpenseLegacyId: PropTypes.number,

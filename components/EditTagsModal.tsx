@@ -1,11 +1,12 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { Collective } from '../lib/graphql/types/v2/graphql';
+import { editTagsMutation } from '../lib/graphql/v1/mutations';
 
 import { toast } from './ui/useToast';
 import CollectiveTagsInput from './CollectiveTagsInput';
@@ -15,21 +16,8 @@ import StyledButton from './StyledButton';
 import StyledInputFormikField from './StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 
-const editTagsMutation = gqlV1`
-  mutation editCollective(
-    $collective: CollectiveInputType!
-  ) {
-    editCollective(
-      collective: $collective
-    ) {
-      id
-      tags
-    }
-  }
-`;
-
 const tagStatsQuery = gql`
-  query tagStats($host: AccountReferenceInput) {
+  query TagStats($host: AccountReferenceInput) {
     tagStats(host: $host, limit: 5) {
       nodes {
         id
@@ -93,7 +81,7 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
   };
 
   return (
-    <StyledModal flexGrow={1} maxWidth="500px" onClose={handleClose} trapFocus>
+    <StyledModal maxWidth="500px" onClose={handleClose}>
       <Formik initialValues={initialValues} onSubmit={submit}>
         {formik => (
           <Form onSubmit={formik.handleSubmit}>

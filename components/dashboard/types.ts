@@ -1,5 +1,5 @@
 export type DashboardSectionProps = {
   accountSlug: string;
-  subpath?: string;
+  subpath?: string[];
   isDashboard?: boolean;
 };

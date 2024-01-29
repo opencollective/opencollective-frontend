@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { closestCenter, DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -13,7 +13,8 @@ import styled, { css } from 'styled-components';
 import { getCollectiveSections, getSectionPath } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
-import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { collectiveSettingsQuery } from '../../../lib/graphql/v1/queries';
 import i18nNavbarCategory from '../../../lib/i18n/navbar-categories';
 import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
 
@@ -76,15 +77,6 @@ export const getSettingsQuery = gql`
           }
         }
       }
-    }
-  }
-`;
-
-export const collectiveSettingsV1Query = gqlV1/* GraphQL */ `
-  query EditCollectivePage($slug: String) {
-    Collective(slug: $slug) {
-      id
-      settings
     }
   }
 `;
@@ -441,7 +433,7 @@ const EditCollectivePage = ({ collective }) => {
   const [submitSetting, { loading: isSubmitting, error }] = useMutation(editAccountSettingsMutation, {
     context: API_V2_CONTEXT,
     // Refresh the settings for GQLV1 cache, to refresh the navbar
-    refetchQueries: [{ query: collectiveSettingsV1Query, variables: { slug: collective.slug } }],
+    refetchQueries: [{ query: collectiveSettingsQuery, variables: { slug: collective.slug } }],
   });
 
   // Load sections from fetched collective

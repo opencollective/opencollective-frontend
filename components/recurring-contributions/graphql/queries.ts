@@ -1,5 +1,6 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../lib/graphql/helpers';
 
+import { accountHoverCardFields } from '../../AccountHoverCard';
 import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
 
 export const managedOrderFragment = gql`
@@ -53,6 +54,7 @@ export const managedOrderFragment = gql`
       ... on Individual {
         isGuest
       }
+      ...AccountHoverCardFields
     }
     toAccount {
       id
@@ -61,7 +63,7 @@ export const managedOrderFragment = gql`
       type
       description
       tags
-      imageUrl(height: 96)
+      imageUrl
       hasImage
       backgroundImageUrl(height: 256)
       settings
@@ -81,12 +83,14 @@ export const managedOrderFragment = gql`
           supportedPaymentMethods
         }
       }
+      ...AccountHoverCardFields
     }
     platformTipAmount {
       value
       valueInCents
     }
   }
+  ${accountHoverCardFields}
 `;
 
 export const manageContributionsQuery = gql`

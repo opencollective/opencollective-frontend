@@ -1,11 +1,11 @@
 import React from 'react';
-import { gql, useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { isMulti } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 
 import ComboSelectFilter from './ComboSelectFilter';
 

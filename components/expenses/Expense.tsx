@@ -10,7 +10,7 @@ import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { getCollectiveTypeForUrl, getSuggestedTags } from '../../lib/collective.lib';
+import { getCollectiveTypeForUrl, getSuggestedTags } from '../../lib/collective';
 import CommentType from '../../lib/constants/commentTypes';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
@@ -94,7 +94,7 @@ const PrivateNoteLabel = () => {
     <Span fontSize="12px" color="black.700" fontWeight="bold">
       <FormattedMessage id="Expense.PrivateNote" defaultMessage="Private note" />
       &nbsp;&nbsp;
-      <PrivateInfoIcon color="#969BA3" />
+      <PrivateInfoIcon size={12} className="text-muted-foreground" />
     </Span>
   );
 };
@@ -179,7 +179,7 @@ function Expense(props) {
   const prevState = usePrevious(state);
 
   useEffect(() => {
-    if (prevState?.status !== state.status) {
+    if (prevState && prevState.status !== state.status) {
       scrollToExpenseTop();
     }
   }, [state.status]);
@@ -610,7 +610,7 @@ function Expense(props) {
             <ExpenseForm
               collective={collective}
               host={host}
-              loading={loading || loadingLoggedInUser || isRefetchingDataForUser}
+              loading={isRefetchingDataForUser}
               expense={editedExpense || expense}
               originalExpense={expense}
               expensesTags={suggestedTags}
@@ -695,6 +695,7 @@ function Expense(props) {
 
       {state.showFilesViewerModal && (
         <FilesViewerModal
+          allowOutsideInteraction
           files={files}
           parentTitle={intl.formatMessage(
             {

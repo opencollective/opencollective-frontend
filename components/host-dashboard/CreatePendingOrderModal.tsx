@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import dayjs from 'dayjs';
@@ -11,7 +11,7 @@ import styled from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields, verifyEmailPattern } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { CreatePendingContributionModalQuery, OrderPageQuery } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../lib/i18n/collective-type';
@@ -138,11 +138,9 @@ const createPendingContributionModalCollectiveQuery = gql`
           currency
           settings
           imageUrl
-          currency
           ... on AccountWithContributions {
             tiers {
               nodes {
-                id
                 id
                 slug
                 legacyId
@@ -153,6 +151,7 @@ const createPendingContributionModalCollectiveQuery = gql`
         }
       }
       ... on AccountWithHost {
+        bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
         host {
           id
           legacyId
@@ -293,6 +292,9 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
 
   React.useEffect(() => {
     setFieldValue('amount.currency', data?.account?.currency || host.currency);
+    if (formik.touched.hostFeePercent !== true) {
+      setFieldValue('hostFeePercent', data?.account?.bankTransfersHostFeePercent || host.hostFeePercent);
+    }
   }, [data?.account]);
 
   React.useEffect(() => {
@@ -324,20 +326,9 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const tiersOptions = childAccount
     ? getTiersOptions(intl, childAccount?.tiers?.nodes || [])
     : getTiersOptions(intl, collective?.tiers?.nodes || []);
-  const receiptTemplates = host?.settings?.invoice?.templates;
-  const receiptTemplateTitles = [];
-  if (receiptTemplates?.default?.title?.length > 0) {
-    receiptTemplateTitles.push({
-      value: 'default',
-      label: receiptTemplates?.default?.title,
-    });
-  }
-  if (receiptTemplates?.alternative?.title?.length > 0) {
-    receiptTemplateTitles.push({ value: 'alternative', label: receiptTemplates?.alternative?.title });
-  }
 
   const recommendedVendors = collective?.host?.vendors?.nodes || [];
-  const defaultSources = [...(recommendedVendors || []), host];
+  const defaultSources = [...recommendedVendors, host];
   const defaultSourcesOptions = map(groupBy(defaultSources, 'type'), (accounts, type) => {
     return {
       label: formatCollectiveType(intl, type, accounts.length),
@@ -589,7 +580,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               </Field>
             </Box>
           )}
-          {(true || canAddHostFee) && (
+          {canAddHostFee && (
             <Field
               name="hostFeePercent"
               htmlFor="CreatePendingContribution-hostFeePercent"
@@ -797,11 +788,12 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     </Form>
   );
 };
+
 type CreatePendingContributionModalProps = {
   hostSlug: string;
   edit?: Partial<OrderPageQuery['order']>;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess: () => void;
 };
 
 const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePendingContributionModalProps) => {
@@ -922,7 +914,7 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
               });
             }
 
-            props?.onSuccess?.();
+            props.onSuccess();
             handleClose();
           }}
         >

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { pick } from 'lodash';
 import { useRouter } from 'next/router';
@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import { Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
@@ -43,7 +43,7 @@ const applicationSettingsFragment = gql`
 `;
 
 const applicationQuery = gql`
-  query OAuthApplicationQuery($id: String!) {
+  query OAuthApplication($id: String!) {
     application(id: $id) {
       id
       ...ApplicationSettings

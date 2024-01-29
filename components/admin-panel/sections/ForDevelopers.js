@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
 
-import { isIndividualAccount } from '../../../lib/collective.lib';
+import { isIndividualAccount } from '../../../lib/collective';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { getOauthAppSettingsRoute, getPersonalTokenSettingsRoute } from '../../../lib/url-helpers';
 

@@ -117,7 +117,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
           )}
         </div>
         {filters.orderBy && (
-          <div className="flex flex-1 justify-end">
+          <div className="flex w-full flex-1 justify-end">
             <filters.orderBy.StandaloneComponent
               onChange={value => setFilter('orderBy', value)}
               value={values.orderBy}

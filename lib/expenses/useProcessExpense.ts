@@ -1,9 +1,9 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 
 import { expensePageExpenseFieldsFragment } from '../../components/expenses/graphql/fragments';
 
-import { API_V2_CONTEXT } from '../graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../graphql/helpers';
 import { Expense, ProcessExpensePaymentParams } from '../graphql/types/v2/graphql';
 
 type ProcessExpenseAction = (params?: {

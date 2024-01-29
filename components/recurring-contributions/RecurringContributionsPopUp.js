@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { CreditCard } from '@styled-icons/boxicons-regular/CreditCard';
 import { Dollar } from '@styled-icons/boxicons-regular/Dollar';
 import { XCircle } from '@styled-icons/boxicons-regular/XCircle';
@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import { Flex } from '../Grid';

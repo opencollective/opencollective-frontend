@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { PlusCircle } from '@styled-icons/feather/PlusCircle';
 import { Form, Formik } from 'formik';
 import { get, isNil, map, pick } from 'lodash';
@@ -10,7 +10,7 @@ import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-
 import { OPENCOLLECTIVE_FOUNDATION_ID, OPENSOURCE_COLLECTIVE_ID } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { requireFields } from '../lib/form-utils';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
 import ApplicationDescription from './ocf-host-application/ApplicationDescription';
 import OCFPrimaryButton from './ocf-host-application/OCFPrimaryButton';

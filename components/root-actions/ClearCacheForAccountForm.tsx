@@ -1,10 +1,10 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { startCase, uniq } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { AccountCacheType, ClearCacheMutation, ClearCacheMutationVariables } from '../../lib/graphql/types/v2/graphql';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';

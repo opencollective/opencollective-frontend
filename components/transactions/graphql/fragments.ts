@@ -1,4 +1,6 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../lib/graphql/helpers';
+
+import { accountHoverCardFields } from '../../AccountHoverCard';
 
 export const transactionsQueryCollectionFragment = gql`
   fragment TransactionsQueryCollectionFragment on TransactionCollection {
@@ -76,6 +78,7 @@ export const transactionsQueryCollectionFragment = gql`
           hostFeePercent
           platformFeePercent
         }
+        ...AccountHoverCardFields
       }
       fromAccount {
         id
@@ -102,6 +105,7 @@ export const transactionsQueryCollectionFragment = gql`
           hostFeePercent
           platformFeePercent
         }
+        ...AccountHoverCardFields
       }
       host {
         id
@@ -172,7 +176,7 @@ export const transactionsQueryCollectionFragment = gql`
           slug
         }
       }
-      relatedTransactions(kind: [HOST_FEE, PAYMENT_PROCESSOR_COVER]) {
+      relatedTransactions(kind: [HOST_FEE, PAYMENT_PROCESSOR_FEE, PAYMENT_PROCESSOR_COVER, TAX]) {
         id
         type
         kind
@@ -183,4 +187,5 @@ export const transactionsQueryCollectionFragment = gql`
       }
     }
   }
+  ${accountHoverCardFields}
 `;

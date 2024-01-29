@@ -1,11 +1,11 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../../lib/graphql/helpers';
 
+import { accountHoverCardFields } from '../../../AccountHoverCard';
 import {
   expenseHostFields,
   expensesListAdminFieldsFragment,
   expensesListFieldsFragment,
 } from '../../../expenses/graphql/fragments';
-import { accountFieldsFragment, accountHoverCardFragment } from '../../filters/HostedAccountFilter';
 
 export const accountExpensesQuery = gql`
   query AccountExpenses(
@@ -27,6 +27,8 @@ export const accountExpensesQuery = gql`
     $virtualCards: [VirtualCardReferenceInput]
     $createdByAccount: AccountReferenceInput
     $includeChildrenExpenses: Boolean
+    $fetchHostForExpenses: Boolean!
+    $hasAmountInCreatedByAccountCurrency: Boolean!
   ) {
     expenses(
       account: $account
@@ -54,15 +56,32 @@ export const accountExpensesQuery = gql`
       nodes {
         id
         ...ExpensesListFieldsFragment
+        amountInCreatedByAccountCurrency: amountV2(currencySource: CREATED_BY_ACCOUNT)
+          @include(if: $hasAmountInCreatedByAccountCurrency) {
+          value
+          valueInCents
+          currency
+          exchangeRate {
+            date
+            value
+            source
+            isApproximate
+          }
+        }
+        host @include(if: $fetchHostForExpenses) {
+          id
+          ...ExpenseHostFields
+        }
       }
     }
   }
 
   ${expensesListFieldsFragment}
+  ${expenseHostFields}
 `;
 
 export const accountExpensesMetadataQuery = gql`
-  query AccountExpensesMetadataQuery($accountSlug: String!) {
+  query AccountExpensesMetadata($accountSlug: String!) {
     account(slug: $accountSlug) {
       id
       slug
@@ -223,12 +242,8 @@ export const hostDashboardMetadataQuery = gql`
     ready_to_pay: expenses(host: { slug: $hostSlug }, limit: 0, status: READY_TO_PAY) @include(if: $getViewCounts) {
       totalCount
     }
-    scheduled_for_payment: expenses(
-      host: { slug: $hostSlug }
-      limit: 0
-      status: SCHEDULED_FOR_PAYMENT
-      payoutMethodType: BANK_ACCOUNT
-    ) @include(if: $getViewCounts) {
+    scheduled_for_payment: expenses(host: { slug: $hostSlug }, limit: 0, status: SCHEDULED_FOR_PAYMENT)
+      @include(if: $getViewCounts) {
       totalCount
     }
     on_hold: expenses(host: { slug: $hostSlug }, limit: 0, status: ON_HOLD) @include(if: $getViewCounts) {
@@ -247,8 +262,6 @@ export const hostDashboardMetadataQuery = gql`
     hostedAccounts: accounts(host: { slug: $hostSlug }, orderBy: { field: ACTIVITY, direction: DESC }) {
       nodes {
         id
-        __typename
-        ...AccountFields
         ...AccountHoverCardFields
       }
     }
@@ -261,8 +274,7 @@ export const hostDashboardMetadataQuery = gql`
     }
   }
 
-  ${accountFieldsFragment}
-  ${accountHoverCardFragment}
+  ${accountHoverCardFields}
   ${expenseHostFields}
   ${hostInfoCardFields}
 `;

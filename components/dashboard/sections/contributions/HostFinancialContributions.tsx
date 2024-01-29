@@ -1,16 +1,17 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { PlusIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { Views } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../../../lib/hooks/usePrevious';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
+import { accountHoverCardFields } from '../../../AccountHoverCard';
 import { confirmContributionFieldsFragment } from '../../../ContributionConfirmationModal';
 import { Flex } from '../../../Grid';
 import CreatePendingOrderModal from '../../../host-dashboard/CreatePendingOrderModal';
@@ -25,7 +26,7 @@ import { DashboardSectionProps } from '../../types';
 
 import { filters, schema, toVariables } from './filters';
 
-const accountOrdersQuery = gql`
+const hostOrdersQuery = gql`
   query HostContributions(
     $hostSlug: String
     $limit: Int!
@@ -72,6 +73,12 @@ const accountOrdersQuery = gql`
           name
           imageUrl
           type
+          isIncognito
+          ... on Individual {
+            isGuest
+            emails
+          }
+          ...AccountHoverCardFields
         }
         pendingContributionData {
           expectedAt
@@ -93,6 +100,7 @@ const accountOrdersQuery = gql`
           ... on AccountWithHost {
             bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
           }
+          ...AccountHoverCardFields
         }
         permissions {
           id
@@ -103,9 +111,10 @@ const accountOrdersQuery = gql`
     }
   }
   ${confirmContributionFieldsFragment}
+  ${accountHoverCardFields}
 `;
 
-const accountOrdersMetaDataQuery = gql`
+const hostOrdersMetaDataQuery = gql`
   query OrdersMetaData($hostSlug: String) {
     account(slug: $hostSlug) {
       id
@@ -154,7 +163,7 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
   const intl = useIntl();
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
 
-  const { data: metaData, refetch: refetchMetaData } = useQuery(accountOrdersMetaDataQuery, {
+  const { data: metaData, refetch: refetchMetaData } = useQuery(hostOrdersMetaDataQuery, {
     variables: { hostSlug },
     context: API_V2_CONTEXT,
   });
@@ -196,7 +205,7 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
     },
   });
 
-  const { data, error, loading, variables, refetch } = useQuery(accountOrdersQuery, {
+  const { data, error, loading, variables, refetch } = useQuery(hostOrdersQuery, {
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
   });
@@ -212,7 +221,7 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
   }, [LoggedInUser]);
 
   return (
-    <div className="flex w-full flex-col gap-4">
+    <div className="flex w-full max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
         description={<FormattedMessage defaultMessage="Contributions for Collectives you host." />}

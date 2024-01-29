@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Lock } from '@styled-icons/fa-solid/Lock';
+import { Markup } from 'interweave';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import { borders } from 'styled-system';
 
 import { FEATURES, isFeatureEnabled } from '../lib/allowed-features';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 import { compose, formatDate } from '../lib/utils';
 
@@ -264,14 +264,9 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
     return (
       <React.Fragment>
         {update.userCanSeeUpdate && (
-          <Container
-            mb={2}
-            pl={[0, 60]}
-            fontSize="14px"
-            color="#4B4E52"
-            css={{ wordBreak: 'break-word' }}
-            dangerouslySetInnerHTML={{ __html: update.summary }}
-          />
+          <Container mb={2} pl={[0, 60]} fontSize="14px" color="#4B4E52" css={{ wordBreak: 'break-word' }}>
+            <Markup noWrap content={update.summary} />
+          </Container>
         )}
         {!update.userCanSeeUpdate && !isReloadingData && (
           <PrivateUpdateMesgBox type="info" data-cy="mesgBox">

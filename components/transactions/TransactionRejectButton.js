@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { MinusCircle } from '@styled-icons/boxicons-regular/MinusCircle';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
@@ -109,7 +109,9 @@ const TransactionRejectButton = props => {
                     )}
                   </MessageBox>
                   {error && <MessageBoxGraphqlError mt="12px" error={error} />}
-                  <TransactionRejectMessageForm message={message} onChange={message => setMessage(message)} />
+                  <div className="mt-4 w-full">
+                    <TransactionRejectMessageForm message={message} onChange={message => setMessage(message)} />
+                  </div>
                 </Flex>
               </React.Fragment>
             }

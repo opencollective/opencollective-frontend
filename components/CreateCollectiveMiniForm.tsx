@@ -131,7 +131,7 @@ const prepareMutationVariables = collective => {
   }
 };
 
-const createCollectiveMutation = gqlV1`
+const createCollectiveMutation = gqlV1/* GraphQL */ `
   mutation CreateCollective($collective: CollectiveInputType!) {
     createCollective(collective: $collective) {
       id
@@ -158,7 +158,7 @@ const createCollectiveMutation = gqlV1`
   }
 `;
 
-const createUserMutation = gqlV1`
+const createUserMutation = gqlV1/* GraphQL */ `
   mutation CreateUser($user: UserInputType!) {
     createUser(user: $user, throwIfExists: false, sendSignInLink: false) {
       user {
@@ -227,9 +227,11 @@ const CreateCollectiveMiniForm = ({
         errors.members = [{ member: { email: formatMessage(msg.invalidEmail) } }];
       }
       if (!get(values, 'members[0].member.name')) {
-        errors.members
-          ? (errors.members[0].member.name = formatMessage(msg.invalidName))
-          : [{ member: { name: formatMessage(msg.invalidName) } }];
+        if (!errors.members) {
+          errors.members = [{ member: { name: formatMessage(msg.invalidName) } }];
+        } else {
+          errors.members[0].member.name = formatMessage(msg.invalidName);
+        }
       }
     } else if (isUser) {
       if (!values.email || !isValidEmail(values.email)) {

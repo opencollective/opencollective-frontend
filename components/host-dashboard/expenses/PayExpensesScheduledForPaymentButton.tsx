@@ -1,10 +1,10 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { create, Mode } from '@transferwise/approve-api-action-helpers';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { addAuthTokenToHeader } from '../../../lib/api';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { Host } from '../../../lib/graphql/types/v2/graphql';
 import { getWebsiteUrl } from '../../../lib/utils';
 
@@ -94,7 +94,6 @@ export default function PayExpensesScheduledForPaymentButton(props: PayExpensesS
       </StyledButton>
       {showConfirmationModal && (
         <ConfirmationModal
-          zindex={1000}
           header={<FormattedMessage id="expenses.scheduled.confirmation.title" defaultMessage="Pay Expenses Batch" />}
           disableSubmit={!scheduledExpenses?.data?.expenses}
           body={

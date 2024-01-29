@@ -11,7 +11,7 @@ const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
-  useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true' || process.env.API_PROXY !== 'true',
+  useFileSystemPublicRoutes: true,
   productionBrowserSourceMaps: true,
   typescript: {
     ignoreBuildErrors: true,
@@ -42,6 +42,7 @@ const nextConfig = {
         API_KEY: null,
         API_URL: null,
         PDF_SERVICE_URL: null,
+        ML_SERVICE_URL: null,
         DISABLE_MOCK_UPLOADS: false,
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
@@ -55,6 +56,7 @@ const nextConfig = {
         CAPTCHA_PROVIDER: 'HCAPTCHA',
         SENTRY_TRACES_SAMPLE_RATE: null,
         OC_APPLICATION: null,
+        LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
       }),
     );
 

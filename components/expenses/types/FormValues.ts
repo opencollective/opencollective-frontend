@@ -1,4 +1,5 @@
 import {
+  AmountInput,
   ExpenseAttachedFileInput,
   ExpenseType,
   PayoutMethodType,
@@ -9,12 +10,12 @@ export interface ExpenseItemFormValues {
   id?: string;
   incurredAt: Date;
   description: string;
-  amount: number;
+  amountV2: AmountInput;
   url?: string;
   __isNew?: boolean;
   __parsingResult?: UploadFileResult['parsingResult']['expense'];
   __isUploading?: boolean;
-  __file?: File;
+  __file?: { name?: string; path?: string };
   __fromInput?: 'multi';
 }
 

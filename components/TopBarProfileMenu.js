@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { ChevronRight } from '@styled-icons/boxicons-regular/ChevronRight';
@@ -9,7 +8,7 @@ import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { getDashboardRoute, getSettingsRoute } from '../lib/url-helpers';
@@ -134,7 +133,7 @@ const UserAccountLinks = ({
         isMobileMenuLink={isMobileView}
         href={
           useDashboard
-            ? getDashboardRoute(LoggedInUser.collective, 'manage-contributions')
+            ? getDashboardRoute(LoggedInUser.collective, 'outgoing-contributions')
             : `/${LoggedInUser.collective.slug}/manage-contributions`
         }
       >
@@ -286,7 +285,7 @@ class TopBarProfileMenu extends React.Component {
         position="absolute"
         right={[0, 16]}
         top={[69, 75]}
-        zIndex={3000}
+        zIndex={1001}
         data-cy="user-menu"
         css={{ overflow: 'hidden' }}
       >
@@ -376,7 +375,7 @@ class TopBarProfileMenu extends React.Component {
                 <Hide lg md sm>
                   <Box height="90vh" p={3} overflowY="auto">
                     <Flex alignItems="center">
-                      {showUserAccount ? (
+                      <React.Fragment>
                         <P
                           color="black.700"
                           fontSize="12px"
@@ -385,26 +384,11 @@ class TopBarProfileMenu extends React.Component {
                           pr={2}
                           textTransform="uppercase"
                           whiteSpace="nowrap"
-                          onClick={this.toggleAccountInfo}
                         >
-                          ← <FormattedMessage id="Back" defaultMessage="Back" />
+                          <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
                         </P>
-                      ) : (
-                        <React.Fragment>
-                          <P
-                            color="black.700"
-                            fontSize="12px"
-                            fontWeight="500"
-                            letterSpacing="0.06em"
-                            pr={2}
-                            textTransform="uppercase"
-                            whiteSpace="nowrap"
-                          >
-                            <FormattedMessage id="menu.myAccount" defaultMessage="My account" />
-                          </P>
-                          <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
-                        </React.Fragment>
-                      )}
+                        <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+                      </React.Fragment>
                     </Flex>
                     <Flex
                       py={3}
@@ -426,7 +410,7 @@ class TopBarProfileMenu extends React.Component {
                           </P>
                         </Box>
                       </Flex>
-                      {!showUserAccount ? <ChevronRight size={20} color="#76777A" /> : ''}
+                      <ChevronRight size={20} color="#76777A" />
                     </Flex>
                     <ProfileMenuMemberships user={LoggedInUser} />
                   </Box>

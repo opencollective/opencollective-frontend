@@ -4,7 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Expense, Host } from '../../lib/graphql/types/v2/graphql';
+import { Account, Expense, Host } from '../../lib/graphql/types/v2/graphql';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { useToast } from '../ui/useToast';
@@ -16,10 +16,17 @@ export type ConfirmProcessExpenseModalProps = {
   onClose: () => void;
   expense: Expense;
   host: Host;
+  account: Account;
   onConfirm?: () => Promise<any>;
 };
 
-export default function ApproveExpenseModal({ onClose, onConfirm, host, expense }: ConfirmProcessExpenseModalProps) {
+export default function ApproveExpenseModal({
+  onClose,
+  onConfirm,
+  host,
+  account,
+  expense,
+}: ConfirmProcessExpenseModalProps) {
   const intl = useIntl();
   const [editExpense] = useMutation(editExpenseCategoryMutation, { context: API_V2_CONTEXT });
   const [selectedCategory, setSelectedCategory] = React.useState(expense.accountingCategory);
@@ -27,14 +34,13 @@ export default function ApproveExpenseModal({ onClose, onConfirm, host, expense 
   return (
     <ConfirmationModal
       onClose={onClose}
-      trapFocus={false}
       header={<FormattedMessage defaultMessage="Approve Expense" />}
       maxWidth={384}
       disableSubmit={!selectedCategory}
       continueHandler={async () => {
         try {
           // 1. Edit the accounting category if it was changed
-          if (selectedCategory.id !== expense.accountingCategory?.id) {
+          if (selectedCategory?.id !== expense.accountingCategory?.id) {
             await editExpense({
               variables: {
                 expenseId: expense.id,
@@ -59,8 +65,13 @@ export default function ApproveExpenseModal({ onClose, onConfirm, host, expense 
           id="confirm-expense-category"
           onChange={setSelectedCategory}
           host={host}
+          account={account}
+          expenseType={expense.type}
+          expenseValues={expense}
           selectedCategory={selectedCategory}
+          valuesByRole={expense.valuesByRole}
           allowNone={false}
+          predictionStyle="full"
         />
       </div>
     </ConfirmationModal>

@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { Field, useFormikContext } from 'formik';
-import { get, kebabCase, partition, set } from 'lodash';
+import { compact, get, kebabCase, partition, set } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import { I18nSupportLink } from '../I18nFormatters';
@@ -30,6 +30,10 @@ export const msg = defineMessages({
   currency: {
     id: 'Currency',
     defaultMessage: 'Currency',
+  },
+  fieldRequired: {
+    id: 'FieldRequired',
+    defaultMessage: '{name} is required.',
   },
 });
 
@@ -81,12 +85,16 @@ const CUSTOM_METHOD_LABEL_BY_CURRENCY = {
   },
 };
 
+const validateRequiredInput = (intl, input, required) =>
+  required ? value => (value ? undefined : intl.formatMessage(msg.fieldRequired, { name: input.name })) : undefined;
+
 const Input = ({ input, getFieldName, disabled, currency, loading, refetch, formik, host }) => {
   const intl = useIntl();
   const isAccountHolderName = input.key === 'accountHolderName';
-  const fieldName = isAccountHolderName ? getFieldName(`data.${input.key}`) : getFieldName(`data.details.${input.key}`);
+  const fieldName = isAccountHolderName ? getFieldName(input.key) : getFieldName(`details.${input.key}`);
   const required = disabled ? false : input.required;
-  let validate = required ? value => (value ? undefined : `${input.name} is required`) : undefined;
+  const submitted = Boolean(formik.submitCount);
+  let validate = validateRequiredInput(intl, input, required);
   if (input.type === 'text') {
     if (input.validationRegexp || input.minLength || input.maxLength) {
       validate = value => {
@@ -116,7 +124,7 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
               labelFontSize="13px"
               required={required}
               hideOptionalLabel={disabled}
-              error={(meta.touched || disabled) && meta.error}
+              error={(meta.touched || disabled || submitted) && meta.error}
               hint={input.hint}
             >
               {() => {
@@ -126,7 +134,7 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
                     <StyledInput
                       {...field}
                       placeholder={input.example}
-                      error={(meta.touched || disabled) && meta.error}
+                      error={(meta.touched || disabled || submitted) && meta.error}
                       disabled={disabled}
                       width="100%"
                       maxLength={input.maxLength}
@@ -159,14 +167,14 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
               labelFontSize="13px"
               required={required}
               hideOptionalLabel={disabled}
-              error={(meta.touched || disabled) && meta.error}
+              error={(meta.touched || disabled || submitted) && meta.error}
               hint={input.hint}
             >
               {() => (
                 <StyledInput
                   {...field}
                   type="date"
-                  error={(meta.touched || disabled) && meta.error}
+                  error={(meta.touched || disabled || submitted) && meta.error}
                   disabled={disabled}
                   width="100%"
                   value={get(formik.values, field.name) || ''}
@@ -188,24 +196,24 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
               labelFontSize="13px"
               required={required}
               hideOptionalLabel={disabled}
-              error={(meta.touched || disabled) && meta.error}
+              error={(meta.touched || disabled || submitted) && meta.error}
             >
               {() => (
                 <StyledSelect
                   inputId={field.name}
                   disabled={disabled}
-                  error={(meta.touched || disabled) && meta.error}
+                  error={(meta.touched || disabled || submitted) && meta.error}
                   isLoading={loading && !options.length}
                   name={field.name}
                   options={options}
                   value={options.find(c => c.value === get(formik.values, field.name)) || null}
                   onChange={({ value }) => {
                     formik.setFieldValue(field.name, value);
-                    if (input.refreshRequirementsOnChange) {
+                    if (input.refreshRequirementsOnChange && refetch) {
                       refetch({
                         slug: host ? host.slug : WISE_PLATFORM_COLLECTIVE_SLUG,
                         currency,
-                        accountDetails: get(set({ ...formik.values }, field.name, value), getFieldName('data')),
+                        accountDetails: get(set({ ...formik.values }, field.name, value), getFieldName('')),
                       });
                     }
                   }}
@@ -225,16 +233,16 @@ Input.propTypes = {
   disabled: PropTypes.bool,
   loading: PropTypes.bool,
   host: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
+    slug: PropTypes.string,
   }),
-  currency: PropTypes.string.isRequired,
+  currency: PropTypes.string,
   formik: PropTypes.object.isRequired,
   getFieldName: PropTypes.func.isRequired,
-  refetch: PropTypes.func.isRequired,
+  refetch: PropTypes.func,
   input: PropTypes.object.isRequired,
 };
 
-const FieldGroup = ({ field, ...props }) => {
+export const FieldGroup = ({ field, ...props }) => {
   return (
     <Box flex="1">
       {field.group.map(input => (
@@ -248,16 +256,17 @@ FieldGroup.propTypes = {
   disabled: PropTypes.bool,
   loading: PropTypes.bool,
   host: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
+    slug: PropTypes.string,
   }),
-  currency: PropTypes.string.isRequired,
+  currency: PropTypes.string,
   formik: PropTypes.object.isRequired,
   getFieldName: PropTypes.func.isRequired,
-  refetch: PropTypes.func.isRequired,
+  refetch: PropTypes.func,
   field: PropTypes.object.isRequired,
 };
 
 const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
+  const intl = useIntl();
   const { loading, error, data, refetch } = useQuery(requiredFieldsQuery, {
     context: API_V2_CONTEXT,
     // A) If `fixedCurrency` was passed in PayoutBankInformationForm (2) (3)
@@ -302,12 +311,12 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     } else {
       // eslint-disable-next-line no-console
       console.warn('Could not fetch requiredFields through Wise.');
-      return;
+      return null;
     }
   }
 
   const transactionTypeValues = data.host.transferwise.requiredFields.map(rf => ({
-    label: CUSTOM_METHOD_LABEL_BY_CURRENCY?.[currency]?.requiredFields?.options?.[rf.type] || rf.title,
+    label: CUSTOM_METHOD_LABEL_BY_CURRENCY[currency]?.requiredFields?.options?.[rf.type] || rf.title,
     value: rf.type,
   }));
   // Some currencies offer different methods for the transaction
@@ -321,21 +330,27 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
 
   const transactionMethodFieldName = getFieldName('data.type');
   const transactionMethod = get(formik.values, transactionMethodFieldName);
+  const submitted = Boolean(formik.submitCount);
+
+  const transactionMethodLabel =
+    CUSTOM_METHOD_LABEL_BY_CURRENCY[currency]?.requiredFields?.label ||
+    intl.formatMessage({
+      id: 'PayoutBankInformationForm.TransactionMethod',
+
+      defaultMessage: 'Transaction Method',
+    });
 
   return (
     <Flex flexDirection="column">
-      <Field name={getFieldName('data.type')}>
-        {({ field }) => (
+      <Field
+        name={getFieldName('data.type')}
+        validate={validateRequiredInput(intl, { name: transactionMethodLabel }, !disabled)}
+      >
+        {({ field, meta }) => (
           <StyledInputField
             name={field.name}
-            label={
-              CUSTOM_METHOD_LABEL_BY_CURRENCY?.[currency]?.requiredFields?.label || (
-                <FormattedMessage
-                  id="PayoutBankInformationForm.TransactionMethod"
-                  defaultMessage="Transaction Method"
-                />
-              )
-            }
+            label={transactionMethodLabel}
+            error={(meta.touched || disabled || submitted) && meta.error}
             labelFontSize="13px"
             mt={3}
             mb={2}
@@ -352,6 +367,8 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
                 options={transactionTypeValues}
                 value={transactionTypeValues.find(method => method.value === availableMethods?.type) || null}
                 disabled={disabled}
+                error={(meta.touched || disabled || submitted) && meta.error}
+                required
               />
             )}
           </StyledInputField>
@@ -370,7 +387,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
               disabled={disabled}
               field={field}
               formik={formik}
-              getFieldName={getFieldName}
+              getFieldName={string => getFieldName(compact(['data', string]).join('.'))}
               host={host}
               key={kebabCase(field.name)}
               loading={loading}
@@ -402,7 +419,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
               disabled={disabled}
               field={field}
               formik={formik}
-              getFieldName={getFieldName}
+              getFieldName={string => getFieldName(compact(['data', string]).join('.'))}
               host={host}
               key={kebabCase(field.name)}
               loading={loading}

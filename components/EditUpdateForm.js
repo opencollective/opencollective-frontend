@@ -94,7 +94,6 @@ class EditUpdateForm extends React.Component {
     } catch (error) {
       this.setState({ loading: false, error: error.message });
     }
-    return false;
   }
 
   render() {

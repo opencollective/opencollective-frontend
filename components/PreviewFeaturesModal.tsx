@@ -1,8 +1,8 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { PreviewFeature } from '../lib/preview-features';
 
@@ -110,7 +110,7 @@ const PreviewFeaturesModal = ({ open, setOpen }: { open: boolean; setOpen: (open
           </DialogDescription>
         </DialogHeader>
         {previewFeatures
-          ?.filter(f => !f.dependsOn)
+          .filter(f => !f.dependsOn)
           .map(feature => {
             const dependentFeatures = previewFeatures.filter(f => f.dependsOn === feature.key);
             return <PreviewFeatureCard key={feature.key} feature={feature} dependentFeatures={dependentFeatures} />;

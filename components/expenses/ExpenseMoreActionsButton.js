@@ -212,6 +212,7 @@ const ExpenseMoreActionsButton = ({
                       loading={isLoading}
                       onClick={downloadInvoice}
                       disabled={processExpense.loading || isDisabled}
+                      data-cy="download-expense-invoice-btn"
                     >
                       <IconDownload size="16px" />
                       {isLoading ? (

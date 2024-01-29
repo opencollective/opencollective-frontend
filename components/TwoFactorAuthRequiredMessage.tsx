@@ -44,7 +44,7 @@ export const TwoFactorAuthRequiredMessage = ({
         <StyledHr my="16px" borderColor="black.400" />
         {LoggedInUser && (
           <Flex justifyContent="center">
-            <Link href={getSettingsRoute(LoggedInUser.collective, 'user-security')}>
+            <Link href={getSettingsRoute(LoggedInUser.collective, 'user-security#two-factor-auth')}>
               <StyledButton buttonStyle="primary">
                 <FormattedMessage defaultMessage="Activate 2FA" />
               </StyledButton>

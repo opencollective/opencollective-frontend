@@ -1,6 +1,6 @@
 import React, { Fragment, MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -17,7 +17,7 @@ import {
 import CreatableSelect from 'react-select/creatable';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import colors from '../lib/theme/colors';
 
 import { Flex } from './Grid';
@@ -195,6 +195,14 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
               Input,
               Option,
             }}
+            onBlur={(event: React.FocusEvent<HTMLInputElement>) => {
+              // Needed for React-select to work with Radix UI dialogs
+              // https://github.com/JedWatson/react-select/issues/5732#issuecomment-1742107647
+              const element = event.relatedTarget;
+              if (element && (element.tagName === 'A' || element.tagName === 'BUTTON' || element.tagName === 'INPUT')) {
+                (element as HTMLElement).focus();
+              }
+            }}
             onKeyDown={e => {
               // Stop enter key from closing the menu and submitting the form when it's loading and there are no options
               if (e.key === 'Enter' && loading && options.length === 0) {
@@ -206,7 +214,7 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
             isLoading={loading}
             onChange={(selectedOptions: TagOption[]) => setSelected(selectedOptions)}
             styles={{
-              menuPortal: styles => ({ ...styles, zIndex: 9999 }),
+              menuPortal: styles => ({ ...styles, zIndex: 9999, pointerEvents: 'auto' }),
               menu: styles => ({ ...styles, fontSize: '14px' }),
               control: (styles, state) => ({
                 ...styles,

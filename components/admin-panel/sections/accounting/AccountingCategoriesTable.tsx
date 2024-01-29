@@ -1,15 +1,18 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { cloneDeep, get, isEqual, pick } from 'lodash';
+import { cloneDeep, get, isEqual, omit, pick, uniq } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useWarnIfUnsavedChanges from '../../../../lib/hooks/warnIfUnsavedChanges';
+import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
 import { DataTable } from '../../../DataTable';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import StyledSelect from '../../../StyledSelect';
 import { Button } from '../../../ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
@@ -26,7 +29,7 @@ type AccountingCategoriesTableMeta = {
 };
 
 const accountingCategoriesQuery = gql`
-  query AdminAccountingCategoriesQuery($hostSlug: String!) {
+  query AdminAccountingCategories($hostSlug: String!) {
     host(slug: $hostSlug) {
       id
       slug
@@ -37,6 +40,7 @@ const accountingCategoriesQuery = gql`
           code
           name
           friendlyName
+          expensesTypes
         }
       }
     }
@@ -59,6 +63,7 @@ const editAccountingCategoryMutation = gql`
               code
               name
               friendlyName
+              expensesTypes
             }
           }
         }
@@ -92,6 +97,53 @@ const EditableCell = ({ getValue, row, column, table }) => {
   );
 };
 
+const ExpensesTypesCell = ({ cell, getValue, row, column, table }) => {
+  const intl = useIntl();
+  const value = getValue() as ExpenseType[] | null;
+  const setValue = value => table.options.meta.update(row.index, column.id, value);
+  const allExpenseTypes = Object.values(omit(ExpenseType, 'FUNDING_REQUEST'));
+  const getOption = value => {
+    if (value === null) {
+      return { value, label: intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' }) };
+    } else {
+      return { value, label: i18nExpenseType(intl, value) };
+    }
+  };
+
+  // Build options list
+  const options = React.useMemo(() => [null, ...allExpenseTypes].map(getOption), [value]);
+
+  // View for accountants
+  if (table.options.meta.disabled) {
+    return (
+      <p>
+        {value === null
+          ? intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' })
+          : value.map(value => i18nExpenseType(intl, value)).join(', ')}
+      </p>
+    );
+  }
+
+  return (
+    <StyledSelect
+      isMulti
+      minWidth={200}
+      inputId={`${cell.id}-input`}
+      options={options}
+      isClearable={false}
+      value={Array.isArray(value) ? value.map(getOption) : null}
+      placeholder={intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' })}
+      onChange={options => {
+        if (!options?.length || options.find(option => option.value === null)) {
+          setValue(null);
+        } else {
+          setValue(uniq(options.map(option => option.value).sort()));
+        }
+      }}
+    />
+  );
+};
+
 const columns = [
   {
     accessorKey: 'code',
@@ -110,6 +162,11 @@ const columns = [
     header: () => <FormattedMessage id="AccountingCategory.friendlyName" defaultMessage="Friendly name" />,
     cell: EditableCell,
     meta: { placeholderPath: 'name', maxLength: 255 },
+  },
+  {
+    accessorKey: 'expensesTypes',
+    cell: ExpensesTypesCell,
+    header: () => <FormattedMessage defaultMessage="Expense types" />,
   },
   {
     accessorKey: 'actions',
@@ -138,7 +195,7 @@ const columns = [
   },
 ];
 
-const DEFAULT_CATEGORY = { code: '', name: '', friendlyName: '' };
+const DEFAULT_CATEGORY = { code: '', name: '', friendlyName: '', expensesTypes: null };
 
 export const AccountingCategoriesTable = ({ hostSlug }: AccountingCategoriesTableProps) => {
   const intl = useIntl();
@@ -184,7 +241,8 @@ export const AccountingCategoriesTable = ({ hostSlug }: AccountingCategoriesTabl
       onSubmit={async e => {
         e.preventDefault();
         try {
-          const cleanCategories = categories.map(category => pick(category, ['id', 'code', 'name', 'friendlyName']));
+          const editableFields = ['code', 'name', 'friendlyName', 'expensesTypes'];
+          const cleanCategories = categories.map(category => pick(category, ['id', ...editableFields]));
           await editAccountingCategories({ variables: { categories: cleanCategories } });
           toast({ variant: 'success', message: intl.formatMessage({ id: 'saved', defaultMessage: 'Saved' }) });
         } catch (e) {

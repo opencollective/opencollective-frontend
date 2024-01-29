@@ -1,5 +1,6 @@
+// This is the "legacy" version of the transactions page in Dashboard, will likely be replaced by the new version in /components/dashboard/sections/transactions
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { uniq } from 'lodash';
 import { ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/router';
@@ -8,7 +9,7 @@ import { z } from 'zod';
 
 import { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
 import { isMulti, isNullable, limit, offset } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import {
   Currency,
   PaymentMethodType,
@@ -178,7 +179,7 @@ const Transactions = ({ accountSlug }: DashboardSectionProps) => {
   const { transactions, account } = data || {};
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="menu.transactions" defaultMessage="Transactions" />}
         actions={
@@ -207,7 +208,7 @@ const Transactions = ({ accountSlug }: DashboardSectionProps) => {
                       setDisplayExportCSVModal(true);
                     }}
                   >
-                    <FormattedMessage defaultMessage="Export CSV" />
+                    <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
                   </DropdownMenuItem>
                 }
               />

@@ -1,5 +1,4 @@
 import React from 'react';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Times as RemoveIcon } from '@styled-icons/fa-solid/Times';
 import { get, groupBy, isEmpty, truncate } from 'lodash';
@@ -9,7 +8,7 @@ import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-i
 import { AccountTypesWithHost } from '../../lib/constants/collectives';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { EMPTY_ARRAY } from '../../lib/constants/utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -47,6 +46,10 @@ const payoutMethodLabels = defineMessages({
   accountBalance: {
     id: 'PayoutMethod.AccountBalance',
     defaultMessage: 'Open Collective (Account Balance)',
+  },
+  none: {
+    id: 'PayoutMethod.None',
+    defaultMessage: 'None',
   },
 });
 
@@ -87,6 +90,7 @@ type PayoutMethodSelectProps = {
       id: string;
     };
   };
+  allowNull?: boolean;
   onChange: (object) => void;
   onRemove?: (object) => void;
 };
@@ -99,7 +103,9 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
   state = { removingPayoutMethod: null };
 
   getPayoutMethodLabel = payoutMethod => {
-    if (payoutMethod.id) {
+    if (!payoutMethod) {
+      return this.props.intl.formatMessage(payoutMethodLabels.none);
+    } else if (payoutMethod.id) {
       if (payoutMethod.name) {
         return payoutMethod.name;
       } else if (payoutMethod.type === PayoutMethodType.ACCOUNT_BALANCE) {
@@ -170,12 +176,12 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
     const isMenu = context === 'menu';
 
     const isDeletable =
-      value.isDeletable === undefined ? value.type !== PayoutMethodType.ACCOUNT_BALANCE : value.isDeletable;
+      value?.isDeletable === undefined ? value?.type !== PayoutMethodType.ACCOUNT_BALANCE : value?.isDeletable;
 
     return (
       <Flex justifyContent="space-between" alignItems="center">
         <Span fontSize={isMenu ? '13px' : '14px'}>{this.getPayoutMethodLabel(value)}</Span>
-        {isMenu && value.id && isDeletable && this.props.onRemove && (
+        {isMenu && value?.id && isDeletable && this.props.onRemove && (
           <StyledRoundButton
             size={20}
             ml={2}
@@ -239,7 +245,7 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
 
     const groupedPms = groupBy(payoutMethods, 'type');
 
-    return pmTypes.map(pmType => ({
+    const categorized = pmTypes.map(pmType => ({
       label: i18nPayoutMethodType(this.props.intl, pmType),
       options: [
         // Add existing payout methods for this type
@@ -254,6 +260,14 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
           : null,
       ].filter(option => option !== null),
     }));
+
+    if (this.props.allowNull) {
+      categorized.unshift({
+        value: null,
+      });
+    }
+
+    return categorized;
   });
 
   render() {
@@ -266,7 +280,7 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
     const payeeIsSameHost = payee && payee.host?.id === collective.host?.id;
 
     const styledSelectOptions = this.getOptions(collective.host, payoutMethods, payee);
-    const hasSuitablePayoutMethodOption = styledSelectOptions.find(({ options }) => options.length > 0) ? true : false;
+    const hasSuitablePayoutMethodOption = styledSelectOptions.find(({ options }) => options?.length > 0) ? true : false;
 
     if (payeeIsCollectiveFamilyType && !payeeIsSameHost) {
       if (!collective?.host?.isTrustedHost) {

@@ -1,11 +1,11 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { CreditCard } from 'lucide-react';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 
 const virtualCardQuery = gql`
-  query VirtualCardQuery($id: String!) {
+  query VirtualCardFilter($id: String!) {
     virtualCard(virtualCard: { id: $id }) {
       id
       name

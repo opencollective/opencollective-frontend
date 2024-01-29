@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { omit, pick } from 'lodash';
 import { withRouter } from 'next/router';
@@ -8,12 +7,12 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { itemHasOCR } from '../components/expenses/lib/ocr';
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { expenseSubmissionAllowed, getCollectivePageMetadata, getCollectiveTypeForUrl } from '../lib/collective.lib';
+import { expenseSubmissionAllowed, getCollectivePageMetadata, getCollectiveTypeForUrl } from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { generateNotFoundError, i18nGraphqlException } from '../lib/errors';
 import { getPayoutProfiles } from '../lib/expenses';
 import FormPersister from '../lib/form-persister';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import UrlQueryHelper from '../lib/UrlQueryHelper';
 import { compose, parseToBoolean } from '../lib/utils';
@@ -32,6 +31,7 @@ import ExpenseNotesForm from '../components/expenses/ExpenseNotesForm';
 import ExpenseRecurringForm from '../components/expenses/ExpenseRecurringForm';
 import ExpenseSummary, { SummaryHeader } from '../components/expenses/ExpenseSummary';
 import {
+  accountingCategoryFields,
   expensePageExpenseFieldsFragment,
   loggedInAccountExpensePayoutFieldsFragment,
 } from '../components/expenses/graphql/fragments';
@@ -271,7 +271,7 @@ class CreateExpensePage extends React.Component {
       const collectiveTypeRoute = collectiveType ? `${collectiveType}/` : '';
       await this.props.router.push({
         pathname: `${parentCollectiveSlugRoute}${collectiveTypeRoute}${collectiveSlug}/expenses/${legacyExpenseId}`,
-        query: pick(this.props.router.query, ['ocr']),
+        query: pick(this.props.router.query, ['ocr', 'mockImageUpload']),
       });
       toast({
         variant: 'success',
@@ -516,9 +516,7 @@ const hostFieldsFragment = gql`
     accountingCategories {
       nodes {
         id
-        name
-        friendlyName
-        code
+        ...AccountingCategoryFields
       }
     }
     policies {
@@ -531,6 +529,7 @@ const hostFieldsFragment = gql`
     supportedPayoutMethods
     isTrustedHost
   }
+  ${accountingCategoryFields}
 `;
 
 const createExpensePageQuery = gql`

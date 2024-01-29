@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { create, Mode } from '@transferwise/approve-api-action-helpers';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { addAuthTokenToHeader } from '../../lib/api';
 import { formatCurrency } from '../../lib/currency-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { getWebsiteUrl } from '../../lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -136,7 +136,6 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
       </MessageBox>
       {showConfirmationModal && (
         <ConfirmationModal
-          zindex={1000}
           header={<FormattedMessage id="expenses.scheduled.confirmation.title" defaultMessage="Pay Expenses Batch" />}
           body={
             <FormattedMessage

@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
-import { gql } from '@apollo/client';
 import { omit } from 'lodash';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
+import { loggedInUserCanAccessFinancialData } from '../lib/collective';
 import { CollectiveType } from '../lib/constants/collectives';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
@@ -19,9 +18,7 @@ import { collectiveNavbarFieldsFragment } from '../components/collective-page/gr
 import ErrorPage from '../components/ErrorPage';
 import { Box } from '../components/Grid';
 import Header from '../components/Header';
-import Loading from '../components/Loading';
 import Footer from '../components/navigation/Footer';
-import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import { transactionsQueryCollectionFragment } from '../components/transactions/graphql/fragments';
 import Transactions, { getVariablesFromQuery } from '../components/transactions/TransactionsPageContent';
@@ -73,6 +70,9 @@ const processingOrderFragment = gql`
       slug
       isIncognito
       type
+      ... on Individual {
+        isGuest
+      }
     }
     toAccount {
       id
@@ -215,6 +215,7 @@ const transactionsPageQueryHelper = getSSRQueryHelpers<ReturnType<typeof getVari
     getPropsFromContext: ctx => ({ query: ctx.query as TransactionsPageProps['query'] }),
     getVariablesFromContext: ctx => ({ ...getVariablesFromQuery(ctx.query), slug: ctx.query.collectiveSlug }),
     context: API_V2_CONTEXT,
+    skipClientIfSSRThrows404: true,
   },
 );
 
@@ -224,30 +225,23 @@ export default function TransactionsPage(props) {
   const { LoggedInUser } = useLoggedInUser();
   const { data, error, variables, refetch, loading } = transactionsPageQueryHelper.useQuery(props);
   const router = useRouter();
-  useEffect(() => {
-    if (LoggedInUser) {
-      refetch();
-    }
-  }, [LoggedInUser]);
+
   useEffect(() => {
     const queryParameters = omit(props.query, ['offset', 'collectiveSlug', 'parentCollectiveSlug']);
     addParentToURLIfMissing(router, account, `/transactions`, queryParameters);
   });
 
   const account = data?.account;
+  const accountType = account?.type;
   const transactions = data?.transactions;
 
-  if (!account && loading) {
-    return (
-      <Page title="Transactions">
-        <Loading />
-      </Page>
-    );
-  } else if (!account) {
-    return <ErrorPage data={data} />;
-  } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, data.account)) {
-    // Hack for funds that want to keep their budget "private"
-    return <PageFeatureNotSupported showContactSupportLink={false} />;
+  if (!loading) {
+    if (!account) {
+      return <ErrorPage data={data} error={error || transactionsPageQueryHelper.getSSRErrorFromPageProps(props)} />;
+    } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, account)) {
+      // Hack for funds that want to keep their budget "private"
+      return <PageFeatureNotSupported showContactSupportLink={false} />;
+    }
   }
 
   return (
@@ -256,14 +250,14 @@ export default function TransactionsPage(props) {
         collective={account}
         LoggedInUser={LoggedInUser}
         canonicalURL={`${getCollectivePageCanonicalURL(account)}/transactions`}
-        noRobots={['USER', 'INDIVIDUAL'].includes(account.type) && !account.isHost}
+        noRobots={['USER', 'INDIVIDUAL'].includes(accountType) && !account.isHost}
       />
       <Body>
         <CollectiveNavbar
           collective={account}
           isAdmin={LoggedInUser && LoggedInUser.isAdminOfCollective(account)}
           selectedCategory={NAVBAR_CATEGORIES.BUDGET}
-          selectedSection={account.type === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
+          selectedSection={accountType === CollectiveType.COLLECTIVE ? Sections.BUDGET : Sections.TRANSACTIONS}
         />
         <Box maxWidth={1260} m="0 auto" px={[2, 3, 4]} my={[4, 5]} data-cy="transactions-page-content">
           <Transactions

@@ -1,38 +1,12 @@
 import React from 'react';
-import MUIDrawer from '@mui/material/Drawer';
 import { X } from 'lucide-react';
 import styled, { css } from 'styled-components';
-import { space, SpaceProps } from 'styled-system';
 
-import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+import { cn } from '../../lib/utils';
 
 import Link from '../Link';
 import StyledRoundButton from '../StyledRoundButton';
-
-const StyledDrawerContainer = styled.div<{ maxWidth: string }>`
-  display: flex;
-  height: 100vh;
-  max-width: ${props => props.maxWidth};
-  width: 100vw;
-  flex-direction: column;
-  hr {
-    margin: 8px 0;
-    border-color: #f3f4f6;
-  }
-
-  ${space}
-`;
-
-const StyledMUIDrawer = styled(MUIDrawer)`
-  height: 100vh !important;
-  z-index: 3000;
-  .MuiDrawer-paper {
-    border-radius: ${props => (props.anchor === 'left' ? '0 12px 12px 0' : '12px 0 0 12px')};
-  }
-  .MuiBackdrop-root {
-    background-color: rgba(0, 0, 0, 0.25);
-  }
-`;
+import { Sheet, SheetContent } from '../ui/Sheet';
 
 const StyledCloseButton = styled(StyledRoundButton)`
   width: 32px;
@@ -118,19 +92,29 @@ type DrawerMenuProps = {
   open: boolean;
   anchor?: 'left' | 'right';
   children: React.ReactNode;
-} & SpaceProps;
+  className?: string;
+};
 
-export const DrawerMenu = ({ onClose, open, anchor = 'right', children, ...props }: DrawerMenuProps) => {
-  const twoFactorPrompt = useTwoFactorAuthenticationPrompt();
-  const disableEnforceFocus = Boolean(twoFactorPrompt?.isOpen);
-
+export const DrawerMenu = ({ onClose, open, anchor = 'right', children, className, ...props }: DrawerMenuProps) => {
   return (
-    <React.Fragment>
-      <StyledMUIDrawer anchor={anchor} open={open} onClose={onClose} disableEnforceFocus={disableEnforceFocus}>
-        <StyledDrawerContainer maxWidth="280px" {...props}>
-          {children}
-        </StyledDrawerContainer>
-      </StyledMUIDrawer>
-    </React.Fragment>
+    <Sheet
+      open={open}
+      onOpenChange={open => {
+        if (!open) {
+          onClose();
+        }
+      }}
+    >
+      <SheetContent
+        side={anchor}
+        className={cn('max-w-72 p-0', anchor === 'right' ? 'rounded-l-2xl' : 'rounded-r-2xl', className)}
+        {...props}
+      >
+        {children}
+        <div className="absolute right-2 top-2">
+          <DrawerCloseButton onClick={onClose} />
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };

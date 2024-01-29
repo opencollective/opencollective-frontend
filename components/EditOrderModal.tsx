@@ -1,39 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
-import { CardElement } from '@stripe/react-stripe-js';
+import React from 'react';
+import { useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
-import { first, get, merge, pick, startCase } from 'lodash';
+import { get, startCase } from 'lodash';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { PAYMENT_METHOD_SERVICE } from '../lib/constants/payment-methods';
 import { formatCurrency } from '../lib/currency-utils';
 import { getIntervalFromContributionFrequency } from '../lib/date-utils';
-import { getErrorFromGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { getStripe, stripeTokenToPaymentMethod } from '../lib/stripe';
+import { getErrorFromGraphqlException, i18nGraphqlException } from '../lib/errors';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import {
+  AccountReferenceInput,
+  EditPaymentMethodModalQuery,
+  PaymentMethod,
+  SetupIntentInput,
+} from '../lib/graphql/types/v2/graphql';
 import { DEFAULT_MINIMUM_AMOUNT } from '../lib/tier-utils';
 
-import AddPaymentMethod, { getSubscriptionStartDate } from './recurring-contributions/AddPaymentMethod';
+import PaymentMethodPicker, { PaymentMethodOption } from './orders/PaymentMethodPicker';
+import { getSubscriptionStartDate } from './recurring-contributions/AddPaymentMethod';
 import {
   ContributionInterval,
   tiersQuery,
   useContributeOptions,
   useUpdateOrder,
 } from './recurring-contributions/UpdateOrderPopUp';
-import {
-  addCreditCardMutation,
-  confirmCreditCardMutation,
-  paymentMethodsQuery,
-  sortAndFilterPaymentMethods,
-  useUpdatePaymentMethod,
-} from './recurring-contributions/UpdatePaymentMethodPopUp';
-import { toast } from './ui/useToast';
+import { useUpdatePaymentMethod } from './recurring-contributions/UpdatePaymentMethodPopUp';
+import { toast, useToast } from './ui/useToast';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import { Box, Flex } from './Grid';
 import I18nFormatters from './I18nFormatters';
+import Loading from './Loading';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import PayWithPaypalButton from './PayWithPaypalButton';
-import { withStripeLoader } from './StripeProvider';
 import StyledButton from './StyledButton';
 import StyledInputAmount from './StyledInputAmount';
 import StyledModal, { ModalBody, ModalHeader } from './StyledModal';
@@ -259,7 +259,6 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
                               value={inputAmountValue}
                               onChange={setInputAmountValue}
                               min={DEFAULT_MINIMUM_AMOUNT}
-                              precision={2}
                               px="2px"
                             />
                           </Box>
@@ -328,274 +327,256 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   );
 };
 
-const EditPaymentMethodModal = withStripeLoader(
-  ({
-    accountSlug,
-    order: contribution,
-    loadStripe,
-    ...props
-  }: Omit<EditOrderModalProps, 'action'> & { loadStripe: any }) => {
-    const mutationOptions = { context: API_V2_CONTEXT };
-    // state management
-    const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false);
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
-    const [loadingSelectedPaymentMethod, setLoadingSelectedPaymentMethod] = useState(true);
-    const [stripe, setStripe] = useState(null);
-    const [stripeElements, setStripeElements] = useState(null);
-    const [newPaymentMethodInfo, setNewPaymentMethodInfo] = useState(null);
-    const [addedPaymentMethod, setAddedPaymentMethod] = useState(null);
-    const [addingPaymentMethod, setAddingPaymentMethod] = useState(false);
-    const { isSubmitting, updatePaymentMethod } = useUpdatePaymentMethod(contribution);
+function EditPaymentMethodModal(props: EditOrderModalProps) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const intl = useIntl();
+  const [option, setOption] = React.useState<PaymentMethodOption>({
+    id: props.order?.paymentMethod?.id,
+    name: props.order?.paymentMethod?.name,
+    type: props.order?.paymentMethod?.type,
+  });
 
-    // GraphQL mutations and queries
-    const { data, refetch } = useQuery(paymentMethodsQuery, {
-      variables: { accountSlug, orderId: contribution.id },
-      context: API_V2_CONTEXT,
-      fetchPolicy: 'network-only',
-    });
-    const [submitAddPaymentMethod] = useMutation(addCreditCardMutation, mutationOptions);
-    const [submitConfirmPaymentMethodMutation] = useMutation(confirmCreditCardMutation, mutationOptions);
-
-    const handleAddPaymentMethodResponse = async response => {
-      const { paymentMethod, stripeError } = response;
-      if (stripeError) {
-        return handleStripeError(paymentMethod, stripeError);
-      } else {
-        return handleSuccess(paymentMethod);
-      }
-    };
-
-    const handleStripeError = async (paymentMethod, stripeError) => {
-      const { message, response } = stripeError;
-
-      if (!response) {
-        toast({
-          variant: 'error',
-          message: message,
-        });
-        setAddingPaymentMethod(false);
-        return false;
-      }
-
-      const stripe = await getStripe();
-      const result = await stripe.handleCardSetup(response.setupIntent.client_secret);
-      if (result.error) {
-        toast({
-          variant: 'error',
-          message: result.error.message,
-        });
-        setAddingPaymentMethod(false);
-        return false;
-      } else {
-        try {
-          const response = await submitConfirmPaymentMethodMutation({
-            variables: { paymentMethod: { id: paymentMethod.id } },
-          });
-          return handleSuccess(response.data.confirmCreditCard.paymentMethod);
-        } catch (error) {
-          toast({
-            variant: 'error',
-            message: error.message,
-          });
-          setAddingPaymentMethod(false);
-          return false;
+  const query = useQuery<EditPaymentMethodModalQuery>(
+    gql`
+      query EditPaymentMethodModal($order: OrderReferenceInput!) {
+        order(order: $order) {
+          id
+          totalAmount {
+            currency
+            valueInCents
+          }
+          fromAccount {
+            id
+            slug
+          }
+          toAccount {
+            id
+            slug
+            ... on AccountWithHost {
+              host {
+                id
+                slug
+                paypalClientId
+                supportedPaymentMethods
+              }
+            }
+            ... on Organization {
+              host {
+                id
+                slug
+                paypalClientId
+                supportedPaymentMethods
+              }
+            }
+          }
         }
       }
-    };
+    `,
+    {
+      context: API_V2_CONTEXT,
+      variables: {
+        order: {
+          id: props.order.id,
+        },
+      },
+      skip: !props.order.id,
+    },
+  );
 
-    const handleSuccess = paymentMethod => {
-      setAddingPaymentMethod(false);
-      refetch();
-      setAddedPaymentMethod(paymentMethod);
-      setShowAddPaymentMethod(false);
-      setLoadingSelectedPaymentMethod(true);
-    };
+  const order = query.data?.order;
 
-    // load stripe on mount
-    useEffect(() => {
-      loadStripe();
-    }, []);
+  const [addStripePaymentMethodFromSetupIntent, { loading }] = useMutation<
+    { addStripePaymentMethodFromSetupIntent: PaymentMethod },
+    { account?: AccountReferenceInput; setupIntent?: SetupIntentInput }
+  >(
+    gql`
+      mutation AddStripePaymentMethodFromSetupIntent(
+        $setupIntent: SetupIntentInput!
+        $account: AccountReferenceInput!
+      ) {
+        addStripePaymentMethodFromSetupIntent(setupIntent: $setupIntent, account: $account) {
+          id
+          type
+          name
+        }
+      }
+    `,
+    {
+      context: API_V2_CONTEXT,
+      variables: {
+        account: {
+          slug: props.accountSlug,
+        },
+      },
+    },
+  );
 
-    // data handling
-    const paymentMethods = get(data, 'account.paymentMethods', null);
-    const existingPaymentMethod = get(data, 'order.paymentMethod', null);
-    const filterPaymentMethodsParams = [paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod];
-    const paymentOptions = React.useMemo(
-      () => sortAndFilterPaymentMethods(...filterPaymentMethodsParams),
-      filterPaymentMethodsParams,
-    );
+  const { isSubmitting: isSubmittingUpdate, updatePaymentMethod } = useUpdatePaymentMethod(props.order);
 
-    useEffect(() => {
-      if (!paymentOptions) {
+  const isUpdatingPaymentMethod = isSubmittingUpdate || loading;
+
+  const onSaveClick = React.useCallback(async () => {
+    let paymentMethodId;
+
+    if (option.id === 'stripe-payment-element' && 'stripe' in option) {
+      const res = await option.elements.submit();
+      if (res.error) {
+        toast({ variant: 'error', message: res.error.message });
+        props.onClose();
         return;
       }
-      if (selectedPaymentMethod === null && contribution.paymentMethod) {
-        setSelectedPaymentMethod(first(paymentOptions.filter(option => option.id === contribution.paymentMethod.id)));
-      } else if (addedPaymentMethod) {
-        setSelectedPaymentMethod(paymentOptions.find(option => option.id === addedPaymentMethod.id));
-      }
-      setLoadingSelectedPaymentMethod(false);
-    }, [paymentOptions, addedPaymentMethod]);
 
-    return (
-      <StyledModal onClose={props.onClose} maxWidth="420px">
-        <ModalHeader onClose={props.onClose}>
-          <H4 fontSize="20px" fontWeight="700">
-            {showAddPaymentMethod ? (
-              <FormattedMessage id="subscription.menu.addPaymentMethod" defaultMessage="Add new payment method" />
-            ) : (
-              <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
-            )}
-          </H4>
-        </ModalHeader>
-        <ModalBody mb={0}>
-          <P fontSize="15px" mb="10" lineHeight="20px">
-            <FormattedMessage
-              id="subscription.updatePaymentMethod.subheader"
-              defaultMessage="Pick an existing payment method or add a new one."
+      const returnUrl = new URL(`${window.location.origin}/${props.accountSlug}/admin/outgoing-contributions`);
+      returnUrl.searchParams.set('orderId', props.order.id);
+      returnUrl.searchParams.set('stripeAccount', option.setupIntent.stripeAccount);
+      returnUrl.searchParams.set('action', 'editPaymentMethod');
+
+      const setupResponse = await option.stripe.confirmSetup({
+        clientSecret: option.setupIntent.client_secret,
+        elements: option.elements,
+        redirect: 'if_required',
+        confirmParams: {
+          expand: ['payment_method'],
+          // eslint-disable-next-line camelcase
+          return_url: returnUrl.href,
+        },
+      });
+      if (setupResponse.error) {
+        toast({ variant: 'error', message: setupResponse.error.message });
+        props.onClose();
+        return;
+      }
+
+      try {
+        const paymentMethodResponse = await addStripePaymentMethodFromSetupIntent({
+          variables: {
+            setupIntent: {
+              id: option.setupIntent.id,
+              stripeAccount: option.setupIntent.stripeAccount,
+            },
+          },
+        });
+        paymentMethodId = paymentMethodResponse.data.addStripePaymentMethodFromSetupIntent.id;
+      } catch (e) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+        return;
+      }
+    } else {
+      paymentMethodId = option.id;
+    }
+
+    await updatePaymentMethod({ id: paymentMethodId });
+    props.onClose();
+  }, [option, props.onClose, intl]);
+
+  const onPaypalSubscription = React.useCallback(
+    async paypalSubscriptionId => {
+      await updatePaymentMethod({
+        service: PAYMENT_METHOD_SERVICE.PAYPAL,
+        paypalInfo: { subscriptionId: paypalSubscriptionId },
+      });
+      props.onClose();
+    },
+    [props.onClose],
+  );
+
+  React.useEffect(() => {
+    async function onPaymentMethodSetup() {
+      try {
+        const response = await addStripePaymentMethodFromSetupIntent({
+          variables: {
+            setupIntent: {
+              id: router.query.setup_intent as string,
+              stripeAccount: router.query.stripeAccount as string,
+            },
+            account: {
+              slug: props.accountSlug,
+            },
+          },
+        });
+        setOption({
+          id: response.data.addStripePaymentMethodFromSetupIntent.id,
+          name: response.data.addStripePaymentMethodFromSetupIntent.name,
+          type: response.data.addStripePaymentMethodFromSetupIntent.type,
+        });
+      } catch (e) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+        return;
+      }
+      // props.onClose();
+    }
+
+    if (
+      router.query.orderId &&
+      router.query.stripeAccount &&
+      router.query.setup_intent &&
+      router.query.redirect_status === 'succeeded'
+    ) {
+      onPaymentMethodSetup();
+    }
+  }, [router.query.orderId, router.query.stripeAccount, router.query.setup_intent, router.query.redirect_status]);
+
+  return (
+    <StyledModal onClose={props.onClose} maxWidth="480px" width="100%">
+      <ModalHeader onClose={props.onClose}>
+        <H4 fontSize="20px" fontWeight="700">
+          <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
+        </H4>
+      </ModalHeader>
+      <ModalBody mb={0}>
+        <P fontSize="15px" mb="10" lineHeight="20px">
+          <FormattedMessage
+            id="subscription.updatePaymentMethod.subheader"
+            defaultMessage="Pick an existing payment method or add a new one."
+          />
+        </P>
+        {!order ? (
+          <Loading />
+        ) : (
+          <PaymentMethodPicker
+            className="mt-3"
+            value={option}
+            onChange={setOption}
+            order={order}
+            host={order.toAccount && 'host' in order.toAccount ? order.toAccount.host : null}
+            account={order?.fromAccount}
+          />
+        )}
+        <Flex flexWrap="wrap" justifyContent="space-between" mt={4}>
+          {option.id === 'pay-with-paypal' ? (
+            <PayWithPaypalButton
+              totalAmount={props.order.totalAmount.valueInCents}
+              currency={props.order.totalAmount.currency}
+              interval={getIntervalFromContributionFrequency(props.order.frequency)}
+              host={props.order.toAccount.host}
+              collective={props.order.toAccount}
+              tier={props.order.tier}
+              style={{ height: 45, size: 'small' }}
+              subscriptionStartDate={getSubscriptionStartDate(props.order)}
+              isSubmitting={isUpdatingPaymentMethod}
+              onError={e => toast({ variant: 'error', title: e.message })}
+              onSuccess={({ subscriptionId }) => {
+                onPaypalSubscription(subscriptionId);
+              }}
             />
-          </P>
-          {showAddPaymentMethod ? (
-            <Box>
-              <AddPaymentMethod
-                order={contribution}
-                isSubmitting={isSubmitting}
-                setNewPaymentMethodInfo={setNewPaymentMethodInfo}
-                onStripeReady={({ stripe, stripeElements }) => {
-                  setStripe(stripe);
-                  setStripeElements(stripeElements);
-                }}
-                onPaypalSuccess={async paypalPaymentMethod => {
-                  await updatePaymentMethod(paypalPaymentMethod);
-                  props.onClose();
-                }}
-              />
-            </Box>
-          ) : loadingSelectedPaymentMethod ? (
-            <LoadingPlaceholder height={100} />
           ) : (
-            <StyledRadioList
-              id="PaymentMethod"
-              name={`${contribution.id}-PaymentMethod`}
-              keyGetter="key"
-              options={paymentOptions}
-              onChange={setSelectedPaymentMethod}
-              value={selectedPaymentMethod?.key}
-            >
-              {({ radio, value: { title, subtitle, icon } }) => (
-                <Flex minHeight={50} py={2} bg="white.full" data-cy="recurring-contribution-pm-box">
-                  <Flex alignItems="center">
-                    <Box as="span" mr={3} flexWrap="wrap">
-                      {radio}
-                    </Box>
-                    <Flex mr={2} css={{ flexBasis: '26px' }}>
-                      {icon}
-                    </Flex>
-                    <Flex flexDirection="column" width="100%">
-                      <P fontSize="12px" fontWeight={subtitle ? 600 : 400} color="black.900" overflowWrap="anywhere">
-                        {title}
-                      </P>
-                      {subtitle && (
-                        <P fontSize="12px" fontWeight={400} lineHeight="18px" color="black.500" overflowWrap="anywhere">
-                          {subtitle}
-                        </P>
-                      )}
-                    </Flex>
-                  </Flex>
-                </Flex>
-              )}
-            </StyledRadioList>
-          )}
-          {!showAddPaymentMethod && (
             <StyledButton
               buttonSize="tiny"
-              width="100%"
-              mt={2}
-              onClick={() => setShowAddPaymentMethod(true)}
-              data-cy="recurring-contribution-add-pm-button"
+              buttonStyle="secondary"
+              type="submit"
+              data-cy="recurring-contribution-submit-pm-button"
+              onClick={onSaveClick}
+              loading={isUpdatingPaymentMethod}
             >
-              <FormattedMessage id="subscription.menu.addPaymentMethod" defaultMessage="Add new payment method" />
+              <FormattedMessage id="save" defaultMessage="Save" />
             </StyledButton>
           )}
-          {showAddPaymentMethod ? (
-            <Flex flexWrap="wrap" justifyContent="space-between" mt={4}>
-              <StyledButton
-                onClick={() => {
-                  setNewPaymentMethodInfo(null);
-                  setShowAddPaymentMethod(false);
-                }}
-              >
-                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </StyledButton>
-              <StyledButton
-                buttonSize="tiny"
-                buttonStyle="secondary"
-                disabled={newPaymentMethodInfo ? !newPaymentMethodInfo.value?.complete : true}
-                type="submit"
-                loading={addingPaymentMethod}
-                data-cy="recurring-contribution-submit-pm-button"
-                onClick={async () => {
-                  setAddingPaymentMethod(true);
-                  if (!stripe) {
-                    toast({
-                      variant: 'error',
-                      message: (
-                        <FormattedMessage
-                          id="Stripe.Initialization.Error"
-                          defaultMessage="There was a problem initializing the payment form. Please reload the page and try again."
-                        />
-                      ),
-                    });
-                    setAddingPaymentMethod(false);
-                    return false;
-                  }
-                  const cardElement = stripeElements.getElement(CardElement);
-                  const { token, error } = await stripe.createToken(cardElement);
-
-                  if (error) {
-                    toast({ variant: 'error', message: error.message });
-                    return false;
-                  }
-                  const newStripePaymentMethod = stripeTokenToPaymentMethod(token);
-                  const newCreditCardInfo = merge(newStripePaymentMethod.data, pick(newStripePaymentMethod, ['token']));
-                  try {
-                    const res = await submitAddPaymentMethod({
-                      variables: {
-                        creditCardInfo: newCreditCardInfo,
-                        name: get(newStripePaymentMethod, 'name'),
-                        account: { slug: accountSlug },
-                      },
-                    });
-                    return handleAddPaymentMethodResponse(res.data.addCreditCard);
-                  } catch (error) {
-                    const errorMsg = getErrorFromGraphqlException(error).message;
-                    toast({ variant: 'error', message: errorMsg });
-                    setAddingPaymentMethod(false);
-                    return false;
-                  }
-                }}
-              >
-                <FormattedMessage id="save" defaultMessage="Save" />
-              </StyledButton>
-            </Flex>
-          ) : (
-            <Flex mt={4}>
-              <StyledButton
-                buttonStyle="secondary"
-                loading={isSubmitting}
-                data-cy="recurring-contribution-update-pm-button"
-                onClick={() => updatePaymentMethod(selectedPaymentMethod).then(props.onClose)}
-                width="100%"
-              >
-                <FormattedMessage id="actions.update" defaultMessage="Update" />
-              </StyledButton>
-            </Flex>
-          )}
-        </ModalBody>
-      </StyledModal>
-    );
-  },
-);
+        </Flex>
+      </ModalBody>
+    </StyledModal>
+  );
+}
 
 const EditOrderModal = (props: EditOrderModalProps) => {
   if (props.action === 'cancel') {

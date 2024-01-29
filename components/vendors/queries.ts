@@ -1,4 +1,6 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../lib/graphql/helpers';
+
+import { accountHoverCardFields } from '../AccountHoverCard';
 
 export type { VendorFieldsFragment } from '../../lib/graphql/types/v2/graphql';
 
@@ -28,6 +30,7 @@ export const vendorFieldFragment = gql`
       slug
       name
       imageUrl
+      ...AccountHoverCardFields
     }
 
     vendorInfo {
@@ -49,14 +52,15 @@ export const vendorFieldFragment = gql`
       data
     }
 
-    orders {
+    orders(filter: OUTGOING, limit: 1) {
       totalCount
     }
 
-    expenses(status: PAID, direction: SUBMITTED) {
+    expenses(status: PAID, direction: SUBMITTED, limit: 1) {
       totalCount
     }
   }
+  ${accountHoverCardFields}
 `;
 
 export const setVendorArchiveMutation = gql`
