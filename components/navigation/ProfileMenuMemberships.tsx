@@ -274,10 +274,8 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
                   <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} closeDrawer={closeDrawer} />
                 )}
                 {sectionIsEmpty ? (
-                  <Box my={2}>
-                    <P fontSize="12px" lineHeight="18px" color="black.700">
-                      {intl.formatMessage(sectionData.emptyMessage)}
-                    </P>
+                  <div className="m-2">
+                    <p className="text-xs text-muted-foreground">{intl.formatMessage(sectionData.emptyMessage)}</p>
                     {Boolean(sectionData.plusButton) && (
                       <Link href={sectionData.plusButton.href} onClick={closeDrawer}>
                         <StyledButton mt="12px" mb="16px" borderRadius="8px" width="100%" fontSize="12px">
@@ -299,7 +297,7 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
                         </StyledButton>
                       </Link>
                     )}
-                  </Box>
+                  </div>
                 ) : accountType === 'ARCHIVED' ? (
                   <Collapse
                     buttonSize={24}

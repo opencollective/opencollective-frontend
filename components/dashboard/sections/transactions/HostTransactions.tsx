@@ -76,6 +76,7 @@ const hostTransactionsMetaDataQuery = gql`
       legacyId
       slug
       currency
+      settings
     }
   }
 `;
@@ -90,7 +91,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const [transactionInDrawer, setTransactionInDrawer] = React.useState(null);
 
-  const [layout, setLayout] = React.useState(TestLayout.DEBITCREDIT);
+  const [layout, setLayout] = React.useState(TestLayout.AMOUNT);
 
   const { data: metaData } = useQuery(hostTransactionsMetaDataQuery, {
     variables: { slug: hostSlug },
@@ -150,7 +151,8 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
               open={displayExportCSVModal}
               setOpen={setDisplayExportCSVModal}
               queryFilter={queryFilter}
-              hostSlug={hostSlug}
+              account={metaData?.host}
+              isHostReport
               trigger={
                 <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
                   <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />

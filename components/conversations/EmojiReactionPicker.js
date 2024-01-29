@@ -144,7 +144,7 @@ const EmojiReactionPicker = ({ comment, update }) => {
       isSelected = update.userReactions?.includes(emoji);
     }
     return {
-      children: <Emoji>{emoji}</Emoji>,
+      children: <Emoji className="font-emoji">{emoji}</Emoji>,
       isSelected,
       onClick: () => {
         setOpen(false);

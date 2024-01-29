@@ -544,7 +544,7 @@ export const expensePageExpenseFieldsFragment = gql`
           valueInCents
           currency
         }
-        paymentProcessorFee {
+        paymentProcessorFee(fetchPaymentProcessorFee: true) {
           valueInCents
           currency
         }

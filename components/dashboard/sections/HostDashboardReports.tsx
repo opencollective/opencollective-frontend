@@ -52,6 +52,7 @@ const hostReportPageQuery = gql`
       createdAt
       hostFeePercent
       isTrustedHost
+      settings
       stats {
         id
         balance(dateTo: $dateTo) {
@@ -213,7 +214,8 @@ const HostDashboardReports = ({ accountSlug: hostSlug }: DashboardSectionProps) 
         title={<FormattedMessage id="Reports" defaultMessage="Reports" />}
         actions={
           <ExportTransactionsCSVModal
-            hostSlug={hostSlug}
+            account={host}
+            isHostReport
             queryFilter={queryFilter}
             trigger={
               <Button size="sm" variant="outline">
