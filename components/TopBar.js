@@ -18,6 +18,7 @@ import theme from '../lib/theme';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
 import DynamicTopBar from './navigation/preview/TopBar';
+import ProfileMenu from './navigation/ProfileMenu';
 import NewTopBar from './navigation/TopBar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -80,7 +81,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const ref = useRef();
-  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
+  const { LoggedInUser } = useLoggedInUser();
   const router = useRouter();
   // We debounce this function to avoid conflicts between the menu button and TopBarMobileMenu useGlobalBlur hook.
   const debouncedSetShowMobileMenu = debounce(setShowMobileMenu);
@@ -96,20 +97,34 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
 
   const onDashboardRoute = isRouteActive('/dashboard');
 
-  const useDashboard =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) ||
-    (onDashboardRoute && !LoggedInUser && loadingLoggedInUser);
+  const useDashboard = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD);
+  const dashboardTurnedOff = useDashboard === false;
 
-  if (useDashboard) {
-    if (LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR)) {
-      return <DynamicTopBar {...{ account, navTitle }} />;
-    }
+  if (LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR)) {
+    return <DynamicTopBar {...{ account, navTitle }} />;
+  }
+
+  const homeRoutes = [
+    '/',
+    '/home',
+    '/collectives',
+    '/become-a-sponsor',
+    '/become-a-host',
+    '/pricing',
+    '/how-it-works',
+    '/fiscal-hosting',
+    '/e2c',
+    '/help',
+  ];
+  const onHomeRoute = homeRoutes.some(isRouteActive);
+
+  if (onDashboardRoute || (!onHomeRoute && LoggedInUser && !dashboardTurnedOff)) {
     return <NewTopBar {...{ account }} />;
   }
 
   return (
     <Flex
-      px={3}
+      px={[3, '24px']}
       py={showSearch ? 2 : 3}
       alignItems="center"
       flexDirection="row"
@@ -277,7 +292,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
           <div className="mr-2 hidden sm:block">
             <ChangelogTrigger />
           </div>
-          <TopBarProfileMenu />
+          {useDashboard ? <ProfileMenu /> : <TopBarProfileMenu />}
         </React.Fragment>
       )}
       <Hide md lg>
