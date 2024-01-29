@@ -15,9 +15,6 @@ import SectionTitle from '../SectionTitle';
 
 import ContributorsGridBackgroundSVG from '../../../public/static/images/collective-page/ContributorsGridBackground.svg';
 
-/* reference to the FixedSizedGrid element */
-const contributorsGridRef = React.createRef();
-
 /** Main contributors container with the bubbles background */
 const MainContainer = styled(Container)`
   background:
@@ -63,6 +60,8 @@ export default class SectionContributors extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = { filter: ContributorsFilter.CONTRIBUTOR_FILTERS.ALL };
+    /* reference to the FixedSizedGrid element */
+    this.contributorsGridRef = React.createRef();
   }
 
   static MIN_CONTRIBUTORS_TO_SHOW_FILTERS = 2;
@@ -70,8 +69,8 @@ export default class SectionContributors extends React.PureComponent {
   setFilter = filter => {
     this.setState({ filter });
 
-    // whenever the filter is changed, scroll is set to poin to the initial item
-    contributorsGridRef.current.scrollToItem({
+    // whenever the filter is changed, scroll is set to point to the initial item
+    this.contributorsGridRef.current.scrollToItem({
       columnIndex: 0,
       rowIndex: 0,
     });
@@ -160,7 +159,7 @@ export default class SectionContributors extends React.PureComponent {
           collectiveId={collective.id}
           currency={collective.currency}
           maxWidthWhenNotFull={Dimensions.MAX_SECTION_WIDTH}
-          gridRef={contributorsGridRef}
+          gridRef={this.contributorsGridRef}
         />
       </MainContainer>
     );
