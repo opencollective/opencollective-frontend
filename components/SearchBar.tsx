@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 import { defineMessages, useIntl } from 'react-intl';
-import { HeightProps, MaxWidthProps } from 'styled-system';
+import { HeightProps } from 'styled-system';
 
 import SearchForm from './SearchForm';
 
@@ -21,9 +21,8 @@ const SearchBar = ({
   onSubmit,
   defaultValue,
   placeholder,
-  maxWidth = '276px',
   ...props
-}: HeightProps & MaxWidthProps & React.HTMLAttributes<HTMLFormElement>) => {
+}: HeightProps & React.HTMLAttributes<HTMLFormElement>) => {
   const [value, setValue] = React.useState(defaultValue || '');
   const intl = useIntl();
 
@@ -38,7 +37,7 @@ const SearchBar = ({
   }, [defaultValue]);
 
   return (
-    <Box maxWidth={maxWidth}>
+    <Box>
       <SearchForm
         placeholder={placeholder || intl.formatMessage(messages.searchPlaceholder)}
         value={value}

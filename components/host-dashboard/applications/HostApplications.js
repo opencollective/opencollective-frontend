@@ -111,11 +111,13 @@ const HostApplications = ({ accountSlug: hostSlug }) => {
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="Menu.HostApplications" defaultMessage="Host Applications" />
         </h1>
-        <SearchBar
-          height={40}
-          defaultValue={query.searchTerm}
-          onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-        />
+        <div className="w-[276px]">
+          <SearchBar
+            height={40}
+            defaultValue={query.searchTerm}
+            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
+          />
+        </div>
       </div>
 
       <DashboardViews
