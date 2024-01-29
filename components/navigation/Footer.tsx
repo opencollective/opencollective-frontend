@@ -1,5 +1,5 @@
 import React from 'react';
-import { SiX } from '@icons-pack/react-simple-icons';
+import SiX  from '@icons-pack/react-simple-icons/icons/SiX';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
 import { Slack } from '@styled-icons/fa-brands/Slack';

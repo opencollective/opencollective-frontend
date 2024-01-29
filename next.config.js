@@ -26,7 +26,6 @@ const nextConfig = {
     outputFileTracingIncludes: {
       '/_document': ['./.next/language-manifest.json'],
     },
-    optimizePackageImports: ['@icons-pack/react-simple-icons'],
   },
   webpack: (config, { webpack, isServer, dev }) => {
     config.resolve.alias['@sentry/replay'] = false;
