@@ -141,7 +141,7 @@ const getCategoryLabel = (
  */
 export const isSupportedExpenseCategory = (expenseType: ExpenseType, category: AccountingCategory) => {
   return (
-    category.kind === AccountingCategoryKind.EXPENSE &&
+    category?.kind === AccountingCategoryKind.EXPENSE &&
     (!category?.expensesTypes || category.expensesTypes.includes(expenseType))
   );
 };

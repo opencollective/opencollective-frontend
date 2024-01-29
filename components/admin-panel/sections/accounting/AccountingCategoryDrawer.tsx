@@ -171,14 +171,14 @@ function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDra
         ),
       },
       hostOnly: {
-        value: props.accountingCategory.hostOnly,
-        label: props.accountingCategory.hostOnly
+        value: props.accountingCategory?.hostOnly,
+        label: props.accountingCategory?.hostOnly
           ? intl.formatMessage({ defaultMessage: 'Yes' })
           : intl.formatMessage({ defaultMessage: 'No' }),
       },
-      instructions: props.accountingCategory.instructions,
+      instructions: props.accountingCategory?.instructions,
       expensesTypes: props.accountingCategory?.expensesTypes
-        ? props.accountingCategory.expensesTypes.map(t => ({ value: t, label: i18nExpenseType(intl, t) }))
+        ? props.accountingCategory?.expensesTypes.map(t => ({ value: t, label: i18nExpenseType(intl, t) }))
         : null,
     };
   }, [props.accountingCategory, intl]);

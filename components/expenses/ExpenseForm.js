@@ -420,7 +420,7 @@ const ExpenseFormBody = ({
     }
 
     // Reset the accounting category (if not supported by the new expense type)
-    if (values.accountingCategory && !isSupportedExpenseCategory(values.type, values.accountingCategory, isHostAdmin)) {
+    if (values.accountingCategory && !isSupportedExpenseCategory(values.type, values.accountingCategory)) {
       formik.setFieldValue('accountingCategory', undefined);
     }
 
