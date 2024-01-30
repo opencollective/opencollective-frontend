@@ -7,7 +7,8 @@ export const AVERAGE_TRANSACTIONS_PER_MINUTE = 8240;
 export const HOST_OMITTED_FIELDS = ['balance', 'hostSlug', 'hostName', 'hostType'];
 
 type CSVField =
-  | 'accountingCategory'
+  | 'accountingCategoryCode'
+  | 'accountingCategoryName'
   | 'date'
   | 'datetime'
   | 'id'
@@ -106,15 +107,8 @@ const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
     'paymentMethodService',
     'paymentMethodType',
   ],
-  expense: [
-    'accountingCategory',
-    'expenseId',
-    'expenseLegacyId',
-    'expenseType',
-    'expenseTags',
-    'payoutMethodType',
-    'merchantId',
-  ],
+  expense: ['expenseId', 'expenseLegacyId', 'expenseType', 'expenseTags', 'payoutMethodType', 'merchantId'],
+  accounting: ['accountingCategoryCode', 'accountingCategoryName'],
   tax: ['taxAmount', 'taxType', 'taxRate', 'taxIdNumber'],
   legacy: ['platformFee', 'hostFee'],
 };
@@ -124,11 +118,13 @@ export const FIELD_GROUPS_2024: Record<string, readonly CSVField[]> = {
   accounts: FIELD_GROUPS.accounts,
   order: FIELD_GROUPS.order,
   expense: FIELD_GROUPS.expense,
+  accounting: FIELD_GROUPS.accounting,
   tax: FIELD_GROUPS.tax.filter(field => field !== 'taxAmount'),
   legacy: [...FIELD_GROUPS.legacy, 'paymentProcessorFee', 'taxAmount'],
 };
 
 export const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, React.ReactNode> = {
+  accounting: <FormattedMessage id="home.accounting" defaultMessage="Accounting" />,
   transaction: <FormattedMessage defaultMessage="Transaction" />,
   accounts: <FormattedMessage defaultMessage="Account" />,
   order: <FormattedMessage defaultMessage="Contribution" />,
@@ -170,7 +166,8 @@ export const DEFAULT_FIELDS = [
 ];
 
 export const FieldLabels: Record<CSVField, React.ReactNode> = {
-  accountingCategory: <FormattedMessage defaultMessage="Accounting Category" />,
+  accountingCategoryCode: <FormattedMessage defaultMessage="Accounting Category Code" />,
+  accountingCategoryName: <FormattedMessage defaultMessage="Accounting Category Name" />,
   date: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
   datetime: <FormattedMessage defaultMessage="Date & Time" />,
   id: <FormattedMessage defaultMessage="Transaction ID" />,
