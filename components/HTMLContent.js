@@ -230,6 +230,9 @@ const HTMLContent = styled(
     padding: 16px;
     font-family: monospace;
     overflow-x: auto;
+    max-width: 100%;
+    white-space: nowrap;
+    border-radius: 4px;
   }
 
   ul {

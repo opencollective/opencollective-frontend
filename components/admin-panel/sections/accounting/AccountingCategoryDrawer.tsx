@@ -122,9 +122,9 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
         <label className="mb-1 mt-4 text-base">
           <FormattedMessage defaultMessage="Instructions" />
         </label>
-        <pre>
+        <div>
           <HTMLContent content={props.accountingCategory?.instructions} />
-        </pre>
+        </div>
       </div>
       <DrawerActions>
         <DropdownMenu>
