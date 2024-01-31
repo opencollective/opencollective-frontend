@@ -530,6 +530,8 @@ export const expensePageExpenseFieldsFragment = gql`
       }
       transaction {
         id
+        kind
+        type
         amount {
           valueInCents
           currency
