@@ -244,12 +244,12 @@ const GetToKnowUs = () => {
             <FormattedMessage
               id="e2c.description"
               defaultMessage={
-                'Join us as we transition from a privately owned company to a structure that allows us to share power and revenue with you.'
+                'Join us as we evolve, focusing on empowering communities to raise funds, sharing success, and distributing resources effectively.'
               }
             />
           </P>
           <Box display={['none', null, 'block']} mt="24px">
-            <Link href="/e2c">
+            <Link href="#">
               <StyledButton
                 minWidth="135px"
                 my={['12px', null, 0]}
