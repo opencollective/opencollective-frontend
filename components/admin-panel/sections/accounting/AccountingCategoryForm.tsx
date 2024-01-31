@@ -214,7 +214,6 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
       >
         <RichTextEditor
           {...props.formik.getFieldProps('instructions')}
-          kind="ACCOUNTING_CATEGORY_DESCRIPTION"
           defaultValue={props.formik.values.instructions}
           withBorders
           showCount
