@@ -30,9 +30,15 @@ const Welcome = () => {
       showSearch={false}
       menuItemsV2={{ solutions: false, product: false, company: false, docs: false }}
     >
-      <Flex flexDirection={['column', 'row']} mb="61px" mt="112px" justifyContent="center" alignItems="center">
-        <Flex textAlign="center" flexDirection="column" pr={[0, '48px']}>
-          <Box>
+      <Flex
+        flexDirection={['column', 'column', 'column', 'row']}
+        mb="61px"
+        mt="112px"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Flex textAlign="center" flexDirection="column" pr={[0, 0, 0, '48px']}>
+          <Box display="flex" justifyContent="center">
             <Image src="/static/images/oc-logo-watercolor-256.png" height={96} width={96} />
           </Box>
           <Container pt="40px" pl="16px" pr={['16px', 0]} width={['100%', '404px']}>
@@ -50,7 +56,7 @@ const Welcome = () => {
           flexDirection="column"
           alignItems="center"
           style={{ overflow: 'visible' }}
-          mt={['100px', 0]}
+          mt={['100px', '100px', '100px', 0]}
         >
           <Box mt="-64px">
             <Image src="/static/images/sample-avatar.png" height={128} width={128} />
@@ -58,10 +64,10 @@ const Welcome = () => {
           <Flex fontSize="24px" fontWeight="700" color="black.900" lineHeight="32px" pt="40px" pb="40px">
             {LoggedInUser?.collective?.name}
           </Flex>
-          <Link href="/create">
-            <WelcomeOptionContainer mt="16px" width={['300px', '472px']} borderRadius="8px">
-              <Flex alignItems="center" p="13px">
-                <Box width="386px">
+          <WelcomeOptionContainer mt="16px" width={['100%', '472px']} borderRadius="8px">
+            <Link href="/create">
+              <Flex alignItems="center" px={['16px', '13px']} py="13px">
+                <Box width="100%">
                   <Flex fontSize="18px" fontWeight="700" color="black.900" lineHeight="26px">
                     <FormattedMessage id="collective.create" defaultMessage="Create Collective" />
                   </Flex>
@@ -73,12 +79,12 @@ const Welcome = () => {
                   <Image src="/static/images/right-arrow.png" alt="Right Arrow" width={22} height={20} />
                 </Box>
               </Flex>
-            </WelcomeOptionContainer>
-          </Link>
-          <Link href="/organizations/new">
-            <WelcomeOptionContainer mt="16px" width={['300px', '472px']} borderRadius="8px">
-              <Flex alignItems="center" p="13px">
-                <Box width="386px">
+            </Link>
+          </WelcomeOptionContainer>
+          <WelcomeOptionContainer mt="16px" width={['100%', '472px']} borderRadius="8px">
+            <Link href="/organizations/new">
+              <Flex alignItems="center" px={['16px', '13px']} py="13px">
+                <Box width="100%">
                   <Flex fontSize="18px" fontWeight="700" color="black.900" lineHeight="26px">
                     <FormattedMessage id="organization.create" defaultMessage="Create Organization" />
                   </Flex>
@@ -90,12 +96,12 @@ const Welcome = () => {
                   <Image src="/static/images/right-arrow.png" alt="Right Arrow" width={22} height={20} />
                 </Box>
               </Flex>
-            </WelcomeOptionContainer>
-          </Link>
-          <Link href="/search">
-            <WelcomeOptionContainer mt="16px" width={['300px', '472px']} borderRadius="8px">
-              <Flex alignItems="center" p="13px">
-                <Box width="386px">
+            </Link>
+          </WelcomeOptionContainer>
+          <WelcomeOptionContainer mt="16px" width={['100%', '472px']} borderRadius="8px">
+            <Link href="/search">
+              <Flex alignItems="center" px={['16px', '13px']} py="13px">
+                <Box width="100%">
                   <Flex fontSize="18px" fontWeight="700" color="black.900" lineHeight="26px">
                     <FormattedMessage defaultMessage="Contribute and engage with more Collectives" />
                   </Flex>
@@ -107,8 +113,8 @@ const Welcome = () => {
                   <Image src="/static/images/right-arrow.png" alt="Right Arrow" width={22} height={20} />
                 </Box>
               </Flex>
-            </WelcomeOptionContainer>
-          </Link>
+            </Link>
+          </WelcomeOptionContainer>
           <Flex justifyContent="space-between" width={['100%', '472px']} pl="13px" pr="13px" pb="32px" pt="40px">
             {LoggedInUser && (
               <StyledLink href={`${LoggedInUser.collective?.slug}/admin`}>
