@@ -103,8 +103,7 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
     '/become-a-host',
     '/pricing',
     '/how-it-works',
-    '/fiscal-hosting',
-    '/e2c',
+    '/fiscal-hosting'
   ];
   const onHomeRoute = homeRoutes.some(isRouteActive);
 

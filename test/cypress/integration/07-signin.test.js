@@ -5,7 +5,7 @@ import { randomEmail, randomGmailEmail, randomHotMail } from '../support/faker';
 describe('signin', () => {
   it('redirects directly when using a dev test account', () => {
     cy.visit('/signin?next=/testuseradmin');
-    cy.get('input[name=email]').type('testuser+admin@opencollective.com');
+    cy.get('input[name=email]').type('testuser+admin@doohicollective.org');
     cy.get('button[type=submit]').click();
     cy.getByDataCy('collective-title').should('be.visible').contains('Test User Admin', { timeout: 15000 });
     cy.assertLoggedIn();
@@ -49,7 +49,7 @@ describe('signin', () => {
   it('redirects if token is invalid but user is already logged in', () => {
     // Sign in with test account
     cy.visit('/signin?next=/testuseradmin');
-    cy.get('input[name=email]').type('testuser+admin@opencollective.com');
+    cy.get('input[name=email]').type('testuser+admin@doohicollective.org');
     cy.get('button[type=submit]').click();
     cy.assertLoggedIn();
 
@@ -62,7 +62,7 @@ describe('signin', () => {
   });
 
   it('redirects if token is expired but user is already logged in', () => {
-    const user = { email: 'testuser+admin@opencollective.com' };
+    const user = { email: 'testuser+admin@doohicollective.org' };
 
     // Sign in with test account
     cy.visit('/signin?next=/testuseradmin');
@@ -82,19 +82,19 @@ describe('signin', () => {
 
   it('trims the email when it has trailing spaces', () => {
     cy.visit('/signin');
-    cy.get('input[name=email]').type('  user@opencollective.com  ');
-    cy.get('input[name=email]').should('have.value', 'user@opencollective.com');
+    cy.get('input[name=email]').type('  user@doohicollective.org  ');
+    cy.get('input[name=email]').should('have.value', 'user@doohicollective.org');
   });
 
   it('does not disable submit button when email has trailing spaces', () => {
     cy.visit('/signin');
-    cy.get('input[name=email]').type('  user@opencollective.com  ');
+    cy.get('input[name=email]').type('  user@doohicollective.org  ');
     cy.get('button[type=submit]').should('not.be.disabled');
   });
 
   it("doesn't go into redirect loop if given own address in redirect", () => {
     cy.visit('/signin?next=/signin');
-    cy.get('input[name=email]').type('testuser+admin@opencollective.com');
+    cy.get('input[name=email]').type('testuser+admin@doohicollective.org');
     cy.get('button[type=submit]').click();
     cy.url().should('eq', `${Cypress.config().baseUrl}/`);
   });

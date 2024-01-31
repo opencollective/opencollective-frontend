@@ -84,7 +84,7 @@ A few more notes about our team:
 
 ### Join us!
 
-We’d love to hear from you. Applications are open through June 2nd. [To apply](https://coda.io/form/Application-Open-Collective-Customer-Support-Representative_dJ3tGEm2kIw). If you have any questions, reach out to us at [support@opencollective.com](mailto:support@opencollective.com).-->
+We’d love to hear from you. Applications are open through June 2nd. [To apply](https://coda.io/form/Application-Open-Collective-Customer-Support-Representative_dJ3tGEm2kIw). If you have any questions, reach out to us at [support@doohicollective.org](mailto:support@doohicollective.org).-->
 
 <!--## [Doohi Collective Foundation](https://opencollective.foundation/): Finance Admin
 
@@ -319,7 +319,7 @@ We are looking for a senior "full-stack" software engineer who’s excited about
 
 ## Interested?
 
-Please [email us](mailto:info@opencollective.com) with "Senior Software Engineer" as subject.
+Please [email us](mailto:info@doohicollective.org) with "Senior Software Engineer" as subject.
 
 Your message should be convincing enough for us to consider you and move to the next stage. Ideally, we want you to cover the following:
 

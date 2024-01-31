@@ -40,7 +40,7 @@ export const WHO_IS_FISCAL_HOSTING_FOR = {
 
 export const HOSTS = [
   {
-    id: 'OCF',
+    id: 'DCF',
     name: 'Doohi Collective Foundation',
     location: '🇺🇸 United States',
     collectivePath: '/foundation/apply',
@@ -56,7 +56,7 @@ export const HOSTS = [
     logo: '/static/images/become-a-host/osc-logo.png',
   },
   {
-    id: 'OCE',
+    id: 'DCE',
     name: 'Doohi Collective Europe',
     location: ' 🇪🇺 Europe',
     collectivePath: '/europe/apply',
@@ -64,10 +64,10 @@ export const HOSTS = [
     logo: '/static/images/fiscal-hosting/oce.png',
   },
   {
-    id: 'OCN',
-    name: 'Doohi Collective NZ',
-    location: '🇳🇿 New Zealand',
-    collectivePath: '/ocnz/apply',
+    id: 'DCC',
+    name: 'Doohi Collective CA',
+    location: '🇨🇦 CANADA',
+    collectivePath: '/dcc/apply',
     bgImage: 'ocn-bg',
     logo: '/static/images/fiscal-hosting/ocn.png',
   },

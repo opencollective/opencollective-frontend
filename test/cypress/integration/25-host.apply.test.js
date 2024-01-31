@@ -15,7 +15,7 @@ describe('apply to host', () => {
     cy.getByDataCy('host-apply-modal-next').click();
     cy.getByDataCy('host-apply-collective-picker').click();
     cy.getByDataCy('host-apply-new-collective-link').click();
-    cy.get('#email').type('testuser@opencollective.com');
+    cy.get('#email').type('testuser@doohicollective.org');
     cy.wait(500);
     cy.getByDataCy('signin-btn').click();
     cy.get(`input[name="name"]`).type('New collective');

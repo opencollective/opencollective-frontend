@@ -15,7 +15,7 @@ export const NoSetup = {
     <TwoFactorAuthenticationSettings
       individual={{
         id: '1234',
-        email: 'test@opencollective.com',
+        email: 'test@doohicollective.org',
       }}
       userTwoFactorAuthenticationMethods={[]}
     />
@@ -27,7 +27,7 @@ export const AuthenticatorAndDevices = {
     <TwoFactorAuthenticationSettings
       individual={{
         id: '1234',
-        email: 'test@opencollective.com',
+        email: 'test@doohicollective.org',
       }}
       userTwoFactorAuthenticationMethods={[
         {

@@ -53,7 +53,7 @@ We may share information about you as follows or as otherwise described in this 
 
 ## Objections, Right To Be Forgotten, and Data Removal
 
-If you are unhappy with your information being processed, shared or stored in line with the content of this policy please email <a href="mailto:support@opencollective.com">support@opencollective.com</a> and we will work to remove public references to your activity on the site. Note that in order to maintain our accounting, tax and legal obligations we may be required to retain some private information about you once this process is complete.
+If you are unhappy with your information being processed, shared or stored in line with the content of this policy please email <a href="mailto:support@doohicollective.org">support@doohicollective.org</a> and we will work to remove public references to your activity on the site. Note that in order to maintain our accounting, tax and legal obligations we may be required to retain some private information about you once this process is complete.
 
 ## Social Sharing Features
 
@@ -93,4 +93,4 @@ Doohi Collective is GDPR compliant. We are not in the business of selling data t
 
 ## Contact Us
 
-If you have any questions about this Privacy Policy, please contact us at: <a href="mailto:support@opencollective.com">support@opencollective.com</a>
+If you have any questions about this Privacy Policy, please contact us at: <a href="mailto:support@doohicollective.org">support@doohicollective.org</a>
