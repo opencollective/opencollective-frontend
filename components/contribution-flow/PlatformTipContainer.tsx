@@ -188,7 +188,7 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
         <Flex alignItems="center" gap={10}>
           <Image alt="Platform Tip" src="/static/images/platform-tip-jar.png" height={64} width={64} />
           <Box flexGrow={1} fontWeight="500" fontSize="20px">
-            <FormattedMessage defaultMessage="Help us keep Open Collective sustainable" />
+            <FormattedMessage defaultMessage="Help us keep Doohi Collective sustainable" />
           </Box>
         </Flex>
         <P my="12px" fontWeight="400" fontSize="16px">
@@ -248,7 +248,7 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
                 }
                 label={
                   <span className="text-sm">
-                    <FormattedMessage defaultMessage="I don't want to contribute to Open Collective" />
+                    <FormattedMessage defaultMessage="I don't want to contribute to Doohi Collective" />
                   </span>
                 }
               />

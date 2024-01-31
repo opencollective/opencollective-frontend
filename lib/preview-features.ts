@@ -30,7 +30,7 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.DASHBOARD,
     title: 'Dashboard',
     description:
-      'A central space to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations.',
+      'A central space to keep on top of everything you do in Doohi Collective, from tracking your expenses to managing organizations.',
     publicBeta: true,
     enabledByDefaultFor: ['*'],
     env: ['development', 'staging', 'production'],

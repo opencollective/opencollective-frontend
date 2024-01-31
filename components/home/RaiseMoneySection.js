@@ -212,7 +212,7 @@ const RaiseMoney = () => {
             <FormattedMessage
               id="home.raiseMoney.description2"
               defaultMessage={
-                "Whether you're a <mutualAidLink>mutual aid group</mutualAidLink>, a <communityLink>community initiative</communityLink>, an <opensourceLink>open-source software project</opensourceLink>, or a <climateLink>climate change activist</climateLink>, Open Collective helps groups unlock access to money."
+                "Whether you're a <mutualAidLink>mutual aid group</mutualAidLink>, a <communityLink>community initiative</communityLink>, an <opensourceLink>open-source software project</opensourceLink>, or a <climateLink>climate change activist</climateLink>, Doohi Collective helps groups unlock access to money."
               }
               values={{
                 u: I18nUnderline,

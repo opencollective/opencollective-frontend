@@ -20,7 +20,7 @@ const PlatformTip = ({ ...props }) => (
     <P fontSize="12px" lineHeight="18px" color="black.800">
       <FormattedMessage
         id="pricing.platformTips"
-        defaultMessage="<strong>Platform Tips</strong><br></br>Open Collective is supported by voluntary contributions called Platform Tips, optionally added at checkout, which enable us to keep building the software without charging Collectives directly."
+        defaultMessage="<strong>Platform Tips</strong><br></br>Doohi Collective is supported by voluntary contributions called Platform Tips, optionally added at checkout, which enable us to keep building the software without charging Collectives directly."
         values={{
           a: getI18nLink({
             href: 'https://docs.opencollective.com/help/financial-contributors/financial-contributors',

@@ -24,7 +24,7 @@ export const SUCCESS_CTA_TYPE = {
 const headerMessages = defineMessages({
   [SUCCESS_CTA_TYPE.JOIN]: {
     id: 'collective.create.join',
-    defaultMessage: 'Join Open Collective',
+    defaultMessage: 'Join Doohi Collective',
   },
   [SUCCESS_CTA_TYPE.SIGN_IN]: {
     id: 'signIn',
@@ -50,19 +50,19 @@ const contentMessages = defineMessages({
   },
   [SUCCESS_CTA_TYPE.SIGN_IN]: {
     id: 'NewContributionFlow.Success.CTA.SignIn.Content',
-    defaultMessage: 'Sign in with your Open Collective account to edit your profile and manage your contributions.',
+    defaultMessage: 'Sign in with your Doohi Collective account to edit your profile and manage your contributions.',
   },
   [SUCCESS_CTA_TYPE.BLOG]: {
     id: 'NewContributionFlow.Success.CTA.Read.Content',
     defaultMessage:
-      "Open Collective aims to foster transparency and sustainability in communities around the world. Here's how you can participate.",
+      "Doohi Collective aims to foster transparency and sustainability in communities around the world. Here's how you can participate.",
   },
   [SUCCESS_CTA_TYPE.NEWSLETTER]: {
     id: 'home.joinUsSection.weNeedUpdate',
     defaultMessage: 'We send updates once a month.',
   },
   [SUCCESS_CTA_TYPE.GO_TO_PROFILE]: {
-    defaultMessage: 'Go to the public page of {accountName} on Open Collective',
+    defaultMessage: 'Go to the public page of {accountName} on Doohi Collective',
   },
 });
 

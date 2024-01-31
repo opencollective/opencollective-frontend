@@ -12,7 +12,7 @@ import Page from '../components/Page';
 const messages = defineMessages({
   defaultTitle: {
     id: 'OC.howItWorks',
-    defaultMessage: 'How Open Collective works',
+    defaultMessage: 'How Doohi Collective works',
   },
   feature: {
     id: 'howItWorks.features',

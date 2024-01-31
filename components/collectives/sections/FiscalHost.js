@@ -95,7 +95,7 @@ const messages = defineMessages({
 const featuredHosts = [
   {
     id: 'OCF',
-    name: 'Open Collective Foundation',
+    name: 'Doohi Collective Foundation',
     collectivePageLink: '/foundation',
     imageUrl: 'https://images.opencollective.com/foundation/a7d522f/logo/256.png',
   },
@@ -107,7 +107,7 @@ const featuredHosts = [
   },
   {
     id: 'OCE',
-    name: 'Open Collective Europe',
+    name: 'Doohi Collective Europe',
     collectivePageLink: '/europe',
     imageUrl: 'https://images.opencollective.com/europe/019a512/logo/256.png',
   },

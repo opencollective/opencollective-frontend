@@ -41,7 +41,7 @@ const shouldRedirectDirectly = urlStr => {
 };
 
 /**
- * A page to use whenever you need to redirect to a page that may be external to Open Collective.
+ * A page to use whenever you need to redirect to a page that may be external to Doohi Collective.
  * The page displays a confirmation to make sure that user is aware of being redirected, to prevent
  * phishing attacks.
  */
@@ -87,7 +87,7 @@ const ExternalRedirectPage = () => {
               <P fontSize="14px" lineHeight="20px" my={3}>
                 <FormattedMessage
                   id="externalRedirect.message"
-                  defaultMessage="Your request is currently being redirected to {redirect}. For the safety and privacy of your Open Collective account, remember to never enter your credentials unless you're on the real Open Collective website."
+                  defaultMessage="Your request is currently being redirected to {redirect}. For the safety and privacy of your Doohi Collective account, remember to never enter your credentials unless you're on the real Doohi Collective website."
                   values={{ redirect: <Strong wordBreak="break-all">{query.url}</Strong> }}
                 />
               </P>

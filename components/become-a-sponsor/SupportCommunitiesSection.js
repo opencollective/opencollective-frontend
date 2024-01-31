@@ -43,7 +43,7 @@ const SupportCommunities = () => (
         >
           <FormattedMessage
             id="becomeASponsor.supportCommunities.description"
-            defaultMessage="The Open Collective platform enables fiscal sponsor entities to host unincorporated groups, giving them a legal structure you can engage with."
+            defaultMessage="The Doohi Collective platform enables fiscal sponsor entities to host unincorporated groups, giving them a legal structure you can engage with."
           />
         </P>
       </Box>

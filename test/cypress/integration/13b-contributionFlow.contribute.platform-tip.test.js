@@ -78,12 +78,12 @@ describe('Contribution Flow: contribute with platform tips', () => {
       .then(() => {
         expect(confirmStub).to.be.calledOnce;
         expect(confirmStub).to.be.calledWith(
-          'You are about to make a contribution of $98.00 to TestCollective that includes a $48.00 tip to the Open Collective platform. The tip amount looks unusually high.\n\nAre you sure you want to do this?',
+          'You are about to make a contribution of $98.00 to TestCollective that includes a $48.00 tip to the Doohi Collective platform. The tip amount looks unusually high.\n\nAre you sure you want to do this?',
         );
       });
 
     // ---- Opt out ----
-    cy.contains(`I don't want to contribute to Open Collective`).click();
+    cy.contains(`I don't want to contribute to Doohi Collective`).click();
 
     // Removes the tip
     cy.getByDataCy('ContributionSummary-Tip').should('not.exist');

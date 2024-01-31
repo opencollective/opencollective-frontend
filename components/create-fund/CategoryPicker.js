@@ -75,7 +75,7 @@ const CreateFundCategoryPicker = () => {
                 <P textAlign="center">
                   It will be hosted by
                   <br />
-                  Open Collective Foundation 501(c)(3).
+                  Doohi Collective Foundation 501(c)(3).
                 </P>
               </Flex>
             </Container>
@@ -104,7 +104,7 @@ const CreateFundCategoryPicker = () => {
                 <P textAlign="center">
                   It will be hosted by
                   <br />
-                  Open Collective Europe Foundation
+                  Doohi Collective Europe Foundation
                 </P>
               </Flex>
             </Container>

@@ -6,13 +6,13 @@ Do you want to get paid to work on your passion for open source, mutual aid, and
 
 ![](https://blog.opencollective.com/content/images/2022/10/P1199711-ANIMATION.gif)
 
-Open Collective is a financial and legal toolbox for grassroots groups. We support 15,000 groups and 30+ nonprofits around the world with one shared backend solution for fundraising and money management. This year our Collectives are on track to raise and spend $35 million dollars in full transparency.
+Doohi Collective is a financial and legal toolbox for grassroots groups. We support 15,000 groups and 30+ nonprofits around the world with one shared backend solution for fundraising and money management. This year our Collectives are on track to raise and spend $35 million dollars in full transparency.
 
 <strong>All position are currently filled, check back later! You can still send a spontaneous application if you wish.</strong>
 
 <!--## Customer Support Representative
 
-[Open Collective](https://opencollective.com/) is currently seeking a Customer Support Representative who is passionate about the future of money, collective work, transparent budgets, open source, mutual aid, and distributed leadership.
+[Doohi Collective](https://opencollective.com/) is currently seeking a Customer Support Representative who is passionate about the future of money, collective work, transparent budgets, open source, mutual aid, and distributed leadership.
 
 ### Responsibilities
 
@@ -35,13 +35,13 @@ This position requires:
 
 We want to work with someone who is:
 
-- Inspired by Open Collective’s mission to make communities sustainable
-- Excited to support/educate our users to make the best use of the Open Collective platform
+- Inspired by Doohi Collective’s mission to make communities sustainable
+- Excited to support/educate our users to make the best use of the Doohi Collective platform
 - Self-motivated and autonomous, able to thrive in our fully remote, asynchronous environment
 - Detail-oriented, practical and organized
 - Great at handling information overload and finding the path forward
 - Flexible and comfortable working in a fast-paced startup environment
-- Eager to understand the ins and outs of the Open Collective software platform
+- Eager to understand the ins and outs of the Doohi Collective software platform
 - Experienced with working openly or excited to develop this practice
 
 Not required, but a bonus:
@@ -49,7 +49,7 @@ Not required, but a bonus:
 - Fluency in language(s) other than English (we have users all over the world)
 - Basic experience with databases (we use PostgreSQL) and/or Metabase to identify and fix data related issues
 - Experience writing or updating user guides/documentation
-- Experience working with online tools like Slack for daily communication, Loom for asynchronous recordings, Google for file sharing and copy editing, Coda for everything, Loomio for decision making, GitHub for product development, and Around for video-conferencing (extra points if you’ve used Open Collective, of course!)
+- Experience working with online tools like Slack for daily communication, Loom for asynchronous recordings, Google for file sharing and copy editing, Coda for everything, Loomio for decision making, GitHub for product development, and Around for video-conferencing (extra points if you’ve used Doohi Collective, of course!)
 - Experience in collaborative communities like the ones that use our platform (open source projects, art collectives, cooperatives, activist groups, solidarity economy projects)
 
 ### Compensation and benefits
@@ -63,17 +63,17 @@ Not required, but a bonus:
 - An opportunity (though not strictly required) to travel when we have full-team in-person retreats with transportation, accommodation, and meals covered during our time together (the last one was in September 2022 in La Ciotat, France)
 - Opportunity to grow in the role, with support for professional development and encouragement to influence strategy and share ideas
 
-### A little about Open Collective
+### A little about Doohi Collective
 
-[Open Collective](https://opencollective.com/), an open-source software company founded in 2015, is committed to supporting grassroots groups and communities around the world with transparent fundraising, money management, and legal tools. We're proud to have supported over 15,000 groups and 30+ nonprofits globally, raising and spending $35 million dollars in full transparency. Our platform helps open source projects, community projects, and mutual aid groups thrive all over the world, and we are on a long-term path toward [community governance](http://opencollective.com/e2c).
+[Doohi Collective](https://opencollective.com/), an open-source software company founded in 2015, is committed to supporting grassroots groups and communities around the world with transparent fundraising, money management, and legal tools. We're proud to have supported over 15,000 groups and 30+ nonprofits globally, raising and spending $35 million dollars in full transparency. Our platform helps open source projects, community projects, and mutual aid groups thrive all over the world, and we are on a long-term path toward [community governance](http://opencollective.com/e2c).
 
-“Open Collective” means transparency (“Open”) and community (“Collective”), and thus our platform is built on values of openness, transparency, and collective collaboration. The team is a group of optimistic, driven, nerdy, and open people. Our culture, though ever-changing and sometimes chaotic like many start-ups, is also oriented toward care, candor, rigor, generosity, and autonomy. (You can read more about our values in our [Community Guidelines](https://docs.opencollective.com/help/about/the-open-collective-way/community-guidelines).)
+“Doohi Collective” means transparency (“Open”) and community (“Collective”), and thus our platform is built on values of openness, transparency, and collective collaboration. The team is a group of optimistic, driven, nerdy, and open people. Our culture, though ever-changing and sometimes chaotic like many start-ups, is also oriented toward care, candor, rigor, generosity, and autonomy. (You can read more about our values in our [Community Guidelines](https://docs.opencollective.com/help/about/the-open-collective-way/community-guidelines).)
 
 Our international, fully-remote, highly-collaborative team currently includes members in Spain, France, Belgium, Germany, the UK, Romania, the United States, Mexico, Canada, Indonesia, Brazil, India, and New Zealand. To learn more about the company, [watch this 50-second video](https://www.youtube.com/watch?v=SfHeSpoSHTM), skim through our [blog](https://blog.opencollective.com), and read about our [strategy](https://blog.opencollective.com/oc-strategy-2023-2024/). We look forward to learning more about you, too!
 
 ### The support team
 
-The support team at Open Collective is currently based in Indonesia, Canada, the UK, and the US. We are responsible for providing exceptional customer service and support to our users, ensuring that their inquiries and concerns are resolved in a timely and professional manner. We are a new and growing team, and we need to your help as we continually improve and optimize our user support systems, utilizing performance analytic reports to inform strategic decision-making and reduce workload and ticket response times, while - of course - continuing to provide quality customer support.
+The support team at Doohi Collective is currently based in Indonesia, Canada, the UK, and the US. We are responsible for providing exceptional customer service and support to our users, ensuring that their inquiries and concerns are resolved in a timely and professional manner. We are a new and growing team, and we need to your help as we continually improve and optimize our user support systems, utilizing performance analytic reports to inform strategic decision-making and reduce workload and ticket response times, while - of course - continuing to provide quality customer support.
 
 A few more notes about our team:
 
@@ -86,15 +86,15 @@ A few more notes about our team:
 
 We’d love to hear from you. Applications are open through June 2nd. [To apply](https://coda.io/form/Application-Open-Collective-Customer-Support-Representative_dJ3tGEm2kIw). If you have any questions, reach out to us at [support@opencollective.com](mailto:support@opencollective.com).-->
 
-<!--## [Open Collective Foundation](https://opencollective.foundation/): Finance Admin
+<!--## [Doohi Collective Foundation](https://opencollective.foundation/): Finance Admin
 
 $60k/year for 40 hrs/wk (or 30 hrs/wk pro rata). Must live in the US. Applications open until March 24th.
 
-[Open Collective Foundation (OCF)](http://opencollective.foundation/) is a nonprofit fiscal sponsor with an open source tech platform, that is enabling 500+ groups to access 501(c)(3) status and fundraise in full transparency. [Our Collectives](https://opencollective.com/foundation#category-CONTRIBUTIONS) include mutual aid groups, public interest open source tech, social justice movements, humanitarian aid, climate action, and many kinds of communities with missions focused on education, civic engagement, and positive social impact. [Solidarity is our guiding principle](https://blog.opencollective.com/solidarity-as-our-guiding-principle/). Our Collectives raised over $30m in 2022, representing 100x growth since 2019. We are scaling our team to meet increasing demand.
+[Doohi Collective Foundation (OCF)](http://opencollective.foundation/) is a nonprofit fiscal sponsor with an open source tech platform, that is enabling 500+ groups to access 501(c)(3) status and fundraise in full transparency. [Our Collectives](https://opencollective.com/foundation#category-CONTRIBUTIONS) include mutual aid groups, public interest open source tech, social justice movements, humanitarian aid, climate action, and many kinds of communities with missions focused on education, civic engagement, and positive social impact. [Solidarity is our guiding principle](https://blog.opencollective.com/solidarity-as-our-guiding-principle/). Our Collectives raised over $30m in 2022, representing 100x growth since 2019. We are scaling our team to meet increasing demand.
 
 ### What Makes Us Different
 
-OCF is a tech-first nonprofit. We are one node in a growing international network of 30+ fiscal sponsor organizations who use [Open Collective](https://opencollective.com/), an open source software platform for transparent fundraising and money management, to create efficiencies with money and amplify impact in communities. Globally, the network supports 15,000+ Collectives. Our tech platform and mission are all about transparency, collective collaboration, and practicality—we apply the same principles to how we run OCF as an organization.
+OCF is a tech-first nonprofit. We are one node in a growing international network of 30+ fiscal sponsor organizations who use [Doohi Collective](https://opencollective.com/), an open source software platform for transparent fundraising and money management, to create efficiencies with money and amplify impact in communities. Globally, the network supports 15,000+ Collectives. Our tech platform and mission are all about transparency, collective collaboration, and practicality—we apply the same principles to how we run OCF as an organization.
 
 ### Learn more
 
@@ -121,7 +121,7 @@ An operations and community-oriented person who is:
 
 - Excited to be a driving force behind our operational functions and to support our Collectives to make the best use of our services
 - Self-motivated and autonomous, to thrive in our fully remote, high-trust, low-hierarchy environment
-- Comfortable with and excited about technology, able to learn new digital tools quickly, and eager to understand the ins and outs of the Open Collective software platform
+- Comfortable with and excited about technology, able to learn new digital tools quickly, and eager to understand the ins and outs of the Doohi Collective software platform
 - Based in the United States
 
 #### Additional desired experience
@@ -130,7 +130,7 @@ An operations and community-oriented person who is:
 
 - Fiscal sponsorship
 - Fast-growth organizations and start-ups
-- Tech tools like Slack, Loom, Google Workspace, Trello, Loomio, GitHub (extra points if you’ve used Open Collective, of course!)
+- Tech tools like Slack, Loom, Google Workspace, Trello, Loomio, GitHub (extra points if you’ve used Doohi Collective, of course!)
 - Experience in collectives, cooperatives, activism, radical movements, solidarity economy
 
 ### Compensation & role details
@@ -156,13 +156,13 @@ Must live within 4 hrs of EST time zone. Applications open until February 17th.
 
 ### What Makes Us Different
 
-OSC is a tech-first nonprofit. We are one node in a growing international network of 30+ fiscal sponsor organizations who use [Open Collective](https://opencollective.com/), an open source software platform for transparent fundraising and money management, to create efficiencies with money and amplify impact in communities. Globally, the network supports 15,000 groups to raise and spend $35M a year. Our tech platform and mission are all about transparency, collective collaboration, and practicality—and we apply the same principles to how we run OSC as an organization.
+OSC is a tech-first nonprofit. We are one node in a growing international network of 30+ fiscal sponsor organizations who use [Doohi Collective](https://opencollective.com/), an open source software platform for transparent fundraising and money management, to create efficiencies with money and amplify impact in communities. Globally, the network supports 15,000 groups to raise and spend $35M a year. Our tech platform and mission are all about transparency, collective collaboration, and practicality—and we apply the same principles to how we run OSC as an organization.
 
 ### Learn more
 
 - OSC's [Website](https://www.oscollective.org/), [mission & values](https://docs.oscollective.org/mission-values-and-strategy), and [strategy](https://blog.opencollective.com/open-source-collectives-strategy-2022-2025/)
 - [What is Open Source Collective (video)](https://www.youtube.com/watch?v=ubfYuAMm3_c)
-- [What is Open Collective (video)](https://www.youtube.com/@OpenCollective)
+- [What is Doohi Collective (video)](https://www.youtube.com/@OpenCollective)
 - [Our documentation](https://docs.oscollective.org/)
 
 ### Who we're looking for
@@ -171,7 +171,7 @@ An operations and community oriented person who is:
 
 - Excited to support our Collectives to make the best use of our services
 - Self-motivated and autonomous, able to thrive in our fully remote, high-trust, low-hierarchy environment
-- Technology driven, able to learn new digital tools quickly, and eager to understand the ins and outs of the Open Collective software platform
+- Technology driven, able to learn new digital tools quickly, and eager to understand the ins and outs of the Doohi Collective software platform
 - Experienced with working openly or excited to develop this practice
 
 ### Must-have skills
@@ -187,7 +187,7 @@ An operations and community oriented person who is:
 
 - 501(c)(3) or (c)(6) nonprofit and/or fiscal sponsorship
 - Fast-growth organizations and start-ups
-- Tech tools like Slack, Loom, Airtable, Google Workspace, Asana, Loomio & GitHub (extra points if you’ve used Open Collective, of course!)
+- Tech tools like Slack, Loom, Airtable, Google Workspace, Asana, Loomio & GitHub (extra points if you’ve used Doohi Collective, of course!)
 
 ### Compensation & role details
 
@@ -207,17 +207,17 @@ Please fill out [this form](https://docs.google.com/forms/d/e/1FAIpQLSfRC2ZivuNQ
 If you have questions, reach out to [hello@oscollective.org](mailto:hello@oscollective.org)-->
 
 <!--
-Right now, [Open Collective](https://opencollective.com) is hiring for a Senior UX Designer.
+Right now, [Doohi Collective](https://opencollective.com) is hiring for a Senior UX Designer.
 
 ## Senior UX Designer
 
-Pay $48K-$60K/year, open to applicants worldwide, role with Open Collective Inc.
+Pay $48K-$60K/year, open to applicants worldwide, role with Doohi Collective Inc.
 
 We are looking for a Senior UX designer who is passionate about: the future of money, collective work, transparent budgets, open source, mutual aid, and distributed leadership. If this describes you, and you are happy with remote and asynchronous work (except for mandatory stand-up calls at 9am ET / 3pm CET weekdays), read more.
 
 ### About
 
-**The design team at [Open Collective](https://opencollective.com)** is currently based in Mexico, India, Brazil, and the United States. It is responsible for planning, designing, and delivering the features that will make this goal possible in a way that embraces the contributions of multiple designers and creatives worldwide. So far, we have not had a UX-focused designer and we are thrilled to add this skillset to the team.
+**The design team at [Doohi Collective](https://opencollective.com)** is currently based in Mexico, India, Brazil, and the United States. It is responsible for planning, designing, and delivering the features that will make this goal possible in a way that embraces the contributions of multiple designers and creatives worldwide. So far, we have not had a UX-focused designer and we are thrilled to add this skillset to the team.
 
 ### As a senior UX designer, you will:
 
@@ -243,7 +243,7 @@ We are looking for a Senior UX designer who is passionate about: the future of m
 
 ### Pay
 
-Open Collective exists to sustain contributors to the commons, including our team. Our budgets and salaries are transparent and based on where you live. We estimate that this role will require $48K - $60K for you to show up joyfully to work (We will propose you something based on your skills and situation). Our aim is that you can earn a good livelihood, have a great work-life balance, and join a team that truly practices what it preaches - no bullshit.
+Doohi Collective exists to sustain contributors to the commons, including our team. Our budgets and salaries are transparent and based on where you live. We estimate that this role will require $48K - $60K for you to show up joyfully to work (We will propose you something based on your skills and situation). Our aim is that you can earn a good livelihood, have a great work-life balance, and join a team that truly practices what it preaches - no bullshit.
 
 ### Perks
 
@@ -254,7 +254,7 @@ Additional to the monetary compensation, we offer a couple of extra perks:
 
 ### Values
 
-We are a group of optimistic, driven, nerdy, and open people. Open Collective stands for Transparency (“open”) and Group Work (“collective”).
+We are a group of optimistic, driven, nerdy, and open people. Doohi Collective stands for Transparency (“open”) and Group Work (“collective”).
 
 **OPEN**: Our product is built to help groups with financial transparency, and all of our internal team salaries, organizational files, code, and designs are open, too. See our [issue repo](https://github.com/opencollective/opencollective/issues) and [design budget transactions](https://opencollective.com/design/transactions).
 
@@ -274,7 +274,7 @@ Please fill out [this form](https://x7rwr9qad3h.typeform.com/to/lySp1Tfn) to app
 
 ## A little about us
 
-On Open Collective, groups like open source projects, neighbourhood associations, mutual aid groups, and more, can collect and spend money transparently, invite collaboration, and help their communities thrive.
+On Doohi Collective, groups like open source projects, neighbourhood associations, mutual aid groups, and more, can collect and spend money transparently, invite collaboration, and help their communities thrive.
 
 Watch this video about what we do and why we are passionate about it:
 
@@ -282,7 +282,7 @@ Watch this video about what we do and why we are passionate about it:
 
 Like the movements that we support, we value openness and transparency. We strive to create inclusive, respectful and sustainable communities and we're 100% open source.
 
-If you want to know more about us, join our open [Slack](https://slack.opencollective.com), read [our blog](https://blog.opencollective.com), and check out the [Open Collective Way](https://docs.opencollective.com/help/about/the-open-collective-way) to understand our values and how we work.
+If you want to know more about us, join our open [Slack](https://slack.opencollective.com), read [our blog](https://blog.opencollective.com), and check out the [Doohi Collective Way](https://docs.opencollective.com/help/about/the-open-collective-way) to understand our values and how we work.
 
 We are a fully remote team that loves distributed collaboration around the world: Spain, France, Belgium, Germany, Romania, UK, US, Canada, Mexico, Brazil, India, New Zealand. This start-up culture is truly different – one of care, listening, rigor, and autonomy within collaboration. If you are used to cut-throat dynamics and overwork, you will be happy to find another way is possible.
 
@@ -324,8 +324,8 @@ Please [email us](mailto:info@opencollective.com) with "Senior Software Engineer
 Your message should be convincing enough for us to consider you and move to the next stage. Ideally, we want you to cover the following:
 
 - About you. What's your story? Where you are coming from? What's you current status?
-- About us. How did you hear about Open Collective? What do you find interesting in Open Collective?
-- Experience. What is your greatest achievment in software engineering? Can you tell us about a past project you're proud of (it doesn’t have to be an engineering one or even a technical one.)? What do you think you can bring to Open Collective?
+- About us. How did you hear about Doohi Collective? What do you find interesting in Doohi Collective?
+- Experience. What is your greatest achievment in software engineering? Can you tell us about a past project you're proud of (it doesn’t have to be an engineering one or even a technical one.)? What do you think you can bring to Doohi Collective?
 
 As part of our screening process, we'll also ask you to make a small contribution to [our codebase](https://github.com/opencollective). Have a look, do one now or be ready for it!
 -->

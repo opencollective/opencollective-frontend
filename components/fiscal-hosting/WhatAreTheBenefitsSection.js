@@ -156,7 +156,7 @@ const WhatAreTheBenefits = () => {
           <Description>
             <FormattedMessage
               id="fiscalHosting.whatAreTheBenefits.moneyManagement.description"
-              defaultMessage="Using your personal bank account can complicate your taxes, and it locks out other team members. A fiscal host holds money on your behalf in its bank account, tracking everything transparently on Open Collective. Everyone can have access to see the budget and to tools for fundraising and requesting payouts."
+              defaultMessage="Using your personal bank account can complicate your taxes, and it locks out other team members. A fiscal host holds money on your behalf in its bank account, tracking everything transparently on Doohi Collective. Everyone can have access to see the budget and to tools for fundraising and requesting payouts."
             />
           </Description>
         </Box>

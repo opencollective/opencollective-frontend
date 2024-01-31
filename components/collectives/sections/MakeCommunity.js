@@ -63,7 +63,7 @@ const MakeCommunity = () => {
             <MainDescription mt={1} mb={4} textAlign={['center', 'left']}>
               <FormattedMessage
                 id="home.makeCommunitySection.description"
-                defaultMessage="Community is about trust and sharing. Open Collective lets you manage your finances so everyone can see where money comes from and where it goes."
+                defaultMessage="Community is about trust and sharing. Doohi Collective lets you manage your finances so everyone can see where money comes from and where it goes."
               />{' '}
               <Span fontWeight="bold" display={['none', 'inline']}>
                 <FormattedMessage
@@ -104,7 +104,7 @@ const MakeCommunity = () => {
           />
         </Flex>
       </Flex>
-      {/* What is great about Open Collective? */}
+      {/* What is great about Doohi Collective? */}
       <Container
         display={'flex'}
         justifyContent="center"
@@ -122,7 +122,7 @@ const MakeCommunity = () => {
           display={[null, 'none']}
           textAlign="center"
         >
-          <FormattedMessage id="home.whatIsGreatAboutOC" defaultMessage="What's great about Open Collective?" />
+          <FormattedMessage id="home.whatIsGreatAboutOC" defaultMessage="What's great about Doohi Collective?" />
         </H2>
         <Box width={['320px', '414px', '548px', null, '696px']} mr={[null, 3, null, null, 4]}>
           <NextIllustration
@@ -141,7 +141,7 @@ const MakeCommunity = () => {
             color="primary.900"
             display={['none', 'block']}
           >
-            <FormattedMessage id="home.whatIsGreatAboutOC" defaultMessage="What's great about Open Collective?" />
+            <FormattedMessage id="home.whatIsGreatAboutOC" defaultMessage="What's great about Doohi Collective?" />
           </H2>
           <P
             letterSpacing={['-0.12px', '-0.16px', '-0.2px']}

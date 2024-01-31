@@ -229,7 +229,7 @@ const ProfileMenuMemberships = ({ user }) => {
     <React.Fragment>
       {hasNoMemberships && (
         <P color="blue.900" fontSize="20px" lineHeight="28px" fontWeight="bold" mt="8px" mb="12px">
-          <FormattedMessage id="ProfileMenuMemberships.Empty" defaultMessage="Make the most out of Open Collective" />
+          <FormattedMessage id="ProfileMenuMemberships.Empty" defaultMessage="Make the most out of Doohi Collective" />
         </P>
       )}
       {Object.keys(MENU_SECTIONS)

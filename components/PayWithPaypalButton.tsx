@@ -150,7 +150,7 @@ class PayWithPaypalButton extends Component<PayWithPaypalButtonProps, { isLoadin
           plan_id: this.props.data.paypalPlan.id,
           start_time: this.props.subscriptionStartDate,
           application_context: {
-            brand_name: `${truncate(this.props.collective.name, { length: 108 })} - Open Collective`,
+            brand_name: `${truncate(this.props.collective.name, { length: 108 })} - Doohi Collective`,
             locale: this.props.intl.locale,
             shipping_preference: 'NO_SHIPPING',
             user_action: 'CONTINUE',
@@ -166,7 +166,7 @@ class PayWithPaypalButton extends Component<PayWithPaypalButtonProps, { isLoadin
         return actions.order.create({
           intent: 'AUTHORIZE',
           application_context: {
-            brand_name: `${truncate(this.props.collective.name, { length: 108 })} - Open Collective`,
+            brand_name: `${truncate(this.props.collective.name, { length: 108 })} - Doohi Collective`,
             locale: this.props.intl.locale,
             shipping_preference: 'NO_SHIPPING',
             user_action: 'CONTINUE',

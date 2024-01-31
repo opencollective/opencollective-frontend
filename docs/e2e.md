@@ -13,7 +13,7 @@ In dev environment, to execute the E2E tests, you will need to open 3 different 
 
 ### 1. API: Server
 
-To make sure tests are properly reproducible, you will need to setup the Open Collective API locally.
+To make sure tests are properly reproducible, you will need to setup the Doohi Collective API locally.
 
 We recommend to run a build and not the development environment.
 

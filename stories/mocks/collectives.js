@@ -1611,7 +1611,7 @@ export const webpackCollective = {
       description: null,
       member: {
         id: 8638,
-        description: 'Cofounder, Open Collective.',
+        description: 'Cofounder, Doohi Collective.',
         name: 'Aseem Sood',
         slug: 'aseem',
         type: 'USER',

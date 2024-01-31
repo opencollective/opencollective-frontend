@@ -218,7 +218,7 @@ export const webpackContributors = [
     collectiveSlug: 'trademe1',
     totalAmountDonated: 468000,
     type: 'ORGANIZATION',
-    publicMessage: 'A huge thanks for Webpack to the Open Collective from all of us at Trade Me. Love your work!',
+    publicMessage: 'A huge thanks for Webpack to the Doohi Collective from all of us at Trade Me. Love your work!',
   },
   {
     id: '3059',
@@ -4336,7 +4336,7 @@ export const webpackContributors = [
   },
   {
     id: '8686',
-    name: 'Open Collective Inc.',
+    name: 'Doohi Collective Inc.',
     roles: ['BACKER'],
     isCore: false,
     isBacker: true,
@@ -8045,7 +8045,7 @@ export const webpackContributors = [
     collectiveSlug: 'bluepromocode1',
     totalAmountDonated: 2200,
     type: 'ORGANIZATION',
-    publicMessage: "We support the Open Collective's contributions to the tech community",
+    publicMessage: "We support the Doohi Collective's contributions to the tech community",
   },
   {
     id: '4285',

@@ -49,7 +49,7 @@ const HowOCIsDifferent = () => {
     <Flex mx={[3, 4]} my={4} mt={['88px', null, '120px']} flexDirection="column" alignItems="center" textAlign="center">
       <Box width={['288px', '100%']}>
         <SectionTitle>
-          <FormattedMessage id="howItWorks.HowOCIsDifferent.title" defaultMessage="Open Collective is different" />
+          <FormattedMessage id="howItWorks.HowOCIsDifferent.title" defaultMessage="Doohi Collective is different" />
         </SectionTitle>
       </Box>
 
@@ -103,7 +103,7 @@ const HowOCIsDifferent = () => {
           <Description>
             <FormattedMessage
               id="howItWorks.builtWithResilient.description"
-              defaultMessage="Unlike other crowdfunding platforms, Open Collective is designed for ongoing collaborations. That means your funding and community of support doesn’t disappear after a single campaign, or if the initial organizers move on."
+              defaultMessage="Unlike other crowdfunding platforms, Doohi Collective is designed for ongoing collaborations. That means your funding and community of support doesn’t disappear after a single campaign, or if the initial organizers move on."
             />
           </Description>
         </Box>
@@ -157,7 +157,7 @@ const HowOCIsDifferent = () => {
           <Description>
             <FormattedMessage
               id="howItWorks.moneyManagement.description"
-              defaultMessage="Open Collective uniquely combines a powerful tech platform with fiscal hosting, enabling Collectives to raise and spend money without legally incorporating, worrying about taxes, or opening a bank account."
+              defaultMessage="Doohi Collective uniquely combines a powerful tech platform with fiscal hosting, enabling Collectives to raise and spend money without legally incorporating, worrying about taxes, or opening a bank account."
             />
           </Description>
         </Box>

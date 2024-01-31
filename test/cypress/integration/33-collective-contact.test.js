@@ -20,14 +20,14 @@ describe('Contact collective', () => {
   it("Can't contact organizations", () => {
     cy.createCollective({ type: 'ORGANIZATION' }).then(org => {
       cy.login({ redirect: `/${org.slug}/contact` });
-      cy.contains("This Collective can't be contacted via Open Collective.");
+      cy.contains("This Collective can't be contacted via Doohi Collective.");
     });
   });
 
   it("Can't contact inactive collectives", () => {
     cy.createCollective({ type: 'COLLECTIVE' }).then(org => {
       cy.login({ redirect: `/${org.slug}/contact` });
-      cy.contains("This Collective can't be contacted via Open Collective.");
+      cy.contains("This Collective can't be contacted via Doohi Collective.");
     });
   });
 

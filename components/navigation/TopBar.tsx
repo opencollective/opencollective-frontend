@@ -177,7 +177,7 @@ const TopBar = ({ account }: TopBarProps) => {
             <Box flexShrink={0}>
               <Link href={ocLogoRoute}>
                 <Flex alignItems="center" gridGap={2}>
-                  <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />
+                  <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Doohi Collective" />
                 </Flex>
               </Link>
             </Box>

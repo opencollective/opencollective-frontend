@@ -14,13 +14,13 @@ import { H2, P, Span } from '../Text';
 const blogEntries = [
   {
     imageSrc: '/static/images/e2c/blog-1.png',
-    title: `Early musings on "Exit to Community" for Open Collective`,
+    title: `Early musings on "Exit to Community" for Doohi Collective`,
     link: 'https://blog.opencollective.com/exit-to-community/',
     date: 'Oct 18 2021',
   },
   {
     imageSrc: '/static/images/e2c/blog-2.png',
-    title: `Pathways for Open Collective’s “Exit to Community”`,
+    title: `Pathways for Doohi Collective’s “Exit to Community”`,
     link: 'https://blog.opencollective.com/exit-to-community-part-2/',
     date: 'Oct 24 2021',
   },
@@ -32,7 +32,7 @@ const blogEntries = [
   },
   {
     imageSrc: '/static/images/e2c/blog-4.png',
-    title: `Deep dive: community stewardship of Open Collective through a Perpetual Purpose Trust`,
+    title: `Deep dive: community stewardship of Doohi Collective through a Perpetual Purpose Trust`,
     link: 'https://blog.opencollective.com/ppt/',
     date: 'Mar 10 2022',
   },
@@ -150,7 +150,7 @@ const LearnWithUs = () => (
         <P fontSize="18px" lineHeight="26px" color="black.800" fontWeight="500" mb="24px">
           <FormattedMessage
             id="e2c.learnWithUs.description"
-            defaultMessage="Sign up to be notified of live conversations with our CEO Pia Mancini, Open Collective hosts, and admins from our 7000 collectives about ways to transition from a privately owned company to a structure that allows us to share power and revenue with you."
+            defaultMessage="Sign up to be notified of live conversations with our CEO Pia Mancini, Doohi Collective hosts, and admins from our 7000 collectives about ways to transition from a privately owned company to a structure that allows us to share power and revenue with you."
           />
         </P>
         <Newsletter />

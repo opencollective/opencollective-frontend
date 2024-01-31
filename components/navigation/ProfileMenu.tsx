@@ -185,7 +185,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
             <Separator className="my-1" />
 
             <MenuItem Icon={Home} href="/home">
-              <FormattedMessage defaultMessage="Open Collective Home" />
+              <FormattedMessage defaultMessage="Doohi Collective Home" />
             </MenuItem>
 
             <MenuItem Icon={LifeBuoy} href="/help">

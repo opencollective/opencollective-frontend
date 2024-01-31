@@ -469,7 +469,7 @@ class SearchPage extends React.Component {
                       <li>
                         <Span pt="8px">
                           <FormattedMessage
-                            defaultMessage="Search our <Link>Docs</Link> for more info about using the Open Collective platform"
+                            defaultMessage="Search our <Link>Docs</Link> for more info about using the Doohi Collective platform"
                             values={{
                               Link: getI18nLink({
                                 openInNewTab: true,

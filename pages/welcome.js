@@ -24,7 +24,7 @@ const Welcome = () => {
 
   return (
     <AuthenticatedPage
-      title={intl.formatMessage({ defaultMessage: 'Welcome to Open Collective!' })}
+      title={intl.formatMessage({ defaultMessage: 'Welcome to Doohi Collective!' })}
       showFooter={false}
       showProfileAndChangelogMenu={false}
       showSearch={false}
@@ -37,7 +37,7 @@ const Welcome = () => {
           </Box>
           <Container pt="40px" pl="16px" pr={['16px', 0]} width={['100%', '404px']}>
             <Flex fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
-              <FormattedMessage defaultMessage="Welcome to Open Collective!" />
+              <FormattedMessage defaultMessage="Welcome to Doohi Collective!" />
             </Flex>
             <Flex fontSize="18px" fontWeight="400" color="black.800" lineHeight="26px" pt="14px">
               <FormattedMessage defaultMessage="Now that you have created your personal account, there are a couple of things you can do from here..." />

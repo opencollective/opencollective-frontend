@@ -15,7 +15,7 @@ const OCIsATechPlatform = () => {
         <SectionTitle textAlign="center">
           <FormattedMessage
             id="e2c.OCIsATechPlatform"
-            defaultMessage="Today, Open Collective is a tech platform that
+            defaultMessage="Today, Doohi Collective is a tech platform that
 enables a network of:"
           />
         </SectionTitle>

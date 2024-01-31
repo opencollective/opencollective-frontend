@@ -34,7 +34,7 @@ const ContactUsSuccess = () => (
     <Flex alignItems="center" width={['288px', '404px']}>
       <Box width={[null, '96px']} height={[null, '96px']}>
         <NextIllustration
-          alt="How Open Collective works"
+          alt="How Doohi Collective works"
           src="/static/images/help-and-support/success-illustration.png"
           width={96}
           height={96}

@@ -311,7 +311,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               <P fontSize="14px" lineHeight="18px" color="black.600" mt={2}>
                 <FormattedMessage
                   id="collective.contributionPolicy.description"
-                  defaultMessage="Financial Contributors are manually reviewed by the Open Collective team to check for abuse or spam. Financial Contributors with a good reputation should not be affected by this setting."
+                  defaultMessage="Financial Contributors are manually reviewed by the Doohi Collective team to check for abuse or spam. Financial Contributors with a good reputation should not be affected by this setting."
                 />
               </P>
             </Container>

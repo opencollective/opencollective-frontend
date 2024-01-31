@@ -22,7 +22,7 @@ const I18N_FX_RATE_SOURCE_LABEL = defineMessages({
 
 const FX_RATE_SOURCE_LABEL = {
   PAYPAL: 'PayPal',
-  OPENCOLLECTIVE: 'Open Collective',
+  OPENCOLLECTIVE: 'Doohi Collective',
   WISE: 'Wise',
 };
 

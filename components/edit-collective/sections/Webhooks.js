@@ -281,7 +281,7 @@ class Webhooks extends React.Component {
       <div>
         <P fontSize="14px" lineHeight="18px">
           <FormattedMessage
-            defaultMessage="You can use Webhooks to build custom integrations with Open Collective. Slack and Discord webhooks are natively supported. You can also integrate them with tools like Zapier, IFTTT, or Huginn. Learn more about this from <DocLink>the documentation</DocLink> or see how you can go further using our <GraphqlAPILink>public GraphQL API</GraphqlAPILink>."
+            defaultMessage="You can use Webhooks to build custom integrations with Doohi Collective. Slack and Discord webhooks are natively supported. You can also integrate them with tools like Zapier, IFTTT, or Huginn. Learn more about this from <DocLink>the documentation</DocLink> or see how you can go further using our <GraphqlAPILink>public GraphQL API</GraphqlAPILink>."
             values={{
               GraphqlAPILink: getI18nLink({
                 href: 'https://docs.opencollective.com/help/contributing/development/api#graphql-api',

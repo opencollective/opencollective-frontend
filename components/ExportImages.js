@@ -44,7 +44,7 @@ class ExportImages extends React.Component {
           {
             name: 'Tier badge',
             url: `${websiteUrl}/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${encodedTierName}&color=brightgreen`,
-            code: `<img alt="open collective badge" src="${websiteUrl}/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${encodedTierName}&color=brightgreen" />`,
+            code: `<img alt="doohi collective badge" src="${websiteUrl}/${collective.slug}/tiers/${tier.slug}/badge.svg?label=${encodedTierName}&color=brightgreen" />`,
             options: [
               {
                 name: 'label',
@@ -177,7 +177,7 @@ class ExportImages extends React.Component {
             {`${websiteUrl}/${collective.slug}/tiers/badge.svg`}
           </StyledLink>
         </Box>
-        <img alt="open collective badge" src={`${websiteUrl}/${collective.slug}/tiers/badge.svg`} />
+        <img alt="doohi collective badge" src={`${websiteUrl}/${collective.slug}/tiers/badge.svg`} />
       </div>
     );
   }

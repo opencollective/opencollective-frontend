@@ -5,7 +5,7 @@ import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-// Open Collective Frontend imports
+// Doohi Collective Frontend imports
 import INTERVALS from '../../lib/constants/intervals';
 import { gqlV1 } from '../../lib/graphql/helpers';
 import { isTierExpired } from '../../lib/tier-utils';

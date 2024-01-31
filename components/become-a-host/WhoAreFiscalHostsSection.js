@@ -72,7 +72,7 @@ const messages = defineMessages({
   'becomeAHost.entity.description': {
     id: 'becomeAHost.entity.description',
     defaultMessage:
-      'Who runs multiple projects and wants to use the Open Collective platform features for transparent budget tracking, combining revenue streams, expense payment management, and community engagement.',
+      'Who runs multiple projects and wants to use the Doohi Collective platform features for transparent budget tracking, combining revenue streams, expense payment management, and community engagement.',
   },
   'becomeAHost.grantMakers': {
     id: 'becomeAHost.grantMakers',
