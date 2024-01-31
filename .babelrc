@@ -32,13 +32,6 @@
         "camel2DashComponentName": false
       },
       "validator"
-    ],
-    [
-      "babel-plugin-formatjs",
-      {
-        "ast": true,
-        "idInterpolationPattern": "[sha512:contenthash:base64:6]"
-      }
     ]
   ],
   "env": {
