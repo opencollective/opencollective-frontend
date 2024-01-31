@@ -801,7 +801,7 @@ const ExpenseFormBody = ({
                     </MessageBox>
                     {formik.values.accountingCategory?.instructions && (
                       <MessageBox type="info" fontSize="12px" mt="24px">
-                        <HTMLContent content={formik.values.accountingCategory.instructions} />
+                        <HTMLContent content={formik.values.accountingCategory.instructions} openLinksInNewTab />
                       </MessageBox>
                     )}
                   </div>
