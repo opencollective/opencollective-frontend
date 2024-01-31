@@ -27,7 +27,7 @@ const nextConfig = {
       '/_document': ['./.next/language-manifest.json'],
     },
   },
-  webpack: (config, { webpack, isServer, dev, buildId }) => {
+  webpack: (config, { webpack, isServer, dev }) => {
     config.resolve.alias['@sentry/replay'] = false;
 
     config.plugins.push(
@@ -57,12 +57,6 @@ const nextConfig = {
         SENTRY_TRACES_SAMPLE_RATE: null,
         OC_APPLICATION: null,
         LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
-      }),
-    );
-
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        'process.env.SENTRY_RELEASE': JSON.stringify(buildId),
       }),
     );
 
@@ -294,13 +288,20 @@ const nextConfig = {
   },
 };
 
-let exportedConfig = withSentryConfig({
-  ...nextConfig,
-  sentry: {
-    disableServerWebpackPlugin: true,
-    disableClientWebpackPlugin: true,
+let exportedConfig = withSentryConfig(
+  {
+    ...nextConfig,
+    sentry: {
+      hideSourceMaps: true,
+    },
   },
-});
+  {
+    org: 'open-collective',
+    project: 'oc-frontend',
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    silent: true,
+  },
+);
 
 if (process.env.ANALYZE) {
   // eslint-disable-next-line node/no-unpublished-require

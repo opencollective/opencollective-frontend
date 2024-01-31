@@ -47,7 +47,7 @@ const cols = {
             <FormattedMoneyAmount
               amount={Math.abs(netAmount.valueInCents)}
               currency={netAmount.currency}
-              precision="2"
+              precision={2}
               amountStyles={{}}
               showCurrencyCode={false}
             />
@@ -70,7 +70,7 @@ const cols = {
             <FormattedMoneyAmount
               amount={Math.abs(netAmount.valueInCents)}
               currency={netAmount.currency}
-              precision="2"
+              precision={2}
               amountStyles={{}}
               showCurrencyCode={false}
             />
@@ -121,16 +121,7 @@ const cols = {
   },
   toFromAccount: {
     accessorKey: 'oppositeAccount',
-    header: () => (
-      <FormattedMessage
-        defaultMessage="{toIcon} To {divider} {fromIcon} From"
-        values={{
-          toIcon: <ArrowRight className="inline-block shrink-0" size={16} />,
-          divider: <span className="font-thin text-muted-foreground">/</span>,
-          fromIcon: <ArrowLeft className="inline-block shrink-0" size={16} />,
-        }}
-      />
-    ),
+    header: () => <FormattedMessage defaultMessage="Recipient/Sender" />,
     meta: { className: 'w-48' },
     cell: ({ cell, row }) => {
       const account = cell.getValue() as Transaction['oppositeAccount'];
@@ -162,16 +153,16 @@ const cols = {
       const kind = cell.getValue() as Transaction['kind'];
       const kindLabel = i18nTransactionKind(intl, kind);
       const isExpense = kind === 'EXPENSE';
-      const { isRefund, isRefunded, isInReview, isDisputed, expense } = row.original;
+      const { isRefund, isRefunded, isInReview, isDisputed, expense, isOrderRejected } = row.original;
 
       return (
         <div className="flex justify-between">
           <div className="flex items-center gap-1.5 truncate">
             <span className="truncate">{kindLabel}</span>
-            {isExpense && expense.type && <Badge size="xs">{i18nExpenseType(intl, expense.type)}</Badge>}
+            {isExpense && expense?.type && <Badge size="xs">{i18nExpenseType(intl, expense.type)}</Badge>}
           </div>
           <div>
-            {isRefunded && (
+            {isRefunded && !isOrderRejected && (
               <Badge size="xs" type={'warning'} className="items-center  gap-1">
                 <Undo size={12} />
                 <FormattedMessage defaultMessage="Refunded" />
@@ -186,6 +177,12 @@ const cols = {
               <Badge size="xs" type={'error'} className="items-center gap-1">
                 <AlertTriangle size={12} />
                 <FormattedMessage defaultMessage="Disputed" />
+              </Badge>
+            )}
+            {isOrderRejected && isRefunded && (
+              <Badge size="xs" type={'error'} className="items-center gap-1">
+                <AlertTriangle size={12} />
+                <FormattedMessage defaultMessage="Rejected" />
               </Badge>
             )}
             {isInReview && (
@@ -217,7 +214,7 @@ const cols = {
           <FormattedMoneyAmount
             amount={netAmount.valueInCents}
             currency={netAmount.currency}
-            precision="2"
+            precision={2}
             amountStyles={{ letterSpacing: 0 }}
             showCurrencyCode={false}
           />

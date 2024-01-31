@@ -76,6 +76,7 @@ const hostTransactionsMetaDataQuery = gql`
       legacyId
       slug
       currency
+      settings
     }
   }
 `;
@@ -90,7 +91,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const [transactionInDrawer, setTransactionInDrawer] = React.useState(null);
 
-  const [layout, setLayout] = React.useState(TestLayout.DEBITCREDIT);
+  const [layout, setLayout] = React.useState(TestLayout.AMOUNT);
 
   const { data: metaData } = useQuery(hostTransactionsMetaDataQuery, {
     variables: { slug: hostSlug },
@@ -128,7 +129,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     views,
   });
 
-  const { data, error, loading, refetch } = useQuery(transactionsTableQuery, {
+  const { data, previousData, error, loading, refetch } = useQuery(transactionsTableQuery, {
     variables: {
       hostAccount: { slug: hostSlug },
       includeIncognitoTransactions: true,
@@ -150,7 +151,8 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
               open={displayExportCSVModal}
               setOpen={setDisplayExportCSVModal}
               queryFilter={queryFilter}
-              hostSlug={hostSlug}
+              account={metaData?.host}
+              isHostReport
               trigger={
                 <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
                   <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
@@ -186,7 +188,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
           <Flex mt={5} justifyContent="center">
             <Pagination
               route={`/dashboard/${hostSlug}/host-transactions`}
-              total={transactions?.totalCount}
+              total={(data || previousData)?.transactions?.totalCount}
               limit={queryFilter.values.limit}
               offset={queryFilter.values.offset}
               ignoredQueryParams={['collectiveSlug']}

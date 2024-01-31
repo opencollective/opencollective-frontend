@@ -200,7 +200,7 @@ describe('Contribution Flow: Donate', () => {
       cy.wait(2000);
 
       // Rejecting the validation should produce an error
-      cy.complete3dSecure(true);
+      cy.complete3dSecure(true, { version: 2 });
       cy.contains('Your payment method has now been confirmed and the payment successfully went through');
     });
   });

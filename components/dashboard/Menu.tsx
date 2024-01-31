@@ -59,7 +59,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
 
   const items: MenuItem[] = [
     {
-      if: isIndividual,
+      if: isIndividual || (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW) && !isHost),
       section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
     },
@@ -203,12 +203,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: HeartHandshake,
     },
     {
-      if: !isHost || !LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_TRANSACTION_PAGE),
+      if: !isHost,
       section: ALL_SECTIONS.TRANSACTIONS,
       Icon: ArrowRightLeft,
     },
     {
-      if: isHost && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_TRANSACTION_PAGE),
+      if: isHost,
       section: ALL_SECTIONS.HOST_TRANSACTIONS,
       Icon: ArrowRightLeft,
       label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),

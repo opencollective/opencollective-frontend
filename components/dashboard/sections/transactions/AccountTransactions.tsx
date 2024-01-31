@@ -32,6 +32,7 @@ const accountTransactionsMetaDataQuery = gql`
       legacyId
       slug
       currency
+      settings
     }
   }
 `;
@@ -57,7 +58,7 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
     },
   });
 
-  const { data, error, loading, refetch } = useQuery(transactionsTableQuery, {
+  const { data, previousData, error, loading, refetch } = useQuery(transactionsTableQuery, {
     variables: {
       account: { slug: accountSlug },
       includeIncognitoTransactions: true,
@@ -78,7 +79,7 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
             open={displayExportCSVModal}
             setOpen={setDisplayExportCSVModal}
             queryFilter={queryFilter}
-            accountSlug={accountSlug}
+            account={metaData?.account}
             trigger={
               <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
                 <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
@@ -111,7 +112,7 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
           <Flex mt={5} justifyContent="center">
             <Pagination
               route={`/dashboard/${accountSlug}/transactions`}
-              total={transactions?.totalCount}
+              total={(data || previousData)?.transactions?.totalCount}
               limit={queryFilter.values.limit}
               offset={queryFilter.values.offset}
               ignoredQueryParams={['collectiveSlug']}

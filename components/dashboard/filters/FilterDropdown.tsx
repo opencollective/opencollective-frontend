@@ -119,7 +119,7 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
           </button>
         )}
         <PopoverTrigger
-          className={clsx('flex h-full items-center px-3 focus:outline-none', hasValue && 'pl-2')}
+          className={clsx('flex h-full items-center px-3 focus:outline-none', hasValue && 'pl-2 text-foreground')}
           disabled={isFilterWithoutComponent}
           data-cy={filterKey ? `filter-${filterKey}` : `add-filter`}
         >

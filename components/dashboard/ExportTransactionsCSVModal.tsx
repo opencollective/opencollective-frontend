@@ -1,5 +1,5 @@
 import React from 'react';
-import { flatten, isEmpty, omit } from 'lodash';
+import { flatten, isEmpty, keys, omit } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import {
@@ -13,7 +13,11 @@ import {
   HOST_OMITTED_FIELDS,
 } from '../../lib/csv';
 import { getEnvVar } from '../../lib/env-utils';
-import { HostReportsPageQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
+import {
+  Account,
+  HostReportsPageQueryVariables,
+  TransactionsPageQueryVariables,
+} from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
@@ -46,26 +50,23 @@ type ExportTransactionsCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
   queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsPageQueryVariables>;
-  accountSlug?: string;
-  hostSlug?: string;
+  account?: Pick<Account, 'slug' | 'settings'>;
+  isHostReport?: boolean;
   trigger: React.ReactNode;
 };
 
 const ExportTransactionsCSVModal = ({
   open,
   setOpen,
-  accountSlug,
-  hostSlug,
+  account,
   trigger,
   queryFilter,
+  isHostReport,
 }: ExportTransactionsCSVModalProps) => {
-  const isHostReport = Boolean(hostSlug);
-
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
-  const [fieldOption, setFieldOption] = React.useState(FieldOptions[0].value);
+  const [fieldSet, setFieldSet] = React.useState(FieldOptions[0].value);
   const [fields, setFields] = React.useState(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
   const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
-
   const fieldGroups = FIELD_GROUPS_2024;
 
   const {
@@ -90,12 +91,17 @@ const ExportTransactionsCSVModal = ({
     { defaultData: 0 },
   );
 
-  const handleFieldOptionsChange = ({ value }) => {
-    setFieldOption(value);
-    if (value === FIELD_OPTIONS.DEFAULT) {
-      setFields(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
-    }
-  };
+  const fieldSetOptions: Array<{ value: string; label: string; fields?: Array<string> }> = React.useMemo(() => {
+    const customFields = account?.settings?.exportedTransactionsFieldSets;
+    return [
+      ...FieldOptions,
+      ...keys(customFields).map(key => ({
+        value: key,
+        label: customFields[key].name,
+        fields: customFields[key].fields,
+      })),
+    ];
+  }, [account]);
 
   const handleFieldSwitch = ({ name, checked }) => {
     if (checked) {
@@ -115,8 +121,8 @@ const ExportTransactionsCSVModal = ({
 
   const getUrl = () => {
     const url = isHostReport
-      ? new URL(`${process.env.REST_URL}/v2/${hostSlug}/hostTransactions.csv`)
-      : new URL(`${process.env.REST_URL}/v2/${accountSlug}/transactions.csv`);
+      ? new URL(`${process.env.REST_URL}/v2/${account?.slug}/hostTransactions.csv`)
+      : new URL(`${process.env.REST_URL}/v2/${account?.slug}/transactions.csv`);
 
     url.searchParams.set('fetchAll', '1');
 
@@ -176,10 +182,19 @@ const ExportTransactionsCSVModal = ({
   };
 
   React.useEffect(() => {
+    const selectedSet = fieldSetOptions.find(option => option.value === fieldSet);
+    if (selectedSet && selectedSet.fields) {
+      setFields(selectedSet.fields.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
+    } else if (fieldSet === FIELD_OPTIONS.DEFAULT) {
+      setFields(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
+    }
+  }, [fieldSetOptions, fieldSet]);
+
+  React.useEffect(() => {
     if (open) {
       fetchRows();
     }
-  }, [queryFilter.values, accountSlug, hostSlug, open]);
+  }, [queryFilter.values, account, open]);
 
   React.useEffect(() => {
     const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
@@ -192,7 +207,7 @@ const ExportTransactionsCSVModal = ({
             `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
     }
     setDownloadUrl(getUrl());
-  }, [fields, queryFilter.values, accountSlug, hostSlug]);
+  }, [fields, flattenTaxesAndPaymentProcessorFees, queryFilter.values, account]);
 
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
   const disabled = exportedRows > 100e3 || isFetchingRows;
@@ -200,7 +215,7 @@ const ExportTransactionsCSVModal = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="md:max-w-2xl">
         <DialogHeader>
           <DialogTitle>
             <FormattedMessage id="ExportTransactionsCSVModal.Title" defaultMessage="Export Transactions" />
@@ -220,7 +235,7 @@ const ExportTransactionsCSVModal = ({
         </div>
 
         <StyledInputField
-          label={<FormattedMessage defaultMessage="Exported Fields" />}
+          label={<FormattedMessage defaultMessage="Exported Fields Set" />}
           labelFontWeight="500"
           labelProps={{ fontSize: '16px', letterSpacing: '0px' }}
           name="fieldOptions"
@@ -228,15 +243,15 @@ const ExportTransactionsCSVModal = ({
           {inputProps => {
             return (
               <Select
-                onValueChange={value => handleFieldOptionsChange({ value })}
-                defaultValue={FieldOptions.find(option => option.value === fieldOption).value}
+                onValueChange={value => setFieldSet(value)}
+                value={fieldSetOptions.find(option => option.value === fieldSet)?.value || FIELD_OPTIONS.CUSTOM}
                 {...inputProps}
               >
                 <SelectTrigger className="">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {FieldOptions.map(option => (
+                  {fieldSetOptions.map(option => (
                     <SelectItem value={option.value} key={option.value}>
                       {option.label}
                     </SelectItem>
@@ -248,7 +263,7 @@ const ExportTransactionsCSVModal = ({
         </StyledInputField>
 
         <div>
-          <Collapsible open={fieldOption === FIELD_OPTIONS.DEFAULT}>
+          <Collapsible open={fieldSet === FIELD_OPTIONS.DEFAULT}>
             <CollapsibleContent>
               <MessageBox type="info" mt={3}>
                 {flatten(
@@ -260,7 +275,7 @@ const ExportTransactionsCSVModal = ({
               </MessageBox>
             </CollapsibleContent>
           </Collapsible>
-          <Collapsible open={fieldOption === FIELD_OPTIONS.CUSTOM}>
+          <Collapsible open={fieldSet !== FIELD_OPTIONS.DEFAULT}>
             <CollapsibleContent>
               <div className="flex flex-col gap-6">
                 {Object.keys(fieldGroups).map(group => {
@@ -286,8 +301,7 @@ const ExportTransactionsCSVModal = ({
                           )}
                         </Button>
                       </div>
-
-                      <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
                         {fieldGroups[group]
                           .filter(field => !(isHostReport && HOST_OMITTED_FIELDS.includes(field)))
                           .map(field => (
@@ -351,7 +365,7 @@ const ExportTransactionsCSVModal = ({
             />
           </MessageBox>
         ) : null}
-        <DialogFooter>
+        <DialogFooter className="mt-2 gap-2 sm:justify-end">
           <Button asChild loading={isFetchingRows} disabled={disabled}>
             <a href={url} rel="noreferrer" target="_blank">
               <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
