@@ -27,7 +27,7 @@ export const decorators = [
   Story => (
     <ApolloProvider client={initClient()}>
       <ThemeProvider theme={theme}>
-        <IntlProvider locale="en">
+        <IntlProvider locale="fr">
           <UserProvider>
             <TooltipProvider>
               <Story />

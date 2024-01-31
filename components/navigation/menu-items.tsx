@@ -40,10 +40,7 @@ export const landingPageItems: Item[] = [
         label: <FormattedMessage id="company.blog" defaultMessage="Blog" />,
         href: '#',
       },
-      // {
-      //   label: <FormattedMessage id="OC.e2c" defaultMessage="Exit to Community" />,
-      //   href: '/e2c',
-      // },
+     
       {
         label: <FormattedMessage id="collective.about.title" defaultMessage="About" />,
         href: '#',
@@ -155,10 +152,6 @@ export const regularFooterItems: Item[] = [
         label: <FormattedMessage id="company.hiring" defaultMessage="Hiring" />,
         href: '/hiring',
       },
-      // {
-      //   label: <FormattedMessage id="e2c.title" defaultMessage="Exit to Community #E2C" />,
-      //   href: '/e2c',
-      // },
       {
         label: <FormattedMessage id="company.termsOfService" defaultMessage="Terms of service" />,
         href: '/tos',

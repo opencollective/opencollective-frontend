@@ -165,11 +165,6 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                         <FormattedMessage id="company.blog" defaultMessage="Blog" />
                       </a>
                     </SubListItem>
-                    <SubListItem>
-                      <Link href={'/e2c'} onClick={closeMenu}>
-                        <FormattedMessage id="OC.e2c" defaultMessage="Exit to Community" />
-                      </Link>
-                    </SubListItem>
                   </Box>
                 )}
               </ListItem>

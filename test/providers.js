@@ -19,9 +19,9 @@ const apolloClient = initClient();
  *    - ThemeProvider: { theme }
  */
 export const withRequiredProviders = (component, providersParams = {}) => {
-  const locale = get(providersParams, 'IntlProvider.locale', 'en');
+  const locale = get(providersParams, 'IntlProvider.locale', 'fr');
   return (
-    <IntlProvider locale={locale} messages={locale === 'en' ? undefined : getLocaleMessages(locale)}>
+    <IntlProvider locale={locale} messages={locale === 'fr' ? undefined : getLocaleMessages(locale)}>
       <ApolloProvider client={get(providersParams, 'ApolloProvider.client', apolloClient)}>
         <ThemeProvider theme={get(providersParams, 'ThemeProvider.theme', theme)}>{component}</ThemeProvider>
       </ApolloProvider>

@@ -30,7 +30,7 @@ const ExitToCommunity = () => {
           <MainDescription fontSize="18px" lineHeight="26px" textAlign="center" fontWeight="500" color="black.800">
             <FormattedMessage
               id="e2c.description"
-              defaultMessage="Join us as we transition from a privately owned company to a structure that allows us to share power and revenue with you. "
+              defaultMessage="Join us as we evolve, focusing on empowering communities to raise funds, sharing success, and distributing resources effectively. "
             />
           </MainDescription>
         </Box>
