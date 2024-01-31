@@ -96,7 +96,7 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
                 </P>
                 <P fontSize="12px" lineHeight="18px" color="black.700">
                   <FormattedMessage
-                    defaultMessage="You can create personal token that integrate with the Open Collective platform. <CreateTokenLink>Create Personal Token</CreateTokenLink>."
+                    defaultMessage="You can create personal token that integrate with the Doohi Collective platform. <CreateTokenLink>Create Personal Token</CreateTokenLink>."
                     values={{
                       CreateTokenLink: children => (
                         <StyledLink

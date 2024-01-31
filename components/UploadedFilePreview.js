@@ -98,7 +98,7 @@ const formatFileSize = sizeInBytes => {
 };
 
 /**
- * To display the preview of a file uploaded on Open Collective.
+ * To display the preview of a file uploaded on Doohi Collective.
  * Supports images and PDFs.
  */
 const UploadedFilePreview = ({

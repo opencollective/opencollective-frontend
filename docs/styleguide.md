@@ -93,7 +93,7 @@ Check out the [Storybook docs](https://storybook.js.org/docs/react/get-started/i
 
 ## Deploy
 
-If you have access the Open Collective `now` team account:
+If you have access the Doohi Collective `now` team account:
 
 ```
 npm run styleguide:deploy

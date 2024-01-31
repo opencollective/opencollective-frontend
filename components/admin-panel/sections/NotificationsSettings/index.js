@@ -413,7 +413,7 @@ const NotificationsSettings = ({ accountSlug, subpath }) => {
                 <P fontSize="15px" fontWeight="500" lineHeight="22px">
                   <FormattedMessage
                     id="NotificationsSettings.Updates.Newsletter"
-                    defaultMessage="Receive the Open Collective newsletter (monthly)"
+                    defaultMessage="Receive the Doohi Collective newsletter (monthly)"
                   />
                 </P>
                 <Switch

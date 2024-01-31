@@ -254,7 +254,7 @@ describe('Expense flow', () => {
       cy.getByDataCy('items[0].amountV2-exchange-rate').realHover();
       cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip')
         .should('contain', '1 USD = 1.1 EUR')
-        .should('contain', 'Source: Open Collective')
+        .should('contain', 'Source: Doohi Collective')
         .should('contain', 'Acquired on: August 1, 2023');
 
       // Play with the FX rate: value too high

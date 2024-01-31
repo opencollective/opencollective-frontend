@@ -19,12 +19,12 @@ const HowOCWorks = () => {
         display={[null, null, 'none']}
       >
         <MainTitle textAlign={['center', null, 'left']} whiteSpace={[null, null, 'pre-line']}>
-          <FormattedMessage id="OC.howItWorks" defaultMessage="How Open Collective works" />
+          <FormattedMessage id="OC.howItWorks" defaultMessage="How Doohi Collective works" />
         </MainTitle>
       </Box>
       <Box ml={[null, '6px', '40px', null, '84px']} width={['288px', '306px', '458px', null, '558px']}>
         <NextIllustration
-          alt="How Open Collective works"
+          alt="How Doohi Collective works"
           src="/static/images/how-it-works/howItWorks-illustration.png"
           width={558}
           height={462}
@@ -38,7 +38,7 @@ const HowOCWorks = () => {
           display={['none', null, 'block']}
         >
           <MainTitle textAlign={['center', null, 'left']} whiteSpace={[null, null, 'pre-line']}>
-            <FormattedMessage id="OC.howItWorks" defaultMessage="How Open Collective works" />
+            <FormattedMessage id="OC.howItWorks" defaultMessage="How Doohi Collective works" />
           </MainTitle>
         </Box>
         <Box width={['288px', '676px', '458px', null, '558px']}>
@@ -51,7 +51,7 @@ const HowOCWorks = () => {
           >
             <FormattedMessage
               id="howItWorks.description"
-              defaultMessage="Open Collective enables all kinds of groups to raise, manage, and spend money transparently. Our open source software platform engages contributors and supporters, automates admin, and helps you tell your story."
+              defaultMessage="Doohi Collective enables all kinds of groups to raise, manage, and spend money transparently. Our open source software platform engages contributors and supporters, automates admin, and helps you tell your story."
             />
           </P>
         </Box>

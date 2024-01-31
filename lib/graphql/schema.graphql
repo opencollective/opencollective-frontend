@@ -218,7 +218,7 @@ interface CollectiveInterface {
   contributionPolicy: String
 
   """
-  Categories set by Open Collective to help moderation.
+  Categories set by Doohi Collective to help moderation.
   """
   categories: [String]!
 
@@ -548,7 +548,7 @@ type Contributor {
   description: String
 
   """
-  If the contributor has a page on Open Collective, this is the slug to link to it
+  If the contributor has a page on Doohi Collective, this is the slug to link to it
   """
   collectiveSlug: String
 
@@ -763,7 +763,7 @@ type LocationType {
   id: String
 
   """
-  A short name for the location (eg. Open Collective Headquarters)
+  A short name for the location (eg. Doohi Collective Headquarters)
   """
   name: String
 
@@ -1888,7 +1888,7 @@ Where does the FX rate come from
 """
 enum CurrencyExchangeRateSourceType {
   """
-  Open Collective internal system, relying on caching and 3rd party APIs
+  Doohi Collective internal system, relying on caching and 3rd party APIs
   """
   OPENCOLLECTIVE
 
@@ -3451,7 +3451,7 @@ type Expense implements Transaction {
   ): Float
 
   """
-  Fee kept by the Open Collective Platform in the lowest unit of the currency of the host (ie. in cents)
+  Fee kept by the Doohi Collective Platform in the lowest unit of the currency of the host (ie. in cents)
   """
   platformFeeInHostCurrency: Float
 
@@ -3651,7 +3651,7 @@ type Order implements Transaction {
   ): Float
 
   """
-  Fee kept by the Open Collective Platform in the lowest unit of the currency of the host (ie. in cents)
+  Fee kept by the Doohi Collective Platform in the lowest unit of the currency of the host (ie. in cents)
   """
   platformFeeInHostCurrency: Float
 
@@ -4767,7 +4767,7 @@ Input type for Location
 """
 input LocationInputType {
   """
-  A short name for the location (eg. Open Collective Headquarters)
+  A short name for the location (eg. Doohi Collective Headquarters)
   """
   name: String
 

@@ -68,7 +68,7 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
         )}
       </Flex>
       <P my={2} color="black.700">
-        <FormattedMessage defaultMessage="You can register new apps that you developed using Open Collective's API." />{' '}
+        <FormattedMessage defaultMessage="You can register new apps that you developed using Doohi Collective's API." />{' '}
         <FormattedMessage
           defaultMessage="For more information about OAuth applications, check <link>our documentation</link>."
           values={{
@@ -93,7 +93,7 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
                 </P>
                 <P fontSize="12px" lineHeight="18px" color="black.700">
                   <FormattedMessage
-                    defaultMessage="You can create apps that integrate with the Open Collective platform. <CreateAppLink>Create an app</CreateAppLink> using the Open Collective's API."
+                    defaultMessage="You can create apps that integrate with the Doohi Collective platform. <CreateAppLink>Create an app</CreateAppLink> using the Doohi Collective's API."
                     values={{
                       CreateAppLink: children => (
                         <StyledLink

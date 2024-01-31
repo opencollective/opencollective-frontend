@@ -26,17 +26,17 @@ const messages = defineMessages({
   'home.OCusers.opensource': {
     id: 'home.OCusers.opensource',
     defaultMessage:
-      'More than 2,500 open source communities use Open Collective to receive money from companies and individuals.',
+      'More than 2,500 open source communities use Doohi Collective to receive money from companies and individuals.',
   },
   'home.OCusers.meetups': {
     id: 'home.OCusers.meetups',
     defaultMessage:
-      'Nearly 100 chapters of Women Who Code use Open Collective to raise money locally and allocate funding throughout their network.',
+      'Nearly 100 chapters of Women Who Code use Doohi Collective to raise money locally and allocate funding throughout their network.',
   },
   'home.OCusers.movements': {
     id: 'home.OCusers.movements',
     defaultMessage:
-      'Many local XR groups are using Open Collective to be transparent, engage their communities, and cover their expenses.',
+      'Many local XR groups are using Doohi Collective to be transparent, engage their communities, and cover their expenses.',
   },
 });
 
@@ -140,13 +140,13 @@ const OCUsers = () => {
   return (
     <Flex my={4} flexDirection="column" mx={[3, 4]} alignItems="center">
       <SectionTitle textAlign="center" mb={3}>
-        <FormattedMessage defaultMessage="Who is using Open Collective?" />
+        <FormattedMessage defaultMessage="Who is using Doohi Collective?" />
       </SectionTitle>
       <Container width={['286px', '548px', null, '768px', '991px']} mb={4} textAlign="center">
         <SectionDescription textAlign="center" mb={4}>
           <FormattedMessage
             id="home.OCUsersSection.subtitle"
-            defaultMessage="Communities around the world are using Open Collective. Find out more about them!"
+            defaultMessage="Communities around the world are using Doohi Collective. Find out more about them!"
           />
         </SectionDescription>
       </Container>

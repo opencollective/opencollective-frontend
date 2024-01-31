@@ -45,7 +45,7 @@ const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color
         <Flex alignItems="center">
           <OtherIcon size={iconSize} color="#9D9FA3" />
           <Span ml={2} fontWeight={fontWeight} fontSize={fontSize} color={color}>
-            Open Collective
+            Doohi Collective
           </Span>
         </Flex>
       );

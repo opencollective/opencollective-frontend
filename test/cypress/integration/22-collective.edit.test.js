@@ -45,7 +45,7 @@ describe('edit collective', () => {
 
     // Check invitation email
     cy.openEmail(({ subject }) => subject.includes('Invitation to join CollectiveToEdit'));
-    cy.contains('Test User Admin just invited you to the role of Administrator of CollectiveToEdit on Open Collective');
+    cy.contains('Test User Admin just invited you to the role of Administrator of CollectiveToEdit on Doohi Collective');
 
     // Accept invitation as new user
     cy.login({ email: invitedUserEmail, redirect: `/member-invitations` });

@@ -59,7 +59,7 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.contains(`We've sent it to ${email}`);
 
     // Open email
-    const expectedEmailSubject = 'Open Collective: Verify your email';
+    const expectedEmailSubject = 'Doohi Collective: Verify your email';
     cy.openEmail(({ subject, html }) => html.includes(email) && subject.includes(expectedEmailSubject));
     cy.contains('a[href*="/confirm/guest"]', 'Verify').click();
 
@@ -186,7 +186,7 @@ describe('Contribution Flow: Guest contributions', () => {
      * This test depends on the previous ones, as we expect data from local storage to be
      * persisted between them.
      */
-    it('Join Open Collective', () => {
+    it('Join Doohi Collective', () => {
       cy.visit('/create-account/guest');
       cy.contains('We found 2 emails that you used to contribute');
       cy.contains(firstEmail);
@@ -199,7 +199,7 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.contains(`We've sent it to ${firstEmail}`);
 
       // Open email
-      const expectedEmailSubject = 'Open Collective: Verify your email';
+      const expectedEmailSubject = 'Doohi Collective: Verify your email';
       cy.openEmail(({ subject, html }) => html.includes(firstEmail) && subject.includes(expectedEmailSubject));
       cy.contains('a[href*="/confirm/guest"]', 'Verify').click();
 

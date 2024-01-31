@@ -19,7 +19,7 @@ const messages = defineMessages({
   },
   defaultDescription: {
     defaultMessage:
-      'Open Collective is a legal and financial toolbox for groups. It’s a fundraising + legal status + money management platform for your community. What do you want to do?',
+      'Doohi Collective is a legal and financial toolbox for groups. It’s a fundraising + legal status + money management platform for your community. What do you want to do?',
   },
 });
 

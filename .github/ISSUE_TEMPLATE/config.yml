@@ -5,10 +5,10 @@ contact_links:
     about: Repository to track issues across all our projects
   - name: Slack Channel
     url: http://slack.opencollective.com/
-    about: Engage with the Open Collective community
+    about: Engage with the Doohi Collective community
   - name: Documentation
     url: https://docs.opencollective.com/help/
-    about: Documentation for Open Collective
+    about: Documentation for Doohi Collective
   - name: Security Policy
     url: https://github.com/opencollective/opencollective/security/policy
     about: Please report security vulnerabilities as outlined here

@@ -274,7 +274,7 @@ export default function ExpensesPage(props: InferGetServerSidePropsType<typeof g
   const account = data?.account;
   const metadata = {
     ...getCollectivePageMetadata(account),
-    title: intl.formatMessage(messages.title, { collectiveName: account?.name || 'Open Collective' }),
+    title: intl.formatMessage(messages.title, { collectiveName: account?.name || 'Doohi Collective' }),
   };
 
   if (!query.loading) {

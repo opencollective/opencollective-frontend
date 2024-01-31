@@ -105,7 +105,7 @@ class SearchForm extends React.Component {
             letterSpacing={letterSpacing}
             lineHeight={lineHeight}
             fontWeight={fontWeight}
-            aria-label="Open Collective search input"
+            aria-label="Doohi Collective search input"
             defaultValue={defaultValue}
             value={value}
             onChange={onChange && (e => onChange(e.target.value))}

@@ -74,7 +74,7 @@ const WhatAreTheBenefits = () => {
             <P fontSize={['15px', '18px']} lineHeight={['22px', '26px']} color="black.700" fontWeight="400">
               <FormattedMessage
                 id="becomeAHost.reduceOverhead.description"
-                defaultMessage="When you’re managing funds for multiple projects or groups, it's easy to get overwhelmed by complex spreadsheets and countless email threads. Open Collective automates budget tracking, reporting, expense processing, and payments, making your job a lot easier."
+                defaultMessage="When you’re managing funds for multiple projects or groups, it's easy to get overwhelmed by complex spreadsheets and countless email threads. Doohi Collective automates budget tracking, reporting, expense processing, and payments, making your job a lot easier."
               />
             </P>
           </Box>
@@ -112,7 +112,7 @@ const WhatAreTheBenefits = () => {
             <P fontSize={['15px', '18px']} lineHeight={['22px', '26px']} color="black.700" fontWeight="400">
               <FormattedMessage
                 id="becomeAHost.increaseCapacity.description"
-                defaultMessage="Open Collective makes it possible for you to offer more services to more projects in less time. Large numbers of transactions won’t overwhelm you, because the platform automates most of the work, and also collects any fund holding fees you set."
+                defaultMessage="Doohi Collective makes it possible for you to offer more services to more projects in less time. Large numbers of transactions won’t overwhelm you, because the platform automates most of the work, and also collects any fund holding fees you set."
               />
             </P>
           </Box>

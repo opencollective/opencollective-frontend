@@ -449,7 +449,7 @@ class CreateCollectiveForm extends React.Component {
                               label={
                                 <FormattedMessage
                                   id="createcollective.tos.label"
-                                  defaultMessage="I agree with the {toslink} of Open Collective."
+                                  defaultMessage="I agree with the {toslink} of Doohi Collective."
                                   values={{
                                     toslink: (
                                       <StyledLink href="/tos" openInNewTab onClick={e => e.stopPropagation()}>

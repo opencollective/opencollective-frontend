@@ -37,7 +37,7 @@ const SafeTransactionMessage = () => {
           <P fontSize="12px" lineHeight="18px" fontWeight="500">
             <FormattedMessage
               id="NewContributionFlow.ProtectTransactionDetails"
-              defaultMessage="Open Collective keeps your transaction safe. <link>Learn more</link>."
+              defaultMessage="Doohi Collective keeps your transaction safe. <link>Learn more</link>."
               values={{
                 link: getI18nLink({
                   href: 'https://docs.opencollective.com/help/product/security#payments-security',

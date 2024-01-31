@@ -29,7 +29,7 @@ describe('Contribution Flow: Sign In', () => {
 
     cy.get('[data-cy="cf-content"] input[name=email]').type(randEmail);
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
-    cy.contains(`${randEmail} does not exist on Open Collective. Would you like to create an account with this email?`);
+    cy.contains(`${randEmail} does not exist on Doohi Collective. Would you like to create an account with this email?`);
   });
 
   it('Works if given a valid email', () => {

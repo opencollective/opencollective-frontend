@@ -545,7 +545,7 @@ function Expense(props) {
                       label={
                         <FormattedMessage
                           id="TOSAndPrivacyPolicyAgreement"
-                          defaultMessage="I agree with the {toslink} and {privacylink} of Open Collective."
+                          defaultMessage="I agree with the {toslink} and {privacylink} of Doohi Collective."
                           values={{
                             toslink: (
                               <StyledLink href="/tos" openInNewTab onClick={e => e.stopPropagation()}>

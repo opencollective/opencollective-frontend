@@ -26,7 +26,7 @@ async function downloadFileHandler(req, res) {
   if (!S3Url.test(url) && !RestApiCsvTransactionsUrl.test(url)) {
     return res.status(400).json({
       error:
-        'Only files from Open Collective S3 buckets and specific REST API are allowed - to the correct environment',
+        'Only files from Doohi Collective S3 buckets and specific REST API are allowed - to the correct environment',
     });
   }
 

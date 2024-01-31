@@ -140,11 +140,11 @@ describe('signin', () => {
     cy.get('[data-cy=checkbox-tosOptIn] [data-cy=custom-checkbox]').click();
     cy.get('button[type=submit]').click();
 
-    const expectedEmailSubject = 'Open Collective: Sign In';
+    const expectedEmailSubject = 'Doohi Collective: Sign In';
     cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
     cy.contains('a', 'One-click Sign In').click();
     cy.wait(200);
-    cy.contains('Welcome to Open Collective!');
+    cy.contains('Welcome to Doohi Collective!');
   });
 
   it('after signup do not show the welcome page if there is a redirect', () => {
@@ -162,11 +162,11 @@ describe('signin', () => {
     cy.get('[data-cy=checkbox-tosOptIn] [data-cy=custom-checkbox]').click();
     cy.get('button[type=submit]').click();
 
-    const expectedEmailSubject = 'Open Collective: Sign In';
+    const expectedEmailSubject = 'Doohi Collective: Sign In';
     cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
     cy.contains('a', 'One-click Sign In').click();
     cy.wait(200);
-    cy.contains('How Open Collective works');
+    cy.contains('How Doohi Collective works');
   });
 
   it('can signup a user with gmail and show Open Gmail button ', () => {

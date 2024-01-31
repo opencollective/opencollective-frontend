@@ -12,14 +12,14 @@ const HowOCWorks = () => (
   <Flex flexDirection="column" px={3} alignItems="center" my="58px">
     <Box textAlign="center" mb={3} width={['304px', '660px', 1, null, '1152px']}>
       <SectionTitle mb={3}>
-        <FormattedMessage id="helpAndSupport.howOCWorks" defaultMessage="This is how Open Collective works" />
+        <FormattedMessage id="helpAndSupport.howOCWorks" defaultMessage="This is how Doohi Collective works" />
       </SectionTitle>
     </Box>
     <Box textAlign="center" width={['288px', '660px', '768px']}>
       <SectionDescription mb="24px">
         <FormattedMessage
           id="helpAndSupport.howOCWorks.description"
-          defaultMessage="Open Collective enables all kinds of collaborative groups, initiatives, and projects to raise, manage, and spend money transparently."
+          defaultMessage="Doohi Collective enables all kinds of collaborative groups, initiatives, and projects to raise, manage, and spend money transparently."
         />
       </SectionDescription>
       <Link href="/how-it-works">
@@ -34,7 +34,7 @@ const HowOCWorks = () => (
     <Box display={['none', 'block', null, null, 'none']} mt="16px">
       <NextIllustration
         src="/static/images/help-and-support/transparency-illustration.png"
-        alt="How open collective illustration"
+        alt="How doohi collective illustration"
         width={660}
         height={390}
       />
@@ -42,7 +42,7 @@ const HowOCWorks = () => (
     <Box display={['none', null, null, null, 'block']} mt="16px">
       <NextIllustration
         src="/static/images/help-and-support/transparency-illustration-lg.png"
-        alt="How open collective illustration"
+        alt="How doohi collective illustration"
         width={862}
         height={441}
       />
@@ -56,7 +56,7 @@ const HowOCWorks = () => (
       <Box mt="16px" order={[null, 3]} width={['216px', '320px', '448px']}>
         <NextIllustration
           src="/static/images/help-and-support/getToKnowUs-illustration.png"
-          alt="How open collective illustration"
+          alt="How doohi collective illustration"
           width={448}
           height={365}
         />

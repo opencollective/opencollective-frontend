@@ -297,7 +297,7 @@ class BannerIframe extends React.Component {
                   <StyledLink openInNewTab href={`https://opencollective.com/${this.props.collectiveSlug}`}>
                     <FormattedMessage
                       id="widget.contributeOnOpenCollective"
-                      defaultMessage="Contribute on Open Collective"
+                      defaultMessage="Contribute on Doohi Collective"
                     />
                   </StyledLink>
                 </Flex>
@@ -378,7 +378,7 @@ class BannerIframe extends React.Component {
               >
                 <FormattedMessage
                   id="widget.contributeOnOpenCollective"
-                  defaultMessage="Contribute on Open Collective"
+                  defaultMessage="Contribute on Doohi Collective"
                 />
               </a>
             </div>
@@ -412,7 +412,7 @@ class BannerIframe extends React.Component {
               >
                 <FormattedMessage
                   id="widget.contributeOnOpenCollective"
-                  defaultMessage="Contribute on Open Collective"
+                  defaultMessage="Contribute on Doohi Collective"
                 />
               </a>
             </div>

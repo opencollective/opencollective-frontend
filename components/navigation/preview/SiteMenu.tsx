@@ -28,9 +28,9 @@ export default function SiteMenu() {
           <Flex p={3} justifyContent="space-between" gridGap={3}>
             <Flex alignItems="center" gridGap={2}>
               <Link href={LoggedInUser ? '/dashboard' : '/'} onClick={onClose}>
-                <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />
+                <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Doohi Collective" />
               </Link>
-              <Image height={20} width={120} src="/static/images/logotype.svg" alt="Open Collective" />
+              <Image height={20} width={120} src="/static/images/logotype.svg" alt="Doohi Collective" />
             </Flex>
           </Flex>
 
@@ -68,7 +68,7 @@ export default function SiteMenu() {
               {LoggedInUser && (
                 <DrawerMenuItem href={'/home'} onClick={onClose}>
                   <Flex alignItems="center" gridGap={2}>
-                    <Home size={16} /> <FormattedMessage defaultMessage="Open Collective Home" />
+                    <Home size={16} /> <FormattedMessage defaultMessage="Doohi Collective Home" />
                   </Flex>
                 </DrawerMenuItem>
               )}

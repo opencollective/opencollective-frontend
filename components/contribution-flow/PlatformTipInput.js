@@ -110,10 +110,10 @@ const PlatformTipInput = ({ currency, amount, quantity, value, onChange, isEmbed
         {!isEmbed ? (
           <FormattedMessage
             id="platformFee.info"
-            defaultMessage="Tips from contributors like you allow us to keep Open Collective free for Collectives. Thanks for any support!"
+            defaultMessage="Tips from contributors like you allow us to keep Doohi Collective free for Collectives. Thanks for any support!"
           />
         ) : (
-          <FormattedMessage defaultMessage="Powered by Open Collective, a platform to raise and spend money in full transparency. Tips from contributors like you help keep this service free for Collectives. Thanks for any support!" />
+          <FormattedMessage defaultMessage="Powered by Doohi Collective, a platform to raise and spend money in full transparency. Tips from contributors like you help keep this service free for Collectives. Thanks for any support!" />
         )}
       </P>
       <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>

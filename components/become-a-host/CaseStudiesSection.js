@@ -22,7 +22,7 @@ const messages = defineMessages({
   'becomeAHost.caseStudies.wwcode': {
     id: 'becomeAHost.caseStudies.wwcode',
     defaultMessage:
-      'Whenever we start a new meetup chapter, we pair it with an Open Collective so they have the means to raise money under our umbrella.',
+      'Whenever we start a new meetup chapter, we pair it with an Doohi Collective so they have the means to raise money under our umbrella.',
   },
   'becomeAHost.caseStudies.socialchangenestcollective': {
     id: 'becomeAHost.caseStudies.socialchangenestcollective',
@@ -32,7 +32,7 @@ const messages = defineMessages({
   'becomeAHost.caseStudies.foundation': {
     id: 'becomeAHost.caseStudies.foundation',
     defaultMessage:
-      'The Open Collective Platform provides the tools to more effectively manage group finances. They can offer their donors tax-deductible status without needing to incorporate a legal entity.',
+      'The Doohi Collective Platform provides the tools to more effectively manage group finances. They can offer their donors tax-deductible status without needing to incorporate a legal entity.',
   },
   'becomeAHost.caseStudies.opensource': {
     id: 'becomeAHost.caseStudies.opensource',
@@ -65,7 +65,7 @@ const caseStudies = [
   },
   {
     id: 'foundation',
-    name: 'Open Collective Foundation',
+    name: 'Doohi Collective Foundation',
     collectivePath: '/foundation',
     learnMorePath: 'https://opencollective.foundation/',
     bgImage: 'ocf',
@@ -166,14 +166,14 @@ const CaseStudies = () => {
     >
       <Box width={['288px', '648px', null, null, '1152px']} mb="8px">
         <SectionTitle textAlign="center">
-          <FormattedMessage defaultMessage="Who is using Open Collective?" />
+          <FormattedMessage defaultMessage="Who is using Doohi Collective?" />
         </SectionTitle>
       </Box>
       <Box mb={[4, 3]} width={['288px', '648px']}>
         <SectionDescription textAlign="center">
           <FormattedMessage
             id="home.OCUsersSection.subtitle"
-            defaultMessage={'Communities around the world are using Open Collective. Find out more about them!'}
+            defaultMessage={'Communities around the world are using Doohi Collective. Find out more about them!'}
           />
         </SectionDescription>
       </Box>

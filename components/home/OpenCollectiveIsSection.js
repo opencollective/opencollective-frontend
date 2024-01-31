@@ -28,7 +28,7 @@ const OpenCollectiveIs = () => {
       <Flex px="16px" justifyContent="center" alignItems="center">
         <Box width={['288px', 1]} mb="135px">
           <SectionTitle textAlign="center" mb={3}>
-            <FormattedMessage id="home.OCIs" defaultMessage={'Open Collective is'} />
+            <FormattedMessage id="home.OCIs" defaultMessage={'Doohi Collective is'} />
           </SectionTitle>
           <SectionDescription textAlign="center">
             <FormattedMessage

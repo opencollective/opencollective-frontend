@@ -197,7 +197,7 @@ const ApplyToFiscalHosts = () => (
       <SectionDescription textAlign="center" my="0">
         <FormattedMessage
           id="fiscalHosting.applyToFiscalHost.description"
-          defaultMessage="<orgsAroundTheWorldLink>Organizations around the world</orgsAroundTheWorldLink> are using Open Collective to host multiple projects, groups and communities. Find out more about them! Or you can <createYourOwnFiscalHostLink>create your own fiscal host</createYourOwnFiscalHostLink>."
+          defaultMessage="<orgsAroundTheWorldLink>Organizations around the world</orgsAroundTheWorldLink> are using Doohi Collective to host multiple projects, groups and communities. Find out more about them! Or you can <createYourOwnFiscalHostLink>create your own fiscal host</createYourOwnFiscalHostLink>."
           values={{
             orgsAroundTheWorldLink: getI18nLink({
               as: Link,
