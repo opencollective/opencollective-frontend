@@ -61,10 +61,10 @@ describe('Gift cards admin', () => {
 
     // Multi-email tests
     const multiEmailSelector = '.gift-cards-recipients .public-DraftEditor-content';
-    cy.get(multiEmailSelector).type('test1@opencollective.com');
+    cy.get(multiEmailSelector).type('test1@doohicollective.org');
     checkSubmit(true, 'Create 1 gift cards');
     // De-duplicate
-    cy.get(multiEmailSelector).type(' test1@opencollective.com');
+    cy.get(multiEmailSelector).type(' test1@doohicollective.org');
     checkSubmit(true, 'Create 1 gift cards');
     // Show invalid emails
     cy.get(multiEmailSelector).type(' Everybody Love Cats');
@@ -74,14 +74,14 @@ describe('Gift cards admin', () => {
 
     // Let's complete and submit this form
     cy.get(multiEmailSelector).type(
-      '{selectall} test1@opencollective.com test2@opencollective.com test3@opencollective.com',
+      '{selectall} test1@doohicollective.org test2@doohicollective.org test3@doohicollective.org',
     );
     cy.get('#giftcard-amount').type('{selectall}').type('12');
     checkSubmit(true, 'Create 3 gift cards');
     cy.getByDataCy('submit-new-gift-cards').click();
     cy.contains('Your 3 gift cards have been sent!');
     cy.getByDataCy('back-to-giftcards-list').click();
-    cy.getByDataCy('gift-cards-list').contains('$12.00 sent to test3@opencollective.com');
+    cy.getByDataCy('gift-cards-list').contains('$12.00 sent to test3@doohicollective.org');
   });
 });
 

@@ -64,7 +64,7 @@ const JoinTheMovement = () => (
           />
         </Box>
         <JoinUsActionContainer
-          link="mailto:pia@opencollective.com"
+          link="mailto:pia@doohicollective.org"
           title={<FormattedMessage id="helpResearch" defaultMessage="Help us with research" />}
           description={
             <FormattedMessage defaultMessage="Email us and find how you can contribute with your time to add to the research about sharing ownership within organizations." />

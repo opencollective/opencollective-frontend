@@ -22,7 +22,7 @@ export default function generateToken(expiresIn = 3000000) {
     id: 9474,
     sub: 9474,
     scope: 'login',
-    email: 'testuser+admin@opencollective.com',
+    email: 'testuser+admin@doohicollective.org',
     exp: Math.floor(Date.now() / 1000) + expiresIn,
   })
     .setProtectedHeader({ alg: 'HS256' })

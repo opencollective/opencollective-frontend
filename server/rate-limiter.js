@@ -46,7 +46,7 @@ const load = async app => {
       next();
       return;
     }
-    const message = `Rate limit exceeded. Try again in a few seconds. Please contact support@opencollective.com if you think this is an error.`;
+    const message = `Rate limit exceeded. Try again in a few seconds. Please contact support@doohicollective.org if you think this is an error.`;
     res.status(429).send(message);
   };
 

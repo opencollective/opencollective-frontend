@@ -34,7 +34,7 @@ Uses the built-in browser email validation to block submission until valid.
 <Canvas>
   <Story name="Loading / Submitting">
     {() => {
-      return <SignIn loading onSubmit={() => {}} onSecondaryAction={() => {}} email="test+betree@opencollective.com" />;
+      return <SignIn loading onSubmit={() => {}} onSecondaryAction={() => {}} email="test+betree@doohicollective.org" />;
     }}
   </Story>
 </Canvas>
@@ -45,7 +45,7 @@ Uses the built-in browser email validation to block submission until valid.
   <Story name="With Unknown Email">
     {() => {
       return (
-        <SignIn onSubmit={() => {}} onSecondaryAction={() => {}} unknownEmail email="test+betree@opencollective.com" />
+        <SignIn onSubmit={() => {}} onSecondaryAction={() => {}} unknownEmail email="test+betree@doohicollective.org" />
       );
     }}
   </Story>

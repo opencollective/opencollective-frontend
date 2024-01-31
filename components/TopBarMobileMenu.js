@@ -224,7 +224,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                 <Slack size={17} color="#9D9FA3" />
               </StyledRoundButton>
             </StyledLink>
-            <StyledLink href="mailto:info@opencollective.com" openInNewTab onClick={closeMenu}>
+            <StyledLink href="mailto:info@doohicollective.org" openInNewTab onClick={closeMenu}>
               <StyledRoundButton size={40}>
                 <Mail size={19} color="#9D9FA3" />
               </StyledRoundButton>

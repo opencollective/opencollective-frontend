@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 
 /**
- * Generate a random email in the form of "oc-test-*@opencollective.com".
+ * Generate a random email in the form of "oc-test-*@doohicollective.org".
  * These emails match the format of API E2E testing accounts and thus they
  * can be used to signin directly using cy.login().
  * See `opencollective-api/server/controllers/users.js`
@@ -10,7 +10,7 @@ import { v4 as uuid } from 'uuid';
  */
 export const randomEmail = (directSignIn = true) => {
   const randomID = uuid().split('-')[0];
-  return directSignIn ? `oc-test-${randomID}@opencollective.com` : `oc-noDirectSignIn-${randomID}@opencollective.com`;
+  return directSignIn ? `oc-test-${randomID}@doohicollective.org` : `oc-noDirectSignIn-${randomID}@doohicollective.org`;
 };
 
 export const randomGmailEmail = () => {

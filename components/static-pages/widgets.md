@@ -64,4 +64,4 @@ E.g. https://opencollective.com/opencollective/collectives.js
 
 ## Feedback
 
-If you would like a different or custom widget, let us know. Send us your feedback to info@opencollective.com or join us on our slack: https://slack.opencollective.com.
+If you would like a different or custom widget, let us know. Send us your feedback to info@doohicollective.org or join us on our slack: https://slack.opencollective.com.

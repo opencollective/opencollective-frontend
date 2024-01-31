@@ -434,7 +434,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                     width="100%"
                     maxWidth={500}
                     maxLength={60}
-                    placeholder="t.anderson@opencollective.com"
+                    placeholder="t.anderson@doohicollective.org"
                   />
                 )}
               </StyledInputFormikField>

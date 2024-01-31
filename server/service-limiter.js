@@ -19,7 +19,7 @@ function increaseServiceLevel(newLevel) {
 
 const onServiceLimited = (req, res) => {
   logger.info(`Service limited for '${req.ip}' '${req.headers['user-agent']}'`);
-  const message = `Service Limited. Try again later. Please contact support@opencollective.com if it persists.`;
+  const message = `Service Limited. Try again later. Please contact support@doohicollective.org if it persists.`;
   res.status(503).send(message);
 };
 

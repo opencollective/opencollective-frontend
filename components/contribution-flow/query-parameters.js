@@ -40,7 +40,7 @@ const ContributionFlowUrlParametersConfig = {
   contributeAs: { type: 'string' },
   /**
    * Guest contributions only: The email to use to contribute
-   * @example test@opencollective.com
+   * @example test@doohicollective.org
    */
   email: { type: 'string' },
   /**

@@ -161,7 +161,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
     it('User', testConfig, () => {
       cy.get('@collective').then(col => {
-        cy.signup({ email: `${randomSlug()}+test@opencollective.com`, redirect: `/${col.slug}/donate` });
+        cy.signup({ email: `${randomSlug()}+test@doohicollective.org`, redirect: `/${col.slug}/donate` });
       });
 
       cy.contains('Your info').click();
@@ -229,7 +229,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
     it('User', testConfig, () => {
       cy.get('@collective').then(col => {
-        cy.signup({ email: `${randomSlug()}+test@opencollective.com`, redirect: `/${col.slug}/donate` });
+        cy.signup({ email: `${randomSlug()}+test@doohicollective.org`, redirect: `/${col.slug}/donate` });
       });
 
       cy.contains('Your info').click();
@@ -284,7 +284,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
     it('User', testConfig, () => {
       cy.get('@collective').then(col => {
-        cy.signup({ email: `${randomSlug()}+test@opencollective.com`, redirect: `/${col.slug}/donate` });
+        cy.signup({ email: `${randomSlug()}+test@doohicollective.org`, redirect: `/${col.slug}/donate` });
       });
 
       cy.contains('Your info').click();
@@ -355,7 +355,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
     it('User', testConfig, () => {
       cy.get('@collective').then(col => {
-        cy.signup({ email: `${randomSlug()}+test@opencollective.com`, redirect: `/${col.slug}/donate` });
+        cy.signup({ email: `${randomSlug()}+test@doohicollective.org`, redirect: `/${col.slug}/donate` });
       });
 
       cy.contains('Your info').click();

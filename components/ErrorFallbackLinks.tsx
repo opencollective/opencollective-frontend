@@ -60,7 +60,7 @@ export const ErrorFallbackLinks = ({
         </Link>
       )}
       {showSupport && (
-        <Link href="mailto:support@opencollective.com">
+        <Link href="mailto:support@doohicollective.org">
           <FormattedMessage id="community.support" defaultMessage="Support" />
         </Link>
       )}

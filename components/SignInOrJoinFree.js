@@ -146,7 +146,7 @@ class SignInOrJoinFree extends React.Component {
       });
 
       // In dev/test, API directly returns a redirect URL for emails like
-      // test*@opencollective.com.
+      // test*@doohicollective.org.
       if (response.redirect) {
         await this.props.router.replace(response.redirect);
       } else if (response.token) {
