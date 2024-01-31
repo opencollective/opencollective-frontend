@@ -144,7 +144,7 @@ const messages = defineMessages({
   'fiscalHosting.feature.automaticReporting.description': {
     id: 'fiscalHosting.feature.automaticReporting.description',
     defaultMessage:
-      'No need to spend hours creating reports for funders. The Open Collective platform has automated quantitative reporting built in. Just sent the funder a link to your page! There are great tools for qualitative reporting too, like posting blogs and newsletters, which also serve to keep your wider community engaged and up to date.',
+      'No need to spend hours creating reports for funders. The Doohi Collective platform has automated quantitative reporting built in. Just sent the funder a link to your page! There are great tools for qualitative reporting too, like posting blogs and newsletters, which also serve to keep your wider community engaged and up to date.',
   },
 
   'fiscalHosting.feature.organizeFinance': {

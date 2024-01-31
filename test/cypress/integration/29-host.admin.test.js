@@ -181,7 +181,7 @@ describe('host dashboard', () => {
         .should('contain', 'Paid by Veganizer BXL');
 
       cy.get('[data-cy=transaction-details-wrapper]:nth-child(3)')
-        .should('contain', 'Financial contribution to Open Collective')
+        .should('contain', 'Financial contribution to Doohi Collective')
         .should('contain', '-€10.00 EUR')
         .should('contain', 'Paid by Xavier Damma');
     });
@@ -294,7 +294,7 @@ describe('host dashboard', () => {
       cy.get('[data-cy="section-budget"]').contains('cypress test - add funds');
       cy.visit('opencollectivehost');
       scrollToSection(Sections.TRANSACTIONS);
-      cy.get('[data-cy="section-transactions"]').contains('Financial contribution to Open Collective');
+      cy.get('[data-cy="section-transactions"]').contains('Financial contribution to Doohi Collective');
     });
   });
 });

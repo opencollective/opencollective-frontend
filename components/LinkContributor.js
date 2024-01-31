@@ -6,9 +6,9 @@ import Link from './Link';
 
 /**
  * `Contributor` type is meant to surface all types of contributors, even the one that
- * may not be registered yet on Open Collective -- for example, Github contributors.
+ * may not be registered yet on Doohi Collective -- for example, Github contributors.
  * The component will automatically fallback on displaying a `span` if the contributor
- * cannot be linked to on Open Collective.
+ * cannot be linked to on Doohi Collective.
  *
  * In the future it may also link to external profiles like Github.
  */

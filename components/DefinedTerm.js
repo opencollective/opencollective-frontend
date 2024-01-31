@@ -74,11 +74,11 @@ const TranslatedDefinitions = defineMessages({
   [Terms.HOST_FEE]: {
     id: 'host.hostFee.help',
     defaultMessage:
-      'The Host Fee is what a Fiscal Host charges a Collective for its services, such as holding funds, making expense payouts, meeting tax obligations, and access to the Open Collective software platform.',
+      'The Host Fee is what a Fiscal Host charges a Collective for its services, such as holding funds, making expense payouts, meeting tax obligations, and access to the Doohi Collective software platform.',
   },
   [Terms.PLATFORM_FEE]: {
     id: 'host.platformFee.help',
-    defaultMessage: 'The Platform fee is what Open Collective charges for use of the software.',
+    defaultMessage: 'The Platform fee is what Doohi Collective charges for use of the software.',
   },
   [Terms.GIFT_CARD]: {
     id: 'GiftCard.definition',

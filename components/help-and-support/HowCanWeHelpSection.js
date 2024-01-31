@@ -16,7 +16,7 @@ const HowCanWeHelp = () => {
     >
       <Box>
         <NextIllustration
-          alt="How Open Collective works"
+          alt="How Doohi Collective works"
           src="/static/images/help-and-support/top-illustration.png"
           width={286}
           height={200}

@@ -195,7 +195,7 @@ const JoinGuestPage = () => {
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
 
   return (
-    <Page title={intl.formatMessage(MESSAGES.pageTitle, { service: 'Open Collective' })}>
+    <Page title={intl.formatMessage(MESSAGES.pageTitle, { service: 'Doohi Collective' })}>
       <Container
         display="flex"
         py={[5, 6, 150]}

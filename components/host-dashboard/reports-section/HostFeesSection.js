@@ -73,7 +73,7 @@ const HostFeesSection = ({ host, isLoading }) => {
             {valuesToDisplay.sharedRevenue}
           </Box>
           <P fontSize="12px" fontWeight="400" mt="10px">
-            <FormattedMessage defaultMessage="Portion of Host Fees paid to Open Collective (which are either paid as you go, or charged monthly through settlement expenses, depending on the payment method.)" />
+            <FormattedMessage defaultMessage="Portion of Host Fees paid to Doohi Collective (which are either paid as you go, or charged monthly through settlement expenses, depending on the payment method.)" />
           </P>
         </Container>
         <Container

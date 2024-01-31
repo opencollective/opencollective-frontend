@@ -137,7 +137,7 @@ const messages = defineMessages({
   },
   'pricing.scale.fee': {
     id: 'pricing.scale.fee',
-    defaultMessage: 'Shared revenue with Open Collective',
+    defaultMessage: 'Shared revenue with Doohi Collective',
   },
   'pricing.scale.feeNote': {
     id: 'pricing.scale.feeNote',

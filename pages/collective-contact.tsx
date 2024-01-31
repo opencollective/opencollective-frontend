@@ -75,7 +75,7 @@ const CollectiveContact = () => {
                   <MessageBox type="warning" withIcon maxWidth={600} m="0 auto">
                     <FormattedMessage
                       id="CollectiveContact.NotAllowed"
-                      defaultMessage="This Collective can't be contacted via Open Collective."
+                      defaultMessage="This Collective can't be contacted via Doohi Collective."
                     />
                   </MessageBox>
                 ) : (

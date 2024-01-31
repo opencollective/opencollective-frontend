@@ -377,7 +377,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
                       item: (
                         <FormattedMessage
                           defaultMessage="{service} platform tip"
-                          values={{ service: 'Open Collective' }}
+                          values={{ service: 'Doohi Collective' }}
                         />
                       ),
                     }}

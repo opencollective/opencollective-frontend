@@ -230,7 +230,7 @@ class CreateFundForm extends React.Component {
                         -{' '}
                         <FormattedMessage
                           id="createFund.tos.label"
-                          defaultMessage="Read the {toslink} of Open Collective."
+                          defaultMessage="Read the {toslink} of Doohi Collective."
                           values={{
                             toslink: (
                               <StyledLink href="/tos" openInNewTab>

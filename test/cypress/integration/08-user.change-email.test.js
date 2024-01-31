@@ -35,7 +35,7 @@ describe('Users can change their email address', () => {
   });
 
   it('sends a confirmation email to confirm the change', () => {
-    cy.openEmail(({ subject }) => subject.includes(`Confirm your email ${newEmail} on Open Collective`));
+    cy.openEmail(({ subject }) => subject.includes(`Confirm your email ${newEmail} on Doohi Collective`));
     cy.contains(`We need to verify that ${newEmail} is correct by clicking this button:`);
     cy.contains('a', 'Confirm Email').click();
 
@@ -61,7 +61,7 @@ describe('Users can change their email address', () => {
     cy.wait(1000);
     cy.getInbox().then(emails => {
       const confirmationEmails = emails.filter(({ subject }) =>
-        subject.includes(`Confirm your email ${emailForDoubleConfirmation} on Open Collective`),
+        subject.includes(`Confirm your email ${emailForDoubleConfirmation} on Doohi Collective`),
       );
       expect(confirmationEmails).to.have.length(2);
     });

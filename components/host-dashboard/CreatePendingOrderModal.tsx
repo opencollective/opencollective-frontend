@@ -710,7 +710,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           <AmountDetailsLine
             value={-amounts.tip || 0}
             currency={currency}
-            label={<FormattedMessage defaultMessage="{service} platform tip" values={{ service: 'Open Collective' }} />}
+            label={<FormattedMessage defaultMessage="{service} platform tip" values={{ service: 'Doohi Collective' }} />}
           />
         )}
         {Boolean(values.tax?.rate) && (
@@ -750,7 +750,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           <MessageBox type="warning" mt={2}>
             <FormattedMessage
               id="Warning.TipAmountContributionWarning"
-              defaultMessage="You are about to make a contribution of {contributionAmount} to {accountName} that includes a {tipAmount} tip to the Open Collective platform. The tip amount looks unusually high.{newLine}{newLine}Are you sure you want to do this?"
+              defaultMessage="You are about to make a contribution of {contributionAmount} to {accountName} that includes a {tipAmount} tip to the Doohi Collective platform. The tip amount looks unusually high.{newLine}{newLine}Are you sure you want to do this?"
               values={{
                 contributionAmount: formatCurrency(amounts.total, currency, { locale: intl.locale }),
                 tipAmount: formatCurrency(amounts.tip, currency, { locale: intl.locale }),

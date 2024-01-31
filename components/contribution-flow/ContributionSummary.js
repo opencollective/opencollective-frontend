@@ -116,7 +116,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                   <FormattedMessage
                     id="SupportProject"
                     defaultMessage="Support {projectName}"
-                    values={{ projectName: 'Open Collective' }}
+                    values={{ projectName: 'Doohi Collective' }}
                   />
                 )}
               </Label>
@@ -207,7 +207,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                   <StyledTooltip
                     verticalAlign="top"
                     content={
-                      <FormattedMessage defaultMessage="Net Amount = Today's charge - Payment processor fee - Support Open Collective" />
+                      <FormattedMessage defaultMessage="Net Amount = Today's charge - Payment processor fee - Support Doohi Collective" />
                     }
                   >
                     <InfoCircle size="16px" color="#76777A" />

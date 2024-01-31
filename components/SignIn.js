@@ -50,7 +50,7 @@ export default class SignIn extends React.Component {
     oAuthAppImage: PropTypes.string,
     /** Show/hide subheading **/
     showSubHeading: PropTypes.bool,
-    /** Show/hide Open Collective Logo **/
+    /** Show/hide Doohi Collective Logo **/
     showOCLogo: PropTypes.bool,
     /** whether the input needs to be auto-focused */
     autoFocus: PropTypes.bool,
@@ -101,9 +101,9 @@ export default class SignIn extends React.Component {
 
   getSignInPageHeading(unknownEmail) {
     if (this.props.isOAuth && unknownEmail) {
-      return <FormattedMessage defaultMessage="Sign in to your Open Collective account" />;
+      return <FormattedMessage defaultMessage="Sign in to your Doohi Collective account" />;
     } else if (this.props.isOAuth) {
-      return <FormattedMessage defaultMessage="Continue with your Open Collective account" />;
+      return <FormattedMessage defaultMessage="Continue with your Doohi Collective account" />;
     } else {
       return this.props.label || <FormattedMessage defaultMessage="Continue with your email" />;
     }
@@ -124,7 +124,7 @@ export default class SignIn extends React.Component {
       <React.Fragment>
         <Head>
           {/* Add title hint for 1password and perhaps other password managers*/}
-          <title>Sign In - Open Collective</title>
+          <title>Sign In - Doohi Collective</title>
         </Head>
         <Box maxWidth={390} px={['20px', 0]}>
           {this.props.isOAuth ? (

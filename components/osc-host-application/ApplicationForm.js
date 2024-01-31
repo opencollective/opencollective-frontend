@@ -744,7 +744,7 @@ const ApplicationForm = ({
                                   <P ml={1} fontSize="12px" lineHeight="16px" fontWeight="400" color="black.800">
                                     <FormattedMessage
                                       id="OC.tos.label"
-                                      defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of Open Collective."
+                                      defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of Doohi Collective."
                                       values={{
                                         TOSLink: getI18nLink({
                                           href: '/tos',

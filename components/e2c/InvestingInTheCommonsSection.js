@@ -59,7 +59,7 @@ const InvestingInTheCommons = () => {
           <Span fontSize="18px" lineHeight="26px" color="black.800">
             <FormattedMessage
               id="e2c.challengingBusiness.description"
-              defaultMessage="Many tech founders are forced to give away ownership and control to investors in order to get money as a start-up. <strong>Open Collective is different.</strong> {lineBreak} {lineBreak} We raised money from people who agreed: <ul><li>Investors get paid back slowly and can’t make us exploit people to create huge profits.</li> <li>Investors do NOT control the platform.</li></ul>"
+              defaultMessage="Many tech founders are forced to give away ownership and control to investors in order to get money as a start-up. <strong>Doohi Collective is different.</strong> {lineBreak} {lineBreak} We raised money from people who agreed: <ul><li>Investors get paid back slowly and can’t make us exploit people to create huge profits.</li> <li>Investors do NOT control the platform.</li></ul>"
               values={{
                 li: listItem => <ListItem>{listItem}</ListItem>,
                 ul: list => <ListWrapper>{list}</ListWrapper>,
@@ -103,7 +103,7 @@ const InvestingInTheCommons = () => {
           <P fontSize="18px" lineHeight="26px" color="black.800">
             <FormattedMessage
               id="e2c.transparentFinances.description"
-              defaultMessage="Open Collective launched in 2016 and raised $3M of seed investment. The platform became profitable in 2020. {lineBreak}{lineBreak} See our investors and term sheets <link>here</link>."
+              defaultMessage="Doohi Collective launched in 2016 and raised $3M of seed investment. The platform became profitable in 2020. {lineBreak}{lineBreak} See our investors and term sheets <link>here</link>."
               values={{
                 lineBreak: <br />,
                 link: getI18nLink({

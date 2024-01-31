@@ -46,7 +46,7 @@ const PlatformTipsCollected = ({ host, isLoading }) => {
             <FormattedMessage
               defaultMessage="{amount} owed to {account}"
               values={{
-                account: 'Open Collective',
+                account: 'Doohi Collective',
                 amount: (
                   <FormattedMoneyAmount
                     amount={host.hostMetrics.pendingPlatformTips.valueInCents}
@@ -62,7 +62,7 @@ const PlatformTipsCollected = ({ host, isLoading }) => {
       <P fontSize="12px" lineHeight="18px" color="black.700">
         <FormattedMessage
           id="Host.PlatformTip.description"
-          defaultMessage="Contributors optionally add Platform Tips to transactions. Amounts owed to Open Collective that have been deposited into the Host's bank account are charged as part of monthly Settlement Expenses."
+          defaultMessage="Contributors optionally add Platform Tips to transactions. Amounts owed to Doohi Collective that have been deposited into the Host's bank account are charged as part of monthly Settlement Expenses."
         />
       </P>
     </Container>

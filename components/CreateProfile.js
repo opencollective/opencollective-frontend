@@ -100,7 +100,7 @@ const TOSCheckBox = ({ onChange, checked }) => {
       name="tosOptIn"
       label={
         <FormattedMessage
-          defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of Open Collective"
+          defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of Doohi Collective"
           values={{
             TOSLink: getI18nLink({
               href: '/tos',
@@ -213,7 +213,7 @@ const CreateProfile = ({
         )}
         <Box pt="48px" fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
           {isOAuth ? (
-            <FormattedMessage defaultMessage="Create an account in Open Collective" />
+            <FormattedMessage defaultMessage="Create an account in Doohi Collective" />
           ) : (
             <FormattedMessage defaultMessage="Create your personal account" />
           )}

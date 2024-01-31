@@ -137,7 +137,7 @@ const JoinUs = ({ page }) => (
             {page === 'becomeAHost' ? (
               <FormattedMessage
                 id="becomeAHost.joinUsSection.subtitle"
-                defaultMessage="Open Collective makes fiscal sponsorship shine. Grantees and project participants will love the simplicity and accessibility, and you’ll love the huge reduction of overheads."
+                defaultMessage="Doohi Collective makes fiscal sponsorship shine. Grantees and project participants will love the simplicity and accessibility, and you’ll love the huge reduction of overheads."
               />
             ) : (
               <FormattedMessage defaultMessage="Collective finances. Collective technology. Collective power." />
@@ -164,7 +164,7 @@ const JoinUs = ({ page }) => (
           description={
             <FormattedMessage
               id="home.joinUsSection.ourStories"
-              defaultMessage="Open Collective aims to foster transparency and sustainability in communities around the world, see how you could."
+              defaultMessage="Doohi Collective aims to foster transparency and sustainability in communities around the world, see how you could."
             />
           }
         />

@@ -1,6 +1,6 @@
-# Open Collective Frontend components
+# Doohi Collective Frontend components
 
-This project is an extract of the [Open Collective Frontend](https://github.com/opencollective/opencollective-frontend) components. It is meant to be used as a library of React components for Open Collective projects such as our [Frontend Template](https://github.com/opencollective/opencollective-frontend-template).
+This project is an extract of the [Doohi Collective Frontend](https://github.com/opencollective/opencollective-frontend) components. It is meant to be used as a library of React components for Doohi Collective projects such as our [Frontend Template](https://github.com/opencollective/opencollective-frontend-template).
 
 ## How to add this to your project
 
@@ -12,7 +12,7 @@ This project is an extract of the [Open Collective Frontend](https://github.com/
 npm install --save-exact @opencollective/frontend-components
 ```
 
-2. Plug the Open Collective theme in your project (usually in \_app.js):
+2. Plug the Doohi Collective theme in your project (usually in \_app.js):
 
 ```jsx
 import { ThemeProvider } from 'styled-components';

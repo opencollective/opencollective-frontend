@@ -45,7 +45,7 @@ const MAX_PAYOUT_OPTION_DATA_LENGTH = 20;
 const payoutMethodLabels = defineMessages({
   accountBalance: {
     id: 'PayoutMethod.AccountBalance',
-    defaultMessage: 'Open Collective (Account Balance)',
+    defaultMessage: 'Doohi Collective (Account Balance)',
   },
   none: {
     id: 'PayoutMethod.None',
@@ -288,7 +288,7 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
           <MessageBox type="error" mt={2} mb={3} fontSize="12px">
             <FormattedMessage defaultMessage="This Expense is between different Hosts but the Payer Host is not allowed for this yet." />
             &nbsp;
-            <FormattedMessage defaultMessage="If it's an issue, contact the Host or Open Collective support." />
+            <FormattedMessage defaultMessage="If it's an issue, contact the Host or Doohi Collective support." />
           </MessageBox>
         );
       }
@@ -304,7 +304,7 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
               }}
             />
             &nbsp;
-            <FormattedMessage defaultMessage="If it's an issue, contact the Host or Open Collective support." />
+            <FormattedMessage defaultMessage="If it's an issue, contact the Host or Doohi Collective support." />
           </MessageBox>
         );
       }

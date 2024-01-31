@@ -1,4 +1,4 @@
-# Open Collective Widgets
+# Doohi Collective Widgets
 
 ## For collectives
 

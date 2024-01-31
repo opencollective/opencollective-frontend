@@ -28,7 +28,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
           description={
             <FormattedMessage
               id="Dashboard.Home.Subtitle"
-              defaultMessage="The latest news and updates you need to know in Open Collective."
+              defaultMessage="The latest news and updates you need to know in Doohi Collective."
             />
           }
         />
@@ -63,7 +63,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
                   <p>
                     <FormattedMessage
                       id="Dashboard.Banner.Description"
-                      defaultMessage="We’ve created this space for you to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations."
+                      defaultMessage="We’ve created this space for you to keep on top of everything you do in Doohi Collective, from tracking your expenses to managing organizations."
                     />
                   </p>
                 </AlertDescription>

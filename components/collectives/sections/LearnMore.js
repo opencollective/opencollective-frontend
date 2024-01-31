@@ -111,7 +111,7 @@ const messages = defineMessages({
   },
   'home.learnMore.blog': {
     id: 'home.learnMore.blog',
-    defaultMessage: 'Case studies, news, and how groups around the world use Open Collective.',
+    defaultMessage: 'Case studies, news, and how groups around the world use Doohi Collective.',
   },
   'home.learnMore.blog.buttonText': {
     id: 'home.learnMore.blog.buttonText',
@@ -135,7 +135,7 @@ const messages = defineMessages({
   },
   'home.learnMore.openFinances': {
     id: 'home.learnMore.openFinances',
-    defaultMessage: 'We operate as an Open Collective ourselves, with transparent budgets.',
+    defaultMessage: 'We operate as an Doohi Collective ourselves, with transparent budgets.',
   },
   'home.learnMore.openFinances.buttonText': {
     id: 'home.learnMore.openFinances.buttonText',
@@ -227,7 +227,7 @@ const LearnMore = ({ page }) => {
             <P color="black.700" fontSize="18px" lineHeight="27px" letterSpacing="-0.2px" my={3}>
               <FormattedMessage
                 id="home.contributeToPlatform.description"
-                defaultMessage="Open Collective is free for charitable initiatives. We rely on generosity of contributors like you to make this possible."
+                defaultMessage="Doohi Collective is free for charitable initiatives. We rely on generosity of contributors like you to make this possible."
               />
             </P>
           </Box>

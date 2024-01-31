@@ -32,23 +32,23 @@ const SocialLink = ({ href, children, ...props }) => (
 const SocialLinks = ({ className }: { className?: string }) => {
   return (
     <div className={cn('flex items-center gap-1', className)}>
-      <SocialLink href="https://twitter.com/opencollect" rel="me" aria-label="Open Collective Twitter link">
+      <SocialLink href="https://twitter.com/opencollect" rel="me" aria-label="Doohi Collective Twitter link">
         <Twitter size={16} />
       </SocialLink>
       <SocialLink
         href="https://mastodon.opencollective.com/@opencollective"
         rel="me"
-        aria-label="Open Collective Mastodon link"
+        aria-label="Doohi Collective Mastodon link"
       >
         <Mastodon size={16} />
       </SocialLink>
-      <SocialLink href="https://github.com/opencollective" rel="me" aria-label="Open Collective Github link">
+      <SocialLink href="https://github.com/opencollective" rel="me" aria-label="Doohi Collective Github link">
         <Github size={16} />
       </SocialLink>
-      <SocialLink href="https://slack.opencollective.com" aria-label="Open Collective Slack link">
+      <SocialLink href="https://slack.opencollective.com" aria-label="Doohi Collective Slack link">
         <Slack size={16} />
       </SocialLink>
-      <SocialLink href="/contact" aria-label="Contact Open Collective">
+      <SocialLink href="/contact" aria-label="Contact Doohi Collective">
         <Mail size={16} />
       </SocialLink>
     </div>
@@ -67,7 +67,7 @@ const Footer = () => {
               <Link href="/home">
                 <Image
                   src="/static/images/opencollectivelogo-footer-n.svg"
-                  alt="Open Collective"
+                  alt="Doohi Collective"
                   height={28}
                   width={167}
                 />
@@ -135,7 +135,7 @@ const Footer = () => {
             <Link href="/">
               <Image
                 src="/static/images/opencollectivelogo-footer-n.svg"
-                alt="Open Collective"
+                alt="Doohi Collective"
                 height={28}
                 width={167}
               />

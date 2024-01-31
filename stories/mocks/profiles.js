@@ -8,7 +8,7 @@ export const personalProfile = {
 export default [
   {
     id: 1,
-    name: 'Open Collective Inc.',
+    name: 'Doohi Collective Inc.',
     type: 'COLLECTIVE',
   },
   {
