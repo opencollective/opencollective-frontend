@@ -175,7 +175,7 @@ const ExportTransactionsCSVModal = ({
             `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
     }
     setDownloadUrl(getUrl());
-  }, [fields, tmpDateInterval]);
+  }, [fields, flattenTaxesAndPaymentProcessorFees, tmpDateInterval]);
 
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
   const disabled = !isValidDateInterval || exportedRows > 100e3;
