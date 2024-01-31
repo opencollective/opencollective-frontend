@@ -25,7 +25,7 @@ const DedicatedTeam = () => {
             <FormattedMessage
               id="home.weDedicatedTeam.description"
               defaultMessage={
-                'Open Collective is made possible by an international team of people who are committed to community-control of technology. Connect with us.'
+                'Doohi Collective is made possible by an international team of people who are committed to community-control of technology. Connect with us.'
               }
             />
           </SectionDescription>

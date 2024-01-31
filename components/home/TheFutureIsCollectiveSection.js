@@ -34,7 +34,7 @@ const TheFutureIsCollective = () => {
               <FormattedMessage
                 id="home.futureIsCollective.description"
                 defaultMessage={
-                  'Open Collective is a <b>legal and financial</b> toolbox for grassroots groups. It’s a <b>fundraising + legal status + money management</b> platform for your community. What do you want to do?'
+                  'Doohi Collective is a <b>legal and financial</b> toolbox for grassroots groups. It’s a <b>fundraising + legal status + money management</b> platform for your community. What do you want to do?'
                 }
                 values={{
                   b: I18nBold,

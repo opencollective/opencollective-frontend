@@ -361,7 +361,7 @@ const CreateCollectiveMiniForm = ({
                       as={StyledInput}
                       {...inputProps}
                       placeholder={intl.formatMessage(msg.examples, {
-                        examples: isUser ? 'Jane Mary Doe, Frank Vincent Zappa' : 'Open Collective Inc.',
+                        examples: isUser ? 'Jane Mary Doe, Frank Vincent Zappa' : 'Doohi Collective Inc.',
                       })}
                       width="100%"
                       data-cy="mini-form-legalName-field"

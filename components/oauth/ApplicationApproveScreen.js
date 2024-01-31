@@ -218,7 +218,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
                 <P fontSize="16px" color="black.700" ml={3}>
                   <FormattedMessage
                     defaultMessage="Verify your identity on {service}"
-                    values={{ service: 'Open Collective' }}
+                    values={{ service: 'Doohi Collective' }}
                   />{' '}
                   <br />
                   <p className="mt-1 text-sm">

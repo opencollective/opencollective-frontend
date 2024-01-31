@@ -106,7 +106,7 @@ const OTHER_MESSAGES = defineMessages({
   tipAmountContributionWarning: {
     id: 'Warning.TipAmountContributionWarning',
     defaultMessage:
-      'You are about to make a contribution of {contributionAmount} to {accountName} that includes a {tipAmount} tip to the Open Collective platform. The tip amount looks unusually high.{newLine}{newLine}Are you sure you want to do this?',
+      'You are about to make a contribution of {contributionAmount} to {accountName} that includes a {tipAmount} tip to the Doohi Collective platform. The tip amount looks unusually high.{newLine}{newLine}Are you sure you want to do this?',
   },
   pastEventWarning: {
     id: 'Warning.PastEvent',

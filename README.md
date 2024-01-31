@@ -1,4 +1,4 @@
-# Open Collective Frontend
+# Doohi Collective Frontend
 
 ![GitHub](https://img.shields.io/github/license/opencollective/opencollective-frontend)
 [![Crowdin](https://d322cqt584bo4o.cloudfront.net/opencollective/localized.svg)](https://crowdin.com/project/opencollective)
@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://github.com/opencollective/opencollective-frontend">
-    <img width="838" src="https://user-images.githubusercontent.com/1556356/91951703-030aa180-ed01-11ea-8b1d-b3e4a0ca1fed.png" alt="Babel - Open Collective">
+    <img width="838" src="https://user-images.githubusercontent.com/1556356/91951703-030aa180-ed01-11ea-8b1d-b3e4a0ca1fed.png" alt="Babel - Doohi Collective">
   </a>
 </p>
 
@@ -35,11 +35,11 @@ npm install
 
 ### Environment variables
 
-This project requires an access to the Open Collective API.
+This project requires an access to the Doohi Collective API.
 
-By default, it will try to connect to the Open Collective staging API, **you don't have to change anything**.
+By default, it will try to connect to the Doohi Collective staging API, **you don't have to change anything**.
 
-In case you want to connect to the Open Collective API running locally:
+In case you want to connect to the Doohi Collective API running locally:
 
 - clone, install and start [opencollective-api](https://github.com/opencollective/opencollective-api)
 - in this project, copy the following content to a `.env` file:
@@ -85,7 +85,7 @@ We're currently looking for contributions for the following languages:
 - Spanish
 - Japanese
 
-Want to add a new language for Open Collective? [Contact us](https://slack.opencollective.org),
+Want to add a new language for Doohi Collective? [Contact us](https://slack.opencollective.org),
 we'll be happy to help you to set it up!
 
 ## Contributing
@@ -96,17 +96,17 @@ TL;DR: we use [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/)
 
 ## Bounties
 
-This repo is part of the Open Collective bounty program. Get paid to contribute to Open Source! The Open Collective engineering team is small and we're always looking for new contributors to our Open Source codebases. Our Bounty program is an opportunity to solve issues that could be neglected otherwise. Contributors who fix these issues will be rewarded financially. Please see our docs for more information: https://docs.opencollective.com/help/contributing/development/bounties
+This repo is part of the Doohi Collective bounty program. Get paid to contribute to Open Source! The Doohi Collective engineering team is small and we're always looking for new contributors to our Open Source codebases. Our Bounty program is an opportunity to solve issues that could be neglected otherwise. Contributors who fix these issues will be rewarded financially. Please see our docs for more information: https://docs.opencollective.com/help/contributing/development/bounties
 
 ## Deployment
 
-This project is currently deployed to staging and production with [Heroku](https://www.heroku.com/). To deploy, you need to be a core member of the Open Collective team.
+This project is currently deployed to staging and production with [Heroku](https://www.heroku.com/). To deploy, you need to be a core member of the Doohi Collective team.
 
 More info: [docs/deployment.md](docs/deployment.md)
 
 ## Publishing components
 
-To publish a frontend components update to [NPM](https://www.npmjs.com/package/@opencollective/frontend-components), you need to be a core member of the Open Collective team. Steps:
+To publish a frontend components update to [NPM](https://www.npmjs.com/package/@opencollective/frontend-components), you need to be a core member of the Doohi Collective team. Steps:
 
 1. Check the currently published version with `npm view @opencollective/frontend-components version`
 2. Trigger the publishing script by running `npm run publish-components {NEW_VERSION}`, where `{NEW_VERSION}` is the new version number (please follow [semver](https://semver.org/)).

@@ -127,7 +127,7 @@ const NewsAndUpdatesModal = ({ open, setOpen }) => {
                 <FormattedMessage id="NewsAndUpdates.link.whatsNew" defaultMessage="What's new" />
               </DialogTitle>
               <DialogDescription>
-                <FormattedMessage defaultMessage="Keep track of the latest updates from Open Collective." />
+                <FormattedMessage defaultMessage="Keep track of the latest updates from Doohi Collective." />
               </DialogDescription>
             </div>
             <Image

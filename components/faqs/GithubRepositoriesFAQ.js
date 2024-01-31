@@ -22,7 +22,7 @@ const GithubRepositoriesFAQ = props => (
       <Content>
         <FormattedMessage
           id="GithubRepositories.faq.host.content"
-          defaultMessage="Open Source Collective 501(c)(6) is a US non-profit that was created to serve as Fiscal Host (aka fiscal sponsor) to open source projects using Open Collective. Learn more about OSC at https://oscollective.org."
+          defaultMessage="Open Source Collective 501(c)(6) is a US non-profit that was created to serve as Fiscal Host (aka fiscal sponsor) to open source projects using Doohi Collective. Learn more about OSC at https://oscollective.org."
         />
       </Content>
     </Entry>

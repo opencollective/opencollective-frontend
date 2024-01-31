@@ -47,7 +47,7 @@ const AboutOurFees = () => {
           <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
             <FormattedMessage
               id="OCFHostApplication.aboutOurFees.description"
-              defaultMessage="In order to support you better, we use the Open Collective Platform to manage your initiative."
+              defaultMessage="In order to support you better, we use the Doohi Collective Platform to manage your initiative."
             />
           </P>
         </Box>
@@ -76,7 +76,7 @@ const AboutOurFees = () => {
             <P textAlign="center" color="black.600" fontSize="13px" lineHeight="16px">
               <FormattedMessage
                 id="OCFHostApplication.crowdFunding.description"
-                defaultMessage="On each incoming contribution made via the Open Collective Platform"
+                defaultMessage="On each incoming contribution made via the Doohi Collective Platform"
               />
             </P>
           </Box>

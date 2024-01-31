@@ -70,7 +70,7 @@ class CreateProject extends Component {
           <Flex flexDirection="column" p={4} mt={2}>
             <Box mb={3}>
               <H1 fontSize="32px" lineHeight="36px" fontWeight="bold" textAlign="center">
-                <FormattedMessage id="collective.create.join" defaultMessage="Join Open Collective" />
+                <FormattedMessage id="collective.create.join" defaultMessage="Join Doohi Collective" />
               </H1>
             </Box>
             <Box textAlign="center">

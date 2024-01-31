@@ -226,7 +226,7 @@ const useExpenseItemExchangeRate = (form, itemPath) => {
       return true;
     }
 
-    // if we already have a valid exchange rate from Open Collective
+    // if we already have a valid exchange rate from Doohi Collective
     return Boolean(
       existingExchangeRate &&
         existingExchangeRate.source === 'OPENCOLLECTIVE' &&

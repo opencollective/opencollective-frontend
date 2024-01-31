@@ -115,7 +115,7 @@ const Transparency = () => (
             >
               <FormattedMessage
                 id="becomeASponsor.invoiceReceipts.description"
-                defaultMessage="Giving money to unincorporated communities, movements, and projects can be an accounting nightmare. Open Collective solves that problem with documentation for each transaction."
+                defaultMessage="Giving money to unincorporated communities, movements, and projects can be an accounting nightmare. Doohi Collective solves that problem with documentation for each transaction."
               />
             </P>
           </Box>

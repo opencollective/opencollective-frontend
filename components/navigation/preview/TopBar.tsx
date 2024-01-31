@@ -118,7 +118,7 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
             <Box flexShrink={0}>
               <Link href={ocLogoRoute}>
                 <Flex alignItems="center" gridGap={2}>
-                  <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />
+                  <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Doohi Collective" />
                 </Flex>
               </Link>
             </Box>
@@ -156,7 +156,7 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
               </React.Fragment>
             ) : onHomeRoute ? (
               <div className="flex flex-1 items-center gap-2">
-                <Image height={20} width={120} src="/static/images/logotype.svg" alt="Open Collective" />
+                <Image height={20} width={120} src="/static/images/logotype.svg" alt="Doohi Collective" />
                 <div className="flex flex-1 justify-center">
                   <HomePageMenu />
                 </div>

@@ -210,7 +210,7 @@ class EditCollectiveForm extends React.Component {
       },
       'hostFeePercent.warning': {
         id: 'collective.hostFeePercent.warning',
-        defaultMessage: `Open Collective will charge 15% of your Host Fee revenue as its Platform Fee.`,
+        defaultMessage: `Doohi Collective will charge 15% of your Host Fee revenue as its Platform Fee.`,
       },
       'hostFeePercent.warning2': {
         id: 'newPricing.tab.hostFeeChargeExample',

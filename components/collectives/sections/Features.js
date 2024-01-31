@@ -267,7 +267,7 @@ const Features = ({ sectionTitle, sectionSubtitle }) => {
     <Flex mx={[3, 4]} flexDirection="column" textAlign="center" my={[4, null, 0]}>
       <SectionTitle mb={3}>
         {sectionTitle || (
-          <FormattedMessage id="home.featureSection.title" defaultMessage="How to use Open Collective" />
+          <FormattedMessage id="home.featureSection.title" defaultMessage="How to use Doohi Collective" />
         )}
       </SectionTitle>
       <SectionDescription>

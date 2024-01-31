@@ -34,7 +34,7 @@ const WhatDoesE2CMean = () => {
           minWidth={[null, null, '534px']}
         >
           <NextIllustration
-            alt="How Open Collective works"
+            alt="How Doohi Collective works"
             src="/static/images/e2c/whatDoesE2CMean-illustration.png"
             width={534}
             height={357}

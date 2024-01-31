@@ -13,7 +13,7 @@ const messages = defineMessages({
   },
   description: {
     id: 'GuestProfile.description',
-    defaultMessage: 'This contributor has not joined Open Collective yet',
+    defaultMessage: 'This contributor has not joined Doohi Collective yet',
   },
 });
 

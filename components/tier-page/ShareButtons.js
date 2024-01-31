@@ -9,7 +9,7 @@ import { Twitter } from '@styled-icons/feather/Twitter';
 import copy from 'copy-to-clipboard';
 import { defineMessages, injectIntl } from 'react-intl';
 
-// Open Collective Frontend imports
+// Doohi Collective Frontend imports
 import { facebookShareURL, linkedInShareURL, mailToURL, tweetURL } from '../../lib/url-helpers';
 
 import Container from '../Container';

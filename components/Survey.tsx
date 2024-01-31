@@ -149,7 +149,7 @@ export function Survey({
       <ReactAnimateHeight duration={150} height={completed ? 'auto' : 0}>
         {completed && (
           <p className="text-muted-foreground">
-            <FormattedMessage defaultMessage="Thank you for your feedback! It will help us improve Open Collective." />
+            <FormattedMessage defaultMessage="Thank you for your feedback! It will help us improve Doohi Collective." />
           </p>
         )}
       </ReactAnimateHeight>
