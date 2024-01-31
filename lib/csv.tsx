@@ -83,6 +83,8 @@ const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
     'netAmount',
     'balance',
     'currency',
+    'accountingCategoryCode',
+    'accountingCategoryName',
   ],
   accounts: [
     'accountSlug',
@@ -108,7 +110,6 @@ const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
     'paymentMethodType',
   ],
   expense: ['expenseId', 'expenseLegacyId', 'expenseType', 'expenseTags', 'payoutMethodType', 'merchantId'],
-  accounting: ['accountingCategoryCode', 'accountingCategoryName'],
   tax: ['taxAmount', 'taxType', 'taxRate', 'taxIdNumber'],
   legacy: ['platformFee', 'hostFee'],
 };
@@ -118,13 +119,11 @@ export const FIELD_GROUPS_2024: Record<string, readonly CSVField[]> = {
   accounts: FIELD_GROUPS.accounts,
   order: FIELD_GROUPS.order,
   expense: FIELD_GROUPS.expense,
-  accounting: FIELD_GROUPS.accounting,
   tax: FIELD_GROUPS.tax.filter(field => field !== 'taxAmount'),
   legacy: [...FIELD_GROUPS.legacy, 'paymentProcessorFee', 'taxAmount'],
 };
 
 export const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, React.ReactNode> = {
-  accounting: <FormattedMessage id="home.accounting" defaultMessage="Accounting" />,
   transaction: <FormattedMessage defaultMessage="Transaction" />,
   accounts: <FormattedMessage defaultMessage="Account" />,
   order: <FormattedMessage defaultMessage="Contribution" />,
