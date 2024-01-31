@@ -344,6 +344,9 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
 
       // Component ready!
       this.isReady = true;
+
+      // Set initial value for text
+      this.setState({ text: this.editorRef.current.innerText });
     }
   };
 
