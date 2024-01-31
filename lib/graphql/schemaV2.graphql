@@ -1652,7 +1652,15 @@ type AccountingCategory {
   A friendly name for non-accountants (i.e. expense submitters and collective admins)
   """
   friendlyName: String
+
+  """
+  Whether this category is only meant for the host admins
+  """
   hostOnly: Boolean!
+
+  """
+  Instructions for the expense submitters
+  """
   instructions: String
 
   """
@@ -17217,7 +17225,11 @@ input AccountingCategoryInput {
   A friendly name for non-accountants (i.e. expense submitters and collective admins)
   """
   friendlyName: String
-  hostOnly: Boolean = false
+
+  """
+  Whether this category is only meant for the host admins
+  """
+  hostOnly: Boolean! = false
   instructions: String
 
   """
