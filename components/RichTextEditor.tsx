@@ -509,6 +509,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
     const isEmbedAttachment =
       attachmentContent?.includes(`<iframe src="${SUPPORTED_IFRAME_URLS.youTube}`) ||
       attachmentContent?.includes(`<iframe src="${SUPPORTED_IFRAME_URLS.anchorFm}`);
+
     if (isEmbedAttachment) {
       return;
     } else if (!attachment.file) {
@@ -519,6 +520,10 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
         attachment.remove(); // Remove unknown stuff, usually when copy-pasting HTML
       }
 
+      return;
+    } else if (this.props.version === 'simplified') {
+      // Don't upload files in simplified mode
+      attachment.remove();
       return;
     }
 
