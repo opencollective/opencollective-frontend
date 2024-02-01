@@ -312,7 +312,7 @@ const ExpenseFormBody = ({
   const { formatMessage } = intl;
   const router = useRouter();
   const formRef = React.useRef();
-  const { LoggedInUser } = useLoggedInUser();
+  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const { values, handleChange, errors, setValues, dirty, touched, resetForm, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
   const hasOCRPreviewEnabled = checkOCREnabled(LoggedInUser, router, host);
@@ -483,7 +483,7 @@ const ExpenseFormBody = ({
   let payeeForm;
   if (loading) {
     payeeForm = <LoadingPlaceholder height={32} />;
-  } else if (isDraft && !loggedInAccount) {
+  } else if (isDraft && !loggedInAccount && !loadingLoggedInUser) {
     payeeForm = (
       <ExpenseFormPayeeSignUpStep
         collective={collective}
@@ -988,9 +988,10 @@ const ExpenseForm = ({
   drawerActionsContainer,
 }) => {
   const isDraft = expense?.status === ExpenseStatus.DRAFT;
-  const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
+  const router = useRouter();
   const intl = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
+  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
+  const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
   const supportedExpenseTypes = React.useMemo(() => getSupportedExpenseTypes(collective), [collective]);
   const initialValues = { ...getDefaultExpense(collective, supportedExpenseTypes), ...expense };
   const validate = expenseData => validateExpense(intl, expenseData, collective, host, LoggedInUser);
@@ -1001,6 +1002,13 @@ const ExpenseForm = ({
     initialValues.payoutMethod = expense.draft.payoutMethod;
     initialValues.payeeLocation = expense.draft.payeeLocation;
     initialValues.payee = expense.recurringExpense ? expense.payee : expense.draft.payee;
+  }
+
+  const isPayeeExistingUser = initialValues.payee?.id && !initialValues.payee?.email;
+  const isDraftSentToExistingUser = isDraft && isPayeeExistingUser && !expense.recurringExpense;
+  const isUserLoggedOut = !loadingLoggedInUser && !LoggedInUser;
+  if (isDraftSentToExistingUser && isUserLoggedOut) {
+    router.push({ pathname: '/signin', query: { next: router.asPath } });
   }
 
   return (
