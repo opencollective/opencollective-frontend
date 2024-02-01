@@ -181,6 +181,8 @@ export const transactionsPageQuery = gql`
       orderBy: $orderBy
     ) {
       ...TransactionsQueryCollectionFragment
+      kinds
+      paymentMethodTypes
     }
   }
   ${transactionsQueryCollectionFragment}
