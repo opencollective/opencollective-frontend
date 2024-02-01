@@ -7,7 +7,8 @@ export const AVERAGE_TRANSACTIONS_PER_MINUTE = 8240;
 export const HOST_OMITTED_FIELDS = ['balance', 'hostSlug', 'hostName', 'hostType'];
 
 type CSVField =
-  | 'accountingCategory'
+  | 'accountingCategoryCode'
+  | 'accountingCategoryName'
   | 'date'
   | 'datetime'
   | 'id'
@@ -82,6 +83,8 @@ const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
     'netAmount',
     'balance',
     'currency',
+    'accountingCategoryCode',
+    'accountingCategoryName',
   ],
   accounts: [
     'accountSlug',
@@ -106,15 +109,7 @@ const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
     'paymentMethodService',
     'paymentMethodType',
   ],
-  expense: [
-    'accountingCategory',
-    'expenseId',
-    'expenseLegacyId',
-    'expenseType',
-    'expenseTags',
-    'payoutMethodType',
-    'merchantId',
-  ],
+  expense: ['expenseId', 'expenseLegacyId', 'expenseType', 'expenseTags', 'payoutMethodType', 'merchantId'],
   tax: ['taxAmount', 'taxType', 'taxRate', 'taxIdNumber'],
   legacy: ['platformFee', 'hostFee'],
 };
@@ -170,7 +165,8 @@ export const DEFAULT_FIELDS = [
 ];
 
 export const FieldLabels: Record<CSVField, React.ReactNode> = {
-  accountingCategory: <FormattedMessage defaultMessage="Accounting Category" />,
+  accountingCategoryCode: <FormattedMessage defaultMessage="Accounting Category Code" />,
+  accountingCategoryName: <FormattedMessage defaultMessage="Accounting Category Name" />,
   date: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
   datetime: <FormattedMessage defaultMessage="Date & Time" />,
   id: <FormattedMessage defaultMessage="Transaction ID" />,
