@@ -85,6 +85,9 @@ exports[`HTMLContent cannot inject malicious content 1`] = `
   padding: 16px;
   font-family: monospace;
   overflow-x: auto;
+  max-width: 100%;
+  white-space: nowrap;
+  border-radius: 4px;
 }
 
 .c1 ul {
@@ -224,6 +227,9 @@ exports[`HTMLContent handles broken HTML 1`] = `
   padding: 16px;
   font-family: monospace;
   overflow-x: auto;
+  max-width: 100%;
+  white-space: nowrap;
+  border-radius: 4px;
 }
 
 .c1 ul {
@@ -347,6 +353,9 @@ exports[`HTMLContent renders simple HTML string 1`] = `
   padding: 16px;
   font-family: monospace;
   overflow-x: auto;
+  max-width: 100%;
+  white-space: nowrap;
+  border-radius: 4px;
 }
 
 .c1 ul {

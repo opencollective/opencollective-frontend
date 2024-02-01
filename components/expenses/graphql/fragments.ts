@@ -107,6 +107,8 @@ export const accountingCategoryFields = gql`
   fragment AccountingCategoryFields on AccountingCategory {
     id
     name
+    kind
+    instructions
     friendlyName
     code
     expensesTypes
@@ -151,7 +153,7 @@ export const expenseHostFields = gql`
     plan {
       id
     }
-    accountingCategories {
+    accountingCategories(kind: EXPENSE) {
       nodes {
         id
         ...AccountingCategoryFields

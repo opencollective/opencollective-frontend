@@ -5,23 +5,23 @@ import { AccountingCategory, AccountingCategoryKind } from '../../../../lib/grap
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
 import { Drawer, DrawerActions, DrawerHeader } from '../../../Drawer';
+import HTMLContent from '../../../HTMLContent';
 import StyledButton from '../../../StyledButton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 
 import {
   AccountingCategoryForm,
   AccountingCategoryKindI18n,
+  EditableAccountingCategoryFields,
   useAccoutingCategoryFormik,
 } from './AccountingCategoryForm';
 
 type AccountingCategoryDrawerProps = {
   open: boolean;
   onClose: () => void;
-  onEdit: (
-    category: Pick<AccountingCategory, 'id' | 'kind' | 'name' | 'friendlyName' | 'code' | 'expensesTypes'>,
-  ) => void;
+  onEdit: (category: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>) => void;
   onDelete: (category: Pick<AccountingCategory, 'id'>) => void;
-  accountingCategory?: Pick<AccountingCategory, 'id' | 'kind' | 'name' | 'friendlyName' | 'code' | 'expensesTypes'>;
+  accountingCategory?: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>;
 };
 
 export function AccountingCategoryDrawer(props: AccountingCategoryDrawerProps) {
@@ -56,7 +56,7 @@ export function AccountingCategoryDrawer(props: AccountingCategoryDrawerProps) {
 }
 
 type AccountingCategoryDrawerViewProps = {
-  accountingCategory?: Pick<AccountingCategory, 'id' | 'kind' | 'name' | 'friendlyName' | 'code' | 'expensesTypes'>;
+  accountingCategory?: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>;
   onEditClick: () => void;
   onDeleteClick: () => void;
 };
@@ -72,6 +72,16 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
         <p>
           {props.accountingCategory?.kind && (
             <FormattedMessage {...AccountingCategoryKindI18n[props.accountingCategory?.kind]} />
+          )}
+        </p>
+        <label className="mb-1 mt-4 text-base">
+          <FormattedMessage defaultMessage="Host only" />
+        </label>
+        <p>
+          {props.accountingCategory?.hostOnly ? (
+            <FormattedMessage defaultMessage="Yes" />
+          ) : (
+            <FormattedMessage defaultMessage="No" />
           )}
         </p>
         <label className="mb-1 mt-4 text-base">
@@ -108,6 +118,13 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
             <FormattedMessage id="AllExpenses" defaultMessage="All expenses" />
           )}
         </p>
+
+        <label className="mb-1 mt-4 text-base">
+          <FormattedMessage defaultMessage="Instructions" />
+        </label>
+        <div>
+          <HTMLContent content={props.accountingCategory?.instructions} />
+        </div>
       </div>
       <DrawerActions>
         <DropdownMenu>
@@ -134,10 +151,8 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
 }
 
 type AccountingCategoryEditingDrawerViewProps = {
-  accountingCategory?: Pick<AccountingCategory, 'id' | 'kind' | 'name' | 'friendlyName' | 'code' | 'expensesTypes'>;
-  onEdit: (
-    category: Pick<AccountingCategory, 'id' | 'kind' | 'name' | 'friendlyName' | 'code' | 'expensesTypes'>,
-  ) => void;
+  accountingCategory?: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>;
+  onEdit: (category: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>) => void;
   onExitEdit: () => void;
 };
 
@@ -155,8 +170,15 @@ function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDra
           AccountingCategoryKindI18n[props.accountingCategory?.kind || AccountingCategoryKind.EXPENSE],
         ),
       },
+      hostOnly: {
+        value: props.accountingCategory?.hostOnly,
+        label: props.accountingCategory?.hostOnly
+          ? intl.formatMessage({ defaultMessage: 'Yes' })
+          : intl.formatMessage({ defaultMessage: 'No' }),
+      },
+      instructions: props.accountingCategory?.instructions,
       expensesTypes: props.accountingCategory?.expensesTypes
-        ? props.accountingCategory.expensesTypes.map(t => ({ value: t, label: i18nExpenseType(intl, t) }))
+        ? props.accountingCategory?.expensesTypes.map(t => ({ value: t, label: i18nExpenseType(intl, t) }))
         : null,
     };
   }, [props.accountingCategory, intl]);
@@ -169,6 +191,8 @@ function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDra
           ...values,
           id: props.accountingCategory?.id,
           kind: values.kind ? values.kind.value : null,
+          hostOnly: values.hostOnly.value,
+          instructions: values.instructions,
           expensesTypes:
             values.expensesTypes && values.expensesTypes.length > 0 ? values.expensesTypes.map(t => t.value) : null,
         });

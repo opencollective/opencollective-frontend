@@ -114,7 +114,9 @@ const MessageBox = ({ type = 'white', withIcon = false, isLoading, children, ...
           </Box>
         )}
 
-        <Box flex={1}>{children}</Box>
+        <Box flex={1} maxWidth="100%">
+          {children}
+        </Box>
       </Flex>
     </Message>
   );
