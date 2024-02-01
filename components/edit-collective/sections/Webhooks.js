@@ -72,7 +72,7 @@ class Webhooks extends React.Component {
   };
 
   getEventTypes = memoizeOne(collective => {
-    const removeList = [];
+    const removeList = [WebhookEvents.COLLECTIVE_TRANSACTION_CREATED]; // Deprecating this event, see https://github.com/opencollective/opencollective/issues/7162
 
     // Features
     const canReceiveExpenses = isFeatureEnabled(collective, FEATURES.RECEIVE_EXPENSES);
