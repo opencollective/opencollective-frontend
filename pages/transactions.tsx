@@ -183,6 +183,7 @@ export const transactionsPageQuery = gql`
       ...TransactionsQueryCollectionFragment
       kinds
       paymentMethodTypes
+      totalCount
     }
   }
   ${transactionsQueryCollectionFragment}

@@ -103,19 +103,21 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                   textTransform="uppercase"
                   color="black.700"
                   extraTooltipContent={
-                    <Fragment>
-                      <Box mt={2}>
-                        <FormattedMessage
-                          id="budgetSection-balance-consolidated"
-                          defaultMessage="Total consolidated including Projects and Events: {amount}"
-                          values={{
-                            amount: formatCurrency(stats?.consolidatedBalance.valueInCents || 0, collective.currency, {
-                              locale,
-                            }),
-                          }}
-                        />
-                      </Box>
-                    </Fragment>
+                    stats.consolidatedBalance?.valueInCents && (
+                      <Fragment>
+                        <Box mt={2}>
+                          <FormattedMessage
+                            id="budgetSection-balance-consolidated"
+                            defaultMessage="Total consolidated including Projects and Events: {amount}"
+                            values={{
+                              amount: formatCurrency(stats.consolidatedBalance.valueInCents || 0, collective.currency, {
+                                locale,
+                              }),
+                            }}
+                          />
+                        </Box>
+                      </Fragment>
+                    )
                   }
                 />
               ) : (
@@ -142,7 +144,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                         id="budgetSection-raised-total"
                         defaultMessage="Total contributed before fees: {amount}"
                         values={{
-                          amount: formatCurrency(stats?.totalAmountRaised.valueInCents || 0, collective.currency, {
+                          amount: formatCurrency(stats.totalAmountRaised.valueInCents || 0, collective.currency, {
                             locale,
                           }),
                         }}
@@ -164,7 +166,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
               currency={collective.currency}
             />
           </StatContainer>
-          {!isFund && (
+          {!isFund && stats.totalAmountReceived?.valueInCents && stats.yearlyBudget?.valueInCents && (
             <StatContainer data-cy="budgetSection-estimated-budget" borderTop={borderTop}>
               <StatTitle>
                 <Calendar size="12px" />
@@ -186,7 +188,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                           id="CollectivePage.SectionBudget.TotalAmountReceived"
                           defaultMessage="Total received in the last 12 months: {amount}"
                           values={{
-                            amount: formatCurrency(stats?.totalAmountReceived.valueInCents || 0, collective.currency, {
+                            amount: formatCurrency(stats.totalAmountReceived.valueInCents || 0, collective.currency, {
                               locale,
                             }),
                           }}

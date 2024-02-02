@@ -56,6 +56,7 @@ export const transactionsSectionQuery = gql`
       includeChildrenTransactions: true
     ) {
       ...TransactionsQueryCollectionFragment
+      totalCount
     }
   }
   ${transactionsQueryCollectionFragment}

@@ -49,21 +49,22 @@ const budgetSectionAccountFieldsFragment = gql`
       }
     }
     stats {
+      # Skip following on Heavy Accounts (low performance vs relevance ratio)
       id
       balance {
         valueInCents
         currency
       }
-      consolidatedBalance {
+      consolidatedBalance @skip(if: $heavyAccount) {
         valueInCents
         currency
       }
-      yearlyBudget {
+      yearlyBudget @skip(if: $heavyAccount) {
         valueInCents
         currency
       }
       activeRecurringContributions
-      totalAmountReceived(periodInMonths: 12) {
+      totalAmountReceived(periodInMonths: 12) @skip(if: $heavyAccount) {
         valueInCents
         currency
       }
@@ -80,7 +81,7 @@ const budgetSectionAccountFieldsFragment = gql`
 `;
 
 export const budgetSectionQuery = gql`
-  query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
+  query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind], $heavyAccount: Boolean!) {
     transactions(
       account: { slug: $slug }
       limit: $limit
@@ -158,7 +159,7 @@ export const budgetSectionForIndividualQuery = gql`
 `;
 
 export const budgetSectionWithHostQuery = gql`
-  query BudgetSectionWithHost($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
+  query BudgetSectionWithHost($slug: String!, $limit: Int!, $kind: [TransactionKind], $heavyAccount: Boolean!) {
     transactions(
       account: { slug: $slug }
       limit: $limit
@@ -207,7 +208,12 @@ export const getBudgetSectionQueryVariables = (collectiveSlug, isIndividual) => 
   if (isIndividual) {
     return { slug: collectiveSlug, limit: 3, kind: getDefaultKinds().filter(kind => kind !== TransactionKind.EXPENSE) };
   } else {
-    return { slug: collectiveSlug, limit: 3, kind: getDefaultKinds() };
+    return {
+      slug: collectiveSlug,
+      limit: 3,
+      kind: getDefaultKinds(),
+      heavyAccount: ['opencollective', 'opensource', 'foundation', 'europe'].includes(collectiveSlug),
+    };
   }
 };
 

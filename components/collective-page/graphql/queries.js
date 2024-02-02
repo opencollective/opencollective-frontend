@@ -58,23 +58,11 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       }
       stats {
         id
-        balance
-        balanceWithBlockedFunds
-        yearlyBudget
-        updates
-        activeRecurringContributions
-        totalAmountReceived(periodInMonths: 12)
-        totalAmountRaised: totalAmountReceived
-        totalNetAmountRaised: totalNetAmountReceived
         backers {
           id
           all
           users
           organizations
-        }
-        transactions {
-          id
-          all
         }
       }
       connectedTo: memberOf(role: "CONNECTED_COLLECTIVE", limit: 1) {

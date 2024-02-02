@@ -15,7 +15,7 @@ import ContributionsBudget from './Budget/ContributionsBudget';
 import ExpenseBudget from './Budget/ExpenseBudget';
 
 export const budgetSectionQuery = gql`
-  query BudgetSection($slug: String!) {
+  query BudgetSection($slug: String!, $heavyAccount: Boolean!) {
     account(slug: $slug) {
       id
       stats {
@@ -24,16 +24,16 @@ export const budgetSectionQuery = gql`
           valueInCents
           currency
         }
-        consolidatedBalance {
+        consolidatedBalance @skip(if: $heavyAccount) {
           valueInCents
           currency
         }
-        yearlyBudget {
+        yearlyBudget @skip(if: $heavyAccount) {
           valueInCents
           currency
         }
         activeRecurringContributions
-        totalAmountReceived(periodInMonths: 12) {
+        totalAmountReceived(periodInMonths: 12) @skip(if: $heavyAccount) {
           valueInCents
           currency
         }
@@ -56,7 +56,10 @@ export const budgetSectionQuery = gql`
  */
 const SectionFinancialOverview = ({ collective, LoggedInUser }) => {
   const budgetQueryResult = useQuery(budgetSectionQuery, {
-    variables: { slug: collective.slug },
+    variables: {
+      slug: collective.slug,
+      heavyAccount: ['opencollective', 'opensource', 'foundation', 'europe'].includes(collective.slug),
+    },
     context: API_V2_CONTEXT,
   });
   const { data, refetch } = budgetQueryResult;
