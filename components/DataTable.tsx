@@ -1,5 +1,14 @@
 import React from 'react';
-import { ColumnDef, flexRender, getCoreRowModel, Row, TableMeta, useReactTable } from '@tanstack/react-table';
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  Row,
+  SortingState,
+  TableMeta,
+  useReactTable,
+} from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
 import { Skeleton } from './ui/Skeleton';
@@ -23,6 +32,7 @@ interface DataTableProps<TData, TValue> {
   footer?: React.ReactNode;
   tableRef?: React.Ref<HTMLTableElement>;
   compact?: boolean;
+  initialSort?: SortingState;
 }
 
 export function DataTable<TData, TValue>({
@@ -39,13 +49,24 @@ export function DataTable<TData, TValue>({
   footer,
   tableRef,
   compact,
+  initialSort,
   ...tableProps
 }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = React.useState<SortingState>(initialSort ?? []);
+  const [rowSelection, setRowSelection] = React.useState({});
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     meta,
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      rowSelection,
+    },
   });
 
   return (

@@ -3,7 +3,7 @@ import { gql } from '../../lib/graphql/helpers';
 import { collectiveNavbarFieldsFragment } from '../collective-page/graphql/fragments';
 
 export const adminPanelQuery = gql`
-  query AdminPanel($slug: String!) {
+  query Dashboard($slug: String!) {
     account(slug: $slug) {
       id
       legacyId
@@ -15,6 +15,18 @@ export const adminPanelQuery = gql`
       isArchived
       isIncognito
       imageUrl(height: 256)
+      pendingExpenses: expenses(status: PENDING, direction: RECEIVED, includeChildrenExpenses: true, limit: 0) {
+        totalCount
+      }
+      childrenAccounts {
+        totalCount
+        nodes {
+          id
+          slug
+          name
+          type
+        }
+      }
       features {
         id
         ...NavbarFields

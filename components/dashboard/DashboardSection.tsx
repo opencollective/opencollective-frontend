@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
-import { isIndividualAccount } from '../../lib/collective';
-
 import { HostAdminAccountingSection } from '../admin-panel/sections/accounting';
 import AccountSettings from '../admin-panel/sections/AccountSettings';
 import InvoicesReceipts from '../admin-panel/sections/invoices-receipts/InvoicesReceipts';
@@ -27,8 +25,7 @@ import HostDashboardAgreements from './sections/HostDashboardAgreements';
 import HostDashboardReports from './sections/HostDashboardReports';
 import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
 import HostVirtualCards from './sections/HostVirtualCards';
-import { CollectiveOverview } from './sections/Overview/CollectiveOverview';
-import IndividualOverview from './sections/Overview/IndividualOverview';
+import Overview from './sections/overview/Overview';
 import AccountTransactions from './sections/transactions/AccountTransactions';
 import HostTransactions from './sections/transactions/HostTransactions';
 import Vendors from './sections/Vendors';
@@ -46,7 +43,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.REPORTS]: HostDashboardReports,
   [SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
   [SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
-  [SECTIONS.OVERVIEW]: CollectiveOverview,
+  [SECTIONS.OVERVIEW]: Overview,
   [SECTIONS.EXPENSES]: ReceivedExpenses,
   [SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
   [SECTIONS.CONTRIBUTORS]: Contributors,
@@ -76,11 +73,8 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     );
   }
 
-  let DashboardComponent = DASHBOARD_COMPONENTS[section];
+  const DashboardComponent = DASHBOARD_COMPONENTS[section];
   if (DashboardComponent) {
-    if (section === SECTIONS.OVERVIEW && isIndividualAccount(account)) {
-      DashboardComponent = IndividualOverview;
-    }
     return (
       <div className="w-full">
         <DashboardComponent accountSlug={account.slug} subpath={subpath} isDashboard />

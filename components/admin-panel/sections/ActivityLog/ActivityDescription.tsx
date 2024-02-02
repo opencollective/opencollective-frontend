@@ -12,6 +12,7 @@ import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
 import Avatar from '../../../Avatar';
 import FollowButton from '../../../FollowButton';
+import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import LinkExpense from '../../../LinkExpense';
@@ -80,6 +81,21 @@ export const getActivityVariables = (
   Account: () => <CollectiveTag collective={activity.account} displayFollowButton={options?.displayFollowButton} />,
   AccountType: () => formatCollectiveType(intl, activity.account?.type || 'COLLECTIVE'),
   AccountParent: () => <CollectiveTag collective={activity.account?.parent} />,
+  Amount: msg => {
+    if (!activity.expense) {
+      return msg;
+    }
+
+    return (
+      <FormattedMoneyAmount
+        amount={activity.expense.amountV2.valueInCents}
+        currency={activity.expense.amountV2.currency}
+        precision={2}
+        amountStyles={{ letterSpacing: 0 }}
+      />
+    );
+  },
+  Payee: msg => (!activity.expense ? msg : <CollectiveTag collective={activity.expense.payee} />),
   Expense: msg =>
     !activity.expense ? (
       msg
