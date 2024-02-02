@@ -283,11 +283,9 @@ const getDefaultStep = (defaultStep, stepOneCompleted, isCreditCardCharge) => {
   }
 };
 
-const checkOCREnabled = (loggedInUser, router, host) => {
+const checkOCREnabled = (router, host) => {
   const urlFlag = router.query.ocr && parseToBoolean(router.query.ocr);
-  return (
-    urlFlag !== false && isInternalHost(host) && (loggedInUser?.hasPreviewFeatureEnabled('EXPENSE_OCR') || urlFlag)
-  );
+  return urlFlag !== false && isInternalHost(host);
 };
 
 const ExpenseFormBody = ({
@@ -315,7 +313,7 @@ const ExpenseFormBody = ({
   const { LoggedInUser } = useLoggedInUser();
   const { values, handleChange, errors, setValues, dirty, touched, resetForm, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
-  const hasOCRPreviewEnabled = checkOCREnabled(LoggedInUser, router, host);
+  const hasOCRPreviewEnabled = checkOCREnabled(router, host);
   const hasOCRFeature = hasOCRPreviewEnabled && checkExpenseSupportsOCR(values.type, LoggedInUser);
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
