@@ -242,7 +242,7 @@ describe('host dashboard', () => {
       // Pay
       cy.getByDataCy('pay-expense-modal').as('payExpenseModal');
       cy.get('@payExpenseModal').find('[data-cy="pay-type-MANUAL"]').click();
-      cy.get('@payExpenseModal').find('[data-cy="total-amount-paid"]').type('10.23');
+      cy.get('@payExpenseModal').find('[data-cy="expense-amount-paid"]').type('10.00');
       cy.get('@payExpenseModal').find('[data-cy="mark-as-paid-button"]').click();
       cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Paid');
 
