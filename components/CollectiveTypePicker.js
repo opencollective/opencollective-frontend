@@ -10,7 +10,7 @@ import StyledButton from './StyledButton';
 
 /** Return the caption associated to a given collective type */
 const getTypeCaption = type => {
-  if (type === CollectiveType.USER) {
+  if (type === CollectiveType.USER || type === CollectiveType.INDIVIDUAL) {
     return <FormattedMessage id="User.InviteNew" defaultMessage="Invite new User" />;
   } else if (type === CollectiveType.ORGANIZATION) {
     return <FormattedMessage id="organization.create" defaultMessage="Create Organization" />;

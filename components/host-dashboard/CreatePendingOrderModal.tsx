@@ -12,7 +12,7 @@ import styled from 'styled-components';
 import { formatCurrency } from '../../lib/currency-utils';
 import { requireFields, verifyEmailPattern } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { CreatePendingContributionModalQuery, OrderPageQuery } from '../../lib/graphql/types/v2/graphql';
+import { AccountType, CreatePendingContributionModalQuery, OrderPageQuery } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 import { i18nTaxType } from '../../lib/i18n/taxes';
@@ -20,7 +20,7 @@ import { require2FAForAdmins } from '../../lib/policies';
 import { omitDeep } from '../../lib/utils';
 
 import CollectivePicker, { DefaultCollectiveLabel } from '../CollectivePicker';
-import CollectivePickerAsync from '../CollectivePickerAsync';
+import CollectivePickerAsync from '../CollectivePickerAsyncV2';
 import { confirmContributionFieldsFragment } from '../ContributionConfirmationModal';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
@@ -387,9 +387,9 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
             <CollectivePickerAsync
               inputId={field.id}
               data-cy="create-pending-contribution-to"
-              types={['COLLECTIVE', 'ORGANIZATION', 'FUND']}
+              types={[AccountType.COLLECTIVE, AccountType.ORGANIZATION, AccountType.FUND]}
               error={field.error}
-              hostCollectiveIds={[host.legacyId]}
+              hosts={[host]}
               onBlur={() => form.setFieldTouched(field.name, true)}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               collective={field.value}
@@ -463,15 +463,15 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
             <CollectivePickerAsync
               inputId={field.id}
               data-cy="create-pending-contribution-source"
-              types={['USER', 'ORGANIZATION', 'VENDOR']}
+              types={[AccountType.INDIVIDUAL, AccountType.ORGANIZATION, AccountType.VENDOR]}
               error={field.error}
               onBlur={() => form.setFieldTouched(field.name, true)}
-              customOptions={defaultSourcesOptions}
+              emptyCustomOptions={defaultSourcesOptions}
               onChange={({ value }) => form.setFieldValue(field.name, value)}
               collective={field.value}
-              includeVendorsForHostId={collective?.host?.legacyId}
+              includeVendorsForHost={collective?.host}
               menuPortalTarget={null}
-              creatable={['USER', 'VENDOR']}
+              creatable={[AccountType.INDIVIDUAL, AccountType.VENDOR]}
               HostCollectiveId={host?.legacyId}
             />
           )}

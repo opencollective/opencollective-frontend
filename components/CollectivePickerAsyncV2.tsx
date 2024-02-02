@@ -5,13 +5,14 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { CollectivePickerV2SearchQueryQueryVariables } from '../lib/graphql/types/v2/graphql';
+import { AccountType, CollectivePickerV2SearchQueryQueryVariables } from '../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../lib/i18n/collective-type';
 
 import CollectivePicker from './CollectivePicker';
+import { StyledSelectProps } from './StyledSelect';
 
 const collectivePickerSearchQuery = gql`
-  query CollectivePickerV2SearchQuery(
+  query CollectivePickerV2Search(
     $term: String!
     $types: [AccountType]
     $limit: Int
@@ -113,7 +114,7 @@ const getPlaceholder = (intl, types) => {
   }
 };
 
-type CollectivePickerAsyncProps = CollectivePickerV2SearchQueryQueryVariables & {
+type CollectivePickerAsyncProps = {
   inputId?: string;
   limit?: number;
   preload?: boolean;
@@ -125,7 +126,13 @@ type CollectivePickerAsyncProps = CollectivePickerV2SearchQueryQueryVariables & 
   isLoading?: boolean;
   skipGuests?: boolean;
   includeArchived?: boolean;
-};
+  collective?: { id?: string; slug?: string; name?: string; imageUrl?: string };
+  menuPortalTarget?: HTMLElement;
+  creatable?: AccountType[];
+  /** When creating a vendor, use this Host id as ParentCollectiveId */
+  HostCollectiveId?: number;
+} & Pick<CollectivePickerV2SearchQueryQueryVariables, 'types' | 'hosts' | 'parents' | 'includeVendorsForHost'> &
+  Pick<StyledSelectProps, 'error' | 'onBlur' | 'onChange' | 'disabled'>;
 
 /**
  * A specialization of `CollectivePicker` that fetches the data based on user search.
