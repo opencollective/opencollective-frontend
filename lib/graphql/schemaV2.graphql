@@ -1654,6 +1654,16 @@ type AccountingCategory {
   friendlyName: String
 
   """
+  Whether this category is only meant for the host admins
+  """
+  hostOnly: Boolean!
+
+  """
+  Instructions for the expense submitters
+  """
+  instructions: String
+
+  """
   The account this category belongs to
   """
   account: Host!
@@ -1664,14 +1674,14 @@ type AccountingCategory {
   expensesTypes: [ExpenseType]
 
   """
-  The time of creation of this accounting category
-  """
-  createdAt: DateTime!
-
-  """
   The kind of transactions this category applies to
   """
   kind: AccountingCategoryKind
+
+  """
+  The time of creation of this accounting category
+  """
+  createdAt: DateTime!
 }
 
 """
@@ -17215,6 +17225,12 @@ input AccountingCategoryInput {
   A friendly name for non-accountants (i.e. expense submitters and collective admins)
   """
   friendlyName: String
+
+  """
+  Whether this category is only meant for the host admins
+  """
+  hostOnly: Boolean! = false
+  instructions: String
 
   """
   If meant for expenses, the types of expenses this category applies to

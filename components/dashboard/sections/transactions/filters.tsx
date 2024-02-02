@@ -1,8 +1,9 @@
 import React from 'react';
-import { omit, uniq } from 'lodash';
+import { omit } from 'lodash';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
+import { PAYMENT_METHOD_TYPE } from '../../../../lib/constants/payment-methods';
 import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti, isNullable, limit, offset } from '../../../../lib/filters/schemas';
 import {
@@ -18,7 +19,6 @@ import { i18nPaymentMethodType } from '../../../../lib/i18n/payment-method-type'
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { sortSelectOptions } from '../../../../lib/utils';
 
-import { getDefaultKinds } from '../../../transactions/filters/TransactionsKindFilter';
 import { Input } from '../../../ui/Input';
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
@@ -83,11 +83,11 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   kind: {
     labelMsg: defineMessage({ id: 'Transaction.Kind', defaultMessage: 'Kind' }),
     Component: ({ meta, intl, ...props }) => {
-      const kinds = uniq([...(meta?.kinds || []), ...getDefaultKinds()]);
+      const kinds = meta?.kinds || TransactionKind;
       return (
         <ComboSelectFilter
           isMulti
-          options={kinds
+          options={Object.values(kinds)
             .map(value => ({
               label: i18nTransactionKind(intl, value),
               value,
@@ -102,7 +102,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   paymentMethodType: {
     labelMsg: defineMessage({ id: 'Fields.paymentMethod', defaultMessage: 'Payment method' }),
     Component: ({ value, meta, intl, ...props }) => {
-      const paymentMethodTypes = meta?.paymentMethodTypes || PaymentMethodType;
+      const paymentMethodTypes = meta?.paymentMethodTypes || PAYMENT_METHOD_TYPE;
       return (
         <ComboSelectFilter
           isMulti
