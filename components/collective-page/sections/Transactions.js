@@ -56,7 +56,6 @@ export const transactionsSectionQuery = gql`
       includeChildrenTransactions: true
     ) {
       ...TransactionsQueryCollectionFragment
-      totalCount
     }
   }
   ${transactionsQueryCollectionFragment}
@@ -86,7 +85,7 @@ const SectionTransactions = props => {
   }, [filter, props.collective.slug, refetch]);
 
   const { intl, collective } = props;
-  const collectiveHasNoTransactions = !loading && data?.transactions?.totalCount === 0 && filter === FILTERS.ALL;
+  const collectiveHasNoTransactions = !loading && data?.transactions?.nodes.length === 0 && filter === FILTERS.ALL;
 
   return (
     <Box pb={4}>
@@ -131,7 +130,7 @@ const SectionTransactions = props => {
               onMutationSuccess={() => refetch()}
             />
           )}
-          {data?.transactions.totalCount === 0 && (
+          {data?.transactions?.nodes.length === 0 && (
             <MessageBox type="info">
               <FormattedMessage
                 id="TransactionsList.Empty"
