@@ -5,7 +5,7 @@ import { get, orderBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { isIndividualAccount } from '../../../lib/collective';
+import { isHeavyAccount, isIndividualAccount } from '../../../lib/collective';
 import { TransactionKind } from '../../../lib/constants/transactions';
 import { EMPTY_ARRAY } from '../../../lib/constants/utils';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
@@ -212,7 +212,7 @@ export const getBudgetSectionQueryVariables = (collectiveSlug, isIndividual) => 
       slug: collectiveSlug,
       limit: 3,
       kind: getDefaultKinds(),
-      heavyAccount: ['opencollective', 'opensource', 'foundation', 'europe'].includes(collectiveSlug),
+      heavyAccount: isHeavyAccount(collectiveSlug),
     };
   }
 };

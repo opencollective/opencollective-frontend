@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 
+import { isHeavyAccount } from '../../../lib/collective';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 
 import { Flex } from '../../Grid';
@@ -58,7 +59,7 @@ const SectionFinancialOverview = ({ collective, LoggedInUser }) => {
   const budgetQueryResult = useQuery(budgetSectionQuery, {
     variables: {
       slug: collective.slug,
-      heavyAccount: ['opencollective', 'opensource', 'foundation', 'europe'].includes(collective.slug),
+      heavyAccount: isHeavyAccount(collective.slug),
     },
     context: API_V2_CONTEXT,
   });
