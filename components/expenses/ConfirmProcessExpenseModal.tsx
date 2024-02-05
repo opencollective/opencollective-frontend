@@ -1,6 +1,6 @@
 import React from 'react';
-import type { MessageDescriptor } from 'react-intl';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { AlertTriangleIcon } from 'lucide-react';
+import { defineMessages, FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
@@ -114,11 +114,15 @@ const messages = defineMessages({
     id: 'actions.spam',
     defaultMessage: 'Mark as Spam',
   },
+  MARK_AS_SPAM_LABEL: {
+    id: 'Expense.MarkAsSpamLabel',
+    defaultMessage: 'Why are you marking this expense as spam?',
+  },
 });
 
 const MessagesPerType: Record<
   ConfirmProcessExpenseModalType,
-  { title: MessageDescriptor; description: MessageDescriptor; confirmBtn: MessageDescriptor }
+  { title: MessageDescriptor; description: MessageDescriptor; confirmBtn: MessageDescriptor; label?: MessageDescriptor }
 > = {
   REQUEST_RE_APPROVAL: {
     title: messages.REQUEST_RE_APPROVAL_TITLE,
@@ -159,6 +163,7 @@ const MessagesPerType: Record<
     title: messages.MARK_AS_SPAM_TITLE,
     description: messages.MARK_AS_SPAM_DESCRIPTION,
     confirmBtn: messages.MARK_AS_SPAM_CONFIRM_BUTTON,
+    label: messages.MARK_AS_SPAM_LABEL,
   },
 };
 
@@ -250,9 +255,19 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
     <StyledModal role="alertdialog" width="432px" onClose={onClose} trapFocus>
       <ModalHeader>{intl.formatMessage(MessagesPerType[type].title)}</ModalHeader>
       <ModalBody pt={2}>
-        <P mb={3} color="black.700" lineHeight="20px">
-          {intl.formatMessage(MessagesPerType[type].description)}
-        </P>
+        <Flex>
+          <AlertTriangleIcon size={30} color="orange" />
+          <P mb={3} color="black.700" lineHeight="20px" ml={10}>
+            {intl.formatMessage(MessagesPerType[type].description)}
+          </P>
+        </Flex>
+
+        {MessagesPerType[type].label && (
+          <P mb={2} color="black.700" fontWeight="500">
+            {intl.formatMessage(MessagesPerType[type].label)}
+          </P>
+        )}
+
         <RichTextEditor
           data-cy="confirm-action-text"
           kind="COMMENT"
