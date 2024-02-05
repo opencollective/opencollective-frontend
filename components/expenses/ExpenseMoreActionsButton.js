@@ -21,6 +21,8 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import useClipboard from '../../lib/hooks/useClipboard';
 import { getCollectivePageCanonicalURL, getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
+import { withUser } from '../UserProvider';
+import { useToast } from '../ui/useToast';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { DownloadLegalDocument } from '../legal-documents/DownloadLegalDocument';
@@ -85,12 +87,15 @@ const ExpenseMoreActionsButton = ({
   linkAction,
   onModalToggle,
   onDelete,
+  LoggedInUser,
   ...props
 }) => {
   const [processModal, setProcessModal] = React.useState(false);
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
   const { account } = React.useContext(DashboardContext);
+  const { toast } = useToast();
+
   const router = useRouter();
   const permissions = expense?.permissions;
 
@@ -136,6 +141,17 @@ const ExpenseMoreActionsButton = ({
                 buttonStyle="dangerSecondary"
                 data-cy="spam-button"
                 onClick={async () => {
+                  const isSubmitter = expense.createdByAccount.legacyId === LoggedInUser?.CollectiveId;
+
+                  if (isSubmitter) {
+                    toast({
+                      variant: 'error',
+                      message: "You can't mark your own expenses as spam",
+                    });
+
+                    return;
+                  }
+
                   setProcessModal('MARK_AS_SPAM');
                   setOpen(false);
                 }}
@@ -336,4 +352,4 @@ ExpenseMoreActionsButton.defaultProps = {
   isViewingExpenseInHostContext: false,
 };
 
-export default ExpenseMoreActionsButton;
+export default withUser(ExpenseMoreActionsButton);
