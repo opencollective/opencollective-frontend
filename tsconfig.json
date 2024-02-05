@@ -15,7 +15,7 @@
     "moduleResolution": "node",
     "typeRoots": ["node_modules/@types", "lib/custom_typings"],
     "jsx": "preserve",
-    "resolveJsonModule": true,
+    "resolveJsonModule": true
   },
   "include": [
     "next-env.d.ts",
@@ -27,7 +27,7 @@
     "scripts",
     "server",
     "stories",
-    "test",
+    "test"
   ],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules"]
 }
