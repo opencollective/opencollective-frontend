@@ -71,6 +71,7 @@ const HTMLContent = styled(
     maxCollapsedHeight = 20,
     collapsePadding = 1,
     hideViewMoreLink = false,
+    openLinksInNewTab = false,
     ...props
   }) => {
     const [isOpen, setOpen] = React.useState(false);
@@ -112,6 +113,12 @@ const HTMLContent = styled(
                       src={src}
                     />
                   );
+                }
+              } else if (node.tagName === 'a') {
+                // Open links in new tab
+                if (openLinksInNewTab) {
+                  node.setAttribute('target', '_blank');
+                  node.setAttribute('rel', 'noopener noreferrer');
                 }
               }
             }}
@@ -230,6 +237,9 @@ const HTMLContent = styled(
     padding: 16px;
     font-family: monospace;
     overflow-x: auto;
+    max-width: 100%;
+    white-space: nowrap;
+    border-radius: 4px;
   }
 
   ul {
@@ -293,6 +303,7 @@ HTMLContent.propTypes = {
   collapsePadding: PropTypes.number,
   /* Hides the "Read full description/collapse" link */
   hideViewMoreLink: PropTypes.bool,
+  openLinksInNewTab: PropTypes.bool,
 };
 
 HTMLContent.defaultProps = {

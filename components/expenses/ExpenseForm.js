@@ -33,6 +33,7 @@ import {
 
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
+import HTMLContent from '../HTMLContent';
 import { serializeAddress } from '../I18nAddressFields';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -282,11 +283,9 @@ const getDefaultStep = (defaultStep, stepOneCompleted, isCreditCardCharge) => {
   }
 };
 
-const checkOCREnabled = (loggedInUser, router, host) => {
+const checkOCREnabled = (router, host) => {
   const urlFlag = router.query.ocr && parseToBoolean(router.query.ocr);
-  return (
-    urlFlag !== false && isInternalHost(host) && (loggedInUser?.hasPreviewFeatureEnabled('EXPENSE_OCR') || urlFlag)
-  );
+  return urlFlag !== false && isInternalHost(host);
 };
 
 const ExpenseFormBody = ({
@@ -314,7 +313,7 @@ const ExpenseFormBody = ({
   const { LoggedInUser } = useLoggedInUser();
   const { values, handleChange, errors, setValues, dirty, touched, resetForm, setErrors } = formik;
   const hasBaseFormFieldsCompleted = values.type && values.description;
-  const hasOCRPreviewEnabled = checkOCREnabled(LoggedInUser, router, host);
+  const hasOCRPreviewEnabled = checkOCREnabled(router, host);
   const hasOCRFeature = hasOCRPreviewEnabled && checkExpenseSupportsOCR(values.type, LoggedInUser);
   const isInvite = values.payee?.isInvite;
   const isNewUser = !values.payee?.id;
@@ -419,7 +418,7 @@ const ExpenseFormBody = ({
     }
 
     // Reset the accounting category (if not supported by the new expense type)
-    if (values.accountingCategory && !isSupportedExpenseCategory(values.type, values.accountingCategory, isHostAdmin)) {
+    if (values.accountingCategory && !isSupportedExpenseCategory(values.type, values.accountingCategory)) {
       formik.setFieldValue('accountingCategory', undefined);
     }
 
@@ -798,6 +797,11 @@ const ExpenseFormBody = ({
                     <MessageBox type="info" fontSize="12px" mt="24px">
                       <FormattedMessage defaultMessage="Please make sure that all the expense items in this expense belong to the selected expense category. If needed, you may submit additional items in separate expenses with different expense categories." />
                     </MessageBox>
+                    {formik.values.accountingCategory?.instructions && (
+                      <MessageBox type="info" fontSize="12px" mt="24px">
+                        <HTMLContent content={formik.values.accountingCategory.instructions} openLinksInNewTab />
+                      </MessageBox>
+                    )}
                   </div>
                 )}
                 {values.type === expenseTypes.INVOICE && (

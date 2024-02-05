@@ -3,7 +3,14 @@ import { get, isUndefined, pick, remove, size, throttle } from 'lodash';
 import { ChevronDown, Sparkles } from 'lucide-react';
 import { defineMessages, FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
-import { Account, AccountingCategory, Expense, ExpenseType, Host } from '../../lib/graphql/types/v2/graphql';
+import {
+  Account,
+  AccountingCategory,
+  AccountingCategoryKind,
+  Expense,
+  ExpenseType,
+  Host,
+} from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { fetchExpenseCategoryPredictions } from '../../lib/ml-service';
@@ -138,7 +145,10 @@ export const isSupportedExpenseCategory = (
   category: AccountingCategory,
   isHostAdmin: boolean,
 ) => {
-  return isHostAdmin || !category?.expensesTypes || category.expensesTypes.includes(expenseType);
+  return (
+    category?.kind === AccountingCategoryKind.EXPENSE &&
+    (isHostAdmin || !category?.expensesTypes || category.expensesTypes.includes(expenseType))
+  );
 };
 
 const getOptions = (
@@ -276,7 +286,7 @@ const ExpenseCategorySelect = ({
   const hasPredictions = Boolean(predictions?.length);
   const options = React.useMemo(
     () => getOptions(intl, host, expenseType, showCode, allowNone, valuesByRole, isHostAdmin),
-    [host, expenseType, allowNone, showCode, valuesByRole, isHostAdmin],
+    [intl, host, expenseType, allowNone, showCode, valuesByRole, isHostAdmin],
   );
 
   return (

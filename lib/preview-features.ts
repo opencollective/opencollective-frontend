@@ -4,7 +4,6 @@
 export enum PREVIEW_FEATURE_KEYS {
   DASHBOARD = 'dashboard',
   EXPENSE_PIPELINE = 'EXPENSE_PIPELINE',
-  EXPENSE_OCR = 'EXPENSE_OCR',
   EXPENSE_CATEGORIZATION = 'EXPENSE_CATEGORIZATION',
   DYNAMIC_TOP_BAR = 'DYNAMIC_TOP_BAR',
   COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
@@ -47,13 +46,6 @@ export const previewFeatures: PreviewFeature[] = [
     description: 'Introducing tabs in the host expenses dashboard to help you manage paying expenses.',
     publicBeta: false,
     closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.EXPENSE_OCR,
-    title: 'Expense AI assistant',
-    description: 'Introducing an AI assistant to help you create expenses.',
-    publicBeta: false,
-    enabledByDefaultFor: ['*'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION,

@@ -264,7 +264,7 @@ const BanAccountsWithSearch = () => {
           isDanger
           continueLabel="Ban accounts"
           header="Ban accounts"
-          cancelHandler={() => setDryRunData(null)}
+          onClose={() => setDryRunData(null)}
           disableSubmit={!dryRunData.isAllowed}
           continueHandler={async () => {
             try {

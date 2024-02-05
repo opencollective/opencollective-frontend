@@ -77,7 +77,7 @@ type RichTextEditorProps = RichTextEditorContainerProps & {
   videoEmbedEnabled?: boolean;
   'data-cy': string;
   /** Called when an image is being uploaded to set a boolean */
-  setUploading: (uploading: boolean) => void;
+  setUploading?: (uploading: boolean) => void;
 };
 
 const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
@@ -93,8 +93,9 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
   trix-editor {
     border: none;
     padding: 0;
-    margin-top: 8px;
+    margin-top: 1px;
     padding-top: 8px;
+    padding-right: 4px;
     outline-offset: 0.5em;
     ${CustomScrollbarCSS}
     &::-webkit-scrollbar {
@@ -132,10 +133,19 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
   trix-toolbar {
     min-height: 40px;
     background: ${props => props.toolbarBackgroundColor};
-    ${props => !props.withBorders && `box-shadow: 0px 5px 3px -3px rgba(0, 0, 0, 0.1);`}
     z-index: 2;
     margin-bottom: 8px;
-    ${props => props.withBorders && `min-height: 0px; margin-bottom: 0;`}
+    ${props =>
+      props.withBorders
+        ? css`
+            min-height: 0px;
+            margin-bottom: 0;
+            box-shadow: 0px 4px 4px -5px #b7b7b7;
+            padding-bottom: 6px;
+          `
+        : css`
+            box-shadow: 0px 5px 3px -3px rgba(0, 0, 0, 0.1);
+          `}
 
     .trix-button-group {
       border-radius: 6px;
@@ -334,6 +344,9 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
 
       // Component ready!
       this.isReady = true;
+
+      // Set initial value for text
+      this.setState({ text: this.editorRef.current.innerText });
     }
   };
 
@@ -496,6 +509,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
     const isEmbedAttachment =
       attachmentContent?.includes(`<iframe src="${SUPPORTED_IFRAME_URLS.youTube}`) ||
       attachmentContent?.includes(`<iframe src="${SUPPORTED_IFRAME_URLS.anchorFm}`);
+
     if (isEmbedAttachment) {
       return;
     } else if (!attachment.file) {
@@ -506,6 +520,10 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
         attachment.remove(); // Remove unknown stuff, usually when copy-pasting HTML
       }
 
+      return;
+    } else if (this.props.version === 'simplified') {
+      // Don't upload files in simplified mode
+      attachment.remove();
       return;
     }
 

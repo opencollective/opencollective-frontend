@@ -107,6 +107,8 @@ export const accountingCategoryFields = gql`
   fragment AccountingCategoryFields on AccountingCategory {
     id
     name
+    kind
+    instructions
     friendlyName
     code
     expensesTypes
@@ -151,7 +153,7 @@ export const expenseHostFields = gql`
     plan {
       id
     }
-    accountingCategories {
+    accountingCategories(kind: EXPENSE) {
       nodes {
         id
         ...AccountingCategoryFields
@@ -530,6 +532,8 @@ export const expensePageExpenseFieldsFragment = gql`
       }
       transaction {
         id
+        kind
+        type
         amount {
           valueInCents
           currency
@@ -542,7 +546,7 @@ export const expensePageExpenseFieldsFragment = gql`
           valueInCents
           currency
         }
-        paymentProcessorFee(fetchPaymentProcessorFee: true) {
+        paymentProcessorFee {
           valueInCents
           currency
         }
@@ -580,6 +584,16 @@ export const expensePageExpenseFieldsFragment = gql`
           id
           currency
           amount
+          feesPayer
+        }
+        relatedTransactions(kind: PAYMENT_PROCESSOR_FEE) {
+          id
+          type
+          kind
+          amount {
+            valueInCents
+            currency
+          }
         }
       }
     }
