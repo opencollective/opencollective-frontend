@@ -33,7 +33,7 @@ export const budgetSectionQuery = gql`
           valueInCents
           currency
         }
-        activeRecurringContributions
+        activeRecurringContributions @skip(if: $heavyAccount)
         totalAmountReceived(periodInMonths: 12) @skip(if: $heavyAccount) {
           valueInCents
           currency
