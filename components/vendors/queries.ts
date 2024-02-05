@@ -9,6 +9,7 @@ export const vendorFieldFragment = gql`
     id
     slug
     name
+    legalName
     type
     description
     tags
