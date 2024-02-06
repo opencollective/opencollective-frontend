@@ -1368,7 +1368,7 @@
   "Expense.InvoiceItems": "Προϊόντα",
   "Expense.JoinAndSubmit": "Συμμετοχή και υποβολή",
   "expense.markAsPaid": "Σήμανση ως πληρωμένο",
-  "Expense.MarkAsSpamWarning": "This will prevent the submitter account to post new expenses. Are you sure?",
+  "Expense.MarkAsSpamWarning": "This will prevent the submitter account to post new expenses.",
   "Expense.markAsUnpaid": "Σήμανση εξόδων ως ανεξόφλητων",
   "expense.markAsUnpaid.btn": "Σήμανση ως ανεξόφλητο",
   "Expense.markAsUnpaid.details": "The amount will be credited back to the Collective balance.",

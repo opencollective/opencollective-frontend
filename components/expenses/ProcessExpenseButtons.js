@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
@@ -21,6 +21,7 @@ import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 import { useToast } from '../ui/useToast';
+import { withUser } from '../UserProvider';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import ApproveExpenseModal from './ApproveExpenseModal';
@@ -29,7 +30,6 @@ import DeleteExpenseButton from './DeleteExpenseButton';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
 import { SecurityChecksButton } from './SecurityChecksModal';
-import { withUser } from '../UserProvider';
 
 const processExpenseMutation = gql`
   mutation ProcessExpense(
@@ -72,7 +72,7 @@ export const hasProcessButtons = permissions => {
 const messages = defineMessages({
   markAsSpamWarning: {
     id: 'Expense.MarkAsSpamWarning',
-    defaultMessage: 'This will prevent the submitter account to post new expenses. Are you sure?',
+    defaultMessage: 'This will prevent the submitter account to post new expenses.',
   },
 });
 
@@ -383,6 +383,9 @@ ProcessExpenseButtons.propTypes = {
         message: PropTypes.string,
       }),
     ),
+    createdByAccount: PropTypes.shape({
+      legacyId: PropTypes.number.isRequired,
+    }),
   }).isRequired,
   /** The account where the expense has been submitted */
   collective: PropTypes.object.isRequired,
@@ -401,6 +404,7 @@ ProcessExpenseButtons.propTypes = {
   displaySecurityChecks: PropTypes.bool,
   isViewingExpenseInHostContext: PropTypes.bool,
   disabled: PropTypes.bool,
+  LoggedInUser: PropTypes.object,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {

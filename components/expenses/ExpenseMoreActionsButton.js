@@ -28,6 +28,8 @@ import { DashboardContext } from '../dashboard/DashboardContext';
 import { DownloadLegalDocument } from '../legal-documents/DownloadLegalDocument';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
+import { useToast } from '../ui/useToast';
+import { withUser } from '../UserProvider';
 
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
@@ -337,6 +339,9 @@ ExpenseMoreActionsButton.propTypes = {
         slug: PropTypes.string.isRequired,
       }),
     }),
+    createdByAccount: PropTypes.shape({
+      legacyId: PropTypes.number.isRequired,
+    }),
   }),
   /** Called with an error if anything wrong happens */
   onError: PropTypes.func,
@@ -345,6 +350,7 @@ ExpenseMoreActionsButton.propTypes = {
   onEdit: PropTypes.func,
   linkAction: PropTypes.oneOf(['link', 'copy']),
   isViewingExpenseInHostContext: PropTypes.bool,
+  LoggedInUser: PropTypes.object,
 };
 
 ExpenseMoreActionsButton.defaultProps = {
