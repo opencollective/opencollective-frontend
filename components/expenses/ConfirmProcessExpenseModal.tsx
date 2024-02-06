@@ -1,5 +1,4 @@
 import React from 'react';
-import { AlertTriangleIcon } from 'lucide-react';
 import { defineMessages, FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
@@ -7,6 +6,7 @@ import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import type { Expense } from '../../lib/graphql/types/v2/graphql';
 
 import { Flex } from '../Grid';
+import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
@@ -108,7 +108,7 @@ const messages = defineMessages({
   },
   MARK_AS_SPAM_DESCRIPTION: {
     id: 'Expense.MarkAsSpamWarning',
-    defaultMessage: 'This will prevent the submitter account to post new expenses. Are you sure?',
+    defaultMessage: 'This will prevent the submitter account to post new expenses.',
   },
   MARK_AS_SPAM_CONFIRM_BUTTON: {
     id: 'actions.spam',
@@ -256,15 +256,17 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
       <ModalHeader>{intl.formatMessage(MessagesPerType[type].title)}</ModalHeader>
       <ModalBody pt={2}>
         <Flex>
-          <AlertTriangleIcon size={30} color="orange" />
-          <P mb={3} color="black.700" lineHeight="20px" ml={10}>
+          <MessageBox lineHeight="20px" mb={10} type="warning" withIcon>
             {intl.formatMessage(MessagesPerType[type].description)}
-          </P>
+          </MessageBox>
         </Flex>
 
         {MessagesPerType[type].label && (
-          <P mb={2} color="black.700" fontWeight="500">
-            {intl.formatMessage(MessagesPerType[type].label)}
+          <P as="label" htmlFor="expense-ban-reason" mb={2} color="black.700" fontWeight="500">
+            {intl.formatMessage(
+              { id: 'OptionalFieldLabel', defaultMessage: '{field} (optional)' },
+              { field: intl.formatMessage(MessagesPerType[type].label) },
+            )}
           </P>
         )}
 
