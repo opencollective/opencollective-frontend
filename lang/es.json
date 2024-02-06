@@ -2837,6 +2837,7 @@
   "SE0Wpk": "Acepto las <TOSLink>condiciones de servicio</TOSLink> de Open Collective",
   "Seanpx": "Obligatorio",
   "Search": "Buscar",
+  "search.clear": "Limpiar búsqueda",
   "search.placeholder": "Buscar...",
   "searchFilter.host": "Anfitriones fiscales",
   "SearchFor": "Buscar por {entity}",

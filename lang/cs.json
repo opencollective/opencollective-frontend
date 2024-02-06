@@ -2837,6 +2837,7 @@
   "SE0Wpk": "I agree with the <TOSLink>terms of service</TOSLink> of Open Collective",
   "Seanpx": "Required",
   "Search": "Hledat",
+  "search.clear": "Vymazat hledání",
   "search.placeholder": "Search...",
   "searchFilter.host": "Fiscal hosts",
   "SearchFor": "Hledat {entity}",

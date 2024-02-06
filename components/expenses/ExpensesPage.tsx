@@ -118,7 +118,7 @@ const Expenses = props => {
             />
           </Box>
         )}
-        <Box flex="12 1 160px">
+        <Box flex="12 1 160px" width="276px">
           <SearchBar defaultValue={query.searchTerm} onSubmit={searchTerm => handleSearch(searchTerm)} height="40px" />
         </Box>
         <Box flex="0 1 160px">

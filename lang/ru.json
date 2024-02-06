@@ -2837,6 +2837,7 @@
   "SE0Wpk": "I agree with the <TOSLink>terms of service</TOSLink> of Open Collective",
   "Seanpx": "Required",
   "Search": "Поиск",
+  "search.clear": "Очистить поиск",
   "search.placeholder": "Поиск...",
   "searchFilter.host": "Фискальные представители",
   "SearchFor": "Искать {entity}",

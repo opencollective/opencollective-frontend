@@ -197,13 +197,14 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           {title || <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
         </h1>
-
-        <SearchBar
-          height="40px"
-          defaultValue={router.query.searchTerm}
-          onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-          placeholder={intl.formatMessage(messages.searchPlaceholder)}
-        />
+        <div className="w-[276px]">
+          <SearchBar
+            height="40px"
+            defaultValue={router.query.searchTerm}
+            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
+            placeholder={intl.formatMessage(messages.searchPlaceholder)}
+          />
+        </div>
       </div>
       <hr className="my-5" />
       <Flex mb={34}>

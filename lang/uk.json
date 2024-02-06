@@ -2837,6 +2837,7 @@
   "SE0Wpk": "I agree with the <TOSLink>terms of service</TOSLink> of Open Collective",
   "Seanpx": "Required",
   "Search": "Пошук",
+  "search.clear": "Очистити пошук",
   "search.placeholder": "Пошук...",
   "searchFilter.host": "Фіскальні агенти",
   "SearchFor": "Шукати {entity}",

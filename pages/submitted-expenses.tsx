@@ -182,7 +182,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
                     <FormattedMessage defaultMessage="Submitted Expenses" />
                   </H1>
                   <Box mx="auto" />
-                  <SearchFormContainer p={2}>
+                  <SearchFormContainer p={2} width="276px">
                     <SearchBar
                       defaultValue={searchTerm}
                       onSubmit={searchTerm => this.handleSearch(searchTerm, data.account)}

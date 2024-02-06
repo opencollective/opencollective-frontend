@@ -2837,6 +2837,7 @@
   "SE0Wpk": "I agree with the <TOSLink>terms of service</TOSLink> of Open Collective",
   "Seanpx": "Required",
   "Search": "Hľadať",
+  "search.clear": "Vymazať vyhľadávanie",
   "search.placeholder": "Hľadať...",
   "searchFilter.host": "Fiškálni hostitelia",
   "SearchFor": "Vyhľadať {entity}",

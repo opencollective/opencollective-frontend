@@ -190,16 +190,18 @@ const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         </h1>
-        <SearchBar
-          height="40px"
-          defaultValue={query.searchTerm}
-          onSubmit={searchTerm =>
-            router.push({
-              pathname: pageRoute,
-              query: getQueryParams({ searchTerm, offset: null }),
-            })
-          }
-        />
+        <div className="w-[276px]">
+          <SearchBar
+            height="40px"
+            defaultValue={query.searchTerm}
+            onSubmit={searchTerm =>
+              router.push({
+                pathname: pageRoute,
+                query: getQueryParams({ searchTerm, offset: null }),
+              })
+            }
+          />
+        </div>
       </div>
       {paypalPreApprovalError && (
         <DismissibleMessage>

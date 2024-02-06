@@ -2837,6 +2837,7 @@
   "SE0Wpk": "Ich stimme den <TOSLink>Nutzungsbedingungen</TOSLink> von Open Collective zu",
   "Seanpx": "Required",
   "Search": "Suchen",
+  "search.clear": "Suche löschen",
   "search.placeholder": "Suchen …",
   "searchFilter.host": "Finanzträger",
   "SearchFor": "Suche nach {entity}",
