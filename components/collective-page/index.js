@@ -62,11 +62,10 @@ class CollectivePage extends Component {
     isRoot: PropTypes.bool.isRequired,
     onPrimaryColorChange: PropTypes.func.isRequired,
     stats: PropTypes.shape({
-      balance: PropTypes.number.isRequired,
-      yearlyBudget: PropTypes.number.isRequired,
-      updates: PropTypes.number.isRequired,
-      backers: PropTypes.object,
-    }),
+      backers: PropTypes.shape({
+        all: PropTypes.number,
+      }),
+    }).isRequired,
     status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
     refetch: PropTypes.func,
   };

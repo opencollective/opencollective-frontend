@@ -65,8 +65,6 @@ const StatContainer = styled.div`
 
 const BudgetStats = ({ collective, stats, horizontal }) => {
   const { locale } = useIntl();
-  const monthlyRecurring =
-    (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
   const isFund = collective.type === CollectiveType.FUND;
   const isIndividual = !collective.isHost && isIndividualAccount(collective);
   const borderTop = ['1px solid #dcdee0', 'none', horizontal ? null : '1px solid #dcdee0'];
@@ -103,19 +101,21 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                   textTransform="uppercase"
                   color="black.700"
                   extraTooltipContent={
-                    <Fragment>
-                      <Box mt={2}>
-                        <FormattedMessage
-                          id="budgetSection-balance-consolidated"
-                          defaultMessage="Total consolidated including Projects and Events: {amount}"
-                          values={{
-                            amount: formatCurrency(stats?.consolidatedBalance.valueInCents || 0, collective.currency, {
-                              locale,
-                            }),
-                          }}
-                        />
-                      </Box>
-                    </Fragment>
+                    stats.consolidatedBalance?.valueInCents && (
+                      <Fragment>
+                        <Box mt={2}>
+                          <FormattedMessage
+                            id="budgetSection-balance-consolidated"
+                            defaultMessage="Total consolidated including Projects and Events: {amount}"
+                            values={{
+                              amount: formatCurrency(stats.consolidatedBalance.valueInCents || 0, collective.currency, {
+                                locale,
+                              }),
+                            }}
+                          />
+                        </Box>
+                      </Fragment>
+                    )
                   }
                 />
               ) : (
@@ -142,7 +142,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                         id="budgetSection-raised-total"
                         defaultMessage="Total contributed before fees: {amount}"
                         values={{
-                          amount: formatCurrency(stats?.totalAmountRaised.valueInCents || 0, collective.currency, {
+                          amount: formatCurrency(stats.totalAmountRaised.valueInCents || 0, collective.currency, {
                             locale,
                           }),
                         }}
@@ -164,41 +164,51 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
               currency={collective.currency}
             />
           </StatContainer>
-          {!isFund && (
-            <StatContainer data-cy="budgetSection-estimated-budget" borderTop={borderTop}>
-              <StatTitle>
-                <Calendar size="12px" />
-                <DefinedTerm
-                  term={Terms.ESTIMATED_BUDGET}
-                  textTransform="uppercase"
-                  color="black.700"
-                  extraTooltipContent={
-                    <Fragment>
-                      <Box mt={2}>
-                        <FormattedMessage
-                          id="CollectivePage.SectionBudget.MonthlyRecurringAmount"
-                          defaultMessage="Monthly recurring: {amount}"
-                          values={{ amount: formatCurrency(monthlyRecurring, collective.currency, { locale }) }}
-                        />
-                      </Box>
-                      <Box mt={2}>
-                        <FormattedMessage
-                          id="CollectivePage.SectionBudget.TotalAmountReceived"
-                          defaultMessage="Total received in the last 12 months: {amount}"
-                          values={{
-                            amount: formatCurrency(stats?.totalAmountReceived.valueInCents || 0, collective.currency, {
-                              locale,
-                            }),
-                          }}
-                        />
-                      </Box>
-                    </Fragment>
-                  }
-                />
-              </StatTitle>
-              <StatAmount amount={stats.yearlyBudget.valueInCents} currency={collective.currency} />
-            </StatContainer>
-          )}
+          {!isFund &&
+            stats.totalAmountReceived?.valueInCents &&
+            stats.yearlyBudget?.valueInCents &&
+            stats.activeRecurringContributions && (
+              <StatContainer data-cy="budgetSection-estimated-budget" borderTop={borderTop}>
+                <StatTitle>
+                  <Calendar size="12px" />
+                  <DefinedTerm
+                    term={Terms.ESTIMATED_BUDGET}
+                    textTransform="uppercase"
+                    color="black.700"
+                    extraTooltipContent={
+                      <Fragment>
+                        <Box mt={2}>
+                          <FormattedMessage
+                            id="CollectivePage.SectionBudget.MonthlyRecurringAmount"
+                            defaultMessage="Monthly recurring: {amount}"
+                            values={{
+                              amount: formatCurrency(
+                                (stats.activeRecurringContributions?.monthly || 0) +
+                                  (stats.activeRecurringContributions?.yearly || 0) / 12,
+                                collective.currency,
+                                { locale },
+                              ),
+                            }}
+                          />
+                        </Box>
+                        <Box mt={2}>
+                          <FormattedMessage
+                            id="CollectivePage.SectionBudget.TotalAmountReceived"
+                            defaultMessage="Total received in the last 12 months: {amount}"
+                            values={{
+                              amount: formatCurrency(stats.totalAmountReceived.valueInCents || 0, collective.currency, {
+                                locale,
+                              }),
+                            }}
+                          />
+                        </Box>
+                      </Fragment>
+                    }
+                  />
+                </StatTitle>
+                <StatAmount amount={stats.yearlyBudget.valueInCents} currency={collective.currency} />
+              </StatContainer>
+            )}
         </React.Fragment>
       ) : (
         <React.Fragment>

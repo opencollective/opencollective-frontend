@@ -100,7 +100,11 @@ class CollectivePage extends React.Component {
         isGuest: PropTypes.bool,
         parentCollective: PropTypes.shape({ slug: PropTypes.string, image: PropTypes.string }),
         host: PropTypes.object,
-        stats: PropTypes.object,
+        stats: PropTypes.shape({
+          backers: PropTypes.shape({
+            all: PropTypes.number,
+          }),
+        }).isRequired,
         coreContributors: PropTypes.arrayOf(PropTypes.object),
         financialContributors: PropTypes.arrayOf(PropTypes.object),
         tiers: PropTypes.arrayOf(PropTypes.object),
