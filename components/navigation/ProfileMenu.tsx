@@ -117,7 +117,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
     return () => {
       router.events.off('routeChangeStart', handler);
     };
-  }, [router]);
+  }, []);
 
   if (!LoggedInUser) {
     return <LoginBtn />;
@@ -198,7 +198,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
 
             <Separator className="my-1" />
 
-            <MenuItem Icon={LogOut} onClick={() => logout(logoutParameters)}>
+            <MenuItem Icon={LogOut} onClick={() => logout(logoutParameters)} data-cy="logout">
               <FormattedMessage id="menu.logout" defaultMessage="Log out" />
             </MenuItem>
           </div>
@@ -231,11 +231,9 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
         )}
       </Popover>
       {isMobile && (
-        <React.Fragment>
-          <DrawerMenu onClose={() => setMenuOpen(false)} open={isMenuOpen}>
-            {content}
-          </DrawerMenu>
-        </React.Fragment>
+        <DrawerMenu onClose={() => setMenuOpen(false)} open={isMenuOpen}>
+          {content}
+        </DrawerMenu>
       )}
     </React.Fragment>
   );

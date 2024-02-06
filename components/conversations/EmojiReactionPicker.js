@@ -144,7 +144,7 @@ const EmojiReactionPicker = ({ comment, update }) => {
       isSelected = update.userReactions?.includes(emoji);
     }
     return {
-      children: <Emoji>{emoji}</Emoji>,
+      children: <Emoji className="font-emoji">{emoji}</Emoji>,
       isSelected,
       onClick: () => {
         setOpen(false);
@@ -152,12 +152,12 @@ const EmojiReactionPicker = ({ comment, update }) => {
         if (comment) {
           return action({
             variables: { emoji: emoji, comment: { id: comment.id } },
-            optimisticResponse: getOptimisticResponse(comment, emoji, !isSelected, true),
+            optimisticResponse: getOptimisticResponse(comment, emoji, !isSelected),
           });
         } else if (update) {
           return action({
             variables: { emoji: emoji, update: { id: update.id } },
-            optimisticResponse: getOptimisticResponse(update, emoji, !isSelected, false),
+            optimisticResponse: getOptimisticResponse(update, emoji, !isSelected),
           });
         }
       },
@@ -214,13 +214,13 @@ const EmojiReactionPicker = ({ comment, update }) => {
 
 EmojiReactionPicker.propTypes = {
   comment: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    id: PropTypes.string,
     html: PropTypes.string,
     createdAt: PropTypes.string,
     userReactions: PropTypes.array,
   }),
   update: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    id: PropTypes.string,
     html: PropTypes.string,
     createdAt: PropTypes.string,
     fromAccount: PropTypes.shape({

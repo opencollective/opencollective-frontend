@@ -5,7 +5,7 @@ import { get, orderBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { isIndividualAccount } from '../../../lib/collective.lib';
+import { isHeavyAccount, isIndividualAccount } from '../../../lib/collective';
 import { TransactionKind } from '../../../lib/constants/transactions';
 import { EMPTY_ARRAY } from '../../../lib/constants/utils';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
@@ -34,22 +34,37 @@ const budgetSectionAccountFieldsFragment = gql`
     id
     isHost
     type
+    ... on AccountWithHost {
+      host {
+        id
+        slug
+        name
+      }
+    }
+    ... on Organization {
+      host {
+        id
+        slug
+        name
+      }
+    }
     stats {
+      # Skip following on Heavy Accounts (low performance vs relevance ratio)
       id
       balance {
         valueInCents
         currency
       }
-      consolidatedBalance {
+      consolidatedBalance @skip(if: $heavyAccount) {
         valueInCents
         currency
       }
-      yearlyBudget {
+      yearlyBudget @skip(if: $heavyAccount) {
         valueInCents
         currency
       }
-      activeRecurringContributions
-      totalAmountReceived(periodInMonths: 12) {
+      activeRecurringContributions @skip(if: $heavyAccount)
+      totalAmountReceived(periodInMonths: 12) @skip(if: $heavyAccount) {
         valueInCents
         currency
       }
@@ -66,7 +81,7 @@ const budgetSectionAccountFieldsFragment = gql`
 `;
 
 export const budgetSectionQuery = gql`
-  query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
+  query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind], $heavyAccount: Boolean!) {
     transactions(
       account: { slug: $slug }
       limit: $limit
@@ -144,7 +159,7 @@ export const budgetSectionForIndividualQuery = gql`
 `;
 
 export const budgetSectionWithHostQuery = gql`
-  query BudgetSectionWithHost($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
+  query BudgetSectionWithHost($slug: String!, $limit: Int!, $kind: [TransactionKind], $heavyAccount: Boolean!) {
     transactions(
       account: { slug: $slug }
       limit: $limit
@@ -193,7 +208,12 @@ export const getBudgetSectionQueryVariables = (collectiveSlug, isIndividual) => 
   if (isIndividual) {
     return { slug: collectiveSlug, limit: 3, kind: getDefaultKinds().filter(kind => kind !== TransactionKind.EXPENSE) };
   } else {
-    return { slug: collectiveSlug, limit: 3, kind: getDefaultKinds() };
+    return {
+      slug: collectiveSlug,
+      limit: 3,
+      kind: getDefaultKinds(),
+      heavyAccount: isHeavyAccount(collectiveSlug),
+    };
   }
 };
 

@@ -207,7 +207,7 @@ CollectivePickerAsync.propTypes = {
   /** Function to filter results returned by the API */
   filterResults: PropTypes.func,
   /** If true, a permanent option to create a collective will be displayed in the select */
-  creatable: PropTypes.bool,
+  creatable: PropTypes.oneOfType([PropTypes.bool, PropTypes.array]),
   /** If true, a permanent option to invite a new user will be displayed in the select */
   invitable: PropTypes.bool,
   skipGuests: PropTypes.bool,

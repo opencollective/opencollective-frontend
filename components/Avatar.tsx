@@ -72,6 +72,7 @@ const Avatar = ({
   name = undefined,
   useIcon = false,
   children = null,
+  displayTitle = true,
   ...styleProps
 }) => {
   let child = children;
@@ -107,7 +108,7 @@ const Avatar = ({
     }
   }
   return (
-    <StyledAvatar size={radius} type={type} src={src} title={name} {...styleProps}>
+    <StyledAvatar size={radius} type={type} src={src} title={displayTitle ? name : undefined} {...styleProps}>
       {child}
     </StyledAvatar>
   );
@@ -142,6 +143,7 @@ Avatar.propTypes = {
   backgroundColor: PropTypes.string,
   /* If true, will display a default icon instead of image */
   useIcon: PropTypes.bool,
+  displayTitle: PropTypes.bool,
 };
 
 const shouldUseDefaultGuestAvatar = name => {

@@ -52,6 +52,7 @@ const hostReportPageQuery = gql`
       createdAt
       hostFeePercent
       isTrustedHost
+      settings
       stats {
         id
         balance(dateTo: $dateTo) {
@@ -208,16 +209,17 @@ const HostDashboardReports = ({ accountSlug: hostSlug }: DashboardSectionProps) 
   const collectives = queryFilter.values.account ? [{ slug: queryFilter.values.account }] : undefined;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="Reports" defaultMessage="Reports" />}
         actions={
           <ExportTransactionsCSVModal
-            hostSlug={hostSlug}
+            account={host}
+            isHostReport
             queryFilter={queryFilter}
             trigger={
               <Button size="sm" variant="outline">
-                <FormattedMessage defaultMessage="Export CSV" />
+                <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
               </Button>
             }
           />

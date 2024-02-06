@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getCollectivePageMetadata } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
@@ -95,8 +95,8 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
   });
 
   const { collectiveSlug, edit, draftKey } = props;
-  const data = queryResult?.data;
-  const error = queryResult?.error;
+  const data = queryResult.data;
+  const error = queryResult.error;
   const { refetch, fetchMore, startPolling, stopPolling } = queryResult;
   if (!queryResult.loading) {
     if (!data || error) {
@@ -108,7 +108,7 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
     }
   }
 
-  const expense = cloneDeep(data.expense);
+  const expense = cloneDeep(data?.expense);
   if (expense && data.expensePayeeStats?.payee?.stats) {
     expense.payee.stats = data.expensePayeeStats?.payee?.stats;
   }

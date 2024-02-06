@@ -6,7 +6,6 @@ import { Account, ExpenseType, UploadFileResult } from '../../../lib/graphql/typ
 import type { ExpenseFormValues, ExpenseItemFormValues } from '../types/FormValues';
 
 import { expenseItemsMustHaveFiles, newExpenseItem } from './items';
-import { getSupportedCurrencies } from './utils';
 
 /**
  * This function mutates formValues, make sure to clone it first
@@ -18,7 +17,7 @@ const updateExpenseItemWithUploadResult = (
   itemIdx: number,
 ): boolean => {
   const itemPath = `items[${itemIdx}]`;
-  const itemValues = get(formValues, itemPath) || newExpenseItem();
+  const itemValues: ExpenseItemFormValues = get(formValues, itemPath) || newExpenseItem({}, formValues.currency);
 
   // Set item URL
   const fileUrl = uploadResult.file?.url;
@@ -47,26 +46,14 @@ const updateExpenseItemWithUploadResult = (
       itemValues.incurredAt = parsingResult.date;
     }
 
-    if (
-      parsingResult.amount?.valueInCents &&
-      parsingResult.amount.currency === formValues.currency &&
-      !itemValues.amount
-    ) {
-      itemValues.amount = parsingResult.amount.valueInCents;
+    if (parsingResult.amount?.valueInCents && !itemValues.amountV2?.valueInCents) {
+      itemValues.amountV2 = parsingResult.amount;
     }
   }
 
   set(formValues, itemPath, itemValues);
 
   return true;
-};
-
-const canSetCurrency = (formValues: ExpenseFormValues, collective, currency: string) => {
-  return (
-    currency &&
-    !formValues.items.some(item => item.amount) &&
-    getSupportedCurrencies(collective, formValues.payoutMethod).includes(currency)
-  );
 };
 
 /**
@@ -94,14 +81,6 @@ export const updateExpenseFormWithUploadResult = (
     // Expense title/description
     if (!form.values.description) {
       formValues.description = uniqueOCRResult.parsingResult.expense.description;
-    }
-
-    // Currency - we only force it if no amount have been set yet
-    if (form.values.type !== 'CHARGE') {
-      const parsedCurrency = uniqueOCRResult.parsingResult.expense.amount?.currency;
-      if (canSetCurrency(formValues, collective, parsedCurrency)) {
-        formValues.currency = parsedCurrency;
-      }
     }
   }
 
@@ -146,14 +125,14 @@ export const checkExpenseSupportsOCR = (expenseType: ExpenseType, loggedInUser):
   }
 };
 
-type FieldsWithOCRSupport = 'description' | 'incurredAt' | 'amount';
+type FieldsWithOCRSupport = 'description' | 'incurredAt' | 'amountV2';
 
 type ExpenseItemFields = Extract<keyof ExpenseItemFormValues, FieldsWithOCRSupport>;
 
 export const ITEM_OCR_FIELD_MAPPING: Record<ExpenseItemFields, string> = {
   incurredAt: '__parsingResult.date',
   description: '__parsingResult.description',
-  amount: '__parsingResult.amount',
+  amountV2: '__parsingResult.amount',
 };
 
 /**
@@ -162,7 +141,6 @@ export const ITEM_OCR_FIELD_MAPPING: Record<ExpenseItemFields, string> = {
 const compareItemOCRValue = (
   item: ExpenseItemFormValues,
   field: Omit<keyof ExpenseItemFormValues, `_${string}`>,
-  expenseCurrency: string,
 ): {
   hasMismatch: boolean;
   ocrValue: any;
@@ -171,11 +149,18 @@ const compareItemOCRValue = (
   const checkValue = ocrValue => {
     if (isNil(existingValue) || isNil(ocrValue)) {
       return { hasMismatch: false, ocrValue };
-    } else if (field === 'amount') {
+    } else if (field === 'amountV2') {
+      const hasCurrencyMismatch = ocrValue.currency !== existingValue?.['currency'];
+      const hasAmountMismatch = existingValue?.['valueInCents'] !== ocrValue.valueInCents;
       return {
-        hasMismatch: ocrValue.currency !== expenseCurrency || existingValue !== ocrValue.valueInCents,
+        hasCurrencyMismatch,
+        hasAmountMismatch,
+        hasMismatch: hasCurrencyMismatch || hasAmountMismatch,
         ocrValue,
       };
+    } else if (field === 'incurredAt') {
+      const normalizeDateStr = dateStr => dateStr.split('T')[0];
+      return { hasMismatch: normalizeDateStr(ocrValue) !== normalizeDateStr(existingValue), ocrValue };
     } else {
       return { hasMismatch: existingValue !== ocrValue, ocrValue };
     }
@@ -187,15 +172,11 @@ const compareItemOCRValue = (
 
 type ExpenseOCRValuesComparison = Record<FieldsWithOCRSupport, { hasMismatch: boolean; ocrValue: any }>;
 
-export const compareItemOCRValues = (
-  item: ExpenseItemFormValues,
-  expenseCurrency: string,
-): ExpenseOCRValuesComparison => {
+export const compareItemOCRValues = (item: ExpenseItemFormValues): ExpenseOCRValuesComparison => {
   return Object.keys(ITEM_OCR_FIELD_MAPPING).reduce((result, field) => {
     result[field as keyof ExpenseItemFormValues] = compareItemOCRValue(
       item,
       field as Omit<keyof ExpenseItemFormValues, `_${string}`>,
-      expenseCurrency,
     );
     return result;
   }, {} as ExpenseOCRValuesComparison);

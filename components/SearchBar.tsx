@@ -25,6 +25,11 @@ const SearchBar = ({
   const [value, setValue] = React.useState(defaultValue || '');
   const intl = useIntl();
 
+  const handleClearFilter = () => {
+    setValue('');
+    onSubmit(null);
+  };
+
   // Reset value when `defaultValue` change, to handle reset filters
   React.useEffect(() => {
     setValue(defaultValue || '');
@@ -40,6 +45,7 @@ const SearchBar = ({
         const searchInput = event.target.elements.q;
         onSubmit(searchInput.value || null);
       }}
+      onClearFilter={handleClearFilter}
       {...props}
     />
   );
@@ -48,6 +54,7 @@ const SearchBar = ({
 SearchBar.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   defaultValue: PropTypes.string,
+  maxWidth: PropTypes.string,
   placeholder: PropTypes.string,
 };
 

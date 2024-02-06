@@ -2,17 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { isNil } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
 
 import Container from '../Container';
 import { Flex } from '../Grid';
+import Image from '../Image';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledSelect from '../StyledSelect';
 import { P, Span } from '../Text';
-
-import illustration from './fees-on-top-illustration.png';
 
 const msg = defineMessages({
   noThankYou: {
@@ -24,11 +22,6 @@ const msg = defineMessages({
     defaultMessage: 'Other',
   },
 });
-
-const Illustration = styled.img.attrs({ src: illustration })`
-  width: 40px;
-  height: 40px;
-`;
 
 const DEFAULT_PERCENTAGES = [0.1, 0.15, 0.2];
 const DEFAULT_PLATFORM_TIP_INDEX = 1;
@@ -125,7 +118,7 @@ const PlatformTipInput = ({ currency, amount, quantity, value, onChange, isEmbed
       </P>
       <Flex justifyContent="space-between" flexWrap={['wrap', 'nowrap']}>
         <Flex alignItems="center">
-          <Illustration alt="" />
+          <Image alt="" width={40} height={40} src="/static/images/fees-on-top-illustration.png" />
           <P fontWeight={500} fontSize="12px" lineHeight="18px" color="black.900" mx={10}>
             <FormattedMessage id="platformFee.thankYou" defaultMessage="Thank you for your contribution:" />
           </P>

@@ -4,7 +4,7 @@ import { themeGet } from '@styled-system/theme-get';
 import { includes } from 'lodash';
 import { MessageSquare } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { FormattedDate, FormattedMessage } from 'react-intl';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
@@ -14,7 +14,8 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
-import { expenseItemsMustHaveFiles } from './lib/items';
+import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
+import { getExpenseExchangeRateWarningOrError } from './lib/utils';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
@@ -67,6 +68,17 @@ CreatedByUserLink.propTypes = {
 
 const Spacer = () => <Span mx="6px">{'•'}</Span>;
 
+const prepareDraftItems = (items, expenseCurrency) => {
+  if (!items) {
+    return [];
+  }
+
+  return items.map(item => {
+    const amountV2 = getExpenseItemAmountV2FromNewAttrs(item, expenseCurrency);
+    return { ...item, amountV2 };
+  });
+};
+
 /**
  * Last step of the create expense flow, shows the summary of the expense with
  * the ability to submit it.
@@ -89,6 +101,7 @@ const ExpenseSummary = ({
   openFileViewer,
   ...props
 }) => {
+  const intl = useIntl();
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
   const isGrant = expense?.type === expenseTypes.GRANT;
@@ -96,7 +109,8 @@ const ExpenseSummary = ({
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const createdByAccount =
     (isDraft ? expense?.requestedByAccount || expense?.createdByAccount : expense?.createdByAccount) || {};
-  const expenseItems = expense?.items?.length > 0 ? expense.items : expense?.draft?.items || [];
+  const expenseItems =
+    expense?.items?.length > 0 ? expense.items : prepareDraftItems(expense?.draft?.items, expense?.currency);
   const expenseTaxes = expense?.taxes?.length > 0 ? expense.taxes : expense?.draft?.taxes || [];
   const isMultiCurrency =
     expense?.amountInAccountCurrency && expense.amountInAccountCurrency.currency !== expense.currency;
@@ -188,6 +202,7 @@ const ExpenseSummary = ({
           <React.Fragment>
             <AccountingCategoryPill
               host={host}
+              account={expense.account}
               expense={expense}
               canEdit={Boolean(expense.permissions?.canEditAccountingCategory)}
               allowNone={!isLoggedInUserExpenseHostAdmin}
@@ -340,7 +355,7 @@ const ExpenseSummary = ({
         <div data-cy="expense-summary-items">
           {expenseItems.map((attachment, attachmentIdx) => (
             <React.Fragment key={attachment.id || attachmentIdx}>
-              <Flex my={24} flexWrap="wrap">
+              <Flex my={24} flexWrap="wrap" data-cy="expense-summary-item">
                 {attachment.url && expenseItemsMustHaveFiles(expense.type) && (
                   <Box mr={3} mb={3} width={['100%', 'auto']}>
                     <UploadedFilePreview
@@ -384,14 +399,44 @@ const ExpenseSummary = ({
                       </Span>
                     )}
                   </Flex>
-                  <P fontSize={15} color="black.600" mt={2} textAlign="right" ml={3}>
-                    <FormattedMoneyAmount
-                      amount={attachment.amount}
-                      currency={expense.currency}
-                      amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontWeight: '500' }}
-                      precision={2}
-                    />
-                  </P>
+                  <Container
+                    fontSize={15}
+                    color="black.600"
+                    mt={2}
+                    textAlign="right"
+                    ml={3}
+                    data-cy="expense-summary-item-amount"
+                  >
+                    {attachment.amountV2?.exchangeRate ? (
+                      <div>
+                        <FormattedMoneyAmount
+                          amount={Math.round(attachment.amountV2.valueInCents * attachment.amountV2.exchangeRate.value)}
+                          currency={expense.currency}
+                          amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontWeight: '500' }}
+                          precision={2}
+                        />
+                        <div className="mt-[2px] text-xs">
+                          <AmountWithExchangeRateInfo
+                            amount={attachment.amountV2}
+                            invertIconPosition
+                            amountStyles={{ letterSpacing: 0 }}
+                            {...getExpenseExchangeRateWarningOrError(
+                              intl,
+                              attachment.amountV2.exchangeRate,
+                              attachment.referenceExchangeRate,
+                            )}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <FormattedMoneyAmount
+                        amount={attachment.amountV2?.valueInCents || attachment.amount}
+                        currency={attachment.amountV2?.currency || expense.currency}
+                        amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontWeight: '500' }}
+                        precision={2}
+                      />
+                    )}
+                  </Container>
                 </Flex>
               </Flex>
               <StyledHr borderStyle="dotted" />

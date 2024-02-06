@@ -7,7 +7,7 @@ import { isNil, omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getLegacyIdForCollective } from '../../../lib/collective.lib';
+import { getLegacyIdForCollective } from '../../../lib/collective';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
@@ -618,10 +618,6 @@ const CancelModalButton = styled(StyledButton)`
   }
 `;
 
-const ModalContainer = styled(StyledModal)`
-  padding-bottom: 10px;
-`;
-
 const FieldDescription = styled.div`
   color: #737373;
   font-size: 0.75rem;
@@ -636,9 +632,9 @@ const ContributeCardPreviewContainer = styled.div`
 
 export default function EditTierModal({ tier, collective, onClose, onUpdate, forcedType }) {
   return (
-    <ModalContainer onClose={onClose} ignoreEscapeKey>
+    <StyledModal className="sm:max-w-4xl" onClose={onClose} ignoreEscapeKey>
       <EditTierForm tier={tier} collective={collective} onClose={onClose} forcedType={forcedType} onUpdate={onUpdate} />
-    </ModalContainer>
+    </StyledModal>
   );
 }
 

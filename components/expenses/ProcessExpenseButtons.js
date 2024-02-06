@@ -310,7 +310,7 @@ const ProcessExpenseButtons = ({
           onDelete={onDelete}
         />
       )}
-      {displaySecurityChecks && expense?.securityChecks?.length && (
+      {displaySecurityChecks && expense?.securityChecks?.length > 0 && (
         <SecurityChecksButton {...buttonProps} minWidth={0} expense={expense} />
       )}
 
@@ -328,6 +328,7 @@ const ProcessExpenseButtons = ({
         <ApproveExpenseModal
           expense={expense}
           host={host}
+          account={collective}
           onConfirm={() => triggerAction('APPROVE')}
           onClose={() => {
             setShowApproveExpenseModal(false);

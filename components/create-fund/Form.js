@@ -5,7 +5,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { suggestSlug } from '../../lib/collective.lib';
+import { suggestSlug } from '../../lib/collective';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';

@@ -7,7 +7,7 @@ import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { Flex } from '../../Grid';
 import Image from '../../Image';
 import Link from '../../Link';
-import { DrawerCloseButton, DrawerMenu, DrawerMenuItem } from '../DrawerMenu';
+import { DrawerMenu, DrawerMenuItem } from '../DrawerMenu';
 
 export default function SiteMenu() {
   const { LoggedInUser } = useLoggedInUser();
@@ -32,13 +32,12 @@ export default function SiteMenu() {
               </Link>
               <Image height={20} width={120} src="/static/images/logotype.svg" alt="Open Collective" />
             </Flex>
-            <DrawerCloseButton onClick={onClose} />
           </Flex>
 
           <Flex flex={1} flexDirection="column" overflowY="auto">
             <Flex flexDirection="column" py={2}>
               {LoggedInUser ? (
-                <DrawerMenuItem href={LoggedInUser ? '/dashboard' : '/'} onClick={onClose}>
+                <DrawerMenuItem href={'/dashboard'} onClick={onClose}>
                   <Flex alignItems="center" gridGap={2}>
                     <LayoutDashboard size={16} /> <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
                   </Flex>

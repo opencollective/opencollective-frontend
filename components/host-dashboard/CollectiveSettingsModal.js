@@ -218,7 +218,7 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
                   },
                 });
 
-                props?.onClose();
+                props.onClose();
               } catch (e) {
                 toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }
@@ -236,7 +236,7 @@ const CollectiveSettingsModal = ({ host, collective, ...props }) => {
 };
 
 CollectiveSettingsModal.propTypes = {
-  onClose: PropTypes.func,
+  onClose: PropTypes.func.isRequired,
   collective: PropTypes.shape({
     id: PropTypes.string,
     hostFeePercent: PropTypes.number,

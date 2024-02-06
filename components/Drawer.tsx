@@ -1,12 +1,10 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import MUIDrawer from '@mui/material/Drawer';
+import clsx from 'clsx';
 import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { createGlobalStyle } from 'styled-components';
 
-import { useTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
-import { cn } from '../lib/utils';
-
+import { Sheet, SheetContent } from './ui/Sheet';
 import StyledRoundButton from './StyledRoundButton';
 
 export const DrawerActionsContext = createContext(null);
@@ -38,8 +36,6 @@ export function Drawer({
   className?: string;
 }) {
   const [drawerActionsContainer, setDrawerActionsContainer] = useState(null);
-  const twoFactorPrompt = useTwoFactorAuthenticationPrompt();
-  const disableEnforceFocus = Boolean(twoFactorPrompt?.isOpen);
 
   const drawerRef = useRef();
   const [drawedWidth, setDrawerWidth] = useState(0);
@@ -59,31 +55,30 @@ export function Drawer({
   return (
     <DrawerActionsContext.Provider value={drawerActionsContainer}>
       <GlobalDrawerStyle drawedWidth={drawedWidth} />
-      <MUIDrawer
-        className="[&_.MuiBackdrop-root]:bg-slate-950/25"
-        anchor="right"
+      <Sheet
         open={open}
-        onClose={onClose}
-        disableEnforceFocus={disableEnforceFocus}
+        onOpenChange={open => {
+          if (!open) {
+            onClose();
+          }
+        }}
       >
-        <div ref={drawerRef} className={cn('flex h-full w-screen max-w-lg flex-col', className)} data-cy={dataCy}>
-          <div className="flex flex-1 flex-col overflow-y-scroll">
-            <div className="relative py-6">
-              {showCloseButton && (
-                <StyledRoundButton
-                  className="absolute right-5 top-5"
-                  size={36}
-                  type="button"
-                  isBorderless
-                  onClick={onClose}
-                  data-cy="close-drawer"
-                >
-                  <X size={20} aria-hidden="true" />
-                </StyledRoundButton>
-              )}
+        <SheetContent className={clsx('flex flex-col gap-0 p-0', className)} ref={drawerRef} data-cy={dataCy}>
+          <div className="relative flex-1 overflow-y-scroll px-4 py-6 sm:px-6">
+            {showCloseButton && (
+              <StyledRoundButton
+                className="absolute right-5 top-5"
+                size={36}
+                type="button"
+                isBorderless
+                onClick={onClose}
+                data-cy="close-drawer"
+              >
+                <X size={20} aria-hidden="true" />
+              </StyledRoundButton>
+            )}
 
-              <div className="px-4 sm:px-6">{children}</div>
-            </div>
+            {children}
           </div>
           {showActionsContainer && (
             <div
@@ -91,8 +86,8 @@ export function Drawer({
               ref={ref => setDrawerActionsContainer(ref)}
             />
           )}
-        </div>
-      </MUIDrawer>
+        </SheetContent>
+      </Sheet>
     </DrawerActionsContext.Provider>
   );
 }

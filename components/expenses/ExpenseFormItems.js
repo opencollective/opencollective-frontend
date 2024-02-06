@@ -10,6 +10,7 @@ import { i18nTaxType } from '../../lib/i18n/taxes';
 import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemsMustHaveFiles, newExpenseItem } from './lib/items';
 import { compareItemOCRValues, itemHasOCR, updateExpenseFormWithUploadResult } from './lib/ocr';
+import { expenseTypeSupportsItemCurrency } from './lib/utils';
 
 import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
@@ -25,12 +26,11 @@ import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseItemForm from './ExpenseItemForm';
 
 /** Converts a list of filenames to expense item objects */
-const filesListToItems = files => files.map(({ url }) => newExpenseItem({ url }));
+const filesListToItems = (files, expenseCurrency) => files.map(({ url }) => newExpenseItem({ url }, expenseCurrency));
 
 class ExpenseFormItems extends React.PureComponent {
   static propTypes = {
     collective: PropTypes.object,
-    availableCurrencies: PropTypes.arrayOf(PropTypes.string),
     /** @ignore from injectIntl */
     intl: PropTypes.object,
     /** Array helper as provided by formik */
@@ -58,12 +58,13 @@ class ExpenseFormItems extends React.PureComponent {
   componentDidUpdate(oldProps) {
     const { values, touched } = this.props.form;
 
+    // Add or remove the default item when changing the expense type
     if (oldProps.form.values.type !== values.type) {
       if ([expenseTypes.INVOICE, expenseTypes.GRANT].includes(values.type)) {
         this.addDefaultItem();
       } else if (!touched.items && values.items?.length === 1) {
         const firstItem = values.items[0];
-        if (!firstItem.url && !firstItem.description && !firstItem.amount) {
+        if (!firstItem.url && !firstItem.description && !firstItem.amountV2?.valueInCents) {
           this.props.remove(0);
         }
       }
@@ -73,7 +74,7 @@ class ExpenseFormItems extends React.PureComponent {
   addDefaultItem() {
     const { values } = this.props.form;
     if (isEmpty(values.items)) {
-      this.props.push(newExpenseItem());
+      this.props.push(newExpenseItem({}, values.currency));
     }
   }
 
@@ -100,14 +101,6 @@ class ExpenseFormItems extends React.PureComponent {
       });
     }
   }
-
-  onCurrencyChange = async newCurrency => {
-    /* If we are calling setFieldValue in response to a field change and has validations
-     * we should set the field to touched; https://github.com/jaredpalmer/formik/issues/2059
-     */
-    await this.props.form.setFieldValue('currency', newCurrency);
-    this.props.form.setFieldTouched('currency', true);
-  };
 
   getApplicableTaxType() {
     const { collective, form } = this.props;
@@ -142,7 +135,7 @@ class ExpenseFormItems extends React.PureComponent {
 
   getItemsOCRComparisons(items) {
     return items.reduce((comparisons, item) => {
-      comparisons[item.id] = compareItemOCRValues(item, this.props.form.values.currency);
+      comparisons[item.id] = compareItemOCRValues(item);
       return comparisons;
     }, {});
   }
@@ -154,17 +147,18 @@ class ExpenseFormItems extends React.PureComponent {
   }
 
   render() {
-    const { availableCurrencies, hasOCRFeature, collective } = this.props;
+    const { hasOCRFeature, collective } = this.props;
     const { values, errors, setFieldValue } = this.props.form;
     const requireFile = expenseItemsMustHaveFiles(values.type);
     const isGrant = values.type === expenseTypes.GRANT;
     const isInvoice = values.type === expenseTypes.INVOICE;
     const isCreditCardCharge = values.type === expenseTypes.CHARGE;
+    const itemsHaveCurrencyPicker = expenseTypeSupportsItemCurrency(values.type);
     const items = values.items || [];
     const hasItems = items.length > 0;
     const itemsWithOCR = items.filter(itemHasOCR);
     const itemsOCRComparisons = this.getItemsOCRComparisons(itemsWithOCR);
-    const ocrMismatchWarningFields = ['amount', 'incurredAt'];
+    const ocrMismatchWarningFields = ['amountV2', 'incurredAt'];
     const hasOCRWarnings = some(itemsOCRComparisons, comparison =>
       some(comparison, (value, field) => ocrMismatchWarningFields.includes(field) && value.hasMismatch),
     );
@@ -175,7 +169,7 @@ class ExpenseFormItems extends React.PureComponent {
           <StyledDropzone
             {...attachmentDropzoneParams}
             kind="EXPENSE_ITEM"
-            data-cy="expense-multi-attachments-dropzone"
+            data-cy="expense-multi-items-dropzone"
             onSuccess={files => filesListToItems(files).map(this.props.push)}
             onReject={uploadErrors => {
               this.reportErrors(uploadErrors);
@@ -185,12 +179,15 @@ class ExpenseFormItems extends React.PureComponent {
             mb={3}
             useGraphQL={hasOCRFeature}
             parseDocument={hasOCRFeature}
+            parsingOptions={{ currency: values.currency }}
             onDrop={files => {
               // Insert dummy items to display the loading states when uploading through GraphQL
               if (hasOCRFeature) {
                 this.props.form.setFieldValue(
                   'items',
-                  files.map(file => newExpenseItem({ __isUploading: true, __file: file, __fromInput: 'multi' })),
+                  files.map(file =>
+                    newExpenseItem({ __isUploading: true, __file: file, __fromInput: 'multi' }, values.currency),
+                  ),
                 );
               }
             }}
@@ -220,7 +217,6 @@ class ExpenseFormItems extends React.PureComponent {
           <ExpenseItemForm
             key={`item-${attachment.id}`}
             attachment={attachment}
-            currency={values.currency}
             itemIdx={index}
             errors={errors}
             onRemove={onRemove}
@@ -230,13 +226,11 @@ class ExpenseFormItems extends React.PureComponent {
             onUploadError={e => this.reportErrors([e])}
             isOptional={values.payee?.isInvite}
             editOnlyDescriptiveInfo={isCreditCardCharge}
-            hasMultiCurrency={!index && availableCurrencies?.length > 1} // Only display currency picker for the first item
-            availableCurrencies={availableCurrencies}
-            onCurrencyChange={async value => await this.onCurrencyChange(value)}
             isInvoice={isInvoice}
             hasOCRFeature={hasOCRFeature}
             collective={collective}
             ocrComparison={itemsOCRComparisons[attachment.id]}
+            hasCurrencyPicker={itemsHaveCurrencyPicker}
           />
         ))}
         {/** Do not display OCR warnings for OCR charges since date/amount can't be changed */}

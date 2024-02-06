@@ -77,7 +77,7 @@ const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
 
-  const { data: metadata } = useQuery(accountExpensesMetadataQuery, {
+  const { data: metadata, loading: loadingMetaData } = useQuery(accountExpensesMetadataQuery, {
     variables: { accountSlug },
     context: API_V2_CONTEXT,
   });
@@ -111,7 +111,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const pageRoute = `/dashboard/${accountSlug}/expenses`;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage defaultMessage="Received Expenses" />}
         description={<FormattedMessage defaultMessage="Expenses submitted to your account." />}
@@ -127,7 +127,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
       ) : (
         <React.Fragment>
           <ExpensesList
-            isLoading={loading}
+            isLoading={loading || loadingMetaData}
             collective={metadata?.account}
             host={metadata?.account?.isHost ? metadata?.account : metadata?.account?.host}
             expenses={data?.expenses?.nodes}

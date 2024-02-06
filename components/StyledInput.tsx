@@ -26,7 +26,7 @@ const getBorderColor = ({ error, success }) => {
  */
 const StyledInput = styled.input`
   &:not([type='checkbox']):not([type='radio']):not([type='range']) {
-    min-height: 36px;
+    min-height: ${props => props.minHeight || '36px'};
   }
 
   ${background}
@@ -59,6 +59,22 @@ const StyledInput = styled.input`
           `;
     }
   }}
+
+  ${props =>
+    props.hideSpinners &&
+    css`
+      ::-webkit-inner-spin-button,
+      ::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: textfield;
+        margin: 0;
+      }
+
+      &[type='number'] {
+        appearance: none;
+        -moz-appearance: textfield;
+      }
+    `}
 
   &[type=radio] {
     cursor: pointer;

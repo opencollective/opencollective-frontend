@@ -80,6 +80,9 @@ export const transactionsTableQuery = gql`
     $orderBy: ChronologicalOrderInput
     $group: String
     $includeHost: Boolean
+    $expenseType: [ExpenseType]
+    $expense: ExpenseReferenceInput
+    $order: OrderReferenceInput
   ) {
     transactions(
       host: $hostAccount
@@ -102,6 +105,9 @@ export const transactionsTableQuery = gql`
       orderBy: $orderBy
       group: $group
       includeHost: $includeHost
+      expenseType: $expenseType
+      expense: $expense
+      order: $order
     ) {
       ...TransactionsTableQueryCollectionFragment
     }

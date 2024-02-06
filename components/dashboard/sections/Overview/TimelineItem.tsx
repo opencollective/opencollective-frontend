@@ -1,9 +1,10 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { capitalize } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { WorkspaceHomeQuery } from '../../../../lib/graphql/types/v2/graphql';
+import { ActivityType, type TimelineQuery } from '../../../../lib/graphql/types/v2/graphql';
 import { ActivityDescriptionI18n, ActivityTimelineMessageI18n } from '../../../../lib/i18n/activities';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
@@ -12,13 +13,13 @@ import { AvatarWithLink } from '../../../AvatarWithLink';
 import DateTime from '../../../DateTime';
 import HTMLContent from '../../../HTMLContent';
 import Link from '../../../Link';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import StyledLink from '../../../StyledLink';
+import { Skeleton } from '../../../ui/Skeleton';
 
 dayjs.extend(relativeTime);
 
 type ActivityListItemProps = {
-  activity?: WorkspaceHomeQuery['account']['feed'][0];
+  activity?: TimelineQuery['account']['feed'][0];
   isLast?: boolean;
   openExpense?: (legacyId: number) => void;
 };
@@ -30,11 +31,25 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
 
   const isLoading = !activity;
   const isLastWeek = dayjs(activity?.createdAt).isAfter(dayjs().subtract(1, 'week'));
+
+  const displayFollowButton = activity?.type === ActivityType.COLLECTIVE_UPDATE_PUBLISHED;
+  const i18nMsg = ActivityTimelineMessageI18n[activity?.type] || ActivityDescriptionI18n[activity?.type];
+
+  let description = null;
+  if (i18nMsg) {
+    description = intl.formatMessage(
+      i18nMsg,
+      getActivityVariables(intl, activity, { onClickExpense: openExpense, displayFollowButton }),
+    );
+  } else {
+    description = capitalize(activity?.type.replace('_', ' '));
+  }
+
   return (
     <div className="rounded-2xl border p-4 text-sm">
       <div className="flex flex-1 items-start gap-3">
         {isLoading ? (
-          <LoadingPlaceholder height={32} width={32} borderRadius="50%" />
+          <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
         ) : (
           <AvatarWithLink
             size={32}
@@ -43,17 +58,12 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
           />
         )}
         {isLoading ? (
-          <LoadingPlaceholder height={16} width={300} />
+          <Skeleton className="h-4 w-80" />
         ) : (
-          <div className="flex flex-1 flex-wrap items-center justify-between">
-            <div className="text-foreground">
-              {intl.formatMessage(
-                ActivityTimelineMessageI18n[activity.type] || ActivityDescriptionI18n[activity.type],
-                getActivityVariables(intl, activity, { onClickExpense: openExpense }),
-              )}
-            </div>
+          <div className="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-1">
+            <div className="text-foreground">{description}</div>
 
-            <div className="flex-1 whitespace-nowrap text-right text-muted-foreground">
+            <div className="self-start whitespace-nowrap text-muted-foreground">
               {isLastWeek ? (
                 dayjs(activity.createdAt).fromNow()
               ) : (

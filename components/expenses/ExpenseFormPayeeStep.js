@@ -8,7 +8,7 @@ import { first, get, groupBy, isEmpty, omit, pick } from 'lodash';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { compareNames } from '../../lib/collective.lib';
+import { compareNames } from '../../lib/collective';
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';

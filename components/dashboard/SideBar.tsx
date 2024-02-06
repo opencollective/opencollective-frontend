@@ -1,6 +1,7 @@
 import React from 'react';
 import { MenuIcon } from 'lucide-react';
 
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn } from '../../lib/utils';
 
@@ -25,6 +26,7 @@ const AdminPanelSideBar = ({
   onRoute: _onRoute,
   ...props
 }: AdminPanelSideBarProps) => {
+  const { LoggedInUser } = useLoggedInUser();
   const [isMenuOpen, setMenuOpen] = React.useState(false);
   const { viewport } = useWindowResize();
   const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
@@ -51,12 +53,15 @@ const AdminPanelSideBar = ({
         )}
       </div>
     ),
-    [isLoading, activeSlug, viewport],
+    [isLoading, activeSlug, viewport, LoggedInUser],
   );
 
   return (
     <div
-      className={cn('w-full flex-shrink-0 flex-grow-0 md:w-64', isMobile && 'sticky top-0 z-10 bg-white py-2.5')}
+      className={cn(
+        'w-full flex-shrink-0 flex-grow-0 md:w-52 xl:w-64',
+        isMobile && 'sticky top-0 z-10 bg-white py-2.5',
+      )}
       {...props}
     >
       <div className="sticky top-8">
@@ -69,7 +74,7 @@ const AdminPanelSideBar = ({
               </StyledRoundButton>
 
               <React.Fragment>
-                <DrawerMenu anchor="left" open={isMenuOpen} onClose={() => setMenuOpen(false)} p="16px">
+                <DrawerMenu anchor="left" open={isMenuOpen} onClose={() => setMenuOpen(false)} className="p-4 pt-10">
                   {content}
                 </DrawerMenu>
               </React.Fragment>

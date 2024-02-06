@@ -9,19 +9,19 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { connectAccount } from '../../lib/api';
+import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
+import Image from '../Image';
 import Link from '../Link';
 import Loading from '../Loading';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
+import { toast } from '../ui/useToast';
 
-import bankAccountIllustration from '../../public/static/images/create-collective/bankAccountIllustration.png';
-import stripeIllustration from '../../public/static/images/create-collective/stripeIllustration.png';
-
-const Image = styled.img`
+const ImageSizingContainer = styled(Container)`
   @media screen and (min-width: 52em) {
     height: 256px;
     width: 256px;
@@ -75,14 +75,8 @@ class StripeOrBankAccountPicker extends React.Component {
 
   connectStripe = async () => {
     const service = 'stripe';
-    try {
-      const json = await connectAccount(this.props.host.id, service);
-      window.location.href = json.redirectUrl;
-    } catch (err) {
-      // TODO: this should be reported to the user
-      // eslint-disable-next-line no-console
-      console.error(`>>> /api/connected-accounts/${service} error`, err);
-    }
+    const json = await connectAccount(this.props.host.id, service);
+    window.location.href = json.redirectUrl;
   };
 
   render() {
@@ -108,10 +102,14 @@ class StripeOrBankAccountPicker extends React.Component {
           <Flex justifyContent="center" alignItems="center" flexDirection={['column', 'row']}>
             <Container alignItems="center" width={[null, 280, 312]} mb={[2, 0]}>
               <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                <Image
-                  src={stripeIllustration}
-                  alt={intl.formatMessage(this.messages.connectService, { service: 'Stripe' })}
-                />
+                <ImageSizingContainer>
+                  <Image
+                    width={256}
+                    height={256}
+                    src="/static/images/create-collective/stripeIllustration.png"
+                    alt={intl.formatMessage(this.messages.connectService, { service: 'Stripe' })}
+                  />
+                </ImageSizingContainer>
                 {stripeAccount ? (
                   <ConnectedAccountCard
                     width={2 / 3}
@@ -136,9 +134,19 @@ class StripeOrBankAccountPicker extends React.Component {
                     mt={[2, 3]}
                     mb={3}
                     minWidth={'145px'}
+                    loading={buttonLoading}
                     onClick={async () => {
-                      await addHost(collective, host);
-                      this.connectStripe();
+                      try {
+                        this.setState({ buttonLoading: true });
+                        await addHost(collective, host);
+                        await this.connectStripe();
+                      } catch (e) {
+                        this.setState({ buttonLoading: false });
+                        toast({
+                          variant: 'error',
+                          message: i18nGraphqlException(intl, e),
+                        });
+                      }
                     }}
                   >
                     <FormattedMessage defaultMessage="Connect {service}" values={{ service: 'Stripe' }} />
@@ -163,7 +171,14 @@ class StripeOrBankAccountPicker extends React.Component {
               pt={[3, 0]}
             >
               <Flex flexDirection="column" justifyContent="center" alignItems="center">
-                <Image src={bankAccountIllustration} alt={intl.formatMessage(this.messages.addBankAccount)} />
+                <ImageSizingContainer>
+                  <Image
+                    width={256}
+                    height={256}
+                    src="/static/images/create-collective/bankAccountIllustration.png"
+                    alt={intl.formatMessage(this.messages.addBankAccount)}
+                  />
+                </ImageSizingContainer>
                 {isBankAccountAlreadyThere ? (
                   <ConnectedAccountCard
                     width={2 / 3}

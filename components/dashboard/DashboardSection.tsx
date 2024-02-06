@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
+import { isIndividualAccount } from '../../lib/collective';
 
 import { HostAdminAccountingSection } from '../admin-panel/sections/accounting';
 import AccountSettings from '../admin-panel/sections/AccountSettings';
@@ -16,19 +15,20 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 
 import HostApplications from './sections/collectives/HostApplications';
+import HostedCollectives from './sections/collectives/HostedCollectives';
 import HostFinancialContributions from './sections/contributions/HostFinancialContributions';
 import IncomingContributions from './sections/contributions/IncomingContributions';
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
+import Contributors from './sections/Contributors';
 import HostExpenses from './sections/expenses/HostDashboardExpenses';
 import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
 import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
 import HostDashboardAgreements from './sections/HostDashboardAgreements';
-import HostDashboardHostedCollectives from './sections/HostDashboardHostedCollectives';
 import HostDashboardReports from './sections/HostDashboardReports';
 import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
 import HostVirtualCards from './sections/HostVirtualCards';
-import Overview from './sections/Overview';
-import Transactions from './sections/Transactions';
+import { CollectiveOverview } from './sections/Overview/CollectiveOverview';
+import IndividualOverview from './sections/Overview/IndividualOverview';
 import AccountTransactions from './sections/transactions/AccountTransactions';
 import HostTransactions from './sections/transactions/HostTransactions';
 import Vendors from './sections/Vendors';
@@ -37,7 +37,7 @@ import { LEGACY_SECTIONS, LEGACY_SETTINGS_SECTIONS, SECTION_LABELS, SECTIONS, SE
 import DashboardHeader from './DashboardHeader';
 
 const DASHBOARD_COMPONENTS = {
-  [SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
+  [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,
   [SECTIONS.CHART_OF_ACCOUNTS]: HostAdminAccountingSection,
   [SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: HostFinancialContributions,
   [SECTIONS.HOST_EXPENSES]: HostExpenses,
@@ -46,12 +46,13 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.REPORTS]: HostDashboardReports,
   [SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
   [SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
-  [SECTIONS.OVERVIEW]: Overview,
+  [SECTIONS.OVERVIEW]: CollectiveOverview,
   [SECTIONS.EXPENSES]: ReceivedExpenses,
   [SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
+  [SECTIONS.CONTRIBUTORS]: Contributors,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
-  [SECTIONS.TRANSACTIONS]: Transactions,
+  [SECTIONS.TRANSACTIONS]: AccountTransactions,
   [SECTIONS.HOST_TRANSACTIONS]: HostTransactions,
   [SECTIONS.VIRTUAL_CARDS]: VirtualCards,
   [SECTIONS.TEAM]: Team,
@@ -65,8 +66,6 @@ const SETTINGS_COMPONENTS = {
 
 const DashboardSection = ({ account, isLoading, section, subpath }) => {
   const { formatMessage } = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
-  const useNewTransactionsPage = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_TRANSACTION_PAGE);
 
   if (isLoading) {
     return (
@@ -79,8 +78,8 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   let DashboardComponent = DASHBOARD_COMPONENTS[section];
   if (DashboardComponent) {
-    if (section === SECTIONS.TRANSACTIONS && useNewTransactionsPage) {
-      DashboardComponent = AccountTransactions;
+    if (section === SECTIONS.OVERVIEW && isIndividualAccount(account)) {
+      DashboardComponent = IndividualOverview;
     }
     return (
       <div className="w-full">
@@ -91,7 +90,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
-      <div className="w-full">
+      <div className="w-full max-w-screen-lg">
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <AccountSettings account={account} section={section} />
@@ -103,19 +102,23 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   const SettingsComponent = SETTINGS_COMPONENTS[section];
   if (SettingsComponent) {
     return (
-      <div className="max-w-screen-md">
+      // <div className="flex max-w-screen-lg justify-center">
+      <div className="max-w-screen-md flex-1">
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
+      // </div>
     );
   }
 
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
-      <div className="max-w-screen-md">
+      // <div className="flex max-w-screen-lg justify-center">
+      <div className="max-w-screen-md flex-1">
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <AccountSettings account={account} section={section} />
       </div>
+      // </div>
     );
   }
 

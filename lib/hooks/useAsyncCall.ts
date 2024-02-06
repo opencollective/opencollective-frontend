@@ -5,7 +5,16 @@ import { useToast } from '../../components/ui/useToast';
 
 import { formatErrorMessage } from '../errors';
 
-export const useAsyncCall = (fn, { useErrorToast = false, defaultData = null } = {}) => {
+export const useAsyncCall = <T extends (...args: any[]) => Promise<any>>(
+  fn: T,
+  { useErrorToast = false, defaultData = null } = {},
+): {
+  loading: boolean;
+  call: (...args: Parameters<T>) => Promise<void>;
+  callWith: (...args: Parameters<T>) => () => Promise<void>;
+  data: Awaited<ReturnType<T>>;
+  error: any;
+} => {
   const [loading, setLoading] = React.useState(false);
   const [data, setData] = React.useState(defaultData);
   const [error, setError] = React.useState();
@@ -16,8 +25,9 @@ export const useAsyncCall = (fn, { useErrorToast = false, defaultData = null } =
     (...args) =>
     async () => {
       setLoading(true);
-      setError();
-      setData();
+      setError(undefined);
+      setData(undefined);
+
       try {
         const response = await fn(...args);
         setData(response);

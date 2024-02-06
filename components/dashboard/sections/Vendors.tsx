@@ -333,7 +333,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
   const error = queryError;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage defaultMessage="Vendors" />}
         description={

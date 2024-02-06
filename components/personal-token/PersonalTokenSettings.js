@@ -168,6 +168,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                   values: {
                     ...result.data.updatePersonalToken,
                     expiresAt: stripTime(result.data.updatePersonalToken.expiresAt),
+                    scope: (data.personalToken.scope || []).map(scope => ({ value: scope, label: scope })),
                   },
                 });
               } catch (e) {

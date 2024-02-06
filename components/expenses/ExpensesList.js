@@ -182,10 +182,8 @@ ExpensesList.propTypes = {
   /** Defines the field in `expense` that holds the amount. Useful to display the right one based on the context for multi-currency expenses. */
   expenseFieldForTotalAmount: PropTypes.string,
   collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    parent: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-    }),
+    slug: PropTypes.string,
+    parent: PropTypes.shape({ slug: PropTypes.string }),
     currency: PropTypes.string,
   }),
   expenses: PropTypes.arrayOf(
@@ -194,7 +192,6 @@ ExpensesList.propTypes = {
       legacyId: PropTypes.number.isRequired,
     }),
   ),
-  totalAmount: PropTypes.number,
   useDrawer: PropTypes.bool,
   setOpenExpenseLegacyId: PropTypes.func,
   openExpenseLegacyId: PropTypes.number,

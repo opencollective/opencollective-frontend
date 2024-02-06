@@ -30,6 +30,14 @@ const uploadFileMutation = gql`
           amount {
             valueInCents
             currency
+            exchangeRate {
+              value
+              fromCurrency
+              toCurrency
+              date
+              source
+              isApproximate
+            }
           }
           items {
             description
@@ -81,6 +89,10 @@ export const useGraphQLFileUploader = ({
     uploadFile: React.useCallback(
       async (input: UploadFileInput | UploadFileInput[]) => {
         const allInputs = Array.isArray(input) ? input : [input];
+        if (allInputs.length === 0) {
+          return;
+        }
+
         setIsUploading(true);
         try {
           let result;

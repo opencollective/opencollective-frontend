@@ -171,7 +171,7 @@ const TopBar = ({ account }: TopBarProps) => {
 
   return (
     <Fragment>
-      <div className="border-b bg-white px-4 md:px-7" ref={ref}>
+      <div className="border-b bg-white px-4 xl:px-6" ref={ref}>
         <div className="flex h-16 items-center justify-between gap-4 py-4">
           <Flex alignItems="center" gridGap={[2, 3]}>
             <Box flexShrink={0}>

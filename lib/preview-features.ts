@@ -4,10 +4,9 @@
 export enum PREVIEW_FEATURE_KEYS {
   DASHBOARD = 'dashboard',
   EXPENSE_PIPELINE = 'EXPENSE_PIPELINE',
-  EXPENSE_OCR = 'EXPENSE_OCR',
   EXPENSE_CATEGORIZATION = 'EXPENSE_CATEGORIZATION',
   DYNAMIC_TOP_BAR = 'DYNAMIC_TOP_BAR',
-  NEW_TRANSACTION_PAGE = 'NEW_TRANSACTION_PAGE',
+  COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
 }
 
 export type PreviewFeature = {
@@ -32,12 +31,13 @@ export const previewFeatures: PreviewFeature[] = [
     description:
       'A central space to keep on top of everything you do in Open Collective, from tracking your expenses to managing organizations.',
     publicBeta: true,
-    enabledByDefaultFor: ['opencollective'],
+    enabledByDefaultFor: ['*'],
+    env: ['development', 'staging', 'production'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR,
     title: 'Dynamic top bar',
-    publicBeta: true,
+    publicBeta: false,
     dependsOn: PREVIEW_FEATURE_KEYS.DASHBOARD,
   },
   {
@@ -48,13 +48,6 @@ export const previewFeatures: PreviewFeature[] = [
     closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
   },
   {
-    key: PREVIEW_FEATURE_KEYS.EXPENSE_OCR,
-    title: 'Expense AI assistant',
-    description: 'Introducing an AI assistant to help you create expenses.',
-    publicBeta: false,
-    enabledByDefaultFor: ['*'],
-  },
-  {
     key: PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION,
     title: 'Expense categorization',
     description: 'Facilitate your accounting by categorizing your expenses according to a chart of accounts.',
@@ -63,9 +56,12 @@ export const previewFeatures: PreviewFeature[] = [
     alwaysEnableInDev: true,
   },
   {
-    key: PREVIEW_FEATURE_KEYS.NEW_TRANSACTION_PAGE,
-    title: 'New Transactions page',
-    description: 'Improved Transactions page in Dashboard',
-    publicBeta: true,
+    key: PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW,
+    title: 'Collective Overview',
+    description: 'Overview page for Collectives in Dashboard',
+    publicBeta: false,
+    alwaysEnableInDev: true,
+    enabledByDefaultFor: ['*'],
+    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
   },
 ];

@@ -4,7 +4,7 @@ import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { getSuggestedTags } from '../../lib/collective.lib';
+import { getSuggestedTags } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -118,7 +118,7 @@ const Expenses = props => {
             />
           </Box>
         )}
-        <Box flex="12 1 160px">
+        <Box flex="12 1 160px" width="276px">
           <SearchBar defaultValue={query.searchTerm} onSubmit={searchTerm => handleSearch(searchTerm)} height="40px" />
         </Box>
         <Box flex="0 1 160px">

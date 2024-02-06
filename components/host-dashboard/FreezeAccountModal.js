@@ -146,7 +146,8 @@ const FreezeAccountModal = ({ collective, ...props }) => {
                         successMsgArgs,
                       ),
                 });
-                props?.onClose();
+                props.onSuccess?.();
+                props.onClose();
               } catch (e) {
                 toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }
@@ -169,6 +170,7 @@ const FreezeAccountModal = ({ collective, ...props }) => {
 
 FreezeAccountModal.propTypes = {
   onClose: PropTypes.func,
+  onSuccess: PropTypes.func,
   collective: PropTypes.shape({
     id: PropTypes.string,
     hostFeePercent: PropTypes.number,

@@ -48,7 +48,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
   });
 
   return (
-    <StyledModal maxWidth={432} trapFocus {...props}>
+    <StyledModal maxWidth={432} {...props}>
       <CollectiveModalHeader collective={collective} mb={3} />
       <ModalBody>
         <div>
@@ -127,7 +127,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
                     successMsgArgs,
                   ),
                 });
-                props?.onClose();
+                props.onClose();
               } catch (e) {
                 toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }

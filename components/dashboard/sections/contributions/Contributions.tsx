@@ -90,6 +90,7 @@ const dashboardContributionsQuery = gql`
     $includeIncognito: Boolean
     $minAmount: Int
     $maxAmount: Int
+    $paymentMethod: PaymentMethodReferenceInput
   ) {
     account(slug: $slug) {
       id
@@ -104,6 +105,7 @@ const dashboardContributionsQuery = gql`
         searchTerm: $searchTerm
         offset: $offset
         limit: $limit
+        paymentMethod: $paymentMethod
       ) {
         totalCount
         nodes {
@@ -349,7 +351,6 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
       slug: accountSlug,
       filter: direction || 'OUTGOING',
       includeIncognito: true,
-      minAmount: 1,
       ...queryFilter.variables,
     },
     context: API_V2_CONTEXT,
@@ -375,7 +376,7 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={
           isIncoming ? (

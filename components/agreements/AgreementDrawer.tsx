@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { Agreement as GraphQLAgreement, FileInfo } from '../../lib/graphql/types/v2/graphql';
+import { Agreement as GraphQLAgreement } from '../../lib/graphql/types/v2/graphql';
 
 import { Drawer } from '../Drawer';
+import FilesViewerModal from '../FilesViewerModal';
 
 import Agreement from './Agreement';
 import AgreementForm from './AgreementForm';
@@ -17,7 +18,6 @@ type AgreementDrawerProps = {
   onDelete: (GraphQLAgreement) => void;
   agreement?: GraphQLAgreement;
   hostLegacyId: number;
-  onFilePreview: (file: FileInfo | string) => void;
 };
 
 export default function AgreementDrawer({
@@ -29,12 +29,12 @@ export default function AgreementDrawer({
   canEdit,
   agreement,
   hostLegacyId,
-  onFilePreview,
 }: AgreementDrawerProps) {
   const [isEditing, setEditing] = React.useState<boolean>(false);
-
+  const [filesViewerOpen, setFilesViewerOpen] = React.useState<boolean>(false);
   const closeDrawer = React.useCallback(() => {
     setEditing(false);
+    setFilesViewerOpen(false);
     onClose();
   }, [onClose]);
 
@@ -53,7 +53,7 @@ export default function AgreementDrawer({
           agreement={agreement}
           onCreate={onCreate}
           onCancel={() => (isEditing ? setEditing(false) : closeDrawer())}
-          openFileViewer={onFilePreview}
+          openFileViewer={() => setFilesViewerOpen(true)}
           onEdit={agreement => {
             onEdit?.(agreement);
             closeDrawer();
@@ -64,10 +64,19 @@ export default function AgreementDrawer({
           agreement={agreement}
           onEdit={() => setEditing(true)}
           onDelete={onDelete}
-          openFileViewer={onFilePreview}
+          openFileViewer={() => setFilesViewerOpen(true)}
         />
       ) : (
-        <Agreement agreement={agreement} openFileViewer={() => onFilePreview(agreement.attachment)} />
+        <Agreement agreement={agreement} openFileViewer={() => setFilesViewerOpen(true)} />
+      )}
+      {filesViewerOpen && (
+        <FilesViewerModal
+          files={[agreement.attachment]}
+          openFileUrl={agreement.attachment.url}
+          onClose={() => setFilesViewerOpen(false)}
+          parentTitle={`${agreement.account.name} / ${agreement.title}`}
+          allowOutsideInteraction
+        />
       )}
     </Drawer>
   );

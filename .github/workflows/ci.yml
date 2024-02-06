@@ -16,6 +16,7 @@ env:
   NODE_ENV: test
   WEBSITE_URL: http://localhost:3000
   API_URL: http://localhost:3060
+  PDF_SERVICE_URL: http://localhost:3002
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
   CI: true
 
@@ -54,6 +55,9 @@ jobs:
 
   depcheck:
     runs-on: ubuntu-latest
+
+    # Disable because we get an unrelated error after updating the Sentry config: https://github.com/opencollective/opencollective/issues/7254
+    if: ${{ false }}
 
     timeout-minutes: 15
 
@@ -99,7 +103,7 @@ jobs:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
       - name: Restore NextJS build cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .next/cache
           # Generate a new cache whenever packages or source files change

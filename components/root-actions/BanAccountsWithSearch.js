@@ -143,7 +143,9 @@ const BanAccountsWithSearch = () => {
 
   return (
     <div>
-      <SearchBar placeholder="Search accounts" onSubmit={setSearchTerm} disabled={loading || submitting} />
+      <Box width="276px">
+        <SearchBar placeholder="Search accounts" onSubmit={setSearchTerm} disabled={loading || submitting} />
+      </Box>
 
       {error ? (
         <MessageBoxGraphqlError error={error} />
@@ -262,7 +264,7 @@ const BanAccountsWithSearch = () => {
           isDanger
           continueLabel="Ban accounts"
           header="Ban accounts"
-          cancelHandler={() => setDryRunData(null)}
+          onClose={() => setDryRunData(null)}
           disableSubmit={!dryRunData.isAllowed}
           continueHandler={async () => {
             try {

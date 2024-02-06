@@ -1,22 +1,25 @@
 import React from 'react';
-import { uniq } from 'lodash';
+import { omit } from 'lodash';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
+import { PAYMENT_METHOD_TYPE } from '../../../../lib/constants/payment-methods';
 import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { isMulti, isNullable, limit, offset } from '../../../../lib/filters/schemas';
+import { integer, isMulti, isNullable, limit, offset } from '../../../../lib/filters/schemas';
 import {
   Currency,
+  ExpenseType,
   PaymentMethodType,
   TransactionKind,
   TransactionsTableQueryVariables,
   TransactionType,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nPaymentMethodType } from '../../../../lib/i18n/payment-method-type';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { sortSelectOptions } from '../../../../lib/utils';
 
-import { getDefaultKinds } from '../../../transactions/filters/TransactionsKindFilter';
+import { Input } from '../../../ui/Input';
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
@@ -35,6 +38,9 @@ export const schema = z.object({
   type: z.nativeEnum(TransactionType).optional(),
   paymentMethodType: isMulti(isNullable(z.nativeEnum(PaymentMethodType))).optional(),
   virtualCard: isMulti(z.string()).optional(),
+  expenseType: isMulti(z.nativeEnum(ExpenseType)).optional(),
+  expenseId: integer.optional(),
+  contributionId: integer.optional(),
   openTransactionId: z.string().optional(),
   group: z.string().optional(),
 });
@@ -54,6 +60,8 @@ export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQuer
   date: dateFilter.toVariables,
   amount: amountFilter.toVariables,
   virtualCard: (virtualCardIds, key) => ({ [key]: virtualCardIds.map(id => ({ id })) }),
+  expenseId: id => ({ expense: { legacyId: id } }),
+  contributionId: id => ({ order: { legacyId: id } }),
 };
 
 // The filters config is used to populate the Filters component.
@@ -75,11 +83,11 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   kind: {
     labelMsg: defineMessage({ id: 'Transaction.Kind', defaultMessage: 'Kind' }),
     Component: ({ meta, intl, ...props }) => {
-      const kinds = uniq([...(meta?.kinds || []), ...getDefaultKinds()]);
+      const kinds = meta?.kinds || TransactionKind;
       return (
         <ComboSelectFilter
           isMulti
-          options={kinds
+          options={Object.values(kinds)
             .map(value => ({
               label: i18nTransactionKind(intl, value),
               value,
@@ -94,7 +102,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   paymentMethodType: {
     labelMsg: defineMessage({ id: 'Fields.paymentMethod', defaultMessage: 'Payment method' }),
     Component: ({ value, meta, intl, ...props }) => {
-      const paymentMethodTypes = meta?.paymentMethodTypes || PaymentMethodType;
+      const paymentMethodTypes = meta?.paymentMethodTypes || PAYMENT_METHOD_TYPE;
       return (
         <ComboSelectFilter
           isMulti
@@ -116,5 +124,50 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   group: {
     labelMsg: defineMessage({ defaultMessage: 'Transaction group' }),
     valueRenderer: ({ value }) => value.substring(0, 8),
+  },
+  expenseType: {
+    labelMsg: defineMessage({ defaultMessage: 'Expense type' }),
+
+    Component: ({ valueRenderer, intl, ...props }) => (
+      <ComboSelectFilter
+        isMulti
+        options={Object.values(omit(ExpenseType, ExpenseType.FUNDING_REQUEST))
+          .map(value => ({ label: valueRenderer({ value, intl }), value }))
+          .sort(sortSelectOptions)}
+        {...props}
+      />
+    ),
+    valueRenderer: ({ value, intl }) => i18nExpenseType(intl, value),
+  },
+  contributionId: {
+    labelMsg: defineMessage({ defaultMessage: 'Contribution ID' }),
+    Component: ({ value, onChange }) => {
+      return (
+        <div className="p-2">
+          <Input
+            autoFocus
+            placeholder="1234"
+            value={value}
+            onChange={e => onChange(e.target.value.length ? Number(e.target.value) : undefined)}
+          />
+        </div>
+      );
+    },
+  },
+  expenseId: {
+    labelMsg: defineMessage({ defaultMessage: 'Expense ID' }),
+    Component: ({ value, onChange }) => {
+      return (
+        <div className="p-2">
+          <Input
+            type="number"
+            autoFocus
+            placeholder="1234"
+            value={value}
+            onChange={e => onChange(e.target.value.length ? Number(e.target.value) : undefined)}
+          />
+        </div>
+      );
+    },
   },
 };

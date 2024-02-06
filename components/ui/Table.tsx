@@ -9,9 +9,9 @@ const Table = React.forwardRef<
 >(({ className, innerClassName, mobileTableView, fullWidth, ...props }, ref) => (
   <div
     className={cn(
-      'overflow-auto',
+      'table-auto overflow-auto',
       mobileTableView || fullWidth
-        ? '-mx-3 border-b border-t 2xl:mx-0 2xl:rounded-xl 2xl:border'
+        ? '-mx-4 border-b border-t 2xl:mx-0 2xl:rounded-xl 2xl:border'
         : 'w-full rounded-xl border',
       fullWidth ? 'sm:-mx-6' : mobileTableView ? 'sm:mx-0 sm:w-full sm:rounded-xl sm:border' : '',
       className,
@@ -85,7 +85,7 @@ const TableCell = React.forwardRef<
       'relative  px-2 py-2 align-middle  first:pl-4 last:pr-4  [&:has([role=checkbox])]:pr-0',
       withIndicator && 'first:border-l-2 first:border-transparent first:data-[state=indicated]:border-primary',
       fullWidth && 'sm:first:pl-6 sm:last:pr-6 2xl:first:pl-4 2xl:last:pr-4',
-      compact ? 'h-[36px] min-h-[36px]' : 'h-[56px] min-h-[56px]',
+      compact ? 'h-[45px] min-h-[45px]' : 'h-[56px] min-h-[56px]',
       className,
     )}
     {...props}

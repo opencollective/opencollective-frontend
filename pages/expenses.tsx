@@ -6,7 +6,7 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { getCollectivePageMetadata, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
+import { getCollectivePageMetadata, loggedInUserCanAccessFinancialData } from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
@@ -251,6 +251,7 @@ const expensePageQueryHelpers = getSSRQueryHelpers<ReturnType<typeof getVariable
   context: API_V2_CONTEXT,
   getPropsFromContext: ctx => getPropsFromQuery(ctx.query),
   getVariablesFromContext: (ctx, props) => getVariablesFromProps(props),
+  skipClientIfSSRThrows404: true,
 });
 
 export const getServerSideProps = expensePageQueryHelpers.getServerSideProps;
@@ -268,18 +269,18 @@ export default function ExpensesPage(props: InferGetServerSidePropsType<typeof g
     }
   }, [LoggedInUser]);
 
-  const error = query?.error;
-  const data: ExpensesPageQuery = query?.data;
-
+  const error = query.error || expensePageQueryHelpers.getSSRErrorFromPageProps(props);
+  const data: ExpensesPageQuery = query.data;
+  const account = data?.account;
   const metadata = {
-    ...getCollectivePageMetadata(data.account),
-    title: intl.formatMessage(messages.title, { collectiveName: data.account.name }),
+    ...getCollectivePageMetadata(account),
+    title: intl.formatMessage(messages.title, { collectiveName: account?.name || 'Open Collective' }),
   };
 
   if (!query.loading) {
     if (error) {
-      return <ErrorPage data={data} />;
-    } else if (!data.account || !data.expenses?.nodes) {
+      return <ErrorPage data={data} error={error} />;
+    } else if (!account || !data?.expenses?.nodes) {
       return <ErrorPage error={generateNotFoundError(props.collectiveSlug)} log={false} />;
     } else if (!isFeatureSupported(data.account, FEATURES.RECEIVE_EXPENSES)) {
       return <PageFeatureNotSupported showContactSupportLink />;

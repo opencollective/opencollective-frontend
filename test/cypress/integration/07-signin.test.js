@@ -171,7 +171,7 @@ describe('signin', () => {
 
   it('can signup a user with gmail and show Open Gmail button ', () => {
     // Submit the form using the email providers--gmail)
-    const gmailEmail = randomGmailEmail(false);
+    const gmailEmail = randomGmailEmail();
     cy.visit('/signin');
     cy.contains('a', 'Create an account').click();
     cy.get('input[name=name]').type('Dummy Name');
@@ -189,7 +189,7 @@ describe('signin', () => {
 
   it('can signup a user with Hotmail and show Open Hotmail button', () => {
     // Submit the form using the email providers--hotmail
-    const hotmail = randomHotMail(false);
+    const hotmail = randomHotMail();
     cy.visit('/signin');
     cy.contains('a', 'Create an account').click();
     cy.get('input[name=name]').type('Dummy Name');

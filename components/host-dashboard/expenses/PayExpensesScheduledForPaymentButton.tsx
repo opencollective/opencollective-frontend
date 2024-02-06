@@ -94,7 +94,6 @@ export default function PayExpensesScheduledForPaymentButton(props: PayExpensesS
       </StyledButton>
       {showConfirmationModal && (
         <ConfirmationModal
-          zindex={1000}
           header={<FormattedMessage id="expenses.scheduled.confirmation.title" defaultMessage="Pay Expenses Batch" />}
           disableSubmit={!scheduledExpenses?.data?.expenses}
           body={

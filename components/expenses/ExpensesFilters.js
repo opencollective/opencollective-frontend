@@ -143,7 +143,7 @@ const ExpensesFilters = ({
       {showChargeHasReceiptFilter && (
         <FilterContainer>
           <FilterLabel htmlFor="expenses-charge-has-receipts">
-            <FormattedMessage id="expenses.chargeHasReceiptsFilter" defaultMessage="Charge Receipts" />
+            <FormattedMessage id="expenses.chargeHasReceiptsFilter" defaultMessage="Virtual Card Charge Receipts" />
           </FilterLabel>
           <StyledSelectFilter
             inputId="expenses-charge-has-receipts"

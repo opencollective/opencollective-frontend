@@ -22,6 +22,10 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
         type
         url
       }
+      location {
+        id
+        country
+      }
       tags
       company
       type
@@ -54,23 +58,11 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       }
       stats {
         id
-        balance
-        balanceWithBlockedFunds
-        yearlyBudget
-        updates
-        activeRecurringContributions
-        totalAmountReceived(periodInMonths: 12)
-        totalAmountRaised: totalAmountReceived
-        totalNetAmountRaised: totalNetAmountReceived
         backers {
           id
           all
           users
           organizations
-        }
-        transactions {
-          id
-          all
         }
       }
       connectedTo: memberOf(role: "CONNECTED_COLLECTIVE", limit: 1) {
@@ -100,6 +92,10 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
         name
         slug
         type
+        location {
+          id
+          country
+        }
         settings
         plan {
           id

@@ -9,7 +9,7 @@ import { H2 } from './Text';
 const ContactCollectiveModal = ({ collective, onClose }) => {
   const [hasData, setHasData] = React.useState(false);
   return (
-    <StyledModal role="alertdialog" width="578px" onClose={onClose} trapFocus hasUnsavedChanges={hasData}>
+    <StyledModal role="alertdialog" width="578px" onClose={onClose} hasUnsavedChanges={hasData}>
       <ModalHeader>
         <H2 mb={2} fontSize={'28px'}>
           <FormattedMessage

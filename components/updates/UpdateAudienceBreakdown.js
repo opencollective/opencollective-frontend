@@ -50,7 +50,7 @@ const UpdateAudienceBreakdown = ({ audienceStats, isLoading }) => {
       />
       {hasOnlyTotal ? '.' : ':'}
       {!hasOnlyTotal && (
-        <ul>
+        <ul className="list-inside list-disc">
           {Object.entries(stats).map(([key, count]) => (
             <li key={key}>{intl.formatMessage(translatedTypes[key], { count })}</li>
           ))}

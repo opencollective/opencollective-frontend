@@ -1901,6 +1901,11 @@ enum CurrencyExchangeRateSourceType {
   Wise API
   """
   WISE
+
+  """
+  User-provided exchange rate
+  """
+  USER
 }
 
 type EXPENSE_CATEGORIZATION {
@@ -3463,7 +3468,12 @@ type Expense implements Transaction {
   """
   The amount paid in tax (for example VAT) for this transaction
   """
-  taxAmount: Float
+  taxAmount(
+    """
+    Fetch TAX transaction for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
+  ): Float
 
   """
   If taxAmount is set, this field will contain more info about the tax
@@ -3483,6 +3493,11 @@ type Expense implements Transaction {
     Fetch PAYMENT_PROCESSOR_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchPaymentProcessorFee: Boolean = false
+
+    """
+    Fetch TAX transaction transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
   ): Float
   amountInHostCurrency: Float
   host: User
@@ -3653,7 +3668,12 @@ type Order implements Transaction {
   """
   The amount paid in tax (for example VAT) for this transaction
   """
-  taxAmount: Float
+  taxAmount(
+    """
+    Fetch TAX transaction for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
+  ): Float
 
   """
   If taxAmount is set, this field will contain more info about the tax
@@ -3673,6 +3693,11 @@ type Order implements Transaction {
     Fetch PAYMENT_PROCESSOR_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchPaymentProcessorFee: Boolean = false
+
+    """
+    Fetch TAX transaction transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
   ): Float
   amountInHostCurrency: Float
   host: User

@@ -35,6 +35,7 @@ import {
   confirmCreditCardMutation,
 } from '../../recurring-contributions/UpdatePaymentMethodPopUp';
 import StyledButton from '../../StyledButton';
+import StyledLink from '../../StyledLink';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
 import { useToast } from '../../ui/useToast';
@@ -166,7 +167,7 @@ export default function ManagePaymentMethods(props: ManagePaymentMethodsProps) {
         </MessageBox>
       )}
       {orderedPaymentMethods.map(pm => {
-        return <PaymentMethodItem key={pm.id} paymentMethod={pm} />;
+        return <PaymentMethodItem key={pm.id} account={props.account} paymentMethod={pm} />;
       })}
       <AddCreditCardButton className="mt-3" account={query.data?.account} />
     </div>
@@ -175,6 +176,7 @@ export default function ManagePaymentMethods(props: ManagePaymentMethodsProps) {
 
 type PaymentMethodItemProps = {
   paymentMethod: ManagePaymentMethodsQuery['account']['paymentMethods'][number];
+  account: Pick<Account, 'slug'>;
 };
 
 function PaymentMethodItem(props: PaymentMethodItemProps) {
@@ -296,13 +298,16 @@ function PaymentMethodItem(props: PaymentMethodItemProps) {
               </p>
             )}
             {hasRecurringContributions && (
-              <p className="text-xs font-normal leading-4 text-gray-400">
+              <StyledLink
+                className="text-xs font-normal leading-4 text-gray-400"
+                href={`/dashboard/${props.account.slug}/outgoing-contributions?status=ACTIVE&status=ERROR&type=RECURRING&paymentMethod=${props.paymentMethod.id}`}
+              >
                 <FormattedMessage
                   id="paymentMethod.activeSubscriptions"
                   defaultMessage="{n} active {n, plural, one {recurring financial contribution} other {recurring financial contributions}}"
                   values={{ n: props.paymentMethod.recurringContributions.totalCount }}
                 />
-              </p>
+              </StyledLink>
             )}
           </div>
         </label>

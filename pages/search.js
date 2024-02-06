@@ -169,7 +169,7 @@ class SearchPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.onClick = this.onClick.bind(this);
+
     const term = props.term;
     if (this.props.isHost) {
       this.state = { filter: 'HOST', term };
@@ -240,6 +240,13 @@ class SearchPage extends React.Component {
       sortBy: q.value === '' && router.query.sortBy === 'RANK' ? 'ACTIVITY' : router.query.sortBy,
     };
     router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
+  };
+
+  handleClearFilter = () => {
+    const { router } = this.props;
+    this.setState({ term: '' });
+
+    router.push({ pathname: router.pathname });
   };
 
   onClick = filter => {
@@ -324,6 +331,7 @@ class SearchPage extends React.Component {
                 onSubmit={this.refetch}
                 showSearchButton
                 searchButtonStyles={{ minWidth: '40px', height: '40px' }}
+                onClearFilter={this.handleClearFilter}
               />
             </SearchFormContainer>
           </Flex>
@@ -445,7 +453,7 @@ class SearchPage extends React.Component {
             </AllCardsContainer>
 
             {accounts?.nodes?.length === 0 && (
-              <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
+              <Flex py={3} mt={4} width={1} justifyContent="center" flexDirection="column" alignItems="center">
                 <H1 fontSize="32px" lineHeight="40px" color="black.700" fontWeight={500}>
                   <FormattedMessage defaultMessage="No results match your search" />
                 </H1>
@@ -457,7 +465,7 @@ class SearchPage extends React.Component {
                     <FormattedMessage defaultMessage="Try refining your search, here are some tips:" />
                   </Container>
                   <Container fontSize="15px" lineHeight="22px">
-                    <ul>
+                    <ul className="list-inside list-disc">
                       <li>
                         <FormattedMessage defaultMessage="Make sure your spelling is correct" />
                       </li>
@@ -481,7 +489,7 @@ class SearchPage extends React.Component {
                       </li>
                     </ul>
                   </Container>
-                  <Container fontSize="18px" lineHeight="26px" pt={16}>
+                  <Container fontSize="18px" lineHeight="26px" pt={16} mt={4} textAlign="center">
                     <FormattedMessage
                       defaultMessage="Still no luck? Contact <SupportLink>support</SupportLink> or find us in <SlackLink>Slack</SlackLink>"
                       values={{

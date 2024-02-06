@@ -19,7 +19,7 @@ export const ConfirmOCRValues = ({
   currency: string;
 }) => {
   const hasMismatches = React.useMemo(() => {
-    return items.some(item => some(compareItemOCRValues(item, currency), { hasMismatch: true }));
+    return items.some(item => some(compareItemOCRValues(item), { hasMismatch: true }));
   }, [items, currency]);
 
   return (
