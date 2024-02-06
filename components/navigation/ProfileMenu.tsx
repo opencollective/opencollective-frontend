@@ -26,7 +26,7 @@ import { cn } from '../../lib/utils';
 import Avatar from '../Avatar';
 import Link from '../Link';
 import LoginBtn from '../LoginBtn';
-import PreviewFeaturesModal from '../PreviewFeaturesModal';
+import { withPreviewFeatures } from '../PreviewFeaturesProvider';
 import { Badge } from '../ui/Badge';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { Separator } from '../ui/Separator';
@@ -95,11 +95,15 @@ const MenuItem = ({
   );
 };
 
-const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserContextProps['logout']>[0] }) => {
+interface ProfileMenuProps {
+  logoutParameters?: Parameters<UserContextProps['logout']>[0];
+  setShowPreviewFeatures?: (arg: boolean) => void;
+}
+
+const ProfileMenu = ({ logoutParameters, setShowPreviewFeatures }: ProfileMenuProps) => {
   const router = useRouter();
   const { LoggedInUser, logout } = useLoggedInUser();
   const [isMenuOpen, setMenuOpen] = React.useState(false);
-  const [showPreviewFeaturesModal, setShowPreviewFeaturesModal] = React.useState(false);
   const hasAvailablePreviewFeatures = LoggedInUser?.getAvailablePreviewFeatures()?.length > 0;
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
@@ -123,95 +127,97 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
     return <LoginBtn />;
   }
 
+  const handlePreviewFeaturesClick = () => {
+    setShowPreviewFeatures(true);
+    setMenuOpen(false);
+  };
+
   const pendingInvitations = data?.memberInvitations?.length > 0 ? data?.memberInvitations?.length : null;
 
   const content = (
-    <React.Fragment>
-      <div className="flex flex-col sm:flex-row">
-        <div className="flex flex-col sm:w-[228px]">
-          <div className="flex flex-col gap-1 py-2">
-            <div className="flex items-center gap-2 px-2 py-1">
-              <Avatar collective={LoggedInUser.collective} radius={32} />
-              <div className="truncate">
-                <div className="truncate text-sm font-medium">{LoggedInUser.collective.name}</div>
-                <div className="truncate text-xs text-muted-foreground">{LoggedInUser.email}</div>
-              </div>
+    <div className="flex flex-col sm:flex-row">
+      <div className="flex flex-col sm:w-[228px]">
+        <div className="flex flex-col gap-1 py-2">
+          <div className="flex items-center gap-2 px-2 py-1">
+            <Avatar collective={LoggedInUser.collective} radius={32} />
+            <div className="truncate">
+              <div className="truncate text-sm font-medium">{LoggedInUser.collective.name}</div>
+              <div className="truncate text-xs text-muted-foreground">{LoggedInUser.email}</div>
             </div>
-
-            <Separator className="my-1" />
-
-            <MenuItem Icon={User} href={`/${LoggedInUser.collective.slug}`}>
-              <FormattedMessage id="menu.profile" defaultMessage="Profile" />
-            </MenuItem>
-            <MenuItem Icon={LayoutDashboard} href={`/dashboard/${LoggedInUser.collective.slug}`}>
-              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-            </MenuItem>
-            {pendingInvitations && (
-              <MenuItem
-                Icon={Mailbox}
-                href="/member-invitations"
-                appending={
-                  <Badge type="info" round size="sm">
-                    {pendingInvitations}
-                  </Badge>
-                }
-              >
-                <FormattedMessage defaultMessage="Member Invitations" />
-              </MenuItem>
-            )}
-
-            {hasAvailablePreviewFeatures && (
-              <MenuItem
-                Icon={FlaskConical}
-                onClick={() => setShowPreviewFeaturesModal(true)}
-                appending={
-                  <Badge type="info" round size="sm">
-                    <FormattedMessage defaultMessage="New!" />
-                  </Badge>
-                }
-              >
-                <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />
-              </MenuItem>
-            )}
-            {LoggedInUser.isRoot && (
-              <MenuItem Icon={PocketKnife} href="/opencollective/root-actions">
-                <FormattedMessage id="RootActions" defaultMessage="Root Actions" />
-              </MenuItem>
-            )}
-            <MenuItem Icon={Settings} href={`/dashboard/${LoggedInUser.collective.slug}/info`}>
-              <FormattedMessage id="Settings" defaultMessage="Settings" />
-            </MenuItem>
-
-            <Separator className="my-1" />
-
-            <MenuItem Icon={Home} href="/home">
-              <FormattedMessage defaultMessage="Open Collective Home" />
-            </MenuItem>
-
-            <MenuItem Icon={LifeBuoy} href="/help">
-              <FormattedMessage defaultMessage="Help & Support" />
-            </MenuItem>
-
-            <MenuItem Icon={BookOpen} href="https://docs.opencollective.com" external={true}>
-              <FormattedMessage id="menu.documentation" defaultMessage="Documentation" />
-            </MenuItem>
-
-            <Separator className="my-1" />
-
-            <MenuItem Icon={LogOut} onClick={() => logout(logoutParameters)} data-cy="logout">
-              <FormattedMessage id="menu.logout" defaultMessage="Log out" />
-            </MenuItem>
           </div>
-        </div>
-        <Separator className="sm:hidden" />
-        <div className="flex flex-col sm:w-[256px]">
-          <div className="flex-grow border-l text-sm sm:basis-0 sm:overflow-y-auto">
-            <ProfileMenuMemberships user={LoggedInUser} closeDrawer={() => setMenuOpen(false)} />
-          </div>
+
+          <Separator className="my-1" />
+
+          <MenuItem Icon={User} href={`/${LoggedInUser.collective.slug}`}>
+            <FormattedMessage id="menu.profile" defaultMessage="Profile" />
+          </MenuItem>
+          <MenuItem Icon={LayoutDashboard} href={`/dashboard/${LoggedInUser.collective.slug}`}>
+            <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
+          </MenuItem>
+          {pendingInvitations && (
+            <MenuItem
+              Icon={Mailbox}
+              href="/member-invitations"
+              appending={
+                <Badge type="info" round size="sm">
+                  {pendingInvitations}
+                </Badge>
+              }
+            >
+              <FormattedMessage defaultMessage="Member Invitations" />
+            </MenuItem>
+          )}
+
+          {hasAvailablePreviewFeatures && (
+            <MenuItem
+              Icon={FlaskConical}
+              onClick={handlePreviewFeaturesClick}
+              appending={
+                <Badge type="info" round size="sm">
+                  <FormattedMessage defaultMessage="New!" />
+                </Badge>
+              }
+            >
+              <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />
+            </MenuItem>
+          )}
+          {LoggedInUser.isRoot && (
+            <MenuItem Icon={PocketKnife} href="/opencollective/root-actions">
+              <FormattedMessage id="RootActions" defaultMessage="Root Actions" />
+            </MenuItem>
+          )}
+          <MenuItem Icon={Settings} href={`/dashboard/${LoggedInUser.collective.slug}/info`}>
+            <FormattedMessage id="Settings" defaultMessage="Settings" />
+          </MenuItem>
+
+          <Separator className="my-1" />
+
+          <MenuItem Icon={Home} href="/home">
+            <FormattedMessage defaultMessage="Open Collective Home" />
+          </MenuItem>
+
+          <MenuItem Icon={LifeBuoy} href="/help">
+            <FormattedMessage defaultMessage="Help & Support" />
+          </MenuItem>
+
+          <MenuItem Icon={BookOpen} href="https://docs.opencollective.com" external={true}>
+            <FormattedMessage id="menu.documentation" defaultMessage="Documentation" />
+          </MenuItem>
+
+          <Separator className="my-1" />
+
+          <MenuItem Icon={LogOut} onClick={() => logout(logoutParameters)} data-cy="logout">
+            <FormattedMessage id="menu.logout" defaultMessage="Log out" />
+          </MenuItem>
         </div>
       </div>
-      <PreviewFeaturesModal open={showPreviewFeaturesModal} setOpen={setShowPreviewFeaturesModal} />
-    </React.Fragment>
+      <Separator className="sm:hidden" />
+      <div className="flex flex-col sm:w-[256px]">
+        <div className="flex-grow border-l text-sm sm:basis-0 sm:overflow-y-auto">
+          <ProfileMenuMemberships user={LoggedInUser} closeDrawer={() => setMenuOpen(false)} />
+        </div>
+      </div>
+    </div>
   );
   return (
     <React.Fragment>
@@ -238,4 +244,4 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
     </React.Fragment>
   );
 };
-export default ProfileMenu;
+export default withPreviewFeatures(ProfileMenu);
