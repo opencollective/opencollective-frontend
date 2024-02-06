@@ -98,7 +98,7 @@ const PublishUpdateBtn = ({ id, isHost, isChangelog }) => {
   return (
     <StyledPublishUpdateBtn data-cy="PublishUpdateBtn">
       <Container mt="4" mb="5" display="flex" flexDirection="column" alignItems="left" width="100%" maxWidth={400}>
-        {(isHost || get(update, 'account.isHost')) && (
+        {!isChangelog && (isHost || get(update, 'account.isHost')) && (
           <Box mb={2}>
             <Label htmlFor="whoToNotify" mb={2}>
               <FormattedMessage id="update.publish.notify.selection" defaultMessage="Select who should be notified" />

@@ -180,6 +180,8 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
                   <FormattedMessage defaultMessage="Private update" />
                 </Flex>{' '}
               </StyledTooltip>
+            ) : update.isChangelog ? (
+              <FormattedMessage defaultMessage="Changelog" />
             ) : (
               <FormattedMessage defaultMessage="Public update" />
             )}
