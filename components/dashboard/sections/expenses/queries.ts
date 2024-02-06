@@ -66,6 +66,8 @@ export const accountExpensesQuery = gql`
             value
             source
             isApproximate
+            fromCurrency
+            toCurrency
           }
         }
         host @include(if: $fetchHostForExpenses) {
