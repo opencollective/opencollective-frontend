@@ -108,7 +108,7 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
     }
   }
 
-  const expense = cloneDeep(data.expense);
+  const expense = cloneDeep(data?.expense);
   if (expense && data.expensePayeeStats?.payee?.stats) {
     expense.payee.stats = data.expensePayeeStats?.payee?.stats;
   }
