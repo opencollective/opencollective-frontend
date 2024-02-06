@@ -206,7 +206,7 @@
     "@babel/types": "^7.23.5",
     "@cypress/code-coverage": "^3.12.12",
     "@formatjs/cli": "^6.2.4",
-    "@graphql-codegen/cli": "5.0.0",
+    "@graphql-codegen/cli": "5.0.2",
     "@graphql-codegen/gql-tag-operations-preset": "^2.1.0",
     "@graphql-eslint/eslint-plugin": "^3.20.1",
     "@next/bundle-analyzer": "^14.0.3",
