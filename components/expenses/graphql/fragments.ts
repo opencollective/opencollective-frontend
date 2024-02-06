@@ -221,6 +221,8 @@ export const expensePageExpenseFieldsFragment = gql`
         value
         source
         isApproximate
+        fromCurrency
+        toCurrency
       }
     }
     createdAt
@@ -645,6 +647,8 @@ export const expensesListFieldsFragment = gql`
         value
         source
         isApproximate
+        fromCurrency
+        toCurrency
       }
     }
     currency

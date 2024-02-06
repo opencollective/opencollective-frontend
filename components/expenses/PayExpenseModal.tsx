@@ -43,6 +43,8 @@ const quoteExpenseQuery = gql`
       amountInHostCurrency: amountV2(currencySource: HOST) {
         exchangeRate {
           value
+          fromCurrency
+          toCurrency
         }
       }
       host {
