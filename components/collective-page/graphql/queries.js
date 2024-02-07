@@ -58,6 +58,8 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       }
       stats {
         id
+        balance
+        yearlyBudget
         backers {
           id
           all
