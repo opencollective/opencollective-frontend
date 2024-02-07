@@ -42,9 +42,9 @@ const Welcome = () => {
             <Image src="/static/images/oc-logo-watercolor-256.png" height={96} width={96} />
           </Box>
           <Container pt="40px" pl="16px" pr={['16px', 0]} width={['100%', '404px']}>
-            <Flex fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
+            <Box fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
               <FormattedMessage defaultMessage="Welcome to Open Collective!" />
-            </Flex>
+            </Box>
             <Flex fontSize="18px" fontWeight="400" color="black.800" lineHeight="26px" pt="14px">
               <FormattedMessage defaultMessage="Now that you have created your personal account, there are a couple of things you can do from here..." />
             </Flex>
