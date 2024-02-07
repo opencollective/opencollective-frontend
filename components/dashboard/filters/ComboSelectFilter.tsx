@@ -76,6 +76,7 @@ function ComboSelectFilter({
   value,
   isMulti = false,
   options = [],
+  groupedOptions,
   onChange,
   labelMsg,
   loading,
@@ -86,7 +87,8 @@ function ComboSelectFilter({
   value: any;
   isMulti?: boolean;
   selected?: string[];
-  options: { label: React.ReactNode; value: any }[];
+  options?: { label: React.ReactNode; value: any }[];
+  groupedOptions?: { label: string; options: { label: React.ReactNode; value: any }[] }[];
   onChange: (value: any) => void;
   labelMsg?: MessageDescriptor;
   loading?: boolean;
@@ -130,7 +132,7 @@ function ComboSelectFilter({
       />
 
       <CommandList>
-        {loading && !options.length ? (
+        {loading && !options?.length ? (
           <CommandLoading />
         ) : (
           <CommandEmpty>
@@ -138,34 +140,60 @@ function ComboSelectFilter({
           </CommandEmpty>
         )}
 
-        <CommandGroup>
-          {creatable && input && (
-            <SelectItem isSelected={selected.some(v => v === input)} value={input} label={input} onSelect={onSelect} />
-          )}
+        {options?.length > 0 && (
+          <CommandGroup>
+            {creatable && input && (
+              <SelectItem
+                isSelected={selected.some(v => v === input)}
+                value={input}
+                label={input}
+                onSelect={onSelect}
+              />
+            )}
 
-          {searchFunc &&
-            selected
-              .filter(v => !options.some(o => o.value === v))
-              .filter(v => !creatable || v !== input)
-              .map(v => (
-                <SelectItem key={v} isSelected={true} value={v} onSelect={onSelect} valueRenderer={valueRenderer} />
-              ))}
+            {searchFunc &&
+              selected
+                .filter(v => !options.some(o => o.value === v))
+                .filter(v => !creatable || v !== input)
+                .map(v => (
+                  <SelectItem key={v} isSelected={true} value={v} onSelect={onSelect} valueRenderer={valueRenderer} />
+                ))}
 
-          {options
-            .filter(o => !creatable || o.value !== input)
-            .map(option => {
-              const isSelected = selected.some(v => v === option.value);
-              return (
-                <SelectItem
-                  key={option.value}
-                  isSelected={isSelected}
-                  value={option.value}
-                  label={option.label}
-                  onSelect={onSelect}
-                />
-              );
-            })}
-        </CommandGroup>
+            {options
+              .filter(o => !creatable || o.value !== input)
+              .map(option => {
+                const isSelected = selected.some(v => v === option.value);
+                return (
+                  <SelectItem
+                    key={option.value}
+                    isSelected={isSelected}
+                    value={option.value}
+                    label={option.label}
+                    onSelect={onSelect}
+                  />
+                );
+              })}
+          </CommandGroup>
+        )}
+
+        {groupedOptions
+          ?.filter(group => group.options.length)
+          .map(group => (
+            <CommandGroup key={group.label} heading={group.label}>
+              {group.options.map(option => {
+                const isSelected = selected.some(v => v === option.value);
+                return (
+                  <SelectItem
+                    key={option.value}
+                    isSelected={isSelected}
+                    value={option.value}
+                    label={option.label}
+                    onSelect={onSelect}
+                  />
+                );
+              })}
+            </CommandGroup>
+          ))}
       </CommandList>
     </Command>
   );

@@ -48,7 +48,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      'group border-b ring-inset ring-ring data-[state=selected]:bg-slate-100',
+      'group/row border-b ring-inset ring-ring data-[state=selected]:bg-slate-100',
       highlightOnHover && 'hover:bg-slate-100',
       className,
     )}
@@ -65,7 +65,7 @@ const TableHead = React.forwardRef<
     <th
       ref={ref}
       className={cn(
-        'h-12 px-2 text-left align-middle font-medium text-slate-500 first:pl-4 last:pr-4 [&:has([role=checkbox])]:pr-0 ',
+        'h-12 px-2 text-left align-middle font-medium tracking-tight text-muted-foreground first:pl-4  last:pr-4 [&:has([role=checkbox])]:pr-0',
         fullWidth && 'sm:first:pl-6 sm:last:pr-6 2xl:first:pl-4 2xl:last:pr-4',
         className,
       )}
@@ -105,7 +105,7 @@ const TableActionsButton = React.forwardRef<HTMLButtonElement, React.HTMLAttribu
     <button
       ref={ref}
       className={cn(
-        'flex h-8 w-8 items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-500 shadow-sm shadow-transparent ring-2 ring-transparent transition-colors hover:text-slate-950 hover:shadow-slate-200  focus:outline-none focus-visible:ring-black active:ring-black group-hover:border-slate-200 group-hover:bg-white data-[state=open]:ring-black',
+        'flex h-8 w-8 items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-500 shadow-sm shadow-transparent ring-2 ring-transparent transition-colors hover:text-slate-950 hover:shadow-slate-200  focus:outline-none focus-visible:ring-black active:ring-black group-hover/row:border-slate-200 group-hover/row:bg-white data-[state=open]:ring-black',
         className,
       )}
       {...props}

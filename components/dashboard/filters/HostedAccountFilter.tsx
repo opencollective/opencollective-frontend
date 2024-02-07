@@ -58,7 +58,7 @@ export const AccountRenderer = ({
       account={account}
       {...(inOptionsList && { hoverCardContentProps: { side: 'right', sideOffset: 24 } })}
       trigger={
-        <div className="flex h-full w-full items-center justify-between gap-2 overflow-hidden">
+        <div className="flex h-full w-full max-w-48 items-center justify-between gap-2 overflow-hidden">
           <Avatar collective={account} radius={20} />
           <div className="relative flex flex-1 items-center justify-between gap-1 overflow-hidden">
             <span className="truncate">{account.name ?? account.slug}</span>

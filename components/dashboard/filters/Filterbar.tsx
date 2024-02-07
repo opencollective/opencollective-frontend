@@ -10,23 +10,25 @@ import { Separator } from '../../ui/Separator';
 
 import FilterDropdown from './FilterDropdown';
 
-function useGetFilterbarOptions(filters, values, defaultSchemaValues) {
+function useGetFilterbarOptions(filters, values, defaultSchemaValues, meta) {
   const filterKeys = Object.keys(filters);
   const [displayedFilters, setDisplayedFilters] = React.useState(
-    filterKeys.filter(key => filterShouldDisplay(key, { values, filters, defaultSchemaValues })),
+    filterKeys.filter(key => filterShouldDisplay(key, { values, filters, defaultSchemaValues, meta })),
   );
   const remainingFilters = filterKeys.filter(key =>
-    filterShouldBeInAddFilterOptions(key, { values, filters, defaultSchemaValues }),
+    filterShouldBeInAddFilterOptions(key, { values, filters, defaultSchemaValues, meta }),
   );
 
   // When the values change, this effect makes sure to update the displayed filter keys array and maintain the order of the filters
   React.useEffect(() => {
-    const updatedKeys = filterKeys.filter(key => filterShouldDisplay(key, { values, filters, defaultSchemaValues }));
+    const updatedKeys = filterKeys.filter(key =>
+      filterShouldDisplay(key, { values, filters, defaultSchemaValues, meta }),
+    );
     const remainingKeys = displayedFilters.filter(key => updatedKeys.includes(key));
     const keysToAppend = updatedKeys.filter(key => !remainingKeys.includes(key));
 
     setDisplayedFilters([...remainingKeys, ...keysToAppend]);
-  }, [values]);
+  }, [values, meta]);
 
   return { displayedFilters, remainingFilters };
 }
@@ -55,7 +57,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
   hideSeparator?: boolean;
 }) {
   const intl = useIntl();
-  const { displayedFilters, remainingFilters } = useGetFilterbarOptions(filters, values, defaultSchemaValues);
+  const { displayedFilters, remainingFilters } = useGetFilterbarOptions(filters, values, defaultSchemaValues, meta);
 
   return (
     <div className={cn('flex flex-col gap-4', className)}>
@@ -74,7 +76,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
         !hideSeparator && <Separator />
       )}
       <div className="flex flex-wrap justify-between gap-2">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {displayedFilters.map(key => {
             const filter = filters[key];
             if (filter.StandaloneComponent) {

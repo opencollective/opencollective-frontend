@@ -1530,6 +1530,7 @@ type Expense {
   The payout method to use for this expense
   """
   payoutMethod: PayoutMethod
+  paymentMethod: PaymentMethod
 
   """
   The virtual card used to pay for this charge
@@ -3010,6 +3011,9 @@ enum PaymentMethodType {
   bacs_debit @deprecated(reason: "Please use uppercase values")
   bancontact @deprecated(reason: "Please use uppercase values")
   link @deprecated(reason: "Please use uppercase values")
+  bank_transfer @deprecated(reason: "Please use uppercase values")
+  payout @deprecated(reason: "Please use uppercase values")
+  virtual_card @deprecated(reason: "Please use uppercase values")
   ALIPAY
   CREDITCARD
   PREPAID
@@ -3027,6 +3031,9 @@ enum PaymentMethodType {
   BACS_DEBIT
   BANCONTACT
   LINK
+  BANK_TRANSFER
+  PAYOUT
+  VIRTUAL_CARD
 }
 
 input ExpenseReferenceInput {
@@ -4144,6 +4151,7 @@ enum PaymentMethodService {
   OPENCOLLECTIVE
   PREPAID
   THEGIVINGBLOCK
+  WISE
 }
 
 enum PaymentMethodLegacyType {
@@ -4676,12 +4684,12 @@ type TimeSeriesAmount implements TimeSeries {
   """
   The start date of the time series
   """
-  dateFrom: DateTime!
+  dateFrom: DateTime
 
   """
   The end date of the time series
   """
-  dateTo: DateTime!
+  dateTo: DateTime
 
   """
   The interval between two data points
@@ -4698,12 +4706,12 @@ interface TimeSeries {
   """
   The start date of the time series
   """
-  dateFrom: DateTime!
+  dateFrom: DateTime
 
   """
   The end date of the time series
   """
-  dateTo: DateTime!
+  dateTo: DateTime
 
   """
   The interval between two data points
@@ -5470,12 +5478,12 @@ type HostMetricsTimeSeries {
   """
   The start date of the time series
   """
-  dateFrom: DateTime!
+  dateFrom: DateTime
 
   """
   The end date of the time series
   """
-  dateTo: DateTime!
+  dateTo: DateTime
 
   """
   The interval between two data points
@@ -5520,12 +5528,12 @@ type TimeSeriesAmountWithSettlement implements TimeSeries {
   """
   The start date of the time series
   """
-  dateFrom: DateTime!
+  dateFrom: DateTime
 
   """
   The end date of the time series
   """
-  dateTo: DateTime!
+  dateTo: DateTime
 
   """
   The interval between two data points
@@ -5557,12 +5565,12 @@ type TimeSeriesAmountWithKind implements TimeSeries {
   """
   The start date of the time series
   """
-  dateFrom: DateTime!
+  dateFrom: DateTime
 
   """
   The end date of the time series
   """
-  dateTo: DateTime!
+  dateTo: DateTime
 
   """
   The interval between two data points
@@ -17820,6 +17828,11 @@ input ProcessExpensePaymentParams {
   Transfer details for fulfilling the expense
   """
   transfer: ProcessExpenseTransferParams
+
+  """
+  Payment method using for paying the expense
+  """
+  paymentMethodService: PaymentMethodService
 }
 
 enum MarkAsUnPaidExpenseStatus {

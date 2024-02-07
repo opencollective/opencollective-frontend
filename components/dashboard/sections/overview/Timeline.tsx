@@ -63,9 +63,9 @@ export function Timeline({ accountSlug, withFilter = false }) {
   }, [error, data]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold">
+        <h3 className="text-lg font-bold">
           <FormattedMessage id="Dashboard.Home.ActivityHeader" defaultMessage="Recent activity" />
         </h3>
         {withFilter && (
