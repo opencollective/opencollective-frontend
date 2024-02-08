@@ -291,23 +291,36 @@ const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
       valueInCents: values.paymentProcessorFeeInHostCurrency,
       currency: host.currency,
     };
+    const expenseAmountInHostCurrency = {
+      valueInCents: values.expenseAmountInHostCurrency,
+      currency: host.currency,
+    };
     const grossAmount = totalAmount.valueInCents - (paymentProcessorFee.valueInCents || 0);
     const effectiveRate = expense.currency !== host.currency && grossAmount / expense.amount;
-    return { paymentProcessorFee, totalAmount, effectiveRate };
+    return { paymentProcessorFee, totalAmount, effectiveRate, expenseAmountInHostCurrency };
   } else if (quote) {
     const effectiveRate = expense.currency !== host.currency && quote.sourceAmount.valueInCents / expense.amount;
     const totalAmount = cloneDeep(quote.sourceAmount);
+    const expenseAmountInHostCurrency = {
+      valueInCents: quote.sourceAmount.valueInCents - quote.paymentProcessorFeeAmount.valueInCents,
+      currency: quote.sourceAmount.currency,
+    };
     if (feesPayer === 'PAYEE') {
       totalAmount.valueInCents -= quote.paymentProcessorFeeAmount.valueInCents;
     }
-    return { paymentProcessorFee: quote.paymentProcessorFeeAmount, totalAmount, effectiveRate };
+    return {
+      paymentProcessorFee: quote.paymentProcessorFeeAmount,
+      totalAmount,
+      effectiveRate,
+      expenseAmountInHostCurrency,
+    };
   } else {
     return {};
   }
 };
 
 const getHandleSubmit = (intl, currency, onSubmit) => async values => {
-  values.totalAmountPaidInHostCurrency =
+  const totalAmountPaidInHostCurrency =
     values.expenseAmountInHostCurrency + (values.paymentProcessorFeeInHostCurrency || 0);
   // Show a confirm if the fee is unusually high (more than 50% of the total amount)
   if (
@@ -331,7 +344,7 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
     return;
   }
 
-  return onSubmit(omit(values, 'expenseAmountInHostCurrency'));
+  return onSubmit({ ...omit(values, 'expenseAmountInHostCurrency'), totalAmountPaidInHostCurrency });
 };
 
 type PayExpenseModalProps = {
@@ -377,17 +390,13 @@ const PayExpenseModal = ({
     skip: !canQuote,
   });
 
-  const amounts = React.useMemo(
-    () =>
-      calculateAmounts({
-        values: formik.values,
-        expense,
-        quote: quoteQuery.data?.expense?.quote,
-        host,
-        feesPayer: formik.values.feesPayer,
-      }),
-    [expense, formik.values, host, quoteQuery.data?.expense?.quote],
-  );
+  const amounts = calculateAmounts({
+    values: formik.values,
+    expense,
+    quote: quoteQuery.data?.expense?.quote,
+    host,
+    feesPayer: formik.values.feesPayer,
+  });
   const amountWithoutTaxes = getAmountWithoutTaxes(expense.amount, expense.taxes);
   const paymentServiceOptions = React.useMemo(
     () => [
@@ -601,8 +610,8 @@ const PayExpenseModal = ({
                 <Amount>
                   <FormattedMoneyAmount
                     amountStyles={{ fontWeight: 500 }}
-                    amount={formik.values.expenseAmountInHostCurrency}
-                    currency={host.currency}
+                    amount={amounts.expenseAmountInHostCurrency.valueInCents}
+                    currency={amounts.expenseAmountInHostCurrency.currency}
                     currencyCodeStyles={{ color: 'black.500' }}
                   />
                 </Amount>
