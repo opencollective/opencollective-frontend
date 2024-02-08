@@ -283,6 +283,7 @@
   "activitiesUpdates.description": "Přijímat e-maily, když je zveřejněna nová aktualizace nebo komentáře jsou přidány do konverzace.",
   "activitiesUpdates.title": "Činnosti a aktualizace",
   "AddedAdministrators": "Přidaní administrátoři",
+  "AddFundsModal.accountingCategory": "Accounting category",
   "AddFundsModal.disclaimer": "Kliknutím na přidat prostředky souhlasíte s vyčleněním {amount} z Vašeho bankovního účtu pro tento kolektiv.",
   "AddFundsModal.ForThePurpose": "Pro účely",
   "AddFundsModal.FromTheSource": "Ze zdroje",

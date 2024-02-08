@@ -6,11 +6,11 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { Account, Expense, Host } from '../../lib/graphql/types/v2/graphql';
 
+import AccountingCategorySelect from '../AccountingCategorySelect';
 import ConfirmationModal from '../ConfirmationModal';
 import { useToast } from '../ui/useToast';
 
 import { editExpenseCategoryMutation } from './graphql/mutations';
-import ExpenseCategorySelect from './ExpenseCategorySelect';
 
 export type ConfirmProcessExpenseModalProps = {
   onClose: () => void;
@@ -61,8 +61,9 @@ export default function ApproveExpenseModal({
         <label htmlFor="confirm-expense-category" className="mb-2 text-base font-bold">
           <FormattedMessage defaultMessage="Confirm Expense Category" />
         </label>
-        <ExpenseCategorySelect
+        <AccountingCategorySelect
           id="confirm-expense-category"
+          kind="EXPENSE"
           onChange={setSelectedCategory}
           host={host}
           account={account}

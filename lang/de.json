@@ -283,6 +283,7 @@
   "activitiesUpdates.description": "E-Mails erhalten, wenn eine neue Aktualisierung veröffentlicht wird oder Kommentare zu einer Unterhaltung hinzugefügt werden.",
   "activitiesUpdates.title": "Aktivitäten und Aktualisierungen",
   "AddedAdministrators": "Administratoren hinzugefügt",
+  "AddFundsModal.accountingCategory": "Accounting category",
   "AddFundsModal.disclaimer": "Indem Sie auf Guthaben hinzufügen klicken, erklären Sie sich damit einverstanden, {amount} im Namen dieses Kollektivs auf Ihrem Bankkonto zurückzulegen.",
   "AddFundsModal.ForThePurpose": "Im Sinne",
   "AddFundsModal.FromTheSource": "Aus der Quelle",

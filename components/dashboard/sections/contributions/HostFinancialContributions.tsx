@@ -40,6 +40,23 @@ const hostOrdersQuery = gql`
     $orderBy: ChronologicalOrderInput
     $frequency: ContributionFrequency
   ) {
+    host(slug: $hostSlug) {
+      id
+      slug
+      currency
+      legacyId
+      name
+      isHost
+      accountingCategories {
+        nodes {
+          id
+          name
+          code
+          friendlyName
+          kind
+        }
+      }
+    }
     orders(
       account: { slug: $hostSlug }
       includeHostedAccounts: true
@@ -62,6 +79,12 @@ const hostOrdersQuery = gql`
         description
         createdAt
         status
+        accountingCategory {
+          id
+          name
+          code
+          friendlyName
+        }
         ...ConfirmContributionFields
         paymentMethod {
           id
@@ -106,6 +129,7 @@ const hostOrdersQuery = gql`
           id
           canMarkAsExpired
           canMarkAsPaid
+          canUpdateAccountingCategory
         }
       }
     }
@@ -268,6 +292,7 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
             orders={data?.orders?.nodes}
             nbPlaceholders={variables.limit}
             showPlatformTip
+            host={data?.host}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

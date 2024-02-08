@@ -8,14 +8,14 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { Account, AccountingCategory, Expense, Host } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
 
+import AccountingCategorySelect from '../AccountingCategorySelect';
 import StyledSpinner from '../StyledSpinner';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 import { editExpenseCategoryMutation } from './graphql/mutations';
-import ExpenseCategorySelect from './ExpenseCategorySelect';
 
-type AccountingCategoryPillProps = {
+type ExpenseAccountingCategoryPillProps = {
   expense: Expense;
   canEdit: boolean;
   account: Account;
@@ -36,19 +36,20 @@ const getCategoryLabel = (category: AccountingCategory) => {
   }
 };
 
-const AdminAccountingCategoryPill = ({
+const ExpenseAdminAccountingCategoryPill = ({
   expense,
   account,
   host,
   allowNone,
   showCodeInSelect,
-}: Omit<AccountingCategoryPillProps, 'canEdit'>) => {
+}: Omit<ExpenseAccountingCategoryPillProps, 'canEdit'>) => {
   const intl = useIntl();
   const [editExpense, { loading }] = useMutation(editExpenseCategoryMutation, { context: API_V2_CONTEXT });
   const { toast } = useToast();
   return (
-    <ExpenseCategorySelect
+    <AccountingCategorySelect
       id="expense-summary-category-select"
+      kind="EXPENSE"
       host={host}
       account={account}
       expenseType={expense.type}
@@ -75,23 +76,23 @@ const AdminAccountingCategoryPill = ({
         <span className="mr-1">{getCategoryLabel(expense.accountingCategory)}</span>
         {loading ? <StyledSpinner size="1em" /> : <ChevronDown size="1em" />}
       </Button>
-    </ExpenseCategorySelect>
+    </AccountingCategorySelect>
   );
 };
 
-export const AccountingCategoryPill = ({
+export const ExpenseAccountingCategoryPill = ({
   expense,
   host,
   account,
   canEdit,
   allowNone,
   showCodeInSelect = false,
-}: AccountingCategoryPillProps) => {
+}: ExpenseAccountingCategoryPillProps) => {
   if (!canEdit || !host) {
     return <div className={BADGE_CLASS}>{getCategoryLabel(expense.accountingCategory)}</div>;
   } else {
     return (
-      <AdminAccountingCategoryPill
+      <ExpenseAdminAccountingCategoryPill
         expense={expense}
         account={account}
         host={host}

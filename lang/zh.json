@@ -283,6 +283,7 @@
   "activitiesUpdates.description": "当有新的更新发布或有指指点点时，会收到电子邮件。",
   "activitiesUpdates.title": "活动和更新",
   "AddedAdministrators": "已添加管理员",
+  "AddFundsModal.accountingCategory": "Accounting category",
   "AddFundsModal.disclaimer": "点击下面的“添加资金”按钮，即表示你同意代表社群在银行帐户中预留 {amount}.",
   "AddFundsModal.ForThePurpose": "为以下目的：",
   "AddFundsModal.FromTheSource": "来自外部",

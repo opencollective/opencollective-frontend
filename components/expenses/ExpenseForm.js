@@ -31,6 +31,7 @@ import {
   validateExpenseTaxes,
 } from './lib/utils';
 
+import AccountingCategorySelect, { isSupportedExpenseCategory } from '../AccountingCategorySelect';
 import ConfirmationModal from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
@@ -48,7 +49,6 @@ import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
 
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
-import ExpenseCategorySelect, { isSupportedExpenseCategory } from './ExpenseCategorySelect';
 import ExpenseFormItems from './ExpenseFormItems';
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
@@ -771,8 +771,9 @@ const ExpenseFormBody = ({
                         <StyledInputFormikField name="accountingCategory" lab>
                           {({ meta }) => (
                             <div>
-                              <ExpenseCategorySelect
+                              <AccountingCategorySelect
                                 id="ExpenseCategoryInput"
+                                kind="EXPENSE"
                                 host={host}
                                 account={collective}
                                 selectedCategory={values.accountingCategory}

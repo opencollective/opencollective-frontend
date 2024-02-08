@@ -35,7 +35,7 @@ import StyledInputField from '../StyledInputField';
 import { P, Span } from '../Text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
-import { AccountingCategoryPill } from './AccountingCategoryPill';
+import { ExpenseAccountingCategoryPill } from './ExpenseAccountingCategoryPill';
 import { ExpenseItemDescriptionHint } from './ItemDescriptionHint';
 
 export const msg = defineMessages({
@@ -536,7 +536,7 @@ const ExpenseItemForm = ({
                   <FormattedMessage defaultMessage="Expense category" />
                 </P>
                 <div className="flex max-h-[38px] grow items-center">
-                  <AccountingCategoryPill
+                  <ExpenseAccountingCategoryPill
                     expense={form.values}
                     host={collective.host}
                     account={collective}

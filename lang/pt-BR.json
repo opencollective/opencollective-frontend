@@ -283,6 +283,7 @@
   "activitiesUpdates.description": "Receba e-mails quando uma nova atualização é publicada ou comentários são adicionados a uma conversa.",
   "activitiesUpdates.title": "Atividades e Atualizações",
   "AddedAdministrators": "Administradores adicionados",
+  "AddFundsModal.accountingCategory": "Accounting category",
   "AddFundsModal.disclaimer": "Ao clicar abaixo, você concorda em reservar {amount} em sua conta bancária em nome do coletivo.",
   "AddFundsModal.ForThePurpose": "Com o propósito de",
   "AddFundsModal.FromTheSource": "Da fonte",

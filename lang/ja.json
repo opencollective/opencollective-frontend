@@ -283,6 +283,7 @@
   "activitiesUpdates.description": "Receive emails when a new update is published or comments are added to a conversation.",
   "activitiesUpdates.title": "Activities and Updates",
   "AddedAdministrators": "Added Administrators",
+  "AddFundsModal.accountingCategory": "Accounting category",
   "AddFundsModal.disclaimer": "「資金を追加する」をクリックすることで、この団体のためにあなたの銀行口座に{amount}を確保することに同意します。",
   "AddFundsModal.ForThePurpose": "For the purpose of",
   "AddFundsModal.FromTheSource": "From the source",

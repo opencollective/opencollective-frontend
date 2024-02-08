@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, isUndefined, pick, remove, size, throttle } from 'lodash';
+import { get, isUndefined, pick, remove, size, throttle, uniq } from 'lodash';
 import { ChevronDown, Sparkles } from 'lucide-react';
 import { defineMessages, FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
@@ -10,22 +10,33 @@ import {
   Expense,
   ExpenseType,
   Host,
-} from '../../lib/graphql/types/v2/graphql';
-import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { fetchExpenseCategoryPredictions } from '../../lib/ml-service';
-import { cn } from '../../lib/utils';
+} from '../lib/graphql/types/v2/graphql';
+import { useAsyncCall } from '../lib/hooks/useAsyncCall';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { fetchExpenseCategoryPredictions } from '../lib/ml-service';
+import { cn } from '../lib/utils';
 
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/Command';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from './ui/Command';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
 
-type ExpenseCategorySelectProps = {
-  host: Host;
-  account: Account;
-  expenseType: ExpenseType;
-  predictionStyle?: 'full' | 'inline';
+type RequiredAccountingCategoryFields = Pick<AccountingCategory, 'id' | 'name' | 'code' | 'kind'>;
+
+type RequiredHostFields = Pick<Host, 'slug'> & {
+  orderAccountingCategories?: { nodes: RequiredAccountingCategoryFields[] };
+  expenseAccountingCategories?: { nodes: RequiredAccountingCategoryFields[] };
+  accountingCategories?: { nodes: RequiredAccountingCategoryFields[] };
+};
+
+type AccountingCategorySelectProps = {
+  host: RequiredHostFields;
+  /** The account holding the expense. Only used when using the prediction service */
+  account?: Account;
+  kind: AccountingCategoryKind | `${AccountingCategoryKind}`;
+  /** If `kind` is `EXPENSE`, the (optional) expense type is used to filter the categories */
+  expenseType?: ExpenseType;
   /** If provided, these values (descriptions, items, etc...) will be used to call the prediction service */
   expenseValues?: Partial<Expense>;
+  predictionStyle?: 'full' | 'inline';
   selectedCategory: AccountingCategory | undefined | null;
   valuesByRole?: Expense['valuesByRole'];
   onChange: (category: AccountingCategory) => void;
@@ -34,6 +45,7 @@ type ExpenseCategorySelectProps = {
   id?: string;
   error?: boolean;
   children?: React.ReactNode;
+  borderRadiusClass?: string;
 };
 
 const VALUE_NONE = '__none__';
@@ -74,7 +86,7 @@ const SelectionRoleLabels = defineMessages({
 const getSelectionInfoForLabel = (
   intl: IntlShape,
   category: AccountingCategory | null,
-  valuesByRole: Expense['valuesByRole'],
+  valuesByRole: Expense['valuesByRole'] = null,
 ): React.ReactNode | null => {
   const roles = ['submitter', 'accountAdmin', 'hostAdmin'];
   const rolesCategories = roles.map(field => get(valuesByRole, `${field}.accountingCategory`));
@@ -109,7 +121,7 @@ const getCategoryLabel = (
   intl: IntlShape,
   category: AccountingCategory,
   showCode: boolean,
-  valuesByRole: Expense['valuesByRole'],
+  valuesByRole: Expense['valuesByRole'] = null,
 ): React.ReactNode | null => {
   if (isUndefined(category)) {
     return null;
@@ -153,18 +165,25 @@ export const isSupportedExpenseCategory = (
 
 const getOptions = (
   intl: IntlShape,
-  host: Host,
+  host: RequiredHostFields,
+  kind: AccountingCategoryKind | `${AccountingCategoryKind}`,
   expenseType: ExpenseType,
   showCode: boolean,
   allowNone: boolean,
   valuesByRole: Expense['valuesByRole'],
   isHostAdmin: boolean,
 ): OptionsMap => {
-  const categories = [...get(host, 'accountingCategories.nodes', [])];
+  const contributionCategories = ['CONTRIBUTION', 'ADDED_FUNDS'];
+  const possibleFields = ['accountingCategories', 'expenseAccountingCategories', 'orderAccountingCategories'];
+  const categories = uniq([...possibleFields.map(field => get(host, `${field}.nodes`, [])).flat()]);
   const categoriesById: OptionsMap = {};
 
   // Show all categories to host admins, but only the ones that match the expense type to other users
-  remove(categories, category => !isSupportedExpenseCategory(expenseType, category, isHostAdmin));
+  if (kind === AccountingCategoryKind.EXPENSE) {
+    remove(categories, category => !isSupportedExpenseCategory(expenseType, category, isHostAdmin));
+  } else if (contributionCategories.includes(kind)) {
+    remove(categories, category => !contributionCategories.includes(category.kind));
+  }
 
   categories.forEach(category => {
     categoriesById[category.id] = {
@@ -213,7 +232,7 @@ const getCleanInputData = (
  */
 const useExpenseCategoryPredictionService = (
   enabled: boolean,
-  host: Host,
+  host: RequiredHostFields,
   account: Account,
   expenseValues?: Partial<Expense>,
 ) => {
@@ -222,7 +241,7 @@ const useExpenseCategoryPredictionService = (
   const [showPreviousPredictions, setShowPreviousPredictions] = React.useState(true);
   const inputData = !enabled ? null : getCleanInputData(expenseValues);
   const hasValidParams = Boolean(
-    inputData && inputData.type && (inputData.description.length > 3 || inputData.items.length > 3),
+    account && inputData && inputData.type && (inputData.description.length > 3 || inputData.items.length > 3),
   );
 
   // Trigger new fetch predictions, and hide the current ones if we don't get a response within 1s (to avoid flickering)
@@ -236,7 +255,7 @@ const useExpenseCategoryPredictionService = (
         }
       });
     }
-  }, [host.slug, account.slug, hasValidParams, ...Object.values(inputData || {})]);
+  }, [host.slug, account?.slug, hasValidParams, ...Object.values(inputData || {})]);
 
   // Map returned categories with known ones to build `predictions`
   const predictions = React.useMemo(() => {
@@ -262,9 +281,10 @@ const useExpenseCategoryPredictionService = (
   return { loading, predictions: predictions || (showPreviousPredictions && previousPredictions.current) || [] };
 };
 
-const ExpenseCategorySelect = ({
+const AccountingCategorySelect = ({
   host,
   account,
+  kind,
   expenseType,
   selectedCategory,
   valuesByRole,
@@ -275,18 +295,24 @@ const ExpenseCategorySelect = ({
   allowNone = false,
   showCode = false,
   expenseValues = undefined,
-  children,
-}: ExpenseCategorySelectProps) => {
+  borderRadiusClass = 'rounded-lg',
+  children = null,
+}: AccountingCategorySelectProps) => {
   const intl = useIntl();
   const [isOpen, setOpen] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = Boolean(LoggedInUser?.isAdminOfCollective(host));
-  const usePredictions = host.slug === 'foundation' && (predictionStyle === 'full' || isOpen);
+  const usePredictions = host.slug === 'foundation' && kind === 'EXPENSE' && (predictionStyle === 'full' || isOpen);
   const { predictions } = useExpenseCategoryPredictionService(usePredictions, host, account, expenseValues);
   const hasPredictions = Boolean(predictions?.length);
+  const triggerChange = newCategory => {
+    if (selectedCategory?.id !== newCategory?.id) {
+      onChange(newCategory);
+    }
+  };
   const options = React.useMemo(
-    () => getOptions(intl, host, expenseType, showCode, allowNone, valuesByRole, isHostAdmin),
-    [intl, host, expenseType, allowNone, showCode, valuesByRole, isHostAdmin],
+    () => getOptions(intl, host, kind, expenseType, showCode, allowNone, valuesByRole, isHostAdmin),
+    [intl, host, kind, expenseType, allowNone, showCode, valuesByRole, isHostAdmin],
   );
 
   return (
@@ -296,7 +322,7 @@ const ExpenseCategorySelect = ({
           {children || (
             <button
               id={id}
-              className={cn('flex w-full items-center justify-between rounded-lg border px-3 py-2', {
+              className={cn('flex w-full items-center justify-between border px-3 py-2', borderRadiusClass, {
                 'border-red-500': error,
                 'border-gray-300': !error,
               })}
@@ -313,7 +339,7 @@ const ExpenseCategorySelect = ({
             </button>
           )}
         </PopoverTrigger>
-        <PopoverContent className="z-[5000] w-[320px] p-0">
+        <PopoverContent className="z-[5000] min-w-[280px] p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
           <Command filter={(categoryId, search) => (options[categoryId]?.searchText.includes(search) ? 1 : 0)}>
             {size(options) > 6 && <CommandInput placeholder="Filter by name" />}
             <CommandEmpty>
@@ -329,11 +355,11 @@ const ExpenseCategorySelect = ({
                       value={categoryId}
                       className={cn('block p-3 text-xs', { 'font-semibold': isSelected })}
                       onSelect={categoryId => {
-                        onChange(options[categoryId].value);
+                        triggerChange(options[categoryId].value);
                         setOpen(false);
                       }}
                     >
-                      <div className="flex justify-between">
+                      <div className="flex justify-between" data-cy="xxx">
                         <span
                           className={
                             // If there are predictions, grey out the categories that are not selected or predicted
@@ -372,8 +398,8 @@ const ExpenseCategorySelect = ({
                       <span
                         tabIndex={0}
                         role="button"
-                        onKeyDown={e => e.key === 'Enter' && onChange(prediction)}
-                        onClick={() => onChange(prediction)}
+                        onKeyDown={e => e.key === 'Enter' && triggerChange(prediction)}
+                        onClick={() => triggerChange(prediction)}
                         className="cursor-pointer text-[--primary-color-600] underline hover:opacity-80"
                         aria-label={intl.formatMessage({ defaultMessage: 'Select {name}' }, { name: prediction.name })}
                       >
@@ -392,4 +418,4 @@ const ExpenseCategorySelect = ({
   );
 };
 
-export default ExpenseCategorySelect;
+export default AccountingCategorySelect;

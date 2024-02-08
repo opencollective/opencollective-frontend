@@ -39,6 +39,14 @@ const budgetSectionAccountFieldsFragment = gql`
         id
         slug
         name
+        accountingCategories {
+          nodes {
+            id
+            code
+            name
+            kind
+          }
+        }
       }
     }
     ... on Organization {
@@ -46,8 +54,17 @@ const budgetSectionAccountFieldsFragment = gql`
         id
         slug
         name
+        accountingCategories {
+          nodes {
+            id
+            code
+            name
+            kind
+          }
+        }
       }
     }
+
     stats {
       # Skip following on Heavy Accounts (low performance vs relevance ratio)
       id
