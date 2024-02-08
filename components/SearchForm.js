@@ -95,6 +95,7 @@ class SearchForm extends React.Component {
       className,
       onClearFilter,
       intl,
+      onKeyPress,
     } = this.props;
     return (
       <form action="/search" method="GET" onSubmit={onSubmit} className={className}>
@@ -130,6 +131,7 @@ class SearchForm extends React.Component {
             defaultValue={defaultValue}
             value={value}
             onChange={onChange && (e => onChange(e.target.value))}
+            onKeyPress={onKeyPress}
             disabled={disabled}
             onFocus={onFocus}
             autoComplete={autoComplete}
@@ -185,6 +187,7 @@ SearchForm.propTypes = {
   closeSearchModal: PropTypes.func,
   onClearFilter: PropTypes.func,
   intl: PropTypes.object,
+  onKeyPress: PropTypes.func,
 };
 
 const composedFunction = compose(withRouter, injectIntl);

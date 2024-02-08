@@ -81,6 +81,7 @@ const SearchTopics = () => {
   const [searchResults, setSearchResults] = React.useState([]);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
+  const [allowSubmit, setAllowSubmit] = React.useState(true);
   const { toast } = useToast();
   const { styles, attributes } = usePopper(refElement, popperElement, {
     placement: 'bottom',
@@ -104,6 +105,7 @@ const SearchTopics = () => {
     try {
       const results = await searchDocs(query);
       setSearchResults(results.items);
+      setAllowSubmit(results.items.length > 0);
     } catch (error) {
       toast({
         variant: 'error',
@@ -127,12 +129,19 @@ const SearchTopics = () => {
         ),
       });
       setSearchResults([]);
+      setAllowSubmit(false);
     } finally {
       setIsLoading(false);
     }
   };
 
   const debouncedSearch = React.useCallback(debounce(search, 500), []);
+
+  const handleKeyPress = event => {
+    if (event.key === 'Enter' && !allowSubmit) {
+      event.preventDefault();
+    }
+  };
 
   return (
     <Flex justifyContent="center" alignItems="center" px="16px">
@@ -162,6 +171,7 @@ const SearchTopics = () => {
             lineHeight="20px"
             letterSpacing="normal"
             fontWeight="400"
+            onKeyPress={handleKeyPress}
           />
         </Box>
         {showSearchResults && (
