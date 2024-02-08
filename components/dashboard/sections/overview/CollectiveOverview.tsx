@@ -111,9 +111,8 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       label: <FormattedMessage defaultMessage="Received" />,
       helpLabel: <FormattedMessage defaultMessage="Total amount received this period" />,
       amount: data?.account.received,
-      timeseries: data?.account.receivedTimeseries,
+      timeseries: { ...data?.account.receivedTimeseries, currency: data?.account.received?.current?.currency },
       showCurrencyCode: true,
-      withTimeseries: true,
     },
     {
       id: 'spent',
@@ -153,7 +152,6 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
             amount={metric.amount}
             count={metric.count}
             timeseries={metric.timeseries}
-            withTimeseries={metric.withTimeseries}
             loading={loading}
             expanded
             showCurrencyCode
