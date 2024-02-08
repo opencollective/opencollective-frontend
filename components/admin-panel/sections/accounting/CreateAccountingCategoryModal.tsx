@@ -10,7 +10,7 @@ import {
   AccountingCategoryForm,
   AccountingCategoryKindI18n,
   EditableAccountingCategoryFields,
-  useAccoutingCategoryFormik,
+  useAccountingCategoryFormik,
 } from './AccountingCategoryForm';
 
 type CreateAccountingCategoryModalProps = {
@@ -28,7 +28,7 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
     [onCreate],
   );
 
-  const formik = useAccoutingCategoryFormik({
+  const formik = useAccountingCategoryFormik({
     initialValues: {
       name: '',
       friendlyName: '',

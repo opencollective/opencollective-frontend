@@ -33,7 +33,7 @@ import { H1, H4, P, Span } from '../Text';
 import { Separator } from '../ui/Separator';
 import UploadedFilePreview from '../UploadedFilePreview';
 
-import { AccountingCategoryPill } from './AccountingCategoryPill';
+import { ExpenseAccountingCategoryPill } from './ExpenseAccountingCategoryPill';
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 import ExpenseMoreActionsButton from './ExpenseMoreActionsButton';
@@ -200,7 +200,7 @@ const ExpenseSummary = ({
       <div className="flex gap-2 align-middle">
         {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, collective, host) && (
           <React.Fragment>
-            <AccountingCategoryPill
+            <ExpenseAccountingCategoryPill
               host={host}
               account={expense.account}
               expense={expense}

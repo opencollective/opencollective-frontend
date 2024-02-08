@@ -283,6 +283,7 @@
   "activitiesUpdates.description": "קבלת מיילים כשמתפרסם עדכון חדש או כשמתווספות הערות לשיחה.",
   "activitiesUpdates.title": "פעילויות ועדכונים",
   "AddedAdministrators": "מנהל/אדמין התווסף/ה בהצלחה",
+  "AddFundsModal.accountingCategory": "Accounting category",
   "AddFundsModal.disclaimer": "בלחיצה על הוספת כספים הנך מאשר/ת כי סכום של {amount} בחשבון הבנק יוקצב לקבוצה זו.",
   "AddFundsModal.ForThePurpose": "למטרת",
   "AddFundsModal.FromTheSource": "מהמקור",

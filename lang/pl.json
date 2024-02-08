@@ -283,6 +283,7 @@
   "activitiesUpdates.description": "Otrzymuj wiadomości e-mail, gdy zostanie opublikowana nowa aktualizacja lub dodane zostaną komentarze do rozmowy.",
   "activitiesUpdates.title": "Aktywności i aktualizacje",
   "AddedAdministrators": "Dodani Administratorzy",
+  "AddFundsModal.accountingCategory": "Accounting category",
   "AddFundsModal.disclaimer": "Po naciśnięciu Dodaj środki, zgadzasz się, aby kwota {amount} została zarezerwowana na Twoim koncie bankowym w imieniu tego kolektywu.",
   "AddFundsModal.ForThePurpose": "Do celów",
   "AddFundsModal.FromTheSource": "Ze źródła",

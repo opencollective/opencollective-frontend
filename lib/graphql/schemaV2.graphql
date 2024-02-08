@@ -5242,6 +5242,7 @@ enum ActivityType {
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
+  ORDER_UPDATED
   VENDOR_CREATED
   VENDOR_EDITED
   VENDOR_DELETED
@@ -6272,6 +6273,11 @@ type OrderPermissions {
   Whether the current user can set tags on this order
   """
   canSetTags: Boolean!
+
+  """
+  Whether the current user can update the accounting category of this order
+  """
+  canUpdateAccountingCategory: Boolean!
 }
 
 """
@@ -13704,6 +13710,7 @@ enum ActivityAndClassesType {
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
   ORDER_THANKYOU
+  ORDER_UPDATED
   VENDOR_CREATED
   VENDOR_EDITED
   VENDOR_DELETED
@@ -16296,6 +16303,21 @@ type Mutation {
     """
     amount: AmountInput
   ): Order
+
+  """
+  Update the accounting category of an order. Scope: "orders".
+  """
+  updateOrderAccountingCategory(
+    """
+    Reference to the Order to update
+    """
+    order: OrderReferenceInput!
+
+    """
+    Reference to the Accounting Category to update the order with
+    """
+    accountingCategory: AccountingCategoryReferenceInput
+  ): Order!
 
   """
   Confirm an order (strong customer authentication). Scope: "orders".

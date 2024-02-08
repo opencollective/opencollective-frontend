@@ -153,7 +153,7 @@ export const expenseHostFields = gql`
     plan {
       id
     }
-    accountingCategories(kind: EXPENSE) {
+    expenseAccountingCategories: accountingCategories(kind: EXPENSE) {
       nodes {
         id
         ...AccountingCategoryFields

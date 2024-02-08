@@ -283,6 +283,7 @@
   "activitiesUpdates.description": "Отримувати повідомлення електронною поштою, коли публікується оновлення або до бесіди додаються коментарі.",
   "activitiesUpdates.title": "Діяльність та оновлення",
   "AddedAdministrators": "Додано адміністраторів",
+  "AddFundsModal.accountingCategory": "Accounting category",
   "AddFundsModal.disclaimer": "Натиснувши на кнопку нижче, ви погоджуєтесь на перерахування {amount} з вашого банківського рахунку до Колективу.",
   "AddFundsModal.ForThePurpose": "Для мети",
   "AddFundsModal.FromTheSource": "З джерела",

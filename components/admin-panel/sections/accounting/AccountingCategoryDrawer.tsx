@@ -5,7 +5,7 @@ import { AccountingCategory, AccountingCategoryKind } from '../../../../lib/grap
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
 import { Drawer, DrawerActions, DrawerHeader } from '../../../Drawer';
-import HTMLContent from '../../../HTMLContent';
+import HTMLContent, { isEmptyHTMLValue } from '../../../HTMLContent';
 import StyledButton from '../../../StyledButton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 
@@ -13,7 +13,7 @@ import {
   AccountingCategoryForm,
   AccountingCategoryKindI18n,
   EditableAccountingCategoryFields,
-  useAccoutingCategoryFormik,
+  useAccountingCategoryFormik,
 } from './AccountingCategoryForm';
 
 type AccountingCategoryDrawerProps = {
@@ -108,23 +108,31 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
           </span>
         </p>
 
-        <label className="mb-1 mt-4 text-base">
-          <FormattedMessage defaultMessage="Expense types" />
-        </label>
-        <p>
-          {props.accountingCategory?.expensesTypes ? (
-            props.accountingCategory.expensesTypes.map(value => i18nExpenseType(intl, value)).join(', ')
-          ) : (
-            <FormattedMessage id="AllExpenses" defaultMessage="All expenses" />
-          )}
-        </p>
+        {props.accountingCategory?.kind === AccountingCategoryKind.EXPENSE && (
+          <React.Fragment>
+            <label className="mb-1 mt-4 text-base">
+              <FormattedMessage defaultMessage="Expense types" />
+            </label>
+            <p>
+              {props.accountingCategory?.expensesTypes ? (
+                props.accountingCategory.expensesTypes.map(value => i18nExpenseType(intl, value)).join(', ')
+              ) : (
+                <FormattedMessage id="AllExpenses" defaultMessage="All expenses" />
+              )}
+            </p>
+          </React.Fragment>
+        )}
 
-        <label className="mb-1 mt-4 text-base">
-          <FormattedMessage defaultMessage="Instructions" />
-        </label>
-        <div>
-          <HTMLContent content={props.accountingCategory?.instructions} />
-        </div>
+        {!isEmptyHTMLValue(props.accountingCategory?.instructions) && (
+          <React.Fragment>
+            <label className="mb-1 mt-4 text-base">
+              <FormattedMessage defaultMessage="Instructions" />
+            </label>
+            <div>
+              <HTMLContent content={props.accountingCategory?.instructions} />
+            </div>
+          </React.Fragment>
+        )}
       </div>
       <DrawerActions>
         <DropdownMenu>
@@ -183,7 +191,7 @@ function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDra
     };
   }, [props.accountingCategory, intl]);
 
-  const formik = useAccoutingCategoryFormik({
+  const formik = useAccountingCategoryFormik({
     initialValues,
     async onSubmit(values) {
       try {
@@ -209,7 +217,7 @@ function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDra
         <StyledButton onClick={props.onExitEdit}>
           <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
         </StyledButton>
-        <StyledButton buttonStyle="secondary" onClick={formik.submitForm}>
+        <StyledButton buttonStyle="secondary" onClick={formik.submitForm} loading={formik.isSubmitting} minWidth={135}>
           <FormattedMessage id="save" defaultMessage="Save" />
         </StyledButton>
       </DrawerActions>

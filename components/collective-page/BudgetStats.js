@@ -65,13 +65,14 @@ const StatContainer = styled.div`
 
 const BudgetStats = ({ collective, stats, horizontal }) => {
   const { locale } = useIntl();
-  const isFund = collective.type === CollectiveType.FUND;
-  const isIndividual = !collective.isHost && isIndividualAccount(collective);
-  const borderTop = ['1px solid #dcdee0', 'none', horizontal ? null : '1px solid #dcdee0'];
 
   if (!stats) {
     return null;
   }
+
+  const isFund = collective.type === CollectiveType.FUND;
+  const isIndividual = !collective.isHost && isIndividualAccount(collective);
+  const borderTop = ['1px solid #dcdee0', 'none', horizontal ? null : '1px solid #dcdee0'];
 
   return (
     <StyledCard
