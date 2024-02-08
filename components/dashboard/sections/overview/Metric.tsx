@@ -4,7 +4,7 @@ import { isNil } from 'lodash';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { Amount, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
+import { Amount, Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
 
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { InfoTooltipIcon } from '../../../InfoTooltipIcon';
@@ -38,11 +38,13 @@ export interface MetricProps extends React.ComponentPropsWithoutRef<'div'> {
   timeseries?: {
     current: TimeSeriesAmount;
     comparison?: TimeSeriesAmount;
+    currency: Currency;
   };
   helpLabel?: React.ReactNode;
   showCurrencyCode?: boolean;
   expanded?: boolean;
   withTimeseries?: boolean;
+  currency?: Currency;
 }
 export function Metric({
   count,
@@ -56,7 +58,6 @@ export function Metric({
   children,
   showCurrencyCode = false,
   helpLabel,
-  withTimeseries = false,
 }: MetricProps) {
   let value, comparisonValue;
   if (amount?.current) {
@@ -133,11 +134,9 @@ export function Metric({
           )}
         </div>
 
-        {withTimeseries && (
+        {timeseries && (
           <div className={clsx('relative', expanded ? 'h-[220px]' : 'h-[110px]')}>
-            {timeseries && (
-              <ComparisonChart expanded={expanded} current={timeseries?.current} comparison={timeseries?.comparison} />
-            )}
+            {timeseries.current && <ComparisonChart expanded={expanded} {...timeseries} />}
           </div>
         )}
       </div>

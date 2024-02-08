@@ -6,7 +6,7 @@ import { useIntl } from 'react-intl';
 
 import { formatAmountForLegend } from '../../../../lib/charts';
 import dayjs from '../../../../lib/dayjs';
-import { TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
+import { Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
 
 import MessageBox from '../../../MessageBox';
 import { formatPeriod, getDayjsIsoUnit } from '../../filters/PeriodCompareFilter';
@@ -182,6 +182,7 @@ const getSeries = ({ current, comparison }): ApexOptions['series'] => {
 interface ComparisonChartProps {
   current: TimeSeriesAmount;
   comparison?: TimeSeriesAmount;
+  currency: Currency;
   expanded?: boolean;
 }
 
@@ -209,7 +210,7 @@ function setDatesIfMissing(timeseries: TimeSeriesAmount): TimeSeriesAmount {
   return timeseries;
 }
 
-function Chart({ current, comparison, expanded }: ComparisonChartProps) {
+function Chart({ current, comparison, expanded, currency }: ComparisonChartProps) {
   const intl = useIntl();
 
   // When using the "All time" option, the API does not return a dateFrom value, instead we pick the lowest returned date to start the time series.
@@ -221,7 +222,6 @@ function Chart({ current, comparison, expanded }: ComparisonChartProps) {
     [currentWithDates, comparison],
   );
 
-  const currency = current.nodes[0]?.amount?.currency || comparison.nodes[0]?.amount?.currency;
   const options = makeApexOptions({
     currency,
     timeUnit: current.timeUnit,
