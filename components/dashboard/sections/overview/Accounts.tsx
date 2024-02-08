@@ -43,8 +43,15 @@ function CollapsibleAccountsList({ accounts, label }) {
                 showCurrencyCode={false}
               />
             </span>
-            <Button variant="ghost" size="icon-xs" className="-my-1 -mr-1 text-muted-foreground group-hover:bg-muted">
-              <ChevronDown size={18} className="transition-transform" />
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              className="-my-1 -mr-1 text-muted-foreground group-hover:bg-muted"
+              asChild
+            >
+              <div>
+                <ChevronDown size={18} className="transition-transform" />
+              </div>
             </Button>
           </div>
 
@@ -81,7 +88,7 @@ export function Accounts({ accountSlug }) {
           <FormattedMessage defaultMessage="Accounts" />
         </div>
         <DropdownMenu>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild>
             <Button size="xs" variant="outline" className="gap-1">
               <FormattedMessage id="order.new" defaultMessage="New" />
               <ChevronDown className="text-muted-foreground" size={16} />

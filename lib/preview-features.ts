@@ -59,7 +59,7 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW,
     title: 'Collective Overview',
     description: 'Overview page for Collectives in Dashboard',
-    publicBeta: false,
+    publicBeta: true,
     alwaysEnableInDev: true,
     enabledByDefaultFor: ['*'],
     closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],

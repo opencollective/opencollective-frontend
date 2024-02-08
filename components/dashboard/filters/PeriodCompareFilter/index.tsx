@@ -46,7 +46,6 @@ const getAvailableTimeUnits = (value: PeriodCompareFilterValueType): TimeUnit[] 
   // All options (a subset of TimeUnit)
   const timeUnits = [TimeUnit.HOUR, TimeUnit.DAY, TimeUnit.WEEK, TimeUnit.MONTH, TimeUnit.YEAR];
 
-  // If no dateFrom is set, return all time units
   if (!dateFrom) {
     startDate = dayjs.utc('2016-01-01');
   }
@@ -121,33 +120,33 @@ function getPeriodDates(value: PeriodCompareFilterValueType): {
   const OpTimeUnit = getDayjsOpUnit(value.timeUnit);
 
   const now = dayjs.utc();
-  let dateTo = now.endOf(IsoTimeUnit);
+  let dateTo = now.endOf('day');
   let dateFrom;
 
   switch (value.type) {
     case PeriodFilterType.TODAY:
-      dateFrom = dateTo.subtract(1, 'day');
+      dateFrom = now.startOf('day');
       break;
     case PeriodFilterType.LAST_7_DAYS:
-      dateFrom = dateTo.subtract(7, 'day');
+      dateFrom = now.endOf(IsoTimeUnit).subtract(7, 'day');
       break;
     case PeriodFilterType.LAST_4_WEEKS:
-      dateFrom = dateTo.subtract(4, 'weeks');
+      dateFrom = now.endOf(IsoTimeUnit).subtract(4, 'weeks');
       break;
     case PeriodFilterType.LAST_3_MONTHS:
-      dateFrom = dateTo.subtract(3, 'months');
+      dateFrom = now.endOf(IsoTimeUnit).subtract(3, 'months');
       break;
     case PeriodFilterType.LAST_12_MONTHS:
-      dateFrom = dateTo.subtract(12, 'months');
+      dateFrom = now.endOf(IsoTimeUnit).subtract(12, 'months');
       break;
     case PeriodFilterType.MONTH_TO_DATE:
-      dateFrom = dateTo.startOf('month');
+      dateFrom = now.startOf('month');
       break;
     case PeriodFilterType.QUARTER_TO_DATE:
-      dateFrom = dateTo.startOf('quarter');
+      dateFrom = now.startOf('quarter');
       break;
     case PeriodFilterType.YEAR_TO_DATE:
-      dateFrom = dateTo.startOf('year');
+      dateFrom = now.startOf('year');
       break;
   }
   if (value.gte) {
@@ -295,7 +294,7 @@ const PeriodCompareFilter = ({
         onValueChange={(timeUnit: TimeUnit) => value.timeUnit !== timeUnit && onChange({ ...value, timeUnit })}
       >
         <SelectPrimitive.Trigger asChild>
-          <Button size="sm" variant="outline" className="justify-between gap-0.5 rounded-full text-left antialiased">
+          <Button size="sm" variant="outline" className="justify-between gap-0.5 rounded-full text-left">
             <SelectValue />
             <ChevronDown size={16} className="text-muted-foreground" />
           </Button>

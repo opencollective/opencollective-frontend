@@ -1,6 +1,7 @@
 import React from 'react';
 import { ErrorBoundary } from '@sentry/nextjs';
 import type { ApexOptions } from 'apexcharts';
+import { isNil } from 'lodash';
 import dynamic from 'next/dynamic';
 import { useIntl } from 'react-intl';
 
@@ -18,7 +19,7 @@ const formatSeriesData = ({ nodes = [], dateFrom, dateTo, timeUnit }): { x: numb
 
   const startDate = dayjs.utc(dateFrom).startOf(timeUnit === 'WEEK' ? 'isoWeek' : timeUnit);
   const endDate = dayjs.utc(dateTo);
-
+  const now = dayjs.utc();
   let currentDate = startDate;
   let i = 0;
 
@@ -26,7 +27,7 @@ const formatSeriesData = ({ nodes = [], dateFrom, dateTo, timeUnit }): { x: numb
   while (currentDate.isBefore(endDate) || currentDate.isSame(endDate)) {
     keyedData[currentDate.toISOString()] = {
       x: i,
-      y: 0,
+      y: now.isAfter(currentDate) ? 0 : undefined,
     };
     i++;
     currentDate = currentDate.add(1, timeUnit);
@@ -144,7 +145,10 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
     min: 0,
     labels: {
       show: expanded,
-      formatter: value => formatAmountForLegend(value, currency, intl.locale),
+      formatter: value =>
+        isNil(value)
+          ? intl.formatMessage({ defaultMessage: 'No data' })
+          : formatAmountForLegend(value, currency, intl.locale),
     },
   },
   tooltip: {
@@ -184,6 +188,7 @@ interface ComparisonChartProps {
   comparison?: TimeSeriesAmount;
   currency: Currency;
   expanded?: boolean;
+  isPeriod?: boolean;
 }
 
 function setDatesIfMissing(timeseries: TimeSeriesAmount): TimeSeriesAmount {

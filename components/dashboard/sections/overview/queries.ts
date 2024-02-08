@@ -239,6 +239,7 @@ export const overviewMetricsQuery = gql`
     $includeComparison: Boolean!
     $includeChildren: Boolean
     $includeBalance: Boolean!
+    $includeBalanceTimeseries: Boolean!
     $includeSpent: Boolean!
     $includeReceived: Boolean!
     $includeReceivedTimeseries: Boolean!
@@ -257,6 +258,43 @@ export const overviewMetricsQuery = gql`
         comparison: balance(includeChildren: $includeChildren, dateTo: $compareTo) @include(if: $includeComparison) {
           currency
           valueInCents
+        }
+      }
+      balanceTimeseries: stats @include(if: $includeBalanceTimeseries) {
+        id
+        current: balanceTimeSeries(
+          includeChildren: $includeChildren
+          dateFrom: $dateFrom
+          dateTo: $dateTo
+          timeUnit: $timeUnit
+        ) {
+          dateTo
+          dateFrom
+          timeUnit
+          nodes {
+            date
+            amount {
+              currency
+              value
+            }
+          }
+        }
+        comparison: balanceTimeSeries(
+          includeChildren: $includeChildren
+          dateFrom: $compareFrom
+          dateTo: $compareTo
+          timeUnit: $timeUnit
+        ) @include(if: $includeComparison) {
+          dateTo
+          dateFrom
+          timeUnit
+          nodes {
+            date
+            amount {
+              currency
+              value
+            }
+          }
         }
       }
       spent: stats @include(if: $includeSpent) {
