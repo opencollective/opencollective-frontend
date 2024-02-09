@@ -56,6 +56,8 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isHost = isHostAccount(account);
   const isSelfHosted = isSelfHostedAccount(account);
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
+  const isActive = account.isActive;
+  const isActiveHost = isHost && isActive;
 
   const items: MenuItem[] = [
     {
@@ -214,7 +216,8 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
     },
     {
-      if: !isOneOfTypes(account, [EVENT, USER]) && !isAccountantOnly,
+      if:
+        !isOneOfTypes(account, [EVENT, USER]) && (account.type !== 'ORGANIZATION' || isActiveHost) && !isAccountantOnly,
       section: ALL_SECTIONS.TIERS,
       Icon: HeartHandshake,
     },
