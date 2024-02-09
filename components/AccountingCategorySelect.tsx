@@ -15,17 +15,16 @@ import { useAsyncCall } from '../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { fetchExpenseCategoryPredictions } from '../lib/ml-service';
 import { cn } from '../lib/utils';
+import { ACCOUNTING_CATEGORY_HOST_FIELDS } from './expenses/lib/accounting-categories';
 
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from './ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
 
-type RequiredAccountingCategoryFields = Pick<AccountingCategory, 'id' | 'name' | 'code' | 'kind'>;
-
 type RequiredHostFields = Pick<Host, 'slug'> & {
-  orderAccountingCategories?: { nodes: RequiredAccountingCategoryFields[] };
-  expenseAccountingCategories?: { nodes: RequiredAccountingCategoryFields[] };
-  accountingCategories?: { nodes: RequiredAccountingCategoryFields[] };
+  [K in (typeof ACCOUNTING_CATEGORY_HOST_FIELDS)[number]]?: { nodes: RequiredAccountingCategoryFields[] };
 };
+
+type RequiredAccountingCategoryFields = Pick<AccountingCategory, 'id' | 'name' | 'code' | 'kind'>;
 
 type AccountingCategorySelectProps = {
   host: RequiredHostFields;
@@ -174,7 +173,7 @@ const getOptions = (
   isHostAdmin: boolean,
 ): OptionsMap => {
   const contributionCategories = ['CONTRIBUTION', 'ADDED_FUNDS'];
-  const possibleFields = ['accountingCategories', 'expenseAccountingCategories', 'orderAccountingCategories'];
+  const possibleFields = ACCOUNTING_CATEGORY_HOST_FIELDS;
   const categories = uniq([...possibleFields.map(field => get(host, `${field}.nodes`, [])).flat()]);
   const categoriesById: OptionsMap = {};
 
