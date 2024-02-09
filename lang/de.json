@@ -2528,7 +2528,7 @@
   "PayExpense.paymentMethodService.Hint": "The payment service used to pay for this expense.",
   "PayExpense.paymentProcessorFeeInHostCurrency.Hint": "Amount that was charged in fees. Leave it empty if the payee is paying the fees.",
   "PayExpense.ProcessorFeesInput": "Gebühren des Zahlungsabwickler",
-  "PayExpenseModal.ManualPayoutWarning": "By clicking below, you acknowledge that this expense has already been paid {payoutMethod}.",
+  "PayExpenseModal.ManualPayoutWarning": "By clicking below, you acknowledge that this expense has already been paid outside the platform (through Wise, bank transfer or else).",
   "PayExpenseModal.NotEnoughFundsOnWise": "Your Wise {currency} account has insufficient balance to cover the existing batch plus this expense amount. You need {totalNeeded} and you currently only have {available}. Please add funds to your Wise {currency} account.",
   "PayExpenseModal.RefillBalanceError": "Lade dein Guthaben über das Host-Dashboard auf",
   "PayExpenseTitle": "Pay expense",

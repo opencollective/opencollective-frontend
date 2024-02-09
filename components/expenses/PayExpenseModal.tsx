@@ -695,8 +695,7 @@ const PayExpenseModal = ({
                 <P mt={2} fontSize="12px" lineHeight="18px">
                   <FormattedMessage
                     id="PayExpenseModal.ManualPayoutWarning"
-                    defaultMessage="By clicking below, you acknowledge that this expense has already been paid {payoutMethod}."
-                    values={{ payoutMethod: hasBankInfoWithoutWise ? 'manually' : `via ${payoutMethodLabel}` }}
+                    defaultMessage="By clicking below, you acknowledge that this expense has already been paid outside the platform (through Wise, bank transfer or else)."
                   />
                 </P>
               </MessageBox>

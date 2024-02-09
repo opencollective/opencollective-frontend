@@ -2528,7 +2528,7 @@
   "PayExpense.paymentMethodService.Hint": "The payment service used to pay for this expense.",
   "PayExpense.paymentProcessorFeeInHostCurrency.Hint": "Amount that was charged in fees. Leave it empty if the payee is paying the fees.",
   "PayExpense.ProcessorFeesInput": "Tarifas del procesador de pagos",
-  "PayExpenseModal.ManualPayoutWarning": "Al hacer clic abajo, reconoces que este gasto ya ha sido pagado {payoutMethod}.",
+  "PayExpenseModal.ManualPayoutWarning": "By clicking below, you acknowledge that this expense has already been paid outside the platform (through Wise, bank transfer or else).",
   "PayExpenseModal.NotEnoughFundsOnWise": "Tu cuenta Wise {currency} no tiene saldo suficiente para cubrir el lote existente más este gasto. Necesitas {totalNeeded} y actualmente sólo tienes {available}. Por favor, añade fondos a tu cuenta Wise {currency}.",
   "PayExpenseModal.RefillBalanceError": "Recargar el saldo desde el panel de control de Host",
   "PayExpenseTitle": "Pagar un gasto",
