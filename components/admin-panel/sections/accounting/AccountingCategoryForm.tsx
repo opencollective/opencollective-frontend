@@ -147,6 +147,30 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
           />
         </StyledInputField>
       )}
+      {props.formik.values.kind.value === AccountingCategoryKind.EXPENSE && (
+        <StyledInputField
+          name="expensesTypes"
+          required
+          label={intl.formatMessage({ defaultMessage: 'Expense Types' })}
+          mt={3}
+        >
+          <StyledSelect
+            {...props.formik.getFieldProps('expensesTypes')}
+            inputId="expensesTypes"
+            options={expenseTypeOptions}
+            placeholder={intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' })}
+            isMulti
+            width="100%"
+            maxWidth={500}
+            onChange={options =>
+              props.formik.setFieldValue(
+                'expensesTypes',
+                options.map(({ value }) => expenseTypeOptions.find(c => c.value === value)),
+              )
+            }
+          />
+        </StyledInputField>
+      )}
       <StyledInputField name="name" required label={intl.formatMessage({ defaultMessage: 'Category name' })} mt={3}>
         <StyledInput
           {...props.formik.getFieldProps('name')}
@@ -182,30 +206,6 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
           onChange={e => props.formik.setFieldValue('code', e.target.value)}
         />
       </StyledInputField>
-      {props.formik.values.kind.value === AccountingCategoryKind.EXPENSE && (
-        <StyledInputField
-          name="expensesTypes"
-          required
-          label={intl.formatMessage({ defaultMessage: 'Expense Types' })}
-          mt={3}
-        >
-          <StyledSelect
-            {...props.formik.getFieldProps('expensesTypes')}
-            inputId="expensesTypes"
-            options={expenseTypeOptions}
-            placeholder={intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' })}
-            isMulti
-            width="100%"
-            maxWidth={500}
-            onChange={options =>
-              props.formik.setFieldValue(
-                'expensesTypes',
-                options.map(({ value }) => expenseTypeOptions.find(c => c.value === value)),
-              )
-            }
-          />
-        </StyledInputField>
-      )}
       {props.formik.values.kind.value === AccountingCategoryKind.EXPENSE && (
         <StyledInputField
           name="instructions"
