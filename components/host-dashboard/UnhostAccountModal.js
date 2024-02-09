@@ -128,6 +128,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
                   ),
                 });
                 props.onClose();
+                props.onSuccess?.();
               } catch (e) {
                 toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }
@@ -146,6 +147,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
 
 UnhostAccountModal.propTypes = {
   onClose: PropTypes.func,
+  onSuccess: PropTypes.func,
   collective: PropTypes.shape({
     id: PropTypes.string,
     hostFeePercent: PropTypes.number,

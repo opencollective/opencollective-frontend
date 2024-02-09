@@ -210,6 +210,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
             compact
             meta={{ intl, openCollectiveDetails: handleDrawer, onEdit: handleEdit, host: data?.host }}
             onClickRow={row => handleDrawer(row.original)}
+            getRowDataCy={row => `collective-${row.original.slug}`}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

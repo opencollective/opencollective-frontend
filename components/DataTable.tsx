@@ -33,6 +33,7 @@ interface DataTableProps<TData, TValue> {
   tableRef?: React.Ref<HTMLTableElement>;
   compact?: boolean;
   initialSort?: SortingState;
+  getRowDataCy?: (row: Row<TData>) => string;
 }
 
 export function DataTable<TData, TValue>({
@@ -50,6 +51,7 @@ export function DataTable<TData, TValue>({
   tableRef,
   compact,
   initialSort,
+  getRowDataCy,
   ...tableProps
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>(initialSort ?? []);
@@ -107,6 +109,7 @@ export function DataTable<TData, TValue>({
           table.getRowModel().rows.map(row => (
             <TableRow
               key={row.id}
+              data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
               data-state={row.getIsSelected() && 'selected'}
               {...(onClickRow && {
                 onClick: () => onClickRow(row),

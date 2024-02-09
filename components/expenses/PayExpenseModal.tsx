@@ -610,8 +610,8 @@ const PayExpenseModal = ({
                 <Amount>
                   <FormattedMoneyAmount
                     amountStyles={{ fontWeight: 500 }}
-                    amount={amounts.expenseAmountInHostCurrency.valueInCents}
-                    currency={amounts.expenseAmountInHostCurrency.currency}
+                    amount={amounts.expenseAmountInHostCurrency?.valueInCents}
+                    currency={amounts.expenseAmountInHostCurrency?.currency}
                     currencyCodeStyles={{ color: 'black.500' }}
                   />
                 </Amount>
