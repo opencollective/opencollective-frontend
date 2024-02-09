@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { FormikProvider, useFormik, useFormikContext } from 'formik';
-import { cloneDeep, get, kebabCase, round } from 'lodash';
+import { cloneDeep, get, kebabCase, omit, round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { border, BorderProps, color, space, SpaceProps, typography } from 'styled-system';
@@ -277,33 +277,51 @@ const getInitialValues = (expense, host) => {
     ...DEFAULT_VALUES,
     ...getPayoutOptionValue(expense.payoutMethod, true, host),
     feesPayer: expense.feesPayer || DEFAULT_VALUES.feesPayer,
-    totalAmountPaidInHostCurrency: expense.currency === host.currency ? expense.amount : null,
+    expenseAmountInHostCurrency: expense.currency === host.currency ? expense.amount : null,
   };
 };
 
-const calculateAmounts = ({ formik, expense, quote, host, feesPayer }) => {
-  if (formik.values.forceManual) {
-    const totalAmount = { valueInCents: formik.values.totalAmountPaidInHostCurrency, currency: host.currency };
+const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
+  if (values.forceManual) {
+    const totalAmount = {
+      valueInCents: values.expenseAmountInHostCurrency + (values.paymentProcessorFeeInHostCurrency || 0),
+      currency: host.currency,
+    };
     const paymentProcessorFee = {
-      valueInCents: formik.values.paymentProcessorFeeInHostCurrency,
+      valueInCents: values.paymentProcessorFeeInHostCurrency,
+      currency: host.currency,
+    };
+    const expenseAmountInHostCurrency = {
+      valueInCents: values.expenseAmountInHostCurrency,
       currency: host.currency,
     };
     const grossAmount = totalAmount.valueInCents - (paymentProcessorFee.valueInCents || 0);
     const effectiveRate = expense.currency !== host.currency && grossAmount / expense.amount;
-    return { paymentProcessorFee, totalAmount, effectiveRate };
+    return { paymentProcessorFee, totalAmount, effectiveRate, expenseAmountInHostCurrency };
   } else if (quote) {
     const effectiveRate = expense.currency !== host.currency && quote.sourceAmount.valueInCents / expense.amount;
     const totalAmount = cloneDeep(quote.sourceAmount);
+    const expenseAmountInHostCurrency = {
+      valueInCents: quote.sourceAmount.valueInCents - quote.paymentProcessorFeeAmount.valueInCents,
+      currency: quote.sourceAmount.currency,
+    };
     if (feesPayer === 'PAYEE') {
       totalAmount.valueInCents -= quote.paymentProcessorFeeAmount.valueInCents;
     }
-    return { paymentProcessorFee: quote.paymentProcessorFeeAmount, totalAmount, effectiveRate };
+    return {
+      paymentProcessorFee: quote.paymentProcessorFeeAmount,
+      totalAmount,
+      effectiveRate,
+      expenseAmountInHostCurrency,
+    };
   } else {
     return {};
   }
 };
 
 const getHandleSubmit = (intl, currency, onSubmit) => async values => {
+  const totalAmountPaidInHostCurrency =
+    values.expenseAmountInHostCurrency + (values.paymentProcessorFeeInHostCurrency || 0);
   // Show a confirm if the fee is unusually high (more than 50% of the total amount)
   if (
     values.forceManual &&
@@ -326,7 +344,7 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
     return;
   }
 
-  return onSubmit(values);
+  return onSubmit({ ...omit(values, 'expenseAmountInHostCurrency'), totalAmountPaidInHostCurrency });
 };
 
 type PayExpenseModalProps = {
@@ -372,6 +390,13 @@ const PayExpenseModal = ({
     skip: !canQuote,
   });
 
+  const amounts = calculateAmounts({
+    values: formik.values,
+    expense,
+    quote: quoteQuery.data?.expense?.quote,
+    host,
+    feesPayer: formik.values.feesPayer,
+  });
   const amountWithoutTaxes = getAmountWithoutTaxes(expense.amount, expense.taxes);
   const paymentServiceOptions = React.useMemo(
     () => [
@@ -383,14 +408,6 @@ const PayExpenseModal = ({
     ],
     [intl],
   );
-
-  const amounts = calculateAmounts({
-    formik,
-    expense,
-    quote: quoteQuery.data?.expense?.quote,
-    host,
-    feesPayer: formik.values.feesPayer,
-  });
 
   const amountBatched = quoteQuery.data?.expense.host?.transferwise.amountBatched;
   const amountInBalance = quoteQuery.data?.expense.host?.transferwise.balances.find(
@@ -432,7 +449,7 @@ const PayExpenseModal = ({
                     ...formik.values,
                     ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
                     paymentProcessorFeeInHostCurrency: null,
-                    totalAmountPaidInHostCurrency: expense.currency === host.currency ? expense.amount : null,
+                    expenseAmountInHostCurrency: expense.currency === host.currency ? expense.amount : null,
                     feesPayer: !getCanCustomizeFeesPayer(
                       expense,
                       collective,
@@ -457,22 +474,22 @@ const PayExpenseModal = ({
             {hasManualPayment && (
               <React.Fragment>
                 <StyledInputField
-                  name="totalAmountPaidInHostCurrency"
-                  htmlFor="totalAmountPaidInHostCurrency"
+                  name="expenseAmountInHostCurrency"
+                  htmlFor="expenseAmountInHostCurrency"
                   inputType="number"
-                  error={formik.errors.totalAmountPaidInHostCurrency}
+                  error={formik.errors.expenseAmountInHostCurrency}
                   required
                   mt={3}
                   label={
                     <FormattedMessage
-                      id="PayExpense.totalAmountPaidInHostCurrency.Input"
-                      defaultMessage="Total amount paid"
+                      id="PayExpense.expenseAmountInHostCurrency.Input"
+                      defaultMessage="Amount paid for expense"
                     />
                   }
                   hint={
                     <FormattedMessage
-                      id="PayExpense.totalAmountPaidInHostCurrency.Hint"
-                      defaultMessage="The total amount debited from your account."
+                      id="PayExpense.expenseAmountInHostCurrency.Hint"
+                      defaultMessage="The amount paid for this expense, in host currency, without payment processor fees."
                     />
                   }
                 >
@@ -481,12 +498,12 @@ const PayExpenseModal = ({
                       {...inputProps}
                       currency={host.currency}
                       currencyDisplay="FULL"
-                      value={formik.values.totalAmountPaidInHostCurrency}
-                      data-cy="total-amount-paid"
+                      value={formik.values.expenseAmountInHostCurrency}
+                      data-cy="expense-amount-paid"
                       placeholder="0.00"
                       maxWidth="100%"
                       min={1}
-                      onChange={value => formik.setFieldValue('totalAmountPaidInHostCurrency', value)}
+                      onChange={value => formik.setFieldValue('expenseAmountInHostCurrency', value)}
                     />
                   )}
                 </StyledInputField>
@@ -503,7 +520,7 @@ const PayExpenseModal = ({
                   hint={
                     <FormattedMessage
                       id="PayExpense.paymentProcessorFeeInHostCurrency.Hint"
-                      defaultMessage="Amount in fees, included in the total amount paid."
+                      defaultMessage="Amount that was charged in fees. Leave it empty if the payee is paying the fees."
                     />
                   }
                 >
@@ -516,7 +533,7 @@ const PayExpenseModal = ({
                       placeholder="0.00"
                       maxWidth="100%"
                       min={0}
-                      max={formik.values.totalAmountPaidInHostCurrency || 100000000}
+                      max={formik.values.expenseAmountInHostCurrency || 100000000}
                       onChange={value => formik.setFieldValue('paymentProcessorFeeInHostCurrency', value)}
                     />
                   )}
@@ -593,8 +610,8 @@ const PayExpenseModal = ({
                 <Amount>
                   <FormattedMoneyAmount
                     amountStyles={{ fontWeight: 500 }}
-                    amount={amountWithoutTaxes}
-                    currency={expense.currency}
+                    amount={amounts.expenseAmountInHostCurrency.valueInCents}
+                    currency={amounts.expenseAmountInHostCurrency.currency}
                     currencyCodeStyles={{ color: 'black.500' }}
                   />
                 </Amount>
@@ -678,8 +695,7 @@ const PayExpenseModal = ({
                 <P mt={2} fontSize="12px" lineHeight="18px">
                   <FormattedMessage
                     id="PayExpenseModal.ManualPayoutWarning"
-                    defaultMessage="By clicking below, you acknowledge that this expense has already been paid {payoutMethod}."
-                    values={{ payoutMethod: hasBankInfoWithoutWise ? 'manually' : `via ${payoutMethodLabel}` }}
+                    defaultMessage="By clicking below, you acknowledge that this expense has already been paid outside the platform (through Wise, bank transfer or else)."
                   />
                 </P>
               </MessageBox>
