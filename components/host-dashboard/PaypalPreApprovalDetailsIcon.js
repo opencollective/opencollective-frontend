@@ -83,6 +83,6 @@ PaypalPreApprovalDetailsIcon.propTypes = {
 };
 
 // ignore unused exports default
-// do we want to use it in the future?
+// keep for future use?
 
 export default PaypalPreApprovalDetailsIcon;

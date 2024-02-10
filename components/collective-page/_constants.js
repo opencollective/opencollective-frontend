@@ -1,18 +1,9 @@
-// ignore unused exports
-
 /**
  * Shared dimensions between collective page's components
  */
 export const Dimensions = {
   PADDING_X: [15, 30],
   MAX_SECTION_WIDTH: 1260,
-};
-
-/**
- * Durations for page animations
- */
-export const AnimationsDurations = {
-  HERO_COLLAPSE: 150,
 };
 
 export const Sections = {
@@ -43,6 +34,3 @@ export const Sections = {
   // EMPTY for new collectives/no data in any category sections
   EMPTY: 'empty',
 };
-
-/** A list of all section names */
-export const AllSectionsNames = Object.values(Sections);

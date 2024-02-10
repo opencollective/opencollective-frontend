@@ -1,5 +1,3 @@
-// ignore unused exports
-
 'use client';
 
 import * as React from 'react';
@@ -163,6 +161,9 @@ const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTML
   return <span className={cn('ml-auto text-xs tracking-widest opacity-60', className)} {...props} />;
 };
 DropdownMenuShortcut.displayName = 'DropdownMenuShortcut';
+
+// ignore unused exports
+// ui library
 
 export {
   DropdownMenu,

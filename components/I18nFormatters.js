@@ -5,6 +5,7 @@ import Link from './Link';
 import StyledLink from './StyledLink';
 
 // ignore unused exports
+// utility library
 
 // eslint-disable-next-line react/display-name
 export const getI18nLink = linkProps => chunks => (

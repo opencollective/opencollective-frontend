@@ -1,5 +1,5 @@
 // ignore unused exports repeatIt, repeatDescribe
-// will these be used in the future?
+// keep for future use?
 
 import { flatten } from 'lodash';
 

@@ -1,5 +1,3 @@
-// ignore unused exports
-
 'use client';
 
 import * as React from 'react';
@@ -25,5 +23,8 @@ const CollapsibleContent = React.forwardRef<
   />
 ));
 CollapsibleContent.displayName = CollapsiblePrimitive.CollapsibleContent.displayName;
+
+// ignore unused exports
+// ui library
 
 export { Collapsible, CollapsibleTrigger, CollapsibleContent };

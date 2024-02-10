@@ -1,5 +1,5 @@
 // ignore unused exports mockedRouter, withMockRouterContext
-// will these be used in the future?
+// keep for future use?
 
 import React from 'react';
 import PropTypes from 'prop-types';
