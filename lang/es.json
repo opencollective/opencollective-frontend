@@ -24,7 +24,7 @@
   "/66Po2": "Incluye el {rate}% de {taxName} ({amount})",
   "/aBz/1": "Ir a la página pública de {accountName} en Open Collective",
   "/CCt2w": "Editar {type, select, TICKET {Ticket} other {Categoría}}",
-  "/eA1Ga": "<Individual></Individual> paid <Amount></Amount> to <Payee></Payee> for <Expense>{expenseDescription}</Expense>",
+  "/eA1Ga": "<Individual></Individual> pagó <Amount></Amount> a <Payee></Payee> por <Expense>{expenseDescription}</Expense>",
   "/ELnaY": "Tipos de gastos actualizados",
   "/EO1Lu": "Todos los administradores {account} deben tener 2FA",
   "/GQXtd": "¿No eres tú? <SignOutLink>Cierra sesión</SignOutLink> para cambiar de perfil.",
