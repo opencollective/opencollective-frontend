@@ -51,6 +51,7 @@ import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import UserSecurity from './sections/UserSecurity';
 import Webhooks from './sections/Webhooks';
+import { EditAccountInfoForm } from './EditAccountInfoForm';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
 
@@ -597,8 +598,12 @@ class EditCollectiveForm extends React.Component {
     const { collective, status, intl, router } = this.props;
 
     const section = this.props.section || get(router, 'query.section', 'info');
-
     const isNew = !collective.id;
+
+    if (section === 'info' && get(router, 'query.newForm')) {
+      return <EditAccountInfoForm accountSlug={collective.slug} />;
+    }
+
     let submitBtnMessageId = isNew ? 'event.create.btn' : 'save';
     if (['loading', 'saved'].includes(status)) {
       submitBtnMessageId = status;
