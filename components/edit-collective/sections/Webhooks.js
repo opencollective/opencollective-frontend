@@ -91,7 +91,7 @@ class Webhooks extends React.Component {
       );
     }
     if (!canReceiveContributions) {
-      removeList.push('collective.member.created', 'subscription.canceled');
+      removeList.push('collective.member.created', 'subscription.canceled', 'order.thankyou');
     }
     if (!canUseVirtualCards) {
       removeList.push('virtualcard.purchase');
