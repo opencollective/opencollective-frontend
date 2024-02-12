@@ -392,10 +392,6 @@ export const expensePageExpenseFieldsFragment = gql`
         ...NavbarFields
         MULTI_CURRENCY_EXPENSES
       }
-      expensesTags {
-        id
-        tag
-      }
       location {
         id
         address

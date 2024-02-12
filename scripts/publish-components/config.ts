@@ -40,7 +40,7 @@ export default {
     'components/StyledInputMask.*',
     'components/StyledInputPercentage.*',
     'components/StyledInputSlider.*',
-    'components/StyledInputTags.*',
+    'components/EditTags.*',
     'components/StyledInput.*',
     'components/StyledKeyframes.*',
     'components/StyledLinkButton.*',

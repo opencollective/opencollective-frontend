@@ -6,7 +6,7 @@ import { NextRouter, withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-intl';
 import styled from 'styled-components';
 
-import { getCollectivePageMetadata, getSuggestedTags, isIndividualAccount } from '../lib/collective';
+import { getCollectivePageMetadata, isIndividualAccount } from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
@@ -147,8 +147,6 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
     }
   };
 
-  getSuggestedTags = memoizeOne(getSuggestedTags);
-
   render() {
     const { collectiveSlug, data, query } = this.props;
     const searchTerm = Array.isArray(query.searchTerm) ? query.searchTerm[0] : query.searchTerm;
@@ -230,7 +228,6 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
                         collective={data.account}
                         expenses={data.expenses?.nodes}
                         nbPlaceholders={data.variables.limit}
-                        suggestedTags={this.getSuggestedTags(data.account)}
                         isInverted
                         view="submitter"
                         expenseFieldForTotalAmount="amountInCreatedByAccountCurrency"

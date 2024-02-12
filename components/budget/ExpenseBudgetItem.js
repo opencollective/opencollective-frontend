@@ -104,7 +104,6 @@ const ExpenseBudgetItem = ({
   expense,
   showProcessActions,
   view,
-  suggestedTags,
   onProcess,
   selected,
   expandExpense,
@@ -454,11 +453,7 @@ const ExpenseBudgetItem = ({
               )}
             </Flex>
           ) : (
-            <Tags
-              expense={expense}
-              canEdit={get(expense, 'permissions.canEditTags', false)}
-              suggestedTags={suggestedTags}
-            />
+            <Tags expense={expense} canEdit={get(expense, 'permissions.canEditTags', false)} />
           )}
         </Box>
         {showProcessActions && expense?.permissions && !isExpensePaidOrRejected && (
@@ -501,7 +496,6 @@ ExpenseBudgetItem.propTypes = {
   showProcessActions: PropTypes.bool,
   view: PropTypes.oneOf(['public', 'admin', 'submitter']),
   host: PropTypes.object,
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
   expense: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     legacyId: PropTypes.number,
