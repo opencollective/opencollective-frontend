@@ -84,6 +84,9 @@ const DialogDescription = React.forwardRef<
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
+// ignore unused exports
+// ui library
+
 export {
   Dialog,
   DialogTrigger,

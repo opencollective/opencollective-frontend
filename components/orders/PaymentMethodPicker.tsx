@@ -37,7 +37,7 @@ import Loading from '../Loading';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 
-export const paymentMethodPickerQuery = gql`
+const paymentMethodPickerQuery = gql`
   query PaymentMethodPicker($accountSlug: String!, $hostSlug: String!) {
     account(slug: $accountSlug) {
       id

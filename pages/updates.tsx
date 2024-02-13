@@ -16,7 +16,7 @@ import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
@@ -30,7 +30,8 @@ import Updates from '../components/Updates';
 import UpdateFilters from '../components/updates/UpdateFilters';
 
 const ROUTE_PARAMS = ['collectiveSlug'];
-export const UPDATES_PER_PAGE = 10;
+
+const UPDATES_PER_PAGE = 10;
 
 export const updatesPageQuery = gql`
   query UpdatesPage(
@@ -95,7 +96,7 @@ export const updatesPageQuery = gql`
       }
     }
   }
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
 `;
 
 const getPropsFromQuery = (query: NextParsedUrlQuery) => ({
@@ -127,8 +128,12 @@ const updatesPageQueryHelper = getSSRQueryHelpers<
   skipClientIfSSRThrows404: true,
 });
 
+// ignore unused exports getServerSideProps
+// next.js export
 export const getServerSideProps = updatesPageQueryHelper.getServerSideProps;
 
+// ignore unused exports default
+// next.js export
 export default function UpdatesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();

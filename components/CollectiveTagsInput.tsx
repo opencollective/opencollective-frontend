@@ -24,7 +24,7 @@ import { Flex } from './Grid';
 import StyledTag from './StyledTag';
 import { Span } from './Text';
 
-export const searchTagsQuery = gql`
+const searchTagsQuery = gql`
   query SearchTags($term: String) {
     tagStats(tagSearchTerm: $term) {
       nodes {

@@ -41,4 +41,6 @@ const HowItWorks = () => {
   );
 };
 
+// ignore unused exports default
+// next.js export
 export default HowItWorks;

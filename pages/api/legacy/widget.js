@@ -3,6 +3,8 @@ import path from 'path';
 
 import { template } from 'lodash';
 
+// ignore unused exports default
+// next.js export
 export default function handler(req, res) {
   const content = fs.readFileSync(path.join(process.cwd(), 'server/templates/widget.js'), 'utf8');
   const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });

@@ -79,7 +79,7 @@ interface AccountMetricsMeta extends TableMeta<AccountMetricsRow> {
   metric: MetricProps;
 }
 
-export const columns: ColumnDef<AccountMetricsRow>[] = [
+const columns: ColumnDef<AccountMetricsRow>[] = [
   {
     id: 'name',
     accessorKey: 'name',

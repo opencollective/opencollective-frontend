@@ -12,7 +12,7 @@ import { fadeIn } from './StyledKeyframes';
 import { withUser } from './UserProvider';
 
 // Define static dimensions
-export const COLLECTIVE_CARD_MARGIN_X = 32;
+const COLLECTIVE_CARD_MARGIN_X = 32;
 const COLLECTIVE_CARD_MARGIN_Y = 26;
 const COLLECTIVE_CARD_WIDTH = 144;
 const COLLECTIVE_CARD_HEIGHT = 220;

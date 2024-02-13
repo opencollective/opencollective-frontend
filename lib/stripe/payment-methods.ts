@@ -33,7 +33,7 @@ enum StripePaymentMethod {
   wechat_pay = 'wechat_pay',
 }
 
-export const RestrictedCurrencyByStripePaymentMethod: Partial<Record<StripePaymentMethod, string[]>> = {
+const RestrictedCurrencyByStripePaymentMethod: Partial<Record<StripePaymentMethod, string[]>> = {
   [StripePaymentMethod.bacs_debit]: ['gbp'],
   [StripePaymentMethod.bancontact]: ['eur'],
   [StripePaymentMethod.sepa_debit]: ['eur'],

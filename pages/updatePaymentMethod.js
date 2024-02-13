@@ -386,4 +386,6 @@ const addSubscriptionsData = graphql(subscriptionsQuery, {
 
 const addGraphql = compose(addSubscriptionsData, addReplaceCreditCardMutation);
 
+// ignore unused exports default
+// next.js export
 export default injectIntl(withUser(addGraphql(withStripeLoader(UpdatePaymentPage))));

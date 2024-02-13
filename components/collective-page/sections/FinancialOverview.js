@@ -15,7 +15,7 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import ContributionsBudget from './Budget/ContributionsBudget';
 import ExpenseBudget from './Budget/ExpenseBudget';
 
-export const budgetSectionQuery = gql`
+const budgetSectionQuery = gql`
   query BudgetSection($slug: String!, $heavyAccount: Boolean!) {
     account(slug: $slug) {
       id

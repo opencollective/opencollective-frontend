@@ -13,7 +13,7 @@ import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/u
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import Container from '../components/Container';
 import CommentForm from '../components/conversations/CommentForm';
 import { commentFieldsFragment } from '../components/conversations/graphql';
@@ -107,7 +107,7 @@ const updatePageQuery = gql`
     }
   }
   ${commentFieldsFragment}
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
 `;
 
 type UpdatePageArgs = {
@@ -122,8 +122,12 @@ const updatePageSSRQueryHelpers = getSSRQueryHelpers({
   context: API_V2_CONTEXT,
 });
 
+// ignore unused exports getServerSideProps
+// next.js export
 export const getServerSideProps = updatePageSSRQueryHelpers.getServerSideProps;
 
+// ignore unused exports default
+// next.js export
 export default function UpdatePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { LoggedInUser } = useLoggedInUser();
   const queryResult = updatePageSSRQueryHelpers.useQuery(props);

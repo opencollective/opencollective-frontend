@@ -11,11 +11,17 @@ const config: CodegenConfig = {
     './lib/graphql/types/v2': {
       preset: 'gql-tag-operations-preset',
       schema: './lib/graphql/schemaV2.graphql',
-      plugins: [],
       presetConfig: {
         augmentedModuleName: '@apollo/client',
         gqlTagName: 'gql',
       },
+      plugins: [
+        {
+          add: {
+            content: '/* ignore unused exports */',
+          },
+        },
+      ],
     },
   },
   pluckConfig: {
@@ -23,5 +29,8 @@ const config: CodegenConfig = {
     gqlMagicComment: 'GraphQLV2',
   },
 };
+
+// ignore unused exports default
+// config file
 
 export default config;

@@ -27,7 +27,7 @@ const tooltipContent = () => (
   </div>
 );
 
-export const rejectTransactionMutation = gql`
+const rejectTransactionMutation = gql`
   mutation RejectTransaction($transaction: TransactionReferenceInput!, $message: String) {
     rejectTransaction(transaction: $transaction, message: $message) {
       id

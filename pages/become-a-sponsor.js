@@ -28,4 +28,6 @@ const BecomeASponsor = () => {
   );
 };
 
+// ignore unused exports default
+// next.js export
 export default BecomeASponsor;

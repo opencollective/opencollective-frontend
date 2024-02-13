@@ -34,4 +34,6 @@ const FiscalHosting = () => {
   );
 };
 
+// ignore unused exports default
+// next.js export
 export default FiscalHosting;

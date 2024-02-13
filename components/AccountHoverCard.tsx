@@ -81,7 +81,7 @@ type AccountHoverCardProps = {
   hoverCardContentProps?: React.ComponentProps<typeof Content>;
 };
 
-export const userContextualMembershipsQuery = gql`
+const userContextualMembershipsQuery = gql`
   query UserContextualMemberships(
     $userSlug: String!
     $accountSlug: String

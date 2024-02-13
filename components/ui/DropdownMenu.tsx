@@ -162,6 +162,9 @@ const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTML
 };
 DropdownMenuShortcut.displayName = 'DropdownMenuShortcut';
 
+// ignore unused exports
+// ui library
+
 export {
   DropdownMenu,
   DropdownMenuTrigger,

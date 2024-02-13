@@ -99,4 +99,6 @@ const OAuthAuthorizePage = () => {
   );
 };
 
+// ignore unused exports default
+// next.js export
 export default OAuthAuthorizePage;

@@ -273,4 +273,6 @@ const addCreateUpdateMutation = graphql(createUpdateMutation, {
 
 const addGraphql = compose(addCollectiveNavbarData, addCreateUpdateMutation);
 
+// ignore unused exports default
+// next.js export
 export default withUser(addGraphql(withRouter(injectIntl(CreateUpdatePage))));

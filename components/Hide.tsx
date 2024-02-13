@@ -5,7 +5,7 @@ import { pointerEvents } from '../lib/styled-system-custom-properties';
 
 import { Box } from './Grid';
 
-export const breakpoints = {
+const breakpoints = {
   xs: '@media screen and (max-width: 40em)',
   sm: '@media screen and (min-width: 40em) and (max-width: 52em)',
   md: '@media screen and (min-width: 52em) and (max-width: 64em)',
@@ -13,7 +13,7 @@ export const breakpoints = {
 };
 
 // eslint-disable-next-line react/display-name
-export const hidden = key => props =>
+const hidden = key => props =>
   props[key]
     ? {
         [breakpoints[key]]: {
@@ -22,10 +22,10 @@ export const hidden = key => props =>
       }
     : null;
 
-export const xs = hidden('xs');
-export const sm = hidden('sm');
-export const md = hidden('md');
-export const lg = hidden('lg');
+const xs = hidden('xs');
+const sm = hidden('sm');
+const md = hidden('md');
+const lg = hidden('lg');
 
 const Hide = styled(Box)<{ xs?: boolean; sm?: boolean; md?: boolean; lg?: boolean }>`
   ${xs}

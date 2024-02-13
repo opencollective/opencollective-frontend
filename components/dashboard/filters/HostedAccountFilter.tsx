@@ -86,7 +86,7 @@ const resultNodeToOption = account => ({
   value: account.slug,
 });
 
-export function HostedAccountFilter({
+function HostedAccountFilter({
   meta: { hostSlug, hostedAccounts },
   ...props
 }: FilterComponentProps<

@@ -258,7 +258,8 @@ const cols = {
     },
   },
 };
-export const getColumns = (useAltLayout?: boolean): ColumnDef<Transaction>[] => {
+
+const getColumns = (useAltLayout?: boolean): ColumnDef<Transaction>[] => {
   return useAltLayout
     ? [
         cols.createdAt,

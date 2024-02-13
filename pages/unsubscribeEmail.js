@@ -96,4 +96,6 @@ class UnsubscribeEmail extends React.Component {
   }
 }
 
+// ignore unused exports default
+// next.js export
 export default withUser(UnsubscribeEmail);

@@ -133,4 +133,6 @@ class CollectivesIframe extends React.Component {
   }
 }
 
+// ignore unused exports default
+// next.js export
 export default CollectivesIframe;

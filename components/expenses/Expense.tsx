@@ -53,7 +53,7 @@ import ExpenseSummary from './ExpenseSummary';
 import PrivateCommentsMessage from './PrivateCommentsMessage';
 import TaxFormLinkModal from './TaxFormLinkModal';
 
-export const getVariableFromProps = props => {
+const getVariableFromProps = props => {
   const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1))
     .utc(true)
     .toISOString();
@@ -64,7 +64,7 @@ export const getVariableFromProps = props => {
   };
 };
 
-export const ExpenseHeader = styled(H1)<{ inDrawer?: boolean }>`
+const ExpenseHeader = styled(H1)<{ inDrawer?: boolean }>`
   ${props =>
     props.inDrawer
       ? css`

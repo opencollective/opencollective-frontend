@@ -1,4 +1,5 @@
 'use client';
+
 import * as React from 'react';
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible';
 
@@ -22,5 +23,8 @@ const CollapsibleContent = React.forwardRef<
   />
 ));
 CollapsibleContent.displayName = CollapsiblePrimitive.CollapsibleContent.displayName;
+
+// ignore unused exports
+// ui library
 
 export { Collapsible, CollapsibleTrigger, CollapsibleContent };

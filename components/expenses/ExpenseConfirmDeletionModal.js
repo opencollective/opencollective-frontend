@@ -10,7 +10,7 @@ import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import ConfirmationModal from '../ConfirmationModal';
 import { useToast } from '../ui/useToast';
 
-export const deleteExpenseMutation = gql`
+const deleteExpenseMutation = gql`
   mutation DeleteExpense($id: String!) {
     deleteExpense(expense: { id: $id }) {
       id
@@ -18,7 +18,7 @@ export const deleteExpenseMutation = gql`
   }
 `;
 
-export const removeExpenseFromCache = (cache, { data: { deleteExpense } }) => {
+const removeExpenseFromCache = (cache, { data: { deleteExpense } }) => {
   cache.modify({
     fields: {
       expenses(existingExpenses, { readField }) {

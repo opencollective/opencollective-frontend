@@ -292,4 +292,6 @@ const addGraphql = compose(
   }),
 );
 
+// ignore unused exports default
+// next.js export
 export default withRouter(injectIntl(withUser(addGraphql(ResetPasswordPage))));

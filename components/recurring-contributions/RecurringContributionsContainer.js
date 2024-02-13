@@ -16,14 +16,14 @@ import { withUser } from '../UserProvider';
 
 import RecurringContributionsCard from './RecurringContributionsCard';
 
-export const FILTERS = {
+const FILTERS = {
   ACTIVE: 'ACTIVE',
   MONTHLY: 'MONTHLY',
   YEARLY: 'YEARLY',
   CANCELLED: 'CANCELLED',
 };
 
-export const I18nFilters = defineMessages({
+const I18nFilters = defineMessages({
   [FILTERS.ACTIVE]: {
     id: 'Subscriptions.Active',
     defaultMessage: 'Active',

@@ -295,4 +295,6 @@ const addRedeemPaymentMethodMutation = graphql(redeemPaymentMethodMutation, {
 
 const addGraphql = compose(addRedeemPageData, addRedeemPaymentMethodMutation);
 
+// ignore unused exports default
+// next.js export
 export default injectIntl(withUser(withRouter(addGraphql(RedeemPage))));

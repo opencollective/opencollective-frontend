@@ -20,7 +20,7 @@ interface ActivityItemMeta extends TableMeta<Activity> {
   openActivity: (activity: Activity) => void;
 }
 
-export const cardColumns: ColumnDef<Activity>[] = [
+const cardColumns: ColumnDef<Activity>[] = [
   {
     accessorKey: 'summary',
     cell: ({ row }) => {
@@ -30,7 +30,7 @@ export const cardColumns: ColumnDef<Activity>[] = [
   },
 ];
 
-export const tableColumns: ColumnDef<Activity>[] = [
+const tableColumns: ColumnDef<Activity>[] = [
   {
     accessorKey: 'createdAt',
     header: () => <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,

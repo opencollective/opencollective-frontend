@@ -241,4 +241,4 @@ export default injectIntl(
   withApollo(withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(injectIntl(UserProvider))))),
 );
 
-export { UserConsumer, withUser };
+export { withUser };

@@ -211,4 +211,6 @@ OSCHostApplication.propTypes = {
   refetchLoggedInUser: PropTypes.func,
 };
 
+// ignore unused exports default
+// next.js export
 export default withUser(OSCHostApplication);

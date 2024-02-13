@@ -20,7 +20,6 @@ const DebitCreditItem = styled.div`
 const DebitCreditList = styled.div`
   border: 1px solid #e6e8eb;
   border-radius: 8px 8px 0 0;
-
   & > ${DebitCreditItem}:not(:last-child) {
     border-bottom: 1px solid #e6e8eb;
   }
@@ -73,5 +72,7 @@ export const CreditItem = ({ children, ...props }) => {
 
 CreditItem.propTypes = { children: PropTypes.node };
 
-/** @component */
+// ignore unused exports default
+// used in Stories mdx
+
 export default DebitCreditList;

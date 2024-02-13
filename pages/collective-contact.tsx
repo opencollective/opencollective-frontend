@@ -11,7 +11,7 @@ import { Account } from '../lib/graphql/types/v2/graphql';
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import CollectiveContactForm from '../components/CollectiveContactForm';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
@@ -113,7 +113,9 @@ const collectiveContactPageQuery = gql`
       }
     }
   }
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
 `;
 
+// ignore unused exports default
+// next.js export
 export default CollectiveContact;

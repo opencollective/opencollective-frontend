@@ -108,7 +108,7 @@ const dateToSimpleDateString = (date: Date) => {
   return dayjs.utc(date).format('YYYY-MM-DD');
 };
 
-export function getPeriodDates(value: PeriodCompareFilterValueType): {
+function getPeriodDates(value: PeriodCompareFilterValueType): {
   dateFrom?: Dayjs;
   dateTo?: Dayjs;
   compareFrom?: Dayjs;

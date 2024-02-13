@@ -52,4 +52,6 @@ const addCollectivePageData = graphql(collectivePageQuery, {
   }),
 });
 
+// ignore unused exports default
+// next.js export
 export default withUser(addCollectivePageData(AcceptFinancialContributionsPage));

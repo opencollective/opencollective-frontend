@@ -646,7 +646,7 @@ EditTierModal.propTypes = {
   forcedType: PropTypes.string,
 };
 
-export function ContributeCardPreview({ tier, collective }) {
+function ContributeCardPreview({ tier, collective }) {
   const intl = useIntl();
 
   const previewTier = {
@@ -674,7 +674,7 @@ ContributeCardPreview.propTypes = {
   collective: PropTypes.object,
 };
 
-export const editTiersFieldsFragment = gql`
+const editTiersFieldsFragment = gql`
   fragment EditTiersFields on Tier {
     id
     legacyId
@@ -778,7 +778,7 @@ const getRequiredFields = values => {
   return fields;
 };
 
-export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
+function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
   const intl = useIntl();
   const isEditing = React.useMemo(() => !!tier?.id);
   const initialValues = React.useMemo(() => {

@@ -199,4 +199,6 @@ AdminPanelPage.getInitialProps = async ({ query: { slug, section = null, subpath
   };
 };
 
+// ignore unused exports default
+// next.js export
 export default AdminPanelPage;
