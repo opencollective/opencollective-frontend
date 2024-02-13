@@ -16,7 +16,7 @@ export function InfoTooltipIcon({
 }) {
   return (
     <Tooltip delayDuration={100}>
-      <TooltipTrigger className="cursor-help" onClick={e => e.preventDefault()}>
+      <TooltipTrigger className="cursor-help" onClick={e => e.preventDefault()} asChild>
         <InfoIcon size={size} className={cn('text-muted-foreground', className)} />
       </TooltipTrigger>
       <TooltipContent className="max-w-xs" onPointerDownOutside={e => e.preventDefault()}>

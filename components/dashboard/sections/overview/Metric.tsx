@@ -23,7 +23,7 @@ export function getPercentageDifference(current: number, previous?: number) {
   return Math.round(((current - previous) / previous) * 100);
 }
 
-export interface MetricProps extends React.ComponentPropsWithoutRef<'div'> {
+interface BaseMetricProps {
   count?: {
     current: number;
     comparison?: number;
@@ -42,22 +42,34 @@ export interface MetricProps extends React.ComponentPropsWithoutRef<'div'> {
   };
   helpLabel?: React.ReactNode;
   showCurrencyCode?: boolean;
+  showTimeSeries?: boolean;
   expanded?: boolean;
-  withTimeseries?: boolean;
   currency?: Currency;
+  isSnapshot?: boolean;
 }
+
+type MetricDivProps = BaseMetricProps & Omit<React.ComponentPropsWithoutRef<'div'>, 'onClick'>;
+type MetricButtonProps = BaseMetricProps &
+  React.ComponentPropsWithoutRef<'button'> & {
+    onClick: () => void;
+  };
+
+export type MetricProps = MetricDivProps | MetricButtonProps;
+
 export function Metric({
   count,
   amount,
   label,
   loading,
-  onClick,
   timeseries,
   className,
   expanded,
   children,
   showCurrencyCode = false,
+  showTimeSeries = false,
   helpLabel,
+  isSnapshot = false,
+  ...props
 }: MetricProps) {
   let value, comparisonValue;
   if (amount?.current) {
@@ -68,15 +80,18 @@ export function Metric({
     comparisonValue = count.comparison;
   }
   const percentageDiff = getPercentageDifference(value, comparisonValue);
-  // const loading = true;
+  const isButton = 'onClick' in props;
+  const Comp = isButton ? 'button' : 'div';
+
   return (
-    <div
+    <Comp
       className={clsx(
         'group flex flex-col gap-1  rounded-xl border transition-all',
-        onClick && ' cursor-pointer hover:scale-[1.01] hover:shadow-lg',
+        isButton &&
+          'cursor-pointer text-left ring-ring ring-offset-2 hover:shadow-lg focus:outline-none focus-visible:ring-2',
         className,
       )}
-      {...(onClick && { onClick })}
+      {...(isButton && { onClick: props.onClick })}
     >
       <div className="space-y-1 p-3">
         <div>
@@ -112,29 +127,48 @@ export function Metric({
             <Skeleton className="mt-1 h-4 w-1/3" />
           ) : !isNil(comparisonValue) ? (
             <div className="text-sm text-muted-foreground">
-              <FormattedMessage
-                defaultMessage="{countOrAmount} previous period"
-                values={{
-                  countOrAmount: amount ? (
-                    <FormattedMoneyAmount
-                      amount={Math.abs(amount.comparison.valueInCents)}
-                      currency={amount.comparison.currency}
-                      precision={2}
-                      amountStyles={{ letterSpacing: 0 }}
-                      showCurrencyCode={false}
-                    />
-                  ) : (
-                    count.comparison.toLocaleString()
-                  ),
-                }}
-              />
+              {isSnapshot ? (
+                <FormattedMessage
+                  defaultMessage={'{countOrAmount} at start of period'}
+                  values={{
+                    countOrAmount: amount ? (
+                      <FormattedMoneyAmount
+                        amount={Math.abs(amount.comparison.valueInCents)}
+                        currency={amount.comparison.currency}
+                        precision={2}
+                        amountStyles={{ letterSpacing: 0 }}
+                        showCurrencyCode={false}
+                      />
+                    ) : (
+                      count.comparison.toLocaleString()
+                    ),
+                  }}
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage={'{countOrAmount} previous period'}
+                  values={{
+                    countOrAmount: amount ? (
+                      <FormattedMoneyAmount
+                        amount={Math.abs(amount.comparison.valueInCents)}
+                        currency={amount.comparison.currency}
+                        precision={2}
+                        amountStyles={{ letterSpacing: 0 }}
+                        showCurrencyCode={false}
+                      />
+                    ) : (
+                      count.comparison.toLocaleString()
+                    ),
+                  }}
+                />
+              )}
             </div>
           ) : (
             <div className="h-5" />
           )}
         </div>
 
-        {timeseries && (
+        {showTimeSeries && timeseries && (
           <div className={clsx('relative', expanded ? 'h-[220px]' : 'h-[110px]')}>
             {timeseries.current && <ComparisonChart expanded={expanded} {...timeseries} />}
           </div>
@@ -142,7 +176,7 @@ export function Metric({
       </div>
 
       {children && <div className="border-t">{children}</div>}
-    </div>
+    </Comp>
   );
 }
 

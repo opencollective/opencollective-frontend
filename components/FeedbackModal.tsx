@@ -18,12 +18,13 @@ export enum FEEDBACK_KEY {
   HOST_TRANSACTIONS = 'HOST_TRANSACTIONS',
   GENERAL_FEEDBACK = 'GENERAL_FEEDBACK',
   DASHBOARD = 'DASHBOARD',
+  COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
 }
 
 export function FeedbackModal({
   feedbackKey = FEEDBACK_KEY.GENERAL_FEEDBACK,
   title = <FormattedMessage defaultMessage="Provide feedback" />,
-  description = <FormattedMessage defaultMessage="How was your experience?" />,
+  description = <FormattedMessage defaultMessage="How is your experience? What can be improved?" />,
   placeholder = '',
   open,
   setOpen,

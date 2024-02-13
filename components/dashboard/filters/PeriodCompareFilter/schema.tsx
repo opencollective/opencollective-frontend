@@ -27,7 +27,7 @@ export enum PeriodFilterCompare {
 const defaultTimeUnitPerPeriodType = {
   [PeriodFilterType.TODAY]: TimeUnit.HOUR,
   [PeriodFilterType.LAST_7_DAYS]: TimeUnit.DAY,
-  [PeriodFilterType.LAST_4_WEEKS]: TimeUnit.WEEK,
+  [PeriodFilterType.LAST_4_WEEKS]: TimeUnit.DAY,
   [PeriodFilterType.LAST_3_MONTHS]: TimeUnit.MONTH,
   [PeriodFilterType.LAST_12_MONTHS]: TimeUnit.MONTH,
   [PeriodFilterType.MONTH_TO_DATE]: TimeUnit.DAY,
@@ -70,7 +70,7 @@ export const schema = z
     return value;
   })
   .default({
-    type: PeriodFilterType.LAST_3_MONTHS,
+    type: PeriodFilterType.LAST_4_WEEKS,
     compare: PeriodFilterCompare.PREVIOUS_PERIOD,
-    timeUnit: TimeUnit.MONTH,
+    timeUnit: TimeUnit.DAY,
   });
