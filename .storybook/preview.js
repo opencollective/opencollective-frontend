@@ -1,7 +1,7 @@
 import React from 'react';
 import { ApolloProvider } from '@apollo/client';
+import { withDesign } from '@storybook/addon-designs';
 import { IntlProvider } from 'react-intl';
-import { withDesign } from 'storybook-addon-designs';
 import { ThemeProvider } from 'styled-components';
 
 import { initClient } from '../lib/apollo-client';
