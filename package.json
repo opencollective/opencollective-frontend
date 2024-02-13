@@ -156,7 +156,7 @@
     "commit": "git-cz",
     "cypress:open": "cross-env TZ=UTC cypress open --e2e",
     "cypress:run": "cross-env TZ=UTC cypress run",
-    "depcheck": "npx depcheck",
+    "depcheck": "npx @opencollective/depcheck",
     "deploy:production": "cross-env ./scripts/pre-deploy.sh production && git push production main",
     "deploy:staging": "cross-env ./scripts/pre-deploy.sh staging && git push -f staging main",
     "dev": "node server",
@@ -327,21 +327,16 @@
       "prettier --write"
     ]
   },
-  "depcheck": {
+  "@opencollective/depcheck": {
     "ignores": [
       "@babel/types",
-      "@types/webpack-env",
       "@graphql-codegen/gql-tag-operations-preset",
-      "@storybook/*",
-      "@shopify/address",
-      "jest-styled-components",
-      "storybook-addon-designs",
-      "styled-jsx",
-      "esbuild",
-      "tailwindcss",
+      "@types/webpack-env",
       "autoprefixer",
+      "esbuild",
       "postcss",
-      "prettier-plugin-tailwindcss"
+      "prettier-plugin-tailwindcss",
+      "styled-jsx"
     ]
   }
 }

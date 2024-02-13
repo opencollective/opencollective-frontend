@@ -32,10 +32,7 @@ module.exports = {
     return config;
   },
   staticDirs: ['../public'],
-  framework: {
-    name: '@storybook/nextjs',
-    options: {},
-  },
+  framework: '@storybook/nextjs',
   docs: {
     autodocs: true,
   },
