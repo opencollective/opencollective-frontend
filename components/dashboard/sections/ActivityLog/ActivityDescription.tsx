@@ -1,86 +1,84 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import clsx from 'clsx';
 import { capitalize } from 'lodash';
-import { CheckCircle, XCircle } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { Account } from '../../../../lib/graphql/types/v2/graphql';
 import { ActivityDescriptionI18n } from '../../../../lib/i18n/activities';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import formatMemberRole from '../../../../lib/i18n/member-role';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
-import Avatar from '../../../Avatar';
-import FollowButton from '../../../FollowButton';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import LinkExpense from '../../../LinkExpense';
 
-const ResourceTag = ({ children }) => (
-  <div className="inline-block rounded-full bg-slate-100 px-2 py-0.5 text-sm hover:underline">{children}</div>
+const ResourceTag = ({ children, disabled }: { children: React.ReactNode; disabled?: boolean }) => (
+  <div
+    className={clsx(
+      'inline-block rounded-full bg-muted px-2 py-0.5 text-sm',
+      disabled ? 'text-muted-foreground' : 'hover:underline',
+    )}
+  >
+    {children}
+  </div>
 );
-
-const CollectiveTag = ({
-  collective,
-  openInNewTab,
-  displayFollowButton,
-}: {
-  collective: Pick<Account, 'slug' | 'name' | 'type' | 'imageUrl' | 'isIncognito'>;
-  openInNewTab?: boolean;
-  displayFollowButton?: boolean;
-}) => {
-  return (
-    <div className="inline-block">
-      <div className="flex flex-wrap">
-        <ResourceTag>
-          <Avatar collective={collective} radius={14} display="inline-block" verticalAlign="middle" mr={1} mb="1px" />
-          <LinkCollective collective={collective} openInNewTab={openInNewTab} />
-        </ResourceTag>
-        {displayFollowButton && (
-          <FollowButton
-            buttonProps={{ buttonSize: 'tiny', isBorderless: true }}
-            account={collective}
-            followButtonStyle="secondary"
-            followLabel={
-              <React.Fragment>
-                <CheckCircle className="mr-[0.2rem]" size="1rem" />
-                <FormattedMessage defaultMessage="Follow collective" />
-              </React.Fragment>
-            }
-            unfollowLabel={
-              <React.Fragment>
-                <XCircle className="mr-[0.2rem]" size="1rem" />
-                <FormattedMessage defaultMessage="Unfollow collective" />
-              </React.Fragment>
-            }
-          />
-        )}
-      </div>
-    </div>
-  );
-};
 
 export const getActivityVariables = (
   intl,
   activity,
   options?: {
     onClickExpense?: (id: number) => void;
-    displayFollowButton?: boolean;
   },
 ) => ({
   expenseDescription: activity.expense?.description,
-  updateTitle: activity.data?.update?.title,
+  updateTitle: activity.update?.title,
+  conversationTitle: activity.conversation?.title,
   hasParent: Boolean(activity.account?.parent),
   Individual: () => (
-    <span className="font-medium">
-      <LinkCollective collective={activity.individual || activity.fromAccount} className="hover:underline" />
-    </span>
+    <LinkCollective
+      collective={activity.individual}
+      withHoverCard
+      className="font-medium hover:underline"
+      hoverCardProps={{
+        includeAdminMembership: {
+          hostSlug: activity.host?.slug,
+          accountSlug: activity.account?.slug,
+        },
+      }}
+    />
   ),
-  FromAccount: () => <CollectiveTag collective={activity.fromAccount} />,
-  Account: () => <CollectiveTag collective={activity.account} displayFollowButton={options?.displayFollowButton} />,
+  IndividualOrAccount: () => (
+    <LinkCollective
+      collective={activity.individual || activity.account}
+      withHoverCard
+      className="font-medium hover:underline"
+      {...(activity.individual && {
+        hoverCardProps: {
+          includeAdminMembership: {
+            hostSlug: activity.host?.slug,
+            accountSlug: activity.account?.slug,
+          },
+        },
+      })}
+    />
+  ),
+  FromAccount: () => (
+    <LinkCollective collective={activity.fromAccount} withHoverCard className="font-medium hover:underline" />
+  ),
+  Account: () => (
+    <LinkCollective
+      collective={activity.account}
+      withHoverCard
+      hoverCardProps={{ displayFollowButton: true }}
+      className="font-medium hover:underline"
+    />
+  ),
   AccountType: () => formatCollectiveType(intl, activity.account?.type || 'COLLECTIVE'),
-  AccountParent: () => <CollectiveTag collective={activity.account?.parent} />,
+  AccountParent: () => (
+    <LinkCollective collective={activity.account?.parent} withHoverCard className="font-medium hover:underline" />
+  ),
   Amount: msg => {
     if (!activity.expense) {
       return msg;
@@ -95,10 +93,17 @@ export const getActivityVariables = (
       />
     );
   },
-  Payee: msg => (!activity.expense ? msg : <CollectiveTag collective={activity.expense.payee} />),
-  Expense: msg =>
+  Payee: msg =>
     !activity.expense ? (
       msg
+    ) : (
+      <LinkCollective collective={activity.expense.payee} withHoverCard className="font-medium hover:underline" />
+    ),
+  Expense: msg =>
+    !activity.expense ? (
+      <ResourceTag disabled>
+        <FormattedMessage defaultMessage="Deleted expense" />
+      </ResourceTag>
     ) : (
       <ResourceTag>
         <LinkExpense
@@ -111,8 +116,10 @@ export const getActivityVariables = (
         </LinkExpense>
       </ResourceTag>
     ),
-  Host: () => <CollectiveTag collective={activity.host} />,
-  Vendor: () => <CollectiveTag collective={activity.data?.vendor} />,
+  Host: () => <LinkCollective collective={activity.host} withHoverCard className="font-medium hover:underline" />,
+  Vendor: () => (
+    <LinkCollective collective={activity.data?.vendor} withHoverCard className="font-medium hover:underline" />
+  ),
   CommentEntity: () => {
     if (activity.expense) {
       return (
@@ -129,7 +136,7 @@ export const getActivityVariables = (
       );
     } else {
       // We're not yet linking conversations & updates to comments in the activity table
-      return <CollectiveTag collective={activity.account} />;
+      return <LinkCollective collective={activity.account} withHoverCard className="font-medium hover:underline" />;
     }
   },
   Order: msg =>
@@ -153,6 +160,19 @@ export const getActivityVariables = (
         <Link
           href={`${getCollectivePageRoute(activity.account)}/updates/${activity.update.slug}`}
           title={activity.update.title}
+        >
+          {msg}
+        </Link>
+      </ResourceTag>
+    ),
+  Conversation: msg =>
+    !activity.conversation ? (
+      msg
+    ) : (
+      <ResourceTag>
+        <Link
+          href={`${getCollectivePageRoute(activity.account)}/conversations/${activity.conversation.slug}-${activity.conversation.id}`}
+          title={activity.conversation.title}
         >
           {msg}
         </Link>

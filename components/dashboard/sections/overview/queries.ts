@@ -18,7 +18,9 @@ export const timelineQuery = gql`
           slug
           type
           isIncognito
-          imageUrl(height: 48)
+          ...AccountHoverCardFields
+
+          imageUrl
           ... on Individual {
             isGuest
           }
@@ -35,7 +37,8 @@ export const timelineQuery = gql`
           slug
           type
           isIncognito
-          imageUrl(height: 48)
+          ...AccountHoverCardFields
+          imageUrl
           ... on Individual {
             isGuest
           }
@@ -61,12 +64,14 @@ export const timelineQuery = gql`
             name
             slug
             imageUrl
+            ...AccountHoverCardFields
           }
           account {
             id
             name
             type
             slug
+            ...AccountHoverCardFields
             ... on AccountWithParent {
               parent {
                 id
@@ -98,17 +103,25 @@ export const timelineQuery = gql`
           summary
           slug
         }
+        conversation {
+          id
+          title
+          summary
+          slug
+        }
         individual {
           id
           slug
           name
           type
-          imageUrl(height: 48)
+          imageUrl
           isIncognito
+          ...AccountHoverCardFields
         }
       }
     }
   }
+  ${accountHoverCardFields}
 `;
 
 export const collectiveBalanceQuery = gql`

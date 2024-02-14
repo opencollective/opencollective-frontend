@@ -133,6 +133,16 @@ const activityLogQuery = gql`
             }
           }
         }
+        update {
+          id
+          slug
+          title
+        }
+        conversation {
+          id
+          slug
+          title
+        }
         individual {
           id
           slug
