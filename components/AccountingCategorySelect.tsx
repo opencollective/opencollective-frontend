@@ -17,7 +17,7 @@ import { fetchExpenseCategoryPredictions } from '../lib/ml-service';
 import { cn } from '../lib/utils';
 import { ACCOUNTING_CATEGORY_HOST_FIELDS } from './expenses/lib/accounting-categories';
 
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from './ui/Command';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
 
 type RequiredHostFields = Pick<Host, 'slug'> & {
@@ -341,46 +341,49 @@ const AccountingCategorySelect = ({
         <PopoverContent className="z-[5000] min-w-[280px] p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
           <Command filter={(categoryId, search) => (options[categoryId]?.searchText.includes(search) ? 1 : 0)}>
             {size(options) > 6 && <CommandInput placeholder="Filter by name" />}
-            <CommandEmpty>
-              <FormattedMessage defaultMessage="No category found" />
-            </CommandEmpty>
-            <CommandGroup className="max-h-[300px] overflow-y-auto">
-              {Object.entries(options).map(([categoryId, { label }]) => {
-                const isSelected = selectedCategory?.id === categoryId;
-                const isPrediction = predictions?.some(prediction => prediction.id === categoryId);
-                return (
-                  <React.Fragment key={categoryId}>
-                    <CommandItem
-                      value={categoryId}
-                      className={cn('block p-3 text-xs', { 'font-semibold': isSelected })}
-                      onSelect={categoryId => {
-                        triggerChange(options[categoryId].value);
-                        setOpen(false);
-                      }}
-                    >
-                      <div className="flex justify-between" data-cy="xxx">
-                        <span
-                          className={
-                            // If there are predictions, grey out the categories that are not selected or predicted
-                            isSelected || isPrediction || !hasPredictions ? 'text-neutral-900' : 'text-gray-600'
-                          }
-                        >
-                          {label}
-                        </span>
-                        {isPrediction && (
+
+            <CommandList>
+              <CommandEmpty>
+                <FormattedMessage defaultMessage="No category found" />
+              </CommandEmpty>
+              <CommandGroup>
+                {Object.entries(options).map(([categoryId, { label }]) => {
+                  const isSelected = selectedCategory?.id === categoryId;
+                  const isPrediction = predictions?.some(prediction => prediction.id === categoryId);
+                  return (
+                    <React.Fragment key={categoryId}>
+                      <CommandItem
+                        value={categoryId}
+                        className={cn('block p-3 text-xs', { 'font-semibold': isSelected })}
+                        onSelect={categoryId => {
+                          triggerChange(options[categoryId].value);
+                          setOpen(false);
+                        }}
+                      >
+                        <div className="flex justify-between" data-cy="xxx">
                           <span
-                            className="text-right text-xs text-gray-500"
-                            title={intl.formatMessage({ defaultMessage: 'Suggested' })}
+                            className={
+                              // If there are predictions, grey out the categories that are not selected or predicted
+                              isSelected || isPrediction || !hasPredictions ? 'text-neutral-900' : 'text-gray-600'
+                            }
                           >
-                            <Sparkles size={16} className="mr-1 inline-block text-yellow-500" strokeWidth={1.5} />
+                            {label}
                           </span>
-                        )}
-                      </div>
-                    </CommandItem>
-                  </React.Fragment>
-                );
-              })}
-            </CommandGroup>
+                          {isPrediction && (
+                            <span
+                              className="text-right text-xs text-gray-500"
+                              title={intl.formatMessage({ defaultMessage: 'Suggested' })}
+                            >
+                              <Sparkles size={16} className="mr-1 inline-block text-yellow-500" strokeWidth={1.5} />
+                            </span>
+                          )}
+                        </div>
+                      </CommandItem>
+                    </React.Fragment>
+                  );
+                })}
+              </CommandGroup>
+            </CommandList>
           </Command>
         </PopoverContent>
       </Popover>
