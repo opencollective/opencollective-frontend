@@ -136,7 +136,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
   return (
     <Fragment>
       {isEditingCover && <HeroBackgroundCropperModal collective={collective} onClose={() => editCover(false)} />}
-      {isEditingTags && <EditTagsModal collective={collective} onClose={() => editTags(false)} />}
+      <EditTagsModal open={isEditingTags} setOpen={editTags} collective={collective} onClose={() => editTags(false)} />
 
       <Container position="relative" minHeight={325} zIndex={1000} data-cy="collective-hero">
         <HeroBackground collective={collective} />

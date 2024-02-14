@@ -15,6 +15,9 @@ import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledInputFormikField from './StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/Dialog';
+import { AutocompleteEditTags } from './EditTags';
+import { Button } from './ui/Button';
 
 const tagStatsQuery = gql`
   query TagStats($host: AccountReferenceInput) {
@@ -29,10 +32,12 @@ const tagStatsQuery = gql`
 
 export type EditTagsModalProps = {
   collective: Collective;
+  open: boolean;
+  setOpen: (open: boolean) => void;
   onClose: () => void;
 };
 
-export default function EditTagsModal({ collective, onClose }: EditTagsModalProps) {
+export default function EditTagsModal({ collective, onClose, open, setOpen }: EditTagsModalProps) {
   const [editTags, { loading }] = useMutation(editTagsMutation);
 
   const { data: { tagStats } = { tagStats: null } } = useQuery(tagStatsQuery, {
@@ -40,6 +45,7 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
     context: API_V2_CONTEXT,
   });
 
+  const variables = { ...(collective.host?.slug ? { host: { slug: collective.host.slug } } : {}) };
   const initialValues = {
     tags: collective.tags,
   };
@@ -80,6 +86,60 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
     onClose?.();
   };
 
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            <FormattedMessage defaultMessage="Edit tags" />
+          </DialogTitle>
+          <DialogDescription>
+            <FormattedMessage
+              id="collective.tags.info"
+              defaultMessage="Tags help you improve your group’s discoverability and connect with similar initiatives across the world."
+            />
+          </DialogDescription>
+        </DialogHeader>
+        <Formik initialValues={initialValues} onSubmit={submit}>
+          {formik => (
+            <Form onSubmit={formik.handleSubmit}>
+              <StyledInputFormikField
+                name="tags"
+                htmlFor="tags"
+                labelProps={{ fontWeight: 500, fontSize: '14px', lineHeight: '17px' }}
+              >
+                {({ field }) => {
+                  return (
+                    <AutocompleteEditTags
+                      query={tagStatsQuery}
+                      variables={variables}
+                      {...field}
+                      defaultValue={formik.values.tags}
+                      // disabled={loading}
+                      onChange={tags => {
+                        formik.setFieldValue(
+                          'tags',
+                          tags.map(t => t.value.toLowerCase()),
+                        );
+                      }}
+                    />
+                  );
+                }}
+              </StyledInputFormikField>
+              <DialogFooter>
+                <Button variant="outline" disabled={loading} type="button" onClick={handleClose}>
+                  <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+                </Button>
+                <Button loading={loading} disabled={!formik.dirty} type="submit">
+                  <FormattedMessage id="save" defaultMessage="Save" />
+                </Button>
+              </DialogFooter>
+            </Form>
+          )}
+        </Formik>
+      </DialogContent>
+    </Dialog>
+  );
   return (
     <StyledModal maxWidth="500px" onClose={handleClose}>
       <Formik initialValues={initialValues} onSubmit={submit}>

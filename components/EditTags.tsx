@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { DocumentNode, useLazyQuery } from '@apollo/client';
 import { debounce, uniqBy } from 'lodash';
 import { Search, Tags, TagsIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-
+import { DndContext, DragOverlay } from '@dnd-kit/core';
+import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { AccountReferenceInput, InputMaybe, Scalars } from '../lib/graphql/types/v2/graphql';
+import { CSS } from '@dnd-kit/utilities';
 
 import { Button } from './ui/Button';
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/Command';
@@ -83,6 +85,31 @@ export const AutocompleteEditTags = ({ query, variables, ...props }: Autocomplet
   return <EditTags {...props} suggestedTags={suggestedTags} loading={loading} searchFunc={searchFunc} />;
 };
 
+const SortableTag = ({ children, ...props }) => {
+  const { attributes, isDragging, listeners, setNodeRef, transform, transition } = useSortable({
+    id: props.value,
+  });
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+    opacity: isDragging ? '0.4' : undefined,
+  };
+  return (
+    <div style={style} ref={setNodeRef} {...attributes} {...listeners}>
+      <StyledTag
+        // m="4px"
+        variant="rounded-right"
+        // maxHeight="none"
+        style={{ cursor: 'grab' }}
+        // onMouseDown={onMouseDown}
+        closeButtonProps={{ ...props.removeProps, isFocused: props.isFocused, onPointerDown: e => e.stopPropagation() }}
+      >
+        {children}
+      </StyledTag>
+    </div>
+  );
+};
+
 const EditTags = ({ suggestedTags, loading, searchFunc, value, onChange, defaultValue, disabled }: EditTagsProps) => {
   const intl = useIntl();
   const [tags, setTags] = React.useState(getOptions(value || defaultValue));
@@ -110,22 +137,78 @@ const EditTags = ({ suggestedTags, loading, searchFunc, value, onChange, default
 
   const options = getOptions(suggestedTags ?? []);
   const filteredOptions = options?.filter(o => !value?.includes(o.value) && o.value !== inputValue);
+  const [draggingTag, setDraggingTag] = useState<string | null>(null);
+
+  function handleDragOver(event) {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setTags(tags => {
+        const oldIndex = tags.findIndex(item => item.value === active.id);
+        const newIndex = tags.findIndex(item => item.value === over.id);
+        return arrayMove(tags, oldIndex, newIndex);
+      });
+    }
+  }
+
+  // Fix to avoid infinite loop caused by dragging over two items with variable sizes: https://github.com/clauderic/dnd-kit/issues/44#issuecomment-1018686592
+  const debouncedDragOver = useCallback(
+    debounce(handleDragOver, 40, {
+      trailing: false,
+      leading: true,
+    }),
+    [],
+  );
+
+  function handleDragStart(event) {
+    setDraggingTag(event.active.id);
+  }
+
+  function handleDragEnd() {
+    setDraggingTag(null);
+    onChange(tags);
+  }
 
   return (
     <div className="flex flex-wrap items-center gap-1">
-      {tags.map(tag => (
-        <StyledTag
-          key={tag.value}
-          variant="rounded-right"
-          color={disabled ? 'black.500' : 'black.700'}
-          closeButtonProps={{
-            onClick: () => removeTag(tag.value, true),
-            disabled,
-          }}
-        >
-          {tag.label}
-        </StyledTag>
-      ))}
+      <DndContext
+        onDragStart={handleDragStart}
+        onDragOver={debouncedDragOver}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragEnd}
+      >
+        <SortableContext items={tags.map(o => o.value)}>
+          {tags.map(tag => (
+            <SortableTag
+              key={tag.value}
+              value={tag.value}
+              variant="rounded-right"
+              color={disabled ? 'black.500' : 'black.700'}
+              closeButtonProps={{
+                onClick: () => removeTag(tag.value, true),
+                disabled,
+              }}
+            >
+              {tag.label}
+            </SortableTag>
+          ))}
+        </SortableContext>
+        <DragOverlay>
+          {draggingTag ? (
+            <StyledTag
+              m="4px"
+              variant="rounded-right"
+              style={{ cursor: 'grabbing', color: 'black' }}
+              maxHeight="none"
+              backgroundColor="black.200"
+              closeButtonProps={true}
+            >
+              {draggingTag}
+            </StyledTag>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
+
       <Popover>
         <PopoverTrigger asChild>
           <Button
