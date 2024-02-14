@@ -33,6 +33,8 @@ import {
 
 import AccountingCategorySelect, { isSupportedExpenseCategory } from '../AccountingCategorySelect';
 import ConfirmationModal from '../ConfirmationModal';
+import { expenseTagsQuery } from '../dashboard/filters/ExpenseTagsFilter';
+import { AutocompleteEditTags } from '../EditTags';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
 import { serializeAddress } from '../I18nAddressFields';
@@ -44,7 +46,6 @@ import StyledCard from '../StyledCard';
 import { StyledCurrencyPicker } from '../StyledCurrencyPicker';
 import StyledHr from '../StyledHr';
 import StyledInputFormikField from '../StyledInputFormikField';
-import StyledInputTags from '../StyledInputTags';
 import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
 
@@ -299,7 +300,6 @@ const ExpenseFormBody = ({
   formPersister,
   loggedInAccount,
   loading,
-  expensesTags,
   shouldLoadValuesFromPersister,
   isDraft,
   defaultStep,
@@ -718,8 +718,9 @@ const ExpenseFormBody = ({
                     </Span>
                     <Flex alignItems="flex-start" mt={2}>
                       <ExpenseTypeTag type={values.type} mr="4px" />
-                      <StyledInputTags
-                        suggestedTags={expensesTags}
+                      <AutocompleteEditTags
+                        query={expenseTagsQuery}
+                        variables={{ account: { slug: collective.slug } }}
                         onChange={tags => {
                           formik.setFieldValue(
                             'tags',
@@ -922,7 +923,6 @@ ExpenseFormBody.propTypes = {
   loggedInAccount: PropTypes.object,
   loading: PropTypes.bool,
   isDraft: PropTypes.bool,
-  expensesTags: PropTypes.arrayOf(PropTypes.string),
   host: PropTypes.shape({
     transferwise: PropTypes.shape({
       availableCurrencies: PropTypes.arrayOf(PropTypes.object),
@@ -981,7 +981,6 @@ const ExpenseForm = ({
   formPersister,
   loggedInAccount,
   loading,
-  expensesTags,
   shouldLoadValuesFromPersister,
   defaultStep,
   drawerActionsContainer,
@@ -1029,7 +1028,6 @@ const ExpenseForm = ({
           onCancel={onCancel}
           formPersister={formPersister}
           loggedInAccount={loggedInAccount}
-          expensesTags={expensesTags}
           loading={loading}
           shouldLoadValuesFromPersister={shouldLoadValuesFromPersister}
           isDraft={isDraft}
@@ -1052,7 +1050,6 @@ ExpenseForm.propTypes = {
   formPersister: PropTypes.object,
   loggedInAccount: PropTypes.object,
   loading: PropTypes.bool,
-  expensesTags: PropTypes.arrayOf(PropTypes.string),
   /** Defines the default selected step, if accessible (previous steps need to be completed) */
   defaultStep: PropTypes.oneOf(Object.values(EXPENSE_FORM_STEPS)),
   host: PropTypes.shape({

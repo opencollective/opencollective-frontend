@@ -92,7 +92,6 @@ const ExpenseSummary = ({
   isEditing,
   borderless = undefined,
   canEditTags,
-  suggestedTags,
   showProcessButtons,
   onClose = undefined,
   onDelete,
@@ -211,7 +210,7 @@ const ExpenseSummary = ({
             <Separator orientation="vertical" className="h-[24px] w-[2px]" />
           </React.Fragment>
         )}
-        <Tags expense={expense} isLoading={isLoading} canEdit={canEditTags} suggestedTags={suggestedTags} />
+        <Tags expense={expense} isLoading={isLoading} canEdit={canEditTags} />
       </div>
       <Flex alignItems="center" mt="12px">
         {isLoading && !expense ? (
@@ -644,8 +643,6 @@ ExpenseSummary.propTypes = {
   }),
   /** Whether current user can edit the tags */
   canEditTags: PropTypes.bool,
-  /** If canEdit is true, this array is used to display suggested tags */
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
   /** Whether or not this is being displayed for an edited Expense */
   isEditing: PropTypes.bool,
   /** Whether to show the process buttons (Approve, Pay, etc) */

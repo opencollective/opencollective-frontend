@@ -4,7 +4,6 @@ import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { getSuggestedTags } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -87,8 +86,6 @@ const Expenses = props => {
       return { type: 'info', closeButtonProps: true };
     }
   }
-
-  const suggestedTags = React.useMemo(() => getSuggestedTags(data?.account), [data?.account]);
 
   const isSelfHosted = data?.account?.id === data?.account?.host?.id;
 
@@ -173,7 +170,6 @@ const Expenses = props => {
                 host={data?.account?.host ?? (data?.account?.isHost ? data?.account : null)}
                 expenses={data?.expenses?.nodes}
                 nbPlaceholders={variables.limit}
-                suggestedTags={suggestedTags}
                 isInverted={query.direction === 'SUBMITTED'}
                 view={query.direction === 'SUBMITTED' ? 'submitter' : undefined}
                 useDrawer={isDashboard}
