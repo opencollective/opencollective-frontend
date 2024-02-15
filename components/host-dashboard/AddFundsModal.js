@@ -523,10 +523,12 @@ const AddFundsModal = ({ collective, ...props }) => {
                       inputType="date"
                       label={
                         <span>
-                          <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
+                          <FormattedMessage defaultMessage="Effective Date" />
                           {` `}
                           <StyledTooltip
-                            content={() => <FormattedMessage defaultMessage="Date the funds were received." />}
+                            content={() => (
+                              <FormattedMessage defaultMessage="Date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
+                            )}
                           >
                             <InfoCircle size={16} />
                           </StyledTooltip>

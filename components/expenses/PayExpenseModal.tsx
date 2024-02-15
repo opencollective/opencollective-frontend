@@ -26,6 +26,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledButtonSet from '../StyledButtonSet';
 import StyledCheckbox from '../StyledCheckbox';
+import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
@@ -563,6 +564,29 @@ const PayExpenseModal = ({
                       }
                       onChange={({ value }) => formik.setFieldValue('paymentMethodService', value)}
                       {...inputProps}
+                    />
+                  )}
+                </StyledInputField>
+                <StyledInputField
+                  name="clearedAt"
+                  htmlFor="clearedAt"
+                  error={formik.errors.clearedAt}
+                  required={false}
+                  mt={3}
+                  label={<FormattedMessage defaultMessage="Effective Date" />}
+                  hint={
+                    <FormattedMessage defaultMessage="Date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
+                  }
+                >
+                  {inputProps => (
+                    <StyledInput
+                      {...inputProps}
+                      id="clearedAt"
+                      name="clearedAt"
+                      type="date"
+                      data-cy="clearedAt"
+                      defaultValue={formik.values.clearedAt}
+                      onChange={e => formik.setFieldValue('clearedAt', new Date(e.target.value))}
                     />
                   )}
                 </StyledInputField>

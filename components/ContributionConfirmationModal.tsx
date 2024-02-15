@@ -322,9 +322,13 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
             <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
               <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-processedAt">
                 <span>
-                  <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
+                  <FormattedMessage defaultMessage="Effective Date" />
                   {` `}
-                  <StyledTooltip content={() => <FormattedMessage defaultMessage="Date the funds were received." />}>
+                  <StyledTooltip
+                    content={() => (
+                      <FormattedMessage defaultMessage="Date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
+                    )}
+                  >
                     <InfoCircle size={16} />
                   </StyledTooltip>
                 </span>
