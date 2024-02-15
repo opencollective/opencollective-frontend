@@ -1,6 +1,6 @@
 import React from 'react';
 import { get, isUndefined, pick, remove, size, throttle, uniq } from 'lodash';
-import { ChevronDown, Sparkles } from 'lucide-react';
+import { Check, ChevronDown, Sparkles } from 'lucide-react';
 import { defineMessages, FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
 import {
@@ -97,8 +97,7 @@ const getSelectionInfoForLabel = (
   if (rolesHaveSelectedCategory.some(Boolean)) {
     const rolesToDisplay = roles.filter((_, index) => rolesHaveSelectedCategory[index]);
     return (
-      <span className="ml-1 text-xs font-normal italic text-gray-500">
-        {'• '}
+      <span className="text-xs font-normal italic text-muted-foreground">
         <FormattedMessage
           id="accountingCategory.selectedBy"
           defaultMessage="Selected by {nbRoles, select, 1 {{role1}} 2 {{role1} and {role2}} other {{role1}, {role2} and {role3}}}."
@@ -141,8 +140,11 @@ const getCategoryLabel = (
   const selectionInfo = getSelectionInfoForLabel(intl, category, valuesByRole);
   return (
     <React.Fragment>
-      {showCode && category && <span className="mr-2 italic text-neutral-700">#{category.code}</span>}
-      {categoryStr}
+      <div className="space-x-1.5">
+        {showCode && category && <span className="text-muted-foreground">{category.code}</span>}
+        <span>{categoryStr}</span>
+      </div>
+
       {selectionInfo}
     </React.Fragment>
   );
@@ -338,7 +340,7 @@ const AccountingCategorySelect = ({
             </button>
           )}
         </PopoverTrigger>
-        <PopoverContent className="z-[5000] min-w-[280px] p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+        <PopoverContent className="min-w-[280px] p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
           <Command filter={(categoryId, search) => (options[categoryId]?.searchText.includes(search) ? 1 : 0)}>
             {size(options) > 6 && <CommandInput placeholder="Filter by name" />}
 
@@ -354,29 +356,34 @@ const AccountingCategorySelect = ({
                     <React.Fragment key={categoryId}>
                       <CommandItem
                         value={categoryId}
-                        className={cn('block p-3 text-xs', { 'font-semibold': isSelected })}
                         onSelect={categoryId => {
                           triggerChange(options[categoryId].value);
                           setOpen(false);
                         }}
                       >
-                        <div className="flex justify-between" data-cy="xxx">
+                        <div className="flex flex-1 items-start justify-between" data-cy="xxx">
                           <span
                             className={
                               // If there are predictions, grey out the categories that are not selected or predicted
-                              isSelected || isPrediction || !hasPredictions ? 'text-neutral-900' : 'text-gray-600'
+                              isSelected || isPrediction || !hasPredictions
+                                ? 'text-foreground'
+                                : 'text-muted-foreground'
                             }
                           >
                             {label}
                           </span>
-                          {isPrediction && (
-                            <span
-                              className="text-right text-xs text-gray-500"
-                              title={intl.formatMessage({ defaultMessage: 'Suggested' })}
-                            >
-                              <Sparkles size={16} className="mr-1 inline-block text-yellow-500" strokeWidth={1.5} />
-                            </span>
-                          )}
+                          <div className="flex items-center gap-1 pt-0.5">
+                            {isSelected && <Check size={16} className="ml-2 inline-block" />}
+
+                            {isPrediction && (
+                              <span
+                                className="text-right text-xs text-gray-500"
+                                title={intl.formatMessage({ defaultMessage: 'Suggested' })}
+                              >
+                                <Sparkles size={16} className="mr-1 inline-block text-yellow-500" strokeWidth={1.5} />
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </CommandItem>
                     </React.Fragment>
