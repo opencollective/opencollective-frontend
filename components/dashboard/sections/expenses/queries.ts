@@ -113,9 +113,12 @@ export const accountExpensesMetadataQuery = gql`
         }
       }
       ... on Organization {
-        # We add that for hasFeature
         isHost
         isActive
+        host {
+          id
+          ...ExpenseHostFields
+        }
       }
     }
     expenseTagStats(account: { slug: $accountSlug }) {

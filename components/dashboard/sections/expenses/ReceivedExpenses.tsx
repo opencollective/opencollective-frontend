@@ -129,10 +129,9 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
           <ExpensesList
             isLoading={loading || loadingMetaData}
             collective={metadata?.account}
-            host={metadata?.account?.isHost ? metadata?.account : metadata?.account?.host}
+            host={metadata?.account?.host}
             expenses={data?.expenses?.nodes}
             nbPlaceholders={queryFilter.values.limit}
-            // suggestedTags={suggestedTags}
             useDrawer
             openExpenseLegacyId={Number(router.query.openExpenseId)}
             setOpenExpenseLegacyId={legacyId => {
