@@ -89,6 +89,7 @@ const transactionQuery = gql`
       kind
       description
       createdAt
+      clearedAt
       isRefunded
       isRefund
       isInReview
@@ -513,7 +514,6 @@ export function TransactionDrawer({
                     </CopyID>
                   }
                 />
-
                 <DataList
                   title={<FormattedMessage id="expense.incurredAt" defaultMessage="Date" />}
                   value={
@@ -522,11 +522,32 @@ export function TransactionDrawer({
                     )
                   }
                 />
+                {transaction?.clearedAt && (
+                  <DataList
+                    title={
+                      <div className="flex items-center gap-1">
+                        <FormattedMessage defaultMessage="Effective Date" />
+                        <Tooltip>
+                          <TooltipTrigger className="cursor-help" onClick={e => e.preventDefault()}>
+                            <InfoIcon size={16} />
+                          </TooltipTrigger>
+                          <TooltipContent onPointerDownOutside={e => e.preventDefault()}>
+                            <FormattedMessage defaultMessage="Date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    }
+                    value={
+                      transaction.clearedAt && (
+                        <DateTime dateStyle="medium" timeStyle="short" value={transaction.clearedAt} />
+                      )
+                    }
+                  />
+                )}
                 <DataList
                   title={<FormattedMessage defaultMessage="Type" />}
                   value={i18nTransactionType(intl, transaction?.type)}
                 />
-
                 <DataList
                   title={<FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />}
                   value={
