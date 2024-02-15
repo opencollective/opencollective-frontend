@@ -186,6 +186,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
     refetch();
   };
 
+  const isUnhosted = queryFilter.values?.isUnhosted === true;
   const hostedAccounts = data?.host?.hostedAccounts;
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
@@ -203,7 +204,14 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
           <DataTable
             data-cy="transactions-table"
             innerClassName="text-muted-foreground"
-            columns={[cols.collective, cols.team, cols.fee, cols.hostedSince, cols.balance, cols.actions]}
+            columns={compact([
+              cols.collective,
+              cols.team,
+              !isUnhosted && cols.fee,
+              !isUnhosted && cols.hostedSince,
+              cols.balance,
+              cols.actions,
+            ])}
             data={hostedAccounts?.nodes || []}
             loading={loading}
             mobileTableView
