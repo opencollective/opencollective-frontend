@@ -1,6 +1,6 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { groupBy, mapValues, toPairs } from 'lodash';
+import { groupBy, isNil, mapValues, toPairs } from 'lodash';
 import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Unlink } from 'lucide-react';
 import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
 
@@ -86,7 +86,9 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     header: () => <FormattedMessage defaultMessage="Fee" />,
     cell: ({ row }) => {
       const collective = row.original;
-      return (
+      return isNil(collective.hostFeePercent) ? (
+        ''
+      ) : (
         <div className="whitespace-nowrap">
           {collective.hostFeesStructure === HOST_FEE_STRUCTURE.DEFAULT
             ? `(${collective.hostFeePercent}%)`
@@ -100,7 +102,9 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     header: () => <FormattedMessage id="HostedSince" defaultMessage="Hosted since" />,
     cell: ({ row }) => {
       const since = row.original.approvedAt;
-      return (
+      return isNil(since) ? (
+        ''
+      ) : (
         <div className="whitespace-nowrap">
           <FormattedDate value={since} day="numeric" month="long" year="numeric" />
         </div>
