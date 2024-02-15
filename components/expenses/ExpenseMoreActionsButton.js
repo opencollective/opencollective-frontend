@@ -13,7 +13,7 @@ import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { get } from 'lodash';
 import { ArrowRightLeft, FileText } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { margin } from 'styled-system';
 
@@ -21,15 +21,13 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import useClipboard from '../../lib/hooks/useClipboard';
 import { getCollectivePageCanonicalURL, getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
-import { withUser } from '../UserProvider';
 import { useToast } from '../ui/useToast';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { DownloadLegalDocument } from '../legal-documents/DownloadLegalDocument';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
-import { useToast } from '../ui/useToast';
-import { withUser } from '../UserProvider';
 
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
@@ -89,7 +87,6 @@ const ExpenseMoreActionsButton = ({
   linkAction,
   onModalToggle,
   onDelete,
-  LoggedInUser,
   ...props
 }) => {
   const [processModal, setProcessModal] = React.useState(false);
@@ -97,6 +94,7 @@ const ExpenseMoreActionsButton = ({
   const { isCopied, copy } = useClipboard();
   const { account } = React.useContext(DashboardContext);
   const { toast } = useToast();
+  const intl = useIntl();
 
   const router = useRouter();
   const permissions = expense?.permissions;
@@ -104,6 +102,8 @@ const ExpenseMoreActionsButton = ({
   const processExpense = useProcessExpense({
     expense,
   });
+
+  const { LoggedInUser } = useLoggedInUser();
 
   const showDeleteConfirmMoreActions = isOpen => {
     setDeleteConfirm(isOpen);
@@ -115,6 +115,11 @@ const ExpenseMoreActionsButton = ({
   if (!permissions) {
     return null;
   }
+
+  const spamNotAllowedMessage = defineMessage({
+    id: 'expense.spam.notAllowed',
+    defaultMessage: "You can't mark your own expenses as spam",
+  });
 
   return (
     <React.Fragment>
@@ -148,7 +153,7 @@ const ExpenseMoreActionsButton = ({
                   if (isSubmitter) {
                     toast({
                       variant: 'error',
-                      message: "You can't mark your own expenses as spam",
+                      message: intl.formatMessage(spamNotAllowedMessage),
                     });
 
                     return;
@@ -350,7 +355,6 @@ ExpenseMoreActionsButton.propTypes = {
   onEdit: PropTypes.func,
   linkAction: PropTypes.oneOf(['link', 'copy']),
   isViewingExpenseInHostContext: PropTypes.bool,
-  LoggedInUser: PropTypes.object,
 };
 
 ExpenseMoreActionsButton.defaultProps = {
@@ -358,4 +362,4 @@ ExpenseMoreActionsButton.defaultProps = {
   isViewingExpenseInHostContext: false,
 };
 
-export default withUser(ExpenseMoreActionsButton);
+export default ExpenseMoreActionsButton;
