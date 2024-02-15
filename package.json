@@ -156,7 +156,7 @@
     "commit": "git-cz",
     "cypress:open": "cross-env TZ=UTC cypress open --e2e",
     "cypress:run": "cross-env TZ=UTC cypress run",
-    "depcheck": "npx depcheck",
+    "depcheck": "npx @opencollective/depcheck",
     "deploy:production": "cross-env ./scripts/pre-deploy.sh production && git push production main",
     "deploy:staging": "cross-env ./scripts/pre-deploy.sh staging && git push -f staging main",
     "dev": "node server",
@@ -204,7 +204,6 @@
     "@babel/core": "^7.23.5",
     "@babel/eslint-parser": "^7.23.3",
     "@babel/node": "^7.22.19",
-    "@babel/types": "^7.23.5",
     "@cypress/code-coverage": "^3.12.12",
     "@formatjs/cli": "^6.2.4",
     "@graphql-codegen/cli": "5.0.2",
@@ -216,14 +215,12 @@
     "@rollup/plugin-image": "^3.0.3",
     "@rollup/plugin-json": "^6.0.1",
     "@rollup/plugin-typescript": "^10.0.1",
-    "@storybook/addon-actions": "7.6.15",
     "@storybook/addon-docs": "7.6.15",
     "@storybook/addon-essentials": "7.6.15",
     "@storybook/addon-links": "7.6.15",
     "@storybook/addon-mdx-gfm": "7.6.15",
     "@storybook/addons": "7.6.15",
     "@storybook/nextjs": "7.6.15",
-    "@storybook/react": "7.6.15",
     "@storybook/theming": "7.6.15",
     "@types/apollo-upload-client": "17.0.5",
     "@types/cookie": "^0.6.0",
@@ -327,21 +324,15 @@
       "prettier --write"
     ]
   },
-  "depcheck": {
+  "@opencollective/depcheck": {
     "ignores": [
-      "@babel/types",
-      "@types/webpack-env",
       "@graphql-codegen/gql-tag-operations-preset",
-      "@storybook/*",
-      "@shopify/address",
-      "jest-styled-components",
-      "storybook-addon-designs",
-      "styled-jsx",
-      "esbuild",
-      "tailwindcss",
+      "@types/webpack-env",
       "autoprefixer",
+      "esbuild",
       "postcss",
-      "prettier-plugin-tailwindcss"
+      "prettier-plugin-tailwindcss",
+      "styled-jsx"
     ]
   }
 }
