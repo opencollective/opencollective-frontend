@@ -57,6 +57,14 @@ const ActivitySwitch = ({ account, activityType }) => {
     refetchQueries: [{ query: refetchEmailNotificationQuery, variables: { id: account.id }, context: API_V2_CONTEXT }],
   });
 
+  React.useEffect(() => {
+    if (isOverridedByAll) {
+      setSubscribed(false);
+    } else {
+      setSubscribed(existingSetting ? existingSetting.active : true);
+    }
+  }, [isOverridedByAll]);
+
   const handleToggle = async variables => {
     try {
       setSubscribed(variables.active);
