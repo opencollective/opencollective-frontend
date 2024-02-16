@@ -90,6 +90,7 @@ export const hostApplicationsQuery = gql`
                   name
                   imageUrl
                   ...AccountHoverCardFields
+                  emails
                 }
               }
             }
@@ -197,6 +198,7 @@ const hostedCollectiveFields = gql`
             account {
               id
               ...AccountHoverCardFields
+              emails
             }
           }
         }
@@ -208,6 +210,7 @@ const hostedCollectiveFields = gql`
         account {
           id
           ...AccountHoverCardFields
+          emails
         }
       }
     }
@@ -216,6 +219,7 @@ const hostedCollectiveFields = gql`
         id
         slug
         name
+        ...AccountHoverCardFields
       }
     }
   }

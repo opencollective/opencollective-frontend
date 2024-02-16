@@ -196,6 +196,7 @@
   "9DioA1": "{count, plural, one {# Recurring} other {# Recurring}}",
   "9DNi/v": "No chart of accounts found",
   "9EFQ9C": "The file is larger than the maximum allowed ({max})",
+  "9f14iS": "{childAccountType} by {parentAccount}",
   "9FWGOh": "You need to be logged in as an admin or accountant to view this page",
   "9GxuH5": "Device added",
   "9HVZ95": "Enter related Collectives",

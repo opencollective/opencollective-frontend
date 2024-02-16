@@ -196,6 +196,7 @@
   "9DioA1": "{count, plural, one {# opakovanie} few {# opakovania} other {# opakovaní}}",
   "9DNi/v": "No chart of accounts found",
   "9EFQ9C": "Súbor je väčší než povolené maximum ({max})",
+  "9f14iS": "{childAccountType} by {parentAccount}",
   "9FWGOh": "Na zobrazenie tejto stránky je potrebné byť prihlásený ako správca alebo účtovník",
   "9GxuH5": "Device added",
   "9HVZ95": "Zadajte súvisiace kolektívy",

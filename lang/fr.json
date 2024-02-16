@@ -196,6 +196,7 @@
   "9DioA1": "{count, plural, one {# Récurrent} other {# Récurrents}}",
   "9DNi/v": "Pas de plan comptable",
   "9EFQ9C": "Le fichier est plus volumineux que le maximum autorisé ({max})",
+  "9f14iS": "{childAccountType} by {parentAccount}",
   "9FWGOh": "Vous devez être connecté en tant qu'administrateur ou comptable pour voir cette page",
   "9GxuH5": "Appareil ajouté",
   "9HVZ95": "Entrez les Collectifs concernés",

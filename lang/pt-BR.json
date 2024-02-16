@@ -196,6 +196,7 @@
   "9DioA1": "{count, plural, one {# Recurring} other {# Recurring}}",
   "9DNi/v": "No chart of accounts found",
   "9EFQ9C": "O arquivo é maior do que o máximo permitido ({max})",
+  "9f14iS": "{childAccountType} by {parentAccount}",
   "9FWGOh": "Você precisa estar logado como administrador ou conta para visualizar esta página",
   "9GxuH5": "O dispositivo foi adicionado",
   "9HVZ95": "Inserir Coleções Relacionadas",
