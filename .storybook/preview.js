@@ -1,6 +1,5 @@
 import React from 'react';
 import { ApolloProvider } from '@apollo/client';
-import { withDesign } from '@storybook/addon-designs';
 import { IntlProvider } from 'react-intl';
 import { ThemeProvider } from 'styled-components';
 
@@ -40,5 +39,4 @@ export const decorators = [
       </ThemeProvider>
     </ApolloProvider>
   ),
-  withDesign,
 ];
