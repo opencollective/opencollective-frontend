@@ -5,7 +5,7 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Ban as UnapproveIcon } from '@styled-icons/fa-solid/Ban';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
 import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
-import { defineMessage, defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
@@ -154,11 +154,6 @@ const ProcessExpenseButtons = ({
   const intl = useIntl();
   const { toast } = useToast();
 
-  const spamNotAllowedMessage = defineMessage({
-    id: 'expense.spam.notAllowed',
-    defaultMessage: "You can't mark your own expenses as spam",
-  });
-
   React.useEffect(() => {
     onModalToggle?.(!!confirmProcessExpenseAction);
     return () => onModalToggle?.(false);
@@ -258,7 +253,10 @@ const ProcessExpenseButtons = ({
             if (isSubmitter) {
               toast({
                 variant: 'error',
-                message: intl.formatMessage(spamNotAllowedMessage),
+                message: intl.formatMessage({
+                  id: 'expense.spam.notAllowed',
+                  defaultMessage: "You can't mark your own expenses as spam",
+                }),
               });
 
               return;
