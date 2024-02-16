@@ -1,5 +1,6 @@
 import React from 'react';
-import { defineMessages, FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
+import type { MessageDescriptor} from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
@@ -15,7 +16,8 @@ import { toast } from '../ui/useToast';
 
 const messages = defineMessages({
   reasonPlaceholder: {
-    defaultMessage: 'e.g. We never worked with this person.',
+    defaultMessage: 'e.g, We never worked with this person.',
+    id: 'mpLU2S',
   },
   REQUEST_RE_APPROVAL_TITLE: {
     id: 'expense.requestReApproval.btn',

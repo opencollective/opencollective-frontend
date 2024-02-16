@@ -13,21 +13,21 @@ import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { get } from 'lodash';
 import { ArrowRightLeft, FileText } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { margin } from 'styled-system';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import useClipboard from '../../lib/hooks/useClipboard';
-import { getCollectivePageCanonicalURL, getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
-import { useToast } from '../ui/useToast';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { getCollectivePageCanonicalURL, getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { DownloadLegalDocument } from '../legal-documents/DownloadLegalDocument';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
+import { useToast } from '../ui/useToast';
 
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
@@ -116,11 +116,6 @@ const ExpenseMoreActionsButton = ({
     return null;
   }
 
-  const spamNotAllowedMessage = defineMessage({
-    id: 'expense.spam.notAllowed',
-    defaultMessage: "You can't mark your own expenses as spam",
-  });
-
   return (
     <React.Fragment>
       <PopupMenu
@@ -153,7 +148,10 @@ const ExpenseMoreActionsButton = ({
                   if (isSubmitter) {
                     toast({
                       variant: 'error',
-                      message: intl.formatMessage(spamNotAllowedMessage),
+                      message: intl.formatMessage({
+                        id: 'expense.spam.notAllowed',
+                        defaultMessage: "You can't mark your own expenses as spam",
+                      }),
                     });
 
                     return;
