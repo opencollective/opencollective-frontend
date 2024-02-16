@@ -177,10 +177,14 @@ export const hostDashboardExpensesQuery = gql`
         ...ExpensesListAdminFieldsFragment
       }
     }
+    host(slug: $hostSlug) {
+      id
+      ...ExpenseHostFields
+    }
   }
-
   ${expensesListFieldsFragment}
   ${expensesListAdminFieldsFragment}
+  ${expenseHostFields}
 `;
 
 const hostInfoCardFields = gql`
@@ -227,10 +231,9 @@ const hostInfoCardFields = gql`
 `;
 
 export const hostDashboardMetadataQuery = gql`
-  query HostDashboardMetadata($hostSlug: String!, $getViewCounts: Boolean!) {
+  query HostDashboardMetadata($hostSlug: String!) {
     host(slug: $hostSlug) {
       id
-      ...ExpenseHostFields
       ...HostInfoCardFields
       transferwise {
         id
@@ -241,26 +244,25 @@ export const hostDashboardMetadataQuery = gql`
         }
       }
     }
-    all: expenses(host: { slug: $hostSlug }, limit: 0) @include(if: $getViewCounts) {
+    all: expenses(host: { slug: $hostSlug }) {
       totalCount
     }
-    ready_to_pay: expenses(host: { slug: $hostSlug }, limit: 0, status: READY_TO_PAY) @include(if: $getViewCounts) {
+    ready_to_pay: expenses(host: { slug: $hostSlug }, status: READY_TO_PAY) {
       totalCount
     }
-    scheduled_for_payment: expenses(host: { slug: $hostSlug }, limit: 0, status: SCHEDULED_FOR_PAYMENT)
-      @include(if: $getViewCounts) {
+    scheduled_for_payment: expenses(host: { slug: $hostSlug }, status: SCHEDULED_FOR_PAYMENT) {
       totalCount
     }
-    on_hold: expenses(host: { slug: $hostSlug }, limit: 0, status: ON_HOLD) @include(if: $getViewCounts) {
+    on_hold: expenses(host: { slug: $hostSlug }, status: ON_HOLD) {
       totalCount
     }
-    incomplete: expenses(host: { slug: $hostSlug }, limit: 0, status: INCOMPLETE) @include(if: $getViewCounts) {
+    incomplete: expenses(host: { slug: $hostSlug }, status: INCOMPLETE) {
       totalCount
     }
-    error: expenses(host: { slug: $hostSlug }, limit: 0, status: ERROR) @include(if: $getViewCounts) {
+    error: expenses(host: { slug: $hostSlug }, status: ERROR) {
       totalCount
     }
-    paid: expenses(host: { slug: $hostSlug }, limit: 0, status: PAID) @include(if: $getViewCounts) {
+    paid: expenses(host: { slug: $hostSlug }, status: PAID) {
       totalCount
     }
 
@@ -280,6 +282,5 @@ export const hostDashboardMetadataQuery = gql`
   }
 
   ${accountHoverCardFields}
-  ${expenseHostFields}
   ${hostInfoCardFields}
 `;
