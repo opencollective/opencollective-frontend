@@ -5,7 +5,7 @@ module.exports = {
     '@storybook/addon-links',
     '@storybook/addon-docs',
     '@storybook/addon-essentials',
-    'storybook-addon-designs',
+    '@storybook/addon-designs',
     '@storybook/addon-mdx-gfm',
   ],
   webpackFinal: config => {
