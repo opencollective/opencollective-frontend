@@ -19,11 +19,14 @@ jobs:
           # a pull request then we can checkout the head.
           fetch-depth: 2
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version-file: 'package.json'
-          cache: 'npm'
+          cache: 'pnpm'
 
       # If this run was triggered by a pull request event, then checkout
       # the head of the pull request instead of the merge commit.
