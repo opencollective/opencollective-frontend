@@ -273,7 +273,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.CHART_OF_ACCOUNTS,
-                if: Boolean(LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION)),
               },
               {
                 section: ALL_SECTIONS.INVOICES_RECEIPTS,

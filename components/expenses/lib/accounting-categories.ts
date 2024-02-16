@@ -50,7 +50,6 @@ export const shouldDisplayExpenseCategoryPill = (
     expense?.accountingCategory ||
       (user &&
         ACCOUNTING_CATEGORY_HOST_FIELDS.some(field => get(host, `${field}.nodes`)?.length > 0) &&
-        (userMustSetAccountingCategory(user, account, host) ||
-          user.hasPreviewFeatureEnabled('EXPENSE_CATEGORIZATION'))),
+        userMustSetAccountingCategory(user, account, host)),
   );
 };
