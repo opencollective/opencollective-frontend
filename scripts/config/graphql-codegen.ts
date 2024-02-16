@@ -9,7 +9,10 @@ const config: CodegenConfig = {
   },
   generates: {
     './lib/graphql/types/v2/': {
-      preset: 'client-preset',
+      preset: 'client',
+      presetConfig: {
+        fragmentMasking: false,
+      },
       schema: './lib/graphql/schemaV2.graphql',
       plugins: [
         {

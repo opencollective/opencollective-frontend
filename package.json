@@ -327,7 +327,8 @@
   },
   "@opencollective/depcheck": {
     "ignores": [
-      "@graphql-codegen/gql-tag-operations-preset",
+      "@graphql-codegen/add",
+      "@graphql-codegen/client-preset",
       "@types/webpack-env",
       "autoprefixer",
       "esbuild",
