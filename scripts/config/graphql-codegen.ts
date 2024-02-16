@@ -8,13 +8,9 @@ const config: CodegenConfig = {
     },
   },
   generates: {
-    './lib/graphql/types/v2': {
-      preset: 'gql-tag-operations-preset',
+    './lib/graphql/types/v2/': {
+      preset: 'client-preset',
       schema: './lib/graphql/schemaV2.graphql',
-      presetConfig: {
-        augmentedModuleName: '@apollo/client',
-        gqlTagName: 'gql',
-      },
       plugins: [
         {
           add: {
