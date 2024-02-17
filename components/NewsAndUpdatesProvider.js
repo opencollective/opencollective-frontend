@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 
 const NewsAndUpdatesContext = React.createContext({
@@ -8,10 +8,13 @@ const NewsAndUpdatesContext = React.createContext({
 const NewsAndUpdatesProvider = ({ children }) => {
   const [showNewsAndUpdates, setShowNewsAndUpdates] = useState(false);
 
-  const context = {
-    showNewsAndUpdates,
-    setShowNewsAndUpdates,
-  };
+  const context = useMemo(
+    () => ({
+      showNewsAndUpdates,
+      setShowNewsAndUpdates,
+    }),
+    [showNewsAndUpdates, setShowNewsAndUpdates],
+  );
 
   return <NewsAndUpdatesContext.Provider value={context}>{children}</NewsAndUpdatesContext.Provider>;
 };

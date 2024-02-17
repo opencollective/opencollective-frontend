@@ -42,8 +42,10 @@ import { withTwoFactorAuthentication } from '../lib/two-factor-authentication/Tw
 import sentryLib from '../server/sentry';
 
 import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
+import GlobalPreviewFeatures from '../components/GlobalPreviewFeatures';
 import IntlProvider from '../components/intl/IntlProvider';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
+import PreviewFeaturesProvider from '../components/PreviewFeaturesProvider';
 import { TooltipProvider } from '../components/ui/Tooltip';
 
 PolyfillInterweaveSSR();
@@ -136,12 +138,15 @@ class OpenCollectiveFrontendApp extends App {
               <IntlProvider locale={locale}>
                 <TooltipProvider delayDuration={500} skipDelayDuration={100}>
                   <UserProvider>
-                    <NewsAndUpdatesProvider>
-                      <Component {...pageProps} />
-                      <Toaster />
-                      <GlobalNewsAndUpdates />
-                      <TwoFactorAuthenticationModal />
-                    </NewsAndUpdatesProvider>
+                    <PreviewFeaturesProvider>
+                      <NewsAndUpdatesProvider>
+                        <Component {...pageProps} />
+                        <Toaster />
+                        <GlobalNewsAndUpdates />
+                        <GlobalPreviewFeatures />
+                        <TwoFactorAuthenticationModal />
+                      </NewsAndUpdatesProvider>
+                    </PreviewFeaturesProvider>
                   </UserProvider>
                 </TooltipProvider>
               </IntlProvider>
