@@ -575,7 +575,7 @@ const PayExpenseModal = ({
                   mt={3}
                   label={<FormattedMessage defaultMessage="Effective Date" />}
                   hint={
-                    <FormattedMessage defaultMessage="Date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
+                    <FormattedMessage defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
                   }
                 >
                   {inputProps => (

@@ -532,7 +532,7 @@ export function TransactionDrawer({
                             <InfoIcon size={16} />
                           </TooltipTrigger>
                           <TooltipContent onPointerDownOutside={e => e.preventDefault()}>
-                            <FormattedMessage defaultMessage="Date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
+                            <FormattedMessage defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
                           </TooltipContent>
                         </Tooltip>
                       </div>
