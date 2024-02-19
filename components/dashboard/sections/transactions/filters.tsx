@@ -23,14 +23,25 @@ import { Input } from '../../../ui/Input';
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
+import { dateToVariables } from '../../filters/DateFilter/schema';
 import { orderByFilter } from '../../filters/OrderFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { VirtualCardRenderer } from '../../filters/VirtualCardsFilter';
+
+const clearedAtDateFilter = {
+  ...dateFilter,
+  toVariables: value => dateToVariables(value, 'cleared'),
+  filter: {
+    ...dateFilter.filter,
+    labelMsg: defineMessage({ defaultMessage: 'Effective Date' }),
+  },
+};
 
 export const schema = z.object({
   limit: limit.default(20),
   offset,
   date: dateFilter.schema,
+  clearedAt: clearedAtDateFilter.schema,
   amount: amountFilter.schema,
   orderBy: orderByFilter.schema,
   searchTerm: searchFilter.schema,
@@ -58,6 +69,7 @@ export type FilterMeta = {
 export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
   orderBy: orderByFilter.toVariables,
   date: dateFilter.toVariables,
+  clearedAt: clearedAtDateFilter.toVariables,
   amount: amountFilter.toVariables,
   virtualCard: (virtualCardIds, key) => ({ [key]: virtualCardIds.map(id => ({ id })) }),
   expenseId: id => ({ expense: { legacyId: id } }),
@@ -68,6 +80,7 @@ export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQuer
 export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   searchTerm: searchFilter.filter,
   date: dateFilter.filter,
+  clearedAt: clearedAtDateFilter.filter,
   amount: amountFilter.filter,
   orderBy: orderByFilter.filter,
   type: {
