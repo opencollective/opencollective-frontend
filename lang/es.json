@@ -1551,6 +1551,7 @@
   "form.processing": "procesando",
   "Form.yourEmail": "Tu dirección de correo electrónico",
   "Form.yourPassword": "Tu contraseña",
+  "FormError.enum": "Must be one of: {options}",
   "FormError.InvalidValue": "Valor no válido",
   "FormError.max": "El valor es demasiado alto",
   "FormError.maxLength": "El valor es demasiado largo",

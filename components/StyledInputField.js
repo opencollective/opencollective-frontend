@@ -49,6 +49,7 @@ const StyledInputField = ({
   flexDirection = undefined,
   justifyContent = undefined,
   alignItems = undefined,
+  placeholder = undefined,
   ...props
 }) => {
   const isCheckbox = inputType === 'checkbox';
@@ -115,6 +116,7 @@ const StyledInputField = ({
               success,
               disabled,
               required,
+              placeholder,
             })
           : children}
       </Flex>

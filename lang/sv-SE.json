@@ -1551,6 +1551,7 @@
   "form.processing": "under bearbetning",
   "Form.yourEmail": "Din e-postadress",
   "Form.yourPassword": "Ditt lösenord",
+  "FormError.enum": "Must be one of: {options}",
   "FormError.InvalidValue": "Ogiltigt värde",
   "FormError.max": "Värdet är för högt",
   "FormError.maxLength": "Värdet är för långt",

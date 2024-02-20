@@ -1551,6 +1551,7 @@
   "form.processing": "verwerken",
   "Form.yourEmail": "Je e-mailadres",
   "Form.yourPassword": "Je wachtwoord",
+  "FormError.enum": "Must be one of: {options}",
   "FormError.InvalidValue": "Ongeldige waarde",
   "FormError.max": "De waarde is te hoog",
   "FormError.maxLength": "De waarde is te lang",
