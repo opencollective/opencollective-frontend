@@ -206,8 +206,9 @@
     "@babel/node": "^7.22.19",
     "@cypress/code-coverage": "^3.12.12",
     "@formatjs/cli": "^6.2.4",
+    "@graphql-codegen/add": "^5.0.2",
     "@graphql-codegen/cli": "5.0.2",
-    "@graphql-codegen/gql-tag-operations-preset": "^2.1.0",
+    "@graphql-codegen/client-preset": "^4.2.2",
     "@graphql-eslint/eslint-plugin": "^3.20.1",
     "@next/bundle-analyzer": "^14.0.3",
     "@rollup/plugin-babel": "^6.0.4",
@@ -326,7 +327,8 @@
   },
   "@opencollective/depcheck": {
     "ignores": [
-      "@graphql-codegen/gql-tag-operations-preset",
+      "@graphql-codegen/add",
+      "@graphql-codegen/client-preset",
       "@types/webpack-env",
       "autoprefixer",
       "esbuild",
