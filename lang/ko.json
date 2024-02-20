@@ -1081,7 +1081,7 @@
   "editCollective.host.removeBtn": "호스트 제거",
   "editCollective.legalName.description": "Legal names are private and used in receipts, tax forms, payment details on expenses, and other non-public contexts. Legal names are only visible to admins.",
   "editCollective.menu.advanced": "고급",
-  "editCollective.menu.collectivePage": "프로필 페이지",
+  "editCollective.menu.collectivePage": "Profile Sections",
   "editCollective.menu.connectedAccounts": "연결된 계정",
   "editCollective.menu.expenses": "Expenses Policy",
   "editCollective.menu.export": "내보내기",
