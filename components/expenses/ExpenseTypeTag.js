@@ -8,7 +8,7 @@ import { i18nExpenseType } from '../../lib/i18n/expense';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledTag from '../StyledTag';
 
-const ExpenseTypeTag = ({ type, legacyId, isLoading, ...props }) => {
+const ExpenseTypeTag = ({ type, legacyId = undefined, isLoading = false, ...props }) => {
   const intl = useIntl();
   return !type && !legacyId && isLoading ? (
     <LoadingPlaceholder height={24} width={73} borderRadius="12px 2px 2px 12px" />
@@ -32,6 +32,10 @@ ExpenseTypeTag.propTypes = {
   type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
   legacyId: PropTypes.number,
   isLoading: PropTypes.bool,
+};
+
+ExpenseTypeTag.defaultProps = {
+  isLoading: false,
 };
 
 export default ExpenseTypeTag;
