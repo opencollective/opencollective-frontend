@@ -1081,7 +1081,7 @@
   "editCollective.host.removeBtn": "Remover Host",
   "editCollective.legalName.description": "Os nomes legais são privados e usados em recibos, formulários de impostos, dados de pagamento em despesas e outros contextos não-públicos. Os nomes legais só são visíveis aos administradores.",
   "editCollective.menu.advanced": "Avançado",
-  "editCollective.menu.collectivePage": "Página do Perfil",
+  "editCollective.menu.collectivePage": "Profile Sections",
   "editCollective.menu.connectedAccounts": "Contas Conectadas",
   "editCollective.menu.expenses": "Política de Despesas",
   "editCollective.menu.export": "Exportar",
