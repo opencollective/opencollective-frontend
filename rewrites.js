@@ -127,6 +127,10 @@ exports.REWRITES = [
     destination: '/create-project',
   },
   {
+    source: '/dashboard/:slug/expenses/new',
+    destination: '/submit-expense',
+  },
+  {
     source: '/dashboard',
     destination: '/dashboard',
   },

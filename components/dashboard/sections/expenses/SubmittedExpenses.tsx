@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { omit } from 'lodash';
+import { PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -10,6 +11,7 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import Pagination from '../../../Pagination';
+import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
@@ -57,6 +59,14 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
       <DashboardHeader
         title={<FormattedMessage defaultMessage="Submitted Expenses" />}
         description={<FormattedMessage defaultMessage="Expenses that you have submitted to other Collectives." />}
+        actions={
+          <Button size="sm" className="gap-1" onClick={() => router.push(`/dashboard/${accountSlug}/expenses/new`)}>
+            <span>
+              <FormattedMessage id="create" defaultMessage="Create" />
+            </span>
+            <PlusIcon size={20} />
+          </Button>
+        }
       />
       <Filterbar {...queryFilter} meta={filterMeta} />
 
