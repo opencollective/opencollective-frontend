@@ -10,13 +10,13 @@ import SocialLinksFormField from './edit-collective/SocialLinksFormField';
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import { Switch } from './ui/Switch';
 import CollectiveTagsInput from './CollectiveTagsInput';
+import EditTags from './EditTags';
 import { Box, Flex } from './Grid';
 import InputTypeLocation from './InputTypeLocation';
 import StyledButton from './StyledButton';
 import StyledCheckbox from './StyledCheckbox';
 import StyledInputGroup from './StyledInputGroup';
 import StyledInputLocation from './StyledInputLocation';
-import StyledInputTags from './StyledInputTags';
 import StyledSelect from './StyledSelect';
 import StyledTextarea from './StyledTextarea';
 import TimezonePicker from './TimezonePicker';
@@ -297,7 +297,7 @@ class InputField extends React.Component {
                   <label>{capitalize(field.label)}</label>
                 </Box>
                 <Box width={[1, 2 / 12]}>
-                  <StyledInputTags {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
+                  <EditTags {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
                 </Box>
               </Flex>
             )}
@@ -310,7 +310,7 @@ class InputField extends React.Component {
                 )}
                 {field.description && <HelpBlock p={1}>{field.description}</HelpBlock>}
                 <Box width={1}>
-                  <StyledInputTags {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
+                  <EditTags {...field} onChange={entries => field.onChange(entries.map(e => e.value))} />
                 </Box>
               </Flex>
             )}

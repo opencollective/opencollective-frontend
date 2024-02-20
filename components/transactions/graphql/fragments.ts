@@ -4,11 +4,8 @@ import { accountHoverCardFields } from '../../AccountHoverCard';
 
 export const transactionsQueryCollectionFragment = gql`
   fragment TransactionsQueryCollectionFragment on TransactionCollection {
-    totalCount
     offset
     limit
-    kinds
-    paymentMethodTypes
     nodes {
       id
       uuid

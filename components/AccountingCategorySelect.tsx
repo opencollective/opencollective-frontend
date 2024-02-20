@@ -1,24 +1,41 @@
 import React from 'react';
-import { get, isUndefined, pick, remove, size, throttle } from 'lodash';
-import { ChevronDown, Sparkles } from 'lucide-react';
+import { get, isUndefined, pick, remove, size, throttle, uniq } from 'lodash';
+import { Check, ChevronDown, Sparkles } from 'lucide-react';
 import { defineMessages, FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
-import { Account, AccountingCategory, Expense, ExpenseType, Host } from '../../lib/graphql/types/v2/graphql';
-import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { fetchExpenseCategoryPredictions } from '../../lib/ml-service';
-import { cn } from '../../lib/utils';
+import {
+  Account,
+  AccountingCategory,
+  AccountingCategoryKind,
+  Expense,
+  ExpenseType,
+  Host,
+} from '../lib/graphql/types/v2/graphql';
+import { useAsyncCall } from '../lib/hooks/useAsyncCall';
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { fetchExpenseCategoryPredictions } from '../lib/ml-service';
+import { cn } from '../lib/utils';
+import { ACCOUNTING_CATEGORY_HOST_FIELDS } from './expenses/lib/accounting-categories';
 
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../ui/Command';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/Command';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
 
-type ExpenseCategorySelectProps = {
-  host: Host;
-  account: Account;
-  expenseType: ExpenseType;
-  predictionStyle?: 'full' | 'inline';
+type RequiredHostFields = Pick<Host, 'slug'> & {
+  [K in (typeof ACCOUNTING_CATEGORY_HOST_FIELDS)[number]]?: { nodes: RequiredAccountingCategoryFields[] };
+};
+
+type RequiredAccountingCategoryFields = Pick<AccountingCategory, 'id' | 'name' | 'code' | 'kind'>;
+
+type AccountingCategorySelectProps = {
+  host: RequiredHostFields;
+  /** The account holding the expense. Only used when using the prediction service */
+  account?: Account;
+  kind: AccountingCategoryKind | `${AccountingCategoryKind}`;
+  /** If `kind` is `EXPENSE`, the (optional) expense type is used to filter the categories */
+  expenseType?: ExpenseType;
   /** If provided, these values (descriptions, items, etc...) will be used to call the prediction service */
   expenseValues?: Partial<Expense>;
+  predictionStyle?: 'full' | 'inline';
   selectedCategory: AccountingCategory | undefined | null;
   valuesByRole?: Expense['valuesByRole'];
   onChange: (category: AccountingCategory) => void;
@@ -27,6 +44,7 @@ type ExpenseCategorySelectProps = {
   id?: string;
   error?: boolean;
   children?: React.ReactNode;
+  borderRadiusClass?: string;
 };
 
 const VALUE_NONE = '__none__';
@@ -67,7 +85,7 @@ const SelectionRoleLabels = defineMessages({
 const getSelectionInfoForLabel = (
   intl: IntlShape,
   category: AccountingCategory | null,
-  valuesByRole: Expense['valuesByRole'],
+  valuesByRole: Expense['valuesByRole'] = null,
 ): React.ReactNode | null => {
   const roles = ['submitter', 'accountAdmin', 'hostAdmin'];
   const rolesCategories = roles.map(field => get(valuesByRole, `${field}.accountingCategory`));
@@ -79,8 +97,7 @@ const getSelectionInfoForLabel = (
   if (rolesHaveSelectedCategory.some(Boolean)) {
     const rolesToDisplay = roles.filter((_, index) => rolesHaveSelectedCategory[index]);
     return (
-      <span className="ml-1 text-xs font-normal italic text-gray-500">
-        {'• '}
+      <span className="text-xs font-normal italic text-muted-foreground">
         <FormattedMessage
           id="accountingCategory.selectedBy"
           defaultMessage="Selected by {nbRoles, select, 1 {{role1}} 2 {{role1} and {role2}} other {{role1}, {role2} and {role3}}}."
@@ -102,7 +119,7 @@ const getCategoryLabel = (
   intl: IntlShape,
   category: AccountingCategory,
   showCode: boolean,
-  valuesByRole: Expense['valuesByRole'],
+  valuesByRole: Expense['valuesByRole'] = null,
 ): React.ReactNode | null => {
   if (isUndefined(category)) {
     return null;
@@ -123,8 +140,11 @@ const getCategoryLabel = (
   const selectionInfo = getSelectionInfoForLabel(intl, category, valuesByRole);
   return (
     <React.Fragment>
-      {showCode && category && <span className="mr-2 italic text-neutral-700">#{category.code}</span>}
-      {categoryStr}
+      <div className="space-x-1.5">
+        {showCode && category && <span className="text-muted-foreground">{category.code}</span>}
+        <span>{categoryStr}</span>
+      </div>
+
       {selectionInfo}
     </React.Fragment>
   );
@@ -138,23 +158,33 @@ export const isSupportedExpenseCategory = (
   category: AccountingCategory,
   isHostAdmin: boolean,
 ) => {
-  return isHostAdmin || !category?.expensesTypes || category.expensesTypes.includes(expenseType);
+  return (
+    category?.kind === AccountingCategoryKind.EXPENSE &&
+    (isHostAdmin || !category?.expensesTypes || category.expensesTypes.includes(expenseType))
+  );
 };
 
 const getOptions = (
   intl: IntlShape,
-  host: Host,
+  host: RequiredHostFields,
+  kind: AccountingCategoryKind | `${AccountingCategoryKind}`,
   expenseType: ExpenseType,
   showCode: boolean,
   allowNone: boolean,
   valuesByRole: Expense['valuesByRole'],
   isHostAdmin: boolean,
 ): OptionsMap => {
-  const categories = [...get(host, 'accountingCategories.nodes', [])];
+  const contributionCategories = ['CONTRIBUTION', 'ADDED_FUNDS'];
+  const possibleFields = ACCOUNTING_CATEGORY_HOST_FIELDS;
+  const categories = uniq([...possibleFields.map(field => get(host, `${field}.nodes`, [])).flat()]);
   const categoriesById: OptionsMap = {};
 
   // Show all categories to host admins, but only the ones that match the expense type to other users
-  remove(categories, category => !isSupportedExpenseCategory(expenseType, category, isHostAdmin));
+  if (kind === AccountingCategoryKind.EXPENSE) {
+    remove(categories, category => !isSupportedExpenseCategory(expenseType, category, isHostAdmin));
+  } else if (contributionCategories.includes(kind)) {
+    remove(categories, category => !contributionCategories.includes(category.kind));
+  }
 
   categories.forEach(category => {
     categoriesById[category.id] = {
@@ -203,7 +233,7 @@ const getCleanInputData = (
  */
 const useExpenseCategoryPredictionService = (
   enabled: boolean,
-  host: Host,
+  host: RequiredHostFields,
   account: Account,
   expenseValues?: Partial<Expense>,
 ) => {
@@ -212,7 +242,7 @@ const useExpenseCategoryPredictionService = (
   const [showPreviousPredictions, setShowPreviousPredictions] = React.useState(true);
   const inputData = !enabled ? null : getCleanInputData(expenseValues);
   const hasValidParams = Boolean(
-    inputData && inputData.type && (inputData.description.length > 3 || inputData.items.length > 3),
+    account && inputData && inputData.type && (inputData.description.length > 3 || inputData.items.length > 3),
   );
 
   // Trigger new fetch predictions, and hide the current ones if we don't get a response within 1s (to avoid flickering)
@@ -226,7 +256,7 @@ const useExpenseCategoryPredictionService = (
         }
       });
     }
-  }, [host.slug, account.slug, hasValidParams, ...Object.values(inputData || {})]);
+  }, [host.slug, account?.slug, hasValidParams, ...Object.values(inputData || {})]);
 
   // Map returned categories with known ones to build `predictions`
   const predictions = React.useMemo(() => {
@@ -252,9 +282,10 @@ const useExpenseCategoryPredictionService = (
   return { loading, predictions: predictions || (showPreviousPredictions && previousPredictions.current) || [] };
 };
 
-const ExpenseCategorySelect = ({
+const AccountingCategorySelect = ({
   host,
   account,
+  kind,
   expenseType,
   selectedCategory,
   valuesByRole,
@@ -265,18 +296,24 @@ const ExpenseCategorySelect = ({
   allowNone = false,
   showCode = false,
   expenseValues = undefined,
-  children,
-}: ExpenseCategorySelectProps) => {
+  borderRadiusClass = 'rounded-lg',
+  children = null,
+}: AccountingCategorySelectProps) => {
   const intl = useIntl();
   const [isOpen, setOpen] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = Boolean(LoggedInUser?.isAdminOfCollective(host));
-  const usePredictions = host.slug === 'foundation' && (predictionStyle === 'full' || isOpen);
+  const usePredictions = host.slug === 'foundation' && kind === 'EXPENSE' && (predictionStyle === 'full' || isOpen);
   const { predictions } = useExpenseCategoryPredictionService(usePredictions, host, account, expenseValues);
   const hasPredictions = Boolean(predictions?.length);
+  const triggerChange = newCategory => {
+    if (selectedCategory?.id !== newCategory?.id) {
+      onChange(newCategory);
+    }
+  };
   const options = React.useMemo(
-    () => getOptions(intl, host, expenseType, showCode, allowNone, valuesByRole, isHostAdmin),
-    [host, expenseType, allowNone, showCode, valuesByRole, isHostAdmin],
+    () => getOptions(intl, host, kind, expenseType, showCode, allowNone, valuesByRole, isHostAdmin),
+    [intl, host, kind, expenseType, allowNone, showCode, valuesByRole, isHostAdmin],
   );
 
   return (
@@ -286,7 +323,7 @@ const ExpenseCategorySelect = ({
           {children || (
             <button
               id={id}
-              className={cn('flex w-full items-center justify-between rounded-lg border px-3 py-2', {
+              className={cn('flex w-full items-center justify-between border px-3 py-2', borderRadiusClass, {
                 'border-red-500': error,
                 'border-gray-300': !error,
               })}
@@ -303,49 +340,57 @@ const ExpenseCategorySelect = ({
             </button>
           )}
         </PopoverTrigger>
-        <PopoverContent className="z-[5000] w-[320px] p-0">
+        <PopoverContent className="min-w-[280px] p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
           <Command filter={(categoryId, search) => (options[categoryId]?.searchText.includes(search) ? 1 : 0)}>
             {size(options) > 6 && <CommandInput placeholder="Filter by name" />}
-            <CommandEmpty>
-              <FormattedMessage defaultMessage="No category found" />
-            </CommandEmpty>
-            <CommandGroup className="max-h-[300px] overflow-y-auto">
-              {Object.entries(options).map(([categoryId, { label }]) => {
-                const isSelected = selectedCategory?.id === categoryId;
-                const isPrediction = predictions?.some(prediction => prediction.id === categoryId);
-                return (
-                  <React.Fragment key={categoryId}>
-                    <CommandItem
-                      value={categoryId}
-                      className={cn('block p-3 text-xs', { 'font-semibold': isSelected })}
-                      onSelect={categoryId => {
-                        onChange(options[categoryId].value);
-                        setOpen(false);
-                      }}
-                    >
-                      <div className="flex justify-between">
-                        <span
-                          className={
-                            // If there are predictions, grey out the categories that are not selected or predicted
-                            isSelected || isPrediction || !hasPredictions ? 'text-neutral-900' : 'text-gray-600'
-                          }
-                        >
-                          {label}
-                        </span>
-                        {isPrediction && (
+
+            <CommandList>
+              <CommandEmpty>
+                <FormattedMessage defaultMessage="No category found" />
+              </CommandEmpty>
+              <CommandGroup>
+                {Object.entries(options).map(([categoryId, { label }]) => {
+                  const isSelected = selectedCategory?.id === categoryId;
+                  const isPrediction = predictions?.some(prediction => prediction.id === categoryId);
+                  return (
+                    <React.Fragment key={categoryId}>
+                      <CommandItem
+                        value={categoryId}
+                        onSelect={categoryId => {
+                          triggerChange(options[categoryId].value);
+                          setOpen(false);
+                        }}
+                      >
+                        <div className="flex flex-1 items-start justify-between" data-cy="xxx">
                           <span
-                            className="text-right text-xs text-gray-500"
-                            title={intl.formatMessage({ defaultMessage: 'Suggested' })}
+                            className={
+                              // If there are predictions, grey out the categories that are not selected or predicted
+                              isSelected || isPrediction || !hasPredictions
+                                ? 'text-foreground'
+                                : 'text-muted-foreground'
+                            }
                           >
-                            <Sparkles size={16} className="mr-1 inline-block text-yellow-500" strokeWidth={1.5} />
+                            {label}
                           </span>
-                        )}
-                      </div>
-                    </CommandItem>
-                  </React.Fragment>
-                );
-              })}
-            </CommandGroup>
+                          <div className="flex items-center gap-1 pt-0.5">
+                            {isSelected && <Check size={16} className="ml-2 inline-block" />}
+
+                            {isPrediction && (
+                              <span
+                                className="text-right text-xs text-gray-500"
+                                title={intl.formatMessage({ defaultMessage: 'Suggested' })}
+                              >
+                                <Sparkles size={16} className="mr-1 inline-block text-yellow-500" strokeWidth={1.5} />
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </CommandItem>
+                    </React.Fragment>
+                  );
+                })}
+              </CommandGroup>
+            </CommandList>
           </Command>
         </PopoverContent>
       </Popover>
@@ -362,8 +407,8 @@ const ExpenseCategorySelect = ({
                       <span
                         tabIndex={0}
                         role="button"
-                        onKeyDown={e => e.key === 'Enter' && onChange(prediction)}
-                        onClick={() => onChange(prediction)}
+                        onKeyDown={e => e.key === 'Enter' && triggerChange(prediction)}
+                        onClick={() => triggerChange(prediction)}
                         className="cursor-pointer text-[--primary-color-600] underline hover:opacity-80"
                         aria-label={intl.formatMessage({ defaultMessage: 'Select {name}' }, { name: prediction.name })}
                       >
@@ -382,4 +427,4 @@ const ExpenseCategorySelect = ({
   );
 };
 
-export default ExpenseCategorySelect;
+export default AccountingCategorySelect;

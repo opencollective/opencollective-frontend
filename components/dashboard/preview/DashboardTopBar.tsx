@@ -10,7 +10,7 @@ import { getDashboardRoute } from '../../../lib/url-helpers';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/DropdownMenu';
 import { DashboardContext } from '../DashboardContext';
 
-export const MenuLink = ({ section, label, href, Icon, isActive, onChangeVisiblity, visibility }) => {
+const MenuLink = ({ section, label, href, Icon, isActive, onChangeVisiblity, visibility }) => {
   const { ref, inView } = useInView({
     /* Optional options */
     threshold: 1,

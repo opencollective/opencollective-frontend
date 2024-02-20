@@ -48,7 +48,7 @@ const PlusIcon = styled.div`
   color: ${props => props.theme.colors.green[600]};
 `;
 
-export const BoldMsg = msg => (
+const BoldMsg = msg => (
   <Span color="black.900" fontWeight="bold" fontSize="14px">
     {msg}
   </Span>

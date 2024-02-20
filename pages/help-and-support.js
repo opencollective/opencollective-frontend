@@ -100,4 +100,6 @@ HelpAndSupport.getInitialProps = async ctx => ({
   ...ctx.query,
 });
 
+// ignore unused exports default
+// next.js export
 export default HelpAndSupport;

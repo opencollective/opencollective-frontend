@@ -161,7 +161,7 @@ const membershipsQuery = gqlV1/* GraphQL */ `
   }
 `;
 
-export const addMembershipsData = graphql(membershipsQuery, {
+const addMembershipsData = graphql(membershipsQuery, {
   options: props => ({
     variables: {
       memberCollectiveSlug: props.memberCollectiveSlug,

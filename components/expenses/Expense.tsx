@@ -10,7 +10,7 @@ import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { getCollectiveTypeForUrl, getSuggestedTags } from '../../lib/collective';
+import { getCollectiveTypeForUrl } from '../../lib/collective';
 import CommentType from '../../lib/constants/commentTypes';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
@@ -53,7 +53,7 @@ import ExpenseSummary from './ExpenseSummary';
 import PrivateCommentsMessage from './PrivateCommentsMessage';
 import TaxFormLinkModal from './TaxFormLinkModal';
 
-export const getVariableFromProps = props => {
+const getVariableFromProps = props => {
   const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1))
     .utc(true)
     .toISOString();
@@ -64,7 +64,7 @@ export const getVariableFromProps = props => {
   };
 };
 
-export const ExpenseHeader = styled(H1)<{ inDrawer?: boolean }>`
+const ExpenseHeader = styled(H1)<{ inDrawer?: boolean }>`
   ${props =>
     props.inDrawer
       ? css`
@@ -220,8 +220,6 @@ function Expense(props) {
     const activities = expense?.activities || [];
     return sortBy([...comments, ...activities], 'createdAt');
   }, [expense]);
-
-  const suggestedTags = React.useMemo(() => getSuggestedTags(collective), [collective]);
 
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;
   const isEditingExistingExpense = isEditing && expense !== undefined;
@@ -508,7 +506,6 @@ function Expense(props) {
             collective={collective}
             onEdit={onEditBtnClick}
             onDelete={onDelete}
-            suggestedTags={suggestedTags}
             canEditTags={get(expense, 'permissions.canEditTags', false)}
             showProcessButtons
             drawerActionsContainer={drawerActionsContainer}
@@ -613,7 +610,6 @@ function Expense(props) {
               loading={isRefetchingDataForUser}
               expense={editedExpense || expense}
               originalExpense={expense}
-              expensesTags={suggestedTags}
               payoutProfiles={payoutProfiles}
               loggedInAccount={loggedInAccount}
               onCancel={() => setState(state => ({ ...state, status: PAGE_STATUS.VIEW, editedExpense: null }))}
@@ -727,13 +723,6 @@ Expense.propTypes = {
   stopPolling: PropTypes.func,
   isRefetchingDataForUser: PropTypes.bool,
   drawerActionsContainer: PropTypes.object,
-
-  expensesTags: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-      tag: PropTypes.string,
-    }),
-  ),
 };
 
 export default Expense;

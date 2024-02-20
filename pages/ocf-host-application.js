@@ -180,4 +180,6 @@ OCFHostApplication.propTypes = {
   LoggedInUser: PropTypes.object,
 };
 
+// ignore unused exports default
+// next.js export
 export default withUser(OCFHostApplication);

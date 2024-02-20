@@ -20,7 +20,7 @@ import WarnIfUnsavedChanges from './WarnIfUnsavedChanges';
 
 type ModalProps = SpaceProps & LayoutProps & BackgroundProps;
 
-export const Modal = styled(Container).attrs((props: ModalProps) => ({
+const Modal = styled(Container).attrs((props: ModalProps) => ({
   maxWidth: props.maxWidth || '95%',
   maxHeight: props.maxHeight || '97%',
 }))<ModalProps>`

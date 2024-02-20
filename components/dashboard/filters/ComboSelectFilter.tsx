@@ -3,6 +3,10 @@ import clsx from 'clsx';
 import { debounce, isUndefined } from 'lodash';
 import { CheckIcon } from 'lucide-react';
 import { FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
+import { z } from 'zod';
+
+import { FilterConfig } from '../../../lib/filters/filter-types';
+import { sortSelectOptions } from '../../../lib/utils';
 
 import {
   Command,
@@ -72,6 +76,7 @@ function ComboSelectFilter({
   value,
   isMulti = false,
   options = [],
+  groupedOptions,
   onChange,
   labelMsg,
   loading,
@@ -82,7 +87,8 @@ function ComboSelectFilter({
   value: any;
   isMulti?: boolean;
   selected?: string[];
-  options: { label: React.ReactNode; value: any }[];
+  options?: { label: React.ReactNode; value: any }[];
+  groupedOptions?: { label: string; options: { label: React.ReactNode; value: any }[] }[];
   onChange: (value: any) => void;
   labelMsg?: MessageDescriptor;
   loading?: boolean;
@@ -126,7 +132,7 @@ function ComboSelectFilter({
       />
 
       <CommandList>
-        {loading && !options.length ? (
+        {loading && !options?.length ? (
           <CommandLoading />
         ) : (
           <CommandEmpty>
@@ -134,37 +140,99 @@ function ComboSelectFilter({
           </CommandEmpty>
         )}
 
-        <CommandGroup>
-          {creatable && input && (
-            <SelectItem isSelected={selected.some(v => v === input)} value={input} label={input} onSelect={onSelect} />
-          )}
+        {options?.length > 0 && (
+          <CommandGroup>
+            {creatable && input && (
+              <SelectItem
+                isSelected={selected.some(v => v === input)}
+                value={input}
+                label={input}
+                onSelect={onSelect}
+              />
+            )}
 
-          {searchFunc &&
-            selected
-              .filter(v => !options.some(o => o.value === v))
-              .filter(v => !creatable || v !== input)
-              .map(v => (
-                <SelectItem key={v} isSelected={true} value={v} onSelect={onSelect} valueRenderer={valueRenderer} />
-              ))}
+            {searchFunc &&
+              selected
+                .filter(v => !options.some(o => o.value === v))
+                .filter(v => !creatable || v !== input)
+                .map(v => (
+                  <SelectItem key={v} isSelected={true} value={v} onSelect={onSelect} valueRenderer={valueRenderer} />
+                ))}
 
-          {options
-            .filter(o => !creatable || o.value !== input)
-            .map(option => {
-              const isSelected = selected.some(v => v === option.value);
-              return (
-                <SelectItem
-                  key={option.value}
-                  isSelected={isSelected}
-                  value={option.value}
-                  label={option.label}
-                  onSelect={onSelect}
-                />
-              );
-            })}
-        </CommandGroup>
+            {options
+              .filter(o => !creatable || o.value !== input)
+              .map(option => {
+                const isSelected = selected.some(v => v === option.value);
+                return (
+                  <SelectItem
+                    key={option.value}
+                    isSelected={isSelected}
+                    value={option.value}
+                    label={option.label}
+                    onSelect={onSelect}
+                  />
+                );
+              })}
+          </CommandGroup>
+        )}
+
+        {groupedOptions
+          ?.filter(group => group.options.length)
+          .map(group => (
+            <CommandGroup key={group.label} heading={group.label}>
+              {group.options.map(option => {
+                const isSelected = selected.some(v => v === option.value);
+                return (
+                  <SelectItem
+                    key={option.value}
+                    isSelected={isSelected}
+                    value={option.value}
+                    label={option.label}
+                    onSelect={onSelect}
+                  />
+                );
+              })}
+            </CommandGroup>
+          ))}
       </CommandList>
     </Command>
   );
 }
 
 export default React.memo(ComboSelectFilter) as typeof ComboSelectFilter;
+
+type ZodDefaultOrOptional<T extends z.ZodTypeAny> = z.ZodDefault<T> | z.ZodOptional<T>;
+
+export function buildComboSelectFilter<
+  Options extends [string, ...string[]],
+  Schema extends ZodDefaultOrOptional<z.ZodEnum<Options> | z.ZodArray<z.ZodEnum<Options>>>,
+>(
+  schema: Schema,
+  labelMsg: MessageDescriptor,
+  i18nLabels: Record<z.infer<z.ZodEnum<Options>>, MessageDescriptor>,
+): FilterConfig<z.infer<Schema>> {
+  const schemaWithoutDefault = 'removeDefault' in schema ? schema.removeDefault() : schema.unwrap();
+
+  const isMulti = 'element' in schemaWithoutDefault;
+  const schemaEnum = isMulti ? schemaWithoutDefault.element : schemaWithoutDefault;
+
+  return {
+    schema: isMulti ? schema.or(schemaEnum.transform(val => [val])) : schema,
+    filter: {
+      labelMsg,
+      Component: ({ intl, ...props }) => (
+        <ComboSelectFilter
+          isMulti={isMulti}
+          options={schemaEnum.options
+            .map(value => ({
+              value,
+              label: intl.formatMessage(i18nLabels[value]),
+            }))
+            .sort(sortSelectOptions)}
+          {...props}
+        />
+      ),
+      valueRenderer: ({ value, intl }) => intl.formatMessage(i18nLabels[value]),
+    },
+  };
+}

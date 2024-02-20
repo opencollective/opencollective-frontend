@@ -69,6 +69,22 @@ jobs:
 
       - run: npm run depcheck
 
+  find-unused-exports:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - run: npm run find-unused-exports
+
   check-langs:
     runs-on: ubuntu-latest
 
@@ -100,7 +116,7 @@ jobs:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
       - name: Restore NextJS build cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .next/cache
           # Generate a new cache whenever packages or source files change

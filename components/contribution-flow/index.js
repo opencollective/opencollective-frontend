@@ -8,6 +8,7 @@ import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
+import { isURL } from 'validator';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
@@ -51,7 +52,6 @@ import ContributionFlowStepContainer from './ContributionFlowStepContainer';
 import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import ContributionFlowSuccess from './ContributionFlowSuccess';
 import ContributionSummary from './ContributionSummary';
-import { validateNewOrg } from './CreateOrganizationForm';
 import { PlatformTipOption } from './PlatformTipContainer';
 import { DEFAULT_PLATFORM_TIP_PERCENTAGE } from './PlatformTipInput';
 import {
@@ -113,6 +113,16 @@ const OTHER_MESSAGES = defineMessages({
     defaultMessage: `You're contributing to a past event.`,
   },
 });
+
+const validateNewOrg = values => {
+  if (!values.name) {
+    return false;
+  } else if (values.website && !isURL(values.website)) {
+    return false;
+  }
+
+  return true;
+};
 
 class ContributionFlow extends React.Component {
   static propTypes = {

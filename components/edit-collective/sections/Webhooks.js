@@ -72,7 +72,7 @@ class Webhooks extends React.Component {
   };
 
   getEventTypes = memoizeOne(collective => {
-    const removeList = [];
+    const removeList = [WebhookEvents.COLLECTIVE_TRANSACTION_CREATED]; // Deprecating this event, see https://github.com/opencollective/opencollective/issues/7162
 
     // Features
     const canReceiveExpenses = isFeatureEnabled(collective, FEATURES.RECEIVE_EXPENSES);
@@ -91,7 +91,7 @@ class Webhooks extends React.Component {
       );
     }
     if (!canReceiveContributions) {
-      removeList.push('collective.member.created', 'subscription.canceled');
+      removeList.push('collective.member.created', 'subscription.canceled', 'order.thankyou');
     }
     if (!canUseVirtualCards) {
       removeList.push('virtualcard.purchase');

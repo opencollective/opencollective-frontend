@@ -19,6 +19,7 @@ import { i18nTaxType } from '../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../lib/policies';
 import { omitDeep } from '../../lib/utils';
 
+import AccountingCategorySelect from '../AccountingCategorySelect';
 import CollectivePicker, { DefaultCollectiveLabel } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { confirmContributionFieldsFragment } from '../ContributionConfirmationModal';
@@ -98,7 +99,15 @@ const createPendingContributionModalQuery = gql`
       currency
       settings
       hostFeePercent
-
+      orderAccountingCategories: accountingCategories(kind: [CONTRIBUTION, ADDED_FUNDS]) {
+        nodes {
+          id
+          name
+          friendlyName
+          code
+          kind
+        }
+      }
       plan {
         id
         hostFees
@@ -326,17 +335,6 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const tiersOptions = childAccount
     ? getTiersOptions(intl, childAccount?.tiers?.nodes || [])
     : getTiersOptions(intl, collective?.tiers?.nodes || []);
-  const receiptTemplates = host?.settings?.invoice?.templates;
-  const receiptTemplateTitles = [];
-  if (receiptTemplates?.default?.title?.length > 0) {
-    receiptTemplateTitles.push({
-      value: 'default',
-      label: receiptTemplates?.default?.title,
-    });
-  }
-  if (receiptTemplates?.alternative?.title?.length > 0) {
-    receiptTemplateTitles.push({ value: 'alternative', label: receiptTemplates?.alternative?.title });
-  }
 
   const recommendedVendors = collective?.host?.vendors?.nodes || [];
   const defaultSources = [...recommendedVendors, host];
@@ -520,6 +518,29 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         </Field>
 
         {/* Contribution */}
+        {host.orderAccountingCategories?.nodes?.length > 0 && (
+          <Field
+            name="accountingCategory"
+            htmlFor="addFunds-accountingCategory"
+            required={false}
+            label={<FormattedMessage id="AddFundsModal.accountingCategory" defaultMessage="Accounting category" />}
+            mt={3}
+          >
+            {({ form, field }) => (
+              <AccountingCategorySelect
+                id={field.id}
+                kind="CONTRIBUTION"
+                onChange={value => form.setFieldValue(field.name, value)}
+                host={host}
+                account={collective}
+                selectedCategory={field.value}
+                allowNone={true}
+                borderRadiusClass="rounded"
+              />
+            )}
+          </Field>
+        )}
+
         <Field
           name="ponumber"
           htmlFor="CreatePendingContribution-ponumber"
@@ -910,6 +931,7 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
                 tier: !values.tier ? null : { id: values.tier.id },
                 expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
                 tax,
+                accountingCategory: values.accountingCategory && { id: values.accountingCategory.id },
               };
 
               const result = await createPendingOrder({ variables: { order } });

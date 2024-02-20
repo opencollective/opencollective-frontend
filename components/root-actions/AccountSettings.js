@@ -14,7 +14,7 @@ import StyledCheckbox from '../StyledCheckbox';
 import StyledInputField from '../StyledInputField';
 import { useToast } from '../ui/useToast';
 
-export const editAccountFlagsMutation = gql`
+const editAccountFlagsMutation = gql`
   mutation EditAccountFlags(
     $account: AccountReferenceInput!
     $isArchived: Boolean

@@ -6,7 +6,7 @@ import { NextRouter, withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-intl';
 import styled from 'styled-components';
 
-import { getCollectivePageMetadata, getSuggestedTags, isIndividualAccount } from '../lib/collective';
+import { getCollectivePageMetadata, isIndividualAccount } from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
@@ -23,8 +23,8 @@ import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
+import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import { Dimensions } from '../components/collective-page/_constants';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
@@ -147,8 +147,6 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
     }
   };
 
-  getSuggestedTags = memoizeOne(getSuggestedTags);
-
   render() {
     const { collectiveSlug, data, query } = this.props;
     const searchTerm = Array.isArray(query.searchTerm) ? query.searchTerm[0] : query.searchTerm;
@@ -182,7 +180,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
                     <FormattedMessage defaultMessage="Submitted Expenses" />
                   </H1>
                   <Box mx="auto" />
-                  <SearchFormContainer p={2}>
+                  <SearchFormContainer p={2} width="276px">
                     <SearchBar
                       defaultValue={searchTerm}
                       onSubmit={searchTerm => this.handleSearch(searchTerm, data.account)}
@@ -230,7 +228,6 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
                         collective={data.account}
                         expenses={data.expenses?.nodes}
                         nbPlaceholders={data.variables.limit}
-                        suggestedTags={this.getSuggestedTags(data.account)}
                         isInverted
                         view="submitter"
                         expenseFieldForTotalAmount="amountInCreatedByAccountCurrency"
@@ -334,7 +331,7 @@ const submittedExpensesPageQuery = gql`
   }
 
   ${expensesListFieldsFragment}
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
   ${expenseHostFields}
 `;
 
@@ -364,4 +361,6 @@ const addExpensesPageData = graphql<SubmittedExpensesPageProps>(submittedExpense
   },
 });
 
+// ignore unused exports default
+// next.js export
 export default injectIntl(addExpensesPageData(withUser(withRouter(SubmittedExpensesPage))));

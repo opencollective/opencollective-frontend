@@ -197,7 +197,7 @@ const Transactions = ({
         <h1 className={isDashboard ? 'text-2xl font-bold leading-10 tracking-tight' : 'text-[32px] leading-10'}>
           <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
         </h1>
-        <div className="flex-grow sm:flex-grow-0">
+        <div className="w-[276px] flex-grow sm:flex-grow-0">
           <SearchBar
             placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…' })}
             defaultValue={router.query.searchTerm}

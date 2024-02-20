@@ -33,6 +33,13 @@ export const collectiveAdminsMustConfirmAccountingCategory = (
   return Boolean(policy?.requiredForCollectiveAdmins);
 };
 
+// Defines the fields in the `Host` object where the accounting categories are stored
+export const ACCOUNTING_CATEGORY_HOST_FIELDS = [
+  'orderAccountingCategories',
+  'expenseAccountingCategories',
+  'accountingCategories',
+] as const;
+
 export const shouldDisplayExpenseCategoryPill = (
   user: LoggedInUser | null,
   expense: Expense,
@@ -42,7 +49,7 @@ export const shouldDisplayExpenseCategoryPill = (
   return Boolean(
     expense?.accountingCategory ||
       (user &&
-        get(host, 'accountingCategories.nodes', []).length > 0 &&
+        ACCOUNTING_CATEGORY_HOST_FIELDS.some(field => get(host, `${field}.nodes`)?.length > 0) &&
         (userMustSetAccountingCategory(user, account, host) ||
           user.hasPreviewFeatureEnabled('EXPENSE_CATEGORIZATION'))),
   );

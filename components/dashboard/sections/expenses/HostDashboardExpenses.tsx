@@ -14,9 +14,7 @@ import {
   PayoutMethodType,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import ExpensePipelineOverview from '../../../host-dashboard/expenses/ExpensePipelineOverview';
@@ -89,19 +87,16 @@ const ROUTE_PARAMS = ['slug', 'section'];
 const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
-  const expensePipelineFeatureIsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_PIPELINE);
   const query = router.query;
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const pageRoute = `/dashboard/${hostSlug}/host-expenses`;
 
   const {
     data: metaData,
-    loading: loadingMetaData,
     error: errorMetaData,
     refetch: refetchMetaData,
   } = useQuery(hostDashboardMetadataQuery, {
-    variables: { hostSlug, getViewCounts: Boolean(expensePipelineFeatureIsEnabled), withHoverCard: true },
+    variables: { hostSlug, withHoverCard: true },
     context: API_V2_CONTEXT,
   });
 
@@ -166,7 +161,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     defaultFilterValues: views[1].filter,
     filters,
     meta,
-    views: expensePipelineFeatureIsEnabled ? views : undefined,
+    views,
   });
 
   const variables = {
@@ -264,8 +259,8 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       ) : (
         <React.Fragment>
           <ExpensesList
-            isLoading={loading || loadingMetaData}
-            host={metaData?.host}
+            isLoading={loading}
+            host={data?.host}
             nbPlaceholders={paginatedExpenses.limit}
             expenses={paginatedExpenses.nodes}
             view="admin"

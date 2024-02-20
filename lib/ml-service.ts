@@ -1,6 +1,6 @@
 import { ExpenseType } from './graphql/types/v2/graphql';
 
-export const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 
 export type ExpenseCategoryPrediction = {
   code: string;

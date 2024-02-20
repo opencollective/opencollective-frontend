@@ -3,9 +3,6 @@ import PropTypes from 'prop-types';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-
 import { HostAdminAccountingSection } from '../admin-panel/sections/accounting';
 import AccountSettings from '../admin-panel/sections/AccountSettings';
 import InvoicesReceipts from '../admin-panel/sections/invoices-receipts/InvoicesReceipts';
@@ -28,8 +25,7 @@ import HostDashboardAgreements from './sections/HostDashboardAgreements';
 import HostDashboardReports from './sections/HostDashboardReports';
 import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
 import HostVirtualCards from './sections/HostVirtualCards';
-import Overview from './sections/Overview';
-import Transactions from './sections/Transactions';
+import Overview from './sections/overview/Overview';
 import AccountTransactions from './sections/transactions/AccountTransactions';
 import HostTransactions from './sections/transactions/HostTransactions';
 import Vendors from './sections/Vendors';
@@ -53,7 +49,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.CONTRIBUTORS]: Contributors,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
-  [SECTIONS.TRANSACTIONS]: Transactions,
+  [SECTIONS.TRANSACTIONS]: AccountTransactions,
   [SECTIONS.HOST_TRANSACTIONS]: HostTransactions,
   [SECTIONS.VIRTUAL_CARDS]: VirtualCards,
   [SECTIONS.TEAM]: Team,
@@ -67,8 +63,6 @@ const SETTINGS_COMPONENTS = {
 
 const DashboardSection = ({ account, isLoading, section, subpath }) => {
   const { formatMessage } = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
-  const useNewTransactionsPage = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_TRANSACTION_PAGE);
 
   if (isLoading) {
     return (
@@ -79,11 +73,8 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     );
   }
 
-  let DashboardComponent = DASHBOARD_COMPONENTS[section];
+  const DashboardComponent = DASHBOARD_COMPONENTS[section];
   if (DashboardComponent) {
-    if (section === SECTIONS.TRANSACTIONS && useNewTransactionsPage) {
-      DashboardComponent = AccountTransactions;
-    }
     return (
       <div className="w-full">
         <DashboardComponent accountSlug={account.slug} subpath={subpath} isDashboard />

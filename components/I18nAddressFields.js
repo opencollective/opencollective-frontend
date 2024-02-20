@@ -127,7 +127,7 @@ ZoneSelect.propTypes = {
   onChange: PropTypes.func,
 };
 
-export const FormikLocationFieldRenderer = ({ name, label, required, prefix, info }) => {
+const FormikLocationFieldRenderer = ({ name, label, required, prefix, info }) => {
   const validate = required ? value => (value ? undefined : `${label} is required`) : undefined;
   return (
     <Field key={name} name={`${prefix}.${name}`} validate={validate}>
@@ -299,7 +299,7 @@ const I18nAddressFields = ({
           label={fieldLabel}
           info={fieldInfo}
           value={value?.[fieldName]}
-          required={required === false ? false : !Object.keys(data?.optionalLabels).includes(fieldName)}
+          required={required === false ? false : !Object.keys(data?.optionalLabels || {}).includes(fieldName)}
           fieldProps={fieldProps}
           onChange={({ target: { name, value: fieldValue } }) =>
             onCountryChange(set(cloneDeep(value || {}), name, fieldValue))

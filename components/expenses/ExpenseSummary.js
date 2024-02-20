@@ -33,7 +33,7 @@ import { H1, H4, P, Span } from '../Text';
 import { Separator } from '../ui/Separator';
 import UploadedFilePreview from '../UploadedFilePreview';
 
-import { AccountingCategoryPill } from './AccountingCategoryPill';
+import { ExpenseAccountingCategoryPill } from './ExpenseAccountingCategoryPill';
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 import ExpenseMoreActionsButton from './ExpenseMoreActionsButton';
@@ -92,7 +92,6 @@ const ExpenseSummary = ({
   isEditing,
   borderless = undefined,
   canEditTags,
-  suggestedTags,
   showProcessButtons,
   onClose = undefined,
   onDelete,
@@ -200,7 +199,7 @@ const ExpenseSummary = ({
       <div className="flex gap-2 align-middle">
         {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, collective, host) && (
           <React.Fragment>
-            <AccountingCategoryPill
+            <ExpenseAccountingCategoryPill
               host={host}
               account={expense.account}
               expense={expense}
@@ -211,7 +210,7 @@ const ExpenseSummary = ({
             <Separator orientation="vertical" className="h-[24px] w-[2px]" />
           </React.Fragment>
         )}
-        <Tags expense={expense} isLoading={isLoading} canEdit={canEditTags} suggestedTags={suggestedTags} />
+        <Tags expense={expense} isLoading={isLoading} canEdit={canEditTags} />
       </div>
       <Flex alignItems="center" mt="12px">
         {isLoading && !expense ? (
@@ -644,8 +643,6 @@ ExpenseSummary.propTypes = {
   }),
   /** Whether current user can edit the tags */
   canEditTags: PropTypes.bool,
-  /** If canEdit is true, this array is used to display suggested tags */
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
   /** Whether or not this is being displayed for an edited Expense */
   isEditing: PropTypes.bool,
   /** Whether to show the process buttons (Approve, Pay, etc) */

@@ -13,8 +13,8 @@ import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/u
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
+import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import { Sections } from '../components/collective-page/_constants';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import ErrorPage from '../components/ErrorPage';
 import { Box } from '../components/Grid';
 import Header from '../components/Header';
@@ -107,7 +107,7 @@ const processingOrderFragment = gql`
   }
 `;
 
-export const transactionsPageQuery = gql`
+const transactionsPageQuery = gql`
   query TransactionsPage(
     $slug: String!
     $limit: Int!
@@ -181,10 +181,13 @@ export const transactionsPageQuery = gql`
       orderBy: $orderBy
     ) {
       ...TransactionsQueryCollectionFragment
+      kinds
+      paymentMethodTypes
+      totalCount
     }
   }
   ${transactionsQueryCollectionFragment}
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
   ${processingOrderFragment}
 `;
 
@@ -219,8 +222,12 @@ const transactionsPageQueryHelper = getSSRQueryHelpers<ReturnType<typeof getVari
   },
 );
 
+// ignore unused exports getServerSideProps
+// next.js export
 export const getServerSideProps = transactionsPageQueryHelper.getServerSideProps;
 
+// ignore unused exports default
+// next.js export
 export default function TransactionsPage(props) {
   const { LoggedInUser } = useLoggedInUser();
   const { data, error, variables, refetch, loading } = transactionsPageQueryHelper.useQuery(props);

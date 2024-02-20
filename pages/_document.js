@@ -33,6 +33,8 @@ const cache = createIntlCache();
 
 // The document (which is SSR-only) needs to be customized to expose the locale
 // data for the user's locale for React Intl to work in the browser.
+// ignore unused exports default
+// next.js export
 export default class IntlDocument extends Document {
   static async getInitialProps(ctx) {
     // Get the `locale` and `messages` from the request object on the server.
@@ -119,7 +121,6 @@ export default class IntlDocument extends Document {
       'PAYPAL_ENVIRONMENT',
       'STRIPE_KEY',
       'SENTRY_DSN',
-      'SENTRY_RELEASE',
       'WEBSITE_URL',
       'GOOGLE_MAPS_API_KEY',
       'RECAPTCHA_SITE_KEY',

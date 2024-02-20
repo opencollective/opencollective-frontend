@@ -22,8 +22,8 @@ import AutosizeText from '../AutosizeText';
 import { AvatarWithLink } from '../AvatarWithLink';
 import Container from '../Container';
 import DateTime from '../DateTime';
-import { AccountingCategoryPill } from '../expenses/AccountingCategoryPill';
 import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
+import { ExpenseAccountingCategoryPill } from '../expenses/ExpenseAccountingCategoryPill';
 import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
 import ExpenseTypeTag from '../expenses/ExpenseTypeTag';
 import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
@@ -104,7 +104,6 @@ const ExpenseBudgetItem = ({
   expense,
   showProcessActions,
   view,
-  suggestedTags,
   onProcess,
   selected,
   expandExpense,
@@ -225,7 +224,7 @@ const ExpenseBudgetItem = ({
                   <span className="text-sm font-normal text-neutral-700">
                     <FormattedMessage id="expense.accountingCategory" defaultMessage="Category" />
                   </span>
-                  <AccountingCategoryPill
+                  <ExpenseAccountingCategoryPill
                     expense={expense}
                     host={host}
                     account={expense.account}
@@ -454,11 +453,7 @@ const ExpenseBudgetItem = ({
               )}
             </Flex>
           ) : (
-            <Tags
-              expense={expense}
-              canEdit={get(expense, 'permissions.canEditTags', false)}
-              suggestedTags={suggestedTags}
-            />
+            <Tags expense={expense} canEdit={get(expense, 'permissions.canEditTags', false)} />
           )}
         </Box>
         {showProcessActions && expense?.permissions && !isExpensePaidOrRejected && (
@@ -501,7 +496,6 @@ ExpenseBudgetItem.propTypes = {
   showProcessActions: PropTypes.bool,
   view: PropTypes.oneOf(['public', 'admin', 'submitter']),
   host: PropTypes.object,
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
   expense: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     legacyId: PropTypes.number,

@@ -81,7 +81,7 @@ export const DrawerMenuItem = ({ href = undefined, onClick = undefined, children
   </StyledMenuItem>
 );
 
-export const DrawerCloseButton = ({ onClick }) => (
+const DrawerCloseButton = ({ onClick }) => (
   <StyledCloseButton type="button" isBorderless onClick={onClick}>
     <X size={20} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
   </StyledCloseButton>

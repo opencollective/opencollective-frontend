@@ -5,11 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import {
   AVERAGE_TRANSACTIONS_PER_MINUTE,
-  CSV_VERSIONS,
-  CsvVersions,
   DEFAULT_FIELDS,
-  DEFAULT_FIELDS_2024,
-  FIELD_GROUPS,
   FIELD_GROUPS_2024,
   FIELD_OPTIONS,
   FieldGroupLabels,
@@ -25,6 +21,8 @@ import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { parseToBoolean } from '../lib/utils';
 
 import { getIntervalFromValue, PeriodFilterForm } from './filters/PeriodFilter';
+import { Label } from './ui/Label';
+import { Switch } from './ui/Switch';
 import { Box, Flex, Grid } from './Grid';
 import MessageBox from './MessageBox';
 import PeriodFilterPresetsSelect from './PeriodFilterPresetsSelect';
@@ -64,14 +62,11 @@ const ExportTransactionsCSVModal = ({
   const [tmpDateInterval, setTmpDateInterval] = React.useState(intervalFromValue);
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [fieldOption, setFieldOption] = React.useState(FieldOptions[0].value);
-  const [csvVersion, setCsvVersion] = React.useState(CsvVersions[0].value);
-  // const [fieldGroups, setFieldGroups] = React.useState(FIELD_GROUPS);
   const [fields, setFields] = React.useState(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
   const [isValidDateInterval, setIsValidDateInterval] = React.useState(true);
+  const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
 
-  const fieldGroups = parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES'))
-    ? FIELD_GROUPS_2024
-    : FIELD_GROUPS;
+  const fieldGroups = FIELD_GROUPS_2024;
 
   const {
     loading: isFetchingRows,
@@ -94,13 +89,6 @@ const ExportTransactionsCSVModal = ({
     },
     { defaultData: 0 },
   );
-
-  const handleCsvVersionsChange = ({ value }) => {
-    setCsvVersion(value);
-    const defaultFields = value === CSV_VERSIONS.VERSION_2024 ? DEFAULT_FIELDS_2024 : DEFAULT_FIELDS;
-    setFields(defaultFields.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
-    // setFieldGroups(value === CSV_VERSIONS.VERSION_2024 ? FIELD_GROUPS_2024 : FIELD_GROUPS);
-  };
 
   const handleFieldOptionsChange = ({ value }) => {
     setFieldOption(value);
@@ -162,8 +150,9 @@ const ExportTransactionsCSVModal = ({
     if (to) {
       url.searchParams.set('dateTo', simpleDateToISOString(to, true, timezoneType));
     }
-    if (csvVersion === CSV_VERSIONS.VERSION_2023) {
+    if (flattenTaxesAndPaymentProcessorFees) {
       url.searchParams.set('flattenPaymentProcessorFee', '1');
+      url.searchParams.set('flattenTax', '1');
     }
     if (!isEmpty(fields)) {
       url.searchParams.set('fields', Object.keys(fields).join(','));
@@ -186,7 +175,7 @@ const ExportTransactionsCSVModal = ({
             `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
     }
     setDownloadUrl(getUrl());
-  }, [fields, tmpDateInterval]);
+  }, [fields, flattenTaxesAndPaymentProcessorFees, tmpDateInterval]);
 
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
   const disabled = !isValidDateInterval || exportedRows > 100e3;
@@ -197,7 +186,7 @@ const ExportTransactionsCSVModal = ({
         <FormattedMessage id="ExportTransactionsCSVModal.Title" defaultMessage="Export Transactions" />
       </ModalHeader>
       <ModalBody>
-        {isHostReport && accounts?.length && (
+        {isHostReport && accounts?.length > 0 && (
           <MessageBox type="warning" withIcon mt={3}>
             <FormattedMessage
               id="ExportTransactionsCSVModal.FilteredCollectivesWarning"
@@ -247,27 +236,6 @@ const ExportTransactionsCSVModal = ({
             inputId="daterange"
             omitPresets
           />
-
-          {parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES')) && (
-            <StyledInputField
-              label={<FormattedMessage defaultMessage="CSV Version" />}
-              labelFontWeight="700"
-              labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
-              name="csvVersions"
-              mt={3}
-              gridColumn="1 / span 2"
-            >
-              {inputProps => (
-                <StyledSelect
-                  {...inputProps}
-                  options={CsvVersions}
-                  onChange={handleCsvVersionsChange}
-                  defaultValue={CsvVersions.find(option => option.value === csvVersion)}
-                  width="100%"
-                />
-              )}
-            </StyledInputField>
-          )}
 
           <StyledInputField
             label={<FormattedMessage defaultMessage="Exported Fields" />}
@@ -336,6 +304,24 @@ const ExportTransactionsCSVModal = ({
               </Box>
             );
           })}
+
+        {parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES')) && (
+          <div className="mt-4 flex flex-row items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label className="text-base">
+                <FormattedMessage defaultMessage="Separate transactions compatibility" />
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" />
+              </p>
+            </div>
+            <Switch
+              checked={flattenTaxesAndPaymentProcessorFees}
+              onCheckedChange={setFlattenTaxesAndPaymentProcessorFees}
+            />
+          </div>
+        )}
+
         {exportedRows > 100e3 ? (
           <MessageBox type="error" withIcon mt={3}>
             <FormattedMessage
@@ -367,7 +353,7 @@ const ExportTransactionsCSVModal = ({
             href={disabled ? undefined : downloadUrl}
             disabled={disabled}
           >
-            <FormattedMessage defaultMessage="Export CSV" />
+            <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
           </StyledButton>
         </Flex>
       </ModalFooter>

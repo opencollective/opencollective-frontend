@@ -1,7 +1,7 @@
 import { gql } from '../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../AccountHoverCard';
-import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '../../collective-navbar/fragments';
 
 export const managedOrderFragment = gql`
   fragment ManagedOrderFields on Order {
@@ -122,6 +122,6 @@ export const manageContributionsQuery = gql`
       }
     }
   }
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
   ${managedOrderFragment}
 `;

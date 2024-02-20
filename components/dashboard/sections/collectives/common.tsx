@@ -1,6 +1,6 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { groupBy, mapValues, toPairs } from 'lodash';
+import { groupBy, isNil, mapValues, toPairs } from 'lodash';
 import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Unlink } from 'lucide-react';
 import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
 
@@ -86,7 +86,9 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     header: () => <FormattedMessage defaultMessage="Fee" />,
     cell: ({ row }) => {
       const collective = row.original;
-      return (
+      return isNil(collective.hostFeePercent) ? (
+        ''
+      ) : (
         <div className="whitespace-nowrap">
           {collective.hostFeesStructure === HOST_FEE_STRUCTURE.DEFAULT
             ? `(${collective.hostFeePercent}%)`
@@ -100,7 +102,9 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     header: () => <FormattedMessage id="HostedSince" defaultMessage="Hosted since" />,
     cell: ({ row }) => {
       const since = row.original.approvedAt;
-      return (
+      return isNil(since) ? (
+        ''
+      ) : (
         <div className="whitespace-nowrap">
           <FormattedDate value={since} day="numeric" month="long" year="numeric" />
         </div>
@@ -136,7 +140,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
           <div className="flex flex-1 items-center justify-end" onClick={e => e.stopPropagation()}>
             <MoreActionsMenu collective={collective} onEdit={onEdit} openCollectiveDetails={openCollectiveDetails}>
-              <TableActionsButton className="h-8 w-8">
+              <TableActionsButton data-cy="more-actions-btn" className="h-8 w-8">
                 <MoreHorizontal className="relative h-3 w-3" aria-hidden="true" />
               </TableActionsButton>
             </MoreActionsMenu>
@@ -176,27 +180,39 @@ export const MoreActionsMenu = ({
               <DropdownMenuSeparator />
             </React.Fragment>
           )}
-          <DropdownMenuItem className="cursor-pointer" onClick={() => setOpenModal('ADD_FUNDS')}>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            data-cy="actions-add-funds"
+            onClick={() => setOpenModal('ADD_FUNDS')}
+          >
             <Banknote className="mr-2" size="16" />
             <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="cursor-pointer" onClick={() => setOpenModal('ADD_AGREEMENT')}>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            data-cy="actions-add-agreement"
+            onClick={() => setOpenModal('ADD_AGREEMENT')}
+          >
             <FilePlus2 className="mr-2" size="16" />
             <FormattedMessage defaultMessage="Add Agreement" />
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="cursor-pointer" onClick={() => setOpenModal('CONTACT')}>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            data-cy="actions-contact"
+            onClick={() => setOpenModal('CONTACT')}
+          >
             <Mail className="mr-2" size="16" />
             <FormattedMessage id="Contact" defaultMessage="Contact" />
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="cursor-pointer" onClick={() => setOpenModal('FREEZE')}>
+          <DropdownMenuItem className="cursor-pointer" data-cy="actions-freeze" onClick={() => setOpenModal('FREEZE')}>
             <Pause className="mr-2" size="16" />
             <FormattedMessage defaultMessage="Freeze Collective" />
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="cursor-pointer" onClick={() => setOpenModal('UNHOST')}>
+          <DropdownMenuItem className="cursor-pointer" data-cy="actions-unhost" onClick={() => setOpenModal('UNHOST')}>
             <Unlink className="mr-2" size="16" />
             <FormattedMessage defaultMessage="Unhost" />
           </DropdownMenuItem>
@@ -211,7 +227,12 @@ export const MoreActionsMenu = ({
             <FreezeAccountModal collective={collective} onClose={() => setOpenModal(null)} onSuccess={onEdit} />
           )}
           {openModal === 'UNHOST' && (
-            <UnhostAccountModal collective={collective} host={collective.host} onClose={() => setOpenModal(null)} />
+            <UnhostAccountModal
+              collective={collective}
+              host={collective.host}
+              onClose={() => setOpenModal(null)}
+              onSuccess={onEdit}
+            />
           )}
           {openModal === 'ADD_AGREEMENT' && (
             <AddAgreementModal

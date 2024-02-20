@@ -28,13 +28,13 @@ import LinkCollective from '../../LinkCollective';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import { Dropdown, DropdownContent } from '../../StyledDropdown';
-import { EditTag } from '../../StyledInputTags';
 import StyledLink from '../../StyledLink';
 import StyledModal from '../../StyledModal';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import { H1, Span } from '../../Text';
 import TruncatedTextWithTooltip from '../../TruncatedTextWithTooltip';
+import { Button } from '../../ui/Button';
 import UserCompany from '../../UserCompany';
 import ContainerSectionContent from '../ContainerSectionContent';
 
@@ -195,22 +195,21 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
           {!isEvent && (
             <Fragment>
               {(isCollective || isFund || isProject) && (
-                <Flex my="30px" mb={2} flexWrap="wrap" data-cy="collective-tags">
+                <div className="my-7 mb-2 flex flex-wrap items-center gap-2" data-cy="collective-tags">
                   <StyledTag
                     textTransform="uppercase"
                     variant="rounded-left"
                     backgroundColor="black.200"
-                    mt={['5px', 0]}
                     fontWeight={500}
                   >
                     <I18nCollectiveTags tags={collective.type} />
                   </StyledTag>
                   {tagCount > 0 && (
                     <Fragment>
-                      <Container borderRight="1px solid #C3C6CB" height="22px" padding="5px" mt={['5px', 0]} />
+                      <Container borderRight="1px solid #C3C6CB" height="22px" />
                       {displayedTags.map(tag => (
                         <Link key={tag} href={`/search?tag=${tag}`}>
-                          <StyledTag variant="rounded-right" ml="10px" mt={['5px', 0]} fontWeight={500}>
+                          <StyledTag variant="rounded-right" fontWeight={500}>
                             <I18nCollectiveTags tags={tag} />
                           </StyledTag>
                         </Link>
@@ -223,8 +222,6 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                                 as={StyledButton}
                                 border="none"
                                 variant="rounded-right"
-                                ml="10px"
-                                mt={['5px', 0]}
                                 fontWeight={500}
                                 {...triggerProps}
                               >
@@ -260,14 +257,17 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     </Fragment>
                   )}
                   {isAdmin && (
-                    <EditTag ml="10px" mt={['5px', 0]} active={isEditingTags} onClick={() => editTags(true)}>
-                      <Tags size="14px" />{' '}
-                      <Span ml="4px" letterSpacing={0}>
-                        <FormattedMessage id="StyledInputTags.EditLabel" defaultMessage="Edit Tags" />
-                      </Span>
-                    </EditTag>
+                    <Button
+                      size="xs"
+                      variant="outline"
+                      className="h-6 gap-1 border-dashed text-xs text-muted-foreground"
+                      onClick={() => editTags(true)}
+                    >
+                      <Tags size={16} />
+                      <FormattedMessage id="StyledInputTags.EditLabel" defaultMessage="Edit Tags" />
+                    </Button>
                   )}
-                </Flex>
+                </div>
               )}
               <Flex alignItems="center" flexWrap="wrap" fontSize="14px" gap="16px" mt={2}>
                 <Flex gap="16px" flexWrap="wrap">

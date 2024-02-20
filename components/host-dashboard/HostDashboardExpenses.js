@@ -10,8 +10,6 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useQueryFilter, { BooleanFilter } from '../../lib/hooks/deprecated/useQueryFilter';
 import { useLazyGraphQLPaginatedResults } from '../../lib/hooks/useLazyGraphQLPaginatedResults';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import DashboardViews from '../dashboard/DashboardViews';
@@ -77,13 +75,6 @@ const getVariablesFromQuery = query => {
   };
 };
 
-const enforceDefaultParamsOnQuery = query => {
-  return {
-    ...query,
-    status: query.status || 'READY_TO_PAY',
-  };
-};
-
 const ROUTE_PARAMS = ['hostCollectiveSlug', 'view', 'slug', 'section'];
 
 const hasParams = query => {
@@ -95,9 +86,7 @@ const hasParams = query => {
 const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
   const router = useRouter() || {};
   const intl = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
-  const expensePipelineFeatureIsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_PIPELINE);
-  const query = expensePipelineFeatureIsEnabled ? router.query : enforceDefaultParamsOnQuery(router.query);
+  const query = router.query;
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const hasFilters = React.useMemo(() => hasParams(query), [query]);
   const pageRoute = isDashboard ? `/dashboard/${hostSlug}/host-expenses` : `/${hostSlug}/admin/expenses`;
@@ -121,12 +110,8 @@ const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
     context: API_V2_CONTEXT,
   });
 
-  const {
-    data: metaData,
-    loading: loadingMetaData,
-    refetch: refetchMetaData,
-  } = useQuery(hostDashboardMetadataQuery, {
-    variables: { hostSlug, getViewCounts: Boolean(expensePipelineFeatureIsEnabled) },
+  const { data: metaData, refetch: refetchMetaData } = useQuery(hostDashboardMetadataQuery, {
+    variables: { hostSlug },
     context: API_V2_CONTEXT,
   });
 
@@ -150,7 +135,7 @@ const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
     },
     {
       label: intl.formatMessage({ id: 'expense.scheduledForPayment', defaultMessage: 'Scheduled for payment' }),
-      query: { status: 'SCHEDULED_FOR_PAYMENT', payout: 'BANK_ACCOUNT', orderBy: 'CREATED_AT,ASC' },
+      query: { status: 'SCHEDULED_FOR_PAYMENT', orderBy: 'CREATED_AT,ASC' },
       id: 'scheduled_for_payment',
       count: metaData?.scheduled_for_payment?.totalCount,
     },
@@ -190,16 +175,18 @@ const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="Expenses" defaultMessage="Expenses" />
         </h1>
-        <SearchBar
-          height="40px"
-          defaultValue={query.searchTerm}
-          onSubmit={searchTerm =>
-            router.push({
-              pathname: pageRoute,
-              query: getQueryParams({ searchTerm, offset: null }),
-            })
-          }
-        />
+        <div className="w-[276px]">
+          <SearchBar
+            height="40px"
+            defaultValue={query.searchTerm}
+            onSubmit={searchTerm =>
+              router.push({
+                pathname: pageRoute,
+                query: getQueryParams({ searchTerm, offset: null }),
+              })
+            }
+          />
+        </div>
       </div>
       {paypalPreApprovalError && (
         <DismissibleMessage>
@@ -260,23 +247,22 @@ const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
 
         {metaData?.host ? (
           <div>
-            {expensePipelineFeatureIsEnabled && (
-              <DashboardViews
-                query={query}
-                omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
-                views={views}
-                onChange={query => {
-                  router.push(
-                    {
-                      pathname: pageRoute,
-                      query,
-                    },
-                    undefined,
-                    { scroll: false },
-                  );
-                }}
-              />
-            )}
+            <DashboardViews
+              query={query}
+              omitMatchingParams={[...ROUTE_PARAMS, 'orderBy']}
+              views={views}
+              onChange={query => {
+                router.push(
+                  {
+                    pathname: pageRoute,
+                    query,
+                  },
+                  undefined,
+                  { scroll: false },
+                );
+              }}
+            />
+
             <ExpensesFilters
               collective={metaData.host}
               filters={query}
@@ -319,8 +305,8 @@ const HostDashboardExpenses = ({ accountSlug: hostSlug, isDashboard }) => {
         ) : (
           <React.Fragment>
             <ExpensesList
-              isLoading={loading || loadingMetaData}
-              host={metaData?.host}
+              isLoading={loading}
+              host={data?.host}
               nbPlaceholders={paginatedExpenses.limit}
               expenses={paginatedExpenses.nodes}
               view="admin"

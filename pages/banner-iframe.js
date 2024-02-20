@@ -431,10 +431,12 @@ class BannerIframe extends React.Component {
   }
 }
 
-export const addCollectiveBannerIframeData = graphql(collectiveBannerIframeQuery, {
+const addCollectiveBannerIframeData = graphql(collectiveBannerIframeQuery, {
   options({ collectiveSlug, useNewFormat }) {
     return { skip: !collectiveSlug || useNewFormat };
   },
 });
 
+// ignore unused exports default
+// next.js export
 export default addCollectiveBannerIframeData(BannerIframe);

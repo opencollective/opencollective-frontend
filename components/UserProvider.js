@@ -143,7 +143,6 @@ class UserProvider extends React.Component {
             const result = await twoFactorAuthPrompt.open({
               supportedMethods: decodedToken.supported2FAMethods,
               authenticationOptions: decodedToken.authenticationOptions,
-              isRequired: true,
               allowRecovery: true,
             });
 
@@ -169,18 +168,22 @@ class UserProvider extends React.Component {
             return LoggedInUser;
           } catch (e) {
             this.setState({ loadingLoggedInUser: false, errorLoggedInUser: e.message });
-            toast({
-              variant: 'error',
-              message: e.message,
-            });
 
-            // stop trying to get the code.
+            // Stop loop if user cancelled the prompt
+            if (e.type === 'TWO_FACTOR_AUTH_CANCELED') {
+              throw new Error(formatErrorMessage(intl, e));
+            }
+
+            // Stop loop if too many requests or token is invalid
             if (
               e.type === 'too_many_requests' ||
               (e.type === 'unauthorized' && e.message.includes('Cannot use this token'))
             ) {
               throw new Error(e.message);
             }
+
+            // Otherwise, retry 2fa prompt and show error
+            toast({ variant: 'error', message: e.message });
           }
         }
       } else {
@@ -238,4 +241,4 @@ export default injectIntl(
   withApollo(withLoggedInUser(withTwoFactorAuthenticationPrompt(withRouter(injectIntl(UserProvider))))),
 );
 
-export { UserConsumer, withUser };
+export { withUser };

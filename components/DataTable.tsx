@@ -1,5 +1,14 @@
 import React from 'react';
-import { ColumnDef, flexRender, getCoreRowModel, Row, TableMeta, useReactTable } from '@tanstack/react-table';
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  Row,
+  SortingState,
+  TableMeta,
+  useReactTable,
+} from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
 import { Skeleton } from './ui/Skeleton';
@@ -23,6 +32,8 @@ interface DataTableProps<TData, TValue> {
   footer?: React.ReactNode;
   tableRef?: React.Ref<HTMLTableElement>;
   compact?: boolean;
+  initialSort?: SortingState;
+  getRowDataCy?: (row: Row<TData>) => string;
 }
 
 export function DataTable<TData, TValue>({
@@ -39,13 +50,25 @@ export function DataTable<TData, TValue>({
   footer,
   tableRef,
   compact,
+  initialSort,
+  getRowDataCy,
   ...tableProps
 }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = React.useState<SortingState>(initialSort ?? []);
+  const [rowSelection, setRowSelection] = React.useState({});
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     meta,
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      rowSelection,
+    },
   });
 
   return (
@@ -86,6 +109,7 @@ export function DataTable<TData, TValue>({
           table.getRowModel().rows.map(row => (
             <TableRow
               key={row.id}
+              data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
               data-state={row.getIsSelected() && 'selected'}
               {...(onClickRow && {
                 onClick: () => onClickRow(row),

@@ -143,11 +143,13 @@ const HostDashboardHostedCollectives = ({ accountSlug: hostSlug }) => {
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           <FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />
         </h1>
-        <SearchBar
-          height={40}
-          defaultValue={query.searchTerm}
-          onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-        />
+        <div className="w-[276px]">
+          <SearchBar
+            height={40}
+            defaultValue={query.searchTerm}
+            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
+          />
+        </div>
       </div>
       <hr className="my-5" />
       <Box mb={34}>

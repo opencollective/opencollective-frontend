@@ -101,4 +101,6 @@ class MemberInvitationsPage extends React.Component {
   }
 }
 
+// ignore unused exports default
+// next.js export
 export default MemberInvitationsPage;

@@ -299,11 +299,6 @@ class CreateExpensePage extends React.Component {
     this.setState(state => ({ expense: { ...state.expense, [name]: value } }));
   };
 
-  getSuggestedTags(collective) {
-    const tagsStats = (collective && collective.expensesTags) || null;
-    return tagsStats && tagsStats.map(({ tag }) => tag);
-  }
-
   render() {
     const { collectiveSlug, data, LoggedInUser, loadingLoggedInUser, router } = this.props;
     const { step } = this.state;
@@ -397,7 +392,6 @@ class CreateExpensePage extends React.Component {
                             loggedInAccount={loggedInAccount}
                             onSubmit={this.onFormSubmit}
                             expense={this.state.expense}
-                            expensesTags={this.getSuggestedTags(collective)}
                             payoutProfiles={payoutProfiles}
                             formPersister={this.state.formPersister}
                             shouldLoadValuesFromPersister={this.state.isInitialForm}
@@ -660,4 +654,6 @@ const addHoc = compose(
   injectIntl,
 );
 
+// ignore unused exports default
+// next.js export
 export default addHoc(CreateExpensePage);

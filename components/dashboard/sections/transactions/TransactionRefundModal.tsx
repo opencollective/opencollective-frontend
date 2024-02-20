@@ -17,7 +17,7 @@ import {
 import { Button } from '../../../ui/Button';
 import { toast } from '../../../ui/useToast';
 
-export const refundTransactionMutation = gql`
+const refundTransactionMutation = gql`
   mutation RefundTransaction($transaction: TransactionReferenceInput!) {
     refundTransaction(transaction: $transaction) {
       id

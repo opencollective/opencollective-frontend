@@ -56,4 +56,6 @@ CollectivesPage.getInitialProps = ({ req, res }) => {
   return { skipDataFromTree };
 };
 
+// ignore unused exports default
+// next.js export
 export default CollectivesPage;

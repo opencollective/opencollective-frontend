@@ -254,18 +254,12 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
   const archivedMemberships = filterArchivedMemberships(user.memberOf);
   const groupedMemberships = groupBy(memberships, m => m.collective.type);
   groupedMemberships.ARCHIVED = archivedMemberships;
-  const hasNoMemberships = isEmpty(memberships);
   const shouldDisplaySection = section => {
     return MENU_SECTIONS[section].emptyMessage || !isEmpty(groupedMemberships[section]);
   };
 
   return (
     <React.Fragment>
-      {hasNoMemberships && (
-        <P color="blue.900" fontSize="20px" lineHeight="28px" fontWeight="bold" mt="8px" mb="12px">
-          <FormattedMessage id="ProfileMenuMemberships.Empty" defaultMessage="Make the most out of Open Collective" />
-        </P>
-      )}
       {Object.keys(MENU_SECTIONS)
         .filter(shouldDisplaySection)
         .map((accountType, i) => {
@@ -280,10 +274,8 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
                   <MenuSectionHeader section={accountType} hidePlusIcon={sectionIsEmpty} closeDrawer={closeDrawer} />
                 )}
                 {sectionIsEmpty ? (
-                  <Box my={2}>
-                    <P fontSize="12px" lineHeight="18px" color="black.700">
-                      {intl.formatMessage(sectionData.emptyMessage)}
-                    </P>
+                  <div className="m-2">
+                    <p className="text-xs text-muted-foreground">{intl.formatMessage(sectionData.emptyMessage)}</p>
                     {Boolean(sectionData.plusButton) && (
                       <Link href={sectionData.plusButton.href} onClick={closeDrawer}>
                         <StyledButton mt="12px" mb="16px" borderRadius="8px" width="100%" fontSize="12px">
@@ -305,7 +297,7 @@ const ProfileMenuMemberships = ({ user, closeDrawer }: ProfileMenuMembershipsPro
                         </StyledButton>
                       </Link>
                     )}
-                  </Box>
+                  </div>
                 ) : accountType === 'ARCHIVED' ? (
                   <Collapse
                     buttonSize={24}

@@ -1,7 +1,7 @@
 import { gql } from '../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../AccountHoverCard';
-import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '../../collective-navbar/fragments';
 
 export const loggedInAccountExpensePayoutFieldsFragment = gql`
   fragment LoggedInAccountExpensePayoutFields on Individual {
@@ -107,6 +107,8 @@ export const accountingCategoryFields = gql`
   fragment AccountingCategoryFields on AccountingCategory {
     id
     name
+    kind
+    instructions
     friendlyName
     code
     expensesTypes
@@ -151,7 +153,7 @@ export const expenseHostFields = gql`
     plan {
       id
     }
-    accountingCategories {
+    expenseAccountingCategories: accountingCategories(kind: EXPENSE) {
       nodes {
         id
         ...AccountingCategoryFields
@@ -219,6 +221,8 @@ export const expensePageExpenseFieldsFragment = gql`
         value
         source
         isApproximate
+        fromCurrency
+        toCurrency
       }
     }
     createdAt
@@ -388,10 +392,6 @@ export const expensePageExpenseFieldsFragment = gql`
         ...NavbarFields
         MULTI_CURRENCY_EXPENSES
       }
-      expensesTags {
-        id
-        tag
-      }
       location {
         id
         address
@@ -530,6 +530,8 @@ export const expensePageExpenseFieldsFragment = gql`
       }
       transaction {
         id
+        kind
+        type
         amount {
           valueInCents
           currency
@@ -580,6 +582,16 @@ export const expensePageExpenseFieldsFragment = gql`
           id
           currency
           amount
+          feesPayer
+        }
+        relatedTransactions(kind: PAYMENT_PROCESSOR_FEE) {
+          id
+          type
+          kind
+          amount {
+            valueInCents
+            currency
+          }
         }
       }
     }
@@ -597,7 +609,7 @@ export const expensePageExpenseFieldsFragment = gql`
   }
 
   ${expenseHostFields}
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
   ${accountingCategoryFields}
   ${accountHoverCardFields}
   ${expenseValuesByRoleFragment}
@@ -631,6 +643,8 @@ export const expensesListFieldsFragment = gql`
         value
         source
         isApproximate
+        fromCurrency
+        toCurrency
       }
     }
     currency

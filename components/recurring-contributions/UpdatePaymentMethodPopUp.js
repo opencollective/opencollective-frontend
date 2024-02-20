@@ -43,7 +43,7 @@ const messages = defineMessages({
   },
 });
 
-export const paymentMethodFragment = gql`
+const paymentMethodFragment = gql`
   fragment UpdatePaymentMethodFragment on PaymentMethod {
     id
     name
@@ -61,7 +61,7 @@ export const paymentMethodFragment = gql`
   }
 `;
 
-export const paymentMethodsQuery = gql`
+const paymentMethodsQuery = gql`
   query UpdatePaymentMethodPopUpPaymentMethod($accountSlug: String!, $orderId: String!) {
     account(slug: $accountSlug) {
       id
@@ -81,7 +81,7 @@ export const paymentMethodsQuery = gql`
   ${paymentMethodFragment}
 `;
 
-export const updatePaymentMethodMutation = gql`
+const updatePaymentMethodMutation = gql`
   mutation UpdatePaymentMethod(
     $order: OrderReferenceInput!
     $paymentMethod: PaymentMethodReferenceInput
@@ -107,7 +107,7 @@ export const updatePaymentMethodMutation = gql`
   }
 `;
 
-export const paymentMethodResponseFragment = gql`
+const paymentMethodResponseFragment = gql`
   fragment paymentMethodResponseFragment on CreditCardWithStripeError {
     paymentMethod {
       id
@@ -143,12 +143,7 @@ export const confirmCreditCardMutation = gql`
 
 const mutationOptions = { context: API_V2_CONTEXT };
 
-export const sortAndFilterPaymentMethods = (
-  paymentMethods,
-  contribution,
-  addedPaymentMethod,
-  existingPaymentMethod,
-) => {
+const sortAndFilterPaymentMethods = (paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod) => {
   if (!paymentMethods) {
     return null;
   }

@@ -177,7 +177,7 @@ const membersQuery = gqlV1/* GraphQL */ `
   }
 `;
 
-export const addMembersData = graphql(membersQuery, {
+const addMembersData = graphql(membersQuery, {
   options: props => ({
     variables: {
       collectiveSlug: props.collective.slug,

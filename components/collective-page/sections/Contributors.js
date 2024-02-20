@@ -60,12 +60,20 @@ export default class SectionContributors extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = { filter: ContributorsFilter.CONTRIBUTOR_FILTERS.ALL };
+    /* reference to the FixedSizedGrid element */
+    this.contributorsGridRef = React.createRef();
   }
 
   static MIN_CONTRIBUTORS_TO_SHOW_FILTERS = 2;
 
   setFilter = filter => {
     this.setState({ filter });
+
+    // whenever the filter is changed, scroll is set to point to the initial item
+    this.contributorsGridRef.current.scrollToItem({
+      columnIndex: 0,
+      rowIndex: 0,
+    });
   };
 
   // Memoize filtering functions as they can get expensive if there are a lot of contributors
@@ -151,6 +159,7 @@ export default class SectionContributors extends React.PureComponent {
           collectiveId={collective.id}
           currency={collective.currency}
           maxWidthWhenNotFull={Dimensions.MAX_SECTION_WIDTH}
+          gridRef={this.contributorsGridRef}
         />
       </MainContainer>
     );

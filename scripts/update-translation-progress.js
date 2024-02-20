@@ -23,7 +23,7 @@ if (!TOKEN) {
   throw new Error('Missing CROWDIN_TOKEN from env');
 }
 
-export async function fetchProgress() {
+async function fetchProgress() {
   try {
     const { data } = await fetch(`https://api.crowdin.com/api/v2/projects/${PROJECT_ID}/languages/progress`, {
       method: 'GET',
@@ -40,7 +40,7 @@ const generateLocalesForJsFile = locales => {
   return `export default ${JSON.stringify(locales)};`;
 };
 
-export async function main() {
+async function main() {
   const progress = await fetchProgress();
   const newLocales = cloneDeep(locales);
   for (const progressItem of progress) {

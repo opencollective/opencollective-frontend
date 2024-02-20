@@ -53,10 +53,11 @@ interface SheetContentProps
 const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Content>, SheetContentProps>(
   ({ side = 'right', className, children, ...props }, ref) => (
     <SheetPortal>
-      <SheetOverlay />
-      <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
-        {children}
-      </SheetPrimitive.Content>
+      <SheetOverlay>
+        <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
+          {children}
+        </SheetPrimitive.Content>
+      </SheetOverlay>
     </SheetPortal>
   ),
 );
@@ -87,6 +88,9 @@ const SheetDescription = React.forwardRef<
   <SheetPrimitive.Description ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
 ));
 SheetDescription.displayName = SheetPrimitive.Description.displayName;
+
+// ignore unused exports
+// ui library
 
 export {
   Sheet,

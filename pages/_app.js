@@ -157,4 +157,6 @@ class OpenCollectiveFrontendApp extends App {
   }
 }
 
+// ignore unused exports default
+// next.js export
 export default withTwoFactorAuthentication(OpenCollectiveFrontendApp);

@@ -19,8 +19,8 @@ import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
+import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import { Dimensions } from '../components/collective-page/_constants';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Expenses from '../components/expenses/ExpensesPage';
@@ -39,7 +39,7 @@ const messages = defineMessages({
 
 const EXPENSES_PER_PAGE = 10;
 
-export const expensesPageQuery = gql`
+const expensesPageQuery = gql`
   query ExpensesPage(
     $collectiveSlug: String!
     $account: AccountReferenceInput
@@ -178,7 +178,7 @@ export const expensesPageQuery = gql`
   }
 
   ${expensesListFieldsFragment}
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
   ${expenseHostFields}
 `;
 
@@ -254,8 +254,12 @@ const expensePageQueryHelpers = getSSRQueryHelpers<ReturnType<typeof getVariable
   skipClientIfSSRThrows404: true,
 });
 
+// ignore unused exports getServerSideProps
+// next.js export
 export const getServerSideProps = expensePageQueryHelpers.getServerSideProps;
 
+// ignore unused exports default
+// next.js export
 export default function ExpensesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
   const router = useRouter();

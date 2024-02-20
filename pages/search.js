@@ -169,7 +169,7 @@ class SearchPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.onClick = this.onClick.bind(this);
+
     const term = props.term;
     if (this.props.isHost) {
       this.state = { filter: 'HOST', term };
@@ -240,6 +240,13 @@ class SearchPage extends React.Component {
       sortBy: q.value === '' && router.query.sortBy === 'RANK' ? 'ACTIVITY' : router.query.sortBy,
     };
     router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
+  };
+
+  handleClearFilter = () => {
+    const { router } = this.props;
+    this.setState({ term: '' });
+
+    router.push({ pathname: router.pathname });
   };
 
   onClick = filter => {
@@ -324,6 +331,7 @@ class SearchPage extends React.Component {
                 onSubmit={this.refetch}
                 showSearchButton
                 searchButtonStyles={{ minWidth: '40px', height: '40px' }}
+                onClearFilter={this.handleClearFilter}
               />
             </SearchFormContainer>
           </Flex>
@@ -536,9 +544,7 @@ class SearchPage extends React.Component {
   }
 }
 
-export { SearchPage as MockSearchPage };
-
-export const searchPageQuery = gql`
+const searchPageQuery = gql`
   query SearchPage(
     $term: String!
     $type: [AccountType]
@@ -622,7 +628,7 @@ export const searchPageQuery = gql`
   }
 `;
 
-export const addSearchPageData = graphql(searchPageQuery, {
+const addSearchPageData = graphql(searchPageQuery, {
   options: props => ({
     context: API_V2_CONTEXT,
     variables: {
@@ -638,4 +644,6 @@ export const addSearchPageData = graphql(searchPageQuery, {
   }),
 });
 
+// ignore unused exports default
+// next.js export
 export default injectIntl(withRouter(addSearchPageData(SearchPage)));

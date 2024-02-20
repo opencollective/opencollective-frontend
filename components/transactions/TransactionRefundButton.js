@@ -11,7 +11,7 @@ import { Box, Flex } from '../Grid';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import StyledButton from '../StyledButton';
 
-export const refundTransactionMutation = gql`
+const refundTransactionMutation = gql`
   mutation RefundTransaction($transaction: TransactionReferenceInput!) {
     refundTransaction(transaction: $transaction) {
       id

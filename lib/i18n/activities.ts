@@ -13,7 +13,8 @@ export const ActivityTimelineMessageI18n = defineMessages({
     defaultMessage: '<Individual></Individual> marked <Expense>{expenseDescription}</Expense> as incomplete',
   },
   COLLECTIVE_EXPENSE_PAID: {
-    defaultMessage: '<Individual></Individual> paid <Expense>{expenseDescription}</Expense>',
+    defaultMessage:
+      '<Individual></Individual> paid <Amount></Amount> to <Payee></Payee> for <Expense>{expenseDescription}</Expense>',
   },
   COLLECTIVE_EXPENSE_REJECTED: {
     defaultMessage: '<Individual></Individual> rejected <Expense>{expenseDescription}</Expense>',

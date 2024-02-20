@@ -2,7 +2,6 @@ module.exports = {
   projects: {
     default: {
       schema: 'lib/graphql/schemaV2.graphql',
-      documents: ['pages/**/*.(ts|tsx)', 'components/**/*.(ts|tsx)'],
       extensions: {
         endpoints: {
           dev: 'http://localhost:3060/graphql/v2',

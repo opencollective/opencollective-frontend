@@ -34,7 +34,7 @@ export const getVariablesFromQuery = query => {
   };
 };
 
-export const getPropsFromQuery = query => {
+const getPropsFromQuery = query => {
   return {
     legacyExpenseId: parseInt(query.ExpenseId),
     draftKey: query.key,
@@ -62,6 +62,8 @@ const expensePageQueryHelper = getSSRQueryHelpers<
   getPropsFromContext: context => getPropsFromQuery(context.query),
 });
 
+// ignore unused exports getServerSideProps
+// next.js export
 export const getServerSideProps = expensePageQueryHelper.getServerSideProps;
 
 const getPageMetadata = (intl, legacyExpenseId, expense) => {
@@ -76,6 +78,8 @@ const getPageMetadata = (intl, legacyExpenseId, expense) => {
   }
 };
 
+// ignore unused exports default
+// next.js export
 export default function ExpensePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
@@ -108,7 +112,7 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
     }
   }
 
-  const expense = cloneDeep(data.expense);
+  const expense = cloneDeep(data?.expense);
   if (expense && data.expensePayeeStats?.payee?.stats) {
     expense.payee.stats = data.expensePayeeStats?.payee?.stats;
   }

@@ -1,20 +1,21 @@
-import { ThemeProvider } from 'styled-components';
-import { RouterContext } from 'next/dist/shared/lib/router-context';
-import { IntlProvider } from 'react-intl';
-import theme from '../lib/theme';
+import React from 'react';
 import { ApolloProvider } from '@apollo/client';
+import { IntlProvider } from 'react-intl';
+import { ThemeProvider } from 'styled-components';
 
-import UserProvider from '../components/UserProvider';
 import { initClient } from '../lib/apollo-client';
-import { withDesign } from 'storybook-addon-designs';
+import theme from '../lib/theme';
+import { RouterContext } from 'next/dist/shared/lib/router-context';
+
+import { Toaster } from '../components/ui/Toaster';
+import { TooltipProvider } from '../components/ui/Tooltip';
+import UserProvider from '../components/UserProvider';
 
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
-import { TooltipProvider } from '../components/ui/Tooltip';
-import { Toaster } from '../components/ui/Toaster';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
@@ -38,5 +39,4 @@ export const decorators = [
       </ThemeProvider>
     </ApolloProvider>
   ),
-  withDesign,
 ];

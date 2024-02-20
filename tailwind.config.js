@@ -55,6 +55,14 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
+        emoji: [
+          'AppleColorEmoji',
+          'Segoe UI Emoji',
+          'NotoColorEmoji',
+          'Segoe UI Symbol',
+          'Android Emoji',
+          'EmojiSymbols',
+        ],
       },
       keyframes: {
         'accordion-down': {

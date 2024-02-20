@@ -18,6 +18,7 @@ import { i18nTaxType } from '../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../lib/policies';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
+import AccountingCategorySelect from '../AccountingCategorySelect';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../collective-page/graphql/queries';
 import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../collective-page/sections/Budget';
 import { DefaultCollectiveLabel } from '../CollectivePicker';
@@ -90,6 +91,7 @@ const addFundsMutation = gql`
     $hostFeePercent: Float!
     $invoiceTemplate: String
     $tax: TaxInput
+    $accountingCategory: AccountingCategoryReferenceInput
   ) {
     addFunds(
       account: $account
@@ -102,6 +104,7 @@ const addFundsMutation = gql`
       tier: $tier
       invoiceTemplate: $invoiceTemplate
       tax: $tax
+      accountingCategory: $accountingCategory
     ) {
       id
       description
@@ -135,6 +138,12 @@ const addFundsMutation = gql`
           }
         }
       }
+      accountingCategory {
+        id
+        code
+        name
+        kind
+      }
       tier {
         id
         legacyId
@@ -151,6 +160,44 @@ const addFundsTierFieldsFragment = gql`
     slug
     legacyId
     name
+  }
+`;
+
+const addFundsAccountQueryHostFieldsFragment = gql`
+  fragment AddFundsAccountQueryHostFields on Host {
+    id
+    type
+    legacyId
+    slug
+    name
+    settings
+    plan {
+      id
+      hostFees
+    }
+    policies {
+      id
+      REQUIRE_2FA_FOR_ADMINS
+    }
+    isTrustedHost
+    vendors(forAccount: { slug: $slug }) {
+      nodes {
+        id
+        slug
+        name
+        type
+        description
+        imageUrl(height: 64)
+      }
+    }
+    orderAccountingCategories: accountingCategories(kind: [CONTRIBUTION, ADDED_FUNDS]) {
+      nodes {
+        id
+        code
+        name
+        kind
+      }
+    }
   }
 `;
 
@@ -172,6 +219,9 @@ const addFundsAccountQuery = gql`
             ...AddFundsTierFields
           }
         }
+        host {
+          ...AddFundsAccountQueryHostFields
+        }
       }
       ... on AccountWithParent {
         parent {
@@ -179,49 +229,12 @@ const addFundsAccountQuery = gql`
         }
       }
       ... on Host {
-        id
-        type
-        slug
-        name
-        settings
-        plan {
-          id
-          hostFees
-        }
-        policies {
-          id
-          REQUIRE_2FA_FOR_ADMINS
-        }
-        isTrustedHost
+        ...AddFundsAccountQueryHostFields
       }
       ... on AccountWithHost {
         addedFundsHostFeePercent: hostFeePercent(paymentMethodType: HOST)
         host {
-          id
-          type
-          legacyId
-          slug
-          name
-          settings
-          plan {
-            id
-            hostFees
-          }
-          policies {
-            id
-            REQUIRE_2FA_FOR_ADMINS
-          }
-          isTrustedHost
-          vendors(forAccount: { slug: $slug }) {
-            nodes {
-              id
-              slug
-              name
-              type
-              description
-              imageUrl(height: 64)
-            }
-          }
+          ...AddFundsAccountQueryHostFields
         }
       }
       ... on AccountWithContributions {
@@ -235,6 +248,7 @@ const addFundsAccountQuery = gql`
     }
   }
   ${addFundsTierFieldsFragment}
+  ${addFundsAccountQueryHostFieldsFragment}
 `;
 
 const getInitialValues = values => ({
@@ -319,7 +333,7 @@ const AddFundsModal = ({ collective, ...props }) => {
   });
   const account = data?.account;
   const currency = account?.currency;
-  const host = account?.isHost ? account : account?.host;
+  const host = account?.isHost && !account.host ? account : account?.host;
   const applicableTax = getApplicableTaxType(collective, host);
 
   const [submitAddFunds, { error: fundError }] = useMutation(addFundsMutation, {
@@ -403,6 +417,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                   invoiceTemplate: values.invoiceTemplate?.value || defaultInvoiceTemplate,
                   processedAt: values.processedAt ? new Date(values.processedAt) : null,
                   tax: values.tax,
+                  accountingCategory: values.accountingCategory ? { id: values.accountingCategory.id } : null,
                 },
               });
 
@@ -521,6 +536,33 @@ const AddFundsModal = ({ collective, ...props }) => {
                     >
                       {({ field }) => <StyledInput data-cy="add-funds-processedAt" {...field} />}
                     </Field>
+                    {account.host?.orderAccountingCategories?.nodes?.length > 0 && (
+                      <Field
+                        name="accountingCategory"
+                        htmlFor="addFunds-accountingCategory"
+                        required={false}
+                        label={
+                          <FormattedMessage
+                            id="AddFundsModal.accountingCategory"
+                            defaultMessage="Accounting category"
+                          />
+                        }
+                        mt={3}
+                      >
+                        {({ form, field }) => (
+                          <AccountingCategorySelect
+                            id={field.id}
+                            kind="CONTRIBUTION"
+                            onChange={value => form.setFieldValue(field.name, value)}
+                            host={host}
+                            account={account}
+                            selectedCategory={field.value}
+                            allowNone={true}
+                            borderRadiusClass="rounded"
+                          />
+                        )}
+                      </Field>
+                    )}
                     <Field
                       name="memo"
                       htmlFor="addFunds-memo"

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 
+import { isHeavyAccount } from '../../../lib/collective';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 
 import { Flex } from '../../Grid';
@@ -14,8 +15,8 @@ import ContainerSectionContent from '../ContainerSectionContent';
 import ContributionsBudget from './Budget/ContributionsBudget';
 import ExpenseBudget from './Budget/ExpenseBudget';
 
-export const budgetSectionQuery = gql`
-  query BudgetSection($slug: String!) {
+const budgetSectionQuery = gql`
+  query BudgetSection($slug: String!, $heavyAccount: Boolean!) {
     account(slug: $slug) {
       id
       stats {
@@ -24,16 +25,16 @@ export const budgetSectionQuery = gql`
           valueInCents
           currency
         }
-        consolidatedBalance {
+        consolidatedBalance @skip(if: $heavyAccount) {
           valueInCents
           currency
         }
-        yearlyBudget {
+        yearlyBudget @skip(if: $heavyAccount) {
           valueInCents
           currency
         }
-        activeRecurringContributions
-        totalAmountReceived(periodInMonths: 12) {
+        activeRecurringContributions @skip(if: $heavyAccount)
+        totalAmountReceived(periodInMonths: 12) @skip(if: $heavyAccount) {
           valueInCents
           currency
         }
@@ -56,7 +57,10 @@ export const budgetSectionQuery = gql`
  */
 const SectionFinancialOverview = ({ collective, LoggedInUser }) => {
   const budgetQueryResult = useQuery(budgetSectionQuery, {
-    variables: { slug: collective.slug },
+    variables: {
+      slug: collective.slug,
+      heavyAccount: isHeavyAccount(collective.slug),
+    },
     context: API_V2_CONTEXT,
   });
   const { data, refetch } = budgetQueryResult;

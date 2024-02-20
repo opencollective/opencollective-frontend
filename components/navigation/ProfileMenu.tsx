@@ -198,7 +198,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
 
             <Separator className="my-1" />
 
-            <MenuItem Icon={LogOut} onClick={() => logout(logoutParameters)}>
+            <MenuItem Icon={LogOut} onClick={() => logout(logoutParameters)} data-cy="logout">
               <FormattedMessage id="menu.logout" defaultMessage="Log out" />
             </MenuItem>
           </div>

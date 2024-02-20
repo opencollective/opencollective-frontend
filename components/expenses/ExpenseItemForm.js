@@ -35,10 +35,10 @@ import StyledInputField from '../StyledInputField';
 import { P, Span } from '../Text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
-import { AccountingCategoryPill } from './AccountingCategoryPill';
+import { ExpenseAccountingCategoryPill } from './ExpenseAccountingCategoryPill';
 import { ExpenseItemDescriptionHint } from './ItemDescriptionHint';
 
-export const msg = defineMessages({
+const msg = defineMessages({
   previewImgAlt: {
     id: 'ExpenseReceiptImagePreview.Alt',
     defaultMessage: 'Expense receipt preview',
@@ -306,6 +306,7 @@ const ExpenseItemForm = ({
   isInvoice,
   hasOCRFeature,
   ocrComparison,
+  hasCurrencyPicker,
 }) => {
   const intl = useIntl();
   const form = useFormikContext();
@@ -478,7 +479,7 @@ const ExpenseItemForm = ({
                           min={isOptional ? undefined : 1}
                           maxWidth="100%"
                           placeholder="0.00"
-                          hasCurrencyPicker={true}
+                          hasCurrencyPicker={hasCurrencyPicker}
                           loadingExchangeRate={loadingExchangeRate}
                           exchangeRate={field.value?.exchangeRate}
                           minFxRate={referenceExchangeRate?.value * (1 - FX_RATE_ERROR_THRESHOLD) || undefined}
@@ -535,7 +536,7 @@ const ExpenseItemForm = ({
                   <FormattedMessage defaultMessage="Expense category" />
                 </P>
                 <div className="flex max-h-[38px] grow items-center">
-                  <AccountingCategoryPill
+                  <ExpenseAccountingCategoryPill
                     expense={form.values}
                     host={collective.host}
                     account={collective}
@@ -600,6 +601,7 @@ ExpenseItemForm.propTypes = {
   editOnlyDescriptiveInfo: PropTypes.bool,
   itemIdx: PropTypes.number.isRequired,
   ocrComparison: PropTypes.object,
+  hasCurrencyPicker: PropTypes.bool,
 };
 
 ExpenseItemForm.defaultProps = {
