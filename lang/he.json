@@ -1081,7 +1081,7 @@
   "editCollective.host.removeBtn": "הסרת מארח",
   "editCollective.legalName.description": "שמות חוקיים הנם מידע פרטי ונמצאים בשימוש בקבלות, טפסי מיסוי, פרטי תשלומים ובעוד הקשרים שאינם פומביים. רק מנהלים רואים את השם החוקי.",
   "editCollective.menu.advanced": "מתקדם",
-  "editCollective.menu.collectivePage": "עמוד הפרופיל",
+  "editCollective.menu.collectivePage": "Profile Sections",
   "editCollective.menu.connectedAccounts": "חשבונות מחוברים",
   "editCollective.menu.expenses": "מדינות הוצאות",
   "editCollective.menu.export": "ייצוא",

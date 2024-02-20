@@ -1081,7 +1081,7 @@
   "editCollective.host.removeBtn": "Remover Administrador",
   "editCollective.legalName.description": "Legal names are private and used in receipts, tax forms, payment details on expenses, and other non-public contexts. Legal names are only visible to admins.",
   "editCollective.menu.advanced": "Avançado",
-  "editCollective.menu.collectivePage": "Página de Perfil",
+  "editCollective.menu.collectivePage": "Profile Sections",
   "editCollective.menu.connectedAccounts": "Conectar contas",
   "editCollective.menu.expenses": "Expenses Policy",
   "editCollective.menu.export": "Exportar",

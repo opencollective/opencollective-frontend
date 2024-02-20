@@ -1081,7 +1081,7 @@
   "editCollective.host.removeBtn": "Ta bort värd",
   "editCollective.legalName.description": "Juridiska namn är privata och används på kvitton, skatteformulär, betalningsdetaljer på utgifter och andra icke-offentliga sammanhang. Juridiska namn är endast synliga för administratörer.",
   "editCollective.menu.advanced": "Avancerad",
-  "editCollective.menu.collectivePage": "Profilsida",
+  "editCollective.menu.collectivePage": "Profile Sections",
   "editCollective.menu.connectedAccounts": "Anslutna konton",
   "editCollective.menu.expenses": "Utgiftspolicy",
   "editCollective.menu.export": "Exportera",

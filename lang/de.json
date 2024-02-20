@@ -1081,7 +1081,7 @@
   "editCollective.host.removeBtn": "Träger entfernen",
   "editCollective.legalName.description": "Rechtliche Namen sind privat und werden in Quittungen, Steuerformularen, Ausgabendetails und anderen nicht-öffentlichen Kontexten verwendet. Rechtliche Namen sind nur für Administratoren sichtbar.",
   "editCollective.menu.advanced": "Erweitert",
-  "editCollective.menu.collectivePage": "Profilseite",
+  "editCollective.menu.collectivePage": "Profile Sections",
   "editCollective.menu.connectedAccounts": "Verbundene Accounts",
   "editCollective.menu.expenses": "Ausgabenrichtlinie",
   "editCollective.menu.export": "Exportieren",

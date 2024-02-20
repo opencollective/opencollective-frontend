@@ -1081,7 +1081,7 @@
   "editCollective.host.removeBtn": "ホストを削除",
   "editCollective.legalName.description": "法的な名前は非公開で、領収書、納税申告書、経費の支払い明細、その他の非公開の内容において使用されます。法的な名前は管理者にのみ表示されます。",
   "editCollective.menu.advanced": "詳細",
-  "editCollective.menu.collectivePage": "プロフィールページ",
+  "editCollective.menu.collectivePage": "Profile Sections",
   "editCollective.menu.connectedAccounts": "連携済みのアカウント",
   "editCollective.menu.expenses": "経費精算ポリシー",
   "editCollective.menu.export": "エクスポート",
