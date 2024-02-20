@@ -1081,7 +1081,7 @@
   "editCollective.host.removeBtn": "移除主体",
   "editCollective.legalName.description": "Legal names are private and used in receipts, tax forms, payment details on expenses, and other non-public contexts. Legal names are only visible to admins.",
   "editCollective.menu.advanced": "高级设置",
-  "editCollective.menu.collectivePage": "资料页",
+  "editCollective.menu.collectivePage": "Profile Sections",
   "editCollective.menu.connectedAccounts": "已连接的帐户",
   "editCollective.menu.expenses": "开支政策",
   "editCollective.menu.export": "支出",
