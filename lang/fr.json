@@ -1081,7 +1081,7 @@
   "editCollective.host.removeBtn": "Supprimer l'hôte",
   "editCollective.legalName.description": "Les noms juridiques sont privés et utilisés dans les reçus, les formulaires fiscaux, les détails de paiement sur les dépenses et autres contextes non publics.",
   "editCollective.menu.advanced": "Avancé",
-  "editCollective.menu.collectivePage": "Page de profil",
+  "editCollective.menu.collectivePage": "Profile Sections",
   "editCollective.menu.connectedAccounts": "Comptes connectés",
   "editCollective.menu.expenses": "Politique de remboursement",
   "editCollective.menu.export": "Exporter",

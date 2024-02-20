@@ -1081,7 +1081,7 @@
   "editCollective.host.removeBtn": "Odstrániť Hostiteľa",
   "editCollective.legalName.description": "Právne názvy sú súkromné a používajú sa na účtenkách, v daňových formulároch, pri úhrade výdavkov a v iných neverejných kontextoch. Právne názvy sú viditeľné len pre správcov.",
   "editCollective.menu.advanced": "Pokročilé",
-  "editCollective.menu.collectivePage": "Stránka profilu",
+  "editCollective.menu.collectivePage": "Profile Sections",
   "editCollective.menu.connectedAccounts": "Pripojené účty",
   "editCollective.menu.expenses": "Pravidlá týkajúce sa výdavkov",
   "editCollective.menu.export": "Exportovať",

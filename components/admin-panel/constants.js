@@ -150,7 +150,7 @@ export const SECTION_LABELS = defineMessages({
   },
   [ALL_SECTIONS.COLLECTIVE_PAGE]: {
     id: 'editCollective.menu.collectivePage',
-    defaultMessage: 'Profile Page',
+    defaultMessage: 'Profile Sections',
   },
   [ALL_SECTIONS.CONNECTED_ACCOUNTS]: {
     id: 'editCollective.menu.connectedAccounts',

@@ -1081,7 +1081,7 @@
   "editCollective.host.removeBtn": "Usuń hosta",
   "editCollective.legalName.description": "Nazwy prawne są prywatne i używane w pokwitowaniach, formularzach podatkowych, szczegółach płatności wydatków oraz innych niepublicznych kontekstach. Nazwy prawne są widoczne tylko dla administratorów.",
   "editCollective.menu.advanced": "Zaawansowane",
-  "editCollective.menu.collectivePage": "Strona profilu",
+  "editCollective.menu.collectivePage": "Profile Sections",
   "editCollective.menu.connectedAccounts": "Połączone konta",
   "editCollective.menu.expenses": "Polityka wydatków",
   "editCollective.menu.export": "Eksportuj",

@@ -1081,7 +1081,7 @@
   "editCollective.host.removeBtn": "Вилучити фіскальний агент",
   "editCollective.legalName.description": "Юридичні імена приватні й використовуються у квитанціях, податкових формах, платіжних відомостях про витрати та інших непублічних контекстах. Юридичні імена видимі лише адміністраторам.",
   "editCollective.menu.advanced": "Додатково",
-  "editCollective.menu.collectivePage": "Сторінка профілю",
+  "editCollective.menu.collectivePage": "Profile Sections",
   "editCollective.menu.connectedAccounts": "Під’єднані облікові записи",
   "editCollective.menu.expenses": "Політика витрат",
   "editCollective.menu.export": "Експорт",
