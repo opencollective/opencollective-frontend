@@ -54,8 +54,6 @@ function CollapsibleAccountsList({ accounts, label }) {
               </div>
             </Button>
           </div>
-
-          {/* <ChevronDown size={24} /> */}
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="flex flex-col gap-4 border-t p-3">

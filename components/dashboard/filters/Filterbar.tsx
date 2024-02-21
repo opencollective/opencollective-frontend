@@ -88,6 +88,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
                   onChange={val => setFilter(key, val)}
                   isViewActive={!!activeViewId}
                   intl={intl}
+                  meta={meta}
                 />
               );
             }
