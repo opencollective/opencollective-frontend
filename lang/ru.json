@@ -196,6 +196,7 @@
   "9DioA1": "{count, plural, one {# повторение} few {# повторения} other {# повторений}}",
   "9DNi/v": "No chart of accounts found",
   "9EFQ9C": "Размер файла больше чем максимально допустимый ({max})",
+  "9f14iS": "{childAccountType} by {parentAccount}",
   "9FWGOh": "Для просмотра этой страницы вам необходимо войти в систему как администратор или бухгалтер",
   "9GxuH5": "Устройство добавлено",
   "9HVZ95": "Enter related Collectives",

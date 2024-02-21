@@ -196,6 +196,7 @@
   "9DioA1": "{count, plural, one {# Återkommande} other {# Återkommande}}",
   "9DNi/v": "No chart of accounts found",
   "9EFQ9C": "Filen är större än maximalt tillåten ({max})",
+  "9f14iS": "{childAccountType} by {parentAccount}",
   "9FWGOh": "Du måste vara inloggad som administratör eller revisor för att se denna sida",
   "9GxuH5": "Device added",
   "9HVZ95": "Enter related Collectives",

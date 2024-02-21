@@ -185,9 +185,9 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
     refetchMetadata();
     refetch();
   };
-
   const isUnhosted = queryFilter.values?.isUnhosted === true;
   const hostedAccounts = data?.host?.hostedAccounts;
+
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />} />
