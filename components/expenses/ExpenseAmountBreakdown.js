@@ -96,13 +96,17 @@ ExpenseAmountBreakdown.propTypes = {
   /** Expense items */
   items: PropTypes.arrayOf(
     PropTypes.shape({
-      amount: PropTypes.number,
+      amountV2: PropTypes.shape({
+        valueInCents: PropTypes.number,
+        currency: PropTypes.string,
+      }),
     }),
   ).isRequired,
   /** Taxes applied to the expense */
   taxes: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string,
+      type: PropTypes.string,
       rate: PropTypes.number,
     }),
   ),

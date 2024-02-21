@@ -9,6 +9,7 @@ import { ExpenseSummaryStepQuery, ExpenseSummaryStepQueryVariables } from '../..
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';
+import ExpenseAmountBreakdown from '../expenses/ExpenseAmountBreakdown';
 import ExpenseAttachedFiles from '../expenses/ExpenseAttachedFiles';
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -142,8 +143,6 @@ function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
 
   const submitter = query.data?.submitter;
 
-  const totalAmount = props.form.values.expenseItems.reduce((acc, i) => acc + i.amount.valueInCents, 0);
-
   return (
     <div>
       <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">
@@ -213,20 +212,18 @@ function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
         </div>
 
         <div className="mb-8 flex flex-col gap-2 text-sm">
-          {props.form.values.expenseItems.map((ei, i) => (
+          {(props.form.values.expenseItems || []).map((ei, i) => (
             // index is the only stable key available here
             // eslint-disable-next-line react/no-array-index-key
             <ExpenseItemSummary key={i} expenseItem={ei} />
           ))}
         </div>
 
-        <div className="mb-8 text-right text-sm font-medium">
-          <FormattedMessage
-            defaultMessage="Total amount ({currency}): {amount}"
-            values={{
-              currency: props.form.values.expenseCurrency,
-              amount: <FormattedMoneyAmount amount={totalAmount} currency={props.form.values.expenseCurrency} />,
-            }}
+        <div className="mb-8">
+          <ExpenseAmountBreakdown
+            currency={props.form.values.expenseCurrency}
+            items={(props.form.values.expenseItems || []).map(ei => ({ ...ei, amountV2: ei.amount }))}
+            taxes={props.form.values.tax ? [{ ...props.form.values.tax, type: props.form.options.taxType }] : []}
           />
         </div>
 
@@ -325,16 +322,17 @@ function ExpenseSummaryStepListItem(props: { className?: string; form: ExpenseFo
 function ExpenseItemSummary(props: { expenseItem: ExpenseItem }) {
   return (
     <div className="flex justify-between gap-4">
-      <div className="h-[64px] w-[64px]">
-        {props.expenseItem.url && (
+      {props.expenseItem.url && (
+        <div className="h-[64px] w-[64px]">
           <UploadedFilePreview
             className="inline-block h-[112px] w-[112px]"
             size={64}
             url={props.expenseItem.url}
             maxHeight={64}
           />
-        )}
-      </div>
+        </div>
+      )}
+
       <div className="flex flex-grow flex-col justify-between">
         <div className="">{props.expenseItem.description}</div>
         <div>

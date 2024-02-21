@@ -1,7 +1,9 @@
 import React from 'react';
 import { ApolloClient, gql, useApolloClient } from '@apollo/client';
+import { accountHasGST, accountHasVAT, checkVATNumberFormat, GST_RATE_PERCENT, TaxType } from '@opencollective/taxes';
+import { Account } from '@opencollective/taxes/dist/types/Accounts';
 import type { Path, PathValue } from 'dot-path-value';
-import { FormikErrors, useFormik } from 'formik';
+import { FormikErrors, FormikHelpers, useFormik } from 'formik';
 import { isEmpty, set } from 'lodash';
 import z from 'zod';
 
@@ -63,6 +65,11 @@ export type ExpenseFormValues = {
   expenseCurrency?: string;
   expenseItems?: ExpenseItem[];
   expenseAttachedFiles?: { url: string }[];
+  hasTax?: boolean;
+  tax?: {
+    rate: number;
+    idNumber: string;
+  };
 };
 
 export type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setFieldValue'> & {
@@ -89,7 +96,7 @@ const minimumSchema = z.object({
       url: z.string().url().optional(),
       date: z.string(),
       amount: z.object({
-        valueInCents: z.number(),
+        valueInCents: z.number().min(1),
         currency: z.string().refine(v => Object.values(Currency).includes(v as Currency), {
           message: `Currency must be one of: ${Object.values(Currency).join(',')}`,
         }),
@@ -105,6 +112,7 @@ const formSchemaQuery = gql`
       name
       slug
       currency
+      settings
       supportedExpenseTypes
 
       ...ExpenseFormSchemaFeatureFields
@@ -160,9 +168,26 @@ const formSchemaQuery = gql`
 
   fragment ExpenseFormSchemaHostFields on Host {
     id
+    legacyId
     name
+    legalName
     slug
+    type
     currency
+    settings
+
+    location {
+      id
+      address
+      country
+    }
+    transferwise {
+      id
+      availableCurrencies
+    }
+
+    supportedPayoutMethods
+    isTrustedHost
 
     expensesTags {
       id
@@ -198,6 +223,7 @@ type ExpenseFormOptions = {
   accountingCategories?: ExpenseFormSchemaHostFieldsFragment['accountingCategories']['nodes'];
   allowExpenseItemAttachment?: boolean;
   allowExpenseItemCurrencyChange?: boolean;
+  taxType?: TaxType;
 };
 
 async function buildFormOptions(
@@ -212,6 +238,7 @@ async function buildFormOptions(
   }
 
   try {
+    // TODO: memo or enable cache for this.
     const query = await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
       query: formSchemaQuery,
       context: API_V2_CONTEXT,
@@ -281,7 +308,7 @@ async function buildFormOptions(
               : z.string().url().optional(),
           date: z.string(),
           amount: z.object({
-            valueInCents: z.number(),
+            valueInCents: z.number().min(1),
             currency: z.string().refine(v => Object.values(Currency).includes(v as Currency), {
               message: `Currency must be one of: ${Object.values(Currency).join(',')}`,
             }),
@@ -293,15 +320,62 @@ async function buildFormOptions(
     options.allowExpenseItemAttachment = options.allowExpenseItemCurrencyChange =
       expenseTypeFromOption(values.expenseTypeOption) === ExpenseType.RECEIPT;
 
+    if (expenseTypeFromOption(values.expenseTypeOption) === ExpenseType.INVOICE) {
+      if (accountHasVAT(account as any, host as any)) {
+        options.taxType = TaxType.VAT;
+      } else if (accountHasGST(host || account)) {
+        options.taxType = TaxType.GST;
+      }
+    }
+
+    if (options.taxType) {
+      options.schema = options.schema.extend({
+        hasTax: z.boolean().optional(),
+      });
+    }
+
+    if (values.hasTax) {
+      options.schema = options.schema.extend({
+        tax: z.object({
+          rate:
+            options.taxType === TaxType.GST
+              ? z.number().refine(v => [0, 0.15].includes(v), {
+                  message: 'GST tax must be 0% or 15%',
+                })
+              : z.number().refine(v => v > 0 && v < 1, {
+                  message: 'VAT tax must be between 0% and 100%',
+                }),
+          idNumber:
+            options.taxType === TaxType.GST
+              ? z.string().optional()
+              : z.string().refine(v => checkVATNumberFormat(v).isValid, {
+                  message: 'Invalid VAT Number',
+                }),
+        }),
+      });
+    }
+
     return options;
   } catch (err) {
     return options;
   }
 }
 
+function usePrevious(value) {
+  const ref = React.useRef(value);
+  React.useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref.current;
+}
+
 export function useExpenseForm(opts: {
-  initialValues: Parameters<typeof useFormik<ExpenseFormValues>>['0']['initialValues'];
-  onSubmit: Parameters<typeof useFormik<ExpenseFormValues>>['0']['onSubmit'];
+  initialValues: ExpenseFormValues;
+  onSubmit: (
+    values: ExpenseFormValues,
+    formikHelpers: FormikHelpers<ExpenseFormValues>,
+    options: ExpenseFormOptions,
+  ) => void | Promise<any>;
 }): ExpenseForm {
   const apolloClient = useApolloClient();
   const { LoggedInUser } = useLoggedInUser();
@@ -320,42 +394,59 @@ export function useExpenseForm(opts: {
         return errs;
       }
     },
-    onSubmit: opts.onSubmit,
+    onSubmit(values, formikHelpers) {
+      return opts.onSubmit(values, formikHelpers, formOptions);
+    },
   });
+
+  const prevValues = usePrevious(expenseForm.values);
 
   /* field dependencies */
   const setFieldValue = expenseForm.setFieldValue;
   // reset fields that depend on collective
   React.useEffect(() => {
-    return () => {
+    if (expenseForm.values.collectiveSlug !== prevValues.collectiveSlug) {
       setFieldValue('expenseTypeOption', null);
       setFieldValue('accountingCategoryId', null);
       setFieldValue('payoutMethodId', null);
       setFieldValue('expenseCurrency', null);
-    };
-  }, [setFieldValue, expenseForm.values.collectiveSlug]);
+    }
+  }, [setFieldValue, prevValues.collectiveSlug, expenseForm.values.collectiveSlug]);
 
   // reset fields that depend on payee
   React.useEffect(() => {
-    return () => {
+    if (expenseForm.values.payeeSlug !== prevValues.payeeSlug) {
       setFieldValue('payoutMethodId', null);
-    };
-  }, [setFieldValue, expenseForm.values.payeeSlug]);
+    }
+  }, [setFieldValue, prevValues.payeeSlug, expenseForm.values.payeeSlug]);
 
   // reset fields that depend on expense type
   React.useEffect(() => {
-    return () => {
+    if (expenseForm.values.expenseTypeOption !== prevValues.expenseTypeOption) {
       setFieldValue('expenseCurrency', null);
       setFieldValue('expenseAttachedFiles', null);
       setFieldValue('expenseItems', null);
-    };
-  }, [setFieldValue, expenseForm.values.expenseTypeOption]);
+    }
+  }, [setFieldValue, prevValues.expenseTypeOption, expenseForm.values.expenseTypeOption]);
 
   React.useEffect(() => {
-    return () => {
+    if (expenseForm.values.payoutMethodId !== prevValues.payoutMethodId) {
       setFieldValue('expenseCurrency', null);
-    };
-  }, [setFieldValue, expenseForm.values.payoutMethodId]);
+    }
+  }, [setFieldValue, prevValues.payoutMethodId, expenseForm.values.payoutMethodId]);
+
+  React.useEffect(() => {
+    if (!formOptions.taxType) {
+      setFieldValue('hasTax', false);
+      setFieldValue('tax', null);
+    }
+  }, [formOptions.taxType, setFieldValue]);
+
+  React.useEffect(() => {
+    if (!expenseForm.values.hasTax) {
+      setFieldValue('tax', null);
+    }
+  }, [expenseForm.values.hasTax, setFieldValue]);
 
   // calculate form
   React.useEffect(() => {

@@ -52,7 +52,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   const [currentStep, setCurrentStep] = React.useState<ExpenseFlowStep>(ExpenseFlowStep.COLLECTIVE);
   const expenseForm = useExpenseForm({
     initialValues: {},
-    async onSubmit(values, h) {
+    async onSubmit(values, h, formOptions) {
       try {
         const result = await createExpense({
           variables: {
@@ -87,7 +87,15 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               payeeLocation: null,
               privateMessage: null,
               tags: values.tags,
-              tax: null,
+              tax: values.hasTax
+                ? [
+                    {
+                      rate: values.tax.rate,
+                      type: formOptions.taxType,
+                      idNumber: values.tax.idNumber,
+                    },
+                  ]
+                : null,
             },
           },
         });

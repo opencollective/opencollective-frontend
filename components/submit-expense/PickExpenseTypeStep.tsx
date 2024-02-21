@@ -13,7 +13,7 @@ export const PickExpenseTypeStep: ExpenseStepDefinition = {
   Form: PickExpenseTypeForm,
   StepListItem: PickExpenseTypeStepListItem,
   hasError(form) {
-    return !!form.errors.expenseTypeOption;
+    return !form.values.expenseTypeOption || !!form.errors.expenseTypeOption;
   },
 };
 
