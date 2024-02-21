@@ -1,5 +1,4 @@
 const baseConfig = {
-  parser: '@typescript-eslint/parser',
   processor: '@graphql-eslint/graphql',
   env: {
     jest: true,
@@ -10,16 +9,12 @@ const baseConfig = {
     'plugin:import/typescript',
     'plugin:react-hooks/recommended',
   ],
-  plugins: ['@typescript-eslint/eslint-plugin', 'simple-import-sort', 'formatjs'],
+  plugins: ['simple-import-sort', 'formatjs'],
   rules: {
     'no-console': 'error',
     'require-atomic-updates': 'off',
-    // Typescript
-    'node/no-missing-import': ['error', { tryExtensions: ['.js', '.ts', '.tsx'] }],
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error'],
-    // -- End of typescript-specific config
     'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
+    'node/no-missing-import': ['error', { tryExtensions: ['.js', '.ts', '.tsx'] }],
     'no-restricted-imports': [
       'error',
       {
@@ -144,8 +139,33 @@ module.exports = {
   ignorePatterns: ['./lib/graphql/types/*', './lib/graphql/*.graphql'],
   overrides: [
     {
-      files: ['*.js', '*.jsx', '*.ts', '*.tsx'],
+      files: ['*.js', '*.jsx'],
       ...baseConfig,
+    },
+    {
+      files: ['*.ts', '*.tsx'],
+      parser: '@typescript-eslint/parser',
+      parserOptions: {
+        project: ['tsconfig.json'],
+      },
+      ...baseConfig,
+      extends: [...baseConfig.extends, 'plugin:@typescript-eslint/recommended'],
+      rules: {
+        ...baseConfig.rules,
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-explicit-any': 'warn',
+        '@typescript-eslint/no-var-requires': 'warn',
+        '@typescript-eslint/no-unused-vars': 'error',
+        '@typescript-eslint/consistent-type-exports': 'error',
+        '@typescript-eslint/consistent-type-imports': 'error',
+        // https://typescript-eslint.io/troubleshooting/performance-troubleshooting/#eslint-plugin-import
+        'react/prop-types': 'off',
+        'import/named': 'off',
+        'import/namespace': 'off',
+        'import/default': 'off',
+        'import/no-named-as-default-member': 'off',
+        'import/no-unresolved': 'off',
+      },
     },
     {
       files: ['*.graphql'],
@@ -155,12 +175,6 @@ module.exports = {
       files: ['scripts/*.js'],
       rules: {
         'no-console': 'off',
-      },
-    },
-    {
-      files: ['*.tsx'],
-      rules: {
-        'react/prop-types': 'off',
       },
     },
   ],
