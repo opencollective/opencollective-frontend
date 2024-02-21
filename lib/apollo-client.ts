@@ -299,7 +299,7 @@ type SSRQueryHelperProps<TVariables> = {
  * A helper to easily plug Apollo on functional components that use `getServerSideProps` thats make sure that
  * the server-side query and the client-side query/variables are the same; to properly rehydrate the cache.
  */
-export function getSSRQueryHelpers<TVariables, TProps = {}>({
+export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>({
   query,
   getVariablesFromContext = undefined,
   getPropsFromContext = undefined,

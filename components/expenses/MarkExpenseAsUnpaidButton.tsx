@@ -103,7 +103,9 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
           <StyledSelect
             inputId="new-expense-status"
             options={expenseStatusOptions}
-            onChange={value => setNewExpenseStatusOption(value)}
+            onChange={(newValue: { value: MarkAsUnPaidExpenseStatus; label: string }) =>
+              setNewExpenseStatusOption(newValue)
+            }
             value={newExpenseStatusOption}
             width="100%"
           />

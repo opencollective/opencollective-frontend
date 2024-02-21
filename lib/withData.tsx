@@ -84,7 +84,7 @@ const withData = ComposedComponent => {
       this.client = initClient({ initialState: serverState.apollo.data, twoFactorAuthContext });
     }
 
-    client: ApolloClient<{}> | null;
+    client: ApolloClient<object> | null;
 
     render() {
       return <ComposedComponent {...this.props} client={this.client} />;

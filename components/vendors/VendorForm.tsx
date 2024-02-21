@@ -74,7 +74,7 @@ const EDITABLE_FIELDS = [
 type VendorFormProps = {
   vendor?: VendorFieldsFragment;
   host?: Omit<DashboardVendorsQuery['account'], 'vendors'>;
-  onSuccess?: Function;
+  onSuccess?: () => void;
   onCancel: () => void;
   isModal?: boolean;
   supportsTaxForm: boolean;

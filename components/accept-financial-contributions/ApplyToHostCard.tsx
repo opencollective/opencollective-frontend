@@ -29,9 +29,8 @@ export default function ApplyToHostCard(props: {
 
   return (
     <React.Fragment>
-      {/* @ts-ignore StyledCollectiveCard is not typed */}
+      {/* @ts-expect-error StyledCollectiveCard is not typed */}
       <StyledCollectiveCardWrapper
-        /* @ts-ignore StyledCollectiveCard is not typed */
         collective={props.host}
         minWidth={250}
         position="relative"

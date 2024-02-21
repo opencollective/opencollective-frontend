@@ -158,7 +158,7 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
     },
     y: {
       title: {
-        // @ts-ignore - the second argument containing dataPointIndex is missing in the type definition
+        // @ts-expect-error - the second argument containing dataPointIndex is missing in the type definition
         formatter: (seriesName: string, { dataPointIndex }) => {
           let startDate;
 

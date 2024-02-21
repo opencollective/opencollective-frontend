@@ -130,7 +130,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
               <Box flexGrow={1} m="24px 24px 0 24px">
                 <Flex fontSize="16px" lineHeight="24px" fontWeight="500" justifyContent="space-between">
                   <Box>{virtualCard.name}</Box>
-                  {/* @ts-ignore */}
+                  {/* @ts-expect-error StateLabel is not typed */}
                   <StateLabel isActive={virtualCard.status === VirtualCardStatus.ACTIVE}>
                     {virtualCard.status}
                   </StateLabel>

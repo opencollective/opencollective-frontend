@@ -80,7 +80,19 @@ type RadioListProps = {
   /** Name for the radio inputs */
   name: string;
   /** A function that returns the content of each radio item */
-  children: Function;
+  children: ({
+    checked,
+    index,
+    key,
+    value,
+    radio,
+  }: {
+    checked: boolean;
+    index: number;
+    key: string;
+    value: any;
+    radio: React.ReactNode;
+  }) => React.ReactNode;
   /** A function that returns the key to use for each item */
   keyGetter?: string | ((item: any) => string);
   /** A list of options to use */

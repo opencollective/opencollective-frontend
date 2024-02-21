@@ -64,7 +64,7 @@ type StyledUpdateProps = {
   compact?: boolean;
   LoggedInUser?: any;
   isReloadingData?: boolean;
-  deleteUpdate?: Function;
+  deleteUpdate?: ({ variables }: { variables: { id: string } }) => void;
   intl: any;
   router: any;
   /** Reactions associated with this update **/
