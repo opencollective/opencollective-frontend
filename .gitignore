@@ -51,3 +51,6 @@ public/static/scripts/pdf.worker.min.js
 # pdfjs character maps - copied from node_modules by webpack (see next.config.js)
 public/static/cmaps
 .vercel
+
+lib/graphql/types/v2/index.ts
+lib/graphql/types/v2/gql.ts
