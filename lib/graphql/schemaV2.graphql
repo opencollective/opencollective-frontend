@@ -373,6 +373,16 @@ interface Account {
     dateTo: DateTime
 
     """
+    Only return transactions that were cleared after this date
+    """
+    clearedFrom: DateTime
+
+    """
+    Only return transactions that were cleared before this date
+    """
+    clearedTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -1293,6 +1303,7 @@ interface Transaction {
   giftCardEmitterAccount: Account
   createdAt: DateTime
   updatedAt: DateTime
+  clearedAt: DateTime
   expense: Expense
   order: Order
   isRefunded: Boolean
@@ -1914,6 +1925,16 @@ type Host implements Account & AccountWithContributions {
     Only return transactions that were created before this date
     """
     dateTo: DateTime
+
+    """
+    Only return transactions that were cleared after this date
+    """
+    clearedFrom: DateTime
+
+    """
+    Only return transactions that were cleared before this date
+    """
+    clearedTo: DateTime
 
     """
     The term to search
@@ -6637,6 +6658,16 @@ type Bot implements Account {
     dateTo: DateTime
 
     """
+    Only return transactions that were cleared after this date
+    """
+    clearedFrom: DateTime
+
+    """
+    Only return transactions that were cleared before this date
+    """
+    clearedTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -7304,6 +7335,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only return transactions that were created before this date
     """
     dateTo: DateTime
+
+    """
+    Only return transactions that were cleared after this date
+    """
+    clearedFrom: DateTime
+
+    """
+    Only return transactions that were cleared before this date
+    """
+    clearedTo: DateTime
 
     """
     The term to search
@@ -7995,6 +8036,7 @@ type Credit implements Transaction {
   giftCardEmitterAccount: Account
   createdAt: DateTime
   updatedAt: DateTime
+  clearedAt: DateTime
   expense: Expense
   order: Order
   isRefunded: Boolean
@@ -8138,6 +8180,7 @@ type Debit implements Transaction {
   giftCardEmitterAccount: Account
   createdAt: DateTime
   updatedAt: DateTime
+  clearedAt: DateTime
   expense: Expense
   order: Order
   isRefunded: Boolean
@@ -8402,6 +8445,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Only return transactions that were created before this date
     """
     dateTo: DateTime
+
+    """
+    Only return transactions that were cleared after this date
+    """
+    clearedFrom: DateTime
+
+    """
+    Only return transactions that were cleared before this date
+    """
+    clearedTo: DateTime
 
     """
     The term to search
@@ -9293,6 +9346,16 @@ type Individual implements Account {
     dateTo: DateTime
 
     """
+    Only return transactions that were cleared after this date
+    """
+    clearedFrom: DateTime
+
+    """
+    Only return transactions that were cleared before this date
+    """
+    clearedTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -10168,6 +10231,16 @@ type Organization implements Account & AccountWithContributions {
     dateTo: DateTime
 
     """
+    Only return transactions that were cleared after this date
+    """
+    clearedFrom: DateTime
+
+    """
+    Only return transactions that were cleared before this date
+    """
+    clearedTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -10925,6 +10998,16 @@ type Vendor implements Account & AccountWithContributions {
     Only return transactions that were created before this date
     """
     dateTo: DateTime
+
+    """
+    Only return transactions that were cleared after this date
+    """
+    clearedFrom: DateTime
+
+    """
+    Only return transactions that were cleared before this date
+    """
+    clearedTo: DateTime
 
     """
     The term to search
@@ -12245,6 +12328,16 @@ type Query {
     Only return transactions that were created before this date
     """
     dateTo: DateTime
+
+    """
+    Only return transactions that were cleared after this date
+    """
+    clearedFrom: DateTime
+
+    """
+    Only return transactions that were cleared before this date
+    """
+    clearedTo: DateTime
 
     """
     The term to search
@@ -14067,6 +14160,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     dateTo: DateTime
 
     """
+    Only return transactions that were cleared after this date
+    """
+    clearedFrom: DateTime
+
+    """
+    Only return transactions that were cleared before this date
+    """
+    clearedTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -14832,6 +14935,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Only return transactions that were created before this date
     """
     dateTo: DateTime
+
+    """
+    Only return transactions that were cleared after this date
+    """
+    clearedFrom: DateTime
+
+    """
+    Only return transactions that were cleared before this date
+    """
+    clearedTo: DateTime
 
     """
     The term to search
@@ -17900,6 +18013,11 @@ input ProcessExpensePaymentParams {
   Payment method using for paying the expense
   """
   paymentMethodService: PaymentMethodService
+
+  """
+  Date funds were cleared on the fiscal host bank, Wise, PayPal, Stripe or any other external account holding these funds.
+  """
+  clearedAt: DateTime
 }
 
 enum MarkAsUnPaidExpenseStatus {

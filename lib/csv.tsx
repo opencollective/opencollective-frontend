@@ -11,6 +11,7 @@ type CSVField =
   | 'accountingCategoryName'
   | 'date'
   | 'datetime'
+  | 'effectiveDate'
   | 'id'
   | 'legacyId'
   | 'shortId'
@@ -65,6 +66,7 @@ const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
   transaction: [
     'date',
     'datetime',
+    'effectiveDate',
     'id',
     'legacyId',
     'shortId',
@@ -169,6 +171,7 @@ export const FieldLabels: Record<CSVField, React.ReactNode> = {
   accountingCategoryName: <FormattedMessage defaultMessage="Accounting Category Name" />,
   date: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
   datetime: <FormattedMessage defaultMessage="Date & Time" />,
+  effectiveDate: <FormattedMessage defaultMessage="Effective Date" />,
   id: <FormattedMessage defaultMessage="Transaction ID" />,
   legacyId: <FormattedMessage defaultMessage="Legacy Transaction ID" />,
   shortId: <FormattedMessage defaultMessage="Short Transaction ID" />,
