@@ -1552,6 +1552,7 @@
   "form.processing": "σε επεξεργασία",
   "Form.yourEmail": "Η διεύθυνση email σας",
   "Form.yourPassword": "Your password",
+  "FormError.enum": "Must be one of: {options}",
   "FormError.InvalidValue": "Μη έγκυρη τιμή",
   "FormError.max": "Η τιμή είναι πολύ υψηλή",
   "FormError.maxLength": "Η τιμή είναι πολύ μεγάλη",
