@@ -119,7 +119,7 @@ const paymentMethodResponseFragment = gql`
   }
 `;
 
-export const addCreditCardMutation = gql`
+const addCreditCardMutation = gql`
   mutation AddCreditCardRecurringContributions(
     $creditCardInfo: CreditCardCreateInput!
     $name: String!
@@ -132,7 +132,7 @@ export const addCreditCardMutation = gql`
   ${paymentMethodResponseFragment}
 `;
 
-export const confirmCreditCardMutation = gql`
+const confirmCreditCardMutation = gql`
   mutation ConfirmCreditCardRecurringContributions($paymentMethod: PaymentMethodReferenceInput!) {
     confirmCreditCard(paymentMethod: $paymentMethod) {
       ...paymentMethodResponseFragment
