@@ -126,7 +126,7 @@
     "redis": "4.6.13",
     "sanitize-html": "2.12.0",
     "slugify": "1.6.6",
-    "spdx-license-list": "6.8.0",
+    "spdx-license-list": "6.9.0",
     "speakeasy": "2.0.0",
     "styled-components": "5.3.11",
     "styled-system": "5.1.5",
