@@ -1552,6 +1552,7 @@
   "form.processing": "בטיפול",
   "Form.yourEmail": "כתובת המייל שלך",
   "Form.yourPassword": "Your password",
+  "FormError.enum": "Must be one of: {options}",
   "FormError.InvalidValue": "ערך לא חוקי",
   "FormError.max": "הערך גבוה מדי",
   "FormError.maxLength": "הערך ארוך מדי",
