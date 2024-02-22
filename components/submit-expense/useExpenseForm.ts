@@ -25,6 +25,7 @@ import { userMustSetAccountingCategory } from '../expenses/lib/accounting-catego
 import { getSupportedCurrencies } from '../expenses/lib/utils';
 
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
+import { getCustomZodErrorMap } from '../FormikZod';
 
 export enum ExpenseTypeOption {
   INVOICE = 'INVOICE',
@@ -336,7 +337,7 @@ async function buildFormOptions(
                   toCurrency: z.string(),
                   date: z.string().nullable(),
                 })
-                .nullable()
+                .nullable(),
             }),
           })
           .refine(
@@ -419,6 +420,7 @@ const needExchangeRateFilter = (expectedCurrency: string) => (ei: ExpenseItem) =
       Math.abs(dayjs.utc(ei.amount.exchangeRate.date).diff(dayjs.utc(ei.date), 'days')) > 2));
 
 export function useExpenseForm(opts: {
+  formRef?: React.MutableRefObject<HTMLFormElement>;
   initialValues: ExpenseFormValues;
   onSubmit: (
     values: ExpenseFormValues,
@@ -433,8 +435,10 @@ export function useExpenseForm(opts: {
 
   const expenseForm: ExpenseFormik = useFormik<ExpenseFormValues>({
     initialValues: opts.initialValues,
+    initialStatus: { schema: formOptions.schema },
     async validate(values) {
-      const result = formOptions.schema.safeParse(values);
+      opts.formRef?.current?.reportValidity?.();
+      const result = formOptions.schema.safeParse(values, { errorMap: getCustomZodErrorMap(intl) });
       if (result.success === false) {
         const errs = {};
 
@@ -584,6 +588,11 @@ export function useExpenseForm(opts: {
       }
     };
   }, [apolloClient, expenseForm.values.expenseCurrency, expenseForm.values.expenseItems, setFieldValue]);
+
+  const setStatus = expenseForm.setStatus;
+  React.useEffect(() => {
+    setStatus({ schema: formOptions.schema });
+  }, [formOptions.schema, setStatus]);
 
   // calculate form
   React.useEffect(() => {

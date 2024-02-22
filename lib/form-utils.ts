@@ -28,6 +28,10 @@ export const RICH_ERROR_MESSAGES = defineMessages({
     id: 'FormError.InvalidValue',
     defaultMessage: 'Invalid value',
   },
+  requiredValue: {
+    id: 'Error.FieldRequired',
+    defaultMessage: 'This field is required',
+  },
 });
 
 const isEmpty = value => {

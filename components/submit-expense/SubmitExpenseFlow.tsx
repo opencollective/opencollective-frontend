@@ -35,6 +35,7 @@ const I18nMessages = defineMessages({
 export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   const intl = useIntl();
   const router = useRouter();
+  const formRef = React.useRef<HTMLFormElement>();
   const [submittedExpenseId, setSubmittedExpenseId] = React.useState(null);
   const [createExpense] = useMutation<CreateExpenseFromDashboardMutation, CreateExpenseFromDashboardMutationVariables>(
     gql`
@@ -52,6 +53,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
 
   const [currentStep, setCurrentStep] = React.useState<ExpenseFlowStep>(ExpenseFlowStep.COLLECTIVE);
   const expenseForm = useExpenseForm({
+    formRef,
     initialValues: {},
     async onSubmit(values, h, formOptions) {
       try {
@@ -183,7 +185,9 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               currentStep={currentStep}
             />
             <div className="flex-grow overflow-auto">
-              <step.Form form={expenseForm} slug={props.slug} />
+              <form ref={formRef} onSubmit={(e) => e.preventDefault()} >
+                <step.Form form={expenseForm} slug={props.slug} />
+              </form>
             </div>
           </React.Fragment>
         )}
