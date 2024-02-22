@@ -1552,6 +1552,7 @@
   "form.processing": "processing",
   "Form.yourEmail": "E-posta adresiniz",
   "Form.yourPassword": "Şifreniz",
+  "FormError.enum": "Must be one of: {options}",
   "FormError.InvalidValue": "Invalid value",
   "FormError.max": "The value is too high",
   "FormError.maxLength": "The value is too long",
