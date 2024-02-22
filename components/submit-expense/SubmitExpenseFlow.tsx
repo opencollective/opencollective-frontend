@@ -11,6 +11,7 @@ import {
   CreateExpenseFromDashboardMutation,
   CreateExpenseFromDashboardMutationVariables,
   Currency,
+  CurrencyExchangeRateInput,
 } from '../../lib/graphql/types/v2/graphql';
 
 import Link from '../Link';
@@ -79,7 +80,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               invoiceInfo: null,
               items: values.expenseItems.map(ei => ({
                 description: ei.description,
-                amountV2: { valueInCents: ei.amount.valueInCents, currency: ei.amount.currency as Currency },
+                amountV2: { valueInCents: ei.amount.valueInCents, currency: ei.amount.currency as Currency, exchangeRate: ei.amount.exchangeRate as CurrencyExchangeRateInput },
                 incurredAt: new Date(ei.date),
                 url: ei.url,
               })),

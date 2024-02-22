@@ -51,7 +51,7 @@ function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
     if (isEmpty(props.form.values.expenseItems)) {
       setFieldValue('expenseItems', [
         {
-          date: new Date().toISOString().substring(0, 10),
+          date: new Date(),
           description: '',
           amount: {
             valueInCents: 0,

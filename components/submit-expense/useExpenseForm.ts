@@ -1,10 +1,11 @@
 import React from 'react';
 import { ApolloClient, gql, useApolloClient } from '@apollo/client';
-import { accountHasGST, accountHasVAT, checkVATNumberFormat, GST_RATE_PERCENT, TaxType } from '@opencollective/taxes';
-import { Account } from '@opencollective/taxes/dist/types/Accounts';
+import { accountHasGST, accountHasVAT, checkVATNumberFormat, TaxType } from '@opencollective/taxes';
+import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
 import { FormikErrors, FormikHelpers, useFormik } from 'formik';
-import { isEmpty, set } from 'lodash';
+import { isEmpty, isEqual, map, partialRight, pick, set, uniqBy } from 'lodash';
+import { IntlShape, useIntl } from 'react-intl';
 import z from 'zod';
 
 import { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
@@ -12,6 +13,8 @@ import { getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import {
   Currency,
+  ExpenseFormExchangeRatesQuery,
+  ExpenseFormExchangeRatesQueryVariables,
   ExpenseFormSchemaHostFieldsFragment,
   ExpenseFormSchemaQuery,
   ExpenseFormSchemaQueryVariables,
@@ -49,8 +52,19 @@ export function expenseTypeFromOption(opt: ExpenseTypeOption) {
 
 export type ExpenseItem = {
   description: string;
-  date: string;
-  amount: { valueInCents: number; currency: string };
+  date: Date;
+  amount: {
+    valueInCents: number;
+    currency: string;
+    exchangeRate?: {
+      value: number;
+      source: string;
+      fromCurrency: string;
+      toCurrency: string;
+      date: string;
+    };
+    referenceExchangeRate?: ExpenseItem['amount']['exchangeRate'] | { source: 'OPENCOLLECTIVE' };
+  };
   url?: string;
 };
 
@@ -227,6 +241,7 @@ type ExpenseFormOptions = {
 };
 
 async function buildFormOptions(
+  intl: IntlShape,
   apolloClient: ApolloClient<any>,
   loggedInUser: LoggedInUser,
   values: ExpenseFormValues,
@@ -300,20 +315,42 @@ async function buildFormOptions(
 
     options.schema = options.schema.extend({
       expenseItems: z.array(
-        z.object({
-          description: z.string().min(1),
-          url:
-            expenseTypeFromOption(values.expenseTypeOption) === ExpenseType.RECEIPT
-              ? z.string().url()
-              : z.string().url().optional(),
-          date: z.string(),
-          amount: z.object({
-            valueInCents: z.number().min(1),
-            currency: z.string().refine(v => Object.values(Currency).includes(v as Currency), {
-              message: `Currency must be one of: ${Object.values(Currency).join(',')}`,
+        z
+          .object({
+            description: z.string().min(1),
+            url:
+              expenseTypeFromOption(values.expenseTypeOption) === ExpenseType.RECEIPT
+                ? z.string().url()
+                : z.string().url().optional(),
+            date: z.string(),
+            amount: z.object({
+              valueInCents: z.number().min(1),
+              currency: z.string().refine(v => Object.values(Currency).includes(v as Currency), {
+                message: `Currency must be one of: ${Object.values(Currency).join(',')}`,
+              }),
+              exchangeRate: z
+                .object({
+                  value: z.number(),
+                  source: z.string(),
+                  fromCurrency: z.string(),
+                  toCurrency: z.string(),
+                  date: z.string().nullable(),
+                })
+                .nullable()
             }),
-          }),
-        }),
+          })
+          .refine(
+            item => {
+              if (item.amount.currency && item.amount.currency !== values.expenseCurrency) {
+                return item.amount.exchangeRate?.value && item.amount.exchangeRate?.source;
+              }
+              return true;
+            },
+            {
+              message: intl.formatMessage({ defaultMessage: 'Missing exchange rate' }),
+              path: ['amount', 'exchangeRate', 'value'],
+            },
+          ),
       ),
     });
 
@@ -361,13 +398,25 @@ async function buildFormOptions(
   }
 }
 
-function usePrevious(value) {
-  const ref = React.useRef(value);
+function usePrevious<T>(value: T): T {
+  const ref = React.useRef<T>(value);
   React.useEffect(() => {
     ref.current = value;
   }, [value]);
   return ref.current;
 }
+
+const needExchangeRateFilter = (expectedCurrency: string) => (ei: ExpenseItem) =>
+  expectedCurrency &&
+  ei.amount.currency &&
+  ei.amount.currency !== expectedCurrency &&
+  (!ei.amount.exchangeRate ||
+    !ei.amount.exchangeRate.source ||
+    !ei.amount.exchangeRate.value ||
+    ei.amount.exchangeRate.fromCurrency !== ei.amount.currency ||
+    ei.amount.exchangeRate.toCurrency !== expectedCurrency ||
+    (ei.amount.exchangeRate.source === 'OPENCOLLECTIVE' &&
+      Math.abs(dayjs.utc(ei.amount.exchangeRate.date).diff(dayjs.utc(ei.date), 'days')) > 2));
 
 export function useExpenseForm(opts: {
   initialValues: ExpenseFormValues;
@@ -377,6 +426,7 @@ export function useExpenseForm(opts: {
     options: ExpenseFormOptions,
   ) => void | Promise<any>;
 }): ExpenseForm {
+  const intl = useIntl();
   const apolloClient = useApolloClient();
   const { LoggedInUser } = useLoggedInUser();
   const [formOptions, setFormOptions] = React.useState<ExpenseFormOptions>({ schema: minimumSchema });
@@ -448,13 +498,100 @@ export function useExpenseForm(opts: {
     }
   }, [expenseForm.values.hasTax, setFieldValue]);
 
+  React.useEffect(() => {
+    if (isEmpty(expenseForm.values.expenseItems)) {
+      return;
+    }
+
+    const exchangeRateRequests = uniqBy(
+      expenseForm.values.expenseItems.filter(needExchangeRateFilter(expenseForm.values.expenseCurrency)).map(ei => ({
+        fromCurrency: ei.amount.currency as Currency,
+        toCurrency: expenseForm.values.expenseCurrency as Currency,
+        date: dayjs.utc(ei.date).toDate(),
+      })),
+      ei => `${ei.fromCurrency}-${ei.toCurrency}-${ei.date}`,
+    );
+
+    expenseForm.values.expenseItems.forEach((ei, i) => {
+      if (ei.amount?.currency && ei.amount.currency === expenseForm.values.expenseCurrency) {
+        setFieldValue(`expenseItems.${i}.amount.exchangeRate`, null);
+      }
+    });
+
+    if (isEmpty(exchangeRateRequests)) {
+      return;
+    }
+
+    const ctrl = new AbortController();
+    let queryComplete = false;
+    async function updateExchangeRates() {
+      try {
+        const res = await apolloClient.query<ExpenseFormExchangeRatesQuery, ExpenseFormExchangeRatesQueryVariables>({
+          query: gql`
+            query ExpenseFormExchangeRates($exchangeRateRequests: [CurrencyExchangeRateRequest!]!) {
+              currencyExchangeRate(requests: $exchangeRateRequests) {
+                value
+                source
+                fromCurrency
+                toCurrency
+                date
+                isApproximate
+              }
+            }
+          `,
+          context: {
+            ...API_V2_CONTEXT,
+            fetchOptions: {
+              signal: ctrl.signal,
+            },
+          },
+          variables: {
+            exchangeRateRequests,
+          },
+        });
+
+        queryComplete = true;
+
+        if (!isEmpty(res.data?.currencyExchangeRate)) {
+          expenseForm.values.expenseItems.forEach((ei, i) => {
+            if (needExchangeRateFilter(expenseForm.values.expenseCurrency)(ei)) {
+              const exchangeRate = res.data.currencyExchangeRate.find(
+                rate =>
+                  rate.fromCurrency === ei.amount.currency && rate.toCurrency === expenseForm.values.expenseCurrency,
+              );
+              setFieldValue(
+                `expenseItems.${i}.amount.exchangeRate`,
+                pick(exchangeRate, ['date', 'fromCurrency', 'toCurrency', 'value', 'source']),
+              );
+              setFieldValue(
+                `expenseItems.${i}.amount.referenceExchangeRate`,
+                pick(exchangeRate, ['date', 'fromCurrency', 'toCurrency', 'value', 'source']),
+              );
+            }
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        return;
+      }
+    }
+
+    updateExchangeRates();
+
+    return () => {
+      if (!queryComplete) {
+        ctrl.abort();
+      }
+    };
+  }, [apolloClient, expenseForm.values.expenseCurrency, expenseForm.values.expenseItems, setFieldValue]);
+
   // calculate form
   React.useEffect(() => {
     async function refreshFormOptions() {
-      setFormOptions(await buildFormOptions(apolloClient, LoggedInUser, expenseForm.values));
+      setFormOptions(await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values));
     }
     refreshFormOptions();
-  }, [apolloClient, LoggedInUser, expenseForm.values]);
+  }, [apolloClient, LoggedInUser, expenseForm.values, intl]);
 
   // revalidate form
   const validateForm = expenseForm.validateForm;
@@ -474,15 +611,12 @@ export function useExpenseForm(opts: {
       return;
     }
 
-    for (const item of expenseForm.values.expenseItems) {
-      if (!item.amount?.currency || !item.amount?.valueInCents) {
-        item.amount = {
-          ...item.amount,
-          currency: expenseForm.values.expenseCurrency,
-        };
+    expenseForm.values.expenseItems.forEach((ei, i) => {
+      if (!ei.amount?.currency && !ei.amount?.valueInCents) {
+        setFieldValue(`expenseItems.${i}.amount.currency`, expenseForm.values.expenseCurrency);
       }
-    }
-  }, [expenseForm.values.expenseCurrency, expenseForm.values.expenseItems]);
+    });
+  }, [expenseForm.values.expenseCurrency, expenseForm.values.expenseItems, setFieldValue]);
 
   return Object.assign(expenseForm, {
     options: formOptions,
