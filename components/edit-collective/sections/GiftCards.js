@@ -80,7 +80,7 @@ class GiftCards extends React.Component {
       >
         {({ item, isSelected }) => (
           <Link
-            href={{ pathname: `/${this.props.collectiveSlug}/admin/gift-cards`, query: { ...query, filter: item } }}
+            href={{ pathname: `/dashboard/${this.props.collectiveSlug}/gift-cards`, query: { ...query, filter: item } }}
           >
             <P p="0.5em 1em" color={isSelected ? 'white.full' : 'black.800'} style={{ margin: 0 }}>
               {item === 'all' && <FormattedMessage id="giftCards.filterAll" defaultMessage="All" />}
@@ -96,7 +96,7 @@ class GiftCards extends React.Component {
   renderNoGiftCardMessage(onlyConfirmed) {
     if (onlyConfirmed === undefined) {
       return (
-        <Link href={`/${this.props.collectiveSlug}/admin/gift-cards-create`}>
+        <Link href={`/dashboard/${this.props.collectiveSlug}/gift-cards-create`}>
           <FormattedMessage id="giftCards.createFirst" defaultMessage="Create your first gift card!" />
         </Link>
       );
@@ -145,7 +145,7 @@ class GiftCards extends React.Component {
           >
             {this.renderFilters(onlyConfirmed)}
             <Flex justifyContent="center">
-              <Link href={`/${collectiveSlug}/admin/gift-cards-create`}>
+              <Link href={`/dashboard/${collectiveSlug}/gift-cards-create`}>
                 <StyledButton buttonStyle="primary" buttonSize="medium">
                   <Add size="1em" />
                   {'  '}
@@ -161,7 +161,7 @@ class GiftCards extends React.Component {
                 options={batchesOptions}
                 onChange={({ value }) =>
                   this.props.router.push({
-                    pathname: `/${collectiveSlug}/admin/gift-cards`,
+                    pathname: `/dashboard/${collectiveSlug}/gift-cards`,
                     query: this.getQueryParams(['filter', 'batch'], { batch: value }),
                   })
                 }

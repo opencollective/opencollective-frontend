@@ -44,7 +44,7 @@ describe('Gift cards admin', () => {
     cy.getDownloadedPDFContent(filename).should('contain', '$542.00	Gift	Card	from	TestOrg');
 
     // Links should also be added to gift cards list
-    cy.contains('a[href$="/admin/gift-cards"]', 'Back to Gift Cards list').click();
+    cy.getByDataCy('back-to-giftcards-list').click();
     cy.getByDataCy('vc-details').should($giftCards => {
       expect($giftCards).to.have.length(paginationSize);
     });

@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
-import FreezeAccountModal from './host-dashboard/FreezeAccountModal';
+import FreezeAccountModal from './dashboard/sections/collectives/FreezeAccountModal';
 import I18nFormatters from './I18nFormatters';
 import StyledButton from './StyledButton';
 import { P, Span } from './Text';

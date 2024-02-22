@@ -15,7 +15,7 @@ describe('edit collective', () => {
   });
 
   beforeEach(() => {
-    cy.login({ redirect: `/${collectiveSlug}/admin` });
+    cy.login({ redirect: `/dashboard/${collectiveSlug}/info` });
   });
 
   it('edit members', () => {
@@ -166,6 +166,7 @@ describe('edit user collective', () => {
       redirect: `/${userSlug}/admin`,
     });
 
+    cy.getByDataCy('menu-item-Settings').click();
     cy.getByDataCy('menu-item-user-security').click();
     cy.contains('Add authenticator').click();
     cy.getByDataCy('qr-code').should('exist');

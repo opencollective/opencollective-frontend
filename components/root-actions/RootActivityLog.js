@@ -1,7 +1,7 @@
 import React from 'react';
 
-import ActivityLog from '../admin-panel/sections/ActivityLog';
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import ActivityLog from '../dashboard/sections/ActivityLog';
 import { Box } from '../Grid';
 import StyledInputField from '../StyledInputField';
 

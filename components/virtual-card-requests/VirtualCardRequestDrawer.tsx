@@ -5,6 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { VirtualCardRequest, VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
+import { i18nVirtualCardRequestStatus } from '../../lib/i18n/virtual-card-request';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
@@ -185,7 +186,7 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
                         : 'error'
                   }
                 >
-                  {virtualCardRequest?.status}
+                  {i18nVirtualCardRequestStatus(intl, virtualCardRequest?.status)}
                 </StyledTag>
               }
               onClose={props.onClose}

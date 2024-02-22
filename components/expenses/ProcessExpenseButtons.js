@@ -13,7 +13,10 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { collectiveAdminsMustConfirmAccountingCategory } from './lib/accounting-categories';
 
-import { getScheduledExpensesQueryVariables, scheduledExpensesQuery } from '../host-dashboard/ScheduledExpensesBanner';
+import {
+  getScheduledExpensesQueryVariables,
+  scheduledExpensesQuery,
+} from '../dashboard/sections/expenses/ScheduledExpensesBanner';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
