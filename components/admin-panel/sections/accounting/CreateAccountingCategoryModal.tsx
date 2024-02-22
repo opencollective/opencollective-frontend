@@ -55,15 +55,15 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
   });
 
   return (
-    <StyledModal onClose={props.onClose}>
-      <form onSubmit={e => formik.handleSubmit(e)}>
-        <ModalHeader>
-          <FormattedMessage defaultMessage="Create accounting category" />
-        </ModalHeader>
-        <ModalBody>
-          <AccountingCategoryForm formik={formik} />
-        </ModalBody>
-        <ModalFooter showDivider={false}>
+    <StyledModal onClose={props.onClose} hasUnsavedChanges={formik.dirty}>
+      <ModalHeader>
+        <FormattedMessage defaultMessage="Create accounting category" />
+      </ModalHeader>
+      <ModalBody>
+        <AccountingCategoryForm formik={formik} />
+      </ModalBody>
+      <ModalFooter showDivider={false}>
+        <form onSubmit={e => formik.handleSubmit(e)}>
           <div className="flex justify-center gap-4">
             <StyledButton type="submit" buttonStyle="primary">
               <FormattedMessage defaultMessage="Create category" />
@@ -72,8 +72,8 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </StyledButton>
           </div>
-        </ModalFooter>
-      </form>
+        </form>
+      </ModalFooter>
     </StyledModal>
   );
 }
