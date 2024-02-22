@@ -152,14 +152,12 @@ module.exports = {
       extends: [...baseConfig.extends, 'plugin:@typescript-eslint/recommended'],
       rules: {
         ...baseConfig.rules,
-        'no-unused-vars': 'off',
         '@typescript-eslint/no-explicit-any': 'warn',
         '@typescript-eslint/no-var-requires': 'warn',
-        '@typescript-eslint/no-unused-vars': 'error',
         '@typescript-eslint/consistent-type-exports': 'error',
         '@typescript-eslint/consistent-type-imports': 'error',
-        // https://typescript-eslint.io/troubleshooting/performance-troubleshooting/#eslint-plugin-import
         'react/prop-types': 'off',
+        // https://typescript-eslint.io/troubleshooting/performance-troubleshooting/#eslint-plugin-import
         'import/named': 'off',
         'import/namespace': 'off',
         'import/default': 'off',
