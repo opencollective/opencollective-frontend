@@ -1552,6 +1552,7 @@
   "form.processing": "en cours de traitement",
   "Form.yourEmail": "Votre adresse e-mail",
   "Form.yourPassword": "Votre mot de passe",
+  "FormError.enum": "Must be one of: {options}",
   "FormError.InvalidValue": "Valeur non valide",
   "FormError.max": "La valeur est trop élevée",
   "FormError.maxLength": "La valeur est trop longue",
