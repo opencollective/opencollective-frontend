@@ -1552,6 +1552,7 @@
   "form.processing": "处理中",
   "Form.yourEmail": "你的电子邮箱地址",
   "Form.yourPassword": "你的密码",
+  "FormError.enum": "Must be one of: {options}",
   "FormError.InvalidValue": "无效的值",
   "FormError.max": "数值过高",
   "FormError.maxLength": "数值过长",
