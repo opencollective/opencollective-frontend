@@ -1552,6 +1552,7 @@
   "form.processing": "обрабатываем",
   "Form.yourEmail": "Ваш адрес электронной почты",
   "Form.yourPassword": "Ваш пароль",
+  "FormError.enum": "Must be one of: {options}",
   "FormError.InvalidValue": "Неверное значение",
   "FormError.max": "Значение слишком большое",
   "FormError.maxLength": "Значение слишком длинное",
