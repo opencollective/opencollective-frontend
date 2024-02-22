@@ -1552,6 +1552,7 @@
   "form.processing": "zpracování",
   "Form.yourEmail": "Your email address",
   "Form.yourPassword": "Your password",
+  "FormError.enum": "Must be one of: {options}",
   "FormError.InvalidValue": "Neplatná hodnota",
   "FormError.max": "Hodnota je příliš vysoká",
   "FormError.maxLength": "Hodnota je příliš dlouhá",
