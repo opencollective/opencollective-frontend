@@ -1,8 +1,8 @@
 import React from 'react';
-import { Formik, FormikConfig, FormikValues, useFormik } from 'formik';
+import { Formik, FormikConfig, FormikErrors, FormikState, FormikValues, useFormik } from 'formik';
 import { get, isNil, max, set } from 'lodash';
 import { IntlShape, useIntl } from 'react-intl';
-import { z, ZodEffects, ZodIssue, ZodObject } from 'zod';
+import { z, ZodEffects, ZodIssue, ZodNullable, ZodObject, ZodOptional, ZodTypeAny } from 'zod';
 
 import { RICH_ERROR_MESSAGES } from '../lib/form-utils';
 
@@ -59,11 +59,11 @@ const getCustomZodErrorMap =
  * @returns A function that can be used as a Formik `validate` function for a Zod schema. The function will
  * check the values against the Zod schema and return an object of internationalized error messages.
  */
-const getErrorsObjectFromZodSchema = (
+function getErrorsObjectFromZodSchema<Values>(
   intl: IntlShape,
-  zodSchema: AcceptedZodSchema,
-  values: z.infer<typeof zodSchema>,
-): Record<string, string> => {
+  zodSchema: z.ZodSchema<Values>,
+  values: Values,
+): FormikErrors<Values> {
   const errors = {};
   const result = zodSchema.safeParse(values, { errorMap: getCustomZodErrorMap(intl) });
   if (!result.success) {
@@ -76,15 +76,15 @@ const getErrorsObjectFromZodSchema = (
   }
 
   return errors;
-};
+}
 
-const isOptionalField = (field: z.ZodTypeAny): boolean => {
+const isOptionalField = (field: z.ZodTypeAny): field is ZodOptional<any> | ZodNullable<any> => {
   return ['ZodOptional', 'ZodNullable'].includes(field._def.typeName);
 };
 
 const getTypeFromOptionalField = (field: z.ZodTypeAny): z.ZodTypeAny => {
   if (isOptionalField(field)) {
-    return getTypeFromOptionalField(field._def['innerType']);
+    return getTypeFromOptionalField(field.unwrap());
   } else {
     return field;
   }
@@ -118,6 +118,14 @@ const getNestedFieldFromSchema = (schema: z.ZodTypeAny, fullPath: string[]): z.Z
 
   return null;
 };
+
+function isZodType<T extends ZodTypeAny>(v: any, typeKind: z.ZodFirstPartyTypeKind): v is T {
+  if ('typeName' in v._def) {
+    return v._def.typeName === typeKind;
+  }
+
+  return false;
+}
 
 /**
  * @param name a dot-separated path to the field in the schema.
@@ -155,23 +163,27 @@ export const getInputAttributesFromZodSchema = (
   }
 
   // Handle type-specific attributes
-  if (field._def.typeName === 'ZodString') {
+  if (isZodType<z.ZodString>(field, z.ZodFirstPartyTypeKind.ZodString)) {
     attributes['type'] = 'text';
-    if (!isNil(field['minLength'])) {
-      attributes['minLength'] = field['minLength'];
+    if (!isNil(field.minLength)) {
+      attributes['minLength'] = field.minLength;
     }
-    if (!isNil(field['maxLength'])) {
-      attributes['maxLength'] = field['maxLength'];
+    if (!isNil(field.maxLength)) {
+      attributes['maxLength'] = field.maxLength;
     }
-  } else if (field._def.typeName === 'ZodNumber') {
+  } else if (isZodType<z.ZodNumber>(field, z.ZodFirstPartyTypeKind.ZodNumber)) {
     attributes['type'] = 'number';
-    const minChecks = field._def.checks.filter(check => check.kind === 'min').map(check => check.value);
+    const minChecks = field._def.checks
+      .filter((check): check is z.ZodNumberCheck & { kind: 'min' } => check.kind === 'min')
+      .map(check => check.value);
     const minValue = max(minChecks); // Get the least restrictive minimum
     if (!isNil(minValue)) {
       attributes['min'] = minValue;
     }
 
-    const maxChecks = field._def.checks.filter(check => check.kind === 'max').map(check => check.value);
+    const maxChecks = field._def.checks
+      .filter((check): check is z.ZodNumberCheck & { kind: 'max' } => check.kind === 'max')
+      .map(check => check.value);
     const maxValue = max(maxChecks); // Get the most restrictive maximum
     if (!isNil(maxValue)) {
       attributes['max'] = maxValue;
@@ -181,14 +193,30 @@ export const getInputAttributesFromZodSchema = (
   return attributes;
 };
 
+interface FormikStatusWithSchema {
+  schema: ZodObject<any> | ZodEffects<any>;
+}
+
+interface FormikWithSchema<Values> extends FormikState<Values> {
+  status: FormikStatusWithSchema;
+}
+
+function isFormikWithSchema<T>(formik: FormikState<T>): formik is FormikWithSchema<T> {
+  if (formik.status && 'schema' in formik.status) {
+    return formik.status.schema instanceof ZodObject || formik.status.schema instanceof ZodEffects;
+  }
+
+  return false;
+}
+
 /**
  * @returns the Zod schema from a Formik form (if defined)
  */
-export const getSchemaFromFormik = (formik: FormikValues): AcceptedZodSchema | undefined => {
-  if (formik.status && (formik.status instanceof ZodObject || formik.status instanceof ZodEffects)) {
-    return formik.status;
+export function getSchemaFromFormik(formik: FormikState<any>): AcceptedZodSchema | undefined {
+  if (isFormikWithSchema(formik)) {
+    return formik.status.schema;
   }
-};
+}
 
 /**
  * A wrapper around `useFormik` that plugs in Zod validation.
@@ -200,13 +228,16 @@ export const getSchemaFromFormik = (formik: FormikValues): AcceptedZodSchema | u
 export function useFormikZod<Values extends FormikValues = FormikValues>({
   schema,
   ...props
-}: Omit<FormikConfig<Values>, 'initialValues' | 'validate' | 'initialValues'> & {
-  schema: AcceptedZodSchema;
-  initialValues: z.infer<typeof schema> & Values;
+}: Omit<FormikConfig<Values>, 'initialStatus' | 'validate'> & {
+  schema: z.ZodSchema<Values>;
 }) {
   const intl = useIntl();
-  const validate = React.useCallback(values => getErrorsObjectFromZodSchema(intl, schema, values), [intl, schema]);
-  return useFormik<Values>({ ...props, validate, initialStatus: schema });
+  const validate = React.useCallback(
+    values => getErrorsObjectFromZodSchema<Values>(intl, schema, values),
+    [intl, schema],
+  );
+
+  return useFormik<Values>({ ...props, validate, initialStatus: { schema } });
 }
 
 /**
@@ -215,16 +246,19 @@ export function useFormikZod<Values extends FormikValues = FormikValues>({
  * Combined with `StyledInputFormikField` this components provides a simple way to have automatic
  * form validation and HTML best practices (e.g. setting the `required` and HTML validation attributes).
  */
-export const FormikZod = ({
+export function FormikZod<Values extends FormikValues = FormikValues>({
   schema,
   ...props
-}: Omit<React.ComponentProps<typeof Formik>, 'initialStatus' | 'validate' | 'initialValues'> & {
-  schema: AcceptedZodSchema;
-  initialValues: z.infer<typeof schema>;
-}) => {
+}: Omit<React.ComponentProps<typeof Formik>, 'initialStatus' | 'validate'> & {
+  schema: z.ZodSchema<Values>;
+}) {
   const intl = useIntl();
-  const validate = React.useCallback(values => getErrorsObjectFromZodSchema(intl, schema, values), [intl, schema]);
-  return <Formik initialStatus={schema} validate={validate} {...props} />;
-};
+  const validate = React.useCallback(
+    values => getErrorsObjectFromZodSchema<Values>(intl, schema, values),
+    [intl, schema],
+  );
+
+  return <Formik initialStatus={{ schema }} validate={validate} {...props} />;
+}
 
 // ignore unused exports useFormikZod, FormikZod, getInputAttributesFromZodSchema
