@@ -163,7 +163,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
           <Filterbar hideSeparator {...queryFilter} />
 
           <Metric {...metric} loading={loading} expanded showTimeSeries showCurrencyCode>
-            <AccountTable queryFilter={queryFilter} accountSlug={accountSlug} metric={metric} />
+            <AccountTable queryFilter={queryFilter} accountSlug={router.query?.as ?? accountSlug} metric={metric} />
           </Metric>
         </div>
       );
