@@ -5,7 +5,6 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 import { Host } from '../../lib/graphql/types/v2/graphql';
 import { elementFromClass } from '../../lib/react-utils';
 
-import Avatar from '../Avatar';
 import { useDrawerActionsContainer } from '../Drawer';
 import PayoutMethodData from '../expenses/PayoutMethodData';
 import Link from '../Link';
@@ -55,10 +54,7 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
       <H4 mb={32}>
         <FormattedMessage defaultMessage="Vendor's Details" />
       </H4>
-      <SectionTitle>
-        <Avatar collective={vendor} radius={40} />
-        {vendor.name}
-      </SectionTitle>
+      <SectionTitle>{vendor.name}</SectionTitle>
       <div className="mt-5 flex gap-8">
         <HeaderInfo>
           <FormattedMessage id="agreement.createdOn" defaultMessage="Created on" />
@@ -130,7 +126,7 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
           <SectionTitle>
             <FormattedMessage id="expense.notes" defaultMessage="Notes" />
           </SectionTitle>
-          <div>{notes}</div>
+          <div className="text-sm">{notes}</div>
         </div>
       )}
       {drawerActionsContainer &&
