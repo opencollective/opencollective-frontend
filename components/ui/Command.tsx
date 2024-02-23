@@ -3,7 +3,7 @@
 'use client';
 
 import * as React from 'react';
-import { DialogProps } from '@radix-ui/react-dialog';
+import type { DialogProps } from '@radix-ui/react-dialog';
 /* The 'carloslfu-cmdk-internal' package above is a fork of `cmdk` but bundling the latest fixes
   that are not published on npm yet. These fixes are needed for the AccountSwitcher to work properly.
   When cmdk releases 0.2.1 or 0.3.0 we should switch over to that.
@@ -11,7 +11,8 @@ import { DialogProps } from '@radix-ui/react-dialog';
 */
 import { Command as CommandPrimitive } from 'carloslfu-cmdk-internal';
 import clsx from 'clsx';
-import { Loader2, LucideIcon, Search } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 
 import { cn } from '../../lib/utils';
 

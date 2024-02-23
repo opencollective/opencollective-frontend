@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 import { pick } from 'lodash';
-import { NextPageContext } from 'next';
+import type { NextPageContext } from 'next';
 
 const supportedLanguages = ['en'];
 

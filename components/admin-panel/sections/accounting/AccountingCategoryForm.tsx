@@ -152,7 +152,7 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
             isMulti
             width="100%"
             maxWidth={500}
-            onChange={options =>
+            onChange={(options: { value: ExpenseType }[]) =>
               props.formik.setFieldValue(
                 'expensesTypes',
                 options.map(({ value }) => expenseTypeOptions.find(c => c.value === value)),

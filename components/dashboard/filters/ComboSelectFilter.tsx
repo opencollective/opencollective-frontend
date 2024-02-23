@@ -2,10 +2,11 @@ import React, { useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import { debounce, isUndefined } from 'lodash';
 import { CheckIcon } from 'lucide-react';
-import { FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
-import { z } from 'zod';
+import type { MessageDescriptor } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
+import type { z } from 'zod';
 
-import { FilterConfig } from '../../../lib/filters/filter-types';
+import type { FilterConfig } from '../../../lib/filters/filter-types';
 import { sortSelectOptions } from '../../../lib/utils';
 
 import {

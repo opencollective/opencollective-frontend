@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryOptions } from '@apollo/client';
+import type { QueryOptions } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { getDataFromTree } from '@apollo/client/react/ssr';
 import { cloneDeep, isUndefined, omitBy, pick } from 'lodash';

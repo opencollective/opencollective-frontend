@@ -1,4 +1,4 @@
-import LoggedInUser from '../LoggedInUser';
+import type LoggedInUser from '../LoggedInUser';
 
 export const enum Experiment {
   NEW_PLATFORM_TIP_FLOW = 'newPlatformTipFlow',

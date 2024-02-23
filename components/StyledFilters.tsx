@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { FlexGrowProps, FlexWrapProps } from 'styled-system';
+import type { FlexGrowProps, FlexWrapProps } from 'styled-system';
 
 import { Flex } from './Grid';
 import StyledButton from './StyledButton';

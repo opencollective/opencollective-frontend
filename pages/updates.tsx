@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { omitBy } from 'lodash';
-import { InferGetServerSidePropsType } from 'next';
+import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -11,7 +11,7 @@ import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
-import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
+import type { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';

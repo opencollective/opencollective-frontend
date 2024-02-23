@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { DocumentNode, useLazyQuery } from '@apollo/client';
+import type { DocumentNode } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { debounce, uniqBy } from 'lodash';
 import { Search, Tags, TagsIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { AccountReferenceInput, InputMaybe, Scalars } from '../lib/graphql/types/v2/graphql';
+import type { AccountReferenceInput, InputMaybe, Scalars } from '../lib/graphql/types/v2/graphql';
 
 import { Button } from './ui/Button';
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/Command';

@@ -1,5 +1,6 @@
-import React, { HTMLInputTypeAttribute } from 'react';
+import React from 'react';
 import { get, merge, pick } from 'lodash';
+import type { HTMLInputTypeAttribute } from 'react';
 import { useIntl } from 'react-intl';
 
 import StyledHr from '../StyledHr';

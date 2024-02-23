@@ -7,7 +7,7 @@ import { compareItemOCRValues } from './lib/ocr';
 import MessageBox from '../MessageBox';
 import { Checkbox } from '../ui/Checkbox';
 
-import { ExpenseItemFormValues } from './types/FormValues';
+import type { ExpenseItemFormValues } from './types/FormValues';
 
 export const ConfirmOCRValues = ({
   onConfirm,

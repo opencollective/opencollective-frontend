@@ -11,7 +11,7 @@ import Image from '../../../Image';
 import { Alert, AlertDescription, AlertTitle } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import { Timeline } from './Timeline';
 

@@ -8,7 +8,7 @@ import { useToast } from '../../components/ui/useToast';
 import { canUseMockImageUpload, mockImageUpload } from '../api';
 import { i18nGraphqlException } from '../errors';
 import { API_V2_CONTEXT, gql } from '../graphql/helpers';
-import { UploadedFileKind, UploadFileResult } from '../graphql/types/v2/graphql';
+import type { UploadedFileKind, UploadFileResult } from '../graphql/types/v2/graphql';
 
 const uploadFileMutation = gql`
   mutation UploadFile($files: [UploadFileInput!]!) {

@@ -6,10 +6,10 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { HELP_MESSAGE } from '../../../lib/constants/dismissable-help-message';
-import { FilterComponentConfigs, Views } from '../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, Views } from '../../../lib/filters/filter-types';
 import { boolean, limit, offset } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import { DashboardVendorsQuery } from '../../../lib/graphql/types/v2/graphql';
+import type { DashboardVendorsQuery } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
 import Avatar from '../../Avatar';
@@ -31,14 +31,15 @@ import {
 import { Pagination } from '../../ui/Pagination';
 import { TableActionsButton } from '../../ui/Table';
 import OrganizationDetails from '../../vendors/OrganizationDetails';
-import { setVendorArchiveMutation, vendorFieldFragment, VendorFieldsFragment } from '../../vendors/queries';
+import type { VendorFieldsFragment } from '../../vendors/queries';
+import { setVendorArchiveMutation, vendorFieldFragment } from '../../vendors/queries';
 import VendorDetails, { VendorContactTag } from '../../vendors/VendorDetails';
 import VendorForm from '../../vendors/VendorForm';
 import DashboardHeader from '../DashboardHeader';
 import { EmptyResults } from '../EmptyResults';
 import { Filterbar } from '../filters/Filterbar';
 import { searchFilter } from '../filters/SearchFilter';
-import { DashboardSectionProps } from '../types';
+import type { DashboardSectionProps } from '../types';
 
 enum VendorsTab {
   ALL = 'ALL',

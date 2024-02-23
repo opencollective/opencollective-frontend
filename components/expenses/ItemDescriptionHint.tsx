@@ -1,10 +1,10 @@
 import React from 'react';
-import { FieldProps, FormikProps } from 'formik';
+import type { FieldProps, FormikProps } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import StyledLinkButton from '../StyledLinkButton';
 
-import { ExpenseFormValues } from './types/FormValues';
+import type { ExpenseFormValues } from './types/FormValues';
 
 type ExpenseItemDescriptionHintProps = {
   form: FormikProps<ExpenseFormValues>;

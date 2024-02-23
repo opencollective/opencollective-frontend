@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import { Account, Update } from '../../../lib/graphql/types/v2/graphql';
+import type { Account, Update } from '../../../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import { formatDate } from '../../../lib/utils';
 

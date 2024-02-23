@@ -4,7 +4,8 @@ import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
-import { size, SizeProps, space, SpaceProps } from 'styled-system';
+import type { SizeProps, SpaceProps } from 'styled-system';
+import { size, space } from 'styled-system';
 
 import Container from './Container';
 

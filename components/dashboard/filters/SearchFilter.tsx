@@ -5,8 +5,7 @@ import { Search } from 'lucide-react';
 import { defineMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import type { FilterComponentProps } from '../../../lib/filters/filter-types';
-import { FilterConfig } from '../../../lib/filters/filter-types';
+import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 
 import { Input } from '../../ui/Input';
 

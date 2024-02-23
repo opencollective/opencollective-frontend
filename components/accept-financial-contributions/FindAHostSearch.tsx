@@ -4,7 +4,7 @@ import { take } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { Account, Host } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Host } from '../../lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from '../Grid';
 import Loading from '../Loading';

@@ -1,5 +1,6 @@
 import React from 'react';
 import { get } from 'lodash';
+import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRightLeft,
   BarChart2,
@@ -11,7 +12,6 @@ import {
   Globe2,
   HeartHandshake,
   LayoutDashboard,
-  LucideIcon,
   Receipt,
   Settings,
   Store,

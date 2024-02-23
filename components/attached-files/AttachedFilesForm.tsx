@@ -2,7 +2,7 @@ import React from 'react';
 import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
+import type { UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
 import { attachmentDropzoneParams } from './lib/attachments';
 
 import { Flex } from '../Grid';

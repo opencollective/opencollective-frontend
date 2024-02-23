@@ -4,7 +4,7 @@ import { flatten } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { TimelineQuery } from '../../../../lib/graphql/types/v2/graphql';
+import type { TimelineQuery } from '../../../../lib/graphql/types/v2/graphql';
 import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 
 import ExpenseDrawer from '../../../expenses/ExpenseDrawer';

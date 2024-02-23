@@ -13,9 +13,10 @@ import Pagination from '../../../Pagination';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
-import { FilterMeta, filters, schema, toVariables } from './filters';
+import type { FilterMeta } from './filters';
+import { filters, schema, toVariables } from './filters';
 import { accountExpensesQuery } from './queries';
 
 const ROUTE_PARAMS = ['slug', 'section', 'subpath'];

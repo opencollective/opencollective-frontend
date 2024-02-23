@@ -7,12 +7,12 @@ import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import {
+import type {
   AccountingCategory,
-  AccountingCategoryKind,
   AdminAccountingCategoriesQuery,
   AdminAccountingCategoriesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
@@ -22,13 +22,14 @@ import { buildComboSelectFilter } from '../../../dashboard/filters/ComboSelectFi
 import { Filterbar } from '../../../dashboard/filters/Filterbar';
 import { buildOrderByFilter } from '../../../dashboard/filters/OrderFilter';
 import { searchFilter } from '../../../dashboard/filters/SearchFilter';
-import { DashboardSectionProps } from '../../../dashboard/types';
+import type { DashboardSectionProps } from '../../../dashboard/types';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 
 import { AccountingCategoriesTable } from './AccountingCategoriesTable';
-import { AccountingCategoryKindI18n, EditableAccountingCategoryFields } from './AccountingCategoryForm';
+import type { EditableAccountingCategoryFields } from './AccountingCategoryForm';
+import { AccountingCategoryKindI18n } from './AccountingCategoryForm';
 import { CreateAccountingCategoryModal } from './CreateAccountingCategoryModal';
 
 const accountingCategoriesQuery = gql`

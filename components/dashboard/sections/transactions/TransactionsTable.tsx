@@ -1,10 +1,10 @@
 import React from 'react';
-import { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import clsx from 'clsx';
 import { AlertTriangle, ArrowLeft, ArrowRight, MoreHorizontal, Undo } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { Transaction } from '../../../../lib/graphql/types/v2/graphql';
+import type { Transaction } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';

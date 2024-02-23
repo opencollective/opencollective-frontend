@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { connectAccount } from '../../../lib/api';
 import { createError, ERROR } from '../../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import { Amount, ExpenseCollection, Host } from '../../../lib/graphql/types/v2/graphql';
+import type { Amount, ExpenseCollection, Host } from '../../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../../lib/hooks/useAsyncCall';
 import { getDashboardUrl } from '../../../lib/stripe/dashboard';
 

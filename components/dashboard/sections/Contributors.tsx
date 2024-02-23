@@ -4,7 +4,7 @@ import { toNumber } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterConfig } from '../../../lib/filters/filter-types';
+import type { FilterConfig } from '../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { MemberRole } from '../../../lib/graphql/types/v2/graphql';
@@ -24,7 +24,7 @@ import ComboSelectFilter from '../filters/ComboSelectFilter';
 import { emailFilter } from '../filters/EmailFilter';
 import { Filterbar } from '../filters/Filterbar';
 import { orderByFilter } from '../filters/OrderFilter';
-import { DashboardSectionProps } from '../types';
+import type { DashboardSectionProps } from '../types';
 
 // type FilterMemberRole = MemberRole.FOLLOWER | MemberRole.BACKER | MemberRole.CONTRIBUTOR
 

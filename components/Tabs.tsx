@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl';
 import { useWindowResize, VIEWPORTS } from '../lib/hooks/useWindowResize';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select';
-import { Flex } from './Grid';
+import type { Flex } from './Grid';
 
 const abbreviateNumber = number => {
   if (number >= 1000000000) {
@@ -38,7 +38,7 @@ const Count = ({ count, selected }: { count?: number; selected?: boolean }) => {
 type TabsProps = {
   tabs: Array<{ id: string; label: React.ReactNode | string; count?: number; selected?: boolean }>;
   selectedId?: string;
-  onChange?: Function;
+  onChange?: (value: string) => void;
 };
 
 const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps & Parameters<typeof Flex>[0]) => {

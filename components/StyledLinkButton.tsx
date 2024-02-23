@@ -1,8 +1,10 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
-import { color, ColorProps, typography, TypographyProps, variant } from 'styled-system';
+import type { ColorProps, TypographyProps } from 'styled-system';
+import { color, typography, variant } from 'styled-system';
 
-import { textDecoration, TextDecorationProps } from '../lib/styled-system-custom-properties';
+import type { TextDecorationProps } from '../lib/styled-system-custom-properties';
+import { textDecoration } from '../lib/styled-system-custom-properties';
 
 type StyledLinkButtonProps = ColorProps &
   TypographyProps &

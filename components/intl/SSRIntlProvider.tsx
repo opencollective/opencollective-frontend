@@ -1,5 +1,5 @@
 import React from 'react';
-import { IntlShape } from 'react-intl';
+import type { IntlShape } from 'react-intl';
 
 const SSRIntlContext = React.createContext<{ intl: IntlShape }>(null);
 

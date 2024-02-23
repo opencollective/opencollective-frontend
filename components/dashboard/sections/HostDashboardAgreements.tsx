@@ -4,10 +4,10 @@ import { PlusIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
 import { integer } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import { Agreement, HostAgreementsQueryVariables } from '../../../lib/graphql/types/v2/graphql';
+import type { Agreement, HostAgreementsQueryVariables } from '../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
@@ -23,7 +23,7 @@ import DashboardHeader from '../DashboardHeader';
 import { EmptyResults } from '../EmptyResults';
 import { Filterbar } from '../filters/Filterbar';
 import { hostedAccountFilter } from '../filters/HostedAccountFilter';
-import { DashboardSectionProps } from '../types';
+import type { DashboardSectionProps } from '../types';
 
 const hostDashboardAgreementsQuery = gql`
   query HostAgreements($hostSlug: String!, $limit: Int!, $offset: Int!, $account: [AccountReferenceInput]) {

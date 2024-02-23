@@ -2,7 +2,8 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { Account, Host, VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Host } from '../../lib/graphql/types/v2/graphql';
+import { VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
 import { VirtualCardRequestStatusI18n } from '../../lib/i18n/virtual-card-request';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -61,7 +62,9 @@ export default function VirtualCardRequestFilter(props: VirtualCardRequestStatus
           <StyledSelectFilter
             intl={intl}
             inputId="virtual-card-request.status.filter"
-            onChange={newValue => props.onVirtualCardRequestStatusFilter(newValue.map(v => v.value))}
+            onChange={(newValue: { value: VirtualCardRequestStatus }[]) =>
+              props.onVirtualCardRequestStatusFilter(newValue.map(v => v.value))
+            }
             isMulti={true}
             isLoading={props.loading}
             value={props.virtualCardRequestStatusFilter.map(c => ({

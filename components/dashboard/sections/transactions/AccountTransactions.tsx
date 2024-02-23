@@ -13,7 +13,7 @@ import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ExportTransactionsCSVModal from '../../ExportTransactionsCSVModal';
 import { Filterbar } from '../../filters/Filterbar';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import { filters, schema, toVariables } from './filters';
 import { transactionsTableQuery } from './queries';

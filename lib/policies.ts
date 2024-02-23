@@ -1,6 +1,6 @@
 import { get } from 'lodash';
 
-import { Policies } from './graphql/types/v2/graphql';
+import type { Policies } from './graphql/types/v2/graphql';
 
 type PoliciesUnion = Exclude<keyof Policies, '__typename' | 'id'>;
 

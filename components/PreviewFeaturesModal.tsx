@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { PreviewFeature } from '../lib/preview-features';
+import type { PreviewFeature } from '../lib/preview-features';
 
 import { Badge } from './ui/Badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/Dialog';

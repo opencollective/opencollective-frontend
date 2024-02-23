@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import {
+import type {
   PaymentIntent,
   Stripe,
   StripeElements,
@@ -12,16 +12,15 @@ import clsx from 'clsx';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import {
+import type {
   Account,
   Host,
   Order,
   PaymentMethod,
-  PaymentMethodLegacyType,
   PaymentMethodPickerQuery,
-  PaymentMethodService,
   PaymentMethodType,
 } from '../../lib/graphql/types/v2/graphql';
+import { PaymentMethodLegacyType, PaymentMethodService } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
@@ -30,7 +29,8 @@ import {
   isPaymentMethodDisabled,
 } from '../../lib/payment-method-utils';
 import { isStripePaymentMethodEnabledForCurrency, StripePaymentMethodsLabels } from '../../lib/stripe/payment-methods';
-import useSetupIntent, { StripeSetupIntent } from '../../lib/stripe/useSetupIntent';
+import type { StripeSetupIntent } from '../../lib/stripe/useSetupIntent';
+import useSetupIntent from '../../lib/stripe/useSetupIntent';
 
 import PayPal from '../icons/PayPal';
 import Loading from '../Loading';

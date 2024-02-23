@@ -23,7 +23,7 @@ import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import Avatar from '../../Avatar';
 import Container from '../../Container';
 import DashboardHeader from '../../dashboard/DashboardHeader';
-import { DashboardSectionProps } from '../../dashboard/types';
+import type { DashboardSectionProps } from '../../dashboard/types';
 import EditMemberModal from '../../edit-collective/sections/team/EditMemberModal';
 import InviteMemberModal from '../../edit-collective/sections/team/InviteMemberModal';
 import { teamSectionQuery } from '../../edit-collective/sections/team/queries';

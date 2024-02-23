@@ -196,17 +196,14 @@ export const getWebsiteUrl = () => {
   }
 };
 
-export function compose(...funcs) {
-  const functions = funcs.reverse();
-  return function (...args) {
-    const [firstFunction, ...restFunctions] = functions;
-    let result = firstFunction.apply(null, args);
-    restFunctions.forEach(fnc => {
-      result = fnc.call(null, result);
-    });
-    return result;
+// https://medium.com/@akhilanand.ak01/function-composition-in-javascript-exploring-the-power-of-compose-4114da8b9875
+export const compose = (...functions) => {
+  return input => {
+    return functions.reduceRight((acc, fn) => {
+      return fn(acc);
+    }, input);
   };
-}
+};
 
 /** This function will return true if reportValidity is not supported by the browser, or if it succeed */
 export const reportValidityHTML5 = domNodeOrEvent => {

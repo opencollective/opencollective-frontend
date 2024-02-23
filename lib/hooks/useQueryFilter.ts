@@ -2,7 +2,7 @@ import React from 'react';
 import { forEach, isEmpty, isNil, isUndefined, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 import { toast } from '../../components/ui/useToast';
 

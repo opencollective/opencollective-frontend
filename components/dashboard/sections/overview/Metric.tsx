@@ -4,11 +4,12 @@ import { isNil } from 'lodash';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { Amount, Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
+import type { Amount, Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
 
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { InfoTooltipIcon } from '../../../InfoTooltipIcon';
-import { Badge, BadgeProps } from '../../../ui/Badge';
+import type { BadgeProps } from '../../../ui/Badge';
+import { Badge } from '../../../ui/Badge';
 import { Skeleton } from '../../../ui/Skeleton';
 
 import ComparisonChart from './ComparisonChart';

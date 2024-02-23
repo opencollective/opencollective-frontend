@@ -19,7 +19,8 @@
   },
   "include": [
     "next-env.d.ts",
-    "lib/graphql/types/v2/gql.d.ts",
+    "lostpixel.config.ts",
+    "middleware.ts",
     "components",
     "cypress",
     "lib",

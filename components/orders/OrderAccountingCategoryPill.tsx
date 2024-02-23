@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Account, AccountingCategory, Host, Order } from '../../lib/graphql/types/v2/graphql';
+import type { Account, AccountingCategory, Host, Order } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
 
 import AccountingCategorySelect from '../AccountingCategorySelect';

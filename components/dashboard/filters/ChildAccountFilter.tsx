@@ -2,8 +2,8 @@ import React from 'react';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
-import { Account } from '../../../lib/graphql/types/v2/graphql';
+import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
+import type { Account } from '../../../lib/graphql/types/v2/graphql';
 
 import ComboSelectFilter from './ComboSelectFilter';
 import { AccountRenderer } from './HostedAccountFilter';

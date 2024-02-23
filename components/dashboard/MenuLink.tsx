@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
-import { ArrowRight, ChevronDown, ChevronUp, LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 import ReactAnimateHeight from 'react-animate-height';
 import { useIntl } from 'react-intl';
 

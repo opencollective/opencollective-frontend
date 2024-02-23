@@ -1,9 +1,9 @@
 import React from 'react';
-import { FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
 import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { Account } from '../../lib/graphql/types/v2/graphql';
+import type { Account } from '../../lib/graphql/types/v2/graphql';
 import { attachmentDropzoneParams } from './lib/attachments';
 
 import { Flex } from '../Grid';
@@ -12,7 +12,7 @@ import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
 import { P, Span } from '../Text';
 
-import { ExpenseFormValues } from './types/FormValues';
+import type { ExpenseFormValues } from './types/FormValues';
 import AddNewAttachedFilesButton from './AddNewAttachedFilesButton';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 

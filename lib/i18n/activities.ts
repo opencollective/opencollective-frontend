@@ -1,6 +1,7 @@
-import { defineMessages, MessageDescriptor } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
+import { defineMessages } from 'react-intl';
 
-import { ActivityTypes } from '../constants/activities';
+import type { ActivityTypes } from '../constants/activities';
 
 export const ActivityTimelineMessageI18n = defineMessages({
   COLLECTIVE_EXPENSE_APPROVED: {

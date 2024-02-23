@@ -5,10 +5,11 @@ import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
-import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { AccountVirtualCardsQueryVariables, VirtualCardStatus } from '../../../../lib/graphql/types/v2/graphql';
+import type { AccountVirtualCardsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { VirtualCardStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { sortSelectOptions } from '../../../../lib/utils';
 import { VirtualCardStatusI18n } from '../../../../lib/virtual-cards/constants';
@@ -27,7 +28,7 @@ import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { orderByFilter } from '../../filters/OrderFilter';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import { accountVirtualCardsQuery } from './queries';
 

@@ -217,7 +217,7 @@ const ExportTransactionsCSVModal = ({
               {() => (
                 <PeriodFilterPresetsSelect
                   inputId="csv-export-date-presets-select"
-                  // @ts-ignore PeriodFilterPresetsSelect is not typed yet, the following conflicts with proptypes
+                  // @ts-expect-error PeriodFilterPresetsSelect is not typed yet, the following conflicts with proptypes
                   SelectComponent={StyledSelect}
                   onChange={setTmpDateInterval}
                   interval={tmpDateInterval}

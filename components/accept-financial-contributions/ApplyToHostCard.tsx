@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
-import { Account, Host } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Host } from '../../lib/graphql/types/v2/graphql';
 
 import ApplyToHostModal from '../ApplyToHostModal';
 import { Box, Flex } from '../Grid';
@@ -29,9 +29,8 @@ export default function ApplyToHostCard(props: {
 
   return (
     <React.Fragment>
-      {/* @ts-ignore StyledCollectiveCard is not typed */}
+      {/* @ts-expect-error StyledCollectiveCard is not typed */}
       <StyledCollectiveCardWrapper
-        /* @ts-ignore StyledCollectiveCard is not typed */
         collective={props.host}
         minWidth={250}
         position="relative"

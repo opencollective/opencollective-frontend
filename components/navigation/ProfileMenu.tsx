@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { get } from 'lodash';
+import type { LucideIcon } from 'lucide-react';
 import {
   BookOpen,
   ExternalLink,
@@ -9,7 +10,6 @@ import {
   LayoutDashboard,
   LifeBuoy,
   LogOut,
-  LucideIcon,
   Mailbox,
   PocketKnife,
   Settings,
@@ -19,7 +19,8 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import useLoggedInUser, { UserContextProps } from '../../lib/hooks/useLoggedInUser';
+import type { UserContextProps } from '../../lib/hooks/useLoggedInUser';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn } from '../../lib/utils';
 

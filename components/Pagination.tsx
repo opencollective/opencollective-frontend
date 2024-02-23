@@ -124,7 +124,7 @@ type CommonVariantProps = {
 };
 type PageComponentProps = React.PropsWithChildren<{ page: number }>;
 
-type InputPaginationProps = {};
+type InputPaginationProps = object;
 
 function InputPagination(props: InputPaginationProps & CommonVariantProps) {
   const changePage = React.useCallback(

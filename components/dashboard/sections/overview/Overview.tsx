@@ -3,7 +3,7 @@ import React from 'react';
 import { isIndividualAccount } from '../../../../lib/collective';
 
 import { DashboardContext } from '../../DashboardContext';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import { CollectiveOverview } from './CollectiveOverview';
 import IndividualOverview from './IndividualOverview';

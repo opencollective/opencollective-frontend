@@ -4,14 +4,13 @@ import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { PAYMENT_METHOD_TYPE } from '../../../../lib/constants/payment-methods';
-import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti, isNullable, limit, offset } from '../../../../lib/filters/schemas';
+import type { Currency, TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import {
-  Currency,
   ExpenseType,
   PaymentMethodType,
   TransactionKind,
-  TransactionsTableQueryVariables,
   TransactionType,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';

@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
+import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
 import theme from '../../lib/theme';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';

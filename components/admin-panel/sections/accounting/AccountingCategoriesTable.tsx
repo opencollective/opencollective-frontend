@@ -1,7 +1,8 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { AccountingCategory, AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
+import type { AccountingCategory } from '../../../../lib/graphql/types/v2/graphql';
+import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
 import { DataTable } from '../../../DataTable';
@@ -10,7 +11,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { TableActionsButton } from '../../../ui/Table';
 
 import { AccountingCategoryDrawer } from './AccountingCategoryDrawer';
-import { AccountingCategoryKindI18n, EditableAccountingCategoryFields } from './AccountingCategoryForm';
+import type { EditableAccountingCategoryFields } from './AccountingCategoryForm';
+import { AccountingCategoryKindI18n } from './AccountingCategoryForm';
 
 type AccountingCategoriesTableMeta = {
   disabled?: boolean;

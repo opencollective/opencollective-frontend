@@ -1,7 +1,7 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import { FilterComponentConfigs, resetFilters, SetFilter, Views } from '../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, resetFilters, SetFilter, Views } from '../../../lib/filters/filter-types';
 import { filterShouldBeInAddFilterOptions, filterShouldDisplay } from '../../../lib/filters/filter-utils';
 import { cn } from '../../../lib/utils';
 

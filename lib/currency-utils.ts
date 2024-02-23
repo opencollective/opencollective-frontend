@@ -3,7 +3,8 @@ import { isNil, round } from 'lodash';
 
 import { ZERO_DECIMAL_CURRENCIES } from './constants/currency';
 import { CurrencyPrecision } from './constants/currency-precision';
-import { Amount, Currency, CurrencyExchangeRate, CurrencyExchangeRateInput } from './graphql/types/v2/graphql';
+import type { Amount, CurrencyExchangeRate, CurrencyExchangeRateInput } from './graphql/types/v2/graphql';
+import { Currency } from './graphql/types/v2/graphql';
 
 export type Options = {
   locale?: string;

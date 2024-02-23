@@ -70,8 +70,8 @@ type StyledUpdateProps = {
   editable?: boolean;
   LoggedInUser?: any;
   isReloadingData?: boolean;
-  editUpdate?: Function;
-  deleteUpdate?: Function;
+  editUpdate?: ({ variables }: { variables: { update: object } }) => void;
+  deleteUpdate?: ({ variables }: { variables: { id: string } }) => void;
   intl: any;
   router: any;
   /** Reactions associated with this update **/

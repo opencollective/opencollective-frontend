@@ -3,7 +3,7 @@ import { CornerDownRight } from 'lucide-react';
 import { defineMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
-import { FilterConfig } from '../../../../lib/filters/filter-types';
+import type { FilterConfig } from '../../../../lib/filters/filter-types';
 import { i18nDateFilterLabel, i18nDatePeriodLabel } from '../../../../lib/i18n/date-filter';
 
 import { Input } from '../../../ui/Input';
@@ -12,7 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { DateFilterValue } from './DateFilterValue';
 import { DateInput } from './DateInput';
 import { DateRangeInput } from './DateRangeInput';
-import { dateFilterSchema, DateFilterType, DateFilterValueType, dateToVariables, Period } from './schema';
+import type { DateFilterValueType } from './schema';
+import { dateFilterSchema, DateFilterType, dateToVariables, Period } from './schema';
 import { Timezonepicker } from './TimezonePicker';
 
 export const dateFilter: FilterConfig<z.infer<typeof dateFilterSchema>> = {

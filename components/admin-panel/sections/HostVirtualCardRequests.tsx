@@ -4,11 +4,11 @@ import { identity, toLower, toUpper } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import { Account, Host, VirtualCardRequestCollection } from '../../../lib/graphql/types/v2/graphql';
+import type { Account, Host, VirtualCardRequestCollection } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/deprecated/useQueryFilter';
 
 import { accountHoverCardFields } from '../../AccountHoverCard';
-import { DashboardSectionProps } from '../../dashboard/types';
+import type { DashboardSectionProps } from '../../dashboard/types';
 import { Box, Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';

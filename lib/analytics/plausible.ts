@@ -1,5 +1,5 @@
-import { AnalyticsEvent } from './events';
-import { AnalyticsProperty } from './properties';
+import type { AnalyticsEvent } from './events';
+import type { AnalyticsProperty } from './properties';
 
 declare global {
   interface Window {

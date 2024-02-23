@@ -6,12 +6,14 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { Account, MemberRole } from '../lib/graphql/types/v2/graphql';
+import type { Account } from '../lib/graphql/types/v2/graphql';
+import { MemberRole } from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { ButtonStyle } from '../lib/theme/variants/button';
+import type { ButtonStyle } from '../lib/theme/variants/button';
 
 import { useToast } from './ui/useToast';
-import StyledButton, { StyledButtonProps } from './StyledButton';
+import type { StyledButtonProps } from './StyledButton';
+import StyledButton from './StyledButton';
 import StyledSpinner from './StyledSpinner';
 
 type FollowButtonProps = {

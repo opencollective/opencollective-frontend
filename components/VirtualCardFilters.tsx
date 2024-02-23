@@ -3,7 +3,8 @@ import { debounce, isNil, sortBy } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { Collective, Currency, VirtualCardStatus } from '../lib/graphql/types/v2/graphql';
+import type { Collective, Currency } from '../lib/graphql/types/v2/graphql';
+import { VirtualCardStatus } from '../lib/graphql/types/v2/graphql';
 import { VirtualCardStatusI18n } from '../lib/virtual-cards/constants';
 
 import AmountRangeFilter from './filters/AmountRangeFilter';
@@ -160,7 +161,7 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
             intl={intl}
             inputId="virtual-card.collectives.filter"
             isLoading={props.loading}
-            onChange={newValue => props.onCollectivesFilterChange(newValue.map(v => v.value))}
+            onChange={(newValue: { value: string }[]) => props.onCollectivesFilterChange(newValue.map(v => v.value))}
             isMulti={true}
             isSearchable
             value={
@@ -182,7 +183,9 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
           <StyledSelectFilter
             intl={intl}
             inputId="virtual-card.status.filter"
-            onChange={newValue => props.onVirtualCardStatusFilter(newValue.map(v => v.value))}
+            onChange={(newValue: { value: VirtualCardStatus }[]) =>
+              props.onVirtualCardStatusFilter(newValue.map(v => v.value))
+            }
             isMulti={true}
             isLoading={props.loading}
             value={props.virtualCardStatusFilter.map(c => ({
@@ -224,7 +227,7 @@ export default function VirtualCardFilters(props: VirtualCardFiltersProps) {
             intl={intl}
             inputId="virtual-card.missingReceipts.filter"
             isLoading={props.loading}
-            onChange={newValue => props.onMissingReceiptsChange(newValue.value)}
+            onChange={(newValue: { value: boolean }) => props.onMissingReceiptsChange(newValue.value)}
             value={missingReceiptValue}
             options={missingReceiptOptions}
           />

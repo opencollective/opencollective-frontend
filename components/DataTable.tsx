@@ -1,14 +1,6 @@
 import React from 'react';
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  Row,
-  SortingState,
-  TableMeta,
-  useReactTable,
-} from '@tanstack/react-table';
+import type { ColumnDef, Row, SortingState, TableMeta } from '@tanstack/react-table';
+import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
 import { Skeleton } from './ui/Skeleton';

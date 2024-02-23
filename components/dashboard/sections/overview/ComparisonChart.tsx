@@ -7,7 +7,7 @@ import { useIntl } from 'react-intl';
 
 import { formatAmountForLegend } from '../../../../lib/charts';
 import dayjs from '../../../../lib/dayjs';
-import { Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
+import type { Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
 
 import MessageBox from '../../../MessageBox';
 import { formatPeriod, getDayjsIsoUnit } from '../../filters/PeriodCompareFilter';
@@ -157,7 +157,7 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
     },
     y: {
       title: {
-        // @ts-ignore - the second argument containing dataPointIndex is missing in the type definition
+        // @ts-expect-error - the second argument containing dataPointIndex is missing in the type definition
         formatter: (seriesName: string, { dataPointIndex }) => {
           let startDate;
 

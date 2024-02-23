@@ -1,43 +1,37 @@
-import React from 'react';
-import styled, { CSSProp } from 'styled-components';
-import {
-  background,
+import type React from 'react';
+import type { CSSProp } from 'styled-components';
+import styled from 'styled-components';
+import type {
   BackgroundProps,
-  border,
   BorderProps,
-  color,
   ColorProps,
-  flexbox,
   FlexboxProps,
-  layout,
   LayoutProps,
-  position,
   PositionProps,
-  shadow,
   ShadowProps,
-  size,
   SizeProps,
-  space,
   SpaceProps,
-  typography,
   TypographyProps,
 } from 'styled-system';
+import { background, border, color, flexbox, layout, position, shadow, size, space, typography } from 'styled-system';
 
+import type {
+  ClearProps,
+  CursorProps,
+  FloatProps,
+  OverflowProps,
+  PointerEventsProps,
+  WhiteSpaceProps,
+  WordBreakProps,
+} from '../lib/styled-system-custom-properties';
 import {
   clear,
-  ClearProps,
   cursor,
-  CursorProps,
   float,
-  FloatProps,
   overflow,
-  OverflowProps,
   pointerEvents,
-  PointerEventsProps,
   whiteSpace,
-  WhiteSpaceProps,
   wordBreak,
-  WordBreakProps,
 } from '../lib/styled-system-custom-properties';
 
 export type ContainerProps = FlexboxProps &

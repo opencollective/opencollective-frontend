@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getDefaultFileName } from '../../lib/expenses';
-import { FileInfo } from '../../lib/graphql/types/v2/graphql';
+import type { FileInfo } from '../../lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from '../Grid';
 import LocalFilePreview from '../LocalFilePreview';

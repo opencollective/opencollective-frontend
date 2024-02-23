@@ -3,7 +3,7 @@ import { round } from 'lodash';
 import { InfoIcon } from 'lucide-react';
 import { useIntl } from 'react-intl';
 
-import { CurrencyExchangeRate, CurrencyExchangeRateInput } from '../lib/graphql/types/v2/graphql';
+import type { CurrencyExchangeRate, CurrencyExchangeRateInput } from '../lib/graphql/types/v2/graphql';
 import { cn } from '../lib/utils';
 
 import { Input } from './ui/Input';
