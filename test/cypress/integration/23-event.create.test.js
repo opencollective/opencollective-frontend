@@ -52,7 +52,6 @@ describe('event.create.test.js', () => {
     cy.get('[data-cy="edit-collective-btn"]:visible').click();
     cy.get('[data-cy="menu-item-Settings"]:visible').click();
 
-    // cy.wait(400);
     // edit event info
     cy.get('.inputs .inputField.name input').type(`{selectall}${updatedTitle}`);
     cy.wait(400);
