@@ -197,7 +197,7 @@ export const metricsPerAccountQuery = gql`
     }
     spent: stats @include(if: $includeSpent) {
       id
-      current: totalAmountSpent(dateFrom: $dateFrom, dateTo: $dateTo, net: true) @include(if: $includeComparison) {
+      current: totalAmountSpent(dateFrom: $dateFrom, dateTo: $dateTo, net: true) {
         currency
         valueInCents
       }
@@ -209,7 +209,7 @@ export const metricsPerAccountQuery = gql`
     }
     received: stats @include(if: $includeReceived) {
       id
-      current: totalAmountReceived(dateFrom: $dateFrom, dateTo: $dateTo, net: true) @include(if: $includeReceived) {
+      current: totalAmountReceived(dateFrom: $dateFrom, dateTo: $dateTo, net: true) {
         currency
         valueInCents
       }

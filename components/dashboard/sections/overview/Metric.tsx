@@ -86,14 +86,14 @@ export function Metric({
   return (
     <Comp
       className={clsx(
-        'group flex flex-col gap-1  rounded-xl border transition-all',
+        'group flex flex-col gap-1 rounded-xl border transition-all',
         isButton &&
           'cursor-pointer text-left ring-ring ring-offset-2 hover:shadow-lg focus:outline-none focus-visible:ring-2',
         className,
       )}
       {...(isButton && { onClick: props.onClick })}
     >
-      <div className="space-y-1 p-3">
+      <div className="w-full space-y-1 p-3">
         <div>
           {label && (
             <div className="flex items-center gap-1">
