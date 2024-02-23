@@ -95,7 +95,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
               route={pageRoute}
               total={data?.expenses?.totalCount}
               limit={queryFilter.values.limit}
-              offset={queryFilter.values.limit}
+              offset={queryFilter.values.offset}
               ignoredQueryParams={ROUTE_PARAMS}
             />
           </div>
