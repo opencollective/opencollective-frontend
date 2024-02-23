@@ -14,7 +14,6 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 import { confirmContributionFieldsFragment } from '../../../ContributionConfirmationModal';
 import { Flex } from '../../../Grid';
-import CreatePendingOrderModal from '../../../host-dashboard/CreatePendingOrderModal';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import OrdersList from '../../../orders/OrdersList';
 import Pagination from '../../../Pagination';
@@ -24,6 +23,7 @@ import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
 import { DashboardSectionProps } from '../../types';
 
+import CreatePendingOrderModal from './CreatePendingOrderModal';
 import { filters, schema, toVariables } from './filters';
 
 const hostOrdersQuery = gql`

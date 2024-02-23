@@ -61,7 +61,7 @@ class ConfirmOrderPage extends React.Component {
         this.handleStripeError(orderConfirmed);
       } else {
         this.props.router.replace(
-          `/${orderConfirmed.order.fromAccount.slug}/admin/payment-methods?successType=payment`,
+          `/dashboard/${orderConfirmed.order.fromAccount.slug}/payment-methods?successType=payment`,
         );
       }
     } catch (e) {

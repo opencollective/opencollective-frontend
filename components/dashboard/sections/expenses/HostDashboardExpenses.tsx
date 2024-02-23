@@ -17,8 +17,6 @@ import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGra
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import ExpensesList from '../../../expenses/ExpensesList';
-import ExpensePipelineOverview from '../../../host-dashboard/expenses/ExpensePipelineOverview';
-import ScheduledExpensesBanner from '../../../host-dashboard/ScheduledExpensesBanner';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -31,6 +29,7 @@ import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { DashboardSectionProps } from '../../types';
 
+import ExpensePipelineOverview from './ExpensePipelineOverview';
 import {
   FilterMeta as CommonFilterMeta,
   filters as commonFilters,
@@ -38,6 +37,7 @@ import {
   toVariables as commonToVariables,
 } from './filters';
 import { hostDashboardExpensesQuery, hostDashboardMetadataQuery } from './queries';
+import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),

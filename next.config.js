@@ -235,18 +235,24 @@ const nextConfig = {
       // Legacy settings (/edit)
       {
         source: '/:slug/edit/:section*',
-        destination: '/:slug/admin/:section*',
+        destination: '/dashboard/:slug/:section*',
         permanent: false,
       },
       {
         source: '/:parentCollectiveSlug/events/:eventSlug/edit/:section*',
-        destination: '/:parentCollectiveSlug/events/:eventSlug/admin/:section*',
+        destination: '/dashboard/:eventSlug/:section*',
         permanent: false,
       },
       // Legacy host dashboard (/host/dashboard)
       {
         source: '/:slug/dashboard/:section*',
-        destination: '/:slug/admin/:section*',
+        destination: '/dashboard/:slug/:section*',
+        permanent: false,
+      },
+      // Legacy admin panel
+      {
+        source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',
+        destination: '/dashboard/:slug/:section*/:subpath*',
         permanent: false,
       },
       // Legacy subscriptions

@@ -134,7 +134,7 @@ class SuccessPage extends React.Component {
                       values={{
                         takeMeThere: (
                           <Link
-                            href={`/${collective.host.slug}/admin/fiscal-hosting`}
+                            href={`/dashboard/${collective.host.slug}/fiscal-hosting`}
                             data-cy="afc-success-host-settings-link"
                           >
                             <FormattedMessage id="takeMeThere" defaultMessage="Take me there" />
@@ -156,7 +156,7 @@ class SuccessPage extends React.Component {
                 />
               </StyledButton>
             </Link>
-            <Link href={`/${collective.slug}/admin/tiers`} data-cy="afc-success-host-tiers-link">
+            <Link href={`/dashboard/${collective.slug}/tiers`} data-cy="afc-success-host-tiers-link">
               <StyledButton buttonStyle="dark" mt={[2, 3]} mb={[3, 2]} ml={[null, 3]} px={3}>
                 <FormattedMessage id="createCustomTiers" defaultMessage="Create your own tiers" />
               </StyledButton>

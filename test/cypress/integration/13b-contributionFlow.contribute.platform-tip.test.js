@@ -98,7 +98,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
   it('Is not displayed when contribution amount is 0', () => {
     // Create a special tier to allow free contributions
     // TODO: Would be great to have that as a cypress command for that part, but there's no mutation to edit tiers on GQLV2 yet
-    cy.login({ redirect: `/${collective.slug}/admin/tiers` });
+    cy.login({ redirect: `/dashboard/${collective.slug}/tiers` });
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
     cy.get('[data-cy="minimumAmount"]input').type('{backspace}{backspace}{backspace}0');
     cy.getByDataCy('confirm-btn').click();

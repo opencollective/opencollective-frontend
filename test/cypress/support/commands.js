@@ -313,7 +313,7 @@ Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, colle
  * Add a stripe credit card on the collective designated by `collectiveSlug`.
  */
 Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
-  cy.login({ redirect: `/${collectiveSlug}/admin/payment-methods` });
+  cy.login({ redirect: `/dashboard/${collectiveSlug}/payment-methods` });
   cy.contains('button', 'Add a credit card').click();
   cy.wait(2000);
   fillStripeInput();

@@ -13,9 +13,6 @@ import AddAgreementModal from '../../../agreements/AddAgreementModal';
 import Avatar from '../../../Avatar';
 import ContactCollectiveModal from '../../../ContactCollectiveModal';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
-import AddFundsModal from '../../../host-dashboard/AddFundsModal';
-import FreezeAccountModal from '../../../host-dashboard/FreezeAccountModal';
-import UnhostAccountModal from '../../../host-dashboard/UnhostAccountModal';
 import { Badge } from '../../../ui/Badge';
 import {
   DropdownMenu,
@@ -25,6 +22,10 @@ import {
   DropdownMenuTrigger,
 } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
+
+import AddFundsModal from './AddFundsModal';
+import FreezeAccountModal from './FreezeAccountModal';
+import UnhostAccountModal from './UnhostAccountModal';
 
 export const cols: Record<string, ColumnDef<any, any>> = {
   collective: {

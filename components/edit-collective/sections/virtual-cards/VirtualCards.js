@@ -12,7 +12,6 @@ import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import Collapse from '../../../Collapse';
 import { Box, Flex, Grid } from '../../../Grid';
 import HTMLContent from '../../../HTMLContent';
-import { getI18nLink } from '../../../I18nFormatters';
 import Loading from '../../../Loading';
 import Pagination from '../../../Pagination';
 import { P } from '../../../Text';
@@ -110,7 +109,7 @@ const virtualCardsQuery = gql`
 
 const VIRTUAL_CARDS_PER_PAGE = 6;
 
-const VirtualCards = ({ accountSlug, isDashboard }) => {
+const VirtualCards = ({ accountSlug }) => {
   const router = useRouter();
   const routerQuery = omit(router.query, ['slug', 'section']);
   const offset = parseInt(routerQuery.offset) || 0;
@@ -132,7 +131,7 @@ const VirtualCards = ({ accountSlug, isDashboard }) => {
   if (loading) {
     return <Loading />;
   }
-  const pageRoute = isDashboard ? `/dashboard/${accountSlug}/virtual-cards` : `/${accountSlug}/admin/virtual-cards`;
+  const pageRoute = `/dashboard/${accountSlug}/virtual-cards`;
 
   const handleUpdateFilters = queryParams => {
     return router.push({
@@ -144,21 +143,6 @@ const VirtualCards = ({ accountSlug, isDashboard }) => {
   return (
     <Box>
       <Box>
-        {!isDashboard && (
-          <P>
-            <FormattedMessage
-              id="VirtualCards.Description"
-              defaultMessage="Use a virtual card to spend from your collective's budget. You can request multiple cards (review the host's policy to see how many). Your fiscal host will create the card for you and assign it a limit and a merchant. You will be notified by email once the card is assigned. <learnMoreLink>Learn more</learnMoreLink>"
-              values={{
-                learnMoreLink: getI18nLink({
-                  href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/virtual-cards',
-                  openInNewTabNoFollow: true,
-                }),
-              }}
-            />
-          </P>
-        )}
-
         {data?.account.host?.settings?.virtualcards?.policy && (
           <P mt={3}>
             <Collapse

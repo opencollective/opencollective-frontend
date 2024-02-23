@@ -427,7 +427,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
         return;
       }
 
-      const returnUrl = new URL(`${window.location.origin}/${props.accountSlug}/admin/outgoing-contributions`);
+      const returnUrl = new URL(`${window.location.origin}/dashboard/${props.accountSlug}/outgoing-contributions`);
       returnUrl.searchParams.set('orderId', props.order.id);
       returnUrl.searchParams.set('stripeAccount', option.setupIntent.stripeAccount);
       returnUrl.searchParams.set('action', 'editPaymentMethod');

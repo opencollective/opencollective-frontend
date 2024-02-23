@@ -20,9 +20,6 @@ import { i18nCustomApplicationFormLabel } from '../../../../lib/i18n/custom-appl
 import Avatar from '../../../Avatar';
 import { Drawer, DrawerActions, DrawerHeader } from '../../../Drawer';
 import { Flex } from '../../../Grid';
-import AcceptRejectButtons from '../../../host-dashboard/AcceptRejectButtons';
-import ApplicationMessageModal from '../../../host-dashboard/ApplicationMessageModal';
-import ValidatedRepositoryInfo from '../../../host-dashboard/ValidatedRepositoryInfo';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import { APPLICATION_DATA_AMOUNT_FIELDS } from '../../../ocf-host-application/ApplicationForm';
@@ -33,7 +30,10 @@ import StyledTooltip from '../../../StyledTooltip';
 import { InfoList, InfoListItem } from '../../../ui/InfoList';
 import { type Toast, useToast } from '../../../ui/useToast';
 
+import AcceptRejectButtons from './AcceptRejectButtons';
+import ApplicationMessageModal from './ApplicationMessageModal';
 import { hostApplicationsMetadataQuery, hostApplicationsQuery, processApplicationMutation } from './queries';
+import ValidatedRepositoryInfo from './ValidatedRepositoryInfo';
 
 const msg = defineMessages({
   approved: {
