@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Lock } from '@styled-icons/feather/Lock';
 import { FormattedMessage } from 'react-intl';
@@ -15,8 +15,10 @@ import StyledTextarea from '../../../StyledTextarea';
 import { P, Span } from '../../../Text';
 
 const ApplicationMessageModal = ({ collective, onClose, onConfirm, ...modalProps }) => {
-  const [message, setMessage] = useState('');
+  const [message, _setMessage] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
+
+  const setMessage = useCallback(_setMessage, [_setMessage]);
 
   return (
     <StyledModal onClose={onClose} width="576px" {...modalProps} trapFocus>
