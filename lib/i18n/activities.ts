@@ -3,7 +3,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl';
 import { ActivityTypes } from '../constants/activities';
 
 interface TimelineMessageDescriptor extends MessageDescriptor {
-  avatar?: 'fromAccount' | 'account'; // Used to determine which avatar to display (default is Individual)
+  avatar?: 'fromAccount' | 'account' | 'individual'; // Used to determine which avatar to display (default is Individual)
   content?: 'update' | 'conversation'; // Used to determine which content card to display
 }
 
