@@ -15,6 +15,7 @@ import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import { Collapsible, CollapsibleContent } from './ui/Collapsible';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
 import Avatar from './Avatar';
+import FollowButton from './FollowButton';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import Link from './Link';
 import StyledSpinner from './StyledSpinner';
@@ -79,6 +80,7 @@ type AccountHoverCardProps = {
   };
   infoItems?: InfoItemProps[];
   hoverCardContentProps?: React.ComponentProps<typeof Content>;
+  displayFollowButton?: boolean;
 };
 
 const userContextualMembershipsQuery = gql`
@@ -260,6 +262,7 @@ export const AccountHoverCard = ({
   account,
   includeAdminMembership: { accountSlug, hostSlug } = {},
   hoverCardContentProps,
+  displayFollowButton,
 }: AccountHoverCardProps) => {
   const [open, setOpen] = React.useState(false);
 
@@ -314,20 +317,19 @@ export const AccountHoverCard = ({
         {trigger}
       </HoverCardTrigger>
       <HoverCardContent
-        className="w-80 cursor-default text-left text-sm"
+        className="w-80 cursor-default text-left text-sm font-normal"
         onClick={e => e.stopPropagation()} // Prevent click propagation when used inside other elements such as `HostedAccountFilter`
         {...hoverCardContentProps}
       >
         <div className="relative flex flex-col gap-4 text-sm">
-          <div
-            className={clsx(
-              'flex  gap-3 overflow-hidden break-words',
-              isIndividual ? 'flex-col items-start' : 'items-center',
-            )}
-          >
-            <Link href={getCollectivePageRoute(account)}>
-              <Avatar collective={account} radius={isIndividual ? 64 : 40} />
-            </Link>
+          <div className="flex flex-col gap-3 overflow-hidden break-words">
+            <div className="flex justify-between">
+              <Link href={getCollectivePageRoute(account)}>
+                <Avatar collective={account} radius={64} />
+              </Link>
+
+              {displayFollowButton && <FollowButton account={account} isHoverCard />}
+            </div>
 
             <div className="overflow-hidden">
               <Link href={getCollectivePageRoute(account)}>

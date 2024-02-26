@@ -1,30 +1,25 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
-import clsx from 'clsx';
-import { Minus, Plus } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { Account, MemberRole } from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { ButtonStyle } from '../lib/theme/variants/button';
+import { cn } from '../lib/utils';
 
+import { Button } from './ui/Button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/DropdownMenu';
 import { useToast } from './ui/useToast';
-import StyledButton, { StyledButtonProps } from './StyledButton';
-import StyledSpinner from './StyledSpinner';
 
 type FollowButtonProps = {
   className?: string;
   account: Pick<Account, 'slug'>;
-  buttonProps?: StyledButtonProps;
-  followLabel?: React.ReactNode;
-  unfollowLabel?: React.ReactNode;
-  followButtonStyle?: ButtonStyle;
-  unfollowButtonStyle?: ButtonStyle;
+  isHoverCard?: boolean;
 };
 
-export default function FollowButton(props: FollowButtonProps) {
+export default function FollowButton({ className, account, isHoverCard }: FollowButtonProps) {
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -34,8 +29,8 @@ export default function FollowButton(props: FollowButtonProps) {
     if (!LoggedInUser) {
       return false;
     }
-    return LoggedInUser.hasRole(MemberRole.FOLLOWER, props.account);
-  }, [LoggedInUser, props.account]);
+    return LoggedInUser.hasRole(MemberRole.FOLLOWER, account);
+  }, [LoggedInUser, account]);
 
   const [followAccount] = useMutation(
     gql`
@@ -50,7 +45,7 @@ export default function FollowButton(props: FollowButtonProps) {
     {
       context: API_V2_CONTEXT,
       variables: {
-        accountSlug: props.account.slug,
+        accountSlug: account.slug,
       },
     },
   );
@@ -68,7 +63,7 @@ export default function FollowButton(props: FollowButtonProps) {
     {
       context: API_V2_CONTEXT,
       variables: {
-        accountSlug: props.account.slug,
+        accountSlug: account.slug,
       },
     },
   );
@@ -87,39 +82,56 @@ export default function FollowButton(props: FollowButtonProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [isFollowingAccount, props.account, intl]);
+  }, [isFollowingAccount, account, intl]);
 
-  const UnfollowLabel = props.unfollowLabel || (
-    <React.Fragment>
-      <FormattedMessage id="actions.unfollow" defaultMessage="Unfollow" />
-      <Minus className="ml-[0.2rem]" size="1rem" />
-    </React.Fragment>
-  );
-
-  const FollowLabel = props.followLabel || (
-    <React.Fragment>
-      <FormattedMessage id="actions.follow" defaultMessage="Follow" />
-      <Plus className="ml-[0.2rem]" size="1rem" />
-    </React.Fragment>
-  );
-
-  const followButtonStyle = props.followButtonStyle || 'standard';
-  const unfollowButtonStyle = props.unfollowButtonStyle || 'dangerSecondary';
-
-  if (!LoggedInUser) {
+  if (!LoggedInUser || LoggedInUser.collective.slug === account.slug) {
     return null;
   }
 
+  // Use a dropdown to provide the unfollow action, unless it is in a hover card where dropdowns do not work (and hover cards are not available on mobile)
+  if (isFollowingAccount && !isHoverCard) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button size="xs" variant="outline" loading={isLoading} className={cn('gap-0.5', className)}>
+            <FormattedMessage id="Following" defaultMessage="Following" />
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuItem onClick={onButtonClick}>
+            <FormattedMessage id="actions.unfollow" defaultMessage="Unfollow" />
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
   return (
-    <StyledButton
-      {...props.buttonProps}
-      className={clsx('space-between flex h-7 min-w-[100px] items-center', props.className)}
+    <Button
+      size="xs"
+      variant="outline"
       disabled={isLoading}
-      buttonStyle={isFollowingAccount ? unfollowButtonStyle : followButtonStyle}
       onClick={onButtonClick}
+      loading={isLoading}
+      className={cn(
+        'group',
+        isFollowingAccount && isHoverCard && 'hover:border-red-600 hover:bg-transparent hover:text-red-600',
+        className,
+      )}
     >
-      {isFollowingAccount ? UnfollowLabel : FollowLabel}
-      {isLoading && <StyledSpinner size="0.9em" />}
-    </StyledButton>
+      {isFollowingAccount && isHoverCard ? (
+        <React.Fragment>
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <FormattedMessage id="actions.unfollow" defaultMessage="Unfollow" />
+          </div>
+          <span className="opacity-100 group-hover:opacity-0">
+            <FormattedMessage id="Following" defaultMessage="Following" />
+          </span>
+        </React.Fragment>
+      ) : (
+        <FormattedMessage id="actions.follow" defaultMessage="Follow" />
+      )}
+    </Button>
   );
 }
